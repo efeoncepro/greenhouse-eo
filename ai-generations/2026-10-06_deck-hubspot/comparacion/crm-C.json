@@ -1,0 +1,26 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "hero",
+  "voice": {
+    "eyebrow": "El nuevo Smart CRM",
+    "question": "¿Sigo llenando el CRM?",
+    "answer": [
+      "Ya no"
+    ]
+  },
+  "body": "El CRM de HubSpot se llena con llamadas, emails y reuniones. Lo dejamos configurado y confiable.",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-crm-C.png",
+    "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara junto a un registro de cliente de luz que se llena solo con tres haces que vienen de una llamada, un email y una reunión"
+  },
+  "line": "growth",
+  "use": "brochure"
+}

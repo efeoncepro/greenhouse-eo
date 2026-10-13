@@ -1,0 +1,4890 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:17:13.310Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.related.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/related_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "como ahorrar dinero",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.048,
+    "estimateStatus": "available",
+    "maxUsd": 0.048,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live/",
+      "sourceModifiedAt": "2026-08-14T14:55:46.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 2710,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 2710,
+        "costUsd": 0.01656,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061917-1987-0387-0000-c42716486728",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01656,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01656,
+    "tasks": [
+      {
+        "id": "10061917-1987-0387-0000-c42716486728",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.1451 sec.",
+        "cost": 0.01656,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "related_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "related_keywords",
+          "se_type": "google",
+          "keyword": "como ahorrar dinero",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": true,
+          "include_serp_info": true,
+          "depth": 3,
+          "limit": 300,
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "como ahorrar dinero",
+            "seed_keyword_data": {
+              "se_type": "google",
+              "keyword": "como ahorrar dinero",
+              "location_code": 2604,
+              "language_code": "es",
+              "keyword_info": {
+                "se_type": "google",
+                "last_updated_time": "2026-09-16 20:21:11 +00:00",
+                "competition": 0.15,
+                "competition_level": "LOW",
+                "cpc": 1.12,
+                "search_volume": 590,
+                "low_top_of_page_bid": 0.04,
+                "high_top_of_page_bid": 0.79,
+                "categories": [
+                  10012,
+                  10092,
+                  10524
+                ],
+                "monthly_searches": [
+                  {
+                    "year": 2026,
+                    "month": 8,
+                    "search_volume": 390
+                  },
+                  {
+                    "year": 2026,
+                    "month": 7,
+                    "search_volume": 390
+                  },
+                  {
+                    "year": 2026,
+                    "month": 6,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2026,
+                    "month": 5,
+                    "search_volume": 480
+                  },
+                  {
+                    "year": 2026,
+                    "month": 4,
+                    "search_volume": 480
+                  },
+                  {
+                    "year": 2026,
+                    "month": 3,
+                    "search_volume": 480
+                  },
+                  {
+                    "year": 2026,
+                    "month": 2,
+                    "search_volume": 480
+                  },
+                  {
+                    "year": 2026,
+                    "month": 1,
+                    "search_volume": 720
+                  },
+                  {
+                    "year": 2025,
+                    "month": 12,
+                    "search_volume": 590
+                  },
+                  {
+                    "year": 2025,
+                    "month": 11,
+                    "search_volume": 720
+                  },
+                  {
+                    "year": 2025,
+                    "month": 10,
+                    "search_volume": 720
+                  },
+                  {
+                    "year": 2025,
+                    "month": 9,
+                    "search_volume": 720
+                  }
+                ],
+                "search_volume_trend": {
+                  "monthly": 0,
+                  "quarterly": -34,
+                  "yearly": -46
+                }
+              },
+              "keyword_info_normalized_with_bing": null,
+              "keyword_info_normalized_with_clickstream": null,
+              "clickstream_keyword_info": null,
+              "keyword_properties": {
+                "se_type": "google",
+                "core_keyword": null,
+                "synonym_clustering_algorithm": "text_processing",
+                "keyword_difficulty": 0,
+                "detected_language": "es",
+                "is_another_language": false
+              },
+              "serp_info": {
+                "se_type": "google",
+                "check_url": "https://www.google.com/search?q=como%20ahorrar%20dinero&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                "serp_item_types": [
+                  "ai_overview",
+                  "video",
+                  "people_also_ask",
+                  "organic",
+                  "short_videos",
+                  "related_searches"
+                ],
+                "se_results_count": 106,
+                "last_updated_time": "2026-07-26 12:17:31 +00:00",
+                "previous_updated_time": "2026-04-23 02:07:10 +00:00"
+              },
+              "avg_backlinks_info": {
+                "se_type": "google",
+                "backlinks": 31.1,
+                "dofollow": 14.1,
+                "referring_pages": 31.1,
+                "referring_domains": 28,
+                "referring_main_domains": 13.4,
+                "rank": 63.5,
+                "main_domain_rank": 373.1,
+                "last_updated_time": "2026-07-26 12:17:33 +00:00"
+              },
+              "search_intent_info": {
+                "se_type": "google",
+                "main_intent": "informational",
+                "foreign_intent": null,
+                "last_updated_time": "2026-04-29 21:14:04 +00:00"
+              }
+            },
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 38,
+            "items_count": 38,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 20:21:11 +00:00",
+                    "competition": 0.15,
+                    "competition_level": "LOW",
+                    "cpc": 1.12,
+                    "search_volume": 590,
+                    "low_top_of_page_bid": 0.04,
+                    "high_top_of_page_bid": 0.79,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 720
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -34,
+                      "yearly": -46
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=como%20ahorrar%20dinero&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "video",
+                      "people_also_ask",
+                      "organic",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 106,
+                    "last_updated_time": "2026-07-26 12:17:31 +00:00",
+                    "previous_updated_time": "2026-04-23 02:07:10 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 31.1,
+                    "dofollow": 14.1,
+                    "referring_pages": 31.1,
+                    "referring_domains": 28,
+                    "referring_main_domains": 13.4,
+                    "rank": 63.5,
+                    "main_domain_rank": 373.1,
+                    "last_updated_time": "2026-07-26 12:17:33 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 21:14:04 +00:00"
+                  }
+                },
+                "depth": 0,
+                "related_keywords": [
+                  "como ahorrar dinero si gano poco",
+                  "tabla para ahorrar dinero",
+                  "10 formas de ahorrar dinero",
+                  "como ahorrar dinero en casa",
+                  "como ahorrar dinero en el banco",
+                  "como ahorrar dinero en un mes",
+                  "como ahorrar dinero en un año",
+                  "como ahorrar dinero siendo adolescente"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "tabla para ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 14:27:49 +00:00",
+                    "competition": 0.31,
+                    "competition_level": "LOW",
+                    "cpc": 0.14,
+                    "search_volume": 140,
+                    "low_top_of_page_bid": 0.17,
+                    "high_top_of_page_bid": 0.78,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 170
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 57,
+                      "quarterly": 22,
+                      "yearly": -48
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=tabla%20para%20ahorrar%20dinero&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "images",
+                      "people_also_ask",
+                      "organic",
+                      "ai_overview",
+                      "related_searches"
+                    ],
+                    "se_results_count": 127,
+                    "last_updated_time": "2026-10-04 10:34:01 +00:00",
+                    "previous_updated_time": "2026-06-13 06:19:22 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 21:33:26 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": [
+                  "plantilla de ahorro 10 millones pdf gratis",
+                  "plantillas para ahorrar dinero mensual",
+                  "plantillas para ahorrar dinero 10 millones",
+                  "plantilla de ahorro 20 millones en 1 año",
+                  "plantillas de ahorro pdf gratis",
+                  "plantillas para ahorrar dinero excel gratis",
+                  "plantillas para ahorrar dinero 5 millones",
+                  "plantillas de ahorro programado para imprimir"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantillas de ahorro programado para imprimir",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 00:22:20 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 140,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10307
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 140
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 57,
+                      "quarterly": 57,
+                      "yearly": -21
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 18:43:27 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero si gano poco",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 17:45:40 +00:00",
+                    "competition": 0.14,
+                    "competition_level": "LOW",
+                    "cpc": 0.37,
+                    "search_volume": 70,
+                    "low_top_of_page_bid": 0.04,
+                    "high_top_of_page_bid": 0.71,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 70
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -29,
+                      "quarterly": -29,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20ahorrar%20dinero%20si%20gano%20poco&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&glp=1&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "related_searches"
+                    ],
+                    "se_results_count": 499000,
+                    "last_updated_time": "2024-06-17 18:57:55 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 19.5,
+                    "dofollow": 17.2,
+                    "referring_pages": 19.1,
+                    "referring_domains": 11.4,
+                    "referring_main_domains": 10.9,
+                    "rank": 53.4,
+                    "main_domain_rank": 543.9,
+                    "last_updated_time": "2024-06-17 18:57:57 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-30 05:48:39 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": [
+                  "tabla para ahorrar dinero",
+                  "31 maneras de ahorrar dinero todos los días del mes",
+                  "trucos para ahorrar dinero día a día",
+                  "como ahorrar dinero en casa sin gastarlo",
+                  "como ahorrar dinero en casa",
+                  "como ahorrar dinero en un mes",
+                  "como ahorrar dinero en un año",
+                  "como ahorrar dinero en bcp"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "10 formas de ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 17:33:19 +00:00",
+                    "competition": 0.11,
+                    "competition_level": "LOW",
+                    "cpc": 0.75,
+                    "search_volume": 70,
+                    "low_top_of_page_bid": 0.48,
+                    "high_top_of_page_bid": 2.23,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 140
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -25,
+                      "quarterly": -40,
+                      "yearly": -73
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=10%20formas%20de%20ahorrar%20dinero&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&glp=1&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "images",
+                      "related_searches"
+                    ],
+                    "se_results_count": null,
+                    "last_updated_time": "2024-04-16 15:56:34 +00:00",
+                    "previous_updated_time": "2024-02-16 00:14:42 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 16.6,
+                    "dofollow": 14,
+                    "referring_pages": 16.2,
+                    "referring_domains": 11.7,
+                    "referring_main_domains": 11.2,
+                    "rank": 55.4,
+                    "main_domain_rank": 374.9,
+                    "last_updated_time": "2024-04-16 15:56:36 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 01:48:05 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": [
+                  "tabla para ahorrar dinero",
+                  "100 formas de ahorrar dinero",
+                  "10 formas de ahorrar dinero en casa",
+                  "31 maneras de ahorrar dinero todos los días del mes",
+                  "5 formas de ahorrar dinero",
+                  "trucos para ahorrar dinero día a día",
+                  "ejemplos de ahorro",
+                  "como ahorrar dinero si gano poco"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "ejemplos de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 13:59:36 +00:00",
+                    "competition": 0.01,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 50,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 70
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -33,
+                      "quarterly": -86,
+                      "yearly": -71
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "ejemplos de ahorrar",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 56,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=ejemplos%20de%20ahorro&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "featured_snippet",
+                      "related_searches"
+                    ],
+                    "se_results_count": 42600000,
+                    "last_updated_time": "2022-05-19 15:00:48 +00:00",
+                    "previous_updated_time": "2022-02-22 20:17:39 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 15:55:05 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": [
+                  "4 ejemplos de ahorro",
+                  "10 ejemplos de ahorro",
+                  "ejemplos de ahorro en la vida cotidiana",
+                  "ejemplos de ahorro familiar",
+                  "5 ejemplos de ahorro",
+                  "ejemplos de ahorro personal",
+                  "ejemplos de ahorro brainly",
+                  "100 formas de ahorrar dinero"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "donde puedo ahorrar mi dinero y ganar intereses",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 22:57:06 +00:00",
+                    "competition": 0.53,
+                    "competition_level": "MEDIUM",
+                    "cpc": 2.38,
+                    "search_volume": 50,
+                    "low_top_of_page_bid": 0.21,
+                    "high_top_of_page_bid": 1.63,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 90
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -75,
+                      "yearly": -86
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 14:47:45 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en casa",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 22:18:40 +00:00",
+                    "competition": 0.29,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 30,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -67,
+                      "quarterly": 0,
+                      "yearly": -67
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "como ahorrar en casa dinero",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 55,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20ahorrar%20dinero%20en%20casa&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "images",
+                      "related_searches"
+                    ],
+                    "se_results_count": 34000000,
+                    "last_updated_time": "2022-05-14 17:38:30 +00:00",
+                    "previous_updated_time": "2022-02-15 22:13:16 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-24 16:37:54 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": [
+                  "como ahorrar dinero si gano poco",
+                  "como ahorrar dinero en casa sin gastarlo",
+                  "trucos para ahorrar dinero día a día",
+                  "tabla para ahorrar dinero",
+                  "100 formas de ahorrar dinero",
+                  "10 tips para ahorrar dinero",
+                  "31 maneras de ahorrar dinero todos los días del mes",
+                  "como ahorrar dinero en una alcancía"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "10 formas de ahorrar dinero en casa",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 02:47:52 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 30,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 30
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -50,
+                      "yearly": -80
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-24 16:58:50 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "trucos para ahorrar dinero día a día",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 03:01:16 +00:00",
+                    "competition": 0.2,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 40
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": -80
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "trucos para ahorrar dinero dia a dia",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 53,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=trucos%20para%20ahorrar%20dinero%20d%C3%ADa%20a%20d%C3%ADa&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 3400000,
+                    "last_updated_time": "2021-06-06 12:50:08 +00:00",
+                    "previous_updated_time": "2021-05-07 12:50:07 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 22:51:37 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en bcp",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 04:11:44 +00:00",
+                    "competition": 0.29,
+                    "competition_level": "LOW",
+                    "cpc": 0.56,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 30
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": -75
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 18:31:36 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantilla de ahorro 10 millones pdf gratis",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 18:30:17 +00:00",
+                    "competition": 0.01,
+                    "competition_level": "LOW",
+                    "cpc": 0.97,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 18:23:30 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantillas de ahorro pdf gratis",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 01:48:33 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10019,
+                      10168,
+                      10537,
+                      10885,
+                      12209
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 100,
+                      "quarterly": 100,
+                      "yearly": -50
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 19:42:08 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "estrategias para ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 03:11:09 +00:00",
+                    "competition": 0.15,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 30
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 52,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=estrategias%20para%20ahorrar%20dinero&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 6890000,
+                    "last_updated_time": "2022-02-22 17:11:21 +00:00",
+                    "previous_updated_time": "2021-12-06 14:17:45 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 19:25:59 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": [
+                  "estrategias para ahorrar dinero para niños",
+                  "estrategias para ahorrar dinero en familia",
+                  "100 formas de ahorrar dinero",
+                  "tabla para ahorrar dinero",
+                  "5 estrategias para ahorrar",
+                  "estrategias para ahorrar dinero en casa",
+                  "trucos para ahorrar dinero día a día",
+                  "métodos de ahorro de dinero para jóvenes"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "10 ejemplos de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 00:09:39 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 30
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 30
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -67,
+                      "yearly": -50
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 20:02:57 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "ejemplos de ahorro familiar",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 20:16:35 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 40
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 40
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": -50
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 52,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=ejemplos%20de%20ahorro%20familiar&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "images",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 44800000,
+                    "last_updated_time": "2021-10-24 10:02:24 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 12:59:52 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": [
+                  "2 ejemplos de ahorro familiar",
+                  "plan de ahorro familiar ejemplos",
+                  "ejemplos de ahorro financiero",
+                  "5 formas de ahorrar en familia",
+                  "como ahorrar dinero si gano poco",
+                  "4 ejemplos de ahorro",
+                  "100 formas de ahorrar dinero",
+                  "como ahorrar en casa"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en el banco",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 11:40:05 +00:00",
+                    "competition": 0.34,
+                    "competition_level": "MEDIUM",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": 0.24,
+                    "high_top_of_page_bid": 1.38,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -50,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "como ahorrar dinero en banco",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 52,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20ahorrar%20dinero%20en%20el%20banco&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 10300000,
+                    "last_updated_time": "2022-06-18 15:16:52 +00:00",
+                    "previous_updated_time": "2021-06-10 15:33:58 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 08:37:54 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": [
+                  "como ahorrar dinero si gano poco",
+                  "donde puedo ahorrar mi dinero y ganar intereses",
+                  "10 formas de ahorrar dinero",
+                  "5 formas de ahorrar dinero",
+                  "como ahorrar dinero en casa",
+                  "100 formas de ahorrar dinero",
+                  "tabla para ahorrar dinero",
+                  "como ahorrar dinero en un año"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en un mes",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 18:38:49 +00:00",
+                    "competition": 0.11,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cómo ahorrar dinero en un mes",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 53,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20ahorrar%20dinero%20en%20un%20mes&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "images",
+                      "related_searches"
+                    ],
+                    "se_results_count": 29600000,
+                    "last_updated_time": "2021-05-29 16:30:15 +00:00",
+                    "previous_updated_time": "2021-02-24 07:24:50 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 06:26:13 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en un año",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 18:03:01 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": null,
+                      "quarterly": 0,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 05:39:00 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "31 maneras de ahorrar dinero todos los días del mes",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 05:56:24 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 20
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 30
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 09:12:38 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en casa sin gastarlo",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 23:24:08 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -100,
+                      "yearly": -100
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 03:04:35 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantillas para ahorrar dinero mensual",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-10-04 13:46:54 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-10-04 13:47:34 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantilla de ahorro 20 millones en 1 año",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 07:43:54 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10276,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -100,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": [
+                      "informational"
+                    ],
+                    "last_updated_time": "2026-04-29 19:52:13 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantillas para ahorrar dinero excel gratis",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-10-04 13:46:51 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-10-04 13:47:34 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "100 formas de ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 23:35:39 +00:00",
+                    "competition": 0.07,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10276,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 56,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=100%20formas%20de%20ahorrar%20dinero&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "images",
+                      "related_searches"
+                    ],
+                    "se_results_count": 6390000,
+                    "last_updated_time": "2022-02-27 18:29:16 +00:00",
+                    "previous_updated_time": "2021-12-06 22:38:00 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 00:35:12 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": [
+                  "5 formas de ahorrar dinero",
+                  "100 formas de ahorrar dinero para niños",
+                  "tabla para ahorrar dinero",
+                  "10 formas de ahorrar dinero",
+                  "31 maneras de ahorrar dinero todos los días del mes",
+                  "como aprender a ahorrar dinero si gano poco",
+                  "100 formas de ahorrar dinero en casa",
+                  "estrategias para ahorrar dinero"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "5 formas de ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 11:29:58 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 13:02:37 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "10 tips para ahorrar dinero",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 14:58:38 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -100,
+                      "yearly": -100
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 09:05:57 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero en una alcancía",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 02:38:39 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -100,
+                      "quarterly": 0,
+                      "yearly": -100
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 52,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20ahorrar%20dinero%20en%20una%20alcanc%C3%ADa&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "video",
+                      "organic",
+                      "images",
+                      "related_searches"
+                    ],
+                    "se_results_count": 351000,
+                    "last_updated_time": "2021-06-22 08:04:40 +00:00",
+                    "previous_updated_time": "2021-02-08 03:13:27 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 07:52:30 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como aprender a ahorrar dinero si gano poco",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 05:20:23 +00:00",
+                    "competition": 0.38,
+                    "competition_level": "MEDIUM",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": 0.29,
+                    "high_top_of_page_bid": 1.15,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": null
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 55,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20aprender%20a%20ahorrar%20dinero%20si%20gano%20poco&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 109000,
+                    "last_updated_time": "2022-06-07 08:22:41 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-30 01:55:50 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": [
+                  "tabla para ahorrar dinero",
+                  "31 maneras de ahorrar dinero todos los días del mes",
+                  "100 formas de ahorrar dinero",
+                  "como ahorrar dinero en casa sin gastarlo",
+                  "10 tips para ahorrar dinero",
+                  "como ahorrar dinero en un mes",
+                  "métodos de ahorro de dinero para jóvenes",
+                  "como ahorrar dinero en casa"
+                ]
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "4 ejemplos de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 08:36:44 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -100,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 08:54:55 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "5 ejemplos de ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 10:22:10 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -100,
+                      "quarterly": -100,
+                      "yearly": -100
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-24 19:39:49 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "ejemplos de ahorro personal",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 00:41:34 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 10,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 10
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 10
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": null,
+                      "quarterly": null,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 18:29:20 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "como ahorrar dinero siendo adolescente",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-06-13 00:23:38 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": null,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 6,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com.pe/search?q=como%20ahorrar%20dinero%20siendo%20adolescente&num=100&hl=es&gl=PE&gws_rd=cr&ie=UTF-8&oe=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "featured_snippet",
+                      "people_also_ask",
+                      "organic",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 8210000,
+                    "last_updated_time": "2021-06-29 12:46:25 +00:00",
+                    "previous_updated_time": "2021-05-30 12:46:13 +00:00"
+                  },
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 16:34:31 +00:00"
+                  }
+                },
+                "depth": 1,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantillas para ahorrar dinero 10 millones",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-04 07:35:42 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": null,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 8,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-09-04 07:36:49 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "plantillas para ahorrar dinero 5 millones",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-04 01:08:19 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": null,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 8,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-09-04 01:08:33 +00:00"
+                  }
+                },
+                "depth": 2,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "100 formas de ahorrar dinero para niños",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-06-17 07:34:15 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": null,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10004,
+                      10012,
+                      10092,
+                      10276,
+                      10524,
+                      13411,
+                      13761
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 6,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 09:44:00 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "ejemplos de ahorro en la vida cotidiana",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-06-13 09:12:34 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": null,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 6,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 16:40:01 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "ejemplos de ahorro brainly",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-06-17 01:52:38 +00:00",
+                    "competition": null,
+                    "competition_level": null,
+                    "cpc": null,
+                    "search_volume": null,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10012,
+                      10092,
+                      10524
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 8,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 7,
+                        "search_volume": 0
+                      },
+                      {
+                        "year": 2025,
+                        "month": 6,
+                        "search_volume": 0
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": null,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": null,
+                  "avg_backlinks_info": null,
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 16:10:02 +00:00"
+                  }
+                },
+                "depth": 3,
+                "related_keywords": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

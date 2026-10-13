@@ -109,6 +109,33 @@ registrar qué versión produjo cada cohorte cuando el portal no ofrezca esa tra
 - `Send automatically`: el agente envía dentro de los guardrails configurados. Activarlo sólo después de
   evidencia estable de calidad, exclusiones correctas, remitentes habilitados y métricas aceptables.
 
+### Calibración de voz y CTA — práctica observada 2026-10-07
+
+Para instrucciones avanzadas de outreach, usar el
+[manual de calibración](../../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md).
+Contiene el snapshot personal aprobado de Julio, su alcance y la evidencia; no es una plantilla para otros
+remitentes ni clientes. Leer de cinco a diez correos propios y distinguir prospección de relación existente;
+no copiar el corpus privado ni confundir calibración por instrucciones con fine-tuning.
+
+Lecciones verificadas en portal 48713323 / Starter Play 101042425:
+
+- El ejemplo con contador 0/10000 era placeholder. Límite observado: 10.000; versión previa: 7.550; con enlace web: 7.969 caracteres.
+  Revalidar límite y estado real en cada portal, sin sustituir valor por placeholder.
+- Guardar en el panel dejó un cambio pendiente: Revisar cambios → Aprobar 1 cambio → recargar → leer
+  y comparar íntegramente. Reconciliar cambios ajenos antes de aprobar. Botón deshabilitado no prueba persistencia.
+- Empatía y CTA son independientes. Mantener el enlace real configurado y la opción de responder por correo
+  como dos vías de una invitación; no interpretar «sin presión» como quitar la agenda.
+- Investigar para encontrar un motivo, sin recitar cargo o empresa. Una situación concreta, una capacidad
+  pertinente y una invitación; evitar dudas acumuladas, catálogo y diagnósticos derivados de una noticia.
+- Delta de Julio: primera mención de Efeonce en el primer correo enlazada a https://efeoncepro.com/
+  como respaldo contextual; no sustituye agenda ni añade otro CTA. No repetir obligatoriamente en seguimientos
+  ni explicar la ausencia del brochure. Guardado de 7.969 caracteres verificado; ambos enlaces en nuevo borrador pendientes.
+- Validar URL y duración antes de prometer minutos, y sustentar capacidades/casos. Enlace visible no prueba destino.
+- Guardado, borrador, envío y resultados son evidencias distintas. Generar un borrador nuevo y revisar
+  seguimientos tras el cambio; la versión vigente de 7.969 sigue pendiente de QA de nueva generación.
+- Preservar revisión humana, audiencia, cadencia y autonomía salvo autorización específica. Ajustar voz
+  no autoriza enrollment ni Iniciar comunicación.
+
 ## 4. Enrollment y sourcing
 
 La superficie general permite enrollment manual, rulesets, workflows, Target Accounts y extensiones de correo.

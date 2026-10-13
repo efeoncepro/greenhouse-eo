@@ -1,0 +1,1878 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:16:04.741Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.ranked.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/ranked_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.072,
+    "estimateStatus": "available",
+    "maxUsd": 0.072,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "sourceModifiedAt": "2026-08-05T15:15:09.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 2609,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 2609,
+        "costUsd": 0.01308,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061916-1987-0381-0000-2807795b1a2e",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01308,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01308,
+    "tasks": [
+      {
+        "id": "10061916-1987-0381-0000-2807795b1a2e",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.2617 sec.",
+        "cost": 0.01308,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "ranked_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "ranked_keywords",
+          "se_type": "google",
+          "target": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+          "location_code": 2604,
+          "language_code": "es",
+          "limit": 500,
+          "offset": 0,
+          "item_types": [
+            "organic"
+          ],
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "target": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 9,
+            "items_count": 9,
+            "metrics": {
+              "organic": {
+                "pos_1": 8,
+                "pos_2_3": 0,
+                "pos_4_10": 0,
+                "pos_11_20": 0,
+                "pos_21_30": 0,
+                "pos_31_40": 0,
+                "pos_41_50": 0,
+                "pos_51_60": 0,
+                "pos_61_70": 1,
+                "pos_71_80": 0,
+                "pos_81_90": 0,
+                "pos_91_100": 0,
+                "etv": 3678.94597864151,
+                "count": 9,
+                "estimated_paid_traffic_cost": 2362.3536224365234,
+                "is_new": 2,
+                "is_up": 1,
+                "is_down": 0,
+                "is_lost": 0,
+                "clickstream_etv": null,
+                "clickstream_gender_distribution": null,
+                "clickstream_age_distribution": null
+              },
+              "paid": null,
+              "featured_snippet": null,
+              "local_pack": null,
+              "ai_overview_reference": null
+            },
+            "metrics_absolute": null,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta digital bbva",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 16:53:57 +00:00",
+                    "competition": 0.38999998569488525,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.44999998807907104,
+                    "search_volume": 6600,
+                    "low_top_of_page_bid": 0.5600000023841858,
+                    "high_top_of_page_bid": 20.850000381469727,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 5400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 5400
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 6600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 4400
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 22
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 2,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-07-11 04:18:23 +00:00",
+                    "previous_updated_time": "2026-04-15 00:38:24 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 53.20000076293945,
+                    "dofollow": 20.899999618530273,
+                    "referring_pages": 51.29999923706055,
+                    "referring_domains": 42,
+                    "referring_main_domains": 27.5,
+                    "rank": 70.0999984741211,
+                    "main_domain_rank": 439.29998779296875,
+                    "last_updated_time": "2026-07-11 04:18:24 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 18:25:32 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta Digital BBVA desde la App en minutos. Costo de mantenimiento 0 soles, 100% online y sin pisar el banco. ¡Descarga la App!",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta Digital BBVA desde la App en minutos"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 2006.4000244140625,
+                    "estimated_paid_traffic_cost": 902.8800048828125,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 2,
+                      "is_new": false,
+                      "is_up": true,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 373
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 2,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-11 04:18:23 +00:00",
+                  "previous_updated_time": "2026-04-15 00:38:24 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "bbva cuenta digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 10:38:40 +00:00",
+                    "competition": 0.4399999976158142,
+                    "competition_level": "MEDIUM",
+                    "cpc": 1.1399999856948853,
+                    "search_volume": 2400,
+                    "low_top_of_page_bid": 0.6100000143051147,
+                    "high_top_of_page_bid": 44.29999923706055,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 2400
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 26
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuenta digital bbva",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=bbva%20cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-09-04 19:57:36 +00:00",
+                    "previous_updated_time": "2026-05-31 14:13:19 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 57.70000076293945,
+                    "dofollow": 21.799999237060547,
+                    "referring_pages": 54.70000076293945,
+                    "referring_domains": 45.20000076293945,
+                    "referring_main_domains": 30.100000381469727,
+                    "rank": 71.9000015258789,
+                    "main_domain_rank": 374.3999938964844,
+                    "last_updated_time": "2026-09-04 19:57:36 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 14:17:58 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta Digital BBVA desde la App en minutos. Costo de mantenimiento 0 soles, 100% online y sin pisar el banco. ¡Descarga la App!",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta Digital BBVA desde la App en minutos"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 729.5999755859375,
+                    "estimated_paid_traffic_cost": 831.7440185546875,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 366
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=bbva%20cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-04 19:57:36 +00:00",
+                  "previous_updated_time": "2026-05-31 14:13:19 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "crear cuenta digital bbva",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 07:10:24 +00:00",
+                    "competition": 0.41999998688697815,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.8600000143051147,
+                    "search_volume": 880,
+                    "low_top_of_page_bid": 0.5799999833106995,
+                    "high_top_of_page_bid": 27.559999465942383,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 480
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 108
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=crear%20cuenta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 109,
+                    "last_updated_time": "2026-09-10 03:43:09 +00:00",
+                    "previous_updated_time": "2026-06-18 12:58:43 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 57.20000076293945,
+                    "dofollow": 21.700000762939453,
+                    "referring_pages": 54.900001525878906,
+                    "referring_domains": 45.29999923706055,
+                    "referring_main_domains": 30.200000762939453,
+                    "rank": 68.0999984741211,
+                    "main_domain_rank": 380.8999938964844,
+                    "last_updated_time": "2026-09-10 03:45:29 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 14:11:52 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "¿Primera vez en BBVA? Empieza diferente. Descarga la app BBVA y dale clic en “Hazte cliente”. Hazte cliente en minutos, desde tu celular, sin colas ni papeleos.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "BBVA"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 267.5199890136719,
+                    "estimated_paid_traffic_cost": 230.06719970703125,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 366
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=crear%20cuenta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 109,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-10 03:43:09 +00:00",
+                  "previous_updated_time": "2026-06-18 12:58:43 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta bbva digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 03:13:47 +00:00",
+                    "competition": 0.4399999976158142,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.550000011920929,
+                    "search_volume": 880,
+                    "low_top_of_page_bid": 0.5,
+                    "high_top_of_page_bid": 44.279998779296875,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 590
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 14,
+                      "quarterly": 0,
+                      "yearly": 39
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuenta digital bbva",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 2,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20bbva%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 107,
+                    "last_updated_time": "2026-07-18 00:54:57 +00:00",
+                    "previous_updated_time": "2026-04-22 18:44:40 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 52.20000076293945,
+                    "dofollow": 19.700000762939453,
+                    "referring_pages": 50.29999923706055,
+                    "referring_domains": 42,
+                    "referring_main_domains": 27.399999618530273,
+                    "rank": 70.0999984741211,
+                    "main_domain_rank": 442,
+                    "last_updated_time": "2026-07-18 00:54:58 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 06:03:15 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta Digital BBVA desde la App en minutos. Costo de mantenimiento 0 soles, 100% online y sin pisar el banco. ¡Descarga la App!",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta Digital BBVA desde la App en minutos"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 267.5199890136719,
+                    "estimated_paid_traffic_cost": 147.13600158691406,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 373
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20bbva%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 107,
+                  "keyword_difficulty": 2,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-18 00:54:57 +00:00",
+                  "previous_updated_time": "2026-04-22 18:44:40 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "abrir cuenta digital bbva",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 04:39:46 +00:00",
+                    "competition": 0.41999998688697815,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.3799999952316284,
+                    "search_volume": 590,
+                    "low_top_of_page_bid": 0.5099999904632568,
+                    "high_top_of_page_bid": 29.600000381469727,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 390
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 51
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "abrir cuenta bbva digital",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 1,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=abrir%20cuenta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 107,
+                    "last_updated_time": "2026-07-26 20:59:31 +00:00",
+                    "previous_updated_time": "2026-05-10 08:35:48 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 52.79999923706055,
+                    "dofollow": 19.600000381469727,
+                    "referring_pages": 50.79999923706055,
+                    "referring_domains": 42.400001525878906,
+                    "referring_main_domains": 27.799999237060547,
+                    "rank": 68.5,
+                    "main_domain_rank": 442.29998779296875,
+                    "last_updated_time": "2026-07-26 20:59:31 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 07:55:28 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta Digital BBVA desde la App en minutos. Costo de mantenimiento 0 soles, 100% online y sin pisar el banco. ¡Descarga la App!",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta Digital BBVA desde la App en minutos"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 179.36000061035156,
+                    "estimated_paid_traffic_cost": 68.15679931640625,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 373
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=abrir%20cuenta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 107,
+                  "keyword_difficulty": 1,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-26 20:59:31 +00:00",
+                  "previous_updated_time": "2026-05-10 08:35:48 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta digital bbva perú",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 11:19:44 +00:00",
+                    "competition": 0.3400000035762787,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.3499999940395355,
+                    "search_volume": 320,
+                    "low_top_of_page_bid": 0.7300000190734863,
+                    "high_top_of_page_bid": 55.29999923706055,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 260
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 50,
+                      "quarterly": -19,
+                      "yearly": 85
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuenta digital bbva peru",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20digital%20bbva%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "ai_overview",
+                      "related_searches"
+                    ],
+                    "se_results_count": 105,
+                    "last_updated_time": "2026-09-19 16:01:14 +00:00",
+                    "previous_updated_time": "2026-06-03 00:42:16 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 47.599998474121094,
+                    "dofollow": 14.800000190734863,
+                    "referring_pages": 47.29999923706055,
+                    "referring_domains": 41.400001525878906,
+                    "referring_main_domains": 26.399999618530273,
+                    "rank": 46.099998474121094,
+                    "main_domain_rank": 492.79998779296875,
+                    "last_updated_time": "2026-09-19 16:01:15 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 07:31:32 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Características de la Cuenta Digital · Sin costo de mantenimiento sin importar el saldo. · Transferencias Interbancarias sin costo hasta S/1,000 o $280.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Características de la Cuenta Digital"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 97.27999877929688,
+                    "estimated_paid_traffic_cost": 34.04800033569336,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 366
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20digital%20bbva%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "ai_overview",
+                    "related_searches"
+                  ],
+                  "se_results_count": 105,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-19 16:01:14 +00:00",
+                  "previous_updated_time": "2026-06-03 00:42:16 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "linea 100 peru",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 18:22:53 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10017,
+                      10146,
+                      10783,
+                      12083
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 260
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -19,
+                      "quarterly": -19,
+                      "yearly": 24
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 8,
+                    "detected_language": "it",
+                    "is_another_language": true
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=linea%20100%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "knowledge_graph",
+                      "google_reviews"
+                    ],
+                    "se_results_count": 181000000,
+                    "last_updated_time": "2026-08-12 18:05:36 +00:00",
+                    "previous_updated_time": "2026-05-13 09:03:24 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 32.20000076293945,
+                    "dofollow": 27.200000762939453,
+                    "referring_pages": 28.100000381469727,
+                    "referring_domains": 13.699999809265137,
+                    "referring_main_domains": 13.100000381469727,
+                    "rank": 66.9000015258789,
+                    "main_domain_rank": 693.0999755859375,
+                    "last_updated_time": "2026-08-12 18:07:26 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 17:40:18 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 61,
+                    "rank_absolute": 62,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta Digital BBVA desde la App en minutos. Costo de mantenimiento 0 soles, 100% online y sin pisar el banco. ¡Descarga la App!",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "100"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 0.5460000038146973,
+                    "estimated_paid_traffic_cost": null,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 372
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=linea%20100%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "knowledge_graph",
+                    "google_reviews"
+                  ],
+                  "se_results_count": 181000000,
+                  "keyword_difficulty": 8,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-12 18:05:36 +00:00",
+                  "previous_updated_time": "2026-05-13 09:03:24 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "tarjeta digital bbva",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 08:58:56 +00:00",
+                    "competition": 0.3700000047683716,
+                    "competition_level": "MEDIUM",
+                    "cpc": 1.5299999713897705,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": 0.75,
+                    "high_top_of_page_bid": 25.59000015258789,
+                    "categories": [
+                      10012,
+                      10097,
+                      11842
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 24,
+                      "quarterly": 0,
+                      "yearly": -19
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=tarjeta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 176,
+                    "last_updated_time": "2026-09-17 09:04:29 +00:00",
+                    "previous_updated_time": "2026-07-01 07:19:43 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 53,
+                    "dofollow": 10.399999618530273,
+                    "referring_pages": 52.5,
+                    "referring_domains": 48.5,
+                    "referring_main_domains": 32,
+                    "rank": 51.20000076293945,
+                    "main_domain_rank": 446.3999938964844,
+                    "last_updated_time": "2026-09-17 09:04:34 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": [
+                      "navigational"
+                    ],
+                    "last_updated_time": "2026-04-29 21:38:02 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 2,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Sin mantenimiento y sin monto mínimo. Tu cuenta siempre es gratis. · Plin gratis para pagar y cobrar al instante. Envía y recibe dinero con tu número de celular ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Sin mantenimiento y sin monto mínimo"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 79.04000091552734,
+                    "estimated_paid_traffic_cost": 120.93119812011719,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 2,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 366
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=tarjeta%20digital%20bbva&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 176,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-17 09:04:29 +00:00",
+                  "previous_updated_time": "2026-07-01 07:19:43 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta bbva sin mantenimiento",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 03:38:54 +00:00",
+                    "competition": 0.3199999928474426,
+                    "competition_level": "LOW",
+                    "cpc": 0.5299999713897705,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.49000000953674316,
+                    "high_top_of_page_bid": 28.540000915527344,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 70
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 140
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -36,
+                      "quarterly": -59,
+                      "yearly": -59
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20bbva%20sin%20mantenimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "ai_overview",
+                      "related_searches"
+                    ],
+                    "se_results_count": 105,
+                    "last_updated_time": "2026-08-31 18:51:22 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 2.0999999046325684,
+                    "dofollow": 1.600000023841858,
+                    "referring_pages": 2.0999999046325684,
+                    "referring_domains": 1.7999999523162842,
+                    "referring_main_domains": 1.7999999523162842,
+                    "rank": 17.100000381469727,
+                    "main_domain_rank": 442.1000061035156,
+                    "last_updated_time": "2026-08-31 18:53:34 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": [
+                      "commercial",
+                      "transactional"
+                    ],
+                    "last_updated_time": "2026-04-26 20:55:46 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.bbva.pe",
+                    "title": "Cuenta Digital BBVA: 100% online y Cero Mantenimiento",
+                    "url": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "breadcrumb": "https://www.bbva.pe › ... › Abre una Cuenta de Ahorros",
+                    "website_name": "BBVA Perú",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Sin costo de mantenimiento sin importar el saldo. Transferencias Interbancarias sin costo hasta S/1,000 o $280. Depósitos y retiros ilimitados y sin costo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Sin costo de mantenimiento sin importar el saldo"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "bbva.pe",
+                    "relative_url": "/personas/productos/cuentas/ahorro/cuenta-digital.html",
+                    "etv": 51.68000030517578,
+                    "estimated_paid_traffic_cost": 27.390399932861328,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": null,
+                    "rank_info": {
+                      "page_rank": 0,
+                      "main_domain_rank": 371
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20bbva%20sin%20mantenimiento&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "ai_overview",
+                    "related_searches"
+                  ],
+                  "se_results_count": 105,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-31 18:51:22 +00:00",
+                  "previous_updated_time": null
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

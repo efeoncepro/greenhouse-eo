@@ -33,6 +33,8 @@ export type PaymentOrderErrorCode =
   | 'unsupported_corridor'
   // TASK-995 — CLF (indexed unit) rejected as a cash/payment-order currency.
   | 'unsupported_currency'
+  | 'contractor_partial_payment_unsupported'
+  | 'contractor_payable_ref_missing'
   | 'invalid_amount'
   | 'amount_exceeds_obligation'
 
@@ -87,9 +89,7 @@ export class PaymentOrderInvalidStateTransitionError extends Error {
   toState: string
 
   constructor(orderId: string, fromState: string, toState: string) {
-    super(
-      `[invalid_state_transition] order=${orderId}: ${fromState} -> ${toState} no esta en la matrix permitida`
-    )
+    super(`[invalid_state_transition] order=${orderId}: ${fromState} -> ${toState} no esta en la matrix permitida`)
     this.name = 'PaymentOrderInvalidStateTransitionError'
     this.orderId = orderId
     this.fromState = fromState
@@ -167,7 +167,9 @@ export const assertPaymentOrderCashCurrency = (currency: string): void => {
 }
 
 // Type guard para code dispatch sin acoplar al name (que cambia con minify).
-export const isPaymentOrderError = (err: unknown): err is { code: PaymentOrderErrorCode; statusCode: number; message: string } => {
+export const isPaymentOrderError = (
+  err: unknown
+): err is { code: PaymentOrderErrorCode; statusCode: number; message: string } => {
   return (
     err !== null &&
     typeof err === 'object' &&

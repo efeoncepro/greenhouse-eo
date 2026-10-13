@@ -1,0 +1,239 @@
+{
+  "tenderId": "hs-B08-ag",
+  "slides": [
+    {
+      "slideId": "deck-method-identity-consent",
+      "contentType": "deck.method-identity-consent",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "docFill": "--gl-ls-doc-color=#ffffff",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#e86bd0",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "reflectGap": "--gl-ls-reflect-gap=14px",
+          "reflectFrom": "--gl-ls-reflect-from=72%",
+          "reflectColor": "--gl-ls-reflect-color=#ffffff",
+          "reflectOpacity": "--gl-ls-reflect-opacity=16%",
+          "sourceLeft": "--gl-mic-source-left=790px",
+          "sourceWidth": "--gl-mic-source-width=170px",
+          "sourcePadY": "--gl-mic-source-pad-y=14px",
+          "sourcePadX": "--gl-mic-source-pad-x=16px",
+          "sourceRadius": "--gl-mic-source-radius=14px",
+          "sourceKickerPx": "--gl-mic-source-kicker-px=12px",
+          "sourceKickerWeight": "--gl-mic-source-kicker-wght=600",
+          "sourceKickerTracking": "--gl-mic-source-kicker-tracking=1.2px",
+          "sourceKickerColor": "--gl-mic-source-kicker-color=#e2e2e2",
+          "sourceNamePx": "--gl-mic-source-name-px=21px",
+          "sourceNameGap": "--gl-mic-source-name-gap=2px",
+          "sourceNameColor": "--gl-mic-source-name-color=#ffffff",
+          "profileLeft": "--gl-mic-profile-left=1120px",
+          "profileTop": "--gl-mic-profile-top=250px",
+          "profileWidth": "--gl-mic-profile-width=380px",
+          "profilePadTop": "--gl-mic-profile-pad-top=22px",
+          "profilePadX": "--gl-mic-profile-pad-x=24px",
+          "profilePadBottom": "--gl-mic-profile-pad-bottom=18px",
+          "profileRadius": "--gl-mic-profile-radius=24px",
+          "profileIcon": "--gl-mic-profile-icon=46px",
+          "profileIconGap": "--gl-mic-profile-icon-gap=12px",
+          "profileKickerPx": "--gl-mic-profile-kicker-px=12px",
+          "profileKickerWeight": "--gl-mic-profile-kicker-wght=600",
+          "profileKickerTracking": "--gl-mic-profile-kicker-tracking=1.2px",
+          "profileKickerColor": "--gl-mic-profile-kicker-color=#5f6b7a",
+          "profileTitlePx": "--gl-mic-profile-title-px=23px",
+          "profileTitleTracking": "--gl-mic-profile-title-tracking=-0.34px",
+          "profileTitleGap": "--gl-mic-profile-title-gap=2px",
+          "profileHeaderGap": "--gl-mic-profile-header-gap=10px",
+          "channelPadY": "--gl-mic-channel-pad-y=9px",
+          "channelGap": "--gl-mic-channel-gap=10px",
+          "channelRule": "--gl-mic-channel-rule-color=#e3e8ee",
+          "channelPx": "--gl-mic-channel-px=15px",
+          "channelWeight": "--gl-mic-channel-wght=500",
+          "purposePx": "--gl-mic-purpose-px=13px",
+          "purposeWeight": "--gl-mic-purpose-wght=400",
+          "purposeColor": "--gl-mic-purpose-color=#5f6b7a",
+          "consentSize": "--gl-mic-consent=26px",
+          "consentGlyph": "--gl-mic-consent-glyph=14px",
+          "consentGlyphWeight": "--gl-mic-consent-glyph-wght=700",
+          "grantedFill": "--gl-mic-granted-fill-color=#0b1f33",
+          "grantedInk": "--gl-mic-granted-ink-color=#ffffff",
+          "deniedRing": "--gl-mic-denied-ring=2px",
+          "deniedRingColor": "--gl-mic-denied-ring-color=#b8c2cc",
+          "deniedInk": "--gl-mic-denied-ink-color=#8a96a3",
+          "actLeft": "--gl-mic-act-left=1540px",
+          "actWidth": "--gl-mic-act-width=230px",
+          "actPadY": "--gl-mic-act-pad-y=14px",
+          "actPadX": "--gl-mic-act-pad-x=16px",
+          "actRadius": "--gl-mic-act-radius=16px",
+          "actGap": "--gl-mic-act-gap=12px",
+          "actIcon": "--gl-mic-act-icon=38px",
+          "actTitlePx": "--gl-mic-act-title-px=18px",
+          "actTitleLeading": "--gl-mic-act-title-leading=1.1",
+          "actTitleLead": "--gl-mic-act-title-lead-color=#0b1f33",
+          "actTitleRest": "--gl-mic-act-title-rest-color=#ffffff",
+          "actDescPx": "--gl-mic-act-desc-px=13px",
+          "actDescWeight": "--gl-mic-act-desc-wght=400",
+          "actDescGap": "--gl-mic-act-desc-gap=3px",
+          "actDescLead": "--gl-mic-act-desc-lead-color=#5f6b7a",
+          "actDescRest": "--gl-mic-act-desc-rest-color=#e2e2e2"
+        },
+        "stage": {
+          "src": "asset-ref:layer:mic-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:mic-platform"
+        },
+        "beams": {
+          "src": "asset-ref:layer:method-identity-consent-beams"
+        },
+        "voice": {
+          "question": "¿Puedo contactar a ese cliente?",
+          "answer": "permiso",
+          "eyebrow": "Smart CRM · identidad y consentimiento",
+          "answerLead": "Con"
+        },
+        "body": "Unificar datos no da permiso para contactar: gobernamos <strong>canal</strong> y propósito antes de activar.",
+        "note": "Ejemplo ilustrativo · el diseño sale de tu inventario de datos",
+        "sources": [
+          {
+            "kicker": "Fuente",
+            "name": "CRM",
+            "top": "--gl-mic-source-top=250px"
+          },
+          {
+            "kicker": "Fuente",
+            "name": "Web",
+            "top": "--gl-mic-source-top=360px"
+          },
+          {
+            "kicker": "Fuente",
+            "name": "E-commerce",
+            "top": "--gl-mic-source-top=470px"
+          },
+          {
+            "kicker": "Fuente",
+            "name": "ERP",
+            "top": "--gl-mic-source-top=580px"
+          },
+          {
+            "kicker": "Fuente",
+            "name": "App",
+            "top": "--gl-mic-source-top=690px"
+          }
+        ],
+        "profile": {
+          "icon": "asset-ref:file:hubspot-icon-data",
+          "kicker": "Perfil unificado",
+          "title": "Un contacto, 5 fuentes"
+        },
+        "channels": [
+          {
+            "channel": "Email",
+            "purpose": "Marketing",
+            "mark": "✓",
+            "state": "yes"
+          },
+          {
+            "channel": "WhatsApp",
+            "purpose": "Servicio",
+            "mark": "✓",
+            "state": "yes"
+          },
+          {
+            "channel": "SMS",
+            "purpose": "Marketing",
+            "mark": "—",
+            "state": "no"
+          },
+          {
+            "channel": "Llamada",
+            "purpose": "Ventas",
+            "mark": "✓",
+            "state": "yes"
+          }
+        ],
+        "activations": [
+          {
+            "icon": "asset-ref:file:hubspot-icon-marketing",
+            "title": "Nurture Agent",
+            "detail": "Sólo con email ✓",
+            "role": "lead",
+            "top": "--gl-mic-act-top=250px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "title": "Customer Agent",
+            "detail": "Por WhatsApp ✓",
+            "role": "rest",
+            "top": "--gl-mic-act-top=400px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-sales",
+            "title": "Prospecting Agent",
+            "detail": "Prepara la llamada",
+            "role": "rest",
+            "top": "--gl-mic-act-top=710px"
+          }
+        ],
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none"
+        }
+      },
+      "template": "MethodIdentityConsent"
+    }
+  ]
+}

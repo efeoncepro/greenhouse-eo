@@ -1,6 +1,18 @@
 import type { ReactNode } from 'react'
 
+import type { Metadata } from 'next'
+
+import { getLocale } from 'next-intl/server'
+
 import { requireViewCodeAccess } from '@/lib/client-portal/guards/require-view-code-access'
+import { getGreenhouseNavigationCopy } from '@/config/greenhouse-navigation-copy'
+import { getPortalPageTitle } from '@/lib/copy/portal-metadata'
+
+export const generateMetadata = async (): Promise<Metadata> => {
+  const { client } = getGreenhouseNavigationCopy(await getLocale())
+
+  return { title: getPortalPageTitle(client.projects.label) }
+}
 
 /**
  * TASK-1685 Slice 2 — el layout gatea por el MISMO carril que la página.

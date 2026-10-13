@@ -53,7 +53,10 @@ export const EVIDENCE_REJECTION_REASONS = [
   'module_disabled',
   'not_connected',
   'target_ambiguous',
-  'no_data'
+  'no_data',
+  // TASK-2033 — la métrica existe pero la fuente la mide sobre una población mayor que el alcance de contenido de la
+  // edición (p. ej. el tráfico estimado del dominio completo). No se emite: sería la cifra del dominio con otro nombre.
+  'outside_content_scope'
 ] as const
 export type EvidenceRejectionReason = (typeof EVIDENCE_REJECTION_REASONS)[number]
 
@@ -132,6 +135,17 @@ export interface EvidenceRejectionV1 {
   scope?: 'current' | 'comparison'
 }
 
+/**
+ * TASK-2033 — alcance de contenido con el que se midió una fuente: la versión, la etiqueta y las reglas de ruta
+ * vigentes al sellar. Va en la fuente (no en una columna aparte) para que la edición diga por sí sola sobre qué
+ * páginas midió, aunque el alcance de la organización cambie después. Ausente = la fuente midió el sitio completo.
+ */
+export interface EvidenceContentScopeV1 {
+  version: number
+  label: string
+  rules: Array<{ kind: 'prefix' | 'exact'; path: string }>
+}
+
 export interface EvidenceSourceV1 {
   module: InsightModule
   adapterVersion: string
@@ -140,6 +154,8 @@ export interface EvidenceSourceV1 {
   method: EvidenceMethodV1
   coverage: EvidenceCoverageV1
   servedWindow: EvidenceWindowV1 | null
+  /** TASK-2033 — presente sólo cuando la fuente se leyó recortada al alcance de contenido de la organización. */
+  contentScope?: EvidenceContentScopeV1
 }
 
 /** Contenido lógico del snapshot antes/después de sellarlo (columnas *_json). */

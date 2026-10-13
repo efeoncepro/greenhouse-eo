@@ -213,7 +213,8 @@ tarjetas; nunca cuenta desde cero; número que corre `aria-hidden`; movimiento r
 final. PDF y deck son estáticos. Waffle por unidad en `insights-chart-geometry.ts`.
 
 **Código.** `src/components/insights/{InsightReport,ModuleScene,ChartFigure,FactMark}.astro`,
-`src/lib/insights-{view,copy,tokens,chart-geometry,fixtures,accept}.ts` + `insights.ts` (cliente server-side),
+`src/lib/insights-{view,copy,tokens,chart-geometry,fixtures,accept,platforms}.ts` + `insights.ts` (cliente server-side;
+isotipos de las 22 plataformas en `public/logos/platforms/`),
 `src/scripts/insights-report.ts` (interacción y motion), `src/styles/insights.css`.
 
 **Anatomía, en orden (`InsightReport.astro`):**
@@ -366,12 +367,20 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
    láminas van tal cual, sin «próximamente» («Deja esos datos... No marques nada en el deck como provisional, asumo la
    responsabilidad»); el estado de arriba queda como registro. Si cambia el estado de un formato (por ejemplo, se
    enciende el correo), actualízalo aquí y en la norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Deck SEO/AEO».
-9. **Propuesta pendiente de aprobación — tarjetas de cifra con isotipo de canal** (AI Overview, ChatGPT, Gemini,
-   Perplexity): tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal` y `Cifras-Canal-Norma` en el canvas de TASK-1975
-   (<https://claude.ai/artifact/9q7nThMhdphN5j8f3K3cbB>). **No implementada**; no la construyas sin la decisión.
+9. *(Cerrado: las tarjetas de cifra con isotipo de canal —tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal` y
+   `Cifras-Canal-Norma` del canvas de TASK-1975— se aprobaron el 2026-10-03 y están en producción desde `36a73e7b7e19`
+   (TASK-1990/1996). Vocabulario vigente, 22 plataformas, y reglas en [`contracts.md`](contracts.md) § Glifos, isotipos y
+   tableros por plataforma. Se conserva el número.)*
 10. **Color por rol de parte en waffle y dona.** Hoy el color va por orden de las partes; el plan aún no declara `role`
     de parte. Decisión pendiente del operador.
 
+
+11. **La portada navy y la portada del deck no dicen qué mide el informe (TASK-2033, 2026-10-12).** La zona «Qué mide
+    este informe» existe sólo en la portada blanca del A4. Una organización con alcance de contenido y portada navy
+    pierde en el PDF la única línea que enumera el contenido medido; Berel se fijó en blanca por eso. Agregar la zona
+    a la navy o al deck es un cambio de plantilla con su gate visual y aprobación del operador.
+12. **El logo del cliente se ve chico cuando es casi cuadrado.** El espacio «Preparado para» de las portadas es bajo;
+    el logo oficial de Berel (1181×1129) queda de unos 35 px de alto en la navy. Sin decisión.
 
 ## Delta 2026-10-04 — disponibilidad y límites de cierre
 

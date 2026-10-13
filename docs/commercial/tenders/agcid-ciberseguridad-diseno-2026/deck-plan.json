@@ -1,0 +1,710 @@
+{
+  "document": "proposal",
+  "line": "growth",
+  "diagnosisDone": true,
+  "slides": [
+    {
+      "recipeId": "cover-proposal-orbit",
+      "purpose": "01 · Diseño editorial y"
+    },
+    {
+      "recipeId": "decision-agenda",
+      "purpose": "02 · La propuesta cubre 5 temas",
+      "slots": {
+        "eyebrow": "Guía de lectura",
+        "question": "La propuesta cubre",
+        "answer": "5 temas",
+        "items": [
+          "Sistema de diseño",
+          "Productos y alcance",
+          "Método y calendario",
+          "Experiencia y muestras",
+          "Entrega e inversión"
+        ],
+        "highlightedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 1
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 1
+      }
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "03 · Documentos y web comparten",
+      "slots": {
+        "eyebrow": "Comprensión del encargo",
+        "question": "Documentos y web comparten",
+        "answer": "estilos",
+        "body": "Documentos y web comparten jerarquías. ANCI valida el contenido y su aplicación institucional.",
+        "pillars": [
+          {
+            "name": "Leer",
+            "text": "Jerarquía, índices, tablas y figuras."
+          },
+          {
+            "name": "Encontrar",
+            "text": "Repositorios y fichas consistentes."
+          },
+          {
+            "name": "Reutilizar",
+            "text": "Estilos y componentes editables."
+          }
+        ],
+        "nav": {
+          "sections": 5,
+          "current": 1
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 1
+      }
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "04 · ANCI recibirá",
+      "slots": {
+        "eyebrow": "Alcance contractual",
+        "question": "ANCI recibirá",
+        "answer": "4 productos",
+        "items": [
+          {
+            "title": "P1 · Manual y plantillas",
+            "desc": "Manual gráfico; PPTX animado y editable; cuatro familias Word en DOCX y DOTX."
+          },
+          {
+            "title": "P2 · Diseño visual web",
+            "desc": "Todas las páginas tipo, sus estados y prototipo Figma en escritorio, tablet y móvil."
+          },
+          {
+            "title": "P3 · Biblioteca",
+            "desc": "Componentes Figma, HTML de referencia y especificaciones para el desarrollador."
+          },
+          {
+            "title": "P4 · Diagramación",
+            "desc": "20 versiones monolingües digitales y 10 consolidadas bilingües para impresión."
+          }
+        ],
+        "selectedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 1
+        },
+        "selectionLabel": "Diseño"
+      },
+      "progress": {
+        "sections": 5,
+        "current": 1
+      }
+    },
+    {
+      "recipeId": "proposal-service-creative",
+      "purpose": "05 · ANCI recibirá",
+      "slots": {
+        "eyebrow": "P1 · Manual y plantillas · Día 30",
+        "question": "ANCI recibirá",
+        "answer": "un manual",
+        "body": "Reglas para tipografía, retícula, color, tablas, figuras y logotipos. Se entregan fuentes editables y plantillas para aplicar el sistema.",
+        "lensPhoto": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+        "steps": [
+          {
+            "kicker": "Sistema gráfico",
+            "name": "Manual editable",
+            "desc": "INDD/IDML y PDF, ejemplos, reglas y recursos."
+          },
+          {
+            "kicker": "Presentaciones",
+            "name": "Plantilla PowerPoint",
+            "desc": "PPTX animado, maestras y elementos editables."
+          },
+          {
+            "kicker": "Documentos",
+            "name": "Plantillas Word",
+            "desc": "Cuatro familias en DOCX y DOTX, con estilos nativos."
+          }
+        ]
+      },
+      "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "06 · Las plantillas Word cubren",
+      "slots": {
+        "eyebrow": "P1 · Plantillas DOCX y DOTX",
+        "question": "Las plantillas Word cubren",
+        "answer": "4 usos",
+        "items": [
+          {
+            "title": "Informe",
+            "desc": "Portada, títulos, cuerpo, índice y estilos para tablas y figuras."
+          },
+          {
+            "title": "Minuta",
+            "desc": "Encabezados, asuntos, acuerdos y seguimiento con estilos nativos."
+          },
+          {
+            "title": "Invitación",
+            "desc": "Jerarquía para actividad, fecha, lugar y convocatoria institucional."
+          },
+          {
+            "title": "Programa",
+            "desc": "Bloques, horarios y actividades con una retícula reutilizable."
+          }
+        ],
+        "selectedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 2
+        },
+        "selectionLabel": "Diseño"
+      },
+      "progress": {
+        "sections": 5,
+        "current": 2
+      }
+    },
+    {
+      "recipeId": "proposal-cinematic-web",
+      "purpose": "07 · El diseño se valida con",
+      "slots": {
+        "eyebrow": "P2 · Web · Día 60",
+        "question": "El diseño se valida con",
+        "answer": "un prototipo",
+        "body": "Vistas para escritorio, tablet y móvil; estados y prototipo Figma editable. Desarrollo productivo posterior.",
+        "steps": [
+          {
+            "glyph": "web",
+            "kicker": "Estructura",
+            "name": "Páginas tipo"
+          },
+          {
+            "glyph": "contenido",
+            "kicker": "Interacción",
+            "name": "Estados y flujos"
+          },
+          {
+            "glyph": "medicion",
+            "kicker": "Validación",
+            "name": "Prototipo Figma"
+          }
+        ],
+        "photo": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png"
+      },
+      "plateRef": "ai-generations/2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "08 · El sitio reúne",
+      "slots": {
+        "eyebrow": "Inventario de vistas web",
+        "question": "El sitio reúne",
+        "answer": "estas vistas",
+        "items": [
+          {
+            "title": "Inicio y resultados",
+            "desc": "Presentación del proyecto, navegación, visibilidad institucional y recursos."
+          },
+          {
+            "title": "Países y estudios",
+            "desc": "Repositorios y fichas reutilizables; se contemplan los doce países del proyecto."
+          },
+          {
+            "title": "Ley Modelo / Ley Marco",
+            "desc": "Contenido y descargas, con la denominación y textos aprobados por ANCI."
+          },
+          {
+            "title": "Actividades y recursos",
+            "desc": "Eventos, talleres, galería y descargables; filtros, búsquedas y estados pertinentes."
+          }
+        ],
+        "selectedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 2
+        },
+        "selectionLabel": "Diseño"
+      },
+      "progress": {
+        "sections": 5,
+        "current": 2
+      }
+    },
+    {
+      "recipeId": "method-waves",
+      "purpose": "09 · La biblioteca incluye",
+      "slots": {
+        "eyebrow": "P3 · Biblioteca · Día 70",
+        "question": "La biblioteca incluye",
+        "evidence": "Biblioteca Figma editable, variantes, estados, tokens y HTML de referencia. Las especificaciones permiten implementar el diseño aprobado.",
+        "steps": [
+          {
+            "kicker": "Inventario",
+            "name": "Componentes",
+            "desc": "Botones, menús, tarjetas, filtros, formularios, tablas, banners y etiquetas."
+          },
+          {
+            "kicker": "Construcción",
+            "name": "Variantes y estados",
+            "desc": "Propiedades, foco, activo, validación, vacíos y comportamiento adaptable."
+          },
+          {
+            "kicker": "Especificación",
+            "name": "Figma + HTML",
+            "desc": "Tokens, medidas y referencia visual; no constituye un sitio en producción."
+          },
+          {
+            "kicker": "Transferencia",
+            "name": "Guía de uso",
+            "desc": "Archivos editables, ejemplos y documentación para el equipo de desarrollo."
+          }
+        ],
+        "answer": "Figma y\nHTML",
+        "selectedStep": 3
+      }
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "10 · Se preparan versiones en",
+      "slots": {
+        "eyebrow": "P4 · Diagramación",
+        "question": "Se preparan versiones en",
+        "answer": "ES y EN",
+        "body": "Siete de trabajo, dos de investigación y una Ley Marco. ANCI aporta textos y traducciones.",
+        "pillars": [
+          {
+            "name": "20 digitales",
+            "text": "Diez documentos en español e inglés."
+          },
+          {
+            "name": "10 bilingües",
+            "text": "PDF de impresión y fuente editable."
+          },
+          {
+            "name": "Por solicitud",
+            "text": "Primera entrega: cinco días hábiles."
+          }
+        ],
+        "nav": {
+          "sections": 5,
+          "current": 2
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 2
+      }
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "11 · Cada versión conserva",
+      "slots": {
+        "eyebrow": "Diseño editorial bilingüe",
+        "question": "Cada versión conserva",
+        "answer": "su texto",
+        "body": "Se cotejan textos y referencias en cada idioma; se ajustan títulos, tablas y saltos de página.",
+        "pillars": [
+          {
+            "name": "Contenido",
+            "text": "Cotejo con texto, tablas y referencias."
+          },
+          {
+            "name": "Composición",
+            "text": "Saltos, leyendas y títulos por idioma."
+          },
+          {
+            "name": "Impresión",
+            "text": "Separadores, fuentes y especificaciones."
+          }
+        ],
+        "nav": {
+          "sections": 5,
+          "current": 2
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 2
+      }
+    },
+    {
+      "recipeId": "method-surround-cycle",
+      "purpose": "12 · El texto avanza hasta",
+      "slots": {
+        "eyebrow": "Producción documental",
+        "question": "El texto avanza hasta",
+        "answer": "el PDF",
+        "evidence": "Cada solicitud conserva insumos y versiones. ANCI revisa; el silencio no implica aprobación.",
+        "stations": [
+          {
+            "icon": "docs/assets/public-site/aeo-service-icons/v2/measure.png",
+            "title": "Preparar",
+            "description": "Día hábil 1: inventario, estilos, estructura y cotejo inicial."
+          },
+          {
+            "icon": "docs/assets/public-site/aeo-service-icons/v2/create.png",
+            "title": "Diagramar",
+            "description": "Días hábiles 2–3: composición, tablas, gráficos y figuras."
+          },
+          {
+            "icon": "docs/assets/public-site/aeo-service-icons/v2/distribute.png",
+            "title": "Revisar",
+            "description": "Día hábil 4: revisión cruzada por persona distinta al autor."
+          },
+          {
+            "icon": "docs/assets/public-site/aeo-service-icons/v2/optimize.png",
+            "title": "Entregar",
+            "description": "Día hábil 5: PDF completo revisado, fuente y lista de controles."
+          }
+        ],
+        "coreLabel": "Documento",
+        "coreCaption": "Una versión por entrega"
+      }
+    },
+    {
+      "recipeId": "decision-plan",
+      "purpose": "13 · Los hitos se fijan a",
+      "slots": {
+        "eyebrow": "Plazos en días",
+        "question": "Los hitos se fijan a",
+        "answer": "30/60/70",
+        "body": "Días desde la reunión de inicio. La Carta Gantt desarrolla actividades, revisiones y dependencias de aprobación.",
+        "horizon": 70,
+        "stops": [
+          {
+            "range": "Días 1–30",
+            "title": "P1 · Manual",
+            "desc": "Inventario, dirección visual, manual, PPTX y cuatro familias Word."
+          },
+          {
+            "range": "Días 31–60",
+            "title": "P2 · Web",
+            "desc": "Vistas, estados y prototipo. Preparación preliminar desde día 11."
+          },
+          {
+            "range": "Días 61–70",
+            "title": "P3 · Librería",
+            "desc": "Figma, HTML y transferencia. Inventario preliminar desde día 41."
+          }
+        ],
+        "currentStop": "1"
+      }
+    },
+    {
+      "recipeId": "decision-risk",
+      "purpose": "14 · Revisamos antes del envío",
+      "slots": {
+        "eyebrow": "Control de calidad",
+        "question": "Revisamos antes del",
+        "answer": "envío",
+        "body": "Se revisan la fuente y el archivo final. Cada observación se vincula a una versión.",
+        "rows": [
+          {
+            "risk": "Contenido alterado",
+            "name": "Cotejo editorial",
+            "how": "Texto, referencias, índices, numeración, tablas y figuras contra los insumos."
+          },
+          {
+            "risk": "Inconsistencia gráfica",
+            "name": "Revisión cruzada",
+            "how": "Página editorial, diapositiva y vista web comparadas con el manual aprobado."
+          },
+          {
+            "risk": "Fuente no reutilizable",
+            "name": "Apertura y edición",
+            "how": "Estilos, vínculos, fuentes, licencias y componentes en los archivos editables."
+          },
+          {
+            "risk": "Exportación defectuosa",
+            "name": "Revisión del final",
+            "how": "Todas las páginas del PDF; enlaces, recursos y especificación de impresión."
+          }
+        ],
+        "selectedRow": "2",
+        "nav": {
+          "sections": 5,
+          "current": 3
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 3
+      }
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "15 · ANCI revisará",
+      "slots": {
+        "eyebrow": "Coordinación con ANCI",
+        "question": "ANCI revisará",
+        "answer": "cada versión",
+        "items": [
+          {
+            "title": "Inicio con acta",
+            "desc": "Inventario de insumos, revisores autorizados, canal de entrega y calendario."
+          },
+          {
+            "title": "Seguimiento semanal propuesto",
+            "desc": "Avance, dependencias, solicitudes y entregas durante los productos iniciales."
+          },
+          {
+            "title": "Revisión consolidada",
+            "desc": "Cada observación conserva página o componente, responsable y versión corregida."
+          },
+          {
+            "title": "Recepción conforme",
+            "desc": "ANCI valida contenido y aplicación institucional; se conserva el registro de aprobación."
+          }
+        ],
+        "selectedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 3
+        },
+        "selectionLabel": "Diseño"
+      },
+      "progress": {
+        "sections": 5,
+        "current": 3
+      }
+    },
+    {
+      "recipeId": "contact-sheet",
+      "purpose": "16 · Campañas de SKY",
+      "slots": {
+        "question": "Campañas de",
+        "answer": "SKY",
+        "chosen": ".auth/agcid-deck-media/sky-17.png",
+        "alternatives": [
+          {
+            "plateRef": ".auth/agcid-deck-media/sky-mail-cl.png",
+            "alt": "SKY · mailing · Chile",
+            "caption": "SKY · mailing · Chile"
+          },
+          {
+            "plateRef": ".auth/agcid-deck-media/sky-mail-br.png",
+            "alt": "SKY · mailing · Brasil",
+            "caption": "SKY · mailing · Brasil"
+          },
+          {
+            "plateRef": ".auth/agcid-deck-media/sky-mail-pe.png",
+            "alt": "SKY · mailing · Perú",
+            "caption": "SKY · mailing · Perú"
+          }
+        ],
+        "collaborator": "Muestra real"
+      },
+      "plateRef": ".auth/agcid-deck-media/sky-17.png"
+    },
+    {
+      "recipeId": "contact-sheet",
+      "purpose": "17 · Diseño para GORE",
+      "slots": {
+        "question": "Diseño para",
+        "answer": "GORE",
+        "chosen": ".auth/agcid-deck-media/gore-8.png",
+        "alternatives": [
+          {
+            "plateRef": ".auth/agcid-deck-media/gore-9.png",
+            "alt": "GORE · aplicaciones · p.9",
+            "caption": "GORE · gráficas · p.9"
+          },
+          {
+            "plateRef": ".auth/agcid-deck-media/bresler-16.png",
+            "alt": "Bresler · portafolio web · p.16",
+            "caption": "Bresler · web · p.16"
+          },
+          {
+            "plateRef": ".auth/agcid-deck-media/sky-17.png",
+            "alt": "SKY · campaña · portafolio p.17",
+            "caption": "SKY · campaña · p.17"
+          }
+        ],
+        "collaborator": "Muestra real"
+      },
+      "plateRef": ".auth/agcid-deck-media/gore-8.png"
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "18 · Nuestros servicios cuentan con",
+      "slots": {
+        "eyebrow": "Respaldos · Anexo 4",
+        "question": "Hay documentación de",
+        "answer": "3 casos",
+        "body": "Carta, contratos, OC, facturas y recepción conforme identifican a Efeonce y sus servicios.",
+        "pillars": [
+          {
+            "name": "SKY Airline",
+            "text": "Carta firmada, OC 221970 y factura 56."
+          },
+          {
+            "name": "Berel",
+            "text": "Contrato y factura 53 del servicio."
+          },
+          {
+            "name": "GORE Santiago",
+            "text": "Recepción conforme EP9 y factura 111."
+          }
+        ],
+        "nav": {
+          "sections": 5,
+          "current": 4
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 4
+      }
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "19 · El trabajo se organiza con",
+      "slots": {
+        "eyebrow": "Organización propuesta",
+        "question": "El trabajo se organiza con",
+        "answer": "4 roles",
+        "items": [
+          {
+            "title": "Coordinación · Julio Reyes",
+            "desc": "Alcance, calendario, comunicaciones y seguimiento de aprobaciones con ANCI."
+          },
+          {
+            "title": "Diseño editorial",
+            "desc": "Manual, plantillas y diagramación; comprobación de estilos y exportaciones."
+          },
+          {
+            "title": "Diseño de interfaces",
+            "desc": "Prototipo, componentes, especificaciones y traspaso al equipo de desarrollo."
+          },
+          {
+            "title": "Revisión editorial y QA",
+            "desc": "Cotejo de contenidos y observaciones; revisión cruzada del producto final."
+          }
+        ],
+        "selectedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 4
+        },
+        "selectionLabel": "Diseño"
+      },
+      "progress": {
+        "sections": 5,
+        "current": 4
+      }
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "20 · ANCI conservará las",
+      "slots": {
+        "eyebrow": "Transferencia",
+        "question": "ANCI conservará las",
+        "answer": "fuentes",
+        "body": "Editables, finales, inventario de recursos y guía de uso para continuar el trabajo.",
+        "pillars": [
+          {
+            "name": "Alcance",
+            "text": "Diseño; no traducción ni impresión física."
+          },
+          {
+            "name": "Revisiones",
+            "text": "Plazos y conciliación según las bases."
+          },
+          {
+            "name": "Vigencia",
+            "text": "Hasta 30/04/2027; conciliar hito de mayo."
+          }
+        ],
+        "nav": {
+          "sections": 5,
+          "current": 5
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 5
+      }
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "21 · La oferta total es de",
+      "slots": {
+        "eyebrow": "EUR · IVA incluido",
+        "question": "La oferta total es de",
+        "answer": "12.000€",
+        "body": "Neto EUR 10.084,03 + IVA EUR 1.915,97 = total EUR 12.000,00. Precio del Anexo 5 firmado.",
+        "pillars": [
+          {
+            "name": "Por productos",
+            "text": "Neto: P1 20% · P2 10% · P3 10% · P4 60%."
+          },
+          {
+            "name": "Pago",
+            "text": "A 30 días de factura, previa conformidad."
+          },
+          {
+            "name": "P4 solicitado",
+            "text": "Pago por unidades solicitadas y entregadas."
+          }
+        ],
+        "nav": {
+          "sections": 5,
+          "current": 5
+        }
+      },
+      "progress": {
+        "sections": 5,
+        "current": 5
+      }
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "22 · El precio se distribuye en",
+      "slots": {
+        "eyebrow": "Desglose · EUR netos",
+        "question": "El precio se distribuye en",
+        "answer": "4 productos",
+        "items": [
+          {
+            "title": "P1 · Manual y plantillas",
+            "desc": "EUR 2.016,80600 netos · 20% del neto total."
+          },
+          {
+            "title": "P2 · Diseño visual web",
+            "desc": "EUR 1.008,40300 netos · 10% del neto total."
+          },
+          {
+            "title": "P3 · Biblioteca",
+            "desc": "EUR 1.008,40300 netos · 10% del neto total."
+          },
+          {
+            "title": "P4 · Diagramación",
+            "desc": "30 × EUR 201,68060 = EUR 6.050,41800 netos · 60%."
+          }
+        ],
+        "selectedItem": "1",
+        "nav": {
+          "sections": 5,
+          "current": 5
+        },
+        "selectionLabel": "Diseño"
+      },
+      "progress": {
+        "sections": 5,
+        "current": 5
+      }
+    },
+    {
+      "recipeId": "close-proposal-horizon",
+      "purpose": "23 · close-proposal-horizon",
+      "slots": {
+        "sloganLineWord": "Brand",
+        "photo": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png"
+      },
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png"
+    }
+  ]
+}

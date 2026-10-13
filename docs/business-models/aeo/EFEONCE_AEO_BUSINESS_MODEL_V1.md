@@ -29,6 +29,8 @@ ser definidos antes de vender como modelo aprobado.
 
 ## Evidence required
 
+Para preparar una oportunidad, usar el [método propuesto de caso de negocio SEO/AEO](../../commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md) y su [manual](../../manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md). Conectan demanda, conversión, incrementalidad y valor económico; no aprueban este modelo, precios ni claims.
+
 - [ ] cases with baseline and period;
 - [ ] methodology for visibility/citations;
 - [ ] repeatable delivery workflow;

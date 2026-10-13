@@ -1,0 +1,12 @@
+{
+  "provider": "byteplus",
+  "model": "dola-seedream-5-0-flash-260915",
+  "requestId": "02179182908627696d528c8df2143421f3e331d7739c2b1b10972",
+  "usage": {
+    "input_images": 0,
+    "generated_images": 1,
+    "output_tokens": 4096,
+    "total_tokens": 4096
+  },
+  "estimatedUsd": 0.018
+}

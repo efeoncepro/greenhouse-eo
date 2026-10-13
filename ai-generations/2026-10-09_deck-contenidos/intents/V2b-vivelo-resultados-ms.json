@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "brand",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "live-results",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo va?",
+    "answer": [
+      "En",
+      "vivo"
+    ]
+  },
+  "body": "Efeonce Insights arma el reporte **solo**: lo ves en Marketing Studio y lo conversamos en Teams.",
+  "panel": {
+    "path": "ai-generations/2026-10-09_deck-contenidos/ui/ms-resultados.png",
+    "alt": "Tus resultados en Marketing Studio"
+  },
+  "meeting": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "name": "Microsoft Teams"
+    },
+    "kicker": "En Microsoft Teams",
+    "title": "Revisión de resultados",
+    "meta": "Jueves 10:00 · 30 min · con tu equipo"
+  },
+  "report": {
+    "kicker": "Efeonce Insights · ahora",
+    "title": "Tu reporte del mes está listo",
+    "sample": "Datos de muestra",
+    "kpis": [
+      {
+        "value": "+24 %",
+        "label": "interacciones"
+      },
+      {
+        "value": "92 %",
+        "label": "DM respondidos"
+      },
+      {
+        "value": "38",
+        "label": "piezas publicadas"
+      }
+    ],
+    "action": "Ver en Marketing Studio",
+    "logo": {
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/marketing-studio-isotype-negative.svg",
+      "alt": "Marketing Studio"
+    }
+  }
+}

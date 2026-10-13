@@ -1,0 +1,42 @@
+{
+  "id": "CT7-paid-social",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic scale, slight low camera angle, a vast dark space at night with haze, like an empty arena): Karo, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; her left shoulder is at about 62 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Behind her, receding for hundreds of meters into the darkness on the right half of the frame, an immense field of THOUSANDS of tiny dark phone screens hangs in the air in rows, all unlit, like an audience waiting. THE MOMENT: she has just launched one vertical ad from the phone she holds up at shoulder height on the frame-right side of her face: from the phone, three dead-straight, precise beams of azure-blue (#0375DB) and white light shoot back into the depth, and only where each beam lands does one compact cluster of a few dozen phone screens light up bright white, while all the others stay dark. At the very start of the beams, right above her phone, the launched ad glows as one small vertical frame with a single orange (#FF6500) dot at its center, the only accent in the frame, lighting nothing around it. Head almost frontal, only her eyes turn up toward the launched ad frame just above her phone, a confident, focused half-smile. A long dark matte console runs between the camera and her, its near edge just in front of the lens. The beams, the clusters and every screen stay inside the RIGHT 50% of the frame. The LEFT 50% is calm, deep dark space with faint haze only. Enormous contrast, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte console edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "AE2b",
+  "alcance": "deck-seccion",
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)",
+  "identidad": [
+    {
+      "persona": "karo"
+    }
+  ],
+  "llave": {
+    "fuente": "the bright origin of the three beams and the launched ad frame just above her phone",
+    "lado": "to the frame-right of her face, at head height",
+    "distancia": "about 35 cm from her face"
+  },
+  "fondo": "the far rows of dark phone screens and the three lit clusters melted into cold round bokeh",
+  "fenomeno": {
+    "que": "one launched ad sends three precise beams that light up only the right audiences among thousands",
+    "esServicio": "Paid social: la pieza correcta, a la audiencia correcta, con presupuesto medido"
+  }
+}

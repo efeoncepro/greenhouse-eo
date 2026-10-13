@@ -3,9 +3,9 @@
 > **Naming vigente:** la Radiografía AEO conserva su nombre como muestra de trabajo; se relaciona con **Efeonce AEO** y puede seguir al **Efeonce AEO Assessment** / **Efeonce AI Visibility Report**. `AI Visibility Grader` queda como alias técnico/histórico del motor que genera evidencia. [ADR](../../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 2.0
+> **Versión:** 2.1
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-09-30
+> **Última actualización:** 2026-10-09 por Claude (experiencia temprana y muestra Pibank)
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](../../think/radiografia-aeo-architecture.md)
 > **Manual técnico:** [Radiografía AEO — Manual](../../think/radiografia-aeo-manual.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
@@ -33,6 +33,28 @@ esta demo ni presentar como operativo un control aún no validado en producción
 
 El enlace concreto del cliente reside en el expediente privado y registro runtime; no se publica
 en este documento. [Manual](../../think/radiografia-aeo-manual.md) · [Otro cliente](../../think/aeo-xray-nuevo-cliente.md).
+
+## Delta 2026-10-09 — experiencia temprana y muestra Pibank Perú
+
+Hay una segunda muestra publicada en Think: Pibank Perú, con la landing «Cuenta Soles Pibank» y un artículo para
+comparar cuentas de ahorro. Además de la pieza terminada, muestra cómo sería trabajar con Efeonce, con datos reales del
+banco:
+
+| Bloque | Qué ve el cliente |
+|---|---|
+| Panel AEO | Preguntas reales hechas a la IA, con fecha: si aparece la marca, si el dato es correcto, si cita su sitio y qué fuentes cita |
+| Hoy vs. con la pieza | Lo que una máquina lee hoy de su página real frente a la pieza: qué se conserva, qué se mejora y qué se suma |
+| Revisión | Cada dato con su documento, responsable y estado, más comentarios; es un ejemplo del flujo y lo dice |
+| Cómo mediríamos | Las métricas de la propuesta, no un texto genérico |
+| Siguiente paso | Una invitación concreta con botón al final del recorrido |
+
+Estos bloques son opcionales: una muestra sin ellos sigue funcionando igual (Pichincha no cambió). El panel usa sólo
+capturas reales con fecha y el «hoy» reconoce lo que el sitio ya hace bien. La muestra Pibank entra a la propuesta
+técnica como lámina con QR y enlace. Cómo se preparan: [guía de otro cliente](../../think/aeo-xray-nuevo-cliente.md#bloques-de-experiencia-temprana-contrato-020-2026-10-09).
+
+> Detalle técnico: contrato `efeonce.aeo-xray` 0.2.0 en [arquitectura](../../think/radiografia-aeo-architecture.md);
+> operación y gates en el [manual](../../think/radiografia-aeo-manual.md); sesión en
+> [Pibank · X-Ray y propuesta v12](../../audits/commercial/2026-10-09-pibank-xray-experiencia-temprana-y-propuesta-v12.md).
 
 ## Qué es
 

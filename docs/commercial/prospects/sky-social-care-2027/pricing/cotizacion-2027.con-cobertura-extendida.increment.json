@@ -1,0 +1,550 @@
+{
+  "schemaVersion": "pricing-v3-quote-increment/1",
+  "binding": false,
+  "audience": "internal",
+  "base": {
+    "calculationId": "composition-3c110015f356ffb3ae8db5b1",
+    "replayDigest": "3c110015f356ffb3ae8db5b1757239271d21f7cb1f98966bf5b30c51cb43d64d"
+  },
+  "withAddOn": {
+    "calculationId": "composition-050f60f1cfd92a276ada31d5",
+    "replayDigest": "050f60f1cfd92a276ada31d5a854d85f9fca5f1221347eb990b29b46b6588158"
+  },
+  "commercialUnit": "managed_service",
+  "currency": "CLP",
+  "statement": "Internal reading: it holds cost and margin and is never shown to a client. The price, cost and margin of an add-on, read as the difference between two frozen quotes: the base, and the base with the add-on in it. Each figure is a frozen amount of one quote minus the same frozen amount of the other; nothing is recalculated. It is not a new price and it approves nothing.",
+  "basis": [
+    "increment = withAddOn - base, for net, cost and marginAmount, in each compared period and over them. The quote with the add-on holds each person as one line with the summed dedication, so a cost charged once per line (the platform fee, a part of the base tools) is in it once and is not part of the increment.",
+    "same_periods: the quote with the add-on has the periods of the base and each is compared with its own. totals is the difference between the totals of the two quotes.",
+    "comparable: both calculated; same currency, offer, commercial unit, account, tax treatment, form and code of engagement, market, quote date, mode and contingency declaration; same catalog, resource policy and credit catalog, by version and by content; the base contained in the quote with the add-on (its lines with their identity and at least their people and dedication, its third-party costs, its tools on their lines); a net that grows in every compared period.",
+    "costByComponentKind: frozen cost of the components by the kind the kernel gave each, at the output FX of each, rounded one by one for reading. An entry may miss by a unit; cost is the figure that adds up.",
+    "changed.tools: frozen cost of the components of each composed tool, read the same way, in the periods in which it moved."
+  ],
+  "versions": {
+    "catalog": "operating-review-2026-10-11-v10",
+    "policy": "operating-review-2026-10-11-v11",
+    "credits": "operator-screenshots-2026-10-09-v1"
+  },
+  "comparison": {
+    "mode": "same_periods",
+    "basePeriods": 12,
+    "withAddOnPeriods": 12,
+    "comparedPeriods": 12
+  },
+  "periods": [
+    {
+      "periodId": 1,
+      "basePeriodIds": [
+        1
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 2,
+      "basePeriodIds": [
+        2
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 3,
+      "basePeriodIds": [
+        3
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3484984",
+        "marginAmount": "1505016",
+        "marginRateRoundedDown": "0.301606"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3885792",
+        "marginAmount": "2394208",
+        "marginRateRoundedDown": "0.381243"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400808",
+        "marginAmount": "889192",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 4,
+      "basePeriodIds": [
+        4
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 5,
+      "basePeriodIds": [
+        5
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3484984",
+        "marginAmount": "1505016",
+        "marginRateRoundedDown": "0.301606"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3885792",
+        "marginAmount": "2394208",
+        "marginRateRoundedDown": "0.381243"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400808",
+        "marginAmount": "889192",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 6,
+      "basePeriodIds": [
+        6
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 7,
+      "basePeriodIds": [
+        7
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 8,
+      "basePeriodIds": [
+        8
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3484984",
+        "marginAmount": "1505016",
+        "marginRateRoundedDown": "0.301606"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3885792",
+        "marginAmount": "2394208",
+        "marginRateRoundedDown": "0.381243"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400808",
+        "marginAmount": "889192",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 9,
+      "basePeriodIds": [
+        9
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 10,
+      "basePeriodIds": [
+        10
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3484984",
+        "marginAmount": "1505016",
+        "marginRateRoundedDown": "0.301606"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3885792",
+        "marginAmount": "2394208",
+        "marginRateRoundedDown": "0.381243"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400808",
+        "marginAmount": "889192",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 11,
+      "basePeriodIds": [
+        11
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3484984",
+        "marginAmount": "1505016",
+        "marginRateRoundedDown": "0.301606"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3885792",
+        "marginAmount": "2394208",
+        "marginRateRoundedDown": "0.381243"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400808",
+        "marginAmount": "889192",
+        "marginRateRoundedDown": "0.689296"
+      }
+    },
+    {
+      "periodId": 12,
+      "basePeriodIds": [
+        12
+      ],
+      "base": {
+        "net": "4990000",
+        "cost": "3078244",
+        "marginAmount": "1911756",
+        "marginRateRoundedDown": "0.383117"
+      },
+      "withAddOn": {
+        "net": "6280000",
+        "cost": "3479051",
+        "marginAmount": "2800949",
+        "marginRateRoundedDown": "0.446010"
+      },
+      "increment": {
+        "net": "1290000",
+        "cost": "400807",
+        "marginAmount": "889193",
+        "marginRateRoundedDown": "0.689296"
+      }
+    }
+  ],
+  "totals": {
+    "comparedPeriods": 12,
+    "base": {
+      "net": "59880000",
+      "cost": "38972628",
+      "marginAmount": "20907372",
+      "marginRateRoundedDown": "0.349154"
+    },
+    "withAddOn": {
+      "net": "75360000",
+      "cost": "43782317",
+      "marginAmount": "31577683",
+      "marginRateRoundedDown": "0.419024"
+    },
+    "increment": {
+      "net": "15480000",
+      "cost": "4809689",
+      "marginAmount": "10670311",
+      "marginRateRoundedDown": "0.689296"
+    },
+    "costByComponentKind": [
+      {
+        "kind": "human",
+        "base": "25510000",
+        "withAddOn": "29050000",
+        "increment": "3540000"
+      },
+      {
+        "kind": "platform_fee",
+        "base": "2009000",
+        "withAddOn": "2009000",
+        "increment": "0"
+      },
+      {
+        "kind": "talent_assurance",
+        "base": "2400000",
+        "withAddOn": "2400000",
+        "increment": "0"
+      },
+      {
+        "kind": "operations",
+        "base": "1200000",
+        "withAddOn": "1200000",
+        "increment": "0"
+      },
+      {
+        "kind": "tool",
+        "base": "7853640",
+        "withAddOn": "9123300",
+        "increment": "1269660"
+      }
+    ]
+  },
+  "netIncrementPerPeriod": "1290000",
+  "changed": {
+    "lines": [
+      {
+        "lineId": "lider",
+        "profile": "ECG-001",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.2"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.25"
+              }
+            },
+            "capacityIncrement": "0.05"
+          }
+        ]
+      },
+      {
+        "lineId": "agentes",
+        "profile": "ECG-021",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.1"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.2"
+              }
+            },
+            "capacityIncrement": "0.1"
+          }
+        ]
+      }
+    ],
+    "tools": [
+      {
+        "toolId": "notion",
+        "label": "Notion",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              4,
+              6,
+              7,
+              9,
+              12
+            ],
+            "base": "32400",
+            "withAddOn": "36000",
+            "increment": "3600"
+          },
+          {
+            "periodIds": [
+              3,
+              5,
+              8,
+              10,
+              11
+            ],
+            "base": "37200",
+            "withAddOn": "40800",
+            "increment": "3600"
+          }
+        ]
+      },
+      {
+        "toolId": "microsoft-365",
+        "label": "Microsoft 365 Business Standard",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              4,
+              6,
+              7,
+              9,
+              12
+            ],
+            "base": "19845",
+            "withAddOn": "22050",
+            "increment": "2205"
+          },
+          {
+            "periodIds": [
+              3,
+              5,
+              8,
+              10,
+              11
+            ],
+            "base": "22785",
+            "withAddOn": "24990",
+            "increment": "2205"
+          }
+        ]
+      },
+      {
+        "toolId": "agent-runtime-usage",
+        "label": "Agent runtime usage per 1,000 items",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "base": "100000",
+            "withAddOn": "200000",
+            "increment": "100000"
+          }
+        ]
+      }
+    ],
+    "thirdPartyCosts": []
+  }
+}

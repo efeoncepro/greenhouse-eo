@@ -1,0 +1,38 @@
+{
+  "read_only_inputs": [
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/plan-busquedas.csv",
+      "sha256": "0731a5188dd1f54b642766b6390b7834ecd2f6bb70170b2582a4275f15919b79"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia/inputs.json",
+      "sha256": "6b380318e10f99fb2d2771339f5bf531d15b45174e08ace25e2e797549cf55fa"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia/results.json",
+      "sha256": "f1744c61b7aa9e13ca8a6a397c47ee65481ad9d7edf3d65364f042fb0d3e7d2e"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx",
+      "sha256": "d87c2aabdf7a3a04ff59a719c48a747ab19a3d689eaa14e6d22427d455f7207e"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/meta-hacia-atras/resultados.json",
+      "sha256": "3d93519189a3d32b56da7708016cb39ca8c4496add52bbe93d15e2b169268094"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/PLAN-DE-CONTENIDOS-V0.7.csv",
+      "sha256": "28485eeeb6b0e2de7879738df5890f94256e48efd3c6ef2b22ae2cc08651f84a"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/CALENDARIO-CRECIMIENTO-V0.7.csv",
+      "sha256": "1e3dbb23fb4b4e21f3f0a99cdafe2f0416b0e83f2a7ee7b57a3f3b233c0cbf2a"
+    }
+  ],
+  "cost_seed": {
+    "path": "data/pricing/seed/sellable-roles-pricing.csv",
+    "sha256": "dcb26b9de88cb47d0ecc47016e0e3de02b7acbbe970c6acb8474760e8a6c2ebb"
+  },
+  "new_assumptions": "inputs.json",
+  "user_costs": "Conversation 2026-10-07; monthly approximate ranges supplied by Julio"
+}

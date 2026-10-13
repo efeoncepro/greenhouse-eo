@@ -1,0 +1,59 @@
+{
+ "formato": "16:9",
+ "impacto": true,
+ "linea": "brand",
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "registro": "cine",
+ "alcance": "deck-seccion",
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark studio space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "id": "CV1b-misma-escala",
+ "desde": "C4S07",
+ "identidad": [
+  {
+   "persona": "nexa"
+  },
+  {
+   "persona": "karo"
+  },
+  {
+   "persona": "julio"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "nexa"
+  },
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "karo"
+  },
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "julio"
+  }
+ ],
+ "escena": "SCENE (cinematic, Hollywood ensemble still, a vast dark creative studio at night): a creative squad of three — PERSON 1 Nexa, PERSON 2 Karo and PERSON 3 Julio, as in their references — stand in a short DIAGONAL that recedes into depth on the RIGHT side of the frame: Nexa nearest, about three meters from the camera; Nexa stands entirely in the right half of the frame: from the left edge to the middle of the frame there is only empty dark studio, with nobody and nothing lit in it; Karo one step behind her and to the right, her face at about 79 %; Julio one more step behind and to the right, partly behind Karo's shoulder; Julio's head stays frontal as in his reference, both ears visible, only his eyes turn left; shot at f/5.6 so all three faces stay sharp; framed from the waist up, all wearing the Efeonce hoodie exactly as in its reference; their heads stay almost frontal and their eyes turn toward the empty dark left of the frame, where the text will sit, with calm, confident closed-mouth half-smiles; between the left edge of the frame and Nexa's body there is a wide band of empty darkness; nobody looks at anybody else; arms relaxed, no hands raised. REALISTIC ADULT PROPORTIONS: camera at chest height, 85mm, nothing foreshortened. THE PHENOMENON: ONE single small glowing rounded-rectangle piece floats at chest height beside Nexa's left elbow, in the dark gap between Nexa and Karo; nothing glows in front of Nexa's body or to the left of it; from it, a long flowing ribbon of cool white-azure light (#0375DB) runs to the RIGHT in front of the chests of Karo and Julio, multiplying the piece into HUNDREDS of identical-system pieces (stories, square posts, banners, video frames: different formats, one shared look), and at the right edge curves back into the depth of the studio behind them, getting smaller and softer, melting into bokeh. The ribbon never goes further left than the first piece, never crosses a face and never rises above the shoulders. On the first piece, ONE single tiny point glows vivid orange (#FF6500), the only accent in the frame; it lights nothing around it. The cool light of the ribbon models their faces from below and from the side, the far side of each face in shadow. Thin haze catches the ribbon. The LEFT 60 % of the frame is calm, deep dark studio space with only faint haze: no objects, no light shapes, no streaks, no pieces; everything lit lives in the right 40 %. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any other brand.",
+ "lecho": {
+  "objeto": "the near-black matte edge of a long production table right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "llave": {
+  "fuente": "the first glowing piece and the ribbon passing in front of their chests",
+  "lado": "low and to the camera-right of each face, at chest height",
+  "tamano": "a ribbon about 30 cm wide",
+  "distancia": "about 50 cm from their faces"
+ },
+ "fondo": "hundreds of small pieces receding into the far right background, melted into soft cool bokeh",
+ "fenomeno": {
+  "que": "one single piece multiplies into hundreds of consistent pieces that flow behind the squad into the depth of the studio",
+  "esServicio": "la capacidad del equipo se multiplica con personas, tecnología y procesos, sin cambiar la marca"
+ },
+ "primerPlano": "the dark out-of-focus body of a cinema camera on a slider close to the lens, cut by the frame at the bottom right corner"
+}

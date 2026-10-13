@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-08",
+  "purpose": "Internal traveller POV photographic direction proofs at new locations",
+  "register": "E with D written colour/light/depth criteria",
+  "model": "gpt-image-2.5-sunburst",
+  "quality": "max",
+  "nativeSize": "3840x2160",
+  "initialInputs": "real geographic photo and synthetic dop-v2/02-cancun-ola finish reference; NOT original D pixels",
+  "refinementInputs": "Valparaíso: own V01; Miami: two refinement calls failed, no V02 image returned; V01 delivered",
+  "provenance": "refs/provenance.json",
+  "operatorApproval": "pending",
+  "publication": "not requested",
+  "files": [
+    {
+      "title": "Valparaíso · Pausa frente al puerto",
+      "file": "01-valparaiso-v02.png",
+      "nativeWidth": 3840,
+      "nativeHeight": 2160,
+      "nativeBytes": 12404541,
+      "sha256": "bf093eb3c510143216a40fac85a3a56c8a0598caeb16bc104d7160c8d16d12d1",
+      "preview": "01-valparaiso-v02-1408x768.webp",
+      "previewBytes": 196704,
+      "previewQuality": 65,
+      "prompt": "prompts/01-valparaiso-v02.txt",
+      "log": "01-valparaiso-v02.log",
+      "attempts": 2
+    },
+    {
+      "title": "Miami Beach · Una servilleta al viento",
+      "file": "02-miami.png",
+      "nativeWidth": 3840,
+      "nativeHeight": 2160,
+      "nativeBytes": 10494811,
+      "sha256": "42b9ff01efb1695aa6e207219e861ed4576c6f764fda04fb3a701e2cb90c5e6b",
+      "preview": "02-miami-1408x768.webp",
+      "previewBytes": 136586,
+      "previewQuality": 80,
+      "prompt": "prompts/02-miami.txt",
+      "log": "02-miami.log",
+      "attempts": 3,
+      "nativeOutputsReturned": 1,
+      "failedRefinementLogs": [
+        "02-miami-v02.log",
+        "02-miami-v02-retry.log"
+      ],
+      "refinementSuccess": false
+    },
+    {
+      "title": "Buenos Aires · Caminata frente al Obelisco",
+      "file": "03-buenos-aires.png",
+      "nativeWidth": 3840,
+      "nativeHeight": 2160,
+      "nativeBytes": 12285225,
+      "sha256": "a2c918308a9dd131308d883678b76899aa4b7ceb70b3692526054089c4c4cdfe",
+      "preview": "03-buenos-aires-1408x768.webp",
+      "previewBytes": 194010,
+      "previewQuality": 80,
+      "prompt": "prompts/03-buenos-aires.txt",
+      "log": "03-buenos-aires.log",
+      "attempts": 1
+    }
+  ]
+}

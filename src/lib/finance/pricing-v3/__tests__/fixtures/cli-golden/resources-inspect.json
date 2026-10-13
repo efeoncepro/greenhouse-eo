@@ -1,0 +1,25 @@
+{
+  "args": [
+    "resources",
+    "inspect",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v11.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--date",
+    "2026-10-11"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 94234,
+    "sha256": "60c438a04f36847531f525ec265c1027881e3c2c1a760fb634399108192b9631"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

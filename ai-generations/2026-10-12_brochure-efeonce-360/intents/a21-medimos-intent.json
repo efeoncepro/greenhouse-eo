@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-measure-formulas",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Qué medimos",
+    "question": "¿Cómo sé que funciona?",
+    "answer": [
+      "Lo",
+      "medimos"
+    ]
+  },
+  "body": "Cada métrica con su fórmula, su fuente y un **dueño**, desde el diagnóstico. Sin cifras de promesa.",
+  "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+  "metrics": [
+    {
+      "glyph": "embudo",
+      "name": "Pipeline",
+      "formula": "Oportunidades creadas por canal ÷ mes",
+      "source": "Tu CRM",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "reloj",
+      "name": "A tiempo",
+      "formula": "Entregas en fecha ÷ total (OTD)",
+      "source": "Greenhouse",
+      "owner": "Responsable de cuenta"
+    },
+    {
+      "glyph": "checklist",
+      "name": "A la primera",
+      "formula": "Piezas aprobadas sin cambios ÷ total (FTR)",
+      "source": "Greenhouse",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "busqueda",
+      "name": "Visibilidad",
+      "formula": "Menciones de tu marca en respuestas de IA ÷ consultas",
+      "source": "AI Visibility Report",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "medicion",
+      "name": "Resultado",
+      "formula": "La métrica de negocio que acordamos, con su línea base",
+      "source": "Efeonce Insights",
+      "owner": "Tu equipo y el nuestro"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:image /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts --model gpt-image-2.5-sunburst --prompt-file ai-generations/2026-10-08_viajeros-pov/prompts/03-cancun-delfines-toalla.txt --size 3840x2160 --quality max --format png --background opaque --count 1 --timeout 600000 --out ai-generations/2026-10-08_viajeros-pov/03-cancun-delfines-toalla.png
+
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-08_viajeros-pov/03-cancun-delfines-toalla.png …
+  ✓ 12075KB · gpt-image-2.5-sunburst · 3840x2160 · max
+    usage: in 935 (img 0 · txt 935) · out 13342 · total 14277
+done

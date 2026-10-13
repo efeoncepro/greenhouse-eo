@@ -2,13 +2,14 @@
 
 ## Status
 
-- Status: `Proposed`
+- Status: `Accepted` — aprobación explícita del operador, 2026-10-09
 - Date: 2026-07-30
 - Owner: Efeonce Talent + Operations + Delivery, con Finance/Commercial como gate económico
 - Scope: Workforce, Hiring/ATS, assessment, talent profiles, onboarding, performance, client experience y capacity pricing
 - Reversibility: `two-way-but-slow`
 - Confidence: `medium`
-- Validated as of: 2026-08-15 (runtime-baseline review; decision remains Proposed)
+- Validated as of: 2026-10-09 (aceptación y revisión documental; baseline runtime fechado por separado)
+- Runtime state: estándar y arquitectura objetivo aceptados; policy detallada, gates y rollout pendientes
 - Evidence: [Hiring Quality Assurance Audit 2026-07-30](../audits/hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
 - Economic companion: [Talent Assurance Economic Guardrails V1](../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md)
 - Architecture companion: [Talent Assurance Architecture V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1.md)
@@ -21,7 +22,7 @@ Efeonce no vende únicamente horas, piezas o personas. Vende capacidades operada
 
 La calidad de selección y la retención no son objetivos opuestos: ambas protegen la promesa. El economics también forma parte del contrato porque un fee que no financia talento, governance, backup y reemplazo vuelve inviable la promesa.
 
-## Decision propuesta
+## Decision aceptada
 
 Efeonce debe operar una capa transversal `Talent Assurance` que:
 
@@ -35,7 +36,28 @@ Efeonce debe operar una capa transversal `Talent Assurance` que:
 
 `Hiring Quality Assurance` será el subsistema que gobierna la entrada de talento. No reemplaza Hiring, HRIS, Performance, Client Experience ni Finance.
 
-## Delta 2026-08-15 — Revisión de baseline y frontera de ejecución
+## Aceptación 2026-10-09 — Estándar transversal y alcance
+
+El operador aprobó explícitamente: «Avancemos con esto y lo de Talent Assurance está aprobado también,
+documentemos todo esto». Se aceptan esta decisión, la arquitectura objetivo y sus guardrails económicos
+como estándar transversal de Efeonce. La aprobación no se limita a CRM ni convierte la evidencia de una
+persona en un claim universal.
+
+La aplicación comercial inicial documentada es la [capacidad regional de CRM y RevOps](EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md).
+Talent Assurance sostiene selección basada en evidencia, formación aplicada, desempeño y continuidad,
+con responsables humanos, memoria transferible y economics que financien el estándar.
+
+La aceptación retira el bloqueo de decisión propuesta. `TASK-1602` conserva el catálogo V1 y la policy
+versionada de vigencia, verificador, apelación, privacidad y revocación; los dominios mantienen revisión
+en sus fronteras. No se acredita un claim store, sello público, Quality Gate obligatorio, outcomes 30/60/90,
+contrato por país ni agente autónomo operativo mediante esta aprobación. Los contratos concretan dedicación,
+formación, respaldo y SLA sólo con capacidad, evidencia y costo comprobados.
+
+El [estado documental de EPIC-038](../epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md)
+conserva las unidades de implementación. El baseline siguiente es histórico: su mención de `Proposed`
+describe agosto de 2026 y no el estado aceptado actual.
+
+## Delta 2026-08-15 — Revisión de baseline y frontera de ejecución (histórico)
 
 La revisión confirmó primitives reutilizables de Hiring/Workforce/Finance, pero no aceptó esta decisión ni creó
 runtime de Talent Assurance. `HiringHandoff` más `greenhouse_hr.hiring_activation_request` es el lineage durable
@@ -188,7 +210,7 @@ Rechazada. Destruye el significado del sello y aumenta retrabajo, churn, presió
 
 Rechazada. La verificación debe estar conectada a Hiring, delivery real, client experience, performance y continuidad.
 
-## Runtime contract propuesto
+## Runtime contract objetivo — implementación pendiente
 
 La implementación futura debe declarar, sin duplicar dominios:
 
@@ -240,7 +262,7 @@ nuevo sistema paralelo
 
 ## Revisit when
 
-Reabrir esta propuesta cuando:
+Revisar esta decisión cuando:
 
 - se definan los thresholds de evidencia por rol;
 - exista un modelo aprobado de verificación y expiración;

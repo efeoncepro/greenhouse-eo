@@ -1,0 +1,28 @@
+{
+  "lane": "flare",
+  "icon": "04-escudo",
+  "elapsedSeconds": 48.88796806335449,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:image",
+    "--model",
+    "gpt-image-2.5-flare",
+    "--quality",
+    "max",
+    "--size",
+    "2048x2048",
+    "--background",
+    "opaque",
+    "--format",
+    "png",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/prompts/04-escudo.txt",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/04-escudo.png",
+    "--timeout",
+    "600000"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/04-escudo.png"
+}

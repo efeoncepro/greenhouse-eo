@@ -75,7 +75,7 @@ Violations visible in code review or agent output are a **hard block**, not a ni
 - Geist:  `var(--font-geist), 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`
 - Poppins: `var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif`
 
-El stack vive textualmente en `src/app/layout.tsx` (param `fallback` de `next/font/google`) y en `src/components/theme/mergedTheme.ts` (`typography.fontFamily`). Cuando se modifique uno hay que reflejarlo en los tres puntos: layout, theme y este documento.
+El stack vive textualmente en `src/app/layout.tsx` (param `fallback` de `next/font/local`) y en `src/components/theme/mergedTheme.ts` (`typography.fontFamily`). Cuando se modifique uno hay que reflejarlo en los tres puntos: layout, theme y este documento.
 
 **Por qué dos familias y no tres**: monospace (Menlo, Courier, Consolas) lee como "código / herramienta de dev / legacy" en UIs enterprise modernas. Ramp, Mercury, Pilot, Stripe Dashboard, Linear y Vercel usan sans-serif con `tabular-nums` para alinear columnas. Monospace pertenece a editores de código y consolas SQL, no al quote builder de un CFO.
 
@@ -102,6 +102,12 @@ un color aislado no demuestra atribución. El canon de producción y contexto cu
 [SEASONAL_CONTENT.md](../../.codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md) y
 [brand-in-scene.md](../../.codex/skills/social-media-studio/references/brand-in-scene.md).
 Estas reglas creativas no activan Bricolage ni nuevos tokens en la UI.
+
+**Carga determinista (ISSUE-178):** los WOFF2 web versionados viven en `src/assets/fonts/web/`,
+con procedencia, licencias y SHA-256 en su manifest. El build verifica sus bytes y rechaza loaders
+Google remotos mediante `scripts/ci/web-fonts-gate.mjs`. Latin cubre ES/EN/PT-BR; una ampliación
+de escrituras requiere assets y QA explícitos. La excepción Bricolage 500 del escenario de login
+conserva su instancia óptica 14, sin incorporarse al theme. No cambian roles ni tokens.
 
 ### 3.2 Type scale
 
@@ -757,7 +763,7 @@ Cuando un agente lee DESIGN.md y necesita el variant runtime, consulta el bridge
 - `src/components/theme/typography-tokens.ts` — line-height token namespace (v1.3+)
 - `src/components/theme/types.ts` — TypeScript augmentation for variants + lineHeights
 - `src/configs/primaryColorConfig.ts` — Efeonce primary palette catalog (7 colors)
-- `src/app/layout.tsx` — font loading via `next/font/google`
+- `src/app/layout.tsx` — font loading via `next/font/local`
 - `src/@core/theme/` — Vuexy base (lowest priority, read-only by hard rule)
 
 **Audits**:

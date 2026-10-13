@@ -1,0 +1,874 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-seo-aeo-managed-service-2026-10-11",
+  "baseDigest": "5b07943f1ac533f59d83a91e4d74155b5ee37f7b11d01126ef798d057672735c",
+  "nextVersion": "operating-review-2026-10-11-v8",
+  "actor": "operator-authorized-agent",
+  "reason": "Add a pricing policy for managed services of the SEO/AEO practice: target margin 55%, floor 45%. The practice floor was approved on 2026-07-13 but the catalog had no offer for it, so an SEO programme could only borrow the creative offer (target equal to floor). CEO decision of 2026-10-11. Existing policies are untouched.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-001:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-001:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-001",
+          "tierCode": "historical-tier-3",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-002:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-002:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-003:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-003:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-003",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-004:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-004:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-004",
+          "tierCode": "historical-tier-3",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-005:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-005:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-005",
+          "tierCode": "historical-tier-3",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-006:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-006:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-006",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-007:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-007:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-007",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-008:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-008:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-008",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-009:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-009:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-009",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-010:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-010:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-010",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-011:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-011:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-011",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-012:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-012:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-012",
+          "tierCode": "historical-tier-3",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-013:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-013:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-013",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-014:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-014:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-014",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-015:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-015:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-015",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-016:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-016:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-016",
+          "tierCode": "historical-tier-3",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-017:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-017:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-017",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-018:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-018:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-018",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-019:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-019:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-019",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-020:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-020:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-020",
+          "tierCode": "historical-tier-4",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-021:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-021:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-021",
+          "tierCode": "historical-tier-4",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-022:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-022:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-022",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-023:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-023:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-023",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-024:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-024:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-024",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-025:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-025:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-025",
+          "tierCode": "historical-tier-4",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-026:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-026:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-026",
+          "tierCode": "historical-tier-4",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-027:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-027:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-027",
+          "tierCode": "historical-tier-4",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-028:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-028:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-028",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-029:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-029:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-029",
+          "tierCode": "historical-tier-1",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-030:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-030:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-030",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-031:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-031:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-031",
+          "tierCode": "historical-tier-2",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-032:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-032:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-032",
+          "tierCode": "historical-tier-4",
+          "offerId": "seo-aeo-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.55",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:seo-aeo-practice-margin-2026-07-13",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Managed service of the SEO/AEO practice. Floor 45% of margin on all costs: approved by the CEO on 2026-07-13 for the practice and reaffirmed on 2026-10-11. Target 55%: the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    }
+  ]
+}

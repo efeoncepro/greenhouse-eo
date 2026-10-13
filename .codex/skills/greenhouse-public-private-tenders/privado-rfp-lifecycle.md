@@ -33,6 +33,16 @@ Confundirlos hace perder deals. Cada uno señala una **etapa de madurez** de la 
 
 Puntos donde se decide y que en público no existen: **7 (shortlist), 8 (orales), 9 (negociación) y 10 (BAFO)**. Ahí es donde una agencia con buena presencia gana contra un competidor más barato pero más frío.
 
+### El Q&A en una plataforma de sourcing es compartido (paso 4)
+
+Cuando el RFP corre por una plataforma (Wherex y similares), el periodo de consultas no es 1:1: el comprador responde a la vista de todos los proveedores. Tres consecuencias operativas, medidas en Sika Mexicana, Wherex N.º 1164 (octubre de 2026):
+
+- **Las respuestas a otros proveedores son parte de las bases.** Ahí se definió qué cotizar, qué formato de muestra se admitía y qué se esperaba además del brief. Se leen todas, no sólo las propias.
+- **Se relee antes de congelar cada documento.** Una respuesta pedía una propuesta de SLA por niveles de complejidad; se leyó el 12/10, con la propuesta técnica ya cerrada; hubo que agregar una lámina y volver a exportar. Releer ficha y mensajes completos antes de cerrar la técnica y otra vez antes de la económica.
+- **Lo que el comprador pospone no se rellena.** Si responde que las condiciones de contratación y pago se revisan con quienes avancen, la oferta no propone plazos de pago: los remite a la formalización. Eso se negocia en los pasos 9 a 11, no en el documento de la oferta.
+
+Dónde mirar cada cosa en el portal (pasos de la oferta, moneda, datos fiscales del comprador, hora de cierre): `wherex-radar-chrome-playwright.md` → «Anatomía de la oferta en el portal».
+
 ## Cómo evalúa el comprador (el scorecard que no ves)
 
 El comité de compra corporativo suele puntuar con dimensiones parecidas a estas — anticípalas y aliméntalas:

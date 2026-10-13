@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "457b512e86e8f8df0b770720b5bab7eb833f81375888c265bf7ec7f017cd6e61",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:SP2b-dias-no-meses-isotipo-lens-440x440",
+      "path": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+      "sha256": "8d1b0670b17d5846a12b63935b46e4eacf9d404e5b78c1135ff23d0f1cce8016"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

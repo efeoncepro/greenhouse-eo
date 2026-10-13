@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "f14eb9ac9d2671116a226b3875a8e0187899898d031c0321b607aa4678086391",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT2-listening",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT2-listening.png",
+      "sha256": "d853da71faa494c8317d4428590eb6b25b8deda5838dc496d2076dd6562629f3"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

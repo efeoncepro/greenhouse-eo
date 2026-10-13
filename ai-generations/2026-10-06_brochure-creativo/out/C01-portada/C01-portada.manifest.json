@@ -1,0 +1,234 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "C01-portada",
+  "input": {
+    "artifactId": "C01-portada",
+    "slides": [
+      {
+        "slideId": "deck-cover-brochure",
+        "contentType": "deck.cover-brochure",
+        "slots": {
+          "frame": {
+            "line": "brand",
+            "margin": 140,
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=220px",
+            "eyebrowTop": 410,
+            "questionTop": 458,
+            "answerTop": 520,
+            "answerPx": 124,
+            "answerInset": "--gl-answer-inset=-4px",
+            "bodyTop": 672,
+            "bodyPx": 28,
+            "bodyWidth": 724,
+            "bodyLeading": "--gl-body-leading=1.3",
+            "bodyWeight": "--gl-body-wght=400",
+            "bodyStrongWeight": "--gl-body-strong-wght=600",
+            "bodyColor": "--gl-body-color=#ffffff",
+            "eyebrowPx": "--gl-eyebrow-px=22px",
+            "eyebrowWeight": "--gl-eyebrow-wght=500",
+            "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+            "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+            "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+            "questionPx": "--gl-question-px=40px",
+            "questionLeading": "--gl-question-leading=1.2",
+            "questionColor": "--gl-question-color=#ffffff",
+            "answerLeading": "--gl-answer-leading=0.95",
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "answerColor": "--gl-answer-color=#ffffff",
+            "logoWidth": "--gl-logo-width=500px"
+          },
+          "backdrop": {
+            "src": "asset-ref:plate:CR4-el-squad-te-la-entrega-v2",
+            "alt": "Una directora creativa de Efeonce con hoodie mira a cámara y ofrece con las palmas una pieza terminada que brilla en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja"
+          },
+          "voice": {
+            "question": "¿Quién crea mi contenido?",
+            "answer": "Tu squad",
+            "eyebrow": "Brochure · Creative Services"
+          },
+          "evidence": "<strong>Seis</strong> capacidades:<br>Squad creativo · Brand systems · Campañas<br>Contenido y social · Audiovisual · Run &amp; Gun"
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-cover-brochure",
+      "contentType": "deck.cover-brochure",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=220px",
+          "eyebrowTop": 410,
+          "questionTop": 458,
+          "answerTop": 520,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "bodyTop": 672,
+          "bodyPx": 28,
+          "bodyWidth": 724,
+          "bodyLeading": "--gl-body-leading=1.3",
+          "bodyWeight": "--gl-body-wght=400",
+          "bodyStrongWeight": "--gl-body-strong-wght=600",
+          "bodyColor": "--gl-body-color=#ffffff",
+          "eyebrowPx": "--gl-eyebrow-px=22px",
+          "eyebrowWeight": "--gl-eyebrow-wght=500",
+          "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+          "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+          "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "logoWidth": "--gl-logo-width=500px"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:CR4-el-squad-te-la-entrega-v2",
+          "alt": "Una directora creativa de Efeonce con hoodie mira a cámara y ofrece con las palmas una pieza terminada que brilla en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja"
+        },
+        "voice": {
+          "question": "¿Quién crea mi contenido?",
+          "answer": "Tu squad",
+          "eyebrow": "Brochure · Creative Services"
+        },
+        "evidence": "<strong>Seis</strong> capacidades:<br>Squad creativo · Brand systems · Campañas<br>Contenido y social · Audiovisual · Run &amp; Gun"
+      },
+      "template": "CoverBrochure",
+      "contractHash": "c5bcb43ef1ffec41a49a5ae407d9bb3f9c58b44f7a8d2ffae4ee6c7a90b65341",
+      "templateHash": "e569234e389ba59aec96b535122204279b5190e451413ce6d17e9e11a08df43d"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

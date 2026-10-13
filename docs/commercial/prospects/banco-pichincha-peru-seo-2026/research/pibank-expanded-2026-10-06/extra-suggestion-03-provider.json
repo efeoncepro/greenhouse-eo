@@ -1,0 +1,345 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:17:29.825Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.keyword.suggestions.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/keyword_suggestions/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "bancos seguros peru",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "limit": 300,
+        "order_by": [
+          "keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.048,
+    "estimateStatus": "available",
+    "maxUsd": 0.048,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live/",
+      "sourceModifiedAt": "2026-08-14T14:59:52.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 2966,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 2966,
+        "costUsd": 0.01224,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061917-1987-0399-0000-8ab113294819",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01224,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01224,
+    "tasks": [
+      {
+        "id": "10061917-1987-0399-0000-8ab113294819",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.6332 sec.",
+        "cost": 0.01224,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "keyword_suggestions",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "keyword_suggestions",
+          "se_type": "google",
+          "keyword": "bancos seguros peru",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": true,
+          "include_serp_info": true,
+          "limit": 300,
+          "order_by": [
+            "keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "bancos seguros peru",
+            "seed_keyword_data": {
+              "se_type": "google",
+              "keyword": "bancos seguros peru",
+              "location_code": 2604,
+              "language_code": "es",
+              "keyword_info": null,
+              "keyword_info_normalized_with_bing": null,
+              "keyword_info_normalized_with_clickstream": null,
+              "clickstream_keyword_info": null,
+              "keyword_properties": null,
+              "serp_info": null,
+              "search_intent_info": null,
+              "avg_backlinks_info": null
+            },
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 2,
+            "items_count": 2,
+            "offset": 0,
+            "offset_token": "eyJDdXJyZW50T2Zmc2V0IjoyLCJSZXF1ZXN0RGF0YSI6eyJrZXl3b3JkIjoiYmFuY29zIHNlZ3Vyb3MgcGVydSIsImluY2x1ZGVfc2VlZF9rZXl3b3JkIjp0cnVlLCJmdWxsX21hdGNoIjpmYWxzZSwibG9hZF9zZXJwX2luZm8iOnRydWUsInNlYXJjaF9hZnRlcl90b2tlbiI6bnVsbCwiaWdub3JlX3N5bm9ueW1zIjpmYWxzZSwibGFuZ3VhZ2UiOiJlcyIsInNlYXJjaF9lbmdpbmUiOiJnb29nbGUiLCJsb2NhdGlvbiI6MjYwNCwidXNlX25ld19jYXRlZ29yaWVzIjp0cnVlLCJvcmRlcl9ieSI6eyJvcmRlcl9maWVsZCI6ImtleXdvcmRfaW5mby5zZWFyY2hfdm9sdW1lIiwib3JkZXJfdHlwZSI6IkRlc2MiLCJuZXh0IjpudWxsfSwibGltaXQiOjMwMCwib2Zmc2V0IjowLCJhaWQiOjE5ODc5MiwidXNlX2NhY2hlIjp0cnVlLCJ0YXNrX2lkIjoiMTAwNjE5MTctMTk4Ny0wMzk5LTAwMDAtOGFiMTEzMjk0ODE5IiwiZmxhZ3MiOm51bGx9LCJSYXdRdWVyeSI6bnVsbCwiSWQiOiI1MzFmNTE3YS02ZTMzLTQ1NzQtOTI0ZS0xMjhjNGRkMzMxYTkiLCJTZWFyY2hBZnRlckRhdGEiOlsxMCwiZTVhNTA4MWEtODY5OC0wMWYzLWYyNGItODU3ZjAzMTdhMjE2Il0sIkV4ZWN1dG9yIjotOTE4NDQwNTk0MDQ0NDUxNzYzM30=",
+            "items": [
+              {
+                "se_type": "google",
+                "keyword": "bancos mas seguros del peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-14 10:12:33 +00:00",
+                  "competition": 0,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": null,
+                  "high_top_of_page_bid": null,
+                  "categories": [
+                    10012,
+                    10093,
+                    11817,
+                    12949
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 20
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": -50
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "it",
+                  "is_another_language": true,
+                  "words_count": 5
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 03:41:41 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword": "bancos seguros en peru",
+                "location_code": 2604,
+                "language_code": "es",
+                "keyword_info": {
+                  "se_type": "google",
+                  "last_updated_time": "2026-09-16 11:50:53 +00:00",
+                  "competition": 0.27,
+                  "competition_level": "LOW",
+                  "cpc": null,
+                  "search_volume": 10,
+                  "low_top_of_page_bid": 0.81,
+                  "high_top_of_page_bid": 1.72,
+                  "categories": [
+                    10012,
+                    10093
+                  ],
+                  "monthly_searches": [
+                    {
+                      "year": 2026,
+                      "month": 8,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 7,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 6,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 5,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 4,
+                      "search_volume": 20
+                    },
+                    {
+                      "year": 2026,
+                      "month": 3,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 2,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2026,
+                      "month": 1,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 12,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 11,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 10,
+                      "search_volume": 10
+                    },
+                    {
+                      "year": 2025,
+                      "month": 9,
+                      "search_volume": 10
+                    }
+                  ],
+                  "search_volume_trend": {
+                    "monthly": 0,
+                    "quarterly": 0,
+                    "yearly": 0
+                  }
+                },
+                "keyword_info_normalized_with_bing": null,
+                "keyword_info_normalized_with_clickstream": null,
+                "clickstream_keyword_info": null,
+                "keyword_properties": {
+                  "se_type": "google",
+                  "core_keyword": null,
+                  "synonym_clustering_algorithm": null,
+                  "keyword_difficulty": null,
+                  "detected_language": "es",
+                  "is_another_language": false,
+                  "words_count": 4
+                },
+                "serp_info": null,
+                "avg_backlinks_info": null,
+                "search_intent_info": {
+                  "se_type": "google",
+                  "main_intent": "commercial",
+                  "foreign_intent": null,
+                  "last_updated_time": "2026-04-29 03:56:52 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

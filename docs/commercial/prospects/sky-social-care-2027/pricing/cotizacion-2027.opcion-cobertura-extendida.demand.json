@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "accountId": "sky-airline-simulation",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "agentes",
+        "profile": "ECG-021",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "lider",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.05"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "sky-precio-opcional",
+        "kind": "agreed_net",
+        "amount": "1290000",
+        "billing": "monthly",
+        "lineIds": [
+          "agentes",
+          "lider"
+        ],
+        "reason": "Opcional de la propuesta entregada el 10/10/2026: cobertura extendida con agentes autónomos, CLP 1.290.000 más IVA al mes. Costo sobre supuestos sin medir (10 puntos más del especialista de agentes, 5 del líder y el doble de consumo de agentes); la construcción de la publicación automática no está en el costo."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "tax:cl-iva-19",
+      "source": {
+        "reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    },
+    "engagementForm": "on_going"
+  },
+  "work": [
+    {
+      "lineId": "agentes",
+      "assigneeIds": [
+        "sky-care-agentes"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "crm-automation",
+          "reason": "Este rol mantiene los agentes y la base de conocimiento; sin automatización de CRM en el alcance."
+        }
+      ]
+    },
+    {
+      "lineId": "lider",
+      "assigneeIds": [
+        "sky-care-lider"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [
+    "agent-runtime-usage"
+  ],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "2",
+      "serviceShare": "0.075",
+      "seatCapacity": 2,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "2",
+        "allocatedUnits": "0.15"
+      },
+      "reason": "Parte incremental del opcional: 2 asiento(s) nominativo(s) que estas personas ya tienen en la cotización base; aquí se carga sólo la dedicación adicional, 0.15 de 2. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "2",
+      "serviceShare": "0.075",
+      "seatCapacity": 2,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "2",
+        "allocatedUnits": "0.15"
+      },
+      "reason": "Parte incremental del opcional: 2 asiento(s) nominativo(s) que estas personas ya tienen en la cotización base; aquí se carga sólo la dedicación adicional, 0.15 de 2. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodId": 1,
+      "toolId": "agent-runtime-usage",
+      "priceId": "hypothesis-per-1000-items",
+      "quantity": "10",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "thousand-items-processed",
+        "totalUnits": "10",
+        "allocatedUnits": "10"
+      },
+      "reason": "Supuesto sin medir de la propuesta: el consumo de agentes se duplica con la atención fuera de horario (unos 10.000 ítems más al mes)."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

@@ -1,0 +1,20 @@
+{
+  "source": "../axis-design-system/scripts/icons-volume.mjs",
+  "sourceSha256": "45f18f025c5e6901f8edf661d5378852c48ce52a425b3d22b5d484d6a7030110",
+  "adapterSha256": "cfe531bc5006cec21ea8000ab429760456ef4492230c6c3159189afa9604c894",
+  "changes": [
+    "absolute imports for tokens/renderer",
+    "candidate inventory from operator-approved selection",
+    "allow only key and check commands"
+  ],
+  "functionsUnchanged": [
+    "keyOne",
+    "key",
+    "mask",
+    "regions",
+    "normalized",
+    "measure",
+    "check"
+  ],
+  "scope": "stateless artifact adapter, no AXIS source/catalog/package/publication changes"
+}

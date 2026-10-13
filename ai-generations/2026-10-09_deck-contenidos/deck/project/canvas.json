@@ -1,0 +1,746 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-09T21:30:00Z"
+ },
+ "title": "Deck Marketing de Contenidos",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [
+  {
+   "id": "deck",
+   "name": "Deck"
+  },
+  {
+   "id": "ruta",
+   "name": "Ruta corta · 21 láminas"
+  },
+  {
+   "id": "ms",
+   "name": "Interfaces · Marketing Studio"
+  }
+ ],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "01 · Portada (receta)"
+  },
+  "02-tesis.dc.html": {
+   "x": 2000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "02 · Tesis"
+  },
+  "03-tres-frentes.dc.html": {
+   "x": 6000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "04 · Seis frentes"
+  },
+  "04-social-media.dc.html": {
+   "x": 10000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "06 · Social media"
+  },
+  "05-formatos.dc.html": {
+   "x": 12000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "07 · Social media · Una idea, cada formato"
+  },
+  "06-influencers.dc.html": {
+   "x": 6000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "12 · Influencer marketing"
+  },
+  "07-ugc.dc.html": {
+   "x": 10000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "14 · Creadores y UGC"
+  },
+  "07b-listening.dc.html": {
+   "x": 12000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "15 · Listening y trendjacking"
+  },
+  "07c-social-care.dc.html": {
+   "x": 4000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "19 · Social care"
+  },
+  "07d-paid-social.dc.html": {
+   "x": 10000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "22 · Paid social"
+  },
+  "07e-redes.dc.html": {
+   "x": 4000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "27 · Redes que atendemos"
+  },
+  "07f-linkedin-ejecutivos.dc.html": {
+   "x": 2000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "34 · Programas · Voz ejecutiva en LinkedIn"
+  },
+  "10a-ciclo.dc.html": {
+   "x": 8000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "37 · Cómo trabajamos"
+  },
+  "11b-marketing-studio.dc.html": {
+   "x": 10000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "38 · Marketing Studio"
+  },
+  "12a-stack.dc.html": {
+   "x": 12000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "39 · Stack (receta)"
+  },
+  "12b-dia.dc.html": {
+   "x": 14000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "40 · Día a día (receta)"
+  },
+  "12c-vivelo-avance.dc.html": {
+   "x": 0,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "41 · Vívelo 1 (receta)"
+  },
+  "12d-vivelo-resultados.dc.html": {
+   "x": 2000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "42 · Vívelo 2 (receta)"
+  },
+  "10b-mes.dc.html": {
+   "x": 4000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "43 · Tu mes con nosotros"
+  },
+  "10c-squad.dc.html": {
+   "x": 6000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "44 · El squad"
+  },
+  "13b-equipo.dc.html": {
+   "x": 8000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "45 · Expertos multidisciplinarios"
+  },
+  "10d-control.dc.html": {
+   "x": 10000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "46 · Control (receta)"
+  },
+  "08-derechos.dc.html": {
+   "x": 12000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "47 · Derechos claros"
+  },
+  "09-medicion.dc.html": {
+   "x": 14000,
+   "y": 6000,
+   "w": 1920,
+   "h": 1080,
+   "title": "48 · Medición"
+  },
+  "10e-prueba.dc.html": {
+   "x": 8000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "05 · Caso Sky (receta)"
+  },
+  "16a-testimonio.dc.html": {
+   "x": 2000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "50 · Testimonio (receta)"
+  },
+  "16b-clientes.dc.html": {
+   "x": 4000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "51 · Clientes (receta)"
+  },
+  "16c-partners.dc.html": {
+   "x": 6000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "52 · Partners (receta)"
+  },
+  "16d-mercados.dc.html": {
+   "x": 8000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "53 · Mercados (receta)"
+  },
+  "10f-empezar.dc.html": {
+   "x": 12000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "55 · Cómo empezar"
+  },
+  "10-como-empezamos.dc.html": {
+   "x": 14000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "56 · Próximos pasos (receta)"
+  },
+  "11-cierre.dc.html": {
+   "x": 0,
+   "y": 8400,
+   "w": 1920,
+   "h": 1080,
+   "title": "57 · Contraportada (receta)"
+  },
+  "MS-Month.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 1100,
+   "title": "Calendario mensual",
+   "page": "ms"
+  },
+  "MS-Timeline.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 1100,
+   "title": "Línea de tiempo por plataforma",
+   "page": "ms"
+  },
+  "MS-Mobile.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Calendario móvil",
+   "page": "ms"
+  },
+  "07g-ejecutivos-programa.dc.html": {
+   "x": 4000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "35 · Programas · Ejecutivos en LinkedIn"
+  },
+  "07h-embajadores.dc.html": {
+   "x": 6000,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "36 · Programas · Embajadores de marca"
+  },
+  "06b-seleccion-creadores.dc.html": {
+   "x": 8000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "13 · Influencer marketing · Cómo elegimos creadores"
+  },
+  "06c-programa-creadores.dc.html": {
+   "x": 0,
+   "y": 4800,
+   "w": 1920,
+   "h": 1080,
+   "title": "33 · Programas · Creadores"
+  },
+  "07a2-produccion.dc.html": {
+   "x": 0,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "09 · Social media · Producción"
+  },
+  "07b2-social-search.dc.html": {
+   "x": 2000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "18 · Listening · Social search"
+  },
+  "07d2-social-commerce.dc.html": {
+   "x": 2000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "26 · Social commerce"
+  },
+  "07d3-lanzamientos.dc.html": {
+   "x": 8000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "29 · Momentos · Lanzamientos"
+  },
+  "07d4-evento-en-vivo.dc.html": {
+   "x": 10000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "30 · Momentos · Cobertura en vivo"
+  },
+  "10g-niveles.dc.html": {
+   "x": 10000,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "54 · Niveles del plan"
+  },
+  "MS-Social.dc.html": {
+   "x": 3550,
+   "y": 0,
+   "w": 1440,
+   "h": 860,
+   "title": "Social de la campaña",
+   "page": "ms"
+  },
+  "07d1-paid-ugc.dc.html": {
+   "x": 14000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "24 · Paid social · UGC patrocinado"
+  },
+  "07d1b-paid-formatos.dc.html": {
+   "x": 0,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "25 · Paid social · Anuncios por canal"
+  },
+  "07b1-listening-radar.dc.html": {
+   "x": 14000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "16 · Listening · De ruido a señales"
+  },
+  "07b3-trendjacking.dc.html": {
+   "x": 0,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "17 · Listening · Trendjacking"
+  },
+  "07c1-care-como.dc.html": {
+   "x": 6000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "20 · Social care · Cómo respondemos"
+  },
+  "07c2-care-agentes.dc.html": {
+   "x": 8000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "21 · Social care · Personas y agentes (receta)"
+  },
+  "07c3-reputacion.dc.html": {
+   "x": 12000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "31 · Momentos · Crisis y reputación"
+  },
+  "07a3-ia.dc.html": {
+   "x": 2000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "10 · Social media · Producción con IA"
+  },
+  "02b-feed-intereses.dc.html": {
+   "x": 4000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "03 · Lo que cambió · Cada pieza compite sola"
+  },
+  "04b-series.dc.html": {
+   "x": 14000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "08 · Social media · Series"
+  },
+  "04c-canales-cerrados.dc.html": {
+   "x": 4000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "11 · Social media · Canales cerrados"
+  },
+  "07d0-probar-escalar.dc.html": {
+   "x": 12000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "23 · Paid social · Probar y escalar"
+  },
+  "07m-momentos.dc.html": {
+   "x": 6000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "28 · Momentos"
+  },
+  "07p-programas.dc.html": {
+   "x": 14000,
+   "y": 3600,
+   "w": 1920,
+   "h": 1080,
+   "title": "32 · Programas"
+  },
+  "09b-social-crm.dc.html": {
+   "x": 0,
+   "y": 7200,
+   "w": 1920,
+   "h": 1080,
+   "title": "49 · Medición · Del social al CRM"
+  },
+  "MS-Resultados.dc.html": {
+   "x": 5070,
+   "y": 0,
+   "w": 1440,
+   "h": 860,
+   "title": "Resultados de la campaña",
+   "page": "ms"
+  },
+  "R-01-main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "01 · Portada (receta)",
+   "page": "ruta"
+  },
+  "R-02-02-tesis.dc.html": {
+   "x": 2000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "02 · Tesis",
+   "page": "ruta"
+  },
+  "R-03-02b-feed-intereses.dc.html": {
+   "x": 4000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "03 · Lo que cambió · Cada pieza compite sola",
+   "page": "ruta"
+  },
+  "R-04-03-tres-frentes.dc.html": {
+   "x": 6000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "04 · Seis frentes",
+   "page": "ruta"
+  },
+  "R-05-10e-prueba.dc.html": {
+   "x": 8000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "05 · Caso Sky (receta)",
+   "page": "ruta"
+  },
+  "R-06-04-social-media.dc.html": {
+   "x": 10000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "06 · Social media",
+   "page": "ruta"
+  },
+  "R-07-06-influencers.dc.html": {
+   "x": 12000,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "07 · Influencer marketing",
+   "page": "ruta"
+  },
+  "R-08-07-ugc.dc.html": {
+   "x": 0,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "08 · Creadores y UGC",
+   "page": "ruta"
+  },
+  "R-09-07a3-ia.dc.html": {
+   "x": 2000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "09 · Social media · Producción con IA",
+   "page": "ruta"
+  },
+  "R-10-07b-listening.dc.html": {
+   "x": 4000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "10 · Listening y trendjacking",
+   "page": "ruta"
+  },
+  "R-11-07c-social-care.dc.html": {
+   "x": 6000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "11 · Social care",
+   "page": "ruta"
+  },
+  "R-12-07d-paid-social.dc.html": {
+   "x": 8000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "12 · Paid social",
+   "page": "ruta"
+  },
+  "R-13-07m-momentos.dc.html": {
+   "x": 10000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "13 · Momentos",
+   "page": "ruta"
+  },
+  "R-14-07p-programas.dc.html": {
+   "x": 12000,
+   "y": 1200,
+   "w": 1920,
+   "h": 1080,
+   "title": "14 · Programas",
+   "page": "ruta"
+  },
+  "R-15-10a-ciclo.dc.html": {
+   "x": 0,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "15 · Cómo trabajamos",
+   "page": "ruta"
+  },
+  "R-16-12b-dia.dc.html": {
+   "x": 2000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "16 · Día a día (receta)",
+   "page": "ruta"
+  },
+  "R-17-10c-squad.dc.html": {
+   "x": 4000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "17 · El squad",
+   "page": "ruta"
+  },
+  "R-18-09-medicion.dc.html": {
+   "x": 6000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "18 · Medición",
+   "page": "ruta"
+  },
+  "R-19-10g-niveles.dc.html": {
+   "x": 8000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "19 · Niveles del plan",
+   "page": "ruta"
+  },
+  "R-20-10f-empezar.dc.html": {
+   "x": 10000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "20 · Cómo empezar",
+   "page": "ruta"
+  },
+  "R-21-11-cierre.dc.html": {
+   "x": 12000,
+   "y": 2400,
+   "w": 1920,
+   "h": 1080,
+   "title": "21 · Contraportada (receta)",
+   "page": "ruta"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "02-tesis.dc.html",
+  "02b-feed-intereses.dc.html",
+  "03-tres-frentes.dc.html",
+  "10e-prueba.dc.html",
+  "04-social-media.dc.html",
+  "05-formatos.dc.html",
+  "04b-series.dc.html",
+  "07a2-produccion.dc.html",
+  "07a3-ia.dc.html",
+  "04c-canales-cerrados.dc.html",
+  "06-influencers.dc.html",
+  "06b-seleccion-creadores.dc.html",
+  "07-ugc.dc.html",
+  "07b-listening.dc.html",
+  "07b1-listening-radar.dc.html",
+  "07b3-trendjacking.dc.html",
+  "07b2-social-search.dc.html",
+  "07c-social-care.dc.html",
+  "07c1-care-como.dc.html",
+  "07c2-care-agentes.dc.html",
+  "07d-paid-social.dc.html",
+  "07d0-probar-escalar.dc.html",
+  "07d1-paid-ugc.dc.html",
+  "07d1b-paid-formatos.dc.html",
+  "07d2-social-commerce.dc.html",
+  "07e-redes.dc.html",
+  "07m-momentos.dc.html",
+  "07d3-lanzamientos.dc.html",
+  "07d4-evento-en-vivo.dc.html",
+  "07c3-reputacion.dc.html",
+  "07p-programas.dc.html",
+  "06c-programa-creadores.dc.html",
+  "07f-linkedin-ejecutivos.dc.html",
+  "07g-ejecutivos-programa.dc.html",
+  "07h-embajadores.dc.html",
+  "10a-ciclo.dc.html",
+  "11b-marketing-studio.dc.html",
+  "12a-stack.dc.html",
+  "12b-dia.dc.html",
+  "12c-vivelo-avance.dc.html",
+  "12d-vivelo-resultados.dc.html",
+  "10b-mes.dc.html",
+  "10c-squad.dc.html",
+  "13b-equipo.dc.html",
+  "10d-control.dc.html",
+  "08-derechos.dc.html",
+  "09-medicion.dc.html",
+  "09b-social-crm.dc.html",
+  "16a-testimonio.dc.html",
+  "16b-clientes.dc.html",
+  "16c-partners.dc.html",
+  "16d-mercados.dc.html",
+  "10g-niveles.dc.html",
+  "10f-empezar.dc.html",
+  "10-como-empezamos.dc.html",
+  "11-cierre.dc.html",
+  "R-01-main.dc.html",
+  "R-02-02-tesis.dc.html",
+  "R-03-02b-feed-intereses.dc.html",
+  "R-04-03-tres-frentes.dc.html",
+  "R-05-10e-prueba.dc.html",
+  "R-06-04-social-media.dc.html",
+  "R-07-06-influencers.dc.html",
+  "R-08-07-ugc.dc.html",
+  "R-09-07a3-ia.dc.html",
+  "R-10-07b-listening.dc.html",
+  "R-11-07c-social-care.dc.html",
+  "R-12-07d-paid-social.dc.html",
+  "R-13-07m-momentos.dc.html",
+  "R-14-07p-programas.dc.html",
+  "R-15-10a-ciclo.dc.html",
+  "R-16-12b-dia.dc.html",
+  "R-17-10c-squad.dc.html",
+  "R-18-09-medicion.dc.html",
+  "R-19-10g-niveles.dc.html",
+  "R-20-10f-empezar.dc.html",
+  "R-21-11-cierre.dc.html",
+  "MS-Month.dc.html",
+  "MS-Timeline.dc.html",
+  "MS-Mobile.dc.html",
+  "MS-Social.dc.html",
+  "MS-Resultados.dc.html"
+ ],
+ "notes": {
+  "titulo": {
+   "x": 0,
+   "y": -300,
+   "text": "Marketing de Contenidos · social, influencers, UGC, listening, social care y paid social · brochure · línea Brand",
+   "kind": "title1",
+   "maxW": 15920,
+   "page": "deck"
+  },
+  "ruta-titulo": {
+   "x": 0,
+   "y": -300,
+   "text": "Ruta corta para presentar: 21 láminas del deck, en el mismo orden. Son copias; el original vive en la página «Deck».",
+   "kind": "title1",
+   "maxW": 13920,
+   "page": "ruta"
+  }
+ },
+ "designSystems": [
+  {
+   "title": "Efeonce — La órbita",
+   "namespace": "efeonce-la-orbita",
+   "artifact": "https://claude.ai/code/artifact/0f7107f2-2ef1-460c-af82-5bf59e2f8785",
+   "version": "1791045370-2874",
+   "copiedAt": "2026-10-09T21:30:00Z"
+  }
+ ]
+}

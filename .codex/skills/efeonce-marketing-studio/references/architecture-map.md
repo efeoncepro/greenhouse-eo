@@ -23,7 +23,7 @@ only; never write values here.
 | `apps/web/src/app/robots.ts` + `layout.tsx` `robots:{index:false}` | Disallow all + noindex (open mode) |
 | `apps/web/src/app/api/v1/**/route.ts` | 17 route handlers, one per registry operation (see `contracts.md`) |
 | `apps/web/src/server/api.ts` | `handle()` adapter: correlation id, actor, `organizationId` narrowing, error classification, `Cache-Control: no-store` |
-| `apps/web/src/server/runtime.ts` | One DB handle per function instance, Google auth client, `accessMode()`, `resolveRequestActor()` (bearer → api_client; no header → mode actor), `configureMediaUrls(STUDIO_MEDIA_URL_SECRET)` |
+| `apps/web/src/server/runtime.ts` | One DB handle per function instance, Google auth client, `accessMode()`, `resolveRequestActor()` (bearer → api_client; no header → mode actor; in `open` mode with a valid temporary write window → `api_client` `open-write-window`, `1f003c1`, test `open-write-window.test.ts`), `configureMediaUrls(STUDIO_MEDIA_URL_SECRET)` |
 | `apps/web/src/server/collect.ts` | Server-side collection helpers for pages |
 | `apps/web/src/server/operations-parity.test.ts` | Route handlers ↔ registry parity (both directions) |
 | `apps/web/src/components/*` | `Shell`, `Nav`, `CommandPalette` (⌘K), `PiecesWorkspace`, `MediaImage` (one retry, then «Vista previa no disponible»), `MediaPlanView`, `Pipeline`, `ThemeToggle`, `theme.ts` (cookie `studio-theme`) |
@@ -76,11 +76,14 @@ only; never write values here.
 | `apps/worker/` | `src/{config,handlers,server}.ts` (`node:http`), `Dockerfile` (+ ffmpeg), `cloudbuild.yaml`, `deploy.sh` (SoT of env vars) |
 | `scripts/media-ingest.ts`, `scripts/media-rights.ts` | `pnpm media:ingest`, `pnpm media:rights`; `media-renditions.ts` now uses the domain toolkit |
 | `scripts/ops/infra/media-originals.sh`, `scripts/ops/sql/media-worker-roles.sql` | Buckets/SA/IAM/Pub/Sub/Scheduler (`--env`, `--wiring`, dry-run default); worker PG roles |
-| `packages/domain/src/commands/` (TASK-1894) | `kernel.ts` (`runCommand`, `authorize`; T2 only `operator_cli` until TASK-1899), `support.ts` (organization lookup, `lockStudioCampaign` → 409, `assertRevision`, `audit`, `written`), `review.ts` + `asset-review.ts`, `state-transitions.ts`, `catalog.ts` + `catalog/` (campaign, brief, concept/asset, rights), `plan.ts` + `plan/` (copy, ads, media plan, posts), `permissions.ts` (`campaignPermissions`), `registry.ts` (`CATALOG_WRITE_COMMANDS`, test against the operations registry) |
+| `packages/domain/src/commands/` (TASK-1894) | `kernel.ts` (`runCommand`, `authorize`; T2 only `operator_cli`; HTTP clients cannot impersonate it), `support.ts` (organization lookup, `lockStudioCampaign` → 409, `assertRevision`, `audit`, `written`), `review.ts` + `asset-review.ts`, `state-transitions.ts`, `catalog.ts` + `catalog/` (campaign, brief, concept/asset, rights), `plan.ts` + `plan/` (copy, ads, media plan, posts), `permissions.ts` (`campaignPermissions`), `registry.ts` (`CATALOG_WRITE_COMMANDS`, test against the operations registry) |
 | `packages/domain/src/state-machines/` | Review, creative, media-authorization and launch machines (table-driven, approval targets, note-required) |
 | `packages/domain/src/channels/validator.ts` | `ChannelValidator` port, `enforceChannels`, `normalizeChannelKeys`, default `unvalidatedChannels` (TASK-1905 plugs the catalog) |
 | `packages/contracts/src/operations-{write,review,catalog,plan}.ts` | `writeOperation` helper + write operations by slice, spread into `operations.ts` |
 | `apps/web/src/server/commands.ts` | `commandRoute` (thin write route: body schema → `runCommand`) |
+| `packages/domain/src/media/derivatives.ts` + `toolkit-node.ts` (TASK-1998) | `playback` derivative (`expectedDerivatives({ playback })`, `derivativeObjectName`, `PLAYBACK_SHORT_EDGE = 720`); `transcodePlayback` + pure `playbackArgs`; test `toolkit-node.test.ts` (real ffmpeg, skipped without it) |
+| `apps/web/src/server/media-signing.ts` (TASK-1998) | V4 read signer for the media bucket (`signPlaybackUrl`, 1 h; redirect cache 5 min) + Range proxy only for `next dev` |
+| `apps/web/src/components/MediaVideo.tsx` (TASK-1999) | Native video player with honest failure (sibling of `MediaImage`) |
 | `scripts/studio-upload.ts`, `scripts/studio-review.ts`, `scripts/studio-write.ts` | `pnpm studio:upload` (API, api_client), `pnpm studio:review`, `pnpm studio:write <operationId>` (operator_cli, dry-run default, T2 `--apply --confirm`) |
 
 ## Database (schema `studio`)
@@ -88,11 +91,12 @@ only; never write values here.
 Tables: `campaign`, `concept`, `asset`, `asset_version`, `asset_rendition`, `copy_variant`, `audience`,
 `ad_configuration`, `media_flight`, `budget_line`, `scheduled_post`, `import_run`, `audit_event`, `api_client`;
 `media_object`, `worker_run`, `post_observation` (TASK-1893); `ops_run` (TASK-1896, migration `1790409464603_ops-run`,
-staging applied 2026-09-26, production pending).
+staging and production applied 2026-09-26).
 TASK-1894: `asset_upload`, `idempotency_record` (migration `1790956839977_asset-ingest-door`); `campaign_brief`,
 `campaign_brief_audience`, `campaign_brief_kpi` + `campaign.source_of_truth/cutover_on/cutover_by` + revisions
 (migration `1790967435017_catalog-write-commands`, staging and production 2026-10-02). Staging sandbox `CMP-900`
 (synthetic, `source_of_truth = 'studio'`); ids `CMP-900`+ are reserved for sandbox/tests.
+TASK-1998: migration `1791129772182_video-playback-rendition` (`asset_rendition` kind `playback`, mime `video/mp4`, CHECK `asset_rendition_playback_mime_chk`; staging and production applied 2026-10-04). Object `renditions/<versionId>/playback-<sha12>.mp4`.
 Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 copies, 72 ads, 4 audiences,
 1 flight, 7 budget lines, 6 posts, 108 renditions; all `organization_id = org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
 
@@ -125,6 +129,7 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | `STUDIO_PG_SSL` | `true` to force SSL |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT_EMAIL` | WIF impersonation (else ADC) |
 | `STUDIO_ACCESS_MODE` | unset/`open` or `efeonce_id` (fails closed until TASK-1898) |
+| `STUDIO_OPEN_WRITE_UNTIL`, `STUDIO_OPEN_WRITE_ORGS` | Temporary write window in `open` mode (ISO ≤ 7 days ahead; `org-…` ids); both valid ⇒ T1 writes for those orgs as `api_client:open-write-window`; expired/absent ⇒ read-only without redeploy (`1f003c1`; see `operations.md`) |
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` (prod; OpenAPI `servers`) |
 | `STUDIO_MEDIA_URL_SECRET` | HMAC secret for media links (≥ 32 chars, sensitive, different per environment); absent ⇒ fallback `/renditions/{id}` |
 | `NODE_AUTH_TOKEN` | Read token for the AXIS package registry (only the `_authToken`) |
@@ -132,8 +137,9 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | `SENTRY_AUTH_TOKEN` | Source-map upload at build (encrypted); absent ⇒ no upload |
 | `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`, `SENTRY_ORG`, `SENTRY_PROJECT` | Optional overrides (default env from `VERCEL_ENV`, release from `VERCEL_GIT_COMMIT_SHA`/`K_REVISION`) |
 | `STUDIO_MEDIA_BUCKET` | Bucket probed by the deep health (else deduced from renditions) |
+| `STUDIO_MEDIA_SIGNER_EMAIL` (TASK-1998) | Signer of the playback 302 (fallback `STUDIO_DOWNLOAD_SIGNER_EMAIL` → `GCP_SERVICE_ACCOUNT_EMAIL`); must read the media bucket |
 | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED`, `STUDIO_ORIGINALS_BUCKET`, `STUDIO_DOWNLOAD_SIGNER_EMAIL` | Original download (TASK-1893; off by default; signer defaults to `GCP_SERVICE_ACCOUNT_EMAIL`) |
-| Worker (Cloud Run): `STUDIO_ORIGINALS_BUCKET`, `STUDIO_MEDIA_BUCKET`, `MEDIA_WORKER_{DERIVATIVES,METRICOOL_READBACK,ARCHIVE_TIERING}_ENABLED`, `MEDIA_WORKER_RECONCILE_BATCH`, `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | SoT `apps/worker/deploy.sh` |
+| Worker (Cloud Run): `STUDIO_ORIGINALS_BUCKET`, `STUDIO_MEDIA_BUCKET`, `MEDIA_WORKER_{DERIVATIVES,METRICOOL_READBACK,ARCHIVE_TIERING,UPLOAD_VERIFY,PLAYBACK}_ENABLED`, `MEDIA_WORKER_RECONCILE_BATCH`, `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | SoT `apps/worker/deploy.sh` |
 
 ## Secrets (Secret Manager, project `efeonce-group`)
 
@@ -169,7 +175,7 @@ Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
 | Path / object | Responsibility |
 |---|---|
 | Capability `marketing_studio.campaign.read` (module `marketing_studio`) | Grants: `efeonce_admin`, `efeonce_account`, `efeonce_operations` |
-| Capability `marketing_studio.asset.download` (TASK-1893, seed applied with release `92002873ced9`) | Same grants; the exchange client does not request it yet (gateway federation pending) |
+| Capability `marketing_studio.asset.download` (TASK-1893, seed applied with release `92002873ced9`) | Same grants; federated read since gateway PR #23; exact delegated capability exchange remains TASK-2003 |
 | `src/lib/sister-platforms/mcp-token-exchange.ts` | `resourceFamily: 'marketing_studio'`, `authorizeMarketingStudio` = `can(persona, …, 'read', 'tenant')` |
 | OAuth client `efeonce-mcp-marketing-studio` (migration applied) | Confidential exchange client; allowed via `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` |
 | `src/mcp/greenhouse/skill-manifest.ts` (`'marketing-studio': { toolPrefix: 'studio.' }`) | Served manual entry; Greenhouse validates the prefix, the gateway validates existence |
@@ -178,3 +184,119 @@ Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
 | `src/lib/marketing-studio/health-alert.ts` | `checkAndAlertMarketingStudioHealth` → Teams destination `marketing-studio-reliability-alerts` («EO - Admin») only on `error` |
 | ops-worker `POST /marketing-studio/health-watch` + scheduler `ops-marketing-studio-health-watch` | Daily 12:20, born paused (`services/ops-worker/deploy.sh`) |
 | `docs/operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md` | Restore + rehearsal runbook (RPO/RTO, paths A/B) |
+
+## TASK-1905 map (Studio deployed 2026-10-04; Greenhouse/MCP/ICP pending)
+
+All paths below are in Studio unless marked Greenhouse.
+- `packages/contracts/src/channels.ts`: catalog dimensions, limits, provenance, versions, aliases and command schemas.
+- `packages/contracts/src/customer-model.ts`: organization customer-model DTO and audience/ICP references.
+- `packages/contracts/src/operations-channels.ts`: catalog readers/governance operations and tools.
+- `packages/contracts/src/operations-channel-campaign.ts`: audience and customer-model operations/tools.
+- `packages/contracts/src/operations-channel-validation.ts`: campaign findings and revalidation operations/tools.
+- `packages/domain/src/channels/`: catalog reader, pure validator, transaction adapter/findings persistence, metadata,
+  alias inventory/backfill and GA4 mapping; `commands/channel-catalog.ts` and `commands/channel-validation.ts`: governed writes.
+- `packages/domain/src/customer-model/`: disabled/default reader, injectable Greenhouse adapter and reference validation.
+- `packages/domain/src/commands/audience.ts`: upsert/remove audience and explicit campaign model-version change.
+- Existing catalog/plan commands, rights primitive and upload finalization use the same catalog validation transaction.
+- API routes: `/api/v1/channels[/{channelKey}]`, `/channel-catalog/versions[/{versionNo}[/channels/{channelKey}|/publish]]`,
+  `/channel-aliases[/{rawValue}]`, `/customer-model`, `/campaigns/{campaignId}/audiences/{audienceKey}`,
+  `/campaigns/{campaignId}/customer-model-version`, `/campaigns/{campaignId}/channel-findings` and
+  `/campaigns/{campaignId}/channel-validation/revalidate` (all beneath `/api/v1`).
+- `1791144092031_channel-catalog.sql`: tables channel_catalog_version, channel, channel_placement, channel_format,
+  channel_copy_limit, channel_objective, channel_tracking, channel_alias, channel_validation_finding.
+- `1791144092429_channel-key-expand.sql`: canonical keys/version, original brief requests, audience revision/ICP refs,
+  campaign model version/segments, asset content_source, ad/budget buying_method and deal_type.
+- `packages/database/seeds/channel-catalog-v1.json`, `scripts/channels-seed.ts`, `scripts/channels-backfill.ts`:
+  explicit seed publication and inventory/mapping/backfill/reversion commands.
+- Flags: `STUDIO_CHANNEL_VALIDATION_MODE` default warn; `STUDIO_CUSTOMER_MODEL_ENABLED` default false. No new provisioned
+  secret, service account or bucket. Adapter credentials are injected; enabling a flag does not provision a consumer.
+- Greenhouse: `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`, registry/runtime grant and negative
+  grant tests. Migration prepared, not applied remotely.
+
+
+## Greenhouse API CLI (local, 2026-10-04)
+
+- `scripts/marketing-studio/cli.mjs`: commands, arguments, JSON/stdin, private token-file/Secret Manager inputs and redacted receipts.
+- `scripts/marketing-studio/client.mjs`: live OpenAPI + manifest discovery, transport/risk checks, authority-preserving HTTP client.
+- `scripts/marketing-studio/upload.mjs`: SHA-256 stream, rights/ticket, direct GCS PUT or resumable session, idempotent confirmation.
+- `scripts/marketing-studio/download.mjs`: original download, byte-size/hash verification, cleanup of incomplete originals.
+- `scripts/marketing-studio/*.test.mjs`: 18 local tests; `package.json` exposes `studio` and `studio:test` (Node 24).
+- `STUDIO_API_URL` / `--base-url`: selected origin; `STUDIO_API_TOKEN`, private `--token-file`, or explicit `--token-secret`
+  plus `--project`: one credential source. No new scope, secret, DB connection or runtime resource is provisioned.
+- `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`: operator canon;
+  `docs/audits/marketing-studio/2026-10-04-studio-api-cli.md`: verification evidence and runtime limits.
+
+- TASK-2001 rollout 2026-10-04: discovery scheduler enabled; activation/discovery flags versioned in deploy.sh, two existing Metricool brand bindings; tracking domain allowlist per organization. No new secrets or IAM grants. See release audit for exact runtime pointers.
+
+## TASK-2002 — mapa del calendario de activaciones (Studio `apps/web/src`, producción `5d962c4`, 2026-10-05)
+
+| Ruta | Responsabilidad |
+|---|---|
+| `app/calendar/page.tsx`, `app/calendar/loading.tsx` | Página del calendario (lee los readers de TASK-2001; nunca calcula un estado de ejecución) y esqueleto de carga |
+| `components/activations/MonthGrid.tsx` | Mes: franjas paid desde `data.flights` (`budgetStatus` proposed rayada / approved sólida), aviso «N sin activación» por día |
+| `components/activations/WeekView.tsx`, `DayView.tsx` (+ `DaySide`) | Semana (carril PAID, franjas mañana/tarde/noche, línea de ahora) y Día (06:00–23:00, «Resumen del día», «Horas por cuenta») |
+| `components/activations/TimelineView.tsx` (+ `TimelineTools`), `TimelineFoldAll.tsx` | Línea de tiempo por plataforma/cuenta/línea, escala Día/Semana/Mes, «Plegar todo» |
+| `components/activations/PaidView.tsx` | Paid = filtro Modality: Paid sobre el mes; resumen por campaña, plan vs fechas en la herramienta vs entrega observada |
+| `components/activations/ActivationSheet.tsx`, `SheetFrame.tsx` | Hoja de la activación (dimensiones, pieza, copy contra límite del canal, avisos, evidencia, tracking URL, historial) |
+| `components/activations/ActivationCard.tsx` | Tarjeta compact/rich/mobile, `EvidenceLine`, `TimeAside`, `PieceBadge` |
+| `components/activations/ExecutionChip.tsx`, `DayPopover.tsx` | Chip de estado con isotipo de la herramienta; popover del día (`pop`) |
+| `components/activations/SidePanels.tsx` | `UnlinkedExecutions`, `UndatedPanel`, `CalendarLegend`, `CalendarStatusBar`, `FreshnessNotice`, `ToolLine`, `dayRange` |
+| `components/activations/PieceStage.tsx` + `stage-model.ts` | Preview por formato (escenario 320 px: video, carrusel, horizontal, grupo por proporción); `stage-model.ts` es módulo **sin directiva** compartido server/client |
+| `components/activations/ActivationFilters.tsx`, `GridKeys.tsx`, `LockedAction.tsx` | Filtros por dimensión (móvil «Ver N activaciones»; desde `bef0ecf` lista por filtro con grupos y conteos), teclado de la grilla (Entrar abre el popover), acción bloqueada `aria-disabled` con motivo |
+| `components/activations/FilterMenu.tsx`, `flags.ts` | Menú de filtro v3.4 (menú propio, no select nativo; conteos por opción, grupos, búsqueda, teclado ↑ ↓ Inicio Fin Enter Esc); banderas circle-flags (MIT) para Mercado (`bef0ecf`) |
+| `components/activations/icons.tsx`, `platforms.tsx`, `model.ts` | `Glyph`, `PieceThumb`, `AccountAvatar`, `Flag`; marcas de plataforma (AXIS `@efeoncepro/axis-brand-assets` 0.4.21, incluye X desde `6dddbfa`); `flightBands`, `isoWeek`, `unlinkedByDay`, `SERVED_MARKETS` (`['CL','MX','CO','PE','US']`, filtro + formulario; deuda: debe salir de la configuración de la org), `facetCounts`/`facetTotal` |
+| `components/activations/write/client.ts` | Cliente de escritura: un `fetch` literal por operación del registro (ver `contracts.md`); `readCalendar` (GET `/api/v1/calendar` con `account`) para los puntos y horas ocupadas de los selectores (`5d962c4`) |
+| `components/activations/write/{parts,PlanDrawer,RescheduleDialog,CancelDialog,LinkDialog}.tsx` | `PlanDrawer` modos plan/edit/from sobre `PlanActivationBody`; reprogramar, cancelar (alertdialog), vincular. `parts.tsx` `Select` usa el menú v3.4 (búsqueda con más de 8 opciones, `allowEmpty` para «Sin especificar»; `e656f2a`) |
+| `components/activations/write/datetime.tsx` | `DatePicker`, `TimePicker`, `RangePicker` v3.5 (portal a `body`, posición fija, abre hacia donde cabe; hoja inferior en teléfono); reemplazan `DateTimeField` nativo, eliminado (`5d962c4`) |
+| `components/activations/write/ActionLayer.tsx` | Servidor: carga catálogo publicado, cuentas, campañas y candidatas; **sólo se monta si el actor puede escribir** |
+| `components/Shell.tsx` | Props `statusBar` (barra inferior propia del calendario reemplaza la del portal) y `readOnly` («Solo lectura» en el encabezado) |
+| `copy.ts` (`COPY.activations.*`: write, stage, timeline, paid, daySide, bar, legend, …), `styles/app.css` (bloques TASK-2002 v3) | Copy visible y estilos; usar la clase `is-today`, nunca `today` |
+
+- **Parámetros de URL del calendario:** `view` (month|week|day|timeline|paid), `date`, `month`, `scale`, `rows`, `line`,
+  `pop`, `action` (plan|edit|reschedule|cancel|link|from), `record`, `activation`, filtros
+  `modality|family|platform|account|market|campaign|status`. La acción vive en la URL; tras aplicar navega a la hoja
+  (plantilla `__ID__`) y hace `router.refresh()`.
+- **Envs (sólo nombres):** `STUDIO_ACTIVATIONS_ENABLED` (apagado ⇒ `LegacyCalendar`), `STUDIO_ACCESS_MODE` (`open` ⇒
+  botones `aria-disabled` y API 403 `write_not_allowed`, salvo ventana `STUDIO_OPEN_WRITE_UNTIL` + `STUDIO_OPEN_WRITE_ORGS` vigente), `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`; sin él la vista
+  previa del plan responde 422 `tracking_destination_invalid`). Los tres presentes en Production; las dos de la
+  ventana, sólo en Production hasta 2026-10-12T10:00Z.
+
+## TASK-2002 — rendimiento y motion (2026-10-05, local `7e081d0` + `11ec7fa`)
+
+| Ruta | Responsabilidad |
+|---|---|
+| `components/activations/CalendarNav.tsx` | Navegación del calendario en `useTransition` (`data-pending`, barra), hoja provisional, inferencia de transición, FLIP al filtrar, anillo de estado, halo de guardado, aviso (`NoticeHost`), `PrefetchNeighbors` (`kind: 'full'`), `CountText` |
+| `components/activations/transition-kind.ts` (+ test) | `transitionFor(from, to, today)`: `nav-forward`/`nav-back`/`view-in`/`view-out`/`filter`/null |
+| `components/activations/motion.ts` | `MOTION` (ms y curvas para JS), `usePresence` (salidas), `useDragToClose` (hojas móviles), `reducedMotion`, `exitDelay` |
+| `components/activations/feedback.ts` | Aviso de escritura (`notify`, `dismissNotice`), halo (`requestGlow`/`takeGlow`), `showDone` |
+| `styles/motion.css` | Todo el motion del calendario + alternativa reducida; se importa después de `app.css` |
+| `scripts/generate-theme.mjs` | Emite `--motion-instant…extended` y `--ease-emphasized/standard/exit/linear` desde `axisMotion` |
+| `packages/domain` readers | `getCalendarRange`, `listActivations`, `activationProjection` paralelizados; `loadChannelCatalog` con caché por versión publicada (`clearChannelCatalogCache`) |
+| `next.config.ts` | `experimental.staleTimes.static = 60` (prefetch manual vale 60 s) |
+| `apps/web/src/server/runtime.ts` + `packages/database/src/connection.ts` | `attachDatabasePool(handle.pool)` (`@vercel/functions` 3.9.9; la 3.9.11 arrastra `@vercel/oidc` 4) para cerrar conexiones antes de congelar; en Vercel `maxConnections` 2 e `idleTimeoutMillis` 5 s; el handle expone `pool` (ISSUE-180) |
+
+## AXIS video transversal — operativo 2026-10-07
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md`.
+
+| Ruta en Studio | Responsabilidad |
+|---|---|
+| `apps/web/src/components/MediaVideo.tsx` | Entrada compartida al player AXIS; recibe el DTO de Studio y conserva la versión seleccionada |
+| `packages/domain/src/media/timeline.ts` | Receta v1 inmutable: máximo 60 cuadros, 160 × 90, 10 columnas, intervalo objetivo de 5 s y WebVTT |
+| `packages/domain/src/media/toolkit-node.ts` | FFmpeg genera el sprite en una pasada; worker existente, sin dependencias nuevas |
+| `packages/domain/src/media/derivatives.ts` | Dos nuevos kinds idempotentes; el barrido genera sólo faltantes, sin recodificar playback ya existente |
+| `packages/contracts/src/dto.ts` + `packages/domain/src/readers/campaigns.ts` | `PlaybackRendition.thumbnailsUrl?: string | null` en asset actual y versiones |
+| `packages/domain/src/media-url.ts` + `apps/web/src/app/api/v1/media/[token]/route.ts` | VTT privado; valida referencias de sprite hermano y firma al servir, sin guardar enlaces caducables |
+| `packages/database/migrations/1791390000000_video-timeline-renditions.sql` | Kinds/MIME aditivos, dimensiones nulas sólo para VTT; aplicada en staging/producción |
+| `apps/worker/deploy.sh` | Flag `MEDIA_WORKER_THUMBNAILS_ENABLED`; activar sólo después de migración y QA; estado runtime en auditoría |
+
+El servicio actual lee originales completos en memoria; este delta no amplía límites de tamaño/duración ni
+introduce streaming adaptativo. La distribución pública es otra decisión: no persistir enlaces privados
+temporales en un artículo de WordPress.
+
+### Video accent belongs to the host view
+
+The deployed Marketing Studio player uses AXIS `line: growth`, matching its approved identity.
+Brand belongs to Creative Studio; do not select it merely because the content is creative.
+The current shell has no active Marketing/Creative switch: route the accent from that context when
+the switch exists, through the shared MediaVideo facade, never per playback surface.

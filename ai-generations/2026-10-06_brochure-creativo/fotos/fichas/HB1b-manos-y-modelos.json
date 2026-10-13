@@ -1,0 +1,54 @@
+{
+ "formato": "16:9",
+ "impacto": true,
+ "linea": "brand",
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "registro": "cine",
+ "alcance": "deck-seccion",
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "id": "HB1b-manos-y-modelos",
+ "desde": "NX7d",
+ "identidad": [
+  {
+   "persona": "nexa"
+  },
+  {
+   "persona": "julio"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "nexa"
+  },
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "julio"
+  },
+  {
+   "objeto": "spark-contenido"
+  }
+ ],
+ "escena": "SCENE (cinematic, Hollywood still, a vast dark production studio at night where physical shooting and AI generation happen in the same space). Julio, as in his reference, wearing the Efeonce hoodie exactly as in its reference, stands nearest, framed from the waist up, behind a compact modern cinema camera on a tripod, one hand on the camera, his head frontal as in his reference with only his eyes turned toward the empty dark left of the frame; JULIO'S FACE must match his first reference image EXACTLY in proportion: his forehead is of MODERATE height, NOT tall, NOT enlarged, with the hairline exactly where it is in that reference, only slightly receding at the temples, and defined curls of moderate volume on top; his face is long and lean, never fuller or wider; his glasses are the thin semi-rimless metal frames of the reference, with the brushed-silver bar across the top. Real photographic skin with irregular pores, fine facial hair and natural unevenness; no smoothing, no plastic sheen, no airbrushed look. his left shoulder is at about 63 % of the frame width; between the left edge of the frame and his shoulder there is a wide band of empty darkness, and nothing lit is visible to the left of his left shoulder. His camera points at ONE fictitious matte-black wireless over-ear headphone on a black pedestal under a slim current-generation LED soft box, at about 88 % of the frame width, near the right edge. About four meters deeper, behind Julio's right shoulder, ONE large frameless screen stands between 72 % and 96 % of the frame width, showing FOUR variants of that same headphone side by side — new backgrounds, a vertical story, a wide banner and one frame of a motion clip — all sharing one look. Nexa, as in her reference, wearing the Efeonce hoodie exactly as in its reference, stands at that screen, supervising, smaller and softer than Julio, framed from the waist up, framed from the waist up, her head almost frontal and her eyes turned toward the empty dark left of the frame, with quiet, focused attention on the work. The Content Spark, exactly as in its reference, sits on Nexa's shoulder. THE PHENOMENON: ONE single continuous stream of cool white-azure light (#0375DB) leaves the physical headphone on the pedestal and flows to the screens, where it becomes the variants: one shot, many pieces. On the approved variant on the screen, ONE single tiny point glows vivid orange (#FF6500), the only accent in the frame; it lights nothing around it. LIGHT: on each face the only key is the stream of light at the camera-right of that person — on Julio where it leaves the product, on Nexa where it reaches the screen; the screen itself stays dim and lights nothing; the soft box lights only the product; NO fill light, far sides of the faces in shadow. Nobody looks at anybody else. REALISTIC ADULT PROPORTIONS: camera about four and a half meters away at chest height, 85mm f/2.8. Thin haze catches the light stream. The LEFT 60 % of the frame is calm, deep dark space with only faint haze: no objects lit, no light shapes, nothing that glows. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any brand on any equipment.",
+ "lecho": {
+  "objeto": "the near-black matte edge of a long production table right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "llave": {
+  "fuente": "the stream of cool white-azure light itself, about 20 cm thick",
+  "lado": "from the camera-right of each person, at chest-to-face height",
+  "distancia": "about one meter from each face"
+ },
+ "fondo": "the dark depth of the studio with a few cold practical lights melted into round bokeh",
+ "fenomeno": {
+  "que": "one stream of light leaves a physical product on set and becomes many variants on the AI generation screens, supervised by people with two agents",
+  "esServicio": "producción híbrida: el oficio y la IA en el mismo flujo, con personas que dirigen y aprueban"
+ },
+ "primerPlano": "the dark out-of-focus corner of a camera case on the table edge, cut by the frame at the bottom right corner"
+}

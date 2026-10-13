@@ -24,6 +24,7 @@ import { getOrganizationCommercialFacts } from '../operator/organization-commerc
 import { assertSubjectGradeable } from '../operator/subject-gradeable'
 import { resolveProviderPolicy } from '../policy'
 import { getGraderProfileForOrganization, projectRun, type GraderRunRow } from '../store'
+import { isMarketCoveredByContract, parseIncludedMarkets } from './contract-coverage'
 import { GraderMarketConfigError } from './contracts'
 import { ensurePrimaryMarket, listProfileMarkets, marketQueries, snapshotMarket } from './store'
 
@@ -159,18 +160,13 @@ export const requestRunBatchInternal = async (input: RunBatchInput): Promise<Run
       )
 
       if (!assignments[0]) throw new GraderMarketConfigError('not_entitled', 403)
-      const metadata = assignments[0].metadata_json as Record<string, unknown> | null
-      const included = metadata?.aeo_markets_included
 
-      const explicit = Array.isArray(included)
-        ? included.filter((value): value is string => typeof value === 'string')
-        : null
+      const contract = {
+        tier: entitlement.tier,
+        marketsIncluded: parseIncludedMarkets(assignments[0].metadata_json as Record<string, unknown> | null)
+      }
 
-      if (
-        markets.some(
-          market => !market!.isPrimary && !(entitlement.tier === 'contracted' && explicit?.includes(market!.marketCode))
-        )
-      )
+      if (markets.some(market => !isMarketCoveredByContract(market!, contract)))
         throw new GraderMarketConfigError('aeo_market_not_included', 403)
       if (used + markets.length > entitlement.allowanceCap) throw new GraderMarketConfigError('quota_exhausted')
 

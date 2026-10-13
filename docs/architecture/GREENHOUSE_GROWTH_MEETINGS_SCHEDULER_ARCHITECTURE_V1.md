@@ -103,6 +103,14 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
 - Funnel no-conversión: `gh_meeting_step_reached` → evento GA4 custom del mismo nombre, nunca key event.
 - `meeting_step`: `viewed|availability_loaded|availability_failed|date_selected|slot_selected|details_started|validation_failed|booking_started|booking_failed`. `fallback_opened` permanece reservado sólo para compatibilidad histórica y el renderer nativo ya no lo emite.
 - Conversión: `gh_meeting_booking_confirmed` existe sólo en `dataLayer`; GTM lo transforma a `generate_lead` con `lead_source=meeting_booking` y no envía además el custom a GA4.
+- Identidad CAPI: sender live 2026-10-13 prefiere UUID renderer y usa fallback Crypto
+  por evento GTM local si falta; [contrato](../reference/measurement-gtm-ga4/09-hubspot-consent.md).
+  Enhancement renderer (preparado localmente, sin release): `event_id` UUID v4
+  independiente, emitido sólo para confirmación elegible fresca. No deriva del receipt ni de
+  IDs internos; se conserva si falla el push y no se reemite el mismo efecto tras éxito.
+  Fallo de entropía omite ID sin romper UX/GA4; el gate UUID servidor bloquea Meta.
+  El nonce browser no es identidad durable del ledger: un futuro sender outbox requiere
+  decisión compartida de identidad/dedupe antes de coexistir. Ver [ADR CAPI](GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
 - `stage` se rechaza porque duplica `meeting_step` y permite pares contradictorios.
 - Parámetros allowlisted: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`, `presentation_variant` y `activation_mode`; `renderer_version` y `contract_version` se validan en el renderer pero no requieren dimensión.
 - Nunca se envían PII, slot/timestamp/timezone exactos, receipt, idempotency/correlation/provider IDs, Teams URL, UTMs crudos ni provider errors.

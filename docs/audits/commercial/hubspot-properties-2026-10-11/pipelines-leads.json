@@ -1,0 +1,59 @@
+{
+  "portalId": 48713323,
+  "asOf": "2026-10-11",
+  "source": "HubSpot MCP discover_hubspot_schema GET_PIPELINES",
+  "data": {
+    "pipelineResults": {
+      "objectType": "LEAD",
+      "results": [
+        {
+          "id": "lead-pipeline-id",
+          "label": "Lead pipeline",
+          "displayOrder": 1,
+          "stages": [
+            {
+              "id": "new-stage-id",
+              "label": "New",
+              "displayOrder": 1,
+              "metadata": {
+                "state": "NEW"
+              }
+            },
+            {
+              "id": "attempting-stage-id",
+              "label": "Attempting",
+              "displayOrder": 2,
+              "metadata": {
+                "state": "IN_PROGRESS"
+              }
+            },
+            {
+              "id": "connected-stage-id",
+              "label": "Connected",
+              "displayOrder": 3,
+              "metadata": {
+                "state": "IN_PROGRESS"
+              }
+            },
+            {
+              "id": "qualified-stage-id",
+              "label": "Qualified",
+              "displayOrder": 4,
+              "metadata": {
+                "state": "QUALIFIED"
+              }
+            },
+            {
+              "id": "unqualified-stage-id",
+              "label": "Disqualified",
+              "displayOrder": 5,
+              "metadata": {
+                "state": "UNQUALIFIED"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -8,7 +8,7 @@
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución; censo 2026-10-04 por campo Epic: 80 hijas, 43 complete, 4 in-progress y 33 to-do (37 abiertas); 1667/1669 pasan a Marketing Studio y 1672/1673 a Insights; 1668 conserva medición. 1651-A operativa; 1651-B no iniciada. 1655 con slices 1–4 entregadas y cierre pendiente; 1690 sin empezar. Hallazgos de sitio ON y selectores ETV improved revalidados en worker activo; sin certificar hoy cobertura BQ, todos los crons o experiencia cliente.`
+- Status real: `En ejecución; censo 2026-10-05 por campo Epic: 81 hijas, 43 complete, 4 in-progress y 34 to-do (38 abiertas); 1667/1669 pasan a Marketing Studio y 1672/1673 a Insights; 1668 conserva medición. 1651-A operativa; 1651-B no iniciada. 1655 con slices 1–4 entregadas y cierre pendiente; 1690 con discovery completo e implementación pendiente; UI TASK-2008 preparada. Hallazgos de sitio ON y selectores ETV improved revalidados en worker activo; sin certificar hoy cobertura BQ, todos los crons o experiencia cliente.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -151,7 +151,7 @@ conserva su scope en el inventario, no desaparece por agrupar integraciones.
 
 ## Child Tasks
 
-> Censo vigente tras redistribución: **80 hijas; 43 complete, 4 in-progress, 33 to-do (37 abiertas)**.
+> Censo vigente tras redistribución: **81 hijas; 43 complete, 4 in-progress, 34 to-do (38 abiertas)**.
 > [Ownership e inventario exhaustivo](../../audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md).
 > [Readbacks previos y límites](../../audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 > Las actualizaciones fechadas que siguen son historia; no prueban disponibilidad actual.
@@ -302,7 +302,8 @@ conserva su scope en el inventario, no desaparece por agrupar integraciones.
 
 - [TASK-1655](../../tasks/in-progress/TASK-1655-growth-seo-historical-data-platform.md) — In-progress: slices 1–4 entregadas; backfill histórico completo; export nativo, paridad MCP y retención pendientes.
 - `TASK-1677` — [**complete**, backend-data] Cierre de la fase **contract** del cutover `seo_v1 → seo_v2`; la ventana expand/contract dejó de estar abierta. Se lista acá para cerrar el denominador del epic (lo declaraba en su campo `Epic:` y no figuraba en esta lista).
-- [TASK-1690](../../tasks/in-progress/TASK-1690-growth-seo-client-surface-population-states.md) — In-progress por ubicación; sin iniciar, con cobertura/fixtures/clics/CTR pendientes.
+- [TASK-1690](../../tasks/in-progress/TASK-1690-growth-seo-client-surface-population-states.md) — Discovery completo, composición independiente GSC/rank/AEO y fixtures pendientes; opción 1 corregida seleccionada.
+- [TASK-2008](../../tasks/to-do/TASK-2008-growth-seo-client-evidence-ui.md) — Consumer UI del Resumen, opción 1 corregida; contratos preparados, bloqueada por el contrato local de TASK-1690.
 - `TASK-1691` — [creada 2026-08-13, ui-ux] **Declarar la lente estimada y su fecha de captura en la tabla de oportunidades.** Cierra `ISSUE-154`: cuando `market === 'available'` la pantalla renderiza Volumen y Barrera de enlaces **sin leyenda de origen y sin `capturedAt`** — la nota `● Medido · Search Console` sólo aparece en el caso `'unavailable'`. El §8 del master flow pide leyenda persistente y as-of explícito para lo estimado; el as-of ya viaja en el contrato programático, sólo falta la superficie.
 - `TASK-1658` — [**code complete 2026-08-27, rollout pendiente**, backend-data] drift de federación MCP + punto ciego del guard de paridad: el drift había crecido de 3 a 8 tools mientras esperaba. Ejecutada: guard de paridad **bidireccional** en el gateway (espejo `GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema + annotations, probado ROJO contra el drift real: 29 findings) + federación de las 8 (inventario 21 = 16 lecturas + 5 escrituras; `run_seo_prospect_diagnostic` como 4.º write bajo `efeonce.mcp.seo.write`, fail-closed hasta TASK-1631) + cierre de 9 divergencias de schema vivas (`intent` de TASK-1659 y `market` en 5 lecturas, entre otras) + canary de las 21. 4 commits locales en `efeonce-mcp` sin push; deploy del gateway post-release develop→main (`tools/list` 13→21). El espejo **dejó de existir**: `TASK-1780` (complete 2026-08-31) hizo que el guardia derive su inventario del manifiesto canónico de Greenhouse, que viaja como artefacto generado con hash.
 

@@ -1,0 +1,714 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "proposal-capacity-policy-2026-10-09",
+  "baseDigest": "b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02",
+  "nextVersion": "review-policy-proposal-2026-10-09-v1",
+  "actor": "Codex:proposal-author",
+  "reason": "User requests help with cost policy/provisions/tools and complete pilot. Prepare unapproved hypotheses and pending records only; preserve baseline and all commercial gates.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "proposal:pricing:design:35",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:pricing:design:35",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.35",
+          "basis": "all_costs",
+          "minimumMargin": "0.35"
+        },
+        "source": {
+          "reference": "proposal-only:capacity-pricing-integrity-pack-2026-10-09",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "estimated"
+        },
+        "note": "Unapproved margin hypothesis. All historical costs/placeholders unchanged; no commercial activation."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:pricing:design:40",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:pricing:design:40",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.35"
+        },
+        "source": {
+          "reference": "proposal-only:capacity-pricing-integrity-pack-2026-10-09",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "estimated"
+        },
+        "note": "Unapproved margin hypothesis. All historical costs/placeholders unchanged; no commercial activation."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:pricing:design:45",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:pricing:design:45",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.35"
+        },
+        "source": {
+          "reference": "proposal-only:capacity-pricing-integrity-pack-2026-10-09",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "estimated"
+        },
+        "note": "Unapproved margin hypothesis. All historical costs/placeholders unchanged; no commercial activation."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:cost:design:CO",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:cost:design:CO",
+        "revision": 1,
+        "kind": "cost",
+        "value": {
+          "profileId": "ECG-002",
+          "seniorityCode": "senior",
+          "localization": {
+            "kind": "specific",
+            "country": "CO"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": null
+            },
+            {
+              "coverage": "human_bonus",
+              "amount": null
+            },
+            {
+              "coverage": "human_statutory",
+              "amount": null
+            }
+          ]
+        },
+        "source": {
+          "reference": "pending:localized-designer-cost-CO",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "Target jurisdiction for evidence collection, not proof of a Colombian salary. USD provisional; replace with source currency and FX when known."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:design-license",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:design-license",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:design-license",
+          "label": "PENDING, NOT APPROVED — design-license",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "tool",
+          "covers": [
+            "tool:design"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:design-license",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:collaboration",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:collaboration",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:collaboration",
+          "label": "PENDING, NOT APPROVED — collaboration",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "tool",
+          "covers": [
+            "tool:collaboration"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:collaboration",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:tracking",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:tracking",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:tracking",
+          "label": "PENDING, NOT APPROVED — tracking",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "tool",
+          "covers": [
+            "tool:tracking"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:tracking",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:ai",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:ai",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:ai",
+          "label": "PENDING, NOT APPROVED — ai",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "account",
+          "kind": "tool",
+          "covers": [
+            "tool:ai"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:ai",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:platform",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:platform",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:platform",
+          "label": "PENDING, NOT APPROVED — platform",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "platform_fee",
+          "covers": [
+            "platform_fee"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:platform",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:training",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:training",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:training",
+          "label": "PENDING, NOT APPROVED — training",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "talent_assurance",
+          "covers": [
+            "assurance:training"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:training",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:verification",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:verification",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:verification",
+          "label": "PENDING, NOT APPROVED — verification",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "talent_assurance",
+          "covers": [
+            "assurance:verification"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:verification",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:backup",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:backup",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:backup",
+          "label": "PENDING, NOT APPROVED — backup",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "account",
+          "kind": "talent_assurance",
+          "covers": [
+            "assurance:backup"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:backup",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:replacement",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:replacement",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:replacement",
+          "label": "PENDING, NOT APPROVED — replacement",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "account",
+          "kind": "talent_assurance",
+          "covers": [
+            "assurance:replacement"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:replacement",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:management",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:management",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:management",
+          "label": "PENDING, NOT APPROVED — management",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "account",
+          "kind": "operations",
+          "covers": [
+            "operations"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:management",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:infrastructure",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:infrastructure",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:infrastructure",
+          "label": "PENDING, NOT APPROVED — infrastructure",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "person",
+          "kind": "operations",
+          "covers": [
+            "infrastructure"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:infrastructure",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:onboarding",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:onboarding",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:onboarding",
+          "label": "PENDING, NOT APPROVED — onboarding",
+          "amount": null,
+          "currency": "USD",
+          "unit": "once",
+          "scope": "account",
+          "kind": "setup",
+          "covers": [
+            "setup"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:onboarding",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:financial-cost",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:financial-cost",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:financial-cost",
+          "label": "PENDING, NOT APPROVED — financial-cost",
+          "amount": null,
+          "currency": "USD",
+          "unit": "month",
+          "scope": "account",
+          "kind": "operations",
+          "covers": [
+            "financial_cost"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:financial-cost",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:resource:annual-exposure",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:resource:annual-exposure",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "resourceId": "proposal:resource:annual-exposure",
+          "label": "PENDING, NOT APPROVED — annual-exposure",
+          "amount": null,
+          "currency": "USD",
+          "unit": "once",
+          "scope": "account",
+          "kind": "operations",
+          "covers": [
+            "annual_exposure"
+          ]
+        },
+        "source": {
+          "reference": "pending:driver:annual-exposure",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "pending"
+        },
+        "note": "See driver-inputs.json. Amount/unit/currency/coverage require evidence or explicit reasoned non-applicability. This row is not a verified quote or journal entry."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "proposal:kit:design-validation",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "proposal:kit:design-validation",
+        "revision": 1,
+        "kind": "kit",
+        "value": {
+          "kitId": "proposal:kit:design-validation",
+          "label": "Complete costing review, not a sellable kit",
+          "requirements": [
+            {
+              "requirementId": "design-license",
+              "coverage": "tool:design",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "proposal:resource:design-license"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:collaboration",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "proposal:resource:collaboration"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:tracking",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "proposal:resource:tracking"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "proposal:resource:ai"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:platform"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "training",
+              "coverage": "assurance:training",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:training"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "verification",
+              "coverage": "assurance:verification",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:verification"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "backup",
+              "coverage": "assurance:backup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:backup"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "replacement",
+              "coverage": "assurance:replacement",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:replacement"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "management",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:management"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "infrastructure",
+              "coverage": "infrastructure",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:infrastructure"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "onboarding",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:onboarding"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "financial-cost",
+              "coverage": "financial_cost",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:financial-cost"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "annual-exposure",
+              "coverage": "annual_exposure",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "proposal:resource:annual-exposure"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "proposal-only:capacity-pricing-integrity-pack-2026-10-09",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-11-08",
+          "status": "estimated"
+        },
+        "note": "All gaps are mandatory for review. Redundant tool requirements may be consolidated/excluded only with evidence. No trial-25 resources or arbitrary reserve percent."
+      }
+    }
+  ]
+}

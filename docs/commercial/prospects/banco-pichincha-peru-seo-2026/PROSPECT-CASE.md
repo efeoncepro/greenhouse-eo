@@ -1,8 +1,23 @@
 # Prospect Case · Banco Pichincha Perú
 
-**Corte:** 28 de septiembre de 2026 · **Uso interno** · **Responsable comercial:** Julio Reyes
-**Decisión:** perseguir la oportunidad y validar encaje en discovery. No es una oportunidad calificada ni una licitación confirmada.
-**Estado al 28-09-2026:** InMail enviado, Jesús respondió, reunión aceptada para el **martes 06-10-2026 11:00–12:00 Lima** y Deal abierto en HubSpot. Detalle en [§9](#9-estado-actual-y-próximos-pasos).
+## Estado vigente · oferta híbrida reforzada · 07-10-2026
+
+La [oferta híbrida](reconstruccion-2027/oferta-hibrida/OFERTA-PARA-PIBANK.md) y el [brief para Claude](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) gobiernan alcance, secuencia y precio: base US$4.500/mes, gradual US$79.200/año, integral US$89.200. Hasta cinco artículos/mes, mejoras según evidencia sin cuota FAQ, técnico/schema y panel AEO de 24 preguntas: 72 observaciones iniciales y 144/mes desde M2. Gradual: campañas PR M3/M8 y refuerzos M6/M11; comunidad desde M3, hub, calculadora y comparador. Sesiones digitales retiradas.
+
+SEO/AEO es evolutivo e incremental. SEM se analiza como palanca de eficiencia; no se añade operación publicitaria. [Método y capacidad](reconstruccion-2027/oferta-hibrida/AEO-Y-AUTORIDAD.md), [acuerdos](reconstruccion-2027/oferta-hibrida/ACUERDOS-DE-ENTREGA.md) y [costeo provisional](reconstruccion-2027/oferta-hibrida/README.md). La integral dimensiona 2.924h; costo SEO/redactor reservado no equivale a dedicación exclusiva.
+
+La meta es 15.200 cuentas con fondos; ~1,17m visitas es el requisito del embudo ilustrativo completo, no un forecast SEO. Investigación y modelos originales permanecen intactos. Los precios están propuestos; faltan validación de costos/roster reales, términos bancarios y contribución observada. Los conteos y fees del registro histórico siguiente no definen la oferta actual.
+
+## Registro del estado anterior v0.6.1 y antecedentes
+
+El registro que sigue conserva el corte anterior; sus cantidades/QA no gobiernan el alcance ampliado. No se altera la fuente de reunión ni las capturas originales.
+
+
+**Revisión de continuidad:** 07 de octubre de 2026 · evidencia original 06-10-2026 · **Uso interno** · **Responsable comercial:** Julio Reyes.
+**Decisión:** preparar propuesta técnica/caso de negocio para **Pibank Perú**, con servicio previsto para 2027. La solicitud está documentada; presupuesto, autoridad económica y adjudicación no están confirmados.
+**Estado vigente:** reunión celebrada y metodología comprendida por Jesús; información de proveedores hasta 09-10, gerencia semana del 19-10. [Minuta](MEETING-2026-10-06.md) y [caso de negocio 2027](BUSINESS-CASE-2027.md) gobiernan la preparación. US$38 millones es inferencia aritmética aceptada provisionalmente por Julio, no moneda confirmada por Jesús.
+
+Las secciones 1–10 conservan investigación, discovery e historia de septiembre, con ajustes de vigencia explícitos. El último readback CRM documentado es de 30-09; no hubo actualización CRM en este trabajo. Estado actual consolidado: [§11](#11-reunion-celebrada-y-propuesta-pibank--06-10-2026).
 
 ## 1. Por qué esta cuenta, por qué ahora
 
@@ -26,7 +41,7 @@ La investigación completa, fechas y enlaces están en [cuenta y mercado](resear
 - Junio de 2026: capital global 15,53%, cartera problema 6,88% frente a 4,48% del sistema, perspectiva estable (Moody’s, agosto de 2026).
 - Salida de microfinanzas y préstamos sin garantía. No vender como oportunidad la ausencia de rankings de préstamos personales.
 
-**Hipótesis de negocio:** el banco necesita captar relaciones de ahorro sostenibles, explicar condiciones con precisión y reducir fricción entre búsqueda y activación. Aún no contamos con entrevista, GSC, GA4, presupuesto ni datos de conversión.
+**Hipótesis de negocio original (28-09):** el banco necesita captar relaciones de ahorro sostenibles, explicar condiciones con precisión y reducir fricción entre búsqueda y activación. La entrevista del 06-10 precisa Pibank como marca/producto objetivo; siguen sin datos GSC, GA4, presupuesto ni conversión. Ver §11.
 
 ## 4. Buying group y ruta de acceso
 
@@ -75,7 +90,7 @@ AI Mode citó al banco en mejor cuenta de ahorros y alto interés, pero no en de
 
 El Brand Visibility Grader se ejecuta por el endpoint admin canónico y el worker async: **EO-GRUN-00056**, run `grun-9c7f0041-26fe-4ef3-8d9c-e5c0990481ac`. Siete preguntas estándar de banca de personas, Perú/es-PE, cinco proveedores. El comparativo del pack pregunta alternativas a BCP; no es un panel diseñado exclusivamente para ahorro. Consultar [estado del Grader](research/GRADER.md) para resultado y entrega verificados.
 
-## 7. Plan de entrada y propuesta posterior
+## 7. Plan de entrada y propuesta posterior — histórico de septiembre
 
 1. ~~Julio envía InMail con el informe verificado y link, mencionando su publicación y experiencia bancaria.~~ Hecho el 28-09-2026; ver §9.
 2. Discovery: producto/moneda/segmento; apertura vs fondeo vs permanencia; medición web-zona digital-app; ejecución y compliance; alcance SEO/GEO; requisito de presencia en Perú.
@@ -90,7 +105,7 @@ El Brand Visibility Grader se ejecuta por el endpoint admin canónico y el worke
 - “Necesitamos agencia en Perú”: precisar entidad local, presencia física o conocimiento de mercado antes de afirmar encaje.
 - “Mándame portafolio”: presentar los antecedentes BICE/Security con alcance verificable; no inventar métricas ni adjuntar material confidencial.
 
-## 8. Gates y siguiente acción
+## 8. Gates de preparación previa — corte septiembre
 
 - [x] Identidad, señal de interés y entidad peruana documentadas.
 - [x] Company, Lead de cuenta y cuatro contactos verificados en HubSpot.
@@ -108,7 +123,7 @@ El pod y la cola se definen en [SALES-POD.md](SALES-POD.md). No hay automatizaci
 
 ## 9. Estado actual y próximos pasos
 
-Corte 28-09-2026, con readback de HubSpot y Outlook en esa fecha.
+Corte 28-09-2026, con readback de HubSpot y Outlook en esa fecha. Se conserva como cronología; próximos pasos vigentes en §11. Las referencias históricas a §9 no indican que la reunión siga pendiente.
 
 ### Cronología
 
@@ -152,3 +167,36 @@ El operador aceptó la demo X-Ray y solicitó redactar el correo robusto previo 
 HubSpot MCP verificó identidad Julio75788512, portal48713323 y permiso DEAL write. Se leyó deal65352884246 «Banco Pichincha Perú - Agencia SEO/AEO», pipeline `default`, etapa `appointmentscheduled`; se confirmó la opción `presentationscheduled` = «Presentación de soluciones». Por instrucción expresa de Julio se actualizó **únicamente dealstage** y una búsqueda independiente confirmó `presentationscheduled`, lastmodified `2026-09-30T17:59:28.427Z`. [Deal](https://app.hubspot.com/contacts/48713323/record/0-3/65352884246?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=search).
 
 La reunión sigue agendada; el cambio de etapa no acredita una presentación ya celebrada. El correo está redactado, pero esta sesión no lo envió ni verificó su envío. Se preserva el checklist histórico fechado del §9 y no se marca credenciales enviadas sin evidencia. La demo fue aceptada por el operador como material de Efeonce; no constituye aprobación del banco ni publicación en su sitio/redes. Implementación y documentación: [dossier](../../../think/aeo-xray-implementation-dossier-2026-09-30.md).
+
+## 11. Reunion celebrada y propuesta Pibank — 06-10-2026
+
+**Cambio de foco:** la necesidad real es Pibank Perú y captación de ahorro para 2027. La investigación/Grader/landing anteriores describen Pichincha, no baseline ni producto Pibank. Jesús vio la demo durante la reunión y pidió una propuesta técnica que estime qué aporte a aperturas habría tenido SEO/GEO desde el lanzamiento. La lectura completa y limitaciones están en [minuta](MEETING-2026-10-06.md).
+
+**Base provisional:** US$38 millones = 15.200 cuentas × US$2.500. Julio cree USD y autoriza esa hipótesis para trabajar; Jesús no confirmó moneda. Definición de cuentas, naturaleza del ticket y periodo exacto de la meta siguen abiertos. Las bandas de 1/5/10% son escala condicional: 152/760/1.520 cuentas y US$380.000/1,9m/3,8m; no forecasts.
+
+**Propuesta:** [BUSINESS-CASE-2027](BUSINESS-CASE-2027.md) reemplaza la hipótesis de 90 días como plan vigente. Julio solicitó después ampliar a doce meses: M1 preparación/entregables, revisiones M3/M6/M9/M12 según maduración. La mención de seis/tres meses permanece sólo como historia de reunión; no es recomendación vigente. No exigir más datos para elaborar borrador: investigar público, construir rango de supuestos y recalibrar al validar con el banco.
+
+**Proceso:** información hasta viernes 09-10; revisión semana 12-10; gerencia semana 19-10; posible segunda reunión final de octubre; papeleo noviembre; servicio 2027. No hay segunda reunión agendada, decisor económico identificado ni contrato acreditado.
+
+**Histórico CRM:** monto S/126.596,45 y cierre 28-10 no provienen del banco. No representan budget ni probabilidad validada; contrastar en readback y revisar por un changeset aparte si Julio lo autoriza. Esta edición no cambió HubSpot ni Notion.
+
+### Avance registrado donde se lee
+
+- [x] Reunión celebrada y fuente completa leída por MCP; [minuta](MEETING-2026-10-06.md).
+- [x] Foco Pibank, contexto de producto y calendario documentados; minuta §§1–4.
+- [x] Interpretación USD y límites conservados como hipótesis del operador; minuta §2.
+- [x] Revisión documental v0.6.1 del caso y propuesta anual para el banco; [caso](BUSINESS-CASE-2027.md) y [propuesta](reconstruccion-2027/PROPUESTA-PARA-PIBANK-2027.md).
+- [x] Research y diagnóstico público preparados; [ampliación inicial](research/PIBANK-RESEARCH-AMPLIADO-2026-10-06.md), [reauditoría](reconstruccion-2027/OPORTUNIDAD-Y-COBERTURA.md) y [capturas de cierre](research/pibank-gap-closure-2026-10-06/README.md). Estas últimas conservan 2.278 observaciones únicas, 1.594 keywords y 19 familias, con filtros y periodos explícitos; no TAM ni baseline privada.
+- [x] Modelo inverso y material técnico reconstruidos; [expediente](reconstruccion-2027/README.md) y [QA v0.6](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md): 10 hojas/29 pruebas nativas y PDFs de 11/2/14 páginas. Muestra DEV previa conservada; verificación local no acredita aceptación bancaria.
+- [ ] Revisión comercial humana/aceptación bancaria: pendientes; QA local no las sustituye.
+- [ ] Alcance/capacidad/fee revisados: faltan cost-to-serve y aprobación comercial.
+- [ ] Envío al banco: no realizado ni readback verificado en esta actualización.
+- [ ] Budget, autoridad económica, periodo meta y contrato: sin evidencia suficiente.
+
+**Siguiente paso:** revisar prioridades y capacidad anual con Julio, costear roster/fee Efeonce y alinear owners/datos/definiciones bancarias para la propuesta del 09-10. Escenarios ilustrativos anuales no son forecast. Cola en [Sales Pod](SALES-POD.md). Claims expuestos por Efeonce en la reunión necesitan prueba independiente antes de repetirse como resultados.
+
+**Historia de la reconstrucción:** Julio objetó el plan interno y el aporte modelado. Se retiró la tabla 10/50/147 del material cliente; aperturas y primer fondeo se separaron y el periodo de meta dejó de suponerse anual. Las 924h correspondían al alcance previo de SEO/GEO, conservado como antecedente.
+
+**Estado vigente v0.6:** 1.066h base + 150h reserva = 1.216h candidatas, con PR y 13 funciones incluidas. [Cierre de brechas](reconstruccion-2027/CIERRE-DE-BRECHAS-2027.md), [QA](../../../audits/commercial/2026-10-06-pibank-brechas-cierre.md) y [retrospectiva](RETROSPECTIVA-2026-10-06.md) documentan alcance, pruebas, copias y conciliación de investigación. El costo conservador de datos es US$1,568512, bajo el techo operativo de US$2; no es presupuesto del banco ni fee del servicio. Propuesta y requisitos no certifican viabilidad económica, forecast ni precio. La cuantificación del aporte estimado a aperturas del programa completo y del lanzamiento sigue abierta; requisitos inversos no equivalen a esa estimación. Doce meses y PR son decisiones posteriores de Julio. [Brief vigente](reconstruccion-2027/BRIEF-PARA-DECK-VIGENTE.md) y [números/rutas para el deck](README.md#numeros-vigentes-y-uso-en-el-deck) distinguen el panel actual de 19 representantes/directo parcial 3.740 del anterior de cinco/3.690. Roster, costos reales y acuerdos de datos/ejecución siguen pendientes.
+
+La revisión documental v0.6.1 tiene QA propio de propuesta/resumen PDF: 11/2 páginas, lectura visual de las 13 páginas finales y copias/hashes verificados. Capturas/Excel v0.6 conservados, sin recálculo; deck v0.6 de 14 láminas archivado histórico mientras Claude prepara el nuevo. Cuantificar aporte continúa pendiente.

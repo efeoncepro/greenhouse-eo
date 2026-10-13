@@ -1,5 +1,11 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
+> Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
+
+> Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
+
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
 Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`) · Plastilina en volumen
 (D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
@@ -426,6 +432,18 @@ vale en toda aplicación:
 
 ---
 
+### A13. Efeonce Rooms — design system de producto (2026-10-07)
+
+- **Autoridad:** decisión explícita del operador; La órbita es el design system de Rooms, AXIS su distribución técnica.
+- **Superficies:** entrada, gestión de salas, editor, exploración, consola del champion, audiencia y evaluación; [dossier](../../../../docs/architecture/rooms/README.md), [EPIC-052](../../../../docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).
+- **Tipografía:** Bricolage editorial, Poppins funcional desde los roles de `efeonceGraphicLine.type`; ninguna base Geist ni Poppins para todos los títulos. Cada rol conserva peso/escala de su contrato.
+- **Composición:** escenario editorial dentro de La órbita; papel/navy, acentos y componentes canónicos; órbita con intención, iconos del catálogo, sin volumen en UI. No imponer el formato pregunta/respuesta al relato.
+- **Marca/cliente:** usar assets oficiales de Efeonce y la marca Rooms del paquete (abajo). No modificar arte cliente ni sus fuentes. No añadir una firma gráfica a cada control como si fuera un anuncio.
+- **Marca Rooms (aprobada 2026-10-08, «eslabón leve»):** las dos «o» de «Rooms» (Poppins Bold a contornos) son dos órbitas enlazadas como eslabones, centros a 1,6 × el radio medio, con la única esfera Growth (`#0e8c82` sobre papel, `#36c8bf` sobre navy) a la 1:30 de la segunda; **nunca en un cruce**. 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (6 formas × `positive`/`negative`/`white`): `lockup` («efeonce | Rooms», por defecto), `logo`, `compact`, `stacked-lockup`, `isotype` (las dos órbitas sin letra: favicon, avatar de la sala, ícono de app; nunca junto al nombre) e `icon` (nave sobre «Rooms» liso). Junto a Efeonce, «Rooms» en el gris de la familia; sólo la esfera lleva el acento. En publicidad, siempre «efeonce | Rooms», nunca «Rooms» suelto. Hasta 0.4.28, sólo en el paquete; desde 0.4.29, en la página «Logotipos» del Lab y en su búsqueda global. Generador `scripts/brand/build-rooms-logos.mjs`; nunca editar los SVG a mano. ADR [`EFEONCE_ROOMS_MARK_DECISION_V1.md`](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); QA en [qa-checklist.md](qa-checklist.md#marcas-de-producto-con-órbitas-enlazadas-rooms-2026-10-08).
+- **Aplicaciones de la marca exploradas, no aprobadas como composiciones de la sala (2026-10-08):** canvas privado «Efeonce Rooms — Logo» (`https://claude.ai/artifact/GxQAjo17CqRKTDvQVMa8R1`; páginas Logo, Aplicaciones y Variantes del símbolo): imagen del enlace compartido 1200×630, invitación por correo, pestaña + ícono de app + avatar + stickers, portada del modo presentación 1920×1080, placa de sala en oficina («Medir.»), post de lanzamiento 1080×1350 y storyboard de apertura (dos órbitas se acercan, se enlazan y la esfera se posa a la 1:30; con movimiento reducido, sólo el cuadro final). Son exploraciones: no aprueban composiciones de la sala (siguen sujetas a los contratos de UI y al go de EPIC-052) ni una animación de logo nueva (las aprobadas siguen siendo reveal/apertura/sting).
+- **Producción y motion:** adapter nativo Rooms sobre packages, no copia de Lab; `efeonceGraphicLine.motion` para marca y `axisMotion`/contrato del componente para interacción. Pins, mappings y píxeles se validan al implementar.
+- **Estado/QA:** decisión de sistema y marca aceptadas; publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages), prueba del símbolo sin contexto y búsqueda formal de marca pendientes; composición, runtime, GVC, fuente efectiva, accesibilidad y go final pendientes. Ningún cambio automático al theme de Greenhouse.
+
 ## B. Presentaciones e informes
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
@@ -515,8 +533,8 @@ marca de producto que acompaña») acompaña a Efeonce y **nunca firma**: junto 
 
 «Versión tipográfica» = la marca se nombra con tipografía; falta usar el archivo oficial `insights-lockup-*`. Ambos
 estados, sin decisión del operador ([ledger.md](ledger.md), «Marca de Insights fuera de Think»). Greenhouse fija
-`@efeoncepro/axis-brand-assets` 0.3.5 y los archivos de Insights llegan en **0.4.0**: aplicarla en Greenhouse exige
-subir esa versión. Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). El ejemplo vivo del producto es la muestra
+`@efeoncepro/axis-brand-assets` 0.4.25, que ya trae los archivos de Insights (llegaron en **0.4.0**): aplicarla en
+Greenhouse ya no exige subir el paquete, sólo la decisión del operador. Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). El ejemplo vivo del producto es la muestra
 `think.efeoncepro.com/insights/muestra`. Las copias `apps/lab/public/branding/insights-*.svg` también están en `main` de AXIS.
 Anatomía del informe y de la web: skill `efeonce-insights` → `references/ui-and-brand.md`.
 
@@ -540,20 +558,63 @@ oscuro de la línea, la negativa.
 
 | Superficie | ¿Lleva la marca? | Estado | Dónde |
 |---|---|---|---|
-| Landing del AI Visibility Report («¿Te recomiendan las IA? / Averígualo») | sí, lockup del Report por decisión del operador (2026-10-02) | publicada y verificada en producción (2026-10-03), Think `f4426d2` | TASK-1966; canvas «Marcas SEO y AEO de Efeonce» |
+| Landing del AI Visibility Report («¿Te recomiendan las IA? / Averígualo») | sí, lockup del Report por decisión del operador (2026-10-02) | hero y encaje amplio publicados/verificados el 2026-10-04, Think `56a300a`; último ajuste de hover sólo local | TASK-1966; canvas «Marcas SEO y AEO de Efeonce» |
 | Portada del AI Visibility Report | sí | aprobada en el canvas (aprobó también la paleta Engine); canónica en AXIS desde `v0.3.30`: la órbita de la portada dice la gravedad | canvas; Lab `/references/ai-visibility-report/`; receta `aiVisibilityReportOrbitSvg` |
 | Post 1:1 de SV360 | sí | aprobado en el canvas | canvas |
 | PDF del informe del Grader (versión cliente y no cliente) | sí, lockup «Efeonce \| AI Visibility Report» | diseño aprobado (24 páginas en es/en/pt-BR) y canónico en AXIS (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`); renderer Engine implementado y validado localmente 2026-10-03; rollout pendiente | TASK-1938; dossier de diez PDFs y 24 comparaciones |
 
-**Landing (2026-10-03):** Engine, lockup oficial de `axis-brand-assets` 0.4.10, una órbita (entrada CSS oficial de AXIS de 2 s, final fijo; ampliación pedida el 2026-10-03), Trazo y firma «Empower your Engine». Evidencia en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md`; firma compactada por corrección del operador (2026-10-03), sin sumar gap del contenedor al margen canónico del eslogan; el formulario local está bloqueado por CORS, sin envío ni deploy. Esto no certifica la página del informe ni el PDF.
+**Estado vigente de la landing (2026-10-04):** identidad Engine y lockup oficial de `axis-brand-assets`
+0.4.10, SVG orbital oficial, Trazo y firma «Empower your Engine». El hero demostrativo de Think `6aab907`
+y su corrección de ancho `56a300a` están publicados; Vercel success y readback público a 1710/2560 px
+registrados en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md`.
+La última corrección del **color de hover** sigue local y no está publicada. Esta evidencia no certifica
+el PDF, la página del informe ni un envío real.
 
-**Siguiente paso del pie (operador, 2026-10-03):** el bloque del método se reemplaza por el SVG oficial `aeo-logo-negative.svg` pequeño y enlace a `https://efeoncepro.com/aeo-2/` (destino verificado). AEO es contexto del servicio en una columna separada, no firma ni lockup compuesto; Efeonce conserva la firma principal. Título legal 600 en caja normal, copyright 400 y enlace 500. Aplicación local revisada en 1440/390; evidencia `footer-aeo/` del dossier, sin deploy.
+**Hero y movimiento vigentes:** consulta → respuesta → marca → fuente ilustrativas, sin atribuir una respuesta
+real a un proveedor. Por decisión del operador no lleva «Cómo funciona» ni leyenda/control visible al pie.
+La escena completa es un botón nativo transparente: clic, toque, Enter y espacio pausan/reanudan; el foco de
+teclado es visible y la descripción accesible conserva que es un ejemplo ficticio. Suspende el movimiento fuera
+de pantalla y en pestaña oculta; reducido/sin JS muestra el ejemplo completo, estable y sin control inoperante.
+Grid en flujo normal y mensaje primero en móvil. Escena DOM/CSS con una sola órbita oficial y sin dependencias
+nuevas. La composición y los tiempos son propios de esta superficie, **no motion canónico AXIS**.
 
-**Revisión de motion de la landing (operador, 2026-10-04):** la entrada de 2 s se percibe demasiado estática. Propuesta local en Think: una órbita oficial continua y tarjetas conceptuales de respuestas que se relevan, con pausa, suspensión fuera de pantalla/pestaña y fallback reducido/sin JS. El ciclo de 12 s es candidato de superficie, no canon AXIS. Dirección y evidencia en `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`; sin publicación ni aprobación visual de esta nueva versión.
+**Encaje y contraste:** cabecera y hero comparten shell acotado a 1360 px; escena cuadrada con máximo de
+500 px. Esos límites locales evitan que el ancho del viewport agrande la fila y aleje el formulario: readback
+1710/2560, escena 500 px y comienzo del formulario en y=678, sin overflow. Think y local medidos al mismo ancho
+eran idénticos antes del arreglo; no era deriva de assets/CSS. El hover primario se mantiene sin elevación.
+El operador rechazó el celeste pálido: el ajuste local usa `color-mix(in srgb, var(--engine-accent) 70%,
+var(--engine-ground))` con `var(--engine-ink)` blanco, **6,80:1** medido; sólo cambia dos declaraciones de
+`BrandVisibilityFormDock.astro`, sin nuevas flechas, motion o geometría. Los tamaños y la mezcla son del adapter
+Think; no se incorporan como tokens generales de la marca.
 
-**Refinamiento UX local (2026-10-04):** el operador pidió ejecutar las seis mejoras del resto de la landing: muestra ampliable del PDF real con datos sintéticos, formulario marca primero desde su contrato gobernado, método de cinco niveles desplegable y liderado por preguntas en español, menor peso tipográfico, aclaraciones de entrega/acceso y CTA final al formulario. Evidencia en `docs/ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md`. Commit + push de la iteración autorizados el 04/10: Think `09e1976` confirmado en `origin/main`; despliegue/readback y activación de la nueva versión del formulario pendientes.
+**Formulario y entorno de prueba:** el readback productivo conserva **Entrega primero**. La versión gobernada
+**Marca primero** se prueba en `localhost:4332` mediante `scripts/growth/preview-ai-visibility-landing.cjs`, con
+renderer real, contrato candidato, banner de QA y POST deshabilitado. **No está activada** en producción y un
+push de la landing no la activa. `localhost:4331` recibe HTTP 200 del contrato pero sin autorización CORS para
+ese Origin; el browser no puede leerlo. No ampliar allowlists ni ocultar el error para obtener una captura.
 
-**Registro de publicación B3c (2026-10-03):** el operador autorizó el push; landing y pie AEO publicados en Think `f4426d2`, Vercel READY. Formulario cargado y CUA 1440/1280/390 sin overflow; sin envío. Los estados locales del registro anterior son históricos. Evidencia en el dossier TASK-1966, `production/`.
+**Criterio reutilizable de esta aplicación:** probar la composición tanto en móvil como por encima del ancho
+de diseño; comparar local y producción con el mismo viewport y distinguir contrato de formulario de estilos
+host. Un control de pausa integrado en la escena debe seguir siendo botón de teclado con foco y nombre
+accesibles. Un ajuste de color se valida sobre el botón real y con contraste medido; no requiere añadir
+movimiento. Registrar por separado implementación, commit, push, despliegue y readback.
+
+**Antecedentes preservados:**
+
+- 03/10, Think `f4426d2`: primera landing Engine publicada y verificada, con entrada orbital oficial de 2 s y
+  final fijo. Firma compactada sin sumar gap al margen canónico del eslogan. Pie con SVG `aeo-logo-negative.svg`
+  pequeño y enlace verificado a `https://efeoncepro.com/aeo-2/`: contexto del servicio en columna separada,
+  nunca otra firma ni lockup armado. Legal 600 en caja normal, copyright 400 y enlace 500. Evidencia en el dossier
+  TASK-1966, `production/` y `footer-aeo/`.
+- 04/10, Think `09e1976`: primera revisión continua con tarjetas conceptuales y refinamiento UX (muestra
+  ampliable del PDF con datos sintéticos, cinco niveles desplegables, menor peso tipográfico, aclaraciones de
+  entrega/acceso y CTA final). El hero quedó reemplazado por la escena demostrativa; el candidato Marca primero
+  sigue separado. Evidencia en `ux-revision-2026-10-04/` y dirección en
+  `docs/ui/motion/TASK-1966-ai-visibility-report-orbit-motion.md`.
+- 04/10, Think `6aab907` → `56a300a`: hero demostrativo, pausa directa y corrección de pantalla amplia. El
+  readback de `56a300a` sustituye el estado anterior de «Vercel en despliegue / readback pendiente» de `6aab907`.
+  El celeste pálido documentado en capturas anteriores es histórico; `form-hover-engine-blue.png` registra el
+  nuevo candidato local. Documentación Greenhouse y hover nuevo permanecen fuera del release publicado.
 
 Canvas de registro: [«Marcas SEO y AEO de Efeonce»](https://claude.ai/artifact/3wPmSbb24fm1pJqAPcv9ac) (sistema, hojas
 por marca, versión en blanco y aplicaciones). Archivos en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el
@@ -573,7 +634,23 @@ su brillo en el color del nivel, con etiqueta y escala a la vista; umbrales del 
 `/references/ai-visibility-report.json`); guía `docs/agent-composition/ai-visibility-report.md`; dirección de
 Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbita-direction.md`. La adopción local y el renderer se registran en TASK-1938; el estado de publicación se verifica por separado.
 
-**Aplicación PDF verificada localmente (2026-10-03):** TASK-1938 conserva react-pdf, snapshot, métricas y flujo de envío. Usa tokens `0.3.41`, contracts `0.3.40` y brand-assets `0.4.15`, sin bump de paquetes; la anatomía editorial faltante sale de una extensión generada en AXIS y sellada en el consumidor, todavía sin publicar. Seis variantes normales ES/EN/PT-BR × cliente/prospecto, seis A4; nombres largos se miden con la fuente real y el contenido extenso continúa sin truncarse. Diez PDFs auditados, contraste y 24 comparaciones color/gris en `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`. Recursos oficiales y seis pesos estáticos: `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report`; registro aditivo. Redes: el PNG oficial incluye el disco, se muestra completo a 40 px, sin doble reducción. Corrección posterior de anotaciones (03/10): el chip de período centra el texto en un contenedor independiente; las versiones de metodología se presentan como números, nunca como IDs técnicos. Pie interior confirmado: organización/período, burbuja URL y folio, sin lockup Insights. Eslogan Engine al 64 %, divisor canónico 11,263 em. Tipos, build y 108 pruebas focales PASS; desincronización de metadata Manzanitas corregida con autorización del operador (check de 49 archivos y siete tests PASS; suite general no repetida). **Code complete local, rollout pendiente**, no acredita envío ni publicación.
+**Aplicación PDF verificada localmente (2026-10-03):** TASK-1938 conserva react-pdf, snapshot, métricas y flujo de envío. Usa tokens `0.3.41`, contracts `0.3.40` y brand-assets `0.4.15`, sin bump de paquetes; la anatomía editorial faltante sale de una extensión generada en AXIS y sellada en el consumidor, todavía sin publicar. Seis variantes normales ES/EN/PT-BR × cliente/prospecto, seis A4; nombres largos se miden con la fuente real y el contenido extenso continúa sin truncarse. Diez PDFs auditados, contraste y 24 comparaciones color/gris en `docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md`. Recursos oficiales y seis pesos estáticos: `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report`; registro aditivo. Redes: el PNG oficial incluye el disco, se muestra completo a 40 px, sin doble reducción. Corrección posterior de anotaciones (03/10): el chip de período centra el texto en un contenedor independiente; las versiones de metodología se presentan como números, nunca como IDs técnicos. Pie interior confirmado: organización/período, burbuja URL y folio, sin lockup Insights. Eslogan Engine al 64 %, divisor canónico 11,263 em. Tipos, build y 108 pruebas focales PASS; desincronización de metadata Manzanitas corregida con autorización del operador (check de 49 archivos y siete tests PASS; suite general no repetida). **Code complete local, rollout pendiente**, no acredita envío ni publicación. **Delta 2026-10-12:** recursos re-sellados contra `axis-brand-assets` 0.4.25 (`7877dfe89`, sin release): los cuatro lockups (`ai-visibility-{aeo,ai-visibility-report}-lockup-{positive,negative}.png`) llevan la terminación concéntrica del anillo (AXIS `2651192`); los otros 43 recursos salieron byte a byte iguales.
+
+### B3d. Efeonce Wave, Reach y Globe — dónde se aplican (2026-10-09, H3)
+
+| Pieza | Dónde va |
+|---|---|
+| `*-lockup-*` («efeonce \| producto») | junto a Efeonce, por defecto: encabezados, decks, informes, correo |
+| `*-logo-*` | el logotipo solo, a todo color, donde el producto está solo (su propia superficie) |
+| `*-isotype-*` | el símbolo: corchetes de Wave, «a» de Reach, globo de Globe; mapa de portafolio (E7) |
+| `{reach,globe}-isotype-small-*` | sólo a 24 px o menos: favicon, chips (Wave no tiene versión chica) |
+
+- **Nunca** «by efeonce», nunca rearmar el lockup a mano ni repintar el gesto (los colores sobre oscuro de Wave y Globe
+  son de producto, no el acento de línea, y viven sólo en el logotipo y el lockup).
+- **Sobre oscuro, los isotipos van todo en blanco** (`isotype-negative` = `isotype-white`, también en
+  `isotype-small`): nunca un isotipo de producto en color sobre oscuro. El producto sigue sin firmar: la firma es `efeonce-logo-*`.
+- **Estado:** decisión aceptada; paquete 0.4.28 en AXIS `main` (`7c96680` + `5346761`, tag `v0.4.28` publicado; desde 0.4.29 todas las piezas públicas en el Lab); Greenhouse fija 0.4.25 (TASK-2014);
+  versión chica pendiente de probar en un favicon real. Detalle: [ledger.md](ledger.md) 2026-10-09.
 
 ### B4. Deck de Insights y correo de aviso
 
@@ -663,6 +740,8 @@ Greenhouse `docs/ui/visual-directions/TASK-1938-ai-visibility-report-pdf-la-orbi
 - **Fuente:** M §10.2; T `emailSignature.team` (tokens y contratos 0.3.4).
 
 ### C3. Firma de respuesta y reenvío
+
+**Excepción vigente, operador 2026-10-08:** los agentes que envían desde el Outlook de Julio usan la firma oficial **completa** (texto por conector o gráfica por Outlook UI), también en respuestas/reenvíos, y CCO `48713323@bcc.hubspot.com`. La versión abreviada de abajo no se elige automáticamente para esos envíos. [Contrato y verificación](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 - Una **línea de texto vivo** (nombre, cargo, teléfono), **sin imágenes** (T `emailSignature.reply`).
 - **Fuente:** M §10.2.
@@ -1168,6 +1247,14 @@ repetía `CR2b` con `proposal-cinematic-creative` y el plan marcaba `plate-repea
 plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 `src/lib/brand-surfaces/examples/deck-*-intent.json`.
 
+**Propuesta técnica SEO/AEO que se lee sin presentador (alternativa aprobada, 2026-10-07).** Para una licitación o
+propuesta técnica SEO/AEO que el cliente lee sin nosotros existe una alternativa aprobada por el operador: láminas a
+mano con tokens para los datos del cliente más láminas del compositor para lo que tiene receta, cinco capítulos con
+pregunta y franja «Qué significa para <cliente>» (caso fuente: Pibank 2027, 44 láminas, línea Engine). **No
+reemplaza** las recetas de brochure ni de propuesta de práctica: esas siguen mandando. Método, columna narrativa y
+checklist: [propuesta-tecnica-seo-sin-presentador.md](../../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md)
+(skill `deck-studio`); trampas de las recetas usadas, en [lessons.md](lessons.md) §2026-10-07 (Pibank).
+
 **Antes de componer un deck entero, valida su plan (TASK-1929, 2026-09-28).** El plan es la lista ordenada de ids de
 receta (`{ document, line?, diagnosisDone?, slides: [{ recipeId, slots?, plateRef?, progress?, purpose? }] }`):
 `pnpm brand:deck-plan -- --plan plan.json` corre `validateDeckPlan` (piso AXIS `resolveSurfaceDocument` en propuesta y
@@ -1465,3 +1552,13 @@ Assessment, AI Visibility Report e Insights. Recorrido, reglas y pendientes: nor
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de
 opción a canon.
+
+## Botones de marca del Lab AXIS (2026-10-04)
+
+Aplicación: CTA y acciones en superficies de marca; componente portable optativo, no recolor de
+interfaces existentes. `line` identifica el contexto de negocio y `tone` conserva la función.
+Usar para una acción de esa línea; evitar mezclar varios acentos principales en la misma jerarquía.
+Radio/medidas comunes, loader orbital y flecha opcional. Fuente y ejemplos: [lab-components.md](lab-components.md).
+Verificado contra: axis-design-system@1bccb3f — 2026-10-04; adopción de productos separada.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).

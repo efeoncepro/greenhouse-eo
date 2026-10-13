@@ -1,0 +1,304 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "pibank-riesgo-v5",
+  "input": {
+    "artifactId": "pibank-riesgo-v5",
+    "slides": [
+      {
+        "slideId": "deck-decision-risk",
+        "contentType": "deck.decision-risk",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 270,
+            "answerPx": 132,
+            "bodyTop": 560,
+            "bodyPx": 26,
+            "bodyWidth": 520,
+            "headersTop": "--gl-dr-headers-top=200px",
+            "headerPx": "--gl-dr-header-px=16px",
+            "secondColumn": "--gl-dr-second-column=1140px",
+            "tableLeft": "--gl-dr-table-left=800px",
+            "tableTop": "--gl-dr-table-top=250px",
+            "tableWidth": "--gl-dr-table-width=980px",
+            "rowHeight": "--gl-dr-row-height=150px",
+            "rowGap": "--gl-dr-row-gap=20px",
+            "riskWidth": "--gl-dr-risk-width=300px",
+            "columnGap": "--gl-dr-column-gap=40px",
+            "ruleStroke": "--gl-dr-rule=2px",
+            "rowPadTop": "--gl-dr-row-pad-top=22px",
+            "riskPx": "--gl-dr-risk-px=26px",
+            "namePx": "--gl-dr-name-px=44px",
+            "nameTracking": "--gl-dr-name-tracking=-0.02em",
+            "howPx": "--gl-dr-how-px=22px",
+            "howGap": "--gl-dr-how-gap=10px"
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-dr-progress-4-of-5-growth"
+          },
+          "voice": {
+            "question": "¿Y si no funciona?",
+            "answer": "corregimos",
+            "eyebrow": "Riesgo controlado",
+            "answerLead": "Lo"
+          },
+          "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+          "headers": {
+            "risk": "El riesgo",
+            "how": "Cómo lo cubrimos"
+          },
+          "risks": [
+            {
+              "risk": "Promesas sin respaldo",
+              "name": "Sin promesas vacías",
+              "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+            },
+            {
+              "risk": "Condiciones erradas",
+              "name": "Revisión del banco",
+              "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+            },
+            {
+              "risk": "Esperar a TI",
+              "name": "Plan alternativo",
+              "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+            },
+            {
+              "risk": "Depender de una persona",
+              "name": "Traspaso documentado",
+              "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+            }
+          ],
+          "selection": {
+            "label": "Pibank",
+            "anchor": "top-start",
+            "participantKind": "department",
+            "scale": 1.15,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none",
+            "item": 1
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-decision-risk",
+      "contentType": "deck.decision-risk",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 132,
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "headersTop": "--gl-dr-headers-top=200px",
+          "headerPx": "--gl-dr-header-px=16px",
+          "secondColumn": "--gl-dr-second-column=1140px",
+          "tableLeft": "--gl-dr-table-left=800px",
+          "tableTop": "--gl-dr-table-top=250px",
+          "tableWidth": "--gl-dr-table-width=980px",
+          "rowHeight": "--gl-dr-row-height=150px",
+          "rowGap": "--gl-dr-row-gap=20px",
+          "riskWidth": "--gl-dr-risk-width=300px",
+          "columnGap": "--gl-dr-column-gap=40px",
+          "ruleStroke": "--gl-dr-rule=2px",
+          "rowPadTop": "--gl-dr-row-pad-top=22px",
+          "riskPx": "--gl-dr-risk-px=26px",
+          "namePx": "--gl-dr-name-px=44px",
+          "nameTracking": "--gl-dr-name-tracking=-0.02em",
+          "howPx": "--gl-dr-how-px=22px",
+          "howGap": "--gl-dr-how-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dr-progress-4-of-5-growth"
+        },
+        "voice": {
+          "question": "¿Y si no funciona?",
+          "answer": "corregimos",
+          "eyebrow": "Riesgo controlado",
+          "answerLead": "Lo"
+        },
+        "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+        "headers": {
+          "risk": "El riesgo",
+          "how": "Cómo lo cubrimos"
+        },
+        "risks": [
+          {
+            "risk": "Promesas sin respaldo",
+            "name": "Sin promesas vacías",
+            "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+          },
+          {
+            "risk": "Condiciones erradas",
+            "name": "Revisión del banco",
+            "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+          },
+          {
+            "risk": "Esperar a TI",
+            "name": "Plan alternativo",
+            "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+          },
+          {
+            "risk": "Depender de una persona",
+            "name": "Traspaso documentado",
+            "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+          }
+        ],
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-start",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionRisk",
+      "contractHash": "420185fb14c39fd0ccf8c37752ac800ac7e7fc7a44451b2b860a4e1f1d848a7b",
+      "templateHash": "517045e0ad356372e3c3eb8e49beae36b4d3f8528ae837524510548c952dabf1"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

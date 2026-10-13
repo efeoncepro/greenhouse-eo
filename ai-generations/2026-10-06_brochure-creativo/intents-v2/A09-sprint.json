@@ -1,0 +1,51 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-service",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Cómo empezar",
+    "question": "¿Y si no me convence?",
+    "answer": [
+      "Empiezas chico"
+    ]
+  },
+  "body": "Un Creative Sprint pagado y acotado prueba el encaje con tu marca antes de sumar capacidad.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Creative Sprint",
+      "desc": "Un proyecto pagado y acotado para probar el encaje con tu marca."
+    },
+    {
+      "kicker": "Managed Squad",
+      "name": "Creative Capacity",
+      "desc": "Squad dedicado On-Going, con capacidad gobernada y métricas de entrega."
+    },
+    {
+      "kicker": "Producción",
+      "name": "Creative Studio",
+      "desc": "Sistema de producción con memoria de marca y control de derechos."
+    }
+  ],
+  "proof": {
+    "text": "Sky: +2.000 piezas aprobadas en 12 meses, 88 % a tiempo.",
+    "source": "caso publicado de Sky Airlines"
+  },
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+    "alt": "Un creativo de Efeonce con polo cuelga pruebas impresas en una pared de referencias y mira hacia atrás sonriendo"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

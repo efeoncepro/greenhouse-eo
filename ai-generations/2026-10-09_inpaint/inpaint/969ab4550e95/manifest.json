@@ -1,0 +1,285 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "969ab4550e95",
+  "key": "969ab4550e958c6334ad4c3c7d7e79e8239289f5fcf65c0ab4b93d56f6e5b706",
+  "status": "completed",
+  "createdAt": "2026-10-10T00:07:55.114Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT5-prisma-formatos.png",
+    "imageSha256": "38235f397595ff78c13a8bb833e7735fca41dc1da81a83b6c522b509534b8262",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-09_deck-contenidos/fotos/plates/mano/mask-brazo.png",
+    "maskSha256": "12019b46b7bd95abee244b4918634c6fd02cb4183240584c7c631c6f0e9ed69d",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 3,
+    "prompt": "Repaint her raised left hand, wrist, forearm and sleeve cuff with correct, natural female anatomy and proportions. The hand is SMALLER than now: a small, slender feminine hand, clearly shorter than her face, about the length from her chin to her eyebrows, with fingers of normal length, not elongated. The wrist and forearm are of natural thickness for that hand: the wrist is about as wide as two thirds of the palm, never a thin stick. Only a short piece of wrist shows: the ribbed knit cuff of the royal-blue hoodie sleeve sits right at the wrist, wrapping all the way around it, the arm coming out from inside the cuff. Same pose: she pinches the small glass prism between thumb and fingertips at the same place; keep the prism and the light beams exactly as they are. Same royal-blue fleece, same cool white-azure light from the upper right, same depth of field, photographic, realistic, no watch, no ring.",
+    "providerPrompt": "Repaint her raised left hand, wrist, forearm and sleeve cuff with correct, natural female anatomy and proportions. The hand is SMALLER than now: a small, slender feminine hand, clearly shorter than her face, about the length from her chin to her eyebrows, with fingers of normal length, not elongated. The wrist and forearm are of natural thickness for that hand: the wrist is about as wide as two thirds of the palm, never a thin stick. Only a short piece of wrist shows: the ribbed knit cuff of the royal-blue hoodie sleeve sits right at the wrist, wrapping all the way around it, the arm coming out from inside the cuff. Same pose: she pinches the small glass prism between thumb and fingertips at the same place; keep the prism and the light beams exactly as they are. Same royal-blue fleece, same cool white-azure light from the upper right, same depth of field, photographic, realistic, no watch, no ring."
+  },
+  "mask": {
+    "touchedFraction": 0.056553819444444445,
+    "editable": 166152,
+    "soft": 42328,
+    "protected": 3477920
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1498,
+      "top": 181,
+      "width": 934,
+      "height": 1143
+    },
+    "target": {
+      "width": 928,
+      "height": 1136
+    },
+    "aspectError": 0.00030168642712768214,
+    "reason": "la zona con contexto ocupa 28.6 % de la imagen: se genera recortada a 928x1136"
+  },
+  "estimate": {
+    "usd": 0.1287,
+    "basis": "3 × salida 928x1136 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 23.692,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.64,
+        "bestError": 4.64,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3477920,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 166152,
+        "maxDelta": 240,
+        "meanDelta": 28.188,
+        "worst": {
+          "x": 1964,
+          "y": 557
+        }
+      },
+      "seam": {
+        "pixels": 42328,
+        "maxDelta": 212,
+        "meanDelta": 6.046,
+        "worst": {
+          "x": 1924,
+          "y": 491
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3477920,
+        "maxDelta": 223,
+        "meanDelta": 2.698,
+        "worst": {
+          "x": 2033,
+          "y": 410
+        }
+      },
+      "outputUsd": 0.0429,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1257,
+        "input_tokens_details": {
+          "image_tokens": 1044,
+          "text_tokens": 213
+        },
+        "output_tokens": 1430,
+        "output_tokens_details": {
+          "image_tokens": 1430,
+          "text_tokens": 0
+        },
+        "total_tokens": 2687
+      },
+      "meta": {
+        "size": "928x1136",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 26.906,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.9,
+        "bestError": 4.9,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3477920,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 166152,
+        "maxDelta": 237,
+        "meanDelta": 32.062,
+        "worst": {
+          "x": 1982,
+          "y": 569
+        }
+      },
+      "seam": {
+        "pixels": 42328,
+        "maxDelta": 215,
+        "meanDelta": 6.666,
+        "worst": {
+          "x": 1924,
+          "y": 491
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3477920,
+        "maxDelta": 227,
+        "meanDelta": 2.862,
+        "worst": {
+          "x": 2033,
+          "y": 410
+        }
+      },
+      "outputUsd": 0.0429,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1257,
+        "input_tokens_details": {
+          "image_tokens": 1044,
+          "text_tokens": 213
+        },
+        "output_tokens": 1430,
+        "output_tokens_details": {
+          "image_tokens": 1430,
+          "text_tokens": 0
+        },
+        "total_tokens": 2687
+      },
+      "meta": {
+        "size": "928x1136",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 3,
+      "raw": "candidate-3-raw.png",
+      "final": "candidate-3.png",
+      "diff": "candidate-3-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 25.806,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.54,
+        "bestError": 4.54,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3477920,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 166152,
+        "maxDelta": 240,
+        "meanDelta": 30.689,
+        "worst": {
+          "x": 1970,
+          "y": 561
+        }
+      },
+      "seam": {
+        "pixels": 42328,
+        "maxDelta": 214,
+        "meanDelta": 6.639,
+        "worst": {
+          "x": 1929,
+          "y": 493
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3477920,
+        "maxDelta": 226,
+        "meanDelta": 2.613,
+        "worst": {
+          "x": 1514,
+          "y": 448
+        }
+      },
+      "outputUsd": 0.0429,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1257,
+        "input_tokens_details": {
+          "image_tokens": 1044,
+          "text_tokens": 213
+        },
+        "output_tokens": 1430,
+        "output_tokens_details": {
+          "image_tokens": 1430,
+          "text_tokens": 0
+        },
+        "total_tokens": 2687
+      },
+      "meta": {
+        "size": "928x1136",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

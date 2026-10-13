@@ -2,9 +2,11 @@ import 'server-only'
 
 import { enableClientPortalModule } from '@/lib/client-portal/commands/enable-module'
 import { expireClientPortalModule } from '@/lib/client-portal/commands/expire-churn'
+import { GrowthMarketError, resolveGrowthMarket } from '@/lib/growth/markets'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { AI_VISIBILITY_MODULE_KEY, type AeoTier } from './entitlement'
+import { AEO_MARKETS_INCLUDED_KEY, parseIncludedMarkets } from './markets/contract-coverage'
 import {
   provisionGraderProfileForOrganization,
   type ProvisionGraderProfileResult
@@ -18,6 +20,8 @@ export type AssignAeoTierErrorCode =
   | 'invalid_tier'
   | 'reason_required'
   | 'pilot_expires_at_required'
+  | 'markets_require_contracted'
+  | 'markets_invalid'
 
 export class AssignAeoTierValidationError extends Error {
   readonly code: AssignAeoTierErrorCode
@@ -51,6 +55,12 @@ export interface AssignAeoTierInput {
   readonly reason: string
   readonly requestedBy: string
   readonly expiresAt?: string | null
+  /**
+   * Países (ISO alpha-2) que el contrato incluye ADEMÁS del principal. Sólo tier `contracted`.
+   * `undefined` = no se toca lo declarado (se conserva al re-asignar el mismo tier);
+   * `[]` = se declara explícitamente que no hay mercados extra.
+   */
+  readonly marketsIncluded?: readonly string[] | null
 }
 
 export interface AssignAeoTierResult {
@@ -61,6 +71,8 @@ export interface AssignAeoTierResult {
   readonly idempotent: boolean
   readonly supersededAssignmentId: string | null
   readonly profile: ProvisionGraderProfileResult | null
+  /** Lo que quedó declarado en el assignment vigente. `null` = nunca se declaró. */
+  readonly marketsIncluded: readonly string[] | null
 }
 
 const VALID_ASSIGNABLE_TIERS: ReadonlySet<string> = new Set<AssignableAeoTier>([
@@ -95,6 +107,53 @@ const assertReason = (reason: unknown): string => {
 
   return reason.trim()
 }
+
+const MAX_MARKETS_INCLUDED = 23
+
+/**
+ * Normaliza contra el catálogo de mercados del producto: un país que el catálogo no conoce no
+ * se guarda "por si acaso" — quedaría declarado en el contrato y sería inmedible.
+ */
+const normalizeMarketsIncluded = (tier: AssignableAeoTier, markets: unknown): string[] | undefined => {
+  if (markets === undefined || markets === null) return undefined
+
+  if (tier !== 'contracted') {
+    throw new AssignAeoTierValidationError(
+      'markets_require_contracted',
+      'marketsIncluded only applies to the contracted tier',
+      400,
+      { field: 'marketsIncluded', tier }
+    )
+  }
+
+  if (!Array.isArray(markets) || markets.length > MAX_MARKETS_INCLUDED) {
+    throw new AssignAeoTierValidationError('markets_invalid', 'marketsIncluded must be an array of country codes', 400, {
+      field: 'marketsIncluded',
+      maxItems: MAX_MARKETS_INCLUDED
+    })
+  }
+
+  const codes = new Set<string>()
+
+  for (const value of markets) {
+    try {
+      if (typeof value !== 'string') throw new GrowthMarketError('aeo_market_unknown')
+      codes.add(resolveGrowthMarket(value).code)
+    } catch (error) {
+      if (!(error instanceof GrowthMarketError)) throw error
+
+      throw new AssignAeoTierValidationError('markets_invalid', 'marketsIncluded has a country outside the catalog', 400, {
+        field: 'marketsIncluded',
+        value
+      })
+    }
+  }
+
+  return [...codes].sort()
+}
+
+const sameMarkets = (a: readonly string[] | null, b: readonly string[] | null): boolean =>
+  JSON.stringify(a ? [...a].sort() : null) === JSON.stringify(b ? [...b].sort() : null)
 
 const readOpenAeoAssignment = async (
   organizationId: string
@@ -137,8 +196,14 @@ const todayIsoDate = (): string => new Date().toISOString().slice(0, 10)
 export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAeoTierResult> => {
   const tier = normalizeTier(input.tier)
   const reason = assertReason(input.reason)
+  const declaredMarkets = normalizeMarketsIncluded(tier, input.marketsIncluded)
   const existing = await readOpenAeoAssignment(input.organizationId)
   const existingTier = resolveAssignmentTier(existing)
+  const existingMarkets = parseIncludedMarkets(existing?.metadata_json)
+
+  // Sin declaración explícita, re-asignar el MISMO tier conserva lo que ya estaba declarado;
+  // cambiar de tier parte sin mercados extra (otro contrato, otra declaración).
+  const targetMarkets = declaredMarkets ?? (existingTier === tier ? existingMarkets : null)
 
   if (tier === 'pilot' && !input.expiresAt) {
     throw new AssignAeoTierValidationError(
@@ -158,7 +223,8 @@ export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAe
         status: null,
         idempotent: true,
         supersededAssignmentId: null,
-        profile: null
+        profile: null,
+        marketsIncluded: null
       }
     }
 
@@ -176,14 +242,20 @@ export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAe
       status: expired.toStatus,
       idempotent: expired.idempotent,
       supersededAssignmentId: existing.assignment_id,
-      profile: null
+      profile: null,
+      marketsIncluded: null
     }
   }
 
   const profile = await provisionGraderProfileForOrganization(input.organizationId)
   const targetStatus = targetStatusForTier(tier)
 
-  if (existing && existingTier === tier && existing.status === targetStatus) {
+  if (
+    existing &&
+    existingTier === tier &&
+    existing.status === targetStatus &&
+    sameMarkets(existingMarkets, targetMarkets)
+  ) {
     return {
       organizationId: input.organizationId,
       tier,
@@ -191,7 +263,8 @@ export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAe
       status: targetStatus,
       idempotent: true,
       supersededAssignmentId: null,
-      profile
+      profile,
+      marketsIncluded: existingMarkets
     }
   }
 
@@ -201,7 +274,10 @@ export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAe
     const expired = await expireClientPortalModule({
       assignmentId: existing.assignment_id,
       actorUserId: input.requestedBy,
-      reason: `${reason} (supersede AEO tier ${existingTier ?? 'unknown'} -> ${tier})`,
+      reason:
+        existingTier === tier
+          ? `${reason} (supersede AEO ${tier}: mercados incluidos)`
+          : `${reason} (supersede AEO tier ${existingTier ?? 'unknown'} -> ${tier})`,
       effectiveTo: todayIsoDate()
     })
 
@@ -216,10 +292,15 @@ export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAe
     sourceRefJson: {
       command: 'assignAeoTier',
       tier,
-      supersededAssignmentId
+      supersededAssignmentId,
+      ...(targetMarkets ? { marketsIncluded: targetMarkets } : {})
     },
+    // Cambiar SÓLO los mercados no es otro contrato: el resto de la metadata del assignment que
+    // se supersede viaja a la fila nueva. En un cambio de tier se parte de cero, como siempre.
     metadataJson: {
-      aeo_tier: tier
+      ...(existingTier === tier ? (existing?.metadata_json ?? {}) : {}),
+      aeo_tier: tier,
+      ...(targetMarkets ? { [AEO_MARKETS_INCLUDED_KEY]: targetMarkets } : {})
     },
     effectiveFrom: todayIsoDate(),
     expiresAt: tier === 'pilot' ? input.expiresAt ?? undefined : undefined,
@@ -234,6 +315,7 @@ export const assignAeoTier = async (input: AssignAeoTierInput): Promise<AssignAe
     status: enabled.status,
     idempotent: enabled.idempotent,
     supersededAssignmentId,
-    profile
+    profile,
+    marketsIncluded: targetMarkets
   }
 }

@@ -1,0 +1,1588 @@
+{
+  "contract": "efeonce.aeo-xray",
+  "version": "0.1.0",
+  "locale": "es-PE",
+  "title": "Pibank Perú · Ahorrar sin tarjeta",
+  "preparedFor": "Pibank Perú",
+  "preparedAt": "2026-10-06",
+  "sources": [
+    {
+      "id": "producto",
+      "label": "Cuenta Soles Pibank · consulta 06-10-2026",
+      "url": "https://pibank.pe/cuenta-soles-pibank/",
+      "accessedAt": "2026-10-06"
+    },
+    {
+      "id": "identidad",
+      "label": "Identidad Pibank / Banco Pichincha Perú",
+      "url": "https://pibank.pe/quienes-somos/",
+      "accessedAt": "2026-10-06"
+    },
+    {
+      "id": "apertura",
+      "label": "Requisitos y apertura · FAQ oficial",
+      "url": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/",
+      "accessedAt": "2026-10-06"
+    },
+    {
+      "id": "tarifario",
+      "label": "Tarifario Cuenta Soles · actualizado 28-09-2026",
+      "url": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/Web/Tarifario_CuentaSolesPibank.pdf",
+      "accessedAt": "2026-10-06"
+    },
+    {
+      "id": "cartilla",
+      "label": "Cartilla Cuenta Soles · actualizada 28-09-2026",
+      "url": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf",
+      "accessedAt": "2026-10-06"
+    },
+    {
+      "id": "ayuda",
+      "label": "Centro de ayuda y canales oficiales",
+      "url": "https://pibank.pe/centro-de-ayuda/",
+      "accessedAt": "2026-10-06"
+    },
+    {
+      "id": "fsd",
+      "label": "Fondo de Seguro de Depósitos · cobertura y condiciones",
+      "url": "https://fsd.org.pe/",
+      "accessedAt": "2026-10-06"
+    }
+  ],
+  "assets": [],
+  "brand": {
+    "name": "Pibank Perú",
+    "accent": "#002850",
+    "ink": "#002850",
+    "action": "#FFDC00",
+    "actionText": "#002850",
+    "fontFamily": "system-sans",
+    "displayFontFamily": "system-sans"
+  },
+  "artifacts": [
+    {
+      "id": "landing",
+      "kind": "landing",
+      "title": "Tus ahorros pueden estar disponibles sin una tarjeta",
+      "summary": "Conoce la Cuenta Soles Pibank: ahorro digital, intereses y operaciones por transferencias. Revisa condiciones y decide con información clara.",
+      "blocks": [
+        {
+          "id": "hero",
+          "kind": "hero",
+          "eyebrow": "Cuenta Soles Pibank",
+          "title": "Tus ahorros pueden estar disponibles sin una tarjeta",
+          "text": "Conoce la Cuenta Soles Pibank: ahorro digital, intereses y operaciones por transferencias. Revisa condiciones y decide con información clara.",
+          "cta": {
+            "label": "Entiende cómo funciona",
+            "artifactId": "landing",
+            "blockId": "como-funciona"
+          }
+        },
+        {
+          "id": "respuesta",
+          "kind": "answer-capsule",
+          "text": "Una cuenta sin tarjeta puede servir para guardar ahorro y moverlo por transferencias digitales. La Cuenta Soles Pibank funciona de esa manera: no ofrece retiros en efectivo ni pagos con tarjeta. Antes de abrirla, revisa si esta forma de usar tu dinero responde a lo que necesitas.",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "como-funciona",
+          "kind": "heading",
+          "level": 2,
+          "text": "Una cuenta para ahorrar; transferencias para mover tu dinero",
+          "short": "Cómo funciona"
+        },
+        {
+          "id": "uso",
+          "kind": "paragraph",
+          "text": "Puedes reservar aquí una parte de tu dinero y conservar otra cuenta para las operaciones que requieren tarjeta o efectivo. Ese uso complementario es una posibilidad; la elección depende de tus necesidades y de las condiciones de ambos bancos.",
+          "sourceIds": [
+            "producto"
+          ]
+        },
+        {
+          "id": "beneficios",
+          "kind": "table",
+          "columns": [
+            "Lo que buscas",
+            "Cómo funciona Pibank",
+            "Qué revisar",
+            "Fuente de condiciones"
+          ],
+          "rows": [
+            [
+              "Intereses sobre ahorro en soles",
+              "La documentación indica cálculo sobre saldo promedio mensual",
+              "Tasa, base de cálculo y fecha efectiva",
+              "Cartilla y tarifario"
+            ],
+            [
+              "Mover fondos digitalmente",
+              "Transferencias desde canales digitales",
+              "Destino, horarios, límites y condiciones",
+              "Producto y tarifario"
+            ],
+            [
+              "Mantener liquidez",
+              "La cuenta no es un depósito a plazo",
+              "Disponibilidad del canal y condiciones de operación",
+              "Producto"
+            ],
+            [
+              "Evitar mantenimiento",
+              "El producto no exige monto mínimo de apertura",
+              "Servicios adicionales e impuestos aplicables",
+              "Producto y tarifario"
+            ]
+          ],
+          "caption": "Comparación de necesidades y funcionamiento; no compara tasas de otros bancos.",
+          "sourceIds": [
+            "producto",
+            "cartilla",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "condiciones",
+          "kind": "heading",
+          "level": 2,
+          "text": "Las condiciones que conviene tener a la vista",
+          "short": "Condiciones"
+        },
+        {
+          "id": "tasa",
+          "kind": "paragraph",
+          "text": "Al 06 de octubre de 2026, la página de producto muestra una TREA de 5% en soles. La cartilla y el tarifario del 28 de septiembre indican una TEA de 5% para saldo promedio mensual desde S/1. La equivalencia TEA/TREA corresponde a las condiciones descritas en la cartilla; la tasa puede cambiar y este dato no es una promesa para 2027.",
+          "sourceIds": [
+            "producto",
+            "cartilla",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "costos",
+          "kind": "paragraph",
+          "text": "No hay comisión de mantenimiento y las transferencias digitales previstas en el tarifario no cobran comisión. Algunos servicios adicionales, como pedir el estado de cuenta en papel, tienen costo. Revisa también el ITF cuando corresponda y las condiciones del banco desde el que transfieras.",
+          "sourceIds": [
+            "tarifario",
+            "cartilla"
+          ]
+        },
+        {
+          "id": "operacion",
+          "kind": "paragraph",
+          "text": "La cuenta no dispone de tarjeta de débito ni operaciones en efectivo por oficinas, agentes o cajeros. Las transferencias se sujetan a horarios, límites y controles de seguridad. Si necesitas efectivo o pagar con tarjeta, contempla un medio adicional.",
+          "sourceIds": [
+            "tarifario"
+          ]
+        },
+        {
+          "id": "apertura",
+          "kind": "heading",
+          "level": 2,
+          "text": "De la apertura al uso de la cuenta",
+          "short": "Apertura y uso"
+        },
+        {
+          "id": "pasos",
+          "kind": "list",
+          "items": [
+            "Prepara tu DNI, celular, correo electrónico y un dispositivo con internet; la apertura está dirigida a mayores de edad según los requisitos publicados.",
+            "Entra al sitio oficial de Pibank y comienza la solicitud. El banco valida tus datos e identidad y presenta el contrato y la cartilla.",
+            "Tras completar la apertura, sigue las indicaciones oficiales para acceder a la app y conocer los datos de tu cuenta.",
+            "Antes de transferir dinero, comprueba destinatario, cuenta o CCI, límites y horarios en los canales oficiales de las entidades involucradas."
+          ],
+          "ordered": true,
+          "sourceIds": [
+            "apertura",
+            "producto"
+          ]
+        },
+        {
+          "id": "confianza",
+          "kind": "heading",
+          "level": 2,
+          "text": "Saber quién responde también forma parte de ahorrar",
+          "short": "Respaldo y ayuda"
+        },
+        {
+          "id": "respaldo",
+          "kind": "paragraph",
+          "text": "Pibank es una marca de Banco Pichincha Perú. Consulta las condiciones de la cobertura del Fondo de Seguro de Depósitos y la entidad que mantiene tu depósito; esa cobertura tiene un monto máximo vigente y no debe interpretarse como ilimitada. Para resolver una duda sobre tu cuenta, utiliza los canales oficiales de atención.",
+          "sourceIds": [
+            "identidad",
+            "producto",
+            "fsd",
+            "ayuda"
+          ]
+        },
+        {
+          "id": "faq",
+          "kind": "faq",
+          "title": "Preguntas frecuentes",
+          "items": [
+            {
+              "question": "¿Puedo usar la cuenta sin tener una tarjeta?",
+              "answer": "Sí. La Cuenta Soles Pibank se opera digitalmente y no emite tarjeta de débito. Sus operaciones disponibles y límites están descritos en la documentación del producto."
+            },
+            {
+              "question": "¿Puedo retirar dinero en efectivo desde Pibank?",
+              "answer": "La documentación no contempla retiros en efectivo por oficinas, agentes o cajeros. Si necesitas efectivo, revisa la opción de transferir a otra cuenta y las condiciones de esa entidad."
+            },
+            {
+              "question": "¿Hay costos además del mantenimiento?",
+              "answer": "El mantenimiento no tiene comisión. El tarifario contempla cargos por servicios adicionales solicitados y pueden aplicar impuestos o condiciones de otra entidad. Consulta la versión vigente."
+            },
+            {
+              "question": "¿La tasa seguirá siendo la misma en 2027?",
+              "answer": "Esta muestra recoge la tasa publicada al 06-10-2026. La documentación permite cambios bajo las condiciones del contrato; consulta el tarifario vigente cuando decidas."
+            }
+          ],
+          "sourceIds": [
+            "producto",
+            "cartilla",
+            "tarifario",
+            "apertura"
+          ]
+        },
+        {
+          "id": "guia",
+          "kind": "cta",
+          "title": "¿Quieres entender cuándo te sirve una cuenta sin tarjeta?",
+          "text": "Revisa el recorrido, los usos y los puntos que conviene comprobar antes de abrir y transferir.",
+          "action": {
+            "label": "Leer la guía",
+            "artifactId": "article"
+          }
+        },
+        {
+          "id": "fuentes",
+          "kind": "sources",
+          "title": "Fuentes para comprobar las condiciones",
+          "items": [
+            {
+              "text": "Cuenta Soles Pibank · consulta 06-10-2026",
+              "href": "https://pibank.pe/cuenta-soles-pibank/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Identidad Pibank / Banco Pichincha Perú",
+              "href": "https://pibank.pe/quienes-somos/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Requisitos y apertura · FAQ oficial",
+              "href": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Tarifario Cuenta Soles · actualizado 28-09-2026",
+              "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/Web/Tarifario_CuentaSolesPibank.pdf",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Cartilla Cuenta Soles · actualizada 28-09-2026",
+              "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Centro de ayuda y canales oficiales",
+              "href": "https://pibank.pe/centro-de-ayuda/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Fondo de Seguro de Depósitos · cobertura y condiciones",
+              "href": "https://fsd.org.pe/",
+              "note": "Consultada el 06-10-2026"
+            }
+          ]
+        },
+        {
+          "id": "oficial",
+          "kind": "cta",
+          "title": "Revisa el producto y sus condiciones actuales",
+          "text": "Continúa en el sitio oficial de Pibank. Esta demostración no recibe solicitudes ni dinero.",
+          "action": {
+            "label": "Consultar Cuenta Soles Pibank",
+            "href": "https://pibank.pe/cuenta-soles-pibank/"
+          }
+        }
+      ],
+      "annotations": [
+        {
+          "id": "respuesta-aeo",
+          "scope": "block",
+          "blockId": "respuesta",
+          "category": "aeo",
+          "title": "Respuesta que distingue ahorro y medios de pago",
+          "explanation": "Resolver la duda de uso con condiciones concretas y fuente oficial; no atribuir citas por el formato.",
+          "status": "proposed",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "faq-onpage",
+          "scope": "block",
+          "blockId": "faq",
+          "category": "on-page",
+          "title": "Preguntas conectadas con la decisión",
+          "explanation": "Las respuestas visibles y el JSON-LD exhibido conservan la misma redacción; no prometen un rich result.",
+          "status": "proposed",
+          "sourceIds": [
+            "producto",
+            "cartilla"
+          ]
+        },
+        {
+          "id": "fuentes-ymyl",
+          "scope": "block",
+          "blockId": "fuentes",
+          "category": "technical",
+          "title": "Fuentes y fecha visibles",
+          "explanation": "Tasa y condiciones tienen fecha y procedencia; la revisión bancaria precede a publicación.",
+          "status": "proposed",
+          "sourceIds": [
+            "cartilla",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "siguiente-paso",
+          "scope": "block",
+          "blockId": "oficial",
+          "category": "conversion",
+          "title": "Un paso coherente con el lector",
+          "explanation": "La muestra enlaza información y no simula un onboarding ni contabiliza aperturas.",
+          "status": "proposed",
+          "sourceIds": [
+            "producto"
+          ]
+        }
+      ],
+      "seo": {
+        "title": "Tus ahorros pueden estar disponibles sin una tarjeta",
+        "description": "Conoce la Cuenta Soles Pibank: ahorro digital, intereses y operaciones por transferencias. Revisa condiciones y decide con información clara.",
+        "canonical": "https://pibank.pe/cuenta-soles-pibank/",
+        "robots": "index,follow",
+        "lang": "es-PE",
+        "structuredData": {
+          "@context": "https://schema.org",
+          "@type": "FinancialProduct",
+          "@id": "https://pibank.pe/cuenta-soles-pibank/#financialproduct",
+          "name": "Tus ahorros pueden estar disponibles sin una tarjeta",
+          "url": "https://pibank.pe/cuenta-soles-pibank/",
+          "description": "Conoce la Cuenta Soles Pibank: ahorro digital, intereses y operaciones por transferencias. Revisa condiciones y decide con información clara.",
+          "brand": {
+            "@type": "Brand",
+            "name": "Pibank"
+          },
+          "provider": {
+            "@type": "BankOrCreditUnion",
+            "name": "Banco Pichincha Perú"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "Perú"
+          }
+        }
+      },
+      "experience": {
+        "thesis": "La disponibilidad del ahorro se entiende mejor cuando explicamos medios de uso, límites y condiciones; esta pieza propone resolver esa decisión sin inventar resultados.",
+        "meta": {
+          "instrument": "AEO X-Ray",
+          "sampleFor": "Pibank Perú",
+          "sampleTitle": "Tus ahorros pueden estar disponibles sin una tarjeta",
+          "preparedAt": "2026-10-06",
+          "preparedBy": "Efeonce"
+        },
+        "gap": {
+          "kicker": "Oportunidad editorial candidata",
+          "headline": "¿Cómo uso mi dinero si mi cuenta no tiene tarjeta?",
+          "serpTitle": "Una decisión del ahorrador por investigar",
+          "serpNote": "La pregunta es una hipótesis editorial. No representa volumen, posición ni una respuesta observada de un buscador.",
+          "serp": [],
+          "punch": "Explicar el uso puede facilitar una decisión informada.",
+          "punchNote": "El sitio ya tiene producto y FAQ; la propuesta conecta sus respuestas. No acredita un hueco de ranking.",
+          "aside": "Investigación pública de Pibank al 06-10-2026. Sin datos de tráfico, aperturas ni fondeo.",
+          "punchOpportunity": "Producto, guía y fuentes oficiales resuelven la pregunta en un recorrido coherente."
+        },
+        "machine": {
+          "seo": [
+            {
+              "id": "meta-title",
+              "label": "Title propuesto",
+              "value": "Tus ahorros pueden estar disponibles sin una tarjeta",
+              "why": "Expresa la decisión resuelta en el contenido visible.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "meta-description",
+              "label": "Descripción propuesta",
+              "value": "Conoce la Cuenta Soles Pibank: ahorro digital, intereses y operaciones por transferencias. Revisa condiciones y decide con información clara.",
+              "why": "Anticipa usos y condiciones sin prometer rendimiento.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "canonical",
+              "label": "Canonical de destino propuesto",
+              "value": "https://pibank.pe/cuenta-soles-pibank/",
+              "why": "La URL pertenece al canal cliente; su publicación requiere validación.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            }
+          ],
+          "og": [
+            {
+              "id": "og-title",
+              "label": "Título al compartir",
+              "value": "Tus ahorros pueden estar disponibles sin una tarjeta",
+              "why": "Conserva la identidad de la pieza.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            }
+          ],
+          "headings": {
+            "why": "Los encabezados son los mismos del contenido visible y ayudan a localizar la respuesta.",
+            "tree": [
+              {
+                "level": 1,
+                "text": "Tus ahorros pueden estar disponibles sin una tarjeta",
+                "coupleId": "hero"
+              },
+              {
+                "level": 2,
+                "text": "Una cuenta para ahorrar; transferencias para mover tu dinero",
+                "coupleId": "como-funciona"
+              },
+              {
+                "level": 2,
+                "text": "Las condiciones que conviene tener a la vista",
+                "coupleId": "condiciones"
+              },
+              {
+                "level": 2,
+                "text": "De la apertura al uso de la cuenta",
+                "coupleId": "apertura"
+              },
+              {
+                "level": 2,
+                "text": "Saber quién responde también forma parte de ahorrar",
+                "coupleId": "confianza"
+              },
+              {
+                "level": 2,
+                "text": "Preguntas frecuentes",
+                "coupleId": "faq"
+              }
+            ],
+            "sourceScope": "page",
+            "sourceStatus": "proposed"
+          },
+          "alts": [],
+          "jsonld": [
+            {
+              "id": "page-schema",
+              "type": "FinancialProduct",
+              "metric": "Entidad/pieza descrita",
+              "why": "Propuesta semántica congruente con la pieza; no markup activo en la demo ni garantía de ranking.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed",
+              "code": {
+                "@context": "https://schema.org",
+                "@type": "FinancialProduct",
+                "@id": "https://pibank.pe/cuenta-soles-pibank/#financialproduct",
+                "name": "Tus ahorros pueden estar disponibles sin una tarjeta",
+                "url": "https://pibank.pe/cuenta-soles-pibank/",
+                "description": "Conoce la Cuenta Soles Pibank: ahorro digital, intereses y operaciones por transferencias. Revisa condiciones y decide con información clara.",
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Pibank"
+                },
+                "provider": {
+                  "@type": "BankOrCreditUnion",
+                  "name": "Banco Pichincha Perú"
+                },
+                "areaServed": {
+                  "@type": "Country",
+                  "name": "Perú"
+                }
+              }
+            },
+            {
+              "id": "faq-schema",
+              "type": "FAQPage",
+              "metric": "Preguntas visibles",
+              "why": "Ejemplo semántico de las respuestas mostradas; no requisito especial AEO ni promesa de rich result.",
+              "tier": 2,
+              "sourceScope": "block",
+              "sourceStatus": "proposed",
+              "coupleId": "faq",
+              "code": {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "¿Puedo usar la cuenta sin tener una tarjeta?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Sí. La Cuenta Soles Pibank se opera digitalmente y no emite tarjeta de débito. Sus operaciones disponibles y límites están descritos en la documentación del producto."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "¿Puedo retirar dinero en efectivo desde Pibank?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "La documentación no contempla retiros en efectivo por oficinas, agentes o cajeros. Si necesitas efectivo, revisa la opción de transferir a otra cuenta y las condiciones de esa entidad."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "¿Hay costos además del mantenimiento?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "El mantenimiento no tiene comisión. El tarifario contempla cargos por servicios adicionales solicitados y pueden aplicar impuestos o condiciones de otra entidad. Consulta la versión vigente."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "¿La tasa seguirá siendo la misma en 2027?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Esta muestra recoge la tasa publicada al 06-10-2026. La documentación permite cambios bajo las condiciones del contrato; consulta el tarifario vigente cuando decidas."
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "craft": [
+            {
+              "label": "De la pregunta a sus condiciones",
+              "detail": "Respuesta breve, funcionamiento, restricciones, fuentes y siguiente paso forman una misma decisión.",
+              "why": "La claridad puede evaluarse con personas; la conversión requiere datos y experimento.",
+              "tier": 3,
+              "coupleId": "respuesta",
+              "sourceStatus": "proposed",
+              "sourceScope": "block"
+            }
+          ]
+        },
+        "flow": [
+          {
+            "step": "",
+            "label": "La oportunidad",
+            "next": "Conoce la pieza."
+          },
+          {
+            "step": "articulo",
+            "label": "La pieza",
+            "next": "Explora su radiografía."
+          },
+          {
+            "step": "radiografia",
+            "label": "La radiografía",
+            "next": "Descubre sus derivados."
+          },
+          {
+            "step": "atomizacion",
+            "label": "Dónde más vive",
+            "next": ""
+          }
+        ],
+        "atomsIntro": "La misma respuesta puede adaptarse a otros formatos, conservando fuentes y condiciones. Aquí hay copy y guion candidatos; no piezas publicadas ni medios producidos.",
+        "atoms": [
+          {
+            "id": "feed-uso",
+            "kind": "Post social",
+            "bornFrom": "La respuesta principal",
+            "coupleId": "respuesta",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Aclara el uso antes de pedir una apertura.",
+            "honesty": "Copy candidato; sin imagen producida ni publicación.",
+            "deliverable": [
+              {
+                "k": "Idea",
+                "v": "Tu ahorro y tus medios de pago pueden tener usos diferentes."
+              },
+              {
+                "k": "Formato",
+                "v": "Feed; arte por producir tras revisar identidad."
+              }
+            ],
+            "post": {
+              "hook": "¿Ahorrar sin tarjeta?",
+              "body": "Una cuenta puede servir para reservar dinero y moverlo por transferencias. Conoce primero las operaciones y límites de la Cuenta Soles Pibank.",
+              "cta": "Revisa las condiciones oficiales."
+            }
+          },
+          {
+            "id": "story-condiciones",
+            "kind": "Story",
+            "bornFrom": "Preguntas frecuentes",
+            "coupleId": "faq",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Entrega una comprobación breve de condiciones.",
+            "honesty": "Copy candidato; sin Story gráfica producida.",
+            "deliverable": [
+              {
+                "k": "Pantalla 1",
+                "v": "Antes de abrir: ¿cómo usarás tu dinero?"
+              },
+              {
+                "k": "Pantalla 2",
+                "v": "Revisa medios disponibles, horarios, límites y cargos."
+              },
+              {
+                "k": "Pantalla 3",
+                "v": "Consulta la Cuenta Soles Pibank en el sitio oficial."
+              }
+            ],
+            "post": {
+              "hook": "Tres cosas que conviene revisar",
+              "body": "Cómo mueves fondos. Qué medios ofrece la cuenta. Qué condiciones y costos aplican.",
+              "cta": "Conoce la información oficial."
+            }
+          },
+          {
+            "id": "reel-guion",
+            "kind": "Guion de reel",
+            "bornFrom": "El funcionamiento de la cuenta",
+            "coupleId": "respuesta",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Explica la decisión con una secuencia breve.",
+            "honesty": "Guion candidato. No hay archivo de video, poster ni reproducción que acreditar.",
+            "deliverable": [
+              {
+                "k": "Inicio",
+                "v": "Una cuenta sin tarjeta: ¿cómo usas tu dinero?"
+              },
+              {
+                "k": "Desarrollo",
+                "v": "Ahorrar, transferir y pagar son necesidades distintas. Revisa las operaciones y condiciones de la cuenta."
+              },
+              {
+                "k": "Cierre",
+                "v": "Decide con información oficial. Cuenta Soles Pibank."
+              }
+            ]
+          }
+        ],
+        "evidence": {
+          "intro": "Las fuentes respaldan el funcionamiento del producto; el ángulo editorial y su efecto comercial se proponen para validar.",
+          "facts": [
+            {
+              "label": "Moneda del producto observado",
+              "value": "Soles",
+              "note": "No se propone una cuenta Dólares no publicada.",
+              "source": "https://pibank.pe/cuenta-soles-pibank/",
+              "asOf": "2026-10-06",
+              "headline": false,
+              "sourceScope": "page",
+              "sourceStatus": "verified"
+            },
+            {
+              "label": "Entidad",
+              "value": "Banco Pichincha Perú",
+              "note": "Pibank es la marca del producto; no una entidad separada inferida.",
+              "source": "https://pibank.pe/quienes-somos/",
+              "asOf": "2026-10-06",
+              "headline": false,
+              "sourceScope": "page",
+              "sourceStatus": "verified"
+            }
+          ],
+          "fanOut": {
+            "title": "Preguntas que esta pieza propone resolver",
+            "note": "Preguntas editoriales; no prompts observados ni prueba de citas.",
+            "items": [
+              {
+                "q": "¿Qué significa ahorrar sin tarjeta?",
+                "covered": true,
+                "coveredBy": "respuesta"
+              },
+              {
+                "q": "¿Qué costos y condiciones debo revisar?",
+                "covered": true,
+                "coveredBy": "faq"
+              },
+              {
+                "q": "¿Dónde compruebo la información?",
+                "covered": true,
+                "coveredBy": "fuentes"
+              }
+            ]
+          },
+          "honesty": "Esta muestra no acredita resultados de tráfico, ranking, citas, apertura, fondeo ni saldo. La investigación del caso conserva sus fuentes y límites por separado; el contenido requiere revisión bancaria antes de implementarse."
+        },
+        "ui": {
+          "disclaimerLabel": "Demostración de Efeonce",
+          "disclaimerBody": "Muestra editorial de Efeonce para Pibank Perú, fechada el 06-10-2026. Requiere validación del banco; no recibe solicitudes ni dinero.",
+          "paneArticleTitle": "La pieza",
+          "paneArticleSubtitle": "Lo que ve la persona",
+          "paneMachineTab": "Lo que lee una máquina",
+          "paneEvidenceTab": "La evidencia",
+          "hintDesktop": "Pasa el cursor o enfoca un bloque para ver sus datos. Haz clic para fijarlo.",
+          "hintMobile": "Toca un bloque para ver qué información produce.",
+          "whyLabel": "Para qué sirve",
+          "schemaNote": "JSON-LD propuesto mostrado como texto; no acredita publicación del cliente.",
+          "sourceLabel": "Fuente",
+          "thesisLabel": "Por qué existe esta pieza",
+          "licenseTitle": "Medios del candidato",
+          "licenseNote": "Preview de contenido sin fotografías, logo cliente ni video producidos. El kit de marca, sus derechos y la revisión visual se completan antes de entregar.",
+          "backToArticle": "Volver a la pieza",
+          "bylineBy": "Por",
+          "readTime": "min de lectura",
+          "instrumentTitle": "La radiografía",
+          "specimenChip": "Propuesta editorial",
+          "producesLabel": "datos",
+          "producesLabelOne": "dato",
+          "flowNext": "Siguiente",
+          "flowOf": "de",
+          "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
+          "closing": "Una decisión, dos piezas y sus derivados conservan condiciones y fuentes. La publicación y los resultados se verifican en el canal cliente después de su aprobación.",
+          "verifyTitle": "Comprueba la propuesta",
+          "verifyNote": "Distinguir observación fechada, propuesta e implementación. No prometer resultados.",
+          "verifySteps": [
+            {
+              "what": "Fuentes",
+              "how": "Contrastar cada afirmación con fuentes fechadas del cliente."
+            },
+            {
+              "what": "Representación",
+              "how": "Comprobar que la capa técnica coincide con el contenido visible."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "article",
+      "kind": "article",
+      "title": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+      "summary": "Una guía para entender las transferencias, preparar la apertura y comprobar las condiciones de una cuenta digital de ahorro como Pibank.",
+      "blocks": [
+        {
+          "id": "hero",
+          "kind": "hero",
+          "eyebrow": "Cuenta Soles Pibank",
+          "title": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+          "text": "Una guía para entender las transferencias, preparar la apertura y comprobar las condiciones de una cuenta digital de ahorro como Pibank.",
+          "cta": {
+            "label": "Entiende cómo funciona",
+            "artifactId": "article",
+            "blockId": "decision"
+          }
+        },
+        {
+          "id": "respuesta",
+          "kind": "answer-capsule",
+          "text": "Una cuenta de ahorro sin tarjeta puede ayudarte a separar dinero y mantenerlo accesible mediante transferencias. Antes de elegirla, comprueba cómo ingresas y retiras fondos, qué operaciones ofrece, qué límites tiene y quién responde. Pibank es un ejemplo de este funcionamiento en soles; no reemplaza necesariamente los medios que ya usas para pagar o retirar efectivo.",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "indice",
+          "kind": "toc",
+          "title": "En esta guía"
+        },
+        {
+          "id": "decision",
+          "kind": "heading",
+          "level": 2,
+          "text": "Primero, distingue ahorrar de pagar",
+          "short": "Para qué sirve"
+        },
+        {
+          "id": "separar",
+          "kind": "paragraph",
+          "text": "Una compra con tarjeta, un retiro en cajero y guardar ahorro son necesidades diferentes. Si buscas una cuenta para reservar dinero, conviene evaluar intereses, acceso y condiciones. Si además necesitas pagar o retirar efectivo desde esa misma cuenta, verifica que tenga esos medios antes de abrirla.",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "complemento",
+          "kind": "paragraph",
+          "text": "En Pibank, el uso digital se concentra en transferencias y consulta de la cuenta. Puedes evaluar mantener tu medio habitual para gastos y usar una cuenta de ahorro para una parte de tus fondos. Es una forma posible de organizarte, no una recomendación de trasladar todo tu dinero.",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "tarjeta",
+          "kind": "heading",
+          "level": 2,
+          "text": "Qué significa que Pibank no tenga tarjeta",
+          "short": "Sin tarjeta"
+        },
+        {
+          "id": "medios",
+          "kind": "paragraph",
+          "text": "La documentación de la Cuenta Soles excluye tarjeta de débito, cheques y operaciones en efectivo por agencias, cajeros o agentes. El acceso a dinero se organiza por los canales digitales y las transferencias disponibles. Esta diferencia debe quedar clara desde el principio; tener una cuenta no implica disponer de todos los medios de pago.",
+          "sourceIds": [
+            "tarifario"
+          ]
+        },
+        {
+          "id": "comparacion",
+          "kind": "table",
+          "columns": [
+            "Necesidad",
+            "Qué puedes evaluar",
+            "Punto de atención"
+          ],
+          "rows": [
+            [
+              "Reservar ahorro en soles",
+              "Cuenta digital con intereses según condiciones",
+              "La tasa y cálculo deben leerse en la documentación vigente"
+            ],
+            [
+              "Enviar dinero a una cuenta local",
+              "Transferencias autorizadas desde la app",
+              "Confirma destinatario, horarios y límites"
+            ],
+            [
+              "Pagar con tarjeta",
+              "Otro medio que ofrezca tarjeta",
+              "Pibank no emite tarjeta para este producto"
+            ],
+            [
+              "Obtener efectivo",
+              "Otra cuenta que permita retiro",
+              "Revisa costo y disponibilidad de la entidad receptora"
+            ]
+          ],
+          "caption": "Criterios de uso del producto; no es un ranking de bancos.",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "banner-comprueba",
+          "kind": "cta",
+          "title": "Una cuenta funciona mejor cuando conoces sus límites",
+          "text": "Comprueba el funcionamiento actual de la Cuenta Soles antes de iniciar una solicitud.",
+          "action": {
+            "label": "Ver condiciones oficiales",
+            "href": "https://pibank.pe/cuenta-soles-pibank/"
+          }
+        },
+        {
+          "id": "transferencias",
+          "kind": "heading",
+          "level": 2,
+          "text": "Cómo pensar el ingreso y la salida de fondos",
+          "short": "Transferencias"
+        },
+        {
+          "id": "verifica",
+          "kind": "paragraph",
+          "text": "Para mover dinero entre entidades, confirma los datos de la cuenta de destino y los canales habilitados. La página de Pibank explica el uso de número de cuenta o CCI para transferencias; los límites y tiempos dependen de la modalidad y condiciones de la operación. También verifica las condiciones del banco emisor.",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "checklist-transferir",
+          "kind": "list",
+          "items": [
+            "Accede desde los canales oficiales; evita seguir enlaces enviados por desconocidos.",
+            "Comprueba nombre del destinatario, cuenta o CCI y moneda antes de confirmar.",
+            "Revisa si la transferencia es inmediata o por horarios y los límites que corresponden.",
+            "Si tienes una duda, detén la operación y consulta al banco mediante su canal oficial."
+          ],
+          "ordered": false,
+          "sourceIds": [
+            "producto",
+            "ayuda"
+          ]
+        },
+        {
+          "id": "fondeo",
+          "kind": "paragraph",
+          "text": "Abrir la cuenta y transferirle dinero son momentos distintos. Esta guía no conoce tu situación ni acredita que la apertura o el depósito se hayan completado. La confirmación de esas operaciones corresponde al banco.",
+          "sourceIds": [
+            "apertura",
+            "producto"
+          ]
+        },
+        {
+          "id": "intereses",
+          "kind": "heading",
+          "level": 2,
+          "text": "Lee la tasa junto con su forma de cálculo",
+          "short": "Intereses"
+        },
+        {
+          "id": "calculo",
+          "kind": "paragraph",
+          "text": "La cartilla publicada el 28-09-2026 indica TEA de 5% sobre saldo promedio mensual en soles desde S/1. La página de producto presenta 5% TREA al corte de esta muestra. La equivalencia TEA/TREA depende de las condiciones descritas y los servicios adicionales quedan fuera de ese cálculo. Consulta la versión vigente; esta tasa no se proyecta a 2027.",
+          "sourceIds": [
+            "cartilla",
+            "producto"
+          ]
+        },
+        {
+          "id": "tiempo",
+          "kind": "paragraph",
+          "text": "El saldo promedio depende de cuánto dinero mantienes durante los días del mes. La cartilla indica abono de intereses al cierre mensual y condiciones para conservar ese derecho. La calculadora oficial ofrece una referencia: no la interpretes como garantía de rendimiento futuro.",
+          "sourceIds": [
+            "cartilla",
+            "producto"
+          ]
+        },
+        {
+          "id": "costos",
+          "kind": "heading",
+          "level": 2,
+          "text": "Sin mantenimiento no significa que todo servicio sea gratuito",
+          "short": "Costos"
+        },
+        {
+          "id": "excepciones",
+          "kind": "paragraph",
+          "text": "Distingue la operación ordinaria de los servicios adicionales que solicites. El tarifario puede incluir cargos, por ejemplo por entrega física del estado de cuenta. También revisa impuestos aplicables y cargos o reglas de otras entidades involucradas; no uses una frase comercial como sustituto de la documentación.",
+          "sourceIds": [
+            "tarifario"
+          ]
+        },
+        {
+          "id": "preparar",
+          "kind": "heading",
+          "level": 2,
+          "text": "Qué preparar antes de abrir la cuenta",
+          "short": "Requisitos"
+        },
+        {
+          "id": "requisitos",
+          "kind": "paragraph",
+          "text": "Los requisitos públicos incluyen ser mayor de edad, DNI, celular, correo electrónico y acceso a internet. La solicitud contempla validación de datos e identidad, aceptación de contrato/cartilla y creación del acceso digital. Tener los datos listos facilita el inicio; la aprobación y controles corresponden al banco.",
+          "sourceIds": [
+            "apertura"
+          ]
+        },
+        {
+          "id": "banner-prepara",
+          "kind": "cta",
+          "title": "Revisa los pasos en el canal oficial",
+          "text": "Antes de compartir información, confirma que estás en el sitio de Pibank y consulta los requisitos vigentes.",
+          "action": {
+            "label": "Consultar requisitos de apertura",
+            "href": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/"
+          }
+        },
+        {
+          "id": "respaldo",
+          "kind": "heading",
+          "level": 2,
+          "text": "Quién ofrece la cuenta y dónde resolver una duda",
+          "short": "Respaldo"
+        },
+        {
+          "id": "entidad",
+          "kind": "paragraph",
+          "text": "La marca Pibank pertenece a Banco Pichincha Perú. Revisa contrato, cartilla y tarifario para conocer la relación y condiciones del producto. La cobertura del Fondo de Seguro de Depósitos se rige por condiciones y un límite vigente; si mantienes otras cuentas en la misma entidad, consulta cómo aplica la cobertura antes de decidir.",
+          "sourceIds": [
+            "identidad",
+            "producto",
+            "fsd"
+          ]
+        },
+        {
+          "id": "atencion",
+          "kind": "paragraph",
+          "text": "Si necesitas ayuda con una operación o acceso, utiliza el centro de ayuda y los canales oficiales. No compartas contraseñas ni códigos de validación para recibir orientación. La existencia de atención humana es parte del recorrido de confianza; los tiempos reales de atención requieren experiencia y medición del servicio.",
+          "sourceIds": [
+            "ayuda"
+          ]
+        },
+        {
+          "id": "faq",
+          "kind": "faq",
+          "title": "Preguntas frecuentes",
+          "items": [
+            {
+              "question": "¿Puedo conservar mi cuenta habitual y abrir Pibank?",
+              "answer": "Puedes evaluar usos complementarios: una cuenta para operaciones que requieren tarjeta o efectivo y otra para ahorro. Revisa los requisitos de apertura y las condiciones de ambas entidades antes de decidir."
+            },
+            {
+              "question": "¿Pibank permite transferencias internacionales?",
+              "answer": "La página del producto describe transferencias dentro del sistema financiero local y excluye transferencias internacionales para esta cuenta. Consulta las condiciones vigentes."
+            },
+            {
+              "question": "¿Abrir la cuenta significa que ya estoy ahorrando en ella?",
+              "answer": "Son etapas diferentes. La apertura habilita la cuenta; el depósito y el saldo mantenido dependen de las operaciones posteriores y de su confirmación por el banco."
+            },
+            {
+              "question": "¿Dónde reviso tasas y cargos?",
+              "answer": "En la página del producto y en la cartilla y tarifario oficiales. Esta guía está fechada el 06-10-2026 y no sustituye actualizaciones posteriores."
+            }
+          ],
+          "sourceIds": [
+            "producto",
+            "cartilla",
+            "tarifario",
+            "apertura"
+          ]
+        },
+        {
+          "id": "fuentes",
+          "kind": "sources",
+          "title": "Fuentes para comprobar las condiciones",
+          "items": [
+            {
+              "text": "Cuenta Soles Pibank · consulta 06-10-2026",
+              "href": "https://pibank.pe/cuenta-soles-pibank/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Identidad Pibank / Banco Pichincha Perú",
+              "href": "https://pibank.pe/quienes-somos/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Requisitos y apertura · FAQ oficial",
+              "href": "https://pibank.pe/faq/que-necesito-y-como-puedo-abrir-una-cuenta-en-pibank/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Tarifario Cuenta Soles · actualizado 28-09-2026",
+              "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/Web/Tarifario_CuentaSolesPibank.pdf",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Cartilla Cuenta Soles · actualizada 28-09-2026",
+              "href": "https://prdpistdoceastus2.blob.core.windows.net/documentos1/ONBOARDING/CartillaInformacion_CuentaSolesPibank.pdf",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Centro de ayuda y canales oficiales",
+              "href": "https://pibank.pe/centro-de-ayuda/",
+              "note": "Consultada el 06-10-2026"
+            },
+            {
+              "text": "Fondo de Seguro de Depósitos · cobertura y condiciones",
+              "href": "https://fsd.org.pe/",
+              "note": "Consultada el 06-10-2026"
+            }
+          ]
+        },
+        {
+          "id": "volver-producto",
+          "kind": "cta",
+          "title": "Decide con las condiciones a la vista",
+          "text": "Vuelve a la propuesta de producto y revisa si sus operaciones responden a tus necesidades.",
+          "action": {
+            "label": "Ver la pieza de producto",
+            "artifactId": "landing"
+          }
+        }
+      ],
+      "annotations": [
+        {
+          "id": "respuesta-aeo",
+          "scope": "block",
+          "blockId": "respuesta",
+          "category": "aeo",
+          "title": "Respuesta que distingue ahorro y medios de pago",
+          "explanation": "Resolver la duda de uso con condiciones concretas y fuente oficial; no atribuir citas por el formato.",
+          "status": "proposed",
+          "sourceIds": [
+            "producto",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "faq-onpage",
+          "scope": "block",
+          "blockId": "faq",
+          "category": "on-page",
+          "title": "Preguntas conectadas con la decisión",
+          "explanation": "Las respuestas visibles y el JSON-LD exhibido conservan la misma redacción; no prometen un rich result.",
+          "status": "proposed",
+          "sourceIds": [
+            "producto",
+            "cartilla"
+          ]
+        },
+        {
+          "id": "fuentes-ymyl",
+          "scope": "block",
+          "blockId": "fuentes",
+          "category": "technical",
+          "title": "Fuentes y fecha visibles",
+          "explanation": "Tasa y condiciones tienen fecha y procedencia; la revisión bancaria precede a publicación.",
+          "status": "proposed",
+          "sourceIds": [
+            "cartilla",
+            "tarifario"
+          ]
+        },
+        {
+          "id": "siguiente-paso",
+          "scope": "block",
+          "blockId": "volver-producto",
+          "category": "conversion",
+          "title": "Un paso coherente con el lector",
+          "explanation": "La muestra enlaza información y no simula un onboarding ni contabiliza aperturas.",
+          "status": "proposed",
+          "sourceIds": [
+            "producto"
+          ]
+        }
+      ],
+      "seo": {
+        "title": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+        "description": "Una guía para entender las transferencias, preparar la apertura y comprobar las condiciones de una cuenta digital de ahorro como Pibank.",
+        "canonical": "https://pibank.pe/ahorrar-sin-tarjeta/",
+        "robots": "index,follow",
+        "lang": "es-PE",
+        "structuredData": {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "@id": "https://pibank.pe/ahorrar-sin-tarjeta/#article",
+          "name": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+          "url": "https://pibank.pe/ahorrar-sin-tarjeta/",
+          "description": "Una guía para entender las transferencias, preparar la apertura y comprobar las condiciones de una cuenta digital de ahorro como Pibank.",
+          "headline": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+          "inLanguage": "es-PE",
+          "author": {
+            "@type": "Organization",
+            "name": "Efeonce · muestra editorial"
+          }
+        }
+      },
+      "experience": {
+        "thesis": "La disponibilidad del ahorro se entiende mejor cuando explicamos medios de uso, límites y condiciones; esta pieza propone resolver esa decisión sin inventar resultados.",
+        "meta": {
+          "instrument": "AEO X-Ray",
+          "sampleFor": "Pibank Perú",
+          "sampleTitle": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+          "preparedAt": "2026-10-06",
+          "preparedBy": "Efeonce"
+        },
+        "gap": {
+          "kicker": "Oportunidad editorial candidata",
+          "headline": "¿Cómo uso mi dinero si mi cuenta no tiene tarjeta?",
+          "serpTitle": "Una decisión del ahorrador por investigar",
+          "serpNote": "La pregunta es una hipótesis editorial. No representa volumen, posición ni una respuesta observada de un buscador.",
+          "serp": [],
+          "punch": "Explicar el uso puede facilitar una decisión informada.",
+          "punchNote": "El sitio ya tiene producto y FAQ; la propuesta conecta sus respuestas. No acredita un hueco de ranking.",
+          "aside": "Investigación pública de Pibank al 06-10-2026. Sin datos de tráfico, aperturas ni fondeo.",
+          "punchOpportunity": "Producto, guía y fuentes oficiales resuelven la pregunta en un recorrido coherente."
+        },
+        "machine": {
+          "seo": [
+            {
+              "id": "meta-title",
+              "label": "Title propuesto",
+              "value": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+              "why": "Expresa la decisión resuelta en el contenido visible.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "meta-description",
+              "label": "Descripción propuesta",
+              "value": "Una guía para entender las transferencias, preparar la apertura y comprobar las condiciones de una cuenta digital de ahorro como Pibank.",
+              "why": "Anticipa usos y condiciones sin prometer rendimiento.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            },
+            {
+              "id": "canonical",
+              "label": "Canonical de destino propuesto",
+              "value": "https://pibank.pe/ahorrar-sin-tarjeta/",
+              "why": "La URL pertenece al canal cliente; su publicación requiere validación.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            }
+          ],
+          "og": [
+            {
+              "id": "og-title",
+              "label": "Título al compartir",
+              "value": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+              "why": "Conserva la identidad de la pieza.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed"
+            }
+          ],
+          "headings": {
+            "why": "Los encabezados son los mismos del contenido visible y ayudan a localizar la respuesta.",
+            "tree": [
+              {
+                "level": 1,
+                "text": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+                "coupleId": "hero"
+              },
+              {
+                "level": 2,
+                "text": "Primero, distingue ahorrar de pagar",
+                "coupleId": "decision"
+              },
+              {
+                "level": 2,
+                "text": "Qué significa que Pibank no tenga tarjeta",
+                "coupleId": "tarjeta"
+              },
+              {
+                "level": 2,
+                "text": "Cómo pensar el ingreso y la salida de fondos",
+                "coupleId": "transferencias"
+              },
+              {
+                "level": 2,
+                "text": "Lee la tasa junto con su forma de cálculo",
+                "coupleId": "intereses"
+              },
+              {
+                "level": 2,
+                "text": "Sin mantenimiento no significa que todo servicio sea gratuito",
+                "coupleId": "costos"
+              },
+              {
+                "level": 2,
+                "text": "Qué preparar antes de abrir la cuenta",
+                "coupleId": "preparar"
+              },
+              {
+                "level": 2,
+                "text": "Quién ofrece la cuenta y dónde resolver una duda",
+                "coupleId": "respaldo"
+              },
+              {
+                "level": 2,
+                "text": "Preguntas frecuentes",
+                "coupleId": "faq"
+              }
+            ],
+            "sourceScope": "page",
+            "sourceStatus": "proposed"
+          },
+          "alts": [],
+          "jsonld": [
+            {
+              "id": "page-schema",
+              "type": "Article",
+              "metric": "Entidad/pieza descrita",
+              "why": "Propuesta semántica congruente con la pieza; no markup activo en la demo ni garantía de ranking.",
+              "tier": 2,
+              "sourceScope": "page",
+              "sourceStatus": "proposed",
+              "code": {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "@id": "https://pibank.pe/ahorrar-sin-tarjeta/#article",
+                "name": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+                "url": "https://pibank.pe/ahorrar-sin-tarjeta/",
+                "description": "Una guía para entender las transferencias, preparar la apertura y comprobar las condiciones de una cuenta digital de ahorro como Pibank.",
+                "headline": "¿Cómo ahorrar y usar tu dinero si tu cuenta no tiene tarjeta?",
+                "inLanguage": "es-PE",
+                "author": {
+                  "@type": "Organization",
+                  "name": "Efeonce · muestra editorial"
+                }
+              }
+            },
+            {
+              "id": "faq-schema",
+              "type": "FAQPage",
+              "metric": "Preguntas visibles",
+              "why": "Ejemplo semántico de las respuestas mostradas; no requisito especial AEO ni promesa de rich result.",
+              "tier": 2,
+              "sourceScope": "block",
+              "sourceStatus": "proposed",
+              "coupleId": "faq",
+              "code": {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "¿Puedo conservar mi cuenta habitual y abrir Pibank?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Puedes evaluar usos complementarios: una cuenta para operaciones que requieren tarjeta o efectivo y otra para ahorro. Revisa los requisitos de apertura y las condiciones de ambas entidades antes de decidir."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "¿Pibank permite transferencias internacionales?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "La página del producto describe transferencias dentro del sistema financiero local y excluye transferencias internacionales para esta cuenta. Consulta las condiciones vigentes."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "¿Abrir la cuenta significa que ya estoy ahorrando en ella?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Son etapas diferentes. La apertura habilita la cuenta; el depósito y el saldo mantenido dependen de las operaciones posteriores y de su confirmación por el banco."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "¿Dónde reviso tasas y cargos?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "En la página del producto y en la cartilla y tarifario oficiales. Esta guía está fechada el 06-10-2026 y no sustituye actualizaciones posteriores."
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "craft": [
+            {
+              "label": "De la pregunta a sus condiciones",
+              "detail": "Respuesta breve, funcionamiento, restricciones, fuentes y siguiente paso forman una misma decisión.",
+              "why": "La claridad puede evaluarse con personas; la conversión requiere datos y experimento.",
+              "tier": 3,
+              "coupleId": "respuesta",
+              "sourceStatus": "proposed",
+              "sourceScope": "block"
+            }
+          ]
+        },
+        "flow": [
+          {
+            "step": "",
+            "label": "La oportunidad",
+            "next": "Conoce la pieza."
+          },
+          {
+            "step": "articulo",
+            "label": "La pieza",
+            "next": "Explora su radiografía."
+          },
+          {
+            "step": "radiografia",
+            "label": "La radiografía",
+            "next": "Descubre sus derivados."
+          },
+          {
+            "step": "atomizacion",
+            "label": "Dónde más vive",
+            "next": ""
+          }
+        ],
+        "atomsIntro": "La misma respuesta puede adaptarse a otros formatos, conservando fuentes y condiciones. Aquí hay copy y guion candidatos; no piezas publicadas ni medios producidos.",
+        "atoms": [
+          {
+            "id": "feed-uso",
+            "kind": "Post social",
+            "bornFrom": "La respuesta principal",
+            "coupleId": "respuesta",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Aclara el uso antes de pedir una apertura.",
+            "honesty": "Copy candidato; sin imagen producida ni publicación.",
+            "deliverable": [
+              {
+                "k": "Idea",
+                "v": "Tu ahorro y tus medios de pago pueden tener usos diferentes."
+              },
+              {
+                "k": "Formato",
+                "v": "Feed; arte por producir tras revisar identidad."
+              }
+            ],
+            "post": {
+              "hook": "¿Ahorrar sin tarjeta?",
+              "body": "Una cuenta puede servir para reservar dinero y moverlo por transferencias. Conoce primero las operaciones y límites de la Cuenta Soles Pibank.",
+              "cta": "Revisa las condiciones oficiales."
+            }
+          },
+          {
+            "id": "story-condiciones",
+            "kind": "Story",
+            "bornFrom": "Preguntas frecuentes",
+            "coupleId": "faq",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Entrega una comprobación breve de condiciones.",
+            "honesty": "Copy candidato; sin Story gráfica producida.",
+            "deliverable": [
+              {
+                "k": "Pantalla 1",
+                "v": "Antes de abrir: ¿cómo usarás tu dinero?"
+              },
+              {
+                "k": "Pantalla 2",
+                "v": "Revisa medios disponibles, horarios, límites y cargos."
+              },
+              {
+                "k": "Pantalla 3",
+                "v": "Consulta la Cuenta Soles Pibank en el sitio oficial."
+              }
+            ],
+            "post": {
+              "hook": "Tres cosas que conviene revisar",
+              "body": "Cómo mueves fondos. Qué medios ofrece la cuenta. Qué condiciones y costos aplican.",
+              "cta": "Conoce la información oficial."
+            }
+          },
+          {
+            "id": "reel-guion",
+            "kind": "Guion de reel",
+            "bornFrom": "El funcionamiento de la cuenta",
+            "coupleId": "respuesta",
+            "sourceScope": "block",
+            "sourceStatus": "proposed",
+            "why": "Explica la decisión con una secuencia breve.",
+            "honesty": "Guion candidato. No hay archivo de video, poster ni reproducción que acreditar.",
+            "deliverable": [
+              {
+                "k": "Inicio",
+                "v": "Una cuenta sin tarjeta: ¿cómo usas tu dinero?"
+              },
+              {
+                "k": "Desarrollo",
+                "v": "Ahorrar, transferir y pagar son necesidades distintas. Revisa las operaciones y condiciones de la cuenta."
+              },
+              {
+                "k": "Cierre",
+                "v": "Decide con información oficial. Cuenta Soles Pibank."
+              }
+            ]
+          }
+        ],
+        "evidence": {
+          "intro": "Las fuentes respaldan el funcionamiento del producto; el ángulo editorial y su efecto comercial se proponen para validar.",
+          "facts": [
+            {
+              "label": "Moneda del producto observado",
+              "value": "Soles",
+              "note": "No se propone una cuenta Dólares no publicada.",
+              "source": "https://pibank.pe/cuenta-soles-pibank/",
+              "asOf": "2026-10-06",
+              "headline": false,
+              "sourceScope": "page",
+              "sourceStatus": "verified"
+            },
+            {
+              "label": "Entidad",
+              "value": "Banco Pichincha Perú",
+              "note": "Pibank es la marca del producto; no una entidad separada inferida.",
+              "source": "https://pibank.pe/quienes-somos/",
+              "asOf": "2026-10-06",
+              "headline": false,
+              "sourceScope": "page",
+              "sourceStatus": "verified"
+            }
+          ],
+          "fanOut": {
+            "title": "Preguntas que esta pieza propone resolver",
+            "note": "Preguntas editoriales; no prompts observados ni prueba de citas.",
+            "items": [
+              {
+                "q": "¿Qué significa ahorrar sin tarjeta?",
+                "covered": true,
+                "coveredBy": "respuesta"
+              },
+              {
+                "q": "¿Qué costos y condiciones debo revisar?",
+                "covered": true,
+                "coveredBy": "faq"
+              },
+              {
+                "q": "¿Dónde compruebo la información?",
+                "covered": true,
+                "coveredBy": "fuentes"
+              }
+            ]
+          },
+          "honesty": "Esta muestra no acredita resultados de tráfico, ranking, citas, apertura, fondeo ni saldo. La investigación del caso conserva sus fuentes y límites por separado; el contenido requiere revisión bancaria antes de implementarse."
+        },
+        "ui": {
+          "disclaimerLabel": "Demostración de Efeonce",
+          "disclaimerBody": "Muestra editorial de Efeonce para Pibank Perú, fechada el 06-10-2026. Requiere validación del banco; no recibe solicitudes ni dinero.",
+          "paneArticleTitle": "La pieza",
+          "paneArticleSubtitle": "Lo que ve la persona",
+          "paneMachineTab": "Lo que lee una máquina",
+          "paneEvidenceTab": "La evidencia",
+          "hintDesktop": "Pasa el cursor o enfoca un bloque para ver sus datos. Haz clic para fijarlo.",
+          "hintMobile": "Toca un bloque para ver qué información produce.",
+          "whyLabel": "Para qué sirve",
+          "schemaNote": "JSON-LD propuesto mostrado como texto; no acredita publicación del cliente.",
+          "sourceLabel": "Fuente",
+          "thesisLabel": "Por qué existe esta pieza",
+          "licenseTitle": "Medios del candidato",
+          "licenseNote": "Preview de contenido sin fotografías, logo cliente ni video producidos. El kit de marca, sus derechos y la revisión visual se completan antes de entregar.",
+          "backToArticle": "Volver a la pieza",
+          "bylineBy": "Por",
+          "readTime": "min de lectura",
+          "instrumentTitle": "La radiografía",
+          "specimenChip": "Propuesta editorial",
+          "producesLabel": "datos",
+          "producesLabelOne": "dato",
+          "flowNext": "Siguiente",
+          "flowOf": "de",
+          "srProduces": "Este bloque produce {n} datos en la capa de máquina.",
+          "closing": "Una decisión, dos piezas y sus derivados conservan condiciones y fuentes. La publicación y los resultados se verifican en el canal cliente después de su aprobación.",
+          "verifyTitle": "Comprueba la propuesta",
+          "verifyNote": "Distinguir observación fechada, propuesta e implementación. No prometer resultados.",
+          "verifySteps": [
+            {
+              "what": "Fuentes",
+              "how": "Contrastar cada afirmación con fuentes fechadas del cliente."
+            },
+            {
+              "what": "Representación",
+              "how": "Comprobar que la capa técnica coincide con el contenido visible."
+            }
+          ]
+        }
+      },
+      "byline": {
+        "author": "Efeonce · muestra editorial",
+        "publishedAt": "2026-10-06"
+      }
+    }
+  ],
+  "flow": {
+    "entryArtifactId": "landing",
+    "links": [
+      {
+        "fromArtifactId": "landing",
+        "toArtifactId": "article",
+        "label": "Leer la guía"
+      },
+      {
+        "fromArtifactId": "article",
+        "toArtifactId": "landing",
+        "label": "Conocer la propuesta"
+      }
+    ]
+  }
+}

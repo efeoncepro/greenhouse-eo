@@ -39,6 +39,25 @@ Objetivo de negocio (medible)
 - **Táctica:** data/estudios propios como munición, expert commentary, HARO/newsjacking,
   relaciones con medios/creators. Mide SOV, menciones, calidad de referidos.
 
+Cuando PR apoya un programa SEO/AEO, prepara una matriz por campaña con pregunta
+editorial, recurso de destino, fuentes/método/fecha, vocero/revisor, medio y hito de salida.
+La secuencia es recurso revisado y publicado → QA → kit/vocero → mensaje/destinatarios
+con autorización aplicable → gestión → comprobación. Coordinar fechas no reemplaza esa
+dependencia; mover una campaña si su recurso sigue pendiente. No presentar una muestra
+compilada de fuentes públicas como un estudio representativo propio.
+
+Separa trabajo controlable (kits, preparación y propuestas) de resultados editoriales
+(coberturas, enlaces y visitas). Registra baseline, originales vs sindicación, dominio y
+grupo editorial, página de destino y atributos del enlace. Mención, enlace seguido,
+nofollow y pauta se informan por separado. Un score de autoridad lleva proveedor,
+escala, dominio y fecha; no se rebautiza una métrica de otro proveedor como DA/Brand
+Authority ni se promete un aumento de puntos.
+
+Añadir PR exige incorporar preparación de datos, edición, relaciones, vocería y medición
+al costeo del programa. Reutilizar un recurso SEO no significa cobrar su producción otra
+vez; tampoco absorber toda la nueva operación en la reserva anterior. El modelo del caso
+separa atribución de causalidad y evita sumar una conversión en varios canales.
+
 ## 4. Influencer/creator a escala de campaña
 
 - Integra creators como canal de la campaña (co-creación, whitelisting, embajadores) — detalle

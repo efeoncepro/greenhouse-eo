@@ -1,0 +1,42 @@
+{
+  "id": "CT8-influencers-aro",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "hum"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, surreal, epic, high-impact editorial photograph, a vast dark empty studio at night with thin haze): a GIANT ring light, a perfect thin glowing circle about two meters tall, taller than a person, stands upright on the dark floor on the RIGHT side of the frame, facing the camera like a doorway. The ring spans from about 60 % to 98 % of the frame width, its whole circle inside the frame. Hum, wearing the ROYAL-BLUE EFEONCE HOODIE, stands at its left edge, FULL FIGURE from head to knees, small against the ring; the shoulder nearest the left edge of the frame is at about 55 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about eight meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: she rests her left hand on the inner rim of the ring, as if holding a door open, and looks straight into the lens with a calm, inviting, knowing smile, head almost frontal. The ring glows clean cool white with a faint azure-blue (#0375DB) edge, the blue of the brand, and it is the only light of the scene. INSIDE the ring we do not see the studio: the circle is a window onto another place, an immense night crowd of thousands of people seen from behind and far away as tiny silhouettes, every one holding up a small glowing phone light, a sea of cool white points stretching to the horizon like a concert audience, softly out of focus. Outside the ring the studio is completely dark and empty. A long dark matte stage edge runs between the camera and her, its near edge just in front of the lens. The ring, the crowd inside it and everything lit stay inside the RIGHT 50% of the frame. The LEFT 50% is calm, deep dark space with faint haze only. No warm light, no faces in the crowd, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte stage edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "deck-seccion",
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)",
+  "llave": {
+    "fuente": "the giant ring light standing beside her",
+    "lado": "to the frame-right of her, the left arc of the ring right beside her face",
+    "distancia": "about 60 cm from her face"
+  },
+  "fondo": "the far horizon of the crowd inside the ring, thousands of phone lights melted into cold round bokeh",
+  "fenomeno": {
+    "que": "a giant ring light becomes a doorway onto a creator's community of thousands",
+    "esServicio": "Influencer marketing: el creador correcto te abre la puerta de su comunidad"
+  }
+}

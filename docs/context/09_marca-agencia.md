@@ -158,6 +158,10 @@ Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas*
 | **RevOps & CRM** | **Kortex** + HubSpot/Salesforce según fit | Diagnóstico de arquitectura, CRM, implementación, automatización e inteligencia comercial. |
 | **Control plane / experiencia** | **Greenhouse** | Operación, cliente, memoria, medición y convergencia del ecosistema. |
 
+**Oferta de agencia de medios:** Efeonce lidera estrategia, creatividad y medios bajo una gestión integrada y
+transparente. Programmatic amplía el mix dentro de Media & Distribution; proveedores permanecen en el expediente
+interno, con identificación contractual/de datos cuando aplique. Es una composición de servicio, no nueva marca
+ni reclasificación de la empresa. [Contrato de oferta](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
 > Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.
 
 > **Submarcas de producto que acompañan (2026-09-29):** distintas de las product brands de la tabla, **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** (línea Engine / Digital Services & Engineering) son submarcas de producto de Efeonce con logo: van siempre en lockup con Efeonce (mismo patrón que Efeonce Insights) y nunca firman solas. [ADR de naming §Delta 2026-09-29](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md#delta-2026-09-29--submarcas-de-producto-seoaeo-con-logo).
@@ -200,6 +204,16 @@ Las 4 capas verbales (en secuencia natural de conversación):
 - **Proof points:** metodología propietaria (sistema estratégico + operativo) · 120+ empresas en 4 países · 80% de renovación · HubSpot Solutions Partner · visibilidad en tiempo real (dashboards vivos, no informes) · **tres plataformas de software propietario (Greenhouse, Kortex, Verk) — modelo ASaaS único en LATAM.**
 
 > ⚠️ Coherencia de proof points: el corpus usa "120+ empresas" y "80% de renovación" (marca-agencia) y también "10+ años" (ecosistema). El GTM cita "win rate ~50%". Mantén consistencia y no infles cifras; ante duda, usa las del documento de autoridad correspondiente.
+
+### Referencia de categoría en búsqueda y respuestas IA
+
+El norte del trabajo SEO/AEO es que compradores de una categoría delimitada puedan descubrir,
+comprender y considerar la marca como opción de referencia para necesidades pertinentes. Una
+representación correcta describe capacidades, público y límites reales; el liderazgo es aspiración
+estratégica y requiere pruebas, no se deduce de un ranking o panel. Visibilidad de marca ante consultas
+non-brand conserva el propósito del descubrimiento genérico. Consideración y elección requieren
+información del comprador y del negocio. El método no cambia el posicionamiento corporativo, naming,
+portfolio ni compromisos de servicio: [canon operativo](../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md).
 
 ### Content Engineering como doctrina editorial emergente
 

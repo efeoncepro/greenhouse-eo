@@ -1,0 +1,1783 @@
+{
+  "version": 2,
+  "status": "draft_for_review",
+  "reference": "EO–PIBANK–2027–01",
+  "date": "2026-10-09",
+  "currency": "USD",
+  "principal": "gradual",
+  "tax": {
+    "status": "pending_billing_entity_and_tax_review",
+    "rate": null,
+    "amount": null,
+    "gross": null
+  },
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Banco Pichincha Perú",
+    "brand": "Pibank",
+    "taxId": null,
+    "contact": "Jesús Vargas Serpa",
+    "role": "Especialista Digital & Performance",
+    "email": "juan.vargas@pichincha.pe",
+    "dealId": "65352884246"
+  },
+  "prices": [
+    {
+      "id": "BASE",
+      "capability": "Servicio continuo SEO/AEO",
+      "price_usd": "4500",
+      "billing_unit": "mes",
+      "full_plan_units": "12",
+      "scope": "SEO técnico y schema pertinentes dentro de 8h CMS/mes, Panel AEO de 24 preguntas en 3 superficies: 72 observaciones iniciales y 144/mes desde M2, hasta 5 artículos/mes, evolución de contenidos y FAQ según evidencia, implementación web priorizada, medición, CRO y dirección",
+      "activation_terms": "Compromiso inicial de 6 meses; luego renovación trimestral"
+    },
+    {
+      "id": "HUB",
+      "capability": "Content hub WordPress",
+      "price_usd": "3000",
+      "billing_unit": "proyecto",
+      "full_plan_units": "1",
+      "scope": "Arquitectura y diseño, hasta tres plantillas sobre sitio existente, implementación y QA",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M1–M2"
+    },
+    {
+      "id": "CALCULADORA",
+      "capability": "Mejora de calculadora existente",
+      "price_usd": "1200",
+      "billing_unit": "proyecto",
+      "full_plan_units": "1",
+      "scope": "Revisión y mejora de una calculadora existente, fórmula, UX y QA",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M2"
+    },
+    {
+      "id": "COMPARADOR",
+      "capability": "Comparador de ahorro",
+      "price_usd": "4000",
+      "billing_unit": "proyecto",
+      "full_plan_units": "1",
+      "scope": "Una herramienta para hasta cinco productos, criterios/fuentes aprobados y actualización manual",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M3–M4"
+    },
+    {
+      "id": "PLANIFICADOR",
+      "capability": "Planificador de ahorro",
+      "price_usd": "3000",
+      "billing_unit": "proyecto",
+      "full_plan_units": "1",
+      "scope": "Una herramienta para meta, aporte y plazo; método validado y QA",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M5–M6"
+    },
+    {
+      "id": "COMUNIDAD",
+      "capability": "Comunidad y distribución",
+      "price_usd": "1000",
+      "billing_unit": "mes activo",
+      "full_plan_units": "12",
+      "scope": "Una newsletter, cuatro adaptaciones y hasta 16h de escucha/moderación mensual en canales acordados",
+      "activation_terms": "Activación mínima 3 meses; luego mensual"
+    },
+    {
+      "id": "PR",
+      "capability": "Campaña de PR y autoridad",
+      "price_usd": "2000",
+      "billing_unit": "campaña",
+      "full_plan_units": "4",
+      "scope": "Recurso/dossier sobre activo existente, 3 ángulos, 12 propuestas a medios, vocería y seguimiento",
+      "activation_terms": "6–8 semanas por campaña; 50% inicio y 50% cierre de entregables"
+    },
+    {
+      "id": "REFUERZO_PR",
+      "capability": "Refuerzo de gestión editorial y enlaces",
+      "price_usd": "500",
+      "billing_unit": "ronda",
+      "full_plan_units": "4",
+      "scope": "Revisión de hasta 10 oportunidades adicionales; hasta 6 gestiones personalizadas y un seguimiento por gestión; verificación de referencias sin duplicar campañas",
+      "activation_terms": "3–4 semanas por ronda; 50% inicio y 50% cierre; no garantiza publicaciones/enlaces"
+    },
+    {
+      "id": "CUIDADO",
+      "capability": "Mantenimiento de herramientas",
+      "price_usd": "200",
+      "billing_unit": "mes activo",
+      "full_plan_units": "10",
+      "scope": "Hasta 4h/mes para hasta tres herramientas entregadas; fórmulas, condiciones y QA menor",
+      "activation_terms": "Desde entrega y fin de garantía correctiva; mensual"
+    }
+  ],
+  "plans": {
+    "base": {
+      "months": [
+        {
+          "month": 1,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 2,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 3,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 4,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 5,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 6,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 7,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 8,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 9,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 10,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 11,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        },
+        {
+          "month": 12,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            }
+          ],
+          "total": 4500
+        }
+      ],
+      "annual": 54000
+    },
+    "gradual": {
+      "months": [
+        {
+          "month": 1,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "HUB",
+              "amount": 1500
+            }
+          ],
+          "total": 6000
+        },
+        {
+          "month": 2,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "HUB",
+              "amount": 1500
+            },
+            {
+              "module": "CALCULADORA",
+              "amount": 1200
+            }
+          ],
+          "total": 7200
+        },
+        {
+          "month": 3,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "PR",
+              "amount": 2000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7700
+        },
+        {
+          "month": 4,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMPARADOR",
+              "amount": 2000
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7700
+        },
+        {
+          "month": 5,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMPARADOR",
+              "amount": 2000
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7700
+        },
+        {
+          "month": 6,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "REFUERZO_PR",
+              "amount": 500
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 6200
+        },
+        {
+          "month": 7,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 5700
+        },
+        {
+          "month": 8,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "PR",
+              "amount": 2000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7700
+        },
+        {
+          "month": 9,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 5700
+        },
+        {
+          "month": 10,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 5700
+        },
+        {
+          "month": 11,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "REFUERZO_PR",
+              "amount": 500
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 6200
+        },
+        {
+          "month": 12,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 5700
+        }
+      ],
+      "annual": 79200
+    },
+    "integral": {
+      "months": [
+        {
+          "month": 1,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "HUB",
+              "amount": 1500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            }
+          ],
+          "total": 7000
+        },
+        {
+          "month": 2,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "HUB",
+              "amount": 1500
+            },
+            {
+              "module": "CALCULADORA",
+              "amount": 1200
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "REFUERZO_PR",
+              "amount": 500
+            }
+          ],
+          "total": 8700
+        },
+        {
+          "month": 3,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMPARADOR",
+              "amount": 2000
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "PR",
+              "amount": 2000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 9700
+        },
+        {
+          "month": 4,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMPARADOR",
+              "amount": 2000
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "REFUERZO_PR",
+              "amount": 500
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 8200
+        },
+        {
+          "month": 5,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "PLANIFICADOR",
+              "amount": 1500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "PR",
+              "amount": 2000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 9200
+        },
+        {
+          "month": 6,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "PLANIFICADOR",
+              "amount": 1500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7200
+        },
+        {
+          "month": 7,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "REFUERZO_PR",
+              "amount": 500
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 6200
+        },
+        {
+          "month": 8,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "PR",
+              "amount": 2000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7700
+        },
+        {
+          "month": 9,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 5700
+        },
+        {
+          "month": 10,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "REFUERZO_PR",
+              "amount": 500
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 6200
+        },
+        {
+          "month": 11,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "PR",
+              "amount": 2000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 7700
+        },
+        {
+          "month": 12,
+          "items": [
+            {
+              "module": "BASE",
+              "amount": 4500
+            },
+            {
+              "module": "COMUNIDAD",
+              "amount": 1000
+            },
+            {
+              "module": "CUIDADO",
+              "amount": 200
+            }
+          ],
+          "total": 5700
+        }
+      ],
+      "annual": 89200
+    }
+  },
+  "submitted": false,
+  "signed": false,
+  "pages": [
+    {
+      "kind": "cover",
+      "title": [
+        "Crecer con confianza.",
+        "Convertir con claridad."
+      ],
+      "subtitle": "Programa anual de SEO, AEO y autoridad para Pibank Perú",
+      "label": "Cotización detallada · Ruta gradual recomendada",
+      "note": "Programa anual durante 2027, con compromiso inicial de seis meses y renovación trimestral. Inicio y fechas exactas por acordar. Propuesta económica y condiciones para revisión."
+    },
+    {
+      "title": "Una inversión conectada al negocio",
+      "lede": "Pibank necesita ser encontrado, explicar su propuesta de ahorro y facilitar decisiones que conduzcan a la apertura y al primer depósito.",
+      "blocks": [
+        {
+          "kind": "section",
+          "title": "Objetivo de referencia",
+          "paragraphs": [
+            "El caso de negocio toma como referencia US$38 millones de captación y 15.200 cuentas con fondos, con un saldo medio ilustrativo de US$2.500. Es una meta del conjunto de Marketing, Producto y operación bancaria; el programa contribuye desde contenido, experiencia y autoridad."
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Momento del recorrido",
+            "Intervención de Efeonce",
+            "Evidencia para decidir"
+          ],
+          "rows": [
+            [
+              "Encontrar",
+              "SEO técnico, contenidos y respuestas útiles en buscadores e IA; referencias editoriales.",
+              "Visibilidad, clics, visitas relevantes y presencia comprobada en IA."
+            ],
+            [
+              "Entender y comparar",
+              "Hub, páginas de producto, FAQ, calculadora y comparador.",
+              "Uso de recursos, regreso al sitio y avance al producto."
+            ],
+            [
+              "Abrir",
+              "Mensajes, llamadas a la acción y mejoras del recorrido bajo accesos autorizados.",
+              "Inicio y finalización de apertura, con datos habilitados por el banco."
+            ],
+            [
+              "Fondear y volver",
+              "Contenido sobre condiciones y uso; comunidad y medición por cohorte.",
+              "Primer depósito y continuidad, mediante evidencia agregada del banco."
+            ]
+          ],
+          "widths": [
+            22,
+            43,
+            35
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Audiencia y organización del programa",
+          "paragraphs": [
+            "La prioridad es la audiencia A/B de 35–55 años del caso vigente, en Perú y en español. La selección de temas se contrasta con demanda de búsqueda y preguntas reales; los volúmenes de búsqueda no se presentan como filtrados por nivel socioeconómico o edad."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Cómo se compra",
+          "text": "Un servicio continuo de {{money:4500}} al mes, con compromiso inicial de seis meses y renovación trimestral, y proyectos/campañas acordados individualmente. La ruta gradual reserva {{money:42500}} en el primer semestre y {{money:79200}} en el año. Cada activación tiene alcance, precio, fechas y aceptación propios."
+        }
+      ]
+    },
+    {
+      "title": "Detalle económico de la ruta gradual",
+      "lede": "Valores netos en {{currency.name}} ({{currency.code}}). Se separa el servicio continuo de las activaciones para mostrar qué integra la inversión.",
+      "blocks": [
+        {
+          "kind": "price_table",
+          "plan": "gradual"
+        },
+        {
+          "kind": "totals",
+          "plan": "gradual"
+        }
+      ]
+    },
+    {
+      "title": "Moneda, impuestos y contratación",
+      "lede": "La oferta conserva el alcance y los precios base del expediente. Esta versión presenta la inversión en {{currency.code}}; los datos tributarios se confirman con la entidad contratante.",
+      "blocks": [
+        {
+          "kind": "note",
+          "title": "Impuestos y total facturable",
+          "text": "Impuestos aplicables: por confirmar. Total con impuestos: pendiente de determinación. La entidad contratante, RUC, documento tributario y tratamiento de eventuales retenciones se acuerdan antes de facturar. No se aplica automáticamente el IVA chileno a una contratación con Perú."
+        },
+        {
+          "kind": "section",
+          "title": "Qué representa el total",
+          "paragraphs": [
+            "{{money:79200}} es la inversión anual propuesta si se ejecutan las activaciones del calendario. {{money:6600}} es el promedio mensual de presupuesto; el máximo mensual de la ruta gradual es {{money:7700}}. El calendario no equivale a doce cuotas uniformes ni activa cargos sin acuerdo."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Identificación para formalizar",
+          "paragraphs": [
+            "Oferente: Efeonce Group SpA · RUT chileno 77.357.182-1. Cliente de referencia: Banco Pichincha Perú, marca Pibank. La razón social contratante exacta, RUC y dirección de facturación se confirman con Compras antes de la orden.",
+            "Contacto de coordinación: Jesús Vargas Serpa, Especialista Digital & Performance. La entidad contratante designará el responsable de Compras y el representante para formalizar."
+          ]
+        },
+        {
+          "kind": "quarter_budget",
+          "plan": "gradual"
+        },
+        {
+          "kind": "note",
+          "title": "Base monetaria de esta versión",
+          "text": "{{currency.fxNote}}"
+        }
+      ]
+    },
+    {
+      "title": "Servicio continuo: SEO técnico",
+      "lede": "La base mantiene un ciclo mensual de investigación, priorización, ejecución y verificación sobre el sitio y los recursos existentes.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Frente",
+            "Trabajo incluido",
+            "Evidencia de entrega"
+          ],
+          "rows": [
+            [
+              "Diagnóstico y prioridades",
+              "Auditoría inicial; mapa de riesgos y oportunidades; backlog por impacto, esfuerzo y dependencia. Revisión mensual.",
+              "Hallazgo, URL afectada, recomendación, responsable y estado."
+            ],
+            [
+              "Rastreo e indexación",
+              "Robots, noindex, sitemap, URLs relevantes, canónicas, duplicados y redirecciones priorizadas.",
+              "Estado previo/posterior; respuestas HTTP y canónica renderizada."
+            ],
+            [
+              "Arquitectura y enlaces",
+              "Conexión del pilar de producto, artículos y herramientas; enlaces rotos y páginas huérfanas pertinentes.",
+              "Origen/destino comprobados y rastreo posterior."
+            ],
+            [
+              "Rendimiento móvil",
+              "Revisión de imágenes, scripts, plantillas y señales LCP/INP/CLS; mejoras acotadas.",
+              "Medición comparable; laboratorio y datos de campo informados por separado."
+            ],
+            [
+              "Datos estructurados",
+              "Organization, Article y BreadcrumbList donde correspondan; inventario de plugins y conflictos.",
+              "JSON-LD renderizado, coherencia con contenido visible y validación pertinente."
+            ],
+            [
+              "Continuidad",
+              "Revisión tras cambios de contenido, producto, plugins o plantilla.",
+              "Registro mensual de cambio, QA, responsable y pendientes."
+            ]
+          ],
+          "widths": [
+            23,
+            44,
+            33
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Capacidad de implementación",
+          "paragraphs": [
+            "Hasta ocho horas mensuales de ajustes CMS priorizados. La carga de los contenidos del programa está incluida por separado. La bolsa CMS y el mantenimiento de herramientas no imputan dos veces la misma intervención."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Cuando interviene TI del banco",
+          "paragraphs": [
+            "Si el cambio requiere permisos o desarrollo del banco, Efeonce entrega la especificación y verifica cuando se implemente. Una recomendación entregada se registra como recomendación, sin dar la implementación por completada."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Criterio de calidad",
+          "text": "Schema refleja datos y contenido visibles, sin inventar reseñas, sucursales ni entidades jurídicas. La validación técnica acredita la entrega; la aparición en resultados enriquecidos, rankings o respuestas IA se observa como resultado."
+        }
+      ]
+    },
+    {
+      "title": "Contenido que evoluciona cada mes",
+      "lede": "La base incluye capacidad para hasta cinco artículos sustanciales al mes: hasta sesenta espacios editoriales durante el programa.",
+      "blocks": [
+        {
+          "kind": "section",
+          "title": "Qué contiene un espacio editorial",
+          "paragraphs": [
+            "Puede ser un artículo nuevo o una actualización sustancial de un activo existente, según el plan mensual aprobado. Incluye intención y brief, fuentes, estructura, redacción, edición, revisión de condiciones del producto, metadatos, enlaces internos y carga en el CMS habilitado."
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Etapa",
+            "Entrega",
+            "Validación"
+          ],
+          "rows": [
+            [
+              "Investigar y elegir",
+              "Mapa de intención y oportunidad; temas de ahorro, rendimiento, confianza, comparación y uso.",
+              "Pertinencia para la audiencia y relación con el recorrido de decisión."
+            ],
+            [
+              "Preparar",
+              "Brief, fuentes y conexión con producto o herramienta; propuesta de respuesta/FAQ pertinente.",
+              "Información del banco disponible y criterios financieros aprobados."
+            ],
+            [
+              "Producir y revisar",
+              "Contenido sustancial, claro y verificable; hasta dos rondas consolidadas por lote.",
+              "Revisión editorial y bancaria; corrección de errores contra brief sin nuevo cobro."
+            ],
+            [
+              "Implementar",
+              "Carga, encabezados, metadatos, enlaces y schema pertinente dentro del entorno acordado.",
+              "URL o versión en revisión, QA y aprobación expresa antes de publicar."
+            ],
+            [
+              "Volver a mejorar",
+              "Revisión de uso, búsquedas, preguntas y condiciones; ajuste del backlog.",
+              "Cambio comprobado y motivo; efecto observado reportado por separado."
+            ]
+          ],
+          "widths": [
+            23,
+            44,
+            33
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "FAQ y contenidos existentes",
+          "paragraphs": [
+            "Las FAQ se trabajan cuando ayudan a resolver una decisión o corregir una respuesta. No tienen una cuota artificial separada. Los briefs anteriores son insumos de priorización; no limitan la capacidad anual ni obligan a publicar todos los títulos."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Cómo se cuentan las entregas",
+          "text": "Una actualización sustancial ocupa un espacio editorial; una corrección de un error de Efeonce no ocupa otro. Sesenta espacios no equivalen a sesenta URLs nuevas garantizadas. Bloqueos de aprobación y reprogramaciones se registran sin acumular capacidad mensual ilimitada."
+        }
+      ]
+    },
+    {
+      "title": "AEO: observación y mejora verificables",
+      "lede": "Un panel repetible convierte las respuestas de IA en decisiones de contenido y exactitud; se conserva evidencia de cada observación.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Configuración",
+            "Cantidad y cadencia",
+            "Registro"
+          ],
+          "rows": [
+            [
+              "Preguntas",
+              "24 preguntas: cuatro por decisión de rendimiento, comparación, confianza, liquidez, apertura y primer fondeo.",
+              "Pregunta exacta, categoría y versión del panel."
+            ],
+            [
+              "Superficies",
+              "Tres superficies acordadas al inicio según acceso y posibilidad de repetir el protocolo.",
+              "Motor, producto, modalidad, contexto Perú/español y fecha."
+            ],
+            [
+              "Primer mes",
+              "Un corte: 24 × 3 = 72 observaciones de línea base.",
+              "Respuesta y fuentes; cobertura efectiva y faltantes."
+            ],
+            [
+              "M2 a M12",
+              "Dos cortes por mes: 24 × 3 × 2 = 144 observaciones mensuales.",
+              "Variación entre cortes; comparabilidad y limitaciones."
+            ],
+            [
+              "Referencia anual",
+              "72 + (144 × 11) = 1.656 observaciones planificadas.",
+              "Consolidado con series, faltantes y cambios de protocolo."
+            ]
+          ],
+          "widths": [
+            23,
+            44,
+            33
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Qué se compara",
+          "paragraphs": [
+            "Presencia de Pibank, recomendación cuando procede, exactitud de condiciones, fuentes citadas y competidores presentes en la misma respuesta. Las preguntas genéricas, de marca y comparativas se informan por separado; preguntar por Pibank no demuestra descubrimiento espontáneo."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Del hallazgo al cambio",
+          "paragraphs": [
+            "Cada mes se entrega cobertura efectiva, diferencias relevantes, ejemplos comprobables y backlog de mejoras. Se corrige información, profundiza una respuesta o construye un recurso; la publicación se comprueba y el siguiente corte registra lo observado."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Integridad del panel",
+          "text": "Una superficie indisponible es un faltante, no cero presencia. Cambiar pregunta o superficie crea una serie nueva con puente documentado. Una API no se presenta como réplica idéntica de una interfaz pública. Dos cortes permiten observar variación, sin acreditar por sí solos causalidad o representatividad estadística."
+        }
+      ]
+    },
+    {
+      "title": "Medición, CRO y aporte a captación",
+      "lede": "La instrumentación vincula el trabajo entregado con el recorrido web y con los resultados bancarios que el cliente pueda compartir de forma autorizada.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Capa de medición",
+            "Indicadores",
+            "Condición de lectura"
+          ],
+          "rows": [
+            [
+              "Visibilidad y demanda",
+              "Consultas, posiciones disponibles, impresiones, clics, visitas orgánicas y panel AEO.",
+              "Fuentes y periodo explícitos; IA no se convierte automáticamente en tráfico."
+            ],
+            [
+              "Uso y decisión",
+              "Interacción con herramientas, clics al producto, retorno y pasos del recorrido.",
+              "Eventos probados y acceso a analítica habilitado por el banco."
+            ],
+            [
+              "Apertura",
+              "Inicio de solicitud, registro completado y cuenta efectivamente abierta.",
+              "No tratar un clic ni un formulario como cuenta bancaria abierta."
+            ],
+            [
+              "Primer depósito",
+              "Cuentas con fondos, tiempo al primer depósito y cohortes.",
+              "Definición bancaria y datos agregados; apertura y fondeo separados."
+            ],
+            [
+              "Aprendizaje",
+              "Cambios realizados, fricciones, hipótesis y prioridades siguientes.",
+              "Distinguir correlación, atribución e incrementalidad demostrada."
+            ]
+          ],
+          "widths": [
+            23,
+            40,
+            37
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Entregables del primer mes",
+          "paragraphs": [
+            "Mapa de eventos y fuentes; diagnóstico de cobertura y calidad de datos; referencia de medición disponible; actualización del escenario prospectivo y del ejercicio retrospectivo desde enero de 2026 según los insumos del caso. La simulación histórica se presenta como simulación, con supuestos y periodos observados separados."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "CRO y coordinación SEO–SEM",
+          "paragraphs": [
+            "Revisión de mensajes, llamadas a la acción, intención y fricciones; propuestas priorizadas y ajustes acotados dentro de la capacidad CMS. Recomendaciones de contenidos y páginas para coordinar SEO con campañas pagadas. La operación de pauta, la inversión publicitaria y una infraestructura de experimentación nueva se acuerdan aparte."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Reporte y alcance del objetivo",
+          "text": "Doce planes y cierres mensuales y cuatro revisiones trimestrales. Se muestran entregas, resultados disponibles, bloqueos y decisiones. La meta de 15.200 cuentas con fondos pertenece al sistema completo de captación; ninguna cuota de SEO o PR se presenta como garantía de cumplimiento."
+        }
+      ]
+    },
+    {
+      "title": "Hub y calculadora",
+      "lede": "Las herramientas apoyan decisiones de ahorro. Se implementan sobre la infraestructura existente del banco, con alcance y aceptación propios.",
+      "blocks": [
+        {
+          "kind": "section",
+          "title": "Content hub WordPress · {{money:3000}}",
+          "paragraphs": [
+            "Proyecto M1–M2: arquitectura editorial, diseño e implementación de hasta tres plantillas sobre el sitio existente, conexión con producto y recursos, y QA. Organización y tipos de plantilla definidos en el brief aprobado."
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Entrega del hub",
+            "Criterio de aceptación"
+          ],
+          "rows": [
+            [
+              "Arquitectura y diseño",
+              "Estructura, navegación y diseños aprobados para las plantillas acordadas."
+            ],
+            [
+              "Plantillas editables",
+              "Implementación en WordPress habilitado; contenido de prueba y campos editables comprobados."
+            ],
+            [
+              "Experiencia y salida",
+              "Navegación, enlaces, adaptación móvil, indexabilidad y contenido publicado/revisado según permisos."
+            ],
+            [
+              "Traspaso",
+              "Fuentes editables y guía de uso del alcance entregado."
+            ]
+          ],
+          "widths": [
+            33,
+            67
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Mejora de calculadora existente · {{money:1200}}",
+          "paragraphs": [
+            "Proyecto M2: mejora de una calculadora existente. Revisión de fórmula y supuestos con Producto, inputs/resultados, experiencia, recorrido y pruebas. Reconstruir otra herramienta o agregar integraciones cambia el alcance."
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Entrega de calculadora",
+            "Criterio de aceptación"
+          ],
+          "rows": [
+            [
+              "Método",
+              "Fórmula, unidades, supuestos y condiciones aprobados por el banco."
+            ],
+            [
+              "Funcionamiento",
+              "Casos normales, límites e inputs inválidos; concordancia entre resultado y método aprobado."
+            ],
+            [
+              "Experiencia",
+              "Etiquetas, mensajes y uso móvil revisados; eventos de uso cuando estén habilitados."
+            ],
+            [
+              "Documentación",
+              "Método y casos de prueba entregados; instrucciones de cambio de condiciones."
+            ]
+          ],
+          "widths": [
+            33,
+            67
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Regla compartida",
+          "text": "Hasta dos rondas consolidadas por proyecto; pagos 50% al inicio y 50% a la aceptación. Rediseñar todo el sitio o construir otro sistema de publicación requiere un alcance adicional."
+        }
+      ]
+    },
+    {
+      "title": "Comparador y continuidad de herramientas",
+      "lede": "La ruta gradual incorpora un comparador y reserva mantenimiento acotado para las herramientas entregadas.",
+      "blocks": [
+        {
+          "kind": "section",
+          "title": "Comparador de ahorro · {{money:4000}}",
+          "paragraphs": [
+            "Un proyecto en M4–M5, para hasta cinco productos. Criterios, fuentes y condiciones son aprobados por el banco. Incluye diseño de la comparación, implementación, actualización manual de datos, conexión con el recorrido y pruebas de resultados."
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Entrega del comparador",
+            "Criterio de aceptación"
+          ],
+          "rows": [
+            [
+              "Modelo comparativo",
+              "Productos, atributos y reglas definidos; unidades y condiciones comparables."
+            ],
+            [
+              "Fuentes y vigencia",
+              "Fuentes verificables, fecha de consulta y responsable de actualización; sin inventar equivalencias."
+            ],
+            [
+              "Interfaz e implementación",
+              "Selección, lectura de resultados, mensajes y comportamiento móvil conforme al diseño aprobado."
+            ],
+            [
+              "Pruebas y documentación",
+              "Casos de comparación, límites, datos faltantes y condiciones; método e instrucciones entregados."
+            ]
+          ],
+          "widths": [
+            33,
+            67
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Mantenimiento · {{money:200}} por mes activo",
+          "paragraphs": [
+            "Referencia M3–M12: diez meses, {{money:2000}}. Hasta cuatro horas mensuales compartidas entre un máximo de tres herramientas entregadas: revisión, actualización de condiciones/fórmulas aprobadas, ajustes menores y QA. La bolsa es conjunta, no cuatro horas por herramienta."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Garantía y activación",
+          "paragraphs": [
+            "Cada proyecto incluye treinta días de garantía correctiva por defectos del alcance entregado. El mantenimiento de una herramienta inicia después de su entrega y del cierre de esa garantía. El banco puede asumirlo mediante traspaso; la referencia M3–M12 se ajusta a las fechas reales de aceptación."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Límites concretos",
+          "text": "El comparador utiliza actualización manual; feeds en vivo, scraping continuo, conexiones a core bancario, autenticación o APIs nuevas requieren un encargo adicional. Cambios de funcionalidades y rediseños se evalúan antes de ejecutar. Un mismo ajuste no se vuelve a cargar a CMS y mantenimiento."
+        }
+      ]
+    },
+    {
+      "title": "Comunidad y distribución",
+      "lede": "Desde M3, un ciclo de participación ayuda a que las personas vuelvan a recursos útiles y aporten preguntas para mejorar el contenido.",
+      "blocks": [
+        {
+          "kind": "metrics",
+          "items": [
+            [
+              "10",
+              "meses activos · M3–M12"
+            ],
+            [
+              "10",
+              "newsletters"
+            ],
+            [
+              "40",
+              "adaptaciones"
+            ],
+            [
+              "160h",
+              "capacidad máxima anual"
+            ]
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "{{money:1000}} por mes activo · {{money:10000}} en la ruta gradual",
+          "paragraphs": [
+            "Cada mes: una newsletter, cuatro adaptaciones y hasta dieciséis horas de escucha/moderación en canales acordados. Los artículos y FAQ que respondan a nuevas preguntas utilizan la capacidad editorial de la base; no duplican una producción."
+          ]
+        },
+        {
+          "kind": "table",
+          "headers": [
+            "Momento mensual",
+            "Trabajo y evidencia"
+          ],
+          "rows": [
+            [
+              "Elegir una pregunta",
+              "Research, escucha y consultas agregadas del banco; registro del tema y razón."
+            ],
+            [
+              "Invitar a participar",
+              "Newsletter y adaptaciones a partir de un artículo o herramienta; llamada a preguntar o compartir una necesidad."
+            ],
+            [
+              "Escuchar y responder",
+              "Revisión en horarios acordados; respuestas basadas en información aprobada y moderación acotada."
+            ],
+            [
+              "Devolver y mejorar",
+              "Síntesis de preguntas; devolución en FAQ/contenido y recurso actualizado."
+            ],
+            [
+              "Medir recurrencia",
+              "Participación disponible, retorno y uso de recursos; aprendizajes que alimentan el siguiente plan."
+            ]
+          ],
+          "widths": [
+            31,
+            69
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Responsabilidades",
+          "paragraphs": [
+            "Efeonce produce, coordina, modera dentro de la bolsa y reporta. El banco habilita canales, plataformas, bases autorizadas, mecanismos de consentimiento y envío; aprueba mensajes y atiende asuntos personales, transacciones, reclamos y datos de cuentas."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Activación y alcance",
+          "text": "Mínimo inicial de tres meses; después, continuidad mensual acordada y aviso de treinta días para desactivar. Se utilizan canales existentes. Un nuevo portal de comunidad, CRM, automatizaciones y atención permanente necesitan un alcance propio."
+        }
+      ]
+    },
+    {
+      "title": "PR, referencias y autoridad editorial",
+      "lede": "Dos campañas principales y dos refuerzos adicionales construyen oportunidades de referencia alrededor de recursos útiles y aprobados.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Capacidad gradual",
+            "Precio y calendario",
+            "Entregables incluidos"
+          ],
+          "rows": [
+            [
+              "Campaña de PR",
+              "{{money:2000}} cada una. Dos: M3 y M8. Total {{money:4000}}",
+              "Tres ángulos editoriales; doce propuestas personalizadas a medios; dossier sobre un activo existente; preparación de vocería y seguimiento durante seis a ocho semanas."
+            ],
+            [
+              "Refuerzo editorial/enlaces",
+              "{{money:500}} cada ronda. Dos: M6 y M11. Total {{money:1000}}",
+              "Hasta diez oportunidades adicionales revisadas; hasta seis gestiones personalizadas con un seguimiento por gestión; comprobación de referencias en tres a cuatro semanas."
+            ]
+          ],
+          "widths": [
+            24,
+            28,
+            48
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Preparación y coordinación",
+          "paragraphs": [
+            "Selección de medios por pertinencia, fuentes verificables, vocero y mensajes aprobados por Comunicaciones. M3 utiliza producto, calculadora o guía aprobados; M6 y M8 pueden utilizar el comparador cuando esté aceptado y publicado. La activación depende de tener el recurso disponible."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Evidencia entregada",
+          "paragraphs": [
+            "Registro de medio, oportunidad, ángulo, propuesta, autorización, fecha, seguimiento y respuesta. Si existe referencia: URL de origen y destino, contexto, atributo del enlace, fecha y estado; visitas referidas cuando la medición permita observarlas."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Cantidades de la ruta",
+          "paragraphs": [
+            "Seis ángulos y veinticuatro propuestas de campaña en el año. Los refuerzos agregan hasta veinte oportunidades revisadas y hasta doce gestiones. Una oportunidad revisada no es un contacto; un seguimiento no es una nueva gestión; una propuesta no es una publicación."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Compromiso controlable",
+          "text": "Cada oportunidad se imputa una sola vez; los refuerzos no revenden el seguimiento de campañas. Publicar o enlazar corresponde al medio. El presupuesto cubre preparación y gestión editorial, con espacios patrocinados o compra de medios presupuestados separadamente si se solicitan."
+        }
+      ]
+    },
+    {
+      "title": "Calendario: primer semestre",
+      "lede": "M1 corresponde al primer mes efectivo del programa en 2027; las fechas se acuerdan al formalizar. Todos los importes son netos en {{currency.code}}.",
+      "blocks": [
+        {
+          "kind": "calendar",
+          "plan": "gradual",
+          "start": 1,
+          "end": 6
+        },
+        {
+          "kind": "note",
+          "title": "Cómo leer este calendario",
+          "text": "El desglose distribuye presupuesto; no es un calendario definitivo de facturas. Hub y comparador se distribuyen en dos meses como referencia de sus hitos. Calculadora y campañas se muestran por mes de activación, aunque su ejecución o pagos puedan cruzar meses."
+        },
+        {
+          "kind": "section",
+          "title": "Dependencias de secuencia",
+          "paragraphs": [
+            "M1 habilita datos, entornos y aprobación. M2 entrega hub/calculadora según aceptación. M3 activa comunidad y primera campaña con un recurso disponible. M4–M5 desarrolla el comparador. M6 y M11 refuerzan referencias; M8 activa la segunda campaña. La base continúa durante todo el año."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Decisiones de activación",
+          "paragraphs": [
+            "Cada orden confirma precio, entregables, fecha, dependencias, responsable y aceptación. Cambiar el inicio de una campaña o herramienta reprograma el calendario sin cambiar de manera implícita el precio ni el alcance contratado."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Calendario: segundo semestre",
+      "lede": "El servicio continuo mantiene la producción y mejora mensual; las activaciones amplían comunidad, referencias y continuidad de herramientas. Valores netos en {{currency.code}}.",
+      "blocks": [
+        {
+          "kind": "calendar",
+          "plan": "gradual",
+          "start": 7,
+          "end": 12
+        },
+        {
+          "kind": "section",
+          "title": "Revisión y aprendizaje",
+          "paragraphs": [
+            "M7–M9 profundiza el uso del comparador y la distribución, con una segunda campaña de PR en M8. M10–M12 actualiza recursos y preguntas, incorpora el refuerzo de M11 y revisa la participación recurrente para el siguiente ciclo."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Condición de calendario",
+          "text": "Comunidad y mantenimiento se presupuestan como módulos activos desde M3. La activación real y el periodo de garantía de cada herramienta se registran en su orden. Ninguna fecha de la tabla convierte un proyecto pendiente en entregado."
+        }
+      ]
+    },
+    {
+      "title": "Gobierno y responsabilidades",
+      "lede": "Un responsable del banco consolida prioridades y revisiones; Efeonce administra ejecución, evidencia y continuidad de las capacidades contratadas.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Frente",
+            "Efeonce",
+            "Banco"
+          ],
+          "rows": [
+            [
+              "Dirección",
+              "Plan mensual, backlog, cierre y revisión trimestral.",
+              "Prioridades de negocio, responsable de revisión y decisiones."
+            ],
+            [
+              "Producto y contenido",
+              "Research, briefs, redacción, edición e implementación habilitada.",
+              "Condiciones, fuentes, marca y aprobación de Marketing/Producto/Cumplimiento."
+            ],
+            [
+              "Sitio y herramientas",
+              "Diseño, implementación acotada, especificación y QA.",
+              "WordPress, accesos mínimos, entornos, hosting, permisos y cambios de TI."
+            ],
+            [
+              "Datos y captación",
+              "Plan de medición; análisis de datos autorizados; documentación de faltantes.",
+              "Analítica y datos agregados de apertura/fondeo; definición bancaria y consentimiento."
+            ],
+            [
+              "PR y comunidad",
+              "Producción, selección, gestión/moderación acordada y reporte.",
+              "Vocero, destinatarios/mensajes aprobados, canales y atención bancaria."
+            ],
+            [
+              "Seguridad y entrega",
+              "Uso de accesos autorizados; inventario y documentación.",
+              "Titularidad de cuentas, datos y plataformas; requisitos de seguridad y validación."
+            ]
+          ],
+          "widths": [
+            23,
+            39,
+            38
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Cadencia propuesta",
+          "paragraphs": [
+            "Arranque: validar brief, fuentes, accesos, metodología y responsables. Cada mes: acordar prioridades, revisar entregas y cerrar resultados/pendientes. Cada trimestre: revisar contribución disponible, riesgos y activaciones siguientes. Las personas y la dedicación se confirman antes del inicio; se vende una capacidad gestionada, no un equipo exclusivo."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Gestión de bloqueos",
+          "text": "Los insumos y aprobaciones son dependencias. Ante un bloqueo, se informa su impacto, se propone trabajo alternativo y se acuerda reprogramación. Los retrasos de Efeonce se corrigen sin contabilizar el mismo alcance como producción nueva."
+        }
+      ]
+    },
+    {
+      "title": "Entrega y aceptación",
+      "lede": "Cada entrega distingue archivo o especificación, implementación comprobada, aprobación y publicación. El banco puede revisar contra criterios concretos.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Entregable",
+            "Criterio para revisar y aceptar"
+          ],
+          "rows": [
+            [
+              "Auditoría/backlog",
+              "Hallazgos sustentados por URL/fuente; prioridad, acción, responsable y dependencia."
+            ],
+            [
+              "Lote editorial",
+              "Brief y fuentes cumplidos; condiciones vigentes aprobadas; archivos/versiones, enlaces, metadatos y QA."
+            ],
+            [
+              "Ajuste técnico",
+              "Cambio comprobado con estado previo/posterior. Si TI lo implementa, especificación y verificación posterior."
+            ],
+            [
+              "Panel AEO",
+              "Preguntas, superficies y fechas registradas; respuesta/fuentes y cobertura efectiva; faltantes explícitos."
+            ],
+            [
+              "Herramientas web",
+              "Diseño y método aprobados; funcionalidades acordadas; pruebas y documentación; versión publicada según autorización."
+            ],
+            [
+              "Comunidad",
+              "Newsletter y cuatro adaptaciones del mes; registro de escucha/moderación y síntesis de aprendizajes dentro de la bolsa."
+            ],
+            [
+              "Campaña/refuerzo",
+              "Preparación y gestiones acordadas; registro de envíos, seguimiento y resultados observados por separado."
+            ],
+            [
+              "Cierre mensual/trimestral",
+              "Trabajo entregado, cambios comprobados, datos disponibles, riesgos, bloqueos y decisiones siguientes."
+            ]
+          ],
+          "widths": [
+            29,
+            71
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Revisión propuesta",
+          "paragraphs": [
+            "Hasta dos rondas consolidadas por lote editorial o proyecto. Se propone una ventana de cinco días hábiles para la revisión del banco, por acordar al inicio. El silencio no autoriza publicar ni equivale a aceptación."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Correcciones y cambios",
+          "paragraphs": [
+            "Un error de Efeonce frente al brief aprobado se corrige sin nuevo cobro ni nueva compra. Cambios de producto, fuentes, funcionalidades o alcance posteriores a la aprobación se evalúan y acuerdan antes de ejecutar."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Resultados y aceptación",
+          "text": "Rankings, citas IA, cobertura y cuentas fondeadas se evalúan como resultados. La entrega se acepta contra alcance y calidad, sin depender de decisiones externas ni garantizar captación."
+        }
+      ]
+    },
+    {
+      "title": "Pagos y condiciones comerciales",
+      "lede": "Condiciones propuestas para revisión y formalización con la entidad contratante. Los precios corresponden a capacidades vinculadas al servicio base activo.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Concepto",
+            "Condición propuesta"
+          ],
+          "rows": [
+            [
+              "Servicio continuo",
+              "{{money:4500}} mensuales anticipados. Compromiso inicial de seis meses (M1–M6); luego renovación por trimestre, con aviso de treinta días antes del cierre de cada trimestre. Revisión trimestral de ejecución y prioridades."
+            ],
+            [
+              "Proyectos",
+              "50% al inicio y 50% a la aceptación. Hub: {{money:1500}} + {{money:1500}}; calculadora: {{money:600}} + {{money:600}}; comparador: {{money:2000}} + {{money:2000}}"
+            ],
+            [
+              "PR y refuerzos",
+              "50% al iniciar y 50% al cierre de entregables. Cada campaña: {{money:1000}} + {{money:1000}}; cada refuerzo: {{money:250}} + {{money:250}}"
+            ],
+            [
+              "Comunidad",
+              "{{money:1000}} por mes activo; mínimo inicial de tres meses, luego continuidad mensual acordada y aviso de treinta días."
+            ],
+            [
+              "Mantenimiento",
+              "{{money:200}} por mes activo tras entrega/garantía; fechas efectivas según aceptación de herramientas."
+            ],
+            [
+              "Garantía",
+              "Treinta días correctivos por defectos del alcance entregado; mejoras y cambios de condiciones mediante mantenimiento o nuevo encargo."
+            ]
+          ],
+          "widths": [
+            27,
+            73
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Moneda, impuestos y formalización",
+          "paragraphs": [
+            "Valores netos en {{currency.code}}. Moneda de contratación, impuestos, documento tributario, retenciones, datos de facturación y plazo operativo de pago se formalizan antes de emitir la orden o contrato. La conversión de referencia, cuando se utiliza, queda documentada en esta versión."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Costos externos y cambio de alcance",
+          "paragraphs": [
+            "Licencias extraordinarias, estudios primarios, compra de medios, viajes e incentivos se presupuestan cuando se requieran. Nuevos canales, piezas audiovisuales, rediseño completo, desarrollos fuera de las herramientas descritas e integraciones bancarias requieren alcance y precio previos."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Estado de la oferta",
+          "text": "Propuesta para revisión, con horizonte anual y precios del expediente vigente al 08/10/2026. Inicio, condiciones finales y vigencia comercial se formalizan en la propuesta aceptada. Esta preparación no acredita aceptación del banco ni activa servicios."
+        }
+      ]
+    },
+    {
+      "title": "Alternativa integral y cierre",
+      "lede": "Si el banco decide adelantar distribución y ampliar herramientas/autoridad, la ruta integral agrega {{money:10000}} a la recomendación gradual.",
+      "blocks": [
+        {
+          "kind": "table",
+          "headers": [
+            "Diferencia respecto de la gradual",
+            "Ampliación",
+            "Inversión adicional"
+          ],
+          "rows": [
+            [
+              "Planificador de ahorro",
+              "Un proyecto para meta, aporte y plazo en M5–M6; metodología validada y QA.",
+              "{{money:3000}}"
+            ],
+            [
+              "Comunidad desde M1",
+              "Dos meses adicionales; total doce newsletters y cuarenta y ocho adaptaciones.",
+              "{{money:2000}}"
+            ],
+            [
+              "PR ampliado",
+              "Dos campañas adicionales; total cuatro campañas: M3/M5/M8/M11.",
+              "{{money:4000}}"
+            ],
+            [
+              "Refuerzos ampliados",
+              "Dos rondas adicionales; total cuatro: M2/M4/M7/M10.",
+              "{{money:1000}}"
+            ]
+          ],
+          "widths": [
+            31,
+            48,
+            21
+          ]
+        },
+        {
+          "kind": "alternative_totals"
+        },
+        {
+          "kind": "section",
+          "title": "Secuencia y alcance conservado",
+          "paragraphs": [
+            "En la integral, el comparador se adelanta a M3–M4. La base, la capacidad editorial y el panel AEO mantienen su alcance; el mantenimiento continúa como referencia M3–M12. El planificador comparte criterios de método aprobado, pruebas, documentación y dos rondas de revisión de los otros proyectos."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Activos, continuidad y próximos pasos",
+      "lede": "La decisión comercial se acompaña de una puesta en marcha con responsabilidades claras y un traspaso verificable del trabajo realizado.",
+      "blocks": [
+        {
+          "kind": "section",
+          "title": "Un programa anual, con compromiso inicial de seis meses",
+          "paragraphs": [
+            "La recomendación gradual combina {{money:54000}} de servicio continuo y {{money:25200}} de activaciones en el año. El primer semestre reserva {{money:42500}}: construye la base y las herramientas y deja ver las primeras señales de visibilidad; desde ahí la continuidad se decide cada trimestre ({{money:19100}} y {{money:17600}} en la ruta gradual). Si el banco elige la ruta integral, el presupuesto total es {{money:89200}}. Una negociación de presupuesto se documenta ajustando capacidades o calendario y haciendo visible su efecto; no reduce de forma implícita los compromisos."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Datos, activos y traspaso",
+          "paragraphs": [
+            "El banco conserva la operación bancaria, sus cuentas y datos. Al cierre se entrega inventario de activos, fuentes editables y documentación conforme a los derechos acordados. Componentes de terceros conservan sus licencias. Se acuerdan accesos mínimos, confidencialidad y condiciones de tratamiento de datos antes de trabajar con información bancaria."
+          ]
+        },
+        {
+          "kind": "section",
+          "title": "Decisión para comenzar",
+          "paragraphs": [
+            "Confirmar ruta, entidad contratante y tratamiento tributario; formalizar base y órdenes de activación; validar equipo, dependencias, responsables y fecha de inicio. La implementación de HubSpot CRM pertenece a un negocio distinto y requiere su propia contratación."
+          ]
+        },
+        {
+          "kind": "note",
+          "title": "Capacidad y arranque",
+          "text": "Antes de formalizar se confirma la asignación del equipo, los entornos y los requisitos de seguridad del banco. No se presupone disponibilidad de accesos ni de datos bancarios. La ejecución remota utiliza plataformas acordadas y responsables identificados."
+        },
+        {
+          "kind": "note",
+          "title": "Responsable comercial",
+          "text": "Julio Reyes · Efeonce Group SpA\njreyes@efeoncepro.com · +56 9 3480 2860"
+        }
+      ]
+    }
+  ],
+  "locale": "es-CL",
+  "presentation": {
+    "currency": "PEN",
+    "locale": "es-PE",
+    "fx": {
+      "from": "USD",
+      "to": "PEN",
+      "rate": "3.437",
+      "date": "2026-10-06",
+      "source": "BCRPData · TC Sistema bancario SBS · Venta · PD04640PD",
+      "sourceUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/diarias/resultados/PD04640PD/html",
+      "requestUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04640PD/json/2026-10-01/2026-10-08",
+      "retrievedAt": "2026-10-08T19:08:32.239055+00:00",
+      "purpose": "reference_conversion",
+      "quoteDate": "2026-10-08",
+      "rawSha256": "f7e0fef20d7fdb59a1ad94e5b485c65000108d6918bcb4c838447a84a2f5c9bb",
+      "unavailableDates": [
+        "2026-10-07",
+        "2026-10-08"
+      ],
+      "settlementRateAgreed": false
+    }
+  }
+}

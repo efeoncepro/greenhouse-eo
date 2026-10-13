@@ -124,8 +124,10 @@ const loopSvg = (manifest: SurfaceManifest, loop: LoopTokens): string => {
   return (
     svgOpen(manifest) +
     `<defs><radialGradient id="sur-fill" cx="${n(cx)}" cy="${n(cy)}" r="${n(rx)}" gradientUnits="userSpaceOnUse" gradientTransform="translate(0 ${n(cy * (1 - ry / rx))}) scale(1 ${n(ry / rx)})">${stops}</radialGradient>` +
-    `<filter id="sur-lit-glow"><feGaussianBlur stdDeviation="${n(loop.lit.glow.blurPx)}"/></filter>` +
-    `<filter id="sur-sphere-glow"><feGaussianBlur stdDeviation="${n(loop.sphere.glow.blurPx)}"/></filter></defs>` +
+    // Región del filtro = lienzo entero: con la región por defecto (caja del objeto + 10 %), el desenfoque del halo
+    // de la esfera, más ancho que ese margen, salía recortado en un cuadrado visible detrás del ícono de la estación.
+    `<filter id="sur-lit-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%"><feGaussianBlur stdDeviation="${n(loop.lit.glow.blurPx)}"/></filter>` +
+    `<filter id="sur-sphere-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%"><feGaussianBlur stdDeviation="${n(loop.sphere.glow.blurPx)}"/></filter></defs>` +
     `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx)}" ry="${n(ry)}" fill="url(#sur-fill)"/>` +
     `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(rx)}" ry="${n(ry)}" fill="none" stroke="${paletteColor(loop.ring.color, 'el anillo del ciclo')}" stroke-opacity="${n(loop.ring.opacity)}" stroke-width="${n(loop.ring.strokePx)}"/>` +
     `<path d="${lit}" fill="none" stroke="${litColor}" stroke-width="${n(loop.lit.glow.strokePx)}" opacity="${n(loop.lit.glow.opacity)}" filter="url(#sur-lit-glow)"/>` +

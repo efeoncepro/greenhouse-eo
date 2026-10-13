@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "managed-addon-increment-example",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 3,
+    "lines": [
+      {
+        "lineId": "care",
+        "profile": "ECG-007",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyId": "allocation:dedicated",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": [
+          {
+            "requirementId": "assurance",
+            "resourceId": "provision-backfill-coverage"
+          },
+          {
+            "requirementId": "operations",
+            "resourceId": "provision-on-call-alert-guard"
+          }
+        ]
+      },
+      {
+        "lineId": "lead",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.28"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "agents",
+        "profile": "ECG-021",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "agreed-monthly-fee",
+        "kind": "agreed_net",
+        "amount": "5950000",
+        "billing": "monthly",
+        "lineIds": [
+          "care",
+          "lead",
+          "agents"
+        ],
+        "reason": "Example: the monthly fee agreed for the service plus the price agreed for its optional add-on, a block of additional conversations that takes eight more points of the lead. Declared for this example; not a commercial approval."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "example:iva-cl-19",
+      "source": {
+        "reference": "example: IVA 19 % declared for this example; not a tax ruling for any client",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    }
+  },
+  "work": [
+    {
+      "lineId": "care",
+      "assigneeIds": [
+        "care-slot"
+      ],
+      "tasks": [
+        "social-care"
+      ],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "social-publishing",
+          "reason": "Example: this role answers comments; it does not schedule or publish content."
+        },
+        {
+          "task": "express-design",
+          "reason": "Example: this role answers comments; it does not design pieces."
+        }
+      ]
+    },
+    {
+      "lineId": "lead",
+      "assigneeIds": [
+        "lead-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "agents",
+      "assigneeIds": [
+        "agents-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "crm-automation",
+          "reason": "Example: this role maintains the agents and the knowledge base; no CRM automation in scope."
+        }
+      ]
+    }
+  ],
+  "serviceToolIds": [
+    "agent-runtime-usage"
+  ],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.46",
+      "seatCapacity": 3,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "1.38"
+      },
+      "reason": "Example hypothesis: three named seats (the dedicated person, the lead and the agent specialist); with the add-on the service carries 1.38 of 3, its declared dedication. Not a real portfolio or an access grant."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.46",
+      "seatCapacity": 3,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "1.38"
+      },
+      "reason": "Example hypothesis: three named seats (the dedicated person, the lead and the agent specialist); with the add-on the service carries 1.38 of 3, its declared dedication. Not a real portfolio or an access grant."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "agent-runtime-usage",
+      "priceId": "hypothesis-per-1000-items",
+      "quantity": "10",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "thousand-items-processed",
+        "totalUnits": "10",
+        "allocatedUnits": "10"
+      },
+      "reason": "Example hypothesis: about 10,000 inbound items classified a month. Not metered."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "social-inbox",
+      "priceId": "sprout-advanced-monthly",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "named-seats",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Example hypothesis: one named seat of the social inbox, billed by the month, for the person who works it. No contract is confirmed."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

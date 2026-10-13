@@ -1,0 +1,88 @@
+{
+  "schema": "efeonce.ai-search-graphic-output.candidate.v1",
+  "surface": "efeonce-exploration",
+  "theme": "light",
+  "state": "suggestion-active",
+  "query": "¿Qué fuentes citan a Efeonce?",
+  "placeholder": "Pregunta sobre tu marca",
+  "aiActionLabel": "Explorar con IA",
+  "suggestions": [
+    {
+      "id": "mencion",
+      "text": "¿Qué dice la IA de Efeonce?"
+    },
+    {
+      "id": "fuentes",
+      "text": "¿Qué fuentes citan a Efeonce?"
+    },
+    {
+      "id": "overview",
+      "text": "¿Aparece en AI Overviews?"
+    }
+  ],
+  "activeSuggestionId": "fuentes",
+  "targetSuggestionId": "fuentes",
+  "modules": [
+    "full",
+    "field",
+    "action",
+    "icon",
+    "suggestions",
+    "suggestion"
+  ],
+  "format": "natural",
+  "provenance": {
+    "mode": "editorial-sample"
+  },
+  "iconSource": "public/references/ai-mode-magnifier-sparkle-on-light.svg",
+  "outputs": [
+    {
+      "module": "full",
+      "file": "efeonce-exploration-full-light-natural.svg",
+      "targetSuggestionId": null,
+      "width": 688,
+      "height": 220,
+      "sha256": "a891eaa76d07edb0f6f800f630fd2027d6c227d24d8e232c1a8501f5525007d6"
+    },
+    {
+      "module": "field",
+      "file": "efeonce-exploration-field-light.svg",
+      "targetSuggestionId": null,
+      "width": 688,
+      "height": 56,
+      "sha256": "9dc6db86cf7b57d036ed8005a495ec86d7266088024419aee38d05c4d8af8110"
+    },
+    {
+      "module": "action",
+      "file": "efeonce-exploration-action-light.svg",
+      "targetSuggestionId": null,
+      "width": 154,
+      "height": 38,
+      "sha256": "d0051da061ed705b20a601ea608d134c456bdbdcfebca40c3195a42d49f10eb7"
+    },
+    {
+      "module": "icon",
+      "file": "efeonce-exploration-icon-light.svg",
+      "targetSuggestionId": null,
+      "width": 24,
+      "height": 24,
+      "sha256": "faaf2046eb51074956bbc70a265565f635e86903be8eb737e5cfe41bd321380d"
+    },
+    {
+      "module": "suggestions",
+      "file": "efeonce-exploration-suggestions-light.svg",
+      "targetSuggestionId": null,
+      "width": 688,
+      "height": 156,
+      "sha256": "2ecdbada8f9931d4889437052089c64564b9ebb4408a4af4493d2fc75b866014"
+    },
+    {
+      "module": "suggestion",
+      "file": "efeonce-exploration-suggestion-light.svg",
+      "targetSuggestionId": "fuentes",
+      "width": 688,
+      "height": 48,
+      "sha256": "d4578f427276b75d0963e1fd483ad1a18967d0b399837c0f2c32129e26f8062d"
+    }
+  ]
+}

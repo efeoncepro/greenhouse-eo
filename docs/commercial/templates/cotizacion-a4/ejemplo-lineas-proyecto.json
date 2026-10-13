@@ -1,0 +1,151 @@
+{
+  "version": 2,
+  "status": "example",
+  "date": "2026-10-11",
+  "reference": "Ejemplo · Sin validez comercial",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "taxId": "Identificación del cliente por confirmar",
+    "contact": "Contacto de ejemplo, Gerencia de Marketing",
+    "logo": null
+  },
+  "cover": {
+    "label": "Ejemplo · Sin validez comercial",
+    "title": [
+      "Sitio web",
+      "corporativo,",
+      "listo para publicar."
+    ],
+    "subtitle": "Diseño e implementación de un sitio de alcance cerrado para Cliente de ejemplo.",
+    "netLabel": "Valor neto del proyecto"
+  },
+  "service": {
+    "name": "Sitio web corporativo de alcance cerrado"
+  },
+  "scope": {
+    "title": [
+      "Un proyecto cerrado,",
+      "de principio a fin."
+    ],
+    "intro": "Ejemplo de alcance. Cada cotización debe especificar las páginas, las entregas y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Diseño",
+        "text": "Estructura del sitio, diseño de hasta seis páginas en versión de escritorio y móvil, y dos rondas consolidadas de revisión."
+      },
+      {
+        "title": "Implementación",
+        "text": "Construcción en el gestor de contenidos acordado, carga del contenido aprobado y formulario de contacto conectado a su destino."
+      },
+      {
+        "title": "Medición y buscadores",
+        "text": "Títulos, descripciones y encabezados de cada página, imágenes optimizadas y medición de visitas y envíos del formulario."
+      },
+      {
+        "title": "Pruebas y publicación",
+        "text": "Pruebas de navegación, enlaces, formulario y móvil. Publicación en el dominio del cliente, con respaldo previo."
+      },
+      {
+        "title": "Entrega",
+        "text": "Archivos de diseño editables, acceso de administración, guía de uso y una sesión remota de capacitación."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Plazo estimado: cuatro semanas",
+    "phases": [
+      {
+        "label": "Semana 1",
+        "title": "Diseño",
+        "text": "Estructura, contenido por página y propuesta visual, con aprobación del cliente."
+      },
+      {
+        "label": "Semanas 2 y 3",
+        "title": "Construcción",
+        "text": "Implementación de las páginas, carga de contenido, versión móvil y formulario."
+      },
+      {
+        "label": "Semana 4",
+        "title": "Publicación",
+        "text": "Pruebas, ajustes, aprobación final, publicación y capacitación."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un precio fijo por",
+      "el proyecto completo."
+    ],
+    "intro": "Una inversión única por el diseño y la implementación del alcance descrito. Todos los valores se expresan en pesos chilenos (CLP).",
+    "summary": "Proyecto único · Pesos chilenos · IVA no incluido",
+    "taxNote": "El valor neto excluye IVA. El total incluye IVA y corresponde al proyecto completo; cada pago del calendario se factura con su IVA."
+  },
+  "lines": [
+    {
+      "label": "Sitio web corporativo",
+      "detail": "Diseño, implementación, pruebas, publicación y entrega del alcance descrito.",
+      "quantity": {
+        "value": 1,
+        "unit": "proyecto"
+      },
+      "net": "2350000"
+    }
+  ],
+  "net": "2350000",
+  "paymentSchedule": {
+    "title": "Calendario de pagos",
+    "milestones": [
+      {
+        "label": "Anticipo",
+        "when": "A la aceptación de la cotización",
+        "net": "1175000",
+        "tax": "223250",
+        "total": "1398250"
+      },
+      {
+        "label": "Saldo",
+        "when": "Contra la aprobación final, antes de publicar",
+        "net": "1175000",
+        "tax": "223250",
+        "total": "1398250"
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Condiciones para iniciar",
+      "y entregar el proyecto."
+    ],
+    "rows": [
+      {
+        "title": "Facturación y pago",
+        "text": "Cada pago del calendario se factura al cumplirse su condición, por su valor neto más IVA. Las condiciones de recepción y pago se acuerdan antes de emitir la cotización final."
+      },
+      {
+        "title": "Contenido y aprobaciones",
+        "text": "El cliente entrega marca, textos e imágenes con derechos de uso, consolida sus revisiones y aprueba cada etapa. El sitio se publica tras su aprobación expresa."
+      },
+      {
+        "title": "Accesos y servicios externos",
+        "text": "El dominio, el alojamiento y las licencias del gestor de contenidos se contratan a nombre del cliente y no forman parte de esta cotización."
+      },
+      {
+        "title": "Límites del alcance",
+        "text": "Páginas adicionales, integraciones o funcionalidades distintas de las descritas requieren una cotización independiente."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Ejemplo sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  }
+}

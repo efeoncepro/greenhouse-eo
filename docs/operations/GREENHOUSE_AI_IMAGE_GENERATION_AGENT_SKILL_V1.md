@@ -3,14 +3,15 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 por Claude (brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1`: estimación de costo previa, `--yes`/`--max-usd` en `ai:fal`, resolución barata por defecto, `--format` en `ai:image`, validaciones locales; antes: puntero a la guía canónica de selección de modelos; correcciones: el costo de GPT Image 2.5 sí se estima antes, 2.5 publica rate limits, OpenAI recomienda 2.5 para integraciones nuevas, precios de fal por escalón de resolución, Wan 3.0 Prime más cara, fórmula de tokens de Seedance válida, Seedream 5 Pro tope 2048², brechas conocidas de ambos CLIs; antes, `pnpm ai:fal` con dos cuentas y failover por saldo, `--balance`, `--detach`/`--status`, registro 47 de 55 verificado, costo real y filtro de contenido de Seedance; antes, Wan 3.0 en `pnpm ai:fal`, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-10-06 por Codex: CLI Nano Banana 2.1 y evidencia Nexa 4K/high; contrato separado de OpenAI/producto/Globe.
+> **Antes:** 2026-09-16 por Claude (brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1`: estimación de costo previa, `--yes`/`--max-usd` en `ai:fal`, resolución barata por defecto, `--format` en `ai:image`, validaciones locales; antes: puntero a la guía canónica de selección de modelos; correcciones: el costo de GPT Image 2.5 sí se estima antes, 2.5 publica rate limits, OpenAI recomienda 2.5 para integraciones nuevas, precios de fal por escalón de resolución, Wan 3.0 Prime más cara, fórmula de tokens de Seedance válida, Seedream 5 Pro tope 2048², brechas conocidas de ambos CLIs; antes, `pnpm ai:fal` con dos cuentas y failover por saldo, `--balance`, `--detach`/`--status`, registro 47 de 55 verificado, costo real y filtro de contenido de Seedance; antes, Wan 3.0 en `pnpm ai:fal`, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
 
 > **➡️ Qué modelo elegir, cuándo y cómo:** la guía canónica es
 > [GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
-> (todos los modelos de `pnpm ai:image` y `pnpm ai:fal`). Esta guía operativa cubre cómo ejecutar, dirigir y validar;
+> (modelos de `pnpm ai:image`, `pnpm ai:fal`, `pnpm ai:nano` y los demás carriles documentados). Esta guía operativa cubre cómo ejecutar, dirigir y validar;
 > si la matriz de decisión de abajo contradice la guía canónica, prevalece la guía.
 
 Esta guia convierte la investigacion de generacion de imagenes con IA en un workflow operativo para Codex y Claude. Cubre iconos, elementos de UI, empty states, ilustraciones, fondos, thumbnails, assets con PNG transparente y edicion con imagenes de referencia.
@@ -588,7 +589,10 @@ Reglas operativas:
   presupuestar el posible rechazo cobrado (prueba corta a baja resolución) y tener Flux 3 / Wan 3.0 si rechaza.
 - **Nano Banana Pro:** nunca por fal (decisión del operador 2026-09-16). En Google, `gemini-3-pro-image` está
   disponible en Vertex pero ninguna superficie lo usa; el provider `google-gemini-image` corre Nano Banana 2
-  (`gemini-3.1-flash-image`) y no hay CLI de Gemini Image (`pnpm ai:image` es sólo OpenAI). No cambiar
+  (`gemini-3.1-flash-image`). **`pnpm ai:nano` usa Nano Banana 2.1** con contrato local separado;
+  `pnpm ai:image` conserva OpenAI y default `gpt-image-2`. Ver [manual Nano](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
+  y [prueba Nexa cine 4K/high](../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md).
+  La prueba visual no constituye ranking general ni cambia defaults. No cambiar
   `GOOGLE_GEMINI_IMAGE_MODEL` para probarlo: cambia todo el carril. Ver arquitectura del generador §Carril Google.
 - El CLI imprime el `request_id` al encolar. Ante `HTTP 408` el trabajo **sigue cobrando en fal**: retomarlo con
   `pnpm ai:fal --capability <id> --request-id <id>` (no reenvía ni vuelve a cobrar), nunca relanzarlo.

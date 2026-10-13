@@ -1,0 +1,594 @@
+{
+  "verifiedAt": "2026-10-07T09:32:13.340432+00:00",
+  "apiVersion": "1.9.0",
+  "newActivations": 26,
+  "previousActivationsPreserved": 3,
+  "calendarActivations": 29,
+  "unlinkedPending": 0,
+  "unlinkedHistoricalPreserved": 31,
+  "copiesDatesAccountsMediaUnchanged": true,
+  "duplicates": 0,
+  "campaigns": {
+    "CMP-001": 12,
+    "CMP-002": 12,
+    "CMP-006": 2
+  },
+  "planStates": {
+    "planned": 24,
+    "draft": 2
+  },
+  "records": [
+    {
+      "providerRef": "381374755",
+      "recordId": "8c6615b3-ffde-48f3-94e7-7e719e73c782",
+      "activationId": "ACT-000026",
+      "campaignId": "CMP-001",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-07T23:00:00.000Z",
+      "localTime": "2026-10-07 20:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-05-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "dcb033d6f8e5dc35d390f17e900663aa3fb79cf38ac3d8f4adc69e059d7a3f8c",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "387560873",
+      "recordId": "6661adc1-64da-413b-b518-c1728c49dcd2",
+      "activationId": "ACT-000022",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-08T14:00:00.000Z",
+      "localTime": "2026-10-08 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-08-video-16x9",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "d99d4255af3f2198bddb11da647e4735dd061ef8dc0e8f54d98337ab5e6f6e75",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381374938",
+      "recordId": "de8700d4-540b-4b7d-a41e-e6655c410bc0",
+      "activationId": "ACT-000031",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-09T14:00:00.000Z",
+      "localTime": "2026-10-09 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-02-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "b241c0b714f52616547dc8ee1bfdc85c9bbefaa85e3f6adf07983a8bc37ce288",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381374962",
+      "recordId": "0960d054-40d3-429c-a30e-356a13a9e0b2",
+      "activationId": "ACT-000008",
+      "campaignId": "CMP-002",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-11T21:00:00.000Z",
+      "localTime": "2026-10-11 18:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-02-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "8e398d172964dbaf794e2608a7b8807bd63bf8b89ffd5e9c40b3e52f8021c757",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381374917",
+      "recordId": "93fb2a14-520b-4eac-a528-1e1ec1f7baeb",
+      "activationId": "ACT-000027",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-13T14:00:00.000Z",
+      "localTime": "2026-10-13 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-02-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "cdcff2e52ed9941c1dcdcd7a9bb8565c6f61e099d666aa854978954b47976483",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381374856",
+      "recordId": "1dcf621e-e9bc-496e-b226-ad4ea8e08220",
+      "activationId": "ACT-000010",
+      "campaignId": "CMP-001",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-14T23:00:00.000Z",
+      "localTime": "2026-10-14 20:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-02-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "c31486586d27afcd04cb9643e40a25a902fa32704513f78327d06a52ab51c55a",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375024",
+      "recordId": "7e5989d0-542e-49ea-942f-717befec85b1",
+      "activationId": "ACT-000024",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-16T14:00:00.000Z",
+      "localTime": "2026-10-16 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-04-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "0e2b69675a5c1dce47b619b2238dfa3175a073cb746533479950c56676f56bd3",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375007",
+      "recordId": "5615d810-dcc9-4cae-9ffc-ad7e0cf1616a",
+      "activationId": "ACT-000019",
+      "campaignId": "CMP-002",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-18T21:00:00.000Z",
+      "localTime": "2026-10-18 18:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-04-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "d8a3c6877665181ec076687cd29b3c184b7f092799cfed2ed20f32dbd100c85b",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381374989",
+      "recordId": "027beed3-59d0-4eeb-ad1f-5b8f962f8be3",
+      "activationId": "ACT-000007",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-20T14:00:00.000Z",
+      "localTime": "2026-10-20 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-03-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "4ef0817d5b3b1acd8cc4672afdc2fdd169d12140f0b843c9d2f0329d6c45d5d0",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375059",
+      "recordId": "7efe8e56-9f26-4101-9fd0-931398fa21a7",
+      "activationId": "ACT-000025",
+      "campaignId": "CMP-001",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-21T23:00:00.000Z",
+      "localTime": "2026-10-21 20:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-03-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "2b66c7a1ebc673d90cfb0f5b89982b0c9368c656e81e4d49783aab6d7934ecbe",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375084",
+      "recordId": "3226ecf3-332e-42c5-be4c-2857375374e3",
+      "activationId": "ACT-000013",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-23T14:00:00.000Z",
+      "localTime": "2026-10-23 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-05-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "e1810c4e9cd95dcab4200f2586e2e2832ee5ed922dc927ef4e7da7857f34606c",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375121",
+      "recordId": "4328ae3d-04c5-4ed4-bbd0-7a027e9f32f1",
+      "activationId": "ACT-000017",
+      "campaignId": "CMP-002",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-25T21:00:00.000Z",
+      "localTime": "2026-10-25 18:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-05-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "e9a8007c5356a5b3a03ad1cef39752b893083ba79a33d37183b1a1c58df92ff9",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375099",
+      "recordId": "7e46b3d7-ec2f-4558-8e2e-26c944bda942",
+      "activationId": "ACT-000023",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-27T14:00:00.000Z",
+      "localTime": "2026-10-27 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-06-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "0287c8d4b66cd744767e22d9f24cbc89cdb4dd107d2ea1dc22cb9b0e38355dd6",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375135",
+      "recordId": "1b06a99e-bb8c-4a1d-acb4-46b1200466dd",
+      "activationId": "ACT-000009",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Julio Reyes",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-28T14:00:00.000Z",
+      "localTime": "2026-10-28 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-03-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "a5c9f0c0492d1e50e16b5bd911209cfd9b1ae4c4b7435aca4cf747cfc8e571d5",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375156",
+      "recordId": "a61d105a-b79e-4661-9441-5a86dadb201c",
+      "activationId": "ACT-000030",
+      "campaignId": "CMP-001",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-28T23:00:00.000Z",
+      "localTime": "2026-10-28 20:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-06-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "e1339edae2a0e16bb055e908c76038a9b54812bdbf9f48ecb0aab67efbe271ae",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375186",
+      "recordId": "2b16af2c-cf9a-4cc8-ac47-5028dfa3a20a",
+      "activationId": "ACT-000011",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-10-30T14:00:00.000Z",
+      "localTime": "2026-10-30 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-06-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "d2748fcbb3b31d62e268c063a7c3cfc01d0699b4f9c637d76eeb4f46e328ef8d",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375199",
+      "recordId": "98f0328f-da39-4b5c-ac12-ee9e9a21d7a9",
+      "activationId": "ACT-000029",
+      "campaignId": "CMP-002",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-01T21:00:00.000Z",
+      "localTime": "2026-11-01 18:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-06-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "ae8ef2f5d1940381e1785649e301af77e76436bce02aafea98ef59c60ef33407",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "375165858",
+      "recordId": "189fec48-a522-40fa-a958-5d8f2d6a6f16",
+      "activationId": "ACT-000016",
+      "campaignId": "CMP-006",
+      "account": "linkedin · Efeonce",
+      "market": "MX",
+      "state": "draft",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-02T14:00:00.000Z",
+      "localTime": "2026-11-02 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP006-01-video-9x16",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "910ac6ca5eef77cf4e76daf0322137e77edd1e1b605bcd22d9f4b6265e1db835",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "375165897",
+      "recordId": "9797f828-7acb-477d-879d-dbfa351aa953",
+      "activationId": "ACT-000018",
+      "campaignId": "CMP-006",
+      "account": "instagram · Efeonce",
+      "market": "MX",
+      "state": "draft",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-02T21:00:00.000Z",
+      "localTime": "2026-11-02 18:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP006-01-video-9x16",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "9456a6d30de3b1df0dbb49b9398c54460024a11ace96a1dfcf99e6abce24890b",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375256",
+      "recordId": "33353ea5-9c4a-4417-9443-f4c3d027696f",
+      "activationId": "ACT-000014",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-03T14:00:00.000Z",
+      "localTime": "2026-11-03 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-07-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "35d4155c0549dd74697d2edf823a7598bd8f4d28646c3fee3d53e20e54205af7",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375210",
+      "recordId": "60cf3c30-3e89-4664-858c-e6a1af6fe79b",
+      "activationId": "ACT-000020",
+      "campaignId": "CMP-001",
+      "account": "linkedin · Julio Reyes",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-04T14:00:00.000Z",
+      "localTime": "2026-11-04 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-06-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "71aba7893eb0a42e2c58ce5db778cae22ccf11ddd016b2f9ce3bb6ee1f9c478f",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375235",
+      "recordId": "ff07e13b-9fe9-4644-ab41-86e80b9a1911",
+      "activationId": "ACT-000032",
+      "campaignId": "CMP-001",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-04T23:00:00.000Z",
+      "localTime": "2026-11-04 20:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP001-07-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "38131fe1c39a29aef4c1feb5aa477e5d896fc51a79f64e6eb34770392a708612",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375293",
+      "recordId": "391a966d-7fba-4620-a8a5-8df6d30d5bf6",
+      "activationId": "ACT-000015",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-06T14:00:00.000Z",
+      "localTime": "2026-11-06 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-07-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "f194623d894d45909a70907e8c311834d17a4a5ce3d8a8ba739f4103fa83a164",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375326",
+      "recordId": "2e162b3f-f716-402f-96c3-cfdb918b417f",
+      "activationId": "ACT-000012",
+      "campaignId": "CMP-002",
+      "account": "instagram · Efeonce",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-08T21:00:00.000Z",
+      "localTime": "2026-11-08 18:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-07-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "bde726e123e98eb40835b89717468a5ac81630c8d9cba0c23969cde45db3286d",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375309",
+      "recordId": "6303c765-7e2b-431c-ba58-f952fe1588dc",
+      "activationId": "ACT-000021",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Julio Reyes",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-11T14:00:00.000Z",
+      "localTime": "2026-11-11 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-06-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "02e8075793a2fe9e73b6f9328e80f34d8e3e38a557e7a6ae4cb47beb1f4823de",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    },
+    {
+      "providerRef": "381375340",
+      "recordId": "9477ec04-3cb0-4ebd-bd5c-6d4d4ea586ad",
+      "activationId": "ACT-000028",
+      "campaignId": "CMP-002",
+      "account": "linkedin · Julio Reyes",
+      "market": "CL",
+      "state": "planned",
+      "executionStatus": "scheduled",
+      "scheduledAt": "2026-11-18T14:00:00.000Z",
+      "localTime": "2026-11-18 11:00:00",
+      "assetVersions": [
+        {
+          "assetId": "CMP002-07-imagen-4x5",
+          "versionNo": 1
+        }
+      ],
+      "bodySha256": "054283014151745fa0d0e3ab588354aabda6c2ca98bbe15c1b6bc119b89c415e",
+      "warnings": [
+        "piece_not_approved"
+      ]
+    }
+  ]
+}

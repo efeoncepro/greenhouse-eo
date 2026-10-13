@@ -1,0 +1,41 @@
+{
+  "observed_at": "2026-10-10",
+  "timezone": "America/Santiago",
+  "source_url": "https://www.linkedin.com/feed/update/urn:li:activity:7511450356242030593/",
+  "method": "Five images opened individually and visually inspected using authenticated browser; downloaded through image controls. No scraping.",
+  "publication_date": "UI displays 1 semana; exact date not verified",
+  "files": [
+    {
+      "slide": 1,
+      "file": "lamina-01.jpeg",
+      "sha256": "da58e6a005868e73d34fb3c7c29143f85b8c79485dfe3a461f6a16c5c0b1c616",
+      "bytes": 204529
+    },
+    {
+      "slide": 2,
+      "file": "lamina-02.jpeg",
+      "sha256": "481a29090f237527bd6dcb0a0ca200d522f7ec8469fad430a268d519a643a1e5",
+      "bytes": 224525
+    },
+    {
+      "slide": 3,
+      "file": "lamina-03.jpeg",
+      "sha256": "db8e0be6d39cad7461893418df68466e9dee80d0228b09933b1185e28ff12ccf",
+      "bytes": 214938
+    },
+    {
+      "slide": 4,
+      "file": "lamina-04.jpeg",
+      "sha256": "014020382e3af2d8d2f472bd15a499fd9fda4516dfe8f7ccd2c9c12bc215d94d",
+      "bytes": 219660
+    },
+    {
+      "slide": 5,
+      "file": "lamina-05.jpeg",
+      "sha256": "d4374496cd90b501822b834c6839bb7bef0ea489c6f99cbd283d8e7c1071cf54",
+      "bytes": 234939
+    }
+  ],
+  "comments": "Three visible comments inspected; no issuer extension or late-entry acceptance observed. One agency self-reports sending; not proof of selection.",
+  "storage": "Originales privados: ~/.codex/agent-data/hubspot-saas-prospecting/socopur-licitacion-2027/"
+}

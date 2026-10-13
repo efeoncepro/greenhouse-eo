@@ -1,0 +1,349 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:16:09.506Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.ranked.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/ranked_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "https://www.viabcp.com/abrir-cuenta",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.072,
+    "estimateStatus": "available",
+    "maxUsd": 0.072,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "sourceModifiedAt": "2026-08-05T15:15:09.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1002,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1002,
+        "costUsd": 0.01212,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061916-1987-0381-0000-02dd35fc3c69",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01212,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01212,
+    "tasks": [
+      {
+        "id": "10061916-1987-0381-0000-02dd35fc3c69",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.2478 sec.",
+        "cost": 0.01212,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "ranked_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "ranked_keywords",
+          "se_type": "google",
+          "target": "https://www.viabcp.com/abrir-cuenta",
+          "location_code": 2604,
+          "language_code": "es",
+          "limit": 500,
+          "offset": 0,
+          "item_types": [
+            "organic"
+          ],
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "target": "https://www.viabcp.com/abrir-cuenta",
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 1,
+            "items_count": 1,
+            "metrics": {
+              "organic": {
+                "pos_1": 0,
+                "pos_2_3": 0,
+                "pos_4_10": 0,
+                "pos_11_20": 0,
+                "pos_21_30": 0,
+                "pos_31_40": 0,
+                "pos_41_50": 0,
+                "pos_51_60": 1,
+                "pos_61_70": 0,
+                "pos_71_80": 0,
+                "pos_81_90": 0,
+                "pos_91_100": 0,
+                "etv": 0.5460000038146973,
+                "count": 1,
+                "estimated_paid_traffic_cost": 0.6497399806976318,
+                "is_new": 1,
+                "is_up": 0,
+                "is_down": 0,
+                "is_lost": 0,
+                "clickstream_etv": null,
+                "clickstream_gender_distribution": null,
+                "clickstream_age_distribution": null
+              },
+              "paid": null,
+              "featured_snippet": null,
+              "local_pack": null,
+              "ai_overview_reference": null
+            },
+            "metrics_absolute": null,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "aperturar cuenta banco de la nación",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 06:23:50 +00:00",
+                    "competition": 0.09000000357627869,
+                    "competition_level": "LOW",
+                    "cpc": 1.190000057220459,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": 0.41999998688697815,
+                    "high_top_of_page_bid": 1.0800000429153442,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 110
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -19,
+                      "quarterly": -56,
+                      "yearly": 21
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 5,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=aperturar%20cuenta%20banco%20de%20la%20naci%C3%B3n&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-09-23 13:39:24 +00:00",
+                    "previous_updated_time": "2026-05-29 21:24:08 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 459,
+                    "dofollow": 402.6000061035156,
+                    "referring_pages": 441.6000061035156,
+                    "referring_domains": 57.400001525878906,
+                    "referring_main_domains": 49.400001525878906,
+                    "rank": 65.30000305175781,
+                    "main_domain_rank": 587.7000122070312,
+                    "last_updated_time": "2026-09-23 13:39:24 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-06 14:22:50 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 51,
+                    "rank_absolute": 55,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div[1]",
+                    "domain": "www.viabcp.com",
+                    "title": "Abrir Cuenta BCP | Apertura tu Cuenta de Ahorros BCP",
+                    "url": "https://www.viabcp.com/abrir-cuenta",
+                    "breadcrumb": "https://www.viabcp.com › abrir-cuenta",
+                    "website_name": "BCP",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Para abrir una cuenta de ahorros, solo deberás ingresar a la web www.abretucuenta.viabcp.com, elegir el tipo de cuenta de ahorros que deseas abrir, completar ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "cuenta"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "viabcp.com",
+                    "relative_url": "/abrir-cuenta",
+                    "etv": 0.5460000038146973,
+                    "estimated_paid_traffic_cost": 0.6497399806976318,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 3,
+                      "referring_main_domains": 3,
+                      "referring_pages": 7,
+                      "dofollow": 7,
+                      "backlinks": 7,
+                      "time_update": "2026-09-22 10:47:42 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 167,
+                      "main_domain_rank": 454
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=aperturar%20cuenta%20banco%20de%20la%20naci%C3%B3n&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 5,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-23 13:39:24 +00:00",
+                  "previous_updated_time": "2026-05-29 21:24:08 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

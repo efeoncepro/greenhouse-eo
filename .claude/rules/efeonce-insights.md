@@ -45,6 +45,12 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   producción desde 2026-09-26. Compara `=== 'true'`: cargarlo con `printf %s true`, redeploy DESPUÉS de la var y
   verificar con una canary (plan con `scopeLines`/`cover`), no con el listado de vars. Rollback = OFF en los dos
   runtimes. Registrar todo flip en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Vocabulario de canales = `AXIS_PLATFORM_ASSETS`** (`contracts/channels.ts`, 22 ids desde `axis-brand-assets` 0.4.25).
+  **NUNCA** agregar ni quitar un id a mano sin el paquete: todo cambio de versión de `axis-brand-assets` corre
+  `contracts/channels.test.ts` y `src/config/insights-channel-isotypes.test.ts`, y un id nuevo lleva nombre en
+  `GH_INSIGHTS.channels`, entrada en `CHANNEL_ISOTYPES` y su SVG en color en los dos catálogos. `channelForDomain` sólo
+  mapea dominios que identifican la red (facebook.com → `facebook`; `meta` nunca sale de un dominio) y sólo marca filas
+  de tabla del PDF y el deck: el modelo web envía el `channelId` propio del hecho.
 - **Selección de figuras (TASK-1974/1975, plan editorial v2)**: la pregunta del lector elige la familia
   (`ChartSpecV1.question` + `QUESTION_FAMILIES`); un hecho del período alimenta UNA figura del capítulo (`duplicated_fact`;
   sólo los totales de la cascada son ancla); la tarjeta de cifra vive en `chapter.stats`, fuera de las 15 familias. Valor,
@@ -60,6 +66,12 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   **NUNCA** se reenvía: se reconcilia contra `email_deliveries`. Un schedule **NUNCA** emite ni envía (CHECK
   `draft_for_review`). Flags `INSIGHTS_SHARING_ENABLED` (Vercel), `INSIGHTS_DELIVERY_ENABLED` y
   `INSIGHTS_SCHEDULES_ENABLED` (Vercel + `ops-worker`); los EmailTypes nacen apagados en `email_type_config`.
+- **Alcance de contenido (TASK-2033)**: con un alcance declarado (`greenhouse_growth.seo_content_scope_versions`,
+  dominio SEO) el capítulo de búsqueda mide SÓLO ese contenido. El adapter lo resuelve una vez, lo pasa a los readers
+  dueños en las dos ventanas y lo sella en cada fuente (`contentScope`); **NUNCA** filtra filas por su cuenta ni cae al
+  sitio completo si no puede leerlo (lanza). El sitio completo entra sólo como referencia `site_total.*`; el ETV del
+  dominio no se emite (`outside_content_scope`). El plan lee el alcance del snapshot, nunca de la configuración viva.
+  Todo hecho nuevo por URL o por página debe recibir el alcance. AEO no se recorta.
 - **Eventos** `insights.*` sólo por `events.ts` en la misma transacción del write; **señales** de reliability
   `insights.editions.*` leen la tabla, no el evento. Observabilidad: `captureWithDomain(err, 'insights', …)`.
 - **Tool MCP nueva** ⇒ entrada en `src/mcp/greenhouse/tool-manifest.ts` (`writes` correcto) + `pnpm mcp:manifest:generate`

@@ -1,0 +1,14 @@
+[
+  {
+    "keyword": "cuenta en dolares",
+    "location_code": 2604,
+    "language_code": "es",
+    "include_seed_keyword": true,
+    "include_serp_info": true,
+    "depth": 3,
+    "limit": 300,
+    "order_by": [
+      "keyword_data.keyword_info.search_volume,desc"
+    ]
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing de Contenidos · Adaptación nativa",
+    "question": "¿Sirve la misma pieza en todas?",
+    "answer": [
+      "Se reinventa"
+    ]
+  },
+  "body": "La misma idea se escribe y se edita para cada plataforma: no se recorta, se reinventa.",
+  "steps": [
+    {
+      "glyph": "telefono",
+      "kicker": "9:16",
+      "name": "Reel y story"
+    },
+    {
+      "glyph": "encuadre",
+      "kicker": "4:5 · 1:1",
+      "name": "Carrusel y post"
+    },
+    {
+      "glyph": "reproducir",
+      "kicker": "16:9",
+      "name": "Video"
+    },
+    {
+      "glyph": "tijeras",
+      "kicker": "Edición nativa",
+      "name": "Adaptación"
+    }
+  ],
+  "note": "Una idea madre, tantas versiones como formatos.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT5-prisma-formatos.png",
+    "alt": "Nexa, con hoodie de Efeonce, sostiene un prisma: un haz de luz azul se abre en cinco pantallas de formatos distintos con la misma idea de campaña"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "tenderId": "hs-B20-azul2",
+  "slides": [
+    {
+      "slideId": "deck-section-cine",
+      "contentType": "deck.section-cine.purpose",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 270,
+          "answerPx": 176,
+          "eyebrowPx": "--gl-sec-eyebrow-px=16px",
+          "eyebrowWght": "--gl-sec-eyebrow-wght=500",
+          "eyebrowTracking": "--gl-sec-eyebrow-tracking=0.14em",
+          "eyebrowColor": "--gl-sec-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-sec-question-px=40px",
+          "questionLeading": "--gl-sec-question-leading=1.2",
+          "questionColor": "--gl-sec-question-color=#f4f6f8",
+          "answerLeading": "--gl-sec-answer-leading=0.9",
+          "answerTracking": "--gl-sec-answer-tracking=-0.05em",
+          "answerInset": "--gl-sec-answer-inset=-8px",
+          "bodyTop": 470,
+          "bodyPx": 34,
+          "bodyWidth": 700,
+          "bodyLeading": "--gl-sc-body-leading=1.35",
+          "bodyColor": "--gl-sc-body-color=#ffffff",
+          "pillarsTop": "--gl-sc-pillars-top=690px",
+          "pillarsWidth": "--gl-sc-pillars-width=700px",
+          "pillarPadY": "--gl-sc-pillar-pad-y=14px",
+          "pillarGap": "--gl-sc-pillar-gap=18px",
+          "pillarStroke": "--gl-sc-pillar-rule=1px",
+          "pillarRuleOpacity": "--gl-sc-pillar-rule-opacity=16%",
+          "pillarLabelPx": "--gl-sc-pillar-label-px=22px",
+          "pillarLabelWidth": "--gl-sc-pillar-label-width=250px",
+          "pillarTextPx": "--gl-sc-pillar-text-px=20px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:HS2d-datos-en-orden",
+          "alt": "Un líder de RevOps de Efeonce, con la chaqueta, levanta la mano y miles de partículas de datos en desorden se ordenan en una red de capas de luz que crece hacia el fondo"
+        },
+        "voice": {
+          "question": "¿Cómo escala mi CRM?",
+          "answer": "Ordenado",
+          "eyebrow": "Datos y arquitectura"
+        },
+        "body": "Antes de automatizar o sumar agentes, ponemos los datos <strong>en orden</strong> y el CRM sobre una base que crece.",
+        "pillars": [
+          {
+            "label": "Datos en orden",
+            "text": "duplicados fuera, propiedades con dueño y una sola fuente de verdad."
+          },
+          {
+            "label": "Modelo que escala",
+            "text": "objetos, asociaciones y pipelines pensados para crecer."
+          },
+          {
+            "label": "Integración gobernada",
+            "text": "cada sync con su dirección, su dueño y su registro de errores."
+          }
+        ]
+      },
+      "template": "SectionCinePurpose"
+    }
+  ]
+}

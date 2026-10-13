@@ -1,0 +1,207 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-12",
+    "offerId": "seo-aeo-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_demand",
+    "accountId": "example-tender-programme",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 3,
+    "lines": [
+      {
+        "lineId": "seo",
+        "profile": "ECG-020",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.5"
+        },
+        "dedicationEvidence": {
+          "reference": "example: dedication estimated by the practice from the technical proposal of the tender",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2027-01-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "choices": []
+      },
+      {
+        "lineId": "content",
+        "profile": "ECG-011",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.25"
+        },
+        "dedicationEvidence": {
+          "reference": "example: dedication estimated by the practice from the technical proposal of the tender",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2027-01-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "choices": []
+      },
+      {
+        "lineId": "lead",
+        "profile": "ECG-016",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "dedicationEvidence": {
+          "reference": "example: dedication estimated by the practice from the technical proposal of the tender",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2027-01-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "agreed-price",
+        "kind": "agreed_total",
+        "amount": "13500000",
+        "lineIds": [
+          "seo",
+          "content",
+          "lead"
+        ],
+        "reason": "Example: price of the whole programme, set by the operator for the tender."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "example:iva-cl-19",
+      "source": {
+        "reference": "example: IVA 19 % declared for this example; not a tax ruling for any client",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    }
+  },
+  "work": [
+    {
+      "lineId": "seo",
+      "assigneeIds": [
+        "planned-seo-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "content",
+      "assigneeIds": [
+        "planned-content-1"
+      ],
+      "tasks": [
+        "seo-writing"
+      ],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "lead",
+      "assigneeIds": [
+        "planned-lead-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.283333333333333333",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "0.85"
+      },
+      "reason": "Three named seats, one per person; the programme carries 0.85 of 3, the declared dedication of the three people.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-01-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.283333333333333333",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "0.85"
+      },
+      "reason": "Three named seats, one per person; the programme carries 0.85 of 3, the declared dedication of the three people.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-01-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "semrush",
+      "priceId": "public-seo-guru-monthly",
+      "quantity": "1",
+      "serviceShare": "0.25",
+      "driver": {
+        "unit": "declared-account-share",
+        "totalUnits": "4",
+        "allocatedUnits": "1"
+      },
+      "reason": "One shared subscription; the programme carries one of four declared account shares. Price chosen: the public list price of the plan, because the contracted plan has no amount.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-01-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

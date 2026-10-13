@@ -1,0 +1,163 @@
+{
+  "tenderId": "utem-casos",
+  "slides": [
+    {
+      "slideId": "p01-deck-decision-case",
+      "contentType": "deck.decision-case",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 104,
+          "questionTop": 210,
+          "answerTop": 280,
+          "answerPx": 124,
+          "panelWidth": "--gl-dc-panel-width=1000px",
+          "panelRadius": "--gl-dc-panel-radius=300px",
+          "photoLeft": "--gl-dc-photo-left=660px",
+          "logoGap": "--gl-dc-logo-gap=22px",
+          "logoMaxWidth": "--gl-dc-logo-max-width=200px",
+          "logoMaxHeight": "--gl-dc-logo-max-height=70px",
+          "figuresTop": "--gl-dc-figures-top=470px",
+          "figuresWidth": "--gl-dc-figures-width=760px",
+          "figuresRowGap": "--gl-dc-figures-row-gap=34px",
+          "figuresColumnGap": "--gl-dc-figures-column-gap=50px",
+          "figureRule": "--gl-dc-figure-rule=2px",
+          "figurePadTop": "--gl-dc-figure-pad-top=16px",
+          "figurePx": "--gl-dc-figure-px=104px",
+          "figureWght": "--gl-dc-figure-wght=300",
+          "figureLeading": "--gl-dc-figure-leading=0.95",
+          "figureTracking": "--gl-dc-figure-tracking=-0.04em",
+          "labelPx": "--gl-dc-label-px=22px",
+          "labelGap": "--gl-dc-label-gap=8px",
+          "sourceTop": "--gl-dc-source-top=938px",
+          "sourcePx": "--gl-dc-source-px=16px",
+          "sourceWidth": "--gl-dc-source-width=760px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CS2-banco-bice",
+          "alt": "Una viajera mira Santiago al amanecer desde una terraza, con su teléfono en la mano"
+        },
+        "voice": {
+          "question": "¿Qué cambió con Sky?",
+          "answer": "Más visible",
+          "eyebrow": "Caso de éxito"
+        },
+        "clientLogo": {
+          "src": "asset-ref:file:sky",
+          "alt": "Sky Airline"
+        },
+        "figures": [
+          {
+            "value": "+65 %",
+            "label": "impresiones orgánicas"
+          },
+          {
+            "value": "+39 %",
+            "label": "citabilidad en IA"
+          },
+          {
+            "value": "+27 %",
+            "label": "clics orgánicos"
+          },
+          {
+            "value": "6 meses",
+            "label": "de estrategia editorial"
+          }
+        ],
+        "source": "Fuente: Sky, 6 meses de SEO/AEO editorial. Citabilidad: ChatGPT y Perplexity.",
+        "selection": {
+          "label": "AEO",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionCase"
+    },
+    {
+      "slideId": "p02-deck-decision-case",
+      "contentType": "deck.decision-case",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 104,
+          "questionTop": 210,
+          "answerTop": 280,
+          "answerPx": 124,
+          "panelWidth": "--gl-dc-panel-width=1000px",
+          "panelRadius": "--gl-dc-panel-radius=300px",
+          "photoLeft": "--gl-dc-photo-left=660px",
+          "logoGap": "--gl-dc-logo-gap=22px",
+          "logoMaxWidth": "--gl-dc-logo-max-width=200px",
+          "logoMaxHeight": "--gl-dc-logo-max-height=70px",
+          "figuresTop": "--gl-dc-figures-top=470px",
+          "figuresWidth": "--gl-dc-figures-width=760px",
+          "figuresRowGap": "--gl-dc-figures-row-gap=34px",
+          "figuresColumnGap": "--gl-dc-figures-column-gap=50px",
+          "figureRule": "--gl-dc-figure-rule=2px",
+          "figurePadTop": "--gl-dc-figure-pad-top=16px",
+          "figurePx": "--gl-dc-figure-px=104px",
+          "figureWght": "--gl-dc-figure-wght=300",
+          "figureLeading": "--gl-dc-figure-leading=0.95",
+          "figureTracking": "--gl-dc-figure-tracking=-0.04em",
+          "labelPx": "--gl-dc-label-px=22px",
+          "labelGap": "--gl-dc-label-gap=8px",
+          "sourceTop": "--gl-dc-source-top=938px",
+          "sourcePx": "--gl-dc-source-px=16px",
+          "sourceWidth": "--gl-dc-source-width=760px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CS3b-berel-squad",
+          "alt": "La líder de marketing de Berel y una estratega de Efeonce eligen juntas un color entre las muestras de la temporada"
+        },
+        "voice": {
+          "question": "¿Qué cambió con Berel?",
+          "answer": "Lo eligen",
+          "eyebrow": "Caso de éxito"
+        },
+        "clientLogo": {
+          "src": "asset-ref:file:berel",
+          "alt": "Berel"
+        },
+        "figures": [
+          {
+            "value": "+54 %",
+            "label": "tráfico orgánico"
+          },
+          {
+            "value": "+120",
+            "label": "páginas de color"
+          },
+          {
+            "value": "×2",
+            "label": "citas en respuestas IA"
+          },
+          {
+            "value": "+38 %",
+            "label": "búsquedas de la marca"
+          }
+        ],
+        "source": "Fuente: Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses.",
+        "selection": {
+          "label": "SEO",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionCase"
+    }
+  ]
+}

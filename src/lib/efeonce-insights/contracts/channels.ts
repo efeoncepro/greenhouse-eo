@@ -10,14 +10,15 @@
  */
 
 /**
- * TASK-1990 — las 19 plataformas del contrato AXIS `efeonce.insights-stat-card` 0.2.0, con los mismos ids que
- * `AXIS_PLATFORM_ASSETS[].platform` de `@efeoncepro/axis-brand-assets` (un test falla si las listas difieren). Que un id
- * esté acá no hace que un adapter lo emita: sólo lo vuelve un `channelId` válido cuando un productor lo selle.
+ * TASK-1990 — las plataformas de AXIS, con los mismos ids que `AXIS_PLATFORM_ASSETS[].platform` de
+ * `@efeoncepro/axis-brand-assets` (un test falla si las listas difieren). Son 22 desde el paquete 0.4.25: las 19 del
+ * contrato `efeonce.insights-stat-card` 0.2.0 más Facebook y Threads (0.4.19) y X (0.4.21). Que un id esté acá no hace
+ * que un adapter lo emita: sólo lo vuelve un `channelId` válido cuando un productor lo selle.
  */
 export const INSIGHT_CHANNEL_IDS = [
   'google', 'google_ai_overview', 'chatgpt', 'gemini', 'claude', 'perplexity',
   'google_search_console', 'google_analytics', 'google_ads', 'bing', 'youtube', 'reddit', 'wikipedia', 'linkedin',
-  'instagram', 'tiktok', 'meta', 'frameio', 'greenhouse'
+  'instagram', 'tiktok', 'meta', 'facebook', 'threads', 'x', 'frameio', 'greenhouse'
 ] as const
 export type InsightChannelId = (typeof INSIGHT_CHANNEL_IDS)[number]
 
@@ -42,7 +43,10 @@ export const SEO_SEARCH_CHANNEL: InsightChannelId = 'google'
 /**
  * TASK-1990 — dominio citado → plataforma con isotipo. Sólo las plataformas cuyo dominio identifica sin ambigüedad a la
  * fuente (una página de YouTube, un hilo de Reddit, un artículo de Wikipedia en cualquier idioma, un perfil de LinkedIn,
- * Instagram o TikTok, una página de Facebook). Cualquier otro dominio queda sin canal: la cifra lleva su glifo.
+ * Instagram o TikTok, una página de Facebook, un hilo de Threads, una publicación de X). Cualquier otro dominio queda sin
+ * canal: la cifra lleva su glifo. Sólo lo usa la marca de fila de las tablas del PDF y el deck (`rowMarkOf`); el modelo web
+ * envía el `channelId` propio del hecho. `meta` no sale de un dominio: es la empresa y su pauta, no la red; Facebook llevó su
+ * isotipo como sustituto hasta que AXIS publicó el propio (axis-brand-assets 0.4.19).
  */
 const DOMAIN_CHANNELS: ReadonlyArray<readonly [string, InsightChannelId]> = [
   ['youtube.com', 'youtube'],
@@ -52,7 +56,11 @@ const DOMAIN_CHANNELS: ReadonlyArray<readonly [string, InsightChannelId]> = [
   ['linkedin.com', 'linkedin'],
   ['instagram.com', 'instagram'],
   ['tiktok.com', 'tiktok'],
-  ['facebook.com', 'meta']
+  ['facebook.com', 'facebook'],
+  ['threads.net', 'threads'],
+  ['threads.com', 'threads'],
+  ['x.com', 'x'],
+  ['twitter.com', 'x']
 ]
 
 export const channelForDomain = (domain: string): InsightChannelId | undefined => {

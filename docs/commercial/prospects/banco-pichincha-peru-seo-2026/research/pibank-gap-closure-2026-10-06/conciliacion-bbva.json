@@ -1,0 +1,17 @@
+{
+  "request": "ranked-09-page2",
+  "provider_task_id": "10061922-1987-0381-0000-51045e53a5b8",
+  "verified_by": "DataForSEO portal Task lookup and Metadata after operator login",
+  "provider_cost_usd": 0.132,
+  "returned_rows_reported": 1000,
+  "target": "bbva.pe",
+  "offset": 500,
+  "limit": 1000,
+  "market": "PE/2604/es",
+  "filters": "relative_url regex (?i)(cuenta|ahorr|deposit|transfer)",
+  "status": "completed_paid_result_not_available_in_portal",
+  "result_recovered": false,
+  "repeated_post": false,
+  "reason": "Portal Result disabled; completed status/cost do not recover keyword rows",
+  "source_url": "https://app.dataforseo.com/api-detail/dataforseo-labs"
+}

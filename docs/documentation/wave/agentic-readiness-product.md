@@ -89,7 +89,9 @@ El producto empieza principalmente en **Web Experience 360** y **Search Visibili
 - **Measurement & Analytics:** instrumentación, observabilidad y medición de outcomes;
 - **Digital Automation & Integrations:** APIs, workflows, MCP y automatizaciones.
 
-No crea una sexta familia de Wave. **Experience LaunchOps** es otro Product Service compuesto de Wave: integra Web
+No crea una familia nueva de Wave (la sexta familia es Product Design 360, aprobada por el operador en octubre de
+2026; Agentic Readiness es un Product Service compuesto, no una familia). **Experience LaunchOps** es otro Product
+Service compuesto de Wave: integra Web
 Experience, Search/AEO, Measurement, Agent Systems, Automation, governance y release. Agentic Readiness puede ser su
 diagnóstico de entrada o una capability de evaluación dentro de ese servicio.
 

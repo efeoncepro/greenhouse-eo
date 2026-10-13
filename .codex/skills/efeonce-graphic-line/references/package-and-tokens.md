@@ -1,5 +1,9 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: `packages/brand-assets/src/manifest.ts` de AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09. Sólo §2.3 (nota) y §6 (filas de Wave/Reach/Globe).
+
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 (versiones vigentes
 > y regla del bump: greenhouse-eo@24e4c72ee, AXIS `v0.3.24`, 2026-09-28) · decisiones del
 > operador D1–D15 del 2026-09-26 registradas y **publicadas** (tag `v0.3.5`, axis@5a87d7a): tokens y contratos 0.3.5,
@@ -223,6 +227,11 @@ aprobado tal cual (D2, 2026-09-26); el naranja de HubSpot no se usa.
 | `globe` | Globe | Creative Studio | Crear | Brand | `#091951` | `#ff6500` | `#bb1954` |
 | `wave` | Wave | Búsqueda, web y medición | Aparecer | Engine | `#091951` | `#0375db` | `#0375db` |
 | `reach` | Reach | Medios y distribución | Llegar | Voice | `#091951` | `#f83902` | `#f83902` |
+
+Estos acentos son los de la **línea** (compatibilidad y mapa de portafolio), no los colores del logotipo. Desde la ruta
+H3 (2026-10-09) el gesto de Globe es `#bb1954` / `#ee4274` (nunca el `#ff6500` Brand) y el de Wave sobre oscuro
+`#2e8be8` + `#a6cdf5`, en el logotipo y el lockup (sobre oscuro, los isotipos van todo en blanco); hoy viven sólo en los SVG de `axis-brand-assets` 0.4.28, no en tokens (si se suma otro producto
+con colores propios, el ADR recomienda llevarlos a tokens de producto).
 
 ### 2.4 Contrastes medidos (WCAG 2.x, calculados desde estos tokens)
 
@@ -770,9 +779,10 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 |---|---|---|---|---|
 | `efeonce-logo-positive` / `-negative` | logo | light / dark | positive / negative | 0,235 |
 | `efeonce-isotype-positive` / `-negative` | isotype | light / dark | | 0,7095 |
-| `globe-logo-*` · `globe-isotype-*` | | | | 0,4925 · 1,1109 |
-| `wave-logo-*` · `wave-isotype-*` | | | | 0,4114 · 0,5558 |
-| `reach-logo-positive` · `reach-logo-negative` · `reach-isotype-*` | | | | 0,3128 · 0,3115 · 1,0143 |
+| `globe-logo-*` · `globe-isotype-*` · `globe-lockup-*` (0.4.28: logotipo solo, sin «by efeonce») | logo / isotype / lockup | | positive / negative / white | 0,4604 · 1,1109 · 0,1430 |
+| `wave-logo-*` · `wave-isotype-*` · `wave-lockup-*` (0.4.28) | logo / isotype / lockup | | positive / negative / white | 0,2325 · 0,5558 · 0,1158 |
+| `reach-logo-*` · `reach-isotype-*` · `reach-lockup-*` (0.4.28) | logo / isotype / lockup | | positive / negative / white | 0,1866 · 1,0143 · 0,1088 |
+| `reach-isotype-small-*` · `globe-isotype-small-*` (0.4.28; sólo ≤ 24 px) | isotype | | positive / negative / white | 1,0143 · 1,1109 |
 | `insights-logo-*` · `insights-isotype-*` (desde 0.4.0) | | | | 0,2906 · 3,4231 |
 | `insights-lockup-positive` / `-negative` (desde 0.4.0) | **lockup** | light / dark | positive / negative | Efeonce + filete + Insights en gris (`#6b6b6b` / `#6f89a2`); nunca se rearma |
 | `sv360-logo-*` · `sv360-isotype-*` · `sv360-lockup-*` · `sv360-name-lockup-*` (desde 0.4.2) | logo / isotype / lockup | light / dark / any | positive / negative / **white** | Efeonce \| SV360; `name-lockup` suma «Search Visibility 360» |
@@ -783,9 +793,19 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 | `url-bubble-baked-light` | url-bubble | light | baked (`#848484`) | 0,1968 |
 | `url-bubble-baked-dark` | url-bubble | dark | baked (`#6f89a2`) | 0,1968 |
 
+**Wave, Reach y Globe en la familia (0.4.28, AXIS `7c96680` + `5346761`, tag `v0.4.28`; ruta H3, 2026-10-09):** 33 archivos (12 reemplazados:
+`logo` e `isotype` positivo/negativo; 21 nuevos: `white`, `lockup` e `isotype-small`). El `lockup` es «efeonce | producto»
+con el logotipo en el gris de la familia y sólo el gesto en color; el `logo` dejó de llevar «by efeonce». En los
+isotipos, `negative` es idéntico a `white` (todo blanco sobre oscuro; el color sobre oscuro vive en `logo` y `lockup`).
+Generador
+`packages/brand-assets/scripts/product-family.mjs` sobre `sources/product-family/` (originales versionados, nunca
+publicados) + `pnpm seal`; sólo contornos, sin máscaras ni `clipPath`. En 0.4.28 las piezas nuevas quedaban fuera del
+catálogo del Lab (`AXIS_LOGO_EXCLUSIONS`); desde 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice del Lab está
+fragmentado y son públicas en «Logotipos», como Rooms y Creative Studio. Greenhouse fija 0.4.25 (adopción: TASK-2014). Criterio: [criteria.md](criteria.md) (H3).
+
 **Insights (0.4.0, tag `v0.4.0`):** marca `insights` en `AXIS_BRAND_ASSET_BRANDS`; `kind: 'lockup'` es nuevo y sólo lo usa
 `insights-lockup-*`. Se generan en Greenhouse con `scripts/brand/build-insights-logo.mjs` y se re-sellan con
-`scripts/seal.mjs`; nunca se editan a mano. **Greenhouse fijaba 0.3.5** al 2026-09-28; hoy fija 0.4.1, que ya los trae. Dónde se
+`scripts/seal.mjs`; nunca se editan a mano. **Greenhouse fijaba 0.3.5** al 2026-09-28; hoy fija 0.4.25, que ya los trae. Dónde se
 aplican y dónde no: [applications.md](applications.md) §B3b.
 
 **Submarcas SEO/AEO (0.4.2, tag `v0.4.2`, publicado el 2026-09-29, AXIS `main` `7f9c8bb`):** export nuevo `AXIS_SEO_AEO_BRANDS` y variante nueva `white` (todo blanco, esfera y logo de Efeonce
@@ -793,12 +813,12 @@ incluidos, para fotos y fondos de color). 33 SVG: `{sv360,aeo,aeo-assessment,ai-
 `{sv360,aeo}-isotype-{positive,negative,white}`, los cuatro `*-lockup-{positive,negative,white}` y
 `sv360-name-lockup-{positive,negative,white}`. Se generan en Greenhouse con `scripts/brand/build-seo-aeo-logos.mjs`
 (contornos de Poppins con fontkit; colores de `@efeoncepro/axis-tokens`, esfera en el acento de Engine `#0375db`) y se
-re-sellan; nunca se editan a mano. Greenhouse fija 0.4.1 y los recibe con TASK-1938. Lab: `/references/seo-aeo/` y
+re-sellan; nunca se editan a mano. Greenhouse fija 0.4.25 y los usa en el PDF del AI Visibility Report (TASK-1938), rasterizados y sellados en `public/branding/pdf/`. Lab: `/references/seo-aeo/` y
 `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md` (publicados el 2026-09-29; responden 200). Criterio:
 [criteria.md](criteria.md) («Submarcas de producto SEO/AEO»); aplicaciones: [applications.md](applications.md) §B3c.
 
-**PNG para correo: `AXIS_EMAIL_ASSETS` (0.4.6, tag `v0.3.38`, 2026-09-29; Greenhouse fija 0.4.5 y todavía no los
-usa).** `assets/email/`, @2x, RGBA con fondo transparente (se apoyan en el `#001a33` declarado en la celda), generados
+**PNG para correo: `AXIS_EMAIL_ASSETS` (0.4.6, tag `v0.3.38`, 2026-09-29; Greenhouse fija 0.4.25 y sólo el PDF del AI
+Visibility Report usa las cuatro redes; los correos todavía no).** `assets/email/`, @2x, RGBA con fondo transparente (se apoyan en el `#001a33` declarado en la celda), generados
 con `pnpm email:assets` (`scripts/generate-email-assets.mjs`, nunca a mano) y sellados en `src/email-manifest.ts`;
 `findEmailAsset(id)` y `emailAssetUrl(id)`.
 
@@ -818,7 +838,7 @@ necesita su propio eslogan generado, nunca uno escalado.
 acento, no medidas, así que no llevan camino recorrido).
 
 **0.4.3 (tag `v0.3.30`, 2026-09-29):** las 48 órbitas estáticas se re-sellaron con el contrato de la órbita 0.4.0
-(cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.1.
+(cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.25.
 
 **Marcas de terceros: `AXIS_PARTNER_ASSETS` (0.4.4, tag `v0.3.31`, 2026-09-29; Greenhouse la fija desde `9289cab0c`).**
 `assets/partners/` guarda las marcas de terceros del deck Salesforce aprobado, **selladas aparte** en
@@ -1098,6 +1118,8 @@ inválidos).
 | `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
 | `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
 | `pnpm glitch:tokens [--check]` (`scripts/glitch/compile-tokens.ts`; sólo Glitch) | compila `glitchLine` a `catalogs/glitch/glitch-tokens.{css,json}` (desde 0.3.24 con `editions`), escribe la estela del Flash `assets/flash-trail.svg` y las variables `--gx-flash-trail-*`; `--check` falla si hay drift. **Se corre junto a `pnpm brand:tokens` en todo bump de `axis-tokens`** (detalle en [glitch.md](glitch.md) §9.1) |
+| `pnpm manzanitas:tokens [--check]` (`scripts/manzanitas/compile-tokens.ts`; sólo Marketing con Manzanitas) | compila `manzanitasRegister` y sus assets precoloreados por línea; su JSON sella las versiones de `axis-tokens`, `axis-brand-assets`, `axis-graphic-line` y `axis-ui-contracts`: **se corre en todo bump de cualquiera de los cuatro** |
+| `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` | re-sella los recursos del PDF del AI Visibility Report en `public/branding/pdf/` (lockups, motores, redes, glifos) y su `ai-visibility-assets.manifest.json` desde los paquetes instalados; sólo cambian los archivos cuya fuente cambió; **se corre en todo bump de `axis-brand-assets`** (guarda: `report-pdf-assets.test.ts`) |
 | `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 66 frames (desde TASK-1928; 32 tras TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`; altas declaradas en `BASELINE_DELTAS.md`: (b)–(e) de TASK-1927, (f) y (h)…(n) de TASK-1928; la (g) es Glitch; estas letras no son las del ADR de AXIS) |
 | `pnpm brand:deck-recipes [-- --check]` | reescribe (o verifica) el índice del README del catálogo de recetas del deck, con la columna «Plantilla» leída de `graphic-line-deck/registry.json`, **y** el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (TASK-1929; recetas + intents de ejemplo de `recipe-map.json`). Córrelo siempre tras editar `EFEONCE_DECK_SLIDE_RECIPES_V1.json`: `--check` falla si el README **o** el catálogo difieren, y el test `catalog-drift` lo corre en CI |
 | `pnpm brand:deck-plan -- --plan <plan.json>` · `-- --propose --context <context.json> [--out <plan.json>]` (`scripts/brand-surfaces/deck-plan.ts`, TASK-1929) | valida el plan de un deck (ids de receta en orden) con `validateDeckPlan` (exit 1 si hay error, 2 si no se lee la entrada) o pide al agente que lo proponga (`proposeDeckPlan`, `server-only`: sólo ids del enum del documento, un reintento, fail-closed; imprime tokens y costo estimado). Local: `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` y `GCP_PROJECT=efeonce-group` con ADC si `.env.local` no las trae. Códigos y arreglos: skill `deck-studio` §«Plan del deck» |
@@ -1289,7 +1311,7 @@ para agentes. A diferencia de Insights, sí hay contrato (§7.10); el renderer d
 
 | Función (`/icons`) | Qué hace |
 | --- | --- |
-| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **86** desde 0.9.0 (37 Trazo + 49 Plastilina: la Plastilina `mano` de D29, con su volumen en `axis-brand-assets` 0.3.6); 85 en 0.8.0 (el Trazo `swipe` de D28); 84 en 0.7.0 (las 5 Plastilina de Glitch, D27); **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
+| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **109** en 0.17.0 (60 Trazo + 49 Plastilina). Historia: **86** desde 0.9.0 (37 Trazo + 49 Plastilina: la Plastilina `mano` de D29, con su volumen en `axis-brand-assets` 0.3.6); 85 en 0.8.0 (el Trazo `swipe` de D28); 84 en 0.7.0 (las 5 Plastilina de Glitch, D27); **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
 | `resolveIcon(req)` / `iconSvg(req)` | SVG con las reglas; errores `IconRequestError` (`unknown-glyph`, `plastilina-below-min`, `gesture-not-drawn`, `gesture-only-plastilina`, `unknown-line`); aviso `response-below-min` |
 | `auditIconGroup(items, { pieceHasSphere })` | issues `mixed-voices`, `more-than-one-response`, `response-with-piece-sphere`, `more-than-one-gesture`, `gesture-not-protagonist` |
 | `skewedOrbitHeroSvg(input)` | Plastilina protagonista dentro de su órbita sesgada (objeto en reposo) |
@@ -1303,3 +1325,281 @@ con url, use, method, review, prompt). Los PNG del volumen están en `@efeoncepr
 --size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>`; prompt canónico AXIS
 `docs/agent-composition/iconography/volume-prompt.txt`.
 
+
+## Colecciones AEO, SEO y Autoridad — 2026-10-04
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04. APIs publicadas en `axis-graphic-line` 0.17.0:
+
+| Subpath | Exports | Entradas y estado | Exportación |
+| --- | --- | --- | --- |
+| `/icons/aeo` | `AEO_ICON_COLLECTION`, `AEO_STROKE_GLYPHS`, `resolveAeoIcon` | 19: 18 canónicas + Brand Authority candidata | 76 SVG |
+| `/icons/seo` | `SEO_ICON_COLLECTION`, `SEO_STROKE_CANDIDATES`, `resolveSeoIcon` | 37: 12 canónicas + 25 candidatas | 148 SVG |
+| `/icons/authority` | `AUTHORITY_ICON_COLLECTION`, `AUTHORITY_STROKE_CANDIDATES`, `resolveAuthorityIcon` | 13 candidatas | 52 SVG |
+
+`ICON_CATALOG` contiene 109 aprobados (60 Trazo + 49 Plastilina). El catálogo principal del Lab
+reúne esos 109 y 25 candidatos únicos: **134**, con estado y colecciones explícitos; comparte inventario
+con la búsqueda y `/references/iconography.json`. No cambia el canon por aparecer en la galería.
+Brand Authority comparte geometría y estado en las tres colecciones. Guías: [AEO](aeo-icons.md),
+[SEO](seo-icons.md), [Autoridad](authority-icons.md).
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+
+## 2026-10-04 — Catálogo de logotipos del ecosistema (Lab publicado; package release pendiente)
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04. Catálogo incorporado a `main` en `617ee02`.
+
+La entrada es **Marca → Logotipos**, `/references/logos/`; su proyección para agentes es
+`/references/logos.json` (`axis.logos.v1`). La fuente portable es `@efeoncepro/axis-brand-assets/logos`:
+`AXIS_LOGO_FAMILIES`, `AXIS_LOGO_ASSETS`, `findLogoAsset`, `logoAssetUrl`. En la colección propia, 14 familias y 99 archivos,
+incluidos Wave, Globe, Reach, Insights, Marketing Studio, SEO/AEO, Greenhouse, AXIS, Glitch y Manzanitas.
+Se migraron 13 SVG oficiales de AXIS/Greenhouse byte por byte; su procedencia y hash están en el paquete.
+La búsqueda global añade tipo `logo`, ID exacto y enlace al archivo dentro del catálogo.
+El subpath y los archivos nuevos aún requieren publicación; el número 0.4.18 no prueba su disponibilidad remota.
+Canon de la decisión: AXIS `docs/architecture/LOGO_CATALOG_DECISION_V1.md`.
+
+
+### Ampliación del catálogo a terceros — 2026-10-04
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04.
+`/logos` ahora proyecta 223 archivos de 52 marcas: 99 propios y 124 de terceros. Colección, Familia y
+búsqueda separan identidades propias, herramientas, plataformas y partners. La biblioteca histórica se
+concilió: 96 archivos migrados byte por byte, 3 reutilizados, Gemini azul defectuoso excluido a favor de
+`gemini-isotype-color`. SVG y cuatro PNG conservan su formato. Terceros declaran scope, procedencia y uso;
+partners conservan autorización y claim. `AXIS_LOGO_EXCLUSIONS` es información del paquete, no proyección
+pública de clientes. Clientes sólo-packages, HubSpot Gold interno y Claudeforce pendiente no se sirven.
+Nuevo seal `scripts/seal-tool-logos.mjs`, invocado por `seal`. Código en `main` y Lab público; export `/logos` y archivos nuevos pendientes de una nueva publicación instalable. El paquete sigue declarando 0.4.18; no asumir que el tarball publicado de esa versión contiene el catálogo.
+
+## Descubrimiento y composición por agentes — 2026-10-04
+
+Entrada `/agents/`; manifest `/agents/capabilities.json` generado desde el registry (52 capacidades
+en este corte). Leer recurso, contrato, lifecycle, adapter y paquete requerido antes de componer;
+seguir sus comandos y ejemplos en `docs/agent-composition/`. La búsqueda visual del Lab y su JSON
+ayudan a encontrar el recurso; los packages poseen valores, archivos y funciones portables.
+Un preview no demuestra que exista un adapter en el consumidor. Una versión workspace no prueba
+publicación: resolver la versión instalable mediante el runbook de consumo privado.
+Tipografía y componentes propios del Lab: [lab-components.md](lab-components.md).
+
+## Botones portables: axis-ui-primitives (2026-10-04)
+
+Versiones del release inicial: tokens 0.3.43, contracts/registry 0.4.0, primitives 0.1.0.
+Release inicial v0.3.43 e instalación desde GitHub Packages verificados (run 37221054045). Contrato `efeonce.button` 1.0.0 candidate.
+`axisButton` posee radio, paletas, líneas, tamaños, loader orbital y movimiento de flecha.
+`resolveButton`, `buttonOptions`, `buttonHtml`, `buttonAttributes`, `buttonPreviewHtml`,
+`buttonCss`, `ButtonValidationError`, `validateButtonMenu`, `validateButtonGroupLabel` están
+en la entrada portable de primitives; CSS en `/button.css`. `/react` exporta Button, ButtonGroup,
+ToggleButton, MenuButton, SplitButton; React y React DOM 18+ son peers opcionales sólo allí.
+
+`line` deriva sus seis claves del canon, sólo afecta tone brand. `arrowMotion: none | nudge`
+exige flecha final. Carga orbital conserva label y ancho. MenuButton admite acciones planas con
+id único, label, icon, disabled y tone; errores `MENU_ITEMS_REQUIRED`, `MENU_ITEM_ID`,
+`GROUP_LABEL_REQUIRED`. Catálogo y API completos en AXIS `packages/primitives/README.md`.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+Corte anterior de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
+Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.
+
+
+`/react` suma ButtonProvider, RadioButtonGroup y ButtonToolbar. Se elige la semántica por intención:
+group = Tab normal; toolbar = acciones con flechas; radiogroup = una elección; toggle = acción binaria.
+El contexto hereda line/tone/size/surface, pero cada prop explícito gana. No duplicar paletas por control.
+MenuButton agrega open/defaultOpen/onOpenChange/portalContainer y reconcilia opciones por ID estable;
+SplitButton reenvía ref/atributos al primario y configura por separado su menú. API en el README del
+package; matriz y limitaciones de accesibilidad en AXIS `docs/quality/buttons.md`.
+
+Corte de distribución anterior verificado: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación en AXIS `3299032`, tokens **0.5.0**; estado de distribución en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04):
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins ni adopción automática en Greenhouse.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### Destino de adopción Greenhouse — 2026-10-04
+
+El operador confirma que Greenhouse migrará eventualmente a los colores de La órbita.
+Las rampas heredadas son compatibilidad de transición, no una identidad paralela permanente.
+`axisColorSystem.adoption.greenhouse` declara el destino como `planned`; el mapeo de roles y el
+rollout siguen pendientes. La futura implementación debe mapear superficie, texto, borde, acción,
+foco y estados mediante un adapter semántico del theme sobre los tokens del package, preservando
+Vuexy y validando claro/oscuro y estados reales. El resolver de composición de marca no es todavía
+un theme completo de producto. Esta dirección no inicia la migración ni cambia pins de Greenhouse.
+
+
+### Botones, chips y badges conectados a La órbita — 2026-10-04
+
+Implementación AXIS: `axisButton` consume `axisColorSystem`/`axisOrbitRamp`, con roles de reposo,
+hover, presionado, foco y deshabilitado. La carga conserva la paleta normal. `default` usa Growth;
+neutral/peligro conservan función. El acento 500 es identidad; si no permite texto pequeño AA, se
+selecciona un tono de la rampa para el fondo del componente (Growth claro: teal vivo del ancla oscura, texto oscuro y borde teal profundo; corrección visual del operador), sin cambiar la marca.
+HTML/React/Lab usan el mismo CSS. Incluidos en tokens 0.5.0 y primitives 0.4.0;
+Greenhouse no cambia pins ni theme. Dueño: AXIS `docs/architecture/BUTTON_ORBIT_COLOR_DECISION_V1.md`.
+
+Chips y badges están **implementados en packages y proyectados en el Lab**:
+`Badge`, `CountBadge`, `Chip`, `FilterChip`, `ChoiceChipGroup`, `ActionChip` y `RemovableChip`;
+HTML/CSS sin framework y React opcional en primitives 0.4.0. Tokens 0.5.0 (`axisCompact`, `axisChip`,
+`axisBadge`), contracts 0.6.0 y registry 0.7.2. `efeonce.chip` y `efeonce.badge` 1.0.0
+candidate; chip 0.1.1 se sustituye por API discriminada, sin animaciones implícitas.
+El Lab consume los mismos exports en `/patterns/efeonce.chip/`, `/patterns/efeonce.badge/` y
+`/docs/chips-badges/`. Fuentes: AXIS `packages/primitives/README.md`,
+`docs/architecture/CHIPS_BADGES_PRIMITIVES_PLAN_V1.md` y `docs/quality/compact.md`.
+Badges informan; filtros y choices son campos nativos; action/removable tienen acciones explícitas.
+El producto posee lógica, operaciones asíncronas y foco al quitar. Soft por defecto;
+outline sólo donde el borde aporta jerarquía. No migrar pins de Greenhouse por un push de fuente.
+
+
+## Distribución de primitives y formularios — 2026-10-04
+
+Fuente `axis-design-system@df2de61`; **`v0.7.2` publicado y verificado**.
+[Release `37239150937`](https://github.com/efeoncepro/axis-design-system/actions/runs/37239150937)
+finalizó `success`; registry remoto e instalaciones privadas limpias confirman las versiones.
+El intento `v0.7.0` (run `37238026404`) se detuvo antes de publicar por overflow de un chip
+removible a 400% en WebKit móvil/Linux. El intento `v0.7.1` se canceló antes de publicar por timeouts de matrices de QA. La fuente
+`df2de61` separa esas pruebas por contexto/ruta sin ampliar timeout ni reducir cobertura.
+La verificación de `v0.7.2` superó esos intentos; un tag o versión en package.json por sí solo no
+acredita instalación remota. Versiones
+de esta entrega: `axis-tokens` **0.5.0**, `axis-ui-contracts` **0.6.0**, `axis-ui-primitives` **0.4.0**
+y `axis-ui-registry` **0.7.2**. Este corte incluye colores/rampas, botones y compactos descritos arriba,
+y diez contratos candidate de formularios. No confundir el número del tag con la versión de cada paquete.
+Instalación verificada: HTML/CSS sin React, SSR con React 18.3.1 y 19.2.7, diez builders,
+`forms.css`, 52 capacidades y subpath `/evidence`. La CI general `37239148653` también finalizó success,
+verificada por separado del workflow de publicación.
+
+`axisForms` posee geometría, paletas, foco y menús. La API canónica vive en
+[README de primitives](https://github.com/efeoncepro/axis-design-system/blob/main/packages/primitives/README.md)
+y [ADR de formularios](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/FORM_PRIMITIVES_DECISION_V1.md).
+Usar `/forms.css` una vez y `/react` para Field, Input, Textarea, Checkbox, RadioGroup, Switch,
+CheckboxGroup, Select, Combobox y NumberField. FormProvider hereda contexto; Field compuesto,
+SearchField, PasswordField, NativeSelect y FormErrorSummary resuelven composición y ayudas.
+La entrada raíz conserva HTML portable; Combobox requiere React.
+
+Select en React añade opciones con descripción/check y teclado; conserva un select nativo para
+validación, FormData y refs, y fallback de servidor/sin JS. `NativeSelect` y `selectHtml` mantienen
+el picker del sistema. Select y Combobox comparten menú tokenizado; no reconstruirlo en cada producto.
+`axisForms.inputFocusOffset` y el CSS del wrapper evitan doble foco; `leadingIcon="mail"` o
+`leadingIcon="folder"` usan íconos funcionales accesibles como decoración, no como sustitutos del label.
+La lógica de guardado, permisos, errores del servidor y reset controlado pertenece al consumidor.
+
+QA y pendientes: [matriz forms](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/forms.md).
+Greenhouse conserva sus pins: adopción y migración del theme siguen separadas de esta distribución.
+Este release no incluye un nuevo `axis-brand-assets`; el catálogo `/logos` sigue necesitando publicación propia.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Agendador nativo — candidato local, 2026-10-05
+
+Token `axisScheduler` en `axis-tokens`; tipos `SchedulerModel`/`SchedulerAction` y helpers
+`validateSchedulerModel`/`schedulerMonthDates` en contracts. Subpath
+`@efeoncepro/axis-ui-primitives/scheduler`: `createScheduler`, `resolveSchedulerRecipe` y los helpers
+reexportados. CSS `/scheduler.css` junto con `/forms.css` y `/button.css`. Cargar Bricolage/Poppins en el host.
+`createScheduler(host, snapshot, onAction)` devuelve `update(snapshot)` y `destroy()`.
+
+No hay red, reserva ni medición en AXIS; el consumidor entrega snapshots y recibe acciones. El estado
+`confirmed` exige comprobante propio; `ambiguous` no ofrece retry. Disponibilidad por ID de slot y fecha
+civil en zona IANA; confirmación nunca inferida de la selección. Capacidad `compose-scheduler`, Lab
+`/references/scheduler/`. Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
+Exports nuevos **sin publicar**, no incluidos por inferencia en primitives 0.5.0.
+
+
+## Growth CTA portable — aprobado visualmente, exports locales 2026-10-05
+
+`axisGrowthCta` deriva paletas de Forms/Growth, tipografía de La órbita y motion de AXIS.
+`GrowthCtaModel`, `validateGrowthCta`, `safeGrowthCtaUrl` y `resolveGrowthCtaAppearance` viven en
+contracts; `createGrowthCta` y `growth-cta.css` en el subpath `axis-ui-primitives/growth-cta`.
+DOM nativo; Lab React sólo para configuradores. El adapter monta Forms/Meetings con AbortSignal y
+disposer; el renderer conserva borrador, usa dialog nativo para la tarea de agenda, anchors reales
+para navegación y destruye recursos por instancia. No consulta APIs ni mide conversiones.
+`compose-growth-cta` es la entrada de registry; exports unreleased. Publicación e integración del
+renderer compartido `<greenhouse-cta>` preceden cualquier afirmación de adopción en sitio público/Think.
+Verificado contra: axis-design-system@eeb24e2 + candidato local — 2026-10-05. Guía de consumo y
+límites en `packages/primitives/README.md` y `docs/quality/growth-cta.md` de AXIS.
+
+
+Revisión Growth CTA (2026-10-05): `GrowthCtaModel.meetingPresentation` admite `dialog` (default)
+e `inline`; ambos montan el adapter de Meetings y conservan selección. `axisGrowthCta` posee ancho
+de panel/integrado, composición tipográfica, marco fino y opacidad de backdrop. Minimal sin caja
+ni sombra, cierre icon-only accesible y modal con calendario hasta el borde. La revisión final
+fue aprobada por el operador el 2026-10-05; la distribución sigue pendiente.
+Verificado contra: axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+Growth CTA, revisión de marcas (2026-10-05): `content.headlineMarks: 'ring-and-sphere'` es opt-in
+para la variante de titular preservado solicitada por el operador. `axisGrowthCta.eyebrowRing`
+centraliza la geometría del anillo, ubicado exclusivamente en el eyebrow superior; `answerHtml` de
+`axis-graphic-line` calcula la esfera y su espacio óptico. La última palabra y esfera quedan juntas.
+Primitives declara la dependencia de graphic-line; no se reimplementa su cálculo. El header funcional
+de agenda expandida omite ambas marcas. Posición aprobada el 2026-10-05; no modifica la receta
+general de voz ni la pregunta del CTA por inferencia.
+Verificado contra: axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+Growth CTA banners (2026-10-05): las recetas se consumen con `placement: 'inline_banner'` y
+`styleVariant: 'minimal' | 'spotlight'`. Proporciones en `axisGrowthCta.banner`, render nativo de
+primitives y comparación en `/references/growth-cta/#banners`. Comparten adapters de formulario
+y agenda modal/inferior; no duplican campañas ni lógica Growth. Recetas aprobadas visualmente
+el 2026-10-05, aún no distribuidas ni adoptadas.
+
+
+Growth CTA (2026-10-05): `content.headlineEmphasis` es una frase exacta y única dentro de
+`headline`, validada por contracts. Primitives conserva texto plano, strong semántico, anillo arriba
+y última palabra inseparable de la esfera. `axisGrowthCta.headlineLeadWeight` /
+`headlineEmphasisWeight` poseen 400/700. Sin énfasis explícito se conserva el peso anterior.
+
+
+Aprobación final del operador 2026-10-05: «Aprobado todo». La revisión aprobada está en source
+local sobre AXIS `3c8a6dd`; `createGrowthCta` y CSS siguen unreleased en el inventario de
+availability. No se deduce disponibilidad del nuevo subpath desde primitives 0.5.0. Antes de
+adoptar: release del set compatible, instalación limpia con export/CSS/dependencia graphic-line,
+adapter de Growth y prueba en cada host. QA vigente: AXIS `docs/quality/growth-cta.md`.
+
+
+## Video player — publicado 2026-10-07
+
+`axisVideoPlayer`, contrato `efeonce.video-player` 0.5.0 candidate y entradas `/video-player`,
+`/video-player.css`, `/video-player/react`, `/video-player/integrations`. Distribución publicada:
+primitives 0.6.5 / tokens 0.6.0 / contracts 0.7.0; Media Chrome 4.19.3 en el adapter browser.
+SSR y tokens permanecen portables; el consumidor importa CSS y no copia componentes del Lab.
+[API, evidencia, adopción Think y límites abiertos](video-player.md). Registry 0.7.2 mantiene
+inventario histórico, no acredita descubrimiento de estos exports.
+
+Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.

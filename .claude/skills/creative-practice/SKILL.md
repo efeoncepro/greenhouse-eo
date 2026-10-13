@@ -16,6 +16,41 @@ description: >-
 
 # Creative Practice — el negocio, no el oficio
 
+## Efeonce Factory — vía On-Demand 2026-10-05
+
+Factory es una vía transversal On-Demand; Creative Services aporta contenido, diseño y audiovisual.
+Campaña puntual y kit comercial son ejemplos opcionales; empaquetar por oportunidad y vender en paralelo.
+Cargar la [decisión](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
+el [modelo económico](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) y las
+[fichas](../../../docs/services/factory/README.md). Creative Services conserva oficio, alcance y accountability;
+costear dirección, preventa, coordinación y QA junto con producción. La OT referencia el compromiso comercial;
+capacidad, derechos, revisiones, precio y cobro se fijan por encargo. No supone operación continua de redes,
+disponibilidad de Globe ni cambios runtime.
+
+## Collateral vigente — brochure «Agencia Creativa» 2026-10-06
+
+El brochure aprobado de la línea es **«Agencia Creativa»** (27 láminas, 16:9; PDF en OneDrive
+`Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`, canvas privado
+<https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs>). La v1 «Servicios Creativos» (15 láminas) **no es vigente**: no
+se manda. Recorre mapa de rutas → un capítulo por ruta → seis capacidades → quién trabaja → cómo se compra → prueba
+(caso SKY) → plan. Ficha y pendientes: [README de Creative Services](../../../docs/services/creative-services/README.md#collateral-comercial);
+armado y lecciones: `deck-studio`. **Antes de llevarlo a un prospecto**, verificar si las cifras y el testimonio del
+caso SKY requieren autorización del cliente (pendiente abierto).
+
+**Cuando el comprador pide «staff augmentation»** (decisión del operador, 2026-10-06): no se le corrige la palabra ni
+se le venden perfiles sueltos. Se responde con la **lámina 19**, «Tu equipo, con talento de Efeonce adentro.»: talento
+creativo embebido con respaldo de Efeonce. Su palabra va **sólo en el eyebrow** («Talento embebido · Staff
+augmentation»).
+
+- **Tres modalidades** = las tres configuraciones del [Embedded Creative Pod](../../../docs/services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md) §4:
+  **Remoto** (con tus herramientas) · **Embebido** (en tu oficina) · **Co-operado** (adentro y en estudio).
+- **Cuatro diferencias:** **reemplazo sin vacío** · **calidad gobernada** · **un fee mensual** (sueldos, cargas,
+  licencias y equipo por cuenta de Efeonce: Fully Managed Creative Capacity, §9) · **tú diriges** (el cliente conserva
+  prioridad, contexto, aprobación y autoridad de marca; la dirección cotidiana del pod y la entrega siguen en Efeonce).
+- 🔴 **No abre Staff Augmentation puro** (perfiles bajo dirección del cliente, sin responsabilidad de entrega de
+  Efeonce): el brochure no lo promete. Se pricea como capacidad + gobierno + integración, nunca al rate de staff aug
+  (Embedded Pod §10).
+
 ## Dirección estratégica de marca y escala — 2026-10-03
 
 Leer la [decisión de marca y ejecución escalable](../../../docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
@@ -275,6 +310,9 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 3. 🔴 **NUNCA publiques un precio unitario por pieza.** *(Ni "por post", ni "por artículo", ni "por spot".)*
    🎯 **Es entregarle al cliente la calculadora para comoditizarte.** *(Ya lo hicimos en la oferta original del blog de SKY:
    "artículo adicional CLP 260.000". Lo adjudicado el 2026-09-23 ya va sin precio unitario, pero la cifra se vio.)*
+   Si el comprador exige «propuesta económica desglosada», el desglose va **por componente de valor** (evolución de
+   la línea gráfica → conceptualización y pieza madre → entregables agrupados), no por pieza; y no se le agrega un
+   tarifario de extras que no pidió. → `modules/04_PRICING.md` §7 (b.1) · `modules/10_PITCH.md` §5.1.
 4. 🔴 **NUNCA el ad-hoc más barato que el marginal del plan.** Rompe la planificación y consume coordinación:
    **tiene que costar MÁS.** *(Hoy hacemos lo contrario.)* → `ANTIPATTERNS.md` 🩸
 5. 🔴 **NUNCA cierres bajo el 45% de margen bruto.** **Piso aprobado por el dueño (2026-07-13).**
@@ -437,3 +475,37 @@ mensual integral por una capacity envelope definida y se despreocupa de esa comp
 No vender “llave en mano” como unlimited. Declarar lanes, capacidad, simultaneidad, rounds, derechos, exclusiones,
 escalamiento y pass-through. El modelo aplica en todos los países donde Efeonce opera, con payroll, impuestos, FX,
 privacidad, derechos laborales, proveedores, seguros y procurement parametrizados por jurisdicción.
+
+## Costeo creativo por el prototipo Cotizador V3
+
+Para simulación local sin UI de roles o servicios con Adobe/IA/plataforma, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+El kernel V3 opt-in complementa investigación/costeo; emisión y autoridad continúan en el cotizador canónico.
+Adobe son dos productos en CLP con IVA (decisión del CEO), tres licencias cada uno y contrato de doce meses pagado al
+mes: Creative Cloud Pro para diseño (incluye Express) y Adobe Express para perfiles de contenido; el 50% de descuento
+de Creative Cloud Pro termina pronto y, por decisión del CEO (2026-10-11), se cotiza desde ya sin él; el importe
+facturado sólo si el CEO lo elige para un encargo corto. El contrato renueva el 2026-11-16. No reducir
+seats nominativos por FTE. Higgsfield/Magnific/ChatGPT/Claude se eligen por necesidad; créditos por proveedor/mes y
+packs/caja/validez separados, nunca equivalencia automática con Studio Credits o piezas. Notion/M365 son base;
+GCP/Vercel se atribuyen desde capacidad declarada, dejando interno/sin asignar visibles.
+
+`managed_service` conserva funciones de diseño/dirección/cuenta como costos internos y preview agrega fee;
+no cambia la política de vender capacidad/lane ni SOW/rights/QA. **`compose assess` juzga cada línea contra el objetivo y el piso de su
+propia oferta (aquí 45%/45%); ya no compara contra un 40/35 genérico.** `assess` sólo reporta gaps, nunca aprueba excepción.
+Una excepción bajo el piso la decide sólo el CEO, caso a caso: SKY social care 2027 es una y nunca sirve
+de referencia para otra cuenta; donde se puede ganar más se sube el objetivo de esa oferta, no el piso.
+Staff augmentation (una persona vendida por dedicación, oferta `talent-assurance-staffing`) tiene su propio piso de
+25% (CEO, 2026-10-11): es otro producto y nunca se elige para bajar el piso de un servicio creativo gestionado.
+La oferta V3 de esta práctica es `creative-managed-service` (objetivo y piso 45%); un programa SEO/AEO gestionado
+usa la suya, `seo-aeo-managed-service` (objetivo 55%, piso 45%). On-Demand es una forma de compromiso que se declara
+en la cotización (+10% sobre On-Going, mismo piso), no una oferta; eso y la puesta en marcha: `modules/04_PRICING.md` §7.
+Desde el contrato 1.4.0 (2026-10-11) V3 lleva los terceros refacturados de un encargo (producción, talento e impresión
++10% con piso 5%; medios y licencias al costo) y, en un servicio gestionado On-Demand, una reserva de contingencia de
+12% del costo de personas; con terceros el 45% se compara contra el margen del trabajo propio, nunca contra el mezclado
+(`modules/04_PRICING.md` §4 y §7b).
+El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no
+la nómina actual: el margen real en personas hoy es mayor que el que muestra V3; no proponer «conectar nómina real»
+ni escribir el pago de una persona. El resumen trae `estimateExposure` (qué insumo estimado carga más costo:
+confirma ése primero); el precio unitario de una herramienta no vence y los seats se declaran por cotización.
+No presentar simulación o costo histórico como tarifa vigente/entrega garantizada. Explain/replay internos y
+preview redactado son estados distintos de quote emitida. Aprobación/ejecución/publicación conservan sus gates.

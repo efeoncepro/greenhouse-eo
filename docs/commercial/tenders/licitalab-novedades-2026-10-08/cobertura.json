@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "verified_at_chile": "2026-10-08T18:38:33-03:00",
+  "source": "LicitaLAB publico, API y UI; Mercado Publico; HubSpot lectura",
+  "status": "radar_only",
+  "portal_hubspot": "48713323",
+  "scope": {
+    "all_view_pages": 10,
+    "all_view_unique": 195,
+    "free_searches": [
+      {
+        "term": "CRM",
+        "pages": 1,
+        "unique_ids": 6
+      },
+      {
+        "term": "HubSpot",
+        "pages": 1,
+        "unique_ids": 0
+      },
+      {
+        "term": "Zoho",
+        "pages": 1,
+        "unique_ids": 0
+      },
+      {
+        "term": "Claude",
+        "pages": 1,
+        "unique_ids": 7
+      },
+      {
+        "term": "OpenAI",
+        "pages": 1,
+        "unique_ids": 2
+      },
+      {
+        "term": "ChatGPT",
+        "pages": 1,
+        "unique_ids": 5
+      },
+      {
+        "term": "WordPress",
+        "pages": 1,
+        "unique_ids": 1
+      },
+      {
+        "term": "sitio web",
+        "pages": 5,
+        "unique_ids": 90
+      },
+      {
+        "term": "SEO",
+        "pages": 1,
+        "unique_ids": 1
+      }
+    ],
+    "free_unique": 107,
+    "union_unique": 280
+  },
+  "dedup": {
+    "prior_review_ids": 2860,
+    "operational_register_ids": 45,
+    "live_crm_deals_with_tender_id": 178,
+    "crm_read_at": "2026-10-08T21:21:55.698Z"
+  },
+  "results": {
+    "absent_all_three_sets": 91,
+    "published_2026_10_08": 84,
+    "older": 7,
+    "api_detail_read": 91,
+    "official_ui_verified": [
+      "1260-17-LP26",
+      "564162-139-LE26",
+      "4629-31-LE26",
+      "2585-125-LE26",
+      "707420-70-COT26",
+      "1591-138-COT26",
+      "94-37-COT26"
+    ]
+  },
+  "limitations": [
+    "Perfil y nueve búsquedas, no universo completo de Mercado Público",
+    "CRM filtrado por id_de_licitacion informado",
+    "RAG dirigido por fragmentos, no lectura integral de todas las bases",
+    "No calificación GO ni costeo/canal/capacidad confirmados",
+    "Cierres de Compra Ágil de primer llamado"
+  ],
+  "external_writes": [],
+  "evidence_sha256": {
+    "docs/commercial/tenders/licitalab-deep-review-2026-10-07/matriz-universo.csv": "1c37f3261fc0382d6ca67e96591bf25f37dd0e3c054ab67b54a0eb7775a359d6",
+    "docs/commercial/tenders/LICITATION_CRM_REGISTER.md": "cb6fea9654aab4a6f1a7a261a65cbe6189f5c464713d056380e57d54711ecb8a",
+    ".auth/licitalab-radar-reports/novedades-all-complete-20261008.json": "5190fa3738015c5fd153fc4bc4ec518319ed4803a505ee31d2fffc01e2643b2b",
+    ".auth/licitalab-radar-reports/novedades-free-20261008.json": "1d781c5e1e942068ed8a6c8e61f7fc4d6ff7630df433ca4b3d78498630ee0816",
+    ".auth/licitalab-radar-reports/novedades-20261008-crm.json": "2303f89c6bbbccf25b98f4bfb32540d6bf28b4ac2888b17ec0cce50037f78408",
+    ".auth/licitalab-radar-reports/novedades-verified-details.json": "46e5040235e086c8b4fb6b402dd6f632c26e83c0c6360fb2606ae93a28b2ed0a"
+  },
+  "output_csv_sha256": "c415cb88c028f92570387b0fb1b37afb12e6fdc43c515ec91e5f26470a81e13e"
+}

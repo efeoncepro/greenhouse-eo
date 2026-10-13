@@ -1,0 +1,42 @@
+{
+  "id": "CT3-ugc-cocina",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (staged, cinematic high-impact editorial photograph, a real small modern apartment kitchen at night, dark): Isabella, wearing the ROYAL-BLUE EFEONCE HOODIE, sits casually at the far RIGHT end of the kitchen counter, framed from the waist up; her left shoulder is at about 64 % of the frame width and her body stays between 62 % and 80 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. A modern smartphone on a tiny tripod stands on the counter at about 84 % of the frame width, at the frame-right of her, recording her; the phone shows us its back and its screen adds no light. THE MOMENT: she laughs mid-sentence and looks down-right into the phone, wide bright smile, completely natural, filming a short home video. Her own live video is PROJECTED huge on the kitchen wall between 82 % and 100 % of the frame width, along the frame-right edge as one tall vertical 9:16 frame of cool white-azure light, much larger than her, as if her small homemade video had become a billboard: it shows her same laughing moment, soft and slightly out of focus, with a fine glowing edge. That projection is the only key light of the scene and lights her side-on. Appliances and shelves stay in deep shadow. Everything lit stays inside the RIGHT 45% of the frame. The LEFT 55% is calm, deep dark, empty kitchen space with no plants, no shelves lit and no objects catching light. No warm light, no tungsten, no logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the dark matte kitchen counter edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "llave": {
+    "fuente": "the huge vertical projection of her own video on the kitchen wall along the frame-right edge",
+    "lado": "to the frame-right of her face, side-on, at head height",
+    "distancia": "about 1.2 m from her face"
+  },
+  "fondo": "the dark kitchen shelves far behind, with two or three cold small bokeh points",
+  "fenomeno": {
+    "que": "a homemade vertical video grows into a billboard of light beside its creator",
+    "esServicio": "UGC y creadores: el contenido de personas reales escala a tus canales y anuncios"
+  },
+  "excepcion": "Operador 2026-10-09: elenco sin línea fija y con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)"
+}

@@ -317,3 +317,14 @@ Post-cutover guardrails:
 - no mover mapping HubSpot ni consent policy a WordPress;
 - no volver al bridge HTML salvo rollback explicito usando el backup meta;
 - antes de declarar cambios futuros en este form, correr `pnpm public-website:verify-aeo-live-contract` y confirmar `heroans` estable.
+
+## AXIS: formato de entrada optativo (2026-10-04)
+
+El renderer admite un `inputBehaviors` factory explícito para compartir formato de teléfono, correo,
+RUT y URL con AXIS. Adapter Greenhouse local, sin activación en embeds publicados ni cambio de pins;
+el source AXIS está en `main`, con primitives 0.5.0 todavía pendiente de publicación.
+El catálogo del selector Growth Forms conserva sus 18 países desde `CALLING_CODES`; la inyección de
+formato no lo sustituye por los 245 países y territorios del catálogo AXIS. Ampliarlo exige una
+adopción explícita y verificar selección/normalización/validación; no implica una nueva allowlist de negocio.
+Ownership, compatibilidad, prueba real del package y promoción:
+[GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md](GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).

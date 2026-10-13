@@ -611,7 +611,19 @@ export const mapEngagementToSelfServiceScenario = (
   const kind = deriveScenarioKind(engagement, latestSubmission, latestPayable, latestPayableReadiness)
   const readiness = READINESS_BY_KIND[kind]
   const copy = COPY_BY_KIND[kind]
-  const supportItems = buildSupportItems(engagement, invoiceAssets)
+
+  const supportItems = buildSupportItems(
+    engagement,
+    invoiceAssets.filter(
+      a =>
+        latestSubmission &&
+        a.contractorWorkSubmissionId === latestSubmission.contractorWorkSubmissionId &&
+        (latestSubmission.metadata.selfServicePeriodChanged !== true || ('servicePeriodStart' in a.metadata && 'servicePeriodEnd' in a.metadata)) &&
+        (!('servicePeriodStart' in a.metadata) ||
+          a.metadata.servicePeriodStart === latestSubmission.servicePeriodStart) &&
+        (!('servicePeriodEnd' in a.metadata) || a.metadata.servicePeriodEnd === latestSubmission.servicePeriodEnd)
+    )
+  )
 
   const servicePeriod = latestSubmission
     ? formatServicePeriod(latestSubmission.servicePeriodStart, latestSubmission.servicePeriodEnd, '—')
@@ -619,6 +631,9 @@ export const mapEngagementToSelfServiceScenario = (
 
   return {
     kind,
+    supportSubmissionId: latestSubmission?.contractorWorkSubmissionId ?? null,
+    requiresInvoice: engagement.requiresInvoice,
+    requiresWorkApproval: engagement.requiresWorkApproval,
     eyebrow: copy.eyebrow,
     title: copy.title,
     summary: copy.summary,

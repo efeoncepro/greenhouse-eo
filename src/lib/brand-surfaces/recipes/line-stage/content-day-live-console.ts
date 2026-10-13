@@ -128,7 +128,7 @@ export const contentDayLiveConsole: RecipeBuilder = ({ intent, manifest, recipe 
   }
 
   const r = c.review ?? {}
-  const icon = c.icon === undefined || c.icon === null ? null : productIcon(c.icon, 'El ícono de la consola (`console.icon`)')
+  const icon = c.icon === undefined || c.icon === null ? null : productIcon(c.icon, 'El ícono de la consola (`console.icon`)', line)
   const { stage, platform } = stageLayers(manifest, recipe, line, 'clv')
   const status = checksT.status
 

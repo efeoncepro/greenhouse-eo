@@ -1,0 +1,194 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-12",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_demand",
+    "accountId": "example-fixed-scope-project",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "build",
+        "profile": "ECG-012",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "hours_per_month",
+          "value": "72"
+        },
+        "dedicationEvidence": {
+          "reference": "example: hours estimated by the practice from the scope of the request",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "choices": []
+      },
+      {
+        "lineId": "design",
+        "profile": "ECG-017",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "hours_per_month",
+          "value": "36"
+        },
+        "dedicationEvidence": {
+          "reference": "example: hours estimated by the practice from the scope of the request",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "choices": []
+      },
+      {
+        "lineId": "lead",
+        "profile": "ECG-016",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "hours_per_month",
+          "value": "18"
+        },
+        "dedicationEvidence": {
+          "reference": "example: hours estimated by the practice from the scope of the request",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "agreed-price",
+        "kind": "agreed_total",
+        "amount": "2900000",
+        "lineIds": [
+          "build",
+          "design",
+          "lead"
+        ],
+        "reason": "Example: price of the whole project, set by the operator."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "example:iva-cl-19",
+      "source": {
+        "reference": "example: IVA 19 % declared for this example; not a tax ruling for any client",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    }
+  },
+  "work": [
+    {
+      "lineId": "build",
+      "assigneeIds": [
+        "planned-build-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "design",
+      "assigneeIds": [
+        "planned-design-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "lead",
+      "assigneeIds": [
+        "planned-lead-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.233333333333333333",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "0.7"
+      },
+      "reason": "Three named seats, one per person; this job carries 0.7 of 3, the declared dedication of the three people (126 of 180 hours each month).",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.233333333333333333",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "0.7"
+      },
+      "reason": "Three named seats, one per person; this job carries 0.7 of 3, the declared dedication of the three people (126 of 180 hours each month).",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "figma",
+      "priceId": "historical",
+      "quantity": "1",
+      "seatCapacity": 1,
+      "serviceShare": "0.2",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.2"
+      },
+      "reason": "One seat for the designer; this job carries the 0.2 of it that matches the declared dedication. Price chosen: the reference of the pricing history, because the current plan has no amount.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

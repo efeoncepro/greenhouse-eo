@@ -1,0 +1,466 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-B18-creditos-5",
+  "input": {
+    "artifactId": "hs-B18-creditos-5",
+    "slides": [
+      {
+        "slideId": "deck-decision-ai-market",
+        "contentType": "deck.decision-ai-market",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 132,
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 380,
+            "questionWidth": "--gl-am-question-width=470px",
+            "answerLeading": "--gl-am-answer-leading=0.9",
+            "answerTracking": "--gl-am-answer-tracking=-0.05em",
+            "answerInset": "--gl-am-answer-inset=-8px",
+            "answerShadowY": "--gl-am-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-am-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-am-answer-shadow-opacity=35%",
+            "answerShadowColor": "--gl-am-answer-shadow-color=#000000",
+            "perspective": "--gl-am-perspective=1800px",
+            "originX": "--gl-am-origin-x=1320px",
+            "originY": "--gl-am-origin-y=450px",
+            "radius": "--gl-am-radius=24px",
+            "angle": "--gl-am-angle=165deg",
+            "leadFillFrom": "--gl-am-lead-from-color=#135064",
+            "leadFillTo": "--gl-am-lead-to-color=#081c30",
+            "sideFillFrom": "--gl-am-side-from-color=#12344f",
+            "sideFillTo": "--gl-am-side-to-color=#081c30",
+            "leadPadY": "--gl-am-lead-pad-y=34px",
+            "leadPadX": "--gl-am-lead-pad-x=32px",
+            "sidePadY": "--gl-am-side-pad-y=28px",
+            "sidePadX": "--gl-am-side-pad-x=26px",
+            "leadBorder": "--gl-am-lead-border=2px",
+            "leadBorderColor": "--gl-am-lead-border-color=#72ded8",
+            "leadBorderOpacity": "--gl-am-lead-border-opacity=90%",
+            "sideBorder": "--gl-am-side-border=1px",
+            "sideBorderColor": "--gl-am-side-border-color=#ffffff",
+            "sideBorderOpacity": "--gl-am-side-border-opacity=16%",
+            "shadowY": "--gl-am-shadow-y=50px",
+            "shadowBlur": "--gl-am-shadow-blur=110px",
+            "shadowColor": "--gl-am-shadow-color=#000610",
+            "shadowOpacity": "--gl-am-shadow-opacity=70%",
+            "haloColor": "--gl-am-halo-color=#72ded8",
+            "leadGlowBlur": "--gl-am-lead-glow-blur=120px",
+            "leadGlowOpacity": "--gl-am-lead-glow-opacity=45%",
+            "sideGlowBlur": "--gl-am-side-glow-blur=40px",
+            "sideGlowOpacity": "--gl-am-side-glow-opacity=14%",
+            "reflectGap": "--gl-am-reflect-gap=14px",
+            "reflectFrom": "--gl-am-reflect-from=72%",
+            "reflectOpacity": "--gl-am-reflect-opacity=16%",
+            "valueLeadPx": "--gl-am-value-lead-px=150px",
+            "valuePx": "--gl-am-value-px=116px",
+            "valueLongPx": "--gl-am-value-long-px=76px",
+            "valueLeading": "--gl-am-value-leading=0.95",
+            "valueTracking": "--gl-am-value-tracking=-0.05em",
+            "valueLeadColor": "--gl-am-value-lead-color=#ffffff",
+            "valueColor": "--gl-am-value-color=#e6edf3",
+            "labelLeadPx": "--gl-am-label-lead-px=30px",
+            "labelPx": "--gl-am-label-px=26px",
+            "labelLeading": "--gl-am-label-leading=1.12",
+            "labelTracking": "--gl-am-label-tracking=-0.02em",
+            "labelGap": "--gl-am-label-gap=26px",
+            "detailLeadPx": "--gl-am-detail-lead-px=18px",
+            "detailPx": "--gl-am-detail-px=16px",
+            "detailWeight": "--gl-am-detail-weight=400",
+            "detailLeading": "--gl-am-detail-leading=1.5",
+            "detailGap": "--gl-am-detail-gap=14px",
+            "detailColor": "--gl-am-detail-color=#c9d6e2",
+            "footerPadTop": "--gl-am-footer-pad-top=18px",
+            "rule": "--gl-am-rule=1px",
+            "ruleColor": "--gl-am-rule-color=#ffffff",
+            "ruleOpacity": "--gl-am-rule-opacity=14%",
+            "yearPx": "--gl-am-year-px=15px",
+            "yearWeight": "--gl-am-year-weight=500",
+            "yearColor": "--gl-am-year-color=#e2e2e2",
+            "logoHeight": "--gl-am-logo-height=26px",
+            "wordmarkPx": "--gl-am-wordmark-px=22px",
+            "wordmarkWeight": "--gl-am-wordmark-weight=700",
+            "wordmarkTracking": "--gl-am-wordmark-tracking=-0.01em",
+            "wordmarkColor": "--gl-am-wordmark-color=#e6edf3",
+            "lumWidth": "--gl-lum-width=216px",
+            "lumBottom": "--gl-lum-bottom=51px"
+          },
+          "stage": {
+            "src": "asset-ref:layer:decision-ai-market-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:decision-ai-market-platform"
+          },
+          "voice": {
+            "question": "¿Se acumulan los créditos?",
+            "answer": "No",
+            "eyebrow": "HubSpot Credits"
+          },
+          "body": "Los créditos son la moneda de los agentes de HubSpot. Customer Agent usa <strong>50 por conversación resuelta</strong>; Prospecting Agent, 100 por lead.",
+          "figures": [
+            {
+              "role": "rest",
+              "size": "small",
+              "left": "--gl-am-left=840px",
+              "top": "--gl-am-top=250px",
+              "width": "--gl-am-width=300px",
+              "height": "--gl-am-height=540px",
+              "rotate": "--gl-am-rotate=16deg",
+              "z": "--gl-am-z=2",
+              "value": "US$0,01",
+              "label": "Cada crédito, en todos los planes.",
+              "detail": "Capacidad extra: USD 10 por cada 1.000 créditos.",
+              "year": "2026",
+              "logo": [
+                {
+                  "src": "asset-ref:file:hubspot-logotype",
+                  "alt": "HubSpot"
+                }
+              ]
+            },
+            {
+              "role": "lead",
+              "size": "large",
+              "left": "--gl-am-left=1135px",
+              "top": "--gl-am-top=190px",
+              "width": "--gl-am-width=370px",
+              "height": "--gl-am-height=600px",
+              "rotate": "--gl-am-rotate=0deg",
+              "z": "--gl-am-z=5",
+              "value": "0",
+              "label": "Créditos que pasan al mes siguiente.",
+              "detail": "Lo que no usas vence al cierre del período: por eso medimos el consumo de cada agente.",
+              "year": "2026",
+              "logo": [
+                {
+                  "src": "asset-ref:file:hubspot-logotype",
+                  "alt": "HubSpot"
+                }
+              ]
+            },
+            {
+              "role": "rest",
+              "size": "large",
+              "left": "--gl-am-left=1500px",
+              "top": "--gl-am-top=250px",
+              "width": "--gl-am-width=300px",
+              "height": "--gl-am-height=540px",
+              "rotate": "--gl-am-rotate=-16deg",
+              "z": "--gl-am-z=2",
+              "value": "5.000",
+              "label": "Cuatro Hubs Enterprise dan 5.000, no 20.000.",
+              "detail": "No se suman entre Hubs: manda el plan más alto.",
+              "year": "2026",
+              "logo": [
+                {
+                  "src": "asset-ref:file:hubspot-logotype",
+                  "alt": "HubSpot"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-decision-ai-market",
+      "contentType": "deck.decision-ai-market",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 132,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-am-question-width=470px",
+          "answerLeading": "--gl-am-answer-leading=0.9",
+          "answerTracking": "--gl-am-answer-tracking=-0.05em",
+          "answerInset": "--gl-am-answer-inset=-8px",
+          "answerShadowY": "--gl-am-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-am-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-am-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-am-answer-shadow-color=#000000",
+          "perspective": "--gl-am-perspective=1800px",
+          "originX": "--gl-am-origin-x=1320px",
+          "originY": "--gl-am-origin-y=450px",
+          "radius": "--gl-am-radius=24px",
+          "angle": "--gl-am-angle=165deg",
+          "leadFillFrom": "--gl-am-lead-from-color=#135064",
+          "leadFillTo": "--gl-am-lead-to-color=#081c30",
+          "sideFillFrom": "--gl-am-side-from-color=#12344f",
+          "sideFillTo": "--gl-am-side-to-color=#081c30",
+          "leadPadY": "--gl-am-lead-pad-y=34px",
+          "leadPadX": "--gl-am-lead-pad-x=32px",
+          "sidePadY": "--gl-am-side-pad-y=28px",
+          "sidePadX": "--gl-am-side-pad-x=26px",
+          "leadBorder": "--gl-am-lead-border=2px",
+          "leadBorderColor": "--gl-am-lead-border-color=#72ded8",
+          "leadBorderOpacity": "--gl-am-lead-border-opacity=90%",
+          "sideBorder": "--gl-am-side-border=1px",
+          "sideBorderColor": "--gl-am-side-border-color=#ffffff",
+          "sideBorderOpacity": "--gl-am-side-border-opacity=16%",
+          "shadowY": "--gl-am-shadow-y=50px",
+          "shadowBlur": "--gl-am-shadow-blur=110px",
+          "shadowColor": "--gl-am-shadow-color=#000610",
+          "shadowOpacity": "--gl-am-shadow-opacity=70%",
+          "haloColor": "--gl-am-halo-color=#72ded8",
+          "leadGlowBlur": "--gl-am-lead-glow-blur=120px",
+          "leadGlowOpacity": "--gl-am-lead-glow-opacity=45%",
+          "sideGlowBlur": "--gl-am-side-glow-blur=40px",
+          "sideGlowOpacity": "--gl-am-side-glow-opacity=14%",
+          "reflectGap": "--gl-am-reflect-gap=14px",
+          "reflectFrom": "--gl-am-reflect-from=72%",
+          "reflectOpacity": "--gl-am-reflect-opacity=16%",
+          "valueLeadPx": "--gl-am-value-lead-px=150px",
+          "valuePx": "--gl-am-value-px=116px",
+          "valueLongPx": "--gl-am-value-long-px=76px",
+          "valueLeading": "--gl-am-value-leading=0.95",
+          "valueTracking": "--gl-am-value-tracking=-0.05em",
+          "valueLeadColor": "--gl-am-value-lead-color=#ffffff",
+          "valueColor": "--gl-am-value-color=#e6edf3",
+          "labelLeadPx": "--gl-am-label-lead-px=30px",
+          "labelPx": "--gl-am-label-px=26px",
+          "labelLeading": "--gl-am-label-leading=1.12",
+          "labelTracking": "--gl-am-label-tracking=-0.02em",
+          "labelGap": "--gl-am-label-gap=26px",
+          "detailLeadPx": "--gl-am-detail-lead-px=18px",
+          "detailPx": "--gl-am-detail-px=16px",
+          "detailWeight": "--gl-am-detail-weight=400",
+          "detailLeading": "--gl-am-detail-leading=1.5",
+          "detailGap": "--gl-am-detail-gap=14px",
+          "detailColor": "--gl-am-detail-color=#c9d6e2",
+          "footerPadTop": "--gl-am-footer-pad-top=18px",
+          "rule": "--gl-am-rule=1px",
+          "ruleColor": "--gl-am-rule-color=#ffffff",
+          "ruleOpacity": "--gl-am-rule-opacity=14%",
+          "yearPx": "--gl-am-year-px=15px",
+          "yearWeight": "--gl-am-year-weight=500",
+          "yearColor": "--gl-am-year-color=#e2e2e2",
+          "logoHeight": "--gl-am-logo-height=26px",
+          "wordmarkPx": "--gl-am-wordmark-px=22px",
+          "wordmarkWeight": "--gl-am-wordmark-weight=700",
+          "wordmarkTracking": "--gl-am-wordmark-tracking=-0.01em",
+          "wordmarkColor": "--gl-am-wordmark-color=#e6edf3",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:decision-ai-market-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:decision-ai-market-platform"
+        },
+        "voice": {
+          "question": "¿Se acumulan los créditos?",
+          "answer": "No",
+          "eyebrow": "HubSpot Credits"
+        },
+        "body": "Los créditos son la moneda de los agentes de HubSpot. Customer Agent usa <strong>50 por conversación resuelta</strong>; Prospecting Agent, 100 por lead.",
+        "figures": [
+          {
+            "role": "rest",
+            "size": "small",
+            "left": "--gl-am-left=840px",
+            "top": "--gl-am-top=250px",
+            "width": "--gl-am-width=300px",
+            "height": "--gl-am-height=540px",
+            "rotate": "--gl-am-rotate=16deg",
+            "z": "--gl-am-z=2",
+            "value": "US$0,01",
+            "label": "Cada crédito, en todos los planes.",
+            "detail": "Capacidad extra: USD 10 por cada 1.000 créditos.",
+            "year": "2026",
+            "logo": [
+              {
+                "src": "asset-ref:file:hubspot-logotype",
+                "alt": "HubSpot"
+              }
+            ]
+          },
+          {
+            "role": "lead",
+            "size": "large",
+            "left": "--gl-am-left=1135px",
+            "top": "--gl-am-top=190px",
+            "width": "--gl-am-width=370px",
+            "height": "--gl-am-height=600px",
+            "rotate": "--gl-am-rotate=0deg",
+            "z": "--gl-am-z=5",
+            "value": "0",
+            "label": "Créditos que pasan al mes siguiente.",
+            "detail": "Lo que no usas vence al cierre del período: por eso medimos el consumo de cada agente.",
+            "year": "2026",
+            "logo": [
+              {
+                "src": "asset-ref:file:hubspot-logotype",
+                "alt": "HubSpot"
+              }
+            ]
+          },
+          {
+            "role": "rest",
+            "size": "large",
+            "left": "--gl-am-left=1500px",
+            "top": "--gl-am-top=250px",
+            "width": "--gl-am-width=300px",
+            "height": "--gl-am-height=540px",
+            "rotate": "--gl-am-rotate=-16deg",
+            "z": "--gl-am-z=2",
+            "value": "5.000",
+            "label": "Cuatro Hubs Enterprise dan 5.000, no 20.000.",
+            "detail": "No se suman entre Hubs: manda el plan más alto.",
+            "year": "2026",
+            "logo": [
+              {
+                "src": "asset-ref:file:hubspot-logotype",
+                "alt": "HubSpot"
+              }
+            ]
+          }
+        ]
+      },
+      "template": "DecisionAiMarket",
+      "contractHash": "1946ae9134cd00c7341dcbfe8ecc2bc9867d8042632917fca0e0eea2979be32f",
+      "templateHash": "454782780c34bf416fd468964a517c2cfd6301051a46451db802c141e6d1d0a4"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

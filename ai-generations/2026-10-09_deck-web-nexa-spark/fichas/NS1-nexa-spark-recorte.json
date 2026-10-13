@@ -1,0 +1,24 @@
+{
+  "id": "NS1-nexa-spark-recorte",
+  "formato": "9:16",
+  "registro": "puesta-en-escena",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "bienvenida"
+    }
+  ],
+  "linea": "engine",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "spark",
+      "vista": "frente"
+    }
+  ],
+  "escena": "SCENE (studio cutout for a presentation slide, full body, isolated subject): she (the woman of the references, her face exactly as in the references) stands upright, FULL BODY from head to shoes, centered, feet together on an invisible floor, relaxed confident posture, shoulders square to camera, head almost frontal, looking straight into the lens with a warm confident half-smile. REALISTIC ADULT PROPORTIONS: camera about four meters away at waist height with an 85mm lens, nothing foreshortened, her head about one eighth of her height. She wears the Efeonce team softshell jacket exactly as in its reference, zipped halfway, with its embroidered emblem exactly as in the reference and the macro, over a plain dark top, dark tailored trousers and clean dark sneakers. Her right forearm is raised in front of her at chest height with the palm open and facing up; ONE Spark, copied EXACTLY from its reference, hovers a few centimetres above her open palm, facing the camera, its LED eyes glowing azure blue, smaller than her head; she supervises it with a relaxed gesture. Her left arm rests naturally at her side. Soft, even studio key light from the front left with a gentle fill, a subtle cool rim light on hair and shoulders, crisp edges everywhere so the figure can be cut out cleanly. NO floor, NO shadow on the ground, NO background objects, NO props other than the Spark. No readable text anywhere.",
+  "lecho": "sin-lecho",
+  "sinLechoPorque": "Recorte aislado con fondo transparente para una lámina de deck: la figura se compone sobre la plataforma de luz y la firma vive en la lámina, no en esta imagen."
+}

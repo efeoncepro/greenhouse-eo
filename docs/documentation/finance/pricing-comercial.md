@@ -1,19 +1,30 @@
 # Pricing Comercial — Catálogo, Motor y Builder de Cotizaciones
 
+Para la evolución del motor local independiente del Excel: [superficie Cotizador V3 implementada](cotizador-v3-superficie-implementada.md), [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y [promoción pendiente](cotizador-v3-promocion-canonica.md). Sus perfiles/tools son datos de revisión, no altas automáticas en el catálogo canónico descrito aquí.
+
+Para costear localmente sin depender de la UI: [CLI de Excel y planes editables](pricing-workbook-cli.md).
+
 > **Capa estratégica:** la metodología transversal de pricing y packaging vive en
 > [`.codex/skills/efeonce-pricing-operator/SKILL.md`](../../../.codex/skills/efeonce-pricing-operator/SKILL.md) y su
-> referencia general. Este documento sigue siendo el owner operativo del catálogo Greenhouse, pricing engine,
-> quote builder, approvals y persistencia; no es la doctrina de pricing de todas las líneas Efeonce.
+> referencia general. Este documento conserva el diseño histórico del programa. La operación vigente de catálogo,
+> pricing engine, quote builder, approvals y persistencia se consulta en [Cotizador](cotizador.md) y su arquitectura;
+> no constituye la doctrina de pricing de todas las líneas Efeonce.
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-18 por Claude (TASK-469)
-> **Ultima actualizacion:** 2026-04-18 por Claude (TASK-469)
-> **Estado:** Programa en diseño (TASK-463..468 en backlog; no implementado en runtime todavía)
+> **Ultima actualizacion:** 2026-10-11: una cotización V3 alimenta la plantilla A4 (`compose document`). 2026-10-09: rutas de las tasks, remisión a V3 local y separación del cotizador vigente; se conserva el diseño original 2026-04-18 por Claude (TASK-469)
+> **Estado de este documento:** diseño histórico del programa (18/04/2026). El cotizador vigente se documenta en [Cotizador](cotizador.md) y la [arquitectura canónica](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md); la disponibilidad en cada entorno se verifica por separado.
 > **Documentacion tecnica:**
 > - Plano UI: [TASK-469 — Commercial Pricing UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
-> - Tasks de schema + engine: [TASK-464a..d](../../tasks/to-do/) — roles, governance, tool catalog, engine
-> - Task bridge payroll: [TASK-468](../../tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md)
+> - Tasks de schema + engine: [TASK-464a](../../tasks/complete/TASK-464a-sellable-roles-catalog-canonical.md) / [464b](../../tasks/complete/TASK-464b-pricing-governance-tables.md) / [464c](../../tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md) / [464d](../../tasks/complete/TASK-464d-pricing-engine-full-model-refactor.md) — roles, governance, tool catalog, engine
+> - Task bridge payroll: [TASK-468](../../tasks/complete/TASK-468-payroll-commercial-employment-types-unification.md)
+
+## Oferta documental rápida de licitación
+
+Para preparar rápidamente la oferta económica HTML/PDF de una licitación o Compra Ágil, desde precio y alcance aprobados, existe una [plantilla documental local](../../commercial/templates/cotizacion-a4/README.md). Puede producir el documento formal de presentación; no crea una cotización persistida, valida margen ni ejecuta approvals o quote-to-cash. Si se pide operar el sistema Greenhouse, seguir el [cotizador](cotizador.md), sus comandos y su estado verificado. El JSON de la plantilla no es una entrada de importación ni un `quotation_id` del sistema.
+
+Desde el 2026-10-11 esa plantilla tiene una segunda fuente de datos: una cotización congelada del prototipo V3. `pnpm --silent pricing:v3 compose document` emite los datos del documento con todos los importes tomados de la cotización ([paso a paso](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#producir-el-documento-de-cotización)). Sigue siendo un borrador local, no una cotización del sistema. Que el [cotizador](cotizador.md) de Greenhouse adopte más adelante ese diseño de documento es la dirección acordada por el CEO; no ha empezado.
 
 ## Que es
 
@@ -43,7 +54,7 @@ Cuatro tipos de ítems vendibles conviven en el catálogo:
 - **Overhead add-ons** (9): PM Fee, Setup Staff Augmentation, Transactional Fee, AI Infra, Efeonce Operational, Descuento por Retención. Se aplican como porcentaje sobre subtotal o monto fijo, con fórmulas parseables (`10% del subtotal`, `1 mes del costo del recurso`, `4-7% variable`).
 - **Servicios empaquetados** (7 activos + 41 placeholder, SKU `EFG-001..048`): combinaciones recurrentes de roles + herramientas + overhead con una composición fija (ej. "Branding Básico" = Sr Strategist 0.25 FTE + Mid Designer 0.5 FTE + PM Fee 5%).
 
-> Detalle técnico: schemas `greenhouse_commercial.sellable_roles`, `tool_catalog` (extendido), `overhead_addons`, `service_catalog`. Ver [TASK-464a](../../tasks/to-do/TASK-464a-sellable-roles-catalog-canonical.md), [TASK-464c](../../tasks/to-do/TASK-464c-tool-catalog-extension-overhead-addons.md), [TASK-465](../../tasks/to-do/TASK-465-service-composition-catalog-ui.md).
+> Detalle técnico: schemas `greenhouse_commercial.sellable_roles`, `tool_catalog` (extendido), `overhead_addons`, `service_catalog`. Ver [TASK-464a](../../tasks/complete/TASK-464a-sellable-roles-catalog-canonical.md), [TASK-464c](../../tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md), [TASK-465](../../tasks/complete/TASK-465-service-composition-catalog-ui.md).
 
 ### 2. Governance (las reglas del comercio)
 
@@ -57,7 +68,7 @@ Además del catálogo, hay tablas que fijan las **dimensiones comerciales**:
 
 Estas dimensiones son code-versioned (vocabulario cerrado, no aprendido del CSV). Cambiarlas requiere migración + deploy — no se improvisan desde admin UI.
 
-> Detalle técnico: schemas `greenhouse_commercial.role_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors`, `employment_types`, `fte_hours_guide`. Ver [TASK-464b](../../tasks/to-do/TASK-464b-pricing-governance-tables.md).
+> Detalle técnico: schemas `greenhouse_commercial.role_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors`, `employment_types`, `fte_hours_guide`. Ver [TASK-464b](../../tasks/complete/TASK-464b-pricing-governance-tables.md).
 
 ### 3. Motor de pricing (el cerebro)
 
@@ -71,7 +82,7 @@ El engine v2 toma una cotización en estado bruto (cliente, modelo, país, moned
 
 El engine consume tablas ya normalizadas; no parsea CSV en runtime. Si una línea hace referencia a un SKU inexistente, falla de forma determinista — no adivina.
 
-> Detalle técnico: `src/lib/commercial/pricing-engine-v2.ts` (consume tablas de TASK-464a/b/c, adapta backward-compat vía `costing-engine.ts` legacy). Ver [TASK-464d](../../tasks/to-do/TASK-464d-pricing-engine-full-model-refactor.md).
+> Detalle técnico: `src/lib/commercial/pricing-engine-v2.ts` (consume tablas de TASK-464a/b/c, adapta backward-compat vía `costing-engine.ts` legacy). Ver [TASK-464d](../../tasks/complete/TASK-464d-pricing-engine-full-model-refactor.md).
 
 ### 4. Builder de cotizaciones (la experiencia)
 
@@ -92,7 +103,7 @@ El semáforo de margen usa cuatro estados con icono + label + color (nunca solo 
 
 "Sobre meta" no es malo — puede indicar una cotización muy competitiva con margen de sobra; el semáforo solo comunica "estás fuera del rango objetivo por arriba" para que Finance sepa si hay espacio para negociar o si es un error de captura.
 
-> Detalle técnico: componentes en `src/components/greenhouse/pricing/` (9 piezas nuevas inventariadas en TASK-469 §3), views en `src/views/greenhouse/finance/quotes/`. Ver [TASK-464e](../../tasks/to-do/TASK-464e-quote-builder-ui-exposure.md), [TASK-465](../../tasks/to-do/TASK-465-service-composition-catalog-ui.md), [TASK-466](../../tasks/to-do/TASK-466-multi-currency-quote-output.md).
+> Detalle técnico: componentes en `src/components/greenhouse/pricing/` (9 piezas nuevas inventariadas en TASK-469 §3), views en `src/views/greenhouse/finance/quotes/`. Ver [TASK-464e](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md), [TASK-465](../../tasks/complete/TASK-465-service-composition-catalog-ui.md), [TASK-466](../../tasks/complete/TASK-466-multi-currency-quote-output.md).
 
 ### 5. Admin UI self-service (Torre de Control)
 
@@ -103,7 +114,7 @@ El semáforo de margen usa cuatro estados con icono + label + color (nunca solo 
 - Audit timeline que muestra quién cambió qué precio, cuándo, y con qué razón
 - Preview de rates vigentes de payroll (AFP, previsional) como referencia read-only para que se entienda por qué un tipo de contratación cuesta lo que cuesta
 
-> Detalle técnico: `src/views/greenhouse/admin/pricing-catalog/`. Ver [TASK-467](../../tasks/to-do/TASK-467-pricing-catalog-admin-ui.md).
+> Detalle técnico: `src/views/greenhouse/admin/pricing-catalog/`. Ver [TASK-467](../../tasks/complete/TASK-467-pricing-catalog-admin-ui.md).
 
 ## Relación con otros módulos
 
@@ -111,7 +122,7 @@ El semáforo de margen usa cuatro estados con icono + label + color (nunca solo 
 
 Crear una cotización en Greenhouse desde `/finance/cotizaciones` propaga automáticamente a HubSpot (nombre, total, estado, deal asociado). Ediciones significativas (send, approve, nueva versión) también sincronizan. La cotización canónica vive en Greenhouse; HubSpot es el espejo donde el equipo comercial trabaja su pipeline.
 
-> Detalle técnico: [TASK-463](../../tasks/to-do/TASK-463-unified-quote-builder-hubspot-bidirectional.md).
+> Detalle técnico: [TASK-463](../../tasks/complete/TASK-463-unified-quote-builder-hubspot-bidirectional.md).
 
 ### Con Payroll
 
@@ -119,7 +130,7 @@ El programa comercial **no modifica payroll**. Cuando el builder necesita saber 
 
 Esto preserva el baseline de regresión payroll (194 tests / 29 files) sin excepciones.
 
-> Detalle técnico: [TASK-468](../../tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md).
+> Detalle técnico: [TASK-468](../../tasks/complete/TASK-468-payroll-commercial-employment-types-unification.md).
 
 ### Con Finance (P&L, margen)
 
@@ -162,6 +173,6 @@ El resto (CostStackPanel, SellableItemPickerDrawer, ServiceCompositionEditor, Qu
 # Pricing strategy companion
 
 The cross-line pricing strategy and packaging method lives in `.codex/skills/efeonce-pricing-operator/SKILL.md` and
-its general patterns reference. This document remains the runtime owner for Greenhouse catalog, pricing engine,
-quote builder, approval and operational persistence; it is not the source for pricing doctrine across all Efeonce
-lines.
+its general patterns reference. This document preserves the historical program design. Current Greenhouse
+catalog, pricing engine, quote builder, approvals and persistence are documented in [Cotizador](cotizador.md)
+and its canonical architecture; this companion does not define pricing doctrine across all Efeonce lines.

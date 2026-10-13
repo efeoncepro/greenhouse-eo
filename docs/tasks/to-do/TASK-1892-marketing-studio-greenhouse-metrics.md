@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-04 — activaciones y calendario de Studio (TASK-2001/2002)
+
+- El follow-up «adapter de social orgánico (Metricool) en Studio» queda cubierto por el descubrimiento de programados y la evidencia de ejecución de TASK-2001; esta task conserva las métricas desde Greenhouse.
+
 ## Status
 
 - Lifecycle: `to-do`

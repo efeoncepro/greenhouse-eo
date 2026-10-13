@@ -46,6 +46,25 @@ Campaign organiza delivery; no sustituye el contrato, pricing, capacidad ni life
 La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
 captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
+## RevOps & CRM — capacidad especializada
+
+- [Modelo de negocio V1](revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md): cliente, buying group, modalidades y economics.
+- [Servicio](../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) y [activación regional](../operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md).
+- [Talent Assurance — guardrails aceptados](EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md).
+
+Dirección aprobada el 2026-10-09; modelo `Approved for validation`. Demanda por servicios, precios, capacidad
+y habilitación contractual requieren evidencia por caso. Ver [ADR](../architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md).
+
+## Efeonce Factory — vía comercial On-Demand
+
+- [Decisión aceptada](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md).
+- [Business Model V1](factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md).
+- [Encargos transversales y ejemplos de empaque](../services/factory/README.md).
+
+Factory convierte capacidad disponible en encargos que sostienen su propia economía y generan caja adicional.
+Vía transversal a las capacidades actuales; empaque por oportunidad y venta en paralelo; las prácticas conservan ownership. Dirección aceptada el 2026-10-05;
+modelo `Approved for validation`, con capacidad, costing, condiciones de cobro y demanda aún por validar.
+
 ## Social Media
 
 - [`Efeonce Social Media — Business Model V1`](creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md)
@@ -64,6 +83,14 @@ captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`]
 Estado: `Approved for validation`. El servicio es humano y recurrente; Efeonce Run & Gun Studio es una capability real
 componible, mientras Globe / Creative Studio no forma parte de la promesa base actual. `Approved for validation` habilita
 pilotos y SOW gobernados, no venta self-serve ni aprobación comercial definitiva.
+
+Delta 2026-10-10: el brochure «Marketing de Contenidos» (57 láminas), aprobado por el operador, entra a la oferta como
+forma de presentarla —frentes, momentos y programas— y suma piezas nuevas (producción con IA, comunidad en canales
+cerrados, social care con agentes, voz ejecutiva, embajadores, social conectado al CRM). El estado sigue
+`Approved for validation`: ninguna pieza nueva tiene costo, precio ni evidencia de capacidad, y trece decisiones
+quedaron abiertas en el [§12 del Business Model](creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10).
+Los frentes de creadores, UGC y paid social del mismo brochure son de Media & Distribution, con su propia lista
+(`DA-01`…`DA-15`).
 
 ## Creative Services offer architecture
 
@@ -216,26 +243,40 @@ Todo business model debe separar al menos estas dimensiones:
 - [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) + [Business Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md) + [Customer Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md) —
   draft de capability en construcción; alcance comercial mid-market y enterprise.
 - [Search + Social Visibility Composition V1](search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) — composición propuesta entre Search Visibility 360 y Social Media; no es una tercera línea contractual.
-- [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — `Proposed`; productora/capability con cinco familias y
+- [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — `Proposed`; productora/capability con seis familias y
   Agentic Readiness Audit como wedge prioritario de validación:
-  Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
-  Automation & Integrations.
-- [Product Design 360 Business Model V1.1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Proposed`;
-  **sexta familia propuesta de Wave**, todavía no aceptada en el ADR de boundaries. Motion primario: **extender la
+  Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms, Digital
+  Automation & Integrations y Product Design 360 (sexta familia, aprobada por el operador; modelo propio abajo).
+- [Product Design 360 Business Model V1.1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Approved`
+  por el operador el 2026-10-10; **sexta familia de Wave**, aceptada en el ADR de boundaries. Motion primario: **extender la
   capacidad de un equipo de product design in-house** vendiendo lanes de capacidad gobernada (feature delivery,
   research, design system, accesibilidad, deuda de diseño, design ops), nunca diseñadores por hora. Incluye contrato
   anti-desplazamiento y la distinción dura Managed Squad ≠ Staff Augmentation. Separa *decidir la experiencia* de
-  *construirla*, que permanece en Web Experience 360. No autoriza pricing ni venta general.
+  *construirla*, que permanece en Web Experience 360. La aprobación cubre el modelo, el nombre público «Product
+  Design 360» y la venta; no publica un tarifario y deja los gates G1–G6 como validación posterior.
 - [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
   habilitadora. No autoriza pricing público ni venta general.
+  Delta 2026-10-10: incorpora lo que trae el deck «Marketing de Contenidos» en creadores, UGC y paid social; estado
+  sin cambio; decisiones abiertas `DA-01`…`DA-15` en su §10.
+  Dirección 12-10: [oferta integral como agencia de medios](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios),
+  con cinco frentes de responsabilidad compuestos, sin nueva solución ni promoción general de estados.
 - [Performance & Commerce Pricing Integrity Pack V1](media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md) —
   `hypothesis_only`; fee mensual por tres niveles de complejidad con piso de 45%, Diagnostic y Sprint de precio fijo,
   híbrido porcentual sólo como alternativa con piso, programmatic sin markup y regla de no doble cobro. Decisión:
   [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md).
+- [Publicidad programática — Business Model V1](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) —
+  `Commercially approved` por el operador 2026-10-09 para servicio, tarifario base y condiciones estándar.
+  Fee propio, setup y medios separados; dos proveedores seleccionados, habilitación externa por campaña.
+  V1.5 (12-10): reunión leída, ruta directa acompañada en evaluación y composición integral; tarifario sin cambio,
+  calibración de costo/margen y no doble cobro en cuenta integral. [Evidencia](../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
+  [Pricing Integrity Pack](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md) y
+  [guía comercial](../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
   submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
-  `Approved for validation`; no autoriza pricing público ni venta general.
+  `Approved for validation`; no autoriza pricing público ni venta general. Delta 2026-10-10 (§11): selección por
+  función y nivel, roster por mercado con revisión por creador y UGC patrocinado por plataforma; Thought Leader Ads,
+  contenido de comunidad, live shopping y origen por creador en el CRM entran `por validar` y sin precio.
 - [Creator Influence & Content Pricing Integrity Pack V1](media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) —
   bandas de validación, fee fijo, pass-through, coordinación de terceros, performance fee, mínimos y condiciones de pago.
 - [Creator Influence & Content Market Research 2026-07-29](../audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md) —
@@ -255,3 +296,40 @@ Todo business model debe separar al menos estas dimensiones:
   benchmark de wedge visual, workflow productization, ecosystem distribution, expansión Business/Enterprise y límites de evidencia.
 - [Globe Market, Distribution & Monetization Strategy V1](../strategy/EFEONCE_GLOBE_MARKET_DISTRIBUTION_AND_MONETIZATION_STRATEGY_V1.md) —
   arquitectura de segmentos, distribución masiva, ventas B2B/enterprise, canales, packaging y validación; `Approved for validation`.
+
+[Pricing de capacidad especializada — propuesta](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md): drivers, margen/guardrails y validación del piloto V3; sin pricing comercial aprobado.
+
+## Cotizador V3 — soporte económico local transversal
+
+[Pricing Integrity Pack de capacidad](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md) mantiene propuestas de
+unidad/margen y validación separadas de la implementación. [ADR operativo](../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md)
+y [manual de agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) cubren núcleo reusable,
+catálogos monetarios/policy/créditos, selección por trabajo, seats/pools/bundles, cartera declarada, explicación,
+preview de rol o fee gestionado y mantenimiento versionado. Es infraestructura de costeo local; no madura
+una oferta, valida disposición de pago ni aprueba condiciones comerciales por calcular.
+
+[Talent Assurance](EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) conserva su gate;
+[fuentes y faltantes](../../data/pricing/v3-operating/README.md) distinguen precio público, operador,
+factura e histórico. TASK-2022 completa flujo local; TASK-2017 sigue parcial por economía real. API/UI/MCP
+canónicos mantienen V2 hasta promoción propia. No trasladar pisos de Creative/otros modelos al piloto.
+
+Delta 2026-10-11 — decisiones del operador (CEO) que rigen cualquier cotización local. El costo de las personas en
+el cotizador es el nivel salarial objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella: el
+margen real sobre personas hoy es mayor que el simulado. El piso de 45% es la norma de los servicios gestionados,
+con una oferta por práctica: la creativa (objetivo 45%) y, desde el 2026-10-11, la de SEO/AEO (objetivo 55%); donde
+se puede ganar más se sube el objetivo de la oferta, no el piso. Una persona vendida por dedicación (staff
+augmentation) tiene un piso de 25%, también del CEO, y de ahí sube según el caso. El 40%/35% del pack de capacidad
+sigue sin aprobación y nunca es un piso; una excepción bajo un piso la decide el CEO para un cliente y no sirve de
+referencia para otro.
+El país de la persona ajusta el costo, el país del cliente ajusta el precio del
+componente humano, cada moneda redondea a su múltiplo y el tipo de cambio de cotización es un valor de política.
+On-Demand es una forma de compromiso que se declara en la cotización (10% más de precio que On-Going, mismo piso), no
+una oferta ni un delivery model; la puesta en marcha de una persona por dedicación se costea con provisiones estimadas
+(onboarding siempre, reclutamiento sólo si hay que contratar) y Adobe va como se factura, dos productos en CLP.
+Desde la noche del 2026-10-11 una cotización lleva los costos de terceros que se refacturan (fila propia por costo:
+10% de gestión con piso de 5% en producción, talento e impresión; medios y licencias al costo) y, en un servicio
+gestionado On-Demand, una reserva de contingencia de 12% del costo de las personas; con terceros el piso se lee sobre
+el margen del trabajo propio, no sobre el mezclado. Los factores de país quedaron cerrados por el CEO como valores de
+política, confirmados desde el 2026-10-12.
+Detalle en el [pack §12](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md#12-delta-2026-10-11--decisiones-del-operador-que-acotan-este-pack);
+valores vigentes y comandos (`--current`) en el manual de agentes.

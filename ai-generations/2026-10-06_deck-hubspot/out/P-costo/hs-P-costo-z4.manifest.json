@@ -1,0 +1,290 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-P-costo-z4",
+  "input": {
+    "artifactId": "hs-P-costo-z4",
+    "slides": [
+      {
+        "slideId": "deck-content-bullets",
+        "contentType": "deck.content-bullets",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 270,
+            "answerPx": 120,
+            "questionPx": "--gl-cb-question-px=40px",
+            "questionLeading": "--gl-cb-question-leading=1.2",
+            "answerLeading": "--gl-cb-answer-leading=1",
+            "answerTracking": "--gl-cb-answer-tracking=-0.04em",
+            "answerInset": "--gl-cb-answer-inset=-4px",
+            "listTop": "--gl-cb-list-top=520px",
+            "listWidth": "--gl-cb-list-width=1640px",
+            "rowGap": "--gl-cb-row-gap=56px",
+            "columnGap": "--gl-cb-column-gap=110px",
+            "rule": "--gl-cb-rule=2px",
+            "padTop": "--gl-cb-pad-top=18px",
+            "numberPx": "--gl-cb-number-px=84px",
+            "numberWght": "--gl-cb-number-wght=300",
+            "numberTracking": "--gl-cb-number-tracking=-0.03em",
+            "numberRaise": "--gl-cb-number-raise=10px",
+            "numberGap": "--gl-cb-number-gap=34px",
+            "titlePx": "--gl-cb-title-px=32px",
+            "descPx": "--gl-cb-desc-px=24px",
+            "descGap": "--gl-cb-desc-gap=10px"
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-cb-progress-4-of-4-revenue-hubspot"
+          },
+          "voice": {
+            "question": "¿Hay costos escondidos?",
+            "answer": "Ninguno",
+            "eyebrow": "Costo total"
+          },
+          "items": [
+            {
+              "number": "01",
+              "title": "Licencias HubSpot",
+              "desc": "Los seats y el tier que usas, pagados directo a HubSpot: USD [monto] al año."
+            },
+            {
+              "number": "02",
+              "title": "Implementación",
+              "desc": "Por alcance y con precio cerrado: [monto] + IVA, según la cotización."
+            },
+            {
+              "number": "03",
+              "title": "Operación gestionada",
+              "desc": "Mensual, con SLA y revisión trimestral: [monto] + IVA al mes."
+            },
+            {
+              "number": "04",
+              "title": "Créditos de IA",
+              "desc": "Consumo medido por agente; lo extra cuesta USD 10 por cada 1.000 créditos."
+            }
+          ],
+          "selection": {
+            "label": "Cliente",
+            "anchor": "bottom-end",
+            "participantKind": "department",
+            "scale": 1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none",
+            "item": 3
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-bullets",
+      "contentType": "deck.content-bullets",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "questionPx": "--gl-cb-question-px=40px",
+          "questionLeading": "--gl-cb-question-leading=1.2",
+          "answerLeading": "--gl-cb-answer-leading=1",
+          "answerTracking": "--gl-cb-answer-tracking=-0.04em",
+          "answerInset": "--gl-cb-answer-inset=-4px",
+          "listTop": "--gl-cb-list-top=520px",
+          "listWidth": "--gl-cb-list-width=1640px",
+          "rowGap": "--gl-cb-row-gap=56px",
+          "columnGap": "--gl-cb-column-gap=110px",
+          "rule": "--gl-cb-rule=2px",
+          "padTop": "--gl-cb-pad-top=18px",
+          "numberPx": "--gl-cb-number-px=84px",
+          "numberWght": "--gl-cb-number-wght=300",
+          "numberTracking": "--gl-cb-number-tracking=-0.03em",
+          "numberRaise": "--gl-cb-number-raise=10px",
+          "numberGap": "--gl-cb-number-gap=34px",
+          "titlePx": "--gl-cb-title-px=32px",
+          "descPx": "--gl-cb-desc-px=24px",
+          "descGap": "--gl-cb-desc-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-cb-progress-4-of-4-revenue-hubspot"
+        },
+        "voice": {
+          "question": "¿Hay costos escondidos?",
+          "answer": "Ninguno",
+          "eyebrow": "Costo total"
+        },
+        "items": [
+          {
+            "number": "01",
+            "title": "Licencias HubSpot",
+            "desc": "Los seats y el tier que usas, pagados directo a HubSpot: USD [monto] al año."
+          },
+          {
+            "number": "02",
+            "title": "Implementación",
+            "desc": "Por alcance y con precio cerrado: [monto] + IVA, según la cotización."
+          },
+          {
+            "number": "03",
+            "title": "Operación gestionada",
+            "desc": "Mensual, con SLA y revisión trimestral: [monto] + IVA al mes."
+          },
+          {
+            "number": "04",
+            "title": "Créditos de IA",
+            "desc": "Consumo medido por agente; lo extra cuesta USD 10 por cada 1.000 créditos."
+          }
+        ],
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 3
+        }
+      },
+      "template": "ContentBullets",
+      "contractHash": "0608027b1fe9488e5d294eb500e46ef842c9f5caeb924c3afe83ca8e90ccb1d0",
+      "templateHash": "77cae7dbd31297da16192b39687a3f91f31edaa7db2ad7a03af61ef774201e94"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

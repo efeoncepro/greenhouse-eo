@@ -118,10 +118,22 @@ Event in dataLayer but tag didn't fire → almost always the **trigger's event n
 
 ## 5. Server-side GTM (sGTM) operations
 
-- **When to adopt:** material stakes in **ad-platform signal recovery** (Meta CAPI, Google Ads Conversion API) — practical threshold ~>$5k/mo paid media with heavy Safari traffic. Below that, Google Tag Gateway or Cloudflare Zaraz suffice.
-- **Hosting:** Cloud Run (~$120/mo at 3-instance guidance; **trap:** Cloud Logging can add ~$100/mo — disable it) / Stape (~$20–200/mo, low-ops) / self-host. Efeonce already has an **`Efeonce Server` sGTM container** (`GTM-K2X4ZTTK`) in the GTM account.
-- **Setup skeleton:** provision the tagging-server image → preview + prod services on Cloud Run → **first-party custom domain** + managed cert → configure server **Clients** (GA4/MP) → point the web GA4 tag's `server_container_url` at the domain → wire Consent Mode through. **Terraform is appropriate for the sGTM infra** (Cloud Run/domain/IAM), unlike the tag config.
-- **Honest tradeoffs:** sGTM buys **signal recovery + PII redaction**, NOT ad-blocker evasion (~80% still detect custom-domain sGTM) and NOT free Safari cookie extension (needs IP alignment). Real infra + real cost + real ops.
+**Canon Meta CAPI:** [runbook 08](08-meta-conversions-api-server-side.md) y
+[ADR servidor](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
+El inventario read-only del 2026-10-13 confirma `Efeonce Server` (`GTM-K2X4ZTTK`),
+`usageContext=server`, versión live 3 y tag Meta CAPI; entrega actual no verificada.
+`GTM-NGHPGRLZ` es web; su snapshot/GA4 smoke no certifican el servidor.
+
+- Recuperar/inventariar el existente antes de crear otro. Verificar hosting, URL, Client,
+  ingreso, template, trigger, salida Meta y consentimiento como eslabones separados.
+- Un contenedor server no recolecta visitas solo; PageView necesita señal de navegación,
+  y Lead debe salir de aceptación comercial persistida del backend hacia ingreso validado.
+- Si se usa Pixel adicional, deduplicar con nombre/ID compartidos. CAPI Gateway es otra
+  solución; no es requisito de GTM Server ni indicador universal de ausencia de CAPI.
+- No prometer evasión de bloqueadores/ITP: el ingreso originado en navegador puede fallar.
+  Dimensionar disponibilidad/costo real antes de provisionar; no usar umbrales de inversión,
+  costos fijos o porcentajes de bloqueo sin fuentes actuales. No apagar logging indiscriminadamente.
+- Snapshot servidor debe redactar tokens; Preview + aprobación siguen siendo obligatorios.
 
 ---
 
@@ -149,7 +161,7 @@ Walk the chain; the step where it first breaks names the fault class:
 | **dataLayer timing / race** | Params `undefined`; nothing anywhere — the most invisible failure. | Push the event **after** data is ready; fire on the data-complete event, not the click. |
 | **Tag firing order** | Events without session/consent context. | Tag sequencing so config/consent fires first. |
 | **Trigger name mismatch** | Event in dataLayer, tag never fires. | Match exactly (case-sensitive). |
-| **Ad-blockers** | Random signal loss. | sGTM + CAPI for paid-media-critical events. |
+| **Ad-blockers** | Browser-originated signal loss. | Diagnose ingress; sGTM does not recover a browser request that never arrived. Backend conversion evidence and explicit consent are separate requirements; see doc 08. |
 
 ---
 

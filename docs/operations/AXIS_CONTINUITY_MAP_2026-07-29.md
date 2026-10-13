@@ -8,6 +8,54 @@
 > [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`](../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md);
 > el runbook operativo en [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1`](./AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+## Actualización — 2026-10-12: `axis-brand-assets` 0.4.25 y sus dependientes
+
+**Pines vigentes** (`package.json`): `axis-tokens` `0.3.41`, `axis-ui-contracts` `0.3.40`, `axis-graphic-line` `0.11.0`,
+`axis-brand-assets` `0.4.25` y `axis-ui-registry` `0.3.1`. El pin de brand-assets subió el 2026-10-06 (`596bfab90`) y sus
+dependientes se regeneraron seis días después: tokens de Manzanitas, vocabulario de canales de Insights (22 plataformas)
+y los cuatro lockups del PDF del AI Visibility Report. La regla para el próximo cambio de versión está en el
+[runbook](AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md), Delta 2026-10-12. Este mapa no autoriza bumps nuevos; la
+adopción del juego publicado es TASK-2014.
+
+## Fuente aprobada — producto, scheduler y Growth CTA, 2026-10-05
+
+El operador aprobó visualmente la entrega AXIS y autorizó documentación/skills y push.
+[Estado y evidencia](../tasks/in-progress/TASK-2007-axis-product-primitives.md) distingue source,
+distribución y adopción. Nuevo `/growth-cta`/CSS y product exports siguen **unreleased** en el
+inventario de availability; source aprobado no acredita tarball ni instalación privada. Scheduler
+ya tuvo push de fuente independiente; su distribución/adopción tampoco se infiere del push.
+
+AXIS posee presentación portable: banners minimal/spotlight, anillo en eyebrow y esfera al cierre,
+énfasis exacto Bricolage400/700, agenda dialog/inline. Growth conserva controller/policy/network,
+booking y medición. API y QA dueños están en AXIS `packages/primitives/README.md`, decisiones de
+Product/Scheduler/Growth CTA y dossiers `docs/quality/`. Antes de adopción: publicar set compatible,
+instalar y comprobar exports/CSS/graphic-line, adaptar renderer compartido y verificar cada host.
+Sin cambios de pins, theme, flags, campañas ni hosts en esta entrega. Las tablas históricas siguientes
+acreditan únicamente sus cortes fechados; no prueban exports posteriores.
+
+## Actualización — 2026-10-04: primitives y formularios
+
+AXIS `df2de61` / tag `v0.7.2`: release `37239150937` SUCCESS y readback de GitHub Packages confirmado.
+Publicados tokens `0.5.0`, contracts `0.6.0`, primitives `0.4.0` y registry `0.7.2`.
+Instalaciones privadas nuevas sin React y con React 18.3.1/19.2.7 PASS, incluidos HTML/CSS/SSR y capacidades.
+Vercel SUCCESS y readback de Field/Select. Formularios 148/148 locales PASS; CI general `37239148653`
+confirmado SUCCESS para el mismo corte. Intentos anteriores fallidos/cancelados conservados en el dossier.
+La entrega agrega roles/ramps de La órbita, chips/badges y diez familias de formularios, incluido Select
+enriquecido con fallback nativo, foco continuo e iconos de apoyo. El Lab consume los mismos packages.
+[Estado, verificación y pendientes](../audits/2026-10-04-axis-forms-release.md) y
+[consumo/rollback](AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) son las fuentes operativas.
+No se cambian pins ni runtime de Greenhouse, Globe o Marketing Studio; publicación y adopción son pasos separados.
+
+## Actualización — 2026-10-04: descubrimiento y composición
+
+AXIS incorpora entrada para agentes, búsqueda unificada, catálogos de íconos/logos y tipografía editorial compartida.
+El [overview](../documentation/creative/axis-packages-y-lab.md), el
+[manual](../manual-de-uso/creative/descubrir-y-componer-con-axis.md) y el
+[cierre con evidencia](../audits/2026-10-04-axis-documentation-closure.md) distinguen Lab, checkout, packages
+publicados y adapters consumidores. `axis-graphic-line@0.17.0` publicado; nueva API `axis-brand-assets/logos`
+en source y Lab, con release pendiente. No se cambiaron pins de consumidores. Las secciones siguientes son
+registros fechados, no certifican por sí solas el estado actual de credenciales o despliegues.
+
 ## Actualización de cierre — 2026-07-30
 
 La migración Axis descrita por este diagnóstico quedó ejecutada y verificada. Esta actualización supersede

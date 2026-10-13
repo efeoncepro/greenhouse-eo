@@ -1,0 +1,43 @@
+{
+  "args": [
+    "compose",
+    "schedule",
+    "--input",
+    "data/pricing/v3-operating/designer.artifact.json",
+    "--milestones",
+    "<tmp>/milestones.json",
+    "--out",
+    "<tmp>/schedule.json"
+  ],
+  "status": 3,
+  "stdout": {
+    "bytes": 2055,
+    "sha256": "f3a5341d063d2c16551e59be86789d9816eaa0432d8aa162c8ceef5c2eba5a7c",
+    "text": "{\n  \"schemaVersion\": \"pricing-v3-payment-schedule/1\",\n  \"binding\": false,\n  \"calculationId\": \"composition-50c9dbe7ec6e58c03f62c9be\",\n  \"replayDigest\": \"50c9dbe7ec6e58c03f62c9be13ee94f2e9034ae4443fbdf5d3266c248cef6dd1\",\n  \"commercialUnit\": \"role_capacity\",\n  \"currency\": \"USD\",\n  \"statement\": \"Payment calendar of a frozen quote: the quoted net presented as the amounts due at each milestone. It is not an invoice and not an amount collected, and it is not a new price: the quoted total is unchanged and the milestone amounts add up to it exactly.\",\n  \"basis\": [\n    \"amount: share x totals.net, read at the nearest price-rounding multiple of the quote (half up) when the quote froze one and at the currency unit otherwise. The last milestone is totals.net minus every amount before it.\",\n    \"tax and total: present only when the quote resolved tax. Tax is totals.tax spread in proportion to the amounts, on the running total, so it adds up to totals.tax. A quote without resolved tax carries null: no rate is assumed here.\",\n    \"periodId and when are the timing the caller declared. Nothing here checks a due date, an acceptance or a payment.\"\n  ],\n  \"rounding\": {\n    \"multiple\": null,\n    \"unit\": \"0.01\",\n    \"source\": \"unit of the output currency\"\n  },\n  \"taxTreatment\": {\n    \"kind\": \"not_resolved\"\n  },\n  \"milestones\": [\n    {\n      \"id\": \"start\",\n      \"label\": \"Al inicio\",\n      \"share\": \"0.5\",\n      \"when\": \"A la firma\",\n      \"amount\": \"652.17\",\n      \"tax\": null,\n      \"total\": null,\n      \"takesRemainder\": false\n    },\n    {\n      \"id\": \"end\",\n      \"label\": \"Al cierre\",\n      \"share\": \"0.5\",\n      \"when\": \"A la entrega\",\n      \"amount\": \"652.16\",\n      \"tax\": null,\n      \"total\": null,\n      \"takesRemainder\": true\n    }\n  ],\n  \"remainder\": {\n    \"milestoneId\": \"end\",\n    \"absorbed\": \"-0.005\",\n    \"note\": \"The last milestone is what is left of the net after the others: it absorbs their rounding and any part of the net that is not a multiple.\"\n  },\n  \"totals\": {\n    \"net\": \"1304.33\",\n    \"tax\": null,\n    \"grandTotal\": null\n  }\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "milestones.json",
+      "mode": "644",
+      "content": {
+        "bytes": 139,
+        "sha256": "3d1845bb692d3feb15a24d933c5e0358e702f810ee9d91f01d6c01c1cc1ef582",
+        "text": "[{\"id\":\"start\",\"label\":\"Al inicio\",\"share\":\"0.5\",\"when\":\"A la firma\"},{\"id\":\"end\",\"label\":\"Al cierre\",\"share\":\"0.5\",\"when\":\"A la entrega\"}]"
+      }
+    },
+    {
+      "name": "schedule.json",
+      "mode": "600",
+      "content": {
+        "bytes": 2055,
+        "sha256": "f3a5341d063d2c16551e59be86789d9816eaa0432d8aa162c8ceef5c2eba5a7c",
+        "text": "{\n  \"schemaVersion\": \"pricing-v3-payment-schedule/1\",\n  \"binding\": false,\n  \"calculationId\": \"composition-50c9dbe7ec6e58c03f62c9be\",\n  \"replayDigest\": \"50c9dbe7ec6e58c03f62c9be13ee94f2e9034ae4443fbdf5d3266c248cef6dd1\",\n  \"commercialUnit\": \"role_capacity\",\n  \"currency\": \"USD\",\n  \"statement\": \"Payment calendar of a frozen quote: the quoted net presented as the amounts due at each milestone. It is not an invoice and not an amount collected, and it is not a new price: the quoted total is unchanged and the milestone amounts add up to it exactly.\",\n  \"basis\": [\n    \"amount: share x totals.net, read at the nearest price-rounding multiple of the quote (half up) when the quote froze one and at the currency unit otherwise. The last milestone is totals.net minus every amount before it.\",\n    \"tax and total: present only when the quote resolved tax. Tax is totals.tax spread in proportion to the amounts, on the running total, so it adds up to totals.tax. A quote without resolved tax carries null: no rate is assumed here.\",\n    \"periodId and when are the timing the caller declared. Nothing here checks a due date, an acceptance or a payment.\"\n  ],\n  \"rounding\": {\n    \"multiple\": null,\n    \"unit\": \"0.01\",\n    \"source\": \"unit of the output currency\"\n  },\n  \"taxTreatment\": {\n    \"kind\": \"not_resolved\"\n  },\n  \"milestones\": [\n    {\n      \"id\": \"start\",\n      \"label\": \"Al inicio\",\n      \"share\": \"0.5\",\n      \"when\": \"A la firma\",\n      \"amount\": \"652.17\",\n      \"tax\": null,\n      \"total\": null,\n      \"takesRemainder\": false\n    },\n    {\n      \"id\": \"end\",\n      \"label\": \"Al cierre\",\n      \"share\": \"0.5\",\n      \"when\": \"A la entrega\",\n      \"amount\": \"652.16\",\n      \"tax\": null,\n      \"total\": null,\n      \"takesRemainder\": true\n    }\n  ],\n  \"remainder\": {\n    \"milestoneId\": \"end\",\n    \"absorbed\": \"-0.005\",\n    \"note\": \"The last milestone is what is left of the net after the others: it absorbs their rounding and any part of the net that is not a multiple.\"\n  },\n  \"totals\": {\n    \"net\": \"1304.33\",\n    \"tax\": null,\n    \"grandTotal\": null\n  }\n}\n"
+      }
+    }
+  ]
+}

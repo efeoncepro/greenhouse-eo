@@ -4,6 +4,7 @@
 > **Owner:** Media & Distribution + Strategy + Commercial + Legal/IP
 > **Mercados base:** Chile, Colombia, México y Perú
 > **Versión:** V1 · 2026-07-29
+> **Último delta:** 2026-10-10 — derechos de lo incorporado desde el deck «Marketing de Contenidos» (§15); el estado no cambia
 > **Naturaleza:** política operativa y comercial; no contrato legal final
 
 ## 1. Decisión
@@ -224,6 +225,99 @@ No avanzar si:
 Este pack orienta el diseño operativo. No autoriza por sí solo a firmar contratos, publicar campañas, procesar datos,
 usar imagen/voz o conceder derechos en Chile, Colombia, México o Perú. La revisión final corresponde a Legal/IP y a un
 abogado habilitado en la jurisdicción aplicable.
+
+## 15. Delta 2026-10-10 — derechos de lo incorporado desde el deck «Marketing de Contenidos»
+
+El operador aprobó el deck el 2026-10-10 y pidió incorporar su contenido al modelo (cita y alcance en el
+[Business Model, §11](CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md#11-delta-2026-10-10--incorporaciones-del-deck-marketing-de-contenidos)).
+Esa decisión define qué se ofrece; **no** revisa ni concede derechos. Este delta no relaja ningún principio, gate ni
+stop condition: sólo extiende el pack a lo que el deck trae y marca lo que no puede prometerse todavía. Sigue siendo
+política operativa, no contrato ni asesoría legal; todo lo marcado `por validar` necesita revisión de Legal/IP y de un
+abogado habilitado en la jurisdicción aplicable.
+
+### 15.1 La lámina «Derechos claros desde el contrato»
+
+Los doce campos de la lámina —entregables; formatos y fechas; rondas de cambios; bruto y editado; canales; uso
+orgánico; uso pagado; whitelisting; territorio y duración; exclusividad; disclosure; aprobaciones y pago— son los
+derechos mínimos que ya exige la [ficha de servicio](../../services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md).
+Es una lista de cara al cliente, **no** reemplaza el rights brief de la §4. El contrato sigue necesitando lo que la
+lámina no nombra: imagen, voz y likeness; música y terceros; derivados (recorte, subtítulos, traducción, doblaje);
+IA y réplicas, bloqueadas por defecto; portfolio; ley aplicable y foro; y expiración con takedown.
+
+Dos frases del deck que se acotan al usarlas en una propuesta:
+
+- **«Tu marca puede usarlo, pautarlo o renovarlo sin sorpresas».** Es cierto dentro de la rights matrix contratada:
+  cada uso existe si está escrito, con canal, territorio y plazo. La renovación depende del creador salvo que la
+  opción se haya pactado al firmar; por eso se recomienda negociar en el contrato inicial una **opción de renovación**
+  (plazo de aviso y fee o fórmula). Esa opción es una práctica propuesta, `por validar` con Legal, y no una condición
+  ya disponible en los contratos.
+- **«Material bruto y editado».** Los raw files siguen siendo un derecho que se pide, se limita en finalidad y
+  almacenamiento, y se cotiza aparte (§4, §9).
+
+### 15.2 Plataformas del UGC patrocinado
+
+El paquete «Partnership Ads» de la §8 nombra el permiso de pauta desde el perfil del creador. Por plataforma:
+
+| Formato | Plataforma | Estado en este pack |
+|---|---|---|
+| Partnership ads | Instagram y Facebook (Meta) | cubierto por el platform overlay de la §6 |
+| Spark Ads | TikTok | cubierto por el platform overlay de la §6 (TikTok) |
+| Thought Leader Ads | LinkedIn | **`por validar`. LinkedIn no tiene overlay en este pack.** No se activa hasta que Legal revise permiso de plataforma, derechos de imagen y nombre, disclosure y revocación |
+
+En los tres casos rige el principio 6: pautar desde el perfil de la persona no equivale a pautar desde la cuenta de la
+marca, y el permiso contractual debe coincidir con la configuración real de la plataforma.
+
+**Perfil de un ejecutivo o empleado del cliente.** Si la publicación amplificada es de una persona del equipo del
+cliente (programas de voz ejecutiva o embajadores, con dueño sin definir: DA-15), no hay talent agreement: la relación
+con esa persona es del cliente —normalmente laboral— y queda fuera de este pack. No se usa este pack para
+autorizarla; requiere una decisión sobre dueño y derechos (DA-07) y el criterio laboral del cliente. Las decisiones
+`DA-##` están en el [modelo de la línea, §10](MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#10-riesgos-y-decisiones-abiertas).
+
+### 15.3 Contenido de clientes reales y de la comunidad
+
+El deck suma una fuente que la taxonomía de la §3 no tenía: contenido publicado por personas **sin contrato** con la
+marca. Entra como hipótesis, con estas reglas mínimas mientras no exista política aprobada:
+
+- aplica el principio 1: no hay derechos implícitos. Mencionar o etiquetar a la marca, usar su hashtag o dar crédito
+  no es una licencia;
+- repostear en canales de la marca exige autorización escrita de la persona; pautarlo exige, además, uso pagado
+  expreso y, si sale desde su perfil, el permiso de la plataforma;
+- menores, terceros identificables, música y marcas visibles siguen la regla de terceros del principio 8;
+- la persona puede pedir el retiro: la autorización se registra con canal, plazo y takedown, como cualquier otro
+  derecho;
+- no se recogen ni se guardan datos personales de esas personas más allá de lo necesario para la autorización.
+
+Estado: `por validar`. **Bloqueado para pauta** hasta que Legal entregue el formato de autorización por país.
+
+### 15.4 Orgánico, lanzamientos y vivo
+
+- **De orgánico a pauta.** Que una pieza haya funcionado en orgánico no cambia sus derechos. Si el plan es pautar las
+  piezas que retienen, el uso pagado y el whitelisting se negocian al firmar (principio 2), aunque después sólo se
+  activen para algunas piezas. Sumar el derecho después es posible, pero queda sujeto a la disponibilidad y al precio
+  del creador.
+- **Creadores en reserva para un lanzamiento.** El contrato suma confidencialidad sobre el producto no anunciado y la
+  fecha desde la cual se puede publicar. Si la reserva impide al creador trabajar con competidores, es exclusividad y
+  se acota y se paga (principio 7). `Por validar` con Legal.
+- **Live shopping y contenido en vivo.** No hay aprobación previa de la pieza: los claims permitidos y el disclosure se
+  aprueban antes y el disclosure se mantiene visible durante la transmisión. La grabación es un asset nuevo y su
+  reutilización —recortes, anuncios, ecommerce— necesita su propia fila en la rights matrix. `Por validar`: sin caso
+  ejecutado ni revisión por país.
+
+### 15.5 Nombres que se cruzan y mercados
+
+- **«Embajadores de marca» (deck) no es el lane `Ambassador` de la §3.** En el deck son personas del equipo del
+  cliente que comparten la marca con su propia voz; en este pack `Ambassador` es talento externo con asociación de
+  imagen, voz y nombre. El paquete «Ambassador/Buyout» de la §8 no aplica a empleados.
+- **Estados Unidos.** El deck declara operación en cinco países, incluido Estados Unidos. Este pack tiene overlay para
+  Chile, Colombia, México y Perú. Una activación con creadores en Estados Unidos no tiene overlay aquí y el overlay
+  por país es obligatorio (§1, §6): no avanza sin revisión de un abogado habilitado en esa jurisdicción.
+
+### 15.6 Origen por creador en el CRM
+
+Identificar a cada creador en enlaces, códigos y nombres de anuncio no requiere datos personales de la audiencia.
+Lo que sí requiere revisión es el dato del contacto que llega al CRM del cliente: la base de licitud, el aviso al
+titular y el encargo de tratamiento son del cliente y de quien integre el CRM. El creador no recibe datos personales
+de los contactos. Sigue vigente la stop condition de la §12 sobre datos de audiencia sin finalidad o autorización.
 
 ## Referencias
 

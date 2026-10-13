@@ -87,7 +87,10 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 
 - **Producir voz**: **ElevenLabs** (v3 audio tags, IVC/PVC cloning, dubbing multi-idioma, voice design;
   Flash v2.5 para real-time), **Seed Audio 1.0** (diálogo multi-personaje + música + SFX en una pasada),
-  **Higgsfield** (`create_voice`, `dubbing`, `voice_change`) — todo vía MCP.
+  **Higgsfield** (`create_voice`, `dubbing`, `voice_change`). Para Seed Audio, TTS/Voice Replication, ASR e
+  interpretación de BytePlus usa `pnpm ai:byteplus` directo por defecto, con la clave Seed Speech:
+  [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md). Los otros proveedores conservan su MCP.
+  Los transportes están conectados; audio no tiene una generación real verificada en este canary.
 - **Producir música**: **ElevenLabs Music**, **Suno/Udio** según controles reales, dirección y licencia verificada
   para la cuenta, pista y uso; una marca de proveedor no acredita derechos comerciales por sí sola.
 - **Producir SFX**: generación de SFX (ElevenLabs) + foley/librerías.
@@ -189,5 +192,13 @@ Para recortes o retiming posteriores, usar `efeonce/APPROVED_MUSIC_CONTINUITY.md
 se mueve o cambia; verificar márgenes inicial/final y no desplazar el foley intacto. Revisión por bandas/mono,
 LUFS, true peak, ASR y hashes son evidencia técnica específica, nunca sustitutos de naturalidad o impacto.
 El template compartido de Motion es `templates/video-postproduction-review.md` en esa skill.
+
+## Locución comercial y música para un video corto (2026-10-12)
+
+Locución para un mercado: voz **de ese país** y en registro de locutor, no coloquial; por el conector de claude.ai el
+motor es `eleven_v4` (indicación del operador del 2026-10-12, que matiza el «v3» de §4 y §6 para este uso). Música para
+un video corto: **un tramo continuo**, nunca reeditada en trozos; los cortes se refuerzan con golpes sintetizados.
+Estado de herramientas (fechado, puede cambiar) y mezcla en `efeonce/STUDIO_TOOLING.md`, delta 2026-10-12; el tramo en
+`efeonce/APPROVED_MUSIC_CONTINUITY.md` §«Pista generada más larga que el video».
 
 Descripción extendida de oficio y términos de búsqueda conservados en `efeonce/EXTENDED_DESCRIPTION.md`.

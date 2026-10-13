@@ -1,0 +1,27 @@
+{
+  "lane": "seedream",
+  "icon": "04-escudo",
+  "elapsedSeconds": 107.02540373802185,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:byteplus",
+    "--model",
+    "seedream5-pro",
+    "--size",
+    "2048x2048",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/prompts/04-escudo.txt",
+    "--input-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream-input.json",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/04-escudo.png",
+    "--out-dir",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/receipts/04-escudo",
+    "--max-usd",
+    "0.09",
+    "--yes"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/04-escudo.png"
+}

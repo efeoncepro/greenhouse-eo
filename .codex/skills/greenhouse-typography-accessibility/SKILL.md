@@ -15,6 +15,14 @@ This is **not** a general UI skill. It composes with:
 
 **Claude parity:** mirrors `typography-design` (global) + its Greenhouse overlay. When you change one, update the other (`~/.claude/skills/typography-design/**` and `.claude/skills/typography-design/SKILL.md`).
 
+## AXIS control specimens
+
+[AXIS primitive consumption](../axis-design-system/references/ui-primitives.md) owns the portable forms/buttons/
+chips/badges boundary. Their Poppins control specimens do not change Greenhouse's Geist product roles.
+Keep field labels visible, icons supplementary and aria-hidden, help/error associations intact, and one visible
+focus contour. Inspect open rich Select descriptions and focused errors at narrow widths and enlarged text;
+package colors and automated checks do not replace consumer contrast or screen-reader verification.
+
 ## First reads (before deciding or auditing)
 
 Read only what the task needs — but never set type blind:

@@ -1,0 +1,28 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "layout": "orbit",
+  "voice": {
+    "eyebrow": "Propuesta · Servicios HubSpot",
+    "question": "¿Mi HubSpot puede hacer más?",
+    "answer": [
+      "Mucho más"
+    ]
+  },
+  "body": "Preparada para **[Cliente]** · Confidencial",
+  "selection": {
+    "target": "client-logo",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "column": {
+    "topPx": 220
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

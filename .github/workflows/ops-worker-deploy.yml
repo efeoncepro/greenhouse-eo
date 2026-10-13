@@ -286,6 +286,11 @@ jobs:
         env:
           ENV: ${{ env.ENV }}
           AUTH_SERVER_GC_ENABLED: ${{ vars.AUTH_SERVER_GC_ENABLED || 'false' }}
+          # TASK-2034: durable rollout switches for the shared worker. Repository
+          # variables plus live env must be updated together; retention survives rollback.
+          GROWTH_MEASUREMENT_META_ENABLED: ${{ vars.GROWTH_MEASUREMENT_META_ENABLED || 'false' }}
+          GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED: ${{ vars.GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED || 'false' }}
+          GROWTH_MEASUREMENT_RETENTION_ENABLED: ${{ vars.GROWTH_MEASUREMENT_RETENTION_ENABLED || 'false' }}
           EXPECTED_SHA: ${{ steps.resolve-worker-sha.outputs.expected_sha }}
           # TASK-1265 — DataForSEO login para el provider google_ai_overview. El password se
           # resuelve via secret ref en el worker; el login se inyecta acá como GH secret

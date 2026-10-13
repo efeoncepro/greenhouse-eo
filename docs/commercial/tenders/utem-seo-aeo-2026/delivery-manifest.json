@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-10-08T14:09:34.250Z",
+  "source": "docs/commercial/tenders/utem-seo-aeo-2026/oferta-tecnica.md",
+  "output_folder": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica",
+  "formats": [
+    "md",
+    "html",
+    "pdf"
+  ],
+  "status": "package_submitted_by_operator",
+  "signed": false,
+  "economic_offer_included": false,
+  "metrics": {
+    "horizontalOverflow": false,
+    "headings": [
+      "1. Una estrategia para conectar la formación continua con quienes la necesitan",
+      "2. Comprensión del contexto de Educación Continua UTEM",
+      "3. Auditoría inicial y plan de implementación",
+      "4. Quince artículos que conectan búsqueda y oferta académica",
+      "5. Una campaña de autoridad digital y PR",
+      "6. Medición, seguimiento técnico y cierre",
+      "7. Cronograma de ejecución",
+      "8. Equipo, coordinación y responsabilidades",
+      "9. Alcance operativo, calidad y resguardo institucional",
+      "10. Entregables y criterios de recepción",
+      "11. Matriz de cumplimiento de las especificaciones",
+      "12. Fuentes y fundamento de la propuesta"
+    ],
+    "tables": 10
+  },
+  "files": [
+    {
+      "name": "UTEM - Propuesta tecnica SEO GEO AEO.md",
+      "bytes": 28606,
+      "sha256": "e415c125ae97f04d489237bad0d6e3394ec5ea4b1a159c1c4b13b2a8ba544b1f"
+    },
+    {
+      "name": "UTEM - Propuesta tecnica SEO GEO AEO.html",
+      "bytes": 35546,
+      "sha256": "cc8651b5c8e7cfa150a0e0300d6b2e19af227496bcd9c10ac14d6152dcb907e5"
+    },
+    {
+      "name": "UTEM - Propuesta tecnica SEO GEO AEO.pdf",
+      "bytes": 316372,
+      "sha256": "7f189d87097435cd453ac1c3edc23548fb2db1423a1cd3ccbd9ae9a36e9348be"
+    },
+    {
+      "name": "CLAUDE-HANDOFF-INTERNO.md",
+      "bytes": 5844,
+      "sha256": "9336194c3b5d5308eb6781a26e674c1b323ceff92ff8856d69341455d01e0bb1",
+      "preSubmissionPreparationSha256": "5091e421e02a8a761f4cea905ba9d602f3e297106e551cf252169b1c28cc1711",
+      "audience": "internal_not_for_buyer",
+      "updated_reason": "Continuidad posterior a presentacion; no cambia entregables client-facing"
+    }
+  ],
+  "submitted": true,
+  "submitted_on": "2026-10-08",
+  "submission_evidence": "submission-evidence.json",
+  "submitted_attachment_inventory_verified": false,
+  "preservation": {
+    "clientFacingFilesUnchanged": true,
+    "internalHandoffUpdatedSeparately": true
+  }
+}

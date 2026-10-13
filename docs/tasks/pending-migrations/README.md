@@ -137,3 +137,10 @@ guard de SQL.
 Y pesa el doble en este repo porque **hay una sola instancia de Cloud SQL** compartida por dev,
 staging y producción: aplicar «en dev» es aplicar en producción, contra un front-end que puede ser
 varios commits más viejo que tu working tree.
+
+### TASK-2001 — contract de scheduled_post (diferido)
+
+La implementación local agrega activaciones y evidencia; conserva scheduled_post para rollback. **No hay SQL destructivo
+listo para aplicar.** Owner: Marketing Studio/EPIC-049. Antes de proponer el contract: release verificado, seis posts
+productivos migrados y planes confirmados, descubrimiento estable, consumidores migrados y aceptación de la ventana de
+rollback. El import con flag ON omite campañas activadas. [QA y límites](../../audits/marketing-studio/TASK-2001-local-verification.md).

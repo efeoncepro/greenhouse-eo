@@ -130,10 +130,89 @@ export type AxisAeoXrayExperience = {
         };
         honesty: string;
     };
+    /** 0.2.0 · bloques opcionales de experiencia temprana: el cliente vive cómo sería trabajar con el productor. */
+    aiPanel?: XrayAiPanel;
+    today?: XrayToday;
+    review?: XrayReview;
+    measure?: XrayMeasure;
+    nextStep?: XrayNextStep;
     ui: Record<string, string | {
         what: string;
         how: string;
     }[]>;
+};
+/** Muestra real del panel de respuestas de IA: preguntas observadas, si aparece la marca, qué cita y si el dato es correcto. */
+export type XrayAiPanel = {
+    title: string;
+    intro: string;
+    surface: string;
+    market: string;
+    asOf: string;
+    method: string;
+    note: string;
+    rows: {
+        question: string;
+        kind: "generic" | "brand";
+        appears: boolean;
+        accuracy: "correct" | "incorrect" | "not-mentioned";
+        citesOwnSite: boolean;
+        cited: string[];
+        detail: string;
+        surface?: string;
+        asOf?: string;
+    }[];
+};
+/** Lo que la máquina lee hoy de la página real del cliente frente a lo que leería con la pieza. */
+export type XrayToday = {
+    title: string;
+    intro: string;
+    url: string;
+    asOf: string;
+    method: string;
+    note: string;
+    rows: {
+        label: string;
+        today: string;
+        proposed: string;
+        verdict: "keep" | "improve" | "add";
+    }[];
+};
+/** Cómo llegaría la pieza a revisión: cada dato con su documento, responsable y estado. */
+export type XrayReview = {
+    title: string;
+    intro: string;
+    version: string;
+    note: string;
+    items: {
+        claim: string;
+        coupleId: string;
+        document: string;
+        owner: string;
+        status: "pending" | "approved" | "changes";
+    }[];
+    comments: {
+        role: string;
+        text: string;
+        coupleId?: string;
+    }[];
+};
+/** Señales con que el productor mediría la pieza, en el vocabulario de su propuesta. */
+export type XrayMeasure = {
+    title: string;
+    intro: string;
+    items: {
+        label: string;
+        question: string;
+        method: string;
+    }[];
+};
+/** Siguiente paso concreto al terminar el recorrido. */
+export type XrayNextStep = {
+    title: string;
+    body: string;
+    ctaLabel: string;
+    ctaHref: string;
+    note?: string;
 };
 export declare function validateXrayExperience(input: unknown, blocks: Set<string>, assets: Set<string>, path: string): {
     code: string;

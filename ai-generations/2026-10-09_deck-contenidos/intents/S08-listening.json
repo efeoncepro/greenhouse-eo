@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing de Contenidos · Listening y trendjacking",
+    "question": "¿Cuándo entro a la conversación?",
+    "answer": [
+      "A tiempo"
+    ]
+  },
+  "body": "De miles de conversaciones, encontramos la que le importa a tu marca y la convertimos en contenido mientras sigue viva.",
+  "steps": [
+    {
+      "glyph": "audifonos",
+      "kicker": "Escucha social",
+      "name": "Listening"
+    },
+    {
+      "glyph": "bombillo",
+      "kicker": "Lectura cultural",
+      "name": "Tendencias"
+    },
+    {
+      "glyph": "rayo",
+      "kicker": "Contenido reactivo",
+      "name": "Trendjacking"
+    },
+    {
+      "glyph": "barra-busqueda",
+      "kicker": "Búsqueda en redes",
+      "name": "Social search"
+    }
+  ],
+  "note": "No toda tendencia es para tu marca: también decimos cuándo no.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT2-listening.png",
+    "alt": "Una estratega de Efeonce con hoodie y lentes atrapa una burbuja de conversación luminosa que se desprende de un muro con miles de conversaciones"
+  }
+}

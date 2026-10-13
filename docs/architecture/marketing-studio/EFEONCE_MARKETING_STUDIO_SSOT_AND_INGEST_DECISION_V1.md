@@ -1,7 +1,7 @@
 # Efeonce Marketing Studio — Fuente única de verdad e ingesta de finales (ADR)
 
-> **Status:** `Accepted` (2026-09-26). Implementación y rollout por tasks (TASK-1894, TASK-1899, TASK-1895); nada de
-> este ADR está en runtime todavía.
+> **Status:** `Accepted` (2026-09-26). Ingesta y commands TASK-1894 desplegados; UI TASK-1895 y
+> MCP T1 TASK-2003 conservan su rollout independiente. Ver actualización 2026-10-04.
 > **Date:** 2026-09-26
 > **Deciders:** Julio Reyes (operador). Redacción: Claude.
 > **Owner:** Efeonce Marketing Studio (EPIC-049)
@@ -15,6 +15,15 @@
 > paridad UI → API → MCP, que siguen vigentes). **Reemplaza** la regla transitoria «OneDrive es la fuente y Studio una
 > proyección reimportable» de la [arquitectura](EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) §7 e invariante 9.
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
+
+## Actualización de alcance — 2026-10-04
+
+TASK-1899 se retiró sin rollout y deja de ser requisito para ingesta por API, CLI o UI. Sus scopes y confirmación
+son antecedentes, no autoridad disponible. TASK-2003 lleva MCP T1 en paralelo. Ingesta y commands Studio están
+desplegados; la [CLI HTTP de Greenhouse](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) usa la misma
+puerta remota. Se verificó con 18 tests locales y upload real en dry-run; no se aplicaron cargas productivas desde
+ese cliente durante su validación. Catálogo TASK-1905: API 1.6.0 y validación `warn`, conservando fuente maestra,
+derechos y aprobación separados. [Release](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md).
 
 ## 1. Contexto
 
@@ -65,7 +74,7 @@ quedaron fuera), nunca como fuente ni como proceso programado de ingesta.
 | Pros | Contras |
 |---|---|
 | Un final existe porque una persona lo entregó, con actor, sha256 y derechos | Cambia un hábito: el equipo tiene que subir, no sólo soltar |
-| Reutiliza lo ya construido en TASK-1893 (bucket, `media_object`, worker, derivados, descarga) | Necesita subida firmada, CLI y tools de escritura (TASK-1894/1899) |
+| Reutiliza lo ya construido en TASK-1893 (bucket, `media_object`, worker, derivados, descarga) | Necesita subida firmada, CLI (TASK-1894) y tools MCP T1 (TASK-2003, pendiente) |
 | Un solo command sirve a CLI, MCP y UI (parity por construcción) | Hasta el corte conviven dos regímenes por campaña |
 | Integridad y auditoría nativas | Archivos grandes exigen subida reanudable |
 
@@ -191,7 +200,8 @@ para trabajar sin miedo a «publicar» por mover un archivo.
 |---|---|
 | TASK-1893 (complete) | Bucket de originales, `media_object`, worker de derivados, descarga firmada: la base sobre la que se construye |
 | TASK-1894 | Command `createAssetVersion`, URL firmada de subida, CLI `studio:upload`, derechos al subir, corte por campaña y señal |
-| TASK-1899 | Tools MCP de subida y aprobación, clase de scope de escritura, identidad delegada, `dryRun` → `confirm` |
+| TASK-1899 | Retirada 2026-10-04; diseño histórico sin gate de ingesta API/CLI/UI |
+| TASK-2003 | Tools MCP T1 e identidad delegada, en paralelo; no habilita aprobación T2 |
 | TASK-1895 | UI de subida, revisión y aprobación, consumidora de los mismos commands |
 
 Espejo por Graph: **no planificado**.

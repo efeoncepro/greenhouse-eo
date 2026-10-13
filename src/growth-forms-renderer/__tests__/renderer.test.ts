@@ -3,7 +3,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 import type { RendererApiConfig } from '../api-client'
-import { FormRenderer } from '../renderer'
+import { FormRenderer, HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE } from '../renderer'
 import { conditionalContractFixture, multiStepContractFixture, staticContractFixture } from '../fixtures'
 import { RENDERER_CSS } from '../styles'
 import { resetTurnstileLoaderForTests } from '../turnstile'
@@ -48,6 +48,41 @@ describe('growth-forms-renderer · FormRenderer', () => {
     ;(window as unknown as { turnstile?: unknown }).turnstile = undefined
     resetTurnstileLoaderForTests()
     window.localStorage.clear()
+  })
+
+  it('opts every rendered form out of HubSpot non-HubSpot form capture before it reaches the DOM', async () => {
+    // Predicado de `collectedforms.js` (HubSpot): un <form> se ignora si trae el atributo
+    // `hs-do-not-collect` o `data-hs-do-not-collect` en el momento en que el script lo descubre
+    // por MutationObserver. El verificador real es el script de HubSpot en el host: la conversión
+    // «<título de la página>: .ghf-form» deja de aparecer en el contacto tras un envío.
+    const hubspotWouldCollect = (form: HTMLFormElement) =>
+      !(form.hasAttribute('hs-do-not-collect') || form.hasAttribute('data-hs-do-not-collect'))
+
+    const seenAtInsertion: boolean[] = []
+
+    const observer = new MutationObserver(records => {
+      for (const record of records) {
+        for (const node of Array.from(record.addedNodes)) {
+          if (!(node instanceof HTMLElement)) continue
+
+          const forms = node.tagName === 'FORM' ? [node as HTMLFormElement] : Array.from(node.querySelectorAll('form'))
+
+          for (const form of forms) seenAtInsertion.push(hubspotWouldCollect(form))
+        }
+      }
+    })
+
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    const { root } = mountInto(multiStepContractFixture())
+
+    await Promise.resolve()
+    observer.disconnect()
+
+    expect(HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE).toBe('data-hs-do-not-collect')
+    expect(root.querySelector('form')).not.toBeNull()
+    expect(seenAtInsertion.length).toBeGreaterThan(0)
+    expect(seenAtInsertion).not.toContain(true)
   })
 
   it('scopes the standalone mount root with .ghf-scope (div mount / internal preview)', () => {

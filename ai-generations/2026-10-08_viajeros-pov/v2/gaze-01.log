@@ -1,0 +1,17 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:inpaint /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/inpaint/cli.ts image --image ai-generations/2026-10-08_viajeros-pov/v2/01-austral-baker-termo.png --mask ai-generations/2026-10-08_viajeros-pov/v2/qa/01-eyes-mask.png --reference ai-generations/2026-10-08_viajeros-pov/v2/anchors/austral.png --prompt-file ai-generations/2026-10-08_viajeros-pov/v2/prompts/01-austral-baker-termo-gaze.txt --model gpt-image-2.5-sunburst --quality high --crop off --run ai-generations/2026-10-08_viajeros-pov/v2/gaze/01
+
+  ⚠ Sunburst edita sin máscara (por instrucción, la imagen entera); el pipeline recompone sólo la zona. Pide en el prompt que no cambie el encuadre.
+  ⧉ 1 referencia(s) del objeto
+  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)
+  · openai edita por instrucción: la máscara no viaja, sólo recompone.
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    · color corregido en el anillo (17700 px): desplazamiento RGB +1.4 / -0.4 / -0.5
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 142/255 · salida USD 0.0553
+    ⚠ la zona editable casi no cambió (delta medio 10.8/255): mira si el modelo cumplió el pedido.
+  ✎ ./ai-generations/2026-10-08_viajeros-pov/v2/gaze/01/inpaint/1c181bccdf97/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+ ELIFECYCLE  Command failed with exit code 3.

@@ -1212,3 +1212,14 @@ canonico de release:
 - **TASK-852 compactado en TASK-851** Worker SHA verification (`expected_sha` + Ready=True polling).
 - **TASK-853 SHIPPED** Azure infra release gating (Bicep diff detector + manual rollback runbook ampliado).
 - **TASK-854 SHIPPED** 2 signals adicionales (`deploy_duration_p95` + `last_status`) + dashboard `/admin/releases`.
+
+### CI build heap exhaustion — PR #254, 2026-10-13
+
+CI PR run `38468218236` attempt2 passed 20,100 tests (616 skipped, zero failures),
+then exhausted the JavaScript heap in Next.js TypeScript with
+`NODE_OPTIONS=--max-old-space-size=6144`. The CI build now inherits the existing
+8 GiB ceiling from `scripts/run-next-build.mjs`; no test/typecheck/build gate is skipped.
+Rerun on the new candidate and require a green conclusion before merging.
+GitHub returned zero job steps and the UI showed Starting job while logs/artifacts
+proved execution: neither is evidence that a runner has not started. Inspect artifacts
+and completed logs before cancelling a run or diagnosing runner capacity.

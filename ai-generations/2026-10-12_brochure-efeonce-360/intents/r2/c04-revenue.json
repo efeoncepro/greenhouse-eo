@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "04 · Te compran · Revenue",
+    "question": "¿Cuándo veo mi pipeline?",
+    "answer": [
+      "En vivo"
+    ]
+  },
+  "body": "**Dos** plataformas, un equipo RevOps:\nHubSpot y Salesforce\nMarketing · Ventas · Servicio · Datos · Agentes",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-B.png",
+    "alt": "La líder de RevOps dirige el nudo de un moño de luz azul con Sparks; el magenta sólo puntúa"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

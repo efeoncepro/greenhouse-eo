@@ -1,9 +1,21 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
+## Decisión vigente 2026-10-04 — TASK-1899 retirada
+
+El operador retira TASK-1899 para preservar libertad de implementación en la etapa actual de Studio. Se anula
+su condición de requisito previo y la obligación de cerrar cada entrega API/CLI/UI con escrituras MCP operativas.
+La ruta de desarrollo de activaciones pasa a **TASK-1905 → TASK-2001 → TASK-2002**, respetando sus dependencias
+funcionales. TASK-1899 y su implementación local quedaron retiradas sin rollout. TASK-2003 toma el carril de
+identidad delegada y escrituras MCP T1 en paralelo; no es requisito para entregar API/CLI/UI. La confirmación T2
+por digest propuesta en TASK-1899 queda como diseño histórico, sin contrato operativo vigente. Se mantienen
+API-first, paridad del registro y controles de acceso; una tool declarada no acredita federación ni una sesión MCP.
+El release de Studio del mismo día es independiente y se documenta con su alcance en cada sección vigente.
+
+
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.10
+> **Versión:** 1.13
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-02 (noche) por Claude (TASK-1894 Entregable B code complete y verificado en staging, sin desplegar en producción: commands del catálogo, autoridad por campaña, máquinas de estado, permisos proyectados, API 1.4.0, §7.4; antes, el mismo día: Entregable A en producción: puerta de ingreso de originales, kernel de commands, API 1.3.0, §7.3; antes, 2026-09-26: ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-10-05 por Claude: ADR de la vista Creative Studio (§1.1, §8). Antes, el mismo día: Delta TASK-2002 (calendario de activaciones en producción en solo lectura; composición, montaje de acciones por URL, paridad UI↔API, dryRun→apply, formatos vía `getAsset`, `Shell statusBar`). Anterior, 2026-10-04: TASK-1905 en producción, Studio `74073de`, API 1.6.0, 59 tools declaradas y catálogo v1 de 52 canales; CLI HTTP en Greenhouse verificada localmente. Los apartados de releases anteriores conservan su fecha y evidencia histórica.
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -40,6 +52,17 @@ Nace del prototipo local `ABRIR CAMPAIGN MANAGER.html` (Codex, OneDrive `5. Cont
 - **Globe.** Globe produce y gobierna piezas generadas. Studio consume esos assets por referencia o API y no reimplementa generación, rutas de modelos ni gobierno de derechos de generación.
 - **Greenhouse.** Organizaciones, clientes, identidad y acceso de personas siguen siendo de Greenhouse / Efeonce ID. Studio los recibe por API o por el canje de tokens; nunca por SQL.
 - **Un gestor de pauta en vivo.** Hasta que existan adapters con readback, Studio registra lo preparado y lo observado; no afirma que algo está publicado o activo por inferencia de fecha.
+
+## 1.1 Dos vistas: Marketing Studio y Creative Studio
+
+Decisión gobernante: [`EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`](EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md)
+(Accepted 2026-10-05). Studio tiene dos vistas sobre **el mismo aggregate**: Marketing Studio, desde quien activa
+(marketing, performance, marketing manager), y Creative Studio, desde el oficio (diseñador, director de arte, brand
+manager). Comparten campaña, brief, concepto, pieza, versión y copy, la API `/api/v1`, los commands y el registro de
+operaciones. La vista no autoriza; el switch conserva la campaña o pieza en foco. La autoridad de «final» es creativa
+(`approveAssetVersion`, `approveCreative`) y los tres estados siguen separados. Lo nuevo del lado creativo (receta de
+producción como faceta del catálogo, hitos derivados, referencias, feedback anclado, chequeo de marca) nace con
+paridad completa por tasks de EPIC-049. En este documento, «Studio» sin calificar se refiere a la plataforma.
 
 ## 2. Topología
 
@@ -104,6 +127,30 @@ tipos hace fallar el build (verificado a propósito).
 
 ## 3. Modelo de dominio
 
+### 3.1 Catálogo y referencias (TASK-1905, 2026-10-04)
+
+Studio main `74073de` desplegado, API 1.6.0, 64 operaciones HTTP y 59 tools declaradas; el [dossier de release](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md) actualiza el estado de los apartados
+históricos. Catálogo global versionado (52 canales), taxonomía/UTM por aparición, validación transaccional,
+snapshots inmutables, aliases revisados, revalidación explícita y backfill auditable. Compra/deal type en
+anuncio/presupuesto; contentSource en asset; cuenta/mercado esperan activaciones TASK-2001.
+Web y worker operan con `STUDIO_CHANNEL_VALIDATION_MODE=warn` y `STUDIO_CUSTOMER_MODEL_ENABLED=false`.
+Reader ICP inyectable: referencia real condicionada a TASK-1906/TASK-1892; T1 delegado a TASK-2003. Gobierno global
+requiere `marketing_studio.catalog.manage` y actualmente `operator_cli` sin restricción organizacional; los bearers
+de servicio/usuario no lo conceden. La migración de capability Greenhouse, el backfill y el canary MCP siguen pendientes. [Contrato funcional](../../documentation/marketing-studio/catalogo-canales-y-referencias-icp.md),
+[manual](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md) y [verificación local previa](../../audits/marketing-studio/TASK-1905-local-verification.md).
+
+Los 52 canales combinan las cuatro modalidades y doce familias; no representan 52 plataformas distintas.
+Compra, aparición, placement y formato son dimensiones separadas. Tracking y límites conservan fuente, fecha y
+ámbito; inventario ambiguo conserva nulos con razón explícita. `validatedWithPreviousSpec` expone antigüedad sin
+revalidar al leer. `channel_unmapped` cuenta registros pendientes y findings vigentes alimentan la atención.
+El dry-run productivo encontró 134 registros sin mapear; ninguno se corrigió automáticamente.
+
+La [CLI HTTP de Greenhouse](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) descubre el contrato remoto,
+prepara escrituras por defecto, exige `--apply` para enviarlas y conserva los controles del servidor. Verificación:
+18 tests locales, lecturas autenticadas y upload real en dry-run; ningún upload aplicado en producción acredita
+este cliente. [Dossier CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+
 Schema `studio` dentro de la base `marketing_studio`. IDs de negocio legibles preservados del catálogo
 (`CMP-001`, `CMP001-01`, `CMP001-01-imagen-16x9`, `copy-01-linkedin-a`), porque son los que ya usan los CDR,
 los nombres de archivo y las UTM.
@@ -128,7 +175,7 @@ los nombres de archivo y las UTM.
 | Corrida de import | `studio.import_run` | uuid | fuente, digest, modo, conteos, resultado |
 | Cliente API | `studio.api_client` | uuid | sha256 del token, scopes, organizaciones permitidas, revocación |
 
-Datos vigentes (producción y staging): 5 campañas (CMP-001..005), 21 conceptos, 54 piezas, 48 copys, 72 anuncios,
+Snapshot histórico de la fundación (2026-09-25; no usar como inventario actual): 5 campañas (CMP-001..005), 21 conceptos, 54 piezas, 48 copys, 72 anuncios,
 4 audiencias, 1 flight, 7 líneas de presupuesto y 6 posts, todos con `organization_id =
 org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
 
@@ -150,17 +197,19 @@ org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
 ## 3.1 Capa de estrategia
 
 Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
-(Accepted 2026-09-26). **Nada de esta sección está en runtime todavía**; la implementan tasks del EPIC-049. Lo vigente
-como contrato:
+(Accepted 2026-09-26). **Actualización 2026-10-04:** catálogo y validación están desplegados (§3); ICP real,
+activaciones y las otras capacidades conservan sus tareas. Contrato vigente:
 
 - **Paridad total con ejecución por agentes.** Toda capacidad, de lectura y de escritura, nace con command o reader de
-  dominio, ruta `/api/v1`, entrada en `operations.ts` (tool o exclusión razonada) y tool MCP federada. La UI escribe
+  dominio, ruta `/api/v1`, entrada en `operations.ts` (tool o exclusión razonada) y manifiesto generado. Federar y
+  verificar MCP es un carril separado que no bloquea API/CLI/UI. La UI escribe
   sólo por esos commands. Claude, Codex y Nexa pueden ejecutar toda acción de la UI con la identidad delegada de la
-  persona (mecánica de TASK-1899). El test de paridad se amplía a escrituras, nivel declarado y mutaciones de la UI.
+  persona (carril T1 de TASK-2003, pendiente de federación; TASK-1899 retirada). El test de paridad se amplía a escrituras, nivel declarado y mutaciones de la UI.
 - **Niveles de riesgo por operación**, declarados en el registro y aplicados por el command: `T0` lectura (directa);
   `T1` borrador o edición reversible (directa, idempotente, `If-Match`, auditada, actor = persona); `T2` aprobación,
-  publicación, gasto, credenciales externas o destructivo (`dryRun` → digest → confirmación explícita de una persona).
-- **Catálogo de canales** gobernado y versionado en Studio (`channel_key`: tipo paid/organic/owned, plataforma,
+  publicación, gasto, credenciales externas o destructivo (confirmación humana; HTTP T2 no habilitado, operador CLI
+  con `--apply --confirm`). El digest propuesto por TASK-1899 quedó retirado.
+- **Catálogo de canales** gobernado y versionado en Studio (`channel_key`: modalidad paid/organic/owned/earned, familia, plataforma,
   placements, formatos, límites de copy, objetivos válidos, fuente y fecha por especificación). Valida copys, piezas y
   anuncios al escribir; reemplaza el `channel` libre por expand → backfill revisado → contract. El mercado no se
   codifica en el canal.
@@ -232,7 +281,7 @@ a un flujo editorial completo desplegado. No hubo implementación o cambio runti
 - **Organización:** toda lectura acepta `organizationId` (id canónico `org-…`). **Intersecta, nunca amplía**: una organización fuera de lo visible responde 404 (anti-oráculo); en modo `open` restringe el resultado.
 - Paginación por cursor opaco en listas que pueden crecer (`assets`, `ads`, `copies`); orden estable por ID.
 - **Escrituras:** hasta el 2026-10-02 no había escrituras HTTP. El import corre por CLI con credencial de migrador. Los commands (crear campaña, versionar asset, revisar copy, aprobar) llegan en TASK-1894 con `Idempotency-Key` + digest, `If-Match` por `revision` y auditoría, y nacen en el mismo registro con su tool de clase `write` o una exclusión con razón. Toda versión nueva entra por **un solo command** (`createAssetVersion`, tool `studio.asset.version.create`) desde CLI, MCP o UI, con subida firmada directa a GCS (§7).
-- **Delta 2026-10-02 (TASK-1894 Entregable A):** existen las dos primeras escrituras, `POST /api/v1/campaigns/{campaignId}/uploads` (tool `studio.asset.upload.request`) y `POST /api/v1/campaigns/{campaignId}/asset-versions` (tool `studio.asset.version.create`), ambas riskTier T1, capability `marketing_studio.asset.write` y scope `studio:assets:write`. El registro declara `riskTier` explícito en sus 20 operaciones (18 lecturas T0 + 2 escrituras T1) y el manifiesto queda en 15 tools + 5 exclusiones. Contrato completo, kernel y compuertas en §7.3. La revisión (aprobar o pedir cambios) existe sólo como CLI de operador; la aprobación por API es Slice 4 + TASK-1899.
+- **Delta 2026-10-02 (TASK-1894 Entregable A):** existen las dos primeras escrituras, `POST /api/v1/campaigns/{campaignId}/uploads` (tool `studio.asset.upload.request`) y `POST /api/v1/campaigns/{campaignId}/asset-versions` (tool `studio.asset.version.create`), ambas riskTier T1, capability `marketing_studio.asset.write` y scope `studio:assets:write`. El registro declara `riskTier` explícito en sus 20 operaciones (18 lecturas T0 + 2 escrituras T1) y el manifiesto queda en 15 tools + 5 exclusiones. Contrato completo, kernel y compuertas en §7.3. En ese release la revisión existía sólo como CLI de operador y se proyectaba aprobación API en Slice 4 + TASK-1899. Actualización 04/10: TASK-1899 retirada; T2 HTTP sigue bloqueado.
 
 ## 4.1 Agentes y Efeonce MCP
 
@@ -248,7 +297,7 @@ el scope de API (`studio:read`). El artefacto `packages/contracts/generated/tool
 
 **Regla del programa.** Toda capacidad nueva de Studio nace en el registro con su tool o una exclusión con razón. Todo
 lo que se puede hacer en la UI se puede hacer por API y por MCP, **incluidas las aprobaciones**: las decide una
-persona; un agente las ejecuta con la identidad delegada de esa persona (TASK-1894 / TASK-1899).
+persona; el consumo MCP T1 requiere el carril delegado de TASK-2003 y su canary. TASK-1899 está retirada y no bloquea API/CLI/UI.
 
 **Autoridad de la persona (lectura).** Studio no conoce personas. La autorización por persona ocurre en Greenhouse:
 
@@ -276,8 +325,8 @@ entrada en `src/mcp/greenhouse/skill-manifest.ts` declara `provider: 'marketing-
 ## 4.2 Operación híbrida con agentes
 
 Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md)
-(Accepted 2026-09-26). **Nada de esta sección está en runtime todavía**; la implementan tasks del EPIC-049. Lo vigente
-como contrato:
+(Accepted 2026-09-26). **Actualización 2026-10-04:** catálogo y validación están desplegados (§3); ICP real,
+activaciones y las otras capacidades conservan sus tareas. Contrato vigente:
 
 - **Work items**: unidad de trabajo por campaña (tipo, responsable = persona **o** rol de agente, quién lo pidió,
   estado, insumos por referencia versionada, entregable como borrador con procedencia, revisión y traspaso al rol
@@ -317,12 +366,33 @@ como contrato:
 
 | Modo (`STUDIO_ACCESS_MODE`) | Comportamiento | Estado |
 |---|---|---|
-| `open` | Lecturas abiertas sin login, por decisión del operador (2026-09-25). Sin escrituras HTTP. `X-Robots-Tag: noindex, nofollow` + `robots.txt` disallow. | **Vigente** |
+| `open` | Lecturas abiertas sin login, por decisión del operador (2026-09-25). Sin escrituras HTTP, salvo la ventana temporal de escritura descrita abajo (vigente hasta el 2026-10-12). `X-Robots-Tag: noindex, nofollow` + `robots.txt` disallow. | **Vigente** |
 | `efeonce_id` | Login first-party con `auth.efeonce.org` (Efeonce ID, relying party). La API exige sesión o bearer de `api_client`; organización derivada del actor. Hoy falla cerrado. | TASK-1898, **última del programa** por decisión del operador |
 
 Riesgo aceptado del modo `open`: cualquiera con la URL ve presupuestos propuestos, copys y audiencias. Se revierte
 cambiando el modo cuando exista el relying party. Aun en `open`, cada reader recibe un `Actor`
 (`{ kind: 'anonymous_open' }`), para que activar `efeonce_id` sea configuración y no refactor.
+
+**Ventana temporal de escritura en modo `open` (decisión temporal del operador, 2026-10-05).** Para probar las
+escrituras de la UI de TASK-2002 en producción antes del login de TASK-1898, el operador eligió «Producción abierta»
+(entre preview protegido, local y producción abierta). Contrato (Studio `1f003c1`, `apps/web/src/server/runtime.ts`,
+test `open-write-window.test.ts`):
+
+- Dos variables, ambas obligatorias: `STUDIO_OPEN_WRITE_UNTIL` (instante ISO; a más de **7 días** hacia adelante se
+  ignora) y `STUDIO_OPEN_WRITE_ORGS` (ids canónicos `org-…`).
+- Con ambas válidas y antes del vencimiento, el modo `open` resuelve el actor `api_client` con id `open-write-window`,
+  scopes `studio:read` + `studio:write`, limitado a esas organizaciones. Habilita las escrituras T1 (planificar,
+  editar, reprogramar, cancelar, vincular y crear desde ejecución). **Aprobar sigue exigiendo persona**
+  (`operator_cli`).
+- Al vencer, o si falta o no es válida alguna variable, vuelve a solo lectura sin redeploy.
+- Producción (Vercel `efeonce-marketing-studio`, sólo Production): hasta `2026-10-12T10:00:00Z`, sólo la organización
+  Efeonce (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`).
+
+Riesgo aceptado: mientras esté abierta, cualquiera con el link puede escribir en la organización Efeonce, y el audit
+registra `api_client:open-write-window`, no una persona. Retiro: al llegar TASK-1898 (login), o antes si el operador lo
+pide (borrar las dos variables o poner una fecha pasada). No es un modo de acceso nuevo: `STUDIO_ACCESS_MODE` sigue
+en `open`. Estado y rollback:
+[runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05).
 
 **Bearer de servicio (TASK-1890).** `Authorization: Bearer mst_…` (47 caracteres) resuelve un `studio.api_client`
 activo (se guarda sólo el sha256; scope `studio:read`, único valor admitido hoy) con sus `organization_ids`. Un token
@@ -367,7 +437,7 @@ Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`
   de licencia) obligatorios. Subida en dos pasos: URL firmada V4 acotada a `originals/sha256/<2>/<sha256>` (reanudable
   para video grande) → el cliente sube directo a GCS → confirma; Studio verifica tamaño, mime y sha256 recalculado antes
   de crear la versión, y los derivados salen por el worker existente. Puertas: CLI `pnpm studio:upload` (TASK-1894),
-  tools MCP de escritura con identidad delegada (TASK-1899) y UI (TASK-1895). Los bytes nunca pasan por MCP ni por Vercel.
+  tools MCP T1 con identidad delegada (TASK-2003, pendiente) y UI (TASK-1895). Los bytes nunca pasan por MCP ni por Vercel.
 - **Inferencia.** CLI y agentes infieren campaña, concepto, formato y versión del nombre canónico
   (`CMP001-02 - <título> - 4x5.png`) y del catálogo; sólo preguntan lo que no pueden inferir.
 - **Aprobación humana.** Una versión nueva entra pendiente de revisión; aprueba una persona (o un agente con su
@@ -453,7 +523,7 @@ mes. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing
 Estado: **en producción desde 2026-10-02** (Studio `a450a3c` puerta de ingreso, `3fe85a2` semilla de CMP-004 con los
 conceptos S01–S08 y BF1–BF3 y creatividad aprobada por CDR-012, `aa91ce3` el anónimo recibe `write_not_allowed` antes de
 validar el cuerpo; API **1.3.0**). Es la primera puerta del command único de §7: la CLI `pnpm studio:upload` ya la usa;
-MCP (TASK-1899) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Subidas.
+MCP T1 (TASK-2003, pendiente) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Subidas.
 
 **Flujo.**
 
@@ -498,7 +568,7 @@ MCP (TASK-1899) y UI (TASK-1895) entran por la misma. Runbook: [`MARKETING_STUDI
 | Compuerta | Regla |
 |---|---|
 | Autoridad | anónimo del modo open → 403 `write_not_allowed` (antes de validar el cuerpo); `user` → `forbidden` hasta TASK-1898; `api_client` → exige el scope de la tool y nunca aprueba; `operator_cli` → escribe |
-| Riesgo | `riskTier` leído del registro: T1 exige `Idempotency-Key` (400 `idempotency_key_required`); T2 bloqueado hasta TASK-1899 |
+| Riesgo | `riskTier` leído del registro: T1 exige `Idempotency-Key` (400 `idempotency_key_required`); T2 por HTTP bloqueado con `confirmation_required`; operador CLI exige confirmación |
 | Organización | fuera de lo visible → 404 (anti-oráculo) |
 | Idempotencia | misma llave + mismo cuerpo (digest) = replay de la respuesta guardada; otro cuerpo = 422 `idempotency_key_reused`; la carrera se resuelve con `ON CONFLICT`; registros de 24 h |
 | `dryRun` | ejecuta las validaciones sin escribir |
@@ -590,11 +660,11 @@ unitarias (kernel, inferencia, derechos, firma V4) e integración `upload.integr
   a producción sigue sin autorizar (§7.4). Hoy no bloquea: el kernel no deja escribir a personas por sesión
   (TASK-1898) y los clientes de API usan scope.
 - Gateway: `pnpm studio:manifest:sync` sin correr; las tools de escritura quedarían fuera por
-  `write_tool_without_scope_class` hasta TASK-1899.
+  `write_tool_without_scope_class` sin su clase/autorización delegada; TASK-2003 es el carril paralelo vigente.
 - De la spec del Entregable A: puerto `ChannelValidator` y `CommandResult.warnings` (*actualizado 2026-10-02 (noche):*
-  existen desde el Entregable B, con adaptador por defecto sin validar; el validador real lo enchufa TASK-1905); decidir la
+  existen desde el Entregable B; TASK-1905 conectó el validador real en producción el 2026-10-04, modo `warn`); decidir la
   exclusión de `studio:review` en `operations.ts` (CLI de operador, hoy sin entrada).
-- Entregables B y C (Slices 4–10). La aprobación por API (`approveAssetVersion`) es Slice 4 + TASK-1899.
+- Entregable B en producción desde el 2026-10-02 (§7.4); Entregable C diferido. La aprobación por HTTP sigue bloqueada: TASK-1899 se retiró sin habilitar ese carril.
 
 ## 7.4 Commands del catálogo (TASK-1894, Entregable B)
 
@@ -643,7 +713,7 @@ Calendario: Studio planifica en `PLANNED` y cancela en `CANCELLED`; nunca public
 se edita. Lectores y salud no cuentan los planificados ni los cancelados como pendientes del proveedor.
 
 **Regla T2.** Una operación T2 (aprobación o destructiva) hoy sólo la ejecuta `operator_cli`; por API responde 403
-`confirmation_required` hasta TASK-1899 (confirmación con persona). Un `api_client` que intenta aprobar recibe 403
+`confirmation_required`; no hay contrato de confirmación por digest activo tras retirar TASK-1899. Un `api_client` que intenta aprobar recibe 403
 `approval_requires_person`. La CLI exige `--confirm` además de `--apply`.
 
 **Errores nuevos** (además de los de §7.3):
@@ -653,7 +723,7 @@ se edita. Lectores y salud no cuentan los planificados ni los cancelados como pe
 | `approval_requires_dedicated_command` | 422 | una transición genérica apunta a un destino aprobatorio |
 | `campaign_not_studio_owned` | 409 | escritura del catálogo en una campaña `onedrive` |
 | `budget_kind_violation` | 422 | `setBudgetLine` con un `kind` distinto de `proposed` |
-| `confirmation_required` | 403 | operación T2 por API (hasta TASK-1899) |
+| `confirmation_required` | 403 | operación T2 por API; carril remoto de confirmación no habilitado |
 | `already_exists` | 409 | el id a crear ya existe |
 
 **Proyección de permisos.** `CampaignDetail.permissions` = `writable`, `lockReason` (`open_mode` |
@@ -668,8 +738,8 @@ DELETE y aprobaciones aceptan cuerpo vacío. Un replay con la misma `Idempotency
 **Exposición.** 29 rutas de escritura (POST/PATCH/PUT/DELETE) + lectura nueva `GET /api/v1/campaigns/{id}/brief`
 (tool `studio.campaign.brief.get`). El registro se reparte por slice (`operations-review.ts`,
 `operations-catalog.ts`, `operations-plan.ts`, helper `operations-write.ts`). Puerto `ChannelValidator` con
-adaptador por defecto sin validar (`catalogVersion null`) y `warnings` en el resultado de toda escritura; el
-validador real llega con TASK-1905.
+`warnings` en el resultado de toda escritura. El adaptador sin validar fue el estado inicial del 02/10; desde
+TASK-1905 (04/10) el default consulta el catálogo publicado, conserva la versión y persiste findings en la misma transacción.
 
 **CLI de operador** `pnpm studio:write <operationId> [--param k=v] [--file cuerpo.json] [--if-match N] [--key llave]
 [--apply [--confirm]]` y `--list`: corre como `operator_cli` con las variables `STUDIO_PG_*` del ambiente, por los
@@ -702,16 +772,47 @@ ajenos (barra de estado de otra sesión). Sandbox `CMP-900` creada por `createCa
 409, brief literal (comillas tipográficas, `\n\n`, espacio final), copy byte a byte, flight y plan con `revision`.
 
 **Pendiente.** Push de Studio a `main`; release de Greenhouse a producción; sync del gateway; Entregable C (corte de
-las campañas existentes); TASK-1898/1899 (persona por sesión, confirmación T2 por API, federación de escrituras).
+las campañas existentes); TASK-1898 (persona por sesión) y TASK-2003 (federación T1). La confirmación T2 por HTTP no está habilitada; TASK-1899 fue retirada.
+
+## 7.5 Reproducción de video (TASK-1998, en producción desde 2026-10-04)
+
+- **Derivado `playback`.** El worker de medios (§7.2) genera para cada versión de video con original en GCS un MP4 H.264
+  High `yuv420p` (CRF 23, techo 2,5 Mbps), lado corto ≤ 720 px sin agrandar, AAC 128 kbps si el original tiene audio,
+  sin metadatos y con `+faststart` (`moov` antes de `mdat`: el navegador empieza a reproducir sin bajar todo). Objeto
+  `renditions/<asset_version_id>/playback-<sha12>.mp4` en el bucket de medios, subido sin sobrescribir; fila
+  `asset_rendition` `kind='playback'`, `mime_type='video/mp4'` (CHECK de pareja `asset_rendition_playback_mime_chk`,
+  migración `1791129772182`). Es una vista de la versión: nunca una `asset_version` ni cambia la revisión.
+- **Flag y backfill.** `MEDIA_WORKER_PLAYBACK_ENABLED` (SoT `apps/worker/deploy.sh`). El evento `OBJECT_FINALIZE` cubre
+  lo nuevo y el barrido horario `/jobs/reconcile-derivatives` hace el backfill de lo ya ingestado, idempotente (segunda
+  corrida `up_to_date`). El cuadro del segundo 1 sólo se extrae si falta un derivado de imagen. Medido con «Los Sparks»
+  (49,6 s, 36,4 MB): 7,3 MB a 1280×720 en ~20 s de CPU (6/6 videos de producción en un barrido), holgado frente al ack de 600 s y al timeout de 900 s.
+- **Transporte sin bytes por Vercel.** El reader entrega el mismo enlace HMAC de los medios (`/api/v1/media/{token}`,
+  sin base). Para `video/*` la ruta responde `302` a una URL V4 de 1 h firmada por IAM `signBlob`
+  (`STUDIO_MEDIA_SIGNER_EMAIL` → `STUDIO_DOWNLOAD_SIGNER_EMAIL` → `GCP_SERVICE_ACCOUNT_EMAIL`), con
+  `response-content-type` y la redirección cacheada 5 min; GCS atiende `Range` (`206`). Sin firmante: `503
+  playback_unavailable`. Sólo `next dev` sin firmante hace de proxy con `Range` (la cuenta personal no firma como la SA
+  del runtime); en Vercel, nunca. Alternativas descartadas: streaming por la función (límite de respuesta de 4,5 MB,
+  doble egreso, una invocación por rango) y URL V4 en el reader (IAM por video y por página). **Cloud CDN** con backend
+  bucket y URL firmada HMAC queda evaluado y diferido: cambia sólo el adaptador `apps/web/src/server/media-signing.ts`;
+  entra si las piezas se comparten fuera del equipo o el egreso crece.
+- **Contrato.** `PlaybackRendition { url, posterUrl, mimeType, widthPx, heightPx, byteSize }` en `Asset.playback` (versión
+  vigente) y `AssetVersionDetail.playback`; `null` si no es video o el derivado no existe (nunca el original).
+  `posterUrl` = el `preview` del segundo 1. API 1.5.0; manifiesto 44 tools (hash `60dfac7524ee`); `getMedia` sigue
+  como exclusión con la razón actualizada. El gateway no valida esquemas de salida, así que el campo viaja antes del
+  sync; el sync del manifiesto (efeoncepro/efeonce-mcp#24) no cambia la superficie federada (digest `193e182cd743`) y no requiere deploy.
+- **Riesgo declarado.** El worker carga el original completo en memoria (2 GiB); con el tope de subida de 1 GiB, un
+  video cercano a ese tamaño podría agotarla. Follow-up: transcode en streaming.
 
 ## 8. Interfaz
 
 - Diseño aprobado por el operador el 2026-09-25 (artifact «v2 · Claro y oscuro»).
 - Tema generado desde `@efeoncepro/axis-tokens@0.2.5` (`apps/web/scripts/generate-theme.mjs` → `theme.generated.css`); `theme:check` en el typecheck falla si el paquete y el CSS divergen. Roles de superficie por tema (app, chrome, inset, card, elev, selected) sobre los valores AXIS.
 - Claro/oscuro con switch; preferencia en la cookie `studio-theme`, leída en el servidor (sin parpadeo). Poppins (display) y Geist (texto) vía `next/font`.
-- Pantallas: Hoy (decisiones), Campañas (hero + tarjetas con pista de tres estados), espacio de campaña (piezas concepto × formato con inspector y preview; copys; anuncios; medios; calendario), Calendario mensual (vuelos por semana, posts vencidos a verificar), Piezas (`/library`) y Medios. Búsqueda ⌘K. Bajo 860 px, navegación inferior.
+- Pantallas: Hoy (decisiones), Campañas (hero + tarjetas con pista de tres estados), espacio de campaña (piezas concepto × formato con inspector y preview; copys; anuncios; medios; calendario), Calendario de activaciones (`/calendar`, TASK-2002: Mes, Semana, Día, Línea de tiempo y Paid, hoja y popover del día; ver [Delta 2026-10-05](#delta-2026-10-05--task-2002-calendario-de-activaciones)), Piezas (`/library`) y Medios. Búsqueda ⌘K. Bajo 860 px, navegación inferior.
 - **Vista previa por formato:** 9:16 se muestra como story; 1:1, 4:5 y 16:9 en tarjeta de feed con su proporción real (antes un `max-height` de 320 px recortaba).
+- **Video (TASK-1999):** `MediaVideo` reproduce `Asset.playback` en la tarjeta de feed o en la story con controles nativos, póster del segundo 1, `preload=metadata`, `playsInline` y sin autoplay ni loop; sin `playback` muestra el cuadro con una nota y, si falla, «No se pudo cargar el video.» con «Reintentar». En la story las capas no capturan clics y dejan libre la franja de controles. El tablero dibuja todas las piezas de cada concepto × tipo × formato (con la etiqueta de variante y la duración en los videos), y el hueco de un formato que sólo existe en el otro tipo lleva a esa pieza («Ver video» / «Ver imagen»).
 - Logos oficiales (`public/brand/`) copiados de `greenhouse-eo/public/branding/`.
+- **Vista Creative Studio (decidida 2026-10-05, sin implementar):** navegación propia sobre los mismos datos, switch que conserva el foco y vista en la URL; ver §1.1.
 - Flujo maestro y huecos conocidos (p. ej. `/library` no alcanzable a 390 px): `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`; la UI de edición es TASK-1895.
 
 ## 9. Observabilidad y operación (TASK-1896)
@@ -756,6 +857,8 @@ alta prioridad hasta portar el script. RTO de referencia medido ≈ 1 min. Runbo
   (`PENDING` con más de 2 h de vencido), `metricool_readback` (48 h, sólo con campañas activas; lee `ops_run` y
   `worker_run.kind = 'metricool_readback'`), `restore_rehearsal` (45 días; fallido o vencido = `down`; nunca corrido =
   `degraded`), `rights_expiring` (versiones cuyo uso vence en 14 días; `not_configured` sin la columna de derechos).
+- TASK-1905 añade `channel_unmapped`: cuenta registros sin resolución canónica en el snapshot, contempla alias
+  exactos en arrays y devuelve `not_configured` si falta el schema. No aplica backfill ni revalidación durante health.
 - Umbrales en un solo módulo: `packages/domain/src/health/thresholds.ts`. Estado global: `down` si la base no
   responde; `degraded` si algo más está degradado o caído; si no, `ok`.
 
@@ -822,13 +925,18 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | TASK-1893 | Originales en GCS + worker de medios | Complete 2026-09-26 (en producción) |
 | TASK-1896 | Observabilidad, alertas y restauración | Complete 2026-09-26 (en producción; restauración probada) |
 | TASK-1892 | Métricas desde Greenhouse (GA4 aún no en producción: TASK-1284) | To-do |
-| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregable B (§7.4) code complete y verificado en staging, sin desplegar en producción; Entregable C diferido |
+| TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad por campaña, `createAssetVersion` con subida firmada, CLI `studio:upload`, derechos al subir y señal «pieza aprobada sin original en Studio» | Entregable A (puerta de ingreso, §7.3) en producción 2026-10-02; Entregable B (§7.4) en producción desde 2026-10-02; Entregable C diferido |
 | TASK-1895 | UI de edición, revisión y métricas | To-do |
-| TASK-1899 | Escrituras, subida y aprobaciones por MCP (scopes `.write`/`.approve`, identidad delegada) | To-do |
+| TASK-1899 | Diseño histórico de escrituras y confirmación MCP | Retirada 2026-10-04, sin rollout; no es prerrequisito API/CLI/UI |
+| TASK-1905 | Catálogo, validación, alias/backfill, audiencias y referencias ICP | Studio desplegado; Greenhouse/MCP/ICP y backfill pendientes |
+| TASK-2002 | Calendario de activaciones (UI) | En producción en solo lectura (verificado en la sesión del 04–05/10); escrituras web esperan TASK-1898 |
+| TASK-2003 | Identidad delegada y escrituras MCP T1 | Carril paralelo pendiente; no bloquea producto |
 | TASK-1897 | Revocar `CONNECT` de PUBLIC en `greenhouse_app` | To-do |
 | TASK-1898 | Login con Efeonce ID | To-do, última |
 
-Orden: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898.
+Secuencia histórica inicial: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898.
+Actualización 2026-10-04: TASK-1899 retirada; activaciones siguen TASK-1905 → TASK-2001 → TASK-2002,
+con TASK-2003 en paralelo para MCP T1 y sus dependencias propias.
 
 - **Flujo editorial SEO (pendiente):** TASK-1667 y TASK-1669 ahora pertenecen a EPIC-049; reutilizan
   TASK-1908 y TASK-1913/1914/1915. Medición/outcome TASK-1668 permanece en EPIC-022.
@@ -845,3 +953,146 @@ Orden: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897
 - Registro de campañas: [`EFEONCE_CAMPAIGN_REGISTRY_V1.md`](../../operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md)
 - Manifiesto de pauta: [`EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md`](../../operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md)
 - Precedente de repo hermano gobernado desde Greenhouse: [`creative-studio/`](../creative-studio/)
+
+## Delta 2026-10-04 — TASK-2001 implementada localmente
+
+Implementa la decisión de activaciones de Strategy Layer §15 y los Delta de TASK-2001. API 1.7.0:
+80 operaciones, 75 tools; todavía no desplegada ni federada. [Verificación local](../../audits/marketing-studio/TASK-2001-local-verification.md).
+
+- `campaign.kind` admite campaign/always_on. `activation` es el plan de Studio, obligatorio dentro de una campaña,
+  con cuenta/mercado y versiones exactas; `execution_record` conserva evidencia del proveedor; `activation_event`
+  es append-only con persona/agente/regla. Relaciones compuestas impiden cruzar organización, campaña o cuenta.
+- Estado calculado: planned, scheduled, scheduled_off_plan, published (organic/owned), delivering/ended (paid),
+  overdue y cancelled. El paso del tiempo nunca demuestra publicación ni entrega. Tolerancia del catálogo:
+  15 minutos para puntos; 0 días por extremo para franjas, fechas locales de la cuenta IANA.
+- Mercado pertenece a la activación. Cuenta devuelve CMS y sitio por separado; horas de cuenta y Santiago en readers.
+  Las vistas reciben avisos de aprobación, versión diferente, colisión, herramienta desactualizada y tracking.
+- Planificar/editar/reprogramar son commands separados con dryRun, revisión/idempotencia y eventos. Reprogramar sólo
+  mueve el plan. Crear desde ejecución devuelve procedencia tool y exige campaña/piezas. Cancelar preserva evidencia.
+- Toda operación aparece en operations.ts/OpenAPI/manifiesto. Los schemas de request usan Zod input; los defaults
+  del servidor no son campos obligatorios para CLI/MCP. Las respuestas mantienen el schema de output.
+- `buildTrackingUrl` es la única derivación de activaciones: catálogo fijado, slug de campaña, id público de activación
+  de ancho mínimo 6 sin truncar, anuncio/audiencia y formato exacto. Dominio propio desde config del operador por org;
+  HTTPS, sin credenciales ni UTM preexistente. Auto-tagging y canal sin tracking externo no reciben UTM manual.
+  Sin destino devuelve null; antes de asignar ACT devuelve params y requiresActivationId. No reserva ids en una lectura.
+- Snapshot se regenera al editar antes de evidencia publicada/entrega y luego se congela, junto al slug de campaña;
+  la Delta vigente prevalece sobre el freeze por evidencia sólo programada del research original. Las campañas nuevas
+  generan slug al crearse; las antiguas requieren revisión personal antes de sus activaciones. Nunca reescribe UTM importada.
+- Owned: HubSpot se lee mediante puerto del owner Greenhouse (org + portal + respuesta completa); WordPress lee REST
+  público del sitio del cliente autorizado. Sin reader CMS se revisa URL pública: HTTP, robots, canonical y sitemap.
+  La fecha confirmada por persona vive separada de published_at; `publication_confirmed` registra confirmed_by desde
+  identidad autenticada. HTTP 200 por sí solo no publica. `draft_url` de Notion sólo se guarda y devuelve.
+- Public fetch: binding server-side por organización/proveedor/cuenta, sólo HTTPS, sin redirects/credenciales, DNS
+  público fijado en la conexión, límites de tiempo/tamaño/paginación. Registrar una cuenta no otorga permiso de lectura.
+- Backfill conserva identidad legacy y observation_source, fechas y observaciones, sin crear/vincular planes; una persona
+  usa createActivationFromExecution. Import deja de tocar posts de campañas activadas con flag ON; OFF conserva el reader
+  antiguo. `scheduled_post` se mantiene hasta el contract post-release. Cada lista paginada devuelve nextCursor.
+
+El dossier/gate/medición SEO-AEO del blog es follow-up backend-data sin ID. SV360 estimado con fuente/fecha, panel IA
+por clúster versionado y autorización con avisos abiertos quedan en ese follow-up; no se implementan ni bloquean 2001.
+
+### Ampliación email del operador — 2026-10-04
+
+Resend (prioridad por volumen), HubSpot, Salesforce Marketing Cloud Engagement y Next requieren adapters distintos
+sobre una proyección común de evidencia de envíos de campaña. Canal/familia, proveedor, cuenta y envío no se
+confunden. Completitud y fecha enviada se observan; la aceptación del proveedor o un destinatario no acreditan
+una campaña completa. El corte 4094da0 tiene consumidor HubSpot, no estos cuatro adapters operativos.
+
+[Decisión y fronteras](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#delta-de-decisión-2026-10-04--email-con-varios-proveedores)
+y [alcance/aceptación](../../tasks/in-progress/TASK-2001-marketing-studio-campaign-activations-execution-evidence.md#delta-2026-10-04-email--resend-principal-y-varios-proveedores).
+
+
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+UI de `/calendar` sobre el reader y los commands de TASK-2001, fiel 1:1 a la dirección visual v3 aprobada (canvas
+`https://claude.ai/artifact/D6uwRFMzvnaHzGDtDLvxBi`; el generador del canvas es la fuente exacta de medidas para
+revisar fidelidad). En producción; las escrituras web dependen de TASK-1898 y, hasta el 2026-10-12, se prueban con la
+ventana temporal de escritura del modo `open` (§5). Wireframe y flujo:
+[`TASK-2002-marketing-studio-activations-calendar.md`](../../ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md),
+[`TASK-2002-marketing-studio-activations-calendar-flow.md`](../../ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md).
+
+**Composición (`apps/web/src`).**
+
+- Ruta `app/calendar/page.tsx` (+ `loading.tsx`). Estado en la URL: `view` (`month|week|day|timeline|paid`), `date`,
+  `month`, `scale`, `rows`, `line`, `pop`, `action`, `record`, `activation` y filtros
+  `modality|family|platform|account|market|campaign|status`. `view=paid` es alias: Paid es el filtro
+  `modality=paid` sobre el mes, como en el tablero.
+- Vistas en `components/activations/`: `MonthGrid`, `WeekView`, `DayView` (+ `DaySide`), `TimelineView`
+  (+ `TimelineTools`, `TimelineFoldAll`), `PaidView`. Tarjeta `ActivationCard` (compact/rich/mobile, `EvidenceLine`,
+  `TimeAside`, `PieceBadge`) y `ExecutionChip`. Laterales y barra en `SidePanels` (`UnlinkedExecutions`,
+  `UndatedPanel`, `CalendarLegend`, `CalendarStatusBar`, `FreshnessNotice`, `ToolLine`). Hoja `ActivationSheet`
+  sobre `SheetFrame`; popover del día `DayPopover` (`?pop=YYYY-MM-DD`); filtros `ActivationFilters`; teclado
+  `GridKeys`; acciones bloqueadas `LockedAction`; isotipos/miniaturas en `icons.tsx` y `platforms.tsx`; derivaciones
+  puras en `model.ts` (`flightBands`, `isoWeek`, `unlinkedByDay`).
+- Franja paid desde el **flight del plan de medios** (`data.flights`, `budgetStatus`: proposed → rayada «propuesto, sin
+  aprobar»; approved → sólida «aprobado»; none → sin frase). «N sin activación» por día usa el día local de Santiago.
+- `Shell` gana `statusBar` (el calendario reemplaza la barra del portal por la suya: «Plan de Studio · Evidencia de
+  ejecución:» + herramientas + hora de Santiago) y `readOnly` (la píldora «Solo lectura» pasa al encabezado). Copy en
+  `copy.ts` (`COPY.activations.*`: write, stage, timeline, paid, daySide, bar, legend…); estilos en `styles/app.css`
+  (bloques TASK-2002 v3). Isotipos desde `@efeoncepro/axis-brand-assets` 0.4.20 (Metricool on-black; sitio web con el
+  isotipo de Efeonce).
+- **Preview por formato** (`PieceStage` + `stage-model.ts`): escenario de 320 px para video (`MediaVideo` con la versión
+  de reproducción y póster), carrusel, imagen horizontal y grupo de recursos por proporción. Tipo, medidas, póster y
+  reproducción se leen con `getAsset` en el servidor. Los helpers de modo viven en un módulo sin directiva para que el
+  server component pueda llamarlos.
+- Límite de copy en la hoja: `getChannel` → `copyLimits` (primaryText) del catálogo de canales.
+
+**Escrituras y paridad UI↔API.**
+
+- `components/activations/write/`: `PlanDrawer` (modos plan/edit/from sobre `PlanActivationBody`), `RescheduleDialog`,
+  `CancelDialog` (alertdialog), `LinkDialog` (candidatas ±14 días misma plataforma, misma cuenta primero, con razón) y
+  `ActionLayer`.
+- **Montaje por URL:** `?action=plan|edit|reschedule|cancel|link|from` + `activation`/`record`. `ActionLayer` (server)
+  carga catálogo publicado, cuentas, campañas y candidatas y **sólo se monta si el actor puede escribir**. En modo
+  `open` los botones quedan `aria-disabled` con su motivo y la API responde 403 `write_not_allowed` (el actor anónimo
+  no escribe ni siquiera `dryRun`). Mientras la ventana temporal de escritura (§5) está abierta, el actor
+  `open-write-window` sí puede escribir en la organización habilitada y los diálogos se montan.
+- `write/client.ts`: un `fetch` literal por operación del registro. `operations-parity.test.ts` exige `method` literal y
+  ruta template estática con nombres de parámetro exactos (`campaignId`, `activationId`, `recordId`).
+- **dryRun → apply:** cada intento usa una `Idempotency-Key` nueva (`web-<uuid>`) e `If-Match` con la revisión; la vista
+  previa va con `dryRun` y la aplicación con otra clave. Errores con forma canónica (`StudioApiError`:
+  message/code/actionable/reason); los hallazgos del catálogo se muestran con texto legible por código.
+- Cuentas del formulario: regla del validador (appearancePlatforms / buyingPlatform) **y** herramienta del canal (paid →
+  `buyingPlatform`; resto → `readbackProvider` si no es `none`). Fecha/hora en la zona de la cuenta (`toZonedIso`) o
+  inicio/fin en paid. Tracking URL tal como la devuelve `GET /api/v1/campaigns/{id}/tracking/preview`: la UI nunca arma
+  UTM. La vista previa requiere `STUDIO_TRACKING_DOMAINS`; sin él responde 422 `tracking_destination_invalid`.
+- Tras aplicar: navega a la hoja de la activación (plantilla de URL con `__ID__`, porque un server component no puede
+  pasar funciones a un client component) y `router.refresh()`.
+
+**Verificación.** Escrituras reales sólo en local (Postgres descartable, actor temporal autorizado por el operador, no
+commiteado y revertido): planificar, editar, reprogramar, cancelar, vincular y crear desde ejecución; la bandeja bajó de
+3 a 1. Con el actor revertido ningún diálogo se monta y `POST …/cancel` responde 403. `pnpm check` y
+`pnpm --filter @studio/web build` verdes; tests web 22/22. Producción: `studio.efeonce.org/calendar` 200 en solo
+lectura (ver [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05)).
+
+**Pendiente.** Escrituras web en producción (TASK-1898, bloqueada por TASK-1834 y TASK-1895); escrituras MCP
+(TASK-2003); hojas de email y landing (contrato owned del reader, en curso); hoja de blog (TASK-1667/1669); trimestre,
+«Más tarde», lote y similares (TASK-2005/2006); release de las capabilities `marketing_studio.asset.write` /
+`campaign.write` (en develop, espera decisión del operador).
+
+**Etapa 2026-10-05 (tarde) — filtros v3.4, formulario y fecha/hora v3.5.** Direcciones v3.4 (filtros) y v3.5 (fecha y
+hora) aprobadas por el operador en el canvas el 2026-10-05.
+
+- **Dimensiones en español** (`c767283`): Modalidad, Familia, Plataforma, Cuenta, Mercado, Campaña, Estado; los valores
+  de marketing siguen en inglés (Paid, Organic, Owned, Earned, Social, Web & Content, Placement).
+  `SERVED_MARKETS = ['CL','MX','CO','PE','US']` en `components/activations/model.ts`, compartido por filtro y
+  formulario; se suma cualquier mercado que aparezca en los datos. Deuda: la lista debe salir de la configuración de
+  la organización.
+- **Menús de filtro** (`bef0ecf`): `FilterMenu.tsx` en vez de select nativo, `flags.ts` (banderas circle-flags, MIT),
+  `Flag` en `icons.tsx`, `facetCounts`/`facetTotal` en `model.ts`. El conteo por opción son las activaciones del
+  período visible con los **otros** filtros aplicados, sobre una segunda lectura del período sin filtros (mismo tope de
+  200). Plataforma separa «Con cuenta conectada» (elegibles) de «Sin cuenta conectada» (`appearancePlatforms` de canales
+  activos con etiqueta en Studio; visibles, no elegibles). En móvil, la hoja de filtros es una lista por filtro.
+- **Campos de selección del formulario** (`e656f2a`): `Select` en `write/parts.tsx` con la misma fila del menú; el
+  clic en una opción hace `preventDefault` porque el campo vive dentro de un `<label>` y reabría el menú.
+- **Fecha, hora e inicio/fin** (`5d962c4`): `write/datetime.tsx` (`DatePicker`, `TimePicker`, `RangePicker`) reemplaza
+  `DateTimeField` (eliminado) en `PlanDrawer` y `RescheduleDialog`. Los días con activaciones de la cuenta elegida y
+  los flights de la campaña salen de `GET /api/v1/calendar` (`readCalendar` en `write/client.ts`), excluyendo la
+  propia activación. La hora ocupada avisa en ámbar y no bloquea. El selector flota sobre la página (portal a
+  `body`, posición fija); en teléfono es hoja inferior.
+- Isotipo de X desde `@efeoncepro/axis-brand-assets` 0.4.21 (`6dddbfa`).
+
+Pendiente de esta etapa: motion y rendimiento percibido (~8 lecturas en cadena en `page.tsx`; `router.push` recarga
+todo el RSC sin estado pendiente; sin View Transitions ni feedback de escritura), mercados desde configuración,
+plataformas del catálogo sin etiqueta en Studio y conteos con el tope de 200. Detalle en
+[runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05).

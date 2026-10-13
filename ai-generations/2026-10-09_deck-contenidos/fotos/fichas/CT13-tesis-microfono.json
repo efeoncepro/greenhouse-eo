@@ -1,0 +1,41 @@
+{
+  "id": "CT13-tesis-microfono",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, the dark stage of a vast arena at night with thin haze, seen from the back of the stage looking out at the audience): Karo, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: her body faces the camera and, with the arm on the frame-right side of her body, she holds a slim modern matte black handheld microphone out sideways at shoulder height, elbow slightly bent, the whole arm visible; the head of the microphone is at about 88 % of the frame width, tilted away from her and toward the crowd lights behind it: she offers it to the audience instead of speaking into it. No hand, arm or microphone is on the left of her body. She looks straight into the lens, at the viewer, both irises centred in her eyes, with a playful, inviting half-smile, head almost frontal; she does NOT look toward the dark left side of the frame, at the microphone or at the crowd. Far behind her, seen only through the open frame-right side of the stage, between 62 % and 100 % of the frame width and below her eye line, an immense crowd of thousands is seen only as tiny cool points of light from their raised phones, melted into round bokeh, no faces, no silhouettes. The left half of the frame is the tall matte black side drape of the stage, unlit, which hides the arena on that side: no crowd, no lamps and no bokeh points on it. ONE hard follow-spot of clean cool white light falls on her from the frame-right at about 45 degrees above her eye line, low enough that both eyes catch the light; its beam is faintly visible in the haze; the only azure-blue (#0375DB) in the frame is a faint edge on that beam; no blue light falls on her face or on the hoodie; the far side of her face falls into shadow. The matte black lid of a road case stands on the stage floor between the camera and her, its near edge just in front of the lens; it is non-reflective and outside the spot. The beam, the crowd lights and everything lit stay inside the RIGHT half of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the matte black lid of a road case on the stage floor close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "karo"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "one hard follow-spot whose beam is faintly visible in the haze",
+    "lado": "from the frame-right at about 45 degrees above her eye line",
+    "distancia": "about 4 m away"
+  },
+  "fondo": "an immense crowd far behind her on the right, thousands of tiny cool phone lights melted into round bokeh",
+  "fenomeno": {
+    "que": "a crowd of thousands, seen only as points of light, waits beyond the microphone she holds out to it",
+    "esServicio": "Tesis: la marca ya no habla sola; la conversación la llevan creadores y comunidad"
+  }
+}

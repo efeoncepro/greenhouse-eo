@@ -1,0 +1,84 @@
+{
+  "tenderId": "C11-caso-sky",
+  "slides": [
+    {
+      "slideId": "deck-decision-case",
+      "contentType": "deck.decision-case",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 104,
+          "questionTop": 210,
+          "answerTop": 280,
+          "answerPx": 124,
+          "panelWidth": "--gl-dc-panel-width=1000px",
+          "panelRadius": "--gl-dc-panel-radius=300px",
+          "photoLeft": "--gl-dc-photo-left=660px",
+          "logoGap": "--gl-dc-logo-gap=22px",
+          "logoMaxWidth": "--gl-dc-logo-max-width=200px",
+          "logoMaxHeight": "--gl-dc-logo-max-height=70px",
+          "figuresTop": "--gl-dc-figures-top=470px",
+          "figuresWidth": "--gl-dc-figures-width=760px",
+          "figuresRowGap": "--gl-dc-figures-row-gap=34px",
+          "figuresColumnGap": "--gl-dc-figures-column-gap=50px",
+          "figureRule": "--gl-dc-figure-rule=2px",
+          "figurePadTop": "--gl-dc-figure-pad-top=16px",
+          "figurePx": "--gl-dc-figure-px=104px",
+          "figureWght": "--gl-dc-figure-wght=300",
+          "figureLeading": "--gl-dc-figure-leading=0.95",
+          "figureTracking": "--gl-dc-figure-tracking=-0.04em",
+          "labelPx": "--gl-dc-label-px=22px",
+          "labelGap": "--gl-dc-label-gap=8px",
+          "sourceTop": "--gl-dc-source-top=938px",
+          "sourcePx": "--gl-dc-source-px=16px",
+          "sourceWidth": "--gl-dc-source-width=760px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:L1-mesa-de-luz",
+          "alt": "Un creativo de Efeonce revisa con lupa y marca con lápiz rojo las pruebas impresas de una campaña sobre la mesa de luz"
+        },
+        "voice": {
+          "question": "¿Qué cambió con Sky?",
+          "answer": "Más rápido",
+          "eyebrow": "Caso · 12 meses"
+        },
+        "clientLogo": {
+          "src": "asset-ref:file:sky",
+          "alt": "Sky Airline"
+        },
+        "figures": [
+          {
+            "value": "+2.000",
+            "label": "piezas aprobadas"
+          },
+          {
+            "value": "39",
+            "label": "campañas"
+          },
+          {
+            "value": "88 %",
+            "label": "entregas a tiempo"
+          },
+          {
+            "value": "−25 %",
+            "label": "tiempo de producción"
+          }
+        ],
+        "source": "Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+        "selection": {
+          "label": "Performance",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 4
+        }
+      },
+      "template": "DecisionCase"
+    }
+  ]
+}

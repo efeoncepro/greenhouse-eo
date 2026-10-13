@@ -43,7 +43,7 @@ mercado, oferta, venta y retención.
 
 > **Portfolio owner:** Search Visibility 360 es una familia de servicios productizados de Wave dentro de Efeonce.
 > Esta skill gobierna el negocio de SEO/AEO; sus boundaries con web, measurement, Globe, Reach y CRM están en
-> [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+> [`EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md`](../../../docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
 
 Esta skill opera **el negocio de vender SEO/AEO**. No enseña a hacer SEO.
 
@@ -57,30 +57,24 @@ casos ficticios o autorizados. Claims comerciales, rankings, precios, casos de c
 de pago no son evidencia de seniority. La dueña del instrumento, su binding por opening, el snapshot inmutable y
 la calibración es `greenhouse-talent-people-operator`; la decisión sigue siendo humana y advisory.
 
-## 0. La tesis — en una categoría de humo, la honestidad es el producto
+## Norte de la práctica: referencia de categoría con representación fiel
 
-**Vender SEO no se parece a vender HubSpot. Se parece a lo contrario.**
+Cargar el [método operativo](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) para estrategia, propuestas y revisión comercial. El norte es ser
+descubiertos, comprendidos y considerados por compradores de una categoría/situación delimitada, con
+capacidad y evidencia reales. Liderazgo es aspiración, no garantía ni claim de superioridad sin pruebas.
+Visibilidad de marca ante preguntas non-brand amplía el descubrimiento; no elimina el tráfico genérico.
+Separar citas, menciones, fidelidad y recomendación de consideración/ventas observadas. Contratar trabajo
+controlable y capacidad; medir resultados sujetos a dependencias. Una correlación no garantiza clics,
+ahorro paid ni revenue. Módulos `03_OFERTA.md`, `08_PRUEBA.md` y `templates/propuesta-tipo.md` aplican esto.
 
-| | HubSpot | **SEO / AEO** |
-|---|---|---|
-| Qué vendes | El producto **de otro** | **El tuyo** |
-| El estado del comprador | *"¿me sirve a mí?"* — **duda de encaje** | 🔴 *"¿eres un estafador?"* — **duda de honestidad** |
-| Dónde se gana | Calificando bien | 🎯 **Ganándote el derecho a ser escuchado** |
+## 0. La tesis — evidencia, pertinencia y transparencia
 
-**El 100% de tus prospectos ya compró SEO y tiene una cicatriz.** Le prometieron primera página, le mostraron
-rankings de keywords que nadie busca, y el revenue no se movió. **No duda del servicio: duda de ti.**
-
-Eso invierte la venta. La secuencia que gana:
-
-```
-1. Le REGALAS el diagnóstico (el Grader)      ← evidencia antes que promesa
-2. Le dices para qué NO le sirve               ← descalificación honesta
-3. Le muestras el piso y el techo, con supuestos ← un precio con método, no un número
-4. Recién ahí, la oferta
-```
-
-🎯 **Es la misma mecánica del waiver de HubSpot: le entregas la evidencia antes de pedirle plata.**
-En una categoría con déficit de confianza, **eso no es un imán de leads: es el motor de venta entero.**
+Empezar en la necesidad del comprador, su evidencia y el estado de la cuenta. Investigar dudas de encaje,
+confianza, inversión y ejecución; no presumir que todos han sufrido una mala experiencia SEO.
+Diagnóstico y demostración contextual sirven cuando resuelven una incertidumbre pertinente. El Grader
+es una entrada posible, no un paso obligatorio para reiniciar oportunidades avanzadas.
+La propuesta conecta territorio, prueba, acciones, medición y alcance comercial; no vende un score ni
+un resultado algorítmico garantizado. Precio y capacidad siguen sus fuentes y aprobaciones.
 
 ---
 
@@ -106,22 +100,14 @@ que el mercado vende, USD 900+/mes.** ✅
 🎯 **"puedes ver lo que hacemos sin tener que confiar en nosotros"** *(que es otra cosa, y no se comoditiza:
 es **transparencia como producto**, y en una categoría con déficit de confianza, es el moat)*.
 
-**(c) 🔴 La atribución de AEO a revenue NO existe.** ✅ *verificado*: los estudios de conversión de tráfico LLM
-**van de +900% a −13% — se contradicen en el signo**, y el tráfico de IA es **el 1,08% del total**.
-**Quien te dé un ROI de AEO te lo está inventando.** 🎯 **Decirlo en voz alta es el activo.**
+**(c) La prueba se construye en tres planos.** Descubrimiento/representación, comportamiento del
+comprador y negocio. Referencias y conversiones observadas se pueden medir cuando hay datos; eso no
+prueba efecto causal de citación ni un ROI incremental. Estudios de CTR mantienen muestra/fecha/límites;
+no implican recuperación de clics o ahorro en paid para el prospecto.
 
-🎯 **Pero SÍ existe un puente honesto, y casi nadie lo usa:** las marcas **citadas** en AI Overviews reciben
-**+35% de clics orgánicos** y **+91% de clics pagados** ✅ — **y eso se mide en el GA4 y la cuenta de Ads DEL
-CLIENTE, no en un dashboard nuestro.**
-
-> ## La citación no es un canal nuevo. Es la condición para seguir existiendo en el viejo.
-> **El AEO no se vende como canal: se vende como eficiencia de medios.** *(Y eso hace entrar al CFO.)*
-> → `modules/01_MERCADO_2026.md` · `modules/08_PRUEBA.md`
-
-**(d) 🎯 Tenemos un activo que casi nadie tiene: el AI Visibility Grader, funcionando, en producción.**
-Y **ya se usa en la venta**. Pero por (b), **su valor tiene que migrar de dar un *score* a dar una
-*prescripción con delta esperado***. Un número no vende. *"Estás invisible en 4 de 7 motores, esto es lo que lo
-mueve, y este es el orden"* sí.
+**(d) El diagnóstico sirve al criterio.** Un Assessment puede orientar qué investigar o mejorar, con
+cobertura y límites visibles. La prescripción se sustenta en brechas, capacidad, dependencias y pruebas;
+no inventar un delta esperado de presencia/ventas porque exista un score.
 
 ---
 
@@ -152,7 +138,7 @@ mueve, y este es el orden"* sí.
 
 8. 🔴 **NUNCA prometas rankings.** Ni posiciones, ni "primera página". **Es la promesa que rompió la confianza
    de la categoría** — y la que va a hacer que te comparen con el que te precedió.
-9. 🔴 **NUNCA atribuyas revenue a citación en IA.** No existe el modelo. **Decirlo en voz alta es el activo.**
+9. **No inferir revenue incremental desde una cita.** Medir referencias y outcomes cuando existan datos; atribución observada no prueba causalidad.
 10. 🔴 **NUNCA prometas —ni muestres sin declarar— un techo de clics sobre un sitio que no tiene muestra
     para su propia curva de CTR.** El techo *("ganarías N clics si subieras a la posición 5")* es
     `impresiones × (CTR objetivo − CTR actual)`, y el CTR objetivo sale de **la curva del propio sitio**
@@ -212,7 +198,7 @@ mueve, y este es el orden"* sí.
 | 🎯 **La cuña: el Grader** — el motor de venta, y su migración de *score* a *prescripción* · 🎯 **el panel competitivo multi-marca** (el cliente + sus competidores con el mismo set de preguntas, el mismo día; caso SKY 2026-09-11) | **`modules/05_CUNA_GRADER.md`** |
 | 🔴 **Descalificación** — los 8 casos en que NO vendemos | **`modules/06_DESCALIFICACION.md`** |
 | **Displacement** — el freelancer · la herramienta · el in-house · la agencia titular · **no hacer nada** | **`modules/07_DISPLACEMENT.md`** |
-| 🎯 **Prueba sin mentir** — el puente de atribución que SÍ existe | **`modules/08_PRUEBA.md`** |
+| 🎯 **Prueba y medición** — compromisos controlables, resultados observados y causalidad | **`modules/08_PRUEBA.md`** |
 | **Canales** — outbound · cross-sell · 🎯 **PAID al Grader (la aritmética)** · licitaciones · inbound propio | **`modules/09_CANALES_OUTBOUND.md`** |
 | 🎯 **PROSPECCIÓN — el manual del vendedor** *(cómo se construye la lista, las señales de compra, el ritmo semanal, la matemática del pipeline)* | **`modules/13_PROSPECCION.md`** |
 | **La conversación** — discovery *(las 9 preguntas)*, propuesta, negociación, QBR | **`modules/10_CONVERSACION.md`** |
@@ -235,6 +221,26 @@ panorama, límites y reunión)*
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 
 ---
+
+## 3b. De discovery a caso de inversión
+
+Si el comprador pide estimar aporte a una meta de negocio, cargar
+`docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md`; el oficio y la demanda los valida `seo-aeo`, el
+buying group `efeonce-customer-model-operator` y la economía `efeonce-pricing-operator` con Finance.
+Conservar el brief posterior a la reunión, la evidencia previa y sus límites; una muestra acredita ejecución, no
+captación. Una meta, ticket o moneda inferidos pueden sostener un borrador cuando el operador lo autoriza, con
+etiqueta, aritmética, confianza y validación pendiente; esa autorización no confirma cifras del cliente ni aprueba
+precio, capacidad, acceso o publicación. Preparar escenarios mensuales, sensibilidad, dependencias y criterios de
+validación; fracciones de una meta son bandas de evaluación, no forecast. El contrafactual desde lanzamiento es
+ilustrativo hasta disponer de evidencia causal suficiente. Separar compromisos controlables de objetivos
+comerciales compartidos y mantener los datos de cada prospecto en su expediente.
+
+
+Diseñar horizonte y revisiones según implementación y maduración: M1 valida preparación y entregables, no
+ROI temprano. Ampliar demanda y revisar el corpus antes de fijar contribución; dimensionar capacidad por
+rol/mes y lotes, sin duplicar mecánicamente un horizonte previo. Duración y cifras de cliente permanecen
+en su expediente; no crean mínimos ni política comercial general.
 
 ## 4. Contrato de sinergias — quién manda en qué
 
@@ -294,6 +300,16 @@ aprender también de oportunidades perdidas o detenidas. Una experiencia visual 
 simulada no demuestra aparición en un motor y un dashboard de muestra no demuestra resultados del prospecto.
 Para producir, cargar la referencia X-Ray y el kit `docs/think/aeo-xray-nuevo-cliente.md`; aquí vive su propósito
 comercial, no otro manual técnico.
+
+**Delta 2026-10-09 — el X-Ray como muestra breve de lo que vende la propuesta.** El contrato 0.2.0 (aditivo; 0.1.0
+sigue vigente) suma bloques de experiencia temprana: **panel AEO real** (qué responde hoy la IA a preguntas genéricas y
+de marca, con fecha y motor), **hoy vs. con la pieza** (lectura pública de la página actual), **revisión** (cómo se
+aprobaría, ilustrativa si lo declara) y **siguiente paso** (CTA concreto). Úsalos para que el comprador vea en pequeño
+los frentes de la propuesta, no como teoría: en Pibank Perú la landing y el artículo representan el pilar y las
+comparativas del plan, y el panel AEO anticipa el panel mensual. Caso, campos y trampas:
+[`../seo-aeo/references/aeo-xray.md`](../seo-aeo/references/aeo-xray.md) §10. La propuesta lo integra en una lámina
+«Muestra X-Ray» con mockup dibujado, QR y enlace (`deck-studio`, `references/propuesta-tecnica-seo-sin-presentador.md`).
+Muestra publicada y propuesta v12 preparadas; envío no realizado al 2026-10-09.
 
 **Dos trabajos — no los confundas:**
 
@@ -470,6 +486,31 @@ Las láminas nativas (familia de marcas, servicios, formatos, comité, industria
 solas: el PDF aprobado vive en `ai-generations/2026-09-29_deck-seo-aeo-documentos/out/` (fuera de git; si no está en
 disco: `pnpm ai-gen:pull ai-generations/2026-09-29_deck-seo-aeo-documentos/out`, nunca re-exportar uno aproximado).
 
+**Propuesta técnica que el cliente lee sin nosotros (alternativa aprobada, 2026-10-07).** Cuando la propuesta
+SEO/AEO la lee un comité o gerencia sin presentador (licitación, propuesta técnica), el deck de práctica no basta:
+usar la alternativa aprobada, con diagnóstico real, plan, medición, responsabilidades y supuestos, y pasar su checklist
+antes de entregar — [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md)
+(caso fuente: Pibank 2027). No reemplaza al brochure ni a la propuesta de práctica. **Regla del operador:**
+equilibrar las métricas propias de SEO/AEO (posiciones, menciones en IA, orgánico sin marca) con las de negocio; SEO y
+AEO valen por sí mismos y además conectan con el negocio, así que la meta del cliente cierra la cadena, no la
+protagoniza, y nunca se promete volumen de negocio.
+
+**Notas de venta de la propuesta Pibank v13 (enviada 2026-10-09).** Forma de las láminas en el reference de
+`deck-studio` enlazado arriba.
+
+- **Autoridad de marca:** si la propuesta mide autoridad con una métrica de proveedor (Brand Authority de Moz), se
+  rotula con su fuente, fecha y alcance, como referencia del proveedor y sin puntos prometidos. No es un score de
+  Efeonce ni reemplaza las métricas propias (posiciones, menciones en IA, orgánico sin marca).
+- **Stack que se muestra al prospecto** (lámina con la receta `content-stack` y logos de AXIS): **Medir** — Search
+  Console, Google Analytics, Semrush y el Visibility Grader (motor del Efeonce AEO Assessment; ver «Nombre comercial
+  vigente»); **Observar IA** — ChatGPT, Gemini y AI Overviews como superficies observadas; **Operar** — Notion,
+  Frame.io, Teams y Efeonce Insights. Sólo herramientas con uso verificado y logo en AXIS: Ahrefs y Screaming Frog
+  quedaron fuera por falta de evidencia de uso; DataForSEO, por no tener logo en AXIS (se usa, pero no se exhibe).
+- **Compromiso inicial de seis meses:** si el comprador pide empezar mensual o por tres meses, el precio mensual se
+  muestra abierto y el compromiso inicial cubre el plazo en que la propuesta promete las primeras señales (en Pibank,
+  el primer semestre: revisión en M3, decisión en M6), con renovación trimestral después. Tres meses no alcanzan para
+  ejecutar el programa ni para medir nada. Regla de precio en `efeonce-pricing-operator`.
+
 **Dónde viven los archivos de `ai-generations/`:** toda ruta `ai-generations/...` es lógica (local, canon
 `gs://efeonce-creative-canon/<ruta del lock>` (`ai-generations/…`; los Sparks, bajo `node_modules/@efeoncepro/axis-brand-assets/…`) o archivo `gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/<ruta>`);
 si falta en disco, `pnpm ai-gen:where` + `pnpm ai-gen:pull`, nunca sustituirla. SSOT: [`AI_GENERATIONS_STORAGE_V1.md`](../../../docs/operations/AI_GENERATIONS_STORAGE_V1.md).
@@ -500,3 +541,30 @@ inclusión en motores ni recuperación/ahorro en paid por una correlación; no p
 experiencia previa para todo prospecto. Medir conversiones de referencia cuando existan datos no prueba el efecto
 causal de una cita. Estas precisiones prevalecen para copy sobre formulaciones absolutas de módulos históricos.
 No reiniciar el Grader por defecto en MOFU/BOFU: evidencia, muestra autorizada y alcance según avance real.
+
+## De la práctica a una propuesta ejecutable
+
+Para dimensionar un programa SEO/AEO, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Sustentar duración,
+lotes y aceptación desde el corpus y las dependencias; contrastar requisitos comerciales con demanda
+curada y separar compromisos de entrega de resultados compartidos o fuera del control del equipo.
+
+## Cotizador V3: simulación local de Search Visibility
+
+Para cotizar sin UI con demanda/perfiles/tools versionados, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Este carril opt-in calcula hipótesis y las explica desde snapshot: no reemplaza cotizador canónico, emisión o
+aprobaciones de §2 y `modules/04_PRICING.md`. SEO→SEMrush, baseNotion/M365, IA/Adobe/plataforma según necesidad;
+conservar variante salarial, países, dedicación y fuente real. Reparto declarado no acredita inventario.
+`managed_service` agrega fee sin publicar costos/horas internos. Un programa SEO/AEO gestionado usa
+`offerId: "seo-aeo-managed-service"` (objetivo 55%, piso 45%; desde el 2026-10-11), no la oferta creativa.
+Un encargo acotado se declara On-Demand en la cotización (forma de compromiso, no oferta: +10% sobre On-Going, mismo
+piso) y los perfiles de contenido llevan Adobe Express, no Creative Cloud Pro: detalle en `modules/04_PRICING.md`.
+Desde el contrato 1.4.0 (2026-10-11) ese encargo On-Demand lleva una reserva de contingencia de 12% del costo de
+personas y puede llevar terceros refacturados como filas propias (con ellos el piso se lee sobre el margen del trabajo
+propio, no sobre el mezclado); el buffer de un On-Going de licitación con multas sigue sin modelar.
+`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta (55%/45%; ya no compara contra un
+40/35 genérico) y **no reemplaza excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
+El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing, no la nómina actual (decisión del
+CEO, 2026-10-11): el margen real en personas hoy es mayor que el que muestra V3. Una excepción bajo el piso la decide
+sólo el CEO y ninguna sirve de referencia para otra cuenta. Moneda, FX de cotización y redondeo: `modules/04_PRICING.md`.

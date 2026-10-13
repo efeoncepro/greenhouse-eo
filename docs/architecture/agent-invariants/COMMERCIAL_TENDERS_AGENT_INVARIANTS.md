@@ -1,15 +1,43 @@
 # Commercial / Tenders — invariantes operativos para agentes
 
 > **Tipo:** Companion de invariantes (load-on-demand)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-07-12 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.1: TASK-1930 — Delta 2026-09-28, la evidencia de la `Proposal` liga los slots del deck «La órbita»; ningún deck usa evidencia `internal`)
+> **Última actualización:** 2026-10-12 por Claude (1.2: Delta 2026-10-12 — la plantilla A4 es la vía por defecto de la oferta económica que ve el comprador; el Excel de `economica:build` sólo cuando las bases exigen planilla. 1.1, 2026-09-28: TASK-1930, la evidencia de la `Proposal` liga los slots del deck «La órbita»; ningún deck usa evidencia `internal`)
 > **Cargar al tocar:** `src/lib/commercial/tenders/**` · `docs/architecture/tender-deck-composer-prototypes/**` · `scripts/commercial/compose-tender-deck.ts` · `src/lib/brand-surfaces/deck-recipes/bindings/**` (datos de la `Proposal` en el deck «La órbita») · cualquier oferta/deck/propuesta de licitación
 > **Contrato completo:** `GREENHOUSE_TENDER_DECK_COMPOSER_V1.md` (el deck) · `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (el aggregate; **leer su §0 — estado real**) · `docs/research/RESEARCH-007-commercial-public-tenders-module.md` (discovery público)
 > **Skills:** `greenhouse-public-private-tenders` (método) + `deck-studio` (argumento, composición y
 > entrega del deck) + `deck-visual-system.md` (el deck) + `bid-construction-playbook.md` (las 10 fases)
 
 ---
+
+## Operación comercial por plataforma — criterio vigente 2026-10-08
+
+Esta aclaración gobierna el trabajo del operador y los agentes; no modifica el runtime de Proposal.
+
+- Investigar todo el alcance autorizado, incluidas oportunidades no recomendadas y las categorías CRM, creativos, diseño web y licencias Claude/OpenAI cuando fueron pedidas. Declarar cobertura real; score no equivale a GO.
+- En Wherex, Mercado Público y procesos descubiertos mediante LicitaLAB, preparar la oferta no requiere contacto previo del comprador. Si no hay canal de consultas, registrar la limitación y los supuestos acordados. No bloquear por aclaraciones imposibles ni inventar requisitos satisfechos.
+- Originales descargados, anexos firmados y postulación son estados separados. Expediente: institución/empresa y proceso numerado; datos corporativos por fuente, nunca copiados a skills. Firma sólo dentro del alcance expresamente autorizado y con declaraciones confirmadas; no habilita envío.
+- Una señal permanece lead hasta calificación. Conservar los Deals existentes cuando el operador lo instruyó. Reutilizar segmentos activos mediante propiedades respaldadas; membresía no equivale a inscripción en Prospecting Agent, consentimiento ni envío.
+- La autorización vigente se reutiliza dentro de su alcance; no exigir nuevamente permiso para una acción ya autorizada. Antes de presentar siguen vigentes admisibilidad, ejecución, costo, margen y aceptación del paquete concreto.
+
+Método: [plataformas y expediente administrativo](../../../.codex/skills/greenhouse-public-private-tenders/platform-bids-and-administrative-package.md).
+Datos: [ficha corporativa](../../commercial/EFEONCE_DATOS_PARA_LICITACIONES.md).
+Continuidad y evidencia: [cierre de sesión](../../audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md).
+
+## Oferta económica documental rápida para licitación — 2026-10-08
+
+Para el pedido de avanzar rápido con HTML/PDF de una licitación o Compra Ágil, usar la [plantilla A4](../../commercial/templates/cotizacion-a4/README.md) desde alcance, precio y condiciones aprobados para ese expediente. Puede generar la oferta económica formal que se presenta al comprador; el ejemplo es ilustrativo. El renderer es local y su JSON/slots, referencia y manifiesto no son registros ni snapshots del cotizador.
+
+Delta 2026-10-11: la plantilla tiene además una versión 2 de sus datos (varias líneas con precio) y una segunda fuente: una cotización congelada de Pricing V3, cuyos datos emite `pnpm --silent pricing:v3 compose document`. En ese caso los importes salen de la cotización y **NUNCA** se escriben ni se editan a mano; para cambiar uno se cambia la cotización y se vuelve a emitir. El resultado sigue siendo un borrador local, no una Quote ([paso a paso](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#producir-el-documento-de-cotización)).
+
+Delta 2026-10-12: la plantilla A4 es la **vía por defecto** de la oferta económica que ve el comprador, no sólo el atajo para un pedido urgente. `pnpm economica:build` (Excel desde `economica.json`) **no lo es**: se usa únicamente cuando las bases exigen una planilla como documento integrante, y si exigen su propio formato manda ese formato. Que `pnpm tender:new` deje un `economica.json` en el expediente no decide con qué se emite: es un insumo del renderer de Excel, no la fuente de la económica. Caso fuente: Sika Mexicana, Wherex N.º 1164. El agente armó la económica en Excel por el precedente de otra licitación y por ese `economica.json`; el operador la devolvió («¿por qué lo generaste con eso si tenemos un render de Efeonce armado que funciona bien y tiene todo de Efeonce?»), el Excel se revirtió y la oferta se compuso con la versión 2 (`node scripts/documents/render-cotizacion-a4.mjs --data <caso>/cotizacion/cotizacion.json --out <carpeta nueva>`). Regla que generaliza: **antes de usar una herramienta por precedente, buscar la canónica de Efeonce.** Desglose de una oferta creativa, lo que no se inventa y trampas de la plantilla: [armado de la oferta](../../../.codex/skills/greenhouse-public-private-tenders/propuesta-tecnica-economica.md) y [manual de la plantilla](../../commercial/templates/cotizacion-a4/README.md#versión-2-en-una-oferta-real-lo-aprendido).
+
+Si el pedido requiere calcular por catálogo, persistir, emitir o aprobar una cotización en Greenhouse, operar el [cotizador canónico](../../documentation/finance/cotizador.md) conforme a la [arquitectura de cotizaciones](../GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md). No usar el HTML como reemplazo, inventar `quotation_id`/`quote_id` ni promover su precio a rate card. Firma, presentación, actualización CRM y operaciones financieras conservan su propia autoridad y evidencia.
+
+Proposal Studio mantiene su gate de Quote/margen: `evaluateQuoteMarginGate` en `src/lib/commercial/tenders/proposals/quote-gate.ts` rechaza `quote_missing` y `margin_unknown`. La oferta documental aprobada o presentada no satisface por sí sola ese GO, los approvals persistidos ni quote-to-cash. Preservar el paquete presentado a UTEM; esta distinción no requiere regenerarlo ni reinterpretar su aprobación comercial.
+
+Fuentes del carril gobernado: [orquestación agéntica propuesta](../GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md) y [guardrails de pricing](../../audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md). Routing load-on-demand conforme a [Agent Context Router](../GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md); esta aclaración documental no cambia el runtime.
 
 ## Estado real del dominio (2026-07-12, post TASK-1393 Slices 0-4) — no asumas de más
 

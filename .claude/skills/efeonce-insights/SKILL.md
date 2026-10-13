@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975 and channel isotypes TASK-1990/1996, in production since release `36a73e7b7e19` on 2026-10-03), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when an organization's report must measure only the content Efeonce works on (content scope, TASK-2033: path rules in the SEO domain, sealed in the edition; live for Berel in staging and the ops-worker since 2026-10-12, Production pending release), when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975 and channel isotypes TASK-1990/1996, in production since release `36a73e7b7e19` on 2026-10-03), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -116,6 +116,24 @@ it without repeating what already cost a day*. It grows with every task: see the
   release `36a73e7b7e19` (2026-10-03). Gateway `efeonce-mcp` 1.7.0 federated the 7 tools
   (58 total): share create/revoke require `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), the 5
   reads use the base scope; sending email and scheduling do not exist over MCP.
+- **Content scope (TASK-2033): with a declared scope, the SEO chapter measures only that content.** An organization
+  can declare which part of its site Efeonce works on (`greenhouse_growth.seo_content_scope_versions`, path rules
+  `prefix`/`exact`, append-only versions; command `setSeoContentScope`, reader `readSeoContentScope`, CLI
+  `pnpm seo:content-scope`). The adapter resolves it ONCE and passes it to the owner readers for the current and the
+  comparison window; it never filters rows itself. Every SEO source seals it (`EvidenceSourceV1.contentScope`) and the
+  plan reads it from the snapshot, never from live config. The whole site enters only as `site_total.*` reference
+  facts; the domain ETV is not emitted (`outside_content_scope`). If the scope cannot be read the adapter throws —
+  NEVER fall back to the whole site. On `seo_gsc_daily` use `gscPagesInContentScopeSql` (one classification per
+  distinct page), never the per-row predicate (5 s vs 0.4 s on a real month). An organization without a scope gets the
+  report it got before. The AEO chapter is not scoped. Scope v1 set for Berel on 2026-10-12; the code that reads it is
+  deployed to Vercel staging and the `ops-worker` (`d9a1c6a2d`), **not yet to Vercel Production**. The scope line is
+  printed only on the WHITE A4 cover: the navy cover and the deck cover have no «Qué mide este informe» zone, and an
+  organization with an `on_dark` logo gets navy from the `auto` rule — set its cover to `light` if the scope must show
+  on the cover (Berel is `light`). See `contracts.md` § Alcance de contenido and `operations.md` § Alcance de contenido.
+- **The weekly clicks line draws only complete weeks (2026-10-12, every organization).** The month's last block has
+  2–3 days; drawn beside full weeks it read as a drop under a headline that said clicks rose. The short block is not
+  drawn nor tabulated; the reading names it («Fuera de la figura: 29–30 sept, que no completa una semana.») and its
+  fact stays in the snapshot and in the month total.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
   `insufficient_data` are rejections recorded in the snapshot and shown as limits in the plan. The AI
   author only rewrites validated text; if a figure changes, the deterministic plan wins.
@@ -168,6 +186,12 @@ it without repeating what already cost a day*. It grows with every task: see the
   none on a page that already has a sphere) needs its own task with the visual gate and operator approval: never
   swap or mix sets piecemeal, and never hand-draw a new icon into a catalog. The third layer, **Plastilina en volumen**
   (D24, 2026-09-27: matte-clay PNG from AXIS, hero moments only), never goes into Insights reports, dashboards or UI.
+- For new semantic icon selection, use the unified [AXIS icon catalog](https://axis.efeonce.org/references/iconography/)
+  and its per-entry status/renderer; AEO/SEO/Authority collections overlap. Canonical AEO forms and candidate
+  Authority forms must not be conflated, and Brand Authority is not a universal AI metric. Channel/source identity
+  still uses the official platform isotype. Follow [AXIS consumption](../axis-design-system/references/agent-consumption.md)
+  for package publication versus the installed consumer: `axis-graphic-line@0.17.0` availability does not certify
+  adoption in existing report templates. `insights-resolve` produces a stat-card manifest, not a complete report.
 - Product mark, report look, live-report UI, AXIS Lab page → [`references/ui-and-brand.md`](references/ui-and-brand.md)
   + `efeonce-graphic-line` (`criteria.md` «Insights, marca de producto que acompaña», `applications.md` §B3–B4) +
   `axis-design-system`. Boundary (binding, **changed by the operator on 2026-10-03**): AXIS is the home of the Insights
@@ -229,7 +253,7 @@ own this contract; the `.codex/` mirror is the same file, so edit `.claude/` and
 
 ## Verification that counts
 
-- Unit: `pnpm vitest run src/lib/efeonce-insights src/lib/api-platform/resources` (+ MCP tests
+- Unit: `pnpm vitest run src/lib/efeonce-insights src/lib/api-platform/resources src/config/insights-channel-isotypes.test.ts` (+ MCP tests
   `src/mcp/greenhouse`) — states/matrix parity, windows (DST, Feb 29, custom overlap), adapters
   (unsupported_window, no_data ≠ 0, RpA suppressed, OTD denominator), editorial (figure guard),
   commands (idempotency, authz, three planes), lanes (same error table), manifest/skill leak tests.

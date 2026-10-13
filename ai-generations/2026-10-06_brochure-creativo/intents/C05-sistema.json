@@ -1,0 +1,51 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-service",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Servicios creativos",
+    "question": "¿Cómo escalas tu contenido?",
+    "answer": [
+      "Con sistema"
+    ]
+  },
+  "body": "Convertimos estrategia e ideas en sistemas, contenido y producción confiable, con capacidad gobernada y memoria de marca.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Creative Sprint",
+      "desc": "Un proyecto pagado y acotado para probar el encaje con tu marca."
+    },
+    {
+      "kicker": "Managed Squad",
+      "name": "Creative Capacity",
+      "desc": "Squad dedicado On-Going, con capacidad gobernada y métricas de entrega."
+    },
+    {
+      "kicker": "Producción",
+      "name": "Creative Studio",
+      "desc": "Sistema de producción con memoria de marca y control de derechos."
+    }
+  ],
+  "proof": {
+    "text": "Sky: +2.000 piezas aprobadas en 12 meses, 88 % a tiempo.",
+    "source": "caso publicado de Sky Airlines"
+  },
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+    "alt": "Un diseñador de Efeonce con el hoodie navy mueve una prueba de diagramación al tope de una grilla de pruebas impresas en el estudio de noche"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

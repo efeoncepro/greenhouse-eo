@@ -1,5 +1,7 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
+> **Decisión vigente 2026-10-07 — Rooms:** La órbita (`efeonce-graphic-line`) es su design system completo: Bricolage editorial/Poppins funcional, color, componentes, iconografía y motion. AXIS distribuye el sistema. Aplica a autoría, exploración y presentación; las piezas del cliente mantienen su diseño. [Dossier](../../architecture/rooms/README.md). La composición y runtime siguen pendientes; no se migra automáticamente Greenhouse ni se impone narrativa pregunta/respuesta.
+
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.9
 > **Creado:** 2026-09-25 por Claude
@@ -7,6 +9,8 @@
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
+
+> **Actualización AXIS 2026-10-04:** catálogo unificado de íconos, logos y workflow de agentes en [AXIS: packages y Lab](../../documentation/creative/axis-packages-y-lab.md). Los releases y pins fechados en el historial inferior describen esos cortes; consulta el [runbook vigente](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) antes de instalar.
 
 ## Para qué sirve
 
@@ -258,6 +262,8 @@ foto nueva de ese tipo:
 
 ## Paso a paso — armar una firma de correo
 
+Para **enviar desde el Outlook de Julio**, cumplir primero la [política de firma oficial completa y CCO HubSpot](../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md), también en respuestas y reenvíos. Ambas vías están aprobadas: reutilizar su HTML oficial en Outlook UI, o añadir la firma completa en texto de la política al enviar por conector. Una firma instalada en Outlook no se añade automáticamente a envíos por conector.
+
 La firma v3.1 está aprobada en dos versiones: **A · sobre papel** y **B · tarjeta navy**. Las reglas completas están
 en el [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail); el contrato
 que las hace cumplir es `efeonce.email-signature` de AXIS.
@@ -301,6 +307,47 @@ perdía al pegar) y el **eslogan va horneado** con sus pesos canónicos (Outlook
 Adaptarse sola al tema claro u oscuro del sistema no es posible: Outlook quita esas reglas al pegar; la versión de
 fondo blanco está preparada para el oscurecido automático de Outlook (logo y eslogan con halo blanco, partners transparente).
 
+### Instalar la firma en HubSpot
+
+**Ruta verificada el 2026-10-07:** pegar el **código HTML completo** de la firma existente en el editor
+**HTML** de HubSpot. La página «Copiar mi firma» prepara texto enriquecido para Outlook; su botón no copia
+el código fuente como texto plano para el campo HTML. En la prueba de HubSpot, pegar en «Simple» tampoco
+conservó la composición: quedaron texto, enlaces y símbolos 📷 en lugar de las imágenes. No repetir esa ruta
+como solución ni concluir que HubSpot no admite estilos. No se aisló qué etapa del portapapeles/editor produjo
+la pérdida; lo comprobado es el fallo del pegado y la recuperación al insertar el HTML original.
+
+1. Verificar el portal y el usuario de destino. La prueba fue en Efeonce `48713323`, usuario Julio Reyes,
+   firma «Julio», predeterminada global para `jreyes@efeoncepro.com`; no extrapolar ese permiso a otra persona
+   ni a otro portal. Una solicitud explícita de instalar la firma autoriza ese cambio de preferencia, no enviar correos.
+2. Recuperar la firma aprobada, sin rediseñarla. Para Julio se usó
+   `ai-generations/2026-09-29_avatares-equipo/firmas/out/julio-reyes/outlook-a.html`.
+   Para otra persona usar su artefacto equivalente y comprobar sus datos/enlaces; no copiar los de Julio.
+   Si falta el archivo en disco, seguir `pnpm ai-gen:where` / `pnpm ai-gen:pull` según
+   [almacenamiento de generaciones](../../operations/AI_GENERATIONS_STORAGE_V1.md), sin regenerar por defecto.
+3. Copiar **el contenido del archivo como texto fuente**, desde `<table` hasta su cierre, con tablas,
+   atributos de tamaño y estilos inline. Conservar las URLs HTTPS públicas de las imágenes ya publicadas;
+   no pegar una captura, texto renderizado, emojis ni rutas locales. Verificar respuesta HTTP y MIME de los
+   recursos: en esta instalación los nueve devolvieron `200` / `image/png`.
+4. En **Configuración → General → Correo → Gestionar firmas de correo electrónico**, seleccionar la firma,
+   elegir **HTML** y reemplazar el contenido por ese código. No pegar en HTML el resultado del botón
+   «Copiar mi firma», cuyo `text/plain` contiene solamente el texto visible.
+5. Revisar **Previsualizar**: foto con órbita, nombre/cargo, teléfono/correo, enlaces, logo, eslogan y partners.
+   El visor observado tiene poca altura y scroll interno: recorrer también la parte inferior antes de juzgar
+   la firma como recortada. Comprobar la carga visual, no solo la presencia de etiquetas `<img>`.
+6. Guardar, comprobar el aviso **«Tu firma se ha actualizado»** y reabrir la firma para verificar persistencia.
+   Conservar o cambiar la asignación predeterminada según el pedido. No volver a convertir a «Simple» después:
+   en la prueba ese modo quedó deshabilitado para el HTML completo.
+
+**Evidencia y límite:** la firma de Julio quedó guardada con el diseño original y se verificó nuevamente en
+la vista previa. No se envió un correo de prueba; la recepción en Outlook/Gmail u otros clientes no quedó
+certificada. La disponibilidad de las imágenes y la vista previa no prueban renderizado idéntico en todos los
+clientes; las fuentes pueden usar el fallback del HTML. El procedimiento reutiliza el contrato de firma existente,
+sin cambiar tokens, assets ni el constructor.
+
+Fuente del proveedor consultada el 2026-10-07:
+[HubSpot: agregar y gestionar firmas de correo](https://knowledge.hubspot.com/account-management/add-an-email-signature-in-the-crm)
+(documenta los editores Simple/HTML y las diferencias de renderizado entre clientes).
+
 **Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
 ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
 comando, y se instala igual, en la cuenta del buzón. `people@efeoncepro.com` usa la firma de **Talent** (no es un área
@@ -325,8 +372,9 @@ este paso a paso no las repite todas.
 2. **Elige la voz por la línea de servicio de la pieza:** Growth, Engine o Revenue → Trazo; Brand → Plastilina. La
    línea Voice todavía no tiene voz fija: elige con criterio y decláralo en la pieza. Una voz por grupo, nunca las dos
    juntas.
-3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra los 79
-   aprobados (36 de Trazo y 43 de Plastilina) en cada línea y fondo, con «Copiar SVG». Desde el 2026-09-27 incluye los
+3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra 134 íconos únicos: 109
+   canónicos (60 Trazo y 49 Plastilina) y 25 candidatos, con filtros AEO, SEO y Autoridad y «Copiar SVG».
+   Confirma el estado antes de elegir. Las colecciones se superponen; Brand Authority conserva una sola identidad. Desde el 2026-09-27 incluye los
    **30 íconos de oficio**: en Trazo, correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist,
    código, base de datos, nube, integración, seguridad, ubicación y reloj; en Plastilina, lápiz, rodillo, aerosol,
    escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo y estrella. Y los
@@ -359,10 +407,14 @@ este paso a paso no las repite todas.
 8. **Si trabajas en código o con un agente,** pinta con `resolveIcon`, revisa el grupo con
    `auditIconGroup(items, { pieceHasSphere })` antes de entregar y usa `skewedOrbitHeroSvg` para la protagonista
    (`@efeoncepro/axis-graphic-line/icons`, desde 0.4.0; los íconos de oficio, desde 0.5.0, tag `v0.5.0`; los de IA,
-   redes sociales y staff, desde 0.6.0, tag `v0.6.0`). El set completo como archivos sale con `pnpm icons:export` en
-   el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`. Greenhouse fija
-   axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4; dentro de Greenhouse sólo lo usa el generador de piezas por
+   redes sociales y staff, desde 0.6.0, tag `v0.6.0`). El set canónico como archivos sale con `pnpm icons:export` en
+   el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`. Al corte 2026-10-04, Greenhouse fija
+   axis-graphic-line 0.11.0 y axis-brand-assets 0.4.15; dentro de Greenhouse sólo lo usa el generador de piezas por
    superficie. Para otra pieza, úsalo desde AXIS o copia el SVG del Lab.
+
+Para los candidatos, usa `resolveSeoIcon` desde `@efeoncepro/axis-graphic-line/icons/seo`, como declara el
+manifest del Lab. `resolveIcon` y `icons:export` sólo cubren canónicos. El release `0.17.0` de graphic-line
+está publicado; consumirlo en Greenhouse exige actualizar y verificar su pin por separado.
 
 ### Pedir un ícono nuevo
 

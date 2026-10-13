@@ -1,0 +1,18 @@
+[
+  {
+    "id": "sunburst-max",
+    "plate": "plates/sunburst-max.png",
+    "logo": {
+      "variant": "negative",
+      "width": 0.2
+    }
+  },
+  {
+    "id": "seedream5-pro-standard",
+    "plate": "plates/seedream5-pro-standard.png",
+    "logo": {
+      "variant": "negative",
+      "width": 0.2
+    }
+  }
+]

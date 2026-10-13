@@ -1,0 +1,15 @@
+{
+  "hoursPerMonth": 80,
+  "monthlySellableHours": 140,
+  "allocationMode": "shared",
+  "assumeRemainingCapacitySold": true,
+  "targetMarginFraction": 0.40,
+  "transactionFeeFraction": 0.03,
+  "additionalMonthlyCostsUsd": [
+    { "label": "Gestión y QA — supuesto", "amount": 250 },
+    { "label": "Talent Assurance — reserva hipotética", "amount": 200 },
+    { "label": "Herramientas internas — supuesto", "amount": 80 }
+  ],
+  "setupCostUsd": 600,
+  "amortizationMonths": 3
+}

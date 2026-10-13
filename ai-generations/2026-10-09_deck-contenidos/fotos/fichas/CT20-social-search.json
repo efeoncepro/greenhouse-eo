@@ -1,0 +1,42 @@
+{
+  "id": "CT20-social-search",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a vast dark studio at night with thin haze): Karo, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up, both hands relaxed inside the front pocket of her hoodie, shoulders loose; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: in the air on her frame-right, at eye level, between 70 % and 96 % of the frame width, floats ONE long pill-shaped search bar made of cool white light, a rounded capsule about 50 cm long, its inside plain even light and completely empty: no letters, no words, no placeholder, no cursor and no dots; at its left end one small magnifying-glass glyph drawn as a plain circle with a short handle, the only mark on it, its edge traced by a hair-thin azure-blue (#0375DB) glow. Directly under the bar hangs a short neat column of exactly THREE thin frameless vertical 9:16 frames of dim azure light with abstract, unreadable content; the TOP one of the three is brighter than the other two and on its corner sits one small crisp orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. She has just found what she was looking for: a knowing, pleased half-smile; head almost frontal, only her eyes turn toward the top frame under the bar on the frame-right; she does not look toward the dark left side of the frame. The search bar is the only key light and lights her face from the frame-right at eye level, cool white; both eyes stay readable, with a catchlight; the colors of the frames stay inside each frame and throw no colored light. Nothing covers the mark on her hoodie. A long dark matte desk runs between the camera and her, its near edge just in front of the lens; its top is matte black and non-reflective. The bar, the three frames and everything lit stay inside the RIGHT half of the frame. The left half of the frame is calm, deep dark studio space with faint haze only: no lamps, no screens and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte desk edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "karo"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the long pill-shaped search bar of cool white light",
+    "lado": "to the frame-right of her face, at eye level",
+    "distancia": "about 50 cm from her face"
+  },
+  "fondo": "the dark depth of the studio far behind her on the right, with two or three small cold bokeh points",
+  "fenomeno": {
+    "que": "an empty search bar of light with three results under it: the first one is hers",
+    "esServicio": "Social search: que la marca sea la respuesta cuando alguien busca dentro de la red"
+  }
+}

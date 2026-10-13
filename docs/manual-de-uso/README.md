@@ -1,5 +1,7 @@
 # Greenhouse EO — Manual de Uso
 
+- [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
+
 > **Naming AEO vigente (2026-09-29):** la capacidad pública es **Efeonce AEO**, el diagnóstico **Efeonce AEO Assessment** y su entregable **Efeonce AI Visibility Report**. Los manuales conservan `AI Visibility Grader` para comandos y rutas existentes. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Esta carpeta guarda guias practicas para usar capacidades concretas del portal Greenhouse.
@@ -14,7 +16,11 @@ La diferencia con otras capas de documentacion:
 
 - [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas (preview por formato, UTM, estados y presupuestos), actualizar datos desde OneDrive (import), generar imágenes (renditions), dar y revocar acceso por API, leer Studio con un agente por MCP y resolver problemas comunes.
 
+- [Descubrir recursos y componer con AXIS](creative/descubrir-y-componer-con-axis.md) — Lab, packages, CLI, íconos, logos y evidencia de salida.
+
 ### Social y Creative Studio
+
+- [Usar BytePlus directo](creative-studio/byteplus-directo.md) — claves separadas en Secret Manager; Seedream, Layerize, Seedance y Seed Speech con el contrato Johor, por CLI local.
 
 - [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de
   clasificación, camino propio o puente, dificultad por toma, referencias aprobadas antes de generar, motor y
@@ -29,11 +35,20 @@ La diferencia con otras capas de documentacion:
 - [Compositor de piezas con CTA — manual de uso](creative/compositor-piezas-cta.md) — plan mínimo con lo que exige
   el gate, componer, certificar (también con `--reproducir`), reporte de accesibilidad, códigos 0/1/2/3, excepciones con
   sha256 del plate y `hasta`, firma externa, decisiones pendientes y problemas comunes (mensaje → causa → solución).
+- [Propuesta gráfica creativa para un cliente](creative/propuesta-grafica-creativa-para-cliente.md) — el anexo gráfico y cómo encaja con el deck técnico, el reel, su página y la económica; de punta a punta, el [playbook de propuesta de campaña creativa](../operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md).
 - [Usar la línea gráfica de Efeonce](creative/usar-linea-grafica-efeonce.md) — hacer una pieza con la órbita
   (qué trabajo hace, color, ubicación del texto, foto de la lente, voz, firma con el logo centrado o burbuja URL sólo
   con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
   logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
+- [Usar la marca de Efeonce Rooms](creative/usar-marca-efeonce-rooms.md) — qué pieza usar dónde (lockup Efeonce | Rooms
+  por defecto, compacto, apilado, símbolo, ícono), variantes `positive`/`negative`/`white`, nunca «Rooms» suelto en
+  publicidad ni la marca sobre el arte del cliente, y cómo regenerar los 18 SVG (generador + sello AXIS). Aceptada el
+  2026-10-08; publicado en el release `v0.4.27`; desde 0.4.29, también en la página «Logotipos» del Lab.
+- [Usar las marcas de Efeonce Wave, Reach y Globe](creative/usar-marcas-wave-reach-globe.md) — ruta H3: qué archivo usar
+  dónde (lockup Efeonce | Producto por defecto, logotipo solo, isotipo e isotipo chico de Reach y Globe a 24 px o
+  menos), variantes `positive`/`negative`/`white`, sin «by efeonce», isotipos todo en blanco sobre oscuro, globo
+  frambuesa y la «a» naranja de Reach sobre oscuro sólo en logotipo y lockup, y cómo regenerar los 33 SVG en AXIS. Aceptada el 2026-10-09; paquete 0.4.28 (tag `v0.4.28` publicado); desde 0.4.29, todas las piezas públicas en el Lab.
 - [Usar las portadas, el avatar y los destacados sociales de Efeonce](creative/usar-portadas-y-destacados-sociales-efeonce.md) —
   qué archivo subir en LinkedIn (página y perfil personal), Facebook, YouTube e Instagram, cómo cambiar una portada,
   el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente
@@ -136,7 +151,11 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
+- [Construir un caso de negocio SEO/AEO](comercial/construir-caso-negocio-seo-aeo.md) — de evidencia y funnel inverso a investigación competitiva, calendario conjunto, costos por función y paquete cliente, con QA del modelo y PDF.
+- [Armar una propuesta técnica SEO/AEO para leer sin presentador](comercial/armar-propuesta-tecnica-seo-sin-presentador.md) — la alternativa aprobada el 2026-10-07 (caso Pibank v10, 44 láminas) para propuestas técnicas que el cliente lee solo: copiar el molde `build-tecnica.py`, intents del compositor, assets al canvas, láminas aprobadas importadas a un acento, PDF con `render-pdf.mjs`, revisión al 100 % y checklist antes de enviar. No reemplaza las recetas de La órbita para brochures.
+
 - [Catálogo HubSpot as a Service](../services/hubspot-as-a-service/README.md) — alcance y frontera de los dos servicios operables que este manual soporta.
+- [Segmentar una prospección por cohorte y propiedades](hubspot/segmentar-prospeccion-por-cohorte.md) — completar cada alta, conservar valores, leer miembros por MCP y resolver recálculo/enums/asociaciones.
 - [Operar ANAM HubSpot Managed Service](hubspot-as-a-service/operar-anam-hubspot-managed-service.md) — rutina diaria/semanal/mensual para Customer Agent, calidad por owner, Growth, Services, automatización, pilotos y preparación read-only de billing.
 - [Usar el Diagnóstico SEO de Prospecto en venta](comercial/diagnostico-seo-prospecto-en-venta.md) — cómo convertir la sorpresa del Grader en tamaño de pérdida cuantificado sin pedirle nada al prospecto: el encadenamiento Grader → diagnóstico → Radiografía AEO → propuesta, qué significa cada estado (`cost_blocked` = cero gasto), y las tres prohibiciones (nunca presentar un estimado como medido, nunca declarar un sitio "sano", nunca cifras de industria ni lifts).
 - [Usar el Panel Competitivo AEO en venta](comercial/panel-competitivo-aeo-en-venta.md) — comparar al cliente con sus competidores en las respuestas de IA con el mismo set de preguntas, el mismo día y los mismos 5 motores: diseñar el set desde demanda real, pedir la preparación a Growth, revisar lo que cae en revisión humana, verificar links, armar el panorama cruzado y entregarlo en correo + reunión con los límites declarados. Caso fuente: SKY frente a LATAM, JetSMART, Avianca y Gol (Chile, 2026-09-11).
@@ -146,6 +165,9 @@ La diferencia con otras capas de documentacion:
 
 ### Finanzas
 
+- [Importar el catálogo de V3 a la plataforma](finance/importar-catalogo-v3-a-la-plataforma.md) — `pnpm quoter:import plan | documents | pointer`: copiar al registro el catálogo, la política y los créditos del repo y reflejar el puntero; simulación por defecto, `--apply` con visto bueno, sólo lo commiteado y empujado.
+- [Operar el Cotizador V3 con agentes](finance/operar-cotizador-v3-con-agentes.md) — descubrir perfiles/recursos, preparar y calcular roles o servicios con las versiones vigentes (`--current`), declarar capacidad, explicar/reproducir, leer el resumen (piso, avisos de la corrida y peso de cada dato estimado), evaluar y preparar una vista comercial interna; cotizar un trabajo On-Demand u On-Going, la puesta en marcha (onboarding y reclutamiento), Adobe y las herramientas con plazo de proveedor, los costos de terceros de un trabajo (refacturados o pagados por el cliente) y la reserva de contingencia de un alcance fijo, cómo leer el margen del trabajo propio junto al margen total, y las tres lecturas de una cotización congelada (calendario de pagos, caja y compromisos con proveedores); mantenimiento con preview/apply y [puntero de versiones](finance/catalogo-v3-seleccion-y-actualizacion.md#versiones-vigentes-el-puntero-currentjson). [Referencia de contratos y límites](../documentation/finance/cotizador-v3-superficie-implementada.md).
+- [Consultar el prototipo Excel por CLI](finance/consultar-excel-pricing-por-cli.md) — investigar la fuente histórica; el workflow V3 usa catálogos versionados y conserva la procedencia.
 - [Registrar ingresos, egresos, pagos y ordenes de pago](finance/registrar-ingresos-egresos-y-ordenes-de-pago.md) — guia operador end-to-end para crear documentos de ingreso/egreso, registrar cobros/pagos reales, decidir pago directo vs orden de pago, aprobar/enviar/marcar pagado y conciliar.
 - [Caja, cobros, pagos y liquidaciones](finance/caja-cobros-pagos-y-liquidaciones.md) — operacion de caja real: registrar cobros/pagos, asignar instrumentos, entender `amount` vs `amountClp`, transferencias internas y settlement legs.
 - [Conciliacion bancaria operativa](finance/conciliacion-bancaria-operacion.md) — crear periodos, importar cartolas, revisar candidatos, usar auto-match/AI suggestions, hacer match/unmatch/exclude y cerrar solo cuando el banco cuadra.
@@ -317,6 +339,7 @@ La diferencia con otras capas de documentacion:
 - [Expandir, separar en capas, borrar, mover, incorporar, cambiar fondo y rehacer detalle](ai-tooling/expandir-y-separar-en-capas.md) — `pnpm ai:layers` (Layerize sobre cualquier imagen; la base se cobra como una capa), `ai:mask --from-layer`, `ai:inpaint erase|move|place|expand|background` y `--zone-resolution`, con lo no editado en delta 0 verificado; ganadores medidos (borrar: clean plate o Sunburst; expandir: Flux Fill, nunca GPT Image) y seccion «Para agentes». TASK-1973.
 - [Editar solo una zona de un video](ai-tooling/editar-una-zona-de-un-video.md) — `pnpm ai:inpaint video` (TASK-1965): mascara fija o por keyframes, motor `fal:flux3-edit` (USD 0,03/s), aborto si el motor corre el encuadre, recomposicion cuadro a cuadro en delta 0, parpadeo medido, audio original y seccion «Para agentes» (codigos 0/2/1, tope de costo, checklist).
 - [Operar Gemini Omni 1.1 desde la CLI de video](ai-tooling/gemini-omni-1-1-cli.md) — `pnpm ai:omni`: generación desde texto, imagen, cuadros o referencias; edición y extensión desde video; autenticación ADC, staging GCS privado, costos nominales, consulta de estado, recuperación y evidencia de seis modos probados a 360p/16:9.
+- [Generar y editar con Nano Banana 2.1](ai-tooling/nano-banana-2-1-cli.md) — `pnpm ai:nano`: Google directo, referencias/sesiones, búsqueda, 1K–4K, thinking, streaming y conteo; matriz de cobertura, prueba Nexa 4K/high y comparación visual limitada con Sunburst. `ai:image` mantiene OpenAI/GPT Image 2 por defecto.
 - [Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0](ai-tooling/operar-cli-fal-seedream-seedance.md) — `pnpm ai:fal`: imagenes y edicion con Seedream 5, separacion de una pieza plana en capas con alfa + `layers.json`, video Seedance y Minimax H3 (Turbo barato, control de camara, LoRAs y entrenamiento), video Flux 3 (borrador → mejora, primer/ultimo cuadro, keyframes, editar y extender un clip) y video a video con Seedance 2.5 (`--task editing|extension`, verificado; con personas o marcas puede rechazar despues de encolar y cobrar el intento, en casos puntuales: probar corto antes del final), video Wan 3.0 y Prime (largo `auto`, referencias, basado en una web o un documento con `--thinking`, `--seed`, default 1080p), con limites validados antes de cobrar; dos cuentas de fal con cambio automatico ante bloqueo por saldo y `--balance`; encolar sin esperar con `--detach` y consultar con `--status`; como retomar un trabajo vencido con `--request-id` sin volver a pagar, que esta verificado (47 de 55), por que no informa costo y por que Gemini Omni y Nano Banana Pro no pasan por fal. Desde v1.7: paso previo para elegir el modelo con la guia canonica de seleccion, costos por escalon de resolucion (Wan 3.0 sale en 1080p y H3 base en 2K por defecto; Wan 3.0 Prime cuesta mas; Flux 3 publicado al doble; formula de tokens de Seedance), minimo de 100 pasos al entrenar LoRA y brechas conocidas del comando.
 - [Operar pilotos de Creative Workflow](ai-tooling/operar-pilotos-creative-workflow.md) — seleccionar motor por contrato de fidelidad, ejecutar una prueba controlada y revisar evidencia; incluye la condición para probar previs 3D exportada como referencia de video, sin tratarla como un render 3D.
 - [Producir un set con Layout Design & Finishing](ai-tooling/producir-layout-design-y-finishing.md) — diseñar

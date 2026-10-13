@@ -7,6 +7,15 @@
 > Gemini, Copilot). Sello: as-of 2026-09 — **reverifica con WebSearch antes de afirmar
 > cifras o features**; riesgo de **atribución equivocada** as-of 2026-08-25.
 
+## Norte de descubrimiento y representación
+
+Aplicar `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`: categoría, comprador y
+situación de compra antes de seleccionar tácticas. Una consulta non-brand puede mencionar/recomendar
+una marca; una URL citada puede no construir reconocimiento de esa marca. Registrar fuente, presencia,
+fidelidad, prominencia y recomendación como resultados distintos. Consideración y elección requieren
+evidencia del comprador. Relevancia y descripción correcta importan junto a frecuencia; aparecer asociado
+a capacidades inventadas o a una necesidad sin encaje no acredita liderazgo.
+
 ## Vocabulario (fíjalo)
 - **AEO** (Answer Engine Optimization) y **GEO** (Generative Engine
   Optimization) se usan casi como sinónimos en 2026. Matiz: *AEO* enfatiza ser

@@ -1,0 +1,19 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "socopur-agencia-marketing-digital-2027",
+  "workspacePath": "docs/commercial/tenders/socopur-agencia-marketing-digital-2027",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Expediente de investigación y recuperación tardía. No hay RFP completo, GO de oferta, propuesta técnica/económica, deck, render ni Proposal.",
+    "Scaffold adaptado: retirados ejemplos económicos CLP/IVA y oferta técnica vacía para no atribuir precio ni alcance inexistentes."
+  ]
+}

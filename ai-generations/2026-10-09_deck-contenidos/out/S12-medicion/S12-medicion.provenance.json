@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "ffa1920e5d6137ca9a7e4348e2ebf5ae3da9e94390634447bb963e3bd3bbf044",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT4-medicion",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT4-medicion.png",
+      "sha256": "8359f7d8bc9b592edb8b7003b49956135ca8d46da97375763e468dbce254269c"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

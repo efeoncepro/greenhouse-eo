@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.21
+> **Version:** 1.22
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-10-04 por Codex: censo y estados reconciliados; hallazgos ON y selectores ETV improved verificados en worker activo. Avances de 03/09 y anteriores: evidencia histórica en tasks y arquitectura.
+> **Ultima actualizacion:** 2026-10-13 por Claude: alcance de contenido por organización (TASK-2033). Antes, 2026-10-04 por Codex: censo y estados reconciliados; hallazgos ON y selectores ETV improved verificados en worker activo. Avances de 03/09 y anteriores: evidencia histórica en tasks y arquitectura.
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -395,6 +395,24 @@ dentro de la consulta de un cliente.
 > etiquetas no coinciden, la diferencia es de fórmula, no de rendimiento.
 
 > Detalle técnico: ADR [GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md](../../architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md) (§Runtime Contract) · policy, provenance y evaluador en `src/lib/growth/seo/etv-methodology/` · runbook de evaluación [evaluar-transicion-dataforseo-improved-etv.md](../../manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md).
+
+## El alcance de contenido: qué parte del sitio trabajamos (TASK-2033)
+
+Search Console mide el sitio completo de un cliente. Desde el 2026-10-12 una organización puede declarar qué parte de
+su sitio trabaja Efeonce, como una lista de rutas: secciones enteras (`/articulos` y todo lo que cuelga de ahí) y
+páginas sueltas. Se guarda por versiones, que no se editan ni se borran; la vigente es la más nueva, y una versión sin
+rutas significa «todo el sitio».
+
+Hoy lo usa Efeonce Insights: con un alcance declarado, el informe mensual mide clics, impresiones, posición, causas
+del cambio, oportunidades y visitas sólo sobre esas páginas. El cockpit SEO del portal sigue mostrando el sitio
+completo. Berel es la primera organización con alcance (artículos, tutoriales, inspiración y dos guías).
+
+Se fija con `pnpm seo:content-scope`, que primero muestra lo que el alcance mediría y las páginas que deja fuera.
+Todavía no se puede leer ni fijar por API o por MCP.
+
+> Detalle técnico: `src/lib/growth/seo/content-scope/` · tabla `greenhouse_growth.seo_content_scope_versions` ·
+> [arquitectura de Insights §5.1](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) ·
+> [manual](../../manual-de-uso/insights/operar-efeonce-insights-api-mcp.md)
 
 ## Que NO existe todavia
 

@@ -1,0 +1,21 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "sika-mexico-campana-q4-home-center-1169",
+  "workspacePath": "docs/commercial/tenders/sika-mexico-campana-q4-home-center-1169",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "La salida de pnpm deck:compose es local/exploratoria y no cuenta como Proposal ni como asset versionado.",
+    "Actualizar este registro solo con evidencia del camino canónico Proposal → render job → asset versionado → verificación autenticada.",
+    "Intake LIC-1169 registrado 2026-10-07; no se ha compuesto ni registrado una propuesta.",
+    "2026-10-07: HOLD operativo por instrucción del operador; esperar aclaraciones de Sika antes de desarrollar propuesta o costeo. Preguntas preparadas, envío no confirmado. Ver research/ACLARACIONES-Y-ESPERA-INTERNO.md. El borrador interno previo de OneDrive está detenido y no aprobado."
+  ]
+}

@@ -1,14 +1,40 @@
 # Product Design 360 — Business Model V1.1
 
-> **Status:** `Proposed` — requiere revisión de Strategy, Finance, Legal y Commercial antes de venta general
+> **Status:** `Approved` — aprobado por el operador el 2026-10-10 ([delta](#delta-2026-10-10--aprobado-por-el-operador)). Cubre el modelo, el nombre público «Product Design 360» y la venta. Los gates G1–G6 quedan como validación posterior, no como condición
 > **Owner:** Efeonce Strategy + Wave + Design
 > **Version:** 1.1 — corrección de tesis: el comprador **ya tiene equipo de diseño**
-> **Date:** 2026-09-10
+> **Date:** 2026-09-10 · aprobado el 2026-10-10
 > **Validated as of:** 2026-09-10 — comparables de mercado verificados con fuente y `as-of`; sin cohortes de cliente
 > **Review cadence:** trimestral, o antes ante cualquier gate de la sección 12
-> **Decision:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Proposed`)
-> **Landing (superficie de producto):** [`TASK-1859`](../../tasks/to-do/TASK-1859-landing-product-design-360.md) — publicación por fases atada al estado de este modelo
+> **Decision:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Accepted` — aprobada por el operador el 2026-10-10)
+> **Landing (superficie de producto):** [`TASK-1859`](../../tasks/to-do/TASK-1859-landing-product-design-360.md) — publicación por fases; el gate de estado de este modelo quedó cumplido el 2026-10-10
 > **Related:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) · [`Wave Business Model V1`](../wave/WAVE_BUSINESS_MODEL_V1.md) · [`Ficha de servicio`](../../services/wave/product-design-360.md) · [`Product Service Operating Model V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
+
+---
+
+## Delta 2026-10-10 — aprobado por el operador
+
+**Estado: `Approved`.** El operador aprobó Product Design 360 en dos pasos, y ambos se citan textual:
+
+- 2026-10-09, al cerrar el brochure «Servicios web y digitales»: «Si, incluyela como algo definitivo por qué está
+  aprobado».
+- 2026-10-10, al ver que varios documentos seguían en `Proposed` o decían que la aprobación no cubría el modelo:
+  «Todo product design hay que ponerlo aprobado».
+
+**Qué cubre.** La familia, su [ADR propio](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md), este
+modelo de negocio, la [ficha de servicio](../../services/wave/product-design-360.md), el nombre público «Product
+Design 360» y su venta. Ya no es «sólo pilotos gobernados por SOW».
+
+**Qué resuelve.** D6 (¿se aprueba la sexta familia?) y D1 (nombre público), en la sección 14.
+
+**Qué pasa con los gates.** La regla `Proposed → Approved for validation → Commercially approved` de la sección 12
+queda superada: la aprobación llegó por decisión del operador, no por cerrar gates. G1–G6 siguen vigentes como
+**validación posterior a la aprobación** —miden si la oferta funciona—, ya no como condición de existencia.
+
+**Qué no cambia.** La tesis, las lanes, las reglas duras, los claims prohibidos y la evidencia. Este delta no
+registra demanda nueva, no fija precios y no registra una revisión de Finance ni de Legal: la unidad económica
+sigue «no validada» (sección 6), el loaded cost local sigue abierto (D7) y los comparables siguen sin ser evidencia
+neutral.
 
 ---
 
@@ -26,7 +52,7 @@ Cambian las secciones 1, 2, 3, 4, 5, 9, 10 y 13, se agrega la sección 8 (contra
 reemplaza la evidencia de mercado por comparables verificados de product design.
 
 Lo que **no** cambió: la frontera con Web Experience 360 y con Globe, la unidad de cobro (capacidad gobernada,
-nunca horas ni pantallas) y el estado `Proposed`.
+nunca horas ni pantallas) y el estado `Proposed` *(vigente hasta el 2026-10-10; ver el delta de arriba)*.
 
 ---
 
@@ -61,8 +87,13 @@ mejores cuentas; sólo la tercera entra como proyecto y necesita convertirse.
 
 **Cómo cobramos.** Envelope de capacidad mensual por lane. Nunca por hora. Nunca por pantalla.
 
-**Qué NO aprueba este documento.** Precio, tarifario, claims públicos, venta general, checkout, ARR, ni el nombre
-público "Product Design 360". Estado `Proposed`: sólo habilita pilotos gobernados por SOW.
+**Qué cubre la aprobación.** Estado `Approved` por decisión del operador (2026-10-10): la familia, este modelo, la
+ficha de servicio, el nombre público «Product Design 360» y su venta. Ya no es «sólo pilotos gobernados por SOW».
+Hasta el 2026-10-09 este párrafo se titulaba «Qué NO aprueba este documento» y limitaba el modelo a pilotos.
+
+**Qué no trae la aprobación.** Cifras: este documento no publica precios ni tarifario, y cada propuesta se cotiza
+en el motor de pricing con loaded cost detrás (sección 6). Tampoco trae evidencia nueva: los claims de resultado
+siguen la lista de «Claims prohibidos» de la sección 4, y no hay checkout ni ARR declarado.
 
 ---
 
@@ -186,7 +217,7 @@ capacidad. Posicionarse contra la agencia local es auto-descontarse.
 | **Suscripción de diseño** *(Design Pickle, NoLimit y similares)* | **USD 399–999/mes** | Volumen de producción gráfica | 🎯 **No es product design.** Es diseño gráfico/marketing. Comparable equivocado si el cliente lo trae a la mesa |
 | **Superside** | **~USD 5.000/mes** + plataforma | Capacidad asignada, rápida | Estrategia, métricas de calidad, equipo con nombre. **Ya publica contenido sobre escalar capacidad de product design: se está moviendo a este terreno** |
 | **No hacer nada** | 0 | La deuda de diseño sigue creciendo de forma compuesta | *(y es el competidor que más deals gana)* |
-| **Efeonce — Design Velocity** | Envelope por lane *(sin precio aprobado)* | Capacidad + criterio + **gobierno medido** | — |
+| **Efeonce — Design Velocity** | Envelope por lane *(sin precio de lista: se cotiza por propuesta en el motor de pricing)* | Capacidad + criterio + **gobierno medido** | — |
 
 ⚠️ **Sesgo declarado de las fuentes.** Buena parte de los comparables de "contratar vs externalizar" provienen de
 proveedores de outsourcing, que tienen interés en que contratar se vea caro. Son direccionalmente útiles y su
@@ -681,9 +712,15 @@ patrón de referencia `src/lib/growth/ai-visibility/**` · `greenhouse-gtm-ga4-o
 | **G5** | El envelope por lane es económicamente viable | Costear lanes reales contra el piso de 45% | ≥2 lanes distintas | 6 meses | Margen ≥ piso en cada lane | Retirar la lane deficitaria del catálogo |
 | **G6** | La frontera con Globe se sostiene en la venta | Revisar cada propuesta que mezcle diseño y producción | Todas las del período | 90 días | 0 propuestas con ownership ambiguo | Reabrir la frontera en el ADR |
 
-`Proposed → Approved for validation` requiere G1 iniciado y posición de Legal sobre la sección 9.
-`Approved for validation → Commercially approved` requiere G1, G3, G4 y G5 cerrados, más pricing aprobado por
-Finance.
+**Regla de estado, superada el 2026-10-10.** Hasta el 2026-10-09 regía: `Proposed → Approved for validation`
+requiere G1 iniciado y posición de Legal sobre la sección 9; `Approved for validation → Commercially approved`
+requiere G1, G3, G4 y G5 cerrados, más pricing aprobado por Finance. El operador aprobó el modelo por decisión
+explícita («Todo product design hay que ponerlo aprobado»), así que el estado ya no depende de esa escalera.
+
+**Lo que rige ahora.** G1–G6 son **validación posterior a la aprobación**: se corren igual, con la misma muestra,
+ventana y criterio de éxito, y su columna «Fallo → decisión» describe qué se le propone al operador si un gate
+falla. Ninguno es condición para que la familia exista ni para venderla. La posición de Legal sobre la sección 9 y
+el pricing por lane siguen pendientes como trabajo, no como bloqueo de estado.
 
 ---
 
@@ -716,6 +753,8 @@ Finance.
 4. **La sexta familia agrega superficie comercial que hay que sostener.** Si G1 falla, replegar a capability dentro
    de Web Experience 360 es la decisión correcta y no debe leerse como fracaso.
 5. **El nombre puede no resistir el mercado.** "Product design" en LATAM puede leerse como diseño industrial.
+   *(D1 quedó resuelta el 2026-10-10: el nombre público es «Product Design 360». El riesgo de lectura sigue
+   siendo una nota de copy.)*
 
 ---
 
@@ -723,12 +762,12 @@ Finance.
 
 | # | Decisión | Owner | Revisit trigger |
 |---|---|---|---|
-| D1 | **Nombre público de la familia** y de la ruta comercial *(hoy: "Design Velocity", en paralelo a Creative Velocity)* | Strategy + Commercial | Antes de cualquier material público |
+| D1 | ✅ **Resuelta el 2026-10-10.** Nombre público de la familia: **«Product Design 360»**, aprobado por el operador. «Design Velocity» se mantiene como nombre del motion A, tal como figura en este modelo. *(Antes: "Nombre público de la familia y de la ruta comercial", abierta hasta cualquier material público)* | Operador | — |
 | D2 | ¿L1 Feature Delivery se ofrece sola alguna vez, o queda siempre acompañada? | Wave + Commercial | Al primer cliente que pida sólo overflow |
 | D3 | Piso de margen por lane; hoy se aplica el 45% transversal | Finance | Al cerrar G5 |
 | D4 | ¿El diseño de experiencias conversacionales/agénticas vive acá o en Agent Systems & Platforms? | Wave + Product | Al primer engagement que lo requiera |
 | D5 | Transferencia de IP del design system cuando conviven marcas del cliente y componentes de Efeonce | Legal | Antes del primer build |
-| D6 | ¿Se aprueba la sexta familia en el ADR de Wave, o se repliega a capability? | Strategy + Leadership | Al cerrar G1 |
+| D6 | ✅ **Resuelta: se aprueba la sexta familia.** El operador la aprobó el 2026-10-09 y extendió la aprobación a todo Product Design 360 el 2026-10-10. Replegar a capability dentro de Web Experience 360 queda como decisión disponible si la validación G1 falla | Operador | Si G1 falla |
 | **D7** | **Loaded cost local: cuánto cuesta de verdad un senior product designer en Chile con cargas** — sin esto la aritmética de displacement no es usable frente a un comprador chileno | Finance + Commercial | Antes de la primera propuesta a un cliente chileno |
 | D8 | ¿Efeonce ofrece `Fully Managed Design Capacity` (absorber equipo, licencias, contratación) como configuración? | Leadership + Finance + Legal | Si un cliente lo solicita |
 

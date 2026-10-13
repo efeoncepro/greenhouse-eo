@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing de Contenidos · Paid social",
+    "question": "¿A quién le llega mi pauta?",
+    "answer": [
+      "A quien importa"
+    ]
+  },
+  "body": "Pauta en redes para que el mejor contenido llegue a la audiencia correcta, con el presupuesto medido.",
+  "steps": [
+    {
+      "glyph": "megafono",
+      "kicker": "Audiencias",
+      "name": "Campañas"
+    },
+    {
+      "glyph": "paleta",
+      "kicker": "Para performance",
+      "name": "Creatividad"
+    },
+    {
+      "glyph": "aro-de-luz",
+      "kicker": "Con creadores",
+      "name": "Partnership ads"
+    },
+    {
+      "glyph": "trofeo",
+      "kicker": "Resultados",
+      "name": "Optimización"
+    }
+  ],
+  "note": "La inversión en medios va en una línea aparte.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT7-paid-social.png",
+    "alt": "Una creadora de Efeonce con hoodie lanza un anuncio desde su teléfono: tres haces de luz cruzan miles de pantallas apagadas y encienden sólo tres grupos"
+  }
+}

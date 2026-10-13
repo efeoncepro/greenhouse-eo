@@ -49,6 +49,19 @@ Architecture `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`, ADR `EFEONCE_INSIGHTS_PLATFO
 runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-045 + master UI flow
 `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`, Think decision `docs/think/README.md`, flag ledger rows.
 
+## TASK-2033 — alcance de contenido (in-progress; en staging y `ops-worker` desde 2026-10-12, Production sin release)
+
+- `src/lib/growth/seo/content-scope/contracts.ts` — `SeoContentScopeV1`, validación de reglas (rechaza, no corrige), `isPathInContentScope`, `contentScopeKey`. Puro, sin I/O.
+- `src/lib/growth/seo/content-scope/sql.ts` — `contentScopeSqlClause` (predicado por fila; conjuntos chicos) y `gscPagesInContentScopeSql` (el que se usa sobre `seo_gsc_daily`).
+- `src/lib/growth/seo/content-scope/store.ts` — `readSeoContentScope`, `setSeoContentScope`; único acceso a la tabla.
+- `greenhouse_growth.seo_content_scope_versions` — `(organization_id, version)`, etiqueta, reglas JSON, motivo y actor; trigger de no-update y no-delete.
+- `scripts/seo/set-content-scope.ts` (`pnpm seo:content-scope`) — CLI del operador, dry-run por defecto.
+- `adapters/seo-adapter.ts` — `ActiveScope`, `sealedScopeOf`, `uniquePageLabels`; `adapters/ga4-site-facts.ts` recibe `landingMatch`.
+- `contracts/evidence.ts` — `EvidenceContentScopeV1`, `EvidenceSourceV1.contentScope`, razón `outside_content_scope`.
+- `editorial/editorial-v2.ts` — `contentScopeOf`, `scopeLinesFor(modules, contentScope)`, `openingFor(module, contentScope)`, `contentScopeContextClaim`.
+- `src/lib/copy/insights.ts` — `GH_INSIGHTS.contentScope`, `readerLimits.outsideContentScope`, `metrics['site_total.*']`.
+- Pruebas: `content-scope/contracts.test.ts`, `content-scope.live.test.ts`, `scoped-readers.live.test.ts`, `editorial/content-scope-plan.test.ts`, casos nuevos en `adapters/adapters.test.ts`.
+
 ## TASK-1846 — durable rendering (2026-09-16)
 
 | Piece | Where | Responsibility |
@@ -71,6 +84,9 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Job launcher | `src/lib/render-dispatch/job-runner.ts` | domain-free Cloud Run Job execution launcher |
 | Worker consumer | `services/artifact-worker/consumers/insights.ts` | claim + render + upload for Insights outputs; Job `parallelism=1`; assets bucket fixed to staging bucket, `bucket_name` per row |
 | Migration | `20260916201127095_task-1846-insights-render-client-user-actor` | runs/events accept `client_user`; human actor on run, enqueue event, retry, cancel |
+| Migration | `20261004152040741_insights-outputs-live-identity-partial-unique` | replaces the total `insight_outputs_identity_uq` with the partial `insight_outputs_live_identity_uq` (`WHERE state NOT IN ('dead_letter','cancelled')`): a terminal output frees its identity for a new request |
+| Domain | `render/contracts.ts` (`INSIGHT_OUTPUT_RELEASED_STATES`, `isInsightOutputLive`, `isInsightOutputLiveIdentityViolation`) | mirror of the partial index predicate + detector of its `23505` (race → idempotent/422, never 500) |
+| Live test | `render/render-identity.live.test.ts` | applies the migration Up in a rolled-back tx as `ops`; proves dead_letter → new row, live collision, no revive |
 | Gateway | `efeonce-mcp` v1.6.0 (PR #14 `da8295a`, 51 tools) | 4 render tools federated; writes need `efeonce.mcp.insights.write`; deployed 2026-09-16 (revision `00054-n78`) |
 | Release plane | artifact-worker Job in the production release control plane | first productive deploy in release `917491fd02e4` (2026-09-16, change-gated) |
 
@@ -154,7 +170,8 @@ Production renders with these catalogs and the v2 contract since the 2026-09-26 
 | --- | --- | --- |
 | Chart contract | `contracts/chart-spec.ts` | 15 families, per-family `data`, structural validation, `chartSpecFactIds` |
 | Value invariants | `editorial/chart-values.ts` | `validateChartSpecValues` over `chart-geometry` (via `artifact-composer/pure`) |
-| Channel registry | `contracts/channels.ts` | `INSIGHT_CHANNEL_IDS`, `channelForAeoProvider`, `SEO_SEARCH_CHANNEL` |
+| Channel registry | `contracts/channels.ts` (+ `channels.test.ts`: drift against the installed `AXIS_PLATFORM_ASSETS`) | `INSIGHT_CHANNEL_IDS` (22 platforms since `axis-brand-assets` 0.4.25), `channelForAeoProvider`, `SEO_SEARCH_CHANNEL`, `channelForDomain` (cited domain → platform; called only by `rowMarkOf` in `render/report-mapper.ts` for `cited_source.*` table rows of the PDF and deck) |
+| Platform isotypes | `catalogs/insights-shared/channels.ts` (`CHANNEL_ISOTYPES`, 22) + copies in `catalogs/insights-{report,deck}/assets/channels/*.svg`; guard `src/config/insights-channel-isotypes.test.ts`; names in `GH_INSIGHTS.channels`; Think `src/lib/insights-platforms.ts` + `public/logos/platforms/` | byte copies of `AXIS_PLATFORM_ASSETS`, never edited by hand; a platform added in AXIS is added in all four places |
 | Family × evidence matrix | `editorial/family-evidence-matrix.ts` | `family_evidence_matrix_v1`, `canProduceFamily` |
 | v2 producers | `editorial/editorial-v2.ts` | bullet ICO, monthly line, readings, opening, essentials, scope lines, `assertChartsAllowed` |
 | Planner / authoring | `editorial/deterministic-planner.ts` (`editorialV2`, `cover`), `editorial/ai-authoring.ts` (`insights-authoring-v2`), `editorial/author-plan.ts` | v2 only with the flag |
@@ -218,7 +235,7 @@ Detail and rules: [`ui-and-brand.md`](ui-and-brand.md).
 | --- | --- | --- |
 | Mark generator | `scripts/brand/build-insights-logo.mjs` (commits `7deed5888` logo/isotype, `b64f07ffa` lockup) | builds `insights-{logo,isotype,lockup}-{positive,negative}.svg` from Poppins Bold outlines; never edit a SVG by hand |
 | Official files | AXIS `packages/brand-assets` → `@efeoncepro/axis-brand-assets` **0.4.0** (tag `v0.4.0`; AXIS `25b5ecf` + `4760e3e`); ids in `src/manifest.ts`, brand `insights` in `AXIS_BRAND_ASSET_BRANDS` (`src/index.ts`), rules in the package README | sealed SHA-256; new asset kind `lockup` |
-| Greenhouse pin | `package.json` `@efeoncepro/axis-brand-assets` **0.3.5** | does NOT carry the Insights files yet (gap) |
+| Greenhouse pin | `package.json` `@efeoncepro/axis-brand-assets` **0.4.25** (since 2026-10-06) | carries the Insights files (present since 0.4.0); which surfaces use them: `ui-and-brand.md` §2 and §7 |
 | Think copies | `efeonce-think/public/branding/insights/` (5 SVG + `og-insights.png`, manual copies; the OG is generated by `efeonce-think/scripts/build-insights-og.mjs`) | lockup in the hero and presentation mode; OG image of the report and the sample |
 | Catalog logos | `src/lib/artifact-composer/catalogs/insights-*/assets/brand/logo-*.svg`; covers `insights-report/report-cover{,-light}.html` (`.brand-lockup` / `.brand-product`, `report-editorial.css`), the mini-lockup of `insights-report/report-chapter.html`, and `insights-deck/insights-cover.html` + `insights-chapter.html` (cover lockup and foot, `.lockup` / `.product`) | covers and chapter openings compose Efeonce logo + rule + «INSIGHTS» as uppercase with 0.34em tracking (spaced capitals, not true small caps; type version; accent on navy covers = open operator decision, `ui-and-brand.md` §7.7); page footers and the A4 back cover use the Efeonce logo; the official `insights-lockup-*` file is not used yet (gap) |
 | Data-color roles | `src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` (copied by hand in `efeonce-think/src/lib/insights-tokens.ts` `dataRoles`) | tokens published in AXIS `efeonceInsights` v0.3.42 ( TASK-1975 added `dataStep*` and `deltaBetter/Worse*`); Think still copies them; the copies diverged on «prior on paper» (`#0e8c82` in Think) — resolved 2026-09-28 in Think `b3c5820` (`#1f9e94`, same as the PDFs); Think copies only 4 of the roles |

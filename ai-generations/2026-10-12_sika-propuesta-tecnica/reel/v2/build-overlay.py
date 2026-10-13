@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""Capa de motion del reel v2, en la línea gráfica POSIBLE (v2.2, 12/10): etiquetas de lugar en caja amarilla con texto negro,
+«UNO solo.» como campo amarillo con cortes negros a 13°, el sello de lanzamiento APROBADO (gen.sello_lanz del manual) y los
+titulares sobre panel amarillo con borde a 13°. Escribe overlay.html; después: node overlay-render.mjs && bash montaje.sh"""
+import os, sys
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, '..', '..', '..', '2026-10-06_sika-propuesta-grafica', 'fuentes', 'manual'))
+import gen  # noqa: E402  (generador del manual de identidad: de ahí sale el sello, sin redibujarlo)
+
+Y, K, R, TEAL = gen.Y, gen.K, gen.R, gen.TEAL
+SELLO = gen.sello_lanz(390, '2en1', TEAL, 'ANTIHONGOS + USO GENERAL').replace(gen.LOGO, '../../logos-cliente/sika-triangulo.png')
+
+HTML = f'''<!doctype html>
+<!-- Generado por build-overlay.py. 1080×1920, 25 s, fondo transparente; se renderiza con overlay-render.mjs (window.seek). -->
+<html lang="es"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;500;800&family=Barlow:wght@400;500;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+html,body{{margin:0;background:transparent}}
+#st{{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Barlow',sans-serif;color:{K}}}
+.abs{{position:absolute}}
+.bc{{font-family:'Barlow Condensed',sans-serif}}
+.vig{{inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.5) 100%)}}
+.lab{{top:1250px;background:{Y};font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:170px;line-height:.9;padding:22px 90px 30px 84px;white-space:nowrap;filter:drop-shadow(0 16px 30px rgba(0,0,0,.45))}}
+.lab.l{{left:0;clip-path:polygon(0 0,100% 0,calc(100% - 51px) 100%,0 100%)}}
+.lab.r{{right:0;padding:22px 84px 30px 96px;clip-path:polygon(51px 0,100% 0,100% 100%,0 100%)}}
+#card{{inset:0;background:{Y}}}
+#card .c1{{right:0;top:0;width:560px;height:520px;background:{K};clip-path:polygon(120px 0,100% 0,100% 100%,0 100%)}}
+#card .c2{{left:0;bottom:0;width:560px;height:520px;background:{K};clip-path:polygon(0 0,100% 0,calc(100% - 120px) 100%,0 100%)}}
+#uno{{left:84px;top:650px;line-height:.82}}
+#u1{{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:470px;letter-spacing:-.015em}}
+#u2{{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-size:300px;margin-top:6px}}
+.panel{{left:0;background:{Y};clip-path:polygon(0 0,100% 0,calc(100% - 92px) 100%,0 100%);filter:drop-shadow(0 16px 30px rgba(0,0,0,.45))}}
+#prod{{bottom:230px;width:1000px;height:400px;box-sizing:border-box;padding:40px 150px 0 84px}}
+#prod .k{{font-weight:800;font-size:30px;letter-spacing:.2em}}
+#prod .n{{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:140px;line-height:.9;margin-top:12px;white-space:nowrap}}
+#prod .s{{font-weight:500;font-size:36px;margin-top:16px}}
+#sello{{left:70px;top:150px;transform-origin:left top}}
+#claim{{bottom:190px;width:900px;height:400px;box-sizing:border-box;padding:44px 150px 0 84px;line-height:.9}}
+#claim .l{{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-size:128px}}
+#claim .h{{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:164px;white-space:nowrap}}
+#fin{{inset:0;background:{Y}}}
+.wipe{{left:-1500px;top:-400px;width:700px;height:2800px;background:{Y};transform:rotate(13deg)}}
+</style></head><body>
+<div id="st">
+  <div class="abs vig" id="vig"></div>
+  <div class="abs lab l" id="w1">BAÑO.</div>
+  <div class="abs lab r" id="w2">COCINA.</div>
+  <div class="abs lab l" id="w3">CANCELERÍA.</div>
+  <div class="abs" id="card"><div class="abs c1"></div><div class="abs c2"></div><div class="abs" id="uno"><div id="u1">UNO</div><div id="u2">solo.</div></div></div>
+  <div class="abs panel" id="prod"><div class="k" id="pk">NUEVO</div><div class="n" id="pn">SikaSeal<sup style="font-size:.4em">®</sup>-170</div><div class="s" id="ps">Sanisil · silicona antihongos</div></div>
+  <div class="abs" id="sello">{SELLO}</div>
+  <div class="abs panel" id="claim"><div class="l" id="c1">Innovar para</div><div class="h" id="c2">simplificar<span style="color:{TEAL}">.</span></div></div>
+  <div class="abs" id="fin"></div>
+  <div class="abs wipe" id="wp1"></div><div class="abs wipe" id="wp2"></div><div class="abs wipe" id="wp3"></div>
+</div>
+<script>
+const tl = gsap.timeline({{ paused: true }});
+gsap.set(['#w1','#w2','#w3','#card','#prod','#sello','#claim','#fin','#wp1','#wp2','#wp3'], {{ autoAlpha: 0 }});
+const lab = (w, side, t0, t1) => {{
+  const d = side === 'l' ? -1 : 1;
+  tl.set(w, {{ autoAlpha: 1 }}, t0)
+    .fromTo(w, {{ xPercent: 105 * d }}, {{ xPercent: 0, duration: .42, ease: 'expo.out' }}, t0 + .06)
+    .to(w, {{ x: -16 * d, duration: t1 - t0 - .62, ease: 'none' }}, t0 + .5)
+    .to(w, {{ xPercent: 105 * d, duration: .14, ease: 'power2.in' }}, t1 - .14)
+    .set(w, {{ autoAlpha: 0 }}, t1);
+}};
+lab('#w1', 'l', 4.0, 6.0); lab('#w2', 'r', 6.0, 8.0); lab('#w3', 'l', 8.0, 10.0);
+// 10–12 · «UNO solo.»: campo amarillo con cortes negros a 13°
+tl.set('#card', {{ autoAlpha: 1 }}, 10.0)
+  .fromTo('#card', {{ clipPath: 'inset(50% 0 50% 0)' }}, {{ clipPath: 'inset(0% 0 0% 0)', duration: .22, ease: 'power4.out' }}, 10.0)
+  .fromTo('#u1', {{ scale: 1.5, autoAlpha: 0, transformOrigin: 'left center' }}, {{ scale: 1, autoAlpha: 1, duration: .26, ease: 'expo.out' }}, 10.12)
+  .fromTo('#u2', {{ x: -60, autoAlpha: 0 }}, {{ x: 0, autoAlpha: 1, duration: .3, ease: 'expo.out' }}, 10.6)
+  .to('#uno', {{ scale: 1.04, transformOrigin: 'left center', duration: 1.1, ease: 'none' }}, 10.7)
+  .to('#card', {{ clipPath: 'inset(0% 0 0% 100%)', duration: .22, ease: 'power3.in' }}, 11.78)
+  .set('#card', {{ autoAlpha: 0 }}, 12.0);
+// 12–17 · aplicación: nombre del producto sobre panel amarillo
+tl.set('#prod', {{ autoAlpha: 1 }}, 12.7)
+  .fromTo('#prod', {{ xPercent: -105 }}, {{ xPercent: 0, duration: .5, ease: 'expo.out' }}, 12.7)
+  .fromTo('#pk', {{ autoAlpha: 0, x: -30 }}, {{ autoAlpha: 1, x: 0, duration: .3, ease: 'power3.out' }}, 12.95)
+  .fromTo('#pn', {{ clipPath: 'inset(0 100% 0 0)' }}, {{ clipPath: 'inset(-20% -5% -20% 0)', duration: .45, ease: 'expo.out' }}, 13.0)
+  .fromTo('#ps', {{ autoAlpha: 0, y: 16 }}, {{ autoAlpha: 1, y: 0, duration: .35, ease: 'power2.out' }}, 13.3)
+  .to('#prod', {{ xPercent: -105, duration: .22, ease: 'power2.in' }}, 16.6)
+  .set('#prod', {{ autoAlpha: 0 }}, 16.84);
+// 17–21 · héroe: sello aprobado y titular sobre panel amarillo
+tl.set('#sello', {{ autoAlpha: 1 }}, 17.3)
+  .fromTo('#sello', {{ scale: 1.7, autoAlpha: 0, rotation: -5 }}, {{ scale: 1, autoAlpha: 1, rotation: 0, duration: .3, ease: 'back.out(1.5)' }}, 17.3)
+  .set('#claim', {{ autoAlpha: 1 }}, 17.9)
+  .fromTo('#claim', {{ xPercent: -105 }}, {{ xPercent: 0, duration: .5, ease: 'expo.out' }}, 17.9)
+  .fromTo('#c1', {{ autoAlpha: 0, x: -30 }}, {{ autoAlpha: 1, x: 0, duration: .3, ease: 'power3.out' }}, 18.15)
+  .fromTo('#c2', {{ clipPath: 'inset(0 100% 0 0)' }}, {{ clipPath: 'inset(-20% -5% -20% 0)', duration: .45, ease: 'expo.out' }}, 18.3)
+  // 20.5–21 · barrido amarillo a 13° hacia la firma
+  .set(['#wp2', '#wp3'], {{ autoAlpha: 1 }}, 20.48)
+  .fromTo('#wp2', {{ x: 0 }}, {{ x: 3400, duration: .5, ease: 'power2.in' }}, 20.5)
+  .fromTo('#wp3', {{ x: -900, scaleX: 3 }}, {{ x: 2200, duration: .4, ease: 'power2.in' }}, 20.6)
+  .set('#fin', {{ autoAlpha: 1 }}, 20.97)
+  .set(['#sello', '#claim', '#vig', '#wp2', '#wp3'], {{ autoAlpha: 0 }}, 20.97)
+  .set('#fin', {{ autoAlpha: 0 }}, 21.0)
+  .to({{}}, {{ duration: 4 }}, 21);
+window.seek = t => {{ tl.seek(t, false); }};
+</script></body></html>
+'''
+open(os.path.join(HERE, 'overlay.html'), 'w').write(HTML)
+print('ok')

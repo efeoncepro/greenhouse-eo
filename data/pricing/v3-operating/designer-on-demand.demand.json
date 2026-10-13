@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "role_capacity",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "talent-assurance-staffing",
+    "engagementCode": "monthly",
+    "engagementForm": "on_demand",
+    "accountId": "designer-on-demand-example",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-002",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyId": "allocation:dedicated",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "design",
+      "assigneeIds": [
+        "design-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [
+        "higgsfield",
+        "magnific"
+      ],
+      "aiSelectionReason": "Image production and upscaling demand declared for simulation.",
+      "creditDemand": [
+        {
+          "periodId": 1,
+          "toolId": "higgsfield",
+          "credits": 1000
+        },
+        {
+          "periodId": 1,
+          "toolId": "magnific",
+          "credits": 12000
+        }
+      ]
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Example of one licensed Business user at invoiced24USD; not a confirmed user assignment."
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "public-standard-teams-monthly",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Explicit publicUS plan simulation, not actualEfeonce billing."
+    },
+    {
+      "periodId": 1,
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "seatCapacity": 3,
+      "serviceShare": "0.333333333333333333",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "3",
+        "allocatedUnits": "1"
+      },
+      "reason": "Portfolio example-capacity-v1 (simulation): One of the three Creative Cloud Pro licences is used by this person; the other two stay with the internal team. Example, not a verified seat assignment."
+    }
+  ],
+  "creditBudgets": [
+    {
+      "periodId": 1,
+      "toolId": "higgsfield",
+      "purchaseDate": "2026-10-11",
+      "useBy": "2026-10-31",
+      "subscriptionCreditsAllocated": 400,
+      "subscriptionCreditsAvailable": 400,
+      "activeSubscription": true,
+      "allowRepeatedPacks": false
+    },
+    {
+      "periodId": 1,
+      "toolId": "magnific",
+      "purchaseDate": "2026-10-11",
+      "useBy": "2026-10-31",
+      "subscriptionCreditsAllocated": 2000,
+      "subscriptionCreditsAvailable": 2000,
+      "activeSubscription": true,
+      "allowRepeatedPacks": false
+    }
+  ],
+  "fxRecordIds": [
+    "fx:CLP:USD",
+    "fx:EUR:USD"
+  ]
+}

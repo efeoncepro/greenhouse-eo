@@ -1,6 +1,6 @@
 # ADR — Wave como productora de ingeniería digital, visibilidad y sistemas de agentes
 
-> **Status:** Accepted direction · 2026-07-25
+> **Status:** Accepted direction · 2026-07-25 · cartera de **seis familias**: la sexta (Product Design 360) fue aprobada por el operador el 2026-10-09 ([delta](#delta-2026-10-09--product-design-360-aprobada)) y la aprobación se extendió a todo Product Design 360 el 2026-10-10 ([delta](#delta-2026-10-10--aprobación-total-de-product-design-360))
 > **Scope:** Portfolio / Commercial / Wave / Search Visibility 360 / Web / Measurement / Agent systems / CRM / Globe / Reach
 > **Canonical business model:** [`docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md)
 > **Related:** [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md`](../business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md) · [`GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md`](GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md)
@@ -33,6 +33,13 @@ agentes**. Su cartera canónica tiene cinco familias:
    agentes. Los proveedores concretos son implementaciones posibles, no la taxonomía de Wave.
 5. **Digital Automation & Integrations** — APIs, webhooks, workflows, data pipelines, automatización e integración
    entre web, analytics, agentes y sistemas empresariales.
+
+> **Vigente desde el 2026-10-09:** la cartera tiene **seis familias**. La sexta es **Product Design 360** —research,
+> UI/UX, design system, accesibilidad, validación y design ops; *decide cómo debe ser la experiencia*—, aprobada por
+> el operador. La lista de arriba conserva el texto aceptado el 2026-07-25; los deltas del
+> [2026-10-09](#delta-2026-10-09--product-design-360-aprobada) y del
+> [2026-10-10](#delta-2026-10-10--aprobación-total-de-product-design-360) son los que rigen para el conteo y el
+> alcance de la aprobación.
 
 ## Boundaries de ownership
 
@@ -146,3 +153,74 @@ familia se acepta en un ADR V2 o si se repliega a capability dentro de Web Exper
 
 **Fuentes:** [`Product Design 360 — Business Model V1`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) ·
 [`Ficha de servicio`](../services/wave/product-design-360.md)
+
+## Delta 2026-10-09 — Product Design 360 aprobada
+
+**Estado: aprobada por el operador.** El 2026-10-09, al cerrar el brochure «Servicios web y digitales», el operador
+dijo sobre Product Design 360, textual: «Si, incluyela como algo definitivo por qué está aprobado». Con eso la
+cartera canónica de Wave pasa de cinco a **seis familias**: las cinco aceptadas el 2026-07-25 más **Product Design
+360**. El delta del 2026-09-10 queda como registro histórico de la propuesta y no se reescribe.
+
+**Qué resuelve.** La decisión abierta D6 del modelo económico («¿se aprueba la sexta familia en el ADR de Wave, o se
+repliega a capability?») queda resuelta a favor de la sexta familia. La frontera interna, la relación con Web
+Experience 360 (capability única, dos ofertas) y la frontera con Globe del delta 2026-09-10 pasan de propuesta a
+decisión vigente, sin cambios de contenido.
+
+**Cómo se resolvió, dicho con honestidad.** El delta anterior ataba la aceptación al gate G1 del modelo económico
+(demanda externa verificada) y a un ADR V2. La aprobación llegó por **decisión explícita del operador**, no por
+cierre de G1: este delta no registra evidencia nueva de demanda, de willingness-to-pay ni de cost-to-serve. Los
+gates G1–G5 siguen siendo la validación pendiente del modelo, ya no la condición para que la familia exista en el
+portfolio.
+
+**Qué no dice la aprobación** *(lectura del 2026-10-09, superada por el
+[delta 2026-10-10](#delta-2026-10-10--aprobación-total-de-product-design-360): la aprobación sí cubre el modelo, el
+nombre público y la venta)*. La frase del operador no menciona precios, piso de margen por lane, posición de
+Legal/IP ni claims de resultado; esos puntos siguen gobernados por el
+[modelo económico](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) y no se dan por
+aprobados aquí. El nombre «Product Design 360» ya aparece en collateral aprobado (lámina 13 del brochure), lo que
+en la práctica lo usa como nombre público; la decisión D1 del modelo no se cerró por separado.
+
+**Evidencia.** Brochure «Servicios web y digitales» (29 láminas, aprobado el 2026-10-09): Product Design 360 es la
+lámina 13, presentada como definitiva y sin «Próximamente». Ficha y pendientes del brochure en
+[`docs/services/wave/README.md`](../services/wave/README.md#collateral-comercial).
+
+**Sincronización: cerrada el 2026-10-10.** El ADR propio, el modelo económico y las filas de `DECISIONS_INDEX.md`
+quedaron alineados; ver el delta siguiente. Las secciones «Decisión» y «Consecuencias» de este ADR conservan el
+texto del 2026-07-25 (cinco familias), con una nota que remite a los deltas, que son los que rigen para el conteo.
+
+## Delta 2026-10-10 — aprobación total de Product Design 360
+
+**Estado: aprobado por el operador, sin reservas de alcance.** El delta del 2026-10-09 leyó la aprobación de forma
+estrecha: registró la sexta familia como aprobada, pero dejó escrito que el modelo económico y el ADR propio seguían
+`Proposed` y que precios, piso de margen, Legal y gates «no se daban por aprobados». El 2026-10-10, al ver esos
+documentos todavía en `Proposed`, el operador ordenó, textual: «Todo product design hay que ponerlo aprobado».
+
+**Qué cubre la aprobación.**
+
+- La **familia** en la cartera de Wave: seis familias, sin condición pendiente.
+- Su **ADR propio**: [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) pasa a
+  `Accepted`.
+- Su **modelo de negocio**:
+  [`Product Design 360 — Business Model V1.1`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md)
+  pasa a `Approved`.
+- Su **ficha de servicio**: [`product-design-360.md`](../services/wave/product-design-360.md).
+- El **nombre público «Product Design 360»**: la decisión D1 del modelo queda resuelta.
+- Su **venta**: ya no es «sólo pilotos gobernados por SOW».
+
+**Qué queda superado.** Del delta 2026-09-10: «No aprueba la sexta familia, ni pricing, ni claims públicos, ni el
+nombre público» y la «Condición de resolución» atada a G1 y a un ADR V2. Del delta 2026-10-09: el párrafo «Qué no
+dice la aprobación» y la «Sincronización pendiente». Ambos deltas se conservan como registro; no se reescriben.
+
+**Qué pasa con los gates.** G1–G6 del modelo económico son validación posterior a la aprobación: miden si la oferta
+funciona, no si existe.
+
+**Qué no cambia, porque es evidencia y no estado.** La aprobación es una decisión del operador; este delta no
+registra una revisión de Legal ni de Finance, no fija precios y no agrega evidencia de demanda, de
+willingness-to-pay ni de cost-to-serve. Siguen en pie las advertencias del modelo: comparables que no son evidencia
+neutral, loaded cost local sin verificar (D7), persona BP9 en `hypothesis_only` y claims de resultado sujetos a la
+lista de «Claims prohibidos». El ownership de las demás capabilities tampoco cambia.
+
+**Documentos alineados el mismo día:** el ADR propio, el modelo, la ficha, [`DECISIONS_INDEX.md`](DECISIONS_INDEX.md),
+[`docs/services/README.md`](../services/README.md), [`docs/services/wave/README.md`](../services/wave/README.md),
+[`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md),
+[`docs/business-models/README.md`](../business-models/README.md) y el context pack (`03` y `13`).

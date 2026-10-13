@@ -1,0 +1,120 @@
+{
+  "portalId": 48713323,
+  "asOf": "2026-10-11",
+  "agentCliVersion": "0.15.1 (build 1348)",
+  "scope": "Complete active definitions returned by properties list; includes hidden; archived definitions not requested. No record database export.",
+  "source": "Authenticated Agent CLI properties list --type OBJECT --format json; meta.next null for all four objects",
+  "requiredness": "No required create-form/stage-rule catalog in definitions; API docs and operational policy separate. UI session unauthenticated.",
+  "review": "Three delegated analyses: Contact, Company, Deal+Lead; root reconciliation with CLI/MCP and official docs.",
+  "objects": {
+    "contacts": {
+      "count": 454,
+      "sha256": "2d88f03e58fa2f2ffb0b501393973937ca0715e4660591295d28e938adc6f517",
+      "readOnlyValue": 290,
+      "metadataWritable": 164,
+      "hidden": 110,
+      "calculatedFlag": 38,
+      "calculationFieldType": 45,
+      "hubspotDefinedTrue": 409,
+      "hubspotDefinedOmitted": 45,
+      "externalOptions": 26,
+      "groups": {
+        "contactinformation": 187,
+        "aeo": 1,
+        "deal_information": 17,
+        "facebook_ads_properties": 14,
+        "contact_activity": 30,
+        "efeonce_prospecting": 4,
+        "socialmediainformation": 18,
+        "greenhouse_growth_forms": 20,
+        "analyticsinformation": 24,
+        "conversioninformation": 28,
+        "emailinformation": 44,
+        "multiaccountmanagement": 3,
+        "order_information": 3,
+        "contactlcs": 35,
+        "sales_properties": 6,
+        "smsinformation": 2,
+        "contactscripted": 2,
+        "prospecting_agent_information": 6,
+        "zoom": 5,
+        "partner_registration_information": 5
+      }
+    },
+    "companies": {
+      "count": 266,
+      "sha256": "63f0c37320ace9a99c66125151c1b1a22673128aaaae1a5d832f39ae1348f644",
+      "readOnlyValue": 176,
+      "metadataWritable": 90,
+      "hidden": 74,
+      "calculatedFlag": 6,
+      "calculationFieldType": 17,
+      "hubspotDefinedTrue": 244,
+      "hubspotDefinedOmitted": 22,
+      "externalOptions": 23,
+      "groups": {
+        "companyinformation": 140,
+        "aeo": 8,
+        "efeonce_prospecting": 2,
+        "company_activity": 15,
+        "socialmediainformation": 8,
+        "conversioninformation": 10,
+        "deal_information": 7,
+        "analyticsinformation": 10,
+        "company_signals": 13,
+        "multiaccountmanagement": 1,
+        "targetaccountsinformation": 5,
+        "buyer_intent_properties": 2,
+        "prospectingagent": 7,
+        "sales_properties": 4,
+        "companylcs": 34
+      }
+    },
+    "deals": {
+      "count": 252,
+      "sha256": "55f777e4ffe7100d7e8c79382cde231e1413f167befe610223f832dc6e7d537f",
+      "readOnlyValue": 199,
+      "metadataWritable": 53,
+      "hidden": 81,
+      "calculatedFlag": 36,
+      "calculationFieldType": 49,
+      "hubspotDefinedTrue": 240,
+      "hubspotDefinedOmitted": 12,
+      "externalOptions": 27,
+      "groups": {
+        "deal_revenue": 8,
+        "dealinformation": 104,
+        "deal_activity": 40,
+        "analyticsinformation": 15,
+        "predictive_deal_score_feature_properties": 12,
+        "dealscripted": 6,
+        "multiaccountmanagement": 2,
+        "hubspotmetrics": 2,
+        "dealstages": 62,
+        "create_document_via_upload": 1
+      }
+    },
+    "leads": {
+      "count": 154,
+      "sha256": "0892599548f7dc1afb20eccccc276577b0d0f406eaecc5c764940d1f4a0418b0",
+      "readOnlyValue": 139,
+      "metadataWritable": 15,
+      "hidden": 58,
+      "calculatedFlag": 41,
+      "calculationFieldType": 38,
+      "hubspotDefinedTrue": 152,
+      "hubspotDefinedOmitted": 2,
+      "externalOptions": 27,
+      "groups": {
+        "lead_information": 132,
+        "leadstages": 22
+      }
+    }
+  },
+  "csv": {
+    "properties": 1126,
+    "embeddedPropertyOptions": 4592,
+    "maxCellCharacters": 551,
+    "optionsSource": "Embedded definition options flattened into property-options.csv. Critical externally resolved options kept separately in external-options.json; empty embedded array does not imply unrestricted values."
+  }
+}

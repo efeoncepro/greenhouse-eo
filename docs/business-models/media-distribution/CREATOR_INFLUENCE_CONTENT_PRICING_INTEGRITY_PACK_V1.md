@@ -3,6 +3,7 @@
 > **Estado:** `Approved for validation`
 > **Owner:** Strategy + Commercial + Finance + Media & Distribution
 > **Versión:** V1.1 · 2026-07-29
+> **Último delta:** 2026-10-10 — lectura del «Cómo se compra» del deck «Marketing de Contenidos» (§11); sin cambio de bandas, fórmulas ni veredicto
 > **Moneda de referencia:** USD; cotizar en moneda del contrato con snapshot FX aprobado
 > **Nota:** estas bandas son hipótesis internas de validación, no un tarifario público ni una autorización de venta
 > **Benchmark:** contrastado con research comercial fechado en [Creator Influence & Content Market Research 2026-07-29](../../audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md)
@@ -206,6 +207,54 @@ Paid usage = 15–35% del creator base fee por cada 30 días, sujeto a negociaci
 
 Estas fórmulas sirven para construir escenarios y cotizaciones internas. Ninguna cifra está aprobada como precio
 público hasta pasar por Finance, Legal, Commercial y cost-to-serve real.
+
+## 11. Delta 2026-10-10 — lectura del «Cómo se compra» del deck «Marketing de Contenidos»
+
+El operador aprobó el deck el 2026-10-10 y pidió incorporar su contenido al modelo (cita y alcance en el
+[Business Model, §11](CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md#11-delta-2026-10-10--incorporaciones-del-deck-marketing-de-contenidos)).
+Un precio no queda aprobado por aparecer en un deck: este delta **no cambia ninguna banda, fórmula, mínimo ni el
+veredicto** `approved_for_validation`. La lámina misma dice «los montos se definen en cada propuesta».
+
+### 11.1 Las cinco líneas del deck sobre este pack
+
+| Línea del deck | Dónde vive en este pack | Coincide | Lo que la lámina no dice y sigue vigente |
+|---|---|---|---|
+| Fee Efeonce · «fijo, por capacidad» | §1, §2 y §10: fee fijo como default; unidad = capacidad gobernada por lane y cadencia | sí, como default | la activación media admite «15% del creator/production spend, aplicando el mayor» (§2, §3). Ver DA-03 |
+| Fees de creadores · «a costo, aparte» | §5: la compensación del creador es costo de terceros, no revenue de Efeonce; §8: pass-through que no infla el ingreso | sí: el fee del creador se traslada sin recargo | el Modelo B de la §3 agrega una línea propia de coordinación (10–15% del pass-through administrado) cuando Efeonce contrata y paga. La lámina no la lista. Ver DA-02 |
+| Derechos y uso pagado · «línea propia» | §5 «Derechos y premiums de uso»; §7: no se descuentan sin evidencia | sí | paid usage, exclusividad, multi-mercado, raw files y perpetuidad se cotizan por separado entre sí |
+| Whitelisting y medios · «línea propia» | §2 Amplification & Whitelisting; §6: media siempre separada | sí | son dos líneas distintas: la licencia de whitelisting es del creador; la inversión en medios es del cliente y, cuando se puede, la paga directo a la plataforma |
+| Comisión por resultado · «sólo si se acuerda» | §4 | parcial | el acuerdo es necesario, no suficiente: tracking, baseline, ventana, fuente, atribución, exclusiones, cap, auditoría y un fee base que cubra el delivery. No se ofrece performance-only ni revenue share en awareness. Ver DA-04 |
+
+### 11.2 «Empiezas chico»: mapeo propuesto, sin banda nueva
+
+| Paso del deck | Oferta de este pack que lo cubre hoy | Condición vigente |
+|---|---|---|
+| Diagnóstico | Creator Fit Brief o Creator Intelligence Sprint | son pagados y, por defecto, anticipados (§6). Si el «diagnóstico de contenidos» del deck es una conversación comercial sin costo, es una etapa previa y no una de estas ofertas: DA-05 |
+| Sprint de prueba «acotado y pagado, con objetivos acordados» | Influencer Activation pequeña, o un primer ciclo de Creator Content & UGC | no existe una banda llamada «sprint de prueba»: se cotiza con la oferta que corresponda y su mínimo (§7) |
+| Servicio continuo | Creator Content & UGC Engine o Creator Partnership Program | mínimos de 3 y 6 meses (§7) |
+
+El mapeo es una propuesta de lectura para Commercial y Finance, no una decisión de pricing.
+
+### 11.3 Lo incorporado al modelo que no tiene precio
+
+Entran a la oferta por decisión del operador del 2026-10-10 y quedan **sin banda, sin costo medido y sin fórmula**.
+No se cotizan por analogía sin revisión de Finance:
+
+- UGC patrocinado en LinkedIn (Thought Leader Ads): no hay referencia de fee de derechos ni de governance para esa
+  plataforma; la referencia de 15–35% de la §5 deriva de la investigación de Aspire y no está contrastada para
+  LinkedIn;
+- licencia de contenido de clientes reales o de la comunidad;
+- live shopping y formatos comprables con creadores, incluida la reutilización de la grabación;
+- reserva de creadores antes de un lanzamiento (hold o exclusividad previa);
+- convención y soporte de «origen por creador» para el CRM (la integración se cotiza en RevOps & CRM).
+
+### 11.4 Decisiones abiertas que afectan este pack
+
+Numeradas en el [modelo de la línea, §10](MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#10-riesgos-y-decisiones-abiertas):
+DA-02 (coordinación de terceros frente a «a costo»), DA-03 (alternativa porcentual frente a «fijo»), DA-04 (qué
+comisión por resultado nombra el deck), DA-05 (diagnóstico y sprint de prueba), DA-06 (governance de Amplification &
+Whitelisting y fee de Managed Performance sobre la misma amplificación) y DA-13 (bandas y mínimo de activación
+distintos entre este pack y el Operating Control Pack, anterior al deck).
 
 ## Documentación relacionada
 

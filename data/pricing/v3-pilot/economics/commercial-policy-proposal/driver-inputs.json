@@ -1,0 +1,261 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.cost-driver-review.v1",
+  "preparedAt": "2026-10-09",
+  "workUnit": "TASK-2017",
+  "runtimeUse": "review_only",
+  "commercialReady": false,
+  "automaticHydration": false,
+  "authority": "Revisión de drivers, no input CLI ni catálogo de importes. Horas propuestas no son medidas/aprobadas. Finance normaliza importes en recursos con source y vigencia; no ejecuta contabilidad.",
+  "rows": [
+    {
+      "driverId": "human",
+      "ownerRole": "People + Finance",
+      "label": "Remuneración y cargas CO",
+      "requiredEvidence": "Autorización/cotización de costo vigente, país/moneda/modalidad y cobertura de salario, bonos, cargas",
+      "catalogTarget": "proposal:cost:design:CO",
+      "derivation": "Costo mensual con componentes no duplicados",
+      "status": "pending_evidence",
+      "inputs": {
+        "salary": null,
+        "contractualBonuses": null,
+        "statutoryCosts": null,
+        "currency": null,
+        "coverageConfirmed": false
+      }
+    },
+    {
+      "driverId": "design-license",
+      "ownerRole": "Operations + Finance",
+      "label": "Licencia diseño",
+      "requiredEvidence": "Plan Adobe/alternativa, asiento nominativo y contrato/factura",
+      "catalogTarget": "proposal:resource:design-license",
+      "derivation": "Precio por unidad × unidades × atribución validada",
+      "status": "pending_evidence",
+      "inputs": {
+        "unitCost": null,
+        "seats": null,
+        "commitmentMonths": null,
+        "cashSchedule": null
+      }
+    },
+    {
+      "driverId": "collaboration",
+      "ownerRole": "Operations + Finance",
+      "label": "Correo/colaboración",
+      "requiredEvidence": "Plan/tenant y asiento; comprobar cobertura existente",
+      "catalogTarget": "proposal:resource:collaboration",
+      "derivation": "Precio por seat y uso atribuible",
+      "status": "pending_evidence",
+      "inputs": {
+        "unitCost": null,
+        "seats": null,
+        "existingCapacity": null
+      }
+    },
+    {
+      "driverId": "tracking",
+      "ownerRole": "Operations",
+      "label": "Memoria y seguimiento",
+      "requiredEvidence": "Plan/permiso de Notion o cobertura de otra plataforma",
+      "catalogTarget": "proposal:resource:tracking",
+      "derivation": "Costo de miembro/cuenta asignado sin duplicar colaboración",
+      "status": "pending_evidence",
+      "inputs": {
+        "unitCost": null,
+        "paidMembers": null,
+        "coveredByOtherTool": null
+      }
+    },
+    {
+      "driverId": "ai",
+      "ownerRole": "Operations + Privacy + Finance",
+      "label": "Asistencia IA",
+      "requiredEvidence": "Workspace aprobado, seats mínimos, datos y límites",
+      "catalogTarget": "proposal:resource:ai",
+      "derivation": "Contrato por seats + uso externo aprobado, sin compartir login",
+      "status": "pending_evidence",
+      "inputs": {
+        "unitCost": null,
+        "paidSeats": null,
+        "existingWorkspace": null,
+        "apiBudget": null
+      }
+    },
+    {
+      "driverId": "platform",
+      "ownerRole": "People + Finance",
+      "label": "Administración de contratación/pago",
+      "requiredEvidence": "Servicio/country/contrato y costos cubiertos",
+      "catalogTarget": "proposal:resource:platform",
+      "derivation": "Fee por persona/unidad contractual, no por FTE automáticamente",
+      "status": "pending_evidence",
+      "inputs": {
+        "fee": null,
+        "model": null,
+        "laborAlreadyCovered": null
+      }
+    },
+    {
+      "driverId": "training",
+      "ownerRole": "Practice + Operations",
+      "label": "Formación aplicada",
+      "requiredEvidence": "Plan y horas protegidas, cursos, rate mentor",
+      "catalogTarget": "proposal:resource:training",
+      "derivation": "Cursos + mentor incremental; tiempo de especialista ya pagado reduce capacidad útil",
+      "status": "pending_evidence",
+      "inputs": {
+        "proposedSpecialistHoursMonthly": "2",
+        "proposedMentorHoursMonthly": "1",
+        "mentorLoadedHourlyRate": null,
+        "courseCost": null,
+        "currency": null
+      }
+    },
+    {
+      "driverId": "verification",
+      "ownerRole": "Practice",
+      "label": "Evaluación y QA",
+      "requiredEvidence": "Scorecard/work sample y QA periódico; lead/rate",
+      "catalogTarget": "proposal:resource:verification",
+      "derivation": "Horas de lead × rate cargado, excluyendo assessment inicial/setup",
+      "status": "pending_evidence",
+      "inputs": {
+        "proposedLeadHoursMonthly": "2",
+        "loadedHourlyRate": null,
+        "qaAlreadyIncludedElsewhere": null
+      }
+    },
+    {
+      "driverId": "backup",
+      "ownerRole": "Operations + Practice",
+      "label": "Respaldo continuo",
+      "requiredEvidence": "Persona/capability disponible, reserva de horas/retainer y acceso",
+      "catalogTarget": "proposal:resource:backup",
+      "derivation": "Capacidad financiada de respaldo + licencias incrementales",
+      "status": "pending_evidence",
+      "inputs": {
+        "reservedHours": null,
+        "rate": null,
+        "retainer": null,
+        "fundedByOtherPool": null
+      }
+    },
+    {
+      "driverId": "replacement",
+      "ownerRole": "People + Operations",
+      "label": "Reemplazo y transición",
+      "requiredEvidence": "Costo/evento y frecuencia observada o downside explícito",
+      "catalogTarget": "proposal:resource:replacement",
+      "derivation": "Frecuencia × selección/transición/overlap / meses; sin frecuencia no inventar importe esperado",
+      "status": "pending_evidence",
+      "inputs": {
+        "observedEvents": null,
+        "observationMonths": null,
+        "costPerEvent": null,
+        "downsideEventCount": "1",
+        "alreadyCoveredByBackupOrSetup": null
+      }
+    },
+    {
+      "driverId": "management",
+      "ownerRole": "Operations + Finance",
+      "label": "Gestión de cuenta",
+      "requiredEvidence": "Actividades y horas Account/Delivery con rate cargado",
+      "catalogTarget": "proposal:resource:management",
+      "derivation": "Horas incrementales o atribuidas × rate, sin repetir QA",
+      "status": "pending_evidence",
+      "inputs": {
+        "proposedHoursMonthly": "2",
+        "loadedHourlyRate": null
+      }
+    },
+    {
+      "driverId": "infrastructure",
+      "ownerRole": "Operations + Finance",
+      "label": "Equipo y soporte",
+      "requiredEvidence": "Equipo/vida útil/asignación/soporte y desembolso",
+      "catalogTarget": "proposal:resource:infrastructure",
+      "derivation": "Política Finance de costo de uso/amortización más soporte sin duplicar compra",
+      "status": "pending_evidence",
+      "inputs": {
+        "monthlyUseCost": null,
+        "supportCost": null,
+        "purchaseCash": null,
+        "existingCostCoverage": null
+      }
+    },
+    {
+      "driverId": "onboarding",
+      "ownerRole": "Practice + Operations",
+      "label": "Inmersión y activación",
+      "requiredEvidence": "Tareas/actores/rates y exclusiones del recurrente",
+      "catalogTarget": "proposal:resource:onboarding",
+      "derivation": "Horas por actor × rate y gastos iniciales; especialista ya remunerado no se cobra dos veces",
+      "status": "pending_evidence",
+      "inputs": {
+        "proposedSpecialistHours": "4",
+        "proposedLeadHours": "2",
+        "proposedAccessCoordinationHours": "2",
+        "loadedRates": null,
+        "includedInRecurringCapacity": null
+      }
+    },
+    {
+      "driverId": "financial-cost",
+      "ownerRole": "Finance",
+      "label": "Financiación/cobranza",
+      "requiredEvidence": "Pago/DSO/anticipo/capital y tasa/comisiones verificadas",
+      "catalogTarget": "proposal:resource:financial-cost",
+      "derivation": "Capital financiado × tasa × tiempo efectivo más comisiones; distinguir de caja",
+      "status": "pending_evidence",
+      "inputs": {
+        "paymentTermsDays": null,
+        "financedCapital": null,
+        "annualRate": null,
+        "fees": null
+      }
+    },
+    {
+      "driverId": "annual-exposure",
+      "ownerRole": "Finance + Operations",
+      "label": "Compromiso anual no recuperable",
+      "requiredEvidence": "Término, cancelación/reasignación y meses sin financiación",
+      "catalogTarget": "proposal:resource:annual-exposure",
+      "derivation": "Sólo porción no financiada/reasignable, excluye meses devengados",
+      "status": "pending_evidence",
+      "inputs": {
+        "remainingUnfundedMonths": null,
+        "reassignmentEvidence": null,
+        "cancellationCost": null
+      }
+    },
+    {
+      "driverId": "bench",
+      "ownerRole": "Operations + Finance",
+      "label": "Capacidad restante comprometida",
+      "requiredEvidence": "Calendario y ventas/reservas reales, costo salarial comprometido",
+      "catalogTarget": "allocation policy / cost record",
+      "derivation": "Costo comprometido menos costo financiado; no sumar a full-FTE de nuevo",
+      "status": "pending_evidence",
+      "inputs": {
+        "costCommitmentFte": null,
+        "fundedCapacityFte": null,
+        "remainingCapacitySellable": null
+      }
+    },
+    {
+      "driverId": "market-fx-tax",
+      "ownerRole": "Commercial + Finance",
+      "label": "Mercado/moneda/fiscal",
+      "requiredEvidence": "Método de ajuste, moneda/SOW, FX y tratamiento entidad",
+      "catalogTarget": "market_factor / fx / request.taxTreatment",
+      "derivation": "País costo separado de mercado; FX sólo exposición correcta",
+      "status": "pending_evidence",
+      "inputs": {
+        "marketPolicyApproved": false,
+        "fxQuote": null,
+        "taxTreatment": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "tenderId": "C01-portada",
+  "slides": [
+    {
+      "slideId": "deck-cover-brochure",
+      "contentType": "deck.cover-brochure",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=220px",
+          "eyebrowTop": 410,
+          "questionTop": 458,
+          "answerTop": 520,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "bodyTop": 672,
+          "bodyPx": 28,
+          "bodyWidth": 724,
+          "bodyLeading": "--gl-body-leading=1.3",
+          "bodyWeight": "--gl-body-wght=400",
+          "bodyStrongWeight": "--gl-body-strong-wght=600",
+          "bodyColor": "--gl-body-color=#ffffff",
+          "eyebrowPx": "--gl-eyebrow-px=22px",
+          "eyebrowWeight": "--gl-eyebrow-wght=500",
+          "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+          "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+          "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "logoWidth": "--gl-logo-width=500px"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:CR4-el-squad-te-la-entrega-v2",
+          "alt": "Una directora creativa de Efeonce con hoodie mira a cámara y ofrece con las palmas una pieza terminada que brilla en azul; detrás, a su derecha, su squad trabaja y sus piezas viajan hacia ella por una cinta de luz naranja"
+        },
+        "voice": {
+          "question": "¿Quién crea mi contenido?",
+          "answer": "Tu squad",
+          "eyebrow": "Brochure · Creative Services"
+        },
+        "evidence": "<strong>Seis</strong> capacidades:<br>Squad creativo · Brand systems · Campañas<br>Contenido y social · Audiovisual · Run &amp; Gun"
+      },
+      "template": "CoverBrochure"
+    }
+  ]
+}

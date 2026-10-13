@@ -169,6 +169,10 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'seo', prefix: 'driver.', question: 'drivers' },
   { module: 'seo', prefix: 'opportunity.', question: 'recommendations' },
   { module: 'seo', prefix: 'site.', question: 'outcome' },
+  // TASK-2033 — la propiedad completa cuando el informe mide un alcance de contenido. Es parte de «qué pasó» (el
+  // contenido medido frente al sitio), pero llega como hecho de REFERENCIA: contexto de la cifra, nunca un resultado
+  // propio. Sólo se emite junto a los clics del alcance, así que no puede responder la pregunta por sí solo.
+  { module: 'seo', prefix: 'site_total.', question: 'outcome' },
   { module: 'aeo', prefix: 'overall_score', question: 'outcome' },
   { module: 'aeo', prefix: 'dimension.', question: 'outcome' },
   { module: 'aeo', prefix: 'mention_rate.', question: 'outcome' },

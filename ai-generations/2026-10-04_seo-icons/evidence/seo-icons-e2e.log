@@ -1,0 +1,23 @@
+
+Running 6 tests using 5 workers
+
+(node:23043) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23042) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › src/test/e2e/aeo-iconography.spec.ts:3:1 › AEO collection filters, scales, exports exact state and preserves mobile width (705ms)
+  ✓  3 [chromium] › src/test/e2e/seo-iconography.spec.ts:5:1 › SEO collection filters, scales, exports exact state and preserves mobile width (780ms)
+(node:23089) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [chromium] › src/test/e2e/lab.spec.ts:1606:1 › iconography reference renders both voices, filters and keeps a honest empty state (1.3s)
+  ✓  2 [mobile] › src/test/e2e/aeo-iconography.spec.ts:3:1 › AEO collection filters, scales, exports exact state and preserves mobile width (1.4s)
+  ✓  4 [mobile] › src/test/e2e/lab.spec.ts:1606:1 › iconography reference renders both voices, filters and keeps a honest empty state (1.9s)
+  ✓  6 [mobile] › src/test/e2e/seo-iconography.spec.ts:5:1 › SEO collection filters, scales, exports exact state and preserves mobile width (638ms)
+
+  6 passed (2.7s)

@@ -2275,3 +2275,15 @@ nunca cero; y es una foto de un día (la tendencia exige repetir el mismo panel 
 humana delegada), `TASK-1863` (grader multi-mercado: una marca, N mercados, lotes y matriz entre mercados) y `TASK-1864`
 (superficie agéntica autosuficiente del MCP) son la base sobre la que el panel debería convertirse en capacidad
 gobernada (un lote de N marcas con el mismo set). Las tres están creadas y sin implementar.
+
+## Delta 2026-10-12 — sellado de los recursos del PDF «La órbita» (TASK-1938)
+
+- Los recursos del PDF del AI Visibility Report salen de `@efeoncepro/axis-brand-assets` (lockups, logo, burbuja, cinco
+  motores, cuatro redes) y de `@efeoncepro/axis-graphic-line/icons` (glifos Trazo). Los genera
+  `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` (`scripts/pdf/ai-visibility-brand-assets.ts`):
+  47 PNG en `public/branding/pdf/` y su sello `ai-visibility-assets.manifest.json` (hash de la fuente y del PNG por
+  archivo). El `REPORT_ASSETS` del Delta 2026-06-27 es el modo anterior del mismo script.
+- Guarda: `report-pdf-assets.test.ts` falla si un sello no coincide con el archivo oficial del paquete instalado. Por
+  eso el comando se corre en todo cambio de versión de `axis-brand-assets`; sólo cambian los archivos cuya fuente cambió.
+- Los cuatro lockups (`ai-visibility-report-lockup-*`, `aeo-lockup-*`) se re-sellaron el 2026-10-12 contra el paquete
+  0.4.25: llevan la terminación del anillo concéntrica a la esfera en vez del corte recto. En develop, sin release.

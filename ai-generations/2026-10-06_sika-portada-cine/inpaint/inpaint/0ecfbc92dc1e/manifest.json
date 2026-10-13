@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0ecfbc92dc1e",
+  "key": "0ecfbc92dc1e47dbd76a7c55346a4fe5733f5674c114b79030d0f47946481af2",
+  "status": "completed",
+  "createdAt": "2026-10-07T00:22:37.105Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-06_sika-portada-cine/plates/SK2b-arte-exacto.png",
+    "imageSha256": "7435af7a218d1caed4543c08ff63c8013add77eebb8c2f1e23ce78cffc34ba49",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-06_sika-portada-cine/plates/SK2-mask-lightbox.png",
+    "maskSha256": "6d07231b1b5e40f883da7c002f07d6244f12571ac1649184e2a7a03527529a96",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "The marked zone is a backlit tension-fabric lightbox print hanging on the studio wall. The printed artwork in it is FINAL and EXACT: do not change any letter, word, shape, layout, size, position or colour of the graphic, the big black word, the headline, the small text, the red triangle logos or the two cartridges. Add ONLY material and light so it reads as a real backlit print photographed in this dark studio: the faint woven texture of the fabric, light slightly brighter at the centre and falling off softly toward the edges, a very soft bloom at the brightest yellow areas, the same lens softness, grain and contrast as the rest of the photograph. Keep the framing identical.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nThe marked zone is a backlit tension-fabric lightbox print hanging on the studio wall. The printed artwork in it is FINAL and EXACT: do not change any letter, word, shape, layout, size, position or colour of the graphic, the big black word, the headline, the small text, the red triangle logos or the two cartridges. Add ONLY material and light so it reads as a real backlit print photographed in this dark studio: the faint woven texture of the fabric, light slightly brighter at the centre and falling off softly toward the edges, a very soft bloom at the brightest yellow areas, the same lens softness, grain and contrast as the rest of the photograph. Keep the framing identical.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.23545789930555555,
+    "editable": 853608,
+    "soft": 14384,
+    "protected": 2818408
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 32,
+      "top": 0,
+      "width": 2528,
+      "height": 1440
+    },
+    "target": {
+      "width": 2528,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 98.8 % de la imagen: se genera recortada a 2528x1440"
+  },
+  "estimate": {
+    "usd": 0.0548,
+    "basis": "1 × salida 2528x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 37.038,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.1,
+        "bestError": 2.1,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        9.39,
+        6.68,
+        2.04
+      ],
+      "protected": {
+        "pixels": 2818408,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 853608,
+        "maxDelta": 228,
+        "meanDelta": 37.21,
+        "worst": {
+          "x": 1602,
+          "y": 288
+        }
+      },
+      "seam": {
+        "pixels": 14384,
+        "maxDelta": 195,
+        "meanDelta": 26.817,
+        "worst": {
+          "x": 811,
+          "y": 743
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2818408,
+        "maxDelta": 175,
+        "meanDelta": 6.015,
+        "worst": {
+          "x": 2302,
+          "y": 387
+        }
+      },
+      "outputUsd": 0.0548,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3224,
+        "input_tokens_details": {
+          "image_tokens": 2958,
+          "text_tokens": 266
+        },
+        "output_tokens": 1828,
+        "output_tokens_details": {
+          "image_tokens": 1828,
+          "text_tokens": 0
+        },
+        "total_tokens": 5052
+      },
+      "meta": {
+        "size": "2528x1440",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

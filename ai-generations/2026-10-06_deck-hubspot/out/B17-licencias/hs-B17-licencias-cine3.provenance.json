@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "32926671436bfa25e4f45c49691d30e49b44a638a3b9c9b6ca3d662820d4ee9b",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic.hero",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:HS5b-licencias-justas",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+      "sha256": "d6a4536d5574c93edcfe5779576fd0920069ac3b1b3f5ffad9d9589458a09e9c"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,9 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:image /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts --model gpt-image-2.5-sunburst --image ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/01-valparaiso.png --prompt-file ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/prompts/01-valparaiso-v02.txt --size 3840x2160 --quality max --format png --count 1 --timeout 600000 --out ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/01-valparaiso-v02.png
+
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-08_sky-registro-e-prueba/urbanas-v1/01-valparaiso-v02.png (edit) …
+  ✓ 12114KB · gpt-image-2.5-sunburst · 3840x2160 · max
+    usage: in 1957 (img 1508 · txt 449) · out 13342 · total 15299
+done

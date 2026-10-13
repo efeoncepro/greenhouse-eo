@@ -1,0 +1,210 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "d5cd435f24e2",
+  "key": "d5cd435f24e22b4793d5bbc836bed73a4ef21f44aa1d1f7851e6079ae43b238c",
+  "status": "completed",
+  "createdAt": "2026-10-10T00:05:58.881Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT5-prisma-formatos.png",
+    "imageSha256": "4626a98120f5652ff45d7d6b161159a5d1949e85b62080a4495d0aadbcf0726a",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-09_deck-contenidos/fotos/plates/mano/mask-puno.png",
+    "maskSha256": "9002b346caa319742ac52425051315a635a0984442718c425246a0f490542398",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Repaint ONLY the wrist and the cuff of the royal-blue hoodie sleeve: her slender feminine forearm comes naturally OUT of the sleeve; the ribbed knit cuff of the same royal-blue hoodie wraps all the way around her wrist as one continuous soft fabric ring, slightly loose, with a soft natural shadow inside the opening where the arm enters; no hard cut, no pasted edge, no dark outline, no watch, no bracelet; the sleeve folds continue naturally into the cuff; same royal-blue color and fleece texture as the rest of the hoodie, same cool white-azure light from the upper right, same depth of field, photographic, realistic.",
+    "providerPrompt": "Repaint ONLY the wrist and the cuff of the royal-blue hoodie sleeve: her slender feminine forearm comes naturally OUT of the sleeve; the ribbed knit cuff of the same royal-blue hoodie wraps all the way around her wrist as one continuous soft fabric ring, slightly loose, with a soft natural shadow inside the opening where the arm enters; no hard cut, no pasted edge, no dark outline, no watch, no bracelet; the sleeve folds continue naturally into the cuff; same royal-blue color and fleece texture as the rest of the hoodie, same cool white-azure light from the upper right, same depth of field, photographic, realistic."
+  },
+  "mask": {
+    "touchedFraction": 0.02564643012152778,
+    "editable": 67479,
+    "soft": 27064,
+    "protected": 3591857
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1658,
+      "top": 576,
+      "width": 639,
+      "height": 619
+    },
+    "target": {
+      "width": 1040,
+      "height": 1008
+    },
+    "aspectError": 0.0005467876227163808,
+    "reason": "la zona con contexto ocupa 10.7 % de la imagen: se genera recortada a 1040x1008"
+  },
+  "estimate": {
+    "usd": 0.1032,
+    "basis": "2 × salida 1040x1008 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 35.002,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.42,
+        "bestError": 4.42,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3591857,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67479,
+        "maxDelta": 218,
+        "meanDelta": 46.614,
+        "worst": {
+          "x": 2066,
+          "y": 905
+        }
+      },
+      "seam": {
+        "pixels": 27064,
+        "maxDelta": 190,
+        "meanDelta": 6.048,
+        "worst": {
+          "x": 2114,
+          "y": 1011
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3591857,
+        "maxDelta": 217,
+        "meanDelta": 0.772,
+        "worst": {
+          "x": 1747,
+          "y": 875
+        }
+      },
+      "outputUsd": 0.0516,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1201,
+        "input_tokens_details": {
+          "image_tokens": 1056,
+          "text_tokens": 145
+        },
+        "output_tokens": 1720,
+        "output_tokens_details": {
+          "image_tokens": 1720,
+          "text_tokens": 0
+        },
+        "total_tokens": 2921
+      },
+      "meta": {
+        "size": "1040x1008",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 29.259,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.1,
+        "bestError": 4.1,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3591857,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67479,
+        "maxDelta": 206,
+        "meanDelta": 38.53,
+        "worst": {
+          "x": 2065,
+          "y": 891
+        }
+      },
+      "seam": {
+        "pixels": 27064,
+        "maxDelta": 149,
+        "meanDelta": 6.145,
+        "worst": {
+          "x": 1911,
+          "y": 759
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3591857,
+        "maxDelta": 228,
+        "meanDelta": 0.776,
+        "worst": {
+          "x": 1747,
+          "y": 876
+        }
+      },
+      "outputUsd": 0.0516,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1201,
+        "input_tokens_details": {
+          "image_tokens": 1056,
+          "text_tokens": 145
+        },
+        "output_tokens": 1720,
+        "output_tokens_details": {
+          "image_tokens": 1720,
+          "text_tokens": 0
+        },
+        "total_tokens": 2921
+      },
+      "meta": {
+        "size": "1040x1008",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "artifactVersion": "pricing-v3-local-artifact/1",
+  "calculationId": "local-fb397f774df79f17689d3d24",
+  "replayDigest": "fb397f774df79f17689d3d247ec6e5ed4f47a65e8c2e10202f9df80076206090",
+  "semantic": {
+    "engineVersion": "pricing-v3-local/1.0.0",
+    "input": {
+      "request": {
+        "schemaVersion": "1.0.0",
+        "quoteDate": "2026-10-09",
+        "offerId": "talent-assurance-staffing",
+        "deliveryModel": "staffing",
+        "engagementCode": "monthly",
+        "offerMarketCountry": "CL",
+        "outputCurrency": "CLP",
+        "duration": {
+          "unit": "month",
+          "periods": 3
+        },
+        "lines": [
+          {
+            "lineId": "design",
+            "profileId": "ECG-002",
+            "seniorityCode": "senior",
+            "talentCountry": "CO",
+            "headcount": 1,
+            "dedication": {
+              "unit": "fte",
+              "value": "0.5"
+            },
+            "allocationMode": "shared",
+            "allocationPolicyRef": "pending-operational-allocation",
+            "assignments": [],
+            "notApplicable": []
+          }
+        ],
+        "adjustments": [],
+        "taxTreatment": {
+          "kind": "not_resolved"
+        }
+      },
+      "snapshot": {
+        "schemaVersion": "1.0.0",
+        "snapshotId": "pilot-co-cl-design-pending",
+        "version": "review-2026-10-09",
+        "mode": "commercial_draft",
+        "calculationCurrency": "USD",
+        "countries": [
+          "CO",
+          "CL",
+          "US"
+        ],
+        "currencies": [
+          {
+            "code": "USD",
+            "precision": 2
+          },
+          {
+            "code": "CLP",
+            "precision": 0
+          }
+        ],
+        "profiles": [
+          {
+            "profileId": "ECG-002",
+            "label": "Senior Visual Designer — piloto por validar",
+            "seniorityCode": "senior",
+            "tierCode": "pending",
+            "cost": null,
+            "requiredCoverages": [
+              "human_salary",
+              "tools",
+              "platform_fee",
+              "talent_assurance",
+              "operations"
+            ]
+          }
+        ],
+        "allocationPolicies": [],
+        "pricingPolicies": [],
+        "talentFactors": [],
+        "marketFactors": [],
+        "resources": [],
+        "fx": []
+      }
+    },
+    "result": {
+      "engineVersion": "pricing-v3-local/1.0.0",
+      "binding": false,
+      "calculationStatus": "needs_input",
+      "reviewStatus": "not_evaluated",
+      "dataMode": "commercial_draft",
+      "calculationCurrency": "USD",
+      "outputCurrency": "CLP",
+      "diagnostics": [
+        {
+          "code": "MISSING_FX",
+          "fieldPath": "snapshot.fx.output",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_FX",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "MISSING_MARKET_POLICY",
+          "fieldPath": "snapshot.marketFactors",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_MARKET_POLICY",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "MISSING_COST",
+          "fieldPath": "snapshot.profiles.ECG-002.cost",
+          "lineId": "design",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_COST",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "MISSING_POLICY",
+          "fieldPath": "request.lines.0",
+          "lineId": "design",
+          "severity": "missing",
+          "message": "Pricing input requires attention: MISSING_POLICY",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        }
+      ],
+      "lines": [],
+      "totals": null,
+      "precisionPolicy": "decimal-80-half-up-final-line-largest-remainder-v1"
+    }
+  },
+  "execution": {
+    "createdAt": "2026-10-09T12:17:58.571Z"
+  }
+}

@@ -22,6 +22,13 @@
 > contexto y acción de personas y agentes. Es narrativa del proveedor, no nombre de una oferta Efeonce ni promesa
 > de ROI. Ver [marco y fuentes](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md#marco-de-posicionamiento-outcomes-era).
 
+## Complemento de capacidad humana — 2026-10-09
+
+La [capacidad especializada CRM/RevOps](../revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) compone Staff Augmentation
+y operación gestionada sobre las familias existentes, con dirección y accountability explícitas. Dirección
+aceptada; oferta en validación, sin precios/capacidad ni habilitación regional automática.
+[ADR](../../architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md) y Talent Assurance gobiernan el estándar; no se crea una nueva familia.
+
 ## 1. Decisión
 
 Efeonce organiza su práctica HubSpot por **resultados operativos del cliente**, no por una lista de Hubs ni por un

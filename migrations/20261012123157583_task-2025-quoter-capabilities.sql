@@ -1,0 +1,90 @@
+-- Up Migration
+
+-- TASK-2025 — Cotizador V3 en la plataforma: capacidades `commercial.quoter.*`.
+--
+-- Propias del cotizador V3. Ninguna del cotizador actual se reutiliza: quien tiene `commercial.quotation:approve`
+-- no hereda la emisión ni la aprobación de excepciones de V3.
+--
+--   commercial.quoter.catalog            leer catálogo, política y créditos; `update` guarda un sucesor, no activa
+--   commercial.quoter.catalog.activate   mover el puntero de versiones vigentes (además, sólo una persona)
+--   commercial.quoter.simulate           calcular sin guardar
+--   commercial.quoter.quote              leer, crear y actualizar cotizaciones
+--   commercial.quoter.issue              emitir y retirar lo emitido (dentro de política, también un agente)
+--   commercial.quoter.exception          aprobar o revocar una excepción bajo el piso (además, sólo una persona)
+--
+-- Puramente aditiva: sólo filas nuevas en el registro.
+
+SET LOCAL lock_timeout = '5s';
+
+INSERT INTO greenhouse_core.capabilities_registry
+  (capability_key, module, allowed_actions, allowed_scopes, description, introduced_at, deprecated_at)
+VALUES
+  ('commercial.quoter.catalog', 'commercial', ARRAY['read', 'update'], ARRAY['tenant'],
+   'Cotizador V3: leer el catálogo, la política de recursos y el catálogo de créditos; update guarda un documento sucesor y no lo activa', NOW(), NULL),
+  ('commercial.quoter.catalog.activate', 'commercial', ARRAY['execute'], ARRAY['tenant'],
+   'Cotizador V3: activar un catálogo moviendo el puntero de versiones vigentes. Exige además una persona identificada', NOW(), NULL),
+  ('commercial.quoter.simulate', 'commercial', ARRAY['read'], ARRAY['tenant'],
+   'Cotizador V3: calcular una cotización sin guardarla', NOW(), NULL),
+  ('commercial.quoter.quote', 'commercial', ARRAY['read', 'create', 'update'], ARRAY['tenant'],
+   'Cotizador V3: leer, crear y actualizar cotizaciones del registro (versiones, destinataria, documento, retiro de un borrador)', NOW(), NULL),
+  ('commercial.quoter.issue', 'commercial', ARRAY['approve'], ARRAY['tenant'],
+   'Cotizador V3: emitir una cotización y retirar lo emitido. Dentro de política lo hace también un agente', NOW(), NULL),
+  ('commercial.quoter.exception', 'commercial', ARRAY['approve'], ARRAY['tenant'],
+   'Cotizador V3: aprobar o revocar una excepción bajo el piso de margen. Exige además una persona identificada', NOW(), NULL)
+ON CONFLICT (capability_key) DO UPDATE SET
+  module = EXCLUDED.module,
+  allowed_actions = EXCLUDED.allowed_actions,
+  allowed_scopes = EXCLUDED.allowed_scopes,
+  description = EXCLUDED.description,
+  deprecated_at = NULL;
+
+-- Anti pre-up-marker: aborta si alguna de las seis capacidades no quedó registrada y vigente.
+DO $$
+DECLARE
+  missing text := '';
+  expected text;
+BEGIN
+  FOR expected IN SELECT unnest(ARRAY[
+    'commercial.quoter.catalog', 'commercial.quoter.catalog.activate', 'commercial.quoter.simulate',
+    'commercial.quoter.quote', 'commercial.quoter.issue', 'commercial.quoter.exception'
+  ]) LOOP
+    IF NOT EXISTS (
+      SELECT 1 FROM greenhouse_core.capabilities_registry c
+       WHERE c.capability_key = expected AND c.deprecated_at IS NULL
+    ) THEN
+      missing := missing || ' ' || expected;
+    END IF;
+  END LOOP;
+
+  IF missing <> '' THEN
+    RAISE EXCEPTION 'TASK-2025 anti pre-up-marker check (capacidades del cotizador): faltan o están retiradas:%', missing;
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+-- Guarda: con una cotización real registrada esta bajada no corre. Un comentario no protege una tabla de la que nada
+-- se borra; esto sí. El carril local sólo crea cotizaciones sintéticas y sigue pudiendo bajar y subir.
+DO $$
+DECLARE
+  real_quotes bigint := 0;
+BEGIN
+  IF to_regclass('greenhouse_commercial.quoter_quotes') IS NOT NULL THEN
+    EXECUTE 'SELECT count(*) FROM greenhouse_commercial.quoter_quotes WHERE data_origin = ''real''' INTO real_quotes;
+  END IF;
+
+  IF real_quotes > 0 THEN
+    RAISE EXCEPTION 'TASK-2025: hay % cotización(es) real(es) registrada(s); esta migración no se baja. La corrección es una migración nueva hacia adelante.', real_quotes;
+  END IF;
+END
+$$;
+
+-- SÓLO deshacer. El registro no borra: retira. Bajar esto sin revertir antes el catálogo de TypeScript deja la
+-- paridad en rojo en el otro sentido (capacidad en el código, retirada en la base).
+UPDATE greenhouse_core.capabilities_registry
+   SET deprecated_at = NOW()
+ WHERE capability_key IN (
+   'commercial.quoter.catalog', 'commercial.quoter.catalog.activate', 'commercial.quoter.simulate',
+   'commercial.quoter.quote', 'commercial.quoter.issue', 'commercial.quoter.exception'
+ );

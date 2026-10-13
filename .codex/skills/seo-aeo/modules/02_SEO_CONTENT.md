@@ -10,6 +10,15 @@
 > **estacionalidad vinculante**, **gate de canibalización leyendo contenido**)
 > as-of 2026-08-25.
 
+## Unidad estratégica de cobertura
+
+Para liderazgo de categoría, cargar `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`.
+Mapear categoría × comprador × situación de compra: comprender, comparar, seleccionar y verificar.
+Clasificar intención y brand/non-brand por separado. Inventariar pruebas autorizadas de capacidades y
+su vínculo con la marca; priorizar brechas antes de formatos/cadencias. Contenido genérico informativo,
+contenido de decisión y evidencia original tienen trabajos distintos; no abandonar blogs ni el non-brand
+por una regla universal. El siguiente paso puede ser consolidar contenido o conseguir evidencia.
+
 ## Cobertura temática: prioridad de negocio antes que volumen
 
 Antes de minar, ordenar categorías por decisiones del lector que la marca puede resolver, no por menor

@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-09-19
+> **Última actualización:** 2026-10-09
 
 ## Propósito
 
@@ -47,6 +47,20 @@ Cada servicio debe declarar como mínimo:
 9. continuidad, soporte, cadence y procedimiento de cambio;
 10. arquitectura, documentación funcional, manual y casos de referencia.
 
+## RevOps & CRM — capacidad especializada regional
+
+[Capacidad especializada de CRM y RevOps](revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md): servicio estructurado con Staff
+Augmentation y operación gestionada. Dirección regional y [Talent Assurance](../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md)
+aprobados el 2026-10-09; oferta `Approved for validation`, con capacidad, pricing y habilitación contractual
+por configuración pendientes. No crea una línea nueva ni una séptima familia HubSpot.
+
+## Vía comercial On-Demand: Efeonce Factory
+
+[Efeonce Factory](factory/README.md) permite comprar encargos acotados mediante empaque mínimo y cotización por
+alcance. Es transversal: web, contenido, audiovisual, medios y otras capacidades actuales; las prácticas conservan
+ownership. Campaña y kit son ejemplos opcionales. [Decisión aceptada](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) el 2026-10-05;
+modelo `Approved for validation`, sin precio público ni capacidad runtime nueva.
+
 ## Familias disponibles
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
@@ -60,6 +74,10 @@ Cada servicio debe declarar como mínimo:
 - [Media & Distribution](media-distribution/README.md) — incluye la ficha propia de
   [Performance & Commerce Distribution](media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) (`Proposed`):
   paid media con dos motions (Demand & Commerce · B2B Pipeline), canales como cobertura y programmatic vía partner.
+  [Publicidad programática](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md): servicio, tarifa base y
+  cobro `Commercially approved` el 2026-10-09; Basis + Real Audiences seleccionados, habilitación externa por campaña.
+  Dirección 12-10: [oferta integral de medios](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios);
+  programa de operación DSP acompañada a evaluar, tarifa sin cambio y fee incremental en cuenta ya contratada.
 - [Channel & Commerce](channel-commerce/README.md) — trade marketing y BTL: 23 servicios en dos familias
   (13 trade + 9 BTL + 1 transversal) con `Managed Channel Operations` como modalidad que opera todos. Estado
   `Proposed`, mercado inicial Chile. ADR: [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md).
@@ -93,7 +111,7 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Measurement & Analytics** | Measurement Audit · Tagging/Data Layer · GTM/GA4 Implementation · Dashboard & Attribution · Analytics Operations |
 | **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
-| **Product Design 360** *(propuesta)* | **Capability de oficio** consumida por dos superficies. Lanes: Accesibilidad · Design system y tokens · Research y validación · Entrega de diseño (UI/UX) · Deuda de diseño · Design ops · Endurecer lo generado con IA. Entradas: Diagnóstico de Capacidad y Sample Sprint |
+| **Product Design 360** | **Capability de oficio** consumida por dos superficies. Lanes: Accesibilidad · Design system y tokens · Research y validación · Entrega de diseño (UI/UX) · Deuda de diseño · Design ops · Endurecer lo generado con IA. Entradas: Diagnóstico de Capacidad y Sample Sprint |
 
 La puerta de entrada de visibilidad en IA se presenta como **Efeonce AEO** (capacidad),
 **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (entregable).
@@ -101,7 +119,9 @@ La familia más amplia sigue siendo **Search Visibility 360**. Este naming no a�
 contratable ni aprueba el [modelo comercial AEO](../business-models/aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md),
 que permanece `Draft`. [ADR de naming](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
-**Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Su motion
+**Product Design 360** es la **sexta familia de Wave, aprobada por el operador**: el 2026-10-09 la aprobó como
+familia y el 2026-10-10 extendió la aprobación a su ADR propio, su modelo de negocio, su ficha, el nombre público y
+su venta («Todo product design hay que ponerlo aprobado»). Hasta el 2026-09-10 figuraba como propuesta. Su motion
 primario es **extender la capacidad de un equipo de product design in-house**, no reemplazarlo: se venden lanes de
 capacidad gobernada, no diseñadores. Cubre superficies operables —web y producto digital— y separa *decidir cómo
 debe ser la experiencia* de *construirla y operarla*, que sigue siendo de Web Experience 360. Ficha:
@@ -131,3 +151,13 @@ Las familias anteriores son product services; el modelo de delivery se cotiza y 
 entregar mediante Productized Service, Managed Squad, Staff Augmentation, Implementation, Advisory o
 Platform-enabled Service, con engagements On-Going, On-Demand o Sample Sprint. Un proyecto puede combinar Wave con
 RevOps & CRM/Kortex, Creative Services/Globe, Media & Distribution (con Reach cuando aplique) o Greenhouse sin mezclar ownership.
+
+## Preparación de costos por agentes
+
+Las fichas mantienen promesa, alcance y responsabilidad; el
+[flujo local Cotizador V3](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) prepara su costo desde
+perfiles/tareas, herramientas, plataforma y consumo, con catálogos versionados y desglose reproducible.
+`role_capacity` y `managed_service` distinguen presentación de capacidad y fee de servicio; los roles no se
+convierten automáticamente en horas vendidas o receta de delivery suficiente. Selección y costeo no activan
+un servicio ni aprueban precio. [Guardrails económicos](../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md)
+y [pendientes por owner](../../data/pricing/v3-operating/operational-gaps.json) conservan los gates de cada práctica.

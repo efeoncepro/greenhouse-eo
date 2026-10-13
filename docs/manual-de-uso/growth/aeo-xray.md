@@ -26,3 +26,17 @@ El enlace concreto se lee del expediente privado/registro runtime; no documentar
 Una visita al sample no acredita resultados SEO/AEO ni controles Greenhouse productivos. Envío
 de email y escritura CRM requieren autorización propia. Assets, grants y datos de otro cliente
 nunca son plantilla del siguiente; extender la experiencia existente, no construir otra UI paralela.
+
+## Delta 2026-10-09 — bloques de experiencia temprana
+
+El contrato 0.2.0 permite sumar a una muestra el panel AEO, «hoy vs. con la pieza», la revisión, la medición y el
+siguiente paso. Para operarlos:
+
+1. Declarar `version: "0.2.0"` en el intent y completar sólo los bloques que tengan datos reales y fechados.
+2. Validar y construir con el kit (`client-kit.mjs validate|build`) y copiar el manifest al JSON publicado.
+3. Correr los gates de Think sobre los artefactos de la muestra (`XRAY_VERIFY_ARTIFACTS`) y la regresión de las
+   muestras ya publicadas.
+
+Campos y reglas: [guía, §«Bloques de experiencia temprana»](../../think/aeo-xray-nuevo-cliente.md#bloques-de-experiencia-temprana-contrato-020-2026-10-09).
+Gates y trampas: [manual, delta 2026-10-09](../../think/radiografia-aeo-manual.md#delta-2026-10-09--dos-muestras-publicadas-y-gates-por-artefacto).
+Caso de referencia: muestra Pibank Perú.

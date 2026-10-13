@@ -117,3 +117,14 @@ cierre, marca lo ya subido y relanza.
 - Poner esfera o mayúsculas en el eslogan; usar las animaciones del logo para clientes o UI de Greenhouse.
 - Animar un objeto de Plastilina en volumen (D24) con el paquete: es un PNG fijo, no se regenera, y el motion de los
   íconos sigue sin definir (pendiente en el ledger).
+
+## Loader compacto y CTA de botones (2026-10-04)
+
+En `efeonce.button`, el operador pidió órbita compacta para actividad indeterminada y flecha de
+CTA con desplazamiento opcional. `axisButton.loader`/`arrowMotion` poseen óptica y tiempo;
+HTML/React comparten modelo. Anillo fijo, una esfera y estela corta constante; no representa avance.
+`arrowMotion="nudge"` mueve sólo la flecha en hover/foco y respeta RTL. Carga/deshabilitado
+suprimen el gesto; reduced motion detiene órbita y gesto. [Detalle](lab-components.md).
+Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).

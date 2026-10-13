@@ -8,6 +8,7 @@ import 'server-only'
  * ventana de cadencia y deja que el worker async normal ejecute el run.
  */
 
+import { marketCoveredByContractSql } from '@/lib/growth/ai-visibility/markets/contract-coverage'
 import { requestRunBatchInternal } from '@/lib/growth/ai-visibility/markets/run-batch'
 import { AI_VISIBILITY_MODULE_KEY } from '@/lib/growth/ai-visibility/entitlement'
 import {
@@ -168,6 +169,10 @@ const claimDueProfiles = async (limit: number): Promise<ClaimedProfile[]> =>
     return result.rows
   })
 
+// Reclama SÓLO lo que el chokepoint de corrida va a aceptar: un mercado secundario que el
+// contrato no declara no es una corrida fallida, es una que no se debía intentar. Sin este
+// filtro se reclamaba, fallaba con `aeo_market_not_included` y se reagendaba a +1 día — todos
+// los días, sin converger nunca (Sky, 2026-10-03 → 2026-10-12).
 const claimDueMarkets = async (limit: number): Promise<ClaimedProfile[]> =>
   withGreenhousePostgresTransaction(async client => {
     const rows = await client.query<ClaimedProfile>(
@@ -181,6 +186,7 @@ const claimDueMarkets = async (limit: number): Promise<ClaimedProfile[]> =>
       AND a.module_key=$2 AND a.status='active' AND a.effective_to IS NULL AND (a.expires_at IS NULL OR a.expires_at>now())
       AND a.metadata_json->>'aeo_tier'='contracted'
     WHERE m.status='active' AND p.status='active' AND m.recurring_regrade_enabled
+      AND ${marketCoveredByContractSql('m', 'a')}
       AND COALESCE(m.recurring_regrade_next_at,'-infinity'::timestamptz)<=now()
     ORDER BY m.recurring_regrade_next_at NULLS FIRST,m.created_at FOR UPDATE OF m SKIP LOCKED LIMIT $1
   ) UPDATE greenhouse_growth.grader_profile_markets m SET recurring_regrade_next_at=due.next_at

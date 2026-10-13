@@ -255,3 +255,16 @@ Cada task downstream conserva su `Out of Scope` y su gate propio (flag `NEXA_KNO
 - [GREENHOUSE_NEXA_ARCHITECTURE_V1.md](GREENHOUSE_NEXA_ARCHITECTURE_V1.md)
 - [GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md](GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md)
 - [GREENHOUSE_FULL_API_PARITY_DECISION_V1.md](GREENHOUSE_FULL_API_PARITY_DECISION_V1.md)
+
+## Delta 2026-10-12 — Retiro planteado y descartado el mismo día
+
+**Estado vigente: Knowledge se queda en Greenhouse.** Tras ver la medición de uso, el operador descartó el retiro.
+Este ADR sigue `Accepted` y nada del runtime cambia. Lo que sigue es el planteamiento original, conservado sólo
+como historia:
+
+El operador decidió retirar Knowledge de Greenhouse («nunca funcionó y hoy no funciona»):
+[`GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md`](GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md), corte 1. **Aún no se ejecutó**: el runtime, sus flags y sus
+invariantes siguen en pie hasta que la task de retiro cierre, y este ADR pasa a `Deprecated` en ese momento. El
+retiro apaga páginas, rutas, el retrieval de Nexa, el lane de API Platform y el ingest por webhook de Notion; el
+schema `greenhouse_knowledge` y sus datos se conservan.
+

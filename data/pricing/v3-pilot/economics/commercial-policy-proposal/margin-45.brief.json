@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-09",
+  "offerId": "talent-assurance-staffing",
+  "engagementCode": "monthly",
+  "accountId": "example-account",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "design",
+      "profile": "ECG-002",
+      "talentCountry": "CO",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.5"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "allowUnlocalizedCost": true,
+      "choices": [
+        {
+          "requirementId": "ai",
+          "resourceId": "ETG-007"
+        }
+      ],
+      "costRecordId": "cost:ECG-002:unknown",
+      "pricingPolicyId": "proposal:pricing:design:45"
+    }
+  ]
+}

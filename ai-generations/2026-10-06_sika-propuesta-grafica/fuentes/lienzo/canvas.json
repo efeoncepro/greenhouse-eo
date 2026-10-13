@@ -1,0 +1,332 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Aplicaciones.dc.html": {
+      "h": 1304,
+      "page": "manual",
+      "title": "08 · Aplicaciones del brief",
+      "w": 1600,
+      "x": 1680,
+      "y": 3030
+    },
+    "Arquitectura.dc.html": {
+      "h": 944,
+      "page": "manual",
+      "title": "04 · Arquitectura con Sika",
+      "w": 1600,
+      "x": 0,
+      "y": 1350
+    },
+    "Audiencias.dc.html": {
+      "h": 844,
+      "page": "manual",
+      "title": "09 · Audiencias",
+      "w": 1600,
+      "x": 3360,
+      "y": 3030
+    },
+    "Construccion.dc.html": {
+      "h": 1064,
+      "page": "manual",
+      "title": "02 · Construcción y tamaño mínimo",
+      "w": 1600,
+      "x": 1680,
+      "y": 0
+    },
+    "Facebook.dc.html": {
+      "h": 1144,
+      "page": "piezas",
+      "title": "✓ APROBADO · ENTREGABLE 1 · Facebook 1:1 · SikaSeal-170",
+      "w": 1080,
+      "x": 0,
+      "y": 1480
+    },
+    "Incorrectos.dc.html": {
+      "h": 824,
+      "page": "manual",
+      "title": "07 · Usos incorrectos",
+      "w": 1600,
+      "x": 0,
+      "y": 3030
+    },
+    "Instagram.dc.html": {
+      "h": 1414,
+      "page": "piezas",
+      "title": "✓ APROBADO · ENTREGABLE 2 · Instagram 4:5 · SikaSeal-170",
+      "w": 1080,
+      "x": 1160,
+      "y": 1480
+    },
+    "Main.dc.html": {
+      "h": 924,
+      "page": "manual",
+      "title": "01 · Firma principal",
+      "w": 1600,
+      "x": 0,
+      "y": 0
+    },
+    "Movimiento.dc.html": {
+      "h": 784,
+      "page": "manual",
+      "title": "06 · Movimiento",
+      "w": 1600,
+      "x": 3360,
+      "y": 1350
+    },
+    "PDV.dc.html": {
+      "h": 1024,
+      "page": "piezas",
+      "title": "✓ APROBADO · EXTRA · Punto de venta en tienda",
+      "w": 1600,
+      "x": 2320,
+      "y": 5000
+    },
+    "Recursos.dc.html": {
+      "h": 1394,
+      "page": "manual",
+      "title": "05 · Color, tipografía y recursos",
+      "w": 1600,
+      "x": 1680,
+      "y": 1350
+    },
+    "Reel.dc.html": {
+      "h": 1224,
+      "page": "piezas",
+      "title": "COMPLEMENTO · Reel · animatic en video, primera versión (sin audio aún)",
+      "w": 1600,
+      "x": 2480,
+      "y": 3270
+    },
+    "Referencia.dc.html": {
+      "h": 1294,
+      "page": "evolucion",
+      "title": "Material de Sika, rehecho en POSIBLE",
+      "w": 2240,
+      "x": 0,
+      "y": 1650
+    },
+    "Sikaflex.dc.html": {
+      "h": 1144,
+      "page": "piezas",
+      "title": "✓ APROBADO · EXTRA · Sikaflex-119",
+      "w": 1080,
+      "x": 0,
+      "y": 5000
+    },
+    "Titular.dc.html": {
+      "h": 944,
+      "page": "manual",
+      "title": "11 · Fórmula de titular",
+      "w": 1600,
+      "x": 0,
+      "y": 4590
+    },
+    "Versiones.dc.html": {
+      "h": 1064,
+      "page": "manual",
+      "title": "03 · Versiones",
+      "w": 1600,
+      "x": 3360,
+      "y": 0
+    },
+    "ViscoCrete.dc.html": {
+      "h": 1144,
+      "page": "piezas",
+      "title": "✓ APROBADO · EXTRA · ViscoCrete 45 HE (industria)",
+      "w": 1080,
+      "x": 1160,
+      "y": 5000
+    },
+    "MasterGraphic.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1144,
+      "title": "✓ APROBADO · MASTER GRAPHIC (rige todas las piezas)",
+      "page": "piezas"
+    },
+    "Evolucion.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1600,
+      "h": 1274,
+      "title": "Evolución · de lo actual a la campaña",
+      "page": "evolucion"
+    },
+    "Storyboard.dc.html": {
+      "x": 0,
+      "y": 3270,
+      "w": 2400,
+      "h": 1124,
+      "title": "ENTREGABLE 3 · Reel · storyboard de 7 cuadros con locución (lo que piden las bases)",
+      "page": "piezas"
+    },
+    "Portada.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "page": "portada",
+      "title": "PORTADA A · cinematográfica: Efeonce Creative Studio presenta la propuesta"
+    },
+    "PortadaSinFoto.dc.html": {
+      "x": 2040,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "page": "portada",
+      "title": "PORTADA B · alternativa sin foto (descartada: queda la A)"
+    },
+    "Contraportada.dc.html": {
+      "x": 4080,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "page": "portada",
+      "title": "CONTRAPORTADA · cierre de la propuesta (línea Brand)"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-06T21:15:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas",
+    "page": "portada"
+  },
+  "notes": {
+    "n_dosenuno": {
+      "fill": "blue",
+      "page": "piezas",
+      "text": "«2 en 1» verificado\n\nFicha técnica global: «SikaSeal-170 All Purpose — Sanitary silicone for general use». Ficha México: «para aplicaciones de uso general y sanitarias».\n\nPor eso el sello dice: ANTIHONGOS + USO GENERAL.",
+      "w": 420,
+      "x": 4000,
+      "y": 1480
+    },
+    "n_leeme": {
+      "fill": "green",
+      "page": "manual",
+      "text": "Cómo leer este lienzo\n\nPágina 0 · Evolución: qué cambia y qué se conserva frente a lo que Sika ya tenía. Empieza aquí.\nPágina 1 · Manual: la identidad de la campaña y cómo convive con Sika.\nPágina 2 · Master Graphic (la pieza madre), los 3 entregables de Wherex y los extras que muestran que el sistema escala.\n\nTodo lo que ves es la versión vigente.",
+      "w": 440,
+      "x": 5040,
+      "y": 0
+    },
+    "n_validar": {
+      "fill": "orange",
+      "page": "manual",
+      "text": "Por validar con Sika\n\n• Colores tomados de sus propios materiales (#FCC500, #ED2630, #141414; líneas #015A78 y #321D59). Se reemplazan por los del manual.\n• Tipografía provisional: Barlow / Barlow Condensed.\n• Usar el triángulo como tilde: confirmar que el manual de Sika permite derivar ese recurso del logo.\n• Logos a 1 tinta: reconstrucción provisional; se usan los oficiales.\n• Tamaños mínimos y posiciones: propuesta, se ajustan al manual.\n• Fotografía: escenas IA (GPT Image 2.5). Envase = render real de Sika, integrado con Sunburst. Bandera retirada de la foto de obra.\n• [Logo retailer] y [Marca socia]: espacios reservados.",
+      "w": 440,
+      "x": 5040,
+      "y": 760
+    },
+    "t_entregables": {
+      "kind": "title1",
+      "maxW": 3920,
+      "page": "piezas",
+      "text": "Entregables de la licitación · SikaSeal-170",
+      "w": 240,
+      "x": 0,
+      "y": 1200
+    },
+    "t_extras": {
+      "kind": "title1",
+      "maxW": 3920,
+      "page": "piezas",
+      "text": "Extras: el sistema escala y vive en tienda",
+      "w": 240,
+      "x": 0,
+      "y": 4720
+    },
+    "t_manual": {
+      "kind": "title1",
+      "maxW": 4960,
+      "page": "manual",
+      "text": "Manual de identidad · campaña POSIBLE",
+      "w": 240,
+      "x": 0,
+      "y": -280
+    },
+    "t_evolucion": {
+      "x": 0,
+      "y": -280,
+      "text": "Mismo concepto, más fuerza",
+      "kind": "title1",
+      "maxW": 1600,
+      "w": 240,
+      "page": "evolucion"
+    },
+    "t_ref": {
+      "x": 0,
+      "y": 1370,
+      "text": "Lo que Sika ya tenía, rehecho en POSIBLE",
+      "kind": "title1",
+      "maxW": 2240,
+      "w": 240,
+      "page": "evolucion"
+    },
+    "t_master": {
+      "x": 0,
+      "y": -280,
+      "text": "Master Graphic · la pieza madre",
+      "kind": "title1",
+      "maxW": 1920,
+      "w": 240,
+      "page": "piezas"
+    },
+    "t_reel": {
+      "x": 0,
+      "y": 2990,
+      "text": "Entregable 3 · Reel",
+      "kind": "title1",
+      "maxW": 4080,
+      "w": 240,
+      "page": "piezas"
+    }
+  },
+  "order": [
+    "Portada.dc.html",
+    "PortadaSinFoto.dc.html",
+    "Contraportada.dc.html",
+    "Evolucion.dc.html",
+    "Referencia.dc.html",
+    "MasterGraphic.dc.html",
+    "Main.dc.html",
+    "Construccion.dc.html",
+    "Versiones.dc.html",
+    "Arquitectura.dc.html",
+    "Recursos.dc.html",
+    "Movimiento.dc.html",
+    "Incorrectos.dc.html",
+    "Aplicaciones.dc.html",
+    "Audiencias.dc.html",
+    "Titular.dc.html",
+    "Facebook.dc.html",
+    "Instagram.dc.html",
+    "Storyboard.dc.html",
+    "Reel.dc.html",
+    "Sikaflex.dc.html",
+    "ViscoCrete.dc.html",
+    "PDV.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "portada",
+      "name": "Portada"
+    },
+    {
+      "id": "evolucion",
+      "name": "0 · Evolución (empieza aquí)"
+    },
+    {
+      "id": "manual",
+      "name": "1 · Manual de identidad"
+    },
+    {
+      "id": "piezas",
+      "name": "2 · Master Graphic y piezas para Wherex"
+    }
+  ],
+  "title": "Sika · Innovar es hacerlo POSIBLE"
+}

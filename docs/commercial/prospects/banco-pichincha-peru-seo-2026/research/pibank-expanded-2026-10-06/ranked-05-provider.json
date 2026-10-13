@@ -1,0 +1,3932 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:16:20.536Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.ranked.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/ranked_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 500,
+        "offset": 0,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.072,
+    "estimateStatus": "available",
+    "maxUsd": 0.072,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/",
+      "sourceModifiedAt": "2026-08-05T15:15:09.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 1822,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 1822,
+        "costUsd": 0.01428,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061916-1987-0381-0000-92472ff16307",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.01428,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.01428,
+    "tasks": [
+      {
+        "id": "10061916-1987-0381-0000-92472ff16307",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.3454 sec.",
+        "cost": 0.01428,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "ranked_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "ranked_keywords",
+          "se_type": "google",
+          "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+          "location_code": 2604,
+          "language_code": "es",
+          "limit": 500,
+          "offset": 0,
+          "item_types": [
+            "organic"
+          ],
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": 19,
+            "items_count": 19,
+            "metrics": {
+              "organic": {
+                "pos_1": 14,
+                "pos_2_3": 0,
+                "pos_4_10": 2,
+                "pos_11_20": 0,
+                "pos_21_30": 0,
+                "pos_31_40": 1,
+                "pos_41_50": 0,
+                "pos_51_60": 0,
+                "pos_61_70": 2,
+                "pos_71_80": 0,
+                "pos_81_90": 0,
+                "pos_91_100": 0,
+                "etv": 2549.6809738874435,
+                "count": 19,
+                "estimated_paid_traffic_cost": 2367.1234650611877,
+                "is_new": 3,
+                "is_up": 1,
+                "is_down": 5,
+                "is_lost": 0,
+                "clickstream_etv": null,
+                "clickstream_gender_distribution": null,
+                "clickstream_age_distribution": null
+              },
+              "paid": null,
+              "featured_snippet": null,
+              "local_pack": null,
+              "ai_overview_reference": null
+            },
+            "metrics_absolute": null,
+            "items": [
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta digital scotiabank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 06:58:02 +00:00",
+                    "competition": 0.41999998688697815,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.1599999964237213,
+                    "search_volume": 1900,
+                    "low_top_of_page_bid": 0.49000000953674316,
+                    "high_top_of_page_bid": 637.8900146484375,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 2400
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1600
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 50,
+                      "quarterly": 50,
+                      "yearly": 50
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 22,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20digital%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-07-14 01:57:20 +00:00",
+                    "previous_updated_time": "2026-04-18 01:16:25 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 317.29998779296875,
+                    "dofollow": 182.8000030517578,
+                    "referring_pages": 212.89999389648438,
+                    "referring_domains": 42.5,
+                    "referring_main_domains": 27.899999618530273,
+                    "rank": 143.6999969482422,
+                    "main_domain_rank": 471,
+                    "last_updated_time": "2026-07-14 01:57:23 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 20:49:01 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 577.5999755859375,
+                    "estimated_paid_traffic_cost": 92.41600036621094,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 324
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20digital%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 22,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-14 01:57:20 +00:00",
+                  "previous_updated_time": "2026-04-18 01:16:25 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "requisitos para ser presidente del perú",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 18:15:21 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 1900,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10018,
+                      13414,
+                      13508
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 4400
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 2900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1900
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 3600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1600
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -45,
+                      "quarterly": -76,
+                      "yearly": -54
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "requisitos para ser presidente del peru",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=requisitos%20para%20ser%20presidente%20del%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "related_searches"
+                    ],
+                    "se_results_count": 28800000,
+                    "last_updated_time": "2026-09-04 11:14:23 +00:00",
+                    "previous_updated_time": "2026-06-17 18:57:06 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 128.1999969482422,
+                    "dofollow": 97.30000305175781,
+                    "referring_pages": 108,
+                    "referring_domains": 23.399999618530273,
+                    "referring_main_domains": 21.5,
+                    "rank": 31.200000762939453,
+                    "main_domain_rank": 650.7000122070312,
+                    "last_updated_time": "2026-09-04 11:14:23 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-30 01:07:25 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 68,
+                    "rank_absolute": 75,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[9]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Por ello el monto abonado al cliente podrá ser de hasta S/23.33 ... No aplica para cuenta en dólares, no aplica para colaboradores o clientes del banco.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "ser",
+                      "para"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 3.990000009536743,
+                    "estimated_paid_traffic_cost": null,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 326
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=requisitos%20para%20ser%20presidente%20del%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "related_searches"
+                  ],
+                  "se_results_count": 28800000,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-04 11:14:23 +00:00",
+                  "previous_updated_time": "2026-06-17 18:57:06 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-12 08:53:56 +00:00",
+                    "competition": 0.5699999928474426,
+                    "competition_level": "MEDIUM",
+                    "cpc": 3.6700000762939453,
+                    "search_volume": 1300,
+                    "low_top_of_page_bid": 0.6299999952316284,
+                    "high_top_of_page_bid": 36.369998931884766,
+                    "categories": [
+                      10004,
+                      10290,
+                      11180
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1600
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1000
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": 30
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 9,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 138,
+                    "last_updated_time": "2026-07-15 01:11:08 +00:00",
+                    "previous_updated_time": "2026-04-20 10:51:30 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 252.39999389648438,
+                    "dofollow": 206.60000610351562,
+                    "referring_pages": 250.6999969482422,
+                    "referring_domains": 87.0999984741211,
+                    "referring_main_domains": 57.900001525878906,
+                    "rank": 109.5,
+                    "main_domain_rank": 331.3999938964844,
+                    "last_updated_time": "2026-07-15 01:11:09 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-30 02:52:47 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 395.20001220703125,
+                    "estimated_paid_traffic_cost": 1450.384033203125,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 2,
+                      "is_new": false,
+                      "is_up": true,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 324
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 138,
+                  "keyword_difficulty": 9,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-15 01:11:08 +00:00",
+                  "previous_updated_time": "2026-04-20 10:51:30 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta scotiabank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 01:02:31 +00:00",
+                    "competition": 0.3700000047683716,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.17000000178813934,
+                    "search_volume": 1000,
+                    "low_top_of_page_bid": 0.5099999904632568,
+                    "high_top_of_page_bid": 640.6300048828125,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1300
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 1000
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 14,
+                      "quarterly": 14,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 18,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-07-16 10:49:02 +00:00",
+                    "previous_updated_time": "2026-04-20 19:26:26 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 315.70001220703125,
+                    "dofollow": 182.10000610351562,
+                    "referring_pages": 211.8000030517578,
+                    "referring_domains": 41.599998474121094,
+                    "referring_main_domains": 27,
+                    "rank": 134.39999389648438,
+                    "main_domain_rank": 391.5,
+                    "last_updated_time": "2026-07-16 10:49:03 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 15:02:52 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 304,
+                    "estimated_paid_traffic_cost": 51.68000030517578,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 18,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-16 10:49:02 +00:00",
+                  "previous_updated_time": "2026-04-20 19:26:26 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "abrir cuenta scotiabank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 03:36:28 +00:00",
+                    "competition": 0.5199999809265137,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.2800000011920929,
+                    "search_volume": 880,
+                    "low_top_of_page_bid": 0.5600000023841858,
+                    "high_top_of_page_bid": 773.6699829101562,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 880
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 0,
+                      "yearly": -41
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 14,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=abrir%20cuenta%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-07-18 08:38:22 +00:00",
+                    "previous_updated_time": "2026-04-22 05:02:00 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 285.79998779296875,
+                    "dofollow": 164.10000610351562,
+                    "referring_pages": 181.39999389648438,
+                    "referring_domains": 24.700000762939453,
+                    "referring_main_domains": 16.399999618530273,
+                    "rank": 135.60000610351562,
+                    "main_domain_rank": 404.20001220703125,
+                    "last_updated_time": "2026-07-18 08:38:23 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-28 23:59:02 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 267.5199890136719,
+                    "estimated_paid_traffic_cost": 74.90560150146484,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=abrir%20cuenta%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 14,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-18 08:38:22 +00:00",
+                  "previous_updated_time": "2026-04-22 05:02:00 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "crear cuenta scotiabank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 16:05:26 +00:00",
+                    "competition": 0.5600000023841858,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.5,
+                    "search_volume": 880,
+                    "low_top_of_page_bid": 0.6000000238418579,
+                    "high_top_of_page_bid": 827.489990234375,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 880
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": 22,
+                      "yearly": -18
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "crear cuenta de scotiabank",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 8,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=crear%20cuenta%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "video",
+                      "people_also_ask",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 20,
+                    "last_updated_time": "2026-07-18 01:09:17 +00:00",
+                    "previous_updated_time": "2026-04-21 04:57:44 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 204.6999969482422,
+                    "dofollow": 93.9000015258789,
+                    "referring_pages": 110.80000305175781,
+                    "referring_domains": 24.799999237060547,
+                    "referring_main_domains": 14.699999809265137,
+                    "rank": 112.19999694824219,
+                    "main_domain_rank": 392.5,
+                    "last_updated_time": "2026-07-18 01:09:17 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-26 23:46:48 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Los participantes deberán abrir su primera Cuenta Digital en Scotiabank con un monto de apertura desde S/500o $150 por el canal digital (app o web). Se premiará ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Cuenta",
+                      "Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 267.5199890136719,
+                    "estimated_paid_traffic_cost": 133.75999450683594,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=crear%20cuenta%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "video",
+                    "people_also_ask",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 20,
+                  "keyword_difficulty": 8,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-18 01:09:17 +00:00",
+                  "previous_updated_time": "2026-04-21 04:57:44 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "scotiabank cuenta digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 04:48:33 +00:00",
+                    "competition": 0.4099999964237213,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.17000000178813934,
+                    "search_volume": 720,
+                    "low_top_of_page_bid": 0.5299999713897705,
+                    "high_top_of_page_bid": 686.6799926757812,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 1000
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 880
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 720
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 69,
+                      "quarterly": 69,
+                      "yearly": 39
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuenta digital scotiabank",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 22,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=scotiabank%20cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-07-18 16:35:21 +00:00",
+                    "previous_updated_time": "2026-04-22 07:51:02 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 317.29998779296875,
+                    "dofollow": 182.8000030517578,
+                    "referring_pages": 212.89999389648438,
+                    "referring_domains": 42.5,
+                    "referring_main_domains": 27.899999618530273,
+                    "rank": 142.39999389648438,
+                    "main_domain_rank": 459.79998779296875,
+                    "last_updated_time": "2026-07-18 16:35:21 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-05-04 15:51:32 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 218.8800048828125,
+                    "estimated_paid_traffic_cost": 37.209598541259766,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=scotiabank%20cuenta%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 22,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-18 16:35:21 +00:00",
+                  "previous_updated_time": "2026-04-22 07:51:02 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "club del ahorro",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 08:07:41 +00:00",
+                    "competition": 0.009999999776482582,
+                    "competition_level": "LOW",
+                    "cpc": 6.150000095367432,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 2.319999933242798,
+                    "high_top_of_page_bid": 3.4700000286102295,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 590
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 720
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 590
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -19,
+                      "yearly": -19
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "el club del ahorro",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 9,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=club%20del%20ahorro&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "video",
+                      "related_searches",
+                      "images"
+                    ],
+                    "se_results_count": 106,
+                    "last_updated_time": "2026-07-29 12:08:14 +00:00",
+                    "previous_updated_time": "2026-04-04 17:38:46 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 73.69999694824219,
+                    "dofollow": 72.5,
+                    "referring_pages": 73.69999694824219,
+                    "referring_domains": 1.7999999523162842,
+                    "referring_main_domains": 1.7999999523162842,
+                    "rank": 102.9000015258789,
+                    "main_domain_rank": 384.70001220703125,
+                    "last_updated_time": "2026-07-29 12:08:15 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": [
+                      "informational"
+                    ],
+                    "last_updated_time": "2026-04-26 08:59:04 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 37,
+                    "rank_absolute": 41,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[8]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 1.0080000162124634,
+                    "estimated_paid_traffic_cost": 6.19920015335083,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=club%20del%20ahorro&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "video",
+                    "related_searches",
+                    "images"
+                  ],
+                  "se_results_count": 106,
+                  "keyword_difficulty": 9,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-29 12:08:14 +00:00",
+                  "previous_updated_time": "2026-04-04 17:38:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "abrir cuenta digital scotiabank",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-17 17:08:45 +00:00",
+                    "competition": 0.49000000953674316,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.23999999463558197,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": 0.6000000238418579,
+                    "high_top_of_page_bid": 776.5399780273438,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 210
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -35,
+                      "yearly": -35
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 22,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=abrir%20cuenta%20digital%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 106,
+                    "last_updated_time": "2026-09-23 16:05:23 +00:00",
+                    "previous_updated_time": "2026-06-08 11:00:40 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 239.39999389648438,
+                    "dofollow": 162.8000030517578,
+                    "referring_pages": 194.10000610351562,
+                    "referring_domains": 44.79999923706055,
+                    "referring_main_domains": 30,
+                    "rank": 158.6999969482422,
+                    "main_domain_rank": 337.29998779296875,
+                    "last_updated_time": "2026-09-23 16:05:29 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 03:34:54 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 79.04000091552734,
+                    "estimated_paid_traffic_cost": 18.969600677490234,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 96,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=abrir%20cuenta%20digital%20scotiabank&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 106,
+                  "keyword_difficulty": 22,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-23 16:05:23 +00:00",
+                  "previous_updated_time": "2026-06-08 11:00:40 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta digital sbp",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 19:44:38 +00:00",
+                    "competition": 0.23000000417232513,
+                    "competition_level": "LOW",
+                    "cpc": 0.8700000047683716,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": 0.25,
+                    "high_top_of_page_bid": 2.309999942779541,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 53,
+                      "quarterly": 53,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 21,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20digital%20sbp&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "people_also_ask",
+                      "organic",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 183,
+                    "last_updated_time": "2026-08-13 10:07:44 +00:00",
+                    "previous_updated_time": "2026-05-11 19:44:35 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 254.89999389648438,
+                    "dofollow": 143.1999969482422,
+                    "referring_pages": 158,
+                    "referring_domains": 24.200000762939453,
+                    "referring_main_domains": 15.800000190734863,
+                    "rank": 111.9000015258789,
+                    "main_domain_rank": 706.4000244140625,
+                    "last_updated_time": "2026-08-13 10:07:50 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 16:09:11 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 3,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[3]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 79.04000091552734,
+                    "estimated_paid_traffic_cost": 68.76480102539062,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 3,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 326
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20digital%20sbp&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "people_also_ask",
+                    "organic",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 183,
+                  "keyword_difficulty": 21,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-13 10:07:44 +00:00",
+                  "previous_updated_time": "2026-05-11 19:44:35 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "linea 100 peru",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 18:22:53 +00:00",
+                    "competition": 0,
+                    "competition_level": "LOW",
+                    "cpc": null,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "categories": [
+                      10017,
+                      10146,
+                      10783,
+                      12083
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 480
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 260
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -19,
+                      "quarterly": -19,
+                      "yearly": 24
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 8,
+                    "detected_language": "it",
+                    "is_another_language": true
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=linea%20100%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "knowledge_graph",
+                      "google_reviews"
+                    ],
+                    "se_results_count": 181000000,
+                    "last_updated_time": "2026-08-12 18:05:36 +00:00",
+                    "previous_updated_time": "2026-05-13 09:03:24 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 32.20000076293945,
+                    "dofollow": 27.200000762939453,
+                    "referring_pages": 28.100000381469727,
+                    "referring_domains": 13.699999809265137,
+                    "referring_main_domains": 13.100000381469727,
+                    "rank": 66.9000015258789,
+                    "main_domain_rank": 693.0999755859375,
+                    "last_updated_time": "2026-08-12 18:07:26 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "informational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 17:40:18 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 65,
+                    "rank_absolute": 66,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Ábrela 100% digital sin monto mínimo. Abre tu cuenta Digital. Abre tu cuenta ... 40% dscto en la línea Nutribullet y 30 % dscto en la línea Nutribullet Portátil ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "100",
+                      "línea"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 0.5460000038146973,
+                    "estimated_paid_traffic_cost": null,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 52,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 326
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=linea%20100%20peru&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "knowledge_graph",
+                    "google_reviews"
+                  ],
+                  "se_results_count": 181000000,
+                  "keyword_difficulty": 8,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-12 18:05:36 +00:00",
+                  "previous_updated_time": "2026-05-13 09:03:24 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de ahorro digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 09:06:25 +00:00",
+                    "competition": 0.6600000262260437,
+                    "competition_level": "MEDIUM",
+                    "cpc": 3.990000009536743,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.5899999737739563,
+                    "high_top_of_page_bid": 6.010000228881836,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -36,
+                      "quarterly": -36,
+                      "yearly": -57
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "cuenta de ahorros digital",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 12,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorro%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "ai_overview",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 200,
+                    "last_updated_time": "2026-08-17 10:02:50 +00:00",
+                    "previous_updated_time": "2026-05-11 19:44:59 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 13.899999618530273,
+                    "dofollow": 8.399999618530273,
+                    "referring_pages": 13.600000381469727,
+                    "referring_domains": 8.199999809265137,
+                    "referring_main_domains": 4.400000095367432,
+                    "rank": 88.30000305175781,
+                    "main_domain_rank": 366.29998779296875,
+                    "last_updated_time": "2026-08-17 10:02:51 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": [
+                      "transactional"
+                    ],
+                    "last_updated_time": "2026-04-25 20:49:01 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 6,
+                    "rank_absolute": 8,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[12]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 7.0980000495910645,
+                    "estimated_paid_traffic_cost": 28.321020126342773,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 2,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorro%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "ai_overview",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 200,
+                  "keyword_difficulty": 12,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-17 10:02:50 +00:00",
+                  "previous_updated_time": "2026-05-11 19:44:59 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta de ahorros digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 08:03:53 +00:00",
+                    "competition": 0.6600000262260437,
+                    "competition_level": "MEDIUM",
+                    "cpc": 3.990000009536743,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.5899999737739563,
+                    "high_top_of_page_bid": 6.010000228881836,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -36,
+                      "quarterly": -36,
+                      "yearly": -57
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 5,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "ai_overview",
+                      "people_also_ask",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 203,
+                    "last_updated_time": "2026-08-17 09:56:36 +00:00",
+                    "previous_updated_time": "2026-05-11 19:55:46 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 14.300000190734863,
+                    "dofollow": 8.800000190734863,
+                    "referring_pages": 14,
+                    "referring_domains": 7.900000095367432,
+                    "referring_main_domains": 4.199999809265137,
+                    "rank": 69.4000015258789,
+                    "main_domain_rank": 446.8999938964844,
+                    "last_updated_time": "2026-08-17 09:56:36 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": [
+                      "transactional"
+                    ],
+                    "last_updated_time": "2026-04-29 07:15:30 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 4,
+                    "rank_absolute": 5,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[3]/div[7]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 13.83899974822998,
+                    "estimated_paid_traffic_cost": 55.21760940551758,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20de%20ahorros%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "ai_overview",
+                    "people_also_ask",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 203,
+                  "keyword_difficulty": 5,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-17 09:56:36 +00:00",
+                  "previous_updated_time": "2026-05-11 19:55:46 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuenta digital scotiabank perú",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 05:32:09 +00:00",
+                    "competition": 0.44999998807907104,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.3400000035762787,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.41999998688697815,
+                    "high_top_of_page_bid": 338.5199890136719,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 170
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 24,
+                      "quarterly": 50,
+                      "yearly": 91
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "scotiabank peru cuenta digital",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 20,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuenta%20digital%20scotiabank%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "people_also_search"
+                    ],
+                    "se_results_count": 109,
+                    "last_updated_time": "2026-09-26 14:41:40 +00:00",
+                    "previous_updated_time": "2026-07-07 19:49:45 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 236.1999969482422,
+                    "dofollow": 161.10000610351562,
+                    "referring_pages": 191.8000030517578,
+                    "referring_domains": 43.5,
+                    "referring_main_domains": 28.700000762939453,
+                    "rank": 135.6999969482422,
+                    "main_domain_rank": 460,
+                    "last_updated_time": "2026-09-26 14:41:40 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 05:58:54 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 2,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 63.84000015258789,
+                    "estimated_paid_traffic_cost": 21.70560073852539,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 96,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuenta%20digital%20scotiabank%20per%C3%BA&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "people_also_search"
+                  ],
+                  "se_results_count": 109,
+                  "keyword_difficulty": 20,
+                  "is_lost": false,
+                  "last_updated_time": "2026-09-26 14:41:40 +00:00",
+                  "previous_updated_time": "2026-07-07 19:49:45 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "cuentas de ahorros digitales",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 07:59:24 +00:00",
+                    "competition": 0.6600000262260437,
+                    "competition_level": "MEDIUM",
+                    "cpc": 3.990000009536743,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.5899999737739563,
+                    "high_top_of_page_bid": 6.010000228881836,
+                    "categories": [
+                      10012,
+                      10093,
+                      11817,
+                      12949
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 390
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 320
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -36,
+                      "quarterly": -36,
+                      "yearly": -57
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 0,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorros%20digitales&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "ai_overview",
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 135,
+                    "last_updated_time": "2026-08-17 06:40:23 +00:00",
+                    "previous_updated_time": "2026-05-11 19:55:02 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 11,
+                    "dofollow": 5.5,
+                    "referring_pages": 10.899999618530273,
+                    "referring_domains": 8,
+                    "referring_main_domains": 4.300000190734863,
+                    "rank": 49.20000076293945,
+                    "main_domain_rank": 404.70001220703125,
+                    "last_updated_time": "2026-08-17 06:40:24 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "commercial",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-27 08:23:22 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 2,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Abre tu Cuenta de ahorro Digital en Scotiabank ! Disfruta del costo sin mantenimiento, transferencias digitales gratuitas y tasa de cambio preferencial.",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Abre tu Cuenta de ahorro Digital en Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 63.84000015258789,
+                    "estimated_paid_traffic_cost": 254.7216033935547,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": true
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 325
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=cuentas%20de%20ahorros%20digitales&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "ai_overview",
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 135,
+                  "keyword_difficulty": 0,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-17 06:40:23 +00:00",
+                  "previous_updated_time": "2026-05-11 19:55:02 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "abrir cuenta scotiabank online",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-14 22:20:03 +00:00",
+                    "competition": 0.5600000023841858,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.4000000059604645,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.30000001192092896,
+                    "high_top_of_page_bid": 269.32000732421875,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 50
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 320
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 110
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 80,
+                      "quarterly": -36,
+                      "yearly": -47
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 12,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=abrir%20cuenta%20scotiabank%20online&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 106,
+                    "last_updated_time": "2026-07-08 12:45:22 +00:00",
+                    "previous_updated_time": "2026-04-19 22:47:13 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 215.10000610351562,
+                    "dofollow": 94.0999984741211,
+                    "referring_pages": 110.5999984741211,
+                    "referring_domains": 24.799999237060547,
+                    "referring_main_domains": 14.699999809265137,
+                    "rank": 113.5,
+                    "main_domain_rank": 514.7999877929688,
+                    "last_updated_time": "2026-07-08 12:45:23 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 08:52:54 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[12]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo que ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 51.68000030517578,
+                    "estimated_paid_traffic_cost": 20.672000885009766,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 324
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=abrir%20cuenta%20scotiabank%20online&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 106,
+                  "keyword_difficulty": 12,
+                  "is_lost": false,
+                  "last_updated_time": "2026-07-08 12:45:22 +00:00",
+                  "previous_updated_time": "2026-04-19 22:47:13 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "crear cuenta scotiabank digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-15 06:18:06 +00:00",
+                    "competition": 0.5799999833106995,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.4699999988079071,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.5600000023841858,
+                    "high_top_of_page_bid": 891.9400024414062,
+                    "categories": [
+                      10012,
+                      10093,
+                      11814
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 70
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": 0,
+                      "quarterly": -18,
+                      "yearly": 56
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": null,
+                    "keyword_difficulty": 20,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=crear%20cuenta%20scotiabank%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "short_videos",
+                      "related_searches"
+                    ],
+                    "se_results_count": 108,
+                    "last_updated_time": "2026-08-31 18:58:53 +00:00",
+                    "previous_updated_time": null
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 284.3999938964844,
+                    "dofollow": 162.89999389648438,
+                    "referring_pages": 191.6999969482422,
+                    "referring_domains": 43,
+                    "referring_main_domains": 28.299999237060547,
+                    "rank": 136.8000030517578,
+                    "main_domain_rank": 448.8999938964844,
+                    "last_updated_time": "2026-08-31 18:59:35 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-25 17:27:19 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 51.68000030517578,
+                    "estimated_paid_traffic_cost": 24.289600372314453,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": null,
+                      "is_new": true,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 326
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=crear%20cuenta%20scotiabank%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "short_videos",
+                    "related_searches"
+                  ],
+                  "se_results_count": 108,
+                  "keyword_difficulty": 20,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-31 18:58:53 +00:00",
+                  "previous_updated_time": null
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "scotiabank abrir cuenta",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-16 20:03:32 +00:00",
+                    "competition": 0.47999998927116394,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.33000001311302185,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.5,
+                    "high_top_of_page_bid": 487.82000732421875,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 90
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 260
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 140
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -18,
+                      "quarterly": -18,
+                      "yearly": -47
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": "abrir cuenta scotiabank",
+                    "synonym_clustering_algorithm": "text_processing",
+                    "keyword_difficulty": 19,
+                    "detected_language": "es",
+                    "is_another_language": false
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=scotiabank%20abrir%20cuenta&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "video",
+                      "related_searches"
+                    ],
+                    "se_results_count": 109,
+                    "last_updated_time": "2026-08-26 06:28:39 +00:00",
+                    "previous_updated_time": "2026-05-15 14:32:17 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 289.20001220703125,
+                    "dofollow": 163.8000030517578,
+                    "referring_pages": 191.6999969482422,
+                    "referring_domains": 43.20000076293945,
+                    "referring_main_domains": 28.5,
+                    "rank": 140.8000030517578,
+                    "main_domain_rank": 393.3999938964844,
+                    "last_updated_time": "2026-08-26 06:28:54 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "transactional",
+                    "foreign_intent": [
+                      "navigational"
+                    ],
+                    "last_updated_time": "2026-04-29 20:45:00 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "Solo necesitas tu DNI y acceder a la web de Scotiabank. Luego completas tus datos personales de forma online para iniciar el registro de tu cuenta. ¿Tengo ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "Solo necesitas tu DNI y acceder a la web de Scotiabank"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 51.68000030517578,
+                    "estimated_paid_traffic_cost": 17.054399490356445,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 326
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=scotiabank%20abrir%20cuenta&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "video",
+                    "related_searches"
+                  ],
+                  "se_results_count": 109,
+                  "keyword_difficulty": 19,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-26 06:28:39 +00:00",
+                  "previous_updated_time": "2026-05-15 14:32:17 +00:00"
+                }
+              },
+              {
+                "se_type": "google",
+                "keyword_data": {
+                  "se_type": "google",
+                  "keyword": "scotiabank digital",
+                  "location_code": 2604,
+                  "language_code": "es",
+                  "keyword_info": {
+                    "se_type": "google",
+                    "last_updated_time": "2026-09-13 01:28:27 +00:00",
+                    "competition": 0.3700000047683716,
+                    "competition_level": "MEDIUM",
+                    "cpc": 0.20999999344348907,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.7799999713897705,
+                    "high_top_of_page_bid": 764.1900024414062,
+                    "categories": [
+                      10012,
+                      10093
+                    ],
+                    "monthly_searches": [
+                      {
+                        "year": 2026,
+                        "month": 8,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 7,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 6,
+                        "search_volume": 110
+                      },
+                      {
+                        "year": 2026,
+                        "month": 5,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 4,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2026,
+                        "month": 3,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2026,
+                        "month": 2,
+                        "search_volume": 140
+                      },
+                      {
+                        "year": 2026,
+                        "month": 1,
+                        "search_volume": 170
+                      },
+                      {
+                        "year": 2025,
+                        "month": 12,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 11,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 10,
+                        "search_volume": 210
+                      },
+                      {
+                        "year": 2025,
+                        "month": 9,
+                        "search_volume": 170
+                      }
+                    ],
+                    "search_volume_trend": {
+                      "monthly": -18,
+                      "quarterly": 27,
+                      "yearly": 0
+                    }
+                  },
+                  "keyword_info_normalized_with_bing": null,
+                  "keyword_info_normalized_with_clickstream": null,
+                  "clickstream_keyword_info": null,
+                  "keyword_properties": {
+                    "se_type": "google",
+                    "core_keyword": null,
+                    "synonym_clustering_algorithm": "keyword_metrics",
+                    "keyword_difficulty": 13,
+                    "detected_language": "en",
+                    "is_another_language": true
+                  },
+                  "serp_info": {
+                    "se_type": "google",
+                    "check_url": "https://www.google.com/search?q=scotiabank%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                    "serp_item_types": [
+                      "organic",
+                      "people_also_ask",
+                      "related_searches"
+                    ],
+                    "se_results_count": 109,
+                    "last_updated_time": "2026-08-26 06:29:51 +00:00",
+                    "previous_updated_time": "2026-05-21 06:22:14 +00:00"
+                  },
+                  "avg_backlinks_info": {
+                    "se_type": "google",
+                    "backlinks": 291.3999938964844,
+                    "dofollow": 162.60000610351562,
+                    "referring_pages": 194.60000610351562,
+                    "referring_domains": 48,
+                    "referring_main_domains": 29.5,
+                    "rank": 117.0999984741211,
+                    "main_domain_rank": 393.3999938964844,
+                    "last_updated_time": "2026-08-26 06:30:16 +00:00"
+                  },
+                  "search_intent_info": {
+                    "se_type": "google",
+                    "main_intent": "navigational",
+                    "foreign_intent": null,
+                    "last_updated_time": "2026-04-29 20:51:55 +00:00"
+                  }
+                },
+                "ranked_serp_element": {
+                  "se_type": "google",
+                  "serp_item": {
+                    "se_type": "google",
+                    "type": "organic",
+                    "rank_group": 1,
+                    "rank_absolute": 1,
+                    "position": "left",
+                    "xpath": "/html[1]/body[1]/div[3]/div[1]/div[13]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]",
+                    "domain": "www.scotiabank.com.pe",
+                    "title": "Abrir Cuenta de Ahorros Digital",
+                    "url": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "breadcrumb": "https://www.scotiabank.com.pe › Cuentas-Bancarias › c...",
+                    "website_name": "Scotiabank",
+                    "is_image": false,
+                    "is_video": false,
+                    "is_featured_snippet": false,
+                    "is_malicious": false,
+                    "checks": null,
+                    "description": "La Cuenta Digital Scotiabank es una cuenta de ahorros que te permite realizar operaciones ilimitadas, sin costo, en todo el Perú a través de nuestros canales ...",
+                    "pre_snippet": null,
+                    "extended_snippet": null,
+                    "amp_version": false,
+                    "rating": null,
+                    "highlighted": [
+                      "La Cuenta Digital Scotiabank es una cuenta de ahorros"
+                    ],
+                    "links": null,
+                    "about_this_result": null,
+                    "main_domain": "scotiabank.com.pe",
+                    "relative_url": "/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+                    "etv": 51.68000030517578,
+                    "estimated_paid_traffic_cost": 10.852800369262695,
+                    "clickstream_etv": null,
+                    "rank_changes": {
+                      "previous_rank_absolute": 1,
+                      "is_new": false,
+                      "is_up": false,
+                      "is_down": false
+                    },
+                    "backlinks_info": {
+                      "referring_domains": 61,
+                      "referring_main_domains": 24,
+                      "referring_pages": 68,
+                      "dofollow": 15,
+                      "backlinks": 68,
+                      "time_update": "2026-09-22 11:01:47 +00:00"
+                    },
+                    "rank_info": {
+                      "page_rank": 97,
+                      "main_domain_rank": 326
+                    }
+                  },
+                  "check_url": "https://www.google.com/search?q=scotiabank%20digital&hl=es&gl=PE&ie=UTF-8&uule=w+CAIQIFISCfUUWcBQyAWREUgGIXkSAZ7y",
+                  "serp_item_types": [
+                    "organic",
+                    "people_also_ask",
+                    "related_searches"
+                  ],
+                  "se_results_count": 109,
+                  "keyword_difficulty": 13,
+                  "is_lost": false,
+                  "last_updated_time": "2026-08-26 06:29:51 +00:00",
+                  "previous_updated_time": "2026-05-21 06:22:14 +00:00"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

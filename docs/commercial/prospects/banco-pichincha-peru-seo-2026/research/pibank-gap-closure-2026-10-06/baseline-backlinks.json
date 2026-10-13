@@ -1,0 +1,29 @@
+{
+  "target": "pibank.pe",
+  "queried_at": "2026-10-07T01:01:39.681Z",
+  "provider": "DataForSEO",
+  "rank_scale": "one_hundred",
+  "domain_rank": 8,
+  "backlinks_summary": 2,
+  "referring_domains_summary": 1,
+  "backlinks_spam_score": 5,
+  "target_spam_score": 0,
+  "detail_returned": 1,
+  "detail_items": [
+    {
+      "url_from": "https://afluenta.pe/pibank-peru-cuenta-de-ahorros-digital-beneficios-trea-y-como-abrirla/",
+      "url_to": "https://pibank.pe/",
+      "anchor": "Visitar Pibank Perú",
+      "dofollow": true,
+      "is_lost": false,
+      "first_seen": "2026-09-29 17:42:58 +00:00",
+      "last_seen": "2026-09-29 17:42:58 +00:00"
+    }
+  ],
+  "cost_usd": 0.048072,
+  "source_files": [
+    "backlinks-summary-provider.json",
+    "backlinks-detail-provider.json"
+  ],
+  "limitation": "Provider index snapshot, not full web census;summary2/detail1 are separate endpoint observations, not forced to agree. Not Moz DA/Brand Authority, not earned program results."
+}

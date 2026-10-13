@@ -1,0 +1,276 @@
+{
+  "verifiedAt": "2026-10-04T22:49:08Z",
+  "studioSha": "aa6fa0771ff0b4181429c10897b7f7a60cf30ae1",
+  "apiVersion": "1.7.0",
+  "tools": 75,
+  "httpOperations": 80,
+  "manifestHash": "d9f5db8f7729255d59921dd591c2f9963f0abe8a637bf288c235fceb6fd1ccc2",
+  "vercel": {
+    "production": "dpl_Atr8ThFhy4UNG8HGtAXYkL529pmA",
+    "staging": "dpl_HXJtsoTbUVxbw23bGGnwpitjrxo4",
+    "state": "READY"
+  },
+  "worker": {
+    "productionRevision": "marketing-studio-media-worker-00005-wc5",
+    "stagingRevision": "marketing-studio-media-worker-staging-00007-kt9",
+    "build": "0d1905e1-66b4-485f-9c68-d34ad6f6e497",
+    "digest": "sha256:3001726da1f901843c3c4b19e8b52e00ce3be0cf0c7e172d956bc0376df1f5d2",
+    "health": 200
+  },
+  "migrations": {
+    "staging": "applied",
+    "production": "applied",
+    "ids": [
+      "1791149145299",
+      "1791149983810",
+      "1791150800150",
+      "1791151430000",
+      "1791151780000"
+    ]
+  },
+  "stagingCanary": {
+    "activationId": "ACT-000001",
+    "checks": [
+      {
+        "path": "/api/v1/activation-accounts",
+        "method": "GET",
+        "http": 200,
+        "result": null
+      },
+      {
+        "path": "/api/v1/campaigns/CMP-001/activations",
+        "method": "POST",
+        "http": 200,
+        "result": "dry_run"
+      },
+      {
+        "path": "/api/v1/campaigns/CMP-001/activations",
+        "method": "POST",
+        "http": 201,
+        "result": "written"
+      },
+      {
+        "path": "/api/v1/campaigns/CMP-001/activations",
+        "method": "POST",
+        "http": 201,
+        "result": "written"
+      },
+      {
+        "path": "/api/v1/activations/ACT-000001",
+        "method": "GET",
+        "http": 200,
+        "result": null
+      },
+      {
+        "path": "/api/v1/activations/ACT-000001/reschedule",
+        "method": "POST",
+        "http": 200,
+        "result": "written"
+      },
+      {
+        "path": "/api/v1/activations/ACT-000001/cancel",
+        "method": "POST",
+        "http": 200,
+        "result": "written"
+      },
+      {
+        "path": "/api/v1/activations/ACT-000001",
+        "method": "GET",
+        "http": 200,
+        "result": null
+      },
+      {
+        "path": "/api/v1/calendar?from=2026-11-01&to=2026-12-03&market=CL",
+        "method": "GET",
+        "http": 200,
+        "result": null
+      },
+      {
+        "path": "/api/v1/executions/unlinked",
+        "method": "GET",
+        "http": 200,
+        "result": null
+      },
+      {
+        "path": "/api/v1/campaigns/CMP-001/activations?organizationId=org-foreign-x",
+        "method": "GET",
+        "http": 404,
+        "result": null
+      }
+    ]
+  },
+  "productionCanary": {
+    "checks": [
+      {
+        "path": "/api/v1/calendar?from=2026-09-01&to=2026-11-01&market=CL",
+        "method": "GET",
+        "httpStatus": 200
+      },
+      {
+        "path": "/api/v1/activations/ACT-000001?organizationId=org-foreign-x",
+        "method": "GET",
+        "httpStatus": 404
+      },
+      {
+        "path": "/api/v1/activation-accounts",
+        "method": "GET",
+        "httpStatus": 401
+      },
+      {
+        "path": "/api/v1/activations/ACT-000001/cancel",
+        "method": "POST",
+        "httpStatus": 403
+      },
+      {
+        "path": "/api/v1/attention",
+        "method": "GET",
+        "httpStatus": 200
+      },
+      {
+        "path": "/api/v1/campaigns/CMP-004/assets",
+        "method": "GET",
+        "httpStatus": 200
+      }
+    ],
+    "calendar": {
+      "count": 6,
+      "market": "CL",
+      "timezone": "America/Santiago",
+      "states": [
+        {
+          "id": "ACT-000001",
+          "state": "overdue"
+        },
+        {
+          "id": "ACT-000002",
+          "state": "overdue"
+        },
+        {
+          "id": "ACT-000003",
+          "state": "overdue"
+        },
+        {
+          "id": "ACT-000004",
+          "state": "scheduled"
+        },
+        {
+          "id": "ACT-000005",
+          "state": "scheduled"
+        },
+        {
+          "id": "ACT-000006",
+          "state": "scheduled"
+        }
+      ]
+    },
+    "readerAccounts": 3,
+    "thumbs": {
+      "count": 44,
+      "all200": true
+    }
+  },
+  "cliDoctor": {
+    "baseUrl": "https://studio.efeonce.org",
+    "authenticated": true,
+    "apiVersion": "1.7.0",
+    "tools": 75,
+    "operations": 80,
+    "health": {
+      "status": "ok",
+      "database": "reachable",
+      "accessMode": "open",
+      "version": "1.7.0"
+    },
+    "note": "Contrato y salud verificados; esto no certifica permisos de escritura."
+  },
+  "workerRuns": [
+    {
+      "worker_run_id": "be9985e2-2c52-4538-a119-78381a8a0a2c",
+      "kind": "metricool_discovery",
+      "trigger": "scheduler",
+      "status": "succeeded",
+      "counts": {
+        "errors": 0,
+        "linked": 0,
+        "changed": 0,
+        "accounts": 3,
+        "observed": 62
+      },
+      "error_code": null,
+      "started_at": "2026-10-04T22:49:03.027592+00:00",
+      "finished_at": "2026-10-04T22:49:05.646553+00:00"
+    },
+    {
+      "worker_run_id": "fdb95e92-2532-4f42-8aea-95740d915936",
+      "kind": "metricool_discovery",
+      "trigger": "manual",
+      "status": "succeeded",
+      "counts": {
+        "errors": 0,
+        "linked": 0,
+        "changed": 0,
+        "accounts": 3,
+        "observed": 62
+      },
+      "error_code": null,
+      "started_at": "2026-10-04T22:48:13.001956+00:00",
+      "finished_at": "2026-10-04T22:48:15.611676+00:00"
+    },
+    {
+      "worker_run_id": "7745d0ef-8c30-4add-8013-13c1ff9684fd",
+      "kind": "metricool_discovery",
+      "trigger": "manual",
+      "status": "succeeded",
+      "counts": {
+        "errors": 0,
+        "linked": 0,
+        "changed": 62,
+        "accounts": 3,
+        "observed": 62
+      },
+      "error_code": null,
+      "started_at": "2026-10-04T22:47:52.844026+00:00",
+      "finished_at": "2026-10-04T22:47:55.6085+00:00"
+    }
+  ],
+  "scheduler": {
+    "attemptDeadline": "900s",
+    "httpTarget": {
+      "oidcToken": {
+        "serviceAccountEmail": "marketing-studio-invoker@efeonce-group.iam.gserviceaccount.com"
+      },
+      "uri": "https://marketing-studio-media-worker-y6egnifl6a-uk.a.run.app/jobs/metricool-discovery"
+    },
+    "name": "projects/efeonce-group/locations/us-east4/jobs/marketing-studio-metricool-discovery",
+    "schedule": "7,37 * * * *",
+    "state": "ENABLED",
+    "timeZone": "America/Santiago"
+  },
+  "data": {
+    "campaigns": 5,
+    "assets": 103,
+    "legacyPosts": 6,
+    "legacyEvidence": 6,
+    "linkedActivations": 6,
+    "market": "CL",
+    "timezone": "America/Santiago",
+    "executionRecords": 63,
+    "unlinkedRecords": 57,
+    "providerObservedPerRun": 62
+  },
+  "limitations": [
+    "3 historical CMP-001 activations overdue; no observed publication date, including 2 provider PUBLISHED labels",
+    "Resend/HubSpot/SFMC Engagement/SFMC Next expansion pending",
+    "Owned provider bindings and Greenhouse endpoint pending; owned flag OFF",
+    "Delegated HTTP/MCP T1 authority and gateway certification pending TASK-2003",
+    "TASK-2002 UI not implemented by this release"
+  ],
+  "documentationChecks": {
+    "taskLint": "PASS, 0 warnings",
+    "opsLint": "PASS, 13 unrelated epic warnings",
+    "docsClosure": "PASS",
+    "skillsMirrors": "PASS",
+    "qaGates": "advisory reviewed",
+    "greenhouseLocalSecretsAudit": "unconfigured 8/8; no Greenhouse env loaded; not a Studio runtime verdict"
+  }
+}

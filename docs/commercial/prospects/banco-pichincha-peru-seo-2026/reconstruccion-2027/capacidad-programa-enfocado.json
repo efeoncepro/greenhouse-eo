@@ -1,0 +1,172 @@
+{
+  "status": "hipotesis de planificacion interna; no roster/costo/fee aprobado",
+  "horizon_months": 12,
+  "base_hours": 814,
+  "reserve_hours": 110,
+  "total_hours": 924,
+  "roles": [
+    {
+      "rol": "Dirección",
+      "monthly": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "base_hours": 72,
+      "reserve_hours": 8
+    },
+    {
+      "rol": "SEO técnico",
+      "monthly": [
+        30,
+        16,
+        16,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "base_hours": 134,
+      "reserve_hours": 18
+    },
+    {
+      "rol": "Editorial",
+      "monthly": [
+        16,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "base_hours": 236,
+      "reserve_hours": 32
+    },
+    {
+      "rol": "Implementación CMS",
+      "monthly": [
+        14,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "base_hours": 102,
+      "reserve_hours": 18
+    },
+    {
+      "rol": "Datos y medición",
+      "monthly": [
+        18,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "base_hours": 70,
+      "reserve_hours": 10
+    },
+    {
+      "rol": "AEO",
+      "monthly": [
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "base_hours": 52,
+      "reserve_hours": 8
+    },
+    {
+      "rol": "QA",
+      "monthly": [
+        10,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "base_hours": 76,
+      "reserve_hours": 8
+    },
+    {
+      "rol": "Coordinación",
+      "monthly": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "base_hours": 72,
+      "reserve_hours": 8
+    }
+  ],
+  "scope": {
+    "substantial_content_deliveries": 12,
+    "max_new_destinations": 6,
+    "faq_improvements": 24,
+    "technical_packages": 12,
+    "technical_package_max_cms_hours": 8,
+    "monthly_aeo_observations": 36,
+    "monthly_aeo_questions": 12,
+    "surfaces": 3,
+    "replicates": 1
+  }
+}

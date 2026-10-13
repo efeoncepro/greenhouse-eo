@@ -49,6 +49,7 @@ export const MEETING_TELEMETRY_PAYLOAD_KEYS = [
   'error_category',
   'renderer_version',
   'contract_version',
+  'event_id', // Opaque UUID for a fresh eligible conversion, unrelated to the receipt.
 ] as const
 
 export type MeetingStep = (typeof MEETING_STEPS)[number]
@@ -125,6 +126,8 @@ export interface MeetingAvailability {
 }
 
 export interface MeetingBookingRequest {
+  /** Consent/context for destination-specific matching; never telemetry or processing consent. */
+  measurementContext?: unknown
   schedulerKey: string
   surfaceId: string
   idempotencyKey: string

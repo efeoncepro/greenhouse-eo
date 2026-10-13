@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Contraportada · Conversamos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#cfe4fa}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: #001a33; color: #ffffff; font-family: 'Poppins', system-ui, sans-serif;">
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0;">
+    <defs><radialGradient id="stageX" cx="1500" cy="540" r="900" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="{{accent}}" stop-opacity="0.28"></stop><stop offset="0.35" stop-color="{{accent}}" stop-opacity="0.10"></stop><stop offset="1" stop-color="{{accent}}" stop-opacity="0"></stop></radialGradient><linearGradient id="floorX" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"></stop><stop offset="1" stop-color="#000814" stop-opacity="0.55"></stop></linearGradient></defs>
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#stageX)"></rect>
+    <rect x="0" y="778" width="1920" height="302" fill="url(#floorX)"></rect>
+  </svg>
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0;">
+    <defs>
+      <radialGradient id="haloC" cx="1638" cy="540" r="900" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#0375db" stop-opacity="0.13"></stop>
+        <stop offset="1" stop-color="#0375db" stop-opacity="0"></stop>
+      </radialGradient>
+    </defs>
+    <circle cx="1638" cy="540" r="900" fill="url(#haloC)"></circle>
+    <circle cx="1638" cy="540" r="818" fill="none" stroke="#0375db" stroke-opacity="0.16" stroke-width="2"></circle>
+    <path d="M 1292.3 -201.4 A 818 818 0 0 0 847.9 328.3" fill="none" stroke="{{accent}}" stroke-width="5" stroke-linecap="round"></path>
+    <circle cx="847.9" cy="328.3" r="22" fill="{{accent}}"></circle>
+  </svg>
+  <div style="position: absolute; left: 140px; top: 140px; width: 660px; display: flex; flex-direction: column;">
+    <img src="/_blob/419a1423f65ea02f50ab57ec7f36bda7" alt="Efeonce" style="width: 500px; height: auto; display: block;">
+    <div style="margin-top: 124px; display: flex; align-items: center; gap: 16px; font-size: 40px; font-weight: 300; line-height: 1.25;">
+      <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 9999px; border: 3px solid {{accent}}; box-sizing: border-box; flex: none;"></span>
+      <span>¿Conversamos?</span>
+    </div>
+    <div style="margin-top: 18px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 124px; font-weight: 760; letter-spacing: -0.035em; line-height: 0.9; font-variation-settings: 'opsz' 88; white-space: pre-line;">Cuando
+quieras<span aria-hidden="true" style="display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.05em; border-radius: 9999px; background: {{accent}};"></span></div>
+    <div style="margin-top: 44px; font-size: 28px; line-height: 1.2;"><span style="font-weight: 800; font-style: italic; color: #e2e2e2;">Empower </span><span style="font-weight: 800; color: #cfe4fa;">your </span><span style="font-weight: 900; font-style: italic; color: {{accent}};">Engine</span></div>
+    <div style="margin-top: 32px; display: flex; flex-direction: column; gap: 14px;">
+      <img src="/_blob/a6c69b68160be2538955abce07cff3af" alt="efeoncepro.com" style="width: 260px; height: auto; display: block;">
+      <div style="font-size: 18px; font-weight: 400; line-height: 1.55; color: #cfe4fa;">sales@efeoncepro.com · +56 9 3732 3064 · +1 (239) 235-2073<br>Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0375db","options":["#0375db","#36c8bf","#ff6500","#f83902"]},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#0375db' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "996da464b1f582ee7b61562f814e72ec2ad5a3265ab5bfb34b1440cfa01cd7f0",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT1-portada-squad",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT1-portada-squad.png",
+      "sha256": "4ab7a751fb3c5cd120a13c6cd98e27ced0b1058ae8f7da435006ab4b11a949d5"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

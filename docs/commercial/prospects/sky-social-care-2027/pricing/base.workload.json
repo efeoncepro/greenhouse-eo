@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "sky-social-care-base-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "design:sky-social-care-operacion-v2:seccion-10",
+      "effectiveFrom": "2026-10-10",
+      "effectiveUntil": "2026-12-31",
+      "status": "estimated"
+    }
+  },
+  "drivers": [
+    {
+      "driverId": "conversations",
+      "label": "Conversaciones públicas a responder",
+      "unit": "conversation",
+      "unitsPerMonth": "1300",
+      "minutesPerUnit": "3",
+      "source": {
+        "reference": "request:sky-2026-10-09:1300-por-mes",
+        "effectiveFrom": "2026-10-10",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "fixedWork": [
+    {
+      "workId": "service-upkeep",
+      "label": "Base de conocimiento, traspasos y revisión de calidad",
+      "hoursPerMonth": "70",
+      "source": {
+        "reference": "design:sky-social-care-operacion-v2:seccion-10",
+        "effectiveFrom": "2026-10-10",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "titular",
+      "driverShares": [
+        {
+          "driverId": "conversations",
+          "share": "0.8"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "service-upkeep",
+          "share": "1"
+        }
+      ],
+      "reason": "Atiende la cola en horario núcleo y mantiene la base."
+    },
+    {
+      "lineId": "respaldo",
+      "driverShares": [
+        {
+          "driverId": "conversations",
+          "share": "0.2"
+        }
+      ],
+      "fixedWorkShares": [],
+      "presenceHoursPerMonth": "22",
+      "reason": "Toma el resto de la cola y cubre las horas que el titular no cubre."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.05"
+  }
+}

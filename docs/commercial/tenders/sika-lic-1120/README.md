@@ -1,6 +1,6 @@
 # Licitación / Propuesta — Sika LIC-1120
 
-> **Estado:** `plan-bid` · **Cierre:** 2026-08-19 18:00 (hora indicada por Wherex) · **Origen:** `private_rfp / Wherex`
+> **Estado:** `lost` — perdida, según el operador (Julio Reyes, 2026-10-12); este workspace nunca registró el resultado y no tiene adjudicatario, precio ganador ni motivo. · **Cierre:** 2026-08-19 18:00 (hora indicada por Wherex) · **Origen:** `private_rfp / Wherex`
 > **Proposal (Studio):** aún no registrada · **Owner:** Julio Reyes · **Creado:** 2026-08-12
 
 Campaña digital de continuidad comercial para el cierre de tiendas ARVA y TyP de Sika Mexicana. La oportunidad está marcada como de interés en Wherex y tiene una pregunta propia abierta; no hay precio, archivos, aceptación de términos ni propuesta enviada.

@@ -1,0 +1,82 @@
+{
+  "tenderId": "A21-mercados",
+  "slides": [
+    {
+      "slideId": "deck-content-markets",
+      "contentType": "deck.content-markets",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 130,
+          "questionTop": 196,
+          "answerTop": 280,
+          "answerPx": 128,
+          "answerLeading": "--gl-ls-answer-leading=0.95",
+          "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=600px",
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "lumWidth": "--gl-lum-width=160px",
+          "lumBottom": "--gl-lum-bottom=62px",
+          "svSpaceBg": "--gl-sv-space-bg-color=#020716",
+          "svHalo": "--gl-sv-halo-color=#72ded8",
+          "svShadow": "--gl-sv-shadow-color=#000610",
+          "svLabelBg": "--gl-sv-label-bg-color=#041028",
+          "svCity": "--gl-sv-city-color=#9fd7ff"
+        },
+        "photo": {
+          "src": "asset-ref:plate:MK2-mercados",
+          "alt": "Las Américas de noche vistas desde la órbita; cinco puntos de luz azul unidos por arcos en Miami, Ciudad de México, Bogotá, Lima y Santiago"
+        },
+        "voice": {
+          "question": "¿Dónde trabajan?",
+          "answer": "países",
+          "eyebrow": "Mercados",
+          "answerLead": "En cinco"
+        },
+        "body": "Chile, Estados Unidos, Colombia, México y Perú, con <strong>un solo equipo</strong> y un solo interlocutor.",
+        "markets": [
+          {
+            "country": "EE. UU.",
+            "city": "Miami",
+            "side": "start",
+            "x": "--gl-smk-x=1412px",
+            "top": "--gl-smk-top=143px"
+          },
+          {
+            "country": "México",
+            "city": "Ciudad de México",
+            "side": "end",
+            "x": "--gl-smk-x=744px",
+            "top": "--gl-smk-top=228px"
+          },
+          {
+            "country": "Colombia",
+            "city": "Bogotá",
+            "side": "start",
+            "x": "--gl-smk-x=1437px",
+            "top": "--gl-smk-top=380px"
+          },
+          {
+            "country": "Perú",
+            "city": "Lima",
+            "side": "end",
+            "x": "--gl-smk-x=569px",
+            "top": "--gl-smk-top=583px"
+          },
+          {
+            "country": "Chile",
+            "city": "Santiago",
+            "side": "start",
+            "x": "--gl-smk-x=1498px",
+            "top": "--gl-smk-top=840px"
+          }
+        ]
+      },
+      "template": "ContentMarkets"
+    }
+  ]
+}

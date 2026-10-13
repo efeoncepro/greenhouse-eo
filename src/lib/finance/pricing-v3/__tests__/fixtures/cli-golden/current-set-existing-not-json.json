@@ -1,0 +1,40 @@
+{
+  "args": [
+    "current",
+    "set",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v10.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v10.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--reason",
+    "Golden baseline: replace the pointer.",
+    "--confirm",
+    "0000000000000000000000000000000000000000000000000000000000000000",
+    "--out",
+    "<tmp>/pointer.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 247,
+    "sha256": "b5671f03734d8eb338dd5f673f59921b4df47c61a79ff97d4ec03361fb6be417",
+    "text": "{\n  \"error\": {\n    \"code\": \"INPUT_NOT_JSON\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"out\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "pointer.json",
+      "mode": "644",
+      "content": {
+        "bytes": 13,
+        "sha256": "171b4049ba8bd1727b7730f22cf105438ecce9f2e1a042d3c54becc3d17f3e66",
+        "text": "not a pointer"
+      }
+    }
+  ]
+}

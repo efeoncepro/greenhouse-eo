@@ -82,6 +82,83 @@ describe('meeting telemetry', () => {
     expect(pushed).toMatchObject({ event: 'gh_meeting_booking_confirmed', scheduler_key: 'efeonce-discovery-30' })
     expect(pushed).not.toHaveProperty('conversionReceipt')
     expect(pushed).not.toHaveProperty('email')
+    expect(pushed.event_id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+    expect(pushed.event_id).not.toBe(response.conversionReceipt)
+  })
+
+  it('conserva el UUID cuando el dataLayer falla y no repite una emisión confirmada', () => {
+    const effect = reduceMeetingTelemetry(initialMeetingTelemetryState(), base, {
+      type: 'booking_confirmed', response: meetingConfirmedFixture(),
+    }).effects[0]
+
+    const host = document.createElement('div')
+    const failingLayer = { push: () => { throw new Error('blocked') } }
+    const win = window as unknown as Window & { dataLayer: unknown }
+
+    win.dataLayer = failingLayer
+    let generated = 0
+
+    const createConversionEventId = () => {
+      generated += 1
+
+return '00000000-0000-4000-8000-000000000001'
+    }
+
+    emitMeetingTelemetry(host, effect, { createConversionEventId })
+    win.dataLayer = []
+    emitMeetingTelemetry(host, effect, { createConversionEventId })
+    emitMeetingTelemetry(host, effect, { createConversionEventId })
+
+    expect(generated).toBe(1)
+    expect(win.dataLayer).toEqual([expect.objectContaining({
+      event: 'gh_meeting_booking_confirmed',
+      event_id: '00000000-0000-4000-8000-000000000001',
+    })])
+  })
+
+  it('no crea identidad para interacción, replay ni telemetría deshabilitada', () => {
+    const host = document.createElement('div')
+
+    const step = reduceMeetingTelemetry(initialMeetingTelemetryState(), base, {
+      type: 'step_reached', step: 'viewed',
+    }).effects[0]
+
+    const disabled = reduceMeetingTelemetry(initialMeetingTelemetryState(), base, {
+      type: 'booking_confirmed', response: meetingConfirmedFixture(),
+    }).effects[0]
+
+    const replay = reduceMeetingTelemetry(initialMeetingTelemetryState(), base, {
+      type: 'booking_confirmed', response: { ...meetingConfirmedFixture(), conversionEligible: false },
+    })
+
+    let generated = 0
+
+    const createConversionEventId = () => {
+      generated += 1
+
+return '00000000-0000-4000-8000-000000000001'
+    }
+
+    emitMeetingTelemetry(host, step, { createConversionEventId })
+    emitMeetingTelemetry(host, disabled, { dataLayerEnabled: false, createConversionEventId })
+
+    expect(generated).toBe(0)
+    expect(replay.effects).toHaveLength(0)
+    expect((window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer[0]).not.toHaveProperty('event_id')
+  })
+
+  it('mantiene el espejo GA4 sin inventar un ID si falla la entropía segura', () => {
+    const effect = reduceMeetingTelemetry(initialMeetingTelemetryState(), base, {
+      type: 'booking_confirmed', response: meetingConfirmedFixture(),
+    }).effects[0]
+
+    expect(() => emitMeetingTelemetry(document.createElement('div'), effect, {
+      createConversionEventId: () => { throw new Error('unavailable') },
+    })).not.toThrow()
+    const pushed = (window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer[0]
+
+    expect(pushed.event).toBe('gh_meeting_booking_confirmed')
+    expect(pushed).not.toHaveProperty('event_id')
   })
 
   it('descarta bases manipuladas en vez de reenviar valores arbitrarios', () => {

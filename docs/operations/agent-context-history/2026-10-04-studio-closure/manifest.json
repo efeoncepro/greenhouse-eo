@@ -1,0 +1,23 @@
+{
+  "purpose": "Snapshot previo a consolidacion documental de Studio 2026-10-04; no es estado vigente",
+  "files": [
+    {
+      "source": "project_context.md",
+      "snapshot": "docs/operations/agent-context-history/2026-10-04-studio-closure/project_context.md",
+      "sha256": "f423c392039ebb37a80fd1a8bb8ed22f6f609e1b6201a7f02ea8e3bafb645718",
+      "bytes": 48826
+    },
+    {
+      "source": "Handoff.md",
+      "snapshot": "docs/operations/agent-context-history/2026-10-04-studio-closure/Handoff.md",
+      "sha256": "f61d48c4dd5c9b6396c39d587d5f487a2259245171d4a4c51682f7bc62b82fc3",
+      "bytes": 49371
+    },
+    {
+      "source": "changelog.md",
+      "snapshot": "docs/operations/agent-context-history/2026-10-04-studio-closure/changelog.md",
+      "sha256": "bfbd13796039f6e141b9884a2f163f0f08ba35d5d12ae38b5d7ff78032ab3827",
+      "bytes": 60100
+    }
+  ]
+}

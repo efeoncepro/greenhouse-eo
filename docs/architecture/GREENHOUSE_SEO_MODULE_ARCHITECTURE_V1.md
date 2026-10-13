@@ -2001,3 +2001,28 @@ Una tool de lectura sólo consume evidencia persistida. Capturar, escribir o com
 separada cuando exista un consumer legítimo, con presupuesto, idempotencia, audit, confirmación y el scope de
 blast-radius vigente; nunca se cablea un write scope al cliente PKCE público. La capacidad no está operativa hasta
 probar lane y gateway con allow/deny/fault y sincronizar `mcp:manifest` + `skills:mirrors`.
+
+## Delta 2026-10-12 — alcance de contenido por organización (TASK-2033)
+
+El módulo gana una pieza de configuración: qué parte del sitio de una organización trabaja Efeonce.
+
+- **Modelo:** `greenhouse_growth.seo_content_scope_versions`, clave `(organization_id, version)`, append-only (trigger
+  `block_seo_row_mutation`). Se ancla a la organización y no al `seo_target`, por la misma razón que `seo_gsc_daily`:
+  Search Console entrega por propiedad verificada. Reglas `prefix` y `exact`; cero reglas = sitio completo.
+- **Acceso:** sólo `readSeoContentScope` y `setSeoContentScope` (`src/lib/growth/seo/content-scope/store.ts`). El
+  command valida y rechaza —no corrige— una regla mal escrita, es idempotente con las mismas reglas y etiqueta, y
+  serializa escritores por organización con un lock de transacción.
+- **Readers que recortan:** `readSeoOverviewKpisForWindow`, `readSeoWindowMovers` y `readSeoWorkQueue` reciben `scope`
+  opcional. Sin él hacen la consulta de antes. En la cola es un filtro sobre `target_url` que respeta el orden
+  persistido (`rank_in_snapshot`): no reordena ni recalcula.
+- **Forma del SQL:** sobre `seo_gsc_daily` se clasifica una vez por página distinta del rango
+  (`gscPagesInContentScopeSql`) y se cruza por hash. El predicado por fila recalculaba una expresión regular varias
+  veces por cada una de las ~204 mil filas de un mes real: 5 s por consulta contra 0,4 s, mismo resultado.
+- **Paridad:** el matcher TS (`isPathInContentScope`) y el fragmento SQL son la misma regla; la prueba en vivo
+  `content-scope.live.test.ts` los compara sobre todas las páginas reales de la organización con más serie.
+- **Consumer:** Efeonce Insights (arquitectura de Insights §5.1). El cockpit del módulo no lo usa.
+- **Pendiente:** la lectura por el lane ecosystem y su tool MCP (`get_seo_content_scope`), que la regla del módulo
+  exige para todo reader nuevo, y la escritura por API con su capability.
+- **Estado:** tabla aplicada y alcance v1 de Berel fijado el 2026-10-12; código en Vercel staging y `ops-worker`;
+  Vercel Production sin release.
+

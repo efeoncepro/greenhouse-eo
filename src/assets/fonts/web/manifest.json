@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "retrievedAt": "2026-10-04",
+  "fonts": [
+    {
+      "file": "Geist-Latin-Variable.woff2",
+      "family": "Geist",
+      "weight": "400 800",
+      "style": "normal",
+      "subset": "latin",
+      "cssSource": "https://fonts.googleapis.com/css2?family=Geist:wght@400..800&display=swap",
+      "source": "https://fonts.gstatic.com/s/geist/v5/gyByhwUxId8gMEwcGFWNOITd.woff2",
+      "sha256": "9b6f5ff45b278c744b5f379a2c4ecbaf858a842b8eaf82ac8d21b699ca16c608",
+      "bytes": 29288,
+      "fontVersion": "Version 1.800",
+      "axes": {
+        "wght": [
+          100.0,
+          400.0,
+          900.0
+        ]
+      }
+    },
+    {
+      "file": "Poppins-Latin-600.woff2",
+      "family": "Poppins",
+      "weight": "600",
+      "style": "normal",
+      "subset": "latin",
+      "cssSource": "https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap",
+      "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6Z1xlFd2JQEk.woff2",
+      "sha256": "872e862918591a9e824dc03ed92f05729435ffbb8ebbb10eff7eda26592b1798",
+      "bytes": 7992,
+      "fontVersion": "4.004",
+      "axes": {}
+    },
+    {
+      "file": "Poppins-Latin-700.woff2",
+      "family": "Poppins",
+      "weight": "700",
+      "style": "normal",
+      "subset": "latin",
+      "cssSource": "https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap",
+      "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.woff2",
+      "sha256": "197a3cbd7290c242c5c765268cdd69a9a39867fdc80cd13071f243a81c56fb76",
+      "bytes": 7848,
+      "fontVersion": "4.004",
+      "axes": {}
+    },
+    {
+      "file": "Poppins-Latin-800.woff2",
+      "family": "Poppins",
+      "weight": "800",
+      "style": "normal",
+      "subset": "latin",
+      "cssSource": "https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap",
+      "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLDD4Z1xlFd2JQEk.woff2",
+      "sha256": "4ef5511d8e7b39ae3f98ffed14d6071d7914e0c145fee5a79bb43aa962ff0fc4",
+      "bytes": 7816,
+      "fontVersion": "4.004",
+      "axes": {}
+    },
+    {
+      "file": "BricolageGrotesque-Latin-500.woff2",
+      "family": "Bricolage Grotesque",
+      "weight": "500",
+      "style": "normal",
+      "subset": "latin",
+      "cssSource": "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500&display=swap",
+      "source": "https://fonts.gstatic.com/s/bricolagegrotesque/v9/3y9U6as8bTXq_nANBjzKo3IeZx8z6up5BeSl5jBNz_19PpbpMXuECpwUxJBOm_OJWiaaD30YfKfjZZoLvSni-Molss4MHt0GOQ.woff2",
+      "sha256": "9f73a88a8ffa26afe16c35f07df6885ae4cff9ce08fff155bd754fbd5a5b294a",
+      "bytes": 22400,
+      "fontVersion": "Version 1.001;gftools[0.9.33.dev8+g029e19f]",
+      "axes": {}
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "C10-medicion",
+  "input": {
+    "artifactId": "C10-medicion",
+    "slides": [
+      {
+        "slideId": "deck-content-measure",
+        "contentType": "deck.content-measure",
+        "slots": {
+          "frame": {
+            "line": "brand",
+            "margin": 140,
+            "eyebrowTop": 150,
+            "questionTop": 215,
+            "answerTop": 270,
+            "answerPx": 300,
+            "bodyTop": 590,
+            "bodyPx": 26,
+            "bodyWidth": 560,
+            "eyebrowPx": "--gl-eyebrow-px=20px",
+            "figurePx": "--gl-figure-px=64px",
+            "notePx": "--gl-note-px=17px",
+            "lensCx": "--gl-lens-cx=1420px",
+            "lensCy": "--gl-lens-cy=600px",
+            "lensR": "--gl-lens-r=359.97px",
+            "lensGrayscale": "--gl-lens-grayscale=1",
+            "lensContrast": "--gl-lens-contrast=1.1",
+            "lensBrightness": "--gl-lens-brightness=0.5",
+            "lensMultiply": "--gl-lens-multiply=0.8",
+            "columnWidth": "--gl-column-width=976.84px"
+          },
+          "photo": {
+            "src": "asset-ref:plate:H1b-estratega-uniforme",
+            "lensSrc": "asset-ref:plate:H1b-estratega-uniforme",
+            "alt": "Una estratega de Efeonce, con el uniforme del equipo, revisa el tablero de entregas del cliente"
+          },
+          "orbit": {
+            "src": "asset-ref:layer:measure-880-brand"
+          },
+          "voice": {
+            "question": "¿Cuántas llegan a tiempo?",
+            "answer": "88 %",
+            "eyebrow": "Lo medimos"
+          },
+          "body": "de las entregas de Sky llegaron a tiempo en 12 meses. Lo ves en tu portal, no en un informe que llega tarde.",
+          "figures": [
+            {
+              "value": "0,12",
+              "label": "ajustes por pieza"
+            },
+            {
+              "value": "39",
+              "label": "campañas"
+            }
+          ],
+          "note": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-measure",
+      "contentType": "deck.content-measure",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 150,
+          "questionTop": 215,
+          "answerTop": 270,
+          "answerPx": 300,
+          "bodyTop": 590,
+          "bodyPx": 26,
+          "bodyWidth": 560,
+          "eyebrowPx": "--gl-eyebrow-px=20px",
+          "figurePx": "--gl-figure-px=64px",
+          "notePx": "--gl-note-px=17px",
+          "lensCx": "--gl-lens-cx=1420px",
+          "lensCy": "--gl-lens-cy=600px",
+          "lensR": "--gl-lens-r=359.97px",
+          "lensGrayscale": "--gl-lens-grayscale=1",
+          "lensContrast": "--gl-lens-contrast=1.1",
+          "lensBrightness": "--gl-lens-brightness=0.5",
+          "lensMultiply": "--gl-lens-multiply=0.8",
+          "columnWidth": "--gl-column-width=976.84px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:H1b-estratega-uniforme",
+          "lensSrc": "asset-ref:plate:H1b-estratega-uniforme",
+          "alt": "Una estratega de Efeonce, con el uniforme del equipo, revisa el tablero de entregas del cliente"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:measure-880-brand"
+        },
+        "voice": {
+          "question": "¿Cuántas llegan a tiempo?",
+          "answer": "88 %",
+          "eyebrow": "Lo medimos"
+        },
+        "body": "de las entregas de Sky llegaron a tiempo en 12 meses. Lo ves en tu portal, no en un informe que llega tarde.",
+        "figures": [
+          {
+            "value": "0,12",
+            "label": "ajustes por pieza"
+          },
+          {
+            "value": "39",
+            "label": "campañas"
+          }
+        ],
+        "note": "caso publicado de Sky Airlines, métricas de entrega de 12 meses"
+      },
+      "template": "ContentMeasure",
+      "contractHash": "533651f9bcf7e0a1506fc2282ca296701a29a874c91dce0acaa22f031ab1961c",
+      "templateHash": "c65b5f871a4645ec49d851e744ccf125b446bed4a29a5f0ab5e2d09d07c960ac"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

@@ -79,6 +79,28 @@ automatically creates a product brand or a business line.
 7. Greenhouse is the operational/customer control plane and may be part of an offer without becoming the seller of
    every service.
 
+### Aplicación 2026-10-05 — identidad del chrome de Greenhouse
+
+Decisión explícita del operador: Efeonce firma la navegación y Greenhouse identifica la plataforma en el footer.
+Aplica al portal interno y cliente, en los layouts Vuexy vertical y horizontal:
+
+- Menú expandido y cabecera horizontal: logo Efeonce oficial; menú colapsado: isotipo Efeonce oficial.
+- Lateral navy: assets negativos blancos, incluso con el contenido en tema claro.
+- Footer del portal: logo Greenhouse sin claim, azul en tema claro y blanco en tema oscuro.
+- El texto alternativo identifica la marca pintada. El nombre del producto, rutas, metadata y permisos siguen
+  siendo Greenhouse; este cambio no renombra el producto ni altera los documentos institucionales.
+- Reusar el registro de assets y los adapters Vuexy existentes; no reconstruir SVG ni crear otro shell.
+
+**Metadata del portal (aprobación posterior del operador, 2026-10-05):** título general
+`Efeonce | Greenhouse`; títulos contextuales `Efeonce | Acceder`, `Efeonce | Proyectos` y
+`Efeonce | Finanzas`, con etiquetas equivalentes en inglés según el locale. El helper compartido vive en
+`src/lib/copy/portal-metadata.ts`; los nombres de navegación se reutilizan del canon existente. Esta aplicación
+abarca el título raíz, login, listado/detalle de proyectos y resumen de finanzas. Los overrides de otras
+secciones mantienen su contrato vigente; no aplicar una plantilla global que duplique prefijos o sufijos.
+
+Esta aplicación actualiza la regla anterior «Greenhouse en toda navegación de la app» de `DESIGN.md` y sus
+invariantes. Los SVG Efeonce locales deben conservar la paridad con `@efeoncepro/axis-brand-assets`.
+
 ## 5. Commercial data contract
 
 Commercial records should preserve the layers instead of using a single “business unit” label:
@@ -103,3 +125,46 @@ providers must be corrected when they are current operating or commercial guidan
 identifiers may retain the old label when changing it would corrupt evidence; add a pointer to this decision instead.
 
 Canonical sources that describe the portfolio should link here rather than restating a competing taxonomy.
+
+## Aplicación 2026-10-05 — Efeonce Factory
+
+[Efeonce Factory](EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) nombra la vía comercial On-Demand aceptada
+por el operador. Efeonce conserva la relación contractual y las prácticas existentes conservan ownership de
+servicio/delivery/economics. Arranca con contenido y diseño dentro de Creative Services; ampliaciones requieren
+su práctica dueña. Su clasificación definitiva de marca e identidad visual permanecen abiertas. Esta vía no
+crea por inferencia business line, entidad, product brand, runtime, enum comercial ni pipeline CRM nuevos.
+
+### Aclaración aceptada 2026-10-05 — Factory transversal
+
+El [delta aceptado de Factory](EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md#delta-aceptado-2026-10-05--alcance-transversal)
+sustituye el arranque limitado a contenido/diseño y dos ofertas de la aplicación anterior. Factory vende encargos
+On-Demand de las capacidades actuales de Efeonce, incluidas web, contenido, audiovisual y medios. Campaña y kit
+son ejemplos opcionales; cada práctica conserva ownership y economía.
+
+### Clasificación aceptada 2026-10-05 — Factory es la modalidad On-Demand
+
+Decisión del operador: **Efeonce Factory es la modalidad On-Demand de Efeonce**, es decir, la capa *Engagement* de §2
+con nombre propio. No es una business line, ni una product brand, ni una oferta: proyectos con inicio, fin, alcance y
+precio cerrados, de cualquier línea (Brand, Engine, Revenue, Voice…). Su contraparte es el engagement On-Going
+(retainer), que no lleva marca propia.
+
+- Se dice «un proyecto Factory de Engine» o «Brand On-Demand vía Factory». La línea dice qué se hace; Factory, cómo
+  se contrata.
+- Su marca lleva el acento Growth de la masterbrand porque cruza todas las líneas
+  ([marca de Factory](EFEONCE_FACTORY_MARK_DECISION_V1.md)). En el entregable de un proyecto Factory manda la
+  identidad de la línea dueña; Factory aparece como contexto en su variante neutra (blanca), nunca como un segundo
+  acento.
+- No crea business line, entidad, enum comercial ni pipeline CRM nuevos; la práctica dueña conserva ownership y
+  economía de cada encargo.
+
+## Aplicación 2026-10-08 — marca de Efeonce Rooms
+
+[Efeonce Rooms](rooms/README.md) es la sala de venta de Efeonce: sirve a propuestas creativas y SEO/AEO, a veces en la
+misma sala. Su marca entra a la fila de productos (Marketing Studio, Creative Studio, Factory) con el acento Growth de
+la masterbrand porque, como Factory, no pertenece a una sola línea
+([marca de Rooms](rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md)).
+
+- Aplica la regla 1 de §4: la firma es siempre «efeonce | Rooms», nunca «Rooms» suelto en publicidad; «rooms» es casi
+  genérico en la categoría de salas de venta digitales.
+- La marca no decide su clase en la taxonomía de §2, ni producto, publicación o el go de
+  [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md).

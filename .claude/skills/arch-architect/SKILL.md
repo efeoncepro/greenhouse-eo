@@ -361,3 +361,24 @@ All architecture specs go in `docs/architecture/GREENHOUSE_<TOPIC>_V<N>.md`. Num
 ADRs (if/when adopted) go in `docs/adr/ADR-NNNN-*.md`. (Greenhouse currently embeds decisions in V1 specs rather than separate ADRs; consult with user before introducing the ADR pattern broadly.)
 
 Reading order in `docs/architecture/` is documented in `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
+
+## Cotizador V3: extracción y paridad futura
+
+Ante evolución del motor de pricing local, cargar
+[ADR operativo](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md),
+[contrato de agentes](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[mapa de promoción](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
+Kernel Decimal puro, resolver/composer/portfolio/credits y adapters de archivos/digests separan dominio de IO;
+los consumers no poseen fórmulas. Snapshots conservan versiones y replay; mantenimiento crea sucesores,
+contextDigests/baseDigest/previewDigest conservan bloqueo optimista e impacto. Artefactos viejos no se repricean.
+Las versiones vigentes las nombra un puntero (`data/pricing/v3-operating/current.json`: ruta, versión y digest de
+catálogo, política y créditos) que `--current` verifica antes de usar y `current set --confirm <pointerDigest>`
+mueve; no resolver «la última versión» por nombre de archivo ni borrar versiones viejas (los artefactos dependen de ellas).
+
+El flujo V3 es local opt-in y sus fuentes review-only no pasan a source of truth canónico por inferencia.
+Para extracción/API/UI/MCP reutilizar primitives de simulación/redacción/submit existentes: tenancy/autoridad,
+audiencias, idempotencia/lifecycle/audit, schema/error/cifras comunes y rollout/readback/rollback propios.
+Preview local redactado no sustituye audiencia/permisos server-side; readiness nunca otorga autoridad comercial.
+No crear endpoint por botón, una API paralela de quotes, client-side math o conexión productiva desde esta documentación.
+El costo de personas del catálogo V3 es el nivel salarial objetivo del Excel de pricing, no la nómina (decisión del
+CEO, 2026-10-11): no diseñar la extracción «conectando payroll real» como base de costo del cotizador.

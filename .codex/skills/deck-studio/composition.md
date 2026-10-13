@@ -170,6 +170,36 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   SEO/AEO sobre siete plantillas nuevas. **Nunca** se agrega una
   plantilla sin su receta ni una receta sin la aprobación del operador.
 
+### Trampas medidas: `cover-proposal`, `decision-case` y `content-team` dentro de una propuesta técnica
+
+Medidas al traer láminas del compositor como imagen a una propuesta técnica hecha con generador propio (Pibank y UTEM,
+2026-10-07/08; Sika, 2026-10-12). Son límites de las recetas de hoy: se resuelven así, **nunca** editando la plantilla
+ni rehaciendo la lámina a mano.
+
+- **`cover-proposal`: la selección «Cliente» no se apaga desde el intent.** Pinta etiqueta, cursor, marco y manijas
+  sobre el logo del cliente aunque nadie la pida (`selection: false` se ignora, `null` rompe el render, `"none"` es
+  inválido; detalle en `efeonce-graphic-line`, `references/lessons.md`, 2026-10-07). Hoy se borra en post con un script
+  propio de cada composición: `quitar-seleccion-portada.mjs` (Pibank y UTEM) y, para el layout `dawn`,
+  `ai-generations/2026-10-12_sika-propuesta-tecnica/quitar-seleccion-dawn.mjs` (repone etiqueta y cursor con el espejo
+  izquierdo de la lámina, simétrica en x = 960; rellena el marco interpolando en vertical; devuelve intactos los
+  píxeles del logo). Las coordenadas y el umbral de color son de esa lámina y ese logo: con otro logo se revisa al
+  100 % que no quede resto.
+- **`cover-proposal`: la respuesta va en una línea.** Con dos líneas se monta sobre la burbuja URL (Sika, 2026-10-12).
+  Se acorta la respuesta; no se mueve la burbuja.
+- **`decision-case` sólo compone en claro y en línea `growth`.** `line: "brand"` con `theme: "light"` falla con
+  `line-piece-keeps-efeonce-dark` (lo mismo `content-clients`). En un deck oscuro de otra línea entra como lámina clara
+  de Growth; si debe quedar en un solo acento, se recolorea la imagen (`recolor-engine.mjs` del caso UTEM), decisión
+  del operador. Cada cifra lleva `source` y la foto es la del caso: el operador la elige (Sika: pidió la del avión).
+- **`decision-case` es LA lámina de caso de éxito.** Una versión dibujada a mano con las mismas cifras fue rechazada
+  (Sika, 2026-10-12: «esta no es la lámina de caso de éxito nuestra»); en el brochure Servicios web el operador ya la
+  había pedido por nombre.
+- **`content-team`: trunca nombres completos y muestra la selección «Cliente»** (Sika, 2026-10-12); además exige cinco
+  fichas. En ese caso el equipo se armó a mano con las fotos reales del squad
+  (`src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`). Es una brecha de la plantilla, pendiente de
+  corregir: no la tomes como permiso para dibujar otras láminas con receta.
+
+Procedimiento completo del caso Sika: [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md).
+
 ### Mapa receta → plantilla (las 78, verificado contra `recipe-map.json` y `registry.json` el 2026-09-28)
 
 El autor escribe la columna 2; la 3 la deriva el mapper y la 4 la elige el selector del catálogo (nunca el autor).

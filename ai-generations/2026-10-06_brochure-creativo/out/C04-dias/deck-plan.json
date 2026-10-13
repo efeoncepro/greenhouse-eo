@@ -1,0 +1,46 @@
+{
+  "tenderId": "C04-dias",
+  "slides": [
+    {
+      "slideId": "deck-section-split",
+      "contentType": "deck.section-split.corner-bottom",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "layout": "corner-bottom",
+          "margin": 140,
+          "questionTop": 600,
+          "answerTop": 670,
+          "answerPx": 132,
+          "numberTop": "--gl-number-top=260px",
+          "labelTop": "--gl-label-top=450px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "panelWidth": "--gl-panel-width=960px",
+          "panelRadius": "--gl-panel-radius=300px",
+          "photoLeft": "--gl-photo-left=660px",
+          "photoWidth": "--gl-photo-width=1260px",
+          "panelLeft": "--gl-panel-left=0px",
+          "columnWidth": "--gl-column-width=820px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:section-split-indicator-corner-bottom-3-of-5-growth"
+        },
+        "photo": {
+          "src": "asset-ref:plate:SP2b-dias-no-meses-isotipo",
+          "alt": "Un creativo de Efeonce con polo cuelga pruebas impresas en una pared de referencias y mira hacia atrás sonriendo, con más láminas en la otra mano"
+        },
+        "progress": {
+          "number": "03",
+          "label": "Sección 3 de 5"
+        },
+        "voice": {
+          "question": "¿Cuánto tarda tu campaña?",
+          "answer": "En días"
+        }
+      },
+      "template": "SectionSplitCornerBottom"
+    }
+  ]
+}

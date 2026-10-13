@@ -1,0 +1,34 @@
+{
+  "tender_id": "519302-9-LE26",
+  "observed_on": "2026-10-10",
+  "files": [
+    {
+      "file": "ANEXO ECONOMICO.docx",
+      "size": 17481,
+      "sha256": "110d9844a0d48c55385e2c4fca09651438fbf2ca178e5635954cd619e98a8f58",
+      "status": "original_downloaded",
+      "source": "Mercado Público"
+    },
+    {
+      "file": "ANEXOS ADMINISTRATIVOS.docx",
+      "size": 28867,
+      "sha256": "051d1aacdfbbacf539c68e64849d48bdf9cd20563be48bcaf62ce0b41d1cfb8b",
+      "status": "original_downloaded",
+      "source": "Mercado Público"
+    },
+    {
+      "file": "ANEXOS TECNICOS.docx",
+      "size": 28811,
+      "sha256": "d7cd089899be10307cd44f11d20f83e35ef85f3d2189811a3844163107ae995f",
+      "status": "original_downloaded",
+      "source": "Mercado Público"
+    },
+    {
+      "file": "RE N° 381 APRUEBA BASES CAMPAÑA MKT DIGITAL.pdf",
+      "size": 816229,
+      "status": "original_pending_recaptcha",
+      "sha256": null,
+      "source": "Inventario LicitaLAB; extracción RAG dirigida"
+    }
+  ]
+}

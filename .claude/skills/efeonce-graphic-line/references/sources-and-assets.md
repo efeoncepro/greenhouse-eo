@@ -1,5 +1,9 @@
 # Dónde está cada cosa
 
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
+
+> Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
+
 > Verificado contra: axis-design-system@e26bd85 (iconografía y versiones: AXIS `main@5b8ab20`, tag `v0.3.6`) y
 > greenhouse-eo@051660d73 — 2026-09-26. Plastilina en volumen (D24): AXIS `main@c18e3d3` — 2026-09-27. Oficio (D25,
 > catálogo de 60 y 33 volúmenes): AXIS main@aa66225, 2026-09-27 (tag `v0.5.0`). IA, social y staff (D26, catálogo de
@@ -7,6 +11,19 @@
 > greenhouse-eo@016d0a183 — 2026-09-27 (tag AXIS `v0.3.8`). Versiones vigentes y fila de Glitch: greenhouse-eo@24e4c72ee
 > — 2026-09-28 (tag AXIS `v0.3.24`). Efeonce AI Visibility Report: AXIS `main` `26097c5`, tag `v0.3.30` — 2026-09-29.
 > Módulos de correo y camino recorrido: AXIS `main` `c92160b`, tag `v0.3.38` — 2026-09-29.
+
+## Entrada actual de descubrimiento — 2026-10-04
+
+Verificado contra: `axis-design-system@aee99d2`. Empezar por `/agents/` y
+`/agents/capabilities.json` (41 capacidades). Los packages poseen exports y archivos; Lab proyecta
+referencias; checkout ejecuta CLIs; cada consumidor mantiene sus adapters. Los mínimos y versiones
+históricas de las tablas siguientes no prueban el estado del tarball actualmente instalado.
+
+| Recurso | Fuente actual | Descubrimiento |
+| --- | --- | --- |
+| Íconos | `axis-graphic-line` 0.17.0 publicado: `/icons`, `/icons/aeo`, `/icons/seo`, `/icons/authority` | `/references/iconography/` y `.json`: 134 únicos, 109 canónicos + 25 candidatos; [estado](iconography.md) |
+| Logos | Fuente `axis-brand-assets/logos`: `AXIS_LOGO_ASSETS`, `AXIS_LOGO_FAMILIES`, `findLogoAsset`, `logoAssetUrl`; nuevo release pendiente, aunque workspace declare 0.4.18 | `/references/logos/` y `.json`: 223 assets, 52 familias; [límites](package-and-tokens.md) |
+| Títulos del Lab | `LabHeading.astro`, `editorial-typography.css`, token `efeonceGraphicLine.type.answer.family` | [Implementación y gates](lab-components.md); specimens conservan contrato |
 
 ## Fuentes de verdad (por orden de autoridad)
 
@@ -96,8 +113,11 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | Qué | Dónde |
 |---|---|
 | Logos, isotipos, burbujas URL, 48 órbitas estáticas | `@efeoncepro/axis-brand-assets` (nunca copias a mano) |
-| Marca de Insights (logo, isotipo, lockup) | `@efeoncepro/axis-brand-assets` **0.4.0** (`insights-*`); Greenhouse fija 0.3.5 y no los trae; Think usa copias manuales en `efeonce-think/public/branding/insights/` (5 de los 6 SVG, sin `insights-isotype-positive`; en código sólo los dos lockups) + `og-insights.png`, generada por `efeonce-think/scripts/build-insights-og.mjs` (regenerarla si cambia el lockup) |
-| Submarcas SEO/AEO (logo, isotipo de SV360 y AEO, lockup, `sv360-name-lockup`; variantes positive/negative/white) | `@efeoncepro/axis-brand-assets` **0.4.2** (publicado el 2026-09-29; `AXIS_SEO_AEO_BRANDS`; 0.4.3, del mismo día, sólo re-sella las órbitas estáticas con el contrato 0.4.0); Greenhouse fija 0.4.1 y los recibe con TASK-1938. Nunca copias a mano: se regeneran con `scripts/brand/build-seo-aeo-logos.mjs` |
+| Marca de Insights (logo, isotipo, lockup) | `@efeoncepro/axis-brand-assets` **0.4.0** (`insights-*`); Greenhouse fija 0.4.25 y ya los trae; Think usa copias manuales en `efeonce-think/public/branding/insights/` (5 de los 6 SVG, sin `insights-isotype-positive`; en código sólo los dos lockups) + `og-insights.png`, generada por `efeonce-think/scripts/build-insights-og.mjs` (regenerarla si cambia el lockup) |
+| Submarcas SEO/AEO (logo, isotipo de SV360 y AEO, lockup, `sv360-name-lockup`; variantes positive/negative/white) | `@efeoncepro/axis-brand-assets` **0.4.2** (publicado el 2026-09-29; `AXIS_SEO_AEO_BRANDS`; 0.4.3, del mismo día, sólo re-sella las órbitas estáticas con el contrato 0.4.0); Greenhouse fija 0.4.25 y los usa en el PDF del AI Visibility Report (TASK-1938), rasterizados y sellados en `public/branding/pdf/`. Nunca copias a mano: se regeneran con `scripts/brand/build-seo-aeo-logos.mjs` |
+| Marca de producto Creative Studio (logo, lockup, short-lockup, compact, stacked y short-stacked lockup, isotipo, ícono; variantes positive/negative/white; 2026-10-06) | `@efeoncepro/axis-brand-assets` **0.4.26** (`creative-studio-*`, 24 SVG; release en curso el 2026-10-06, verificar el tag antes de darlo por publicado). Nunca copias a mano: se regeneran con `scripts/brand/build-creative-studio-logos.mjs`. Uso de las piezas cortas («Studio» a secas): [ledger.md](ledger.md) 2026-10-06 |
+| Marca de producto Efeonce Rooms (logo, lockup, compact, stacked lockup, isotipo de dos órbitas enlazadas con la esfera a la 1:30, ícono; variantes positive/negative/white; 2026-10-08) | `@efeoncepro/axis-brand-assets` **0.4.27** (`rooms-*`, 18 SVG; commits AXIS `6e1621b` + `1dfb95c` + `f249e82` en `main`; publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages); hasta 0.4.28 sólo en el paquete por `AXIS_LOGO_EXCLUSIONS`; desde 0.4.29, públicos en «Logotipos» del Lab). Nunca copias a mano: se regeneran con `scripts/brand/build-rooms-logos.mjs`. ADR: `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md` |
+| Efeonce Wave, Efeonce Reach y Efeonce Globe en la familia (ruta H3; `logo` = logotipo solo, sin «by efeonce»; `lockup` «efeonce \| producto» por defecto junto a Efeonce; `isotype`; `isotype-small` sólo Reach y Globe, ≤ 24 px; variantes positive/negative/white; en los isotipos, `negative` = `white`: todo blanco sobre oscuro; 2026-10-09) | `@efeoncepro/axis-brand-assets` **0.4.28** (`{wave,reach,globe}-{logo,lockup,isotype}-*` + `{reach,globe}-isotype-small-*`, 33 archivos; AXIS `7c96680` + `5346761` en `main`, tag `v0.4.28` publicado; hasta 0.4.28 las piezas nuevas quedaban sólo en el paquete por `AXIS_LOGO_EXCLUSIONS`, desde 0.4.29 son públicas en «Logotipos» del Lab). Originales versionados en AXIS `packages/brand-assets/sources/product-family/` (nunca publicados); se regeneran con `packages/brand-assets/scripts/product-family.mjs` + `pnpm seal`, nunca a mano. Greenhouse fija 0.4.25 (adopción: TASK-2014). ADR: `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` |
 | Masters del motion del logo | `gs://efeonce-group-axis-public-media/motion/logo/v1.1/…` (público, CORS para el Lab) |
 | Kit de la identidad sonora (recomendada) | `gs://efeonce-group-axis-public-media/sonic/v1/` → `masters/` (logo, etiqueta con voz, motion WAV+MP4 16:9/9:16, piezas largas, cierre de energía, voz sola) y `web/` (MP3, MP4 720p, pósters WebP); 65 archivos. Producción: `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`; binarios fuera de git: `pnpm ai-gen:pull` si faltan) |
 | Sonido de Glitch (sólo Glitch, versión B) | `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`masters/` + `web/`); lo produce el taller `efeonce-brand-workshop` → `tools/glitch-motion/src/sound.mjs`. Detalle: [glitch.md](glitch.md) §13 |
@@ -105,10 +125,10 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | MP4, GIF y cuadros finales para el equipo | OneDrive `Alineación/5. Contenidos/13- Branding/Motion Órbita Efeonce/v1.1/` |
 | Versiones web del motion y pósters | Lab `apps/lab/public/media/graphic-line/motion/` |
 | Fotos de las láminas (lente, oficina, merch) | Lab `apps/lab/public/media/graphic-line/assets/` (`of-*.webp`, `ia-*.webp`, `L*-*.webp`) |
-| PNG para correo (logo 220, eslogan por línea separado del logo, 4 redes, burbuja horneada) | `@efeoncepro/axis-brand-assets` **0.4.6** (`assets/email/`, `AXIS_EMAIL_ASSETS`, `findEmailAsset`, `emailAssetUrl`); se regeneran con `pnpm email:assets` en AXIS; Greenhouse fija 0.4.5 y todavía no los usa |
+| PNG para correo (logo 220, eslogan por línea separado del logo, 4 redes, burbuja horneada) | `@efeoncepro/axis-brand-assets` **0.4.6** (`assets/email/`, `AXIS_EMAIL_ASSETS`, `findEmailAsset`, `emailAssetUrl`); se regeneran con `pnpm email:assets` en AXIS; Greenhouse fija 0.4.25; los usa sólo el PDF del AI Visibility Report (las cuatro redes `email-social-*-white`, `scripts/pdf/ai-visibility-brand-assets.ts`); los correos de `src/emails/` todavía no |
 | Firma de correo (personal y de equipo) | contrato `efeonce.email-signature`; imágenes en `gs://efeonce-group-axis-public-media/email-signature/v3.1/` (`shared/<dark\|light>/`, `people/<persona>-<dark\|light>.png`, `areas/<área>-<dark\|light>.png`); generador vigente `ai-generations/2026-09-26_firma-partners/build4.mjs` (sin versionar: `pnpm ai-gen:pull` si falta; `HOST_BASE=<url>` escribe `hosted/` y los HTML de Outlook; `AREA=<área>` para la de equipo). La exploración de `exploracion-v5/firma/` es histórica (origen del token `portrait`) |
 | Kits 3D, prendas, lanyard, SVG oficiales | OneDrive `…/13- Branding/` (ver skill `efeonce-brand-studio`) |
-| Íconos de la línea (79 glifos aprobados: 36 Trazo + 43 Plastilina, desde D26) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons` (79 desde 0.6.0, tag `v0.6.0`; 60 en 0.5.0; 30 en 0.4.0); en archivos, `pnpm icons:export` en AXIS (SVG por glifo y estado + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
+| Íconos de la línea (109 glifos aprobados: 60 Trazo + 49 Plastilina, en 0.17.0) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons` (historia: 79 desde 0.6.0, tag `v0.6.0`; 60 en 0.5.0; 30 en 0.4.0); en archivos, `pnpm icons:export` en AXIS (SVG por glifo y estado + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
 | Plastilina en volumen (43 PNG desde D26, 1024 px, alfa) | `@efeoncepro/axis-brand-assets` 0.3.4 (publicado con el tag `v0.6.0`; la 0.3.3 trae 33 y la 0.3.2 los 18 de la base): `assets/volume/<glifo>.png`, sellados en `src/volume-manifest.ts`; `volumeIconUrl(glyph)`. Nunca se regenera dentro de una pieza |
 | Prompt canónico del volumen | AXIS `docs/agent-composition/iconography/volume-prompt.txt` (copia en el Lab: `/media/iconography/volume-prompt.txt`). No se reescribe: si un detalle falla, se agrega UNA línea |
 | Corridas del volumen (no canónicas) | Greenhouse `ai-generations/2026-09-27_plastilina-3d-gpt/` (`ref/`, `crudo/`, `alfa/`, prompts, QA; la vía aprobada) y `ai-generations/2026-09-26_plastilina-volumen/` (intento Blender, rechazado). Canvas «Íconos de La órbita» (claude.ai artifact Y9mx42L72zYc6iLg4j3Maj): lámina Y2 aprobada, Y1 (Blender) descartada |

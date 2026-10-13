@@ -1,0 +1,45 @@
+{
+ "id": "BS1b-del-manual-al-sistema",
+ "formato": "16:9",
+ "impacto": true,
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "karo"
+  }
+ ],
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "escena": "SCENE (cinematic, Hollywood still, a vast dark creative studio at night): Karo, as in her reference, the art director, stands behind a long dark worktable, framed from the waist up, wearing the Efeonce hoodie exactly as in its reference; she stands entirely in the right half of the frame: from the left edge to the middle of the frame there is only empty dark studio, with nothing lit in it. Her head stays almost frontal and her eyes turn toward the empty dark left of the frame, where the text will sit, with a confident, slightly sideways half-smile. On the table in front of her and to the camera-right lies a CLOSED, heavy, hardbound brand book, in shadow, matte, its cover blank with no letters; her right hand rests flat on its cover, her left arm relaxed, both arms fully visible. THE PHENOMENON: from the edge of the closed book, the brand identity of a fictitious brand rises into the air as an ORDERED SYSTEM of cool white-azure light (#0375DB), floating above the camera-right half of the table, between her shoulder and the right edge of the frame: one simple abstract geometric mark of a FICTITIOUS client brand — two interlocking open squares, thin and precise; it must NOT resemble the emblem on her hoodie in any way: no rocket, no ship, no ellipse, no orbit, no windows, no dot — a row of five colour swatches, stacked blocks of thin lines that suggest typography (no readable letters), a fine layout grid, and in front of them three finished pieces built from those parts — a vertical story, a square post and a wide banner — all sharing exactly the same look, each carrying the same two-square mark, with no orange on them. Everything is aligned to one invisible grid, precise, like an exploded technical drawing made of light; it rises up to her shoulder height and never above her head, never in front of her face and never into the left half of the frame. On the large abstract mark only, ONE single tiny point glows vivid orange (#FF6500), the only orange in the whole frame; it lights nothing around it. The Efeonce emblem appears ONLY embroidered on her hoodie, nowhere else in the frame. LIGHT: the light system is the only key light, from below and the camera-right, cool white; NO fill light, the far side of her face in shadow with the nose shadow legible; the book stays dark, only its edge catches a rim. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm f/2. Thin haze catches the light. The LEFT 55 % of the frame is calm, deep dark studio space with only faint haze: no objects, no light shapes. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any brand.",
+ "lecho": {
+  "objeto": "the near-black matte edge of a long worktable right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark studio space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "registro": "cine",
+ "desde": "CR4",
+ "alcance": "deck-seccion",
+ "linea": "brand",
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "llave": {
+  "fuente": "the identity system of light rising from the brand book",
+  "lado": "from below and the camera-right, at chest height",
+  "tamano": "about 60 cm across",
+  "distancia": "about fifty centimetres from her face"
+ },
+ "primerPlano": "the dark out-of-focus corner of a stack of printed proofs on the table edge, cut by the frame at the bottom right corner",
+ "fondo": "a few large cold practical lights far behind on the right, melted into round bokeh",
+ "fenomeno": {
+  "que": "a closed, heavy brand book on the table lies in shadow while, from its pages, the brand identity rises as an ordered system of cool light: a mark, a colour palette, type blocks, a grid and the first finished pieces built from them",
+  "esServicio": "Brand Systems: la marca deja el manual y se convierte en un sistema que el equipo usa todos los días"
+ }
+}

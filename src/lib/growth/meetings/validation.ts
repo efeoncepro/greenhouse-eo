@@ -6,6 +6,7 @@ import { canonicalizeMeetingTimezone } from './timezone'
 const safeAttributionValue = z.string().trim().min(1).max(80).regex(/^[A-Za-z0-9._~-]+$/)
 
 export const meetingBookingRequestSchema = z.object({
+  measurementContext: z.unknown().optional(),
   schedulerKey: z.string().regex(/^[a-z0-9][a-z0-9_-]{2,63}$/),
   surfaceId: z.string().regex(/^fhsf-[A-Za-z0-9_-]{3,100}$/),
   idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/),

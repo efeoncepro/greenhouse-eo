@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "role_capacity",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-09",
+    "offerId": "talent-assurance-staffing",
+    "engagementCode": "monthly",
+    "accountId": "example-account",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "USD",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "crm",
+        "profile": "ECG-027",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.5"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ]
+  },
+  "work": [
+    {
+      "lineId": "crm",
+      "assigneeIds": [
+        "crm-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "0.25",
+      "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-simulation-service-units",
+        "totalUnits": "100",
+        "allocatedUnits": "25"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "0.2",
+      "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-simulation-service-units",
+        "totalUnits": "100",
+        "allocatedUnits": "20"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": [],
+  "clientProvidedTools": [
+    {
+      "periodId": 1,
+      "toolId": "hubspot",
+      "lineIds": [
+        "crm"
+      ],
+      "reason": "Synthetic confirmed client CRM access, isolated test; not actual client evidence.",
+      "evidence": {
+        "reference": "synthetic:client-access-demo",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "2026-10-31",
+        "status": "confirmed"
+      }
+    }
+  ]
+}

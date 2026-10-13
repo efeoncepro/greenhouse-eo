@@ -1,0 +1,105 @@
+{
+  "tenderId": "P1-partners",
+  "slides": [
+    {
+      "slideId": "deck-content-partners",
+      "contentType": "deck.content-partners",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "answerLeading": "--gl-cpt-answer-leading=1",
+          "answerTracking": "--gl-cpt-answer-tracking=-0.04em",
+          "answerInset": "--gl-cpt-answer-inset=-4px",
+          "questionWidth": "--gl-cpt-question-width=1300px",
+          "bodyTop": 330,
+          "bodyPx": 26,
+          "bodyWidth": 560,
+          "bodyRight": "--gl-cpt-body-right=260px",
+          "sealTop": "--gl-cpt-seal-top=488px",
+          "sealLogo": "--gl-cpt-seal-logo=44px",
+          "sealGap": "--gl-cpt-seal-gap=26px",
+          "sealPx": "--gl-cpt-seal-px=24px",
+          "dividerWidth": "--gl-cpt-divider-width=2px",
+          "dividerHeight": "--gl-cpt-divider-height=40px",
+          "ruleTop": "--gl-cpt-rule-top=568px",
+          "ruleStroke": "--gl-cpt-rule=2px",
+          "ruleWidth": "--gl-cpt-rule-width=1640px",
+          "rowHeight": "--gl-cpt-row-height=110px",
+          "logoMaxWidth": "--gl-cpt-logo-max-width=260px",
+          "logoMaxHeight": "--gl-cpt-logo-max-height=96px",
+          "row1Top": "--gl-cpt-row1-top=616px",
+          "row1Width": "--gl-cpt-row1-width=1640px",
+          "row2Top": "--gl-cpt-row2-top=806px",
+          "row2Width": "--gl-cpt-row2-width=1300px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-cpt-progress-3-of-4-brand"
+        },
+        "voice": {
+          "question": "¿Con quién construimos?",
+          "answer": "Con los grandes",
+          "eyebrow": "Partners"
+        },
+        "body": "Programas oficiales de los fabricantes con los que operamos tu contenido.",
+        "seal": "Partner oficial de",
+        "selection": {
+          "label": "Contenido",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 3
+        },
+        "row1": [
+          {
+            "src": "asset-ref:file:hubspot-logotype",
+            "alt": "HubSpot"
+          },
+          {
+            "src": "asset-ref:file:salesforce.com_logo",
+            "alt": "Salesforce"
+          },
+          {
+            "src": "asset-ref:file:adobe-logotype",
+            "alt": "Adobe"
+          },
+          {
+            "src": "asset-ref:file:microsoft_logo_2012",
+            "alt": "Microsoft"
+          },
+          {
+            "src": "asset-ref:file:amazon_web_services_logo",
+            "alt": "Amazon Web Services"
+          }
+        ],
+        "row2": [
+          {
+            "src": "asset-ref:file:google_cloud_logo",
+            "alt": "Google Cloud"
+          },
+          {
+            "src": "asset-ref:file:claude-logotype",
+            "alt": "Claude"
+          },
+          {
+            "src": "asset-ref:file:openai_logo",
+            "alt": "OpenAI"
+          },
+          {
+            "src": "asset-ref:file:byteplus",
+            "alt": "BytePlus"
+          }
+        ]
+      },
+      "template": "ContentPartners"
+    }
+  ]
+}

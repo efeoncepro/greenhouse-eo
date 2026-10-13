@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "pricing-v3-operational-gaps/1",
+  "asOf": "2026-10-11",
+  "commercialStatus": "requires_review",
+  "items": [
+    {
+      "code": "ADOBE_RENEWAL_DATE",
+      "owner": "CEO",
+      "required": "At the renewal of 2026-11-16, record how many licences are kept if that number changes. The price to quote with is already decided",
+      "known": "The contract renews on 2026-11-16 (vendor console shown by the CEO on 2026-10-11: annual plan paid monthly; at renewal the number of licences can be changed or the plan cancelled). Policy v9 declares that date on the Adobe prices, so the commitment reading counts what is left of the running term. The earlier single package of USD 180 was replaced in policy v7 by the two products as invoiced"
+    },
+    {
+      "code": "CURRENT_LICENSE_CONTRACTS",
+      "owner": "Operations/Finance",
+      "required": "Plan, seats, frequency, tax and billing evidence of all actually used tools",
+      "known": "Notion invoice9Business×24USD +30USDcredits through2026-10-20; payment unverified. Other variants historical/public/operator."
+    },
+    {
+      "code": "RESOURCE_ASSIGNMENTS",
+      "owner": "Operations",
+      "required": "Stable user IDs, access rights, purchased quantity and declared client/internal/unassigned capacity perresource/period",
+      "known": "Operator approved declared-capacity method; no actual portfolio provided. Examples synthetic."
+    },
+    {
+      "code": "LOCALIZED_TALENT_COSTS",
+      "owner": "CEO",
+      "required": "Nothing further on the cost basis: decided. A specific cost record only where the target cost of a profile in a country departs from the Chile reference times the talent factor",
+      "known": "Decided by the CEO on 2026-10-11: the quoter prices on the TARGET cost of each profile (the pricing workbook, confirmed by its author), not on current payroll. Current payroll is deliberately lower and the goal is to raise the team's pay to the quoter's figures, so the real margin on people today is higher than the quoter shows. Do not replace the catalog costs with payroll costs, and do not record anyone's pay here. Since catalog v5 the 32 workbook costs are the cost of each profile in Chile; the person's country adjusts them through one talent factor per country"
+    },
+    {
+      "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
+      "owner": "Operations/Finance",
+      "required": "Measured delivery cost and driver for assurance, operations and continuity, to replace the two «TEST ONLY» provisions of the staffing kits",
+      "known": "Still open on 2026-10-11. The assurance and operations requirements of the seven staffing kits resolve to trial-assurance and trial-operations, USD 25 a month each, labelled «TEST ONLY, NOT MEASURED»: placeholders kept from the historical simulation, not measured costs and not a Talent Assurance standard. They enter the cost and the price of every quote of a person sold by dedication (CLP 50,000 a month in designer-on-demand), show as estimated inputs, and compose assess raises PROVISION_COST_EVIDENCE_REQUIRED for them. The trial set-up amount was replaced on 2026-10-11 by the two start-up provisions (see STARTUP_PROVISIONS_NOT_MEASURED); the managed-service provisions are tracked in MANAGED_SERVICE_PROVISIONS_UNMEASURED"
+    },
+    {
+      "code": "COMMERCIAL_POLICY",
+      "owner": "CEO",
+      "required": "Nothing owed by the operator. Exceptions below a floor are decided by the CEO case by case",
+      "known": "Decided by the CEO: 45% is the margin floor of the managed services of the creative practice (2026-10-10; offer creative-managed-service, target 45, minimum 45), and 25% is the margin floor of a person sold by dedication (2026-10-11; offer talent-assurance-staffing, catalog v7), with the price rising from there case by case. The managed services of the SEO/AEO practice have their own offer since catalog v8 (seo-aeo-managed-service): floor 45%, approved on 2026-07-13, and target 55%, the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Where more can be earned the target of the offer is raised, not the floor. The staff-augmentation targets by workbook tier (30% tiers 1 and 2, 35% tier 3, 40% tier 4) were proposed by the agent and confirmed by the CEO the same day; they replace the historical markup. The country factors are closed as policy values (see COUNTRY_FACTORS_UNVALIDATED): confirmed in catalog v10 from 2026-10-12. The 40 target / 35 floor of the readiness proposal was never approved and is not a floor. It was removed from compose assess on 2026-10-11: the reading now reports the pricing rule each line was priced with (its target and floor) and whether the kernel flagged a row. What an offer is sold as is a fact of the catalog since v11 (record kind offer): the two managed services as managed_service, staff augmentation as role_capacity"
+    },
+    {
+      "code": "SERVICE_AND_CONTRACT_TERMS",
+      "owner": "Practice/Commercial/Finance",
+      "required": "Deliverables, cadence, limits, SOW, entity, tax, payment and lifecycle approvals",
+      "known": "Managedservice preview is local redacted simulation; no issue/send."
+    },
+    {
+      "code": "CANONICAL_PROMOTION",
+      "owner": "Platform/Finance",
+      "required": "Accepted integrationunit, V2/V3 parity, tenant/auth/audience/snapshot/lifecycle and rollout verification",
+      "known": "Promotion approved by the CEO on 2026-10-12 as its own program (EPIC-053; decision GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1): a V3-owned registry and API, then the CLI over that API, MCP and the interface last. Approved, not implemented: no API, database, UI or MCP exists yet and the CLI is still local."
+    },
+    {
+      "code": "MANAGED_SERVICE_PROVISIONS_UNMEASURED",
+      "owner": "Operations/Finance",
+      "required": "Measured monthly cost of replacement hours (vacations, leave, turnover) and of the out-of-hours alert guard",
+      "known": "provision-backfill-coverage 200USD and provision-on-call-alert-guard 100USD are declared estimates added 2026-10-10"
+    },
+    {
+      "code": "AGENT_RUNTIME_USAGE_UNMETERED",
+      "owner": "Operations/Finance",
+      "required": "Metered model cost per processed item and the monthly item volume per service",
+      "known": "agent-runtime-usage 10USD per 1,000 items is a hypothesis added 2026-10-10; no meter exists"
+    },
+    {
+      "code": "SOCIAL_INBOX_NOT_CONTRACTED",
+      "owner": "Operations/Commercial",
+      "required": "Chosen inbox, plan, seats, profiles covered and who pays the license",
+      "known": "Operator confirmed Sprout Social Advanced on 2026-10-10. Policy v4 carries the public price: 399USD per seat per month on annual billing (sproutsocial.com/pricing, read 2026-10-10) and 499USD on monthly billing (third-party guides). Contracted plan, seat count, billing term and who pays remain unconfirmed"
+    },
+    {
+      "code": "MANAGED_SERVICE_SETUP_NOT_PARAMETRIC",
+      "owner": "Finance/Architecture",
+      "required": "A setup that scales with onboarding weeks and people instead of a fixed catalog amount",
+      "known": "managed-service-core carries no setup; setup is quoted outside the V3 flow. Still not modelled on 2026-10-11: a managed-service quote has no start-up row, so an all-in price of a managed service (agreed_total) covers its fee only, and a waived start-up of a managed service is a text of the document with no reference value"
+    },
+    {
+      "code": "MARGIN_FLOOR_SCOPE",
+      "owner": "CEO",
+      "required": "Nothing further: decided. A managed service whose target should sit above the floor gets a higher target in its own pricing policy",
+      "known": "Decided by the CEO on 2026-10-10: 45% is the margin floor for managed services, and a service where more can be earned raises its target, not the floor. creative-managed-service encodes target and minimum 0.45 from the floor approved 2026-07-13. SKY social care 2027 (CLP 4,990,000 per month, 40.26% modeled margin) is an approved exception because SKY is an existing client"
+    },
+    {
+      "code": "QUOTE_FX_REVIEW",
+      "owner": "CEO",
+      "required": "Review the quote FX when the market moves beyond its margin, and decide CLF and the EUR reference, which were not part of this decision",
+      "known": "Quote FX are CEO policy values with a prudential margin over spot, USD as reference currency: USD to CLP 1000 (spot ~937), COP 3650 (~3219), MXN 19.25 (~17.98), PEN 3.70 (~3.435), all from 2026-10-10. Catalog v6 adds EUR to USD 1.20 (ECB reference 1.1206) as an open-ended estimate under the same instruction; it was not explicitly decided for EUR. USD to CLF 0.024 stays an estimated 2025 value. There is no USD to EUR quote FX, so a quote cannot be issued in EUR"
+    },
+    {
+      "code": "COMMERCIAL_ROUNDING_SCOPE",
+      "owner": "CEO",
+      "required": "Multiples for any further quote currency (CLF, EUR) and any offer that should round differently from its currency",
+      "known": "Catalog v4 rounds every offer per currency by CEO decision of 2026-10-10: CLP 10000, USD 10, PEN 50, COP 50000, MXN 100. A currency without a rule is not rounded. Rounding is per billable row; rounding on the period total or to commercial endings such as 990000 is expressed as an agreed net"
+    },
+    {
+      "code": "COUNTRY_FACTORS_UNVALIDATED",
+      "owner": "CEO",
+      "required": "Nothing owed. Closed by the CEO on 2026-10-11: the country factors are the policy values to quote with. Revisit one only when a real hire or a closed deal in that country contradicts it, through a new catalog version; a profile that departs from its country factor gets a specific cost record",
+      "known": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya»): these are the factors to quote with, and catalog v10 records them as confirmed policy values from 2026-10-12. Since catalog v5 there are two country axes. Talent factor on cost, relative to Chile: CL 1; CO 0.80, PE 0.85, MX 0.90, ES 3, US 5 are estimates from job postings and salary guides read on 2026-10-11, one factor per country for every profile. Market factor on the human price: CL 1, CO 0.90 and US 1.10 decided by the CEO from the workbook ranges; PE 0.95, MX 1 and ES 1.10 are estimates. In CO and PE the margin floor follows the factor (floorBasis base_market), so a quote at policy price shows about 41% and 43% real margin without being flagged. Factors by client type (SME, public tender, strategic client) exist in the workbook and are expressed today as an agreed net"
+    },
+    {
+      "code": "UNIT_PRICE_REVIEW",
+      "owner": "Operations",
+      "required": "Review each tool unit price by its review date, and replace it with a new policy version when a provider changes it; confirm the contracted plan where the price is a public list price",
+      "known": "Decided by the CEO on 2026-10-11: a unit price does not expire. Resource policy v6 keeps the 25 tool prices valid until replaced and gives each a review date of 2027-04-11 that warns without blocking; before, every price ended within 30 days of its evidence and blocked the quote. What varies is the number of seats, declared per quote. Most prices are still public list prices marked estimated"
+    },
+    {
+      "code": "ENGAGEMENT_FORM",
+      "owner": "CEO",
+      "required": "Decide whether new quotes must declare the form of the engagement, and whether the Hybrid and Licence/Consulting forms of the workbook are needed. Review the 10% if On-Demand engagements start leaving people unsold when they end",
+      "known": "Decided on 2026-10-11: the form of the engagement is its own datum (catalog v9, contract 1.3.0). On-Going ratio 1, On-Demand ratio 1.10 on the price of every row, same floor as On-Going. The 10% is the workbook's commercial-model multiplier; the CEO left the adjustment to the agent, who kept it. An undeclared form prices as On-Going and says nothing"
+    },
+    {
+      "code": "STARTUP_PROVISIONS_NOT_MEASURED",
+      "owner": "Operations",
+      "required": "Measure account onboarding and recruiting on the next two real incorporations and replace the estimates. Decide whether managed services need a start-up provision",
+      "known": "Since catalog v9: account onboarding USD 200 once per person (default) and recruiting USD 500 once per person (optional, only when a person has to be hired). Both estimates proposed by the agent and accepted by the CEO on 2026-10-11, in place of the workbook rule of one month of the resource's cost. The managed-service kit has no start-up requirement"
+    },
+    {
+      "code": "ADOBE_DISCOUNT_ENDS",
+      "owner": "CEO",
+      "required": "Nothing owed. Closed by the CEO on 2026-10-11: Adobe is quoted without its discount, at the list price printed on the invoice. If Adobe changes its list price, issue a new policy version like any other price change",
+      "known": "Decided by the CEO on 2026-10-11: Adobe Creative Cloud Pro is quoted without its 50% discount from now on, because the discount ends in about 36 days and a fee quoted today has to hold after it. Policy v10: the current price is the list price of invoice 3582641940 with IVA, CLP 325,405.5 a month for three licences (CLP 108,468.5 each), a decided value, marked confirmed in policy v11; no further invoice is needed to quote. The amount actually invoiced until then, CLP 162,605, stays as the price invoiced-with-discount, to be chosen explicitly for a job that ends before the discount does. Adobe Express, 3 licences, CLP 16,240 a month, has no discount. Totals are with IVA by the CEO's decision (the tax is recovered, not month by month). The four content profiles that use Adobe Express were confirmed by the CEO"
+    },
+    {
+      "code": "SUPPLIER_CONTRACT_TERMS",
+      "owner": "Operations",
+      "required": "Declare a term and a renewal date on any other tool whose licences keep being charged after they stop being needed; decide how a quote says whether a seat is bought for a job or already held",
+      "known": "Stated and shown by the CEO on 2026-10-11 and declared in policy v9 as how long a licence, once taken, has to be paid for: Adobe twelve months, renewing on 2026-11-16 (a licence that is bought stays available and keeps being charged until the contract renews); Microsoft 365 one month (invoice G185142527: a one-year commitment billed monthly, but assigning or removing a licence raises or lowers the monthly amount); Notion one month (invoice 0D8C80A9-0039: Business monthly). HubSpot is contracted for a year, but the CEO stated on 2026-10-11 that it is not needed in quotes now (account managers may use it later to manage their portfolio), so its price stays pending on purpose and nothing is declared. A quote carries periods, not the length of the contract, and does not say whether a seat is a new purchase, so the cash reading of an engagement cannot subtract a seat bought for it"
+    },
+    {
+      "code": "THIRD_PARTY_AND_CONTINGENCY",
+      "owner": "CEO",
+      "required": "Adjust the handling rates and the reserve rate with the first real job that carries third-party costs or a fixed scope. Decide whether the reserve also applies to an On-Going service won in a tender with penalties, and how a supplier's payment terms and any commitment that outlives the job are declared",
+      "known": "Built on 2026-10-11 (contract 1.4.0, catalog v10) on the CEO's go-ahead («seguiré tu recomendación»). A third-party cost is declared in the quote with its evidence and priced by the rule of its category: production, talent and printing with a 10% handling and a 5% floor; media and licences at cost. Each is its own row, outside the market factor, the engagement ratio and rate discounts; a cost the client pays directly is a note in no total. A contingency reserve of 12% of the person cost applies to the two managed-service offers when sold On-Demand, as a cost, and leaves a quote only by a declared waiver. All these rates are estimates proposed by the agent. The summary shows the margin of own work next to the blended one. Not frozen in a quote: when a supplier is paid, and whether a purchase binds past the job"
+    },
+    {
+      "code": "NAMED_SEATS_UNDER_TWO_PLANS",
+      "owner": "Finance/Architecture",
+      "required": "Nothing owed. Closed on 2026-10-11: a named tool can be held under several plans in one period, carry a paid seat nobody uses (`idleSeats`) and a seat shared by several people (`seatSharing`); every paid seat is used, shared or declared idle or the quote does not calculate. Still to validate outside the quoter, case by case: that the supplier allows a named seat to be shared",
+      "known": "Found on 2026-10-11 quoting a real managed service with a reinforcement person in five campaign weeks a year. The composer takes one price per tool and period; a seat-priced tool must have exactly as many seats as people using it that period; and an annual subscription cannot change its units or have gaps without a renewal policy. So «one annual seat all year plus one monthly seat in the campaign months» cannot be expressed. Two consistent readings were quoted instead: two annual seats all year with the reinforcement spread evenly over the twelve months, and a monthly-billed account with a second seat in the campaign months. They bracket the real cost; the difference between them is about 2.4 margin points on that quote. Closed the same day. The three purchase plans of that quote now calculate as declared: one monthly seat shared (the CEO's decision), an annual seat plus a monthly one in the campaign months, and two annual seats with one idle for seven months"
+    },
+    {
+      "code": "OPTION_QUOTES_REPEAT_PER_LINE_FEES",
+      "owner": "Finance/Architecture",
+      "required": "Nothing owed. Closed on 2026-10-11: an add-on that extends people already in the base quote is declared as the base with the add-on in it, and `compose increment` reads its price, cost and margin as the difference between the two frozen quotes; `compose document --increment` prints it. A standalone `--option` stays right for an add-on that is a new person or a separate job",
+      "known": "Found on 2026-10-11. The document prints an optional add-on from its own frozen quote, which is the right source for its price. When the add-on is a few more points of a person who is already a line of the base quote, the add-on's quote is a new line and takes the per-line platform fee and its share of the base tools again. Measured on a real add-on of eight points of one person: the fee alone was about a quarter of its cost and moved its margin from above the floor to well below it. The price printed is unaffected; the margin of such an add-on is a lower bound. Closed the same day. On that real add-on the increment removes exactly the per-line fee charged again, and its margin is back above the floor; on the second add-on of that quote the incremental cost matches the one estimated independently"
+    },
+    {
+      "code": "PROJECT_OFFER_NOT_MODELLED",
+      "owner": "Finance/Architecture",
+      "required": "An offer for one-off fixed-scope projects: its offer record with the commercial unit, and its pricing policies. Its target and floor are the CEO’s to decide if it is created",
+      "known": "Found on 2026-10-11 quoting a real fixed-scope web project. There are three offers: two managed services and staff augmentation. A one-off project is quoted today with a managed-service offer sold On-Demand at one price (agreed_total, printed as one line with combine), which brings the 10% ratio and the 12% contingency reserve of that offer. Which of the two managed-service offers fits a project of neither practice is not stated anywhere"
+    },
+    {
+      "code": "PLATFORM_FEE_PER_LINE",
+      "owner": "CEO",
+      "required": "Decide whether the platform fee is prorated by the dedication of the line. Open: not decided either way, and not to be prorated by hand in a quote",
+      "known": "The platform fee is USD 49 a month for each person of a line (one record per profile, estimated; one per line when the line is one person, which is the usual case), charged whole whatever the dedication of the line. Measured on the committed examples on 2026-10-11: 2.8% of the cost of a full-time line (designer-on-demand, CLP 49,000 of 1,768,438); 4.8% of a three-line managed service with two part-time lines (managed-addon-increment, CLP 441,000 of 9,228,927); 5.2% of the own-work cost of a six-line service (managed-on-demand-third-party, CLP 294,000 of 5,666,722); and 24.0% of the cost of a line of 0.08 FTE (managed-addon-increment.option-standalone, CLP 147,000 of 612,288). It weighs on small jobs and on quotes with many part-time lines. An add-on that extends a person already in the base quote avoids charging it twice through compose increment (see OPTION_QUOTES_REPEAT_PER_LINE_FEES); that does not answer this question"
+    },
+    {
+      "code": "TOOLS_WITHOUT_CURRENT_PRICE",
+      "owner": "Operations",
+      "required": "The contracted plan and amount of each tool whose current price holds no amount, issued as a new policy version",
+      "known": "Read on 2026-10-11 with policy v11: the current price of 22 of the 33 tools is pending (no amount), so a quote that uses one of them names another priced id of the same tool (a public plan or the historical value) and reports that choice as an assumption. HubSpot holds no priced id on purpose (see SUPPLIER_CONTRACT_TERMS). Related: UNIT_PRICE_REVIEW and CURRENT_LICENSE_CONTRACTS"
+    },
+    {
+      "code": "TENDER_CEILING_AND_SCORING_NOT_MODELLED",
+      "owner": "Commercial/Finance",
+      "required": "If tenders are to be quoted inside the quoter: the buyer’s price ceiling and the scoring logic of the tender as inputs of a quote",
+      "known": "Found on 2026-10-11 quoting a three-month programme in a public tender. The quoter prices the work and records the agreed price; it does not know the ceiling a buyer publishes or how price is scored against the other bidders. Both are handled outside it"
+    },
+    {
+      "code": "LATE_PAYMENT_COST_OF_MONEY_NOT_MODELLED",
+      "owner": "Finance",
+      "required": "If payment terms are to weigh on a price: the cost of money of a late payment as a cost of the quote",
+      "known": "Not modelled as of 2026-10-11. A quote carries periods and, in its document, payment milestones; neither the payment term nor the cost of financing a late payment enters cost or price. Payment terms are written as condition text of the document"
+    },
+    {
+      "code": "PLATFORM_PANEL_AND_INSIGHTS_NOT_COSTED",
+      "owner": "Finance/Architecture",
+      "required": "If they are to be costed in a quote: the Greenhouse panel and Insights as resources with a cost and a price rule",
+      "known": "Not modelled as of 2026-10-11. Neither is a resource of the catalog or of the resource policy; a quote that includes them carries no cost for them"
+    },
+    {
+      "code": "QUOTE_REGISTRY_IN_GREENHOUSE",
+      "owner": "Platform/Finance",
+      "required": "Delivered by EPIC-053 (registry API: TASK-2027; interface and production render: epic unit without a task yet). Not started",
+      "known": "As of 2026-10-11 the document produced by compose document is a draft: it has no quote number, versions, QR verification, signatures or approval, which exist only in the Greenhouse quoter. Related: CANONICAL_PROMOTION. Outside the quoter by the CEO’s decision of 2026-10-11, and not a pending item: the start date of the service and the length of the contract, because a quote is not a contract"
+    },
+    {
+      "code": "PROVISION_EVIDENCE_READ_FROM_LABEL",
+      "owner": "Platform/Finance",
+      "required": "A declared fact on the resource records of the catalog that says a provision is a test placeholder or is not measured, so that compose assess reads that fact instead of the words of a label",
+      "known": "Open as of 2026-10-11 (close). One free-text match remains in compose assess: PROVISION_COST_EVIDENCE_REQUIRED recognises the test provisions by their label («TEST ONLY», «NOT MEASURED», «trial»). The other one was closed the same day: ALLOCATION_EVIDENCE_REQUIRED reads the evidence an allocation declares (allocations[].evidence) and no longer the wording of its reason. A provision relabelled without those words would stop raising the gap while staying unmeasured. Closing it needs a new catalog version. Related: ASSURANCE_OPERATIONS_ONBOARDING_COSTS, MANAGED_SERVICE_PROVISIONS_UNMEASURED"
+    },
+    {
+      "code": "BLOCKERS_REPEATED_PER_PERIOD",
+      "owner": "Platform",
+      "required": "The blockers of a quote that did not calculate folded by period like the gaps of a calculated one: one entry with its periodIds",
+      "known": "Open as of 2026-10-11 (close). compose assess folds the gaps of a calculated quote that differ only in their period, and counts them before folding in gapOccurrences. A blocked quote still repeats the same diagnostic once per period, under the path the quote reported it with (<period>:<tool>), in the summary and in compose assess alike: a tool without an allocation in a twelve-month quote is twelve entries"
+    },
+    {
+      "code": "QUOTE_DOCUMENT_ALTERNATIVES_NOT_MODELLED",
+      "owner": "Commercial/Platform",
+      "required": "If one document is to present two alternatives of one offer: a block that prints each alternative with its own lines, net, tax and total, taken from its own frozen quote",
+      "known": "Not modelled as of 2026-10-11 (close). Two alternatives of one offer (for instance the same service sold On-Demand and On-Going, or two scopes) are two quotes and two documents. The options block of the document (--option, --increment) is for add-ons that are added to the quote: an option enters no line, net, tax or total, so it cannot stand for an alternative that replaces the quote"
+    },
+    {
+      "code": "ASSESSMENT_SNAPSHOTS_PREDATE_FOLDED_READING",
+      "owner": "Platform",
+      "required": "Nothing owed. If a committed reading is ever needed as a reference of today's shape, run compose assess on its artifact instead of reading the committed file",
+      "known": "As of 2026-10-11 (close). The committed derived readings (*.assessment.json of older examples of this folder and of one prospect folder) predate the folded assessment: one gap per period, paths <period>:<tool>, no gapOccurrences, and ALLOCATION_EVIDENCE_REQUIRED read from the wording of reason. They are dated snapshots and are not regenerated. No committed demand of this folder declares allocation evidence, so today's reading raises ALLOCATION_EVIDENCE_REQUIRED for every tool with an allocation of every example"
+    }
+  ]
+}

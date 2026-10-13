@@ -1,0 +1,26 @@
+{
+  "scope": "derived alpha only; RGB retained; canonical key derivatives preserved separately",
+  "criterion": "source R-B: alpha 0 at <=2, linear feather to full at >=12; specific to warm body/orange on navy of this proof",
+  "stats": [
+    {
+      "icon": "binoculares",
+      "removedPixels": 15239,
+      "featheredPixels": 15564
+    },
+    {
+      "icon": "metronomo",
+      "removedPixels": 304726,
+      "featheredPixels": 4051
+    },
+    {
+      "icon": "sello-aprobacion",
+      "removedPixels": 10295,
+      "featheredPixels": 7402
+    },
+    {
+      "icon": "iman",
+      "removedPixels": 133944,
+      "featheredPixels": 4856
+    }
+  ]
+}

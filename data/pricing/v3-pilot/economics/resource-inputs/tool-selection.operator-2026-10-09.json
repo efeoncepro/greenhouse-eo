@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.tool-selection-inputs.v1",
+  "recordedAt": "2026-10-09",
+  "workUnit": "TASK-2017",
+  "runtimeUse": "review_only",
+  "executableByCli": false,
+  "automaticCatalogUpdate": false,
+  "source": {
+    "kind": "operator_statement",
+    "reference": "pricing-v3-chat-2026-10-09-demand-based-tool-selection",
+    "status": "operator_confirmed_requirement"
+  },
+  "rules": [
+    {
+      "ruleId": "base-notion",
+      "resource": "Notion",
+      "historicalResourceId": "ETG-015",
+      "appliesTo": "all_contributing_roles",
+      "selection": "required",
+      "reason": "PMS de Efeonce, necesario para todos según el operador.",
+      "allocationPolicy": null
+    },
+    {
+      "ruleId": "base-microsoft-365",
+      "resource": "Microsoft 365",
+      "historicalResourceId": "ETG-016",
+      "appliesTo": "all_contributing_roles",
+      "selection": "required",
+      "reason": "Base común de trabajo, necesaria para todos según el operador.",
+      "allocationPolicy": null
+    },
+    {
+      "ruleId": "seo-writing-semrush",
+      "resource": "SEMrush",
+      "historicalResourceId": "ETG-004",
+      "appliesTo": "seo_writing_work",
+      "selection": "required",
+      "reason": "El operador identifica SEMrush como herramienta necesaria para un redactor SEO.",
+      "profileBinding": null,
+      "allocationPolicy": null
+    },
+    {
+      "ruleId": "seo-writing-adobe",
+      "resource": "Adobe Creative Cloud",
+      "historicalResourceId": "ETG-001",
+      "appliesTo": "seo_writing_without_visual_production",
+      "selection": "not_required_by_default",
+      "reason": "Redacción SEO por sí sola no requiere suite Adobe; una tarea visual adicional debe justificar su selección."
+    }
+  ],
+  "conditionalAiResources": [
+    {"resource": "Higgsfield", "costReference": "2026-10-09-operator.json", "budgetKind": "provider_credit", "assignment": "pending_by_role_and_work"},
+    {"resource": "Magnific", "costReference": "2026-10-09-operator.json", "budgetKind": "provider_credit", "assignment": "pending_by_role_and_work"},
+    {"resource": "ChatGPT", "historicalResourceId": "ETG-007", "plan": null, "currentCost": null, "budgetKind": "plan_dependent", "assignment": "pending_by_role_and_work"},
+    {"resource": "Claude Team", "costReference": "claude-team.public-pricing-2026-10-09.json", "budgetKind": "named_seat_and_explicit_additional_usage", "assignment": "pending_by_role_and_work"}
+  ],
+  "compositionRequirements": [
+    "Combine mandatory common tools with role requirements, actual work and explicit service requirements.",
+    "An agent explains each inclusion, omission, allocation and missing input; it does not invent prices or allocation percentages.",
+    "All contributing people require the common base; this does not imply a new full provider subscription per quote, person or service.",
+    "Deduplicate costs by subscription, period and assignment identity, not by provider name; distinct named users may require separate seats.",
+    "Paid subscriptions already held remain costs to attribute; new cash requirements are separate.",
+    "Shared seats, client supply, FTE discounts and portfolio allocation require explicit coverage and policy.",
+    "AI resources are selected for work that needs them; no universal AI seat or simultaneous ChatGPT plus Claude requirement was specified.",
+    "Services include selected internal resource costs while retaining their agreed commercial unit and scope."
+  ],
+  "pending": [
+    "normalized_versioned_role_and_service_kits",
+    "current_notion_microsoft_365_semrush_and_chatgpt_plans_and_costs",
+    "claude_team_actual_seat_types_count_billing_and_assignments",
+    "named_assignments_access_and_sharing_permissions",
+    "cost_allocation_driver_denominator_and_period",
+    "ai_selection_and_consumption_per_work",
+    "automatic_quote_binding_and_complete_explanation"
+  ]
+}

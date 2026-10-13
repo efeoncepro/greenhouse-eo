@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-07",
+  "preserved_goal": {
+    "funded": 15200,
+    "ticket_usd": 2500,
+    "equivalent_usd": 38000000,
+    "opening_rate": 0.02,
+    "funding_rate": 0.65,
+    "visits_required_exact": 1169230.769230769,
+    "visits_required_ceil": 1169231
+  },
+  "source_panel_families": 19,
+  "source_proxy_by_lane": {
+    "direct": 3740.0,
+    "conditional": 3330.0,
+    "competitor": 18300.0,
+    "assisted": 5680.0
+  },
+  "search_sensitivities": [
+    {
+      "scenario": "prudente",
+      "mature_capture_assumption": 0.02,
+      "annual_visit_equivalents_test": 2993.2000000000003,
+      "annual_openings_test": 59.864,
+      "annual_funded_test": 38.9116,
+      "competitor_visit_equivalents_test": 986.0,
+      "status": "partial_panel_sensitivity_not_whole_program_forecast_or_verified_incrementality"
+    },
+    {
+      "scenario": "trabajo",
+      "mature_capture_assumption": 0.05,
+      "annual_visit_equivalents_test": 7483.0,
+      "annual_openings_test": 149.66,
+      "annual_funded_test": 97.27900000000001,
+      "competitor_visit_equivalents_test": 2465.0,
+      "status": "partial_panel_sensitivity_not_whole_program_forecast_or_verified_incrementality"
+    },
+    {
+      "scenario": "expansion",
+      "mature_capture_assumption": 0.1,
+      "annual_visit_equivalents_test": 14966.0,
+      "annual_openings_test": 299.32,
+      "annual_funded_test": 194.55800000000002,
+      "competitor_visit_equivalents_test": 4930.0,
+      "status": "partial_panel_sensitivity_not_whole_program_forecast_or_verified_incrementality"
+    }
+  ],
+  "capacity_hours": 2216,
+  "capacity_hours_with_reserve": 2548.3999999999996,
+  "salary_group_hours": {
+    "writer": 520,
+    "designer": 152,
+    "seo": 512
+  },
+  "minimum_capacity_headroom_hours": 3.8000000000000043,
+  "pricing": [
+    {
+      "scenario": "bajo",
+      "labor_before_reserve_usd": 40540.48888888889,
+      "labor_reserve_usd": 6081.073333333333,
+      "tools_other_usd": 2400,
+      "annual_cost_test_usd": 49021.56222222222,
+      "monthly_cost_test_usd": 4085.1301851851854,
+      "monthly_fee_at_40pct_margin_usd": 6808.550308641975,
+      "monthly_fee_proposed_usd": 8000,
+      "gross_margin_at_proposed_fee": 0.48935872685185183
+    },
+    {
+      "scenario": "central",
+      "labor_before_reserve_usd": 44789.61111111111,
+      "labor_reserve_usd": 6718.441666666667,
+      "tools_other_usd": 3600,
+      "annual_cost_test_usd": 55108.052777777775,
+      "monthly_cost_test_usd": 4592.337731481482,
+      "monthly_fee_at_40pct_margin_usd": 7653.896219135803,
+      "monthly_fee_proposed_usd": 8000,
+      "gross_margin_at_proposed_fee": 0.42595778356481484
+    },
+    {
+      "scenario": "alto",
+      "labor_before_reserve_usd": 49038.73333333334,
+      "labor_reserve_usd": 7355.81,
+      "tools_other_usd": 6000,
+      "annual_cost_test_usd": 62394.543333333335,
+      "monthly_cost_test_usd": 5199.545277777778,
+      "monthly_fee_at_40pct_margin_usd": 8665.908796296297,
+      "monthly_fee_proposed_usd": 8000,
+      "gross_margin_at_proposed_fee": 0.3500568402777778
+    }
+  ],
+  "proposed_fee_usd_month": 8000,
+  "approved_fee": false,
+  "whole_program_incremental_forecast": null,
+  "new_provider_calls": 0,
+  "sem_operations": false
+}

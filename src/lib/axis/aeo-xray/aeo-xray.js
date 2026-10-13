@@ -2,10 +2,16 @@ import { aeoXray } from './aeo-xray-tokens.js';
 import { validateXrayExperience, validateXrayMachineConsistency, } from "./aeo-xray-experience.js";
 export const AXIS_AEO_XRAY_CONTRACT = {
     id: "efeonce.aeo-xray",
-    version: "0.1.0",
+    // 0.2.0 suma bloques opcionales de experiencia temprana; 0.1.0 sigue vigente sin cambios.
+    version: "0.2.0",
     lifecycle: "candidate",
     owner: "efeonce-aeo-xray",
     anatomy: ["shell", "artifact", "block", "annotation", "evidence", "source"],
+    // Los campos que todo contrato publicado declara (DesignPatternContract); salen de los tokens `aeoXray`.
+    states: ["proposed", "implemented", "verified", "measured"],
+    accessibility: ["text-4.5-normal", "text-3-large", "target-44px", "reduced-motion-respected", "evidence-status-visible"],
+    responsive: ["desktop-instrument", "mobile-sheet"],
+    motion: ["original-xray-choreography", "reduced-motion-none"],
     consumers: ["efeonce-think", "greenhouse-aeo-xray"],
     evidence: ["TASK-1950", "tokens:aeoXray"],
 };
@@ -70,7 +76,7 @@ export function validateAeoXrayIntent(input) {
         "brand",
         "flow",
     ], "");
-    if (input.contract !== "efeonce.aeo-xray" || input.version !== "0.1.0")
+    if (input.contract !== "efeonce.aeo-xray" || !["0.1.0", "0.2.0"].includes(input.version))
         issue("contract-version-unsupported", "contract");
     required(input, ["locale", "title", "preparedFor"], "");
     if (!date(input.preparedAt))
@@ -378,6 +384,7 @@ export function validateAeoXrayIntent(input) {
                 "fontFamily",
                 "displayFontFamily",
                 "logoAssetId",
+                "logoOnDarkAssetId",
             ], "brand");
             required(b, ["name", "accent"], "brand");
             for (const k of ["accent", "ink", "action", "actionText"])
@@ -388,6 +395,8 @@ export function validateAeoXrayIntent(input) {
                     issue("font-invalid", `brand.${k}`);
             if (b.logoAssetId && !assetIds.has(b.logoAssetId))
                 issue("reference-missing", "brand.logoAssetId");
+            if (b.logoOnDarkAssetId !== undefined && !assetIds.has(b.logoOnDarkAssetId))
+                issue("reference-missing", "brand.logoOnDarkAssetId");
         }
     }
     if (!obj(input.flow))

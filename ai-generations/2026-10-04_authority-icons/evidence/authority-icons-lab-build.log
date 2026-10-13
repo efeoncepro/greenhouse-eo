@@ -1,0 +1,108 @@
+
+> @efeonce/axis-design-system-lab@0.1.0 build /Users/jreye/Documents/axis-design-system/apps/lab
+> node scripts/sync-brand-assets.mjs && astro build
+
+brand assets: 315 files synced from @efeoncepro/axis-brand-assets (233 in email/, sparks-2d/, platforms/, cast-2d/, cast-photo/)
+spark rig: 15 KB generados en public/references/sparks/rig/spark-rig.js
+09:21:54 [content] Syncing content
+09:21:54 [content] Synced content
+09:21:54 [types] Generated 351ms
+09:21:54 [build] output: "static"
+09:21:54 [build] mode: "static"
+09:21:54 [build] directory: /Users/jreye/Documents/axis-design-system/apps/lab/dist/
+09:21:54 [build] Collecting build info...
+09:21:54 [build] ✓ Completed in 378ms.
+09:21:54 [build] Building static entrypoints...
+09:21:55 [vite] ✓ built in 415ms
+09:21:55 [vite] ✓ built in 541ms
+09:21:55 [build] Rearranging server assets...
+
+ generating static routes 
+09:21:55   ├─ /docs/index.html (+10ms) 
+09:21:55   ├─ /patterns/efeonce.activity-timeline/index.html (+2ms) 
+09:21:55   ├─ /patterns/efeonce.advertising-typography/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.ai-search-composition/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.ai-visibility-report/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.border-beam/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.brand-logos/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.brand-motion/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.breadcrumbs/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.button/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.card-density/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.charts/index.html (+2ms) 
+09:21:55   ├─ /patterns/efeonce.chip/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.collaboration-selection/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.composition-shell/index.html (+1ms) 
+09:21:55   ├─ /patterns/efeonce.disclosure/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.email-modules/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.floating-surface/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.gradients/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.graphic-line-orbit/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.insights-stat-card/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.leaderboard/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.loaders/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.motion/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.progress/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.roadmap-timeline/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.spark-rig/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.status/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.surface-recipes/index.html (+0ms) 
+09:21:55   ├─ /patterns/efeonce.team-avatar-group/index.html (+0ms) 
+09:21:55   ├─ /references/aeo-iconography/index.html (+3ms) 
+09:21:55   ├─ /references/aeo-iconography.json (+0ms) 
+09:21:55   ├─ /references/ai-visibility-report/index.html (+4ms) 
+09:21:55   ├─ /references/ai-visibility-report.json (+1ms) 
+09:21:55   ├─ /references/authority-iconography/index.html (+1ms) 
+09:21:55   ├─ /references/authority-iconography.json (+0ms) 
+09:21:55   ├─ /references/cast-2d/index.html (+1ms) 
+09:21:55   ├─ /references/cast-2d.json (+0ms) 
+09:21:55   ├─ /references/cast-photo/index.html (+2ms) 
+09:21:55   ├─ /references/cast-photo.json (+1ms) 
+09:21:55   ├─ /references/colors/index.html (+1ms) 
+09:21:55   ├─ /references/creative-resources/index.html (+2ms) 
+09:21:55   ├─ /references/creative-typography/index.html (+2ms) 
+09:21:55   ├─ /references/elevation/index.html (+1ms) 
+09:21:55   ├─ /references/email/index.html (+5ms) 
+09:21:55   ├─ /references/email.json (+1ms) 
+09:21:55   ├─ /references/geometry/index.html (+1ms) 
+09:21:55   ├─ /references/glitch/index.html (+3ms) 
+09:21:55   ├─ /references/glitch.json (+1ms) 
+09:21:55   ├─ /references/graphic-line/index.html (+18ms) 
+09:21:55   ├─ /references/iconography/index.html (+4ms) 
+09:21:55   ├─ /references/iconography.json (+1ms) 
+09:21:55   ├─ /references/insights/index.html (+5ms) 
+09:21:55   ├─ /references/insights.json (+1ms) 
+09:21:55   ├─ /references/manzanitas/index.html (+5ms) 
+09:21:55   ├─ /references/manzanitas.json (+1ms) 
+09:21:55   ├─ /references/nexa-suit/index.html (+2ms) 
+09:21:55   ├─ /references/nexa-suit.json (+1ms) 
+09:21:55   ├─ /references/photography/why/index.html (+2ms) 
+09:21:55   ├─ /references/photography/why.json (+0ms) 
+09:21:55   ├─ /references/photography/index.html (+2ms) 
+09:21:55   ├─ /references/seo-aeo/index.html (+1ms) 
+09:21:55   ├─ /references/seo-aeo.json (+0ms) 
+09:21:55   ├─ /references/seo-iconography/index.html (+1ms) 
+09:21:55   ├─ /references/seo-iconography.json (+0ms) 
+09:21:55   ├─ /references/social-profiles/index.html (+2ms) 
+09:21:55   ├─ /references/social-profiles.json (+1ms) 
+09:21:55   ├─ /references/sonic-brand/index.html (+1ms) 
+09:21:55   ├─ /references/sonic-brand.json (+1ms) 
+09:21:55   ├─ /references/sparks/index.html (+4ms) 
+09:21:55   ├─ /references/sparks.json (+3ms) 
+09:21:55   ├─ /references/surfaces/deck-recipes.json (+5ms) 
+09:21:55   ├─ /references/surfaces/partner-assets.json (+0ms) 
+09:21:55   ├─ /references/surfaces/web/index.html (+2ms) 
+09:21:55   ├─ /references/surfaces/dooh-pdooh/index.html (+2ms) 
+09:21:55   ├─ /references/surfaces/motion/index.html (+1ms) 
+09:21:55   ├─ /references/surfaces/audiovisual/index.html (+2ms) 
+09:21:55   ├─ /references/surfaces/deck/index.html (+35ms) 
+09:21:55   ├─ /references/surfaces/index.html (+5ms) 
+09:21:55   ├─ /references/surfaces.json (+7ms) 
+09:21:55   ├─ /references/typography/index.html (+1ms) 
+09:21:55   ├─ /index.html (+1ms) 
+09:21:55 ✓ Completed in 200ms.
+
+09:21:55 [build] ✓ Completed in 1.18s.
+09:21:55 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+09:21:55 [build] 62 page(s) built in 1.64s
+09:21:55 [build] Complete!

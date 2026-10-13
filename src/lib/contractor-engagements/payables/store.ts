@@ -18,7 +18,6 @@ import {
 import { resolveHonorariosReadiness } from '../chile-honorarios/readiness'
 import { isClassificationRiskBlocking } from '../classification-risk'
 import { ContractorEngagementValidationError } from '../errors'
-import { listContractorInvoiceAssetsByEngagement } from '../invoice-assets'
 import { getContractorEngagementById } from '../store'
 import type { ContractorEngagement } from '../types'
 
@@ -770,17 +769,11 @@ export const createContractorPayableOffCycle = async (
  * active canonical payment route for the engagement beneficiary, OR a governed
  * waiver.
  */
-export const assessPayableReadiness = async (
-  payable: ContractorPayable
-): Promise<PayableReadinessResult> => {
+export const assessPayableReadiness = async (payable: ContractorPayable): Promise<PayableReadinessResult> => {
   const engagement = await getContractorEngagementById(payable.contractorEngagementId)
 
   if (!engagement) {
-    throw new ContractorEngagementValidationError(
-      'El engagement contractor no existe.',
-      'engagement_not_found',
-      404
-    )
+    throw new ContractorEngagementValidationError('El engagement contractor no existe.', 'engagement_not_found', 404)
   }
 
   let sourceApproved = true
@@ -798,22 +791,35 @@ export const assessPayableReadiness = async (
   let hasRequiredInvoiceAsset = true
 
   if (engagement.requiresInvoice) {
-    const assets = await listContractorInvoiceAssetsByEngagement(payable.contractorEngagementId)
-
-    hasRequiredInvoiceAsset = assets.some(
-      a => a.assetRole === 'invoice_pdf' || a.assetRole === 'tax_xml'
+    const support = await query<{ present: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1 FROM greenhouse_hr.contractor_invoice_assets a
+         JOIN greenhouse_core.assets f ON f.asset_id = a.asset_id AND f.status = 'attached'
+         LEFT JOIN greenhouse_hr.contractor_work_submissions s ON s.contractor_work_submission_id = a.contractor_work_submission_id
+         WHERE a.contractor_engagement_id = $1 AND a.asset_role IN ('invoice_pdf', 'tax_xml')
+           AND (($2::text IS NOT NULL AND a.contractor_work_submission_id = $2
+                 AND (COALESCE(s.metadata_json->>'selfServicePeriodChanged', 'false') <> 'true' OR (a.metadata_json ? 'servicePeriodStart' AND a.metadata_json ? 'servicePeriodEnd'))
+                 AND (NOT (a.metadata_json ? 'servicePeriodStart') OR a.metadata_json->>'servicePeriodStart' IS NOT DISTINCT FROM s.service_period_start::text)
+                 AND (NOT (a.metadata_json ? 'servicePeriodEnd') OR a.metadata_json->>'servicePeriodEnd' IS NOT DISTINCT FROM s.service_period_end::text))
+             OR ($3::text IS NOT NULL AND a.contractor_invoice_id = $3)
+             OR a.metadata_json->>'contractorPayableId' = $4)
+       ) AS present`,
+      [
+        payable.contractorEngagementId,
+        payable.contractorWorkSubmissionId,
+        payable.contractorInvoiceId,
+        payable.contractorPayableId
+      ]
     )
+
+    hasRequiredInvoiceAsset = support[0]?.present === true
   }
 
   const obligationCurrency = payable.paymentCurrency ?? payable.currency
   const fxNeeded = payable.paymentCurrency !== null && payable.paymentCurrency !== payable.currency
   let fxSupported = !fxNeeded
 
-  if (
-    fxNeeded &&
-    FINANCE_CURRENCIES.has(payable.currency) &&
-    FINANCE_CURRENCIES.has(obligationCurrency)
-  ) {
+  if (fxNeeded && FINANCE_CURRENCIES.has(payable.currency) && FINANCE_CURRENCIES.has(obligationCurrency)) {
     const rate = await getLatestStoredExchangeRatePair({
       fromCurrency: payable.currency as 'CLP' | 'USD',
       toCurrency: obligationCurrency as 'CLP' | 'USD'
@@ -1285,19 +1291,48 @@ const markPayablePaymentOrderCreatedTx = async (
   const current = await lockPayable(client, input.contractorPayableId)
 
   if (
-    current.status === 'payment_order_created' &&
+    ['payment_order_created', 'paid'].includes(current.status) &&
     current.paymentOrderId === input.paymentOrderId
   ) {
     return current
   }
 
-  if (current.status !== 'obligation_created') {
+  if (current.status === 'payment_order_created') {
+    const previous = await client.query<{ state: string; settled: boolean }>(
+      `SELECT o.state, EXISTS (SELECT 1 FROM greenhouse_finance.payment_order_lines l WHERE l.order_id = o.order_id AND l.state = 'paid') AS settled
+       FROM greenhouse_finance.payment_orders o WHERE o.order_id = $1 FOR UPDATE`,
+      [current.paymentOrderId]
+    )
+
+    if (!previous.rows[0] || !['cancelled', 'failed'].includes(previous.rows[0].state) || previous.rows[0].settled) {
+      throw new ContractorEngagementValidationError(
+        'La orden anterior sigue vigente o tiene pagos. No se puede reemplazar.',
+        'payable_order_still_live',
+        409
+      )
+    }
+  } else if (current.status !== 'obligation_created') {
     throw new ContractorEngagementValidationError(
       `No se puede registrar la orden de pago desde el estado ${current.status}.`,
       'payable_not_obligation_created',
       409
     )
   }
+
+  const linked = await client.query<{ valid: boolean }>(
+    `SELECT EXISTS (SELECT 1 FROM greenhouse_finance.payment_order_lines l
+      JOIN greenhouse_finance.payment_orders o ON o.order_id = l.order_id
+      WHERE l.order_id = $1 AND l.obligation_id = $2 AND o.state NOT IN ('cancelled', 'failed')
+        AND l.state NOT IN ('cancelled', 'failed')) AS valid`,
+    [input.paymentOrderId, current.financeObligationId]
+  )
+
+  if (!linked.rows[0]?.valid)
+    throw new ContractorEngagementValidationError(
+      'La orden no paga la obligación de este cobro.',
+      'payable_order_mismatch',
+      409
+    )
 
   const result = await client.query<ContractorPayableRow>(
     `UPDATE greenhouse_hr.contractor_payables
@@ -1380,6 +1415,30 @@ const markPayablePaidTx = async (
     )
   }
 
+  if (input.paymentOrderId && input.paymentOrderId !== current.paymentOrderId) {
+    throw new ContractorEngagementValidationError(
+      'La orden no corresponde a este cobro.',
+      'payable_order_mismatch',
+      409
+    )
+  }
+
+  const settled = await client.query<{ paid: boolean }>(
+    `SELECT EXISTS (SELECT 1 FROM greenhouse_finance.payment_obligations b
+       JOIN greenhouse_finance.payment_order_lines l ON l.obligation_id = b.obligation_id
+       JOIN greenhouse_finance.payment_orders o ON o.order_id = l.order_id
+       WHERE b.obligation_id = $1 AND l.order_id = $2 AND o.state = 'paid' AND l.state = 'paid'
+         AND l.currency = b.currency AND l.amount >= b.amount AND b.status = 'paid') AS paid`,
+    [current.financeObligationId, current.paymentOrderId]
+  )
+
+  if (!settled.rows[0]?.paid)
+    throw new ContractorEngagementValidationError(
+      'El cobro todavía no tiene un pago completo confirmado.',
+      'payable_not_fully_settled',
+      409
+    )
+
   // Defensa: respeta la state machine (mirror del trigger DB).
   assertValidPayableTransition(current.status, 'paid')
 
@@ -1436,16 +1495,15 @@ export const markPayablePaid = async (
  * Filtra por estado en SQL, por lo que órdenes no-contractor o payables ya pagados
  * NO aparecen — el cascade es idempotente y un no-op para órdenes ajenas.
  */
-export const listPayableIdsByPaymentOrderForPaidCascade = async (
-  paymentOrderId: string
-): Promise<string[]> => {
+export const listPayableIdsByPaymentOrderForPaidCascade = async (paymentOrderId: string): Promise<string[]> => {
   const rows = await query<{ contractor_payable_id: string }>(
-    `SELECT contractor_payable_id
-     FROM greenhouse_hr.contractor_payables
-     WHERE payment_order_id = $1
-       AND status = 'payment_order_created'`,
+    `SELECT DISTINCT p.contractor_payable_id
+     FROM greenhouse_hr.contractor_payables p
+     JOIN greenhouse_finance.payment_order_lines l ON l.obligation_id = p.finance_obligation_id
+     WHERE l.order_id = $1 AND l.state = 'paid'
+       AND p.status IN ('obligation_created', 'payment_order_created')`,
     [paymentOrderId]
   )
 
-  return rows.map((r) => r.contractor_payable_id)
+  return rows.map(r => r.contractor_payable_id)
 }

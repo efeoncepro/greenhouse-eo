@@ -50,7 +50,7 @@ para cumplir con compras"*. **Si es ese, te estás gastando dos semanas en ser e
 |---|---|---|
 | **RFI** | Respondes **exactamente lo que piden**. Credenciales honestas *(→ `07_PRUEBA` § 1)*. **Calificas TÚ a ELLOS**: ¿hay owner del brief? ¿está el creative lead in-house? ¿cuál es el criterio? | 🔴 Mandar ideas. 🔴 Mandar un deck de 40 láminas. 🔴 Apilar credenciales de fuentes distintas. 🔴 Inventar casos creativos que no tenemos |
 | **Shortlist** | Consigues **acceso a la gente que decide** y al equipo interno. Corres el diagnóstico *(`modules/06_CUNA.md`)* | 🔴 Empezar a diseñar. **Todavía no estás en el juego** |
-| **RFP** | La propuesta: **capacidad + gobierno + alcance con borde** *(rondas, derechos, change order)*. **Precio pasado por el cotizador, piso computado** | 🔴 Cotizar sin loaded cost. 🔴 Publicar precio unitario por pieza *(le entregas la calculadora para comoditizarte)*. 🔴 Prometer superficies del portal que no existen |
+| **RFP** | La propuesta: **capacidad + gobierno + alcance con borde** *(rondas, derechos, change order)*. **Precio pasado por el cotizador, piso computado.** Si exigen el precio desglosado: por componente de valor *(§ 5.1)* | 🔴 Cotizar sin loaded cost. 🔴 Publicar precio unitario por pieza *(le entregas la calculadora para comoditizarte)*. 🔴 Prometer superficies del portal que no existen. 🔴 Ofrecer lo que nadie pidió *(§ 5.1)* |
 | 🎯 **Chemistry** | **Va el equipo REAL.** Menos deck, más conversación. **Demuestra el portal en vivo** | 🔴 Mandar al equipo de ventas. 🔴 Leer láminas |
 | **Decisión** | **Win/loss, siempre** *(§ 7)* | 🔴 Rogar. 🔴 Bajar el precio para "salvar" el deal *(→ `08_DESCALIFICACION`)* |
 
@@ -88,6 +88,13 @@ queda nada que cobrar.**
 | **4** | **Plazo razonable** *(≥ 2 semanas completas para el RFP — el estándar ✅)* | 🔴 Un plazo de 4 días **no es urgencia: es desprecio, o es un proceso ya decidido** |
 
 🔴 **Si falla una sola, la respuesta es (iii) o es no.**
+
+> ⚠️ **Registro 2026-10-12 — tensión abierta con esta política.** En la licitación Sika Mexicana (Wherex N.º 1164,
+> una ronda) la ficha exigía muestras dentro de la oferta: una imagen para Facebook, una para Instagram y un reel de
+> hasta 30 s (el comprador admitía storyboard o animatic). Efeonce preparó para esa oferta, sin cobro, ejecución
+> terminada: un anexo gráfico de 21 páginas y un reel real de 25 s; el operador decidió que fuera el reel y no el
+> storyboard (paquete terminado, no presentado a esa fecha). Eso es nivel (i). **La política no se reescribe aquí:** si la muestra exigida por bases es una categoría aparte lo decide
+> el operador. Hasta entonces el caso **no es precedente**: pregúntale antes de producir una muestra.
 
 ### 💰 El pitch pagado — cómo se plantea sin sonar arrogante
 
@@ -164,6 +171,49 @@ del holding, es lo primero que el comprador quemado busca,** y nosotros vendemos
 
 ---
 
+## 5.1 Licitación por portal — leer al comprador antes de congelar cada documento
+
+En una licitación privada por portal (Wherex y similares) no hay chemistry: el comprador habla por la ficha y por el
+centro de mensajes, y ahí define qué se cotiza y qué va a comparar.
+
+🔴 **Regla:** releer la ficha y el centro de mensajes **completo** —incluidas las respuestas a otros proveedores—
+antes de congelar cada documento, y otra vez antes de la económica. Caso fuente (Sika Mexicana, Wherex N.º 1164,
+2026-10-12): el alcance a cotizar («lanzamiento tipo») lo definieron respuestas dadas a otros proveedores, y la
+expectativa de SLA por niveles se leyó tarde, con el deck técnico ya exportado; se incorporó después como lámina de tiempos por nivel.
+
+| Señal del comprador | Qué significa | Qué se hace |
+|---|---|---|
+| **«Propuesta económica desglosada»** | Quiere ver de qué se compone el monto | Desglose por **componente de valor**, no por pieza → `04_PRICING` §7 (b.1) |
+| **La volumetría es «referencia para comparar ofertas»** | Es una canasta común, no el alcance final: formatos y cantidades pueden cambiar | Cotizar la canasta tal como la definieron; no leerla como volumen comprometido; dejar dicho cómo se ajusta el valor si cambia |
+| **Espera «SLA por niveles de complejidad»** | Va a comparar tiempos por tipo de entregable, no un plazo único | Responderlo con niveles en la técnica (en el caso: 2, 3 y 4 días hábiles por nivel, urgencias y el dato de cumplimiento a la vista, sin firmar un porcentaje el día uno). Qué se firma como SLA → `11_METRICAS_COMPROMISO`; el plazo lo valida operaciones |
+| **Para punto de venta, «sólo el diseño»** | No compra impresión ni producción | No costear ni ofrecer impresión |
+| **Las condiciones de pago «se revisan con quienes avancen»** | No es criterio de esta etapa | No proponer forma de pago: «se acuerdan al formalizar el servicio» |
+| **Un tarifario de piezas extraordinarias es «opcional»** | No lo exige | No se incluye |
+| **El portal pide un servicio, un monto total, una moneda del selector y «NO considera IVA»** | El formato del precio lo fija el portal | Un total neto en esa moneda; el desglose va en el documento adjunto. El tratamiento tributario lo decide Finance o el operador |
+
+### Lo que no se ofrece sin que lo pidan
+
+El operador lo corrigió en el deck y en la económica de ese caso (2026-10-12). Cada uno limita el alcance o abre una
+negociación que el comprador no había abierto:
+
+- **Tarifario de piezas extraordinarias.** El comprador lo admitía como opcional; no se incluyó. Es precio unitario
+  publicado (regla dura 3 del `SKILL.md`).
+- **Forma de pago inventada.** El agente puso 30 días; el comprador había dicho que las condiciones se revisan
+  después. Quedó «se acuerdan al formalizar el servicio».
+- **Cláusulas defensivas o de «fuera del servicio».** El operador quitó una lámina de «piezas adicionales» («¿Es
+  realmente necesario decir esto? ¿Para qué?»), una tarjeta «Fuera del servicio» y las líneas de moneda/facturación
+  e idioma, que no aportaban. El borde se dice en positivo —qué incluye, contado, y cómo se aprueba—; las
+  exclusiones y el change order se escriben en el SOW → `05_SCOPE_SOW` §8.
+- **La distancia.** «Desde Chile» y «horas en común» «nos puede jugar en contra»: se dice que hay personas en Chile
+  y en México, con una sola persona responsable.
+- **Un plazo holgado.** 15–20 días por lanzamiento fue «demasiado tiempo para un cliente de este tipo»; quedó en diez
+  días hábiles. 🔴 Ese plazo es propuesta del agente **sin visto bueno de operaciones**: no lo cites como capacidad
+  probada.
+
+Cuando el operador corrige un tono (defensivo), se barre **todo** el documento, no sólo la lámina comentada.
+
+---
+
 ## 6. El deck — no es nuestro, y la fuente no es el PDF
 
 🔴 **Esta skill es *consumer*, no dueña.** El craft del deck vive en **`deck-studio`** *(y el copy en
@@ -221,6 +271,8 @@ del holding, es lo primero que el comprador quemado busca,** y nosotros vendemos
 6. 🔴 **Nunca muestres una superficie del portal que no existe.** Ensaya la demo antes.
 7. 🔴 **El deck se compone en `deck-studio`, y la fuente es el repo — nunca el PDF.**
 8. 🎯 **Win/loss siempre, incluso cuando ganas.**
+9. 🔴 **En una licitación por portal, relee ficha y centro de mensajes completo antes de congelar cada documento,
+   y no ofrezcas lo que el comprador no pidió** *(tarifario de extras, forma de pago, cláusulas defensivas — § 5.1)*.
 
 ---
 

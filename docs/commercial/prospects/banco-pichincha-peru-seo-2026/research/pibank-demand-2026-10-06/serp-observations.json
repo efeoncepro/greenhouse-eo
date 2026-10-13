@@ -1,0 +1,696 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-06",
+  "captures": [
+    {
+      "id": "SERP-01",
+      "source_file": "serp-full-comparison.json",
+      "task_id": "10061738-1987-0139-0000-ebada8e65731",
+      "query": "mejor cuenta de ahorros peru",
+      "captured_at": "2026-10-06 17:39:08 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 20000,
+      "target_filter": null,
+      "capture_state": "available_full_serp",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "not_observed_in_requested_depth",
+      "organic_rows": [
+        {
+          "rank_group": 1,
+          "rank_absolute": 2,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/comparabien/videos/cu%C3%A1l-es-la-mejor-cuenta-de-ahorro-en-per%C3%BA-para-ti-elige-bien-y-ahorra-m%C3%A1s-/1854218421826703/",
+          "title": "¿Sabías que elegir mal tu cuenta de ahorro puede afectar tus finanzas ..."
+        },
+        {
+          "rank_group": 2,
+          "rank_absolute": 6,
+          "domain": "comparabancaperu.com",
+          "url": "https://comparabancaperu.com/",
+          "title": "ComparaBancaPerú: Compara Tasas Plazo Fijo, Ahorro y CTS 2026 | SBS"
+        },
+        {
+          "rank_group": 3,
+          "rank_absolute": 7,
+          "domain": "www.scotiabank.com.pe",
+          "url": "https://www.scotiabank.com.pe/blog/depositos-e-inversion/deposito-a-plazo-digital/como-ahorrar-dinero-para-ganar-intereses",
+          "title": "¿Cómo ahorrar dinero y ganar intereses?"
+        },
+        {
+          "rank_group": 4,
+          "rank_absolute": 8,
+          "domain": "www.youtube.com",
+          "url": "https://www.youtube.com/watch?v=XveLdx8l-Wo",
+          "title": "Mejores Cuentas de Ahorro 2025 - Soles y Dólares"
+        },
+        {
+          "rank_group": 5,
+          "rank_absolute": 9,
+          "domain": "www.mibanco.com.pe",
+          "url": "https://www.mibanco.com.pe/blog/cuenta-de-ahorro-de-alto-rendimiento",
+          "title": "Cuenta de ahorro de alto rendimiento: crece con Mibanco"
+        },
+        {
+          "rank_group": 6,
+          "rank_absolute": 10,
+          "domain": "www.viabcp.com",
+          "url": "https://www.viabcp.com/ayuda-bcp/cuenta-de-ahorros/cuales-son-los-tipos-de-cuentas-de-ahorros",
+          "title": "¿Cuáles son los tipos de Cuentas de Ahorros BCP?"
+        },
+        {
+          "rank_group": 7,
+          "rank_absolute": 11,
+          "domain": "www.sbs.gob.pe",
+          "url": "https://www.sbs.gob.pe/usuarios/aprende-con-la-sbs/tipos-de-deposito",
+          "title": "Tipos de Depósito"
+        },
+        {
+          "rank_group": 8,
+          "rank_absolute": 12,
+          "domain": "www.reddit.com",
+          "url": "https://www.reddit.com/r/Lima_Peru/comments/1kkx7xx/que_banco_es_mejor_para_ahorrar/",
+          "title": "¿Que banco es mejor para ahorrar? : r/Lima_Peru"
+        },
+        {
+          "rank_group": 9,
+          "rank_absolute": 14,
+          "domain": "www.bancom.pe",
+          "url": "https://www.bancom.pe/personas/promociones/cuenta-ahorro-dolares",
+          "title": "¿Cuál es la mejor cuenta de ahorro en dólares de Perú?"
+        },
+        {
+          "rank_group": 10,
+          "rank_absolute": 15,
+          "domain": "www.youtube.com",
+          "url": "https://www.youtube.com/watch?v=ZkghOFcCuBE",
+          "title": "Las mejores cuentas de ahorro del Perú para NOVIEMBRE 2024"
+        },
+        {
+          "rank_group": 11,
+          "rank_absolute": 16,
+          "domain": "www.efectibank.pe",
+          "url": "https://www.efectibank.pe/ahorros/cuenta-de-ahorros/",
+          "title": "Cuenta de Ahorros Efectiva"
+        },
+        {
+          "rank_group": 12,
+          "rank_absolute": 17,
+          "domain": "www.rankia.pe",
+          "url": "https://www.rankia.pe/blog/cuentas-bancarias-ahorro-corriente-sueldo/4182138-mejores-cuentas-comisiones",
+          "title": "Mejores cuentas sin comisiones del Perú: comparativa actual"
+        },
+        {
+          "rank_group": 13,
+          "rank_absolute": 18,
+          "domain": "comparabien.com.pe",
+          "url": "https://comparabien.com.pe/blog-consejos/donde-mejor-ahorrar-banco-o-cooperativa",
+          "title": "¿Dónde es mejor ahorrar en Perú: banco o cooperativa?"
+        },
+        {
+          "rank_group": 14,
+          "rank_absolute": 20,
+          "domain": "www.youtube.com",
+          "url": "https://www.youtube.com/watch?v=H2gymGY5XzY",
+          "title": "Las mejores cuentas de ahorro en dólares del Perú para abril 2024"
+        },
+        {
+          "rank_group": 15,
+          "rank_absolute": 21,
+          "domain": "www.santanderconsumer.com.pe",
+          "url": "https://www.santanderconsumer.com.pe/personas/ahorros",
+          "title": "Ahorros Santander Consumer | Opciones Seguras en Perú"
+        },
+        {
+          "rank_group": 16,
+          "rank_absolute": 22,
+          "domain": "www.banbif.com.pe",
+          "url": "https://www.banbif.com.pe/personas/cuentas/cuenta-ahorro/gran-cuenta-ahorro",
+          "title": "Abre tu Gran Cuenta Ahorro - Dólares y Soles"
+        },
+        {
+          "rank_group": 17,
+          "rank_absolute": 23,
+          "domain": "www.bancofalabella.pe",
+          "url": "https://www.bancofalabella.pe/cuentas-bancarias",
+          "title": "Cuenta Bancaria: Qué es, tipos y cuál elegir este 2026"
+        },
+        {
+          "rank_group": 18,
+          "rank_absolute": 24,
+          "domain": "cambioseguro.com",
+          "url": "https://cambioseguro.com/articulos/tipos-de-cuentas-de-ahorro-en-el-peru",
+          "title": "Tipos de cuentas de ahorro en el Perú"
+        }
+      ]
+    },
+    {
+      "id": "SERP-02",
+      "source_file": "serp-full-high-yield.json",
+      "task_id": "10061739-1987-0139-0000-199546935daa",
+      "query": "cuenta de ahorros de alto rendimiento",
+      "captured_at": "2026-10-06 17:40:13 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 20000,
+      "target_filter": null,
+      "capture_state": "available_full_serp",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "not_observed_in_requested_depth",
+      "organic_rows": [
+        {
+          "rank_group": 1,
+          "rank_absolute": 2,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/100077766706082/posts/-haz-crecer-tus-ahorros-con-total-libertad-con-la-cuenta-ahorro-flexitotal-de-ca/1056819923586888/",
+          "title": "📈 Haz crecer tus ahorros con total libertad 💰 Con la Cuenta ..."
+        },
+        {
+          "rank_group": 2,
+          "rank_absolute": 4,
+          "domain": "do.scotiabank.com",
+          "url": "https://do.scotiabank.com/banca-de-negocios/administracion-de-efectivo/cuentas-de-ahorro/pequena-y-mediana-empresa/cuenta-alto-rendimiento-empresarial-para-pequena-y-mediana-empresa.html",
+          "title": "Cuenta de Ahorro Alto Rendimiento Empresarial para Pequeña y ..."
+        },
+        {
+          "rank_group": 3,
+          "rank_absolute": 6,
+          "domain": "es.selco.org",
+          "url": "https://es.selco.org/education-articles/make-every-dollar-really-count-with-cultivate-high-yield-savings/",
+          "title": "Haz que cada $ realmente cuente con los ahorros de alto rendimiento ..."
+        },
+        {
+          "rank_group": 4,
+          "rank_absolute": 7,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/AlfinBanco/videos/3-beneficios-de-abrir-tu-cuenta-ahorro-meta-ingresa-a-httpsalfinbancopeahorrosah/1250305443978439/",
+          "title": "¡3 beneficios de abrir tu Cuenta Ahorro Meta!  Ingresa a  https: ..."
+        },
+        {
+          "rank_group": 5,
+          "rank_absolute": 8,
+          "domain": "www.reddit.com",
+          "url": "https://www.reddit.com/r/BEFire/comments/1vlrtq3/worth_it_to_open_multiple_bank_accounts_for_high/?tl=es-419",
+          "title": "¿Vale la pena abrir varias cuentas bancarias para ahorros de alto ..."
+        },
+        {
+          "rank_group": 6,
+          "rank_absolute": 9,
+          "domain": "www.promerica.fi.cr",
+          "url": "https://www.promerica.fi.cr/media/4rubcoqd/030626-reglamento-ahorro-de-alto-rendimiento.pdf?Tarjeta=Veinsa",
+          "title": "reglamento ahorro de alto rendimiento"
+        },
+        {
+          "rank_group": 7,
+          "rank_absolute": 10,
+          "domain": "freedomcu.com",
+          "url": "https://freedomcu.com/cuentas-de-ahorro/",
+          "title": "Cuentas de ahorro - Freedom Credit Union"
+        },
+        {
+          "rank_group": 8,
+          "rank_absolute": 11,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/p/DG3tusUThoo/",
+          "title": "Nuestra Cuenta de Ahorro Alto Rendimiento en Dólares te ofrece ..."
+        },
+        {
+          "rank_group": 9,
+          "rank_absolute": 13,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/reel/DUMWB9wESvN/",
+          "title": "¿Cuáles son las mejores cuentas de ahorro de alto rendimiento? Acá te ..."
+        },
+        {
+          "rank_group": 10,
+          "rank_absolute": 14,
+          "domain": "www.youtube.com",
+          "url": "https://www.youtube.com/watch?v=kUlAPWvRlIA",
+          "title": "Como ESCOGER una cuenta de AHORROS de alto RENDIMIENTO"
+        },
+        {
+          "rank_group": 11,
+          "rank_absolute": 15,
+          "domain": "www.tiktok.com",
+          "url": "https://www.tiktok.com/@arenscristian/video/7219077183669636358",
+          "title": "Cuentas de Ahorro de Alto Rendimiento en Perú"
+        },
+        {
+          "rank_group": 12,
+          "rank_absolute": 16,
+          "domain": "www.bbva.pe",
+          "url": "https://www.bbva.pe/blog/mis-finanzas/ahorro.html",
+          "title": "Ahorro"
+        },
+        {
+          "rank_group": 13,
+          "rank_absolute": 17,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/americatelevision/posts/conoce-las-mejores-cuentas-de-ahorro-en-per%C3%BA-a-setiembre-de-2026-respaldadas-por/1711373603683551/",
+          "title": "Conoce las mejores cuentas de ahorro en Perú a setiembre de 2026 ..."
+        },
+        {
+          "rank_group": 14,
+          "rank_absolute": 18,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/CajaMunicipalIca/posts/-haz-que-tus-ahorros-crezcan-a-tu-ritmo-con-la-cuenta-flexitotal-de-caja-ica-haz/1554008610090698/",
+          "title": "📈 ¡Haz que tus ahorros crezcan a tu ritmo! 💰✨ Con la Cuenta FlexiTotal ..."
+        },
+        {
+          "rank_group": 15,
+          "rank_absolute": 19,
+          "domain": "banbif.com.pe",
+          "url": "https://banbif.com.pe/Portals/0/PortalOld/simuladores/calculodepositoahorros_22_02_18.htm?ver=2018-01-03-163110-820",
+          "title": "Ahorro Persona Natural"
+        },
+        {
+          "rank_group": 16,
+          "rank_absolute": 20,
+          "domain": "www.bancognb.com.pe",
+          "url": "https://www.bancognb.com.pe/main/download?file=peru%2Fbanca_personas%2Fcuentas%2FCartilla_Campana_de_Ahorros_13022015.pdf",
+          "title": "E000275 - Cartilla Campaña de Ahorros"
+        },
+        {
+          "rank_group": 17,
+          "rank_absolute": 21,
+          "domain": "www.affinityfcu.com",
+          "url": "https://www.affinityfcu.com/es-us/financial-wellbeing/blog/financial-wellbeing/what-to-look-for-when-choosing-a-savings-account",
+          "title": "Qué Buscar Al Elegir una Cuenta de Ahorros"
+        }
+      ]
+    },
+    {
+      "id": "SERP-03",
+      "source_file": "serp-full-online-opening.json",
+      "task_id": "10061740-1987-0139-0000-bee18d189ad7",
+      "query": "abrir cuenta de ahorros online",
+      "captured_at": "2026-10-06 17:40:37 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 20000,
+      "target_filter": null,
+      "capture_state": "available_full_serp",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "not_observed_in_requested_depth",
+      "organic_rows": [
+        {
+          "rank_group": 1,
+          "rank_absolute": 1,
+          "domain": "trujilloinforma.com",
+          "url": "https://trujilloinforma.com/abrir-cuenta-de-ahorros-digital-guia-completa-para-hacerlo-desde-tu-celular/",
+          "title": "Abrir cuenta de ahorros digital: guía completa para hacerlo desde tu ..."
+        },
+        {
+          "rank_group": 2,
+          "rank_absolute": 3,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/est%C3%A9s-donde-est%C3%A9s-tu-dinero-puede-seguir-creciendo-abre-tu-cuenta-ahorro-confian/1095977102798390/",
+          "title": "Financiera Confianza"
+        },
+        {
+          "rank_group": 3,
+          "rank_absolute": 5,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/CajaPiura/posts/quieres-abrir-tu-cuenta-en-caja-piura-ingresa-a-nuestro-simulador-de-ahorros-en-/2584656038211404/?locale=es_LA",
+          "title": "¿Quieres abrir tu cuenta en Caja Piura? Ingresa a nuestro Simulador de ..."
+        },
+        {
+          "rank_group": 4,
+          "rank_absolute": 6,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/AlfinBanco/posts/tu-dinero-merece-crecer-abre-tu-cuenta-ahorro-meta-100-digital-y-accede-a-una-ta/1427555342741831/",
+          "title": "¡Tu dinero merece crecer!  Abre tu Cuenta Ahorro Meta 100% digital y ..."
+        },
+        {
+          "rank_group": 5,
+          "rank_absolute": 7,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/reel/DZgHPmQFPTE/",
+          "title": "comenzar a ahorrar ​ ​ Con la Cuenta WOW puedes abrir tu ..."
+        },
+        {
+          "rank_group": 6,
+          "rank_absolute": 8,
+          "domain": "www.youtube.com",
+          "url": "https://www.youtube.com/watch?v=dRktcOICqtY",
+          "title": "¿Cómo abrir una Cuenta Power 100% online? | Cuenta de Ahorros"
+        },
+        {
+          "rank_group": 7,
+          "rank_absolute": 9,
+          "domain": "portaldeayuda.bolivariano.com",
+          "url": "https://portaldeayuda.bolivariano.com/informaci%C3%B3n-abrir-cuenta-ahorros-online",
+          "title": "¿Qué información debo ingresar para abrir una Cuenta de Ahorros Online?"
+        },
+        {
+          "rank_group": 8,
+          "rank_absolute": 10,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/p/Dbbytbflibu/",
+          "title": "¡Que tus ahorros no se queden colgados!🕸️👀​ Un nuevo día es ..."
+        },
+        {
+          "rank_group": 9,
+          "rank_absolute": 11,
+          "domain": "www.bancointernacional.com.ec",
+          "url": "https://www.bancointernacional.com.ec/ob-cuenta-ahorros-persona-natural-pantalla-inicio/",
+          "title": "OB Cuenta Ahorros Persona Natural - Pantalla Inicio"
+        },
+        {
+          "rank_group": 10,
+          "rank_absolute": 12,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/BancoBolivariano/videos/abre-tu-cuenta-de-ahorros-online-de-forma-f%C3%A1cil-y-sencilla-sin-ir-al-banco-%C3%A1brel/325213515546592/",
+          "title": "Abre tu Cuenta de Ahorros Online de forma fácil y sencilla, sin ir al banco. ..."
+        },
+        {
+          "rank_group": 11,
+          "rank_absolute": 13,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/BDFNicaragua/videos/cuenta-online/964385221142386/",
+          "title": "¡Abrir tu Cuenta de ahorro Online es sencillo! Solo debés seguir los ..."
+        },
+        {
+          "rank_group": 12,
+          "rank_absolute": 14,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/tv/CZNI3amFPNb/",
+          "title": "REPOST @virginialimongis Si quieren abrir su propia Cuenta de ..."
+        },
+        {
+          "rank_group": 13,
+          "rank_absolute": 15,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/-haz-que-tu-ahorro-crezca-contigoabre-tu-cuenta-de-ahorro-confianza-y-empieza-a-/982113120851456/",
+          "title": "100% digital 📲 • Seguro Protección 360 (Plan Free) 🛡️ ⏳ Campaña válida"
+        },
+        {
+          "rank_group": 14,
+          "rank_absolute": 16,
+          "domain": "portaldeayuda.bolivariano.com",
+          "url": "https://portaldeayuda.bolivariano.com/beneficios-cuenta-ahorros",
+          "title": "¿Cuáles son los beneficios de abrir una Cuenta Ahorros?"
+        },
+        {
+          "rank_group": 15,
+          "rank_absolute": 17,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/BancoBolivariano/videos/cuenta-ahorros-online/1133080533710529/",
+          "title": "Cuenta Ahorros Online | Banco Bolivariano"
+        },
+        {
+          "rank_group": 16,
+          "rank_absolute": 19,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/FinancieraConfianzaSAA/posts/abre-tu-cuenta-de-ahorro-confianza-y-descubre-que-ahorrar-tambi%C3%A9n-puede-traer-be/1090832253312875/",
+          "title": "Abre tu Cuenta de Ahorro Confianza y descubre que ..."
+        },
+        {
+          "rank_group": 17,
+          "rank_absolute": 20,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/p/Dbbytbflibu/",
+          "title": "¡Que tus ahorros no se queden colgados!🕸️👀​ Un nuevo día es ..."
+        }
+      ]
+    },
+    {
+      "id": "SERP-04",
+      "source_file": "serp-provider.json",
+      "task_id": "10061737-1987-0139-0000-0caefefe7c83",
+      "query": "pibank peru",
+      "captured_at": "2026-10-06 17:37:14 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 20000,
+      "target_filter": null,
+      "capture_state": "available_full_serp",
+      "pibank_best_organic_rank": 5,
+      "pibank_rank_state": "observed",
+      "organic_rows": [
+        {
+          "rank_group": 1,
+          "rank_absolute": 2,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/pibank_pe/",
+          "title": "Pibank Perú (@pibank_pe)"
+        },
+        {
+          "rank_group": 2,
+          "rank_absolute": 5,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/tomaeldato/posts/ya-abr%C3%AD-una-cuenta-en-pibank-para-contarles-toda-la-experiencia-pibank-es-la-ban/1747153004077151/",
+          "title": "Ya abrí una cuenta en Pibank para contarles toda la experiencia ..."
+        },
+        {
+          "rank_group": 3,
+          "rank_absolute": 7,
+          "domain": "www.pichincha.pe",
+          "url": "https://www.pichincha.pe/personas/centro-de-ayuda/banca-internet",
+          "title": "Banca por Internet | Transacciones Seguras y Rápidas - Banco Pichincha"
+        },
+        {
+          "rank_group": 4,
+          "rank_absolute": 8,
+          "domain": "elcomercio.pe",
+          "url": "https://elcomercio.pe/noticias/pibank/",
+          "title": "Noticias sobre Pibank"
+        },
+        {
+          "rank_group": 5,
+          "rank_absolute": 9,
+          "domain": "pibank.pe",
+          "url": "https://pibank.pe/faq/what-is-the-pibank-savings-account/",
+          "title": "¿Qué es la Cuenta Pibank?"
+        },
+        {
+          "rank_group": 6,
+          "rank_absolute": 10,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/reel/Dd5b9J1RD0i/",
+          "title": "Una nueva opción al mercado financiero peruano: Pibank # ..."
+        },
+        {
+          "rank_group": 7,
+          "rank_absolute": 11,
+          "domain": "www.pibank.co",
+          "url": "https://www.pibank.co/",
+          "title": "Pibank Colombia, tu banco online sin comisiones | Pibank, ahí es"
+        },
+        {
+          "rank_group": 8,
+          "rank_absolute": 12,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/reel/Dd984-fz7O_/",
+          "title": "Pibank | Banco Pichincha 5% anual, sin mantenimiento y con Yape, Plin y ..."
+        },
+        {
+          "rank_group": 9,
+          "rank_absolute": 13,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/p/Dd1mFRVyg-P/",
+          "title": "Hola, Perú. Somos Pibank, el modelo de banca directa ..."
+        },
+        {
+          "rank_group": 10,
+          "rank_absolute": 14,
+          "domain": "pibank.pe",
+          "url": "https://pibank.pe/faq/hay-oficinas-de-pibank/",
+          "title": "¿Hay oficinas de Pibank?"
+        },
+        {
+          "rank_group": 11,
+          "rank_absolute": 15,
+          "domain": "pibank.pe",
+          "url": "https://pibank.pe/faq/puedo-abrir-o-cerrar-mi-cuenta-pibank-cuando-quiera/",
+          "title": "¿Puedo abrir o cerrar mi Cuenta Pibank cuando quiera?"
+        },
+        {
+          "rank_group": 12,
+          "rank_absolute": 16,
+          "domain": "www.instagram.com",
+          "url": "https://www.instagram.com/reel/Dd7trJJucvW/",
+          "title": "Pibank llega con una nueva cuenta de ahorro con 5% TREA  ..."
+        },
+        {
+          "rank_group": 13,
+          "rank_absolute": 17,
+          "domain": "pibank.pe",
+          "url": "https://pibank.pe/aviso-de-privacidad/",
+          "title": "Aviso de privacidad - Pibank Perú"
+        },
+        {
+          "rank_group": 14,
+          "rank_absolute": 18,
+          "domain": "www.pichincha.pe",
+          "url": "https://www.pichincha.pe/personas/cuenta/ahorro-preferente",
+          "title": "Cuenta de Ahorros Preferente - Banco Pichincha"
+        },
+        {
+          "rank_group": 15,
+          "rank_absolute": 19,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/PibankPeruOficial/",
+          "title": "Pibank Perú (@PibankPeruOficial)"
+        },
+        {
+          "rank_group": 16,
+          "rank_absolute": 20,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/BancoPichinchaPeru/videos/cuenta-de-ahorros-preferente-550-trea-soles-/896974885578795/",
+          "title": "Banco Pichincha Perú on Reels"
+        },
+        {
+          "rank_group": 17,
+          "rank_absolute": 21,
+          "domain": "www.facebook.com",
+          "url": "https://www.facebook.com/PibankCol/videos/trae-tus-ahorros-a-pibank/1943982599809781/",
+          "title": "Inicia el año trayendo tus ahorros y hazlos crecer con una de las mejores ..."
+        }
+      ]
+    },
+    {
+      "id": "SERP-05",
+      "source_file": "serp-query-02.json",
+      "task_id": "10061737-1987-0139-0000-f8ed2372aa24",
+      "query": "mejor cuenta de ahorros peru",
+      "captured_at": "2026-10-06 17:37:54 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    },
+    {
+      "id": "SERP-06",
+      "source_file": "serp-query-03.json",
+      "task_id": "10061737-1987-0139-0000-6264274c2ded",
+      "query": "cuenta de ahorros de alto rendimiento",
+      "captured_at": "2026-10-06 17:38:07 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    },
+    {
+      "id": "SERP-07",
+      "source_file": "serp-query-04.json",
+      "task_id": "10061738-1987-0139-0000-17d0307a2403",
+      "query": "cuenta remunerada peru",
+      "captured_at": "2026-10-06 17:38:18 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    },
+    {
+      "id": "SERP-08",
+      "source_file": "serp-query-05.json",
+      "task_id": "10061738-1987-0139-0000-52f4a21c8383",
+      "query": "abrir cuenta de ahorros online",
+      "captured_at": "2026-10-06 17:38:38 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    },
+    {
+      "id": "SERP-09",
+      "source_file": "serp-query-06.json",
+      "task_id": "10061738-1987-0139-0000-65d4b365382f",
+      "query": "cuenta de ahorros sin mantenimiento",
+      "captured_at": "2026-10-06 17:38:51 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    },
+    {
+      "id": "SERP-10",
+      "source_file": "serp-query-07.json",
+      "task_id": "10061738-1987-0139-0000-4d656de708d2",
+      "query": "cuenta de ahorro soles",
+      "captured_at": "2026-10-06 17:39:23 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    },
+    {
+      "id": "SERP-11",
+      "source_file": "serp-query-08.json",
+      "task_id": "10061739-1987-0139-0000-665c06f9e61f",
+      "query": "banco para ahorrar peru",
+      "captured_at": "2026-10-06 17:39:45 +00:00",
+      "market": "PE",
+      "location_code": 2604,
+      "language": "es",
+      "device": "mobile",
+      "depth_requested": 20,
+      "status_code": 40102,
+      "target_filter": "pibank.pe",
+      "capture_state": "provider_no_results_no_usable_rank_data",
+      "pibank_best_organic_rank": null,
+      "pibank_rank_state": "unknown_provider_no_results",
+      "organic_rows": []
+    }
+  ],
+  "limitations": [
+    "Full SERP only status20000 with no target filtering",
+    "No Results40102 retained as no usable rank data, not evidence of rank0 or no index",
+    "No share-of-market, unique users or conversion metrics"
+  ]
+}

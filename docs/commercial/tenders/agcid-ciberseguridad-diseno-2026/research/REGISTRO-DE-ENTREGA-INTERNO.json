@@ -1,0 +1,452 @@
+{
+  "fecha": "2026-10-05",
+  "proceso": "1606-32-LE26",
+  "estado": "No presentada: recepción cerrada 2026-10-05 15:10 America/Santiago; ficha Mercado Público verificada Cerrada; sin comprobante de envío. Documentos aprobados conservados.",
+  "onedrive": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/AGCID",
+  "fuentes": [
+    "oferta-tecnica.md",
+    "propuesta-metodologica.md",
+    "research/DOSSIER-DE-MUESTRAS-INTERNO.md",
+    "research/CIERRE-PARA-POSTULAR-INTERNO.md",
+    "deck-plan.json",
+    "deck-render-record-INTERNO.json",
+    "deck-intent.json",
+    "deck-plan-bound.json"
+  ],
+  "entregables": [
+    {
+      "archivo": "02. Propuesta en trabajo/2.2 AGCID — Propuesta técnica — BORRADOR.docx",
+      "bytes": 202231,
+      "sha256": "154d9fc31e7bc124e88621ebd881ccc6f6d4ec49e7530907f1c36883171412df",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/2.2 AGCID — Propuesta técnica — BORRADOR.pdf",
+      "bytes": 289650,
+      "sha256": "dfe7e15b5bdb95c4a1af844a88f44d041126bbd83c861397aee4635af46b54d2",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/2.3 AGCID — Metodología y plan de trabajo — BORRADOR.docx",
+      "bytes": 202403,
+      "sha256": "28cfe1257374ab7ad9e00b40b7927831b2e1750bda9a72f82f212c7463c0143d",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/2.3 AGCID — Metodología y plan de trabajo — BORRADOR.pdf",
+      "bytes": 290475,
+      "sha256": "96f6824b2cf2df2682b822944344001d94d8f727df73e1491b5ba91baeae223a",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Dossier de muestras — INTERNO.docx",
+      "bytes": 201082,
+      "sha256": "f41e04d63428bab717d07d5598f4093732e99724e97e9067dbe66168825f2779",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Dossier de muestras — INTERNO.pdf",
+      "bytes": 286185,
+      "sha256": "0ece1d15105a9b8eee2fa119defd3dc8b18177c0cf56e375a6583f15540bfa35",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Cierre para postular — INTERNO.docx",
+      "bytes": 199305,
+      "sha256": "242ccebecc4325ce7c07869827b1d5021e59581496a91d6700f98258399b7c63",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Cierre para postular — INTERNO.pdf",
+      "bytes": 280375,
+      "sha256": "b78519ac5e80fa48893702a329c044f61ae013ad4af201dcc817d459b08c7251",
+      "estado": "borrador sin firma / no presentado"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/Anexos Administrativos — BORRADOR.docx",
+      "bytes": 7668834,
+      "sha256": "a0ca82b16a82eccdb05ccdca3f1350154335b4e84effef33c2f5e45c57e138d2",
+      "estado": "plantilla oficial de trabajo sin firma"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/Anexos Técnicos — BORRADOR.docx",
+      "bytes": 7667341,
+      "sha256": "4f82a0d27dff546156b97345d4524aa8054043ffdedcb21b461cfd22266f7c78",
+      "estado": "plantilla oficial de trabajo sin firma"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/Anexo 5 actualizado — BORRADOR.docx",
+      "bytes": 7663832,
+      "sha256": "d89e4ac93c091840fb88c343c87475cfd7cb898d157e5a71c720f04b0d3e410d",
+      "estado": "plantilla oficial de trabajo sin firma"
+    },
+    {
+      "archivo": "02. Propuesta en trabajo/2.3 AGCID — Carta Gantt — BORRADOR.xlsx",
+      "bytes": 8611,
+      "sha256": "69e5a9c231d83287d31e707596c356d03affcf7b3d875571df21374263065b92",
+      "estado": "plan relativo al inicio; fechas y asignaciones no aprobadas"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Costeo y margen — INTERNO.xlsx",
+      "bytes": 6307,
+      "sha256": "bb9c5fe7dad530a91a6e090736126d92646a2475815c5d46bf503753d2ce35c5",
+      "estado": "inputs vacíos; sin precio/margen aprobado"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.2 AGCID — Propuesta para presentación — Artifact Composer.pdf",
+      "bytes": 4167909,
+      "sha256": "d1c86a4b54a03a2cac10a50c6fc82f7a143e9f79ffad99694650eb9d1e964249",
+      "estado": "revisión 3; sin comprobante de envío",
+      "paginas": 23
+    }
+  ],
+  "verificacion": "Readback remoto de nombres y tamaños; SHA256 corresponden a archivos locales previos a sincronización, sin cotejo de hash binario remoto.",
+  "envio": null,
+  "respaldos": [
+    {
+      "cliente": "SKY",
+      "archivo": "Contrato-Sky-830c0de8-ff76-48a8-afe4-b897fb2b9eb9.pdf",
+      "bytes": 899399
+    },
+    {
+      "cliente": "Berel",
+      "archivo": "Contrato de Prestacion de Servicios EFEONCE .pdf-firmado.pdf",
+      "bytes": 2140821
+    },
+    {
+      "cliente": "SKY",
+      "archivo": "PO_221970_0.pdf",
+      "bytes": 31091
+    },
+    {
+      "cliente": "SKY",
+      "archivo": "FAC-EL_56_88417000-1.pdf",
+      "bytes": 68188
+    },
+    {
+      "cliente": "Gobierno de Santiago",
+      "archivo": "Certificado Recibo Conforme - EFEONCE.pdf",
+      "bytes": 113940
+    },
+    {
+      "cliente": "Gobierno de Santiago",
+      "archivo": "FAC-EL_111_61923200-3.pdf",
+      "bytes": 67320
+    },
+    {
+      "cliente": "Equipo",
+      "archivo": "CV Melkin Hernández.pdf",
+      "bytes": 1252559
+    },
+    {
+      "cliente": "Equipo",
+      "archivo": "CV VALENTINA HOYOS (2).pdf",
+      "bytes": 56463
+    }
+  ],
+  "pendiente_equipo": "Consulta al operador sobre pertenencia del equipo a exclusividad SKY y acuerdos posteriores; asignación no confirmada.",
+  "verificaciones_locales": [
+    "DOCX abiertos y tabla Anexo 5: cantidades 1/1/1/30",
+    "PDF A4: técnica 5 páginas, metodología 5; fuentes incrustadas y revisión visual de todas las páginas",
+    "Carta Gantt Excel: hitos iniciales, ciclo documental y cobertura 20+10",
+    "Modelo costo/margen sin inputs inventados",
+    "git diff --check PASS; docs:closure-check PASS; enlaces locales y JSON válidos",
+    "Deck revisión 2: render nativo de 24 láminas, lectura PDF, comprobación aritmética y revisión visual completa.",
+    "Revisión 3: 23 láminas modernas, fotos conservadas, titulares corregidos, SKY sustituye informe Berel; PDF y precio validados.",
+    "Revisión 3: 23 láminas modernas, fotos conservadas, titulares corregidos, SKY sustituye informe Berel; PDF y precio validados.",
+    "Anexo 4: únicamente se retiró la referencia al extracto del informe Berel; Word/PDF con firma existente conservada y las tres páginas revisadas."
+  ],
+  "firma": {
+    "tipo": "imagen de firma original, sin modificación; no firma criptográfica",
+    "autorizacion": "instrucción expresa de Julio 05/10/2026",
+    "fuente": "Comercial/Legales/firma/PNG/Firma-Julio.png",
+    "declaraciones_1_2": "confirmadas por representante",
+    "programa": "existencia confirmada y ajuste autorizado; difusión de nueva versión no acreditada"
+  },
+  "precio_recomendado": {
+    "moneda": "EUR",
+    "neto": 12000,
+    "iva": 2280,
+    "total": 14280,
+    "aprobado": false,
+    "economica_firmada": false,
+    "margen_verificado": false
+  },
+  "entregables_completados": [
+    {
+      "archivo": "05. Paquete para presentar/1.1 Anexo 1 — Declaración para ofertar — FIRMADO.docx",
+      "bytes_local": 7691130,
+      "sha256_local_pre_sync": "4ee628d5791e0ee68cb556bc7d574e48cb53682fd8fab87f8a856c335ff68141"
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.1 Anexo 1 — Declaración para ofertar — FIRMADO.pdf",
+      "bytes_local": 104454,
+      "sha256_local_pre_sync": "07cb14c57125361904e3c06868b7dd2215c3cd8cdad5ad848aa82baf62ba6474",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.2 Anexo 2 — Conflictos de interés — FIRMADO.docx",
+      "bytes_local": 7691787,
+      "sha256_local_pre_sync": "8032b591b7ec4102b9ecc3a6246c044325ffd900e9798fab523ee9abcb7bab5d"
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.2 Anexo 2 — Conflictos de interés — FIRMADO.pdf",
+      "bytes_local": 86228,
+      "sha256_local_pre_sync": "ba5a5f09be776ef764c421ef0b127dec4699c39353594935ee9fb9006df2c0ed",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.8 Anexo 8 — Programa de integridad — FIRMADO.docx",
+      "bytes_local": 7692049,
+      "sha256_local_pre_sync": "4708e702ade67355f52ad91e69c01d4133678cd0ee290ce5501126c7526107cd"
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.8 Anexo 8 — Programa de integridad — FIRMADO.pdf",
+      "bytes_local": 87652,
+      "sha256_local_pre_sync": "b5acc5f2c62de6c521548585cc7f25fec81f1cda3c297af10456159e52c0ae77",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.8 Programa de integridad Efeonce — ACTUALIZADO Y FIRMADO.docx",
+      "bytes_local": 229876,
+      "sha256_local_pre_sync": "3d7a4394e870852399302e93c7e3a11e0f5f3a878f991a5b2b7aac5a1a5823c1"
+    },
+    {
+      "archivo": "05. Paquete para presentar/1.8 Programa de integridad Efeonce — ACTUALIZADO Y FIRMADO.pdf",
+      "bytes_local": 315496,
+      "sha256_local_pre_sync": "6b0b4ab53d69afb18121095ffd3e28de6afe58a7eb87d0d4f6fb74192803acd5",
+      "paginas": 3
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 Anexo 4 — Oferta técnica y experiencia — FIRMADO.docx",
+      "bytes_local": 7694681,
+      "sha256_local_pre_sync": "2e80fa2a2862effc2ad156d5ce8cc59c3e94626ae5b16d258d70fb568794a829",
+      "bytes": 7694681,
+      "sha256": "2e80fa2a2862effc2ad156d5ce8cc59c3e94626ae5b16d258d70fb568794a829",
+      "estado": "Referencia a extracto Berel retirada; datos, experiencia y firma conservados"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 Anexo 4 — Oferta técnica y experiencia — FIRMADO.pdf",
+      "bytes_local": 244285,
+      "sha256_local_pre_sync": "50ba2df8fdab3a2bf1cd48a3ee16c8ce917c9c9847eda5d95cf3ee8958271e69",
+      "paginas": 3,
+      "bytes": 244285,
+      "sha256": "50ba2df8fdab3a2bf1cd48a3ee16c8ce917c9c9847eda5d95cf3ee8958271e69",
+      "estado": "Referencia a extracto Berel retirada; datos, experiencia y firma conservados"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 Berel — Factura exportación 53.pdf",
+      "bytes_local": 64528,
+      "sha256_local_pre_sync": "eadd6d6d9ec10f653fb3095fd4a4ed1eccba02ef2ebee1746213fa124dcafaba",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 Gobierno de Santiago — Factura 111.pdf",
+      "bytes_local": 67320,
+      "sha256_local_pre_sync": "b61fdb7acda55b7a45ab1162e4e04567edef484294d03c66705c76fa652b4463",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 Gobierno de Santiago — Recepción conforme EP9.pdf",
+      "bytes_local": 113940,
+      "sha256_local_pre_sync": "232bf00bb96f756ce68ea62d9730afb204f18a49cea05d19e4e732538fd7eac7",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 SKY — Carta de referencia.pdf",
+      "bytes_local": 121877,
+      "sha256_local_pre_sync": "f9ce3b5995bdfeedda711f4858bceab38638e441685ee9380a8111b301fef78f",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 SKY — Factura 56.pdf",
+      "bytes_local": 68188,
+      "sha256_local_pre_sync": "defd41a77eaaf194d5016e1ccbaf2710c1605394bd50fc0f79be76313dd63e03",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.1 SKY — OC 221970.pdf",
+      "bytes_local": 31091,
+      "sha256_local_pre_sync": "bc0a97f42dcf3629e14ee5921e40c0cae0db297f4019ea0ca7c08bf2b11dd8b7",
+      "paginas": 1
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.2 Muestras de diseño.pdf",
+      "bytes_local": 17954866,
+      "sha256_local_pre_sync": "861868f0f44efb7c38099f104fb5c29b37d339953eb1c91ec59e2ad1a16d03ac",
+      "paginas": 9,
+      "bytes": 18172048,
+      "sha256": "899355c58e97aa997b7cdeb51451d5b2cdc4d79fe70933969d232a9114b41a8d",
+      "estado": "SKY/GORE/Bresler; sin informe Berel"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.2 Propuesta técnica — FIRMADA PARA REVISIÓN.docx",
+      "bytes_local": 231465,
+      "sha256_local_pre_sync": "f4b0188acedf0b7805dafce165f7c1be140ead2ddcfe6d92f81de4e7d4168cea"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.2 Propuesta técnica — FIRMADA PARA REVISIÓN.pdf",
+      "bytes_local": 321579,
+      "sha256_local_pre_sync": "987e5d8cb287d8237412d3afc1452f5ec42b1373fae480fca8d02d291aebe8c2",
+      "paginas": 5
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.3 Carta Gantt.xlsx",
+      "bytes_local": 8611,
+      "sha256_local_pre_sync": "69e5a9c231d83287d31e707596c356d03affcf7b3d875571df21374263065b92"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.3 Metodología y plan de trabajo — FIRMADO PARA REVISIÓN.docx",
+      "bytes_local": 231690,
+      "sha256_local_pre_sync": "2e5e9404e5d26be751855e2b9c224e4d2a6095a16516fcd13591b7c74803e11f"
+    },
+    {
+      "archivo": "05. Paquete para presentar/2.3 Metodología y plan de trabajo — FIRMADO PARA REVISIÓN.pdf",
+      "bytes_local": 322379,
+      "sha256_local_pre_sync": "7feb4e82838e3b07c45a3253933bd9f25f0665e8502b30373990cf7081a6aac8",
+      "paginas": 5
+    },
+    {
+      "archivo": "05. Paquete para presentar/3.1 Anexo 5 actualizado — EUR 12000 TOTAL — FIRMADO.docx",
+      "bytes_local": 7692945,
+      "sha256_local_pre_sync": "6b1256bd03f806997c4ec3beee5caec20b61b20658e90b22ede38442b78180ec"
+    },
+    {
+      "archivo": "05. Paquete para presentar/3.1 Anexo 5 actualizado — EUR 12000 TOTAL — FIRMADO.pdf",
+      "bytes_local": 146335,
+      "sha256_local_pre_sync": "5749e4f8fa6519c55d4799d4cdbe1646f9c817fe274ded715d0c47017b03ae96",
+      "paginas": 2
+    },
+    {
+      "archivo": "04. Interno/AGCID — Anexos no aplicables y etapa de contrato — INTERNO.docx",
+      "bytes_local": 197554,
+      "sha256_local_pre_sync": "c2304e9b4b7fc27cdd170a199ca58d87b1916b3c5f136d76f57f4857af7c27f0"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Anexos no aplicables y etapa de contrato — INTERNO.pdf",
+      "bytes_local": 268068,
+      "sha256_local_pre_sync": "092388785f53c622cbc863d53e9c373e098b114b0aff071ec86b7a230b54a8dc",
+      "paginas": 1
+    },
+    {
+      "archivo": "04. Interno/AGCID — Cierre para postular — INTERNO.docx",
+      "bytes_local": 199521,
+      "sha256_local_pre_sync": "08e7dc71b782cc8df6d519e6b9d20c0b2def62a76a0fb2b9b9377f8e5c9df894"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Cierre para postular — INTERNO.pdf",
+      "bytes_local": 280694,
+      "sha256_local_pre_sync": "1b7fc9e501a746aa94985536e088126aa0bb1f6cae96be05c5d3e91455a0fd27",
+      "paginas": 2
+    },
+    {
+      "archivo": "04. Interno/AGCID — Dossier de muestras — INTERNO.docx",
+      "bytes_local": 201362,
+      "sha256_local_pre_sync": "6d506b83f903adc61b271f06f3f5cee76e28af61dc26faf666fba13290c01902"
+    },
+    {
+      "archivo": "04. Interno/AGCID — Dossier de muestras — INTERNO.pdf",
+      "bytes_local": 286723,
+      "sha256_local_pre_sync": "7645a7a3692a1310e87f561a3bd99b9b786eee9bc5c081776f0daf78aae95a33",
+      "paginas": 4
+    }
+  ],
+  "pendientes": [
+    "costos/margen/caja",
+    "disponibilidad contractual de Melkin/Andrés con SKY",
+    "respaldo real de conocimiento/difusión del programa",
+    "CV/herramientas de Andrés",
+    "discrepancias del pliego sin conciliación"
+  ],
+  "hash_scope": "SHA256 de artefactos locales antes de FileProvider/Office cloud. Las propiedades internas de DOCX/XLSX pueden cambiar al sincronizar; validar presencia y contenido, no igualdad binaria remota.",
+  "habilitacion": {
+    "estado": "habilitado según confirmación directa de Julio",
+    "fecha": "2026-10-05",
+    "readback_independiente": false
+  },
+  "verificacion_documental": {
+    "formularios": "DOCX originales preservados; copias separadas y completadas. Tablas normalizadas A4 y separadores preservados para evitar mezcla en PDF.",
+    "firmas": "PNG original sin editar; ubicación comprobada en PDF de Anexos 1/2/4/8, técnica y programa; sin solapamientos.",
+    "economica": "Anexo 5 firmado: 1/1/1/30 unidades; neto 10084.03, IVA redondeado 1915.97, total 12000.00. Precio decidido por Julio; cálculo Decimal, máximos 20/10/10/60 exactos y P4 cantidad × unitario verificados. Word/PDF cotejados visualmente; firma sin solapamientos.",
+    "muestras": "nueve páginas; Berel sin indicadores; excluidos contratos completos y portafolio con texto SKY incorrecto.",
+    "gates": "docs:closure-check PASS y git diff --check PASS el 05/10/2026; no deploy/push/postulación."
+  },
+  "lectura_remota_firmados": {
+    "fecha": "2026-10-05",
+    "medio": "SharePoint list_folder_items",
+    "carpeta": "05. Paquete para presentar",
+    "archivos": 25,
+    "observacion": "Anexo 5 EUR 12000 total firmado presente en Word/PDF; versión EUR 14280 confirmada en archivo interno como descartada y retirada de la cola actual. No presentado."
+  },
+  "precio_aprobado": {
+    "moneda": "EUR",
+    "neto": 10084.03,
+    "iva": 1915.97,
+    "total": 12000.0,
+    "aprobado": true,
+    "economica_firmada": true,
+    "margen_verificado": false,
+    "fecha": "2026-10-05",
+    "interpretacion": "12 mil como precio total impuestos incluidos, conforme a la comparación previa de montos totales",
+    "recomendacion_anterior_total": 14280,
+    "precision_productos": "5 decimales, para exactitud de límites porcentuales y cantidad × unitario; totales fiscales 2 decimales"
+  },
+  "presentacion_revision": 3,
+  "intento_postulacion_mercado_publico": {
+    "fecha_utc": "2026-10-05T18:11:29Z",
+    "proceso": "1606-32-LE26",
+    "autorizacion": "Julio pidió completar y enviar la oferta en Chrome",
+    "estado_ui": "OFERTA NO ENVIADA",
+    "descripcion": "guardada",
+    "neto_eur": 10084.03,
+    "iva_eur": 1915.97,
+    "total_eur": 12000.0,
+    "declaracion_electronica": "FIRMADA en lectura de UI; firma realizada por Julio",
+    "adjuntos_verificados": 0,
+    "comprobante": null,
+    "bloqueo": "fileChooser.setFiles bloqueado: falta Allow access to file URLs en extensión ChatGPT de Google Chrome; selector nativo Abrir deshabilitado",
+    "paquete_local": "/Users/jreye/Downloads/AGCID-Postular",
+    "archivos": [
+      {
+        "archivo": "1.Administrativos.pdf",
+        "bytes": 555827,
+        "sha256": "bcad42f5f1e3422f4f362a868eea96a4e579c51ef7d048819bb5bfc72d242adf"
+      },
+      {
+        "archivo": "2.Tecnica-Metodologia-Experiencia.pdf",
+        "bytes": 1253308,
+        "sha256": "62df81d11d45f5dfdbc3f17c93413cc3d82dbaf3bc7f97ae0b0fc1e1d5aa4e69"
+      },
+      {
+        "archivo": "3.Presentacion.pdf",
+        "bytes": 4167909,
+        "sha256": "d1c86a4b54a03a2cac10a50c6fc82f7a143e9f79ffad99694650eb9d1e964249"
+      },
+      {
+        "archivo": "4.Muestras.pdf",
+        "bytes": 18172048,
+        "sha256": "899355c58e97aa997b7cdeb51451d5b2cdc4d79fe70933969d232a9114b41a8d"
+      },
+      {
+        "archivo": "5.Gantt.xlsx",
+        "bytes": 8611,
+        "sha256": "69e5a9c231d83287d31e707596c356d03affcf7b3d875571df21374263065b92"
+      },
+      {
+        "archivo": "6.Anexo5-EUR12000.pdf",
+        "bytes": 146335,
+        "sha256": "5749e4f8fa6519c55d4799d4cdbe1646f9c817fe274ded715d0c47017b03ae96"
+      }
+    ]
+  },
+  "verificacion_cierre": {
+    "fecha_utc": "2026-10-05T18:25:14.807221+00:00",
+    "estado_ficha": "Cerrada",
+    "cierre_recepcion_santiago": "2026-10-05 15:10:00",
+    "apertura_tecnica_santiago": "2026-10-05 15:11:00",
+    "oferta_enviada": false,
+    "comprobante": null,
+    "fuente": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?qs=6wuisTMHAXdhNG6cKCcrtg==",
+    "evidencia_local": "/Users/jreye/Downloads/AGCID-Postular/licitacion-cerrada.jpg"
+  }
+}

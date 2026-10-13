@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "protected_sha256": {
+    "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/demanda-audiencia-2026-10-08/resultados.json": "d9a4f49980f1a6e47c98a2b0226be328184e9509879f1860a27fe08f61fe9721",
+    "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/conexion-demanda-plan/resultados.json": "8cacacfbc8824179ba57540da31b5b3efaa1c5f20115b15f67d9b9563de422b4",
+    "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/complemento-2026-10-08/resultados.json": "fd0e23b087a1f3b4de15f538d9e1eb9013ec6451856ac424b3deae6d39110241",
+    "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Propuesta-tecnica-SEO-AEO-2027.pdf": "8d258ea018e92adedc58cd0cf8aed6cc7a4902cf1b4cf5e3ea7f3951e9a235d5"
+  },
+  "checks": [
+    "three inverse scenarios reconcile 15200 funded",
+    "partial models preserved byte-for-byte",
+    "PDF preserved byte-for-byte",
+    "no invented channel allocations"
+  ]
+}

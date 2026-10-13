@@ -1,0 +1,24 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "dd35005a02d40f6a36bbdf82ee42384ae5dd34ca29fa406a1c9a756e86d536de",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.close-proposal"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3f-contra-horizonte-engine",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/plates/BR3f-contra-horizonte-engine.png",
+      "sha256": "d1f5a8d2b4ceab0d2b03257934b63166d8b6a81278fb0e2455bfbd6430d821ea"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

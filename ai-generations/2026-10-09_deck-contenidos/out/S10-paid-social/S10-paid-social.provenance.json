@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "3100978c944a8f939cb2ec63ab223870c284a37aa4343b2871b28993198a26a0",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT7-paid-social",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT7-paid-social.png",
+      "sha256": "74e2629eba768021df296465c2c91d2a87562ba135ca33e091750d219f595e46"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

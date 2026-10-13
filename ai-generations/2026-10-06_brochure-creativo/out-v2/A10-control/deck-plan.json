@@ -1,0 +1,80 @@
+{
+  "tenderId": "A10-control",
+  "slides": [
+    {
+      "slideId": "deck-content-bullets",
+      "contentType": "deck.content-bullets",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "questionPx": "--gl-cb-question-px=40px",
+          "questionLeading": "--gl-cb-question-leading=1.2",
+          "answerLeading": "--gl-cb-answer-leading=1",
+          "answerTracking": "--gl-cb-answer-tracking=-0.04em",
+          "answerInset": "--gl-cb-answer-inset=-4px",
+          "listTop": "--gl-cb-list-top=520px",
+          "listWidth": "--gl-cb-list-width=1640px",
+          "rowGap": "--gl-cb-row-gap=56px",
+          "columnGap": "--gl-cb-column-gap=110px",
+          "rule": "--gl-cb-rule=2px",
+          "padTop": "--gl-cb-pad-top=18px",
+          "numberPx": "--gl-cb-number-px=84px",
+          "numberWght": "--gl-cb-number-wght=300",
+          "numberTracking": "--gl-cb-number-tracking=-0.03em",
+          "numberRaise": "--gl-cb-number-raise=10px",
+          "numberGap": "--gl-cb-number-gap=34px",
+          "titlePx": "--gl-cb-title-px=32px",
+          "descPx": "--gl-cb-desc-px=24px",
+          "descGap": "--gl-cb-desc-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-cb-progress-3-of-4-brand"
+        },
+        "voice": {
+          "question": "¿Pierdo el control de mi marca?",
+          "answer": "Nunca",
+          "eyebrow": "Tu marca, tus reglas"
+        },
+        "items": [
+          {
+            "number": "01",
+            "title": "Apruebas tú",
+            "desc": "La aprobación final y los claims son tuyos: nada sale sin tu visto bueno."
+          },
+          {
+            "number": "02",
+            "title": "Tu prioridad manda",
+            "desc": "Decides qué se produce primero en la priorización de cada semana."
+          },
+          {
+            "number": "03",
+            "title": "Rondas pactadas",
+            "desc": "De dos a tres rondas por pieza; la siguiente se conversa como cambio."
+          },
+          {
+            "number": "04",
+            "title": "Derechos por escrito",
+            "desc": "Uso por canal, territorio y plazo, definidos antes de producir."
+          }
+        ],
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "ContentBullets"
+    }
+  ]
+}

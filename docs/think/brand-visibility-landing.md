@@ -1,8 +1,8 @@
 # AI Visibility Report — landing
 
-> **Nombre público canónico (decisión 2026-10-02):** **Efeonce AI Visibility Report**, con su lockup oficial y la línea Engine. Publicada y verificada en producción el 2026-10-03: Think `f4426d2`, Vercel READY, formulario cargado; sin envío de prueba. La evidencia productiva histórica de este documento no certifica este branding. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) · [Revisión local](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md).
+> **Nombre público canónico (decisión 2026-10-02):** **Efeonce AI Visibility Report**, con su lockup oficial y la línea Engine. Hero demostrativo publicado en Think `6aab907`; ajuste de pantalla amplia publicado en `56a300a` y verificado en producción el 2026-10-04, Vercel success. Hover azul profundo del formulario: implementado y verificado sólo en local, publicación pendiente. La evidencia funcional de julio queda como historia, no como smoke de esta iteración. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) · [Revisión local](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/README.md).
 
-## Estado verificado 2026-07-27
+## Evidencia funcional histórica · 2026-07-27
 
 La landing está publicada en producción en `https://think.efeoncepro.com/brand-visibility` y respondió `HTTP 200`.
 El HTML productivo contiene el renderer Growth Forms y el form gobernado del grader:
@@ -49,7 +49,11 @@ La frase guia del framework es:
 
 ### Hero
 
-Composición publicada: «¿Te recomiendan las IA?» / **«Averígualo»**, con esfera Engine, una órbita oficial con entrada CSS de 2 s y cuadro final fijo, fila de motores y CTA «Empezar mi análisis» al formulario. El CTA deja foco en su encabezado; sin desplazamiento animado.
+Composición publicada: «¿Te recomiendan las IA?» / **«Averígualo»**, con esfera Engine, fila de motores y CTA «Empezar mi análisis» al formulario. Lead: «Descubre cómo aparece tu marca, quién aparece en su lugar y qué mejorar primero». El CTA deja foco en su encabezado; sin desplazamiento animado.
+
+La órbita oficial acompaña una escena demostrativa DOM/CSS de consulta → respuesta → mención de marca → fuente citada, en un ciclo de 12 s específico de esta superficie. La escena no representa un análisis real y conserva una descripción accesible que lo aclara. No muestra proveedores como autores de esa respuesta, pie explicativo ni enlace «Cómo funciona» en el encabezado. Un botón transparente sobre la escena pausa/reanuda con clic, toque, Enter o espacio; tiene nombre accesible y foco visible. Se suspende fuera de pantalla o con pestaña oculta; sin JS o con movimiento reducido queda el ejemplo completo estático.
+
+Desktop: shell compartido de máximo 1360 px y escena de máximo 500 px, sin crecimiento indefinido de su altura. Tablet/móvil: texto, motores, escena y CTA en flujo normal. Readback de producción en 1710 y 2560 px: escena de 500 px, formulario en y=678, sin overflow. [Dirección, capturas y QA](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md).
 
 Lockup `Efeonce | AI Visibility Report` en el encabezado. Framework y preview en papel con tinta Engine e íconos Trazo; Efeonce firma con «Empower your Engine» al 64 % del ancho del logo. Assets sin modificar desde AXIS brand-assets 0.4.10; tokens centralizados en `src/lib/ai-visibility-landing-tokens.ts`.
 
@@ -64,9 +68,15 @@ El form es el Growth Form real:
 
 Think no crea inputs, no valida, no duplica consentimiento y no envia el submit.
 
+Producción conserva el orden publicado **Entrega primero**. El candidato **Marca → Mercado → Contexto → Entrega → Confirmar** sólo está probado en QA, con envíos deshabilitados; requiere activación gobernada y readback separados. La tarjeta tiene piel Engine y jerarquía ligera, sin alterar políticas ni renderer compartido.
+
+Último ajuste local: el hover primario usa `color-mix(in srgb, var(--engine-accent) 70%, var(--engine-ground))` y texto blanco (contraste calculado 6,80:1); reemplaza el celeste pálido, sin añadir efectos. Aplica sólo a botones primarios habilitados del embed en esta landing; conserva secundarios, foco y estados deshabilitados. Todavía no publicado.
+
+En localhost:4331 el formulario productivo puede fallar por CORS: el origen local no está autorizado. No se amplía la allowlist. La vista de QA localhost:4332 usa el contrato candidato real y bloquea los envíos; no acredita activación en producción.
+
 ### Framework Efeonce
 
-La seccion `FRAMEWORK DE efeonce` traduce el diagnostico en cinco niveles:
+La sección `Framework de efeonce` traduce el diagnóstico en cinco niveles desplegables, con preguntas en español como título y nomenclatura inglesa secundaria:
 
 1. `Be Found` - acceso, indexacion, robots y cobertura por canal.
 2. `Be Readable` - estructura semantica, schema, contenido y senales legibles.
@@ -87,7 +97,7 @@ La seccion reduce incertidumbre y muestra el output esperado:
 - siguiente accion recomendada;
 - preview del reporte privado.
 
-Los titulos de las cards deben permanecer descriptivos. La mejora visual debe
+La muestra ampliable usa páginas del PDF fixture sintético, claramente identificada como ejemplo, con selector, diálogo nativo, Escape y retorno de foco. Las preguntas frecuentes aclaran entrega, correo y acceso; el CTA final regresa al formulario. Los títulos deben permanecer descriptivos. La mejora visual debe
 venir de jerarquia, iconografia, ritmo y preview, no de nombres opacos.
 
 ## Flujo operativo
@@ -113,6 +123,8 @@ venir de jerarquia, iconografia, ritmo y preview, no de nombres opacos.
 
 - `src/pages/brand-visibility/index.astro`
 - `src/lib/ai-visibility-landing-tokens.ts`
+- `src/components/EngineHeroOrbit.astro`
+- `src/components/AIVisibilityReportSample.astro`
 - `src/components/EfeonceSlogan.astro`
 - `src/components/BrandVisibilityFormDock.astro`
 - `src/components/primitives/EngineAvatarGroup.astro`
@@ -130,13 +142,13 @@ venir de jerarquia, iconografia, ritmo y preview, no de nombres opacos.
   `preferencia` sobre claims vagos como "la IA entiende tu marca" cuando el
   contexto exige precision.
 
-## Estado productivo
+## Estado productivo histórico · julio de 2026
 
 Al cierre del 2026-07-05 la landing esta live, el submit real genera run y el
 handoff abre el reporte. El pendiente conocido no pertenece a la UI: TASK-1341
 debe proteger runtime config de DataForSEO/Google AI Overview en `ops-worker`.
 
-## Validación local 2026-10-03
+## Registro de validación local · 2026-10-03 (histórico)
 
 Build y tipos pasan; cinco anchos sin overflow, una órbita, assets iguales a AXIS y foco verificado por CUA. El formulario externo falla en localhost por `MissingAllowOriginHeader`; no se amplió CORS ni se hizo submit. El reporte web/PDF y el panel de análisis quedan fuera. TASK-1966 sigue in-progress con aceptación y rollout pendientes.
 
@@ -144,4 +156,4 @@ Motion local posterior: [contrato y evidencia](../ui/motion/TASK-1966-ai-visibil
 
 ## Iteración UX y motion 2026-10-04
 
-Think `09e1976` empujado a `origin/main` por autorización del operador: órbita continua con pausa, muestra real ampliable del PDF, método desplegable, jerarquía más ligera, aclaraciones de entrega y CTA final. El contrato marca primero está implementado en Greenhouse y probado en QA, sin activar. [Evidencia y activación](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md). Los estados de las secciones anteriores son históricos; el despliegue y readback de esta iteración aún no están verificados.
+Think `09e1976` empujado a `origin/main` por autorización del operador: órbita continua con pausa, muestra real ampliable del PDF, método desplegable, jerarquía más ligera, aclaraciones de entrega y CTA final. El contrato marca primero está implementado en Greenhouse y probado en QA, sin activar. [Evidencia y activación](../ui/reviews/TASK-1966-ai-visibility-report-landing-la-orbita/ux-revision-2026-10-04/README.md). Registro histórico de ese corte: el despliegue/readback aún no estaba verificado. Queda superado para el hero por `6aab907` y para geometría amplia por `56a300a`, con readback público del 04/10 documentado arriba; no certifica un nuevo envío, correo o PDF real.

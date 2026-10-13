@@ -1,0 +1,19 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "sernatur-arica-medios-online-1330-22-cot26",
+  "workspacePath": "docs/commercial/tenders/sernatur-arica-medios-online-1330-22-cot26",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "La salida de pnpm deck:compose es local/exploratoria y no cuenta como Proposal ni como asset versionado.",
+    "Actualizar este registro solo con evidencia del camino canónico Proposal → render job → asset versionado → verificación autenticada."
+  ]
+}

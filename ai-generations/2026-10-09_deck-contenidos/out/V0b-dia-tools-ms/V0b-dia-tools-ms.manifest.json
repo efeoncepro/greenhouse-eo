@@ -1,0 +1,480 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "V0b-dia-tools-ms",
+  "input": {
+    "artifactId": "V0b-dia-tools-ms",
+    "slides": [
+      {
+        "slideId": "deck-content-day",
+        "contentType": "deck.content-day.tools",
+        "slots": {
+          "frame": {
+            "line": "brand",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 196,
+            "answerTop": 330,
+            "answerPx": 176,
+            "bodyTop": 690,
+            "bodyPx": 26,
+            "bodyWidth": 380,
+            "questionWidth": "--gl-cd-question-width=470px",
+            "answerLeading": "--gl-cd-answer-leading=0.9",
+            "answerTracking": "--gl-cd-answer-tracking=-0.05em",
+            "answerInset": "--gl-cd-answer-inset=-8px",
+            "answerShadowY": "--gl-cd-answer-shadow-y=10px",
+            "answerShadowBlur": "--gl-cd-answer-shadow-blur=60px",
+            "answerShadowOpacity": "--gl-cd-answer-shadow-opacity=35%",
+            "perspective": "--gl-cd-perspective=1700px",
+            "originX": "--gl-cd-origin-x=1190px",
+            "originY": "--gl-cd-origin-y=460px",
+            "deepY": "--gl-cd-deep-y=50px",
+            "deepBlur": "--gl-cd-deep-blur=110px",
+            "deepColor": "--gl-cd-deep-color=#000610",
+            "deepOpacity": "--gl-cd-deep-opacity=75%",
+            "deepEdge": "--gl-cd-deep-edge=16%",
+            "deepHaloBlur": "--gl-cd-deep-halo-blur=90px",
+            "deepHaloOpacity": "--gl-cd-deep-halo-opacity=22%",
+            "haloColor": "--gl-cd-halo-color=#72ded8",
+            "reflectGap": "--gl-cd-reflect-gap=14px",
+            "reflectFrom": "--gl-cd-reflect-from=72%",
+            "reflectOpacity": "--gl-cd-reflect-opacity=16%",
+            "docFill": "--gl-cd-doc-color=#ffffff",
+            "docInk": "--gl-cd-doc-ink-color=#0b1f33",
+            "docMuted": "--gl-cd-doc-muted-color=#5f6b7a",
+            "docRule": "--gl-cd-doc-rule-color=#e3e8ee",
+            "docChip": "--gl-cd-doc-chip-color=#f5f7fa",
+            "docShadowColor": "--gl-cd-doc-shadow-color=#000610",
+            "docShadowY": "--gl-cd-doc-shadow-y=50px",
+            "docShadowBlur": "--gl-cd-doc-shadow-blur=110px",
+            "docShadowOpacity": "--gl-cd-doc-shadow-opacity=75%",
+            "docHaloBlur": "--gl-cd-doc-halo-blur=90px",
+            "docHaloOpacity": "--gl-cd-doc-halo-opacity=22%",
+            "docEdgeOpacity": "--gl-cd-doc-edge-opacity=16%",
+            "panelLeft": "--gl-cd-panel-left=780px",
+            "panelTop": "--gl-cd-panel-top=260px",
+            "panelWidth": "--gl-cd-panel-width=820px",
+            "panelHeight": "--gl-cd-panel-height=490px",
+            "panelRadius": "--gl-cd-panel-radius=22px",
+            "panelRotateY": "--gl-cd-panel-rotate-y=-14deg",
+            "panelRotateX": "--gl-cd-panel-rotate-x=9deg",
+            "tileLabelGap": "--gl-cdt-label-gap=16px",
+            "tileLabelWidth": "--gl-cdt-label-width=300px",
+            "tileShadowY": "--gl-cdt-shadow-y=30px",
+            "tileShadowBlur": "--gl-cdt-shadow-blur=60px",
+            "tileShadowColor": "--gl-cdt-shadow-color=#000610",
+            "tileShadowOpacity": "--gl-cdt-shadow-opacity=60%",
+            "tileGlowBlur": "--gl-cdt-glow-blur=50px",
+            "tileGlowOpacity": "--gl-cdt-glow-opacity=35%",
+            "kickerPx": "--gl-cdt-kicker-px=14px",
+            "kickerTracking": "--gl-cdt-kicker-tracking=0.12em",
+            "titlePx": "--gl-cdt-title-px=26px",
+            "captionLeft": "--gl-cdt-caption-left=930px",
+            "captionTop": "--gl-cdt-caption-top=966px",
+            "captionWidth": "--gl-cdt-caption-width=520px",
+            "captionLogo": "--gl-cdt-caption-logo=30px",
+            "captionGap": "--gl-cdt-caption-gap=12px",
+            "captionPx": "--gl-cdt-caption-px=28px",
+            "captionNotePx": "--gl-cdt-caption-note-px=19px"
+          },
+          "stage": {
+            "src": "asset-ref:layer:content-day-tools-stage"
+          },
+          "platform": {
+            "src": "asset-ref:layer:content-day-tools-platform"
+          },
+          "beams": {
+            "src": "asset-ref:layer:content-day-tools-beams"
+          },
+          "panel": {
+            "src": "asset-ref:file:ms-social",
+            "alt": "La campaña en Marketing Studio: semana de publicaciones por red, bandeja de mensajes y creadores"
+          },
+          "tiles": [
+            {
+              "left": "--gl-cdt-left=630px",
+              "top": "--gl-cdt-top=132px",
+              "size": "--gl-cdt-size=128px",
+              "radius": "--gl-cdt-radius=35px",
+              "icon": "--gl-cdt-icon=72px",
+              "z": "--gl-cdt-z=7",
+              "fillFrom": "--gl-cdt-fill-from-color=#ffffff",
+              "fillMid": "--gl-cdt-fill-mid-color=#eaf1f6",
+              "fillTo": "--gl-cdt-fill-to-color=#cfdce6",
+              "fillMidAt": "--gl-cdt-fill-mid-at=55%",
+              "edge": "--gl-cdt-edge=70%",
+              "src": "asset-ref:file:metricool-on-black",
+              "alt": "Metricool",
+              "name": "Metricool",
+              "label": "Publicamos"
+            },
+            {
+              "left": "--gl-cdt-left=1620px",
+              "top": "--gl-cdt-top=40px",
+              "size": "--gl-cdt-size=112px",
+              "radius": "--gl-cdt-radius=30px",
+              "icon": "--gl-cdt-icon=63px",
+              "z": "--gl-cdt-z=7",
+              "fillFrom": "--gl-cdt-fill-from-color=#ffffff",
+              "fillMid": "--gl-cdt-fill-mid-color=#eaf1f6",
+              "fillTo": "--gl-cdt-fill-to-color=#cfdce6",
+              "fillMidAt": "--gl-cdt-fill-mid-at=55%",
+              "edge": "--gl-cdt-edge=70%",
+              "src": "asset-ref:file:sprout-social-isotype",
+              "alt": "Sprout Social",
+              "name": "Sprout Social",
+              "label": "Escuchamos y atendemos"
+            },
+            {
+              "left": "--gl-cdt-left=1670px",
+              "top": "--gl-cdt-top=540px",
+              "size": "--gl-cdt-size=150px",
+              "radius": "--gl-cdt-radius=41px",
+              "icon": "--gl-cdt-icon=84px",
+              "z": "--gl-cdt-z=8",
+              "fillFrom": "--gl-cdt-fill-from-color=#ffffff",
+              "fillMid": "--gl-cdt-fill-mid-color=#eaf1f6",
+              "fillTo": "--gl-cdt-fill-to-color=#cfdce6",
+              "fillMidAt": "--gl-cdt-fill-mid-at=55%",
+              "edge": "--gl-cdt-edge=70%",
+              "src": "asset-ref:file:favikon-isotype",
+              "alt": "Favikon",
+              "name": "Favikon",
+              "label": "Elegimos creadores"
+            },
+            {
+              "left": "--gl-cdt-left=640px",
+              "top": "--gl-cdt-top=560px",
+              "size": "--gl-cdt-size=142px",
+              "radius": "--gl-cdt-radius=38px",
+              "icon": "--gl-cdt-icon=88px",
+              "z": "--gl-cdt-z=8",
+              "fillFrom": "--gl-cdt-fill-from-color=#14506e",
+              "fillMid": "--gl-cdt-fill-mid-color=#001a33",
+              "fillTo": "--gl-cdt-fill-to-color=#001a33",
+              "fillMidAt": "--gl-cdt-fill-mid-at=100%",
+              "edge": "--gl-cdt-edge=28%",
+              "src": "asset-ref:file:efeonce-isotype-negative",
+              "alt": "Efeonce Insights",
+              "name": "Efeonce Insights",
+              "label": "Reportes automáticos"
+            }
+          ],
+          "caption": {
+            "logo": "asset-ref:file:marketing-studio-isotype-negative",
+            "title": "Tu plan en Marketing Studio",
+            "note": "todo en un solo lugar, en vivo"
+          },
+          "voice": {
+            "question": "¿Cómo trabajamos contigo?",
+            "answer": "Así",
+            "eyebrow": "Tu día a día con Efeonce"
+          },
+          "body": "Cada cosa en su herramienta y <strong>todo</strong> a la vista en Marketing Studio, sin esperar el informe."
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-day",
+      "contentType": "deck.content-day.tools",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 176,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-cd-question-width=470px",
+          "answerLeading": "--gl-cd-answer-leading=0.9",
+          "answerTracking": "--gl-cd-answer-tracking=-0.05em",
+          "answerInset": "--gl-cd-answer-inset=-8px",
+          "answerShadowY": "--gl-cd-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-cd-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-cd-answer-shadow-opacity=35%",
+          "perspective": "--gl-cd-perspective=1700px",
+          "originX": "--gl-cd-origin-x=1190px",
+          "originY": "--gl-cd-origin-y=460px",
+          "deepY": "--gl-cd-deep-y=50px",
+          "deepBlur": "--gl-cd-deep-blur=110px",
+          "deepColor": "--gl-cd-deep-color=#000610",
+          "deepOpacity": "--gl-cd-deep-opacity=75%",
+          "deepEdge": "--gl-cd-deep-edge=16%",
+          "deepHaloBlur": "--gl-cd-deep-halo-blur=90px",
+          "deepHaloOpacity": "--gl-cd-deep-halo-opacity=22%",
+          "haloColor": "--gl-cd-halo-color=#72ded8",
+          "reflectGap": "--gl-cd-reflect-gap=14px",
+          "reflectFrom": "--gl-cd-reflect-from=72%",
+          "reflectOpacity": "--gl-cd-reflect-opacity=16%",
+          "docFill": "--gl-cd-doc-color=#ffffff",
+          "docInk": "--gl-cd-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-cd-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-cd-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-cd-doc-chip-color=#f5f7fa",
+          "docShadowColor": "--gl-cd-doc-shadow-color=#000610",
+          "docShadowY": "--gl-cd-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-cd-doc-shadow-blur=110px",
+          "docShadowOpacity": "--gl-cd-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-cd-doc-halo-blur=90px",
+          "docHaloOpacity": "--gl-cd-doc-halo-opacity=22%",
+          "docEdgeOpacity": "--gl-cd-doc-edge-opacity=16%",
+          "panelLeft": "--gl-cd-panel-left=780px",
+          "panelTop": "--gl-cd-panel-top=260px",
+          "panelWidth": "--gl-cd-panel-width=820px",
+          "panelHeight": "--gl-cd-panel-height=490px",
+          "panelRadius": "--gl-cd-panel-radius=22px",
+          "panelRotateY": "--gl-cd-panel-rotate-y=-14deg",
+          "panelRotateX": "--gl-cd-panel-rotate-x=9deg",
+          "tileLabelGap": "--gl-cdt-label-gap=16px",
+          "tileLabelWidth": "--gl-cdt-label-width=300px",
+          "tileShadowY": "--gl-cdt-shadow-y=30px",
+          "tileShadowBlur": "--gl-cdt-shadow-blur=60px",
+          "tileShadowColor": "--gl-cdt-shadow-color=#000610",
+          "tileShadowOpacity": "--gl-cdt-shadow-opacity=60%",
+          "tileGlowBlur": "--gl-cdt-glow-blur=50px",
+          "tileGlowOpacity": "--gl-cdt-glow-opacity=35%",
+          "kickerPx": "--gl-cdt-kicker-px=14px",
+          "kickerTracking": "--gl-cdt-kicker-tracking=0.12em",
+          "titlePx": "--gl-cdt-title-px=26px",
+          "captionLeft": "--gl-cdt-caption-left=930px",
+          "captionTop": "--gl-cdt-caption-top=966px",
+          "captionWidth": "--gl-cdt-caption-width=520px",
+          "captionLogo": "--gl-cdt-caption-logo=30px",
+          "captionGap": "--gl-cdt-caption-gap=12px",
+          "captionPx": "--gl-cdt-caption-px=28px",
+          "captionNotePx": "--gl-cdt-caption-note-px=19px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:content-day-tools-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:content-day-tools-platform"
+        },
+        "beams": {
+          "src": "asset-ref:layer:content-day-tools-beams"
+        },
+        "panel": {
+          "src": "asset-ref:file:ms-social",
+          "alt": "La campaña en Marketing Studio: semana de publicaciones por red, bandeja de mensajes y creadores"
+        },
+        "tiles": [
+          {
+            "left": "--gl-cdt-left=630px",
+            "top": "--gl-cdt-top=132px",
+            "size": "--gl-cdt-size=128px",
+            "radius": "--gl-cdt-radius=35px",
+            "icon": "--gl-cdt-icon=72px",
+            "z": "--gl-cdt-z=7",
+            "fillFrom": "--gl-cdt-fill-from-color=#ffffff",
+            "fillMid": "--gl-cdt-fill-mid-color=#eaf1f6",
+            "fillTo": "--gl-cdt-fill-to-color=#cfdce6",
+            "fillMidAt": "--gl-cdt-fill-mid-at=55%",
+            "edge": "--gl-cdt-edge=70%",
+            "src": "asset-ref:file:metricool-on-black",
+            "alt": "Metricool",
+            "name": "Metricool",
+            "label": "Publicamos"
+          },
+          {
+            "left": "--gl-cdt-left=1620px",
+            "top": "--gl-cdt-top=40px",
+            "size": "--gl-cdt-size=112px",
+            "radius": "--gl-cdt-radius=30px",
+            "icon": "--gl-cdt-icon=63px",
+            "z": "--gl-cdt-z=7",
+            "fillFrom": "--gl-cdt-fill-from-color=#ffffff",
+            "fillMid": "--gl-cdt-fill-mid-color=#eaf1f6",
+            "fillTo": "--gl-cdt-fill-to-color=#cfdce6",
+            "fillMidAt": "--gl-cdt-fill-mid-at=55%",
+            "edge": "--gl-cdt-edge=70%",
+            "src": "asset-ref:file:sprout-social-isotype",
+            "alt": "Sprout Social",
+            "name": "Sprout Social",
+            "label": "Escuchamos y atendemos"
+          },
+          {
+            "left": "--gl-cdt-left=1670px",
+            "top": "--gl-cdt-top=540px",
+            "size": "--gl-cdt-size=150px",
+            "radius": "--gl-cdt-radius=41px",
+            "icon": "--gl-cdt-icon=84px",
+            "z": "--gl-cdt-z=8",
+            "fillFrom": "--gl-cdt-fill-from-color=#ffffff",
+            "fillMid": "--gl-cdt-fill-mid-color=#eaf1f6",
+            "fillTo": "--gl-cdt-fill-to-color=#cfdce6",
+            "fillMidAt": "--gl-cdt-fill-mid-at=55%",
+            "edge": "--gl-cdt-edge=70%",
+            "src": "asset-ref:file:favikon-isotype",
+            "alt": "Favikon",
+            "name": "Favikon",
+            "label": "Elegimos creadores"
+          },
+          {
+            "left": "--gl-cdt-left=640px",
+            "top": "--gl-cdt-top=560px",
+            "size": "--gl-cdt-size=142px",
+            "radius": "--gl-cdt-radius=38px",
+            "icon": "--gl-cdt-icon=88px",
+            "z": "--gl-cdt-z=8",
+            "fillFrom": "--gl-cdt-fill-from-color=#14506e",
+            "fillMid": "--gl-cdt-fill-mid-color=#001a33",
+            "fillTo": "--gl-cdt-fill-to-color=#001a33",
+            "fillMidAt": "--gl-cdt-fill-mid-at=100%",
+            "edge": "--gl-cdt-edge=28%",
+            "src": "asset-ref:file:efeonce-isotype-negative",
+            "alt": "Efeonce Insights",
+            "name": "Efeonce Insights",
+            "label": "Reportes automáticos"
+          }
+        ],
+        "caption": {
+          "logo": "asset-ref:file:marketing-studio-isotype-negative",
+          "title": "Tu plan en Marketing Studio",
+          "note": "todo en un solo lugar, en vivo"
+        },
+        "voice": {
+          "question": "¿Cómo trabajamos contigo?",
+          "answer": "Así",
+          "eyebrow": "Tu día a día con Efeonce"
+        },
+        "body": "Cada cosa en su herramienta y <strong>todo</strong> a la vista en Marketing Studio, sin esperar el informe."
+      },
+      "template": "ContentDayTools",
+      "contractHash": "825f9a31567c292125329fc1b6ccffc01b05bfffdf1122ad8f51c5eed9ffff4f",
+      "templateHash": "d0259c122b1d271bbb9294bb53ed29c9e076ad87996023d80fecce5518633da2"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

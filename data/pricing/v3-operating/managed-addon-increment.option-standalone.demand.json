@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "managed-addon-increment-example",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 3,
+    "lines": [
+      {
+        "lineId": "lead",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "agreed-add-on-price",
+        "kind": "agreed_net",
+        "amount": "300000",
+        "billing": "monthly",
+        "lineIds": [
+          "lead"
+        ],
+        "reason": "Example: price agreed for the optional add-on, a block of additional conversations. Declared for this example; not a commercial approval."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "example:iva-cl-19",
+      "source": {
+        "reference": "example: IVA 19 % declared for this example; not a tax ruling for any client",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    }
+  },
+  "work": [
+    {
+      "lineId": "lead",
+      "assigneeIds": [
+        "lead-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.08",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.08"
+      },
+      "reason": "Example hypothesis: the add-on quoted alone. One named seat the lead already has in the base quote; only the added dedication is carried here, 0.08 of 1. Not a real portfolio or an access grant."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.08",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.08"
+      },
+      "reason": "Example hypothesis: the add-on quoted alone. One named seat the lead already has in the base quote; only the added dedication is carried here, 0.08 of 1. Not a real portfolio or an access grant."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

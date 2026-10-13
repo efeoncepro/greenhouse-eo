@@ -1,0 +1,27 @@
+{
+  "lane": "seedream",
+  "icon": "01-lupa",
+  "elapsedSeconds": 97.66097116470337,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:byteplus",
+    "--model",
+    "seedream5-pro",
+    "--size",
+    "2048x2048",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/prompts/01-lupa.txt",
+    "--input-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream-input.json",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/01-lupa.png",
+    "--out-dir",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/receipts/01-lupa",
+    "--max-usd",
+    "0.09",
+    "--yes"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-flare-seedream5pro/seedream/01-lupa.png"
+}

@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-10",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "accountId": "sky-airline-simulation",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "titular",
+        "profile": "ECG-007",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyId": "allocation:dedicated",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": [
+          {
+            "requirementId": "assurance",
+            "resourceId": "provision-backfill-coverage"
+          },
+          {
+            "requirementId": "operations",
+            "resourceId": "provision-on-call-alert-guard"
+          }
+        ]
+      },
+      {
+        "lineId": "lider",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.3"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "agentes",
+        "profile": "ECG-021",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "titular",
+      "assigneeIds": [
+        "sky-care-titular"
+      ],
+      "tasks": [
+        "social-care"
+      ],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "social-publishing",
+          "reason": "Este rol responde comentarios; no programa ni publica contenido."
+        }
+      ]
+    },
+    {
+      "lineId": "lider",
+      "assigneeIds": [
+        "sky-care-lider"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "agentes",
+      "assigneeIds": [
+        "sky-care-agentes"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "crm-automation",
+          "reason": "Este rol mantiene los agentes y la base de conocimiento; sin automatización de CRM en el alcance."
+        }
+      ]
+    }
+  ],
+  "serviceToolIds": [
+    "agent-runtime-usage"
+  ],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.5",
+      "seatCapacity": 3,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "1.5"
+      },
+      "reason": "Hipótesis de simulación: tres asientos nominativos; al servicio se le carga 1,5 de 3 (dedicación declarada 1,4)."
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "public-standard-teams-monthly",
+      "quantity": "3",
+      "serviceShare": "0.5",
+      "seatCapacity": 3,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "1.5"
+      },
+      "reason": "Hipótesis de simulación: tres asientos nominativos; al servicio se le carga 1,5 de 3 (dedicación declarada 1,4)."
+    },
+    {
+      "periodId": 1,
+      "toolId": "social-inbox",
+      "priceId": "sprout-advanced-annual",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "named-seats",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Decisión del operador (10/10/2026): un solo asiento nominativo de Sprout Social Advanced, el de la persona dedicada. Precio público con facturación anual; plan contratado sin confirmar.",
+      "seatCapacity": 1
+    },
+    {
+      "periodId": 1,
+      "toolId": "agent-runtime-usage",
+      "priceId": "hypothesis-per-1000-items",
+      "quantity": "10",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "thousand-items-processed",
+        "totalUnits": "10",
+        "allocatedUnits": "10"
+      },
+      "reason": "Hipótesis de simulación: unos 10.000 comentarios entrantes clasificados al mes. No está medido."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

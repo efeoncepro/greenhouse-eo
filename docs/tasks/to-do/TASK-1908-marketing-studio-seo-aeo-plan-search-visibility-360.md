@@ -1,5 +1,14 @@
 # TASK-1908 — Marketing Studio: plan SEO/AEO con Search Visibility 360 (referencias, snapshots, seguimiento y rastreo por persona)
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -33,7 +42,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de capa de estrategia (§4.5); resuelve las preguntas abiertas 2 y 3 del ADR para SEO/AEO`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1907 (versión del plan y readinessContributors) · TASK-1892 (consumer y bindings de Studio en Greenhouse, ventana fija en la lectura SEO) · TASK-1899 (escritura MCP de Studio y proposalDigest)`
+- Blocked by: `TASK-1907 (versión del plan y readinessContributors) · TASK-1892 (consumer y bindings de Studio en Greenhouse, ventana fija en la lectura SEO)`
 - Branch: `efeonce-marketing-studio main (bloque SEO/AEO, adapter, snapshots, seguimiento) · Greenhouse develop (proposalRef y carril delegado de rastreo, manifiesto, docs) · efeonce-mcp rama + PR (sync de Studio, cliente de canje SEO y ruta delegada de track/untrack); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -1,0 +1,376 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:19:39.654Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "get:ai.optimization.chat.gpt.llm.responses.models",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_responses/models"
+    },
+    "family": "ai_optimization",
+    "organizationId": null,
+    "consumer": "aeo",
+    "taskCount": 0,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [],
+    "batchLimit": null,
+    "estimatedCostUsd": 0,
+    "estimateStatus": "available",
+    "maxUsd": null,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_responses/models/",
+      "sourceModifiedAt": "2026-08-07T13:11:02.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 867,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 0,
+        "httpStatus": 200,
+        "latencyMs": 867,
+        "costUsd": 0,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061919-1987-0616-0000-7df90df39276",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 49,
+        "cost": 0,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0,
+    "tasks": [
+      {
+        "id": "10061919-1987-0616-0000-7df90df39276",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.0000 sec.",
+        "cost": 0,
+        "result_count": 49,
+        "path": [
+          "v3",
+          "ai_optimization",
+          "chat_gpt",
+          "llm_responses",
+          "models"
+        ],
+        "data": {
+          "api": "ai_optimization",
+          "function": "llm_responses",
+          "se": "chat_gpt"
+        },
+        "result": [
+          {
+            "model_name": "o4-mini",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "o4-mini-2025-04-16",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "o3-mini",
+            "reasoning": true,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "o3-mini-2025-01-31",
+            "reasoning": true,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "o1",
+            "reasoning": true,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "o1-2024-12-17",
+            "reasoning": true,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-6.1-sol",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-6-sol",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-6-luna",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-6-astra",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.6-terra",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.6-sol",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.6-luna",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.5",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.5-2026-04-23",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.4-nano",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.4-nano-2026-03-17",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.4-mini",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.4-mini-2026-03-17",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.4",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.4-2026-03-05",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.2",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.2-2025-12-11",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.1",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5.1-2025-11-13",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5-nano",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5-nano-2025-08-07",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5-mini",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5-mini-2025-08-07",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-5-2025-08-07",
+            "reasoning": true,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4o-mini",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4o-mini-2024-07-18",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4o",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4o-2024-05-13",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4o-2024-08-06",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4o-2024-11-20",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4.1-nano",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4.1-nano-2025-04-14",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4.1-mini",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4.1-mini-2025-04-14",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4.1",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4.1-2025-04-14",
+            "reasoning": false,
+            "web_search_supported": true,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4-turbo",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4-turbo-2024-04-09",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-4-0613",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-3.5-turbo",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          },
+          {
+            "model_name": "gpt-3.5-turbo-0125",
+            "reasoning": false,
+            "web_search_supported": false,
+            "task_post_supported": true
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,8 +1,8 @@
 # Efeonce Marketing Studio — Operación híbrida con agentes: roles, work items y despachador Claude/OpenAI (ADR)
 
 > **Status:** `Accepted` (2026-09-26). Implementación y rollout por tasks del EPIC-049; nada de este ADR está en
-> runtime todavía. El modo interactivo (persona + skill de rol + Efeonce MCP) ya es posible en lectura hoy y en
-> escritura cuando TASK-1894 y TASK-1899 estén en producción.
+> runtime todavía. Actualización 2026-10-04: TASK-1899 retirada; TASK-2003 toma MCP T1 en paralelo.
+> El release Studio API 1.6.0 no acredita el despachador, work items ni federación de nuevas tools.
 > **Date:** 2026-09-26
 > **Deciders:** Julio Reyes (operador). Redacción: Claude.
 > **Owner:** Efeonce Marketing Studio
@@ -34,6 +34,16 @@
 > **Aplica:** [`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`](../GREENHOUSE_FULL_API_PARITY_DECISION_V1.md) ·
 > [`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](../EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) ·
 > [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
+
+## Actualización de alcance — 2026-10-04
+
+TASK-1899 se retiró sin rollout y no condiciona entregas API/CLI/UI. Los mecanismos de digest/confirmación citados
+desde ella son antecedentes, sin contrato activo. TASK-2003 aborda MCP T1; T2 sigue humano en el carril habilitado,
+actualmente operador CLI. La CLI HTTP no convierte `--confirm` en autoridad remota.
+
+La restricción MCP de §4.2 rige los roles y el despachador de este ADR. El cliente de operador `pnpm studio` es
+un consumidor HTTP y no implementa ese despachador. [Decisión del cliente](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md#delta-2026-10-04--cliente-cli-http-en-greenhouse).
+Los hechos de proveedores de §12 y «Validated as of» conservan su fecha 26/09, sin nueva verificación.
 
 ## 1. Contexto
 
@@ -82,7 +92,7 @@ espacio de trabajo:
 |---|---|---|---|
 | **A. Runtime por proveedor con integraciones propias** (funciones o SDK de Studio embebidos en cada runtime) | Máximo control por proveedor | Dos implementaciones de cada acción; la autoridad se reimplementa por runtime; cada cambio de Studio rompe dos integraciones | Rechazada |
 | **B. Acceso directo a la API `/api/v1` con credencial del agente** | Una sola API | Salta el canje por persona del gateway; el agente queda con un bearer de servicio que no sabe quién pidió el trabajo | Rechazada |
-| **C. Sólo por Efeonce MCP** (`mcp.efeonce.org`, OAuth, mismas tools que usa una persona) | Anthropic y OpenAI hablan MCP remoto con OAuth (§12); una sola superficie gobernada; autoridad por persona ya resuelta (canje RFC 8693, TASK-1899) | Depende de la disponibilidad del gateway; toda capacidad debe estar federada antes de que un agente la use | **Aceptada** |
+| **C. Sólo por Efeonce MCP** (`mcp.efeonce.org`, OAuth, mismas tools que usa una persona) | Anthropic y OpenAI hablan MCP remoto con OAuth (§12); una sola superficie gobernada; autoridad por persona diseñada (canje RFC 8693; TASK-2003 pendiente, TASK-1899 retirada) | Depende de la disponibilidad del gateway; toda capacidad debe estar federada antes de que un agente la use | **Aceptada** |
 
 ### 3.2 Dónde vive el estado del trabajo
 
@@ -184,7 +194,7 @@ espacio de trabajo:
 
 - **Corrida delegada (trabajo asignado):** el agente actúa con la identidad delegada de la persona que asignó el work
   item. Autoridad = intersección de las capabilities de esa persona (releídas en cada llamada por el canje de
-  Greenhouse, TASK-1899) con la lista de tools del rol. Auditoría: «persona X, ejecutado por agente `<rol>@<versión>`
+  Greenhouse, carril T1 TASK-2003) con la lista de tools del rol. Auditoría: «persona X, ejecutado por agente `<rol>@<versión>`
   (corrida R, runtime, modelo)». Si la persona pierde una capability o se revoca la delegación, la siguiente llamada
   falla cerrada.
 - **La delegación para segundo plano la emite sólo Efeonce ID** (`auth.efeonce.org`), nunca el gateway, Studio ni un
@@ -196,17 +206,16 @@ espacio de trabajo:
   crea borradores y work items nuevos; nunca edita contenido aceptado por una persona. La programación la crea una
   persona (`T2`), que queda registrada como responsable del programa; la auditoría registra
   «servicio `<rol>`, programa P de la persona X».
-- **`T2` siempre requiere confirmación de una persona:** `dryRun` → digest de propuesta → confirmación explícita,
-  según TASK-1899. Una confirmación sólo es válida desde un token **sin** claim `act` (la persona misma, en un
-  cliente interactivo o en la UI). Un agente en segundo plano o programado nunca confirma: deja la propuesta en el
-  work item.
+- **`T2` siempre requiere confirmación de una persona.** La mecánica por digest/token de TASK-1899 fue retirada.
+  En runtime, HTTP rechaza T2 y el operador CLI confirma explícitamente. Un agente en segundo plano o programado
+  nunca confirma: deja la propuesta en el work item cuando ese modelo esté implementado.
 - **Un agente nunca tiene más autoridad que la persona que lo asignó**, ni la identidad de servicio más que `T1`.
 
 ### 4.5 Tres modos de ejecución, un contrato
 
 | Modo | Quién inicia | Identidad | Dónde corre | Estado |
 |---|---|---|---|---|
-| **1. Interactivo** | Una persona invoca el rol desde Claude Code, claude.ai, Codex o ChatGPT con la skill de rol + Efeonce MCP | La persona (su propio token OAuth) | En el cliente de la persona | Disponible hoy en lectura; escrituras cuando TASK-1894/1899 estén en producción; distribución en ChatGPT/Codex por TASK-1904 |
+| **1. Interactivo** | Una persona invoca el rol desde Claude Code, claude.ai, Codex o ChatGPT con la skill de rol + Efeonce MCP | La persona (su propio token OAuth) | En el cliente de la persona | Lectura condicionada al provider/conexión; MCP T1 por TASK-2003 y canary propio; distribución en ChatGPT/Codex por TASK-1904 |
 | **2. Delegado en segundo plano** | Asignar un work item a un rol dispara el despachador | Delegada de la persona que asignó (§4.4) | Adaptador del proveedor elegido | Requiere despachador, delegación de Efeonce ID y rol evaluado |
 | **3. Programado** | El despachador por programa (p. ej. lectura semanal) | Servicio de agente, sólo `T0`/`T1` | Igual que el modo 2 | Requiere lo anterior + programa creado por una persona |
 
@@ -289,7 +298,7 @@ del despachador nace sin tipos de Studio para poder promoverse a plataforma (§8
 | Compuerta | Interactivo | Segundo plano delegado | Programado |
 |---|---|---|---|
 | Tools federadas en Efeonce MCP | Sí | Sí | Sí |
-| Escrituras MCP (TASK-1899) | Para escribir | Sí | Sí |
+| Escrituras MCP T1 (TASK-2003; T2 no habilitado) | Para escribir | Sí | Sí |
 | Tarjeta de rol publicada | Recomendado (skill de rol) | Sí | Sí |
 | Evaluación aprobada rol × runtime × modelo | No | Sí | Sí |
 | Delegación de Efeonce ID para segundo plano | No | Sí | No (identidad de servicio) |
@@ -373,7 +382,8 @@ Las tasks por tema las crea el EPIC-049; este ADR no fija sus IDs.
 | Evals, costo y métricas por rol | Sets de evaluación versionados, ejecución por combinación, escalera de autonomía, métricas y señales |
 | Skills de rol para modo interactivo | Planificador de medios y SEO/AEO (en creación), luego copywriter, QA creativo y de marca, analista de desempeño; referenciadas por la tarjeta de rol |
 | Delegación para segundo plano (Efeonce ID) | Diseño y ADR delta en el dueño (EPIC-044): token por corrida con claim `act`, revocación, soporte del emisor nativo para las tools de Studio |
-| TASK-1899 | Escrituras MCP (clase de scope, canje por capability, `Efeonce-Delegated-Token`, `dryRun` → confirmación): base de toda escritura de agente |
+| TASK-1899 | Retirada 2026-10-04; diseño histórico sin rollout |
+| TASK-2003 | Carril paralelo MCP T1 con scope/canje por capability; no bloquea API/CLI/UI |
 | TASK-1904 | Plugin privado de Efeonce MCP para Codex y ChatGPT: canal del modo interactivo en OpenAI |
 | TASK-1909 | Paquete de contexto por campaña y modelo de procedencia que usan los entregables de agentes |
 | TASK-1905 · 1907 · 1908 · 1910 · 1911 | Capacidades de estrategia (canales, plan, SEO/AEO, medición, aprendizajes) que los roles operan como cualquier cliente |
@@ -388,7 +398,7 @@ plataforma con su propio ADR. Hasta entonces vive en Studio.
   `assigned` y visibles para reasignar a una persona. No se borra ningún dato.
 - El kill switch global detiene corridas nuevas y rechaza las llamadas de corridas en curso.
 - La delegación para segundo plano se revoca en Efeonce ID; las tools de escritura se retiran de la federación sin
-  tocar las lecturas (rollback de TASK-1899).
+  tocar las lecturas (rollback del carril MCP efectivamente desplegado).
 - Las skills de rol del modo interactivo siguen funcionando aunque todo lo anterior esté apagado.
 
 ## 10. Revisar cuando
@@ -408,7 +418,7 @@ plataforma con su propio ADR. Hasta entonces vive en Studio.
 
 1. **Mecánica exacta de la delegación para segundo plano** en Efeonce ID: forma del consentimiento de la persona al
    asignar, TTL, atadura a work item y corrida, cómo el gateway la verifica y cómo se relaciona con el canje RFC 8693
-   actual de TASK-1899 (hoy el emisor nativo está `unsupported` para las tools de Studio).
+   previsto en TASK-1899, retirada; revisar el alcance de TASK-2003 antes de decidir este soporte.
    **Resuelta en dueño y principios (2026-09-26):** unidad nueva **U22 de EPIC-044**, poseída por
    [`TASK-1917`](../../tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md). Efeonce ID emite tokens cortos y
    revocables por corrida, con `act` (la persona delega en un rol de agente versionado), scopes ⊆ lista del rol, atados

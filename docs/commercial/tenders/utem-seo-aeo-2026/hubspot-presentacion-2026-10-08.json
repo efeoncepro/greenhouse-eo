@@ -1,0 +1,43 @@
+{
+  "portal": 48713323,
+  "dealId": 65832566144,
+  "process": "5251-1060-COT26",
+  "authority": "Instrucción expresa de Julio en esta conversación: registrar oferta enviada, cambiar etapa y valor total del negocio.",
+  "before": {
+    "stage": "qualifiedtobuy",
+    "amount": "",
+    "currency": "CLP",
+    "pipeline": "default",
+    "bucket": "Core Pipeline",
+    "dealtype": "newbusiness",
+    "buyerBudget": "6800000"
+  },
+  "after": {
+    "stage": "presentationscheduled",
+    "stageLabel": "Presentación de soluciones",
+    "amount": 4800000,
+    "currency": "CLP",
+    "pipeline": "default",
+    "bucket": "Core Pipeline",
+    "dealtype": "newbusiness",
+    "buyerBudget": 6800000
+  },
+  "checks": {
+    "independentReadbacks": 2,
+    "valuesStable": true,
+    "descriptionReconciled": true,
+    "companyAssociationCount": 0,
+    "companyAssociationsChanged": false,
+    "commercialCloseDateChanged": false,
+    "netProgramAmountNotMonthly": true
+  },
+  "vat": 912000,
+  "totalWithVat": 5712000,
+  "notion": {
+    "taskId": "3f339c2f-efe7-815b-bf44-df20bcf8f5db",
+    "status": "Enviada",
+    "submittedOn": "2026-10-08",
+    "readbackVerified": true
+  },
+  "verifiedAt": "2026-10-08T17:59:05.781Z"
+}

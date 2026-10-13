@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "checks": [
+    "33 unique query representatives",
+    "1188 monthly scenario rows",
+    "all Jan-Aug histories complete",
+    "original 19-family priority simulation reproduced",
+    "input hashes unchanged during calculation",
+    "scenario totals, funding and lag reconciled",
+    "60 editorial slots; maximum five per month",
+    "unknown queries not zero",
+    "no foreign traffic or demographic share imported"
+  ],
+  "model_sha256": "d9a4f49980f1a6e47c98a2b0226be328184e9509879f1860a27fe08f61fe9721",
+  "pdf_edited": false,
+  "original_models_edited": false
+}

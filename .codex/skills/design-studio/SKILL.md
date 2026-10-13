@@ -111,6 +111,11 @@ la composición sin forzar utilería y comparar los píxeles finales con esas re
 reutilizado un prompt no lo cumple.
 **Antes de producir, abre el banco aprobado y la guía «El porqué» en AXIS** ([banco](https://axis.efeonce.org/references/photography/) · [por qué](https://axis.efeonce.org/references/photography/why/) · agentes: `manifest.json`, `recipes/<slug>.json` y `why.json`): parte de la receta de la foto más cercana y cierra con su lista de control. Detalle en la referencia `design-studio/references/efeonce-photographic-language.md` §«Banco aprobado y guía «El porqué» en AXIS».
 
+**Cine con motor explícito:** la ficha y `foto:prompt` conservan el estilo y las referencias; Nano Banana 2.1 se
+opera por `pnpm ai:nano` y pasa los mismos gates y revisión que Sunburst. Consulta la [prueba portable Nexa](../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable):
+4K/high con ocho referencias, APROBABLE técnico; la comparación visual es acotada y no cambia defaults ni añade una
+receta al banco aprobado.
+
 > **Skill dueña:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) — criterio, paquete, aplicaciones, motion y convergencia con el lenguaje fotográfico (`references/photography-convergence.md`).
 
 Para piezas de la marca propia Efeonce o su familia (Globe, Wave, Reach) con la **línea gráfica «La órbita»**
@@ -138,6 +143,12 @@ nunca como texto. No aplica a UI de Greenhouse ni a clientes.
   pone espacio, material y luz. Lecciones medidas: la referencia va sin leyendas (el modelo las imprime), el logo chico
   se reinventa y se repone **editando** con el logo oficial como segunda referencia, la puntuación se revisa letra por
   letra y se corrige editando, no regenerando. Detalle en la referencia de la línea.
+- **Descubrimiento antes de producir:** consulta [la búsqueda visual AXIS](https://axis.efeonce.org/),
+  [Logotipos](https://axis.efeonce.org/references/logos/) e [Iconografía](https://axis.efeonce.org/references/iconography/).
+  El catálogo central incluye formas canónicas y candidatas de AEO/SEO/Autoridad; lee `status`, `package` y
+  `renderer` por entrada. Una candidata no se dibuja con `resolveIcon` ni se convierte en aprobada al exportar.
+  Preparación, comandos y QA: [consumo AXIS](../axis-design-system/references/agent-consumption.md).
+  Los starters de composición no generan fotografía ni sustituyen `foto:prompt` y el QA de esta skill.
 - **Íconos de la marca Efeonce** (canónicos 2026-09-26): Trazo (lo que se mide) o Plastilina (lo que se crea, Brand)
   según la línea de la pieza; glifos de `ICON_CATALOG` pintados con `resolveIcon` y grupo pasado por `auditIconGroup`
   (`@efeoncepro/axis-graphic-line/icons`), nunca dibujados ni generados sueltos (no es el «icono» de UI de Greenhouse

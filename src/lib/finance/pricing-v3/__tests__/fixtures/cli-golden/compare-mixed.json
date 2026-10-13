@@ -1,0 +1,21 @@
+{
+  "args": [
+    "compare",
+    "--left",
+    "data/pricing/v3-pilot/economics/colombia-chile-artifact.json",
+    "--right",
+    "data/pricing/v3-catalog/examples/designer.quote.artifact.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 230,
+    "sha256": "f4d491d6f9c91921b75602d972d71185d737a52a7591239ebf6b83301d4f8d1d",
+    "text": "{\n  \"error\": {\n    \"code\": \"INVALID_COMPARISON\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

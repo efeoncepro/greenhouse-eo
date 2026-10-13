@@ -1,0 +1,57 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Growth · Estrategia y medición",
+    "question": "¿Lo medimos?",
+    "answer": [
+      "Siempre"
+    ]
+  },
+  "body": "Estrategia con número: GTM, revenue enablement, analítica y orquestación. Todo lo que se hace se mide, y lo ves en vivo.",
+  "proof": {
+    "text": "Resultados en vivo en Efeonce Insights, cada mes",
+    "source": "Efeonce Insights, producto en operación"
+  },
+  "steps": [
+    {
+      "glyph": "busqueda",
+      "kicker": "Empieza aquí",
+      "name": "Diagnóstico"
+    },
+    {
+      "glyph": "embudo",
+      "kicker": "Plan",
+      "name": "Estrategia y GTM"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "Medición",
+      "name": "Analítica"
+    },
+    {
+      "glyph": "automatizacion",
+      "kicker": "On-going",
+      "name": "Orquestación"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
+    "alt": "Una estratega de Efeonce revisa en pantalla la misma pieza que un agente de IA, con luz teal"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

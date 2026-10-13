@@ -1,0 +1,222 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: shared revision",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: proposed prices",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: funded goal",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: AEO and production",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: no stale scope or internal instructions",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: rendering",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: restored dated diagnosis",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Propuesta-tecnica-2027: remaining business deliverables",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: shared revision",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: proposed prices",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: funded goal",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: AEO and production",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: no stale scope or internal instructions",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: rendering",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: restored dated diagnosis",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Resumen-para-gerencia-2027: remaining business deliverables",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Oferta-hibrida-2027: shared revision",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Oferta-hibrida-2027: proposed prices",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Oferta-hibrida-2027: funded goal",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Oferta-hibrida-2027: AEO and production",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Oferta-hibrida-2027: no stale scope or internal instructions",
+      "pass": true
+    },
+    {
+      "check": "Pibank-Oferta-hibrida-2027: rendering",
+      "pass": true
+    },
+    {
+      "check": "preserved research/model: reconstruccion-2027/conexion-demanda-plan/costeo-interno.csv",
+      "pass": true
+    },
+    {
+      "check": "preserved research/model: reconstruccion-2027/conexion-demanda-plan/capacidad-por-mes.csv",
+      "pass": true
+    },
+    {
+      "check": "preserved research/model: reconstruccion-2027/conexion-demanda-plan/inputs.json",
+      "pass": true
+    },
+    {
+      "check": "preserved research/model: reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx",
+      "pass": true
+    },
+    {
+      "check": "preserved research/model: research/pibank-gap-closure-2026-10-06/plan-busquedas.csv",
+      "pass": true
+    },
+    {
+      "check": "price matches model: base",
+      "pass": true
+    },
+    {
+      "check": "price matches model: integral",
+      "pass": true
+    },
+    {
+      "check": "price matches model: gradual",
+      "pass": true
+    }
+  ],
+  "pdfs": [
+    {
+      "name": "Pibank-Propuesta-tecnica-2027",
+      "pages": 5,
+      "sha256": "06120a05587573786aa021e8bd39a156c0ce12c09e4d86437486e3402359ab24",
+      "source": "PROPUESTA-PARA-PIBANK-2027.md",
+      "source_sha256": "da3ea80be3c41e8ff1ae9cb408aea766522acbb419341f7380a197753b539096",
+      "qa": {
+        "pages": 5,
+        "toc": [
+          {
+            "target": "seccion-1",
+            "page": 1,
+            "title": "1. Objetivo y alcance recomendado"
+          },
+          {
+            "target": "seccion-2",
+            "page": 1,
+            "title": "2. Diagnóstico que orienta las primeras intervenciones"
+          },
+          {
+            "target": "seccion-3",
+            "page": 2,
+            "title": "3. Arquitectura y SEO técnico en WordPress"
+          },
+          {
+            "target": "seccion-4",
+            "page": 3,
+            "title": "4. Producción y AEO que evolucionan con la evidencia"
+          },
+          {
+            "target": "seccion-5",
+            "page": 3,
+            "title": "5. Comunidad, PR y eficiencia de captación"
+          },
+          {
+            "target": "seccion-6",
+            "page": 4,
+            "title": "6. Calendario de la ruta gradual"
+          },
+          {
+            "target": "seccion-7",
+            "page": 4,
+            "title": "7. Aporte estimado y ejercicio desde el lanzamiento"
+          },
+          {
+            "target": "seccion-8",
+            "page": 5,
+            "title": "8. Responsabilidades, inversión y aceptación"
+          }
+        ],
+        "fontsOk": true,
+        "overflow": [],
+        "brokenImages": 0
+      }
+    },
+    {
+      "name": "Pibank-Resumen-para-gerencia-2027",
+      "pages": 2,
+      "sha256": "2a72b58854213b00482d35add1b36de709d5416cd241cb415688b0d255735286",
+      "source": "RESUMEN-PARA-GERENCIA.md",
+      "source_sha256": "702b41b65ea4747c5225f5747a44d894fc239a553f3192b107b16633e2dfccb8",
+      "qa": {
+        "pages": 2,
+        "toc": [],
+        "fontsOk": true,
+        "overflow": [],
+        "brokenImages": 0
+      }
+    },
+    {
+      "name": "Pibank-Oferta-hibrida-2027",
+      "pages": 5,
+      "sha256": "1b361292bc173082d4e1cc2ea322df80a6d12e2aff167b5fbf3999b68756d03d",
+      "source": "oferta-hibrida/OFERTA-PARA-PIBANK.md",
+      "source_sha256": "5374c4832f0f320fc7ffdc03dfbd3683e295562b74acc5b3f9a69291fe911cef",
+      "qa": {
+        "pages": 5,
+        "toc": [],
+        "fontsOk": true,
+        "overflow": [],
+        "brokenImages": 0
+      }
+    }
+  ],
+  "visual_review": "all_12_final_PDF_pages_inspected",
+  "bank_data_validated": false,
+  "sent": false,
+  "package_files": 84,
+  "package_zip_sha256": "1d75ec6e39de831eaf7b1d4e743efcb7dd1c2b20c91fe4aa107d46b30563d67a",
+  "cost_and_demand_models_changed": false,
+  "paid_research_calls": 0,
+  "documentation_gate": "pass_strict_scoped",
+  "context_gate": "pass_zero_errors_zero_warnings",
+  "local_links_checked": 82,
+  "local_links_missing": 0,
+  "current_models_unchanged_against_commit": 4
+}

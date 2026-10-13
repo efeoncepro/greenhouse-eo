@@ -189,6 +189,11 @@ pnpm foto:validar:cine <plate.png>                          # aparte de foto:val
   el 36 % superior. Profundidad y llave son sólo informativas. No ve stickers, relleno ni azul rey bajo luz azul: eso lo
   mira el agente `cine-reviewer` (sólo Claude Code; Codex aplica la rúbrica leyendo `.claude/agents/cine-reviewer.md`).
 
+**Motor explícito, 2026-10-06:** el prompt compilado y el orden de referencias también se usan con `pnpm ai:nano`
+(Nano Banana 2.1); `foto:generar` conserva su ruta Sunburst. El [manual cine](../../manual-de-uso/creative/producir-foto-cine-de-marca.md#generar-con-nano-banana-21-cuando-lo-elige-el-operador)
+describe el desvío sin concatenar bloques ni pasar flags Google a `foto:generar`. La [prueba Nexa 4K/high](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md)
+pasó los gates técnicos con ocho referencias; no cambia los defaults ni incorpora una receta aprobada.
+
 **4. 🔴 Gate de no-regresión al tocar `build-prompt.mjs`.** La condición del operador fue no romper los comandos de los
 demás registros. Antes y después de cualquier cambio al compilador:
 

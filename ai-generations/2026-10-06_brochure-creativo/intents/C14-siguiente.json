@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "use": "brochure",
+  "recipe": "decision-next-steps",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "¿Por dónde empezamos?",
+    "answer": [
+      "Por aquí"
+    ]
+  },
+  "body": "Un diagnóstico para saber dónde está tu marca.",
+  "agenda": {
+    "kicker": "01 · Creative Diagnostic",
+    "title": "Agenda tu diagnóstico",
+    "descriptor": "45 min por videollamada · baseline y siguiente fase",
+    "days": [
+      {
+        "weekday": "Lun",
+        "day": "12"
+      },
+      {
+        "weekday": "Mar",
+        "day": "13"
+      },
+      {
+        "weekday": "Mié",
+        "day": "14"
+      },
+      {
+        "weekday": "Jue",
+        "day": "15"
+      },
+      {
+        "weekday": "Vie",
+        "day": "16"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 2,
+      "time": 2
+    },
+    "summary": "Martes 13 · 11:30 · hora de Chile",
+    "cta": "Agenda un diagnóstico"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Piloto pagado",
+      "title": "Sample Sprint",
+      "desc": "Acotado y gobernado, para probar el encaje con tu marca."
+    },
+    {
+      "number": "03",
+      "label": "On-Going",
+      "title": "Tu squad",
+      "desc": "Tu squad, con métricas en vivo."
+    }
+  ]
+}

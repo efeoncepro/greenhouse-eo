@@ -1,0 +1,162 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "db0cbc87166e4d9bc81e4820d541da422fb4feca5fedaa812c8ced37419442bd",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 23,
+  "contentTypes": [
+    "deck.cover-proposal",
+    "deck.decision-ai-market",
+    "deck.decision-ai-answer",
+    "deck.content-bullets",
+    "deck.decision-traffic-to-revenue",
+    "deck.section-split",
+    "deck.content-bullets",
+    "deck.proposal-service",
+    "deck.proposal-service",
+    "deck.method-eeat",
+    "deck.proposal-cinematic",
+    "deck.method-surround-cycle",
+    "deck.content-team",
+    "deck.content-day.live-progress",
+    "deck.content-day.live-results",
+    "deck.content-measure-formulas",
+    "deck.content-industries",
+    "deck.content-markets",
+    "deck.decision-difference",
+    "deck.decision-risk",
+    "deck.decision-plan",
+    "deck.decision-diagnosis-map",
+    "deck.close-proposal"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:SX4-busqueda-y-respuesta",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png",
+      "sha256": "39c1ffe4f1dff6bf9524ce8f41a8c9e4d18e16ff10741d1ed1fd0b32712a7859"
+    },
+    {
+      "ref": "asset-ref:plate:SE1-te-encuentran-isotipo-lens-440x440",
+      "path": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+      "sha256": "f8fc99ac450c24f551da251abb2ae017d42f646f40a09ef5da3c8671e035b789"
+    },
+    {
+      "ref": "asset-ref:plate:D2-led-medicion-lens-440x440",
+      "path": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png",
+      "sha256": "596776f9ece43605e276c339fcd81068fb1a5187d23664c80acc3977948098d3"
+    },
+    {
+      "ref": "asset-ref:plate:DV1-lo-hacemos",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/DV1-lo-hacemos.png",
+      "sha256": "1834002f04094586e27fcb45e3c95449059585b36e5b9fa4b18724ee7868bff3"
+    },
+    {
+      "ref": "asset-ref:plate:landing-precios-45-review-340x425",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/landing-precios-45.png",
+      "sha256": "7fcae3bb4d28ca48dbcc64a19763bde2439b6efc8ef6a5f2d587dab4980c62d4"
+    },
+    {
+      "ref": "asset-ref:plate:MK2-mercados",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+      "sha256": "10fdddfffbc90647dc8f4045d45dfdf034f6db027d698a9d6140ef7f02a74750"
+    },
+    {
+      "ref": "asset-ref:plate:BR3-contra-horizonte",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "sha256": "0463d21a42b850c7d169271d967c35c01b7bc3e333f5432e7586f3ded4cc4d7d"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:pibank-logo",
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo.svg",
+      "sha256": "cf06079bc36e825a2f293c67b96d756670935aad00e87662ad67dfb1542cd282"
+    },
+    {
+      "ref": "asset-ref:file:measure",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/measure.png",
+      "sha256": "100cd0192cbb7e2a6adf995d5199d4e142524efc1f49101ad93a0756a71153d6"
+    },
+    {
+      "ref": "asset-ref:file:create",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/create.png",
+      "sha256": "58422e2e39a556e55d08020e0bc802ca027396076907eea0004c9de3737670ca"
+    },
+    {
+      "ref": "asset-ref:file:distribute",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/distribute.png",
+      "sha256": "01af746a8dc46f27040c2fed83c31ee7f545447e32e0275356549c149e328301"
+    },
+    {
+      "ref": "asset-ref:file:optimize",
+      "path": "docs/assets/public-site/aeo-service-icons/v2/optimize.png",
+      "sha256": "e5458f43f544e30ce2d422e946851bf8043c0f191eba13c718a35acf8c3cfb1e"
+    },
+    {
+      "ref": "asset-ref:file:squad-andres",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+      "sha256": "ae9b16d7e72588b7d88d12cdabf34b80015e1d5b50f1e9e2e06f05de9ca56c6e"
+    },
+    {
+      "ref": "asset-ref:file:squad-valentina",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+      "sha256": "c268125b320560a51815243e9d2a223288d41e4c3a954a744d95edaf6ab5e18b"
+    },
+    {
+      "ref": "asset-ref:file:squad-julio",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+      "sha256": "71728dfe3a8fccac6ec99338ebf176dc8eca6247f22beb0714a633657f9bf27e"
+    },
+    {
+      "ref": "asset-ref:file:squad-daniela",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+      "sha256": "09f855e35b9532ccb7cad4f8a29b375df1ae686a949856ea4267d754fb0f1a53"
+    },
+    {
+      "ref": "asset-ref:file:squad-melkin",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+      "sha256": "3ed018d2435331cb1978bf46ef5a4580a9661ef5625d359a358da5d34146d085"
+    },
+    {
+      "ref": "asset-ref:file:notion-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "sha256": "73e1972c42eeb5b337bbeb2b4a02a9315ddb1921e690725e89f1fcec96203816"
+    },
+    {
+      "ref": "asset-ref:file:frameio-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "sha256": "a1ba5e2f7c3eda6dca595eae3ce49b90a94417fc46fdb5762eb5aa9bf989add8"
+    },
+    {
+      "ref": "asset-ref:file:efeonce-isotype-negative",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/efeonce-isotype-negative.svg",
+      "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74"
+    },
+    {
+      "ref": "asset-ref:file:greenhouse-seo-dashboard",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png",
+      "sha256": "280263abb9678bfe5364f710bcc86c01c8d6ca7438798f6bb4e8b1251c42acec"
+    },
+    {
+      "ref": "asset-ref:file:teams-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "sha256": "fb94647100f67df8a6faf8ed52bc900ad30fdbeb15690fbdbba613335ef098db"
+    },
+    {
+      "ref": "asset-ref:file:negative-isotipo-green",
+      "path": "public/images/greenhouse/SVG/negative-isotipo-green.svg",
+      "sha256": "c35ceea63282dd9b3d3f2a0b821c69e42e0486f083d535c9036fe4e08f1c0e96"
+    },
+    {
+      "ref": "asset-ref:file:sv360-lockup-negative",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/sv360-lockup-negative.svg",
+      "sha256": "21408c0dd0e26ab59c67302f2099f1bf01ad37979f06c6a84a35f40ec26cb2f0"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

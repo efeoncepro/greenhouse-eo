@@ -1,0 +1,96 @@
+{
+ "observedAt": "2026-10-08",
+ "source": "DataForSEO serp-compare · Google Chile · escritorio · top 20 + AI Overview",
+ "rows": [
+  {
+   "query": "diplomado",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado online",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "educacion continua",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado en gestion publica",
+   "rank": null,
+   "aio": true,
+   "cited": true
+  },
+  {
+   "query": "diplomado control de gestion",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado analisis de datos",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado gestion de proyectos",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado administracion publica",
+   "rank": 11,
+   "aio": true,
+   "cited": true
+  },
+  {
+   "query": "diplomado en educacion",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "postitulo",
+   "rank": 10,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado compras publicas",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado recursos humanos",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado ciberseguridad",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado inteligencia artificial",
+   "rank": null,
+   "aio": true,
+   "cited": false
+  },
+  {
+   "query": "diplomado en seguridad privada",
+   "rank": null,
+   "aio": true,
+   "cited": true
+  }
+ ]
+}

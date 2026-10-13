@@ -1,6 +1,11 @@
 # Revisar licitaciones Wherex con Playwright
 
 > Manual operativo para evaluar oportunidades privadas en Wherex mediante la CLI Playwright y un perfil de Chrome aislado.
+>
+> **Tipo de documento:** Manual de uso
+> **Versión:** 1.1
+> **Creado:** 2026-08-11
+> **Última actualización:** 2026-10-12 por Claude (1.1: cómo es la oferta dentro del portal —pasos, servicio a cotizar, moneda, datos de facturación del comprador, hora de cierre— y relectura del Centro de mensajes antes de congelar cada documento; caso fuente: licitación 1164)
 
 ## Propósito
 
@@ -60,7 +65,7 @@ es evidencia suficiente si abre un diálogo nativo de guardado.
 2. Revisa los estados **Nueva** y **Editando**, página por página. Una oportunidad ya abierta puede pasar a Editando aunque siga vigente; consultar sólo Nueva deja oportunidades fuera del radar.
 3. De cada fila anota comprador, ID, título, estado, fecha y hora de cierre, categoría y una señal inicial del alcance.
 4. Abre la ficha de toda oportunidad que parezca pertinente o ambigua. Lee la **descripción o comentarios generales completa**: no supongas que presupuesto, periodicidad, pago, exclusiones o alcance viven en un campo estructurado. El listado y el título son sólo screening.
-5. Abre **Centro de mensajes → Preguntas** y revisa todas las preguntas y respuestas disponibles. Distingue lo que consultó un proveedor de lo que confirmó el comprador; registra la fecha y el hecho operativo que modifique presupuesto, pago, facturación, inicio, cobertura geográfica, entregables o exclusiones. Si el reporte del runner no trae esa evidencia, la revisión en la UI autenticada es obligatoria antes del dictamen. No pulses `Nueva pregunta`, no respondas ni envíes nada.
+5. Abre **Centro de mensajes → Preguntas** y revisa todas las preguntas y respuestas disponibles. Distingue lo que consultó un proveedor de lo que confirmó el comprador; registra la fecha y el hecho operativo que modifique presupuesto, pago, facturación, inicio, cobertura geográfica, entregables o exclusiones. Si el reporte del runner no trae esa evidencia, la revisión en la UI autenticada es obligatoria antes del dictamen. No pulses `Nueva pregunta`, no respondas ni envíes nada. El Centro de mensajes muestra las preguntas de **todos** los proveedores: las respuestas a otros también definen el alcance (ver «Releer antes de congelar cada documento»).
 6. Lee las bases, brief, RFP, TDR y anexos técnicos cuando puedan cambiar el dictamen. El runner extrae temporalmente PDF, DOCX, XLSX y PPTX, elimina el temporal y marca un archivo no interpretable como `unreadable`. La ficha, sus aclaraciones y los adjuntos deben concordar; ante una diferencia, registra la fuente y fecha, y resuélvela antes de ofertar.
 7. Contrasta el alcance con los servicios canónicos de Efeonce. Distingue lo que Efeonce puede entregar directamente de lo que requeriría partner, certificaciones, cobertura local, hardware, personal presencial u otra capacidad externa.
 8. Entrega una recomendación y evidencia; no selecciones participar/no me interesa, no envíes consultas ni propuestas y no firmes ni subas documentos.
@@ -85,7 +90,8 @@ licitación como candidata para evaluación comercial.
 
 1. Crea o reutiliza el workspace del repositorio con `pnpm tender:new <slug>`. Guarda las bases normativas en
    `bases/` y la investigación interna en `research/`; ese workspace no reemplaza el archivo operativo de OneDrive.
-2. Busca la carpeta del comprador en la biblioteca sincronizada `Alineación/4. Comercial/Licitaciones/` de OneDrive.
+2. Busca la carpeta del comprador en la biblioteca sincronizada `Alineación/4. Comercial/Licitaciones/` de OneDrive. Dentro, reutiliza o crea el proceso numerado
+   `<N>. <Nombre de la licitación>`; por ejemplo `UTEM/1. Agencia SEO-AEO`.
    Si no existe, créala sólo cuando haya al menos un adjunto original que guardar. Conserva el nombre del comprador
    para que el equipo pueda encontrar el expediente sin conocer el slug técnico.
 3. Copia cada PDF, DOCX, XLSX o PPTX original con su nombre de origen. Comprueba que el archivo exista, tenga tamaño
@@ -110,27 +116,67 @@ registro comercial canónico.
    un deal histórico cerrado o uno sin asociación no cubre automáticamente la licitación vigente.
 3. Consulta las propiedades disponibles de HubSpot antes de preparar la creación. Pipeline, etapa, owner y opciones
    permitidas se toman del portal, no de una tabla copiada en este manual.
-4. Si falta la empresa, muestra al operador una tabla con las propiedades exactas y pide aprobación explícita. Crea la
-   empresa, relee su ID y verifica sus valores.
-5. Luego muestra una segunda tabla con el deal exacto y la asociación a esa empresa por ID. Pide una segunda
-   aprobación antes de crear; la primera no autoriza por sí sola una asociación contra un ID aún desconocido.
-6. Relee el deal y consulta su empresa asociada. Informa el ID y la verificación final. No modifiques registros
-   existentes ni inventes properties para que parezcan equivalentes sin confirmación específica.
+4. Si faltan registros, prepara propiedades, identidad y asociaciones para el alcance autorizado. Una señal sigue como lead hasta calificación; no crear un Deal calificado sólo por haber encontrado una licitación.
+5. Obtén autorización cuando falte. Si ya se autorizó la empresa, el proceso y su asociación, resolver y verificar el ID no exige una segunda aprobación por sí solo. No extender ese permiso a otros objetos, etapas ni envíos.
+6. Relee cada objeto y su asociación por ID. Reutiliza registros vigentes y conserva los Deals que el operador haya pedido dejar sin cambios. No dupliques segmentos activos: completa propiedades respaldadas y verifica membresía efectiva.
 
-HubSpot exige esta confirmación por cada escritura, incluso cuando el objetivo general era crear los registros.
-Polpaico ilustra la rama de reutilización: si el deal vigente y su empresa ya existen y están asociados, se reportan
-como verificados y no se duplican.
+Polpaico ilustra la rama de reutilización: si el deal vigente y su empresa ya existen y están asociados, se reportan como verificados y no se duplican.
+
+## Contacto y postulaciones por plataforma
+
+La regla aplica a Wherex, Mercado Público y procesos descubiertos en LicitaLAB: el comprador puede contactar después de revisar la oferta. Si no existe interlocutor o canal de preguntas, documentar la limitación y continuar con las bases y supuestos acordados; no convertir una aclaración imposible en requisito previo automático. Consultar, firmar y enviar requieren su propio alcance autorizado. Método común: [construir una licitación](construir-una-licitacion.md).
 
 ## Preparar y presentar una oferta en Wherex
 
 Esta sección aplica sólo cuando el operador instruye explícitamente preparar o presentar una oferta. La lectura del
-radar no autoriza por sí misma completar formularios, aceptar bases ni enviar.
+radar no autoriza por sí misma completar formularios, aceptar bases ni enviar. Presentar, cargar archivos o enviar
+mensajes en Wherex se hace sólo con la confirmación expresa del operador en ese momento.
+
+### Cómo es la oferta dentro del portal
+
+Lo que sigue se observó el 12/10/2026 en la licitación 1164. La pantalla puede variar entre procesos: úsalo para
+saber dónde mirar y confirma cada dato en la ficha vigente.
+
+| Qué buscas | Dónde está | Qué tener en cuenta |
+| --- | --- | --- |
+| Los pasos de la oferta | «Información y preguntas» → «1. Servicio licitado» → «2. Condiciones y archivos adjuntos» → «3. Resumen y enviar oferta» | El rótulo del paso no es un enlace: se avanza con «Siguiente »». Recorrerlos para leer no cambió nada; la licitación ya figuraba en «Editando». |
+| El servicio a cotizar | «1. Servicio licitado» | Puede ser **un solo servicio** (cantidad 1) con **un monto total**, no una lista de ítems. El desglose va en la oferta económica adjunta y su total debe ser ese monto. |
+| La moneda | Selector del mismo paso (USD, EUR, MXN, CLP, PEN, COP) | En el caso estaba en MXN. La pregunta sobre la moneda nunca se respondió por mensaje: el selector ya la resolvía. |
+| Si el monto lleva impuesto | Leyenda «NO considera IVA» junto al total | El monto que se ingresa es neto. La oferta económica debe declarar la misma base. |
+| Datos de facturación del comprador | Pestaña «Información» | Razón social, identificador fiscal y dirección. Wherex lo rotula «RUT» aunque sea de otro país (en el caso, un RFC mexicano). Es el dato que pide `buyer.taxId` en la plantilla de la oferta económica. |
+| Condiciones de pago | Pestaña «Información» | En el caso decían «Por definir»; el comprador respondió que se revisan con quienes avancen. La oferta no propone un plazo. |
+| Hora de cierre | Ficha | Wherex la muestra en **tu hora local**, sin indicar zona: 19:00 en Santiago era 16:00 en Ciudad de México. Anota las dos. |
+
+En el paso 2 están los tres casilleros de adjuntos (administrativos, técnicos y económicos) y el límite de peso por
+archivo, que configura cada comprador: en ese caso eran 20 MB, y el video de 23 MB no se pudo adjuntar (se ve por el QR y
+el enlace de la propuesta). Revísalo antes de exportar los archivos finales.
+
+Cuando envíes la oferta, el estado pasa a «Enviada» con tu nombre, la fecha y la hora. Para corregirla después hay que
+retirarla y volver a enviarla. Pide al agente que lea el estado, el monto y los adjuntos y los deje en un registro de
+presentación del expediente.
+
+### Releer antes de congelar cada documento
+
+Antes de dar por cerrada la propuesta técnica, cada anexo y la oferta económica, vuelve a leer la ficha y el
+**Centro de mensajes completo**, incluidas las preguntas de otros proveedores y sus respuestas.
+
+- En la licitación 1164, respuestas a otros proveedores definieron qué cotizar (un «lanzamiento tipo» con sus
+  piezas y el desarrollo de la pieza madre), que la muestra de video podía ser un storyboard o animatic, que para
+  punto de venta sólo se pedía el diseño y que la volumetría era una referencia para comparar ofertas.
+- Una respuesta pedía una propuesta de SLA por niveles de complejidad. Se leyó el 12/10, con la propuesta técnica
+  ya cerrada, y obligó a agregar una lámina y volver a exportar.
+- Anota cada respuesta que cambie el alcance con su fecha y hora, y comprueba que la propuesta la cubre.
+
+### Pasos
 
 1. Confirma que existe una cotización aprobada, con moneda, impuestos, cantidad/unidad, vigencia y margen
    proyectado. Un presupuesto publicado es un tope o referencia, no un precio que se pueda ingresar sin revisión.
-2. En **Servicio licitado**, selecciona `Ofertar` para cada servicio y completa cantidad, precio unitario y moneda
-   desde esa cotización. Revisa que el total de Wherex coincida y verifica si la plataforma declara valores con o
-   sin IVA.
+   Si las bases no exigen una planilla propia, la oferta económica que se adjunta es el PDF de la
+   [plantilla A4 de Efeonce](../../commercial/templates/cotizacion-a4/README.md), no un Excel.
+2. En **Servicio licitado**, mira qué estructura pide esa ficha: varios servicios con `Ofertar`, cantidad y precio
+   unitario, o un solo servicio con un monto total. Completa desde la cotización aprobada, en la moneda del
+   selector. Revisa que el total de Wherex coincida con el de la oferta económica y verifica si la plataforma
+   declara valores con o sin IVA.
 3. En **Condiciones y archivos adjuntos**, completa entrega, pago, vigencia y comentario general según la
    propuesta aprobada. Carga cada archivo obligatorio en su campo; revisa tipo y peso máximo. No confundas los
    adjuntos opcionales administrativos, técnicos o económicos con los documentos exigidos.
@@ -166,11 +212,12 @@ enlaces firmados de descarga ni información confidencial innecesaria a document
 
 ## Límites de seguridad y control humano
 
-El runner opera en modo lectura. Puede leer la ficha y los adjuntos autorizados para fundar la recomendación, pero el operador conserva el control de toda acción con efecto comercial o contractual. Presentar una oferta, aceptar términos, responder mensajes, cargar archivos o firmar requiere una instrucción explícita y confirmación humana final.
+El runner opera en modo lectura. Puede leer la ficha y los adjuntos autorizados para fundar la recomendación, pero el operador conserva el control de toda acción con efecto comercial o contractual. Presentar una oferta, aceptar términos, responder mensajes, cargar archivos o firmar requiere autorización explícita del alcance concreto. Una autorización vigente no se pide de nuevo; el permiso de preparar o firmar no habilita enviar.
 
 Al terminar, el perfil aislado conserva sólo su propia sesión; los archivos temporales de adjuntos se eliminan.
 
 ## Referencias
 
 - [Construir una licitación paso a paso](construir-una-licitacion.md)
+- [Plantilla A4 de la oferta económica](../../commercial/templates/cotizacion-a4/README.md)
 - [Skill de licitaciones: ciclo y go/no-go](../../../.codex/skills/greenhouse-public-private-tenders/SKILL.md)

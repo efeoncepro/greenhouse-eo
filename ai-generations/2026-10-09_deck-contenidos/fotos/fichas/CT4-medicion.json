@@ -1,0 +1,42 @@
+{
+  "id": "CT4-medicion",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic scale, a vast dark multi-storey atrium at night with thin haze): Hum, the strategist with a sleek straight bob, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; her left shoulder is at about 60 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about three meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. A long exposure closed by a rear-curtain flash: one thin continuous line of cool white-azure light starts far away and low at floor level deep in the atrium, wavers, then climbs through the haze across the right half of the frame like a growth curve and arrives at her raised LEFT index fingertip, on the frame-right side of her face. THE MOMENT: she has just finished tracing it and holds still exactly as it peaks, looking at the tip with calm satisfaction, not at the lens. The tip is one small orange (#FF6500) dot, the only accent in the frame, which lights nothing around it; her hand and face are lit cool white by the curve. The curve never crosses her chest or the embroidered mark and never passes left of her body. Dark glass walls behind her reflect nothing. The LEFT 45% is calm, deep dark space. No logos of any other brand, no readable text, no numbers.",
+  "lecho": {
+    "objeto": "the dark matte stone balustrade of the atrium gallery close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "hum"
+    }
+  ],
+  "llave": {
+    "fuente": "the rising line of cool white light near her raised fingertip",
+    "lado": "to the frame-right of her face, at shoulder height",
+    "distancia": "about 40 cm from her face"
+  },
+  "fondo": "dark glass panels far behind, melted into faint cold bokeh",
+  "fenomeno": {
+    "que": "a line of light rises into a growth curve and ends at her fingertip",
+    "esServicio": "Medición: el resultado se traza con datos, no se promete"
+  },
+  "excepcion": "Operador 2026-10-09: elenco sin línea fija y con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)"
+}

@@ -44,20 +44,17 @@ Y por eso **nunca se descuenta** *(→ `04_PRICING` § 8)*: **descontarlo es des
 
 ---
 
-## 3. El contrato de expectativas (se firma en el mes 0, no se explica en el mes 9)
+## 3. Contrato de expectativas y revisiones
 
-**Escrito, en la propuesta, antes de firmar:**
+Aplicar `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`. La propuesta separa
+entregas, resultados de búsqueda/representación, comportamiento del comprador y negocio. Definir
+horizonte desde alcance, acceso, implementación, aprobación y maduración; no imponer una tabla universal
+de semanas/meses ni garantizar cita, indexación o tráfico sostenido.
 
-| Horizonte | Qué se mueve | Marca |
-|---|---|---|
-| **Semanas 1-4** | Fundación técnica. **Nada visible todavía** | 🔴 **Decirlo así, sin adornos** |
-| **Semanas 6-10** | **Citabilidad + salud técnica.** Se mide y se ve | ✅ Lo controlamos |
-| **Mes 3-6** | Primeras señales de tráfico | ⚠️ Se proyecta, **no se garantiza** |
-| **Mes 6-12** | Tráfico orgánico sostenido | ⚠️ Idem |
-| 🔴 **Revenue atribuido a IA** | **Nunca. No existe el modelo** | 🔴 **Dicho por escrito** |
-
-🎯 **El cliente que sabe que el mes 1 no va a ver nada, no cancela en el mes 2.**
-**El que esperaba magia, sí.**
+La preparación verifica datos, responsabilidades y entregables; las revisiones de resultados consideran
+edad del trabajo publicado y cobertura. Una falta de ROI temprano no demuestra inviabilidad. Comparar
+corpus/cortes equivalentes y conservar incertidumbre. Cada ciclo deja aprendizaje y pruebas reutilizables
+cuando haya autorización. La experiencia real del servicio alimenta posicionamiento y reconocimiento.
 
 ---
 
@@ -66,7 +63,7 @@ Y por eso **nunca se descuenta** *(→ `04_PRICING` § 8)*: **descontarlo es des
 | Señal | Significa | Acción |
 |---|---|---|
 | 🔴 **Las aprobaciones se ralentizan** | **Perdió interés o perdió al champion** | **Llamada, no email.** *"¿Sigue siendo prioridad esto?"* |
-| 🔴 **Pregunta por revenue en el mes 4** | **El contrato de expectativas falló** | **Volver al puente** *(+35%/+91%, en SU cuenta)* |
+| **Pregunta por negocio sin evidencia suficiente** | Revisar expectativas, cobertura y maduración; no asumir causa | Conectar entrega, representación, consideración y outcomes; conservar pendientes |
 | 🔴 **Deja de entrar al portal** | **Volvió a la caja negra** | 🔴 **Es la señal más grave.** Reactivarla en el QBR |
 | **Cambió el CMO** | 🔴 **Tu champion se fue** | **Re-vender desde cero. En 30 días o lo pierdes** |
 | **Pide "bajar un poco" el alcance** | Presión de presupuesto | 🎯 **Baja el alcance de verdad** — **nunca el precio con el mismo alcance** |

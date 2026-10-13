@@ -1,0 +1,41 @@
+{
+  "id": "CT11-derechos-firma",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark photo studio at night after a shoot, with thin haze): Hum, the strategist with a sleek straight bob, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Beside her, on her frame-right and slightly farther from the camera, between 74 % and 92 % of the frame width, stands a content creator, an illustrative person: a Latin American man in his late twenties with short dark curly hair, in his own light grey overshirt, no logos and nothing blue; he is a little softer in focus than her. Between them, at about 72–78 % of the frame width and at chest height, clear of her chest so the mark on her hoodie stays fully visible, hovers ONE single upright sheet of cool white light the size of a page, its edges traced by a hair-thin azure-blue (#0375DB) glow, with a few hair-thin unreadable lines, like an agreement made of light. THE MOMENT: the creator signs the sheet in the air with his fingertip, leaving one short bright stroke at its lower corner, while Hum holds the top corner of the sheet steady with her left hand; both smile, at ease. Neither looks at the other and neither looks at the lens; both heads almost frontal, only their eyes turn toward the sheet. The sheet of light is the only key light and lights both faces from the side, cool white; both pairs of eyes stay readable, with a catchlight. A long dark matte worktable runs between the camera and them, its near edge just in front of the lens; its top is matte black and non-reflective and its near half stays black. The sheet and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the plain unlit black backdrop of the studio: no stands, no lamps and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte worktable edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "SA1",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "hum"
+    }
+  ],
+  "llave": {
+    "fuente": "the single upright sheet of cool white light between them",
+    "lado": "to the frame-right of her face, at chest height",
+    "distancia": "about 45 cm from her face"
+  },
+  "fondo": "dark studio stands and rolled backdrops far behind them on the right, every lamp and softbox switched off, with two or three small cold bokeh points",
+  "fenomeno": {
+    "que": "a creator signs a sheet of light that she holds steady: the agreement comes before the content",
+    "esServicio": "Derechos claros: cada pieza con un creador queda escrita antes de producir"
+  },
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38). Extra ilustrativo: un creador de contenido ficticio (tercero, no cliente), por analogía con el precedente acotado de SA1: sin marca, en gris, en positivo, junto a una protagonista del equipo.",
+  "atmosfera": "bruma"
+}

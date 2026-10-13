@@ -1,0 +1,210 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "067c2ef9f194",
+  "key": "067c2ef9f19435b6a685a6be27347f760cb15b4fc033da51411afaba9c8bdae5",
+  "status": "completed",
+  "createdAt": "2026-10-10T00:01:59.821Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT5-prisma-formatos.png",
+    "imageSha256": "13e1918388e1cda5c2cb3f6b788ca2e3e2fc249da2fb944c3850334a460fb3f7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-09_deck-contenidos/fotos/plates/mano/mask.png",
+    "maskSha256": "925bc781dd2bf05708a91d269433f3a899808e11b31a9a8c8485fcb2615efb29",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Repaint ONLY her left hand and wrist holding the small glass prism: a slender, delicate, elegant feminine hand of a woman in her early thirties, with long slim fingers, narrow knuckles, fine wrist, smooth natural skin, short natural nails; exactly the same pose, the same position and the same pinch of the prism between thumb and fingertips; keep the prism, the light beam, the hoodie sleeve and the thin dark watch exactly as they are; same cool white and azure lighting from the prism, same depth of field, photographic, realistic.",
+    "providerPrompt": "Repaint ONLY her left hand and wrist holding the small glass prism: a slender, delicate, elegant feminine hand of a woman in her early thirties, with long slim fingers, narrow knuckles, fine wrist, smooth natural skin, short natural nails; exactly the same pose, the same position and the same pinch of the prism between thumb and fingertips; keep the prism, the light beam, the hoodie sleeve and the thin dark watch exactly as they are; same cool white and azure lighting from the prism, same depth of field, photographic, realistic."
+  },
+  "mask": {
+    "touchedFraction": 0.03110894097222222,
+    "editable": 88736,
+    "soft": 25944,
+    "protected": 3571720
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1561,
+      "top": 249,
+      "width": 692,
+      "height": 835
+    },
+    "target": {
+      "width": 928,
+      "height": 1120
+    },
+    "aspectError": 0.00020648358455499505,
+    "reason": "la zona con contexto ocupa 15.6 % de la imagen: se genera recortada a 928x1120"
+  },
+  "estimate": {
+    "usd": 0.0876,
+    "basis": "2 × salida 928x1120 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 34.828,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.78,
+        "bestError": 5.78,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3571720,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 88736,
+        "maxDelta": 239,
+        "meanDelta": 42.355,
+        "worst": {
+          "x": 1995,
+          "y": 758
+        }
+      },
+      "seam": {
+        "pixels": 25944,
+        "maxDelta": 182,
+        "meanDelta": 9.082,
+        "worst": {
+          "x": 1920,
+          "y": 854
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3571720,
+        "maxDelta": 234,
+        "meanDelta": 1.619,
+        "worst": {
+          "x": 1912,
+          "y": 923
+        }
+      },
+      "outputUsd": 0.0438,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1142,
+        "input_tokens_details": {
+          "image_tokens": 1015,
+          "text_tokens": 127
+        },
+        "output_tokens": 1459,
+        "output_tokens_details": {
+          "image_tokens": 1459,
+          "text_tokens": 0
+        },
+        "total_tokens": 2601
+      },
+      "meta": {
+        "size": "928x1120",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 37.806,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.62,
+        "bestError": 7.62,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3571720,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 88736,
+        "maxDelta": 240,
+        "meanDelta": 45.848,
+        "worst": {
+          "x": 1986,
+          "y": 759
+        }
+      },
+      "seam": {
+        "pixels": 25944,
+        "maxDelta": 167,
+        "meanDelta": 10.3,
+        "worst": {
+          "x": 1928,
+          "y": 854
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3571720,
+        "maxDelta": 235,
+        "meanDelta": 1.963,
+        "worst": {
+          "x": 1914,
+          "y": 926
+        }
+      },
+      "outputUsd": 0.0438,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1142,
+        "input_tokens_details": {
+          "image_tokens": 1015,
+          "text_tokens": 127
+        },
+        "output_tokens": 1459,
+        "output_tokens_details": {
+          "image_tokens": 1459,
+          "text_tokens": 0
+        },
+        "total_tokens": 2601
+      },
+      "meta": {
+        "size": "928x1120",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

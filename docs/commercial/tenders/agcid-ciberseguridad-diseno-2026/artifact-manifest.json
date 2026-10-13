@@ -1,0 +1,29 @@
+{
+  "$schema": "../ARTIFACT_MANIFEST_SCHEMA.md",
+  "deal": "agcid-ciberseguridad-diseno-2026",
+  "artifacts": [
+    {
+      "id": "onedrive-agcid-preparacion",
+      "type": "other",
+      "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/AGCID",
+      "as_of": "2026-10",
+      "audience": "internal",
+      "render": "by_link",
+      "used_in": [
+        "README:Trabajo producido"
+      ]
+    },
+    {
+      "id": "agcid-propuesta-artifact-composer",
+      "type": "other",
+      "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/AGCID/05.%20Paquete%20para%20presentar/2.2%20AGCID%20%E2%80%94%20Propuesta%20para%20presentaci%C3%B3n%20%E2%80%94%20Artifact%20Composer.pdf",
+      "as_of": "2026-10",
+      "audience": "client_facing",
+      "render": "by_link",
+      "used_in": [
+        "README:Presentación Artifact Composer",
+        "deck-outline.md"
+      ]
+    }
+  ]
+}

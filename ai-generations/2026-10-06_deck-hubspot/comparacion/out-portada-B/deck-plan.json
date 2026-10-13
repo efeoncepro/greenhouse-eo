@@ -1,0 +1,52 @@
+{
+  "tenderId": "cmp-portada-B",
+  "slides": [
+    {
+      "slideId": "deck-cover-brochure",
+      "contentType": "deck.cover-brochure",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=220px",
+          "eyebrowTop": 410,
+          "questionTop": 458,
+          "answerTop": 520,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "bodyTop": 672,
+          "bodyPx": 28,
+          "bodyWidth": 724,
+          "bodyLeading": "--gl-body-leading=1.3",
+          "bodyWeight": "--gl-body-wght=400",
+          "bodyStrongWeight": "--gl-body-strong-wght=600",
+          "bodyColor": "--gl-body-color=#ffffff",
+          "eyebrowPx": "--gl-eyebrow-px=22px",
+          "eyebrowWeight": "--gl-eyebrow-wght=500",
+          "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+          "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+          "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "logoWidth": "--gl-logo-width=500px"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:CMP-portada-B",
+          "alt": "Una líder de RevOps de Efeonce con la chaqueta dirige con la mano el nudo de un moño de luz magenta y azul, con agentes robot en el flujo"
+        },
+        "voice": {
+          "question": "¿Mi HubSpot puede hacer más?",
+          "answer": "Mucho más",
+          "eyebrow": "Brochure · Servicios HubSpot"
+        },
+        "evidence": "<strong>Seis</strong> soluciones:<br>Marketing y AEO · Ventas y pipeline<br>Revenue lifecycle · Servicio<br>Datos y CRM · Operación con agentes"
+      },
+      "template": "CoverBrochure"
+    }
+  ]
+}

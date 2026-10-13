@@ -1,0 +1,87 @@
+{
+  "tenderId": "pibank-riesgo-v5",
+  "slides": [
+    {
+      "slideId": "deck-decision-risk",
+      "contentType": "deck.decision-risk",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 132,
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "headersTop": "--gl-dr-headers-top=200px",
+          "headerPx": "--gl-dr-header-px=16px",
+          "secondColumn": "--gl-dr-second-column=1140px",
+          "tableLeft": "--gl-dr-table-left=800px",
+          "tableTop": "--gl-dr-table-top=250px",
+          "tableWidth": "--gl-dr-table-width=980px",
+          "rowHeight": "--gl-dr-row-height=150px",
+          "rowGap": "--gl-dr-row-gap=20px",
+          "riskWidth": "--gl-dr-risk-width=300px",
+          "columnGap": "--gl-dr-column-gap=40px",
+          "ruleStroke": "--gl-dr-rule=2px",
+          "rowPadTop": "--gl-dr-row-pad-top=22px",
+          "riskPx": "--gl-dr-risk-px=26px",
+          "namePx": "--gl-dr-name-px=44px",
+          "nameTracking": "--gl-dr-name-tracking=-0.02em",
+          "howPx": "--gl-dr-how-px=22px",
+          "howGap": "--gl-dr-how-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dr-progress-4-of-5-growth"
+        },
+        "voice": {
+          "question": "¿Y si no funciona?",
+          "answer": "corregimos",
+          "eyebrow": "Riesgo controlado",
+          "answerLead": "Lo"
+        },
+        "body": "Cada riesgo tiene su cobertura escrita, y el programa se revisa cada trimestre.",
+        "headers": {
+          "risk": "El riesgo",
+          "how": "Cómo lo cubrimos"
+        },
+        "risks": [
+          {
+            "risk": "Promesas sin respaldo",
+            "name": "Sin promesas vacías",
+            "how": "Medimos desde la línea base del primer mes y reportamos lo que se mueve."
+          },
+          {
+            "risk": "Condiciones erradas",
+            "name": "Revisión del banco",
+            "how": "Ninguna condición se publica sin fuente vigente y el visto bueno de Cumplimiento."
+          },
+          {
+            "risk": "Esperar a TI",
+            "name": "Plan alternativo",
+            "how": "Si un cambio depende de TI, entregamos la especificación y seguimos con el backlog."
+          },
+          {
+            "risk": "Depender de una persona",
+            "name": "Traspaso documentado",
+            "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+          }
+        ],
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-start",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionRisk"
+    }
+  ]
+}

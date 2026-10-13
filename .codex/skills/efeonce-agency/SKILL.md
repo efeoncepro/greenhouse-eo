@@ -5,6 +5,20 @@ description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la
 
 # Efeonce Agency — Contexto de negocio para construir Greenhouse
 
+## Envíos desde el Outlook de Julio
+
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+
+
+## Efeonce Factory — vía comercial 2026-10-05
+
+Al trabajar Factory, cargar la [decisión aceptada](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
+el [modelo](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) y la
+[guía de encargos y ejemplos](../../../docs/services/factory/README.md). Vía transversal On-Demand que complementa retainers con encargos
+rentables por sí mismos; empaque mínimo y venta en paralelo. Efeonce y las prácticas conservan relación y
+ownership. Capacidad, pricing, cobro y demanda se validan por encargo; no inferir runtime Factory desde el canon.
+Entradas: licitaciones públicas, privadas, prospección fría y paid media; seguimiento y economía en el modelo.
+
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` + `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`). Efeonce es la marca paraguas; las líneas de negocio/prácticas poseen ofertas; Globe, Wave, Reach, Kortex y Verk son product brands o platform brands; Greenhouse es el control plane. Las superficies front-of-house consumen plataformas/backbones, pero ninguna product brand reemplaza la relación Efeonce ni equivale automáticamente a toda una línea de negocio. Cargar el contrato de portfolio al razonar sobre marca, capas, hosts, ownership o dónde nace una capacidad del ecosistema.
 
 > Para el contrato transversal de adopción y expansión operator-first, cargar [`Efeonce Operator-First Product & Growth Contract V1`](../../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
@@ -277,3 +291,12 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 ---
 
 *Fuente: `docs/context/` (00–14), context pack de Efeonce Group v5.3 / GTM 2026 / Product Ecosystem v1.0. Propiedad intelectual de Efeonce Group SpA — uso interno. Esta skill es un índice destilado; ante conflicto manda el doc canónico y, sobre runtime, el contrato técnico verificado.*
+
+## Composición integral como agencia de medios
+
+Efeonce articula planificación, compra/operación, creatividad, medición y gestión de inversión dentro de Media &
+Distribution. Programmatic amplía el mix; proveedores no sustituyen la marca ni el criterio de la agencia. Esta
+composición no reclasifica a Efeonce, crea una cuarta solución ni aprueba todo el catálogo. Cargar el
+[modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
+y el [método compartido](../digital-marketing/references/programmatic-media-operations.md) para pitch, alcance,
+rutas de operación y fee incremental. Precios programáticos conservan su aprobación y requieren costeo por caso.

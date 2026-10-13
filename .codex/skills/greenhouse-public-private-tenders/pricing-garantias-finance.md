@@ -38,7 +38,14 @@ Lee el modelo y credit model canónicos en `docs/business-models/creative-studio
 
 Un Studio Credit no equivale a una pieza, hora, moneda, token o costo de proveedor. Una pieza se **estima** como una secuencia de operaciones generativas más trabajo determinista y humano: la generación puede consumir créditos; layout, edición, mezcla, mastering, export y QA deterministas consumen 0 créditos, pero se costean en capacidad/gobernanza. Derechos y licencias permanecen fuera del wallet.
 
-Para bids que exigen precio total o precio unitario por entregable, presenta el formato solicitado, pero conserva internamente el desglose anterior, el supuesto de mix, los créditos estimados, capacidad, derechos y margen. Los rangos por pieza son estimaciones de alcance, no una paridad contractual perpetua.
+Para bids que **exigen** precio total o precio unitario por entregable, presenta el formato solicitado, pero conserva internamente el desglose anterior, el supuesto de mix, los créditos estimados, capacidad, derechos y margen. Los rangos por pieza son estimaciones de alcance, no una paridad contractual perpetua.
+
+Cuando las bases sólo piden un total con «desglose de costos» y no fijan la estructura, Efeonce **no ofrece el precio unitario por pieza por iniciativa propia**: la económica que ve el comprador se desglosa por componente de valor (evolución de marca → conceptualización → entregables agrupados por familia, sin valor unitario). Regla del operador del 12/10/2026 (Sika 1164): «más que cotizar por pieza se cobra el refresh de marca, la conceptualización creativa y ahí luego entregables; ahí se justifica más el monto». Ese desglose client-facing es otra vista del mismo precio: no reemplaza el desglose interno (las cinco líneas, cuando el alcance las tiene) ni cambia el piso. Detalle, ejemplo y el riesgo del componente de pago único: `propuesta-tecnica-economica.md` → «Cómo se desglosa una oferta creativa».
+
+Dos cuidados que salen del mismo caso:
+
+- **El piso se calcula por la unidad que se repite.** Si un componente (la evolución de marca) se cobra una sola vez, el precio de los encargos siguientes es el total menos esa línea; compáralo con el piso antes de proponerlo. En el caso, 64.000 − 16.000 = 48.000 contra un piso de ≈ 57.650 por lanzamiento.
+- **El reparto del total entre componentes es un supuesto de quien arma el documento.** El cotizador entrega filas por rol, no por componente; se declara y lo valida el operador.
 
 No publiques equivalencia CLP/USD por crédito, top-ups, expiración, rollover o checkout mientras sean provisionales. Usa shadow ledger y escenarios `p50/p75/p95`; Finance y Commercial deben aprobar cualquier equivalencia. Error técnico/proveedor/Efeonce libera o reembolsa créditos; un output válido seguido por cambio de dirección creativa es una nueva estimación/change order.
 
@@ -98,4 +105,4 @@ Si el margen no pasa el umbral con un precio que aún sea competitivo en la fór
 
 - Modelado contable/tesorería/factoring/impuestos → `greenhouse-finance-accounting-operator`.
 - Umbral de margen por BU y estrategia de precio/packaging → `commercial-expert` (overlay Efeonce).
-- Cómo se traduce el precio en la oferta económica y sus anexos → `propuesta-tecnica-economica.md`.
+- Cómo se traduce el precio en la oferta económica y sus anexos (plantilla A4 por defecto; Excel sólo si las bases exigen planilla) → `propuesta-tecnica-economica.md`.

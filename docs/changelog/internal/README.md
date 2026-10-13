@@ -16,6 +16,8 @@
 
 - [2026-09](2026-09.md)
 
+- [2026-10](2026-10.md)
+
 No volver a pegar historia completa en este índice.
 
 ## Streams de plataformas hermanas

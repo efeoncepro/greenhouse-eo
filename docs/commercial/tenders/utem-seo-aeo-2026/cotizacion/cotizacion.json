@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "date": "2026-10-08",
+  "dateLabel": "8 de octubre de 2026",
+  "process": "5251-1060-COT26",
+  "currency": "CLP",
+  "net": 4800000,
+  "vatRate": 0.19,
+  "months": 3,
+  "quantity": 1,
+  "validityDays": 30,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "rut": "77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Universidad Tecnológica Metropolitana",
+    "unit": "Educación Continua UTEM",
+    "rut": "70.729.100-1",
+    "domain": "educacioncontinua.utem.cl"
+  },
+  "service": "Servicio integral de posicionamiento digital SEO, GEO y AEO para Educación Continua UTEM",
+  "authority": "Precio autorizado por Julio en esta conversación: incremento a CLP 4.800.000 netos y mandato de crear el documento HTML. La referencia mensual es aritmética, no calendario de pagos.",
+  "signed": false,
+  "submitted": true,
+  "submittedOn": "2026-10-08",
+  "approved": true,
+  "submissionEvidence": "../submission-evidence.json"
+}

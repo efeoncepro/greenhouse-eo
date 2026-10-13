@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "pricing-v3-composition-preview/1",
+  "status": "Simulación interna pendiente de revisión",
+  "binding": false,
+  "commercialUnit": "role_capacity",
+  "currency": "USD",
+  "periods": [
+    {
+      "periodId": 1,
+      "currency": "USD",
+      "items": [
+        {
+          "label": "Senior Visual Designer",
+          "net": "1174.33"
+        },
+        {
+          "label": "Implementación inicial",
+          "net": "130.00"
+        }
+      ],
+      "net": "1304.33"
+    }
+  ],
+  "net": "1304.33",
+  "tax": null,
+  "grandTotal": null,
+  "note": "No es una oferta emitida. Validar alcance, recursos, precio, impuestos y condiciones antes de presentación."
+}

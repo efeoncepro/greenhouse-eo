@@ -9,8 +9,8 @@
     {
       "file": "ai-visibility-ai-visibility-report-lockup-positive.png",
       "sourceId": "ai-visibility-report-lockup-positive",
-      "sourceSha256": "cf89651e9d30d8ada55f5e701cda1da8cba83aca685b2748fe6386dfeee31419",
-      "pngSha256": "de4ea56a1c17d16059e8782e0adc9fd1d1a934f7cb9f97e8034d25f8b6cc4c64",
+      "sourceSha256": "41827cdaa22e7dd975c9c1ac1f2d4a6f9a1f0977596bf5605a63b18bb19a7b43",
+      "pngSha256": "a0d82f52c70fa608c7b09ac6b28e4dd1741f2757ba5aebf00d617c09e3d87104",
       "width": 1554,
       "height": 112,
       "transform": "SVG rasterized; shape and colour unchanged"
@@ -18,8 +18,8 @@
     {
       "file": "ai-visibility-ai-visibility-report-lockup-negative.png",
       "sourceId": "ai-visibility-report-lockup-negative",
-      "sourceSha256": "cb497e6316d828ed1337abe0cd72c997325515f8d97936e2504d271312bf3dce",
-      "pngSha256": "b5f8b54ce2f35123647a966b1ab5da96ceb283a659ecff758e54917e3b44e2b0",
+      "sourceSha256": "b1d84efd79b3198480e89e93fe2b8d5ad804b818ba19fc2a4cbab9f66aea960b",
+      "pngSha256": "d152b52911497485a4bab7f4c6a5b5c53ae28a2a50842daa8a060eba79aef26d",
       "width": 1554,
       "height": 112,
       "transform": "SVG rasterized; shape and colour unchanged"
@@ -27,8 +27,8 @@
     {
       "file": "ai-visibility-aeo-lockup-positive.png",
       "sourceId": "aeo-lockup-positive",
-      "sourceSha256": "52860a452dd394d488b9a9bc4893f5c4d4c62311e6519ef96da078999c9fef71",
-      "pngSha256": "3f24ee2e5dc23162e1cf046316f4db3ecaff3ab3efbbb8c18f3d72db3922a766",
+      "sourceSha256": "53065517f32529238b942dd779d03d251c9ab4354268be0f906a1445df283f76",
+      "pngSha256": "c6e5915c57daac7cdacb2a844aa8da16a912cf998f45d0b654c1dba5fe88447d",
       "width": 790,
       "height": 104,
       "transform": "SVG rasterized; shape and colour unchanged"
@@ -36,8 +36,8 @@
     {
       "file": "ai-visibility-aeo-lockup-negative.png",
       "sourceId": "aeo-lockup-negative",
-      "sourceSha256": "5e51544c05601735213789b0d9fc8e3be12eee950251bb3a2abf78f49403fecb",
-      "pngSha256": "2354de9b5e30d7d6eafcdfdeb8fdf090aff09c7802a93ebe55524cbeb09be5b8",
+      "sourceSha256": "5519687b56eeee198216931ad2a2bdaf6d281ecab75f8d696c429446dbbc5311",
+      "pngSha256": "110456865969cd200a5132f2cee76f4943efdae582329eaa9480c4f1d71a23f3",
       "width": 790,
       "height": 104,
       "transform": "SVG rasterized; shape and colour unchanged"

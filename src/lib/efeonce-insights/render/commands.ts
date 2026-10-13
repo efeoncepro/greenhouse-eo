@@ -15,8 +15,16 @@ import 'server-only'
  *   5. Manifest resuelto por el composer (selector + contratos + validadores) y hash sellado ACÁ;
  *      el worker re-resuelve y compara byte a byte.
  *
- * Idempotencia: un output por (org, edición, target, audiencia). Re-encargar devuelve el run existente
- * mientras su output no esté en `dead_letter`/`cancelled`; nunca produce un segundo asset final.
+ * Idempotencia: a lo más UN output VIVO por (org, edición, target, audiencia) — índice parcial
+ * `insight_outputs_live_identity_uq` (`WHERE state NOT IN ('dead_letter','cancelled')`). Re-encargar
+ * devuelve el run existente mientras su output esté vivo; nunca produce un segundo asset final.
+ *
+ * Salida de un output terminal (decidido 2026-10-04, incidente del canary de Berel): `dead_letter` y
+ * `cancelled` no tienen transición de vuelta, así que un encargo nuevo del mismo target crea una fila
+ * NUEVA cuyo manifest se recompone con el código vigente sobre el MISMO plan congelado. La fila
+ * terminal se conserva (append-only) y el evento `queued` del output nuevo la nombra en `supersedes`.
+ * `retryInsightRender` NO sirve para esto: reusa el manifest sellado, que es justo lo que un fallo
+ * determinista (`semantic_rejected` de un mapper corregido) volvería a rechazar.
  */
 
 import { hashResolvedManifest } from '@/lib/artifact-composer/pure'
@@ -33,7 +41,14 @@ import { getInsightEditorialPlanByEdition } from '../stores/plan-store'
 import { getInsightReportById } from '../stores/report-store'
 import { getInsightEvidenceSnapshotByEdition } from '../stores/snapshot-store'
 
-import { INSIGHT_RENDER_CATALOG_BY_OUTPUT, INSIGHT_RENDERABLE_OUTPUTS, type InsightOutputRecord, type InsightRenderRunRecord } from './contracts'
+import {
+  INSIGHT_RENDER_CATALOG_BY_OUTPUT,
+  INSIGHT_RENDERABLE_OUTPUTS,
+  isInsightOutputLive,
+  isInsightOutputLiveIdentityViolation,
+  type InsightOutputRecord,
+  type InsightRenderRunRecord
+} from './contracts'
 import { buildInsightsDeckPlanInput } from './insights-deck-mapper'
 import { buildInsightReportPlanInput } from './report-mapper'
 import {
@@ -82,6 +97,37 @@ const resolveRequestedOutputs = (edition: { outputs: string[] }, requested: unkn
   return requested
 }
 
+/**
+ * Idempotencia por (org, edición, target, audiencia): si un mismo run vivo cubre TODOS los targets
+ * pedidos, se devuelve ese run. Si sólo parte tiene un render vivo, se rechaza con la causa (no se
+ * mezclan runs) y se nombra qué sí se puede encargar. Sin nada vivo, `null`: corresponde encolar.
+ */
+const resolveLiveCoverage = async (
+  organizationId: string,
+  existing: InsightOutputRecord[],
+  outputs: InsightOutput[]
+): Promise<InsightRenderRunResult | null> => {
+  const alive = existing.filter(o => isInsightOutputLive(o.state))
+  const coveringRun = alive.find(o => outputs.every(output => alive.some(a => a.output === output && a.renderRunId === o.renderRunId)))
+
+  if (coveringRun) {
+    const run = await getInsightRenderRun({ organizationId, renderRunId: coveringRun.renderRunId })
+
+    if (run) return { run, outputs: await listInsightOutputsForRun({ organizationId, renderRunId: run.renderRunId }), idempotent: true }
+  }
+
+  const partial = alive.filter(o => outputs.includes(o.output))
+
+  if (partial.length > 0) {
+    throw new InsightsRenderRejectedError('Parte de los outputs pedidos ya tiene un render vivo en otro run; encarga sólo los que faltan, o reintenta o cancela ese run', {
+      alive: partial.map(o => ({ output: o.output, renderRunId: o.renderRunId, state: o.state })),
+      requestable: outputs.filter(output => !partial.some(o => o.output === output))
+    })
+  }
+
+  return null
+}
+
 export const requestInsightRender = async (input: RequestInsightRenderInput): Promise<InsightRenderRunResult> => {
   if (!isInsightsRenderEnabled(input.env)) throw new InsightsRenderDisabledError()
 
@@ -108,27 +154,18 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
     })
   }
 
-  // Idempotencia por (org, edición, target, audiencia): si ya existe un output vivo para cada target
-  // pedido, se devuelve ese run. dead_letter/cancelled no cuentan como "vivo": ahí sí cabe re-encargar.
   const existing = await findInsightOutputsForEdition({ organizationId: grant.organizationId, editionId: edition.editionId, audience: edition.audience })
-  const alive = existing.filter(o => o.state !== 'dead_letter' && o.state !== 'cancelled')
-  const coveringRun = alive.find(o => outputs.every(output => alive.some(a => a.output === output && a.renderRunId === o.renderRunId)))
+  const covered = await resolveLiveCoverage(grant.organizationId, existing, outputs)
 
-  if (coveringRun) {
-    const run = await getInsightRenderRun({ organizationId: grant.organizationId, renderRunId: coveringRun.renderRunId })
+  if (covered) return covered
 
-    if (run) {
-      return { run, outputs: await listInsightOutputsForRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId }), idempotent: true }
+  // El output terminal más reciente de cada target pedido: el nuevo lo reemplaza y el historial lo dice.
+  const supersedes = new Map<InsightOutput, string>()
+
+  for (const record of existing) {
+    if (!isInsightOutputLive(record.state) && outputs.includes(record.output) && !supersedes.has(record.output)) {
+      supersedes.set(record.output, record.insightOutputId)
     }
-  }
-
-  const partial = alive.filter(o => outputs.includes(o.output))
-
-  if (partial.length > 0) {
-    // Un target ya vivo en otro run y otro no: no se mezclan runs. Se rechaza con la causa.
-    throw new InsightsRenderRejectedError('Parte de los outputs pedidos ya tiene un render vivo en otro run; reintenta o cancela ese run', {
-      alive: partial.map(o => ({ output: o.output, renderRunId: o.renderRunId, state: o.state }))
-    })
   }
 
   const [report, snapshot, plan] = await Promise.all([
@@ -163,7 +200,7 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
 
     const manifest: Record<string, unknown> = { input: planInput as unknown as Record<string, unknown> }
 
-    return { output, catalogName, manifest, manifestHash: hashResolvedManifest(manifest) }
+    return { output, catalogName, manifest, manifestHash: hashResolvedManifest(manifest), supersedesOutputId: supersedes.get(output) ?? null }
   })
 
   // El evento describe el RUN, no una salida. Con más de una, un hash singular mentiría: se sella
@@ -173,34 +210,50 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
     outputs: plannedOutputs.map(o => ({ output: o.output, manifestHash: o.manifestHash }))
   })
 
-  return withGreenhousePostgresTransaction(async client => {
-    const inserted = await insertInsightRenderRun({
-      client,
-      organizationId: grant.organizationId,
-      editionId: edition.editionId,
-      audience: edition.audience,
-      requestedOutputs: outputs,
-      // TASK-1846 — el actor se audita tal cual: un usuario del portal cliente es `client_user`, no
-      // `system` (así lo registran también reportes, ediciones y transiciones de Insights).
-      requestedByKind: grant.actor.kind,
-      requestedByUserId: grant.actor.userId,
-      requestedByMemberId: grant.actor.memberId,
-      outputs: plannedOutputs
-    })
+  try {
+    return await withGreenhousePostgresTransaction(async client => {
+      const inserted = await insertInsightRenderRun({
+        client,
+        organizationId: grant.organizationId,
+        editionId: edition.editionId,
+        audience: edition.audience,
+        requestedOutputs: outputs,
+        // TASK-1846 — el actor se audita tal cual: un usuario del portal cliente es `client_user`, no
+        // `system` (así lo registran también reportes, ediciones y transiciones de Insights).
+        requestedByKind: grant.actor.kind,
+        requestedByUserId: grant.actor.userId,
+        requestedByMemberId: grant.actor.memberId,
+        outputs: plannedOutputs
+      })
 
-    await publishInsightRenderRequested(client as never, {
-      version: 1,
-      renderRunId: inserted.run.renderRunId,
-      editionId: edition.editionId,
-      organizationId: edition.organizationId,
-      audience: edition.audience,
+      await publishInsightRenderRequested(client as never, {
+        version: 1,
+        renderRunId: inserted.run.renderRunId,
+        editionId: edition.editionId,
+        organizationId: edition.organizationId,
+        audience: edition.audience,
+        outputs,
+        manifestHash: runManifestHash,
+        actorKind: grant.actor.kind
+      })
+
+      return { run: inserted.run, outputs: inserted.outputs, idempotent: false }
+    })
+  } catch (error) {
+    // Carrera: otro encargo del mismo target entró entre la lectura y el INSERT. La DB lo frenó
+    // (índice parcial); nunca es un 500. Si ese encargo cubre lo pedido, es el mismo resultado.
+    if (!isInsightOutputLiveIdentityViolation(error)) throw error
+
+    const current = await findInsightOutputsForEdition({ organizationId: grant.organizationId, editionId: edition.editionId, audience: edition.audience })
+    const raced = await resolveLiveCoverage(grant.organizationId, current, outputs)
+
+    if (raced) return raced
+
+    throw new InsightsRenderRejectedError('Otro encargo concurrente ya tiene un render vivo para parte de estos outputs', {
       outputs,
-      manifestHash: runManifestHash,
-      actorKind: grant.actor.kind
+      alive: current.filter(o => isInsightOutputLive(o.state) && outputs.includes(o.output)).map(o => ({ output: o.output, renderRunId: o.renderRunId, state: o.state }))
     })
-
-    return { run: inserted.run, outputs: inserted.outputs, idempotent: false }
-  })
+  }
 }
 
 const loadRun = async (scope: RenderScope, renderRunId: string, need: 'read' | 'create') => {

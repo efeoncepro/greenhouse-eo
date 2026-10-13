@@ -1,0 +1,159 @@
+{
+  "version": 2,
+  "status": "example",
+  "date": "2026-10-11",
+  "reference": "Ejemplo · Sin validez comercial",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de producto digital",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Ejemplo · Sin validez comercial",
+    "title": [
+      "Equipo de",
+      "diseño y",
+      "desarrollo."
+    ],
+    "subtitle": "Dos perfiles dedicados durante tres meses para Cliente de ejemplo."
+  },
+  "service": {
+    "name": "Equipo dedicado de diseño y desarrollo"
+  },
+  "scope": {
+    "title": [
+      "Dos perfiles dedicados,",
+      "un solo equipo."
+    ],
+    "intro": "Ejemplo de alcance. Cada cotización debe especificar los perfiles, su dedicación y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Diseño de producto",
+        "text": "Diseño de interfaces, prototipos navegables y mantenimiento del sistema de componentes, con media jornada de dedicación."
+      },
+      {
+        "title": "Desarrollo front-end",
+        "text": "Implementación de las interfaces aprobadas, pruebas y despliegue en los ambientes del cliente, con jornada completa."
+      },
+      {
+        "title": "Coordinación",
+        "text": "Planificación quincenal, seguimiento del avance y una reunión semanal con la contraparte del cliente."
+      },
+      {
+        "title": "Puesta en marcha",
+        "text": "Accesos, ambientes de trabajo, tablero de seguimiento y plan de trabajo del primer mes."
+      },
+      {
+        "title": "Informes",
+        "text": "Reporte mensual de avance, horas dedicadas por perfil y próximos pasos."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de tres meses",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Puesta en marcha",
+        "text": "Accesos, ambientes y plan de trabajo. Primeras entregas de diseño y base del front-end."
+      },
+      {
+        "label": "Mes 2",
+        "title": "Construcción",
+        "text": "Diseño e implementación de los flujos priorizados, con revisiones quincenales."
+      },
+      {
+        "label": "Mes 3",
+        "title": "Cierre y traspaso",
+        "text": "Ajustes finales, documentación del sistema de componentes y traspaso al equipo del cliente."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Una cotización por",
+      "perfil y dedicación."
+    ],
+    "intro": "Cada perfil se cotiza por mes de dedicación; la puesta en marcha se cobra una sola vez. Todos los valores se expresan en pesos chilenos (CLP).",
+    "summary": "Tres meses · Pesos chilenos · IVA no incluido",
+    "taxNote": "Los valores netos excluyen IVA. El total incluye IVA: tres meses de servicio más la puesta en marcha."
+  },
+  "lines": [
+    {
+      "label": "Diseño de producto (UX/UI)",
+      "detail": "Media jornada: interfaces y prototipos.",
+      "group": "Equipo",
+      "quantity": {
+        "value": 3,
+        "unit": "meses"
+      },
+      "unitNet": "1850000",
+      "net": "5550000"
+    },
+    {
+      "label": "Desarrollo front-end",
+      "detail": "Jornada completa: implementación y pruebas.",
+      "group": "Equipo",
+      "quantity": {
+        "value": 3,
+        "unit": "meses"
+      },
+      "unitNet": "3400000",
+      "net": "10200000"
+    },
+    {
+      "label": "Incorporación y configuración inicial",
+      "detail": "Accesos, ambientes y plan de trabajo.",
+      "group": "Puesta en marcha",
+      "quantity": {
+        "value": 1,
+        "unit": "pago único"
+      },
+      "unitNet": "900000",
+      "net": "900000"
+    }
+  ],
+  "net": "16650000",
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Dedicación",
+        "text": "La dedicación de cada perfil se distribuye en la semana según el plan de trabajo acordado con la contraparte del cliente."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Las condiciones de recepción, facturación y pago se acuerdan antes de emitir la cotización final. Este ejemplo no establece un calendario de cobro."
+      },
+      {
+        "title": "Continuidad del equipo",
+        "text": "Efeonce asegura la continuidad del servicio. Un reemplazo de perfil se informa con anticipación y mantiene la dedicación cotizada."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente prioriza el trabajo, aprueba las entregas y facilita los accesos y permisos acordados."
+      },
+      {
+        "title": "Límites del alcance",
+        "text": "Perfiles adicionales, cambios de dedicación o servicios distintos de los descritos requieren una cotización independiente."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Ejemplo sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  }
+}

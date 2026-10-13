@@ -25,7 +25,7 @@
   helper + DESIGN.md/AXIS + transparencia). design-studio solo dirige el concepto/prompt.
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
-  Gemini 3.1 Flash Image; acabado premium → Gemini 3 Pro Image; texto conceptual → Ideogram;
+  Nano Banana 2.1 por `pnpm ai:nano` (Google Cloud/Vertex global, operador local); acabado premium → Gemini 3 Pro Image (sin CLI propia); texto conceptual → Ideogram;
   vector escalable → Recraft (vía Higgsfield CLI, con sesión desde 2026-09-24, SVG real sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator`; realismo/cámara → FLUX.2; edición precisa,
   máscara o pieza final → GPT Image 2.5 Sunburst; generación cotidiana → GPT Image 2.5 Flare; Batch → GPT Image 2
   (los tres con `pnpm ai:image --model`);
@@ -95,9 +95,13 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
 ## Política de providers y portafolio enterprise
 
 - **Google nativo → Google Cloud/Vertex directo**, nunca Fal: Gemini Image, Veo, Gemini Omni, Lyria,
-  Gemini/Chirp TTS, Chirp STT y Translation. Gemini Image hoy: Nano Banana 2 (`gemini-3.1-flash-image`) es el
-  default del provider `google-gemini-image`; Nano Banana Pro (`gemini-3-pro-image`) está disponible en Vertex pero
-  ninguna superficie lo usa y no hay CLI de Gemini Image (revisión 2026-09-16).
+  Gemini/Chirp TTS, Chirp STT y Translation. Desde el 2026-10-06, **Nano Banana 2.1** (`gemini-nano-banana-2.1`)
+  tiene CLI local `pnpm ai:nano` directo global; [manual](../../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
+  y guía de selección §10.1. El default del provider de producto `google-gemini-image` sigue siendo Nano Banana 2
+  (`gemini-3.1-flash-image`), sin migración de runtime. Nano Banana Pro (`gemini-3-pro-image`) figuraba disponible en
+  Vertex en la revisión 2026-09-16, sin superficie ni CLI propia; no se refrescó aquí. OpenAI sigue directo y
+  `pnpm ai:image` conserva `gpt-image-2` por defecto. Para cine, ficha y `foto:prompt` primero y gates después con
+  cualquier motor; la prueba Nexa 2.1 quedó APROBABLE, no es un alta en el banco aprobado ([casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable)).
 - **Fal → sólo modelos no-Google y utilidades allowlisted.**
 - **OpenAI → directo.**
 - **Post/composición exacta → runtime determinístico/humano.**

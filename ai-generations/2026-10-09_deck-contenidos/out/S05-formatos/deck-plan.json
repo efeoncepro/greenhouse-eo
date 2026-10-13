@@ -1,0 +1,73 @@
+{
+  "tenderId": "S05-formatos",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CT5-prisma-formatos",
+          "alt": "Nexa, con hoodie de Efeonce, sostiene un prisma: un haz de luz azul se abre en cinco pantallas de formatos distintos con la misma idea de campaña"
+        },
+        "voice": {
+          "question": "¿Sirve la misma pieza en todas?",
+          "answer": "Se reinventa",
+          "eyebrow": "Marketing de Contenidos · Adaptación nativa"
+        },
+        "body": "La misma idea se escribe y se edita para cada plataforma: no se recorta, se reinventa.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:telefono-brand-dark-44",
+            "kicker": "9:16",
+            "name": "Reel y story"
+          },
+          {
+            "icon": "asset-ref:icon:encuadre-brand-dark-44",
+            "kicker": "4:5 · 1:1",
+            "name": "Carrusel y post"
+          },
+          {
+            "icon": "asset-ref:icon:reproducir-brand-dark-44",
+            "kicker": "16:9",
+            "name": "Video"
+          },
+          {
+            "icon": "asset-ref:icon:tijeras-brand-dark-44",
+            "kicker": "Edición nativa",
+            "name": "Adaptación"
+          }
+        ],
+        "note": "Una idea madre, tantas versiones como formatos.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

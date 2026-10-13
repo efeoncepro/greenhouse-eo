@@ -5,6 +5,27 @@ description: Business model design and audit for Efeonce offers, portfolio, deli
 
 # Claude routing companion
 
+## Regional CRM specialist capacity
+
+For the accepted regional CRM/RevOps capacity direction (2026-10-09), load
+`docs/business-models/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md` and its service/activation links.
+Model `Approved for validation`; Staff Augmentation and managed delivery are delivery modes, not new
+business lines. Talent Assurance guardrails are accepted; concrete pricing, capacity and contracting
+remain unvalidated until evidence per case. Do not treat a vacancy or approved direction as buyer validation.
+
+For Efeonce Factory, load the [accepted commercial-route decision](../../../docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md),
+the [current model](../../../docs/business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) and
+[engagement guide and packaging examples](../../../docs/services/factory/README.md). Direction accepted 2026-10-05; model
+`Approved for validation`. Cross-practice route for current capabilities; package each opportunity while selling; standalone margin and additional cash,
+with retainer capacity and complete costs preserved. Collection targets are not prices or proven revenue/capacity.
+Greenhouse billing/OT/brief/CX implementation requires its own formal unit; other models retain their states.
+Acquisition: public tenders, private tenders, cold prospecting and paid media. Track cost, conversion and cash by entry;
+load `greenhouse-public-private-tenders` for tenders and preserve its contracts.
+Factory applies only to On-Demand engagements. Monthly/continuous services are named Efeonce; classify
+before naming a Deal. Project installments/milestones do not prove recurrence. Canon: accepted delta and model V1.4.
+Prioritize proposals by fit; current spare capacity does not cap the number of proposals. Separate preparation
+from production commitments; validate execution, suppliers, margin and cash before a binding offer.
+
 The canonical operating skill is `.codex/skills/efeonce-business-model-operator/SKILL.md`.
 Its hardening set includes portfolio/capability model contracts, source catalog, acceptance criteria and
 blind-eval protocol.
@@ -76,3 +97,42 @@ Full-chain and bounded-chain scopes preserve delivery/engagement/mode taxonomy; 
 expansion are lifecycle stages. Quality requires acceptance and correction, time-to-market claims need a baseline,
 and each offer retains its economic, commercial and runtime gates. The full instructions remain in the canonical
 Codex skill above.
+
+## Casos de negocio SEO/AEO
+
+For SEO/AEO business cases, load
+[case-to-proposal decisions](../seo-aeo/references/caso-negocio-y-propuesta.md): separate customer outcomes,
+service duration, cohort value and complete delivery costs. Complementary growth mechanisms cannot
+count the same outcome twice. A prospect case does not create a new offer or approve price or capacity.
+
+## Cotizador V3 y unidad comercial
+
+Para modelar economics de una oferta con talento/tools/plataforma/IA, cargar `efeonce-pricing-operator` y su
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+El agente convierte alcance en demanda; el dominio calcula valores centrales versionados. La unidad
+`managed_service` agrega funciones internas como fee por período; `role_capacity` expresa capacidad de rol.
+Ninguna convierte por sí misma delivery model, compromiso, SOW o madurez de producto: roles/hours usados para
+costear un servicio no implican vender horas/personas. Talent Assurance sigue dirección aceptada; los costos de
+sus actividades y el caso comercial requieren evidencia. Herramientas base/específicas, crédito incremental,
+plataforma, setup, riesgos y límites deben estar en economics aunque la proyección comercial sea un fee.
+On-Demand tampoco es oferta ni delivery model: es la forma del compromiso declarada en la cotización (`engagementForm`;
++10% al precio sobre On-Going, mismo piso) y Factory es su vía comercial. Desde el contrato 1.4.0 (2026-10-11) V3
+lleva los costos de terceros refacturados (fila propia por costo, con la regla de su categoría) y, en un servicio
+gestionado On-Demand, una reserva de contingencia de 12% del costo de personas; con terceros el piso de la oferta se
+lee sobre el margen del trabajo propio, no sobre el mezclado. Siguen aparte en economics: cuándo se le paga al
+proveedor, compras que obligan más allá del encargo (derechos de uso) y el buffer de un On-Going con multas.
+
+Portfolio usa capacidad declarada y separa cliente/interno/sin asignar. Los salarios del Excel de pricing son
+válidos como costo objetivo (los fijó el CEO; no son la nómina actual: el margen real en personas hoy es mayor que
+el que muestra V3 y no se propone conectar payroll); los factores de país (talento y mercado) están cerrados por el
+CEO como valores de política confirmados desde el 2026-10-12, no como estimaciones pendientes. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
+quote lifecycle ni integración API/UI/MCP; el [handoff de promoción](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
+conserva esos gates. No presentar los ejemplos o propuestas de margen como oferta aprobada.
+
+## Oferta integral de medios y programmatic
+
+Para esta composición, cargar el [modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
+y el [método compartido](../digital-marketing/references/programmatic-media-operations.md). Efeonce integra cinco
+frentes de responsabilidad dentro de las tres soluciones existentes. Programmatic tiene servicio/tarifa/cobro
+aprobados; operación DSP directa acompañada se evalúa con RACI, formación, backup y economía por caso. El portfolio
+amplio conserva sus estados; cuenta integral requiere fee conjunto y alcance incremental, sin duplicar tareas.

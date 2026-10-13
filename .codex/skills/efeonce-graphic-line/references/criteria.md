@@ -1,5 +1,14 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta mate uniforme verificado contra: petición y aprobación de cuatro bases planas por el operador,
+> AXIS `de34866` y catálogo live de 134 entradas — 2026-10-12. Prueba de nuevos volúmenes, sin alta/publicación.
+
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` + `5346761` (paquete 0.4.28, tag `v0.4.28`) — 2026-10-09; corrige el endoso «by efeonce» de §6.
+
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: axis-design-system@e26bd85 (iconografía §3.14: AXIS `main@5b8ab20`, tag `v0.3.6`) y
 > greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver
 > [ledger.md](ledger.md)). §3.14 «Plastilina en volumen» (D24): AXIS `main@c18e3d3` — 2026-09-27.
@@ -22,6 +31,41 @@ entendió la línea. Decide como el director de arte que la diseñó: cada eleme
 (lámina 5.6).
 
 ---
+
+## Rooms: design system de producto — 2026-10-07
+
+El operador corrigió la documentación: «efeonce-graphic-line es el nuevo design system». **La órbita gobierna estética, tipografía, componentes, iconografía y motion de Rooms**, incluida su administración. AXIS distribuye los tokens, contratos, componentes y assets; `axisTypography` Poppins/Geist no es la autoridad visual del nuevo consumidor.
+
+- Bricolage Grotesque para títulos/voz editorial desde `efeonceGraphicLine.type.answer.family`; Poppins para lectura, navegación, formularios, notas y evidencia desde `.type.text.family`. Pesos/tamaños según rol, sin convertir todos los títulos en la receta gráfica de respuesta corta.
+- Colores desde `efeonceGraphicLine` y `axisColorSystem`/`axisOrbitRamp`; controles de marca y estados de sus contratos. Iconografía del catálogo; no mezclar Glitch/Manzanitas ni usar volumen en UI.
+- La órbita rodea, mide o enfoca con propósito; el loading sigue el contrato del componente y no inventa progreso. Motion de marca y microinteracción mantienen sus fuentes distintas dentro del mismo sistema.
+- **Adoptar la línea no obliga a escribir propuestas como preguntas/respuestas.** El operador rechazó ese formato como dinámica general; títulos declarativos, método y demostraciones se componen según el contenido.
+- La marca de Rooms enmarca; las piezas del cliente mantienen su diseño. No aplicar fuentes/colores de Efeonce al arte importado.
+
+Ejemplo corregido: la consola Rooms usa encabezados Bricolage y notas/controles Poppins, no un theme heredado Poppins/Geist; el anuncio del cliente mostrado conserva sus fuentes. Motivo: coherencia de producto con el design system actual sin alterar la propuesta. [Dossier Rooms](../../../../docs/architecture/rooms/README.md). Decisión de sistema aceptada; composición renderizada y go de implementación pendientes.
+
+## Rooms: la marca y la esfera fuera del cruce — 2026-10-08
+
+El operador aprobó el logo de Efeonce Rooms, «eslabón leve»: las dos «o» de «Rooms» son dos órbitas enlazadas como eslabones y la única esfera va a la 1:30 de la segunda. Antes había aprobado una versión con la esfera en el cruce de arriba y la retiró el mismo día: «todas las entrelazadas con esfera al centro parecen publicidad íntima femenina».
+
+- **La esfera nunca va en un cruce de órbitas.** En la punta de la almendra que forman dos círculos superpuestos, la esfera se lee, sin contexto, como una figura anatómica. Va a la 1:30 de su órbita, como en toda la familia.
+- **Una letra dentro de una órbita nunca es R:** se lee como ®.
+- **Dos círculos que sólo se tocan** se leen como anteojos o ∞: son genéricos.
+- Antes de aprobar un símbolo, se mira solo (sin la palabra), en grande y a 16–32 px, en claro y oscuro, y se nombra qué más podría leerse (anatómico, ®, 🔗, ⚣, argollas).
+
+Ejemplo corregido: «Rooms» con la esfera posada donde se cruzan las órbitas («el punto de encuentro») → la misma palabra con la esfera a la 1:30 de la segunda órbita. Motivo: el concepto no puede depender de una lectura que el público no hace. [ADR de la marca](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md).
+
+## Wave, Reach y Globe: logotipo propio, lockup de familia (H3) — 2026-10-09
+
+El operador llevó Wave, Reach y Globe a la familia: «ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave». **Cada producto conserva su logotipo; la familia vive en el lockup.**
+
+- **No se redibujan en Poppins** (H1, descartada): la letra de cada marca es identidad (REACH modular, WAVE bloque en mayúsculas, globe redondo); en Poppins se volvían genéricas y perdían presencia.
+- **Lockup:** Efeonce adelante (30 de alto, 20 de aire, filete 1 × 26, 20 de aire) y el logotipo en el gris de la familia (`#6b6b6b` papel / `#6f89a2` oscuro) con **sólo su gesto en color**, para que Efeonce predomine. Tamaño por presencia, no por altura de mayúscula (WAVE 21, REACH 20, globe 35) y base en la «n» de Efeonce; el globo conserva su despegue.
+- **Gestos:** la W de Wave (`#0375db` + `#091951`; oscuro `#2e8be8` + `#a6cdf5`), la «a» con flecha de Reach (`#f83902`), el globo de Globe (`#bb1954`; oscuro `#ee4274`). Globe sobre oscuro **no** toma el naranja Brand `#ff6500` (sigue siendo de Creative Studio): el globo es el objeto, no un acento de línea. Esos colores sobre oscuro son del logotipo y el lockup.
+- **Isotipos sobre oscuro: todo en blanco** (operador, 2026-10-09: «son lo suficientemente distintivos para funcionar así»). `isotype-negative` = `isotype-white` en los tres, y lo mismo en `isotype-small` de Reach y Globe. Un isotipo de color sobre oscuro (los azules de Wave, la punta naranja de Reach, el globo frambuesa) es una exploración superada.
+- **«by efeonce» queda retirado**: `*-logo-*` es el logotipo solo; junto a Efeonce va siempre el `*-lockup-*`, nunca armado a mano. El producto sigue sin firmar (§6).
+
+Ejemplo corregido: «WAVE by efeonce» en el encabezado de un informe → `wave-lockup-positive` («efeonce | WAVE» con sólo la W en color). Motivo: el endoso se leía como marca distinta que Efeonce respalda; el lockup la lee como familia. [ADR H3](../../../../docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md).
 
 ## 1. La idea en una frase y el porqué
 
@@ -447,6 +491,10 @@ sexta: es no usar órbita.
     operador dice «los clay» se refiere a Plastilina; el nombre canónico es **Plastilina** (en inglés, «Plasticine»), y
     el volumen es una capa suya, no una voz nueva. Las librerías «Clay 3D» del equipo en OneDrive son otra cosa
     (ilustración genérica para propuestas) y no se mezclan con Plastilina en una pieza.
+  - **Mate uniforme, prueba 2026-10-12:** el operador pidió superficie lisa y homogénea, sin grano, poros, huellas
+    ni marcas de modelado, en iconos nuevos de Efeonce. Se conserva volumen blando, paleta y esfera de Brand;
+    se añade esa instrucción al prompt canónico, sin reescribirlo. Las bases planas se aprobaron antes del 3D.
+    No cambia los PNG existentes ni canoniza los nuevos volúmenes. [Prueba y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md).
   - **Errores típicos:** generarlo de nuevo dentro de una pieza en vez de usar el PNG aprobado · dos objetos en volumen
     en la misma pieza · el volumen como viñeta o en una fila de servicios · un objeto nuevo inventado directo en 3D ·
     extruir el vector (sale plano, una «galleta»: rechazado por el operador).
@@ -507,7 +555,9 @@ Además, dentro de piezas aprobadas ese día: la portada de propuesta comercial 
 foco.**», evidencia «Preparada para **[Cliente]** · Confidencial»; el nombre del cliente nunca como título), la
 contraportada de brochure («¿Conversamos? **Cuando quieras.**») y la lámina que abre la sección del equipo («¿Quién
 hace crecer tu marca? **Este equipo.**»). La portada general de brochure y la lámina que abre la sección de servicios
-usan «¿Qué hace Efeonce? **Crecer.**». Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
+usan «¿Qué gano con Efeonce? **Crecimiento.**» (operador, 2026-10-09: «Efeonce GENERA crecimiento para nuestros
+clientes»; reemplaza a «¿Qué hace Efeonce? Crecer.», que ya no se usa en piezas nuevas; la pregunta es del cliente
+en primera persona, regla del 2026-10-06, y «Genera crecimiento» no entra en los 12 caracteres de la respuesta). Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
 (≥ 3× la pregunta) · evidencia con una palabra en negrita; nunca un título suelto tipo «Servicios 2026». Si la
 pregunta o la evidencia cruzarían la órbita o al sujeto de la foto, **se acorta la frase** («¿Qué hacemos por tu
 marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte la evidencia en 2–3
@@ -631,7 +681,8 @@ esfera: el acento va al cierre.
 **Efeonce firma todo**, de cualquier línea de servicio; los productos (Globe, Wave, Reach, Greenhouse) aparecen como
 **contexto** —su nombre, su interfaz en un mockup, su isotipo pequeño dentro de su propia superficie— y nunca firman
 (operador, 2026-09-26; manual §7). *Esto reemplaza lo que decía la lámina 3.1 («la firma: el logo propio de cada
-producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la superficie del propio producto.*
+producto, con «by efeonce»»). Desde el 2026-10-09 (H3) el endoso «by efeonce» está **retirado**: junto a Efeonce,
+Wave, Reach y Globe van en su `*-lockup-*` de familia, y `*-logo-*` es el logotipo solo.*
 
 - **Insights, marca de producto que acompaña** (operador, 2026-09-28): en sus propias superficies (el informe compartido,
   el portal) va **junto al logo de Efeonce**, separados por un filete fino y los tres centrados en vertical (las alturas de x quedan ópticamente alineadas,
@@ -819,7 +870,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Órbita alrededor del logo** fuera de un cierre de marca (p. ej. banner de LinkedIn, reverso de la tarjeta), o **esfera pegada al logo** | el logo va en la órbita sólo en el cierre del deck, el cierre de video y el muro de recepción; la esfera es de la palabra | operador 2026-09-26 (D5); lámina 5.4 |
 | **Logo y órbita juntos al frente** de un objeto | frente la palabra, dorso el logo solo | láminas 4.4, 5.6 |
 | **URL como texto**, o **burbuja junto al logo**, o **firma y burbuja a la vez** | la burbuja sólo reemplaza al logo cuando el logo ya está en la imagen | manual §8.5; ADR |
-| **Producto que firma** la pieza (o «by efeonce» como firma) | Efeonce firma todo; el producto es contexto | operador 2026-09-26; manual §7 |
+| **Producto que firma** la pieza (o «by efeonce», retirado desde 2026-10-09) | Efeonce firma todo; el producto es contexto, junto a Efeonce en su lockup de familia | operador 2026-09-26; manual §7; ADR H3 |
 | **Dos acentos** en una pieza, o **teal en una pieza de otra línea** | una línea, un acento; el teal es de Efeonce | láminas 3.1, 3.2 |
 | **Teal claro como texto sobre blanco** | 2,1:1, no alcanza | láminas 1.1, 5.6 |
 | **El acento en texto de menos de 24 px** (eyebrow, etiqueta, dato chico, palabra del eslogan chico) | el acento es para gráfico y texto grande (≥ 3:1); el texto chico va en navy o blanco | operador 2026-09-26 (D1); `accent-text-min-size` |
@@ -851,3 +902,180 @@ en este archivo (palabra de RevOps en el manual, gris del eslogan en `05`) se re
 resuelvan, se reescribe la entrada y se registra en [ledger.md](ledger.md). El halo en papel, el logo dentro de la
 órbita, el contraste del acento, el magenta de HubSpot, el «Growth» del cierre del deck y el anillo propio de la esfera
 quedaron decididos el 2026-09-26.
+
+
+## Descubrimiento de identidades — 2026-10-04
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04; catálogo de logos incorporado en `617ee02`.
+
+Una marca presente en el package pero sin galería ni búsqueda es, para quien compone, un recurso invisible.
+El catálogo Marca → Logotipos debe agrupar cada familia con todas sus variantes selladas, nombre, ID, fondo
+y descarga. Las guías de La órbita, Insights y SEO/AEO explican el uso; el catálogo central permite encontrar
+el archivo. Ejemplo: las 24 variantes de Marketing Studio ya existían, pero no tenían una entrada visible.
+
+El mismo criterio rige los íconos: una entrada central, no colecciones invisibles entre sí. Los filtros
+AEO, SEO y Autoridad muestran pertenencia, no aprobación. Los 134 resultados únicos incluyen 25 candidatos
+marcados; esa visibilidad no los convierte en canon. Una geometría compartida debe tener una sola identidad.
+
+## Identidad editorial del Lab — 2026-10-04
+
+El operador detectó títulos Poppins en páginas del Lab y pidió una corrección robusta y escalable.
+La voz editorial usa Bricolage de `efeonceGraphicLine.type.answer.family` mediante `LabHeading`.
+No se corrige página por página ni con un selector global que cambie los ejemplos: el componente posee
+la familia y el layout carga la fuente una vez. Las muestras de producto, métricas y specimens respetan
+sus contratos. El gate comprueba la fuente efectiva, no solo que el CSS declare Bricolage.
+
+### Loader de botones AXIS (operador, 2026-10-04)
+
+En `efeonce.button`, carga = La órbita compacta con anillo fijo y una esfera con estela corta que recorre. Es actividad indeterminada, nunca un dato ni un arco que se llena. Usa tinta del botón para contraste; reduced motion conserva una órbita quieta. La flecha CTA puede avanzar con `arrowMotion="nudge"` en hover/foco, sin mover texto/ancho. Implementación y límites en [lab-components.md](lab-components.md). Esta autorización no despliega cambios en las UI de productos.
+
+### Botones por línea de negocio (2026-10-04)
+
+La petición del operador se resuelve con contexto optativo `line`, separado de la función `tone`.
+Growth, Brand, Engine, Voice y Revenue (HubSpot/Salesforce) cambian sólo el acento de acciones
+de marca. Neutral y peligro mantienen su significado. Conviene en una landing o flujo de esa línea;
+no justifica recolorear todo Greenhouse o asociar un color de marca a éxito/error. Radio, tipografía,
+estados y accesibilidad son compartidos. Si un acento no admite texto AA, consumir el rol de componente calculado por AXIS desde
+la variante canónica y sus rampas; nunca inventar un color local ni modificar el acento 500. Ejemplo: `line="engine" tone="brand"` para
+«Solicitar propuesta»; `tone="danger"` conserva peligro incluso con `line="engine"`.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+
+## Prioridad de la paleta vigente en AXIS — 2026-10-04
+
+Decisión explícita del operador: «Prevalece por encima de todo la órbita que es la nueva línea».
+La identidad vigente se resuelve desde `efeonceGraphicLine.color` y `efeonceGraphicLine.lines`.
+La hoja general de colores del Lab debe empezar por esa paleta, superficies y acentos por línea
+sobre claro/oscuro, con sus reglas de uso. `axisRamp` documenta rampas de interfaz heredadas de
+Greenhouse: su existencia y consumo no las convierten en una alternativa al canon de La órbita.
+Se identifican como compatibilidad de producto cuando se conservan. La semántica funcional
+(éxito, advertencia, peligro, información) conserva su significado y debe distinguirse de identidad.
+
+El hallazgo original de `13db367` quedó corregido en `3299032`: la hoja y su JSON proyectan
+`axisColorSystem`, paleta, seis líneas y rampas de La órbita. No copiar HEX ni sustituir globalmente
+una rampa compartida sin revisar consumidores. La migración de producto necesita su propia verificación.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación en AXIS `3299032`, tokens **0.5.0**; estado de distribución en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04):
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins ni adopción automática en Greenhouse.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+## Formularios: claridad y foco continuo — 2026-10-04
+
+El operador rechazó los desplegables pobres y el foco con varias líneas. La solución pertenece al
+package: Select presenta título, ayuda y selección marcada; el configurador del Lab usa el mismo
+control. Opciones activas, seleccionadas y deshabilitadas deben distinguirse sin depender sólo del color.
+El campo de texto enfocado tiene **un solo contorno continuo**, conservando el significado de error;
+no se suman un aro externo y otro rectángulo sobre el input.
+
+Los íconos `mail` y `folder` aportan una señal semántica dentro del campo, sin reemplazar su etiqueta
+persistente. Son vocabulario funcional Tabler del primitive, no Trazo/Plastilina ni una esfera de marca
+adicional. No convertir cada campo en una pieza publicitaria. La ayuda, el error y el requerido
+siguen ligados al control. Detalle técnico y límites: [lab-components.md](lab-components.md#formularios-portables--2026-10-04).
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### 2026-10-05 — Agendadores y superficies públicas de Efeonce
+
+Corrección del operador: un render funcional de Growth Meetings no acredita alineación con La órbita.
+Construir primero la composición en AXIS y revisar luego su adaptación. Reutilizar estructura y comportamiento
+no implica canonizar la paleta, tipografía o controles heredados. Aplicar los roles de marca y las primitives
+funcionales; no añadir una órbita decorativa al calendario. Esta dirección no habilita la línea en el interior del portal Greenhouse. El agendador fue
+aprobado visualmente por el operador el 2026-10-05; publicación y adaptación siguen separadas.
+Verificado contra: axis-design-system@8adedef + WIP local de scheduler — 2026-10-05.
+
+
+### 2026-10-05 — Disponibilidad inequívoca y movimiento del agendador
+
+Corrección del operador sobre el candidato: el número del día y la cantidad de horarios no pueden
+parecer dos fechas. Día destacado, ícono de calendario + cantidad para disponibilidad y guion
+para ausencia, con leyenda (revisión posterior del operador sustituye el check y «disp.»); el panel de horas repite el total. No depender sólo del color.
+Motion con causalidad: dirección al cambiar mes/paso, respuesta de selección y contenido secuenciado,
+con contexto estable. Movimiento reducido, foco, interrupción y borrador son parte del comportamiento.
+Implementado en AXIS; agendador aprobado visualmente el 2026-10-05. La evidencia histórica y
+el push del scheduler están en el ledger; no acredita adopción de Growth Meetings.
+
+
+### 2026-10-05 — Revisión del agendador: íconos y Select canónico
+
+En celdas compactas, calendario y cantidad comparten una línea debajo del día. No usar check ni
+abreviatura «disp.»; conservar leyenda y nombre accesible completo. Verificar que el indicador
+quepa dentro de su celda en receta intermedia y móvil. Los campos usan `leadingIcon` del vocabulario
+funcional compartido (persona, correo, empresa), no pictogramas decorativos independientes.
+Los configuradores del Lab consumen Field/Select canónico; no un `<select>` suelto con CSS local.
+NativeSelect sigue siendo un fallback explícito, no una razón para sustituir menús canónicos.
+Verificado contra axis-design-system@8adedef + WIP local, sin publicación.
+
+
+### 2026-10-05 — Cierre celebratorio del agendador
+
+El operador rechaza una confirmación plana. Componer un emblema de celebración funcional, título
+editorial y comprobante separado con calendario/reloj/zona. Confeti breve y acotado, una sola vez
+al confirmar, nunca en error o resultado ambiguo; no añadir órbitas decorativas. Movimiento reducido
+conserva el cierre estático, cancela y no reanuda el efecto. Llevar al cierre visible tras el submit
+sin robar foco si la persona ya está interactuando fuera. AXIS @8adedef + WIP local, sin release.
+
+
+## Growth CTA: ligereza y proporción — corrección del operador, 2026-10-05
+
+El operador rechaza la primera candidata por no tener la forma y limpieza de La órbita: el panel
+lateral estirado a todo el contenedor, la sombra rectangular y el marco grueso del popup se sienten
+pesados. Pide algo premium, elegante y atractivo. El criterio es de composición, no de añadir
+ornamentos: panel con ancho propio; minimal sin caja ni sombra; dominante tipográfica, aire útil,
+cierre discreto y un solo marco en el agendador. Agenda debe poder probarse en modal y desplegada
+hacia abajo. Ambas son opciones visuales de la misma acción; no implican dos operaciones de reserva.
+Revisión aprobada visualmente por el operador el 2026-10-05 («Aprobado todo»). Verificado contra:
+axis-design-system@eeb24e2 + revisión local Growth CTA — 2026-10-05.
+
+
+### Growth CTA: conservar la pregunta, incorporar las marcas — 2026-10-05
+
+El operador corrige la interpretación anterior: «en este caso la pregunta está bien donde está pero
+la esfera y el anillo deben estar». Se conserva texto, posición y protagonismo del titular; no se
+sustituye por un par nuevo como «Lo medimos». El operador precisa después que el anillo debe ir en el título superior (eyebrow) y la esfera
+al cierre del titular grande. Nunca ambas marcas en ese mismo titular. Esta aplicación quedó
+aprobada el 2026-10-05; no convierte la pregunta grande con esfera en regla general de La órbita. La receta usual sigue
+siendo pregunta Poppins/anillo y respuesta Bricolage/esfera.
+
+En el CTA editorial, nunca quitar el padding interno del botón canónico para alinearlo con el texto:
+el fondo de hover y la flecha necesitan ese aire en reposo, hover y foco.
+Verificado contra: axis-design-system@eeb24e2 + revisión local Growth CTA — 2026-10-05.
+
+
+### Growth CTA: dos banners — 2026-10-05
+
+El operador pide construir editorial compacto y de marca. Minimal usa menor altura, titular
+horizontal y reglas finas; spotlight conserva azul profundo, mayor escala y agrupa acción con nota.
+Anillo sólo en el título superior; esfera sólo al cierre del titular. En móvil las columnas se
+apilan. La acción conserva padding y movimiento canónicos. Se comparan ambas recetas en AXIS y quedaron aprobadas visualmente por el operador el
+2026-10-05. La aprobación no acredita publicación de packages ni migración de un consumidor.
+
+
+### Growth CTA: jerarquía dentro de Bricolage — 2026-10-05
+
+El operador pide contraste de pesos para guiar la lectura. En esta aplicación la introducción va
+en 400 y una única idea principal en 700, sin cambiar copy, tamaño o color dentro del titular.
+Ejemplo: «Cuando le preguntan a la IA,» introduce; «¿aparece tu marca?» concentra el énfasis.
+En agenda, «Una conversación.» introduce y «Tu próximo paso.» toma el peso. No se extrapola
+esta aplicación aprobada a titulares arbitrarios ni se infiere énfasis por palabras clave.

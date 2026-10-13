@@ -1,5 +1,54 @@
 # 04 · Pricing — la política que falta
 
+## Carril local opt-in V3: simulación, no emisión
+
+Para composición reproducible de demanda + tools/plataforma/créditos, cargar
+[contrato V3](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+La CLI V3 agrega licencias base/específicas, capacidad declarada y packs por proveedor/mes con fuente/FX,
+congela inputs y produce explain/replay/readiness/preview. Costos históricos y `trial-*` siguen hipótesis;
+no homologar al loaded cost real de este módulo. La referenciaV2 de abajo conserva autoridad de cotización
+canónica. **`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta** (ya no compara
+contra un 40/35 genérico) y no reemplaza precio/condiciones aprobados por cuenta. Servicio con roles internos sigue
+vendiendo fee/capacidad gobernada, no horas/piezas: la oferta se vende como `managed_service` por definición del
+catálogo, y una demanda que declara otra unidad no calcula.
+**Oferta V3 de esta práctica (catálogo v8, 2026-10-11):** un programa SEO/AEO gestionado se cotiza con
+`offerId: "seo-aeo-managed-service"` — objetivo 55% (extremo bajo del target 55-60% de abajo, confirmado por el CEO)
+y piso 45% (el del 2026-07-13). No usar `creative-managed-service` (objetivo = piso: saldría a 45%) ni la oferta de
+staffing; `--current` y fecha de cotización desde el 2026-10-11. Un programa a un precio (tres meses, una
+licitación) declara ese precio como `agreed_total` —un neto por todo el plazo— y el documento lo imprime como
+«1 programa» con `combine`; un fee mensual continuo sigue siendo `agreed_net` por mes
+([procedimiento y ejemplo](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme)).
+**Forma del compromiso (2026-10-11):** un encargo acotado (p. ej. la Fundación de la capa 1) declara
+`engagementForm: "on_demand"` en su propia cotización: +10% al precio sobre On-Going, mismo piso; es forma de
+compromiso, no otra oferta ni delivery model, y la Operación va On-Going (dos cotizaciones; no hay forma híbrida).
+Arranque, coordinación y compromisos con proveedores van como costo; antes de comprometer revisa `compose schedule`
+y `compose commitments` (`compose cash` no es margen ni decide precio). Desde el contrato 1.4.0 (2026-10-11) un
+encargo On-Demand de esta oferta lleva una reserva de contingencia de 12% del costo de personas, como costo (se vende
+con el margen de la oferta y el 10% On-Demand) y sale sólo con una renuncia declarada con motivo; y los terceros que
+se compran y refacturan van como filas propias (producción, talento e impresión +10% con piso 5%; medios y licencias
+al costo), con el piso de 45% leído sobre el margen del trabajo propio (`ownWork`), nunca sobre el mezclado. Las dos
+son estimaciones aceptadas por el CEO. Sin modelar: el buffer de un On-Going ganado en licitación con multas (§4),
+cuándo se le paga al proveedor, una compra que obliga más allá del encargo, períodos bajo un
+mes y la regla del ad-hoc (bug 2). La duración del contrato y la fecha de inicio del servicio no son un pendiente:
+están fuera del cotizador por decisión del CEO (2026-10-11; una cotización no es un contrato). Los perfiles de contenido llevan
+Adobe Express (CEO): declara su reparto o excluye la tarea con motivo.
+Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
+En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
+nómina real del §4: el margen real en personas hoy es mayor que el que muestra V3; no proponer conectarle nómina.
+Excepción bajo el piso: sólo el CEO (SKY social care 2027 es una y no es referencia); donde se puede ganar
+más se sube el objetivo de la oferta, no el piso. El FX de cotización de V3 es política del CEO con USD de
+referencia (CLP 1000 · COP 3650 · MXN 19,25 · PEN 3,70), no el spot de §1/§7, y cada moneda redondea hacia arriba
+(CLP 10.000 · USD 10 · PEN 50 · COP 50.000 · MXN 100): cotiza en la moneda pedida, nunca conviertas a mano; en EUR
+aún no se emite. `estimateExposure` ordena qué insumo estimado confirmar primero; el precio unitario de una
+herramienta no vence (los seats se declaran por cotización, como se compran: varios planes en un periodo, un seat
+pagado sin uso con `idleSeats` o uno que usan varias personas con `seatSharing`, cada uno con su motivo; nunca le
+quites una tarea a una persona para que la cuenta de seats cuadre). Un servicio opcional se cotiza aparte y el
+documento lo imprime fuera del total (`--option`); si el opcional sólo amplía a personas que ya están en la
+cotización base, se cotiza la base con el opcional adentro y su costo y margen se leen como incremento
+(`compose increment`, `--increment`), nunca en una cotización propia; una cortesía se bonifica en la demanda y el
+documento la muestra con su valor de referencia: ninguno de esos importes se digita.
+
 > **Estado, dicho sin adornos (operador, 2026-07-13):** *"actualmente no tenemos una metodología o método para
 > fijar precios; tampoco lo del margen"*.
 >
@@ -327,6 +376,10 @@ PISO = loaded cost del pod          ← del squad blueprint (nómina real, %dedi
      ────────────────────────────
      ÷ (1 − margen mínimo)
 ```
+
+**En V3 (contrato 1.4.0, 2026-10-11):** el buffer de riesgo sólo está modelado para un servicio gestionado vendido
+On-Demand (reserva de 12% del costo de personas). 🔴 El de un On-Going ganado en licitación con multas —este caso—
+**no** está modelado: V3 no lo suma, así que se sigue computando a mano antes de leer el piso.
 
 ### 🔴 Aplicado a SKY — y el piso declarado NO pasa la regla
 

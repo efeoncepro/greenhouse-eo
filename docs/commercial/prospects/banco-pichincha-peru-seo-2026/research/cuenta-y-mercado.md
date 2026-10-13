@@ -60,3 +60,7 @@ RPP informó el 18 de septiembre que la SBS autorizó la adquisición de hasta e
 
 ## Límites de la evidencia
 Los hechos financieros y de estrategia convergen entre memoria, Apoyo y Moody’s. El mapa de compra y las métricas propuestas son hipótesis comerciales. No contamos con entrevistas, presupuesto, contrato de agencia SEO, RFP, GSC ni conversiones del banco. La ausencia en las SERPs muestreadas no demuestra una pérdida económica ni una causa técnica.
+
+## Reencuadre de oportunidad — 06-10-2026
+
+La investigación anterior se conserva como contexto de Banco Pichincha Perú. La [reunión](../MEETING-2026-10-06.md) identifica **Pibank Perú** como marca y `pibank.pe` como dominio del servicio 2027. [Quiénes somos](https://pibank.pe/quienes-somos/) confirma marca/entidad y presencia internacional del modelo; [Cuenta Soles](https://pibank.pe/cuenta-soles-pibank/) muestra producto digital de ahorro, 5% TREA fechado, calculadora y FAQ (consulta 06-10). No se extrapola rendimiento técnico/comercial entre países o desde `pichincha.pe`. El análisis específico de demanda/competencia Pibank sigue pendiente. [Caso de negocio](../BUSINESS-CASE-2027.md).

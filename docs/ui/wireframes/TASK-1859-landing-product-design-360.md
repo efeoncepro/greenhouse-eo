@@ -23,6 +23,13 @@
 
 ## Publication Gate — la oferta todavía no autoriza claims públicos
 
+> **Delta 2026-10-10 — gate de estado cumplido.** El operador aprobó Product Design 360 completo («Todo product
+> design hay que ponerlo aprobado»): el business model está `Approved` y cubre el nombre público y la venta. La
+> escalera de estados de la tabla quedó superada en el modelo: donde dice `Approved for validation` o `Commercially
+> approved`, léase `Approved` por el operador. Las fases A → B → C se conservan como orden de salida; lo que las abre
+> ahora es el trabajo propio de la task (dirección visual, slug, copy, binding del scheduler, QA de accesibilidad) y
+> la autorización del operador para publicar. El párrafo y la tabla de abajo describen el estado al 2026-09-10.
+
 🔴 **Esta es la restricción que ordena todo lo demás.** El business model está en `Proposed` y declara textualmente que no autoriza *"claims públicos, venta general"*. Una landing indexable es un claim público. Por eso la página se construye completa pero se publica por fases, atadas al estado del modelo:
 
 | Fase | Estado del business model | Qué se permite | Indexación |
@@ -31,7 +38,7 @@
 | **B** | `Approved for validation` | Publicar **`noindex, follow`**, fuera del sitemap y del menú; usarla **como pieza que se envía, no que se encuentra**, en conversaciones 1:1 y pilotos | `noindex` |
 | **C** | `Commercially approved` | Indexar, sitemap, menú *Servicios*, enlaces desde landings hermanas, promover el scheduler | `index, follow` |
 
-El nombre público **"Product Design 360" no aparece en la página** mientras siga abierta la decisión D1 del modelo: en LATAM "product design" puede leerse como diseño industrial. La página lidera con **Efeonce** y con lenguaje llano (*capacidad de diseño*, *UX/UI*, *design system*, *accesibilidad*).
+*(Regla al 2026-09-10; D1 quedó resuelta el 2026-10-10 y el nombre está aprobado: ya no es copy prohibido, y usarlo en el titular es decisión de copy.)* El nombre público **"Product Design 360" no aparece en la página** mientras siga abierta la decisión D1 del modelo: en LATAM "product design" puede leerse como diseño industrial. La página lidera con **Efeonce** y con lenguaje llano (*capacidad de diseño*, *UX/UI*, *design system*, *accesibilidad*).
 
 ## Information Architecture
 
@@ -341,7 +348,7 @@ La verificación incluye un escaneo del texto renderizado contra esta lista. Cua
 
 | Prohibido en la página | Por qué |
 |---|---|
-| `Product Design 360` | nombre público no aprobado (D1) |
+| ~~`Product Design 360`~~ | **Levantado el 2026-10-10:** el operador aprobó el nombre público (D1 resuelta). Ya no bloquea la publicación |
 | Cifras de RpA, OTD o FTR (ej. `0,02`, `0,38`) | son de la entrega creativa, no de product design |
 | Nombres de competidores (`Superside`, `Eleken`, `Design Pickle`, `Toptal`…) | no se compite descalificando; y sus precios no son claims de Efeonce |
 | Cifras de salario o costo cargado | son de EE.UU. y de fuentes con sesgo de proveedor |

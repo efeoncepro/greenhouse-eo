@@ -1,0 +1,31 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "37724a1a3eb4203b69b74475af9f83d1de8556539b3af91b34d986b0ab36b4df",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 2,
+  "contentTypes": [
+    "deck.cover-proposal",
+    "deck.close-proposal"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3-contra-horizonte",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "sha256": "0463d21a42b850c7d169271d967c35c01b7bc3e333f5432e7586f3ded4cc4d7d"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:pibank-logo",
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo.svg",
+      "sha256": "cf06079bc36e825a2f293c67b96d756670935aad00e87662ad67dfb1542cd282"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

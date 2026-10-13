@@ -1,0 +1,49 @@
+{
+  "tenderId": "C08-triptico",
+  "slides": [
+    {
+      "slideId": "deck-triptych",
+      "contentType": "deck.triptych",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "questionTop": 48,
+          "answerTop": 944,
+          "answerPx": 108,
+          "questionInset": "--gl-question-inset=48px",
+          "questionPx": "--gl-question-px=34px",
+          "panelWidth": "--gl-panel-width=636px",
+          "gutter": "--gl-gutter=6px",
+          "wordInset": "--gl-word-inset=42px",
+          "bedBlur": "--gl-bed-blur=16px",
+          "bedMaskSolid": "--gl-bed-mask-solid=110px",
+          "bedMaskEnd": "--gl-bed-mask-end=220px",
+          "bedShade": "--gl-bed-shade=82%",
+          "bedShadeHeight": "--gl-bed-shade-height=240px"
+        },
+        "bed": {
+          "src": "asset-ref:plate:T1-escucha"
+        },
+        "question": "¿Cómo trabajamos?",
+        "panels": [
+          {
+            "src": "asset-ref:plate:T1-escucha",
+            "alt": "Una estratega de Efeonce toma notas mientras un panadero le explica su oficio frente al horno",
+            "word": "Escucha"
+          },
+          {
+            "src": "asset-ref:plate:T2-crea",
+            "alt": "Un creativo con el hoodie de Efeonce fija pruebas de fotografía en una pared del estudio",
+            "word": "Crea"
+          },
+          {
+            "src": "asset-ref:plate:T3-mide",
+            "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente",
+            "word": "Mide"
+          }
+        ]
+      },
+      "template": "Triptych"
+    }
+  ]
+}

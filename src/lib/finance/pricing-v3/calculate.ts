@@ -1,0 +1,1223 @@
+import Decimal from 'decimal.js'
+
+import {
+  PRICING_V3_ENGINES,
+  PRICING_V3_MARKET_FLOOR_BASIS,
+  PRICING_V3_THIRD_PARTY_BILLING,
+  parsePricingV3Input
+} from './schemas'
+import type {
+  PricingV3AdjustmentV14,
+  PricingV3ContingencyReserveV14,
+  PricingV3ContractVersion,
+  PricingV3EngagementFactorV13,
+  PricingV3Input,
+  PricingV3MarketFactorV12,
+  PricingV3PriceRounding,
+  PricingV3Source,
+  PricingV3ThirdPartyCostV14,
+  PricingV3ThirdPartyPolicyV14
+} from './schemas'
+
+const D = Decimal.clone({ precision: 80, rounding: Decimal.ROUND_HALF_UP })
+
+// Products of three presented amounts (contract 1.2.0 floor) must be exact for any amount the schema admits; 80 digits
+// only cover two. Nothing is ever divided at this precision except through an integer quotient.
+const Wide = Decimal.clone({ precision: 240, rounding: Decimal.ROUND_HALF_UP })
+
+/** Each contract names its own arithmetic; a result is never relabelled with the policy of another version. */
+export const PRICING_V3_PRECISION_POLICIES = {
+  '1.0.0': 'decimal-80-half-up-final-line-largest-remainder-v1',
+  '1.1.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-v2',
+  '1.2.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-v3',
+  '1.3.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-engagement-ratio-v4',
+  '1.4.0':
+    'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-engagement-ratio-third-party-reserve-v5'
+} as const
+
+// "Met the floor before rounding" is read on the unrounded amounts, whose last digits are division noise: a price
+// built as cost / (1 - floor) lands a hair above or below the floor by chance. Reading the rate at 60 of the 80
+// working digits makes that case deterministic. MARGIN_BELOW_FLOOR itself keeps comparing without any tolerance.
+const UNROUNDED_COMPLIANCE_DIGITS = 60
+
+type Diagnostic = {
+  code: string
+  fieldPath: string
+  lineId?: string
+  severity: 'error' | 'missing' | 'review'
+  message: string
+  resolution: string
+}
+
+type Component = {
+  componentId: string
+  kind: string
+  label: string
+  cost: string
+  price: string
+  cashCommitment: string
+  coverage: string[]
+  trace: Record<string, string>
+}
+
+type Billable = {
+  lineId: string
+  parentLineId: string
+  periodId: number
+  // `monthly` and `setup` are the billing classes of a team row. `third_party` exists only from contract 1.4.0 on: a
+  // row of an earlier contract never has it. It is typed here, on the row every contract shares, so a consumer that
+  // reads rows of any contract keeps one common row type.
+  kind: 'monthly' | 'setup' | typeof PRICING_V3_THIRD_PARTY_BILLING
+  label: string
+  cost: string
+  undiscountedPrice: string
+  discount: string
+  net: string
+  marginAmount: string
+  components: Component[]
+  minimumMargin: string
+}
+
+type Totals = {
+  cost: string
+  undiscountedPrice: string
+  discount: string
+  net: string
+  marginAmount: string
+  marginRate: string | null
+  tax: string | null
+  grandTotal: string | null
+  cashCommitment: string
+  uniformMonthlyNet: string | null
+}
+
+/** Contract 1.1.0 only. Identity per row and in totals: net = undiscountedPrice + uplift - discount. */
+type CommercialAmounts = {
+  /** Already included in `undiscountedPrice`: the policy price is `undiscountedPrice - roundingAdjustment`. */
+  roundingAdjustment: string
+  uplift: string
+}
+
+/**
+ * From contract 1.2.0. `marketAdjustment` is the policy price with the market factor minus the policy price at factor
+ * 1 (signed, before commercial rounding), so `undiscountedPrice - roundingAdjustment - marketAdjustment` is the price
+ * of the base market. It describes the price; `marginAmount` and `marginRate` stay those of the final net. Under
+ * contract 1.3.0 both prices are read at engagement ratio 1 (see `EngagementAmounts`), so this amount is what it
+ * would be for the same row quoted without a form and `engagementAdjustment` is subtracted as well to reach the base.
+ */
+type MarketAmounts = { marketAdjustment: string }
+
+/** From contract 1.2.0, per row. The row is flagged MARGIN_BELOW_FLOOR when its final net is under `floorNet`. */
+type MarketFloor = {
+  /** Policy price over base-market price when the floor follows the base market and the factor lowered it; else "1". */
+  marketPriceRatio: string
+  /** Smallest net, at the currency unit, that meets `minimumMargin` in this market. */
+  floorNet: string
+}
+
+/**
+ * Contract 1.3.0 only. `engagementAdjustment` is the policy price with the engagement ratio minus the same price at
+ * ratio 1, that is, the price every earlier contract forms for the row (signed, both as presented, before commercial
+ * rounding). The walk of a row, exact at every step and in totals:
+ *
+ *   base-market price at ratio 1
+ *     + marketAdjustment       -> policy price in the offer market, as contracts 1.0.0 to 1.2.0 price it
+ *     + engagementAdjustment   -> policy price of this quote
+ *     + roundingAdjustment     -> undiscountedPrice
+ *     + uplift - discount      -> net;  net - cost = marginAmount
+ */
+type EngagementAmounts = { engagementAdjustment: string }
+
+/** Contract 1.3.0 only, per row: the ratio of the engagement form the request declares, as the snapshot states it. */
+type EngagementRatio = { engagementPriceRatio: string }
+
+/**
+ * Contract 1.4.0 only, per row and in totals: the contingency reserve inside `cost`, so `cost - contingencyReserve`
+ * is the cost of the same row quoted without a reserve. A difference of presented amounts, like `marketAdjustment`.
+ * Always "0" on a third-party row: the reserve never rests on what a supplier charges.
+ */
+type ReserveAmounts = { contingencyReserve: string }
+
+/**
+ * Contract 1.4.0 only, in totals. Each one is the sum of its rows, and own work is what is left of the quote once the
+ * third-party rows are taken out:
+ *
+ *   ownWorkMarginRate = ((net - thirdPartyNet) - (cost - thirdPartyCost)) / (net - thirdPartyNet)
+ *
+ * `marginRate` stays the real blended margin of the whole quote; `ownWorkMarginRate` is the one to hold against the
+ * floor of the offer, because a cost re-invoiced at or near cost dilutes the first and not the second.
+ */
+type ThirdPartyTotals = {
+  thirdPartyCost: string
+  thirdPartyNet: string
+  /** Null when the quote sells no own work at a net above zero. */
+  ownWorkMarginRate: string | null
+}
+
+/**
+ * Contract 1.4.0 only, in totals. `contingencyBase` is the cost the applied reserve rests on (person cost, or every
+ * own cost, as the reserve declares). `contingencyReserveWaived` is the reserve a waiver left out of `cost`: what
+ * `contingencyReserve` would have been. With a waiver the first two are "0"; without one the last is.
+ */
+type ReserveTotals = { contingencyBase: string; contingencyReserveWaived: string }
+
+type Envelope<Contract extends PricingV3ContractVersion, Line, Sum> = {
+  engineVersion: (typeof PRICING_V3_ENGINES)[Contract]
+  binding: false
+  calculationStatus: 'calculated' | 'needs_input' | 'invalid'
+  reviewStatus: 'within_policy' | 'requires_review' | 'not_evaluated'
+  dataMode: PricingV3Input['snapshot']['mode'] | null
+  calculationCurrency: string | null
+  outputCurrency: string | null
+  diagnostics: Diagnostic[]
+  lines: Line[]
+  totals: null | Sum
+  precisionPolicy: (typeof PRICING_V3_PRECISION_POLICIES)[Contract]
+}
+
+export type PricingV3ResultV10 = Envelope<'1.0.0', Billable, Totals>
+export type PricingV3LineV11 = Billable & CommercialAmounts
+export type PricingV3TotalsV11 = Totals & CommercialAmounts
+export type PricingV3ResultV11 = Envelope<'1.1.0', PricingV3LineV11, PricingV3TotalsV11>
+
+export type PricingV3LineV12 = PricingV3LineV11 & MarketAmounts & MarketFloor
+export type PricingV3TotalsV12 = PricingV3TotalsV11 & MarketAmounts
+export type PricingV3ResultV12 = Envelope<'1.2.0', PricingV3LineV12, PricingV3TotalsV12>
+
+export type PricingV3LineV13 = PricingV3LineV12 & EngagementAmounts & EngagementRatio
+export type PricingV3TotalsV13 = PricingV3TotalsV12 & EngagementAmounts
+export type PricingV3ResultV13 = Envelope<'1.3.0', PricingV3LineV13, PricingV3TotalsV13>
+
+/** From contract 1.4.0 a row is either a team row or one re-invoiced third-party cost in one period. */
+export type PricingV3LineV14 = PricingV3LineV13 & ReserveAmounts
+
+export type PricingV3TotalsV14 = PricingV3TotalsV13 & ReserveAmounts & ReserveTotals & ThirdPartyTotals
+export type PricingV3ResultV14 = Envelope<'1.4.0', PricingV3LineV14, PricingV3TotalsV14>
+
+/** A result carries only the keys of its own contract (absent, not zero): one more would change its frozen digest. */
+export type PricingV3Result =
+  | PricingV3ResultV10
+  | PricingV3ResultV11
+  | PricingV3ResultV12
+  | PricingV3ResultV13
+  | PricingV3ResultV14
+
+type Row = Billable &
+  Partial<CommercialAmounts & MarketAmounts & MarketFloor & EngagementAmounts & EngagementRatio & ReserveAmounts>
+
+type Draft = Envelope<
+  PricingV3ContractVersion,
+  Row,
+  Totals &
+    Partial<CommercialAmounts & MarketAmounts & EngagementAmounts & ReserveAmounts & ReserveTotals & ThirdPartyTotals>
+>
+
+// The reserve is one component per team row. Its label is fixed here because the snapshot states a rate and a base,
+// not a name: the catalog record that names it stays in the bindings of the quote.
+const CONTINGENCY_RESERVE_KIND = 'contingency_reserve'
+const CONTINGENCY_RESERVE_LABEL = 'Contingency reserve'
+
+/** Pure calculation: all costs, country policies and FX are supplied, never fetched. */
+export function calculatePricingV3(raw: unknown): PricingV3Result {
+  return calculate(raw) as PricingV3Result
+}
+
+// One code path for every contract: 1.0.0 is the case with at most one discount, no rounding and no 1.1.0 keys;
+// 1.1.0 is the case with no market floor basis and no 1.2.0 keys; 1.2.0 is the case with no engagement form, where
+// every price is the price at engagement ratio 1, and no 1.3.0 keys; 1.3.0 is the case with no third-party cost and
+// no contingency reserve, and no 1.4.0 keys.
+function calculate(raw: unknown): Draft {
+  const { contract, parsed } = parsePricingV3Input(raw)
+  // Capabilities are cumulative: 1.2.0 has everything 1.1.0 added, 1.3.0 everything 1.2.0 added, and so on.
+  const v11 = contract !== '1.0.0'
+  const v14 = contract === '1.4.0'
+  const v13 = contract === '1.3.0' || v14
+  const v12 = contract === '1.2.0' || v13
+  const diagnostics: Diagnostic[] = []
+  const lines: Row[] = []
+
+  const base = (status: PricingV3Result['calculationStatus']): Draft => ({
+    engineVersion: PRICING_V3_ENGINES[contract],
+    binding: false,
+    calculationStatus: status,
+    reviewStatus: 'not_evaluated',
+    dataMode: parsed.success ? parsed.data.snapshot.mode : null,
+    calculationCurrency: parsed.success ? parsed.data.snapshot.calculationCurrency : null,
+    outputCurrency: parsed.success ? parsed.data.request.outputCurrency : null,
+    diagnostics,
+    lines: status === 'calculated' ? lines : [],
+    totals: null,
+    precisionPolicy: PRICING_V3_PRECISION_POLICIES[contract]
+  })
+
+  const report = (code: string, fieldPath: string, severity: Diagnostic['severity'], lineId?: string) => {
+    diagnostics.push({
+      code,
+      fieldPath,
+      lineId,
+      severity,
+      message: `Pricing input requires attention: ${code}`,
+      resolution: 'Supply or correct the explicitly referenced record; no implicit fallback is applied.'
+    })
+  }
+
+  if (!parsed.success) {
+    parsed.error.issues.forEach(issue =>
+      report(
+        issue.path.includes('schemaVersion') ? 'UNSUPPORTED_SCHEMA' : 'INVALID_INPUT',
+        issue.path.join('.'),
+        'error'
+      )
+    )
+
+    return base('invalid')
+  }
+
+  const { request: req, snapshot: config } = parsed.data
+  const adjustments: PricingV3AdjustmentV14[] = req.adjustments
+  const rounding: PricingV3PriceRounding | undefined = 'priceRounding' in config ? config.priceRounding : undefined
+  const currency = config.currencies.find(item => item.code === req.outputCurrency)
+  const baseCurrency = config.currencies.find(item => item.code === config.calculationCurrency)
+
+  const duplicate = (values: string[], path: string) => {
+    if (new Set(values).size !== values.length) report('DUPLICATE_ID', path, 'error')
+  }
+
+  duplicate(
+    req.lines.map(item => item.lineId),
+    'request.lines'
+  )
+  duplicate(
+    config.profiles.map(item => item.profileId),
+    'snapshot.profiles'
+  )
+  duplicate(
+    config.resources.map(item => item.resourceId),
+    'snapshot.resources'
+  )
+  duplicate(
+    config.allocationPolicies.map(item => item.policyId),
+    'snapshot.allocationPolicies'
+  )
+  duplicate(
+    config.currencies.map(item => item.code),
+    'snapshot.currencies'
+  )
+  duplicate(
+    config.marketFactors.map(item => item.country),
+    'snapshot.marketFactors'
+  )
+  duplicate(
+    config.talentFactors.map(item => `${item.referenceCountry}:${item.country}`),
+    'snapshot.talentFactors'
+  )
+  duplicate(
+    config.pricingPolicies.map(item => `${item.profileId}:${item.offerId}:${item.engagementCode}`),
+    'snapshot.pricingPolicies'
+  )
+  duplicate(
+    config.fx.map(item => `${item.from}:${item.to}`),
+    'snapshot.fx'
+  )
+
+  const sourceOk = (source: PricingV3Source, path: string, amount?: string, lineId?: string) => {
+    if (source.effectiveFrom > req.quoteDate || source.effectiveUntil < req.quoteDate)
+      report('STALE_SOURCE', path, 'missing', lineId)
+    if (source.status === 'pending') report('MISSING_SOURCE_CONFIRMATION', path, 'missing', lineId)
+    if (source.status === 'estimated') report('ESTIMATED_SOURCE', path, 'review', lineId)
+    if (amount !== undefined && new D(amount).isZero() && !source.zeroReason)
+      report('UNJUSTIFIED_ZERO', path, 'error', lineId)
+  }
+
+  const countryOk = (value: string | null | undefined, path: string, code: string, lineId?: string) => {
+    if (!value) report(code, path, 'missing', lineId)
+    else if (!config.countries.includes(value)) report('UNSUPPORTED_COUNTRY', path, 'error', lineId)
+  }
+
+  countryOk(req.offerMarketCountry, 'request.offerMarketCountry', 'MISSING_OFFER_MARKET')
+  if (!currency || !baseCurrency) report('MISSING_CURRENCY', 'snapshot.currencies', 'missing')
+
+  const fx = (from: string, to: string, path: string): Decimal => {
+    if (!config.currencies.some(item => item.code === from)) report('MISSING_CURRENCY', path, 'missing')
+    if (from === to) return new D(1)
+    const rate = config.fx.find(item => item.from === from && item.to === to)
+
+    if (!rate) {
+      report('MISSING_FX', path, 'missing')
+
+      return new D(1) // Calculation is withheld globally if any required conversion is missing.
+    }
+
+    sourceOk(rate.source, path)
+
+    return new D(rate.rate)
+  }
+
+  const outputFx = fx(config.calculationCurrency, req.outputCurrency, 'snapshot.fx.output')
+  const marketFactors: PricingV3MarketFactorV12[] = config.marketFactors
+  const market = marketFactors.find(item => item.country === req.offerMarketCountry)
+
+  if (!market) report('MISSING_MARKET_POLICY', 'snapshot.marketFactors', 'missing')
+  else sourceOk(market.source, 'snapshot.marketFactors')
+
+  // Contract 1.3.0: the request names the form of the engagement and the snapshot states its price ratio, the way the
+  // offer market names its market factor. A declared form without a ratio withholds the calculation: no ratio is ever
+  // assumed for it. A 1.3.0 request that declares no form is priced at ratio 1, which is what 1.2.0 prices.
+  const engagementFactors: PricingV3EngagementFactorV13[] =
+    ('engagementFactors' in config ? config.engagementFactors : undefined) ?? []
+
+  const engagementForm = 'engagementForm' in req ? req.engagementForm : undefined
+
+  const engagement =
+    engagementForm === undefined ? undefined : engagementFactors.find(item => item.form === engagementForm)
+
+  duplicate(
+    engagementFactors.map(item => item.form),
+    'snapshot.engagementFactors'
+  )
+
+  if (engagementForm !== undefined) {
+    if (!engagement) report('MISSING_ENGAGEMENT_FACTOR', 'snapshot.engagementFactors', 'missing')
+    else sourceOk(engagement.source, 'snapshot.engagementFactors')
+  }
+
+  // The ratio every row of a 1.3.0 result is priced with; undefined in the contracts that have no such thing.
+  const engagementRatio = v13 ? (engagement?.priceRatio ?? '1') : undefined
+
+  // Contract 1.4.0: third-party costs the request declares with the price rule of their category, and the
+  // contingency reserve of the quote. In every earlier contract the three are absent and nothing below is reached.
+  const thirdPartyCosts: PricingV3ThirdPartyCostV14[] =
+    ('thirdPartyCosts' in req ? req.thirdPartyCosts : undefined) ?? []
+
+  const thirdPartyPolicies: PricingV3ThirdPartyPolicyV14[] =
+    ('thirdPartyPolicies' in config ? config.thirdPartyPolicies : undefined) ?? []
+
+  const reserve: PricingV3ContingencyReserveV14 | undefined =
+    'contingencyReserve' in config ? config.contingencyReserve : undefined
+
+  const waiver = 'contingencyWaiver' in req ? req.contingencyWaiver : undefined
+
+  // Adjustments address rows by the id of their parent, a line or a cost: the two share one namespace.
+  duplicate(
+    [...new Set(req.lines.map(item => item.lineId)), ...thirdPartyCosts.map(item => item.costId)],
+    'request.thirdPartyCosts'
+  )
+  duplicate(
+    thirdPartyPolicies.map(item => item.category),
+    'snapshot.thirdPartyPolicies'
+  )
+
+  if (reserve) sourceOk(reserve.source, 'snapshot.contingencyReserve')
+
+  // The reserve leaves a quote only by a declared waiver, and a waiver always shows: with a reserve it puts the quote
+  // under review, without one it has nothing to waive and the input is wrong.
+  if (waiver)
+    report(
+      reserve ? 'CONTINGENCY_RESERVE_WAIVED' : 'CONTINGENCY_WAIVER_WITHOUT_RESERVE',
+      'request.contingencyWaiver',
+      reserve ? 'review' : 'error'
+    )
+
+  if (config.mode === 'historical') report('HISTORICAL_ONLY', 'snapshot.mode', 'review')
+
+  const allocatedCoverage = new Map<string, Decimal>()
+  const allocationIds = new Set<string>()
+
+  const pendingRows: {
+    line: Row
+    rawCost: Decimal
+    rawPrice: Decimal
+    rawFormlessPrice: Decimal
+    rawBasePrice: Decimal
+    rawCash: Decimal
+    /** Contract 1.4.0: the reserve inside `rawCost`, the cost it rests on, and the reserve a waiver left out. */
+    rawReserve: Decimal
+    rawReserveBase: Decimal
+    rawWaivedReserve: Decimal
+    /** Set on a third-party row: its amounts are already in the output currency, and its policy decides rounding. */
+    thirdParty?: { commercialRounding: boolean }
+  }[] = []
+
+  for (const [index, line] of req.lines.entries()) {
+    const path = `request.lines.${index}`
+    const profile = config.profiles.find(item => item.profileId === line.profileId)
+    const allocation = config.allocationPolicies.find(item => item.policyId === line.allocationPolicyRef)
+
+    const policy = config.pricingPolicies.find(
+      item =>
+        item.profileId === line.profileId && item.offerId === req.offerId && item.engagementCode === req.engagementCode
+    )
+
+    countryOk(line.talentCountry, `${path}.talentCountry`, 'MISSING_TALENT_COUNTRY', line.lineId)
+
+    if (!profile) {
+      report('MISSING_PROFILE', `${path}.profileId`, 'missing', line.lineId)
+      continue
+    }
+
+    if (profile.seniorityCode !== line.seniorityCode)
+      report('PROFILE_VARIANT_MISMATCH', `${path}.seniorityCode`, 'error', line.lineId)
+    if (!profile.cost) report('MISSING_COST', `snapshot.profiles.${line.profileId}.cost`, 'missing', line.lineId)
+
+    if (!allocation || !policy) {
+      report('MISSING_POLICY', path, 'missing', line.lineId)
+      continue
+    }
+
+    sourceOk(allocation.source, `${path}.allocationPolicyRef`)
+    sourceOk(policy.source, `snapshot.pricingPolicies.${line.profileId}`)
+    if (allocation.mode !== line.allocationMode || policy.tierCode !== profile.tierCode)
+      report('POLICY_MISMATCH', path, 'error', line.lineId)
+    if (policy.method === 'target_margin' && new D(policy.rate).gte(1))
+      report('INVALID_MARGIN_RATE', path, 'error', line.lineId)
+
+    const fte =
+      line.dedication.unit === 'fte'
+        ? new D(line.dedication.value)
+        : new D(line.dedication.value).div(allocation.hoursPerFteMonth)
+
+    if (fte.gt(1)) report('INVALID_DEDICATION', `${path}.dedication`, 'error', line.lineId)
+    if (allocation.mode === 'dedicated' && new D(allocation.dedicatedBilledFte).lt(fte))
+      report('INSUFFICIENT_DEDICATED_CAPACITY', path, 'error', line.lineId)
+
+    const billedFte =
+      allocation.mode === 'dedicated' ? new D(allocation.dedicatedBilledFte) : D.max(fte, allocation.minimumBilledFte)
+
+    const localization = profile.cost?.localization
+
+    const factor =
+      localization?.kind === 'reference_adjusted'
+        ? config.talentFactors.find(
+            item => item.country === line.talentCountry && item.referenceCountry === localization.referenceCountry
+          )
+        : undefined
+
+    if (profile.cost) {
+      sourceOk(profile.cost.source, `snapshot.profiles.${line.profileId}.cost`, profile.cost.amount, line.lineId)
+      if (profile.cost.covers.some(coverage => !coverage.startsWith('human_')))
+        report('NON_HUMAN_LOADED_COST_REQUIRES_SPLIT', path, 'error', line.lineId)
+      if (profile.cost.localization.kind === 'specific' && profile.cost.localization.country !== line.talentCountry)
+        report('COST_COUNTRY_MISMATCH', path, 'error', line.lineId)
+      if (profile.cost.localization.kind === 'reference_adjusted' && !factor)
+        report('MISSING_TALENT_FACTOR', path, 'missing', line.lineId)
+      if (factor) sourceOk(factor.source, 'snapshot.talentFactors')
+    }
+
+    const human = profile.cost
+      ? new D(profile.cost.amount)
+          .mul(billedFte)
+          .mul(line.headcount)
+          .mul(factor?.factor ?? 1)
+          .mul(fx(profile.cost.currency, config.calculationCurrency, `${path}.costFx`))
+      : new D(0)
+
+    const multiplier =
+      policy.method === 'markup'
+        ? new D(1).plus(policy.rate)
+        : new D(policy.rate).lt(1)
+          ? new D(1).div(new D(1).minus(policy.rate))
+          : new D(1)
+
+    // Price of the human component in the base market (factor 1); tools and fees never take a market factor.
+    const humanBasePrice = human.mul(multiplier)
+    const humanPrice = humanBasePrice.mul(market?.factor ?? 1)
+    const humanCoverage = new Set(profile.cost?.covers ?? [])
+    const covered = new Set(humanCoverage)
+
+    duplicate(profile.cost?.covers ?? [], `snapshot.profiles.${line.profileId}.cost.covers`)
+    duplicate(profile.requiredCoverages, `snapshot.profiles.${line.profileId}.requiredCoverages`)
+
+    const resources: {
+      assignment: (typeof line.assignments)[number]
+      resource: (typeof config.resources)[number]
+      cost: Decimal
+      cash: Decimal
+    }[] = []
+
+    for (const assignment of line.assignments) {
+      const resource = config.resources.find(item => item.resourceId === assignment.resourceId)
+
+      if (!resource) {
+        report('MISSING_RESOURCE', `${path}.assignments`, 'missing', line.lineId)
+        continue
+      }
+
+      if (allocationIds.has(assignment.allocationId)) report('DUPLICATE_ALLOCATION', path, 'error', line.lineId)
+      allocationIds.add(assignment.allocationId)
+      if (resource.scope !== assignment.scope) report('INVALID_RESOURCE_SCOPE', path, 'error', line.lineId)
+      if (resource.unit !== 'month' && assignment.cashTiming !== 'start')
+        report('INVALID_ANNUAL_CASH_TIMING', path, 'error', line.lineId)
+      if (
+        assignment.periodIds &&
+        (new Set(assignment.periodIds).size !== assignment.periodIds.length ||
+          assignment.periodIds.some(period => period > req.duration.periods))
+      )
+        report('INVALID_PERIOD', path, 'error', line.lineId)
+      if (resource.unit === 'month' && assignment.cashTiming !== 'monthly')
+        report('INVALID_MONTHLY_CASH_TIMING', path, 'error', line.lineId)
+      sourceOk(resource.source, `snapshot.resources.${resource.resourceId}`, resource.amount, line.lineId)
+
+      for (const coverage of resource.covers) {
+        if (humanCoverage.has(coverage)) report('DUPLICATE_COVERAGE', path, 'error', line.lineId)
+        covered.add(coverage)
+
+        for (const period of assignment.periodIds ?? Array.from({ length: req.duration.periods }, (_, i) => i + 1)) {
+          const key = `${assignment.scope}:${assignment.scopeRef}:${coverage}:${period}`
+          const used = (allocatedCoverage.get(key) ?? new D(0)).plus(assignment.share)
+
+          allocatedCoverage.set(key, used)
+          if (used.gt(1)) report('DUPLICATE_COVERAGE', path, 'error', line.lineId)
+        }
+      }
+
+      const cash = new D(resource.amount)
+        .mul(assignment.quantity)
+        .mul(assignment.share)
+        .mul(fx(resource.currency, config.calculationCurrency, `${path}.resourceFx.${resource.resourceId}`))
+
+      resources.push({ assignment, resource, cash, cost: resource.unit === 'year' ? cash.div(12) : cash })
+    }
+
+    for (const excluded of line.notApplicable) {
+      if (covered.has(excluded.coverage)) report('DUPLICATE_COVERAGE', path, 'error', line.lineId)
+      covered.add(excluded.coverage)
+    }
+
+    for (const coverage of profile.requiredCoverages) {
+      for (let period = 1; period <= req.duration.periods; period++) {
+        const active =
+          humanCoverage.has(coverage) ||
+          line.notApplicable.some(item => item.coverage === coverage) ||
+          resources.some(
+            item =>
+              item.resource.covers.includes(coverage) &&
+              (!item.assignment.periodIds || item.assignment.periodIds.includes(period))
+          )
+
+        if (!active) report('MISSING_COVERAGE', `${path}.coverage.${coverage}.period.${period}`, 'missing', line.lineId)
+      }
+    }
+
+    for (let period = 1; period <= req.duration.periods; period++) {
+      const components: Component[] = [
+        {
+          componentId: `${line.lineId}:human`,
+          kind: 'human',
+          label: profile.label,
+          cost: human.toString(),
+          price: humanPrice.toString(),
+          cashCommitment: human.toString(),
+          coverage: profile.cost?.covers ?? [],
+          trace: {
+            billedFte: billedFte.toString(),
+            requestedFte: fte.toString(),
+            headcount: String(line.headcount),
+            costFactor: factor?.factor ?? '1',
+            costLocalization: profile.cost?.localization.kind ?? 'missing',
+            marketFactor: market?.factor ?? 'missing',
+            pricingMultiplier: multiplier.toString()
+          }
+        }
+      ]
+
+      const setup: Component[] = []
+
+      for (const { assignment, resource, cost, cash } of resources) {
+        const periods = assignment.periodIds ?? Array.from({ length: req.duration.periods }, (_, i) => i + 1)
+
+        if (!periods.includes(period)) continue
+        const first = Math.min(...periods)
+
+        if (resource.unit === 'once' && period !== first) continue
+        const price = cost.mul(policy.basis === 'all_costs' ? multiplier : 1)
+        const cashNow = resource.unit === 'year' ? (period === first ? cash : new D(0)) : cost
+
+        const component: Component = {
+          componentId: assignment.allocationId,
+          kind: resource.kind,
+          label: resource.label,
+          cost: cost.toString(),
+          price: price.toString(),
+          cashCommitment: cashNow.toString(),
+          coverage: resource.covers,
+          trace: {
+            unit: resource.unit,
+            quantity: assignment.quantity,
+            share: assignment.share,
+            scope: assignment.scope,
+            scopeRef: assignment.scopeRef,
+            marketFactor: '1',
+            pricingMultiplier: policy.basis === 'all_costs' ? multiplier.toString() : '1'
+          }
+        }
+
+        ;(resource.unit === 'once' ? setup : components).push(component)
+      }
+
+      for (const [kind, group] of [
+        ['monthly', components],
+        ['setup', setup]
+      ] as const) {
+        if (group.length === 0) continue
+
+        const sum = (key: 'cost' | 'price' | 'cashCommitment') =>
+          group.reduce((total, component) => total.plus(component[key]), new D(0))
+
+        // Contract 1.4.0. The contingency reserve is a cost of this row: its rate over the person cost of the row or
+        // over every cost of the row, as the reserve declares. It is read before the component is added, so the
+        // reserve never rests on itself, and only on the components of this row, so never on a third-party cost.
+        // Being a cost it is priced like every non-human component (through the multiplier when the policy prices
+        // all costs, with no market factor), takes the engagement ratio below with the rest of the row, raises the
+        // floor of the row and lowers its margin when a discount eats it. It commits no cash. A row with nothing
+        // to rest it on (a setup row under a `human` base) carries none.
+        const reserveBase = !reserve
+          ? new D(0)
+          : reserve.base === 'human'
+            ? group.reduce(
+                (total, component) => (component.kind === 'human' ? total.plus(component.cost) : total),
+                new D(0)
+              )
+            : sum('cost')
+
+        const reserveCost = reserve ? reserveBase.mul(reserve.rate) : new D(0)
+        const reserved = Boolean(reserve) && !waiver && reserveCost.gt(0)
+
+        if (reserve && reserved)
+          group.push({
+            componentId: `${line.lineId}:${kind}:${CONTINGENCY_RESERVE_KIND}`,
+            kind: CONTINGENCY_RESERVE_KIND,
+            label: CONTINGENCY_RESERVE_LABEL,
+            cost: reserveCost.toString(),
+            price: reserveCost.mul(policy.basis === 'all_costs' ? multiplier : 1).toString(),
+            cashCommitment: '0',
+            coverage: [],
+            trace: {
+              rate: reserve.rate,
+              base: reserve.base,
+              baseAmount: reserveBase.toString(),
+              marketFactor: '1',
+              pricingMultiplier: policy.basis === 'all_costs' ? multiplier.toString() : '1'
+            }
+          })
+
+        // Price of the row at engagement ratio 1: what the pricing policy and the market factor form, and all that
+        // contracts 1.0.0 to 1.2.0 ever price.
+        const formlessPrice = sum('price')
+
+        // Contract 1.3.0. The engagement ratio enters here, on every component the row sells and in both billing
+        // classes: after the pricing policy (cost x multiplier) and after the market factor (human component only),
+        // before the row is presented, rounded commercially or adjusted. Cost and cash are not touched: the form of
+        // the commitment changes what the client pays, never what the work costs. A stored component price is the
+        // price it is sold at, so the components of a row still add up to its raw price; the trace names the ratio.
+        const sold =
+          engagementRatio === undefined
+            ? group
+            : group.map(component => ({
+                ...component,
+                price: new D(component.price).mul(engagementRatio).toString(),
+                trace: { ...component.trace, engagementPriceRatio: engagementRatio }
+              }))
+
+        pendingRows.push({
+          rawCost: sum('cost'),
+          rawPrice:
+            engagementRatio === undefined
+              ? formlessPrice
+              : sold.reduce((total, component) => total.plus(component.price), new D(0)),
+          rawFormlessPrice: formlessPrice,
+          // Same components in the same order, with the human one at its base-market price. Read at engagement
+          // ratio 1, like `rawFormlessPrice`: the two are the terms of the market ratio rho (see below).
+          rawBasePrice: group.reduce(
+            (total, component) => total.plus(component.kind === 'human' ? humanBasePrice : component.price),
+            new D(0)
+          ),
+          rawCash: sum('cashCommitment'),
+          rawReserve: reserved ? reserveCost : new D(0),
+          rawReserveBase: reserved ? reserveBase : new D(0),
+          // What the waiver took out of this row: the reserve it would have carried.
+          rawWaivedReserve: waiver ? reserveCost : new D(0),
+          line: {
+            lineId: `${line.lineId}:${period}:${kind}`,
+            parentLineId: line.lineId,
+            periodId: period,
+            kind,
+            label: profile.label,
+            cost: '',
+            ...(v14 ? { contingencyReserve: '' } : {}),
+            ...(v12 ? { marketAdjustment: '' } : {}),
+            ...(v13 ? { engagementAdjustment: '' } : {}),
+            undiscountedPrice: '',
+            ...(v11 ? { roundingAdjustment: '' } : {}),
+            discount: '',
+            ...(v11 ? { uplift: '' } : {}),
+            net: '',
+            marginAmount: '',
+            components: sold,
+            minimumMargin: policy.minimumMargin,
+            ...(v12 ? { marketPriceRatio: '', floorNet: '' } : {}),
+            ...(v13 ? { engagementPriceRatio: '' } : {})
+          }
+        })
+      }
+    }
+  }
+
+  // Contract 1.4.0. Each third-party cost is a row of its own in every period it lists, never a component of a team
+  // row: it takes no pricing multiplier of a line, no market factor and no engagement ratio, and its floor is the one
+  // of its category. Its price is the cost under the rule of that category and nothing else.
+  for (const [index, item] of thirdPartyCosts.entries()) {
+    const path = `request.thirdPartyCosts.${index}`
+    const policy = thirdPartyPolicies.find(candidate => candidate.category === item.category)
+    const supplierCurrency = config.currencies.find(candidate => candidate.code === item.currency)
+
+    if (
+      new Set(item.periodIds).size !== item.periodIds.length ||
+      item.periodIds.some(period => period > req.duration.periods)
+    )
+      report('INVALID_PERIOD', `${path}.periodIds`, 'error', item.costId)
+    if (supplierCurrency && new D(item.amount).decimalPlaces() > supplierCurrency.precision)
+      report('INVALID_THIRD_PARTY_AMOUNT', `${path}.amount`, 'error', item.costId)
+
+    // The evidence of the amount is judged like every source: an expired or pending supplier quote withholds the
+    // calculation, an estimated one puts it under review.
+    sourceOk(item.source, `${path}.source`, undefined, item.costId)
+
+    // A supplier that charges in the currency of the quote is never converted: a round trip through the calculation
+    // currency would not return the amount. Any other currency goes through it, with the frozen records.
+    const sameCurrency = item.currency === req.outputCurrency
+
+    const conversion = sameCurrency
+      ? new D(1)
+      : fx(item.currency, config.calculationCurrency, `${path}.fx`).mul(outputFx)
+
+    if (!policy) {
+      report('MISSING_THIRD_PARTY_POLICY', `${path}.category`, 'missing', item.costId)
+      continue
+    }
+
+    sourceOk(policy.source, `snapshot.thirdPartyPolicies.${item.category}`, undefined, item.costId)
+
+    if (policy.method === 'target_margin' && new D(policy.rate).gte(1)) {
+      report('INVALID_MARGIN_RATE', path, 'error', item.costId)
+      continue
+    }
+
+    const rawCost = new D(item.amount).mul(item.quantity).mul(conversion)
+
+    const rawPrice =
+      policy.method === 'markup' ? rawCost.mul(new D(1).plus(policy.rate)) : rawCost.div(new D(1).minus(policy.rate))
+
+    for (const period of item.periodIds) {
+      pendingRows.push({
+        rawCost,
+        rawPrice,
+        // No market factor and no engagement ratio: the three prices of the walk are one and the same.
+        rawFormlessPrice: rawPrice,
+        rawBasePrice: rawPrice,
+        rawCash: rawCost,
+        rawReserve: new D(0),
+        rawReserveBase: new D(0),
+        rawWaivedReserve: new D(0),
+        thirdParty: { commercialRounding: policy.rounding === 'commercial' },
+        line: {
+          lineId: `${item.costId}:${period}:${PRICING_V3_THIRD_PARTY_BILLING}`,
+          parentLineId: item.costId,
+          periodId: period,
+          kind: PRICING_V3_THIRD_PARTY_BILLING,
+          label: item.label,
+          cost: '',
+          contingencyReserve: '',
+          marketAdjustment: '',
+          engagementAdjustment: '',
+          undiscountedPrice: '',
+          roundingAdjustment: '',
+          discount: '',
+          uplift: '',
+          net: '',
+          marginAmount: '',
+          components: [
+            {
+              componentId: `${item.costId}:${PRICING_V3_THIRD_PARTY_BILLING}`,
+              kind: PRICING_V3_THIRD_PARTY_BILLING,
+              label: item.label,
+              // Unlike every other component, already in the output currency: `outputFx` is 1 and stays 1.
+              cost: rawCost.toString(),
+              price: rawPrice.toString(),
+              cashCommitment: rawCost.toString(),
+              coverage: [],
+              trace: {
+                category: item.category,
+                quantity: item.quantity,
+                supplierCurrency: item.currency,
+                supplierAmount: item.amount,
+                fxPath: [
+                  ...new Set([item.currency, ...(sameCurrency ? [] : [config.calculationCurrency]), req.outputCurrency])
+                ].join('>'),
+                fxRate: conversion.toString(),
+                pricingMethod: policy.method,
+                pricingRate: policy.rate,
+                rounding: policy.rounding,
+                marketFactor: '1',
+                engagementPriceRatio: '1',
+                denominatedIn: req.outputCurrency,
+                outputFx: '1'
+              }
+            }
+          ],
+          minimumMargin: policy.minimumMargin,
+          marketPriceRatio: '',
+          floorNet: '',
+          engagementPriceRatio: ''
+        }
+      })
+    }
+  }
+
+  // A discount and an agreed net of a team billing class name lines; an agreed net of third-party costs names costs.
+  // Anything else is an unknown line, so a rate discount can never reach what a supplier charges.
+  for (const adjustment of adjustments) {
+    const parents =
+      adjustment.kind === 'agreed_net' && adjustment.billing === PRICING_V3_THIRD_PARTY_BILLING
+        ? thirdPartyCosts.map(item => item.costId)
+        : req.lines.map(line => line.lineId)
+
+    duplicate(adjustment.lineIds, 'request.adjustments.lineIds')
+    if (adjustment.lineIds.some(id => !parents.includes(id)))
+      report('UNKNOWN_ADJUSTMENT_LINE', 'request.adjustments', 'error')
+  }
+
+  if (v11) {
+    duplicate(
+      adjustments.map(item => item.adjustmentId),
+      'request.adjustments'
+    )
+
+    // A row is a (line, billing class) pair in every period; a discount claims both classes of its lines.
+    const targets = adjustments.flatMap(item =>
+      [...new Set(item.lineIds)].flatMap(lineId =>
+        (item.kind === 'discount' ? (['monthly', 'setup'] as const) : [item.billing]).map(kind => `${kind}:${lineId}`)
+      )
+    )
+
+    if (new Set(targets).size !== targets.length) report('OVERLAPPING_ADJUSTMENTS', 'request.adjustments', 'error')
+
+    for (const [index, item] of adjustments.entries())
+      if (item.kind === 'agreed_net' && currency && new D(item.amount).decimalPlaces() > currency.precision)
+        report('INVALID_AGREED_AMOUNT', `request.adjustments.${index}.amount`, 'error')
+
+    if (rounding) {
+      sourceOk(rounding.source, 'snapshot.priceRounding')
+      if (currency && !new D(rounding.multiple).mod(new D(10).pow(-currency.precision)).isZero())
+        report('INVALID_PRICE_ROUNDING', 'snapshot.priceRounding.multiple', 'error')
+    }
+  }
+
+  if (req.taxTreatment.kind === 'exclusive') sourceOk(req.taxTreatment.source, 'request.taxTreatment.source')
+  if (diagnostics.some(item => item.severity === 'error')) return base('invalid')
+  if (diagnostics.some(item => item.severity === 'missing')) return base('needs_input')
+  if (!currency) return base('needs_input')
+
+  const precision = currency.precision
+  const unit = new D(10).pow(-precision)
+  const money = (value: Decimal) => value.toFixed(precision, D.ROUND_HALF_UP)
+
+  // Exact count of multiples covering `value`: integer division plus one correction, never ceil(a / b).
+  const ceilDiv = (value: Decimal, by: Decimal) => {
+    const whole = value.divToInt(by)
+
+    return whole.mul(by).lt(value) ? whole.plus(1) : whole
+  }
+
+  // Contract 1.2.0: the market factor declared its floor on the base market and lowered the price. The floor of a row
+  // is then its base-market floor scaled by how much the market lowered that row, rho = price / base price, both as
+  // presented. Rows are kept here as the two terms of rho so every comparison stays a product, never a quotient.
+  //
+  // Contract 1.3.0: what "base-market price" means once an engagement ratio exists. The form of the engagement is a
+  // commercial condition of the quote, not a country effect, so it belongs to the base-market price as much as to the
+  // price of the market: the base-market price of a row is its price at market factor 1 under the same form. The
+  // ratio therefore multiplies both terms of rho and leaves it as it was, and rho is read where contract 1.2.0 reads
+  // it, on the two prices at engagement ratio 1, as presented. Two consequences, both intended:
+  //   - the floor of a row (`floorNet`, and `minimumMargin` itself) is digit for digit the floor of the same row
+  //     quoted without a form. The engagement ratio never relaxes or moves it, not even by a rounding unit;
+  //   - the net judged against that floor carries the ratio. A ratio above 1 is margin the row really has; a ratio
+  //     below 1 (a commitment discount) can take the row under its floor, and then it is flagged like any other price.
+  const floorFollowsBaseMarket =
+    v12 && market?.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS && new D(market.factor).lt(1)
+
+  const marketFloor = new Map<Row, { price: Decimal; basePrice: Decimal }>()
+
+  for (const { line, rawCost, rawPrice, rawFormlessPrice, rawBasePrice, rawReserve, thirdParty } of pendingRows) {
+    // A team row is priced in the calculation currency; a third-party row already is in the output currency.
+    const toOutput = thirdParty ? new D(1) : outputFx
+
+    line.cost = money(rawCost.mul(toOutput))
+    line.undiscountedPrice = money(rawPrice.mul(toOutput))
+
+    // Presented cost of the row minus the presented cost it would have without the reserve.
+    if (v14) line.contingencyReserve = money(new D(line.cost).minus(money(rawCost.minus(rawReserve).mul(toOutput))))
+
+    if (v11) {
+      // Policy price of this quote: with the engagement ratio when the contract has one.
+      const policyPrice = new D(line.undiscountedPrice)
+      // Policy price in the offer market at engagement ratio 1. Before contract 1.3.0 it is the policy price itself.
+      const marketPrice = new D(money(rawFormlessPrice.mul(toOutput)))
+      const basePrice = new D(money(rawBasePrice.mul(toOutput)))
+      const marginShare = new Wide(1).minus(line.minimumMargin)
+
+      // A row whose price has no human component was not lowered by the market: rho is 1 and nothing changes for it.
+      const scaled =
+        floorFollowsBaseMarket && marketPrice.lt(basePrice)
+          ? { price: new Wide(marketPrice), basePrice: new Wide(basePrice) }
+          : undefined
+
+      let rounded = policyPrice
+
+      if (scaled) marketFloor.set(line, scaled)
+
+      // Contract 1.4.0: a third-party row is raised to the multiple only when the policy of its category says so.
+      // Under `none` its policy price stands, so a cost re-invoiced at cost in its own currency nets exactly itself.
+      if (rounding && policyPrice.gt(0) && (!thirdParty || thirdParty.commercialRounding)) {
+        const multiple = new D(rounding.multiple)
+
+        // With a base-market floor, "met the floor before rounding" is read on the base-market price: the price of
+        // this row at market factor 1, which under contract 1.3.0 carries the engagement ratio like the price does.
+        const unroundedPrice = (
+          scaled ? (engagementRatio === undefined ? rawBasePrice : rawBasePrice.mul(engagementRatio)) : rawPrice
+        ).mul(toOutput)
+
+        const compliant = !unroundedPrice
+          .minus(rawCost.mul(toOutput))
+          .div(unroundedPrice)
+          .toSignificantDigits(UNROUNDED_COMPLIANCE_DIGITS)
+          .lt(line.minimumMargin)
+
+        // Floor conservation: a row that met its floor is raised to the smallest multiple that still meets it on the
+        // presented cost. A row that did not is only raised to the next multiple; rounding never repairs a policy.
+        rounded = (
+          compliant
+            ? D.max(
+                ceilDiv(policyPrice, multiple),
+                scaled
+                  ? ceilDiv(new Wide(line.cost).mul(scaled.price), marginShare.mul(scaled.basePrice).mul(multiple))
+                  : ceilDiv(new D(line.cost), multiple.mul(new D(1).minus(line.minimumMargin)))
+              )
+            : ceilDiv(policyPrice, multiple)
+        ).mul(multiple)
+      }
+
+      if (v12) {
+        line.marketAdjustment = money(marketPrice.minus(basePrice))
+        line.marketPriceRatio = scaled ? marketPrice.div(basePrice).toString() : '1'
+        // cost x rho / (1 - minimumMargin), raised to the currency unit: an exact count of units, never a quotient.
+        line.floorNet = money(
+          (scaled
+            ? ceilDiv(new Wide(line.cost).mul(scaled.price), marginShare.mul(scaled.basePrice).mul(unit))
+            : ceilDiv(new Wide(line.cost), marginShare.mul(unit))
+          ).mul(unit)
+        )
+      }
+
+      if (engagementRatio !== undefined) {
+        // What the form added to (or took from) the price of this row in its market, before commercial rounding.
+        line.engagementAdjustment = money(policyPrice.minus(marketPrice))
+        // A third-party row is never multiplied by the ratio of the form: its own ratio is 1 whatever the quote declares.
+        line.engagementPriceRatio = thirdParty ? '1' : engagementRatio
+      }
+
+      line.roundingAdjustment = money(rounded.minus(policyPrice))
+      line.undiscountedPrice = money(rounded)
+      line.uplift = money(new D(0))
+    }
+
+    line.net = line.undiscountedPrice
+    line.discount = money(new D(0))
+
+    // The component of a third-party row states its own denomination (the output currency, `outputFx` 1).
+    if (!thirdParty)
+      line.components = line.components.map(component => ({
+        ...component,
+        trace: { ...component.trace, calculationCurrency: config.calculationCurrency, outputFx: outputFx.toString() }
+      }))
+    lines.push(line)
+  }
+
+  // Proportional split of `total` over `rows` by largest remainder at the currency unit; ties resolve by row id, so
+  // the split never depends on input order. The same routine serves discounts and uplifts.
+  const allocate = (rows: Row[], gross: Decimal, total: Decimal) => {
+    const parts = rows
+      .map(line => {
+        const raw = gross.isZero() ? new D(0) : total.mul(line.net).div(gross)
+        const floor = raw.div(unit).floor().mul(unit)
+
+        return { line, floor, remainder: raw.minus(floor) }
+      })
+      .sort(
+        (a, b) =>
+          b.remainder.cmp(a.remainder) || (a.line.lineId < b.line.lineId ? -1 : a.line.lineId > b.line.lineId ? 1 : 0)
+      )
+
+    let residue = total.minus(parts.reduce((sum, part) => sum.plus(part.floor), new D(0)))
+
+    return parts.map(part => {
+      const allocated = part.floor.plus(residue.gt(0) ? unit : 0)
+
+      if (residue.gt(0)) residue = residue.minus(unit)
+
+      return { line: part.line, allocated }
+    })
+  }
+
+  const gross = (rows: Row[]) => rows.reduce((sum, line) => sum.plus(line.net), new D(0))
+
+  for (const [index, adjustment] of adjustments.entries()) {
+    const targeted = lines.filter(line => adjustment.lineIds.includes(line.parentLineId))
+
+    if (adjustment.kind === 'discount') {
+      const price = gross(targeted)
+
+      for (const { line, allocated } of allocate(targeted, price, new D(money(price.mul(adjustment.rate))))) {
+        line.discount = money(allocated)
+        line.net = money(new D(line.net).minus(allocated))
+      }
+
+      continue
+    }
+
+    // The agreed net is per period: each period's rows of that billing class must add up to exactly `amount`.
+    const groups = Array.from({ length: req.duration.periods }, (_, i) =>
+      targeted.filter(line => line.kind === adjustment.billing && line.periodId === i + 1)
+    ).filter(rows => rows.length > 0)
+
+    const amount = new D(adjustment.amount)
+
+    if (groups.length === 0 || groups.some(rows => gross(rows).isZero() && amount.gt(0))) {
+      report('AGREED_NET_WITHOUT_BASE', `request.adjustments.${index}`, 'error')
+      continue
+    }
+
+    for (const rows of groups) {
+      const price = gross(rows)
+      const gap = amount.minus(price)
+
+      for (const { line, allocated } of allocate(rows, price, gap.abs())) {
+        if (gap.lt(0)) line.discount = money(allocated)
+        else line.uplift = money(allocated)
+        line.net = money(new D(line.net).plus(gap.lt(0) ? allocated.neg() : allocated))
+      }
+    }
+  }
+
+  if (diagnostics.some(item => item.severity === 'error')) return base('invalid')
+
+  for (const line of lines) {
+    const scaled = marketFloor.get(line)
+
+    line.marginAmount = money(new D(line.net).minus(line.cost))
+
+    // The real margin above is never rescaled. Under a base-market floor the verdict is net < cost x rho / (1 - m),
+    // written without dividing: net x (1 - m) x base price < cost x price.
+    if (
+      new D(line.net).isZero() ||
+      (scaled
+        ? new Wide(line.net)
+            .mul(new Wide(1).minus(line.minimumMargin))
+            .mul(scaled.basePrice)
+            .lt(new Wide(line.cost).mul(scaled.price))
+        : new D(line.marginAmount).div(line.net).lt(line.minimumMargin))
+    )
+      report('MARGIN_BELOW_FLOOR', `result.lines.${line.lineId}`, 'review', line.parentLineId)
+  }
+
+  const sumLines = (
+    key:
+      | 'cost'
+      | 'contingencyReserve'
+      | 'marketAdjustment'
+      | 'engagementAdjustment'
+      | 'undiscountedPrice'
+      | 'roundingAdjustment'
+      | 'discount'
+      | 'uplift'
+      | 'net'
+      | 'marginAmount'
+  ) => lines.reduce((sum, line) => sum.plus(line[key] ?? 0), new D(0))
+
+  const net = sumLines('net')
+  const margin = sumLines('marginAmount')
+
+  const tax =
+    req.taxTreatment.kind === 'not_resolved'
+      ? null
+      : req.taxTreatment.kind === 'not_applicable'
+        ? new D(0)
+        : net.mul(req.taxTreatment.rate)
+
+  const periodNets = Array.from({ length: req.duration.periods }, (_, i) =>
+    lines
+      .filter(line => line.kind === 'monthly' && line.periodId === i + 1)
+      .reduce((sum, line) => sum.plus(line.net), new D(0))
+  )
+
+  const uniform = periodNets.every(value => value.eq(periodNets[0]))
+  const result = base('calculated')
+
+  // Contract 1.4.0. Sums of presented amounts over the third-party rows; own work is the rest of the quote.
+  const thirdPartyRows = lines.filter(line => line.kind === PRICING_V3_THIRD_PARTY_BILLING)
+  const thirdPartyCost = thirdPartyRows.reduce((sum, line) => sum.plus(line.cost), new D(0))
+  const thirdPartyNet = thirdPartyRows.reduce((sum, line) => sum.plus(line.net), new D(0))
+  const ownWorkNet = net.minus(thirdPartyNet)
+
+  result.reviewStatus = diagnostics.some(item => item.severity === 'review') ? 'requires_review' : 'within_policy'
+  result.totals = {
+    cost: money(sumLines('cost')),
+    ...(v14
+      ? {
+          contingencyReserve: money(sumLines('contingencyReserve')),
+          // Only team rows carry a base or a waived reserve, and a team row is converted with the output FX.
+          contingencyBase: money(
+            pendingRows.reduce((sum, row) => sum.plus(money(row.rawReserveBase.mul(outputFx))), new D(0))
+          ),
+          // Per row, as `contingencyReserve` is read: the presented cost the row would have with the reserve the
+          // waiver left out, minus the presented cost it has.
+          contingencyReserveWaived: money(
+            pendingRows.reduce(
+              (sum, row) =>
+                row.rawWaivedReserve.isZero()
+                  ? sum
+                  : sum.plus(money(row.rawCost.plus(row.rawWaivedReserve).mul(outputFx))).minus(row.line.cost),
+              new D(0)
+            )
+          )
+        }
+      : {}),
+    ...(v12 ? { marketAdjustment: money(sumLines('marketAdjustment')) } : {}),
+    ...(v13 ? { engagementAdjustment: money(sumLines('engagementAdjustment')) } : {}),
+    undiscountedPrice: money(sumLines('undiscountedPrice')),
+    ...(v11 ? { roundingAdjustment: money(sumLines('roundingAdjustment')) } : {}),
+    discount: money(sumLines('discount')),
+    ...(v11 ? { uplift: money(sumLines('uplift')) } : {}),
+    net: money(net),
+    marginAmount: money(margin),
+    marginRate: net.isZero() ? null : margin.div(net).toString(),
+    ...(v14
+      ? {
+          thirdPartyCost: money(thirdPartyCost),
+          thirdPartyNet: money(thirdPartyNet),
+          ownWorkMarginRate: ownWorkNet.isZero()
+            ? null
+            : ownWorkNet.minus(sumLines('cost').minus(thirdPartyCost)).div(ownWorkNet).toString()
+        }
+      : {}),
+    tax: tax === null ? null : money(tax),
+    grandTotal: tax === null ? null : money(net.plus(money(tax))),
+    cashCommitment: money(
+      pendingRows.reduce(
+        (sum, row) => sum.plus(row.rawCash.mul(row.thirdParty ? 1 : outputFx).toDecimalPlaces(precision)),
+        new D(0)
+      )
+    ),
+    uniformMonthlyNet: uniform ? money(periodNets[0]) : null
+  }
+
+  return result
+}

@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-07",
+  "checks": [
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/plan-busquedas.csv",
+      "pass": true
+    },
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia/inputs.json",
+      "pass": true
+    },
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia/results.json",
+      "pass": true
+    },
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx",
+      "pass": true
+    },
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/meta-hacia-atras/resultados.json",
+      "pass": true
+    },
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/PLAN-DE-CONTENIDOS-V0.7.csv",
+      "pass": true
+    },
+    {
+      "check": "Preserved docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/CALENDARIO-CRECIMIENTO-V0.7.csv",
+      "pass": true
+    },
+    {
+      "check": "19 original families once",
+      "pass": true
+    },
+    {
+      "check": "5 rival families retained",
+      "pass": true
+    },
+    {
+      "check": "Rival original volume 18300 retained",
+      "pass": true
+    },
+    {
+      "check": "Monthly cross product",
+      "pass": true
+    },
+    {
+      "check": "Independent annual traffic prudente",
+      "pass": true
+    },
+    {
+      "check": "Original funnel prudente",
+      "pass": true
+    },
+    {
+      "check": "No rival capture penalty prudente",
+      "pass": true
+    },
+    {
+      "check": "Independent annual traffic trabajo",
+      "pass": true
+    },
+    {
+      "check": "Original funnel trabajo",
+      "pass": true
+    },
+    {
+      "check": "No rival capture penalty trabajo",
+      "pass": true
+    },
+    {
+      "check": "Independent annual traffic expansion",
+      "pass": true
+    },
+    {
+      "check": "Original funnel expansion",
+      "pass": true
+    },
+    {
+      "check": "No rival capture penalty expansion",
+      "pass": true
+    },
+    {
+      "check": "Original reverse full funded goal",
+      "pass": true
+    },
+    {
+      "check": "No manufactured global forecast",
+      "pass": true
+    },
+    {
+      "check": "24 articles preserved",
+      "pass": true
+    },
+    {
+      "check": "Both calendars preserve 2 articles monthly",
+      "pass": true
+    },
+    {
+      "check": "Capacity covers core groups monthly",
+      "pass": true
+    },
+    {
+      "check": "Expanded scope hours",
+      "pass": true
+    },
+    {
+      "check": "Cost sum bajo",
+      "pass": true
+    },
+    {
+      "check": "Gross margin bajo",
+      "pass": true
+    },
+    {
+      "check": "Fee from gross margin bajo",
+      "pass": true
+    },
+    {
+      "check": "Cost sum central",
+      "pass": true
+    },
+    {
+      "check": "Gross margin central",
+      "pass": true
+    },
+    {
+      "check": "Fee from gross margin central",
+      "pass": true
+    },
+    {
+      "check": "Cost sum alto",
+      "pass": true
+    },
+    {
+      "check": "Gross margin alto",
+      "pass": true
+    },
+    {
+      "check": "Fee from gross margin alto",
+      "pass": true
+    },
+    {
+      "check": "No spreadsheet error cells",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet formulas present",
+      "pass": true
+    },
+    {
+      "check": "Original goal displayed",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel prudenteB",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel prudenteC",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel prudenteD",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel trabajoB",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel trabajoC",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel trabajoD",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel expansionB",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel expansionC",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet panel expansionD",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost bajoE",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost bajoF",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost bajoG",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost bajoI",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost centralE",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost centralF",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost centralG",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost centralI",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost altoE",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost altoF",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost altoG",
+      "pass": true
+    },
+    {
+      "check": "Spreadsheet cost altoI",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "formula_count": 3486,
+  "spreadsheet_errors": [],
+  "validated_workbook": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/conexion-demanda-plan/Pibank-Conexion-demanda-plan-costeo.xlsx",
+  "excel_desktop": "not_operated",
+  "new_paid_calls": 0
+}

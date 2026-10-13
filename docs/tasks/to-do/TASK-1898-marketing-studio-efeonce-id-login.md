@@ -6,6 +6,14 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+- **TASK-2002 ya tiene los diálogos de escritura listos** en el calendario de Studio (planificar, editar, reprogramar,
+  cancelar, vincular, crear desde ejecución). `ActionLayer` sólo se monta si el actor puede escribir: hoy en producción
+  (`STUDIO_ACCESS_MODE=open`) no se monta y la API responde 403 `write_not_allowed`. Se habilitan solos cuando exista el
+  actor autenticado de esta task; no requieren UI nueva.
+- Verificado el 2026-10-05 en producción: `/login` y `/api/auth/session` responden 404; `efeonce_id` falla cerrado (401).
+
 ## Delta 2026-10-02
 
 - **TASK-1894 Entregables A y B en producción** (Studio `a8c7886`, API `1.4.0`); el Entregable C (corte de

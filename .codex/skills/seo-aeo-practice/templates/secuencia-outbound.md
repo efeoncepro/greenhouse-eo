@@ -1,89 +1,45 @@
-# Template — Secuencia de outbound (5 toques · 3 semanas)
+# Mensajes de prospección SEO/AEO — evidencia pertinente por cuenta
 
-> 🔴 **Prerrequisito absoluto: el Grader YA corrido sobre su marca.**
-> **Sin el dato, eres el número 41 de la semana.**
-> 🔴 **Nunca la palabra "SEO" en el asunto.** Está quemada.
+La práctica aporta contexto y prueba. Recorrido/cadencia pertenecen a `efeonce-b2b-prospecting` y
+`commercial-expert`; no hay cinco toques obligatorios ni un Assessment necesario para toda cuenta.
+Canon: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`.
+Estos ejemplos preparados no autorizan envío. Adaptar a relación, fase y evidencia; Outlook conserva firma/CCO.
 
----
+## Preparación
 
-## Toque 1 — Email · día 0
+- Cuenta, persona/rol y situación de compra / necesidad pertinente:
+- Categoría y mercado / consulta observada o diseñada / superficie y fecha:
+- Un hallazgo verificable, con corpus/cobertura y límites:
+- Prueba disponible y autorizada: diagnóstico, caso, muestra o plan:
+- Razón de contacto / siguiente paso adecuado al recorrido:
 
-**Asunto:** `{Marca} no aparece cuando le preguntan por {categoría} a ChatGPT`
+## Ejemplo de entrada por una brecha observada
 
-> {Nombre},
+**Asunto:** `{Marca}: {necesidad concreta}`
+
+> {Nombre}, al revisar {superficie y alcance} para {situación}, observamos {hallazgo verificable}.
 >
-> Corrí un diagnóstico de visibilidad en motores de IA sobre {Marca}. **Apareces en {N} de 7.**
+> Puede ser relevante para {necesidad de la cuenta}. La revisión cubre {corpus/mercado/fecha}; no representa
+> todas las búsquedas ni demuestra por sí sola pérdida de ventas.
 >
-> {UN dato concreto y verificable de SU marca.}
+> En Efeonce trabajamos {capacidad pertinente}. {Prueba existente y autorizada, o propuesta explícita de
+> prepararla}. Podemos revisar contigo {decisión/siguiente paso}.
+
+## Ejemplo de seguimiento por representación
+
+> {Nombre}, retomando {contexto real}, contrastamos cómo se describe a {Marca} en {superficie/corpus} con
+> {fuente oficial}. Encontramos {descripción/omisión verificable}.
 >
-> Te lo mando completo, gratis y sin compromiso. **Si al verlo te parece que está todo bien, me lo dices y no
-> te molesto más.**
+> La acción que proponemos es {intervención controlable}, con {prueba/medición}. El objetivo es que quienes
+> buscan {necesidad} puedan comprender bien {capacidad}; la recomendación del motor es un resultado a observar.
 >
-> ¿Te lo mando?
+> {Siguiente paso breve, acorde a la fase y con enlace real cuando corresponda}.
 
-🎯 **La última frase es la que convierte. Y solo funciona si es verdad** *(→ `05_CUNA_GRADER` regla 3)*.
+## Revisión de copy
 
----
-
-## Toque 2 — LinkedIn · día 3
-
-**Solicitud de conexión. Sin pitch. Sin mensaje de venta.**
-*(Solo existir. El objetivo es que el nombre le suene en el toque 3.)*
-
----
-
-## Toque 3 — Email · día 7 🎯 **el del CFO**
-
-**Asunto:** `Esto no es un problema de SEO. Es de tu presupuesto de medios.`
-
-> {Nombre},
->
-> Un dato que casi nadie está mirando: **cuando Google muestra un resumen de IA, el CTR de los anuncios cae
-> un 68%.** No solo el orgánico — **el pagado.**
->
-> Si {Marca} invierte en Google Ads, **está pagando lo mismo por una fracción del resultado.**
->
-> **Y lo único que lo compensa es aparecer citado dentro del resumen: las marcas citadas reciben 91% más
-> clics pagados.**
->
-> Hoy {Marca} no está citada en {N} de 7 motores. Tengo el detalle. ¿Lo vemos 20 minutos?
-
-🎯 **Este correo no va al CMO: va (o se reenvía) al CFO. Es el que abre el presupuesto.**
-
----
-
-## Toque 4 — LinkedIn · día 12 🎯 **la ventana**
-
-> {Nombre}, un dato de tu categoría: **{Competidor} tampoco está citado.** Ninguno de tu sector lo está.
->
-> **La ventana está abierta y no va a durar** — el primero que instale esa capa se lleva el canal.
->
-> Te dejo el diagnóstico si lo quieres, sin compromiso.
-
-🔴 **FOMO real, verificado con el Grader. Nunca inventado.**
-
----
-
-## Toque 5 — Email · día 21 🎯 **el breakup (el que más responde)**
-
-**Asunto:** `Cierro el tema`
-
-> {Nombre},
->
-> **No te voy a insistir más.**
->
-> Te dejo el diagnóstico igual — **es tuyo, no me debes nada, y sirve aunque nunca hablemos.**
->
-> Si algún día quieres revisarlo, acá estoy.
-
-🎯 **Es el toque que más reuniones produce — precisamente porque no pide ninguna.**
-
----
-
-## 🔴 Reglas
-
-- **Máximo 5 toques.** Después, breakup. **Perseguir daña la marca más de lo que produce.**
-- **20-30 cuentas/mes bien hechas.** *(No 3.000 mal: reply <1% no es escala, es gasto.)*
-- 🔴 **La personalización NO se automatiza.** **Si la automatizas, te comoditizas tú mismo.**
-- 🔴 **Nunca "SEO" en el asunto.**
-- ✅ **Siempre un dato de SU marca en el primer correo.**
+- Un hallazgo de la cuenta; no presumir experiencia SEO negativa, caída de tráfico o inversión en paid.
+- No afirmar ausencia universal desde una muestra ni urgencia artificial de «el primero se lleva el canal».
+- No garantizar cita, recomendación, recovery de clics o ahorro paid con una correlación externa.
+- Nombre/situación de marca e intención separados; no confundir sitio citado con proveedor recomendado.
+- Capacidad, muestra y casos con naturaleza/permiso actuales; estados preparado/enviado separados.
+- Canal, frecuencia, salida del recorrido y reuniones bajo la skill de prospección y su autorización.

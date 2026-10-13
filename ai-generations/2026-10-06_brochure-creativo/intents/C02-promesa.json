@@ -1,0 +1,52 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Servicios creativos",
+    "question": "¿Tu marca en cada pantalla?",
+    "answer": [
+      "En todas"
+    ]
+  },
+  "body": "Social, campañas, video, motion y creatividad para performance. Una idea que llega a cada formato, con capacidad creativa gobernada.",
+  "proof": {
+    "text": "Sky: +2.000 piezas aprobadas en 12 meses",
+    "source": "caso publicado de Sky Airlines"
+  },
+  "steps": [
+    {
+      "glyph": "rayo",
+      "kicker": "Empieza aquí",
+      "name": "Creative Sprint"
+    },
+    {
+      "glyph": "paleta",
+      "kicker": "Managed Squad",
+      "name": "Creative Capacity"
+    },
+    {
+      "glyph": "claqueta",
+      "kicker": "Producción",
+      "name": "Creative Studio"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
+    "alt": "Una directora creativa con el hoodie de Efeonce dirige con las manos una órbita de pantallas flotantes"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "department"
+  },
+  "layout": "service",
+  "use": "brochure"
+}

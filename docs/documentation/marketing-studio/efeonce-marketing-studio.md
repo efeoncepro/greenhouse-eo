@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.9
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Ultima actualizacion:** 2026-10-04 (ownership del flujo editorial SEO/AEO; sin implementación)
+> **Ultima actualizacion:** 2026-10-05 por Claude: filtros del calendario en español con menús, conteos y banderas; campos del formulario con menús e íconos; selectores de fecha, hora e inicio/fin; ventana temporal de escritura en producción hasta el 2026-10-12 07:00 de Chile (TASK-2002). Antes ese día: hojas de email y página web del calendario en producción; calendario de activaciones en producción en solo lectura (vistas, hoja, formatos, avisos y diálogos de escritura aún deshabilitados). Se conservan las entradas del 2026-10-04 (catálogo TASK-1905, CLI HTTP, video TASK-1998/1999) y el contrato local de hojas email/landing.
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) · [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
 ## Qué es
@@ -39,13 +39,15 @@ La barra lateral tiene cinco secciones: **Hoy**, **Campañas**, **Calendario**, 
 | **Hoy** | Las decisiones que frenan la pauta: presupuesto que espera aprobación, posts con fecha pasada que siguen «pendientes», pauta bloqueada y campañas que todavía no tienen piezas. Cada decisión trae un botón que lleva a la pantalla donde se resuelve. Abajo, lo que viene (próximas publicaciones) y el inventario. |
 | **Campañas** | Todas las campañas con su portada real y los tres estados. Se pueden filtrar: todas, esperan autorización, en producción o bloqueadas. |
 | **Espacio de una campaña** | Se abre desde Campañas. Arriba muestra los tres estados y el botón **Brief y decisiones**. Tiene cinco pestañas: **Piezas**, **Copys**, **Anuncios**, **Medios** y **Calendario**. |
-| **Calendario** | Vuelos de pauta y publicaciones orgánicas de todas las campañas, mes a mes. Las campañas sin fecha aparecen aparte con el motivo (pauta bloqueada o sin calendario aprobado). |
+| **Calendario** | El calendario de activaciones: qué sale, dónde y cuándo, en vistas Mes, Semana, Día, Línea de tiempo y Paid, junto con lo que las herramientas muestran que realmente se programó o salió. Las campañas sin fecha aparecen aparte con el motivo. Ver [El calendario de activaciones](#el-calendario-de-activaciones). |
 | **Piezas** | Todas las piezas de todas las campañas en un solo lugar. |
 | **Medios** | El plan de medios de las campañas que tienen un vuelo registrado: propuesto, aprobado y gasto real, siempre por separado, más lo que falta para activar. |
 | **Búsqueda (⌘K)** | Encuentra campañas, piezas y frases de copy. También funciona con Ctrl+K. |
 
 Arriba a la derecha hay un botón de sol/luna para cambiar entre modo claro y oscuro; la preferencia se recuerda.
-Mientras el acceso sea abierto, junto a ese botón aparece la etiqueta **Solo lectura**.
+Cuando la web es de solo lectura, junto a ese botón aparece la etiqueta **Solo lectura**. Mientras esté abierta la
+ventana temporal de escritura (hasta el 2026-10-12 a las 07:00 de Chile, ver
+[Escribir desde la web: ventana temporal](#escribir-desde-la-web-ventana-temporal-hasta-el-2026-10-12)), la etiqueta no aparece.
 
 > Detalle técnico: pantallas y tema en la sección 8 de la [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 
@@ -59,10 +61,235 @@ Al hacer clic en una pieza, a la derecha aparece cómo se vería publicada, con 
 - una pieza **vertical 9:16** se muestra como una **story**, a pantalla completa, con el texto encima;
 - una pieza **1:1, 4:5 o 16:9** se muestra dentro de una **tarjeta de feed**, con su proporción real (no se recorta).
 
+**Los videos se reproducen ahí mismo.** Si la pieza es un video, la tarjeta muestra un reproductor con los controles
+del navegador y el primer cuadro como portada. No arranca solo: el sonido empieza cuando presionas play. Se puede
+adelantar, ver a pantalla completa y, en el celular, verlo dentro de la tarjeta. Lo que se reproduce es una versión
+liviana para web (hasta 720 px en el lado corto): para el archivo final se pide la descarga del original. Si un video
+todavía no tiene esa versión, Studio muestra el primer cuadro y lo avisa; si no carga, lo dice y ofrece reintentar.
+
+Cuando un concepto tiene dos piezas del mismo formato (por ejemplo «Los Sparks» y «Los Sparks · con intro para
+Instagram», ambas 16:9), el tablero muestra las dos, y la segunda lleva una etiqueta con lo que la distingue. Las
+miniaturas de video muestran su duración. Si un formato sólo existe como video (o sólo como imagen), su hueco dice
+**Ver video** (o **Ver imagen**) y lleva directo a esa pieza.
+
 Arriba de esa vista se elige el canal (**LinkedIn** o **Meta**) y la variante (**Copy A** o **Copy B**). Si no
 hay copy para esa combinación, Studio lo dice. Debajo aparecen los datos de la pieza (tamaño, peso, versión),
 los anuncios configurados con ella, la **URL con UTM** con botón para copiarla y **Antes de lanzar**: los
 chequeos que todavía faltan para esa pieza.
+
+## El calendario de activaciones
+
+Una **activación** es la salida de una pieza en un canal, una cuenta y una fecha (o un período, si es pauta). El
+calendario (`/calendar`) muestra el **plan de Studio** y, al lado, la **evidencia de ejecución**: lo que las
+herramientas (Metricool, HubSpot) muestran que realmente se programó, se publicó o se entregó. Studio planifica;
+nunca publica. Quien publica es la herramienta.
+
+Está en producción en `studio.efeonce.org/calendar`. Desde el 2026-10-05 y hasta el 2026-10-12 a las 07:00 de Chile
+se puede **escribir** desde la web por una ventana temporal; después vuelve a ser de solo lectura hasta que llegue el
+inicio de sesión (ver [Escribir desde la web](#escribir-desde-la-web-ventana-temporal-hasta-el-2026-10-12)). Sigue la
+dirección visual que el operador aprobó el 2026-10-04 (y sus ampliaciones del 2026-10-05: menús de filtro v3.4 y
+selectores de fecha y hora v3.5), revisada tablero por tablero hasta coincidir con ella.
+
+### Vistas
+
+| Vista | Qué muestra |
+|---|---|
+| **Mes** | La grilla del mes. Encima de los números de día, una franja por campaña paid sacada del plan de medios: **rayada** si el presupuesto está «propuesto, sin aprobar» y **sólida** si está «aprobado». Hoy aparece en un círculo azul con la palabra «Hoy». Cada día muestra tarjetas compactas y, si hay más, «+N más». |
+| **Semana** | Columnas por día y tres franjas: **mañana** (06–12), **tarde** (12–18) y **noche** (18–24). Arriba, un carril PAID con la franja de cada campaña. En la columna de hoy, una línea marca la hora actual («HH:MM · ahora»). Las tarjetas son más grandes y dicen qué muestra la herramienta. |
+| **Día** | Las horas de 06:00 a 23:00 con cada tarjeta en la hora local de su cuenta; si dos se tocan, quedan lado a lado. Al costado, «Resumen del día» y «Horas por cuenta». |
+| **Línea de tiempo** | Grupos plegables por plataforma: en orgánico y owned, una fila por cuenta; en paid, una fila por línea de compra. La pauta se ve como barras por estado (por ejemplo, «En curso» sólido hasta hoy y rayado hasta su fin). Se puede elegir la escala (Día, Semana o Mes), ver sólo las filas con actividad o todas, y plegar todo. |
+| **Paid** | Es el mes con el filtro **Modalidad: Paid**. Resume cada campaña con cuántas líneas hay en cada estado (la peor primero) y, por línea, compara tres cosas: el **plan**, las **fechas en la herramienta** y la **entrega observada**, con una marca cuando difieren (por ejemplo «+1 d»). Al elegir una línea, el costado muestra su evidencia y «Cómo se lee». |
+
+En el celular, la semana se ve como lista por día, con un aviso «N ejecuciones sin activación · Revisar» arriba, y
+Paid como tarjetas con una mini línea del mes.
+
+### Filtros
+
+Arriba de la grilla están los filtros **Modalidad**, **Familia**, **Plataforma**, **Cuenta** y **Mercado**, y después
+**Campaña** y **Estado**. Los nombres de los filtros están en español; los valores de marketing siguen en inglés, como
+se usan en el equipo (Paid, Organic, Owned, Earned, Social, Web & Content, Placement). Sin nada elegido, cada filtro
+muestra sólo su nombre; con un valor elegido se pinta en azul y dice «Filtro: valor». Sin filtros, la barra cabe en una
+línea en una pantalla de 1440 px; con valores elegidos puede pasar a dos líneas. Los filtros viajan en la dirección de
+la página, así que una vista filtrada se puede compartir como enlace.
+
+Cada filtro abre un **menú propio de Studio** (ya no la lista desplegable del navegador):
+
+- **La lista es estable:** las opciones no desaparecen cuando aplicas otros filtros; sólo cambia su número.
+- **Cada opción trae un número**: cuántas activaciones del período que estás mirando quedarían si la eliges, teniendo
+  en cuenta los **otros** filtros que ya aplicaste. El conteo usa el mismo tope de 200 activaciones del calendario.
+- **Una opción en cero se ve en gris, pero se puede elegir.** Si eliges una opción en cero, sube a un grupo «Elegido»
+  arriba de la lista.
+- **Búsqueda** en Plataforma, Cuenta y Campaña, que son las listas largas.
+- **Teclado:** ↑ ↓ recorren la lista, Inicio y Fin van al primero y al último, Entrar elige y Esc cierra el menú.
+- **Plataforma** se divide en dos grupos: «Con cuenta conectada» (plataformas de las cuentas registradas en Studio; se
+  pueden elegir) y «Sin cuenta conectada» (plataformas de los canales activos del catálogo que todavía no tienen una
+  cuenta; se ven, pero no se eligen). Algunas plataformas del catálogo (por ejemplo Discord, Slack, foros o Circle)
+  todavía no aparecen.
+- **Familia** se agrupa en «Con activaciones en {mes}» y «Sin activaciones en {mes}», según el mes que estás mirando.
+- **Cuenta** muestra el nombre del dueño de la cuenta y, debajo, la red o la herramienta de pauta (por ejemplo
+  LinkedIn Ads o Meta Ads).
+- **Mercado** muestra la bandera de cada país. La lista trae los mercados que atiende Efeonce (Chile, México, Colombia,
+  Perú y Estados Unidos) más cualquier otro que aparezca en los datos. Las opciones generales dicen «Todos» en Mercado
+  y Estado, y «Todas» en el resto.
+
+**Calendario vacío por un filtro de lugar.** Si el mes queda vacío por un filtro de mercado, plataforma o cuenta, el
+calendario lo explica con una frase como «No hay activaciones en México en octubre» y ofrece quitar ese filtro.
+
+**En el celular**, la hoja de filtros es una lista con un renglón por filtro; al tocar uno se abre la misma lista que en
+escritorio, con sus grupos y conteos. El botón de la hoja dice «Ver N activaciones» y cuenta con los mismos datos que
+la grilla.
+
+### Qué dice cada tarjeta
+
+La tarjeta muestra la miniatura de la pieza, la hora, el isotipo de la plataforma, la cuenta y un chip de estado a
+todo el ancho; cuando la herramienta ya la tiene, el chip lleva el isotipo de esa herramienta junto a «Programada».
+En la semana se agrega una línea de evidencia, por ejemplo «Metricool · publicada 11:00», «Sin evidencia en X» o «Aún
+sin programar». Si la cuenta opera en otra zona horaria, se ve la ciudad y la hora de Santiago.
+
+### La columna de la derecha
+
+- **Ejecución sin activación:** publicaciones que una herramienta tiene programadas o publicadas sin un plan en
+  Studio. Cada día del mes también avisa «N sin activación».
+- **Sin fechas:** campañas que todavía no tienen fechas, con el motivo (por ejemplo, un candado en «Pauta bloqueada»).
+- **Leyenda:** cómo se leen las franjas (paid propuesto, paid aprobado) y las tarjetas orgánicas.
+
+### La barra de abajo
+
+El calendario tiene su propia barra inferior: «Plan de Studio · Evidencia de ejecución:», luego cada herramienta con
+cuándo se leyó por última vez y la hora de Santiago. Si una herramienta está atrasada, se pinta en amarillo; si hay
+varias atrasadas, se resumen en una sola frase. Cuando la web es de solo lectura, la etiqueta **Solo lectura** se ve en el encabezado. En el celular, el
+aviso de frescura aparece sobre la grilla.
+
+### La hoja de una activación
+
+Al abrir una tarjeta aparece la hoja con: campaña y número de activación, «Pieza · Plataforma Placement», las
+dimensiones (el mercado sólo si no es Chile), la pieza con su estado, fecha planificada y versión, el **copy literal**
+con su conteo de caracteres contra el límite del canal, los **avisos** (cada uno con título y qué hacer), la
+**evidencia** con el logo de la herramienta y «leído hace X», la **tracking URL** con sus parámetros y el
+**historial** en línea de tiempo.
+
+La pieza se ve según su formato:
+
+- **video**, con sus controles y su portada (la misma versión liviana que en la pestaña Piezas);
+- **carrusel**, con flechas, contador («2 / 4»), la siguiente diapositiva asomando y miniaturas; cada diapositiva con
+  su versión;
+- **imagen horizontal**, a todo el ancho;
+- **grupo de recursos** por proporción, con pestañas como «Horizontal 16:9 · N»;
+- una **pieza vertical** queda al costado de los datos.
+
+### Detalle del día
+
+Al tocar el número de un día o «+N más» se abre un pequeño panel con la lista de ese día, los flights de pauta en
+curso y «Abrir vista Día». Esc o ✕ lo cierran y vuelves al día. Con el teclado, Entrar sobre un día lo abre.
+
+### Qué significan los avisos
+
+| Aviso | Qué significa |
+|---|---|
+| «propuesto, sin aprobar» (franja rayada) | Hay un presupuesto propuesto en el plan de medios; no es una autorización ni un gasto. |
+| «aprobado» (franja sólida) | El presupuesto de esa campaña está aprobado. |
+| «N sin activación» | Ese día una herramienta tiene publicaciones sin plan en Studio. Se resuelve vinculándolas o creando su activación. |
+| «Pieza sin aprobar» | La pieza de esa activación todavía no está aprobada. Hoy aparece en todas las piezas importadas desde OneDrive. |
+| «Sin evidencia en X» / «Aún sin programar» | La herramienta todavía no muestra esa salida. No significa que haya fallado. |
+| «Fuera de plan · …» | La herramienta la tiene en otra fecha u hora que la planificada; la diferencia se muestra. |
+| «Sin entrega observada» | Una línea de pauta no muestra entrega en la herramienta. |
+| «+1 d» (en Paid) | Diferencia entre las fechas del plan y las de la herramienta. |
+| «No hay activaciones en México en octubre» (u otro lugar) | El mes quedó vacío por un filtro de mercado, plataforma o cuenta. Quita ese filtro para volver a ver el resto. |
+| Número gris en un menú de filtro | Con los otros filtros aplicados, esa opción no tiene activaciones en el período. Se puede elegir igual. |
+| Hora en ámbar al planificar o reprogramar | La cuenta ya tiene otra activación a esa hora ese día; el aviso dice cuál. No impide guardar. |
+| «Dos activaciones a las 11:00 en LinkedIn · cuentas distintas, sin conflicto» | Coinciden en hora pero en cuentas distintas. Si fuera la misma cuenta, el aviso sale en rojo. |
+| Herramienta en amarillo en la barra | Su última lectura está atrasada; lo que muestra puede no estar al día. |
+| «Sigue cargando…» | La vista tarda más de 10 segundos; se resuelve sola. |
+| «Tus filtros se conservan» + Reintentar | No se pudo cargar; al reintentar no pierdes los filtros. |
+
+Datos reales observados en producción: 3 activaciones en octubre y **50 ejecuciones sin activación**. Ese 50 es el
+tope de la consulta, así que podrían ser más.
+
+### Escribir desde la web: ventana temporal hasta el 2026-10-12
+
+Los botones para **planificar, editar, reprogramar, cancelar, vincular y crear desde una ejecución** están en la hoja,
+la bandeja lateral y el encabezado. Desde el 2026-10-05, por decisión del operador, están **habilitados en producción**
+mediante una **ventana temporal de escritura**, para poder probar las escrituras de la web antes de que exista el
+inicio de sesión.
+
+Qué hay que saber de esta ventana, en simple:
+
+- **Termina sola el 2026-10-12 a las 07:00 de Chile.** Desde ese momento la web vuelve a ser de solo lectura, sin que
+  nadie tenga que hacer nada: los botones se ven, pero quedan deshabilitados y dicen por qué. El operador también puede
+  cerrarla antes.
+- **Sólo vale para la organización Efeonce.** No abre la escritura de otras organizaciones.
+- **Cualquiera que tenga el enlace puede escribir** mientras está abierta, porque todavía nadie inicia sesión. Ese es su
+  riesgo y por eso dura poco.
+- **El historial no dice quién fue.** Cada cambio queda registrado a nombre de la ventana (`open-write-window`), no de
+  una persona.
+- **Aprobar sigue siendo de una persona.** La ventana no permite aprobar; eso se sigue haciendo desde la consola del
+  equipo.
+
+En producción se verificó que la web queda habilitada y que la vista previa de una cancelación responde bien, sin
+escribir nada real. Cuando llegue el inicio de sesión con la cuenta Efeonce (TASK-1898, que espera a TASK-1834 y
+TASK-1895), la ventana se retira y cada cambio quedará a nombre de quien lo hizo. Fuera de la ventana, si alguien
+intenta escribir por la API sin identificarse, recibe un rechazo (`write_not_allowed`). Por agentes, las escrituras
+dependen de TASK-2003.
+
+Cómo funciona cada acción:
+
+- **Planificar** abre un formulario con campaña, canal, cuenta (sólo las que corresponden a ese canal), mercado,
+  pieza y versión, copy, fecha y hora en la zona de la cuenta (o inicio y fin si es pauta). Muestra la tracking URL que
+  arma Studio y valida contra el catálogo antes de guardar. Al guardar, se abre la hoja de la activación nueva.
+- **Reprogramar** avisa en qué estado quedará (por ejemplo «Pasará a «Fuera de plan · −1 d»») y recuerda que Studio no
+  mueve la publicación en la herramienta.
+- **Cancelar** pide confirmación y conserva la evidencia de la herramienta.
+- **Vincular** propone publicaciones de la misma plataforma en ±14 días, con la misma cuenta primero y la razón.
+- **Crear desde una ejecución** trae los datos de la herramienta («De Metricool») con la cuenta bloqueada.
+
+### Los campos del formulario
+
+Las listas del formulario de **Planificar** y **Editar** (canal, plataforma, placement, formato, cuenta, mercado y las
+demás) usan el mismo menú que los filtros: cada opción tiene un check, un ícono, su nombre y, si corresponde, una
+bajada. Los íconos ayudan a reconocer cada cosa: la familia del canal, el logo de la plataforma (X ya muestra su logo y
+no una letra), el avatar de la cuenta con su red o herramienta de pauta, y la bandera del mercado. Cuando una lista
+tiene más de 8 opciones, el menú trae búsqueda. Se maneja con el teclado igual que los filtros, y **Esc cierra sólo el
+menú, no el formulario**. En **Placement** y **Formato** se puede elegir «Sin especificar».
+
+### Elegir fecha, hora o inicio y fin
+
+Los campos de fecha y hora del formulario y del diálogo **Reprogramar** ya no son los del navegador: abren selectores
+propios de Studio.
+
+- **Fecha.** El campo dice la fecha y cuánto falta, por ejemplo «jue 15 oct 2026 · en 10 días». El selector tiene los
+  atajos **Hoy**, **Mañana** y **Próx. lunes**; marca el día de hoy, atenúa los días pasados y pone **puntos** (hasta 3)
+  en los días en que la cuenta elegida ya tiene otras activaciones, para que veas cómo viene su semana.
+- **Hora.** Puedes escribirla («1830» o «18:30») o elegirla de una lista en franjas de 30 minutos, de 07:00 a 22:30. Si
+  la cuenta ya tiene otra activación a esa hora ese día, la hora se pinta en ámbar y un aviso nombra la pieza que ya
+  ocupa ese horario. El aviso **no bloquea**: puedes guardar igual si es lo que quieres.
+- **Inicio y fin (pauta).** Un solo selector con dos meses a la vista y el rango pintado. Debajo de los días se marca el
+  flight de la campaña. Trae los atajos **1 semana**, **2 semanas**, **Todo el mes** y **Hasta el fin del flight**, y
+  muestra el total de días.
+
+El selector se abre por encima de la página y hacia donde cabe completo, así que el diálogo de Reprogramar o el scroll
+del formulario ya no lo cortan. En el teléfono se abre como una hoja que sube desde abajo, con título, botones de
+44 px y un botón «Elegir …» para confirmar.
+
+### Lo que todavía no está
+
+| Qué | Depende de |
+|---|---|
+| Escribir desde la web con nombre de persona, y después del 2026-10-12 | Inicio de sesión Efeonce ID (TASK-1898); hasta entonces sólo existe la ventana temporal descrita arriba |
+| Escribir por agentes (MCP) | TASK-2003 |
+| Más rapidez y movimiento en el calendario | El operador lo calificó 3 de 5 el 2026-10-05: tarda un poco en cambiar de vista o filtro y casi no tiene animaciones. Primero se medirá y acelerará lo que se percibe; luego se diseñará un sistema de movimiento en el canvas (página «v3.6 · Motion», para aprobar) antes de implementarlo. Todavía no tiene task |
+| Mercados configurables por organización | Hoy la lista de mercados está fija en el código de la web. Debe salir de la configuración de cada organización, porque Studio tendrá clientes con otros mercados |
+| Plataformas del catálogo sin etiqueta en Studio (Discord, Slack, foros, Circle y otras) en el filtro | Pendiente; hoy no aparecen en el grupo «Sin cuenta conectada» |
+| Conteos de los filtros sin tope | Hoy cuentan sobre las primeras 200 activaciones del período, igual que el calendario |
+| Datos reales en las hojas de email y de página web | Publicar el lado Greenhouse de la lectura (datos y métricas desde HubSpot/Resend); mientras tanto dicen «Sin dato en la fuente» (ver [Hojas de email y landing](#hojas-de-email-y-landing--contrato-local-2026-10-05)) |
+| Hoja de un blog (dossier SEO/AEO) | TASK-1667 / TASK-1669; hoy se ve como «no medido» |
+| «Línea de tiempo» como opción del selector en la vista Semana | Decisión del operador: la dirección aprobada no la incluía ahí |
+| Trimestre, «Más tarde», acciones en lote y otras alternativas | TASK-2005 / TASK-2006 |
+
+> Detalle técnico: composición, parámetros de URL y paridad con la API en el Delta TASK-2002 de la
+> [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-05--task-2002-calendario-de-activaciones);
+> wireframe y flujos en [`TASK-2002-marketing-studio-activations-calendar.md`](../../ui/wireframes/TASK-2002-marketing-studio-activations-calendar.md)
+> y [`TASK-2002-marketing-studio-activations-calendar-flow.md`](../../ui/flows/TASK-2002-marketing-studio-activations-calendar-flow.md);
+> estado de producción en el [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#task-2002--calendario-de-activaciones-estado-al-2026-10-05).
 
 ## Reglas que la plataforma respeta
 
@@ -102,8 +329,10 @@ explica qué hacer.
 
 ## Acceso
 
-Hoy Studio se puede ver sin iniciar sesión y la web es sólo de lectura: nadie puede cambiar datos desde ella. Cada
-campaña lo explica en sus permisos: mientras el acceso sea abierto, el motivo es «acceso abierto». Los buscadores no
+Hoy Studio se puede ver sin iniciar sesión. Por regla general la web es de solo lectura: nadie puede cambiar datos desde
+ella, y cada campaña lo explica en sus permisos (mientras el acceso sea abierto, el motivo es «acceso abierto»). La
+excepción es la ventana temporal de escritura del calendario, abierta para la organización Efeonce hasta el 2026-10-12
+a las 07:00 de Chile (ver [Escribir desde la web](#escribir-desde-la-web-ventana-temporal-hasta-el-2026-10-12)). Los buscadores no
 lo indexan. El inicio de sesión con la cuenta Efeonce (`auth.efeonce.org`) llega al final del
 programa, por decisión del equipo, cuando ya existan la edición y las aprobaciones.
 
@@ -117,25 +346,21 @@ aprobaciones.
   permitidas. Sólo ve esas campañas; si pide otra, la respuesta es «no encontrado», sin revelar si existe. Un
   token mal copiado o revocado recibe un rechazo aunque la web esté abierta. Los tokens se crean y revocan por
   consola y quedan auditados.
-- **Agentes de IA.** Los agentes leerán Studio por Efeonce MCP (`mcp.efeonce.org`) con **12 herramientas de
-  lectura**: decisiones pendientes, lista de campañas, detalle de campaña, piezas, detalle de una pieza, ver una
-  pieza (la imagen), copys, anuncios, plan de medios, publicaciones, calendario y búsqueda. Cada herramienta
-  explica qué significa cada dato y qué no (por ejemplo, que un presupuesto propuesto no es gasto), y un manual
-  para agentes les enseña a leer los tres estados sin confundirlos.
+- **Agentes de IA.** Studio publica un manifiesto de **59 tools** (API 1.6.0), incluyendo canales, audiencias y
+  revalidación. Esa lista describe lo que el servidor sabe hacer; la conexión de Efeonce MCP puede exponer una
+  parte menor según su configuración, permisos y rollout. Ver el manifiesto no prueba que el agente pueda usarlo.
 
 ¿Quién puede usar las herramientas de agente? Sólo personas con el permiso de lectura de Studio, que hoy tienen
 los roles de **administración**, **cuentas** y **operaciones** de Efeonce. El agente actúa en nombre de esa
 persona: si la persona no tiene el permiso, el agente tampoco puede leer.
 
-**Estado actual:** las herramientas ya están construidas y desplegadas, pero **apagadas**. Se encienden después de
-la próxima publicación de Greenhouse a producción y de una prueba con una persona real. Hasta entonces, un agente
-no ve Studio por MCP.
+**Estado verificado el 04/10:** Studio y su catálogo están en producción. Este release no publicó Greenhouse
+ni el gateway, ni verificó una sesión MCP real con las nuevas tools. El estado de la conexión debe comprobarse
+en el carril de federación; no se deduce de la salud de Studio.
 
-**Qué no pueden hacer los agentes todavía:** crear, editar ni aprobar nada. Desde el 2026-10-02 las operaciones de
-escritura ya existen en la API de Studio y viajan en su lista de herramientas, pero Efeonce MCP no las ofrece a los
-agentes hasta que exista la puerta de escritura con la persona como responsable (TASK-1899). Cuando llegue la escritura, una
-aprobación seguirá siendo una **decisión de una persona**: el agente podrá prepararla y ejecutarla sólo en
-nombre de alguien que tenga el permiso de aprobar, y queda registrada con esa persona como responsable.
+**Escritura por agentes:** la API ya tiene commands de escritura; consumirlos por MCP T1 depende de TASK-2003,
+que corre en paralelo. TASK-1899 está retirada y no bloquea API, CLI ni UI. Las aprobaciones siguen siendo decisión
+de una persona en un carril habilitado: actualmente la API rechaza T2, aunque una CLI envíe `--confirm`.
 
 > Detalle técnico: API y manifiesto de herramientas en la sección 4.1 de la [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md); proveedor del gateway en el [runbook de Efeonce MCP](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md#provider-marketing-studio-efeonce-marketing-studio).
 
@@ -188,7 +413,7 @@ un aviso de conflicto en lugar de pisar el cambio de la primera.
 **Cómo se edita hoy:** todavía no desde las pantallas de la web (llegan con TASK-1895). Hoy se edita por la API de
 Studio, con un token de integración que tenga permiso de escritura, o por la consola del equipo
 (`pnpm studio:write`), que por defecto sólo muestra lo que haría y escribe únicamente si se le pide de forma
-explícita. En producción, hoy ninguna integración tiene permiso de escritura.
+explícita. El cliente de cargas tiene `studio:assets:write`; ese scope no permite editar campañas, copys o planes (`studio:write`).
 
 ### Quién aprueba
 
@@ -196,7 +421,7 @@ explícita. En producción, hoy ninguna integración tiene permiso de escritura.
 presupuesto, o autorizar medios, y también quitar una línea propuesta, exigen que una persona lo
 confirme de forma explícita. Hoy eso sólo se puede hacer desde la consola del equipo, con una confirmación adicional.
 Una integración nunca aprueba (recibe «la aprobación requiere a una persona») y por la API una aprobación queda
-detenida pidiendo confirmación hasta que llegue la puerta de aprobación con la persona como responsable (TASK-1899).
+detenida con `confirmation_required`. TASK-1899 se retiró sin habilitar confirmación delegada por digest.
 Aprobar la creatividad y autorizar medios tienen su propio paso: no se pueden lograr con un cambio de estado genérico.
 
 En Greenhouse, los permisos de escritura de Studio (piezas y campañas) quedaron preparados para los roles de
@@ -206,16 +431,97 @@ En Greenhouse, los permisos de escritura de Studio (piezas y campañas) quedaron
 
 ## Qué viene
 
-El programa (EPIC-049) avanza en este orden, sin fechas comprometidas:
+El programa (EPIC-049) conserva trabajos distintos, sin fechas comprometidas:
 
-1. **Agentes por MCP encendidos** — lectura de campañas desde un asistente, con el permiso de cada persona.
-2. **Originales en la nube y avisos** — los archivos originales dejan de depender de OneDrive, y el equipo recibe
-   alertas en Teams si algo falla.
-3. **Métricas** — resultados de pauta y publicaciones traídos desde Greenhouse.
-4. **Edición y brief como parte de Studio** — ya en Studio desde el 2026-10-02 para campañas gobernadas por Studio
-   (por API y consola). Falta el **corte de las campañas actuales** desde OneDrive, empezando por CMP-004.
-5. **Pantallas de edición, revisión y métricas**, y **escritura y aprobaciones por agentes**, siempre con una
-   persona responsable.
-6. **Inicio de sesión con la cuenta Efeonce**, al final.
+- Activaciones y calendario: TASK-1905 → TASK-2001 → TASK-2002. El catálogo ya está en Studio; cuentas,
+  mercados, URLs de activación y ejecución siguen en esas tareas.
+  El calendario de TASK-2002 ya está en producción; sus escrituras web están habilitadas por una ventana temporal
+  hasta el 2026-10-12 a las 07:00 de Chile y, de forma permanente, esperan el inicio de sesión (TASK-1898).
+- Identidad delegada y escrituras MCP T1: TASK-2003 en paralelo, con verificación de sesión real.
+- Customer model y métricas desde Greenhouse: dependencias TASK-1906/TASK-1892; ICP permanece desactivado.
+- Pantallas de edición y revisión, corte de las campañas actuales desde OneDrive e inicio de sesión Efeonce:
+  conservan sus tareas y autorizaciones. Una API disponible no realiza esos cortes automáticamente.
 
 > Detalle técnico: [EPIC-049](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md).
+
+## Catálogo de canales y validación (2026-10-04)
+
+El catálogo publicado v1 contiene 52 canales, organizados por modalidad y familia, con plataformas de compra y
+aparición separadas, placements, formatos, límites y tracking documentados. Al guardar, Studio conserva la clave
+resuelta y la versión de catálogo junto al texto original. La validación está en **warn**: informa hallazgos sin
+bloquear por esos hallazgos. Una especificación nueva no cambia campañas existentes al leerlas.
+
+La atención puede mostrar canales pendientes de resolver; la revalidación es una operación explícita. El backfill
+histórico sigue pendiente. Las referencias ICP no inventan segmentos ni personas: se admite una nota pendiente,
+y el modelo real seguirá desactivado hasta disponer de su conexión autorizada.
+[Contrato funcional](catalogo-canales-y-referencias-icp.md) · [Gobernar el catálogo](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md).
+
+## Operación por CLI HTTP desde Greenhouse (2026-10-04)
+
+`pnpm studio` permite consultar y preparar operaciones sobre campañas, piezas, copys, anuncios, planes,
+calendario, canales y audiencias usando la API de Studio. Descubre el catálogo de operaciones vigente;
+valida sin persistir por defecto y ejecuta con `--apply`. La carga de archivos incluye derechos de uso,
+transferencia y verificación; una carga no aprueba ni publica. Identidad, permisos, fuente maestra,
+revisiones y disponibilidad de capacidades siguen controlados por Studio. El cliente de cargas no otorga
+escritura general ni autoridad de catálogo. [Pasos, credenciales y límites](../../manual-de-uso/marketing-studio/operar-por-cli-api.md).
+
+Verificación del cliente: 18 tests locales, descubrimiento de 64 operaciones HTTP, lecturas autenticadas y carga
+real en dry-run. Las pruebas de transferencia aplicada fueron locales; no acreditan un upload productivo aplicado
+por esta CLI. [Evidencia CLI](../../audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+## Activaciones y evidencia — candidato local del 04/10
+
+La activación describe una salida de una campaña, incluida una campaña Always On. La persona elige cuenta, mercado,
+canal, pieza/versiones, copy y fecha o franja. La programación observada se compara con ese plan; si se retrasa, se
+muestra la diferencia. Reprogramar en Studio no cambia la herramienta. Published, En curso y Finalizada necesitan
+fecha de publicación o entrega real; vencer una fecha sólo produce overdue.
+
+La evidencia sin plan aparece como ejecución sin activación. Se puede vincular o crear un plan desde sus datos,
+confirmando campaña y piezas. Los avisos y el historial vienen del servidor. Un enlace publicado sin el tracking
+previsto genera un aviso; cuando se publica o entrega, ese tracking queda congelado.
+
+En blog, la cuenta owned identifica CMS y dominio del cliente. Notion se muestra como enlace al borrador, sin acceso
+al contenido. Un reader CMS puede observar publicación; si no existe, Studio comprueba la URL pública y una persona
+confirma la fecha. No basta un HTTP 200. La confirmación queda identificada en el historial.
+
+Estas capacidades están verificadas localmente con flags OFF por defecto; no están disponibles por inferencia en
+producción ni en una conexión MCP. [Manual de operación](../../manual-de-uso/marketing-studio/operar-por-cli-api.md)
+y [QA](../../audits/marketing-studio/TASK-2001-local-verification.md). Dossier SEO/AEO, autorización para publicar y
+métricas posteriores pertenecen a un follow-up independiente.
+
+
+### Próximo contrato owned, implementado localmente (2026-10-04)
+
+Resend y HubSpot tienen adapters de evidencia de campaña; Salesforce Marketing Cloud Engagement y Next se
+representan como proveedores distintos todavía sin lector. Una evidencia de email distingue borrador, parcial,
+completo y desconocido: sólo envío completo con fecha observada acredita publicación. No se importan destinatarios
+ni correo transaccional. La integración Resend de este corte lee broadcasts nativos; otros batches requieren vínculo
+explícito a una campaña. CMS sigue siendo atributo del sitio cliente: WordPress se verifica por API pública; otros
+CMS usan URL pública y fecha confirmada por una persona. Notion sólo es referencia del borrador.
+
+Este contrato local no acredita habilitación en producción. [Conexiones y límites](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md)
+y [operación por CLI](../../manual-de-uso/marketing-studio/operar-por-cli-api.md).
+
+
+## Hojas de email y landing — contrato local 2026-10-05
+
+La lectura de email incorpora remitente, asunto y preheader exactamente como están en la herramienta, su
+conteo y los límites disponibles del catálogo, listas/segmentos y última lectura de entregados, aperturas y clics.
+Cada lectura conserva fuente y fecha; no equivale a una serie de rendimiento. Lista actual no equivale a
+personas que recibieron el envío. Un dato ausente no se muestra como cero.
+
+La landing informa cuántas otras activaciones de la organización apuntan a su URL exacta y conserva evidencia
+de URL/publicación. Un formulario conectado se identifica como Growth Forms con su identidad pública;
+las respuestas ingresan primero a Greenhouse y luego el dispatcher las entrega a HubSpot. La hoja no certifica
+esa entrega ni expone el destino interno de HubSpot. Sin vínculo comprobado queda desconocido.
+
+El calendario productivo de TASK-2002 se mantiene intacto. Esta ampliación aún requiere desplegar readers y
+realizar readback. [Campos y límites para las hojas](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+
+**En la hoja (desde el 2026-10-05, en producción).** Al abrir una activación de email se ven el remitente, el asunto y
+el preheader tal como están en la herramienta, con su conteo de caracteres (si el catálogo no fija límite se ve
+`n / —`), la audiencia con sus contactos y lo que excluye, y la vista previa en Escritorio, Móvil o Bandeja (en el
+teléfono se ven juntas la bandeja y el email). La evidencia dice cuándo quedó programado, si se envió y, después del
+envío, entregados, aperturas y clics. Al abrir una página web se ven su vista previa en Escritorio o Móvil y una
+lista: de cuántas activaciones es destino, si tiene formulario conectado, si la URL responde y cuándo se publicó.
+Lo que la fuente no trae dice «Sin dato en la fuente»; nunca se completa con un ejemplo ni con cero.

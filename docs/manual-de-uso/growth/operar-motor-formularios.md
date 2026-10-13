@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.6 — 2026-08-31 (Codex, TASK-1799 Content Marketing)
+> **Version:** 1.7 — 2026-10-09 (Claude, destinos HubSpot por registro)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -233,6 +233,41 @@ Si la property no existe, agregar `createProperty` con `label`, `type`, `fieldTy
 `options`. Después del `--apply`, actualizar también el `form_destination.mapping_json.fieldMapping`
 en Greenhouse y correr un smoke de secure-submit; HubSpot puede rechazar fields enviados si no están
 en la definición del form.
+
+## Vincular un Growth Form con su formulario de HubSpot
+
+El mapeo de cada formulario del sitio vive en `scripts/growth/hubspot-destinations.registry.ts`: qué
+formulario HubSpot lo recibe y a qué property va cada campo. Cada Growth Form tiene su propio
+formulario HubSpot; no se comparten destinos.
+
+```bash
+pnpm growth:forms:activate-hubspot-destinations
+```
+
+Sin flags no cambia nada: muestra qué crearía en HubSpot, corre el contract check y dice qué
+publicaría en Greenhouse. Los flags se suman en este orden:
+
+1. `--apply-hubspot` crea properties `gh_form_*`, formularios y campos que falten. En formularios
+   existentes sólo agrega y deja `required=false` en todo salvo el correo.
+2. `--smoke` hace dos envíos reales por secure-submit (completo y mínimo) con el contacto
+   `greenhouse-smoke+forms-<fecha>@efeonce.org`. Ambos deben responder 200.
+3. `--apply-greenhouse` clona la versión publicada, adjunta el destino en `direct`, publica y depreca
+   las versiones anteriores. No corre si el contract check tiene violaciones.
+
+`--only=<slug>,<slug>` limita la corrida. Para sumar un campo: agregarlo al registro, repetir los
+tres pasos y verificar que el contract check quede en `OK`.
+
+Que no hacer: no pasar un destino a `direct` sin contract check limpio (un 400 de HubSpot manda la
+submission a dead-letter sin reintento) y no leer `status='delivered'` como prueba de entrega: sin
+destino `direct` significa «entregada al ledger». La prueba es `form_destination_attempt` con HTTP 200.
+
+Para revertir un formulario: republicar la versión anterior o publicar una con el destino en
+`disabled`. Los attempts no se borran.
+
+Problema comun: si la corrida dice `NO APLICADO ... v4 forms`, ese formulario de HubSpot fue creado
+con el editor nuevo y no admite cambios por API («AEO - Lead Form» es el caso). Agregar los campos
+que lista el contract check desde HubSpot (Marketing → Formularios → editar → Propiedades →
+Revisar y actualizar) y volver a correr; la herramienta no activa `direct` mientras falten.
 
 ## Referencias tecnicas
 

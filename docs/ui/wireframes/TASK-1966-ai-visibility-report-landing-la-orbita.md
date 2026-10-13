@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Task: `docs/tasks/to-do/TASK-1966-ai-visibility-report-landing-la-orbita.md`
+- Task: `docs/tasks/complete/TASK-1966-ai-visibility-report-landing-la-orbita.md`
 - Surface: `think.efeoncepro.com/brand-visibility` — repo `efeonce-think`, `src/pages/brand-visibility/index.astro`
   (+ `src/components/BrandVisibilityFormDock.astro`, `src/components/EfeonceSlogan.astro`).
 - Visual direction mode: `repo-native-benchmark`
@@ -10,6 +10,47 @@
 - Fuente aprobada: canvas «Marcas SEO y AEO de Efeonce», artboard `HeroAssessment.dc.html` (2026-09-29), con el cambio
   de nombre y de logo decidido por el operador el 2026-10-02.
 - Fuera de este wireframe: la página del informe `/brand-visibility/r/<token>`, el correo y el PDF (TASK-1938).
+
+## Wireframe vigente · 2026-10-04
+
+Think `6aab907` publica el hero demostrativo; `56a300a` publica el límite de pantalla amplia, verificado en producción. El hover azul profundo posterior sólo está implementado localmente.
+
+```text
+DESKTOP — shell ≤ 1360 px
+[ Efeonce | AI Visibility Report ]
+
+¿Te recomiendan las IA?              [ órbita única · escena ≤ 500 px ]
+Averígualo.                            consulta → respuesta
+Descubre cómo aparece tu marca,        Tu marca → fuente citada
+quién aparece en su lugar y            clic / Enter / espacio: pausa
+qué mejorar primero.                  (sin pie ni control separado)
+[motores]
+[Empezar mi análisis →]  Informe en pantalla y descarga en PDF.
+
+[Conoce la visibilidad de tu marca · formulario gobernado]
+Método desplegable → PDF de ejemplo ampliable → FAQ + CTA → firma Efeonce/AEO
+
+MÓVIL/TABLET — una columna en flujo normal
+[lockup]
+[pregunta + Averígualo.]
+[lead + motores]
+[escena compacta]
+[Empezar mi análisis →]
+[descriptor]
+[formulario]
+```
+
+- Sin enlace «Cómo funciona» en ningún ancho. La escena es pausa/reanudación, no un enlace de navegación ni un resultado real; conserva descripción ilustrativa accesible y foco visible.
+- Fuera del viewport, pestaña oculta o pausa manual: ciclo detenido. Sin JS/reduced-motion: ejemplo completo estático y control oculto.
+- Comienzo de formulario verificado en y=678 a 1710 y 2560 px; la escena permanece en 500 px. Comprobar pantallas amplias además de móvil/1440 para no reintroducir el vacío vertical.
+- Producción sigue **Entrega primero**. **Marca → Mercado → Contexto → Entrega → Confirmar** es candidato de QA con envíos bloqueados; no activado.
+- Hover primario del formulario, sólo local: Engine accent 70% + ground 30%, texto blanco y contraste 6,80:1. Secundarios/foco/disabled se conservan; sin efectos nuevos.
+- Jerarquía de acciones: empezar análisis → avanzar/enviar en el formulario → CTA de preview/final para volver al formulario; pausa directa sobre la escena y enlace AEO en pie son secundarios.
+- [Evidencia y QA](../reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md) · [Contrato de motion](../motion/TASK-1966-ai-visibility-report-orbit-motion.md).
+
+## Wireframe inicial — registro histórico 2026-10-02
+
+Los diagramas, copy y criterios siguientes preservan el artboard de arranque. La revisión vigente anterior sustituye el enlace «Cómo funciona», la órbita vacía, el lead anterior, la reserva superior móvil y la ausencia de motion. No reimplementar esos estados históricos.
 
 ## Desktop Target
 

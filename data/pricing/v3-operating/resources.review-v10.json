@@ -1,0 +1,1240 @@
+{
+  "schemaVersion": "pricing-v3-resource-policy/1",
+  "version": "operating-review-2026-10-11-v10",
+  "mode": "review_only",
+  "source": {
+    "reference": "operator:2026-10-11:adobe-quote-without-discount",
+    "effectiveFrom": "2026-10-11",
+    "effectiveUntil": "9999-12-31",
+    "status": "estimated"
+  },
+  "commonToolIds": [
+    "notion",
+    "microsoft-365"
+  ],
+  "taskCodes": [
+    "seo-writing",
+    "visual-design",
+    "image-generation",
+    "image-upscale",
+    "social-publishing",
+    "crm-operation",
+    "crm-automation",
+    "ux-design",
+    "video-editing",
+    "wordpress-hosting",
+    "wordpress-builder",
+    "wordpress-performance",
+    "wordpress-advanced-fields",
+    "server-tagging",
+    "data-warehouse",
+    "stock-assets",
+    "influencer-research",
+    "express-design",
+    "notion-automation",
+    "social-care"
+  ],
+  "profileTasks": [
+    {
+      "profileId": "ECG-001",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-002",
+      "tasks": [
+        "visual-design"
+      ]
+    },
+    {
+      "profileId": "ECG-003",
+      "tasks": [
+        "visual-design"
+      ]
+    },
+    {
+      "profileId": "ECG-004",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-005",
+      "tasks": [
+        "visual-design"
+      ]
+    },
+    {
+      "profileId": "ECG-006",
+      "tasks": [
+        "social-publishing",
+        "express-design"
+      ]
+    },
+    {
+      "profileId": "ECG-007",
+      "tasks": [
+        "social-publishing",
+        "express-design"
+      ]
+    },
+    {
+      "profileId": "ECG-008",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-009",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-010",
+      "tasks": [
+        "express-design"
+      ]
+    },
+    {
+      "profileId": "ECG-011",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-012",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-013",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-014",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-015",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-016",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-017",
+      "tasks": [
+        "ux-design"
+      ]
+    },
+    {
+      "profileId": "ECG-018",
+      "tasks": [
+        "video-editing"
+      ]
+    },
+    {
+      "profileId": "ECG-019",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-020",
+      "tasks": [
+        "seo-writing"
+      ]
+    },
+    {
+      "profileId": "ECG-021",
+      "tasks": [
+        "crm-automation"
+      ]
+    },
+    {
+      "profileId": "ECG-022",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-023",
+      "tasks": [
+        "influencer-research"
+      ]
+    },
+    {
+      "profileId": "ECG-024",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-025",
+      "tasks": [
+        "crm-operation"
+      ]
+    },
+    {
+      "profileId": "ECG-026",
+      "tasks": [
+        "crm-operation"
+      ]
+    },
+    {
+      "profileId": "ECG-027",
+      "tasks": [
+        "crm-operation"
+      ]
+    },
+    {
+      "profileId": "ECG-028",
+      "tasks": [
+        "express-design"
+      ]
+    },
+    {
+      "profileId": "ECG-029",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-030",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-031",
+      "tasks": []
+    },
+    {
+      "profileId": "ECG-032",
+      "tasks": [
+        "crm-operation"
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "toolId": "notion",
+      "label": "Notion",
+      "tasks": [],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-015"
+        },
+        {
+          "priceId": "current",
+          "basis": "seat",
+          "price": {
+            "amount": "24",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "invoice:notion:0D8C80A9-0039:2026-09-21",
+              "effectiveFrom": "2026-10-11",
+              "effectiveUntil": "9999-12-31",
+              "status": "confirmed"
+            }
+          },
+          "reviewBy": "2027-04-11",
+          "commitmentTermMonths": 1
+        }
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "label": "Microsoft 365 Business Standard",
+      "tasks": [],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-016"
+        },
+        {
+          "priceId": "current",
+          "basis": "seat",
+          "price": {
+            "amount": "14.70",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "invoice:microsoft:G185142527:2026-09-16",
+              "effectiveFrom": "2026-10-11",
+              "effectiveUntil": "9999-12-31",
+              "status": "confirmed"
+            }
+          },
+          "reviewBy": "2027-04-11",
+          "commitmentTermMonths": 1
+        },
+        {
+          "priceId": "public-standard-teams-monthly",
+          "basis": "seat",
+          "price": {
+            "amount": "16.80",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-business-standard",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11",
+          "commitmentTermMonths": 1
+        },
+        {
+          "priceId": "public-standard-teams-annual",
+          "basis": "seat",
+          "price": {
+            "amount": "168",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-business-standard",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "public-standard-no-teams-monthly",
+          "basis": "seat",
+          "price": {
+            "amount": "12.95",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-business-standard",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11",
+          "commitmentTermMonths": 1
+        }
+      ]
+    },
+    {
+      "toolId": "semrush",
+      "label": "SEMrush",
+      "tasks": [
+        "seo-writing"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-004"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current subscription and sharing/consumer allocation not confirmed."
+        },
+        {
+          "priceId": "public-seo-pro-monthly",
+          "basis": "package",
+          "price": {
+            "amount": "139.95",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://www.semrush.com/kb/1547-seo-toolkit-pricing-and-plans",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "public-seo-guru-monthly",
+          "basis": "package",
+          "price": {
+            "amount": "249.95",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://www.semrush.com/kb/1547-seo-toolkit-pricing-and-plans",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        }
+      ]
+    },
+    {
+      "toolId": "adobe",
+      "label": "Adobe Creative Cloud Pro",
+      "tasks": [
+        "visual-design",
+        "video-editing"
+      ],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-001"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "includedSeats": 3,
+          "bundledToolIds": [
+            "adobe-express"
+          ],
+          "price": {
+            "amount": "325405.5",
+            "currency": "CLP",
+            "unit": "month",
+            "source": {
+              "reference": "invoice:adobe:3582641940:list-price;operator:2026-10-11:quote-without-discount",
+              "effectiveFrom": "2026-10-11",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2026-11-16",
+          "commitmentTermMonths": 12,
+          "commitmentRenewsOn": "2026-11-16"
+        },
+        {
+          "priceId": "invoiced-with-discount",
+          "basis": "package",
+          "includedSeats": 3,
+          "bundledToolIds": [
+            "adobe-express"
+          ],
+          "price": {
+            "amount": "162605",
+            "currency": "CLP",
+            "unit": "month",
+            "source": {
+              "reference": "invoice:adobe:3582641940:2026-09-16",
+              "effectiveFrom": "2026-10-11",
+              "effectiveUntil": "9999-12-31",
+              "status": "confirmed"
+            }
+          },
+          "reviewBy": "2026-11-16",
+          "commitmentTermMonths": 12,
+          "commitmentRenewsOn": "2026-11-16"
+        }
+      ]
+    },
+    {
+      "toolId": "chatgpt",
+      "label": "ChatGPT",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "historical-plus",
+          "basis": "seat",
+          "catalogResourceId": "ETG-007"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current ChatGPT plan and invoice not confirmed."
+        },
+        {
+          "priceId": "public-plus-monthly",
+          "basis": "seat",
+          "price": {
+            "amount": "20",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://help.openai.com/en/articles/6950777-what-is-chatgpt-plus",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "public-business-standard-monthly",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "25",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://help.openai.com/en/articles/8542115-chatgpt-business-general-faq",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "public-business-standard-annual",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "240",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://help.openai.com/en/articles/8542115-chatgpt-business-general-faq",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "public-business-premium-monthly",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "125",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://help.openai.com/en/articles/8542115-chatgpt-business-general-faq",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "public-business-premium-annual",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "1200",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://help.openai.com/en/articles/8542115-chatgpt-business-general-faq",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        }
+      ]
+    },
+    {
+      "toolId": "claude-team",
+      "label": "Claude Team",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "standard-monthly",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "25",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://claude.com/pricing",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "standard-annual",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "240",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://claude.com/pricing",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "premium-monthly",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "125",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "https://claude.com/pricing",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "premium-annual",
+          "basis": "seat",
+          "minimumContractSeats": 2,
+          "price": {
+            "amount": "1200",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://claude.com/pricing",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        }
+      ]
+    },
+    {
+      "toolId": "higgsfield",
+      "label": "Higgsfield",
+      "tasks": [
+        "image-generation"
+      ],
+      "access": "credits",
+      "ai": true,
+      "providerId": "higgsfield",
+      "prices": []
+    },
+    {
+      "toolId": "magnific",
+      "label": "Magnific",
+      "tasks": [
+        "image-upscale"
+      ],
+      "access": "credits",
+      "ai": true,
+      "providerId": "magnific",
+      "prices": []
+    },
+    {
+      "toolId": "vercel",
+      "label": "Vercel Greenhouse",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "reported-range-minimum",
+          "basis": "package",
+          "price": {
+            "amount": "60",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "operator-resource-costs-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "reported-range-maximum",
+          "basis": "package",
+          "price": {
+            "amount": "100",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "operator-resource-costs-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        }
+      ]
+    },
+    {
+      "toolId": "gcp",
+      "label": "GCP BBDD",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "reported-monthly",
+          "basis": "package",
+          "price": {
+            "amount": "264",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "operator-resource-costs-2026-10-09",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        }
+      ]
+    },
+    {
+      "toolId": "envato",
+      "label": "Envato Elements",
+      "tasks": [
+        "stock-assets"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-002"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "hubspot",
+      "label": "HubSpot",
+      "tasks": [
+        "crm-operation"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-005"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "zapier",
+      "label": "Zapier",
+      "tasks": [
+        "crm-automation"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-006"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "midjourney",
+      "label": "Midjourney",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-008"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "gemini",
+      "label": "Gemini",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-018"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "figma",
+      "label": "Figma",
+      "tasks": [
+        "ux-design"
+      ],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-019"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "freepik",
+      "label": "Freepik",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-021"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "frame-io",
+      "label": "Frame.io",
+      "tasks": [
+        "video-editing"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-022"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "metricool",
+      "label": "Metricool",
+      "tasks": [
+        "social-publishing"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-003"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "cloudways",
+      "label": "Cloudways VPS",
+      "tasks": [
+        "wordpress-hosting"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-009"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "elementor",
+      "label": "Elementor Pro",
+      "tasks": [
+        "wordpress-builder"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-010"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "wp-rocket",
+      "label": "WP Rocket",
+      "tasks": [
+        "wordpress-performance"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-011"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "crocoblock",
+      "label": "Crocoblock Suite",
+      "tasks": [
+        "wordpress-advanced-fields"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-012"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "gtm-server",
+      "label": "GTM Server-side",
+      "tasks": [
+        "server-tagging"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-013"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "bigquery",
+      "label": "BigQuery",
+      "tasks": [
+        "data-warehouse"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-014"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "shutterstock",
+      "label": "Shutterstock",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-020"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "elevenlabs",
+      "label": "Eleven Labs",
+      "tasks": [],
+      "access": "shared",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-023"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "github-copilot",
+      "label": "Github Copilot",
+      "tasks": [],
+      "access": "named",
+      "ai": true,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-024"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "adobe-express",
+      "label": "Adobe Express",
+      "tasks": [
+        "express-design"
+      ],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-025"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "includedSeats": 3,
+          "price": {
+            "amount": "16240",
+            "currency": "CLP",
+            "unit": "month",
+            "source": {
+              "reference": "invoice:adobe:3582641940:2026-09-16",
+              "effectiveFrom": "2026-10-11",
+              "effectiveUntil": "9999-12-31",
+              "status": "confirmed"
+            }
+          },
+          "reviewBy": "2026-11-16",
+          "commitmentTermMonths": 12,
+          "commitmentRenewsOn": "2026-11-16"
+        }
+      ]
+    },
+    {
+      "toolId": "favikon",
+      "label": "Favikon",
+      "tasks": [
+        "influencer-research"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "historical",
+          "basis": "package",
+          "catalogResourceId": "ETG-026"
+        },
+        {
+          "priceId": "current",
+          "basis": "package",
+          "pendingReason": "Current contracted plan, billing, term, capacity and access evidence required."
+        }
+      ]
+    },
+    {
+      "toolId": "notion-credits",
+      "label": "Notion automation credits budget",
+      "tasks": [
+        "notion-automation"
+      ],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "invoiced-period-budget",
+          "basis": "package",
+          "price": {
+            "amount": "30",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "invoice:notion:0D8C80A9-0039:2026-09-21",
+              "effectiveFrom": "2026-10-11",
+              "effectiveUntil": "9999-12-31",
+              "status": "confirmed"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        }
+      ]
+    },
+    {
+      "toolId": "social-inbox",
+      "label": "Sprout Social — social care inbox",
+      "tasks": [
+        "social-care"
+      ],
+      "access": "named",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "sprout-advanced-annual",
+          "basis": "seat",
+          "price": {
+            "amount": "4788",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://sproutsocial.com/pricing/",
+              "effectiveFrom": "2026-10-10",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "sprout-professional-annual",
+          "basis": "seat",
+          "price": {
+            "amount": "3588",
+            "currency": "USD",
+            "unit": "year",
+            "source": {
+              "reference": "https://sproutsocial.com/pricing/",
+              "effectiveFrom": "2026-10-10",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "sprout-advanced-monthly",
+          "basis": "seat",
+          "price": {
+            "amount": "499",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "third-party-guides:sprout-monthly-billing-2026-10",
+              "effectiveFrom": "2026-10-10",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "current",
+          "basis": "seat",
+          "pendingReason": "Efeonce's contracted Sprout Social plan, seat count, billing term and invoice are not confirmed; who pays the seats for a client service is undecided."
+        }
+      ]
+    },
+    {
+      "toolId": "agent-runtime-usage",
+      "label": "Agent runtime usage per 1,000 items",
+      "tasks": [],
+      "access": "shared",
+      "ai": false,
+      "prices": [
+        {
+          "priceId": "hypothesis-per-1000-items",
+          "basis": "package",
+          "price": {
+            "amount": "10",
+            "currency": "USD",
+            "unit": "month",
+            "source": {
+              "reference": "hypothesis-only:agent-runtime-usage-2026-10-10",
+              "effectiveFrom": "2026-10-10",
+              "effectiveUntil": "9999-12-31",
+              "status": "estimated"
+            }
+          },
+          "reviewBy": "2027-04-11"
+        },
+        {
+          "priceId": "measured",
+          "basis": "package",
+          "pendingReason": "Model usage per processed item has not been measured. Replace the hypothesis with metered cost before any commitment."
+        }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,37 @@ Para el modelo transversal de cliente —ICP, JTBD, buying group, stakeholder ma
 `efeonce-pricing-operator`. Esta skill conserva la ejecución comercial: discovery, negociación, pipeline, proposal,
 win/loss y deal tactics.
 
+Para prospección por cuenta, contactos y rutas frías/tibias/cálidas, cargar
+[efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). Esa skill conserva investigación, cobertura
+objetivo + 2–3 adicionales como base ampliable por roles/riesgos de la oportunidad y entrega; Commercial conserva avance de venta. No cargar ambos recursivamente.
+
+Para ABM/ABS, cargar el [módulo compartido](../efeonce-b2b-prospecting/references/abm-and-abs.md):
+selección/intensidad por cuenta, mapas por iniciativa, consenso/proof y economía. Commercial conserva ABS;
+Digital Marketing el plan ABM. 1:many puede ser válido si conserva selección/relevancia/coordinación;
+no adoptar rangos ni resultados numéricos genéricos como metas Efeonce. Este método local gobierna si el
+bundle global carece del módulo referenciado; no afirmar que se cargó un archivo ausente.
+
+Para discovery y prueba por oferta/función, cargar [decision/proof](../efeonce-b2b-prospecting/references/discovery-and-proof.md)
+con la práctica; para dimensionar preventa/seguimiento, [capacidad y economía](../efeonce-b2b-prospecting/references/capacity-and-economics.md)
+con Pricing/Finance. Para win/loss/no decisión y vigencia, [aprendizaje](../efeonce-b2b-prospecting/references/experiments-and-learning.md).
+Representación target/roles/readback pertenece al [adapter HubSpot](../hubspot-as-a-service/references/account-based-prospecting.md).
+Antes de crear/calificar/cerrar Contact, Company, Lead o Deal, cargar su
+[diccionario y captura por objeto](../hubspot-as-a-service/references/property-inventory.md);
+el diseño Bow-tie histórico no prueba fields/pipelines efectivos ni requisitos UI/API.
+Los módulos comparten método; no crean ofertas, presupuesto, schema, Deals ni nuevas automatizaciones.
+
+Para preparar entrada por situación, usar [playbooks de entrada](../efeonce-b2b-prospecting/references/situation-entry-playbooks.md).
+Cadencias y respuestas se coordinan con [cadencia de cuenta](../efeonce-b2b-prospecting/references/account-cadence.md)
+y [tratamiento de respuestas](../efeonce-b2b-prospecting/references/response-handling.md); Commercial conserva
+objeciones, calificación y negociación. Preparación del remitente/canal: [entregabilidad](../efeonce-b2b-prospecting/references/deliverability-operations.md),
+sin convertir método en autorización de envío, enrollment, cambios DNS o pausas aplicadas.
+
 # commercial-expert — Greenhouse Overlay
+
+## Envíos desde el Outlook de Julio
+
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+
 
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`; índice `docs/public-site/`). Dos ejes ortogonales: **superficies** front-of-house (por audiencia/etapa de funnel — **adquisición** como continuo bow-tie: `Think` = demand-gen + nurturing top-of-funnel [blog *Marketing con Manzanitas* → *Glitch* newsletter semanal IA/Marketing/Negocios + tools *AI Visibility Grader*/ebooks/webinars] · sitio `efeoncepro.com` = demand-capture + conversión; **experiencia** con dos caras: cliente [sky → `experiencia.efeoncepro.com`] y operador [cockpit Greenhouse]) que consumen **plataformas/backbones** (runtime Greenhouse PG+BQ/360, **Kortex** = CRM peer system + producto, Verk). El grader es la costura top→bottom. Cargar PDR-003 al razonar sobre superficies, capas, hosts o dónde nace una capacidad del ecosistema.
 
@@ -261,3 +291,12 @@ Ad-hoc deal reviews / MEDDPICC cards / forecasts: discutir vía conversation, no
 V1.0 prioriza los 5 archivos arriba. V1.1 agrega los 2 que faltan según necesidad.
 
 **Nota (2026-07-13):** el antiguo pendiente `hubspot-portal-operations.md` quedó **resuelto fuera de este overlay**: el negocio HubSpot (vender/implementar/retener como Solutions Partner) vive ahora en la skill **`hubspot-solutions-partner`**, y la operación técnica del portal en `hubspot-ops`.
+
+## Ofrecer medios de forma integral
+
+Cargar el [manual programático](../../../docs/manual-de-uso/comercial/ofrecer-publicidad-programatica.md) y el
+[método compartido](../digital-marketing/references/programmatic-media-operations.md). Partir del problema de
+mix/inversión y presentar una responsabilidad Efeonce con alcance, owners, honorarios y externos claros. Proveedores
+permanecen en el expediente interno. Una demo, entrenamiento declarado o ejemplo de fee no prueba licencia,
+crédito, ahorro ni capacidad activa. Mapear retainer y cotizar sólo alcance incremental; no duplicar planificación,
+setup, coordinación o reportes ni sumar fees completos por canal. Preservar la aprobación acotada del servicio.

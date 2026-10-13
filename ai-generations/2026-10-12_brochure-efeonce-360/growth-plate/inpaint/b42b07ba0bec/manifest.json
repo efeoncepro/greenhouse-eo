@@ -1,0 +1,59 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "b42b07ba0bec",
+  "key": "b42b07ba0bec9c35950a7e6122a4238cc02f38108d01a124226add30963d1cb7",
+  "status": "dry-run",
+  "createdAt": "2026-10-12T14:56:53.459Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+    "imageSha256": "e44a7f5a26b68144e527d41f5e25707a9c93e7a66e205a67234e11d664f2e2fe",
+    "mask": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/c4e3c349-150a-454e-a366-3ec7dbc9bb43/scratchpad/growth/lanyard-mask.png",
+    "maskSha256": "1e0643d2ce100c04431ae55e2c7f3aff653d6e750a31b3f4f9b0b045cf5785a7",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the object in the marked area completely, including its shadow and reflection. Reconstruct what is behind it so the surface, texture and lighting continue naturally. Leave the area empty: no new objects.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.03303255353655134,
+    "editable": 31690,
+    "soft": 28925,
+    "protected": 1774393
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1792,
+      "height": 1024
+    },
+    "target": {
+      "width": 1792,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 29 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0097,
+    "basis": "1 × salida 1792x1024 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": []
+}

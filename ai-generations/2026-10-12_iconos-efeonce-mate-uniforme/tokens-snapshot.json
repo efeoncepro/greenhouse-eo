@@ -1,0 +1,233 @@
+{
+  "volume": {
+    "status": "canonical",
+    "line": "brand",
+    "state": "response",
+    "sizePx": 1024,
+    "minPx": 160,
+    "perPiece": 1,
+    "generation": {
+      "model": "gpt-image-2.5-sunburst",
+      "quality": "high",
+      "referencePx": 760,
+      "background": "#001a33"
+    },
+    "key": {
+      "from": 28,
+      "to": 95,
+      "frameSamplePx": 24
+    },
+    "qa": {
+      "minIoU": 0.75,
+      "sameHoles": true,
+      "sameParts": true
+    }
+  },
+  "icons": {
+    "status": "canonical",
+    "background": "#001a33",
+    "paper": "#f7f8f6",
+    "ink": {
+      "onDark": "#ffffff",
+      "onLight": "#023c70"
+    },
+    "voiceByLine": {
+      "growth": "stroke",
+      "brand": "plastilina",
+      "engine": "stroke",
+      "voice": null,
+      "revenue-hubspot": "stroke",
+      "revenue-salesforce": "stroke"
+    },
+    "stroke": {
+      "grid": 24,
+      "margin": 2,
+      "guides": {
+        "circleRadius": 10,
+        "square": 18,
+        "rectangle": [
+          20,
+          16
+        ]
+      },
+      "width": 1.5,
+      "smallWidth": 1.75,
+      "smallMaxPx": 20,
+      "capFromPx": 64,
+      "maxScreenPx": 4,
+      "sphereRadius": 1.75,
+      "sphereClearance": 0.5,
+      "responseMinPx": 20,
+      "qaSizesPx": [
+        64,
+        32,
+        24,
+        20
+      ]
+    },
+    "plastilina": {
+      "grid": 48,
+      "targetArea": 560,
+      "maxRadius": 22.5,
+      "sphereRadius": 3.4,
+      "knockRadius": 4.5,
+      "gestureWidth": 2.8,
+      "gestureStrokes": [
+        2,
+        5
+      ],
+      "contentWidth": 2.6,
+      "minPx": 32,
+      "qaSizesPx": [
+        160,
+        64,
+        32
+      ],
+      "generation": {
+        "model": "gpt-image-2",
+        "size": "1024x1024",
+        "grid": "3x3",
+        "colors": "solo fondo liso y blanco puro; sin naranja ni puntos",
+        "vectorize": {
+          "upscale": 3,
+          "whiteThreshold": 150,
+          "connectivity": 4,
+          "minComponentPx": 60,
+          "maxOrangeRatio": 0.5,
+          "potrace": [
+            "-s",
+            "--flat",
+            "-t",
+            "40",
+            "-a",
+            "1.15",
+            "-O",
+            "0.6"
+          ]
+        }
+      }
+    },
+    "skewedOrbit": {
+      "tiltDeg": -16,
+      "heightRatio": 0.3333333333333333,
+      "knockPx": 12,
+      "ringOpacity": 0.22,
+      "ringPx": 2.4,
+      "arcPx": 3.8,
+      "arcFromDeg": 118,
+      "arcToDeg": 52,
+      "sphereRadiusPx": 8.3,
+      "sphereKnockRadiusPx": 12.5,
+      "baseWidthPx": 1080,
+      "minObjectPx": 320,
+      "perPiece": 1
+    },
+    "volume": {
+      "status": "canonical",
+      "line": "brand",
+      "state": "response",
+      "sizePx": 1024,
+      "minPx": 160,
+      "perPiece": 1,
+      "generation": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "high",
+        "referencePx": 760,
+        "background": "#001a33"
+      },
+      "key": {
+        "from": 28,
+        "to": 95,
+        "frameSamplePx": 24
+      },
+      "qa": {
+        "minIoU": 0.75,
+        "sameHoles": true,
+        "sameParts": true
+      }
+    }
+  },
+  "colors": {
+    "dark": "#001a33",
+    "teal": "#36c8bf",
+    "halo": "#72ded8",
+    "navy": "#023c70",
+    "tealDark": "#0e8c82",
+    "paper": "#f7f8f6",
+    "productInk": "#091951"
+  },
+  "lines": [
+    {
+      "key": "growth",
+      "name": "Efeonce",
+      "scope": "Marca madre · Growth Strategy & Measurement",
+      "serviceName": "Growth Strategy & Measurement",
+      "sloganWord": "Growth",
+      "product": "greenhouse",
+      "platform": null,
+      "darkBg": "#001a33",
+      "accentOnDark": "#36c8bf",
+      "accentOnLight": "#0e8c82"
+    },
+    {
+      "key": "brand",
+      "name": "Servicios creativos",
+      "scope": "Creative Services",
+      "serviceName": "Creative Services",
+      "sloganWord": "Brand",
+      "product": "globe",
+      "platform": null,
+      "darkBg": "#091951",
+      "accentOnDark": "#ff6500",
+      "accentOnLight": "#bb1954"
+    },
+    {
+      "key": "engine",
+      "name": "Web, infraestructura, SEO y medición",
+      "scope": "Digital Services & Engineering",
+      "serviceName": "Digital Services & Engineering",
+      "sloganWord": "Engine",
+      "product": "wave",
+      "platform": null,
+      "darkBg": "#091951",
+      "accentOnDark": "#0375db",
+      "accentOnLight": "#0375db"
+    },
+    {
+      "key": "voice",
+      "name": "Medios y distribución",
+      "scope": "Media & Distribution",
+      "serviceName": "Media & Distribution",
+      "sloganWord": "Voice",
+      "product": "reach",
+      "platform": null,
+      "darkBg": "#091951",
+      "accentOnDark": "#f83902",
+      "accentOnLight": "#f83902"
+    },
+    {
+      "key": "revenue-hubspot",
+      "name": "RevOps y CRM · HubSpot",
+      "scope": "RevOps & CRM",
+      "serviceName": "RevOps & CRM",
+      "sloganWord": "Revenue",
+      "product": null,
+      "platform": "hubspot",
+      "darkBg": "#091951",
+      "accentOnDark": "#e86bd0",
+      "accentOnLight": "#8e1b82"
+    },
+    {
+      "key": "revenue-salesforce",
+      "name": "RevOps y CRM · Salesforce",
+      "scope": "RevOps & CRM",
+      "serviceName": "RevOps & CRM",
+      "sloganWord": "Revenue",
+      "product": null,
+      "platform": "salesforce",
+      "darkBg": "#091951",
+      "accentOnDark": "#2fb8ff",
+      "accentOnLight": "#00739e"
+    }
+  ]
+}

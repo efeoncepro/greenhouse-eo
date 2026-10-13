@@ -1,0 +1,42 @@
+{
+  "id": "CT22-evento-en-vivo",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, the dark wings of a conference stage at night with thin haze, seen from backstage): Antonio, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and his body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: with the hand on the frame-right side of his body he holds a plain matte black phone VERTICAL on a small black handheld gimbal at shoulder height, at about 80 % of the frame width, clear of his chest so the mark on his hoodie stays fully visible; the phone points away from him toward the frame-right, at the lit stage beyond; its back is blank, with no logo, and its screen is never visible. In the air just beyond the phone, at about 90 % of the frame width, hangs ONE thin upright 9:16 rectangle outline of cool white light with an azure-blue (#0375DB) core, empty inside, like the frame of what he is broadcasting; at its top corner glows one small crisp orange (#FF6500) dot, the live signal, the only accent in the frame, which lights nothing around it. Far behind that outline, seen only through the open frame-right side of the wings, between 70 % and 100 % of the frame width, the lit stage is a soft blur of cool white beams in the haze and tiny cool bokeh points, with no faces, no screens and no readable signs. He is concentrated and calm, a slight focused smile; head almost frontal, only his eyes turn toward the outline of light on the frame-right; he does not look toward the dark left side of the frame. The upright outline of light is the only key light and lights his face from the frame-right at head height, cool white; both eyes stay readable, with a catchlight. His whole arm is visible; the hoodie cuff covers his wrist: no watch. The matte black lid of a road case stands between the camera and him, its near edge just in front of the lens; it is non-reflective and outside every light. The outline, the stage glow and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the tall matte black side drape of the stage wings, unlit: no lamps, no screens and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the matte black lid of a road case close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the thin upright rectangle outline of cool white light just beyond his phone",
+    "lado": "to the frame-right of his face, at head height",
+    "distancia": "about 60 cm from his face"
+  },
+  "fondo": "the lit stage far behind on the right, a soft blur of cool white beams and tiny cool bokeh points",
+  "fenomeno": {
+    "que": "an outline of light with a live dot frames what he is broadcasting from the wings",
+    "esServicio": "Cobertura en vivo: el evento se publica mientras ocurre"
+  }
+}

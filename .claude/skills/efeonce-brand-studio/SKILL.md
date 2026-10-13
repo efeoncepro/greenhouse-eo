@@ -13,7 +13,22 @@ description: Estrategia, arquitectura, posicionamiento, identidad verbal, reputa
 
 **Submarcas de producto con logo (Delta 2026-09-29):** el operador aprobó **Efeonce | SV360** (Search Visibility 360, la capacidad completa SEO + AEO), **Efeonce | AEO**, **Efeonce | AEO Assessment** (el proceso que evalúa la marca; nunca «AI Assessment») y **Efeonce | AI Visibility Report** (el entregable) como **submarcas de producto de Efeonce**, con logo. Acompañan a Efeonce en un lockup (patrón de Efeonce Insights) y **nunca firman solas**: Efeonce sigue siendo la masterbrand y la firma. Pertenecen a la línea Engine (acento `#0375db`, «Empower your Engine»); «la órbita vive en la O». Archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.2 (publicado el 2026-09-29, AXIS `main` `7f9c8bb`), nunca armados a mano; referencia visual en el Lab de AXIS `/references/seo-aeo/`. Detalle: ADR de naming §Delta 2026-09-29 y skill `efeonce-graphic-line` (criteria «Submarcas de producto SEO/AEO», applications §B3c).
 
+**Creative Studio con logo (Delta 2026-10-06):** el operador aprobó para AXIS las 24 piezas del logo de **Creative Studio** —la vista creativa de Efeonce Studio, que abarca a Globe (ADR `EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1` D9)—: el mismo logo de Marketing Studio con el acento de la línea Brand y la palabra «Creative», en `@efeoncepro/axis-brand-assets` 0.4.26 (`creative-studio-*`, generador `scripts/brand/build-creative-studio-logos.mjs`). Las piezas cortas que dicen sólo «Studio» se parecen a las de Marketing Studio salvo por el acento: en superficies visibles cada vista se nombra completa y «Studio» a secas es Marketing Studio. Detalle y estado del release: skill `efeonce-graphic-line` (`references/ledger.md`, 2026-10-06).
+
+**Efeonce Rooms con logo (Delta 2026-10-08):** el operador aprobó la marca de **Efeonce Rooms** (la sala comercial, EPIC-052), variante «eslabón leve»: «Rooms» en Poppins Bold a contornos cuyas dos «o» son **dos órbitas enlazadas como eslabones** (quien propone y quien decide, en la misma sala), con la única esfera en el acento **Growth** a la 1:30 de la segunda —la posición de toda la familia—. Junto a Efeonce, «Rooms» va en el gris de la familia y sólo la esfera conserva el acento. 18 piezas `rooms-*` (`lockup` «efeonce | Rooms» por defecto, `logo`, `compact`, `stacked-lockup`, `isotype` de las dos órbitas sin letra, `icon`; × `positive`/`negative`/`white`) en `@efeoncepro/axis-brand-assets` 0.4.27 (publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages); desde 0.4.29, públicos en «Logotipos» del Lab), generador `scripts/brand/build-rooms-logos.mjs`, nunca copias a mano. Reglas que nacieron aquí y valen para toda la línea: **la esfera nunca va en un cruce de órbitas** (se lee como figura anatómica) y una letra dentro de una órbita nunca es R (®). **Naming:** la revisión de parecido (2026-10-08, búsqueda web, no asesoría legal) ubicó el riesgo en el **nombre**, no en el logotipo: «room/rooms» es casi genérico en salas de venta y hay antecedentes ROOMS/ZOOM ROOMS en EE.UU.; recomendación: búsqueda formal (INAPI y mercados de venta, clases 9/35/42) y solicitud **«EFEONCE ROOMS» mixta** (palabra + diseño), firma siempre «efeonce | Rooms» y **nunca «Rooms» suelto en publicidad**; antes de usar el símbolo solo, probarlo sin contexto a 16–32 px frente a 🔗, ⚣ y argollas de boda. ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`; detalle en la skill `efeonce-graphic-line` (`references/ledger.md`, 2026-10-08, y `applications.md` A13).
+
+**Efeonce Wave, Efeonce Reach y Efeonce Globe en la familia (Delta 2026-10-09, ruta H3):** «ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave». Cada producto **conserva su logotipo** (redibujarlo en Poppins, H1, perdía presencia) y la familia vive en el **lockup**: Efeonce adelante + filete, el logotipo en el gris de la familia con **sólo su gesto en color** (la W de Wave, la «a» con flecha de Reach, el globo de Globe). **Se retira el endoso «by efeonce»**: `*-logo-*` es el logotipo solo. Globe sobre oscuro usa su frambuesa `#ee4274` en el logotipo y el lockup, no el naranja Brand (que sigue siendo de Creative Studio). **Sobre oscuro, los isotipos van todo en blanco** (`isotype-negative` = `isotype-white`); el color sobre oscuro vive en el logotipo y el lockup. Archivos `{wave,reach,globe}-{logo,lockup,isotype}-*` + `{reach,globe}-isotype-small-*` en `@efeoncepro/axis-brand-assets` 0.4.28 (AXIS `7c96680` + `5346761`, tag `v0.4.28`; desde 0.4.29 también públicos en «Logotipos» del Lab), nunca copias a mano; Greenhouse fija 0.4.25 (TASK-2014). ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`; detalle en la skill `efeonce-graphic-line` (`references/ledger.md`, 2026-10-09, y `applications.md` B3d). La regla de firma no cambia: el producto es contexto, Efeonce firma.
+
 Opera la marca como un sistema de crecimiento: posicionamiento relevante, diferencia defendible, memoria acumulada, experiencia demostrable, confianza verificable y decisiones gobernadas.
+
+## Referencia de categoría en búsqueda y respuestas IA
+
+Para liderar una categoría mediante descubrimiento y representación fiel, cargar el
+[método SEO/AEO](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) y `references/semantic-and-ai-brand.md`. Brand Studio fija categoría,
+posicionamiento, diferencias y claims con pruebas; SEO/AEO verifica presencia por superficie y Content
+convierte conocimiento en evidencia útil. Visibilidad ante consultas non-brand conserva la función de
+descubrimiento genérico. Liderazgo en respuestas y liderazgo entre compradores se observan por separado;
+una descripción favorable debe ser también fiel a las capacidades, mercados y límites reales.
 
 ## Alcance y fronteras
 
@@ -210,6 +225,12 @@ El [caso canónico](../../../docs/operations/social/2026-09-13-fiestas-patrias-p
 decisiones del operador, ejecución y evidencia; no tratar una aprobación estética como brand equity medido.
 
 ### Línea gráfica «La órbita» (canónica 2026-09-25)
+
+El [catálogo de logotipos AXIS](https://axis.efeonce.org/references/logos/) reúne las identidades propias y
+marcas externas admitidas, con variante, fondo, procedencia y alcance. Elige el archivo oficial; un logo de
+plataforma y un glifo conceptual SEO/AEO son recursos distintos. Publicar el catálogo no amplía derechos de
+terceros ni confirma un partnership vigente. El nuevo subpath de package `/logos` todavía requiere release;
+[consumo AXIS](../axis-design-system/references/agent-consumption.md) separa Lab, checkout, publicación y adopción.
 
 > **Skill dueña de la línea:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) (viva) guarda el criterio, todo lo disponible en AXIS, las aplicaciones, el motion y la convergencia con la foto. Cárgala para componer; esta sección resume sólo lo que decide marca.
 

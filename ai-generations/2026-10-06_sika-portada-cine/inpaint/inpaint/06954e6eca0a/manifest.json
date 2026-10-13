@@ -1,0 +1,152 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "06954e6eca0a",
+  "key": "06954e6eca0a54080022bf92827a64d4b98107d53839115a5cc82a0c10ba5712",
+  "status": "completed",
+  "createdAt": "2026-10-07T00:14:21.658Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-muro-posible.png",
+    "imageSha256": "7ef77e7afde4de2864427190f3da39925c0b0e1c43eae4c09673c33f2b17ce96",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-06_sika-portada-cine/plates/SK1-mask-persona.png",
+    "maskSha256": "5aecb59023efaa002e5ed98b609d2bcc36bda0f1a144e5d0dfc0c312c54d27ae",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the woman completely. Reconstruct what is behind her exactly as the rest of the scene: the flat blank evenly lit warm yellow lightbox panel continues with its straight bottom edge, and below it the dark matte charcoal wall continues with the same texture and the same soft yellow halo near the panel edge. Keep the framing identical.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the woman completely. Reconstruct what is behind her exactly as the rest of the scene: the flat blank evenly lit warm yellow lightbox panel continues with its straight bottom edge, and below it the dark matte charcoal wall continues with the same texture and the same soft yellow halo near the panel edge. Keep the framing identical.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.2389816623263889,
+    "editable": 763637,
+    "soft": 117345,
+    "protected": 2805418
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2560,
+      "height": 1440
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 70 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 112.62,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.11,
+        "bestError": 1.11,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        0.99,
+        2.02,
+        1.89
+      ],
+      "protected": {
+        "pixels": 2805418,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 763637,
+        "maxDelta": 254,
+        "meanDelta": 126.422,
+        "worst": {
+          "x": 2021,
+          "y": 739
+        }
+      },
+      "seam": {
+        "pixels": 117345,
+        "maxDelta": 248,
+        "meanDelta": 22.805,
+        "worst": {
+          "x": 2248,
+          "y": 823
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2805418,
+        "maxDelta": 115,
+        "meanDelta": 2.44,
+        "worst": {
+          "x": 2294,
+          "y": 849
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3204,
+        "input_tokens_details": {
+          "image_tokens": 3016,
+          "text_tokens": 188
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 5047
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 77.32,
+        "corePixels": 763637,
+        "objectLikeness": null,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

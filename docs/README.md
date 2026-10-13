@@ -37,6 +37,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Sales Goals Q4 2026 y metas trimestrales 2027](commercial/SALES_GOALS_2026_Q4_2027.md)
 - [Service Portfolio & Revenue Architecture V1](commercial/SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md)
 - [CRM Deal Register](commercial/CRM_DEAL_REGISTER.md)
+- [Método de casos de negocio SEO/AEO](commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md): metas/requisitos, demanda, ejecución y economía · [Banco Pichincha / Pibank 2027](commercial/prospects/banco-pichincha-peru-seo-2026/README.md)
 - Esta categoría conserva metas, forecast e índices de oportunidades. HubSpot sigue siendo la autoridad de los
   Deals y Finance conserva facturación, revenue, cobro, costos y margen.
 
@@ -197,6 +198,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Issue Tracker](issues/README.md)
 - [Efeonce Partnership Registry V1](operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)
+- [AXIS: packages, Lab y agentes](documentation/creative/axis-packages-y-lab.md) · [manual operativo](manual-de-uso/creative/descubrir-y-componer-con-axis.md) · [cierre documental](audits/2026-10-04-axis-documentation-closure.md) · [release de formularios](audits/2026-10-04-axis-forms-release.md) · [inputs especializados y adopción pendiente](audits/2026-10-04-axis-specialized-inputs.md)
 - [AXIS Private Package Consumption Runbook](operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)
 - [Agent Context History](operations/agent-context-history/README.md)
 - [Agent Context Router Decision](architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
@@ -222,6 +224,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Informes de auditoría SEO/AEO para clientes](operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) — continuidad, responsabilidad de agencia, validez del Grader y entrega verificada.
 - [Berel — estrategia de cobertura editorial](operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), con inventario auditado y criterios de minería por necesidad.
 - [Berel — colaboración y cadencia mensual](operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md): funciones por canal, cortes y frontera de activación pendiente de aceptación del cliente.
+- [TASK-1690 — discovery de población cliente SEO](audits/seo/2026-10-04-task-1690-discovery.md): contratos/cobertura por fuente, fixtures y propuesta Product Design pendiente de selección; sin implementación ni readback live.
 - [Berel — recuperación de fugas editoriales](audits/seo/BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md): evidencia de octubre–diciembre, preservación de análisis/specs/comentarios y QA preventivo.
 - [Berel — clasificación y conteo de piezas](audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md): etiquetas verificadas y límites del conteo por tarea frente a archivos.
 - [Berel — distribución social selectiva](audits/seo/BEREL_SELECTIVE_SOCIAL_DISTRIBUTION_2026-09-03.md): selección por artículo, cupos y aplicación nov/dic verificada; entregas no certificadas y octubre excluido.
@@ -268,3 +271,11 @@ Indice maestro de la documentacion no operativa del repo.
   - las tasks existentes en el backlog (`CODEX_TASK_*` y `TASK-###` ya creadas) siguen vigentes con su formato original
   - toda task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy) debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse
   - si un trabajo cambia el canal o la disponibilidad de una capacidad visible, revisar tambien `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md` y evaluar si corresponde actualizar `docs/changelog/CLIENT_CHANGELOG.md`
+
+### Marketing Studio — catálogo desplegado y CLI HTTP local
+
+- [Contrato funcional: canales y referencias ICP](documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).
+- [Manual: gobernar catálogo y backfill](manual-de-uso/marketing-studio/gobernar-catalogo-canales.md).
+- [Release de Studio y pendientes](audits/marketing-studio/TASK-1905-release-2026-10-04.md).
+- [CLI HTTP: cargas, descargas y operaciones](manual-de-uso/marketing-studio/operar-por-cli-api.md).
+- [Cierre documental completo de sesión](audits/marketing-studio/2026-10-04-session-documentation-closure.md).

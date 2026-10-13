@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-08",
+  "purpose": "Two internal photographic style proofs requested by operator",
+  "register": "E + D colour/light/depth",
+  "model": "gpt-image-2.5-sunburst",
+  "quality": "max",
+  "requestedSize": "3840x2160",
+  "generationMode": "image edit, two reference inputs per scene",
+  "skill": "https://app.notion.com/p/5e4b2473c7914933a3e65531bb72c885",
+  "provenance": "refs/provenance.json",
+  "operatorApproval": "pending",
+  "publication": "not requested",
+  "files": [
+    {
+      "file": "01-austral-kayak.png",
+      "nativeWidth": 3840,
+      "nativeHeight": 2160,
+      "nativeBytes": 12126454,
+      "sha256": "f9a22fc4cc1fe0a7e7510cbffdb9f4c9b6864bd1b97b5309895a13c5eb1bdfea",
+      "preview": "01-austral-kayak-1408x768.webp",
+      "previewBytes": 195638,
+      "previewQuality": 80,
+      "prompt": "prompts/01-austral-kayak.txt",
+      "log": "01-austral-kayak.log",
+      "attempts": 1
+    },
+    {
+      "file": "02-cancun-ola.png",
+      "nativeWidth": 3840,
+      "nativeHeight": 2160,
+      "nativeBytes": 12472930,
+      "sha256": "9269a9bd78761815f79e92b1e273c9eff82733cb57d4865ca745404d939756ca",
+      "preview": "02-cancun-ola-1408x768.webp",
+      "previewBytes": 174154,
+      "previewQuality": 80,
+      "prompt": "prompts/02-cancun-ola.txt",
+      "log": "02-cancun-ola.log",
+      "attempts": 1
+    }
+  ]
+}

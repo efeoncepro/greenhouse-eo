@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-10-09T23:01:19.332Z",
+  "pages": 6,
+  "sources": [
+    {
+      "path": "docs/business-models/media-distribution/deliverables/programmatic-modelo-de-negocio.src.html",
+      "sha256": "c232572b1c80515f4f4b2096017281d46789699a6037559a09a4ef86ee066337"
+    },
+    {
+      "path": "docs/business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md",
+      "sha256": "06f16a3a69aa6c0c74b8a100ba059ffec16685d45fc27ef6ecba87616a413985"
+    },
+    {
+      "path": "docs/business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md",
+      "sha256": "4d25660dbd501421d36238a81d5d77a12c8b040642a0fc2c38d29f9f24d387f1"
+    },
+    {
+      "path": "docs/services/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md",
+      "sha256": "ab525341754f8075a736d671d4860fef6a0861dc45880ececfa40b11746870b8"
+    },
+    {
+      "path": "docs/audits/commercial/PROGRAMMATIC_PROVIDER_EVIDENCE_2026-10-09.md",
+      "sha256": "84f40071080420acd095177a103fcc9ff8818b9ce1cae26cee2cb8bb5ade8e18"
+    }
+  ],
+  "pdf": {
+    "path": "docs/business-models/media-distribution/deliverables/Efeonce-Programmatic-Modelo-de-Negocio.pdf",
+    "sha256": "4dd2ff14b8e54caeaf3f5c5674d5e55df61b54902c7c78b28e66d87731ee62a4"
+  },
+  "render": {
+    "total": 6,
+    "fontsOk": true,
+    "overflow": [],
+    "brokenImages": 0
+  },
+  "note": "Render y hashes; la revisión visual se registra en README.md. Sin certificación PDF/UA."
+}

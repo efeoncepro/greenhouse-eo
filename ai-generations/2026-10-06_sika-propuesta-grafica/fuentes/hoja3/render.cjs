@@ -1,0 +1,2 @@
+const {chromium}=require('playwright');const fs=require('fs');const H=process.argv[2];const SIZES={car2:[1080,1080],car3:[1080,1080],ss1:[1080,1080],ss3:[1080,1080],cenefa:[2400,400],stopper:[900,1350]};
+(async()=>{const b=await chromium.launch();for(const [k,[w,h]] of Object.entries(SIZES)){const p=await b.newPage({viewport:{width:w,height:h}});await p.goto('file://'+H+'/html/'+k+'.html');await p.waitForTimeout(900);await p.screenshot({path:H+'/'+k+'.png'});await p.close()}await b.close()})()

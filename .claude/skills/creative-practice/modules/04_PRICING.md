@@ -1,5 +1,37 @@
 # 04 — PRICING: capacidad, loaded cost, piso, descuentos
 
+## Carril local opt-in V3: simulación, no emisión
+
+Para composición reproducible de demanda + tools/plataforma/créditos, cargar
+[contrato V3](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+La CLI V3 agrega licencias base/específicas, capacidad declarada y packs por proveedor/mes con fuente/FX,
+congela inputs y produce explain/replay/readiness/preview. Costos históricos y `trial-*` siguen hipótesis;
+no homologar al loaded cost real de este módulo. La referenciaV2 de abajo conserva autoridad de cotización
+canónica. **`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta** (aquí
+`creative-managed-service`: 45%/45%; ya no compara contra un 40/35 genérico) y no reemplaza precio/condiciones
+aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad gobernada, no horas/piezas: la oferta
+se vende como `managed_service` por definición del catálogo, y una demanda que declara otra unidad no calcula.
+Un proyecto único de alcance cerrado se cotiza hoy con esta oferta, `on_demand` y a un precio (`agreed_total`, que
+el documento imprime como «1 proyecto»): no existe una oferta de proyectos
+([procedimiento, tabla por tipo de negocio](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#21-tabla-por-tipo-de-negocio)).
+Si el comprador exige ese precio desglosado, el desglose va por componente de valor y es un reparto manual: §7 (b.1).
+Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
+En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
+nómina real del §3: el margen real en personas hoy es mayor que el que muestra V3; no proponer conectarle nómina.
+Excepción bajo el piso: sólo el CEO (SKY social care 2027 es una y no es referencia); donde se puede ganar
+más se sube el objetivo de la oferta, no el piso. El FX de cotización de V3 es política del CEO con USD de
+referencia (CLP 1000 · COP 3650 · MXN 19,25 · PEN 3,70), no el snapshot del §9, y cada moneda redondea hacia arriba
+(CLP 10.000 · USD 10 · PEN 50 · COP 50.000 · MXN 100): cotiza en la moneda pedida, nunca conviertas a mano; en EUR
+aún no se emite. `estimateExposure` ordena qué insumo estimado confirmar primero; el precio unitario de una
+herramienta no vence (los seats se declaran por cotización, como se compran: varios planes en un periodo, un seat
+pagado sin uso con `idleSeats` o uno que usan varias personas con `seatSharing`, cada uno con su motivo; nunca le
+quites una tarea a una persona —p. ej. al refuerzo de campaña— para que la cuenta de seats cuadre). Un servicio
+opcional se cotiza aparte y el documento lo imprime fuera del total (`--option`); si el opcional sólo amplía a
+personas que ya están en la cotización base, se cotiza la base con el opcional adentro y su costo y margen se leen
+como incremento (`compose increment`, `--increment`), nunca en una cotización propia; una cortesía se bonifica en la
+demanda y el documento la muestra con su valor de referencia: ninguno de esos importes se digita.
+
 > **La regla que ordena todo el módulo:**
 > **Un precio sin loaded cost detrás no es un precio: es una corazonada con decimales.**
 
@@ -75,7 +107,8 @@ adjudicadas el 2026-09-23 ya van sin precio unitario)* **"artículo adicional: C
 el plan de 8 artículos no cuesta 2,08M.
 
 **Regla:** el precio unitario **no se publica.** Si el cliente exige un valor de referencia para el ad-hoc,
-ver §7 (y tiene que costar **más**, no menos).
+ver §7 (y tiene que costar **más**, no menos). Si lo que exige es la **propuesta económica desglosada**, el
+desglose va por componente de valor, no por pieza: §7 (b.1).
 
 ---
 
@@ -158,6 +191,12 @@ antes de computar el piso**, y el buffer se **declara**, no se intuye:
 🎯 **El buffer no es pesimismo: es el precio del riesgo que el cliente te está transfiriendo.**
 Si el cliente quiere el buffer más bajo, **que baje el riesgo** (rondas acotadas, owner nombrado, sin
 penalidades). **Eso es una negociación honesta.** Bajarle el buffer sin bajarle el riesgo es regalarle margen.
+
+**En V3 (contrato 1.4.0, 2026-10-11):** el buffer de un alcance fijo ya se expresa en un servicio gestionado vendido
+On-Demand, como reserva de contingencia: 12% del costo de personas (no de todo el loaded), sumado como costo —se vende
+con el margen de la oferta y el 10% On-Demand— y sale sólo con una renuncia declarada con su motivo, que queda señalada.
+Es una estimación aceptada por el CEO; staff augmentation no la lleva. 🔴 El buffer de un On-Going ganado en licitación
+con multas (la primera fila) **no** está modelado en V3: ése, y los demás riesgos de la tabla, se siguen sumando a mano.
 
 ---
 
@@ -249,6 +288,78 @@ Precio mensual = suma de líneas de capacidad + capa de gobierno. Contrato ≥ 1
 Se dimensiona el squad **para la ventana del proyecto** y se aplica la misma fórmula.
 🔴 **Con un recargo:** un proyecto cerrado tiene **costo de arranque y de cierre** que un on-going amortiza
 en 12 meses. **Un proyecto no es "un mes de retainer".** Si lo cobras como si lo fuera, pierdes plata.
+**En V3 (2026-10-11) esto se expresa en parte:** `engagementForm: "on_demand"` declara la forma del compromiso (no es
+oferta ni delivery model) y suma 10% al precio sobre On-Going con el mismo piso; arranque, coordinación (dedicación de
+una persona) y compromisos con proveedores van como costo, y el 10% cubre sólo riesgo y política. Antes de comprometer
+un encargo (Factory, licitación) revisa `compose schedule` (calendario de pagos) y `compose commitments` (una licencia
+Adobe comprada para un mes se sigue cobrando hasta el fin del contrato si nadie más la usa); `compose cash` no es
+margen ni decide precio. Desde el contrato 1.4.0 (2026-10-11) V3 sí lleva los terceros del encargo: cada costo que
+se compra y se refactura es una fila propia con la regla de su categoría (producción, talento e impresión: +10% de
+gestión con piso 5%; medios y licencias: al costo; estimaciones propuestas por el agente y aceptadas por el CEO, a
+ajustar con el primer encargo real), fuera del 10% On-Demand y de los descuentos; lo que el cliente paga directo es una
+nota que no entra a ningún total. 🔴 **Con terceros hay dos márgenes:** el 45% se compara contra el del trabajo propio
+(`ownWork`), nunca contra el mezclado, que baja con todo lo refacturado cerca del costo; juzgar por el mezclado rechaza
+trabajo sano o, peor, lleva a bajarle el precio al equipo. Un servicio gestionado On-Demand lleva además la reserva de
+contingencia del §4. Cómo declararlo y leerlo:
+[contrato V3](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md). Sin modelar: cuándo se le
+paga al proveedor, una compra que obliga más allá del encargo (derechos de uso que lo sobreviven), comisión sobre lo
+que paga el cliente, tarifario de proveedores recurrentes y períodos menores a un mes. La duración del contrato y la
+fecha de inicio del servicio no son un pendiente: están fuera del cotizador por decisión del CEO (2026-10-11; una
+cotización no es un contrato) y se resuelven en el contrato.
+
+### (b.1) Lanzamiento tipo o proyecto de campaña con «propuesta económica desglosada»
+
+**Cuándo aplica:** un comprador que ya tiene concepto de campaña busca una agencia que lo evolucione y produzca cada
+lanzamiento, fija una canasta de referencia («lanzamiento tipo») y exige el precio desglosado. Caso fuente: Sika
+Mexicana, Wherex N.º 1164 (paquete terminado el 2026-10-12 y **presentado por el operador el 2026-10-13**; resultado desconocido).
+
+**Cómo se costea.** Igual que (b): squad dimensionado para la ventana de un lanzamiento, oferta
+`creative-managed-service`, On-Demand, un período, tres escenarios y piso computado
+([patrón medido](../../efeonce-pricing-operator/references/general-pricing-patterns.md#patrón-medido-proyecto-creativo-de-una-vez-con-desglose-exigido)).
+El total sale de la capacidad que consume el lanzamiento. El desglose se hace después y no mueve el total.
+
+**Cómo se desglosa: por componente de valor, no por pieza suelta.** Corrección del operador (2026-10-12) a un primer
+desglose de ocho líneas, una por entregable: «más que cotizar por pieza se cobra el refresh de marca, la
+conceptualización creativa y ahí luego entregables; ahí se justifica más el monto».
+
+| Bloque | Línea | Qué describe |
+|---|---|---|
+| **Estrategia y concepto** | Evolución o refresh de la línea gráfica | El sistema: firma, sello, reglas gráficas |
+| **Estrategia y concepto** | Conceptualización creativa y pieza madre | Concepto del lanzamiento, titular, Master Graphic |
+| **Entregables** | Un grupo por canal o formato | Las adaptaciones, contadas y descritas dentro del grupo |
+
+Por qué: en una lista de piezas el monto se lee como una suma de artes y lo que más pesa —pensar y ordenar la
+campaña— queda sin línea. Con los componentes arriba, ese trabajo tiene precio propio y los entregables se leen como
+su despliegue.
+
+**Cómo convive con la regla de la casa** (capacidad gobernada; nunca horas ni piezas, regla dura 3):
+
+- El precio se computa desde la capacidad y se vende como un total por lanzamiento. Ninguna línea muestra horas,
+  roles ni tarifa.
+- El desglose es una lectura del mismo total, no una suma de precios unitarios: las piezas van contadas dentro de
+  su grupo, sin valor por pieza.
+- Un grupo de una sola pieza deja su valor a la vista (en el caso, el reel). Es el límite de un desglose exigido:
+  ese valor no es tarifa ni referencia para otra cotización.
+- El cotizador entrega filas por rol, no por componente: **el reparto entre líneas es manual**. Se declara como tal
+  en el expediente y lo confirma el operador.
+- Si cambian formatos o cantidades, el documento dice que el valor de los entregables «se ajusta sobre este
+  desglose»; el ajuste se vuelve a costear, no se obtiene dividiendo una línea por su número de piezas.
+
+**Ejemplo interno del caso (MXN, neto; no es tarifa):** escenarios del cotizador A 63.700 · B USD 3.320 · C (+25 % de
+horas) 76.700; piso 45 % ≈ 57.650. El operador fijó **64.000 por lanzamiento tipo**: es el precio de política, sin
+el colchón de cliente nuevo del §4 (el agente había recomendado 70.000). Estrategia y concepto 30.000 (evolución gráfica 16.000 · conceptualización y Master Graphic 14.000);
+entregables 34.000 (redes: 5 publicaciones y 6 historias, 11.000 · reel de hasta 30 s, 14.000 · punto de venta e
+impresos, 4 diseños, 9.000). Entre 64.000 y el piso hay ≈ 6.350: un desvío cercano al 10 % de las horas lo consume.
+Horas y reparto son supuestos del agente, sin validar por Operations ni Finance.
+
+🔴 **Riesgo: un componente presentado como pago único.** Si la evolución gráfica se cobra una sola vez, los
+lanzamientos siguientes quedan en el total menos esa línea (64.000 − 16.000 = 48.000), bajo el piso calculado para un
+lanzamiento (≈ 57.650). Los tres escenarios costean el lanzamiento completo; ninguno costea uno sin ese componente.
+En el documento va como parte de cada lanzamiento. **Cambiarlo es decisión del operador** (abierta al 2026-10-12):
+el agente avisa el riesgo, no lo resuelve.
+
+**Lo que no entra a la económica sin que el comprador lo pida:** tarifario de piezas extraordinarias (es precio
+unitario publicado; ver (c)) y forma de pago. Lista completa y caso → `modules/10_PITCH.md` §5.1.
 
 ### (c) Ad-hoc / trabajo fuera del plan
 🩸 **BUG (oferta original del blog SKY, superseded 2026-09-23):** el ad-hoc (**CLP 260.000/artículo**) era **más barato que el marginal del plan
@@ -257,7 +368,7 @@ romper la planificación — que es justo lo que destruye la capacidad.
 
 🔴 **Regla:** **el ad-hoc SIEMPRE cuesta MÁS que el marginal del plan.** Rompe la planificación, consume
 coordinación no presupuestada y desordena la cola. **Fix propuesto para SKY: ad-hoc ≥ CLP 550.000 — o, mejor,
-sin precio unitario publicado.**
+sin precio unitario publicado.** V3 no modela esta regla: `on_demand` no compara contra el marginal del plan; hazlo tú.
 
 ### (d) 🩸 BUG VIVO — el plan ampliado está **dominado**
 
@@ -282,6 +393,12 @@ alcance importa. *(Y ya tiene gobernanza real: aprobación, snapshot de costo re
 🔴 **Es otro producto, con otro precio y otro riesgo.** No lo confundas con el Managed Squad
 (→ `modules/03_OFERTA.md`). En staff-aug el cliente dirige; en Managed Squad **nosotros operamos y respondemos
 por el outcome**. **Cobrar un Managed Squad a precio de staff-aug es regalar la parte que más vale: el gobierno.**
+Su piso también es otro: **25%** de margen (decisión del CEO, 2026-10-11; oferta `talent-assurance-staffing` de V3),
+y de ahí sube según el caso. El 45% sigue siendo el piso del servicio gestionado (oferta `creative-managed-service`
+en esta práctica; SEO/AEO tiene la suya, `seo-aeo-managed-service`, objetivo 55%); no uses la oferta de staff-aug
+para bajarlo. Su puesta en marcha se costea aparte en V3: onboarding USD 200 una vez por persona (por defecto) y
+reclutamiento USD 500 sólo si hay que contratar a alguien; ambos son estimaciones. La regla del Excel («un mes del
+recurso») no se usa: plazo mínimo al reclutar y cláusula de conversión son materia de contrato y revisión legal.
 
 ---
 
@@ -297,6 +414,9 @@ explicar qué compra el cliente sin vender horas, piezas ni tokens.
 | **Studio Credits** | operaciones generativas variables gobernadas | pool/envelope; nunca precio por pieza/token/provider |
 | **Implementación/IP** | onboarding, Brand Profile, templates, workflows, integración y training | milestone/aceptación; no regalar buyout del método |
 | **Derechos/licencias/pass-through** | stock, talento, voz, música, territorio, exclusividad y terceros | se negocia/cotiza aparte; no se esconde en credits |
+
+En V3 esta última línea ya se cotiza dentro del encargo, como filas de terceros con su propia regla y su propio piso
+(§7b). Los derechos se siguen negociando aparte: V3 no sabe si un derecho de uso dura más que el encargo.
 
 🔴 **Por qué el gobierno no se descuenta sin rediseño:** workspace, policy, ledger, seguridad, observabilidad
 y soporte base tienen costo operativo asignado y sostienen control, transparencia y switching cost. Un descuento
@@ -388,6 +508,8 @@ para cerrar **nunca vuelve a subirlo, y además enseñó que su primer precio er
 - [ ] ¿El **margen de negociación** está calculado **antes** de la reunión?
 - [ ] ¿Pasó `margin-health` en el cotizador, en verde?
 - [ ] ¿La oferta **NO publica** precio unitario por pieza ni por rol?
+- [ ] Si el comprador exige desglose: ¿va por **componente de valor** con entregables agrupados, el reparto manual
+      está declarado y ningún componente quedó como pago único sin decisión del operador? *(§7 b.1)*
 - [ ] ¿El **ad-hoc cuesta MÁS** que el marginal del plan?
 - [ ] ¿El **plan mayor NO está dominado** por el menor + ad-hoc?
 - [ ] ¿La capa de **gobierno** está cotizada y **marcada como no descontable**?

@@ -1,0 +1,71 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "brand",
+  "role": "content",
+  "recipe": "content-team",
+  "voice": {
+    "eyebrow": "Tu equipo",
+    "question": "¿Quién trabaja en tu cuenta?",
+    "answer": [
+      "Personas",
+      "reales"
+    ]
+  },
+  "body": "Un squad que orbita tu marca y **un** solo interlocutor: tu Responsable de Cuenta.",
+  "team": [
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+        "alt": "Andrés, Senior Visual Designer"
+      },
+      "name": "Andrés",
+      "role": "Senior Visual Designer"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+        "alt": "Valentina, Content Lead"
+      },
+      "name": "Valentina",
+      "role": "Content Lead"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+        "alt": "Julio, Responsable de Cuenta"
+      },
+      "name": "Julio",
+      "role": "Responsable de Cuenta"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+        "alt": "Daniela, Creative Operations Lead"
+      },
+      "name": "Daniela",
+      "role": "Creative Operations Lead"
+    },
+    {
+      "photo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-melkin.png",
+        "alt": "Melkin, Senior Visual Designer"
+      },
+      "name": "Melkin",
+      "role": "Senior Visual Designer"
+    }
+  ],
+  "center": {
+    "title": "Tu marca",
+    "note": "al centro de todo"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "role"
+  }
+}

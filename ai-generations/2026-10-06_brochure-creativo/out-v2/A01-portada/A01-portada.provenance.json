@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "5ef8b5cbe673a77c1ea868c364a45725265c69ef36ba79bab318ee7c959ce5d9",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CR4-el-squad-te-la-entrega-v2",
+      "path": "ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png",
+      "sha256": "8a5464e640953a968b6dce12eb399a9903fbeacab3388782197ea3b4e23b64c4"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

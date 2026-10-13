@@ -1,0 +1,204 @@
+{
+  "portalId": 48713323,
+  "verifiedAt": "2026-10-06T21:09:56.783550+00:00",
+  "cliVersion": "0.15.1",
+  "cohortValue": "research_2026_10_06",
+  "globalSegmentIds": [
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157,
+    158
+  ],
+  "historicalStaticIds": [
+    118,
+    119,
+    140,
+    122,
+    124
+  ],
+  "countsAreDatedObservations": true,
+  "segments": [
+    {
+      "listId": 159,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Software",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industry IN ('COMPUTER_SOFTWARE') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 16
+    },
+    {
+      "listId": 160,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Retail y consumo",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industry IN ('APPAREL_FASHION', 'RETAIL', 'CONSUMER_ELECTRONICS', 'FURNITURE', 'CONSUMER_GOODS', 'SPORTING_GOODS') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 11
+    },
+    {
+      "listId": 161,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Finanzas y seguros",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industry IN ('BANKING', 'FINANCIAL_SERVICES', 'INVESTMENT_MANAGEMENT', 'INSURANCE') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 8
+    },
+    {
+      "listId": 162,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Educación",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industry IN ('EDUCATION_MANAGEMENT', 'E_LEARNING', 'HIGHER_EDUCATION', 'PRIMARY_SECONDARY_EDUCATION', 'PROFESSIONAL_TRAINING_COACHING') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 8
+    },
+    {
+      "listId": 163,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Gobierno",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industry IN ('GOVERNMENT_ADMINISTRATION', 'GOVERNMENT_RELATIONS', 'PUBLIC_POLICY') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 15
+    },
+    {
+      "listId": 164,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Chile - rango 51 a 1000",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "country = 'Chile' AND hs_employee_range IN ('51 - 250', '251 - 1K', '51–200', '201–500', '501–1000') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 38
+    },
+    {
+      "listId": 165,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Tecnología Chile - rango 51 a 1000",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industry IN ('COMPUTER_SOFTWARE', 'INFORMATION_TECHNOLOGY_AND_SERVICES', 'INTERNET', 'COMPUTER_NETWORK_SECURITY') AND country = 'Chile' AND hs_employee_range IN ('51 - 250', '251 - 1K', '51–200', '201–500', '501–1000') AND efeonce_prospecting_cohorts IN ('research_2026_10_06')",
+      "verifiedMemberCount": 15
+    },
+    {
+      "listId": 166,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Tecnología",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industria IN ('Tecnología') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 16
+    },
+    {
+      "listId": 167,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Retail",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industria IN ('Retail') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 11
+    },
+    {
+      "listId": 168,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Finanzas",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industria IN ('Finanzas') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 4
+    },
+    {
+      "listId": 169,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Educación",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industria IN ('Educación') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 5
+    },
+    {
+      "listId": 170,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Gobierno",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "industria IN ('Gobierno') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 11
+    },
+    {
+      "listId": 171,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Roles Marketing y Growth",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "(efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND jobtitle CONTAINS 'Marketing') OR (efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND jobtitle CONTAINS 'Growth') OR (efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND jobtitle CONTAINS 'Comunicaciones')",
+      "verifiedMemberCount": 32
+    },
+    {
+      "listId": 172,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Solicitud observada - HubSpot",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "servicio_de_interes IN ('HubSpot Soporte', 'HubSpot Onboarding') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 3
+    },
+    {
+      "listId": 173,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Solicitud observada - Contenido y social",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "servicio_de_interes IN ('Content Management', 'Social Media') AND efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 1
+    },
+    {
+      "listId": 174,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Individuales con email",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL",
+      "verifiedMemberCount": 63
+    },
+    {
+      "listId": 175,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Fit HubSpot y CRM",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND efeonce_prospecting_service_fit IN ('hubspot_crm')",
+      "verifiedMemberCount": 26
+    },
+    {
+      "listId": 176,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Contactos con email | Fit servicios creativos",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "efeonce_prospecting_cohorts IN ('research_2026_10_06') AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND efeonce_prospecting_service_fit IN ('creative')",
+      "verifiedMemberCount": 51
+    },
+    {
+      "listId": 177,
+      "name": "Efeonce | Búsquedas 2026-10-06 | Empresas | Química y materiales",
+      "objectTypeId": "0-2",
+      "listType": "ACTIVE",
+      "description": "",
+      "filterExpression": "efeonce_prospecting_cohorts IN ('research_2026_10_06') AND industry IN ('BUILDING_MATERIALS', 'CHEMICALS')",
+      "verifiedMemberCount": 1
+    }
+  ]
+}

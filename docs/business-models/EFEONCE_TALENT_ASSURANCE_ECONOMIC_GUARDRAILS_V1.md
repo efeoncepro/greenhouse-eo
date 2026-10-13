@@ -2,11 +2,19 @@
 
 ## Status
 
-- State: `Proposed`
+- State: `Accepted` — principios económicos, aprobación del operador 2026-10-09
 - Date: 2026-07-30
+- Activation: costos, precios, reservas y pisos de margen concretos pendientes de validación Finance/Commercial
 - Owner: Finance + Pricing + Commercial, con Talent/Operations como owners de capacidad
 - Related decision: [Efeonce Talent Assurance Decision V1](../architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md)
 - Scope: ofertas que comprometen personas, pods, capacidad gestionada, embedded capacity o staffing para clientes
+
+## Alcance de la aceptación
+
+El operador aprobó Talent Assurance el 2026-10-09; estos guardrails son parte del estándar aceptado.
+No se aprueban cifras, precios, contratos ni interfaces Finance por esa decisión. `TASK-1607` conserva la
+implementación del gate y los owners económicos validan cada compromiso. La primera aplicación regional
+documentada es el [modelo de capacidad CRM/RevOps](revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md).
 
 ## Purpose
 
@@ -108,3 +116,32 @@ Una vacante con requisitos senior y un presupuesto no competitivo genera fricci�
 - `blocked_by_finance`: falta validación de costo, margen o cash;
 - `no_go`: la promesa no puede sostenerse bajo las condiciones actuales.
 
+## Aplicación local de los guardrails en Pricing V3
+
+El [ADR operativo V3](../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y el
+[Pricing Integrity Pack de capacidad](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md) conectan estas capas
+al costeo local: humano, recursos, plataforma genérica, Assurance/operación, continuidad y setup mantienen
+identidad, cobertura, driver, moneda, vigencia y fuente. El catálogo no confirma una provisión por contener
+un trial; los importes históricos o de prueba permanecen hipótesis hasta medir actividades y costos.
+
+El compositor evita licencias duplicadas, valida usuarios/capacidad y atribuye pools e IA; el portfolio
+reconcilia cuentas, interno y no asignado. Es evidencia aritmética de inputs declarados, no disponibilidad
+real, recruitability, acceso contratado o continuidad financiada. Una licencia o precio público no demuestra
+el estándar de capability de la persona. El preview de fee gestionado no convierte un rol en pod suficiente.
+
+`compose assess` exige revisión económica/comercial aunque calcule, y reporta brechas con owner. Sus señales
+no sustituyen el feasibility gate de Talent Assurance ni implementan TASK-1607/EPIC-038. TASK-2022 está completa
+localmente; TASK-2017 conserva costos/asignaciones/terms pendientes. Cambios de salarios, licencias o reservas
+crean versiones con impactos y nueva evidencia, nunca alteran snapshots aprobados ni contratos en vigor por
+inferencia. [Manual de operación](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+
+Delta 2026-10-11 — decisión del operador (CEO): en el cotizador, el costo de cada persona es el nivel salarial
+objetivo del Excel de pricing (costo del perfil en Chile, ajustado por el factor de talento del país de la persona),
+no la nómina actual, y no se conecta a ella. El margen real sobre personas hoy es mayor que el simulado; ese margen
+simulado no mide lo que Efeonce paga ni reemplaza la evidencia de recruitability de este gate. Las cifras
+comerciales y las excepciones al piso las decide el operador; `compose assess` no las aprueba.
+Desde ese día la puesta en marcha de una persona vendida por dedicación deja de ser un valor de prueba: onboarding
+(USD 200 una vez por persona, por defecto) y reclutamiento (USD 500, sólo si hay que contratar a alguien para ese
+cliente), propuestos por un agente, aceptados por el CEO y estimados hasta medirlos en las próximas dos incorporaciones;
+no acreditan recruitability. Assurance y operación siguen con importes de prueba. La regla del Excel de pricing de un
+mes del recurso no se usa: plazo mínimo y cláusula de conversión son materia de contrato y revisión legal.

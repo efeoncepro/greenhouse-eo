@@ -173,3 +173,13 @@ instrucción explícita del operador.
 **Registro cruzado:** EPIC-027 (child + exit criterion parcial), EPIC-044 (U01), `DECISIONS_INDEX.md`,
 TASK-1828 Slice 0.
 
+## Delta 2026-10-12 — La cláusula «un repositorio» queda enmendada
+
+El operador aprobó el desacople por dominios de producto: [`GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md`](GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md). La frase
+«while retaining one repository» de la sección Decision deja de ser la regla; la unidad de corte pasa a ser el
+producto con su repositorio (AXIS, Marketing Studio, Insights como dominio propio). El resto de este ADR sigue
+vigente: sin big-bang, sin dividir datos ni transacciones por anticipado, evidencia de costo · routing/auth ·
+rollback · ownership por frontera, y trabajo nuevo extraction-ready. El piloto de Labs dentro de este repositorio ya
+no aplica (el Lab vive en AXIS); la medición que lo reemplaza es el build del portal antes y después de retirar las
+rutas de `/design-system`.
+

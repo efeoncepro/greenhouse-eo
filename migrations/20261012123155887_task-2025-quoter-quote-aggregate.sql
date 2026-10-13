@@ -1,0 +1,1210 @@
+-- Up Migration
+
+-- TASK-2025 — Cotizador V3 en la plataforma: el agregado de cotización.
+--
+-- Qué crea, todo nuevo y todo en greenhouse_commercial bajo el prefijo quoter_:
+--   quoter_quotes                  identidad de una cotización; inmutable
+--   quoter_quote_versions          cada versión ES el artefacto congelado, guardado como se emitió; inmutable
+--   quoter_quote_version_index     índices de lectura de una versión; reconstruible desde el artefacto
+--   quoter_state_matrix            qué cambios de estado existen, como dato
+--   quoter_state_transitions       historial de estados (sólo agregar)
+--   quoter_quote_recipients        organización destinataria, como asignación (sólo agregar)
+--   quoter_quote_number_counters   el siguiente número de cada serie
+--   quoter_quote_numbers           número público, asignado una vez en la primera emisión (sólo agregar)
+--   quoter_exception_approvals     aprobación o revocación de una excepción bajo el piso (sólo agregar)
+--   quoter_version_documents       datos del documento del cliente por versión (sólo agregar)
+--   quoter_quote_current           vista: estado, número, destinataria y versiones vigentes de cada cotización
+--
+-- Qué NO hace: no toca ni lee greenhouse_commercial.quotations*; no guarda fecha de inicio, duración de contrato ni
+-- dato de nómina; no vincula un negocio; no siembra cotizaciones.
+--
+-- Reglas que sostiene la base, además del código:
+--   - nada del historial se actualiza, se borra ni se trunca, para ningún rol;
+--   - el estado, el número, la destinataria y «la versión vigente» no son columnas: se leen del historial, y el
+--     historial tiene un orden propio por cotización (no depende de la hora de la transacción);
+--   - cada fila dice quién actuó (actor_principal_id): el registro de comandos caduca y no sirve de memoria;
+--   - una versión guarda sólo un artefacto calculado, y su texto da la huella que declara;
+--   - emitir nombra una versión real con su huella (la última o la última emitida), su documento en vigor, una
+--     cotización con destinataria, una fecha de vigencia y, si la versión está bajo el piso, una aprobación vigente;
+--   - aceptar y rechazar nombran lo último que se emitió. «Vencida» no es un estado guardado: se deriva de la
+--     vigencia de la última emisión, en un solo lugar (quoter_quote_current). Aceptar una vencida se permite, y que
+--     fue fuera de vigencia queda legible ahí mismo (accepted_after_validity);
+--   - la destinataria se reasigna sólo en `draft`; el número lo asigna la base en la primera emisión, sin huecos.
+--
+-- Agregar un estado al ciclo de vida más adelante no toca ninguna tabla con filas: los estados no están enumerados
+-- en restricciones. Es agregar filas a la matriz y reemplazar funciones y la vista (CREATE OR REPLACE).
+--
+-- Concurrencia: todo disparador que lee «lo vigente» de una cotización toma antes el mismo bloqueo transaccional,
+-- quoter_lock_quote(quote_id). El almacén toma ese mismo bloqueo antes de decidir. Una transacción escribe UNA
+-- cotización: una que tocara dos podría cruzarse con otra en orden inverso (bloqueo por cotización y fila del
+-- contador) y PostgreSQL abortaría una de las dos (40P01); un lote futuro ordena los identificadores antes de
+-- bloquear. Toda emisión real espera a la anterior en la fila del contador: correcto a este volumen.
+--
+-- Rechazos con nombre: cada RAISE lleva `CONSTRAINT = '<nombre>'`. El código lo lee de ahí
+-- (src/lib/commercial/quoter/errors.ts) y nunca interpreta el texto del mensaje.
+
+SET LOCAL lock_timeout = '5s';
+
+-- ── Bloqueo por cotización ───────────────────────────────────────────────────────────────────────────────────
+
+-- Forma de dos claves: un espacio propio, sin colisión con los bloqueos de una sola clave de otros dominios.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_lock_quote(p_quote_id text)
+RETURNS void
+LANGUAGE plpgsql
+AS $fn$
+BEGIN
+  -- Leer lo vigente y después escribir sólo es correcto bajo READ COMMITTED: se rechaza cualquier otro aislamiento.
+  PERFORM greenhouse_commercial.quoter_assert_read_committed();
+  PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtext('greenhouse_commercial.quoter_quote'), pg_catalog.hashtext(p_quote_id));
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_lock_quote(text) OWNER TO greenhouse_ops;
+
+-- ── quoter_quotes ────────────────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_quotes (
+  -- El formato fijo impide que una ruta o un texto de prueba se vuelva un identificador permanente.
+  quote_id text NOT NULL DEFAULT ('qtr-' || gen_random_uuid()::text)
+    CHECK (quote_id ~ '^qtr-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'),
+  -- La organización dueña y emisora: siempre la canónica de Efeonce, resuelta por el servidor.
+  owner_organization_id text NOT NULL,
+  -- Sin valor por defecto: quien crea lo declara siempre. Lo decide la identidad que crea, nunca un campo del
+  -- pedido; una cotización de prueba que naciera `real` consumiría un número real.
+  data_origin text NOT NULL CHECK (data_origin IN ('real', 'synthetic')),
+  created_by_actor_kind text NOT NULL CHECK (created_by_actor_kind IN ('member', 'agent', 'service')),
+  created_by_member_id text,
+  created_by_principal_id text NOT NULL CHECK (length(btrim(created_by_principal_id)) > 0),
+  -- Referencia blanda al comando: puede dejar de resolver. Nunca la única huella de quién actuó.
+  command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_quotes_pkey PRIMARY KEY (quote_id),
+  CONSTRAINT quoter_quotes_owner_fk FOREIGN KEY (owner_organization_id)
+    REFERENCES greenhouse_core.organizations (organization_id),
+  CONSTRAINT quoter_quotes_member_identified CHECK (created_by_actor_kind <> 'member' OR (created_by_member_id IS NOT NULL AND length(btrim(created_by_member_id)) > 0))
+);
+
+ALTER TABLE greenhouse_commercial.quoter_quotes OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_quotes IS
+  'Cotizador V3: identidad de una cotización. Inmutable. Estado, número, destinataria y versión vigente viven en tablas de sólo agregar y se leen por quoter_quote_current.';
+
+-- ── quoter_quote_versions ────────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_quote_versions (
+  quote_id text NOT NULL REFERENCES greenhouse_commercial.quoter_quotes (quote_id),
+  version_number integer NOT NULL CHECK (version_number >= 1),
+  owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations (organization_id),
+  -- El artefacto congelado como se emitió, con su sangría y su orden de claves. Nadie lo reserializa.
+  artifact_text text NOT NULL,
+  -- Huella del texto: la comprueba esta base.
+  artifact_digest text NOT NULL CHECK (artifact_digest ~ '^[0-9a-f]{64}$'),
+  -- Huella de identidad del cálculo: la declara el artefacto y la recalcula su reproducción. Evidencia, no llave.
+  replay_digest text NOT NULL CHECK (replay_digest ~ '^[0-9a-f]{64}$'),
+  calculation_id text NOT NULL CHECK (length(btrim(calculation_id)) > 0),
+  artifact_version text NOT NULL CHECK (
+    artifact_version IN ('pricing-v3-local-artifact/1', 'pricing-v3-selection-quote/1', 'pricing-v3-resource-composition/1')
+  ),
+  -- Sólo se registra una cotización calculada.
+  calculation_status text NOT NULL CHECK (calculation_status = 'calculated'),
+  -- El veredicto del motor (MARGIN_BELOW_FLOOR en alguna fila), congelado con la versión. La emisión lo lee.
+  below_floor boolean NOT NULL,
+  origin text NOT NULL CHECK (origin IN ('platform', 'local')),
+  registered_by_actor_kind text NOT NULL CHECK (registered_by_actor_kind IN ('member', 'agent', 'service')),
+  registered_by_member_id text,
+  registered_by_principal_id text NOT NULL CHECK (length(btrim(registered_by_principal_id)) > 0),
+  command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  registered_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_quote_versions_pkey PRIMARY KEY (quote_id, version_number),
+  -- El mismo cálculo no es dos versiones de una cotización.
+  CONSTRAINT quoter_quote_versions_replay_once_per_quote UNIQUE (quote_id, replay_digest),
+  -- Para que un cambio de estado y una aprobación nombren una versión real CON su huella, por llave foránea.
+  CONSTRAINT quoter_quote_versions_identity_with_digest UNIQUE (quote_id, version_number, artifact_digest),
+  CONSTRAINT quoter_quote_versions_member_identified
+    CHECK (registered_by_actor_kind <> 'member' OR (registered_by_member_id IS NOT NULL AND length(btrim(registered_by_member_id)) > 0))
+);
+
+ALTER TABLE greenhouse_commercial.quoter_quote_versions OWNER TO greenhouse_ops;
+
+-- No único a propósito: la identidad de una versión es (quote_id, version_number). Que un cálculo viva en una sola
+-- cotización no retirada lo hace cumplir el almacén bajo bloqueo; una restricción dejaría sin salida a quien retira
+-- un borrador y vuelve a registrar el mismo cálculo, en una tabla de la que nada se borra.
+CREATE INDEX quoter_quote_versions_replay_digest_idx ON greenhouse_commercial.quoter_quote_versions (replay_digest);
+
+COMMENT ON TABLE greenhouse_commercial.quoter_quote_versions IS
+  'Cotizador V3: una versión es el artefacto congelado tal cual. Inmutable. El resultado nunca se reconstruye desde columnas.';
+
+-- ── quoter_quote_version_index ───────────────────────────────────────────────────────────────────────────────
+
+-- Índices de lectura, en una tabla aparte y NO inmutable: si el extractor se equivoca o cambia, se reconstruyen
+-- desde artifact_text. En la fila inmutable un error del extractor sería para siempre.
+CREATE TABLE greenhouse_commercial.quoter_quote_version_index (
+  quote_id text NOT NULL,
+  version_number integer NOT NULL,
+  contract_version text,
+  engine_version text,
+  currency text CHECK (currency IS NULL OR currency ~ '^[A-Z]{3}$'),
+  catalog_version text,
+  catalog_digest text CHECK (catalog_digest IS NULL OR catalog_digest ~ '^[0-9a-f]{64}$'),
+  policy_version text,
+  policy_digest text CHECK (policy_digest IS NULL OR policy_digest ~ '^[0-9a-f]{64}$'),
+  credits_version text,
+  credits_digest text CHECK (credits_digest IS NULL OR credits_digest ~ '^[0-9a-f]{64}$'),
+  indexed_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_quote_version_index_pkey PRIMARY KEY (quote_id, version_number),
+  CONSTRAINT quoter_quote_version_index_version_fk FOREIGN KEY (quote_id, version_number)
+    REFERENCES greenhouse_commercial.quoter_quote_versions (quote_id, version_number)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_quote_version_index OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_quote_version_index IS
+  'Cotizador V3: read index; never the source of a result. Reconstruible desde quoter_quote_versions.artifact_text. El artefacto lleva sus fuentes dentro.';
+
+-- ── quoter_state_matrix ──────────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_state_matrix (
+  -- `none` es el origen centinela del estado inicial: no es un estado de una cotización. Los estados no se enumeran
+  -- aquí: la matriz ES la lista. Un estado nuevo del ciclo de vida entra agregando filas, sin tocar una restricción.
+  from_state text NOT NULL CHECK (from_state ~ '^[a-z][a-z_]{1,39}$'),
+  to_state text NOT NULL CHECK (to_state ~ '^[a-z][a-z_]{1,39}$' AND to_state <> 'none'),
+  requires_human_gate boolean NOT NULL DEFAULT false,
+  CONSTRAINT quoter_state_matrix_pkey PRIMARY KEY (from_state, to_state)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_state_matrix OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_state_matrix IS
+  'Cotizador V3: los cambios de estado que existen. Un par nuevo entra por una migración que sólo agrega filas. Marcar un par con compuerta humana exige una decisión del CEO.';
+
+-- Ningún par exige compuerta humana: emitir, retirar y registrar la respuesta del cliente los hace también un
+-- agente (decisión 7, CEO 2026-10-12). `withdrawn` es el único estado terminal; ningún otro es un callejón sin salida.
+-- La prueba de paridad con TypeScript lee este bloque: una tupla por línea y ningún punto y coma dentro.
+INSERT INTO greenhouse_commercial.quoter_state_matrix (from_state, to_state, requires_human_gate) VALUES
+  ('none', 'draft', false),
+  ('draft', 'issued', false),
+  ('draft', 'withdrawn', false),
+  ('issued', 'revising', false),
+  ('revising', 'issued', false),
+  ('issued', 'withdrawn', false),
+  ('revising', 'withdrawn', false),
+  ('issued', 'accepted', false),
+  ('issued', 'rejected', false),
+  ('revising', 'accepted', false),
+  ('revising', 'rejected', false),
+  ('accepted', 'revising', false),
+  ('rejected', 'revising', false)
+ON CONFLICT (from_state, to_state) DO UPDATE SET requires_human_gate = EXCLUDED.requires_human_gate;
+
+-- ── quoter_version_documents ─────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_version_documents (
+  quote_id text NOT NULL,
+  version_number integer NOT NULL,
+  -- Lo asigna el disparador. Corregir los textos es agregar una fila; rige la última.
+  document_seq integer NOT NULL,
+  owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations (organization_id),
+  -- Lo que se escribió para el documento, en texto canónico.
+  brief_text text NOT NULL,
+  brief_digest text NOT NULL CHECK (brief_digest ~ '^[0-9a-f]{64}$'),
+  -- Los datos del documento, congelados para que lo emitido se regenere igual.
+  document_text text NOT NULL,
+  document_digest text NOT NULL CHECK (document_digest ~ '^[0-9a-f]{64}$'),
+  template_data_version text NOT NULL CHECK (length(btrim(template_data_version)) > 0),
+  stored_by_actor_kind text NOT NULL CHECK (stored_by_actor_kind IN ('member', 'agent', 'service')),
+  stored_by_member_id text,
+  stored_by_principal_id text NOT NULL CHECK (length(btrim(stored_by_principal_id)) > 0),
+  command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  stored_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_version_documents_pkey PRIMARY KEY (quote_id, version_number, document_seq),
+  -- Para que una emisión nombre el documento que emitió CON su huella, por llave foránea.
+  CONSTRAINT quoter_version_documents_identity_with_digest UNIQUE (quote_id, version_number, document_seq, document_digest),
+  CONSTRAINT quoter_version_documents_version_fk FOREIGN KEY (quote_id, version_number)
+    REFERENCES greenhouse_commercial.quoter_quote_versions (quote_id, version_number),
+  CONSTRAINT quoter_version_documents_member_identified
+    CHECK (stored_by_actor_kind <> 'member' OR (stored_by_member_id IS NOT NULL AND length(btrim(stored_by_member_id)) > 0))
+);
+
+ALTER TABLE greenhouse_commercial.quoter_version_documents OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_version_documents IS
+  'Cotizador V3: datos del documento del cliente por versión. Sólo agregar; rige la última fila. Recibe filas en draft y en revising. Lo emitido lo fija el cambio de estado, que nombra su documento y su huella.';
+
+-- ── quoter_exception_approvals ───────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_exception_approvals (
+  quote_id text NOT NULL,
+  version_number integer NOT NULL,
+  -- Lo asigna el disparador. Rige la última decisión: una aprobación se puede revocar agregando una fila.
+  approval_seq integer NOT NULL,
+  owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations (organization_id),
+  -- La huella de ESA versión: una versión nueva no hereda la aprobación.
+  artifact_digest text NOT NULL CHECK (artifact_digest ~ '^[0-9a-f]{64}$'),
+  decision text NOT NULL CHECK (decision IN ('approved', 'revoked')),
+  -- Decidir sobre una excepción bajo el piso es siempre un acto de una persona identificada.
+  actor_kind text NOT NULL DEFAULT 'member' CHECK (actor_kind = 'member'),
+  decided_by_member_id text NOT NULL CHECK (length(btrim(decided_by_member_id)) > 0),
+  decided_by_principal_id text NOT NULL CHECK (length(btrim(decided_by_principal_id)) > 0),
+  reason text NOT NULL CHECK (length(btrim(reason)) >= 10),
+  command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  decided_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_exception_approvals_pkey PRIMARY KEY (quote_id, version_number, approval_seq),
+  CONSTRAINT quoter_exception_approvals_version_fk FOREIGN KEY (quote_id, version_number, artifact_digest)
+    REFERENCES greenhouse_commercial.quoter_quote_versions (quote_id, version_number, artifact_digest)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_exception_approvals OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_exception_approvals IS
+  'Cotizador V3: aprobación o revocación de una excepción bajo el piso. No es un estado: es un acto registrado, por versión y huella, que la emisión comprueba. Rige la última decisión. Sólo una persona.';
+
+-- ── quoter_state_transitions ─────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_state_transitions (
+  transition_id text NOT NULL DEFAULT ('qtt-' || gen_random_uuid()::text),
+  quote_id text NOT NULL REFERENCES greenhouse_commercial.quoter_quotes (quote_id),
+  -- Lo asigna el disparador bajo el bloqueo de la cotización: correlativo y en el orden en que se aceptó. El
+  -- estado vigente es el de la fila de mayor transition_seq, no el de la hora más reciente.
+  transition_seq integer NOT NULL,
+  owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations (organization_id),
+  from_state text NOT NULL,
+  to_state text NOT NULL,
+  -- Hacia `issued`: qué versión, qué huella y qué documento se emitió. Hacia `accepted` o `rejected`: lo último que
+  -- se emitió, que es a lo que el cliente responde. En cualquier otro cambio, nulos. Qué cambio nombra qué lo decide
+  -- el disparador; la tabla sólo exige que los cuatro vayan juntos.
+  version_number integer,
+  artifact_digest text CHECK (artifact_digest IS NULL OR artifact_digest ~ '^[0-9a-f]{64}$'),
+  document_seq integer,
+  document_digest text CHECK (document_digest IS NULL OR document_digest ~ '^[0-9a-f]{64}$'),
+  -- Hasta qué día vale lo emitido. Lo fija cada emisión; nulo en cualquier otro cambio.
+  valid_until date,
+  -- Copiado de la matriz por el disparador; nunca lo da quien llama.
+  requires_human_gate boolean NOT NULL DEFAULT false,
+  -- Con nombre, para ampliar el dominio (un cliente que acepta por el enlace público) cambiando una restricción.
+  actor_kind text NOT NULL CONSTRAINT quoter_state_transitions_actor_kind CHECK (actor_kind IN ('member', 'agent', 'service')),
+  actor_member_id text,
+  actor_principal_id text NOT NULL CHECK (length(btrim(actor_principal_id)) > 0),
+  reason text NOT NULL CHECK (length(btrim(reason)) >= 5),
+  command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  -- La hora de la base, siempre: el disparador la fija y quien llama no puede declarar otra.
+  occurred_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_state_transitions_pkey PRIMARY KEY (quote_id, transition_seq),
+  CONSTRAINT quoter_state_transitions_id_unique UNIQUE (transition_id),
+  CONSTRAINT quoter_state_transitions_pair_fk FOREIGN KEY (from_state, to_state)
+    REFERENCES greenhouse_commercial.quoter_state_matrix (from_state, to_state),
+  CONSTRAINT quoter_state_transitions_version_fk FOREIGN KEY (quote_id, version_number, artifact_digest)
+    REFERENCES greenhouse_commercial.quoter_quote_versions (quote_id, version_number, artifact_digest),
+  CONSTRAINT quoter_state_transitions_document_fk FOREIGN KEY (quote_id, version_number, document_seq, document_digest)
+    REFERENCES greenhouse_commercial.quoter_version_documents (quote_id, version_number, document_seq, document_digest),
+  CONSTRAINT quoter_state_transitions_object_is_whole
+    CHECK (num_nonnulls(version_number, artifact_digest, document_seq, document_digest) IN (0, 4)),
+  CONSTRAINT quoter_state_transitions_member_identified
+    CHECK (actor_kind <> 'member' OR (actor_member_id IS NOT NULL AND length(btrim(actor_member_id)) > 0)),
+  CONSTRAINT quoter_state_transitions_human_gate_needs_member
+    CHECK (requires_human_gate = false OR (actor_kind = 'member' AND actor_member_id IS NOT NULL AND length(btrim(actor_member_id)) > 0))
+);
+
+ALTER TABLE greenhouse_commercial.quoter_state_transitions OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_state_transitions IS
+  'Cotizador V3: historial de estados de una cotización. Sólo agregar. El estado vigente es el de la fila de mayor transition_seq.';
+
+-- El día de hoy donde opera Efeonce. El ÚNICO lugar que dice qué día es para la vigencia de una cotización: lo usan
+-- el disparador de cambios de estado y la vista. Nunca CURRENT_DATE a secas, que depende de la zona de la sesión.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_today()
+RETURNS date
+LANGUAGE sql
+STABLE
+AS $fn$
+  SELECT (pg_catalog.now() AT TIME ZONE 'America/Santiago')::date
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_today() OWNER TO greenhouse_ops;
+
+-- El día, en la misma zona, en que ocurrió algo que la base ya registró.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_local_day(p_at timestamptz)
+RETURNS date
+LANGUAGE sql
+STABLE
+AS $fn$
+  SELECT (p_at AT TIME ZONE 'America/Santiago')::date
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_local_day(timestamptz) OWNER TO greenhouse_ops;
+
+-- El estado vigente de una cotización, o NULL si todavía no tiene ninguno.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_quote_state(p_quote_id text)
+RETURNS text
+LANGUAGE sql
+STABLE
+AS $fn$
+  SELECT t.to_state
+    FROM greenhouse_commercial.quoter_state_transitions t
+   WHERE t.quote_id = p_quote_id
+   ORDER BY t.transition_seq DESC
+   LIMIT 1
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_quote_state(text) OWNER TO greenhouse_ops;
+
+-- ── quoter_quote_recipients ──────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_quote_recipients (
+  quote_id text NOT NULL REFERENCES greenhouse_commercial.quoter_quotes (quote_id),
+  -- Lo asigna el disparador. Rige la asignación de mayor assignment_seq.
+  assignment_seq integer NOT NULL,
+  owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations (organization_id),
+  -- Cliente o potencial cliente. Que lo sea lo valida el comando; aquí, que exista y no sea la propia dueña.
+  client_organization_id text NOT NULL,
+  assigned_by_actor_kind text NOT NULL CHECK (assigned_by_actor_kind IN ('member', 'agent', 'service')),
+  assigned_by_member_id text,
+  assigned_by_principal_id text NOT NULL CHECK (length(btrim(assigned_by_principal_id)) > 0),
+  reason text NOT NULL CHECK (length(btrim(reason)) >= 5),
+  command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  assigned_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_quote_recipients_pkey PRIMARY KEY (quote_id, assignment_seq),
+  CONSTRAINT quoter_quote_recipients_client_fk FOREIGN KEY (client_organization_id)
+    REFERENCES greenhouse_core.organizations (organization_id),
+  CONSTRAINT quoter_quote_recipients_not_the_owner CHECK (client_organization_id <> owner_organization_id),
+  CONSTRAINT quoter_quote_recipients_member_identified
+    CHECK (assigned_by_actor_kind <> 'member' OR (assigned_by_member_id IS NOT NULL AND length(btrim(assigned_by_member_id)) > 0))
+);
+
+ALTER TABLE greenhouse_commercial.quoter_quote_recipients OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_quote_recipients IS
+  'Cotizador V3: organización destinataria de una cotización. Sólo agregar. Reasignable mientras la cotización está en draft; congelada desde la primera emisión. No confiere acceso.';
+
+-- ── Número público ───────────────────────────────────────────────────────────────────────────────────────────
+
+-- Un contador por serie, actualizado en la transacción de la emisión, y no una secuencia: una secuencia consume un
+-- valor aunque la transacción falle, y la primera cotización real tiene que ser EO-QTE-15001, sin huecos después.
+-- El volumen es bajo: que dos emisiones esperen una a la otra por esta fila no importa.
+CREATE TABLE greenhouse_commercial.quoter_quote_number_counters (
+  series text NOT NULL CHECK (series IN ('real', 'synthetic')),
+  prefix text NOT NULL CHECK (prefix ~ '^EO-QTE-(T-)?$'),
+  next_value bigint NOT NULL CHECK (next_value >= 1),
+  CONSTRAINT quoter_quote_number_counters_pkey PRIMARY KEY (series)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_quote_number_counters OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_quote_number_counters IS
+  'Cotizador V3: el siguiente número de cada serie. Sólo avanza de a uno, y sólo dentro de la emisión que lo consume.';
+
+-- La serie real empieza en 15001 (CEO, 2026-10-12): la primera cotización real emitida es EO-QTE-15001 y sigue
+-- correlativa. Sin relleno: el número se imprime tal cual. La serie sintética va aparte y no consume números reales.
+INSERT INTO greenhouse_commercial.quoter_quote_number_counters (series, prefix, next_value) VALUES
+  ('real', 'EO-QTE-', 15001),
+  ('synthetic', 'EO-QTE-T-', 1);
+
+CREATE TABLE greenhouse_commercial.quoter_quote_numbers (
+  -- Una cotización tiene como máximo un número, para siempre.
+  quote_id text NOT NULL REFERENCES greenhouse_commercial.quoter_quotes (quote_id),
+  quote_number text NOT NULL CHECK (quote_number ~ '^EO-QTE-(T-)?[0-9]+$'),
+  -- La emisión que lo produjo: la primera de la cotización.
+  issued_transition_seq integer NOT NULL,
+  assigned_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_quote_numbers_pkey PRIMARY KEY (quote_id),
+  CONSTRAINT quoter_quote_numbers_number_unique UNIQUE (quote_number),
+  CONSTRAINT quoter_quote_numbers_transition_fk FOREIGN KEY (quote_id, issued_transition_seq)
+    REFERENCES greenhouse_commercial.quoter_state_transitions (quote_id, transition_seq)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_quote_numbers OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_quote_numbers IS
+  'Cotizador V3: número público de una cotización. Lo asigna la base una sola vez, en su primera emisión. Un borrador no tiene número. El runtime no puede insertar aquí.';
+
+-- ── Disparadores de inserción: cada uno bajo el bloqueo de su cotización ─────────────────────────────────────
+
+-- El dueño de una fila hija es el de su cotización. Si la cotización no existe, lo rechaza la llave foránea.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_assert_owner_matches(p_table text, p_quote_id text, p_owner text)
+RETURNS void
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  parent_owner text;
+BEGIN
+  SELECT q.owner_organization_id INTO parent_owner FROM greenhouse_commercial.quoter_quotes q WHERE q.quote_id = p_quote_id;
+
+  IF parent_owner IS NOT NULL AND parent_owner IS DISTINCT FROM p_owner THEN
+    RAISE EXCEPTION '%: owner_organization_id no coincide con el de la cotización %', p_table, p_quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_owner_matches_quote';
+  END IF;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_assert_owner_matches(text, text, text) OWNER TO greenhouse_ops;
+
+-- La dueña de toda cotización es la entidad operativa activa (Efeonce). Sin UUID en ninguna parte: se comprueba
+-- el hecho, no un identificador.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_quote_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM greenhouse_core.organizations o
+     WHERE o.organization_id = NEW.owner_organization_id
+       AND o.is_operating_entity = TRUE AND o.active = TRUE AND o.status = 'active'
+  ) THEN
+    RAISE EXCEPTION 'quoter_quotes: la organización dueña no es la entidad operativa activa'
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quotes_owner_is_operating_entity';
+  END IF;
+
+  -- La hora es la del reloj de la base: quien inserta no declara otra. Vale para toda fila del agregado.
+  NEW.created_at := pg_catalog.now();
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_quote_insert() OWNER TO greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_version_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  last_version integer;
+  current_state text;
+BEGIN
+  PERFORM greenhouse_commercial.quoter_lock_quote(NEW.quote_id);
+  PERFORM greenhouse_commercial.quoter_assert_owner_matches('quoter_quote_versions', NEW.quote_id, NEW.owner_organization_id);
+
+  IF NEW.artifact_digest IS DISTINCT FROM greenhouse_commercial.quoter_text_digest(NEW.artifact_text) THEN
+    RAISE EXCEPTION 'quoter_quote_versions: artifact_digest no es el sha256 de artifact_text (cotización %)', NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_versions_text_digest';
+  END IF;
+
+  -- Una versión entra a una cotización recién creada, en borrador o en revisión. Sobre una emitida, aceptada o
+  -- rechazada, primero se registra el cambio a `revising`; una retirada no recibe versiones.
+  current_state := greenhouse_commercial.quoter_quote_state(NEW.quote_id);
+
+  IF current_state IS NOT NULL AND current_state NOT IN ('draft', 'revising') THEN
+    RAISE EXCEPTION 'quoter_quote_versions: la cotización % está en % y no recibe versiones', NEW.quote_id, current_state
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_versions_state_admits_version';
+  END IF;
+
+  SELECT max(v.version_number) INTO last_version FROM greenhouse_commercial.quoter_quote_versions v WHERE v.quote_id = NEW.quote_id;
+
+  IF NEW.version_number IS DISTINCT FROM COALESCE(last_version, 0) + 1 THEN
+    RAISE EXCEPTION 'quoter_quote_versions: version_number % no es el siguiente de la cotización % (último: %)',
+      NEW.version_number, NEW.quote_id, COALESCE(last_version, 0)
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_versions_next_number';
+  END IF;
+
+  NEW.registered_at := pg_catalog.now();
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_version_insert() OWNER TO greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_version_document_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  last_seq integer;
+  current_state text;
+BEGIN
+  PERFORM greenhouse_commercial.quoter_lock_quote(NEW.quote_id);
+  PERFORM greenhouse_commercial.quoter_assert_owner_matches('quoter_version_documents', NEW.quote_id, NEW.owner_organization_id);
+
+  IF NEW.brief_digest IS DISTINCT FROM greenhouse_commercial.quoter_text_digest(NEW.brief_text)
+     OR NEW.document_digest IS DISTINCT FROM greenhouse_commercial.quoter_text_digest(NEW.document_text) THEN
+    RAISE EXCEPTION 'quoter_version_documents: una huella no es el sha256 de su texto (cotización %, versión %)',
+      NEW.quote_id, NEW.version_number
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_version_documents_text_digest';
+  END IF;
+
+  -- Un documento se escribe o se corrige en borrador o en revisión. Lo emitido no cambia: lo fija la emisión, que
+  -- nombra el documento y su huella; para corregirlo se vuelve a `revising` y se emite de nuevo.
+  current_state := greenhouse_commercial.quoter_quote_state(NEW.quote_id);
+
+  IF current_state IS DISTINCT FROM 'draft' AND current_state IS DISTINCT FROM 'revising' THEN
+    RAISE EXCEPTION 'quoter_version_documents: la cotización % está en % y su documento no cambia',
+      NEW.quote_id, COALESCE(current_state, 'none')
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_version_documents_state_admits_document';
+  END IF;
+
+  SELECT max(d.document_seq) INTO last_seq
+    FROM greenhouse_commercial.quoter_version_documents d
+   WHERE d.quote_id = NEW.quote_id AND d.version_number = NEW.version_number;
+
+  NEW.document_seq := COALESCE(last_seq, 0) + 1;
+  NEW.stored_at := pg_catalog.now();
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_version_document_insert() OWNER TO greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_exception_approval_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  last_seq integer;
+  last_decision text;
+  version_below_floor boolean;
+BEGIN
+  PERFORM greenhouse_commercial.quoter_lock_quote(NEW.quote_id);
+  PERFORM greenhouse_commercial.quoter_assert_owner_matches('quoter_exception_approvals', NEW.quote_id, NEW.owner_organization_id);
+
+  SELECT v.below_floor INTO version_below_floor
+    FROM greenhouse_commercial.quoter_quote_versions v
+   WHERE v.quote_id = NEW.quote_id AND v.version_number = NEW.version_number;
+
+  -- Una versión dentro de política no necesita excepción: aprobarla sería un acto sin objeto.
+  IF version_below_floor IS FALSE THEN
+    RAISE EXCEPTION 'quoter_exception_approvals: la versión % de la cotización % no está bajo el piso',
+      NEW.version_number, NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_exception_approvals_version_is_below_floor';
+  END IF;
+
+  SELECT a.approval_seq, a.decision INTO last_seq, last_decision
+    FROM greenhouse_commercial.quoter_exception_approvals a
+   WHERE a.quote_id = NEW.quote_id AND a.version_number = NEW.version_number
+   ORDER BY a.approval_seq DESC
+   LIMIT 1;
+
+  -- Se aprueba lo que no está aprobado y se revoca lo que sí: la última decisión siempre dice algo nuevo.
+  IF NEW.decision IS NOT DISTINCT FROM COALESCE(last_decision, 'revoked') THEN
+    RAISE EXCEPTION 'quoter_exception_approvals: la decisión % repite la vigente (cotización %, versión %)',
+      NEW.decision, NEW.quote_id, NEW.version_number
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_exception_approvals_decision_changes_it';
+  END IF;
+
+  -- Una versión ya emitida no pierde su aprobación: esa fila no significaría nada. El acto es retirar la cotización.
+  IF NEW.decision = 'revoked' AND EXISTS (
+    SELECT 1 FROM greenhouse_commercial.quoter_state_transitions t
+     WHERE t.quote_id = NEW.quote_id AND t.to_state = 'issued' AND t.version_number = NEW.version_number
+  ) THEN
+    RAISE EXCEPTION 'quoter_exception_approvals: la versión % de la cotización % ya se emitió; su aprobación no se revoca',
+      NEW.version_number, NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_exception_approvals_revoke_before_issue';
+  END IF;
+
+  NEW.approval_seq := COALESCE(last_seq, 0) + 1;
+  NEW.decided_at := pg_catalog.now();
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_exception_approval_insert() OWNER TO greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_transition_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  last_seq integer;
+  current_state text;
+  gate boolean;
+  last_version integer;
+  last_issue record;
+  version_below_floor boolean;
+  document_in_force integer;
+BEGIN
+  PERFORM greenhouse_commercial.quoter_lock_quote(NEW.quote_id);
+  PERFORM greenhouse_commercial.quoter_assert_owner_matches('quoter_state_transitions', NEW.quote_id, NEW.owner_organization_id);
+
+  SELECT t.transition_seq, t.to_state
+    INTO last_seq, current_state
+    FROM greenhouse_commercial.quoter_state_transitions t
+   WHERE t.quote_id = NEW.quote_id
+   ORDER BY t.transition_seq DESC
+   LIMIT 1;
+
+  IF NEW.from_state IS DISTINCT FROM COALESCE(current_state, 'none') THEN
+    RAISE EXCEPTION 'quoter_state_transitions: el origen % no es el estado vigente de la cotización % (%)',
+      NEW.from_state, NEW.quote_id, COALESCE(current_state, 'none')
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_from_is_current';
+  END IF;
+
+  SELECT m.requires_human_gate INTO gate
+    FROM greenhouse_commercial.quoter_state_matrix m
+   WHERE m.from_state = NEW.from_state AND m.to_state = NEW.to_state;
+
+  IF gate IS NULL THEN
+    RAISE EXCEPTION 'quoter_state_transitions: el cambio % → % no existe en la matriz (cotización %)',
+      NEW.from_state, NEW.to_state, NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_pair_exists';
+  END IF;
+
+  -- Lo último que se emitió: a eso responde el cliente, y a eso se puede volver desde una revisión.
+  SELECT e.version_number, e.artifact_digest, e.document_seq, e.document_digest, e.valid_until
+    INTO last_issue
+    FROM greenhouse_commercial.quoter_state_transitions e
+   WHERE e.quote_id = NEW.quote_id AND e.to_state = 'issued'
+   ORDER BY e.transition_seq DESC
+   LIMIT 1;
+
+  IF NEW.to_state = 'issued' THEN
+    -- Se emite la última versión o, para volver a lo que el cliente ya tenía, la última emitida.
+    SELECT max(v.version_number) INTO last_version FROM greenhouse_commercial.quoter_quote_versions v WHERE v.quote_id = NEW.quote_id;
+
+    IF NEW.version_number IS NULL
+       OR (NEW.version_number IS DISTINCT FROM last_version AND NEW.version_number IS DISTINCT FROM last_issue.version_number) THEN
+      RAISE EXCEPTION 'quoter_state_transitions: se emite la última versión o la última emitida (cotización %, versión %)',
+        NEW.quote_id, NEW.version_number
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issues_last_or_issued_version';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM greenhouse_commercial.quoter_quote_recipients r WHERE r.quote_id = NEW.quote_id) THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la cotización % no tiene organización destinataria y no se emite', NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_needs_recipient';
+    END IF;
+
+    -- El documento que se emite es el que rige para esa versión, no uno anterior.
+    SELECT max(d.document_seq) INTO document_in_force
+      FROM greenhouse_commercial.quoter_version_documents d
+     WHERE d.quote_id = NEW.quote_id AND d.version_number = NEW.version_number;
+
+    IF NEW.document_seq IS NULL OR NEW.document_seq IS DISTINCT FROM document_in_force THEN
+      RAISE EXCEPTION 'quoter_state_transitions: el documento emitido no es el que rige para la versión % de la cotización %',
+        NEW.version_number, NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issues_document_in_force';
+    END IF;
+
+    -- Nunca se emite bajo el piso sin una aprobación vigente, la emita quien la emita.
+    SELECT v.below_floor INTO version_below_floor
+      FROM greenhouse_commercial.quoter_quote_versions v
+     WHERE v.quote_id = NEW.quote_id AND v.version_number = NEW.version_number;
+
+    IF version_below_floor AND COALESCE((
+      SELECT a.decision FROM greenhouse_commercial.quoter_exception_approvals a
+       WHERE a.quote_id = NEW.quote_id AND a.version_number = NEW.version_number
+       ORDER BY a.approval_seq DESC
+       LIMIT 1
+    ), 'revoked') <> 'approved' THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la versión % de la cotización % está bajo el piso y no tiene aprobación vigente',
+        NEW.version_number, NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_needs_exception_approval';
+    END IF;
+
+    -- Toda emisión dice hasta qué día vale, y no nace vencida. Una re-emisión fija la suya.
+    IF NEW.valid_until IS NULL THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la emisión de la cotización % no declara su vigencia', NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_names_its_validity';
+    END IF;
+
+    IF NEW.valid_until < greenhouse_commercial.quoter_today() THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la vigencia % de la cotización % ya pasó', NEW.valid_until, NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_validity_not_past';
+    END IF;
+  ELSIF NEW.to_state IN ('accepted', 'rejected') THEN
+    -- La respuesta del cliente es sobre lo último que se emitió: esa versión y ese documento, con sus huellas.
+    IF last_issue.version_number IS NULL
+       OR NEW.version_number IS DISTINCT FROM last_issue.version_number
+       OR NEW.artifact_digest IS DISTINCT FROM last_issue.artifact_digest
+       OR NEW.document_seq IS DISTINCT FROM last_issue.document_seq
+       OR NEW.document_digest IS DISTINCT FROM last_issue.document_digest THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la respuesta no nombra lo último que se emitió de la cotización %', NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_responds_to_last_issued';
+    END IF;
+
+    -- Aceptar o rechazar después de vencida la vigencia se permite: una regla que lo impidiera no protegía (bastaba
+    -- re-emitir y aceptar) y borraba el dato. Que fue fuera de vigencia se lee derivado en quoter_quote_current.
+  ELSIF num_nonnulls(NEW.version_number, NEW.artifact_digest, NEW.document_seq, NEW.document_digest) <> 0 THEN
+    RAISE EXCEPTION 'quoter_state_transitions: el cambio % → % no nombra una versión (cotización %)',
+      NEW.from_state, NEW.to_state, NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_names_its_object';
+  END IF;
+
+  IF NEW.to_state <> 'issued' AND NEW.valid_until IS NOT NULL THEN
+    RAISE EXCEPTION 'quoter_state_transitions: sólo una emisión declara vigencia (cotización %)', NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_names_its_validity';
+  END IF;
+
+  NEW.requires_human_gate := gate;
+  NEW.transition_seq := COALESCE(last_seq, 0) + 1;
+  NEW.occurred_at := pg_catalog.now();
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_transition_insert() OWNER TO greenhouse_ops;
+
+-- El número lo asigna la base en la primera emisión, después de que la fila del cambio de estado pasó todas sus
+-- restricciones. SECURITY DEFINER: corre como el dueño, porque el runtime no puede insertar en la tabla de números
+-- ni mover el contador. Nadie elige un número ni lo consume sin emitir.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_assign_number_on_first_issue()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, pg_temp
+AS $fn$
+DECLARE
+  quote_series text;
+  assigned text;
+BEGIN
+  IF NEW.to_state <> 'issued' THEN RETURN NULL; END IF;
+  IF EXISTS (SELECT 1 FROM greenhouse_commercial.quoter_quote_numbers n WHERE n.quote_id = NEW.quote_id) THEN RETURN NULL; END IF;
+
+  SELECT q.data_origin INTO quote_series FROM greenhouse_commercial.quoter_quotes q WHERE q.quote_id = NEW.quote_id;
+
+  UPDATE greenhouse_commercial.quoter_quote_number_counters c
+     SET next_value = c.next_value + 1
+   WHERE c.series = quote_series
+  RETURNING c.prefix || (c.next_value - 1)::text INTO assigned;
+
+  INSERT INTO greenhouse_commercial.quoter_quote_numbers (quote_id, quote_number, issued_transition_seq)
+  VALUES (NEW.quote_id, assigned, NEW.transition_seq);
+
+  RETURN NULL;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_assign_number_on_first_issue() OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_commercial.quoter_assign_number_on_first_issue() FROM PUBLIC;
+
+-- El contador sólo avanza de a uno; su serie y su prefijo no cambian.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_number_counter_update()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+BEGIN
+  IF NEW.series IS DISTINCT FROM OLD.series OR NEW.prefix IS DISTINCT FROM OLD.prefix OR NEW.next_value IS DISTINCT FROM OLD.next_value + 1 THEN
+    RAISE EXCEPTION 'quoter_quote_number_counters: el contador de la serie % sólo avanza de a uno', OLD.series
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_number_counters_advances_by_one';
+  END IF;
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_number_counter_update() OWNER TO greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_before_recipient_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  last_seq integer;
+  current_state text;
+BEGIN
+  PERFORM greenhouse_commercial.quoter_lock_quote(NEW.quote_id);
+  PERFORM greenhouse_commercial.quoter_assert_owner_matches('quoter_quote_recipients', NEW.quote_id, NEW.owner_organization_id);
+
+  current_state := greenhouse_commercial.quoter_quote_state(NEW.quote_id);
+
+  IF current_state IS DISTINCT FROM 'draft' THEN
+    RAISE EXCEPTION 'quoter_quote_recipients: la destinataria de la cotización % sólo se asigna en draft (estado: %)',
+      NEW.quote_id, COALESCE(current_state, 'none')
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_recipients_only_in_draft';
+  END IF;
+
+  SELECT max(r.assignment_seq) INTO last_seq FROM greenhouse_commercial.quoter_quote_recipients r WHERE r.quote_id = NEW.quote_id;
+
+  NEW.assignment_seq := COALESCE(last_seq, 0) + 1;
+  NEW.assigned_at := pg_catalog.now();
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_before_recipient_insert() OWNER TO greenhouse_ops;
+
+CREATE TRIGGER trg_quoter_quotes_insert
+  BEFORE INSERT ON greenhouse_commercial.quoter_quotes
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_quote_insert();
+
+CREATE TRIGGER trg_quoter_quote_versions_insert
+  BEFORE INSERT ON greenhouse_commercial.quoter_quote_versions
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_version_insert();
+
+CREATE TRIGGER trg_quoter_version_documents_insert
+  BEFORE INSERT ON greenhouse_commercial.quoter_version_documents
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_version_document_insert();
+
+CREATE TRIGGER trg_quoter_exception_approvals_insert
+  BEFORE INSERT ON greenhouse_commercial.quoter_exception_approvals
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_exception_approval_insert();
+
+CREATE TRIGGER trg_quoter_state_transitions_insert
+  BEFORE INSERT ON greenhouse_commercial.quoter_state_transitions
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_transition_insert();
+
+CREATE TRIGGER trg_quoter_state_transitions_assign_number
+  AFTER INSERT ON greenhouse_commercial.quoter_state_transitions
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assign_number_on_first_issue();
+
+CREATE TRIGGER trg_quoter_quote_recipients_insert
+  BEFORE INSERT ON greenhouse_commercial.quoter_quote_recipients
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_recipient_insert();
+
+CREATE TRIGGER trg_quoter_quote_number_counters_update
+  BEFORE UPDATE ON greenhouse_commercial.quoter_quote_number_counters
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_before_number_counter_update();
+
+CREATE TRIGGER trg_quoter_quote_number_counters_no_delete
+  BEFORE DELETE ON greenhouse_commercial.quoter_quote_number_counters
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_quote_number_counters_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_quote_number_counters
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+-- ── Sólo agregar, en todo el historial ───────────────────────────────────────────────────────────────────────
+
+CREATE TRIGGER trg_quoter_quotes_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_quotes
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_quotes_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_quotes
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_quote_versions_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_quote_versions
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_quote_versions_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_quote_versions
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_state_transitions_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_state_transitions
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_state_transitions_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_state_transitions
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_quote_recipients_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_quote_recipients
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_quote_recipients_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_quote_recipients
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_quote_numbers_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_quote_numbers
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_quote_numbers_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_quote_numbers
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_exception_approvals_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_exception_approvals
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_exception_approvals_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_exception_approvals
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_version_documents_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_version_documents
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+CREATE TRIGGER trg_quoter_version_documents_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_version_documents
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+-- ── quoter_quote_current ─────────────────────────────────────────────────────────────────────────────────────
+
+CREATE VIEW greenhouse_commercial.quoter_quote_current AS
+  SELECT q.quote_id,
+         q.owner_organization_id,
+         q.data_origin,
+         q.created_at,
+         s.to_state AS state,
+         -- «Vencida» no se guarda: se deriva aquí y sólo aquí. Ningún lector vuelve a aplicar la regla.
+         CASE
+           WHEN s.to_state IN ('issued', 'revising') AND i.valid_until < greenhouse_commercial.quoter_today() THEN 'expired'
+           ELSE s.to_state
+         END AS effective_state,
+         s.occurred_at AS state_since,
+         n.quote_number,
+         r.client_organization_id,
+         v.version_number AS latest_version_number,
+         v.replay_digest AS latest_replay_digest,
+         v.below_floor AS latest_below_floor,
+         x.currency AS latest_currency,
+         i.version_number AS issued_version_number,
+         i.artifact_digest AS issued_artifact_digest,
+         i.document_seq AS issued_document_seq,
+         i.document_digest AS issued_document_digest,
+         i.occurred_at AS issued_at,
+         i.valid_until,
+         -- La aceptación vigente, leída contra la vigencia de la emisión a la que respondió. Derivado, no guardado:
+         -- aceptar fuera de vigencia se permite y aquí queda dicho, con los días de atraso.
+         a.occurred_at AS accepted_at,
+         a.answered_valid_until AS accepted_valid_until,
+         a.days_after_validity > 0 AS accepted_after_validity,
+         GREATEST(a.days_after_validity, 0) AS accepted_days_after_validity
+    FROM greenhouse_commercial.quoter_quotes q
+    LEFT JOIN LATERAL (
+      SELECT t.to_state, t.occurred_at
+        FROM greenhouse_commercial.quoter_state_transitions t
+       WHERE t.quote_id = q.quote_id
+       ORDER BY t.transition_seq DESC
+       LIMIT 1
+    ) s ON true
+    LEFT JOIN greenhouse_commercial.quoter_quote_numbers n ON n.quote_id = q.quote_id
+    LEFT JOIN LATERAL (
+      SELECT c.client_organization_id
+        FROM greenhouse_commercial.quoter_quote_recipients c
+       WHERE c.quote_id = q.quote_id
+       ORDER BY c.assignment_seq DESC
+       LIMIT 1
+    ) r ON true
+    LEFT JOIN LATERAL (
+      SELECT l.version_number, l.replay_digest, l.below_floor
+        FROM greenhouse_commercial.quoter_quote_versions l
+       WHERE l.quote_id = q.quote_id
+       ORDER BY l.version_number DESC
+       LIMIT 1
+    ) v ON true
+    LEFT JOIN greenhouse_commercial.quoter_quote_version_index x
+      ON x.quote_id = q.quote_id AND x.version_number = v.version_number
+    LEFT JOIN LATERAL (
+      SELECT e.version_number, e.artifact_digest, e.document_seq, e.document_digest, e.occurred_at, e.valid_until
+        FROM greenhouse_commercial.quoter_state_transitions e
+       WHERE e.quote_id = q.quote_id AND e.to_state = 'issued'
+       ORDER BY e.transition_seq DESC
+       LIMIT 1
+    ) i ON true
+    -- Sólo cuando el estado vigente es `accepted`: su fila es la última del historial, y la emisión a la que
+    -- respondió es la última anterior a ella.
+    LEFT JOIN LATERAL (
+      SELECT c.occurred_at,
+             answered.valid_until AS answered_valid_until,
+             greenhouse_commercial.quoter_local_day(c.occurred_at) - answered.valid_until AS days_after_validity
+        FROM greenhouse_commercial.quoter_state_transitions c
+        JOIN LATERAL (
+          SELECT p.valid_until
+            FROM greenhouse_commercial.quoter_state_transitions p
+           WHERE p.quote_id = c.quote_id AND p.to_state = 'issued' AND p.transition_seq < c.transition_seq
+           ORDER BY p.transition_seq DESC
+           LIMIT 1
+        ) answered ON true
+       WHERE c.quote_id = q.quote_id AND c.to_state = 'accepted' AND s.to_state = 'accepted'
+       ORDER BY c.transition_seq DESC
+       LIMIT 1
+    ) a ON true;
+
+ALTER VIEW greenhouse_commercial.quoter_quote_current OWNER TO greenhouse_ops;
+
+-- ── Permisos: el runtime lee y agrega; nunca actualiza ni borra ──────────────────────────────────────────────
+
+-- El esquema tiene privilegios por defecto que le dan SELECT, INSERT, UPDATE y DELETE al runtime en toda tabla
+-- nueva, y ALL a greenhouse_migrator (task-345). Se quitan todos y se concede lo justo. El de migraciones es un
+-- perfil de DDL: con INSERT en los números podría darle uno a un borrador y dejar sin salida toda emisión real
+-- posterior, en una tabla de la que nada se borra.
+REVOKE ALL ON greenhouse_commercial.quoter_quotes FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_versions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_version_index FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_state_matrix FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_state_transitions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_recipients FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_number_counters FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_numbers FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_exception_approvals FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_version_documents FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_current FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quotes TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quote_versions TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_state_transitions TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quote_recipients TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_exception_approvals TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_version_documents TO greenhouse_runtime;
+-- El índice de lectura se reconstruye: es la única tabla del agregado que el runtime puede actualizar.
+GRANT SELECT, INSERT, UPDATE ON greenhouse_commercial.quoter_quote_version_index TO greenhouse_runtime;
+-- Números y contador: sólo lectura. Los escribe la función de la emisión, que corre como el dueño.
+GRANT SELECT ON greenhouse_commercial.quoter_quote_numbers TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_commercial.quoter_quote_number_counters TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_commercial.quoter_state_matrix TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_commercial.quoter_quote_current TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_lock_quote(text) TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_quote_state(text) TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_today() TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_local_day(timestamptz) TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_commercial.quoter_quotes, greenhouse_commercial.quoter_quote_versions,
+  greenhouse_commercial.quoter_quote_version_index, greenhouse_commercial.quoter_state_matrix,
+  greenhouse_commercial.quoter_state_transitions, greenhouse_commercial.quoter_quote_recipients,
+  greenhouse_commercial.quoter_quote_number_counters, greenhouse_commercial.quoter_quote_numbers,
+  greenhouse_commercial.quoter_exception_approvals, greenhouse_commercial.quoter_version_documents,
+  greenhouse_commercial.quoter_quote_current TO greenhouse_migrator;
+
+-- ── Verificación: aborta si algo de lo anterior no quedó creado ──────────────────────────────────────────────
+
+DO $$
+DECLARE
+  missing text := '';
+  relation text;
+  trigger_name text;
+  privilege text;
+  grantee text;
+BEGIN
+  FOR relation IN SELECT unnest(ARRAY[
+    'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_matrix',
+    'quoter_state_transitions', 'quoter_quote_recipients', 'quoter_quote_number_counters', 'quoter_quote_numbers',
+    'quoter_exception_approvals', 'quoter_version_documents', 'quoter_quote_current'
+  ]) LOOP
+    IF to_regclass('greenhouse_commercial.' || relation) IS NULL THEN missing := missing || ' ' || relation; END IF;
+  END LOOP;
+
+  IF (SELECT count(*) FROM greenhouse_commercial.quoter_state_matrix) <> 13 THEN
+    missing := missing || ' quoter_state_matrix_seed(!=13)';
+  END IF;
+
+  -- Sólo `withdrawn` es terminal: todo otro destino tiene salida.
+  IF EXISTS (
+    SELECT 1 FROM greenhouse_commercial.quoter_state_matrix m
+     WHERE m.to_state <> 'withdrawn'
+       AND NOT EXISTS (SELECT 1 FROM greenhouse_commercial.quoter_state_matrix n WHERE n.from_state = m.to_state)
+  ) THEN
+    missing := missing || ' quoter_state_matrix_dead_end';
+  END IF;
+
+  IF (SELECT count(*) FROM greenhouse_commercial.quoter_state_matrix WHERE requires_human_gate) <> 0 THEN
+    missing := missing || ' quoter_state_matrix_human_gate(!=0)';
+  END IF;
+
+  -- El arranque de cada serie se lee del contador: no se consume ningún número para comprobarlo.
+  IF (SELECT c.next_value FROM greenhouse_commercial.quoter_quote_number_counters c WHERE c.series = 'real') IS DISTINCT FROM 15001 THEN
+    missing := missing || ' quoter_quote_number_counters(real!=15001)';
+  END IF;
+
+  IF (SELECT c.next_value FROM greenhouse_commercial.quoter_quote_number_counters c WHERE c.series = 'synthetic') IS DISTINCT FROM 1 THEN
+    missing := missing || ' quoter_quote_number_counters(synthetic!=1)';
+  END IF;
+
+  -- Los disparadores, por nombre: un conteo pasaría con uno de más y otro de menos.
+  FOR trigger_name IN SELECT unnest(ARRAY[
+    'trg_quoter_quotes_insert', 'trg_quoter_quote_versions_insert', 'trg_quoter_version_documents_insert',
+    'trg_quoter_exception_approvals_insert', 'trg_quoter_state_transitions_insert',
+    'trg_quoter_state_transitions_assign_number', 'trg_quoter_quote_recipients_insert',
+    'trg_quoter_quote_number_counters_update', 'trg_quoter_quote_number_counters_no_delete',
+    'trg_quoter_quote_number_counters_no_truncate',
+    'trg_quoter_quotes_append_only', 'trg_quoter_quotes_no_truncate',
+    'trg_quoter_quote_versions_append_only', 'trg_quoter_quote_versions_no_truncate',
+    'trg_quoter_state_transitions_append_only', 'trg_quoter_state_transitions_no_truncate',
+    'trg_quoter_quote_recipients_append_only', 'trg_quoter_quote_recipients_no_truncate',
+    'trg_quoter_quote_numbers_append_only', 'trg_quoter_quote_numbers_no_truncate',
+    'trg_quoter_exception_approvals_append_only', 'trg_quoter_exception_approvals_no_truncate',
+    'trg_quoter_version_documents_append_only', 'trg_quoter_version_documents_no_truncate'
+  ]) LOOP
+    IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_trigger t WHERE t.tgname = trigger_name AND NOT t.tgisinternal) THEN
+      missing := missing || ' ' || trigger_name;
+    END IF;
+  END LOOP;
+
+  -- Los roles como son en la instancia: la aplicación entra como greenhouse_app, que hereda del grupo
+  -- greenhouse_runtime; las herramientas de migración entran como greenhouse_migrator_user, que hereda del grupo
+  -- greenhouse_migrator. Se comprueba el privilegio EFECTIVO de quien entra, no sólo el del grupo.
+  --
+  -- La aplicación no puede actualizar, borrar ni truncar el historial, y sí agregarle filas.
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app']) LOOP
+    FOR relation IN SELECT unnest(ARRAY[
+      'quoter_quotes', 'quoter_quote_versions', 'quoter_state_transitions', 'quoter_quote_recipients',
+      'quoter_quote_numbers', 'quoter_exception_approvals', 'quoter_version_documents', 'quoter_quote_number_counters'
+    ]) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+    END LOOP;
+
+    FOR relation IN SELECT unnest(ARRAY[
+      'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_transitions',
+      'quoter_quote_recipients', 'quoter_exception_approvals', 'quoter_version_documents'
+    ]) LOOP
+      IF NOT has_table_privilege(grantee, 'greenhouse_commercial.' || relation, 'INSERT') THEN
+        missing := missing || ' ' || grantee || '_lacks_INSERT_on_' || relation;
+      END IF;
+    END LOOP;
+  END LOOP;
+
+  -- Nadie más que el dueño escribe en los números, el contador o la matriz; las herramientas de migración no
+  -- escriben en ninguna tabla del agregado.
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app', 'greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
+    FOR relation IN SELECT unnest(ARRAY['quoter_quote_numbers', 'quoter_quote_number_counters', 'quoter_state_matrix']) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+    END LOOP;
+  END LOOP;
+
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
+    FOR relation IN SELECT unnest(ARRAY[
+      'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_transitions',
+      'quoter_quote_recipients', 'quoter_exception_approvals', 'quoter_version_documents'
+    ]) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+    END LOOP;
+  END LOOP;
+
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app', 'greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
+    IF has_function_privilege(grantee, 'greenhouse_commercial.quoter_assign_number_on_first_issue()', 'EXECUTE') THEN
+      missing := missing || ' ' || grantee || '_can_execute_number_assignment';
+    END IF;
+  END LOOP;
+
+  IF missing <> '' THEN
+    RAISE EXCEPTION 'TASK-2025 anti pre-up-marker check (agregado de cotización): faltan objetos o sobran permisos:%', missing;
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+-- SÓLO deshacer. Existe para una base sin cotizaciones reales.
+-- Guarda: con una cotización real registrada esta bajada no corre. Un comentario no protege una tabla de la que nada
+-- se borra; esto sí. El carril local sólo crea cotizaciones sintéticas y sigue pudiendo bajar y subir.
+DO $$
+DECLARE
+  real_quotes bigint := 0;
+BEGIN
+  IF to_regclass('greenhouse_commercial.quoter_quotes') IS NOT NULL THEN
+    EXECUTE 'SELECT count(*) FROM greenhouse_commercial.quoter_quotes WHERE data_origin = ''real''' INTO real_quotes;
+  END IF;
+
+  IF real_quotes > 0 THEN
+    RAISE EXCEPTION 'TASK-2025: hay % cotización(es) real(es) registrada(s); esta migración no se baja. La corrección es una migración nueva hacia adelante.', real_quotes;
+  END IF;
+END
+$$;
+
+DROP VIEW IF EXISTS greenhouse_commercial.quoter_quote_current;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_numbers;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_number_counters;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_recipients;
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_quote_state(text);
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_local_day(timestamptz);
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_today();
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_state_transitions;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_exception_approvals;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_version_documents;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_state_matrix;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_version_index;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_versions;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_quotes;
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_recipient_insert();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_number_counter_update();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_assign_number_on_first_issue();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_transition_insert();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_exception_approval_insert();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_version_document_insert();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_version_insert();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_before_quote_insert();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_assert_owner_matches(text, text, text);
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_lock_quote(text);

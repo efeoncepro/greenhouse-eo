@@ -325,3 +325,7 @@ El operador define los destinatarios de cada informe de Sky y confirma qué proy
 
 - ¿Quiénes reciben cada informe de Sky (Diseño digital y Blog SEO/AEO)?
 - ¿El informe del Blog incluye la entrega del equipo de contenido (tareas/piezas) además de SEO y AEO?
+
+## Delta 2026-10-12 — alcance de contenido (TASK-2033)
+
+- `TASK-2033` agregó un alcance de contenido por ORGANIZACIÓN (reglas de ruta en `greenhouse_growth.seo_content_scope_versions`, sellado en las fuentes de la edición). El alcance por servicio contratado de esta task puede montarse sobre el mismo contrato de reglas y los mismos readers con `scope`; hoy hay una sola versión vigente por organización.

@@ -1,3 +1,4 @@
+import { readPublicMeasurementContext } from '../growth-measurement-context/context'
 import {
   MEETING_SCHEDULER_SCHEMA_VERSION,
   type MeetingAvailability,
@@ -214,7 +215,7 @@ export const createMeetingApiClient = (baseUrl: string, fetcher: typeof fetch = 
             'Content-Type': 'application/json',
             'Idempotency-Key': idempotencyKey,
           },
-          body: JSON.stringify(input),
+          body: JSON.stringify({ ...input, measurementContext: readPublicMeasurementContext() }),
         })
       } catch {
         return {

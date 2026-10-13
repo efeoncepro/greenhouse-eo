@@ -1,0 +1,313 @@
+{
+  "template": "cotizacion-a4",
+  "version": 2,
+  "templateFiles": [
+    {
+      "name": "template-lineas.html",
+      "sha256": "34aa9eb8c18b271f687a82a250a0c208173b637edbf44205e1a54a8141b295b9"
+    },
+    {
+      "name": "template.css",
+      "sha256": "c79c121d37ae2619e36dcfe497be9f4150e5bba52f57835502891869d8e16fe5"
+    },
+    {
+      "name": "template-lineas.css",
+      "sha256": "43e19df15765bf54f4b6c719df9757e259076c25c9abb7a1aa8c43809ca38e73"
+    },
+    {
+      "name": "template-lineas-opciones.css",
+      "sha256": "589fbf6a8ddb04e475ed7e9f113644d3e26ee67af5fe5fe5b90887a7005a5cbb"
+    }
+  ],
+  "generatedAt": "2026-10-11T20:19:17.015Z",
+  "dataVersion": 2,
+  "pageCount": 5,
+  "status": "draft",
+  "signed": false,
+  "submitted": false,
+  "currency": "CLP",
+  "sourceCurrency": "CLP",
+  "presentation": {
+    "currency": "CLP",
+    "sourceCurrency": "CLP",
+    "locale": "es-CL",
+    "precision": 0,
+    "fx": null
+  },
+  "amounts": {
+    "net": 59880000,
+    "vat": 11377200,
+    "total": 71257200,
+    "monthly": null,
+    "taxSource": "stated"
+  },
+  "dataSource": "docs/commercial/prospects/sky-social-care-2027/pricing/cotizacion-2027.document.json",
+  "dataSha256": "60876ed554c0d9626394f705b9c3cf6fb07c8d29d56fe48a4c7ac84543a03b08",
+  "source": {
+    "system": "pricing-v3",
+    "calculationId": "composition-3c110015f356ffb3ae8db5b1",
+    "digest": "3c110015f356ffb3ae8db5b1757239271d21f7cb1f98966bf5b30c51cb43d64d",
+    "engineVersion": "pricing-v3-local/1.3.0",
+    "option1CalculationId": "composition-24207c296caf1a93d6e2d95a",
+    "option1Digest": "24207c296caf1a93d6e2d95ae30fa4a2c25827823fc35d3b7ddcb21753f0d07d",
+    "option2CalculationId": "composition-327e591eda88605fc581a662",
+    "option2Digest": "327e591eda88605fc581a66228b0ac21b7d74c84e540dd059152aa5308633281"
+  },
+  "brand": {
+    "line": "engine",
+    "assets": [
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+        "source": "axis-brand-assets:efeonce-logo-positive",
+        "bytes": 4383,
+        "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+      },
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+        "source": "axis-brand-assets:url-bubble-baked-light",
+        "bytes": 9410,
+        "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+        "source": "axis-fonts",
+        "bytes": 408496,
+        "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+        "source": "axis-fonts",
+        "bytes": 158240,
+        "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+        "source": "axis-fonts",
+        "bytes": 152860,
+        "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+        "source": "axis-fonts",
+        "bytes": 151516,
+        "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+        "source": "axis-fonts",
+        "bytes": 150292,
+        "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+      }
+    ],
+    "contactSource": "src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json",
+    "orbit": {
+      "schema": "axis.graphic-line-orbit-composition.v1",
+      "contract": {
+        "id": "efeonce.graphic-line-orbit",
+        "version": "0.3.1"
+      },
+      "canvas": {
+        "width": 794,
+        "height": 1123,
+        "line": "engine",
+        "product": "wave",
+        "platform": null,
+        "surface": "light",
+        "channel": "print",
+        "scale": 1,
+        "socialMultiplierApplied": false
+      },
+      "palette": {
+        "accent": "#0375db",
+        "background": "#f7f8f6",
+        "ring": "#72ded8",
+        "halo": "#72ded8"
+      },
+      "elements": [
+        {
+          "kind": "orbit",
+          "id": "orbit",
+          "placement": {
+            "region": "center",
+            "radius": {
+              "ratio": 0.3,
+              "of": "width"
+            }
+          },
+          "ring": {
+            "strokePx": 1,
+            "opacity": 0.16,
+            "color": "#023c70",
+            "innerOrbits": [
+              {
+                "radiusRatio": 0.72,
+                "opacity": 0.11
+              },
+              {
+                "radiusRatio": 0.44,
+                "opacity": 0.06
+              }
+            ]
+          },
+          "innerOrbits": false,
+          "arc": {
+            "startDeg": 65,
+            "sweepDeg": 50,
+            "strokePx": 1.6,
+            "color": "#0375db",
+            "linecap": "round",
+            "gradient": false
+          },
+          "trajectory": {
+            "meaning": "accent",
+            "origin": null,
+            "direction": "clockwise",
+            "sweepDeg": 50,
+            "value": null,
+            "valueLabel": null,
+            "pairsWithNumber": false
+          },
+          "sphere": {
+            "radiusPx": 3.5,
+            "color": "#0375db",
+            "at": "arc-end",
+            "ring": null
+          },
+          "halo": null
+        }
+      ],
+      "adapterChecks": [
+        "text-never-crosses-ring",
+        "ring-center-on-target-center",
+        "sphere-on-arc-end",
+        "lens-subject-inside-circle",
+        "url-as-bubble-never-text",
+        "decorative-svg-hidden-from-accessibility-tree",
+        "signature-centered",
+        "signature-min-contrast",
+        "accent-text-min-size",
+        "orbit-never-over-subject-or-reserves",
+        "accent-arc-never-reads-as-data",
+        "answer-period-part-of-text",
+        "measure-shows-value-and-source"
+      ]
+    }
+  },
+  "checks": {
+    "layout": [
+      {
+        "page": 1,
+        "gapPx": 133.9375,
+        "headerGapPx": 64,
+        "contentPx": 674.8125,
+        "overflow": []
+      },
+      {
+        "page": 2,
+        "gapPx": 120.484375,
+        "headerGapPx": 22.296875,
+        "contentPx": 768.078125,
+        "overflow": []
+      },
+      {
+        "page": 3,
+        "gapPx": 310.203125,
+        "headerGapPx": 22.296875,
+        "contentPx": 578.359375,
+        "overflow": []
+      },
+      {
+        "page": 4,
+        "gapPx": 580.703125,
+        "headerGapPx": 22.296875,
+        "contentPx": 307.859375,
+        "overflow": []
+      },
+      {
+        "page": 5,
+        "gapPx": 210.53125,
+        "headerGapPx": 22.296875,
+        "contentPx": 678.03125,
+        "overflow": []
+      }
+    ],
+    "pagination": [
+      {
+        "page": 3,
+        "estimatedPx": 578.41,
+        "capacityPx": 870,
+        "blocks": [
+          {
+            "key": "overline",
+            "gapPx": 0,
+            "heightPx": 16
+          },
+          {
+            "key": "title",
+            "gapPx": 10,
+            "heightPx": 85.07
+          },
+          {
+            "key": "intro",
+            "gapPx": 14,
+            "heightPx": 21.97
+          },
+          {
+            "key": "lines",
+            "gapPx": 20,
+            "heightPx": 107.11,
+            "rowsPx": [
+              69.11
+            ]
+          },
+          {
+            "key": "totals",
+            "gapPx": 22,
+            "heightPx": 232
+          },
+          {
+            "key": "taxNote",
+            "gapPx": 14,
+            "heightPx": 36.27
+          }
+        ],
+        "measuredPx": 578.36
+      },
+      {
+        "page": 4,
+        "estimatedPx": 307.95,
+        "capacityPx": 870,
+        "blocks": [
+          {
+            "key": "overline",
+            "gapPx": 0,
+            "heightPx": 16
+          },
+          {
+            "key": "options",
+            "gapPx": 12,
+            "heightPx": 279.95
+          }
+        ],
+        "measuredPx": 307.86
+      }
+    ],
+    "mobile": {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    "browserErrors": [],
+    "visualReview": "pending",
+    "pdfTextAndPageAudit": "pending"
+  },
+  "files": [
+    {
+      "name": "cotizacion.html",
+      "sha256": "b2ac5f858998c666b4c564ac1bfb3f6215f02c02319dc613e024c50f354a63d7"
+    },
+    {
+      "name": "cotizacion.pdf",
+      "sha256": "2c591e1f7eb10ab74d3adba47d2141cebaa94fdee0b22c6f550ef9bcceb1caec"
+    }
+  ]
+}

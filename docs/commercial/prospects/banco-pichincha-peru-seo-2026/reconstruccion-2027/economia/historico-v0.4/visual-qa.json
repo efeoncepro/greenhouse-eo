@@ -1,0 +1,15 @@
+{
+  "status": "visually_reviewed",
+  "workbook_sha256": "7f656e384a088e0ebec96a34226d23cf2862af467afc5739417aa5aa9dea1fb0",
+  "engine": "Bundled LibreOffice PDF export",
+  "pages": 8,
+  "inspection": [
+    "All8pages contact sheet from current XLSX",
+    "Decision first page: explicit required accounts/visits, conditional balances, financialN/D and historical withdrawal",
+    "Controls full resolution: Aperturas selector, retrospective window, financial authorities and12/24/36value horizon",
+    "Economy full resolution: ceiling/floor separate, net rate experiments, 924h candidate vs questioned historical capacities, required value not fee",
+    "Cohort matrices and maturation: monthly totals/dates and outside-window indicators",
+    "Retrolaunch separate explanation: unknown dates/window and illustrative counterfactual"
+  ],
+  "unverified": "Excel Desktop UI; bank inputs, actual quote, causal attribution and approved capacity."
+}

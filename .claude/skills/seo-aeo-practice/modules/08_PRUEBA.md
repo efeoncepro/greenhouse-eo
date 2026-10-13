@@ -1,79 +1,43 @@
-# 08 · Prueba sin mentir — el puente de atribución que sí existe
+# 08 · Prueba — compromisos, resultados y límites de atribución
 
-> 🔴 **Hoy tenemos CERO casos citables.** *(→ `efeonce/ESTADO_ACTUAL.md`)*
-> **Este módulo existe para vender igual — sin inventar uno.**
+Canon: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §§3–7.
+Casos/autorizaciones vigentes se verifican en `efeonce/ESTADO_ACTUAL.md` y expedientes, no desde un conteo histórico.
 
----
+## 1. Tres planos de evidencia
 
-## 1. La verdad incómoda, primero
+1. Descubrimiento y representación: ranking/tráfico por intención y brand/non-brand; cita, presencia,
+   fidelidad, prominencia y recomendación pertinente por superficie/corpus.
+2. Comportamiento y consideración: referencias, visitas, consultas y declaraciones de evaluación.
+3. Negocio: oportunidades, encaje, avance, motivos de elección y ventas con definición del owner.
 
-**No existe un modelo de atribución que conecte "ser citado por ChatGPT" con revenue.**
-✅ *Verificado 2026-07-13. Los estudios de conversión de tráfico LLM **van de +900% a −13%** —
-se contradicen en el signo* (`01_MERCADO` § 3).
+Conectar los planos cuando haya datos autorizados. Una cita no prueba recuerdo, preferencia ni compra;
+atribución de referencias/conversiones observadas no demuestra el efecto incremental causal de una cita.
 
-> ## Cualquiera que te dé un ROI de AEO te lo está inventando.
+## 2. Usar estudios con alcance
 
-🎯 **Y decir esto en voz alta, frente al cliente, es el activo — no la debilidad.**
-Es exactamente lo que él sospecha y **nadie le confirma.** Confirmárselo **te compra la reunión entera.**
+Estudios externos sobre AI Overviews pueden contextualizar presión sobre CTR. Conservar fuente, fecha,
+muestra, dispositivo, intención, población y método (§7 del canon). No presentar correlaciones como
+promesas de recuperar tráfico, abaratar paid o elevar revenue del cliente. No trasladar una cifra a
+GA4/Ads del prospecto como resultado propio ni convertir un 60% del panel en 60% del mercado.
 
----
+## 3. Prueba comercial proporcional
 
-## 2. 🎯 El puente que SÍ existe (y casi nadie lo usa)
+Elegir evidencia según la duda del comprador: diagnóstico trazable, muestra contextual autorizada,
+caso verificable o plan de intervención/medición. Un Assessment demuestra un diagnóstico bajo condiciones
+registradas; una demo demuestra criterio/ejecución, no captación ni eficacia causal. No reiniciar el
+Grader si ya existe evidencia suficiente para avanzar.
 
-**Hay dos datos verificados que sí sostienen una promesa medible:** ✅
+## 4. Qué se compromete y qué se observa
 
-| Dato | Valor |
+| Trabajo/resultados | Contrato de prueba |
 |---|---|
-| Marcas **citadas** en AI Overviews → **clics orgánicos** | 🎯 **+35%** |
-| Marcas **citadas** en AI Overviews → **clics PAGADOS** | 🎯 **+91%** |
-
-> ## La citación no te trae un canal nuevo. Te devuelve el que estabas perdiendo — y te abarata el paid.
-
-### La promesa honesta, palabra por palabra
-
-> *"**No te voy a decir cuánto revenue te va a dar, porque nadie lo sabe.**
->
-> Lo que sí te digo, y lo puedes verificar tú:
-> **las marcas que aparecen citadas dentro de los resúmenes de IA reciben 35% más clics orgánicos y 91% más
-> clics pagados.**
->
-> 🎯 **Y esas dos cosas se miden en TU GA4 y en TU cuenta de Ads. No en un dashboard mío.**"*
-
-🎯 **Ese último matiz es el producto entero.**
-**La medición en NUESTRO dashboard es sospechosa. En el del cliente, es prueba.**
-
----
-
-## 3. 🎯 El reencuadre que abre el presupuesto: esto es eficiencia de medios
-
-**El AEO no se vende como canal. Se vende como *eficiencia de medios*.**
-
-```
-El AI Overview te quitó el 68% del CTR pagado.       ← ya lo estás pagando
-Si te citan, recuperas el 91%.                       ← esto sí se mide en tu cuenta de Ads
-
-🎯 El AEO no es un gasto nuevo. Es lo que hace que el gasto que YA tienes rinda.
-```
-
-🔴 **Esta es la frase que hace que entre el CFO.** Y el CFO **es el que firma.**
-
----
-
-## 4. Qué métricas prometemos — y cuáles nos negamos a prometer
-
-| Métrica | ¿Se promete? | Por qué |
-|---|---|---|
-| **Citabilidad** *(estás/no estás en los motores)* | ✅ **Sí** | **La controlamos.** Es técnica + contenido |
-| **Cobertura de superficie** *(en cuántos motores apareces)* | ✅ **Sí** | Idem |
-| **Velocidad de publicación** *(capacidad declarada)* | ✅ **Sí** | Es un compromiso de operación |
-| **Salud técnica** *(CWV, schema, indexación)* | ✅ **Sí** | Binario y verificable |
-| **Clics orgánicos** | ⚠️ **Se proyecta, no se garantiza** | Depende del algoritmo |
-| 🔴 **Rankings / posiciones** | 🔴 **NUNCA** | **Es la promesa que rompió la categoría** |
-| 🔴 **Tráfico garantizado** | 🔴 **NUNCA** | No lo controlamos |
-| 🔴 **Revenue atribuido a IA** | 🔴 **NUNCA** | **No existe el modelo** |
-
-🎯 **La lista de lo que NOS NEGAMOS a prometer es más persuasiva que la de lo que prometemos.**
-**Enséñala. Literalmente.**
+| Investigación, revisión técnica, contenido, QA y correcciones controlables | Entregable, owner, dependencia y aceptación |
+| Publicación y distribución | Comprometer sólo canales/acciones operados y autorizados; estado leído de vuelta |
+| Medición | Corpus/fuente, configuración conocida, fallos, cobertura y denominadores |
+| Indexación, aparición, cita, recomendación o posición | Resultados observados, sin inclusión garantizada |
+| Clics/conversiones | Medidos cuando hay datos; escenarios sólo con muestra y supuestos declarados |
+| Consideración, preferencia y elección | Evidencia del comprador/CRM; no inferir desde mención |
+| Liderazgo de categoría | Aspiración con criterio comparativo; panel/ranking no certifican liderazgo de mercado |
 
 ---
 
@@ -102,9 +66,9 @@ Si te citan, recuperas el 91%.                       ← esto sí se mide en tu 
 | **3** | **Pedir la autorización.** Por escrito |
 | **4** | **Publicarlo con honestidad**: n=1, dicho en voz alta |
 
-🎯 **Y el caso más fuerte que podemos construir no es de tráfico: es del puente.**
-*"Cuando entramos, estaba citado en 1 de 7 motores. Hoy, en {N}. Y su CTR pagado en las queries donde ahora
-aparece citado subió {X}%."* **Eso se mide en la cuenta de él, y nadie más lo está mostrando.**
+Un caso puede mostrar presencia/representación antes y después bajo el mismo corpus y condiciones,
+y cambios de comportamiento/negocio con sus fuentes. Explicitar que una comparación temporal no demuestra
+causalidad; el número de motores no sustituye el denominador de respuestas pertinentes.
 
 ---
 
@@ -173,12 +137,12 @@ propiedades. Declara el alcance con precisión.
 ## 7. Reglas duras
 
 1. 🔴 **NUNCA inventes un caso.** Ni "ilustrativo", ni "de mercado", ni redondeado.
-2. 🔴 **NUNCA prometas revenue por citación en IA.** **No existe el modelo.**
+2. **No prometer revenue incremental desde citación.** Referencias y outcomes observados se pueden medir; causalidad no se infiere.
 3. 🔴 **NUNCA prometas rankings.**
    - 🔴 **Y su hermano:** **NUNCA muestres un techo de clics sin declarar si el sitio tiene muestra para su
      propia curva de CTR.** Es el mismo defecto — un número preciso que el cliente va a citar y que nadie
      observó *(SKILL.md regla dura **10**)*.
-4. ✅ **SIEMPRE lleva el puente**: +35% orgánico / +91% paid, **medido en la casa del cliente**.
+4. **Elegir prueba pertinente para la decisión.** Un estudio externo no es resultado propio ni garantía de lift del cliente.
 5. ✅ **SIEMPRE declara el denominador** de cualquier número que uses.
 6. 🎯 **SIEMPRE enseña la lista de lo que te niegas a prometer.** **Es más persuasiva que la otra.**
-7. 🎯 **La medición en nuestro dashboard es sospechosa. En el del cliente, es prueba.** Diseña para eso.
+7. **Permitir reconstruir la evidencia desde la fuente.** Dashboard propio o del cliente no cambia la naturaleza causal de los datos.

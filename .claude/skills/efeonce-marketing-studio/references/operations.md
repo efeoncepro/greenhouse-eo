@@ -324,10 +324,9 @@ pnpm studio:review request-changes <assetId> <versionNo> --reviewer "…" --note
 - Production state (2026-10-02): CMP-004 has 44 pieces (11 concepts × 4:5, 9:16, 1:1, 1,91:1) `origin=studio`, all
   approved, 0 pending review.
 
-## Catalog commands (TASK-1894 Entregable B — verified in staging 2026-10-02, NOT in production)
+## Catalog commands (TASK-1894 Entregable B — deployed 2026-10-02)
 
-Studio `a8c7886` is on **local** `main`, not pushed (push = production deploy; the operator does it). Verified on the
-preview of branch `task-1894-entregable-b` (staging DB). Migration `1790967435017_catalog-write-commands.sql` is
+The Entregable B commands are included in production API 1.6.0 (`74073de`). Migration `1790967435017_catalog-write-commands.sql` is
 already applied on staging and production (additive; the 5 real campaigns stay `onedrive`). Full runbook:
 `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Commands del catálogo.
 
@@ -349,6 +348,222 @@ pnpm studio:write authorizeMedia --param campaignId=CMP-900 --file autorizacion.
 - Rollback: revoke clients holding `studio:write` (`pnpm api-client:revoke --id … --reason …`); revert the Studio
   deploy; `pnpm migrate down` of `1790967435017` only if no campaign is `source_of_truth = 'studio'` (staging has
   `CMP-900`).
-- Pending (operator): `git push origin main` in Studio; gateway: apply the prepared read-only federation filter →
-  `pnpm studio:manifest:sync` → test → PR → merge → deploy (never sync the 1.4.0 manifest without the filter); Greenhouse
-  production release of `marketing_studio.asset.write` + `marketing_studio.campaign.write`.
+- The Studio push and read-only gateway filter are complete. Greenhouse write capability production rollout and
+  new delegated T1 federation remain separate. Prefer `pnpm studio` from Greenhouse for API operator work; the
+  `studio:write` examples above are the separate privileged Studio DB operator lane, never an API-auth fallback.
+
+## Video playback (TASK-1998/1999 — production verified 2026-10-04)
+
+```bash
+# Migration procedure (already applied to staging and production 2026-10-04)
+DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:<port>/<db>" PGPASSWORD="…" pnpm migrate up
+# Worker: PLAYBACK_ENABLED in apps/worker/deploy.sh (staging and production true); future changes require governed deploy
+bash apps/worker/deploy.sh --env staging --apply
+# Backfill = the idempotent sweep (batch MEDIA_WORKER_RECONCILE_BATCH); run it now instead of waiting for :07
+gcloud scheduler jobs run marketing-studio-reconcile-derivatives-staging --project efeonce-group --location us-east4
+# Checks
+SELECT a.asset_id, r.width_px, r.height_px, r.byte_size FROM studio.asset_rendition r JOIN studio.asset_version v USING (asset_version_id) JOIN studio.asset a USING (asset_id) WHERE r.kind = 'playback';
+curl -s -m 10 -o /dev/null -D - "$B<playback.url>"                      # Vercel: 302 Location storage.googleapis.com
+curl -s -m 10 -o /dev/null -D - -H 'Range: bytes=0-1023' "<Location>"   # 206 video/mp4
+```
+
+- Localhost: the personal ADC cannot `signBlob` as `marketing-studio-runtime-stg@` (403) — `next dev` proxies with Range
+  instead (never on Vercel). The 302 path is proven by signing as an SA you can impersonate on an object it can read.
+- Always cap `curl` with `-m` against local dev: a hung `next dev` blocks the call forever (2026-10-04).
+- The browser pane screenshot does not capture the video layer (looks black while playing); use Playwright with
+  `channel: 'chrome'` (Chromium lacks H.264) or read the frame into a canvas.
+- Rollback: `PLAYBACK_ENABLED="false"` + redeploy (existing rows keep serving); revert the web deploy; `migrate down` only
+  after deleting `kind = 'playback'` rows.
+
+## TASK-1905 catalog operations (Studio production verified 2026-10-04)
+
+Read Greenhouse `docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md` for the full runbook. Both Studio
+migrations and catalog seed v1 (52 channels) were applied in staging/production. Web and worker explicitly retain
+warn / ICP false. Backfill was inventoried only: 134 unmapped rows, five aliases, review by efeonce_operations.
+Do not rerun the seed or apply guessed aliases just because the following commands exist.
+
+- `pnpm channels:seed --dry-run`: validates seed locally without DB. `--file`/`--version` select explicit inputs.
+- `pnpm channels:seed --apply --actor <operator>`: governed draft/upsert/publish with deterministic idempotency and
+  strict readback; never overwrite a different published seed.
+- `pnpm channels:backfill --dry-run`: read-only DB inventory. `--map 'exact raw=canonical_key'` is explicit/repeatable.
+- `pnpm channels:backfill --apply --actor <operator> --version <published> --map 'exact raw=canonical_key'`: exclusive
+  ops_run, batches of 500, readback; unresolved/concurrent rows remain partial. Original labels/UTM are unchanged.
+- `--revert-alias 'exact raw'`: inspect first with dry-run, then apply with actor and `--confirm`; whole-row snapshot
+  comparison protects later edits. Cannot combine with --map.
+- Validation default warn: findings persisted but write allowed; off: no validation metadata; enforce: unknown/no
+  catalog/hard violations block. Recommended limits warn. Invalid flag values fail. Test each environment before promoting.
+- ICP disabled by default. Injectable adapter timeout 5 s, success cache 300 s/failure 60 s, organization+version scoped,
+  404 => not_entitled and flag-off cache clear. Default reader stays unavailable if enabled without consumer provisioning.
+- Remote order: approved migrations and capability grant, seed/readback, legacy inventory/map/readback, controlled
+  validation cases, explicit flag promotion. Gateway checkout reconciliation and generated manifest sync precede canary;
+  T1 still needs TASK-2003 real authority. No deploy or federation is implied by tests.
+
+- Final local verification: seed52/replay no-op, full PG suite34files216tests zero skips, build PASS, UI1440/390 PASS;
+  CLIbackfill dry0/apply1/replay 0/revert1 with three successful ops. These are isolated local evidence, not rollout.
+- Backfill preserves ANY existing versioned nonempty canonical snapshot, including deduplicated and partially resolved
+  arrays. Such arrays require explicit revalidation. Operator maintenance rejects `onlyOrganizationId` before DB access.
+
+## CLI HTTP desde Greenhouse (local, 2026-10-04)
+
+Manual canónico: `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`. Ejecutar desde Greenhouse, sin
+checkout hermano ni acceso PostgreSQL:
+
+```bash
+pnpm studio --help
+pnpm studio doctor
+pnpm studio list --filter copy
+pnpm studio describe studio.copy.create
+pnpm studio call studio.channels.list
+pnpm studio call studio.copy.create --param campaignId=CMP-900 --file copy.json
+pnpm studio upload ./pieza.png --campaign CMP-004 --asset '<assetId>' --license owned
+pnpm studio download --asset '<assetId>' --version 1 --output ./original.png
+pnpm studio:test
+```
+
+- Descubre contrato en vivo: 59 tools / 64 operaciones HTTP en API 1.6.0. `describe` es dueño del esquema,
+  no una tabla copiada. `call` acepta operationId o nombre `studio.*`; `--file -` acepta JSON desde stdin.
+- Escrituras dryRun por defecto, `--apply` ejecuta; `--key` y `--if-match` conservan intención/revisión.
+  T2 necesita además `--confirm`, sin conceder autoridad. Nunca cambiar llave/revisión para superar un rechazo.
+- Credencial única: `STUDIO_API_TOKEN`, archivo `0600` con `--token-file` o lectura explícita de Secret Manager
+  con `--token-secret <nombre> --project <proyecto>`. Nunca token en argv/salida ni credencial enviada a GCS.
+  El cliente de cargas existente tiene `studio:assets:write`, no `studio:write`; gobierno global aún deniega bearer.
+- `upload` calcula SHA-256 streaming, valida derechos, reserva ticket, transfiere directo a GCS y confirma.
+  `--new-asset` requiere concepto/título/ratio; varios archivos sólo con pieza existente/inferencia. Duplicado no
+  crea versión. `--resume <uploadId>` retoma confirmación, no bytes; pending sale con código 2.
+- `download` verifica tamaño/hash y limpia original incompleto. `call ... --output` permite previews binarios;
+  los archivos nunca se sobrescriben. JSON stdout, progreso stderr; recibos privados redactan URLs/tokens.
+- Verificado: 18 tests + lint; doctor/catálogo/lectura autenticada y upload dryRun reales. Transferencia aplicada,
+  idempotencia, errores y descarga se validaron con HTTP/GCS controlados. No se escribió producción por esta CLI.
+- Esto es cliente local, no deploy ni federación MCP. Un 401/403 se reporta; no se cambia a SQL/operator_cli.
+
+## Sonda del worker y evidencia del release (2026-10-04)
+
+Usar `/health` en Cloud Run. `/healthz` queda sólo como compatibilidad local: el path terminado en z devolvía 404
+antes de llegar al contenedor; no era un problema IAM. Imagen `74073de1188f`, digest `sha256:7e95c904dd9c01f7c023e56111f4495444220f64f162dfef8d15ce034c96b43e`,
+producción `00004-j4h` / staging `00006-p8q`: Ready al 100%, health 200. Vercel Ready y API1.6.0 confirmados.
+Rollback conserva esquema expand y catálogo publicado: volver código/imagen, nunca down/borrado como atajo.
+Dossier completo: `docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md`.
+
+## TASK-2001 rollout — 2026-10-04
+
+Actual production: aa6fa07, API 1.7.0/75 tools/80 HTTP, worker 00005-wc5 (staging 00007-kt9). Activations ON web/workers; discovery ON production with existing Efeonce brand bindings, staging OFF; owned OFF. `marketing-studio-metricool-discovery` active at 7,37 each hour Santiago, OIDC canary succeeded. Read-only discovery never creates plans. Six reviewed plans use CL. Old PUBLISHED labels without publication date stay overdue.
+
+Greenhouse `pnpm studio doctor`, `call getCalendarRange --param from=2026-09-01 --param to=2026-11-01 --param market=CL`, `call getActivation --param activationId=ACT-000001`, `call listUnlinkedExecutions` verified in production with the existing authorized read credential. Person-only commands still need TASK-2003 for delegated HTTP/MCP.
+
+Rollback: pause discovery job, flags OFF through versioned deploy config and redeploy; preserve schema and legacy rows. Prior web dpl_61kJPNWNXabGYetKC6dxwch2s2uW, prior worker 00004-j4h. Never migrate down with protected evidence. Audit: docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md.
+
+## Verificar el calendario de activaciones (TASK-2002, 2026-10-05)
+
+**Local** (Studio): servidor `studio-2002-local` en `:3102` contra Postgres 18 local **descartable**
+`127.0.0.1:55461/marketing_studio` (nunca staging/producción para escrituras de prueba).
+
+- Lectura: abrir `/calendar` y recorrer `view=month|week|day|timeline|paid`, `?pop=YYYY-MM-DD`, la hoja y los estados.
+  Para revisar fidelidad, las medidas exactas salen del generador del canvas (`gen.py`), no de la captura.
+- Diálogos: en modo `open` no se montan. Hace falta un actor con permiso (en la sesión fuente: `operator_cli` temporal
+  en `apps/web/src/server/runtime.ts`). **Requiere autorización explícita del operador en el chat** (el clasificador lo
+  bloquea como debilitamiento de seguridad), nunca se commitea y se revierte al terminar.
+- Desde `1f003c1` (2026-10-05) hay una alternativa sin tocar código: las dos variables de la ventana temporal
+  (`STUDIO_OPEN_WRITE_UNTIL`, `STUDIO_OPEN_WRITE_ORGS`, ver la sección siguiente) como variables **temporales** del
+  servidor local. Aprobar sigue exigiendo persona (`operator_cli`).
+- La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`) en el entorno local; sin él responde
+  422 `tracking_destination_invalid`.
+- Dónde van las variables temporales: en una configuración `studio-2002-local` (:3102) de `.claude/launch.json` de
+  **greenhouse-eo** (el que usa `preview_start`). Se agregan para la prueba y **se revierten al terminar**; el archivo
+  versionado tiene la configuración `studio-2002-local` (:3102, Postgres local 127.0.0.1:55461, `STUDIO_ACCESS_MODE=open`)
+  sin esas variables. Verificado el 2026-10-05: con `STUDIO_OPEN_WRITE_UNTIL`/`STUDIO_OPEN_WRITE_ORGS` agregadas allí
+  se montan los diálogos y las escrituras con `?dryRun=true` responden 200.
+- Recorrido verificado: planificar (vista previa 200 → 201, abre la hoja nueva), editar (PATCH 200), reprogramar,
+  cancelar, vincular, crear desde ejecución (201); la bandeja «Ejecución sin activación» baja su conteo.
+- Al revertir el actor: ningún diálogo se monta y `POST …/cancel` responde 403 `write_not_allowed`.
+- Tras `pnpm install`, reiniciar el servidor de desarrollo.
+- Gates antes de push: `pnpm check` + `pnpm --filter @studio/web build`.
+
+**Producción:** `https://studio.efeonce.org/calendar` → 200, calendario v3 (`STUDIO_ACCESS_MODE=open`). Sin ventana
+temporal de escritura vigente es **solo lectura**: botones `aria-disabled` con su motivo, pastilla «Solo lectura», y
+cualquier escritura por API responde 403 `write_not_allowed` (esperado, no es un incidente). Del 2026-10-05 al
+2026-10-12T10:00Z rige la ventana de la sección siguiente para la org Efeonce. Las escrituras web con persona llegan con
+TASK-1898; por MCP con TASK-2003.
+
+## Ventana temporal de escritura en modo open (Studio `1f003c1`, 2026-10-05)
+
+Para qué: probar las escrituras de la UI en producción antes del login TASK-1898. Decisión del operador 2026-10-05
+(eligió «Producción abierta» entre preview protegido / local / producción abierta). Código: `apps/web/src/server/runtime.ts`,
+test `open-write-window.test.ts`.
+
+- **Cómo funciona:** con `STUDIO_ACCESS_MODE=open`, si `STUDIO_OPEN_WRITE_UNTIL` (ISO, como máximo 7 días adelante; si es
+  más, se ignora) y `STUDIO_OPEN_WRITE_ORGS` (ids `org-…`) son ambas válidas, el modo open resuelve el actor `api_client`
+  id `open-write-window` con scopes `studio:read` + `studio:write`, sólo para esas organizaciones: escrituras T1
+  (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución). **Aprobar sigue exigiendo persona**
+  (`operator_cli`). Al vencer la fecha, o sin ambas variables válidas, vuelve a solo lectura **sin redeploy**.
+- **Estado vigente (Vercel `efeonce-marketing-studio`, sólo Production):** `STUDIO_OPEN_WRITE_UNTIL=2026-10-12T10:00:00Z`
+  (07:00 de Chile del lunes 12-oct) y `STUDIO_OPEN_WRITE_ORGS=org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
+- **Riesgo:** mientras esté abierta, cualquiera con el link puede escribir en la org Efeonce, y el audit registra
+  `api_client:open-write-window`, no una persona.
+- **Verificar que está abierta** (sin escribir nada real):
+  - `GET https://studio.efeonce.org/api/v1/activations/{id}` → `permissions.writable=true`.
+  - Una escritura con `?dryRun=true` (verificado: cancel de ACT-000001 → 200, nada escrito).
+  - En la UI, sin pastilla «Solo lectura» y con los diálogos montados.
+- **Cerrar:** vence sola en la fecha. Para cerrarla antes (lo pide el operador o llega TASK-1898): borrar las dos
+  variables en Vercel Production o poner `STUDIO_OPEN_WRITE_UNTIL` en una fecha pasada. Verificar el cierre con el mismo
+  `GET` (`permissions.writable=false`) y que una escritura con `?dryRun=true` responda 403 `write_not_allowed`.
+- **Nunca** abrirla por más de 7 días (el código lo ignora), ni para orgs de clientes sin decisión del operador, ni
+  dejarla como sustituto del login.
+
+## Verificar rendimiento y motion del calendario (TASK-2002, 2026-10-05)
+
+- **No compartas el `next dev` de otra sesión:** usa un build de producción propio (`pnpm --filter @studio/web build` +
+  `next start` en otro puerto) con una configuración temporal en `launch.json`; elimínala al terminar.
+- **Medir producción:** `curl -w '%{time_starttransfer} %{time_total} %{size_download}'` del documento y del RSC (`RSC: 1`;
+  en `next start` local hace falta `-L`). La navegación cliente se mide con Playwright observando URL/título.
+- **View Transitions:** envolver `document.startViewTransition` en `addInitScript` para registrar `types`; revisar
+  fotogramas del video (`ffmpeg … tile=6x3`) buscando cuadros vacíos o doble exposición.
+- **Escritura local:** `STUDIO_OPEN_WRITE_UNTIL`/`ORGS` y `STUDIO_TRACKING_DOMAINS` sólo en la configuración temporal;
+  reprogramar → Deshacer deja la activación como estaba (verificar `planned_at` en la base local).
+- **Integración del dominio:** crear una base desechable en el cluster local (`CREATE DATABASE …`), migrarla con
+  `node-pg-migrate` del paquete database y exportar `STUDIO_*_IT_PG_URL`; borrarla después. 3 tests fallan igual en HEAD.
+- **Nunca carga sintética contra producción de Studio** (ISSUE-180): medir con un navegador y vigilar las conexiones del
+  rol en paralelo, sólo lectura, desde el proxy de Greenhouse (`pnpm pg:connect`, misma instancia):
+  `select state, count(*), max(now()-state_change) from pg_stat_activity where usename='marketing_studio_app' group by 1`.
+  Sano: suben durante la navegación y vuelven a la base ~10 s después. Tope del rol: 20.
+- **Recuperación si se agota el rol:** liberar sólo sesiones `idle` de `marketing_studio_app` con más de 2–3 minutos
+  (`pg_terminate_backend`); las instancias reabren al necesitarlo. Un rollback de Vercel reactiva instancias viejas que
+  pueden fallar con `bad certificate`: preferir `vercel redeploy <deploy> --target production` + `vercel promote`.
+- Tras `vercel rollback`/`promote`, los pushes siguientes a `main` siguen promoviéndose a producción (visto el 2026-10-05):
+  cualquier push de otra sesión despliega todo `main`.
+
+## Rollout de miniaturas AXIS — verificado, 2026-10-07
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md`. No ejecutar estos pasos
+como consecuencia automática de un cambio de skin. El operador autorizó completar el rollout el 2026-10-07;
+rollout cerrado con migración/CORS en ambos ambientes, web productiva, worker staging `00008-n9x` y
+producción `00006-9lq`, backfill 4/4 y 7/7, reproducción y miniaturas visibles. Evidencia:
+`docs/audits/marketing-studio/2026-10-07-axis-video-adoption.md`. La secuencia siguiente es el runbook,
+no trabajo pendiente ni autorización para repetir operaciones ya aplicadas.
+
+1. Aplicar la migración aditiva `1791390000000_video-timeline-renditions.sql` en staging antes de activar
+   `MEDIA_WORKER_THUMBNAILS_ENABLED`; desplegar reader/transporte compatible y el worker.
+2. Configurar/verificar CORS GET/HEAD del bucket de **medios** para orígenes autorizados; el CORS de uploads
+   en originals no lo sustituye. Aplicado en ambos ambientes; readback de producción: video 206 y
+   `Access-Control-Allow-Origin: https://studio.efeonce.org`.
+3. Activar el flag en `apps/worker/deploy.sh`; con miniaturas activas, el barrido limita el lote a una versión.
+   No garantiza un presupuesto global para archivos grandes. Verificar dos
+   renditions nuevas por video, VTT válido, sprites cargados y segunda corrida sin regeneración. El MP4 previo
+   se conserva; no usar `force` para este backfill.
+4. Verificar en browser autorizado la reproducción y seek, autoocultación, miniaturas, fullscreen, expiración
+   y versión seleccionada. Promover a producción sólo con la evidencia y autorización correspondientes.
+5. El DTO modifica el manifiesto aunque no agrega tools: regeneración/check local hechos. Gateway sin
+   `outputSchema` reenvía JSON completo, por lo que no requiere sync/deploy; no incorporar readers ajenos.
+
+Rollback funcional: apagar el flag evita nueva generación; `thumbnailsUrl` ausente permite seguir con el MP4.
+La migración Down falla si quedan derivados timeline; no borrar objetos/filas como rollback automático.
+La autorización no prueba ejecución: consultar la auditoría para migración, CORS, backfill y despliegues confirmados.
+
+
+### Migrador: excepción histórica del 07/10/2026
+
+Desde Studio `1c0e7ae`, `pnpm migrate up [nombre] [--dry-run] [--no-verbose]` usa wrapper de operador.
+La única inversión aceptada es owned-email `1791155100000` después de timeline `1791390000000`, con
+ambas aplicadas y efectos de schema verificados bajo el mismo advisory lock/cliente. No reordenar IDs ni
+`run_on`, no desactivar globalmente check-order, no repetir SQL. Otros huecos/inversiones fallan.
+`create` y `down` mantienen el CLI original. Dry-run staging/producción exit 0, sin pendientes, tras recuperar
+el reader Metricool. No implica flags email ON ni nuevo worker. Evidencia en la auditoría AXIS del 07/10.

@@ -1,5 +1,8 @@
 # Efeonce Marketing Studio — lessons (append; newest first; each with date, symptom, cause, rule)
 
+- **2026-10-04 · Retirada de TASK-1899.** El operador considera prematuro añadir esta fricción durante la construcción. Se retiró la implementación local y su condición de requisito para desarrollar Studio. No reactivar sus gates por referencias históricas; conservar los controles existentes. La decisión posterior TASK-2003 ya prevé T1 delegado en paralelo, pendiente de implementación/rollout/canary; el T2/proposalDigest retirado no se revive.
+
+
 - **2026-09-25 · One Postgres query per thumbnail exhausted the role.** Symptom: grids of 20+ pieces showed broken
   images; `too many connections for role` on `marketing_studio_app` (limit 20); reproduced 18 of 40 concurrent
   requests = 500. Cause: `/renditions/{id}` authorized each image against the DB. Fix (`c949d3f`): readers return
@@ -196,3 +199,214 @@
 - **Re-importing corrects copy text without duplicates** (copies upsert by `copy_id`; verified 2026-10-03 fixing the
   service name in two copies). The import report prints `updated: N` for every row it touches, changed or not. Rule:
   never read `updated: N` as "everything changed"; verify the specific field with a read.
+
+## 2026-10-04 — Video playback (TASK-1998/1999)
+
+- **The board hid real pieces.** `PiecesWorkspace` picked `assets.find(...)` per concept × kind × ratio, so the second
+  16:9 video of CMP001-08 («con intro para Instagram») had no cell; «Videos 5» showed 4. Rule: a grid keyed by
+  attributes must render every match (or say how many it hides); compare the tab counter with what is drawn.
+- **A function cannot be a video transport.** The media route buffered whole objects (no Range) and Vercel caps a
+  response at 4.5 MB. Rule: big media = 302 to a short V4 URL; authorization stays in the reader's HMAC link.
+- **The operator's ADC cannot sign as the runtime SA** (`signBlob` 403), and the SA that can be impersonated
+  (`ingest-stg`) cannot read the media bucket (`AccessDenied`, signature valid). Rule: do not touch IAM to test
+  locally; dev-only Range proxy + a positive V4 check on an object the signer can read.
+- **Interrupted session = dead proxies and a hung dev server.** The session cut sent SIGTERM to every
+  `cloud-sql-proxy` started from it, and an old `next dev` (2 days) sat at 98 % CPU answering nothing; an uncapped
+  `curl` hung the turn. Rule: run the proxy as a background task, cap every local `curl` with `-m`, check
+  `/api/v1/health` first.
+- **The browser pane screenshot shows a playing video as black.** A canvas read proved real frames (max luma 255).
+  Rule: visual evidence of video with Playwright + Chrome (`channel: 'chrome'`; bundled Chromium has no H.264).
+- **Staging is not production's data.** «Los Sparks» (CMP001-08) was loaded only in production on 2026-10-03; staging
+  has 4 videos. Rule: when a recipe says «staging first», do it, or record that staging was skipped.
+- **Production deploys and merges need the operator's authorization stated in chat, not inferred.** The permission
+  classifier blocked `deploy.sh --env production --apply` after a generic «Autorizado» and only let it run after «te
+  autorizo a correrlo tu todo»; `gh pr merge` stayed blocked («Merge Without Review»). Rule: ask for the explicit
+  production authorization up front, and plan the PR merge as an operator step.
+- **Never write a file with `open(dst, 'w')` in the same expression that reads it.** A script truncated `Handoff.md`
+  (and another session's uncommitted line) before reading it. Rule: read into a variable first, or write to a scratch
+  file; for shared files with foreign hunks commit through a temporary index (`GIT_INDEX_FILE`) built from HEAD + your
+  block, then `git reset -- <paths>` on the real index.
+- **Show durations the way the native player does.** The board said «0:50» and Chrome's controls «0:49» for 49.6 s.
+  Rule: truncate seconds (`Math.floor`), like the browser.
+
+
+## 2026-10-04 — TASK-1905 local implementation
+
+- PostgreSQL integration tests which always roll back can hide deferred FK violations. Seed the referenced catalog
+  version/channel in the fixture and force `SET CONSTRAINTS ALL IMMEDIATE` before rollback. The first real catalog test
+  exposed a hardcoded validator version without its referenced row; fixing the fixture proved persistence honestly.
+- Warn mode must preserve a resolved null for unknown channels. Null-coalescing back to the input literal would invent
+  a canonical key. Preserve original text and store the resolution/version separately.
+- Kernel command coverage is insufficient when legacy rights or upload finalization call a lower primitive. Validate
+  within the same transaction at those entry points too; a prepared upload ticket does not freeze catalog authority.
+- A provisioned consumer and deployed flags are runtime facts. An injectable adapter and a flag set true do not make
+  ICP available; keep the default reader disabled/unavailable until the authorized dependency exists.
+- Check all shared-repo branches before syncing a generated manifest. The gateway was on another task's branch and
+  was deliberately left untouched; never edit generated inventory manually to appear federated.
+
+- A count comparison cannot identify completeness of deduplicated channel arrays: two historical aliases may map to
+  one canonical channel. Preserve any versioned nonempty binding; partial warn arrays use explicit revalidation, not
+  backfill. Global maintenance must reject organization-scoped operators just as the global-catalog kernel does.
+
+- TASK-1905 release: Cloud Run returned Google 404 for /healthz without reaching the container. Use /health
+  (74073de) for the external worker probe; keep /healthz only for local compatibility. Official restriction:
+  https://docs.cloud.google.com/run/docs/known-issues#reserved_url_paths. Probe the actual route after deploy.
+
+
+## 2026-10-04 — catalog release and API operator client
+
+- **Ready is not routable health.** Cloud Run returned 404 on `/healthz` before the container despite a Ready revision.
+  Use `/health`; preserve `/healthz` only for local compatibility. Verify the routable path in staging, then promote
+  the same image digest. Never widen IAM to repair a path intercepted upstream.
+- **Pin validation mode in every writer runtime.** Upload finalization runs in the worker, so web-only `warn` or ICP
+  flags can produce conflicting outcomes. Both deployments now explicitly use warn/ICP false.
+- **Published catalog is not repaired history.** Seed readback of 52 channels did not map 134 legacy records across
+  five ambiguous aliases. Preserve raw labels and existing versioned snapshots; operations owns explicit review.
+- **Contract parity is not authority parity.** The 59 provider tools are callable through the dynamic API client only
+  with the scope/actor accepted by Studio. Upload credentials do not carry general-write scope; catalog service
+  writes still fail closed. Never substitute operator_cli/SQL after an HTTP403, or claim new MCP federation.
+- **CLI output is not a transfer proof.** A live upload dryRun proved metadata validation only. Applied PUT/POST,
+  confirmation polling, duplicates, downloads and hash failures were tested with controlled local HTTP/storage.
+  Keep that evidence distinct from production writes. Resume confirms an existing upload; it does not resume bytes.
+- **Idempotency survives uncertainty.** Emit the logical key before writing, retain it when a call times out, and
+  reread on revision conflict. Neither a new key nor a refreshed If-Match is an automatic retry strategy.
+
+## 2026-10-04 — activations rollout
+
+- Legacy post UUIDs differ between staging and production; verify campaign/post key/provider identity and query target-local IDs. Reuse original command inputs and revision for replay, not the later campaign revision.
+- Tracking allowlists must be configured before a preview canary; fail-closed validation correctly rejects an undeclared destination. Rebuild after Vercel config changes.
+- Metricool PUBLISHED without an observed timestamp is not published evidence. Keep overdue and a reconciliation item, never copy the scheduled timestamp. Preserve a legacy record absent from discovery results.
+- Verify scheduler identity separately from operator invocation. Three accounts read 62 records, repeat changes 0; scheduler run succeeded with its own OIDC.
+- 2026-10-04 (TASK-2002): a published `@efeoncepro/axis-brand-assets` version can lag the AXIS repo — 0.4.18 lacked
+  `assets/tools/` (HubSpot, Metricool, Notion) although they were committed. Check the installed package, not the repo,
+  before importing an asset; publish a new version instead of copying files.
+- 2026-10-04: running `pnpm install` while `next dev` is up can change Next's resolved path (peer reshuffle) and every
+  route then fails with «module factory is not available»; media 500s look like broken thumbnails. Restart the dev server.
+- 2026-10-04: in server components Turbopack may give a static SVG import as a string instead of `StaticImageData`;
+  read `typeof src === 'string' ? src : src.src`.
+- 2026-10-04: an AXIS release tag publishes every package version on `main` not yet in the registry, including other
+  sessions' bumps. List HEAD versions vs registry before tagging; never move a pushed tag — release the next version.
+
+## 2026-10-05 — TASK-2002 calendario v3 y diálogos de escritura
+
+- **Clase global `.today` choca con el calendario.** La grilla de la página Hoy usa `.today` (`display:grid`, 2
+  columnas) y deformaba cualquier `today` del calendario. Regla: usar `is-today`.
+- **Un server component no puede pasar funciones a un client component** (`afterHref`). Regla: pasar una plantilla de
+  URL con `__ID__` y resolverla en el cliente.
+- **Un server component no puede llamar funciones de un módulo `'use client'`** (`stageMode`). Regla: helpers
+  compartidos en un módulo sin directiva (`stage-model.ts`).
+- **Hijos de un flex en columna con overflow se encogen a 0 de alto** (el escenario dentro de `.sheet-body`). Regla:
+  `flex-shrink: 0`.
+- **Lint `react-hooks/set-state-in-effect`.** No resetear estado síncrono en efectos; guardar el resultado con la clave
+  de la entrada que lo produjo y derivarlo al renderizar.
+- **Test de paridad UI↔API.** Todo `fetch` de mutación en archivos cliente lleva `method` literal y ruta template
+  estática con parámetros de nombre exacto (`campaignId`, `activationId`, `recordId`); si no, `operations-parity.test.ts` falla.
+- **El Write tool convirtió un escape de espacio duro en el carácter literal** → `no-irregular-whitespace`. Regla:
+  escribir el escape, no el carácter.
+- **En modo `open` el actor anónimo no escribe ni siquiera `dryRun`** (`handleWrite` rechaza antes de mirar el cuerpo).
+  Para ver diálogos en local hace falta un actor con permiso: pedir autorización explícita al operador (el
+  clasificador lo bloquea como debilitamiento de seguridad), no commitear y revertir.
+- **La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS`** (`{org:[dominios]}`) o devuelve 422
+  `tracking_destination_invalid`.
+- **La regla del validador no basta para filtrar cuentas del formulario.** Una cuenta de pauta (LinkedIn Ads, platform
+  `linkedin`) aparecía en orgánico. Regla: filtrar además por la herramienta del canal (paid → `buyingPlatform`, resto →
+  `readbackProvider` si no es `none`).
+- **Reiniciar el servidor de desarrollo después de `pnpm install`** (factories de módulo rotas; reafirma la lección del 2026-10-04).
+- **Import estático de SVG en Turbopack llega como string o `StaticImageData`.** Regla: leerlo con `srcOf`
+  (reafirma la lección del 2026-10-04).
+- **El generador del canvas (`gen.py`) es la fuente exacta de medidas** para revisar fidelidad contra la dirección v3.
+
+## 2026-10-05 — TASK-2002 filtros v3.4, formulario y fecha/hora v3.5
+
+- **Un menú propio dentro de un `<label>` se reabre al elegir.** Síntoma: en el formulario, un clic en una opción del
+  `Select` (`write/parts.tsx`) cerraba el menú y el `<label>` que envuelve el campo reactivaba el botón, que lo volvía a
+  abrir. Regla: `preventDefault` en el clic del menú (y Esc cierra el menú, no el formulario).
+- **Popovers dentro de un contenedor con scroll o de un modal quedan recortados.** El selector de fecha se cortaba en el
+  modal de Reprogramar y en el scroll del formulario. Regla: sacarlo con portal a `body` y posición fija, y abrir hacia
+  donde cabe completo; en teléfono, hoja inferior.
+- **Conteo por faceta = los OTROS filtros aplicados sobre una lectura sin filtros.** Contar sobre la lectura ya
+  filtrada deja en cero todo lo que no está elegido. Regla: una segunda lectura del período sin filtros y, por opción,
+  aplicar los demás filtros (`facetCounts`/`facetTotal` en `model.ts`); hereda el tope de 200 del calendario.
+- **El período del mes empieza en la grilla, no en el día 1.** Textos como «Con activaciones en {mes}» o «No hay
+  activaciones en México en octubre» toman el mes del primer día de la grilla si se derivan del período (que suele caer
+  en el mes anterior). Regla: usar el mes ancla (el mes mirado) para textos «en {mes}».
+- **El lint del compilador de React prohíbe leer refs durante el render.** Regla: desestructurar lo que devuelve el
+  hook en vez de leer `ref.current` en el render.
+- **Paquetes de GitHub Packages en local:** `NODE_AUTH_TOKEN=$(gh auth token) pnpm install` (reafirma la lección del
+  2026-09-25; se necesitó para subir a AXIS 0.4.21).
+- **Commit con índice temporal también en AXIS.** `packages/tokens/src/tokens.ts` y otros archivos tenían trabajo sin
+  commitear de otra sesión; el release `3c8a6dd` llevó sólo la línea propia por índice temporal. Un test de tokens («AI
+  Visibility Report … source hashes») falla en el árbol de trabajo por ese trabajo ajeno, no por el cambio (reafirma la
+  regla de `GIT_INDEX_FILE` de arriba).
+
+## 2026-10-05 — TASK-2002 rendimiento y motion
+
+- **El RSC del mes lo inflaba la bandeja lateral**, no la grilla: 50 tarjetas con el post entero (~150 de 226 KB) aunque
+  el CSS lo cortaba a 2 líneas. Regla: medir el payload por bloque antes de optimizar lecturas.
+- **Next 16 prefetchea sólo hasta `loading.tsx` en rutas dinámicas**, también con `router.prefetch`; para traer la página
+  hay que pasar `{ kind: 'full' }` (tipado como `PrefetchKind`). Ese prefetch vive `staleTimes.static`.
+- **Una entrada `animation-fill-mode: both` retiene `transform`** y le gana al estilo inline del arrastre: la hoja no
+  sigue el dedo. Regla: entradas con `backwards`, salidas con `both`.
+- **Fundidos secuenciados (sale, luego entra con retraso) dejan un cuadro vacío** visible a 25 fps. Regla: fundidos que
+  se cruzan sin hueco y `::view-transition-*(root)` sin animación para no dejar texto fantasma.
+- **Especificidad igual entre `.is-warm .sheet` y `.is-closing :is(.sheet)`** anuló la salida de la hoja que llegó tras
+  la provisional. Regla: `.is-warm:not(.is-closing)`.
+- **Velocidad de arrastre = promedio desde el inicio** cierra la hoja aunque el dedo se detenga; usar el último tramo.
+- **El lint del compilador de React (`react-hooks/immutability`) prohíbe escribir `ref.current.style` del argumento de un
+  hook**: pasar por una función de módulo. `react-hooks/refs`/orden: declarar callbacks antes de usarlos en hooks.
+- **Los clics capturados en un ancestro llegan antes que el `onClick` del `<Link>`**: para que un enlace maneje su
+  propia salida, marcarlo `data-nav-native`.
+- **ISSUE-180 (2026-10-05): el pool `pg` no cierra conexiones en instancias congeladas de Vercel.** Más consultas en
+  paralelo + prefetch en reposo + medición con 20 navegadores agotaron el tope de 20 del rol web. Regla: `attachDatabasePool`
+  en el runtime web, pool de 2 en Vercel, prefetch sólo por intención, y jamás carga sintética contra producción.
+- **Rollback de Vercel reusa instancias congeladas** del deploy viejo: el Cloud SQL connector puede traer un certificado
+  efímero vencido (`ssl/tls alert bad certificate`). Redeploy fresco + promote las renueva.
+- **`@vercel/functions` 3.9.11 depende de `@vercel/oidc` 4.0.0** y rompe el `dependency-catalog-gate` (Studio fija 3.8.9):
+  usar 3.9.9 hasta migrar oidc a propósito.
+- **Avisar «no push» a una sesión no frena a las demás:** una sesión de branding empujó a `main` y desplegó el código en
+  espera. Con trabajo en producción pendiente, revertir en `main` o confirmar con `ListAgents` y todas las sesiones activas.
+
+
+## 2026-10-07 — Incorporar programación existente de Metricool
+
+- Discovery importa evidencia, no crea activaciones. Comparar IDs del planner con `execution.unlinked.list` y el calendario antes de repetir discovery o programar de nuevo. Las autolistas sin ID/content no son posts concretos.
+- `from_execution` requiere campaña, cuenta, canal, mercado y versiones exactas; nunca asociar sólo por parecido del texto. El manifiesto original puede demostrar ID, medio, copy literal, ruta y hash.
+- Un dry-run HTTP 200 no certifica permiso de apply: la CLI exige credencial para escribir, aunque la web tenga ventana open. El bearer de cargas no concede `studio:write`; no crear/ampliar credenciales ni pasar a operator_cli por un 403. En esta sesión el operador autorizó explícitamente el carril administrativo después del rechazo.
+- El slug de campañas antiguas requiere persona y prefijo `<campaignId en minúsculas>-`; `cmp-002-tu-ia-no-conoce-tu-negocio` es válido, el título sin prefijo no. Declarar el slug no reescribe UTMs del proveedor.
+- Ingresar un archivo crea `pending_review`, que bloquea un plan `planned`. El contrato permite plan `draft` con esa versión y evidencia `scheduled`: usarlo cuando sólo se incorpora programación ya existente sin nueva aprobación. No aprobar una pieza por inferencia ni degradar manualmente la revisión a imported.
+- Evidencia de la operación: `docs/audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md`. Los conteos y estado final se leen allí, no en esta regla reusable.
+
+
+### 2026-10-07 — Evidencia del proveedor no completa el copy del plan
+
+- Al reconciliar Metricool, comprobar tanto `execution.records[].bodyText` como `activation.copyId` y `activation.copy.primaryText`. Igualdad del texto de ejecución no acredita que la ficha muestre copy; abrir al menos una ficha real. Caso: 25 de 26 activaciones cargadas conservaban el texto sólo como evidencia.
+- Recuperar el copy exacto por publicación/cuenta, preservando menciones, emojis y saltos; no sustituirlo por una variante publicitaria parecida. Para campañas OneDrive, ampliar el catálogo gobernado con backup y usar import acotado. El registry del import debe preservar estados/metadatos y títulos de conceptos leídos en vivo; un subconjunto de copies sin títulos puede convertir el título del concepto en su ID. Verificar después por API.
+- Los canales orgánicos IG/LinkedIn v1 consultados tienen placements/formats/copyLimits vacíos: un campo sin especificación no se completa inventando claves o copiando límites de paid. Separar este gap del trabajo de importar copys.
+- Una línea editorial permanente no obliga a una sola campaña always_on. El concepto actual sólo tiene título/orden; carece de brief/ventana propios. Comparar continuidad frente a gobierno por temporada antes de agrupar Seasonalities. Propuesta sin decidir: `docs/audits/marketing-studio/2026-10-07-seasonalities-model-comparison.md`.
+
+### 2026-10-07 — Reutilizar el pipeline de Studio al adoptar AXIS
+
+- Revisar `upload.ts`, `derivatives.ts` y `toolkit-node.ts` antes de diseñar «un servicio nuevo»: Studio ya
+  posee originales por SHA, ingesta verificable, worker FFmpeg y MP4 faststart. AXIS controla presentación;
+  no almacena ni procesa el original.
+- `thumb`/`poster` actuales son un fotograma, no miniaturas temporales. La secuencia requiere sprite + WebVTT,
+  soporte MIME/schema/transporte y reader; no basta añadir un `thumbnailsUrl` al frontend.
+- Un video nativo que responde 206 puede fallar con `crossorigin=anonymous`: comprobar CORS de la respuesta
+  final GCS. En producción se observó 206 con CORS null; no confundir Range operativo con integración completa.
+- No persistir URLs firmadas en VTT: almacenar referencia al sprite hermano y firmar al servir; limitar tamaño,
+  cues, geometría y rechazar referencias externas/traversal.
+- Las miniaturas faltantes se agregan con el barrido idempotente, sin rehacer el MP4. La UI conserva reproducción
+  cuando el índice es null; null no demuestra procesamiento en curso.
+- Un DTO aditivo también puede cambiar el hash del manifiesto MCP. Mantener artefacto local consistente y
+  documentar adopción del gateway por separado; no añadir permisos o despliegues por inferencia.
+
+- **Compatibilidad de toda la imagen del worker:** antes de promover un cambio acotado, revisar migraciones
+  pendientes de todos los handlers incluidos y ejecutar readback de los jobs compartidos. Flags OFF no
+  demuestran independencia de schema: una ruta social puede escribir columnas de evidencia añadidas para
+  email sin consultar su flag. Aplicar sólo dependencias canónicas verificadas, con staging previo, no todas
+  las migraciones pendientes; cerrar con el job fallido recuperado y health, no sólo con SQL o video PASS.
+
+- Una migración canónica aplicada fuera de orden puede recuperar runtime y dejar el migrador ordinal roto.
+  Conservar historia real; una excepción debe identificar exactamente la inversión, validar schema bajo el
+  mismo lock y rechazar cualquier otro hueco. Nunca resolverlo reescribiendo `run_on` ni apagando check-order
+  globalmente. Studio `1c0e7ae` conserva sólo la excepción owned-email/timeline del 07/10/2026.

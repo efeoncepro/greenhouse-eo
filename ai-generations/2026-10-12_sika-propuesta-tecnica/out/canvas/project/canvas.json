@@ -1,0 +1,551 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "Aplicaciones.dc.html": {
+   "h": 1304,
+   "page": "manual",
+   "title": "08 · Aplicaciones del brief",
+   "w": 1600,
+   "x": 1680,
+   "y": 3030
+  },
+  "Arquitectura.dc.html": {
+   "h": 944,
+   "page": "manual",
+   "title": "04 · Arquitectura con Sika",
+   "w": 1600,
+   "x": 0,
+   "y": 1350
+  },
+  "Audiencias.dc.html": {
+   "h": 844,
+   "page": "manual",
+   "title": "09 · Audiencias",
+   "w": 1600,
+   "x": 3360,
+   "y": 3030
+  },
+  "Construccion.dc.html": {
+   "h": 1064,
+   "page": "manual",
+   "title": "02 · Construcción y tamaño mínimo",
+   "w": 1600,
+   "x": 1680,
+   "y": 0
+  },
+  "Facebook.dc.html": {
+   "h": 1144,
+   "page": "piezas",
+   "title": "✓ APROBADO · ENTREGABLE 1 · Facebook 1:1 · SikaSeal-170",
+   "w": 1080,
+   "x": 0,
+   "y": 1480
+  },
+  "Incorrectos.dc.html": {
+   "h": 824,
+   "page": "manual",
+   "title": "07 · Usos incorrectos",
+   "w": 1600,
+   "x": 0,
+   "y": 3030
+  },
+  "Instagram.dc.html": {
+   "h": 1414,
+   "page": "piezas",
+   "title": "✓ APROBADO · ENTREGABLE 2 · Instagram 4:5 · SikaSeal-170",
+   "w": 1080,
+   "x": 1160,
+   "y": 1480
+  },
+  "Main.dc.html": {
+   "h": 924,
+   "page": "manual",
+   "title": "01 · Firma principal",
+   "w": 1600,
+   "x": 0,
+   "y": 0
+  },
+  "Movimiento.dc.html": {
+   "h": 784,
+   "page": "manual",
+   "title": "06 · Movimiento",
+   "w": 1600,
+   "x": 3360,
+   "y": 1350
+  },
+  "PDV.dc.html": {
+   "h": 1024,
+   "page": "piezas",
+   "title": "✓ APROBADO · EXTRA · Punto de venta en tienda",
+   "w": 1600,
+   "x": 2320,
+   "y": 5000
+  },
+  "Recursos.dc.html": {
+   "h": 1394,
+   "page": "manual",
+   "title": "05 · Color, tipografía y recursos",
+   "w": 1600,
+   "x": 1680,
+   "y": 1350
+  },
+  "Reel.dc.html": {
+   "h": 1224,
+   "page": "piezas",
+   "title": "ENTREGABLE 3 · Reel · video de 25 s con locución y música (versión aprobada el 12/10)",
+   "w": 1600,
+   "x": 2480,
+   "y": 3270
+  },
+  "Referencia.dc.html": {
+   "h": 1294,
+   "page": "evolucion",
+   "title": "Material de Sika, rehecho en POSIBLE",
+   "w": 2240,
+   "x": 0,
+   "y": 1650
+  },
+  "Sikaflex.dc.html": {
+   "h": 1144,
+   "page": "piezas",
+   "title": "✓ APROBADO · EXTRA · Sikaflex-119",
+   "w": 1080,
+   "x": 0,
+   "y": 5000
+  },
+  "Titular.dc.html": {
+   "h": 944,
+   "page": "manual",
+   "title": "11 · Fórmula de titular",
+   "w": 1600,
+   "x": 0,
+   "y": 4590
+  },
+  "Versiones.dc.html": {
+   "h": 1064,
+   "page": "manual",
+   "title": "03 · Versiones",
+   "w": 1600,
+   "x": 3360,
+   "y": 0
+  },
+  "ViscoCrete.dc.html": {
+   "h": 1144,
+   "page": "piezas",
+   "title": "✓ APROBADO · EXTRA · ViscoCrete 45 HE (industria)",
+   "w": 1080,
+   "x": 1160,
+   "y": 5000
+  },
+  "MasterGraphic.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 1144,
+   "title": "✓ APROBADO · MASTER GRAPHIC (rige todas las piezas)",
+   "page": "piezas"
+  },
+  "Evolucion.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1600,
+   "h": 1274,
+   "title": "Evolución · de lo actual a la campaña",
+   "page": "evolucion"
+  },
+  "Storyboard.dc.html": {
+   "x": 0,
+   "y": 3270,
+   "w": 2400,
+   "h": 1120,
+   "title": "ENTREGABLE 3 · Reel · storyboard de 8 cuadros del video aprobado (12/10)",
+   "page": "piezas"
+  },
+  "Portada.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "page": "portada",
+   "title": "PORTADA A · cinematográfica: Efeonce Creative Studio presenta la propuesta"
+  },
+  "PortadaSinFoto.dc.html": {
+   "x": 2040,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "page": "portada",
+   "title": "PORTADA B · alternativa sin foto (descartada: queda la A)"
+  },
+  "Contraportada.dc.html": {
+   "x": 4080,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "page": "portada",
+   "title": "CONTRAPORTADA · cierre de la propuesta (línea Brand)"
+  },
+  "Tec-01.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "01 · Portada",
+   "page": "tecnica"
+  },
+  "Tec-02.dc.html": {
+   "x": 2040,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "02 · La idea",
+   "page": "tecnica"
+  },
+  "Tec-03.dc.html": {
+   "x": 4080,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "03 · Cumplimiento",
+   "page": "tecnica"
+  },
+  "Tec-04.dc.html": {
+   "x": 6120,
+   "y": 0,
+   "w": 1920,
+   "h": 1080,
+   "title": "04 · Punto de partida",
+   "page": "tecnica"
+  },
+  "Tec-05.dc.html": {
+   "x": 0,
+   "y": 1280,
+   "w": 1920,
+   "h": 1080,
+   "title": "05 · Evolución",
+   "page": "tecnica"
+  },
+  "Tec-06.dc.html": {
+   "x": 2040,
+   "y": 1280,
+   "w": 1920,
+   "h": 1080,
+   "title": "06 · El sistema",
+   "page": "tecnica"
+  },
+  "Tec-07.dc.html": {
+   "x": 4080,
+   "y": 1280,
+   "w": 1920,
+   "h": 1080,
+   "title": "07 · El brief, punto por punto",
+   "page": "tecnica"
+  },
+  "Tec-08.dc.html": {
+   "x": 6120,
+   "y": 1280,
+   "w": 1920,
+   "h": 1080,
+   "title": "08 · Audiencias",
+   "page": "tecnica"
+  },
+  "Tec-09.dc.html": {
+   "x": 0,
+   "y": 2560,
+   "w": 1920,
+   "h": 1080,
+   "title": "09 · Muestras del concurso",
+   "page": "tecnica"
+  },
+  "Tec-10.dc.html": {
+   "x": 2040,
+   "y": 2560,
+   "w": 1920,
+   "h": 1080,
+   "title": "10 · Alcance del sistema",
+   "page": "tecnica"
+  },
+  "Tec-11.dc.html": {
+   "x": 4080,
+   "y": 2560,
+   "w": 1920,
+   "h": 1080,
+   "title": "11 · Método",
+   "page": "tecnica"
+  },
+  "Tec-12.dc.html": {
+   "x": 6120,
+   "y": 2560,
+   "w": 1920,
+   "h": 1080,
+   "title": "12 · Lanzamiento tipo",
+   "page": "tecnica"
+  },
+  "Tec-13.dc.html": {
+   "x": 0,
+   "y": 3840,
+   "w": 1920,
+   "h": 1080,
+   "title": "13 · Reel",
+   "page": "tecnica"
+  },
+  "Tec-14.dc.html": {
+   "x": 2040,
+   "y": 3840,
+   "w": 1920,
+   "h": 1080,
+   "title": "14 · Plazo",
+   "page": "tecnica"
+  },
+  "Tec-15.dc.html": {
+   "x": 4080,
+   "y": 3840,
+   "w": 1920,
+   "h": 1080,
+   "title": "15 · Tiempos por nivel",
+   "page": "tecnica"
+  },
+  "Tec-16.dc.html": {
+   "x": 6120,
+   "y": 3840,
+   "w": 1920,
+   "h": 1080,
+   "title": "16 · Control",
+   "page": "tecnica"
+  },
+  "Tec-17.dc.html": {
+   "x": 0,
+   "y": 5120,
+   "w": 1920,
+   "h": 1080,
+   "title": "17 · Equipo",
+   "page": "tecnica"
+  },
+  "Tec-18.dc.html": {
+   "x": 2040,
+   "y": 5120,
+   "w": 1920,
+   "h": 1080,
+   "title": "18 · Trabajo con México",
+   "page": "tecnica"
+  },
+  "Tec-19.dc.html": {
+   "x": 4080,
+   "y": 5120,
+   "w": 1920,
+   "h": 1080,
+   "title": "19 · Caso de éxito · Sky",
+   "page": "tecnica"
+  },
+  "Tec-20.dc.html": {
+   "x": 6120,
+   "y": 5120,
+   "w": 1920,
+   "h": 1080,
+   "title": "20 · Continuidad",
+   "page": "tecnica"
+  },
+  "Tec-21.dc.html": {
+   "x": 0,
+   "y": 6400,
+   "w": 1920,
+   "h": 1080,
+   "title": "21 · Inicio",
+   "page": "tecnica"
+  },
+  "Tec-22.dc.html": {
+   "x": 2040,
+   "y": 6400,
+   "w": 1920,
+   "h": 1080,
+   "title": "22 · Cierre",
+   "page": "tecnica"
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-10-06T21:15:00Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas",
+  "page": "tecnica"
+ },
+ "notes": {
+  "n_dosenuno": {
+   "fill": "blue",
+   "page": "piezas",
+   "text": "«2 en 1» verificado\n\nFicha técnica global: «SikaSeal-170 All Purpose — Sanitary silicone for general use». Ficha México: «para aplicaciones de uso general y sanitarias».\n\nPor eso el sello dice: ANTIHONGOS + USO GENERAL.",
+   "w": 420,
+   "x": 4000,
+   "y": 1480
+  },
+  "n_leeme": {
+   "fill": "green",
+   "page": "manual",
+   "text": "Cómo leer este lienzo\n\nPágina 0 · Evolución: qué cambia y qué se conserva frente a lo que Sika ya tenía. Empieza aquí.\nPágina 1 · Manual: la identidad de la campaña y cómo convive con Sika.\nPágina 2 · Master Graphic (la pieza madre), los 3 entregables de Wherex y los extras que muestran que el sistema escala.\n\nTodo lo que ves es la versión vigente.",
+   "w": 440,
+   "x": 5040,
+   "y": 0
+  },
+  "n_validar": {
+   "fill": "orange",
+   "page": "manual",
+   "text": "Por validar con Sika\n\n• Colores tomados de sus propios materiales (#FCC500, #ED2630, #141414; líneas #015A78 y #321D59). Se reemplazan por los del manual.\n• Tipografía provisional: Barlow / Barlow Condensed.\n• Usar el triángulo como tilde: confirmar que el manual de Sika permite derivar ese recurso del logo.\n• Logos a 1 tinta: reconstrucción provisional; se usan los oficiales.\n• Tamaños mínimos y posiciones: propuesta, se ajustan al manual.\n• Fotografía: escenas IA (GPT Image 2.5). Envase = render real de Sika, integrado con Sunburst. Bandera retirada de la foto de obra.\n• [Logo retailer] y [Marca socia]: espacios reservados.",
+   "w": 440,
+   "x": 5040,
+   "y": 760
+  },
+  "t_entregables": {
+   "kind": "title1",
+   "maxW": 3920,
+   "page": "piezas",
+   "text": "Entregables de la licitación · SikaSeal-170",
+   "w": 240,
+   "x": 0,
+   "y": 1200
+  },
+  "t_extras": {
+   "kind": "title1",
+   "maxW": 3920,
+   "page": "piezas",
+   "text": "Extras: el sistema escala y vive en tienda",
+   "w": 240,
+   "x": 0,
+   "y": 4720
+  },
+  "t_manual": {
+   "kind": "title1",
+   "maxW": 4960,
+   "page": "manual",
+   "text": "Manual de identidad · campaña POSIBLE",
+   "w": 240,
+   "x": 0,
+   "y": -280
+  },
+  "t_evolucion": {
+   "x": 0,
+   "y": -280,
+   "text": "Mismo concepto, más fuerza",
+   "kind": "title1",
+   "maxW": 1600,
+   "w": 240,
+   "page": "evolucion"
+  },
+  "t_ref": {
+   "x": 0,
+   "y": 1370,
+   "text": "Lo que Sika ya tenía, rehecho en POSIBLE",
+   "kind": "title1",
+   "maxW": 2240,
+   "w": 240,
+   "page": "evolucion"
+  },
+  "t_master": {
+   "x": 0,
+   "y": -280,
+   "text": "Master Graphic · la pieza madre",
+   "kind": "title1",
+   "maxW": 1920,
+   "w": 240,
+   "page": "piezas"
+  },
+  "t_reel": {
+   "x": 0,
+   "y": 2990,
+   "text": "Entregable 3 · Reel",
+   "kind": "title1",
+   "maxW": 4080,
+   "w": 240,
+   "page": "piezas"
+  },
+  "t_tecnica": {
+   "x": 0,
+   "y": -280,
+   "text": "Propuesta técnica · deck 16:9 · documento aparte del anexo gráfico",
+   "kind": "title1",
+   "maxW": 8040,
+   "w": 240,
+   "page": "tecnica"
+  },
+  "n_tecnica": {
+   "x": 8280,
+   "y": 0,
+   "w": 460,
+   "fill": "orange",
+   "page": "tecnica",
+   "text": "Por confirmar antes de enviar\n\n• Plazo (14): diez días hábiles por lanzamiento y hasta dos rondas; falta el visto bueno de operaciones.\n• Equipo (16): cinco personas con nombre y cargo; «+85 profesionales» es cifra del operador.\n• Caso Sky (18): confirmar que Sky autoriza citarlo en esta licitación.\n• Reel (13): locución y música dentro del reel base; rodaje, talento y voz exclusiva, aparte.\n• México (17): dice «personas en Chile y en México»; se nombran Teams, Notion y Frame.io.\n• Continuidad (19): calendario revisado cada trimestre y balance al cierre de cada lanzamiento.\n• Inicio (20): el manual y la pieza madre quedan a su disposición.\n• Uso del logo de Sika en la portada y de su material en las láminas 4 y 5.\n• Control (15): confirmar qué quiso decir Sika con «no AI/PSD».\n• Berel no se menciona (posible conflicto de interés, sin decidir).\n• Falta: propuesta económica desglosada y moneda (Sika aún no responde).\n• Página del reel en Think (QR de la lámina 13 y del storyboard): en producción desde el 12/10 (noindex; el video es público para quien tenga la dirección)."
+  }
+ },
+ "order": [
+  "Portada.dc.html",
+  "PortadaSinFoto.dc.html",
+  "Contraportada.dc.html",
+  "Evolucion.dc.html",
+  "Referencia.dc.html",
+  "MasterGraphic.dc.html",
+  "Main.dc.html",
+  "Construccion.dc.html",
+  "Versiones.dc.html",
+  "Arquitectura.dc.html",
+  "Recursos.dc.html",
+  "Movimiento.dc.html",
+  "Incorrectos.dc.html",
+  "Aplicaciones.dc.html",
+  "Audiencias.dc.html",
+  "Titular.dc.html",
+  "Facebook.dc.html",
+  "Instagram.dc.html",
+  "Storyboard.dc.html",
+  "Reel.dc.html",
+  "Sikaflex.dc.html",
+  "ViscoCrete.dc.html",
+  "PDV.dc.html",
+  "Tec-01.dc.html",
+  "Tec-02.dc.html",
+  "Tec-03.dc.html",
+  "Tec-04.dc.html",
+  "Tec-05.dc.html",
+  "Tec-06.dc.html",
+  "Tec-07.dc.html",
+  "Tec-08.dc.html",
+  "Tec-09.dc.html",
+  "Tec-10.dc.html",
+  "Tec-11.dc.html",
+  "Tec-12.dc.html",
+  "Tec-13.dc.html",
+  "Tec-14.dc.html",
+  "Tec-15.dc.html",
+  "Tec-16.dc.html",
+  "Tec-17.dc.html",
+  "Tec-18.dc.html",
+  "Tec-19.dc.html",
+  "Tec-20.dc.html",
+  "Tec-21.dc.html",
+  "Tec-22.dc.html"
+ ],
+ "pages": [
+  {
+   "id": "portada",
+   "name": "Portada"
+  },
+  {
+   "id": "evolucion",
+   "name": "0 · Evolución (empieza aquí)"
+  },
+  {
+   "id": "manual",
+   "name": "1 · Manual de identidad"
+  },
+  {
+   "id": "piezas",
+   "name": "2 · Master Graphic y piezas para Wherex"
+  },
+  {
+   "id": "tecnica",
+   "name": "3 · Propuesta técnica (documento aparte)"
+  }
+ ],
+ "title": "Sika · Innovar es hacerlo POSIBLE"
+}

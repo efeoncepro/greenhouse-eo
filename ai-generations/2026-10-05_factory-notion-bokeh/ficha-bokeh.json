@@ -1,0 +1,15 @@
+{
+  "id": "factory-notion-bokeh",
+  "formato": "3:1",
+  "impacto": false,
+  "escena": "SCENE (content production studio at night, Santiago): a wide, low-key view across a dark studio in the middle of a take: the camera is rolling, its monitor plays the shot back and an LED panel has just been dimmed for the next setup. The lens focuses on nothing near: 85mm at f/1.4, everything far out of focus, so the studio becomes large, soft, round bokeh. On the right half, out of focus: the glowing faces of two LED panels and a softbox, the rectangle of an edit monitor showing a video timeline, and the dark silhouette of a cinema camera on a tripod. Deep ink-blue shadows everywhere; the only light is cool blue. No people, no readable screens, no text, no logos.",
+  "lecho": {
+    "objeto": "the out-of-focus edge of a dark edit desk",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "lado": "izquierda"
+    }
+  }
+}

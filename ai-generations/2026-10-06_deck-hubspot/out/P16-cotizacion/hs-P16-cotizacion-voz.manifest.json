@@ -1,0 +1,420 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "hs-P16-cotizacion-voz",
+  "input": {
+    "artifactId": "hs-P16-cotizacion-voz",
+    "slides": [
+      {
+        "slideId": "deck-content-pricing",
+        "contentType": "deck.content-pricing",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 270,
+            "answerPx": 120,
+            "bodyTop": 560,
+            "bodyPx": 25,
+            "bodyWidth": 470,
+            "legalTop": "--gl-pt-legal-top=880px",
+            "legalPx": "--gl-pt-legal-px=17px",
+            "plansLeft": "--gl-pt-plans-left=760px",
+            "plansTop": "--gl-pt-plans-top=250px",
+            "planWidth": "--gl-pt-plan-width=320px",
+            "planHeight": "--gl-pt-plan-height=640px",
+            "planGap": "--gl-pt-plan-gap=30px",
+            "planRadius": "--gl-pt-plan-radius=18px",
+            "liftPx": "--gl-pt-lift=50px",
+            "extraHeight": "--gl-pt-extra-height=100px",
+            "shadowY": "--gl-pt-shadow-y=40px",
+            "shadowBlur": "--gl-pt-shadow-blur=90px",
+            "shadowOpacity": "--gl-pt-shadow-opacity=45%",
+            "labelColor": "--gl-pt-label-color=#023c70",
+            "padY": "--gl-pt-pad-y=34px",
+            "padX": "--gl-pt-pad-x=32px",
+            "recPadY": "--gl-pt-rec-pad-y=40px",
+            "namePx": "--gl-pt-name-px=52px",
+            "recNamePx": "--gl-pt-rec-name-px=64px",
+            "taglinePx": "--gl-pt-tagline-px=21px",
+            "taglineGap": "--gl-pt-tagline-gap=10px",
+            "amountPx": "--gl-pt-amount-px=36px",
+            "recAmountPx": "--gl-pt-rec-amount-px=44px",
+            "amountGap": "--gl-pt-amount-gap=28px",
+            "recAmountGap": "--gl-pt-rec-amount-gap=34px",
+            "periodPx": "--gl-pt-period-px=17px",
+            "periodGap": "--gl-pt-period-gap=4px",
+            "featurePx": "--gl-pt-feature-px=20px",
+            "featurePad": "--gl-pt-feature-pad=13px",
+            "featureRule": "--gl-pt-feature-rule=1.5px",
+            "featuresGap": "--gl-pt-features-gap=26px",
+            "recFeaturesGap": "--gl-pt-rec-features-gap=30px",
+            "labelPx": "--gl-pt-label-px=15px",
+            "labelGap": "--gl-pt-label-gap=14px",
+            "recommended": "2"
+          },
+          "voice": {
+            "question": "¿Cómo se cotiza?",
+            "answer": "Por alcance",
+            "eyebrow": "Inversión"
+          },
+          "body": "Cada modo se cotiza por alcance y capacidad, nunca por horas sueltas. Las licencias de HubSpot van aparte.",
+          "legal": "Valores netos + IVA. Licencias y créditos de HubSpot no incluidos.",
+          "plans": [
+            {
+              "name": "Blueprint",
+              "tagline": "Para decidir con datos",
+              "amount": "[MONTO]",
+              "period": "neto + IVA",
+              "features": [
+                {
+                  "text": "Inventario del portal"
+                },
+                {
+                  "text": "Modelo objetivo"
+                },
+                {
+                  "text": "Roadmap por olas"
+                },
+                {
+                  "text": "Criterios de aceptación"
+                }
+              ]
+            },
+            {
+              "label": "Recomendado",
+              "name": "Proyecto",
+              "tagline": "Para construir por fases",
+              "amount": "[MONTO]",
+              "period": "neto + IVA",
+              "features": [
+                {
+                  "text": "Configuración y datos"
+                },
+                {
+                  "text": "Integraciones"
+                },
+                {
+                  "text": "Automatización y QA"
+                },
+                {
+                  "text": "Capacitación por rol"
+                },
+                {
+                  "text": "Documentación"
+                }
+              ]
+            },
+            {
+              "name": "Operar",
+              "tagline": "Para operar y crecer",
+              "amount": "[MONTO]",
+              "period": "neto + IVA",
+              "features": [
+                {
+                  "text": "Releases con aprobación"
+                },
+                {
+                  "text": "Soporte con SLA"
+                },
+                {
+                  "text": "Agentes supervisados"
+                },
+                {
+                  "text": "Revisión trimestral de valor"
+                },
+                {
+                  "text": "Reporting mensual"
+                }
+              ]
+            }
+          ],
+          "selection": {
+            "label": "Finanzas",
+            "anchor": "top-end",
+            "participantKind": "department",
+            "scale": 1.2,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none",
+            "item": 2
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-pricing",
+      "contentType": "deck.content-pricing",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "bodyTop": 560,
+          "bodyPx": 25,
+          "bodyWidth": 470,
+          "legalTop": "--gl-pt-legal-top=880px",
+          "legalPx": "--gl-pt-legal-px=17px",
+          "plansLeft": "--gl-pt-plans-left=760px",
+          "plansTop": "--gl-pt-plans-top=250px",
+          "planWidth": "--gl-pt-plan-width=320px",
+          "planHeight": "--gl-pt-plan-height=640px",
+          "planGap": "--gl-pt-plan-gap=30px",
+          "planRadius": "--gl-pt-plan-radius=18px",
+          "liftPx": "--gl-pt-lift=50px",
+          "extraHeight": "--gl-pt-extra-height=100px",
+          "shadowY": "--gl-pt-shadow-y=40px",
+          "shadowBlur": "--gl-pt-shadow-blur=90px",
+          "shadowOpacity": "--gl-pt-shadow-opacity=45%",
+          "labelColor": "--gl-pt-label-color=#023c70",
+          "padY": "--gl-pt-pad-y=34px",
+          "padX": "--gl-pt-pad-x=32px",
+          "recPadY": "--gl-pt-rec-pad-y=40px",
+          "namePx": "--gl-pt-name-px=52px",
+          "recNamePx": "--gl-pt-rec-name-px=64px",
+          "taglinePx": "--gl-pt-tagline-px=21px",
+          "taglineGap": "--gl-pt-tagline-gap=10px",
+          "amountPx": "--gl-pt-amount-px=36px",
+          "recAmountPx": "--gl-pt-rec-amount-px=44px",
+          "amountGap": "--gl-pt-amount-gap=28px",
+          "recAmountGap": "--gl-pt-rec-amount-gap=34px",
+          "periodPx": "--gl-pt-period-px=17px",
+          "periodGap": "--gl-pt-period-gap=4px",
+          "featurePx": "--gl-pt-feature-px=20px",
+          "featurePad": "--gl-pt-feature-pad=13px",
+          "featureRule": "--gl-pt-feature-rule=1.5px",
+          "featuresGap": "--gl-pt-features-gap=26px",
+          "recFeaturesGap": "--gl-pt-rec-features-gap=30px",
+          "labelPx": "--gl-pt-label-px=15px",
+          "labelGap": "--gl-pt-label-gap=14px",
+          "recommended": "2"
+        },
+        "voice": {
+          "question": "¿Cómo se cotiza?",
+          "answer": "Por alcance",
+          "eyebrow": "Inversión"
+        },
+        "body": "Cada modo se cotiza por alcance y capacidad, nunca por horas sueltas. Las licencias de HubSpot van aparte.",
+        "legal": "Valores netos + IVA. Licencias y créditos de HubSpot no incluidos.",
+        "plans": [
+          {
+            "name": "Blueprint",
+            "tagline": "Para decidir con datos",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Inventario del portal"
+              },
+              {
+                "text": "Modelo objetivo"
+              },
+              {
+                "text": "Roadmap por olas"
+              },
+              {
+                "text": "Criterios de aceptación"
+              }
+            ]
+          },
+          {
+            "label": "Recomendado",
+            "name": "Proyecto",
+            "tagline": "Para construir por fases",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Configuración y datos"
+              },
+              {
+                "text": "Integraciones"
+              },
+              {
+                "text": "Automatización y QA"
+              },
+              {
+                "text": "Capacitación por rol"
+              },
+              {
+                "text": "Documentación"
+              }
+            ]
+          },
+          {
+            "name": "Operar",
+            "tagline": "Para operar y crecer",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Releases con aprobación"
+              },
+              {
+                "text": "Soporte con SLA"
+              },
+              {
+                "text": "Agentes supervisados"
+              },
+              {
+                "text": "Revisión trimestral de valor"
+              },
+              {
+                "text": "Reporting mensual"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "label": "Finanzas",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "ContentPricing",
+      "contractHash": "3231ecd5229b2dc376ebf7d22a00d88573f8b2e4273c20724d45e435a956c1a9",
+      "templateHash": "2318dede368d9ddeb32063cde860fda52997a79db98332764cae31e1ebb9730e"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

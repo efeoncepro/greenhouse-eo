@@ -1,0 +1,73 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "brochure",
+  "line": "brand",
+  "theme": "dark",
+  "recipe": "content-markets",
+  "voice": {
+    "eyebrow": "Mercados",
+    "question": "¿Dónde trabajan?",
+    "answer": [
+      "En cinco",
+      "países"
+    ]
+  },
+  "body": "Chile, Estados Unidos, Colombia, México y Perú, con **un solo equipo** y un solo interlocutor.",
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "place",
+    "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+    "alt": "Las Américas de noche vistas desde la órbita; cinco puntos de luz azul unidos por arcos en Miami, Ciudad de México, Bogotá, Lima y Santiago"
+  },
+  "markets": [
+    {
+      "country": "EE. UU.",
+      "city": "Miami",
+      "node": [
+        1112,
+        215
+      ],
+      "side": "right"
+    },
+    {
+      "country": "México",
+      "city": "Ciudad de México",
+      "node": [
+        958,
+        283
+      ],
+      "side": "left"
+    },
+    {
+      "country": "Colombia",
+      "city": "Bogotá",
+      "node": [
+        1132,
+        405
+      ],
+      "side": "right"
+    },
+    {
+      "country": "Perú",
+      "city": "Lima",
+      "node": [
+        1098,
+        567
+      ],
+      "side": "left"
+    },
+    {
+      "country": "Chile",
+      "city": "Santiago",
+      "node": [
+        1181,
+        773
+      ],
+      "side": "right"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "calculationStatus": "calculated",
+  "commercialStatus": "requires_review",
+  "binding": false,
+  "gaps": [
+    {
+      "code": "COMMERCIAL_APPROVAL_REQUIRED",
+      "path": "quote",
+      "owner": "Commercial/Finance",
+      "action": "Review scope, complete costs, terms and the selling policy before issuing a quote."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "titular",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "PROVISION_COST_EVIDENCE_REQUIRED",
+      "path": "titular",
+      "owner": "Operations/Finance",
+      "action": "Measure Assurance, operations and onboarding activities and cost."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "respaldo",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "lider",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "cuenta",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "agentes",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "analista",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:notion",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:microsoft-365",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:microsoft-365",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:social-inbox",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:social-inbox",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:agent-runtime-usage",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:agent-runtime-usage",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "TAX_AND_ENTITY_REQUIRED",
+      "path": "quote",
+      "owner": "Finance",
+      "action": "Resolve contractual entity, currency and applicable tax treatment."
+    },
+    {
+      "code": "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+      "path": "commercialUnit",
+      "owner": "Practice/Commercial",
+      "action": "Validate deliverables, acceptance, capacity, responsibilities, limits and continuity; internal role cost is not a service contract."
+    }
+  ],
+  "margin": {
+    "modeledRate": "0.44999974593575059348589099266836141180389059239423428231521046600464626142817874",
+    "proposedTarget": "0.40",
+    "proposedFloor": "0.35",
+    "approved": false,
+    "belowProposedFloor": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "81d102ba5493669a1e8acfdb2445aee19aa0dc80940be8101403ffacbbc6ec78",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:RV1b-motor-de-revenue-isotipo",
+      "path": "ai-generations/2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png",
+      "sha256": "d40554edf859bd5b339a1893824343ee69a4a35990b84e618461b48515a3524b"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

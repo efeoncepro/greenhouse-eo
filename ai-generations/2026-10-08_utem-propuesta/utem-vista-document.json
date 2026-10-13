@@ -1,0 +1,28 @@
+{
+  "contract": "efeonce.surface-composition", "version": "0.1.2", "surface": "deck", "format": "16x9", "use": "proposal", "line": "engine", "sections": 5,
+  "pages": [{
+    "role": "content", "recipe": "content-day", "layout": "live-progress", "line": "engine", "theme": "dark",
+    "voice": { "eyebrow": "Tu día a día con Efeonce", "question": "¿Cómo avanza cada artículo?", "answer": ["A la", "vista"] },
+    "body": "Sigues el plan en Notion y apruebas cada artículo comentando **sobre** la página, antes de publicar.",
+    "plan": {
+      "tool": { "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg", "name": "Notion" },
+      "kicker": "En Notion", "title": "Plan editorial", "meta": "Mes 1 · 3 de 5",
+      "columns": [
+        { "name": "En curso", "cards": [ { "title": "Cómo elegir diplomado", "tag": "Artículo 4" }, { "title": "Página Gestión Pública", "tag": "Página existente" } ] },
+        { "name": "En revisión", "cards": [ { "title": "Análisis de datos", "tag": "Esperando tu visto bueno", "highlight": true } ] },
+        { "name": "Listo", "cards": [ { "title": "Auditoría y línea base", "tag": "Entregado" }, { "title": "Plan editorial mes 1", "tag": "Aprobado" } ] }
+      ]
+    },
+    "review": {
+      "tool": { "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg", "name": "Frame.io" },
+      "kicker": "En Frame.io", "title": "Artículo · datos", "versions": ["v1", "v2"],
+      "piece": { "plateRef": "ai-generations/2026-10-08_utem-propuesta/plates/articulo-analisis-datos.png", "alt": "El artículo en revisión: guía para elegir un diplomado en análisis de datos, en el sitio de Educación Continua UTEM" },
+      "pin": "1",
+      "comments": [
+        { "mark": "1", "author": "UTEM", "version": "v1", "text": "¿Sumamos los requisitos?" },
+        { "own": true, "author": "Efeonce", "version": "v2", "text": "Listos, y con su ficha SEO." }
+      ],
+      "secondary": "Comentar", "primary": "Aprobar"
+    }
+  }]
+}

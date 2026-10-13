@@ -68,3 +68,13 @@ Fuente de verdad que queda vigente:
 - El pricing engine adquiere un "starting price" escalar por servicio (cambiaría el resolver/simulate).
 - Cliente self-service pasa de "solo simular" a "pedir cotización real" (activa B con aprobación).
 - Esta decisión se acepta tras checkpoint humano; hasta entonces no materializar contratos irreversibles de tool/lane externos.
+
+## Delta 2026-10-12 — destino de implementación: el registro de V3
+
+Enmendada por [GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md](GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md)
+(Accepted, CEO). El principio de dos capacidades gobernadas —simular; autorar y emitir— se conserva. Cambia su
+destino: la implementación de llegada es el registro y la API propios del cotizador V3 (`EPIC-053`), no el motor V2.
+Las superficies V2 de este ADR (lanes `quotation/{services,simulate}`, tools `search_services` / `quote_price`, acción
+`author_quote`) siguen sirviendo sin cambios hasta la unidad de retiro del cotizador actual; `TASK-2023` cierra sus
+puertas de escritura. Evidencia: [auditoría 2026-10-12](../audits/commercial/2026-10-12-cotizador-actual-auditoria.md).
+

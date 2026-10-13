@@ -1,0 +1,146 @@
+{
+  "tenderId": "hs-B05-servicios-voz",
+  "slides": [
+    {
+      "slideId": "deck-content-service-lanes",
+      "contentType": "deck.content-service-lanes",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 170,
+          "answerTop": 228,
+          "answerPx": 124,
+          "answerLeading": "--gl-ls-answer-leading=0.95",
+          "answerTracking": "--gl-ls-answer-tracking=-0.045em",
+          "answerInset": "--gl-ls-answer-inset=-6px",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "laneWidth": "--gl-csl-lane-width=400px",
+          "laneHeight": "--gl-csl-lane-height=214px",
+          "lanePadY": "--gl-csl-lane-pad-y=22px",
+          "lanePadX": "--gl-csl-lane-pad-x=24px",
+          "laneRadius": "--gl-csl-lane-radius=20px",
+          "laneIcon": "--gl-csl-lane-icon=52px",
+          "laneIconGap": "--gl-csl-lane-icon-gap=14px",
+          "titlePx": "--gl-csl-title-px=25px",
+          "titleLeading": "--gl-csl-title-leading=1.05",
+          "titleTracking": "--gl-csl-title-tracking=-0.37px",
+          "titleColor": "--gl-csl-title-color=#ffffff",
+          "productPx": "--gl-csl-product-px=14px",
+          "productWeight": "--gl-csl-product-wght=500",
+          "productGap": "--gl-csl-product-gap=4px",
+          "productColor": "--gl-csl-product-color=#e2e2e2",
+          "descPx": "--gl-csl-desc-px=18px",
+          "descWeight": "--gl-csl-desc-wght=300",
+          "descLeading": "--gl-csl-desc-leading=1.45",
+          "descGap": "--gl-csl-desc-gap=16px",
+          "descColor": "--gl-csl-desc-color=#e6edf3",
+          "phasesTop": "--gl-csl-phases-top=870px",
+          "phasesGap": "--gl-csl-phases-gap=14px",
+          "phasePx": "--gl-csl-phase-px=17px",
+          "phaseWeight": "--gl-csl-phase-wght=600",
+          "phaseColor": "--gl-csl-phase-color=#ffffff",
+          "connectorWidth": "--gl-csl-connector-width=34px",
+          "connectorHeight": "--gl-csl-connector-height=2px",
+          "connectorColor": "--gl-csl-connector-color=#e86bd0",
+          "connectorOpacity": "--gl-csl-connector-opacity=70%"
+        },
+        "stage": {
+          "src": "asset-ref:layer:csl-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:csl-platform"
+        },
+        "voice": {
+          "question": "¿Qué hacen en HubSpot?",
+          "answer": "Todo el ciclo",
+          "eyebrow": "Nuestros servicios HubSpot"
+        },
+        "lanes": [
+          {
+            "icon": "asset-ref:file:hubspot-icon-marketing",
+            "title": "Marketing, contenido y AEO",
+            "products": "Marketing Hub · Content Hub",
+            "description": "Demanda, campañas y atribución, visibles en buscadores y en la IA.",
+            "left": "--gl-csl-left=140px",
+            "top": "--gl-csl-top=380px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-sales",
+            "title": "Ventas y pipeline",
+            "products": "Sales Hub",
+            "description": "Pipeline priorizado, secuencias, forecast y la siguiente acción.",
+            "left": "--gl-csl-left=562px",
+            "top": "--gl-csl-top=380px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-revenue",
+            "title": "Revenue lifecycle",
+            "products": "Revenue Hub",
+            "description": "De la cotización al contrato, la renovación y la expansión.",
+            "left": "--gl-csl-left=984px",
+            "top": "--gl-csl-top=380px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "title": "Servicio y customer success",
+            "products": "Service Hub",
+            "description": "Tickets, SLA, knowledge y salud de cada cuenta.",
+            "left": "--gl-csl-left=140px",
+            "top": "--gl-csl-top=616px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-data",
+            "title": "Datos e integración",
+            "products": "Data Hub · Smart CRM",
+            "description": "Datos confiables y sincronizados para equipos y agentes.",
+            "left": "--gl-csl-left=562px",
+            "top": "--gl-csl-top=616px"
+          },
+          {
+            "icon": "asset-ref:file:hubspot-icon-service",
+            "title": "Agentes y operación",
+            "products": "Agent Hub · Customer Agent",
+            "description": "Agentes con ficha, supervisión humana y consumo medido.",
+            "left": "--gl-csl-left=984px",
+            "top": "--gl-csl-top=616px"
+          }
+        ],
+        "phases": [
+          {
+            "number": "01",
+            "label": "Evaluación sin costo"
+          },
+          {
+            "number": "02",
+            "label": "Blueprint e implementación"
+          },
+          {
+            "number": "03",
+            "label": "Optimización y adopción"
+          },
+          {
+            "number": "04",
+            "label": "Operación gestionada"
+          }
+        ]
+      },
+      "template": "ContentServiceLanes"
+    }
+  ]
+}

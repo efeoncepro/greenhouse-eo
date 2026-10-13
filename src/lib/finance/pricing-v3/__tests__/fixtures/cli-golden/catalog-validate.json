@@ -1,0 +1,20 @@
+{
+  "args": [
+    "catalog",
+    "validate",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 190,
+    "sha256": "eb16442bca3dd77131f86c337693ffded42c968fb49d7bf01dce469cd45cd923",
+    "text": "{\n  \"valid\": true,\n  \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\",\n  \"version\": \"operating-review-2026-10-11-v11\",\n  \"records\": 394,\n  \"mode\": \"historical\"\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

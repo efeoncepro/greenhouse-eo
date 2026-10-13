@@ -1,5 +1,21 @@
 # Producción y posproducción de video: método de principio a fin
 
+## Delta 2026-10-12 — reel de muestra para un cliente que pauta en TV
+
+- **Fuente:** reel de muestra de 25 s (9:16, 1080×1920, locución y música) para la propuesta a Sika Mexicana (Wherex
+  N.º 1164). La v1 (animatic con fondo plano y audio) fue rechazada por el operador: «no se ve cinemático y profesional».
+  La v2.2 fue aprobada el 2026-10-12 tras tres correcciones. La propuesta se presentó el 2026-10-13, con el reel en su página y no como adjunto (límite de 20 MB del portal). Hechos en
+  `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md` y `reel/v2/`.
+- **Qué cambia:** se suma una receta ejecutable para este tipo de pieza y cinco reglas: el nivel de producción lo fija
+  dónde pauta la marca, no lo mínimo que admiten las bases; la capa gráfica es una aplicación del manual de la campaña;
+  lo aprobado se importa desde su generador y no se redibuja; la cámara lenta se pide en el plano y no se fabrica
+  estirándolo; la música de un video corto va en un tramo continuo.
+- **Dueños:** [workflow del reel de muestra](../../../.claude/skills/motion-design-studio/workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md),
+  [companion de lecciones §13](../../../.claude/skills/motion-design-studio/companions/video-lessons-and-failure-modes.md)
+  (F33–F38) y, para voz y música, `audio-studio` (`efeonce/STUDIO_TOOLING.md`, delta 2026-10-12, y
+  `efeonce/APPROVED_MUSIC_CONTINUITY.md`). Espejo `.codex` pendiente de sincronizar.
+- **Límite:** el agente no oye; voz, golpes y música las juzgó el operador. El gasto del reel no quedó totalizado.
+
 ## Delta 2026-10-03 (tarde) — distribución y naming del servicio
 
 - **Fuente:** distribución del spot «Los Sparks» (concepto CMP001-08 de CMP-001): registro en Marketing Studio y
@@ -29,7 +45,7 @@
 ## Decisión operativa
 
 - **Status:** Accepted — método documental solicitado por el operador el 2026-09-24; no implementación de plataforma.
-- **Date / Validated as of:** 2026-09-24; delta 2026-10-03 (preproducción transversal, spot animado 2D; distribución Studio → Metricool y naming del servicio).
+- **Date / Validated as of:** 2026-09-24; delta 2026-10-03 (preproducción transversal, spot animado 2D; distribución Studio → Metricool y naming del servicio); delta 2026-10-12 (reel de muestra para un cliente).
 - **Owner:** Creative Studio / Motion Design Studio; Audio Studio posee el oficio sonoro.
 - **Scope:** ejecución por agentes de video generado, filmado, animado o híbrido; preproducción, producción, posproducción y entrega.
 - **Reversibility:** alta; companions versionados, fuentes y entregas preservadas.
@@ -80,6 +96,7 @@ Capas documentales: [descripción funcional](../../documentation/creative-produc
 | Consultar herramientas/endpoints | [STUDIO_TOOLING](../../../.codex/skills/motion-design-studio/efeonce/STUDIO_TOOLING.md), con verificación vigente antes de usarlos |
 | Película generativa con cartelas locales | [Receta específica](../../../.codex/skills/motion-design-studio/workflows/generative-film-with-approved-title-overlays.md) |
 | Spot animado 2D con mascotas/logos compuestos | [Receta específica](../../../.claude/skills/motion-design-studio/workflows/animated-2d-spot-composed-brand-assets.md) |
+| Reel de muestra para un cliente (cuadros fijos → planos → motion de campaña) | [Receta específica](../../../.claude/skills/motion-design-studio/workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md) |
 | Registrar la pieza en la campaña | Skill [`efeonce-marketing-studio`](../../../.claude/skills/efeonce-marketing-studio/SKILL.md) |
 | Programar video con portada por red | [Entrega de video en Metricool](../../../.claude/skills/social-media-studio/references/video-delivery-metricool.md) |
 

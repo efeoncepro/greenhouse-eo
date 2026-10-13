@@ -1,0 +1,7 @@
+[
+  {
+    "target": "pibank.pe",
+    "include_subdomains": true,
+    "rank_scale": "one_hundred"
+  }
+]

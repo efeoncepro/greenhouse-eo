@@ -15,6 +15,7 @@ Nunca degradar repetidamente el audio para disimular la lectura de texto. Si la 
 | Superficie verificada | Configuración | Límite |
 | --- | --- | --- |
 | ElevenLabs directo, nodo `music`, modelo `eleven_music_v2` | `lyrics_type: instrumental`, `instrumental: true`, duración explícita | Disponibilidad de modelo confirmada por `creative_get_flow_node_types`; costo/saldo no confirmado por schema |
+| ElevenLabs remoto oficial (`creative_generate_in_flow`), nodo `music`, modelo `eleven_music_v2_5` (2026-10-09, reel X-Ray Pibank) | Instrumental; ≈ US$0,35 por pista, ≈ 5–7 min | Conectores locales con clave mal cargada; pistas comprobadas sin voz con `whisper-cli` local (apoyo ASR, no escucha) |
 | API ElevenLabs Music Compose | `force_instrumental: true` con `prompt` | No combinar con `composition_plan`; no trasladar ese nombre de parámetro al conector |
 | ElevenLabs directo, nodo `sfx` | Modelo `eleven_text_to_sound_v2`, duración 0,5–30 s, `loop: false` para one-shots | Describir efecto no verbal; revisión auditiva obligatoria |
 | Higgsfield, catálogo audio | `sonilo_music` y `mirelo_text_to_audio` aparecieron como **Game pipeline only** | No asumir que el tool genérico de TTS los ejecuta; verificar operación antes de proponerlos como sustituto |

@@ -296,6 +296,7 @@ For public tenders that pass human selection, GO, and basic admissibility, creat
 `presentationscheduled` for the technical offer, optional `1356915244` only for a requested sample/pilot,
 `decisionmakerboughtin` for completed pricing and terms, `contractsent` after award while formalization is pending,
 then `closedwon` or `closedlost` from verified outcome evidence. Raw radar candidates remain outside HubSpot.
+The same applies to a non-tender proposal (2026-10-09, Pibank deal): once the technical proposal is sent, move the deal to `presentationscheduled` and set `amount` to the proposed total in the deal currency (e.g. PEN, not USD), then read both back.
 
 Writes follow `propose → confirm → write → readback`. Discovery and ranking remain read-only. For a
 manual promotion explicitly confirmed by the operator, the HubSpot MCP is a governed writer: it may create or

@@ -1,0 +1,357 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-third-party-contingency-factors-2026-10-11",
+  "baseDigest": "2a329a9dd1c9fe672d221584a62f18c4146c3f2042103cd9478fa705cb11a29c",
+  "nextVersion": "operating-review-2026-10-11-v10",
+  "actor": "operator-authorized-agent",
+  "reason": "Decisions of the CEO on 2026-10-11. (1) Third-party costs of an engagement get a price rule per category: production, talent and printing with a 10% handling and a 5% floor; media and licences at cost. (2) A contingency reserve of 12% of the person cost for the two managed-service offers when sold On-Demand; none for staff augmentation. Both sets are estimates proposed by the agent that he accepted, to adjust with the first real job. (3) The country factors that were still estimates are closed as policy values: confirmed from 2026-10-12. Pricing policies, floors and every other record are untouched.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "third-party:production",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "third-party:production",
+        "revision": 1,
+        "kind": "third_party_policy",
+        "source": {
+          "reference": "policy:ceo-third-party-handling-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Bought for a job and re-invoiced: handling of 10% over the supplier cost, floor of 5% of margin on the row, commercial rounding. The 10% is the project-management fee of the pricing workbook. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job.",
+        "value": {
+          "category": "production",
+          "label": "Producción y terceros",
+          "method": "markup",
+          "rate": "0.10",
+          "minimumMargin": "0.05",
+          "rounding": "commercial"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "third-party:talent",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "third-party:talent",
+        "revision": 1,
+        "kind": "third_party_policy",
+        "source": {
+          "reference": "policy:ceo-third-party-handling-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Bought for a job and re-invoiced: handling of 10% over the supplier cost, floor of 5% of margin on the row, commercial rounding. The 10% is the project-management fee of the pricing workbook. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job.",
+        "value": {
+          "category": "talent",
+          "label": "Talento",
+          "method": "markup",
+          "rate": "0.10",
+          "minimumMargin": "0.05",
+          "rounding": "commercial"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "third-party:printing",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "third-party:printing",
+        "revision": 1,
+        "kind": "third_party_policy",
+        "source": {
+          "reference": "policy:ceo-third-party-handling-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Bought for a job and re-invoiced: handling of 10% over the supplier cost, floor of 5% of margin on the row, commercial rounding. The 10% is the project-management fee of the pricing workbook. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job.",
+        "value": {
+          "category": "printing",
+          "label": "Impresión",
+          "method": "markup",
+          "rate": "0.10",
+          "minimumMargin": "0.05",
+          "rounding": "commercial"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "third-party:media",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "third-party:media",
+        "revision": 1,
+        "kind": "third_party_policy",
+        "source": {
+          "reference": "policy:ceo-third-party-handling-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Re-invoiced at cost: no handling, no floor, no rounding, so the client is charged exactly what the supplier charges. It follows the operator's own rule for media: no margin on the spend. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job.",
+        "value": {
+          "category": "media",
+          "label": "Medios",
+          "method": "markup",
+          "rate": "0",
+          "minimumMargin": "0",
+          "rounding": "none"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "third-party:licences",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "third-party:licences",
+        "revision": 1,
+        "kind": "third_party_policy",
+        "source": {
+          "reference": "policy:ceo-third-party-handling-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Re-invoiced at cost: no handling, no floor, no rounding, so the client is charged exactly what the supplier charges. It follows the operator's own rule for media: no margin on the spend. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job.",
+        "value": {
+          "category": "licences",
+          "label": "Licencias",
+          "method": "markup",
+          "rate": "0",
+          "minimumMargin": "0",
+          "rounding": "none"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "contingency:creative-managed-service:on_demand",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "contingency:creative-managed-service:on_demand",
+        "revision": 1,
+        "kind": "contingency_reserve",
+        "source": {
+          "reference": "policy:ceo-contingency-reserve-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Contingency reserve of a managed service sold On-Demand (fixed scope): 12% of the person cost of every team row, added as cost. It leaves a quote only through a declared waiver with a reason. The 12% is the buffer the operator used in a tender bid. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job. Staff augmentation carries none: the client directs the work.",
+        "value": {
+          "label": "Reserva de contingencia",
+          "rate": "0.12",
+          "base": "human",
+          "offerId": "creative-managed-service",
+          "engagementForm": "on_demand"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "contingency:seo-aeo-managed-service:on_demand",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "contingency:seo-aeo-managed-service:on_demand",
+        "revision": 1,
+        "kind": "contingency_reserve",
+        "source": {
+          "reference": "policy:ceo-contingency-reserve-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Contingency reserve of a managed service sold On-Demand (fixed scope): 12% of the person cost of every team row, added as cost. It leaves a quote only through a declared waiver with a reason. The 12% is the buffer the operator used in a tender bid. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job. Staff augmentation carries none: the client directs the work.",
+        "value": {
+          "label": "Reserva de contingencia",
+          "rate": "0.12",
+          "base": "human",
+          "offerId": "seo-aeo-managed-service",
+          "engagementForm": "on_demand"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "talent:CO:CL",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "talent:CO:CL",
+        "revision": 2,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "talent_factor",
+        "value": {
+          "country": "CO",
+          "referenceCountry": "CL",
+          "factor": "0.80"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "talent:PE:CL",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "talent:PE:CL",
+        "revision": 2,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "talent_factor",
+        "value": {
+          "country": "PE",
+          "referenceCountry": "CL",
+          "factor": "0.85"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "talent:MX:CL",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "talent:MX:CL",
+        "revision": 2,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "talent_factor",
+        "value": {
+          "country": "MX",
+          "referenceCountry": "CL",
+          "factor": "0.90"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "talent:ES:CL",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "talent:ES:CL",
+        "revision": 2,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "talent_factor",
+        "value": {
+          "country": "ES",
+          "referenceCountry": "CL",
+          "factor": "3"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "talent:US:CL",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "talent:US:CL",
+        "revision": 2,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "talent_factor",
+        "value": {
+          "country": "US",
+          "referenceCountry": "CL",
+          "factor": "5"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:PE",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "market:PE",
+        "revision": 3,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "market_factor",
+        "value": {
+          "country": "PE",
+          "factor": "0.95",
+          "floorBasis": "base_market"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:MX",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "market:MX",
+        "revision": 3,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "market_factor",
+        "value": {
+          "country": "MX",
+          "factor": "1"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:ES",
+      "effectiveFrom": "2026-10-12",
+      "record": {
+        "recordId": "market:ES",
+        "revision": 2,
+        "source": {
+          "reference": "policy:ceo-country-factors-closed-2026-10-11",
+          "effectiveFrom": "2026-10-12",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Closed by the CEO on 2026-10-11 («deja eso cerrado ya») as the policy value to quote with. The value was proposed by the agent from job postings, salary guides and the workbook ranges read that day; it is a policy value, not a market observation, and it is revisited only when a real hire or a closed deal in that country contradicts it. Confirmed from 2026-10-12: a quote dated 2026-10-11 still reads the estimate.",
+        "kind": "market_factor",
+        "value": {
+          "country": "ES",
+          "factor": "1.10"
+        }
+      }
+    }
+  ]
+}

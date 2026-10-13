@@ -1,0 +1,148 @@
+{
+  "tenderId": "hs-B15-medicion-voz2",
+  "slides": [
+    {
+      "slideId": "deck-content-measure-formulas",
+      "contentType": "deck.content-measure-formulas",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "noteRight": "--gl-ls-note-right=120px",
+          "noteTop": "--gl-ls-note-top=112px",
+          "notePx": "--gl-ls-note-px=16px",
+          "noteWeight": "--gl-ls-note-wght=400",
+          "noteColor": "--gl-ls-note-color=#e2e2e2",
+          "lsGlassFrom": "--gl-ls-glass-from-color=#ffffff",
+          "lsGlassFromOpacity": "--gl-ls-glass-from-opacity=14%",
+          "lsGlassTo": "--gl-ls-glass-to-color=#ffffff",
+          "lsGlassToOpacity": "--gl-ls-glass-to-opacity=4%",
+          "lsGlassAngle": "--gl-ls-glass-angle=160deg",
+          "lsGlassBlur": "--gl-ls-glass-blur=6px",
+          "lsGlassBorder": "--gl-ls-glass-border=1px",
+          "lsGlassBorderColor": "--gl-ls-glass-border-color=#ffffff",
+          "lsGlassBorderOpacity": "--gl-ls-glass-border-opacity=18%",
+          "lsGlassShadowY": "--gl-ls-glass-shadow-y=30px",
+          "lsGlassShadowBlur": "--gl-ls-glass-shadow-blur=70px",
+          "lsGlassShadowColor": "--gl-ls-glass-shadow-color=#000610",
+          "lsGlassShadowOpacity": "--gl-ls-glass-shadow-opacity=60%",
+          "cardWidth": "--gl-cmf-card-width=330px",
+          "cardHeight": "--gl-cmf-card-height=262px",
+          "cardPadY": "--gl-cmf-card-pad-y=22px",
+          "cardPadX": "--gl-cmf-card-pad-x=24px",
+          "cardRadius": "--gl-cmf-card-radius=22px",
+          "iconSize": "--gl-cmf-icon=52px",
+          "titlePx": "--gl-cmf-title-px=28px",
+          "titleTracking": "--gl-cmf-title-tracking=-0.56px",
+          "titleGap": "--gl-cmf-title-gap=16px",
+          "titleColor": "--gl-cmf-title-color=#ffffff",
+          "formulaPx": "--gl-cmf-formula-px=16px",
+          "formulaWeight": "--gl-cmf-formula-wght=500",
+          "formulaLeading": "--gl-cmf-formula-leading=1.4",
+          "formulaGap": "--gl-cmf-formula-gap=10px",
+          "formulaPadY": "--gl-cmf-formula-pad-y=8px",
+          "formulaPadX": "--gl-cmf-formula-pad-x=12px",
+          "formulaRadius": "--gl-cmf-formula-radius=10px",
+          "formulaFill": "--gl-cmf-formula-fill-color=#ffffff",
+          "formulaFillOpacity": "--gl-cmf-formula-fill-opacity=8%",
+          "formulaColor": "--gl-cmf-formula-color=#e6edf3",
+          "metaPx": "--gl-cmf-meta-px=13px",
+          "metaWeight": "--gl-cmf-meta-wght=500",
+          "metaTracking": "--gl-cmf-meta-tracking=1.3px",
+          "metaGapFirst": "--gl-cmf-meta-gap-first=12px",
+          "metaGapNext": "--gl-cmf-meta-gap-next=6px",
+          "metaColor": "--gl-cmf-meta-color=#e2e2e2"
+        },
+        "stage": {
+          "src": "asset-ref:layer:cmf-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:cmf-platform"
+        },
+        "voice": {
+          "question": "¿Cómo sé que funciona?",
+          "answer": "medimos",
+          "eyebrow": "Qué medimos",
+          "answerLead": "Lo"
+        },
+        "body": "Cada métrica con su fórmula, su fuente y un <strong>dueño</strong>, desde el diagnóstico.",
+        "note": "Sin cifras de promesa: la línea base se mide en el diagnóstico",
+        "metrics": [
+          {
+            "icon": "asset-ref:icon:medicion-revenue-hubspot-dark-52",
+            "name": "Adopción",
+            "formula": "Usuarios activos ÷ licencias",
+            "sourceLabel": "Fuente",
+            "source": "HubSpot",
+            "ownerLabel": "Dueño",
+            "owner": "Líder del área",
+            "left": "--gl-cmf-left=760px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:reloj-revenue-hubspot-dark-52",
+            "name": "Primer valor",
+            "formula": "Días del kickoff al primer valor acordado",
+            "sourceLabel": "Fuente",
+            "source": "Plan del proyecto",
+            "ownerLabel": "Dueño",
+            "owner": "Efeonce",
+            "left": "--gl-cmf-left=1110px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:checklist-revenue-hubspot-dark-52",
+            "name": "Soporte en SLA",
+            "formula": "Solicitudes dentro del SLA ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Tu canal de soporte",
+            "ownerLabel": "Dueño",
+            "owner": "Efeonce",
+            "left": "--gl-cmf-left=1460px",
+            "top": "--gl-cmf-top=190px"
+          },
+          {
+            "icon": "asset-ref:icon:base-de-datos-revenue-hubspot-dark-52",
+            "name": "Calidad de datos",
+            "formula": "Registros completos y sin duplicar ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Data Hub · informes",
+            "ownerLabel": "Dueño",
+            "owner": "Admin de tu portal",
+            "left": "--gl-cmf-left=935px",
+            "top": "--gl-cmf-top=480px"
+          },
+          {
+            "icon": "asset-ref:icon:ia-revenue-hubspot-dark-52",
+            "name": "Agentes",
+            "formula": "Propuestas aprobadas sin corrección ÷ total",
+            "sourceLabel": "Fuente",
+            "source": "Agent Hub",
+            "ownerLabel": "Dueño",
+            "owner": "Supervisora",
+            "left": "--gl-cmf-left=1285px",
+            "top": "--gl-cmf-top=480px"
+          }
+        ]
+      },
+      "template": "ContentMeasureFormulas"
+    }
+  ]
+}

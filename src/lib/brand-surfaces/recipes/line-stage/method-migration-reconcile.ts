@@ -27,7 +27,7 @@ import {
   lineVoiceFrame,
   lumVars,
   noteVars,
-  productIcon,
+  productRoleIcon,
   req,
   stageLayers,
   uniqueAssets,
@@ -136,7 +136,7 @@ export const methodMigrationReconcile: RecipeBuilder = ({ intent, manifest, reci
     }
   }
 
-  const icon = productIcon('platform', 'El ícono de la reconciliación')
+  const icon = productRoleIcon('platform', 'El ícono de la reconciliación', line)
   const { stage, platform } = stageLayers(manifest, recipe, line, 'mmr')
 
   const leftOf = (i: number) => stages.xPx + i * (stages.widthPx + stages.gapPx)

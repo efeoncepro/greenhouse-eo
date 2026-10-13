@@ -562,7 +562,11 @@
         "despachador de agentes",
         "corrida de agente",
         "evals de roles de agente",
-        "operación híbrida con agentes"
+        "operación híbrida con agentes",
+        "pnpm studio",
+        "CLI HTTP de Marketing Studio",
+        "TASK-1905",
+        "catálogo versionado de canales"
       ],
       "skills": [
         "efeonce-marketing-studio",
@@ -580,7 +584,9 @@
         "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
         "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
         "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md",
-        "docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md"
+        "docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md",
+        "docs/manual-de-uso/marketing-studio/operar-por-cli-api.md",
+        "docs/documentation/marketing-studio/catalogo-canales-y-referencias-icp.md"
       ]
     },
     {
@@ -635,6 +641,32 @@
       ]
     },
     {
+      "id": "b2b-prospecting",
+      "triggers": [
+        "prospección B2B",
+        "Apollo",
+        "prospección fría",
+        "prospección tibia",
+        "prospección cálida",
+        "contactos adyacentes",
+        "grupo comprador",
+        "reactivación comercial",
+        "expansión de cuenta"
+      ],
+      "skills": [
+        "efeonce-b2b-prospecting",
+        "commercial-expert",
+        "efeonce-customer-model-operator"
+      ],
+      "sources": [
+        "docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md",
+        ".codex/skills/efeonce-b2b-prospecting/SKILL.md",
+        "docs/documentation/comercial/prospeccion-b2b.md",
+        "docs/manual-de-uso/comercial/operar-prospeccion-b2b.md",
+        "docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md"
+      ]
+    },
+    {
       "id": "hubspot",
       "triggers": [
         "HubSpot",
@@ -648,7 +680,11 @@
         "HubSpot sector",
         "HubSpot landing",
         "HubSpot Agent CLI",
-        "HubSpot MCP"
+        "HubSpot MCP",
+        "prospección HubSpot",
+        "segmentos activos",
+        "cohorte de prospección",
+        "alta automática de prospectos"
       ],
       "skills": [
         "hubspot-greenhouse-bridge",
@@ -659,7 +695,34 @@
         "docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md",
         "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md",
         "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md",
-        "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md"
+        "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md",
+        "docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md",
+        "docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md"
+      ]
+    },
+    {
+      "id": "pricing-v3-local",
+      "triggers": [
+        "Cotizador V3",
+        "pricing:v3",
+        "cotizar rol",
+        "cotizar servicio",
+        "licencias por perfil",
+        "créditos IA para cotización",
+        "capacidad declarada",
+        "mantenimiento de precios"
+      ],
+      "skills": [
+        "efeonce-pricing-operator",
+        "greenhouse-finance-accounting-operator"
+      ],
+      "sources": [
+        "docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md",
+        "docs/documentation/finance/cotizador-v3-superficie-implementada.md",
+        "docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md",
+        "data/pricing/v3-operating/README.md",
+        "docs/documentation/finance/cotizador-v3-promocion-canonica.md",
+        "docs/documentation/finance/cotizador.md"
       ]
     },
     {
@@ -777,6 +840,24 @@
       ]
     },
     {
+      "id": "tender-economic-document",
+      "triggers": [
+        "oferta económica rápida de licitación",
+        "cotización A4 para Compra Ágil",
+        "HTML para PDF de licitación",
+        "plantilla UTEM de cotización"
+      ],
+      "skills": [
+        "greenhouse-public-private-tenders",
+        "report-studio"
+      ],
+      "sources": [
+        "docs/commercial/templates/cotizacion-a4/README.md",
+        "docs/documentation/finance/cotizador.md",
+        "docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md"
+      ]
+    },
+    {
       "id": "documentation-context",
       "triggers": [
         "documentation",
@@ -882,6 +963,26 @@
         "docs/business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md",
         "docs/audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md",
         "docs/services/media-distribution/README.md"
+      ]
+    },
+    {
+      "id": "julio-outlook-send",
+      "triggers": [
+        "enviar correo desde Outlook",
+        "correo de Julio",
+        "firma oficial de correo",
+        "BCC HubSpot",
+        "CCO HubSpot",
+        "48713323@bcc.hubspot.com"
+      ],
+      "skills": [
+        "copywriting",
+        "hubspot-as-a-service"
+      ],
+      "sources": [
+        "docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md",
+        "docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md",
+        "docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md"
       ]
     }
   ]

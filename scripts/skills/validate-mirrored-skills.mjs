@@ -19,6 +19,20 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // CRM y el adapter account-based conservan los mismos permisos y readbacks en ambos agentes.
+    id: 'hubspot-as-a-service',
+    mode: 'byte-identical',
+    codex: '.codex/skills/hubspot-as-a-service',
+    claude: '.claude/skills/hubspot-as-a-service',
+  },
+  {
+    // Prospección comparte método, templates y escenarios; ningún agente admite contactos vacíos.
+    id: 'efeonce-b2b-prospecting',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-b2b-prospecting',
+    claude: '.claude/skills/efeonce-b2b-prospecting',
+  },
+  {
     // La línea gráfica «La órbita» es una skill viva: si Codex y Claude componen con criterios distintos, la marca
     // sale con dos gramáticas bajo la misma firma. Nace byte-identical.
     id: 'efeonce-graphic-line',

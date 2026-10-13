@@ -1,0 +1,221 @@
+{
+  "tenderId": "pibank-stack-v13-document",
+  "slides": [
+    {
+      "slideId": "deck-content-stack",
+      "contentType": "deck.content-stack",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 150,
+          "bodyTop": 610,
+          "bodyPx": 26,
+          "bodyWidth": 330,
+          "answerLeading": "--gl-stk-answer-leading=0.95",
+          "answerTracking": "--gl-stk-answer-tracking=-0.04em",
+          "tileSize": "--gl-stk-tile=70px",
+          "iconSize": "--gl-stk-icon=40px",
+          "tileRadius": "--gl-stk-tile-radius=19px",
+          "tileShadowY": "--gl-stk-tile-shadow-y=14px",
+          "tileShadowBlur": "--gl-stk-tile-shadow-blur=26px",
+          "tileShadowColor": "--gl-stk-tile-shadow-color=#000814",
+          "tileShadowOpacity": "--gl-stk-tile-shadow-opacity=55%",
+          "tileGlowBlur": "--gl-stk-tile-glow-blur=22px",
+          "tileGlowOpacity": "--gl-stk-tile-glow-opacity=18%",
+          "haloColor": "--gl-stk-halo-color=#72ded8",
+          "labelWidth": "--gl-stk-label-width=350px",
+          "labelPx": "--gl-stk-label-px=28px",
+          "labelNotePx": "--gl-stk-label-note-px=18px",
+          "baseLeft": "--gl-stk-base-left=455.16px",
+          "baseTop": "--gl-stk-base-top=588px",
+          "baseWidth": "--gl-stk-base-width=480px",
+          "baseLogo": "--gl-stk-base-logo=400px",
+          "baseLogoGap": "--gl-stk-base-logo-gap=10px",
+          "baseGlowBlur": "--gl-stk-base-glow-blur=24px",
+          "baseGlowOpacity": "--gl-stk-base-glow-opacity=35%",
+          "baseLeadPx": "--gl-stk-base-lead-px=20px",
+          "baseNotePx": "--gl-stk-base-note-px=18px"
+        },
+        "back": {
+          "src": "asset-ref:layer:content-stack-back-engine"
+        },
+        "front": {
+          "src": "asset-ref:layer:content-stack-front-engine"
+        },
+        "voice": {
+          "question": "¿Con qué lo medimos?",
+          "answer": "visible",
+          "eyebrow": "Nuestro stack",
+          "answerLead": "Con todo"
+        },
+        "body": "<strong>11</strong> herramientas en tres capas: lo que se busca, lo que responde la IA y lo que se coordina.",
+        "tiles": [
+          {
+            "left": "--gl-stk-left=1267.37px",
+            "top": "--gl-stk-top=396.5px",
+            "z": "--gl-stk-z=13",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:search-console-isotype",
+            "alt": "Search Console"
+          },
+          {
+            "left": "--gl-stk-left=1362.63px",
+            "top": "--gl-stk-top=451.5px",
+            "z": "--gl-stk-z=15",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:google-analytics-isotype",
+            "alt": "Google Analytics"
+          },
+          {
+            "left": "--gl-stk-left=1457.89px",
+            "top": "--gl-stk-top=506.5px",
+            "z": "--gl-stk-z=17",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:semrush-isotype",
+            "alt": "Semrush"
+          },
+          {
+            "left": "--gl-stk-left=1553.16px",
+            "top": "--gl-stk-top=561.5px",
+            "z": "--gl-stk-z=19",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:brand-visibility-grader-isotype",
+            "alt": "Visibility Grader"
+          },
+          {
+            "left": "--gl-stk-left=1267.37px",
+            "top": "--gl-stk-top=236.5px",
+            "z": "--gl-stk-z=33",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:chatgpt-isotype",
+            "alt": "ChatGPT"
+          },
+          {
+            "left": "--gl-stk-left=1362.63px",
+            "top": "--gl-stk-top=291.5px",
+            "z": "--gl-stk-z=35",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:gemini-isotype",
+            "alt": "Gemini"
+          },
+          {
+            "left": "--gl-stk-left=1457.89px",
+            "top": "--gl-stk-top=346.5px",
+            "z": "--gl-stk-z=37",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:google-ai-overview-isotype",
+            "alt": "AI Overviews"
+          },
+          {
+            "left": "--gl-stk-left=1267.37px",
+            "top": "--gl-stk-top=76.5px",
+            "z": "--gl-stk-z=53",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:notion-isotype",
+            "alt": "Notion"
+          },
+          {
+            "left": "--gl-stk-left=1362.63px",
+            "top": "--gl-stk-top=131.5px",
+            "z": "--gl-stk-z=55",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:frameio-isotype",
+            "alt": "Frame.io"
+          },
+          {
+            "left": "--gl-stk-left=1457.89px",
+            "top": "--gl-stk-top=186.5px",
+            "z": "--gl-stk-z=57",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:teams-isotype",
+            "alt": "Teams"
+          },
+          {
+            "left": "--gl-stk-left=1553.16px",
+            "top": "--gl-stk-top=241.5px",
+            "z": "--gl-stk-z=59",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:insights-isotype-positive",
+            "alt": "Efeonce Insights"
+          }
+        ],
+        "labels": [
+          {
+            "left": "--gl-stk-label-left=729.47px",
+            "top": "--gl-stk-label-top=474px",
+            "tone": "rest",
+            "name": "Medir",
+            "note": "4 herramientas · lo que se busca"
+          },
+          {
+            "left": "--gl-stk-label-left=729.47px",
+            "top": "--gl-stk-label-top=314px",
+            "tone": "lead",
+            "name": "Observar IA",
+            "note": "3 herramientas · lo que responde"
+          },
+          {
+            "left": "--gl-stk-label-left=729.47px",
+            "top": "--gl-stk-label-top=154px",
+            "tone": "rest",
+            "name": "Operar",
+            "note": "4 herramientas · lo que se coordina"
+          }
+        ],
+        "base": {
+          "lead": "Todo se conecta en",
+          "note": "donde Pibank ve cada avance"
+        }
+      },
+      "template": "ContentStack"
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 # Producir una foto de marca en registro cine — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-02 por Claude
-> **Ultima actualizacion:** 2026-10-02 por Claude (1.1: `--formato` y `--alcance` en `foto:cine:nueva`, la clave `__revisar`, la sección partida 1:1, las siete decisiones del operador, la luz juzgada contra la foto aprobada, el escenario con escala, las 12 recetas y el revisor sólo en Claude Code; 1.2: cambiar de formato con `foto:expandir`; 1.3, 2026-10-03: grupos de 3 a 5 con el elenco, Nexa y Julio, y la expresión de Nexa en grupo)
+> **Ultima actualizacion:** 2026-10-06 por Codex (1.4: puente explícito Nano Banana 2.1 y revisión portable en Codex; 1.1: `--formato` y `--alcance` en `foto:cine:nueva`, la clave `__revisar`, la sección partida 1:1, las siete decisiones del operador, la luz juzgada contra la foto aprobada, el escenario con escala, las 12 recetas y el revisor sólo en Claude Code; 1.2: cambiar de formato con `foto:expandir`; 1.3, 2026-10-03: grupos de 3 a 5 con el elenco, Nexa y Julio, y la expresión de Nexa en grupo)
 > **Modulo:** Creative · marca propia de Efeonce (fotografía de marca, registro cine)
 > **Ruta en portal:** no aplica — se usa desde la terminal con `pnpm foto:*` y el agente `cine-reviewer`
 > **Estado:** comandos y revisor disponibles desde el 2026-10-02 (TASK-1926, delta b). Dos pruebas ciegas hechas; falta el veredicto del operador sobre los plates de la segunda y el orquestador `pnpm foto:cine`
@@ -27,8 +27,9 @@ cambiaron y no reciben nada de esto.
 - **Ten la máquina lista:** `pnpm foto:doctor`.
 - **Ten las imágenes de la receta en disco.** Si `foto:cine:nueva` dice que la ficha no está, o el plate de la receta
   falta: `pnpm ai-gen:where <ruta>` y `pnpm ai-gen:pull <carpeta>`.
-- **Sabe con qué revisas.** El agente `cine-reviewer` existe **sólo en Claude Code**. En Codex no hay agente: aplica tú
-  la misma rúbrica leyendo `.claude/agents/cine-reviewer.md` y el casebook.
+- **Sabe con qué revisas.** `cine-reviewer` es un agente configurado de Claude Code. En Codex aplica la misma rúbrica
+  leyendo `.claude/agents/cine-reviewer.md` y el casebook; si el operador autorizó subagentes, puede revisarla un
+  subagente con esa rúbrica antes y después de generar, como en la prueba Nano del 2026-10-06.
 
 ## Paso a paso
 
@@ -39,8 +40,8 @@ cambiaron y no reciben nada de esto.
    ```
 
    Cada receta dice su formato, alcance, protagonista, por qué funciona y sus advertencias (por ejemplo, «isotipo
-   pintado: receta de luz y escena, no de bordado», o «robots anteriores a los Sparks»). Hoy hay 12, todas aprobadas
-   por el operador:
+   pintado: receta de luz y escena, no de bordado», o «robots anteriores a los Sparks»). El comando devuelve el
+   inventario vigente; esta tabla conserva las doce recetas iniciales aprobadas:
 
    | Receta | Formato | Alcance | Protagonista |
    |---|---|---|---|
@@ -144,9 +145,11 @@ cambiaron y no reciben nada de esto.
 5. **Pide revisión antes de gastar:** en Claude Code, invoca el agente **`cine-reviewer`** con la ruta de la ficha.
    Lee el casebook y la receta de partida, revisa la ficha y su prompt, y devuelve `APROBABLE`, `CORREGIR` o
    `FUERA DE ALCANCE`, con la frase exacta a cambiar. En Codex, aplica la rúbrica de `.claude/agents/cine-reviewer.md`
-   tú mismo.
+   o mediante un subagente autorizado.
 
-6. **Genera una vez:** `pnpm foto:generar <ficha> --quality high` (≈ USD 0,05).
+6. **Genera una vez:** `pnpm foto:generar <ficha> --quality high` conserva la ruta habitual Sunburst. El costo histórico
+   de sus recetas no es una cotización vigente. Si el operador eligió Nano Banana 2.1, usa el [desvío explícito](#generar-con-nano-banana-21-cuando-lo-elige-el-operador)
+   y luego vuelve al paso 7.
 
 7. **Mide y mira:**
 
@@ -163,6 +166,29 @@ cambiaron y no reciben nada de esto.
    una cara modelada por la fuente, con un lado algo más oscuro y la dirección legible. Sólo es falla si la cara queda
    pareja y sin dirección, o iluminada desde el lado contrario a la fuente. La barra anterior, «mitad casi negra», era
    más estricta que lo aprobado y quedó recalibrada.
+
+### Generar con Nano Banana 2.1 cuando lo elige el operador
+
+El registro, la ficha y los gates son los mismos. **Los flags de Google se pasan a `pnpm ai:nano`, nunca a
+`foto:generar`.** Tras compilar con `pnpm foto:prompt`, usa el archivo del prompt y las referencias de la ficha
+resueltas y en su orden; repite `--image` por cada una:
+
+```bash
+pnpm ai:nano --prompt-file <prompt-compilado.txt> --image <ref-1> --image <ref-2> --resolution 4K --aspect 16:9 --thinking high --search off --dry-run
+```
+
+El ejemplo muestra dos referencias: agrega todas las declaradas. Para la llamada autorizada, sustituye `--dry-run`
+por `--out <plate.png> --yes`. Revisa el [manual del CLI](../ai-tooling/nano-banana-2-1-cli.md) para credenciales,
+límites, formatos y estimación del componente visual. No se concatenan bloques de fotografía a mano, no se cambia
+el default de OpenAI y no se elige Pro por un alias: aquí el modelo exacto es `gemini-nano-banana-2.1`.
+
+Prueba documentada: `NB21-NEXA-CINE-v2`, ocho referencias, 4K/high, salida nativa **5504×3072** y reservas **4/4 PASS**.
+Cine-reviewer: **APROBABLE**, pendiente de aprobación del operador; no figura en las recetas aprobadas ni en AXIS.
+Compresión de referencias para transporte, corrección V1→V2 y criterio visual frente a NX7d Sunburst:
+[casebook](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable)
+y [evidencia](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md). La comparación no usó
+prompt, expresión ni referencias idénticos; no establece un ranking general ni un benchmark de costo o velocidad.
+Vuelve al paso 7 y conserva el PNG nativo sin recorte, grade, retoque ni upscale.
 
 ### Cambiar de formato con `foto:expandir`
 

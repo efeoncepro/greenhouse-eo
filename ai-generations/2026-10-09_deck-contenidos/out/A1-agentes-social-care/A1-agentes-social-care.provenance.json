@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "fe59812e61b5abe819f334fb0d5e7a30161afa9bc24633740441a40eeaf0cde4",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-agent-supervisor",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:salesforce-icon-agentforce",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/salesforce-icon-agentforce.svg",
+      "sha256": "59a6d79ba5448d0c3cb6026db9d003b4749720f56452d700971961bb9c9019ce"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

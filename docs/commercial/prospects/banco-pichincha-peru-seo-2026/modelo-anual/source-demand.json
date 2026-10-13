@@ -1,0 +1,1276 @@
+{
+  "metadata": {
+    "default_envelope_searches_monthly": 3690,
+    "source_path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-expanded-2026-10-06/monthly-demand-inputs.json",
+    "source_sha256": "b97ddc71d2b707019e03fb50cbd16887139d85f0ee04ea10212a39a9d7e35e23",
+    "as_of": "2026-10-06",
+    "market": "PE",
+    "language": "es",
+    "limitations": [
+      "Market estimates historical; no GSC. Model panel chosen for intent and product fit, not maximal volume; additional clusters remain research backlog.",
+      "Exact-query dedup plus provider core families and manual model representatives. Panel subtotal is a working proxy with residual cross-intent overlap; not unique people, total market or actual traffic. No blanket MAX universe.",
+      "Historical last12months per row; mapping shape to2027 is illustrative, no trend/growth projection. Prefer flat sensitivity plus observed historical shape, not automatic repeated-growth curve.",
+      "Panel directo 3690/mes; media histórica4015. Condicional1690 y educación4070 separados; no sumados a adquisición.",
+      "No demanda total, personas únicas ni forecast2027. Baseline marca actual, conversiones y AEO: ausentes."
+    ]
+  },
+  "groups": [
+    {
+      "id": "D01",
+      "representative_keyword": "cuenta de ahorros",
+      "monthly_volume_proxy": 2900,
+      "category": "acquisition_direct",
+      "use_in_default_envelope": true,
+      "keyword_id": "KW-6f1e9261d7de",
+      "source": "pibank-demand-2026-10-06/keyword-overview-provider.json",
+      "selection_reason": "Producto de ahorro genérico; variantes singular/plural no se suman",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 3600
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 3600
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 3600
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 2900
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 3600
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 2900
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 3600
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 3600
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 2900
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 2400
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 2900
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 2900
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "representative_keyword": "mejores cuentas de ahorro peru",
+      "monthly_volume_proxy": 320,
+      "category": "acquisition_direct",
+      "use_in_default_envelope": true,
+      "keyword_id": "KW-6a85782fedfa",
+      "source": "pibank-expanded-2026-10-06/ranked-01-provider.json",
+      "selection_reason": "Comparación localizada; otras formulaciones/años no se suman",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 260
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 260
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "representative_keyword": "abrir cuenta de ahorros",
+      "monthly_volume_proxy": 210,
+      "category": "acquisition_direct",
+      "use_in_default_envelope": true,
+      "keyword_id": "KW-96d6310d4067",
+      "source": "pibank-demand-2026-10-06/keyword-overview-provider.json",
+      "selection_reason": "Apertura genérica; crear/apertura/online no se suman",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 170
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 140
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 170
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 210
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 210
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 260
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 170
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 170
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 170
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "representative_keyword": "interés de cuenta de ahorro",
+      "monthly_volume_proxy": 210,
+      "category": "acquisition_direct",
+      "use_in_default_envelope": true,
+      "keyword_id": "KW-2a790d8e0e07",
+      "source": "pibank-expanded-2026-10-06/ranked-01-provider.json",
+      "selection_reason": "Representante core del proveedor para interés; frases con intereses no se suman",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 260
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 170
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 170
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 210
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 210
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 210
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 210
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 110
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 110
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 110
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "representative_keyword": "cuenta de ahorros sin mantenimiento",
+      "monthly_volume_proxy": 50,
+      "category": "acquisition_direct",
+      "use_in_default_envelope": true,
+      "keyword_id": "KW-0db6905fa453",
+      "source": "pibank-demand-2026-10-06/keyword-overview-provider.json",
+      "selection_reason": "Representante core del proveedor; variantes no se suman",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 70
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 50
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 70
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 90
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 70
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 50
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 70
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 30
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 20
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 20
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 30
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 50
+        }
+      ]
+    },
+    {
+      "id": "C01",
+      "representative_keyword": "cuenta digital",
+      "monthly_volume_proxy": 1300,
+      "category": "acquisition_conditional",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-4b5808c1040b",
+      "source": "pibank-expanded-2026-10-06/ranked-05-provider.json",
+      "selection_reason": "Condicional: intención transaccional y expectativas de tarjeta/pagos; elegibilidad no medida",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 1000
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 1300
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 1300
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 1600
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 1300
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "representative_keyword": "cuentas de alto rendimiento peru",
+      "monthly_volume_proxy": 390,
+      "category": "acquisition_conditional",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-6dd48781f2c5",
+      "source": "pibank-expanded-2026-10-06/ranked-01-provider.json",
+      "selection_reason": "Consulta explícita Perú; aceptación condicionada a SERP/producto; no hereda 1.600 mixta",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 390
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 320
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 480
+        }
+      ]
+    },
+    {
+      "id": "E01",
+      "representative_keyword": "fondo de seguro de depositos",
+      "monthly_volume_proxy": 1600,
+      "category": "assisted_education",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-fdba39a2d3e2",
+      "source": "pibank-expanded-2026-10-06/ranked-08-provider.json",
+      "selection_reason": "Confianza asistida; no sumar fondeadas a adquisición",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 2400
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 1900
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 1600
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 1600
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 1600
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 1900
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 1900
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 1600
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 1600
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 1300
+        }
+      ]
+    },
+    {
+      "id": "E02",
+      "representative_keyword": "que es trea",
+      "monthly_volume_proxy": 880,
+      "category": "assisted_education",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-a961453d693c",
+      "source": "pibank-demand-2026-10-06/keyword-overview-provider.json",
+      "selection_reason": "Educación de rendimiento, no conversión directa por defecto",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 880
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 1600
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 1600
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 880
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 880
+        }
+      ]
+    },
+    {
+      "id": "E03",
+      "representative_keyword": "transferencia bancaria",
+      "monthly_volume_proxy": 1000,
+      "category": "assisted_education",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-ee2d6a5d9b6c",
+      "source": "pibank-expanded-2026-10-06/ranked-08-provider.json",
+      "selection_reason": "Operación puede ser cliente existente; sólo apoyo",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 1300
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 2400
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 1000
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 1300
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 1000
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 1000
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 590
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "representative_keyword": "como ahorrar dinero",
+      "monthly_volume_proxy": 590,
+      "category": "assisted_education",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-d423bffb69ac",
+      "source": "pibank-expanded-2026-10-06/extra-related-01-provider.json",
+      "selection_reason": "Educación amplia: no usar como visitas adquiribles sin evidencia",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 720
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 720
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 720
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 720
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 590
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 390
+        }
+      ]
+    },
+    {
+      "id": "F01",
+      "representative_keyword": "cuenta en dolares",
+      "monthly_volume_proxy": 480,
+      "category": "future_usd",
+      "use_in_default_envelope": false,
+      "keyword_id": "KW-f592ba8452f0",
+      "source": "pibank-expanded-2026-10-06/ranked-08-provider.json",
+      "selection_reason": "Producto futuro; excluido del caso Soles actual",
+      "history": [
+        {
+          "year": 2025,
+          "month": 9,
+          "search_volume": 590
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "search_volume": 590
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "search_volume": 590
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "search_volume": 480
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "search_volume": 390
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "search_volume": 320
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "search_volume": 320
+        }
+      ]
+    }
+  ],
+  "history_period": "sep2025–ago2026",
+  "history_monthly_proxy_by_calendar_month": [
+    4370,
+    3690,
+    4860,
+    4440,
+    3710,
+    2960,
+    3530,
+    3490,
+    4630,
+    4550,
+    4330,
+    3620
+  ],
+  "lane_profiles": {
+    "acquisition_conditional": {
+      "panel_keyword_count": 2,
+      "panel_average_volume_proxy": 1690,
+      "historical_monthly_mean": 1724.1666666666667,
+      "history": [
+        {
+          "period": "2025-09",
+          "searches": 1390,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.806186563557274
+        },
+        {
+          "period": "2025-10",
+          "searches": 1620,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.9395843402609956
+        },
+        {
+          "period": "2025-11",
+          "searches": 1620,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.9395843402609956
+        },
+        {
+          "period": "2025-12",
+          "searches": 1780,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 1.0323827936201062
+        },
+        {
+          "period": "2026-01",
+          "searches": 2320,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 1.3455775737071047
+        },
+        {
+          "period": "2026-02",
+          "searches": 1780,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 1.0323827936201062
+        },
+        {
+          "period": "2026-03",
+          "searches": 1780,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 1.0323827936201062
+        },
+        {
+          "period": "2026-04",
+          "searches": 1620,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.9395843402609956
+        },
+        {
+          "period": "2026-05",
+          "searches": 1690,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.9801836636056065
+        },
+        {
+          "period": "2026-06",
+          "searches": 1620,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.9395843402609956
+        },
+        {
+          "period": "2026-07",
+          "searches": 1690,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 0.9801836636056065
+        },
+        {
+          "period": "2026-08",
+          "searches": 1780,
+          "available_rows": 2,
+          "expected_rows": 2,
+          "shape_factor": 1.0323827936201062
+        }
+      ],
+      "not_tam": true,
+      "overlap_between_representatives_not_measured": true,
+      "projection_2027": null
+    },
+    "acquisition_direct": {
+      "panel_keyword_count": 5,
+      "panel_average_volume_proxy": 3690,
+      "historical_monthly_mean": 4015.0,
+      "history": [
+        {
+          "period": "2025-09",
+          "searches": 4630,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 1.1531755915317559
+        },
+        {
+          "period": "2025-10",
+          "searches": 4550,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 1.1332503113325032
+        },
+        {
+          "period": "2025-11",
+          "searches": 4330,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 1.078455790784558
+        },
+        {
+          "period": "2025-12",
+          "searches": 3620,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 0.9016189290161893
+        },
+        {
+          "period": "2026-01",
+          "searches": 4370,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 1.0884184308841842
+        },
+        {
+          "period": "2026-02",
+          "searches": 3690,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 0.9190535491905355
+        },
+        {
+          "period": "2026-03",
+          "searches": 4860,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 1.2104607721046077
+        },
+        {
+          "period": "2026-04",
+          "searches": 4440,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 1.1058530510585305
+        },
+        {
+          "period": "2026-05",
+          "searches": 3710,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 0.9240348692403487
+        },
+        {
+          "period": "2026-06",
+          "searches": 2960,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 0.7372353673723536
+        },
+        {
+          "period": "2026-07",
+          "searches": 3530,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 0.8792029887920298
+        },
+        {
+          "period": "2026-08",
+          "searches": 3490,
+          "available_rows": 5,
+          "expected_rows": 5,
+          "shape_factor": 0.8692403486924035
+        }
+      ],
+      "not_tam": true,
+      "overlap_between_representatives_not_measured": true,
+      "projection_2027": null
+    },
+    "assisted_education": {
+      "panel_keyword_count": 4,
+      "panel_average_volume_proxy": 4070,
+      "historical_monthly_mean": 4098.333333333333,
+      "history": [
+        {
+          "period": "2025-09",
+          "searches": 5300,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 1.2932086213908094
+        },
+        {
+          "period": "2025-10",
+          "searches": 6620,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 1.615290768605124
+        },
+        {
+          "period": "2025-11",
+          "searches": 4920,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 1.2004880032533551
+        },
+        {
+          "period": "2025-12",
+          "searches": 4370,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 1.066287108580724
+        },
+        {
+          "period": "2026-01",
+          "searches": 3760,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.9174461163074421
+        },
+        {
+          "period": "2026-02",
+          "searches": 2960,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.7222448149654331
+        },
+        {
+          "period": "2026-03",
+          "searches": 3560,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.8686457909719398
+        },
+        {
+          "period": "2026-04",
+          "searches": 3690,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.9003660024400163
+        },
+        {
+          "period": "2026-05",
+          "searches": 3800,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.9272061813745426
+        },
+        {
+          "period": "2026-06",
+          "searches": 3630,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.8857259048393656
+        },
+        {
+          "period": "2026-07",
+          "searches": 3410,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.8320455469703132
+        },
+        {
+          "period": "2026-08",
+          "searches": 3160,
+          "available_rows": 4,
+          "expected_rows": 4,
+          "shape_factor": 0.7710451403009354
+        }
+      ],
+      "not_tam": true,
+      "overlap_between_representatives_not_measured": true,
+      "projection_2027": null
+    },
+    "future_usd": {
+      "panel_keyword_count": 1,
+      "panel_average_volume_proxy": 480,
+      "historical_monthly_mean": 465.8333333333333,
+      "history": [
+        {
+          "period": "2025-09",
+          "searches": 590,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.2665474060822899
+        },
+        {
+          "period": "2025-10",
+          "searches": 590,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.2665474060822899
+        },
+        {
+          "period": "2025-11",
+          "searches": 590,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.2665474060822899
+        },
+        {
+          "period": "2025-12",
+          "searches": 480,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.0304114490161003
+        },
+        {
+          "period": "2026-01",
+          "searches": 480,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.0304114490161003
+        },
+        {
+          "period": "2026-02",
+          "searches": 390,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 0.8372093023255814
+        },
+        {
+          "period": "2026-03",
+          "searches": 480,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.0304114490161003
+        },
+        {
+          "period": "2026-04",
+          "searches": 480,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.0304114490161003
+        },
+        {
+          "period": "2026-05",
+          "searches": 480,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 1.0304114490161003
+        },
+        {
+          "period": "2026-06",
+          "searches": 390,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 0.8372093023255814
+        },
+        {
+          "period": "2026-07",
+          "searches": 320,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 0.6869409660107335
+        },
+        {
+          "period": "2026-08",
+          "searches": 320,
+          "available_rows": 1,
+          "expected_rows": 1,
+          "shape_factor": 0.6869409660107335
+        }
+      ],
+      "not_tam": true,
+      "overlap_between_representatives_not_measured": true,
+      "projection_2027": null
+    }
+  }
+}

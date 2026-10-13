@@ -41,9 +41,10 @@ producto) con identidad propia en el Knowledge Graph de Google y en el
 "conocimiento" de los LLMs. **Construir tu entidad es el trabajo de fondo que
 multiplica SEO y AEO a la vez.**
 
-Por qué importa para IA: los LLMs responden mejor (y te citan) sobre entidades
-que *reconocen* y de las que tienen información consistente. Las **menciones de
-marca correlacionan ~3× más con visibilidad IA que los backlinks** (data 2026).
+La identidad consistente permite verificar qué marca ofrece qué capacidad. Evaluar reconocimiento,
+fidelidad y fuentes por plataforma; no garantiza cita o recomendación. Correlaciones entre menciones y
+visibilidad de muestras externas no prueban causalidad ni una preferencia universal de los motores.
+Canon de trabajo: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §§3–4.
 
 ### Cómo se construye una entidad (receta)
 1. **Define la entidad canónicamente** — nombre, qué es, categoría, atributos.
@@ -59,9 +60,9 @@ marca correlacionan ~3× más con visibilidad IA que los backlinks** (data 2026)
    promocional (se revierte y daña reputación).
 4. **Consistencia NAP + descripción** en todos los perfiles (nombre, dirección,
    teléfono idénticos) — ver `06_LOCAL_INTERNATIONAL.md`.
-5. **Menciones co-ocurrentes** — que tu marca aparezca *junto a* las entidades de
-   tu categoría y temas (prensa, podcasts, Reddit, listicles). Esto enseña a los
-   modelos "esta marca pertenece a este espacio". Ver `05_OFFPAGE_AUTHORITY.md`.
+5. **Reconocimiento externo pertinente** — referencias independientes a capacidades demostradas en
+   contextos de la categoría. Investigar su uso observado por plataforma; una publicación no demuestra
+   entrenamiento ni efecto causal en recomendaciones. Ver `05_OFFPAGE_AUTHORITY.md`.
 6. **Knowledge Panel** — el objetivo visible: que Google muestre un panel de tu
    marca. Se gana con entidad sólida + notability + datos estructurados, no se
    solicita directamente (puedes *reclamar* uno existente).

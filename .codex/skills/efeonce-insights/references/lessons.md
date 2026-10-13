@@ -1,5 +1,64 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-12 · TASK-2033 · Cargar el logo para fondo oscuro cambió la portada y borró la línea del alcance.**
+  Síntoma: al cargar la variante `on_dark` del logo de Berel, la regla `auto` pasó la portada de blanca a navy, y la
+  portada navy no tiene la zona «Qué mide este informe»: el PDF dejó de decir en la portada qué contenido mide.
+  Regla: cargar un logo `on_dark` es también una decisión de portada; revisar la portada resultante en la vista previa
+  (`--cover=light|dark`) y, si la organización tiene alcance de contenido, fijar la portada en blanca o aceptar que el
+  alcance no salga en la portada.
+- **2026-10-12 · TASK-2033 · Recortar la medición destapó tres fallas que sólo se ven con datos reales.** Síntoma:
+  con el alcance de contenido de Berel, (1) el render falló cerrado: las páginas que más cambian pasaron a ser
+  artículos con slugs de 65 caracteres y `pageLabelOf` sólo abreviaba hasta el último tramo, sin tope; (2) la lectura
+  de la figura decía «La página que más cambió fue subió de 14 a 82 clics»: la variante sin nombre reutilizaba una
+  frase terminada en «fue», y antes nunca se usaba porque la página que más cambiaba era la de inicio; (3) el
+  predicado de alcance por fila tardaba 5 s por consulta sobre un mes real (204 mil filas), cerca de 50 s por edición.
+  Regla: cambiar la POBLACIÓN de un informe cambia qué filas ganan cada ranking, y eso ejercita ramas que los datos
+  de siempre nunca tocaron; la vista previa real con la población nueva es parte del cambio, no un cierre opcional.
+  Sobre `seo_gsc_daily`, clasificar una vez por página distinta (`gscPagesInContentScopeSql`), nunca por fila.
+- **2026-10-12 · TASK-2033 · El primer registro del ID en el registry coincidía con «Siguiente ID libre».** Síntoma:
+  la guarda `! grep -q "TASK-2033"` antes de registrar dio verdadero porque la nota «Siguiente ID libre TASK-2033»
+  ya contenía el texto, y el script de registro no corrió sin avisar. Regla: buscar la FILA (`^| \`TASK-####\``),
+  no el texto del ID.
+- **2026-10-12 · TASK-2033 · GA4 y Search Console no cuentan lo mismo sobre el mismo contenido.** Síntoma: para las
+  páginas del alcance de Berel, Search Console da 799 clics en septiembre y GA4, 3.994 sesiones orgánicas; y mientras
+  los clics suben 20,9 %, las sesiones caen 51,9 %. No es un defecto del filtro: `seo_gsc_daily` guarda sólo
+  consultas con texto (las anónimas no entran), GA4 cuenta todos los buscadores, y agosto tuvo un pico de dos semanas
+  en el contenido. Regla: antes de leer dos fuentes como contradictorias, mirar la serie semanal de cada una; y
+  avisar al operador cuando un mes de comparación trae un pico, porque el informe lo imprime como caída.
+
+- **2026-10-12 · Afirmé que un canal «llega a Think» sin leer el modelo web.** Síntoma: tras llevar facebook.com a
+  `facebook`, el Handoff, el changelog, la task y el mensaje al operador decían que había que publicar Think antes que
+  Greenhouse para que la web no mostrara la fuente sin isotipo. Era falso: `channelForDomain` sólo lo llama `rowMarkOf`
+  (`render/report-mapper.ts`) para las filas de tabla del PDF y el deck; `sharing/web-model.ts` proyecta únicamente el
+  `channelId` que el hecho ya trae sellado. Lo encontró un subagente de barrido, no quien escribió el cambio. Regla: antes
+  de decir en qué superficies se ve un cambio de canal, `grep` de quién llama a la función y lectura de la proyección de
+  cada superficie (PDF/deck: `report-mapper`; web: `sharing/web-model.ts`); «el vocabulario lo admite» no es «la superficie
+  lo recibe».
+
+- **2026-10-12 · Subir `axis-brand-assets` sin regenerar lo que depende del paquete dejó tres tests rojos seis días.**
+  Síntoma: `pnpm test` con tres fallas ajenas a la task en curso (sello de Manzanitas, vocabulario de canales, sello de
+  los lockups del PDF del AI Visibility Report). Causa: `596bfab90` (TASK-1943, 2026-10-06) subió el pin de 0.4.15 a
+  0.4.25 para traer las marcas de HubSpot; entre esas versiones AXIS sumó Facebook y Threads (0.4.19) y X (0.4.21) a
+  `AXIS_PLATFORM_ASSETS` y redibujó los lockups de las submarcas con terminación concéntrica (AXIS `2651192`). El pin
+  estaba bien; faltó regenerar. Regla: todo cambio de versión de `@efeoncepro/axis-brand-assets` corre, antes del commit,
+  `pnpm manzanitas:tokens`, `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` y
+  `pnpm exec vitest run src/lib/efeonce-insights/contracts/channels.test.ts src/config/insights-channel-isotypes.test.ts`;
+  si AXIS sumó una plataforma, se agrega a `INSIGHT_CHANNEL_IDS`, a `GH_INSIGHTS.channels` y a `CHANNEL_ISOTYPES`, y se
+  copia su isotipo en color a los dos catálogos. Leer el mensaje del test con cuidado: decía «faltan facebook, threads,
+  x» y se leyó como que AXIS tenía MENOS plataformas; era la lista de Greenhouse la corta.
+
+- **2026-10-04 · Un `dead_letter` no tenía salida: el comando lo permitía y la base no.** Síntoma: tras corregir el
+  mapper (release `7182af769`), re-encargar `report_pdf` de la edición de Berel respondió `500 internal_error`; hubo que
+  `revise`. Causa: `requestInsightRender` trataba `dead_letter`/`cancelled` como «no vivos» y su comentario decía que se
+  podía re-encargar, pero `insight_outputs_identity_uq` era una UNIQUE total; y `retry` sólo toma `failed` y reusa el
+  manifest sellado, que el mapper viejo había producido. Ningún test lo veía: el unitario mockeaba el store («dead_letter
+  ⇒ inserta») y el live sólo insertaba la primera fila. Regla: cuando un comando promete un camino que depende de una
+  restricción de base, el live test ejercita ESE camino entero contra PG real (fila terminal + fila nueva + choque de
+  dos vivas); la identidad de una fila con estados terminales va en un índice parcial que espeja el predicado del código
+  (`INSIGHT_OUTPUT_RELEASED_STATES` ↔ `WHERE state NOT IN (…)`). Dos trampas al probarlo: el DDL dentro de un live test
+  exige el perfil `ops` fijado antes de que exista el pool, y dos filas insertadas en la misma transacción empatan en
+  `created_at` (`now()` es el de la transacción): ordenar con desempate y comparar como conjunto.
+
 - **2026-10-04 · TASK-1996 · Tres trampas al publicar y commitear los glifos.** (1) El release de AXIS exige que el tag
   coincida con la versión de un paquete: `v0.4.18` para `axis-graphic-line` 0.16.0 falló («Ningún paquete está en
   0.4.18»); el tag correcto fue `v0.16.0`. (2) Greenhouse fija `axis-graphic-line` 0.11.0 por brand-surfaces y Manzanitas:

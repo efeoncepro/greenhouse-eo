@@ -51,6 +51,12 @@ No la uses:
 
 ## Antes de enviarla
 
+### Del discovery al caso de negocio
+
+Antes de reutilizar una muestra, contrastar entidad, marca, producto y dominio con el mandato actual. Un cambio de marca o producto exige revisar el fit; una muestra histórica no es baseline de la nueva marca. Usar el [método de caso de negocio](../../commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md) y el [manual](construir-caso-negocio-seo-aeo.md) para conectar el diagnóstico con escenarios y decisión de inversión. El caso [Banco Pichincha / Pibank](../../commercial/prospects/banco-pichincha-peru-seo-2026/README.md) registra esta transición.
+
+Para la entrega, consultar el [contrato de accesos actual](../growth/aeo-xray.md): distingue la ruta legacy, las muestras autónomas `sample_` y el carril gobernado `xrg_`. La instrucción legacy de abajo no sustituye ese contrato ni convierte una key de muestra en autenticación de destinatario.
+
 1. Confirma qué hueco explica la muestra: Semrush, Search Console, Grader,
    SERP vivo, benchmark o combinación.
 2. Verifica que el enlace sea tokenizado:
@@ -147,6 +153,14 @@ Cuando la Radiografía entra a una propuesta:
   contexto. La pieza interactiva siempre vale más que un PNG aislado.
 - Conecta explícitamente la cadena: Grader mide → Radiografía demuestra →
   propuesta define alcance → servicio opera.
+
+### Delta 2026-10-09 — la muestra dentro de la propuesta
+
+En la propuesta técnica de Pibank v12, la muestra entra como lámina propia: un mockup dibujado (no una captura) de la
+ventana del X-Ray en «La radiografía» y un celular con la guía, el QR y el enlace. La clave y el QR se leen del expediente
+privado; no se copian a Git. Al exportar a PDF, los enlaces externos de cada lámina se conservan como enlaces clicables.
+Si la muestra incluye bloques de experiencia temprana (panel AEO, «hoy vs. con la pieza», revisión, siguiente paso),
+úsalos en la demo para mostrar cómo sería trabajar juntos, con los datos reales del cliente.
 
 ## Objeciones frecuentes
 

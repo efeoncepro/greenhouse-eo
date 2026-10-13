@@ -1,6 +1,6 @@
 # Propuesta creativa — template
 
-> **CLIENT-FACING.** Registro **formal / institucional** *(trato de usted, cliente en tercera persona)*.
+> **CLIENT-FACING.** Registro **formal / institucional** *(trato de usted; al comprador se le habla en segunda persona formal —ustedes, su marca, su brief— y nunca se narra en tercera persona lo que dijo: corrección del operador, 2026-10-12, caso Sika N.º 1164. La tercera persona queda para el SOW y el contrato)*.
 > **NUNCA tuteo.** *(El tuteo es-CL es la voz del **portal**, no la de una propuesta comercial.)*
 >
 > **Antes de escribir una sola línea:**
@@ -89,6 +89,11 @@ Un cambio de dirección creativa constituye un nuevo brief.)*
 
 **Qué NO incluye:** {{sección explícita}}
 > 🔴 **Lo que no se excluye, se incluye. Esta sección protege el margen más que cualquier cláusula de precio.**
+>
+> ⚠️ **En una propuesta que el comprador va a evaluar en una licitación** *(deck técnico, oferta económica)* el
+> borde se escribe en positivo —qué incluye, contado, y cómo se aprueba— y la lista de exclusiones queda para el
+> SOW. Sin tarjeta «Fuera del servicio» ni lámina de piezas adicionales: el operador las quitó (2026-10-12).
+> → `modules/05_SCOPE_SOW.md` §8 · `modules/10_PITCH.md` §5.1.
 
 **Derechos de uso:** {{canal · territorio · plazo · exclusividad}}
 
@@ -154,12 +159,33 @@ settlement/release/refund · rate version · no-charge work · failure owner}}.
 approval documentado. Una pieza puede consumir cero o muchas operaciones; los ejemplos por pieza sólo explican
 composición.
 
+### Variante: proyecto o «lanzamiento tipo» con precio desglosado
+
+Cuando el comprador pide un proyecto de campaña y exige «propuesta económica desglosada», la tabla anterior no
+aplica (no hay gobierno recurrente ni pool). El desglose va **por componente de valor**; las piezas se cuentan dentro
+de su grupo, sin valor por pieza. → `modules/04_PRICING.md` §7 (b.1).
+
+| Bloque | Componente | Qué incluye | Valor neto |
+|---|---|---|---:|
+| Estrategia y concepto | Evolución de la línea gráfica | {{sistema: firma, sello, reglas gráficas}} | **{{}}** |
+| Estrategia y concepto | Conceptualización creativa y pieza madre | {{concepto, titular, pieza madre}} | **{{}}** |
+| Entregables | {{grupo por canal o formato}} | {{piezas contadas y descritas}} | **{{}}** |
+| **Total por {{lanzamiento / proyecto}}** | | | **{{}}** |
+
+🔴 El total sale del cotizador; el reparto entre líneas es manual y lo confirma el operador. No marque un componente
+como pago único sin su decisión: los encargos siguientes quedarían en el total menos esa línea.
+
 **Condiciones:** {{moneda · impuestos · reajuste · pago · facturación · duración · validez}}
+
+🔴 Sólo lo decidido o lo que el comprador pidió declarar. Si dijo que las condiciones de pago se revisan después, se
+escribe «se acuerdan al formalizar el servicio»; no se propone un plazo de pago ni un tarifario de piezas
+adicionales por iniciativa propia. El tratamiento del impuesto lo decide Finance o el operador.
 
 🔴 **Antes de escribir el número, verifique:**
 - [ ] ¿Pasó por el **cotizador**? ¿`margin-health` en verde?
 - [ ] ¿Está **arriba del piso**?
 - [ ] ¿**NO** publica precio unitario por pieza ni por rol?
+- [ ] Si se exige desglose: ¿va por **componente de valor**, con el reparto manual confirmado por el operador?
 - [ ] Si hay ad-hoc: ¿cuesta **MÁS** que el marginal del plan? 🩸
 - [ ] Si hay plan mayor: ¿**NO está dominado** por el menor + ad-hoc? 🩸
 - [ ] ¿Los **derechos de uso** están como línea propia?

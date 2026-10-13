@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "pricing-v3-current/1",
+  "updatedAt": "2026-10-11",
+  "reason": "Catalog v11: each offer declares the commercial unit it is sold as (record kind offer). No price, cost, factor or policy changes.",
+  "catalog": {
+    "path": "data/pricing/v3-operating/catalog.review-v11.json",
+    "version": "operating-review-2026-10-11-v11",
+    "digest": "238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702"
+  },
+  "policy": {
+    "path": "data/pricing/v3-operating/resources.review-v11.json",
+    "version": "operating-review-2026-10-11-v11",
+    "digest": "7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406"
+  },
+  "credits": {
+    "path": "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "version": "operator-screenshots-2026-10-09-v1",
+    "digest": "6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d"
+  }
+}

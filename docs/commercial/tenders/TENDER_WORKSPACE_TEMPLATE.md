@@ -35,8 +35,10 @@ docs/commercial/tenders/<slug>/
   artifact-manifest.json           # 📄 artefactos VIVOS (Radiografía, Grader report) — por ENLACE, nunca archivo
   oferta-tecnica.md                # ➡️ client-facing (narrativa + ledger de evidencia) — FUENTE
   oferta-economica.md              # ➡️ client-facing (narrativa de la económica)
-  economica.json                   # 📄 input transitorio del renderer Excel; NO es el SSOT económico
-  propuesta-economica.xlsx         # ➡️ entregable BRANDEADO (generado: `pnpm economica:build economica.json`)
+  cotizacion/cotizacion.json       # 📄 datos de la oferta económica A4 (se crea al emitirla; no lo crea el scaffold)
+  cotizacion/v<N>/                 # ➡️ sólo el PDF va al comprador; HTML, datos, manifiesto y QA son internos (carpeta nueva por emisión)
+  economica.json                   # 📄 input del renderer Excel; SÓLO si las bases exigen planilla. NO es el SSOT económico
+  propuesta-economica.xlsx         # ➡️ planilla brandeada, sólo en ese caso (generada: `pnpm economica:build economica.json`)
   deck-plan.json                   # fuente de composición del deck (slots, SSOT del deck)
   anexos/                          # ➡️ administrativos: declaraciones, poderes, certificados
   squad-blueprint-INTERNO.md       # 🔒 loaded cost + piso — NUNCA se entrega
@@ -44,8 +46,8 @@ docs/commercial/tenders/<slug>/
 ```
 
 El discriminador que manda es **audiencia**: `research/` + `*-INTERNO.md` = 🔒 nunca cruzan al
-cliente; raíz (ofertas, deck, xlsx) + `anexos/` = ➡️ van al cliente. El sufijo `-INTERNO` es
-convención load-bearing: un archivo así **jamás** se sube al portal del comprador.
+cliente; raíz (ofertas, deck, xlsx) + el PDF de `cotizacion/v<N>/` + `anexos/` = ➡️ van al cliente. El
+sufijo `-INTERNO` es convención load-bearing: un archivo así **jamás** se sube al portal del comprador.
 
 ## El manifiesto de artefactos (`artifact-manifest.json`)
 
@@ -121,7 +123,37 @@ La auditoría visual es obligatoria: revisa la salida PDF completa, no solo el J
 continuidad narrativa, safe areas, legibilidad, logos, alpha, fotos reales del equipo, claims y enlaces.
 La salida del composer nunca sustituye la revisión humana.
 
-## La oferta económica en Excel (brandeada, no a mano)
+## La oferta económica: `cotizacion/cotizacion.json` y `economica.json`
+
+En el workspace conviven dos archivos de datos económicos. No son dos caminos equivalentes:
+
+| Archivo | Para qué | Cuándo |
+| --- | --- | --- |
+| `cotizacion/cotizacion.json` | Datos de la **plantilla A4 de Efeonce**; genera el PDF que ve el comprador. | **Por defecto**, siempre que las bases no exijan su propia planilla. |
+| `economica.json` | Input del renderer de **Excel** (`pnpm economica:build`). | Sólo cuando las bases exigen una planilla como documento integrante. |
+
+`pnpm tender:new` sigue creando `economica.json` como plantilla vacía; su presencia **no indica** que la
+económica se emita en Excel. `cotizacion/` no lo crea el scaffold: se arma al emitir la oferta, copiando un
+ejemplo de la plantilla (versión 2 cuando hay varias líneas con precio) o, si el precio viene de una
+cotización congelada del Cotizador V3, emitiéndolo con `pricing:v3 compose document`.
+
+```bash
+node scripts/documents/render-cotizacion-a4.mjs \
+  --data docs/commercial/tenders/<slug>/cotizacion/cotizacion.json \
+  --out docs/commercial/tenders/<slug>/cotizacion/v1
+```
+
+Cada emisión va a una carpeta nueva (`v1`, `v2`…). Contrato de datos, revisión del PDF y trampas de uso:
+[manual de la plantilla](../templates/cotizacion-a4/README.md). Si se usan los dos archivos en un mismo
+proceso (PDF más planilla exigida), ambos derivan de la misma cotización aprobada y sus totales deben
+coincidir; ninguno es el SSOT económico. Si no se usa el Excel, `economica.json` queda como plantilla sin
+datos y no se entrega.
+
+Caso fuente (Sika Mexicana, Wherex N.º 1164, 12/10/2026): la económica se armó primero en Excel por la
+presencia de `economica.json` y el precedente de otra licitación; el operador pidió el render de Efeonce
+y el Excel se revirtió.
+
+### Cuando las bases exigen Excel (brandeado, no a mano)
 
 Hay clientes que **exigen Excel** (documento integrante de las bases). El `.xlsx` **no se mantiene a
 mano** (se desincroniza). El cálculo y las condiciones comerciales pertenecen a la versión de cotización y
@@ -139,7 +171,10 @@ marca: banda navy con el wordmark Efeonce, paleta AXIS, tabla con zebra, **bloqu
 formato CLP y print setup A4. **Techo de Excel:** las fuentes no se embeben en `.xlsx` (degradan a la del
 lector); si quieres brand pixel-perfect, ese lugar es un PDF del composer, con el Excel como la planilla
 editable. **Antes de brandear libre, confirma si las bases exigen SU planilla** (formato equivocado =
-inadmisible). 🔴 **NUNCA** un precio unitario por artículo (el schema no tiene ese campo).
+inadmisible). 🔴 **NUNCA** un precio unitario por artículo (el schema no tiene ese campo). Va en la misma
+dirección que el desglose de la plantilla A4: una oferta creativa se desglosa por componente de valor, no
+por pieza suelta (skill de licitaciones, `propuesta-tecnica-economica.md` → «Cómo se desglosa una oferta
+creativa»).
 
 ## Reglas duras
 

@@ -1,0 +1,76 @@
+{
+  "tenderId": "C15-contraportada",
+  "slides": [
+    {
+      "slideId": "deck-close-brochure",
+      "contentType": "deck.close-brochure",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=140px",
+          "logoWidth": "--gl-logo-width=500px",
+          "questionTop": 378,
+          "answerTop": 440,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "sloganTop": "--gl-slogan-top=710px",
+          "sloganPx": "--gl-slogan-px=28px",
+          "sloganLeading": "--gl-slogan-leading=1.15",
+          "contactTop": "--gl-contact-top=780px",
+          "contactPx": "--gl-contact-px=20px",
+          "contactWeight": "--gl-contact-wght=500",
+          "contactLeading": "--gl-contact-leading=1.3",
+          "contactRowGap": "--gl-contact-row-gap=18px",
+          "contactBubbleHeight": "--gl-contact-bubble-height=32px",
+          "contactSocialGap": "--gl-contact-social-gap=28px",
+          "contactSocialIcon": "--gl-contact-social-icon=32px",
+          "contactSocialIconGap": "--gl-contact-social-icon-gap=14px",
+          "contactItemIcon": "--gl-contact-item-icon=23px",
+          "contactItemGap": "--gl-contact-item-gap=8px",
+          "contactIconOpacity": "--gl-contact-icon-opacity=0.78"
+        },
+        "backdrop": {
+          "src": "asset-ref:layer:close-brochure-orbit-brand",
+          "alt": ""
+        },
+        "voice": {
+          "question": "¿Conversamos?",
+          "answer": "quieras",
+          "answerLead": "Cuando"
+        },
+        "slogan": [
+          {
+            "text": "Empower",
+            "style": "800 italic #e2e2e2"
+          },
+          {
+            "text": "your",
+            "style": "800 normal #e2e2e2"
+          },
+          {
+            "text": "Brand",
+            "style": "900 italic #ff6500"
+          }
+        ],
+        "contact": {
+          "email": "sales@efeoncepro.com",
+          "phoneFirst": "+56 9 3732 3064",
+          "phoneSecond": "+1 (239) 235-2073",
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+        },
+        "cta": {
+          "target": "answer"
+        }
+      },
+      "template": "CloseBrochure"
+    }
+  ]
+}

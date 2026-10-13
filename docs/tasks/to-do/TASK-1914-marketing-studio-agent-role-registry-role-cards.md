@@ -1,5 +1,14 @@
 # TASK-1914 — Marketing Studio: registro de roles de agente y tarjetas de rol
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -30,7 +39,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de operación híbrida con agentes (§4.2, §4.3, §4.7, §4.8); ningún slice empezado. Existen dos skills de rol interactivas (planificador de medios, SEO/AEO); faltan tres`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1894 (kernel de commands, dryRun → digest) · TASK-1899 (escritura MCP, cliente de canje por capability). La aplicación de la lista blanca en el gateway para corridas delegadas espera la forma del token de EPIC-044 (ver TASK-1915); el catálogo de tipos de work item lo entrega TASK-1913`
+- Blocked by: `TASK-1894 (kernel de commands, dryRun → digest). La aplicación de la lista blanca en el gateway para corridas delegadas espera la forma del token de EPIC-044 (ver TASK-1915); el catálogo de tipos de work item lo entrega TASK-1913`
 - Branch: `efeonce-marketing-studio main (registro, compilador, guardas) · Greenhouse develop (capability, skills de rol, manual servido, docs) · efeonce-mcp rama + PR (guarda de lista blanca, sync y versión); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

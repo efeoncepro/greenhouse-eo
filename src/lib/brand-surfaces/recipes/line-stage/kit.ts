@@ -326,11 +326,33 @@ export const indexIn = (value: unknown, max: number, what: string): number => {
 }
 
 /**
- * Los íconos oficiales de producto de Salesforce que la receta admite (`thirdPartyProductIcon`): los nombres cortos del
- * catálogo de recetas (`sales`, `service`…) apuntan a `salesforce-icon-<nombre>` de `AXIS_PARTNER_ASSETS`. Se usan en su
- * color, sin recolorear, y sólo donde se nombra el producto; están sujetos a la autorización escrita de Salesforce.
+ * Los íconos oficiales de producto que la receta admite (`thirdPartyProductIcon`), por plataforma: la línea decide el
+ * kit. `revenue-hubspot` usa los seis Hubs de HubSpot (`hubspot-icon-<nombre>`, TASK-1943); cualquier otra línea, los de
+ * Salesforce (`salesforce-icon-<nombre>`). Los nombres cortos del catálogo de recetas (`sales`, `service`…) apuntan a
+ * `AXIS_PARTNER_ASSETS`. Se usan en su color, sin recolorear, y sólo donde se nombra el producto; cada kit está sujeto a
+ * la autorización de su titular.
  */
-export const PRODUCT_ICONS = ['agentforce', 'sales', 'service', 'marketing', 'data-cloud', 'platform', 'slack', 'tableau'] as const
+export const PRODUCT_ICON_KITS = {
+  salesforce: ['agentforce', 'sales', 'service', 'marketing', 'data-cloud', 'platform', 'slack', 'tableau'],
+  hubspot: ['marketing', 'sales', 'service', 'content', 'data', 'revenue']
+} as const
+
+export type ProductIconPartner = keyof typeof PRODUCT_ICON_KITS
+
+/** El kit de Salesforce, el de la serie original (se mantiene por compatibilidad). */
+export const PRODUCT_ICONS = PRODUCT_ICON_KITS.salesforce
+
+/** La plataforma cuyos íconos de producto lleva una línea: HubSpot en `revenue-hubspot`, Salesforce en las demás. */
+export const productPartnerOf = (line: unknown): ProductIconPartner => (line === 'revenue-hubspot' ? 'hubspot' : 'salesforce')
+
+/**
+ * El ícono que una receta fija por su rol, no por el intent: los agentes, la plataforma que reconcilia y el perfil
+ * unificado. En HubSpot los agentes viven en Service Hub (Customer Agent) y la base de clientes en Data Hub.
+ */
+export const PRODUCT_ROLE_ICONS: Record<ProductIconPartner, { agents: string; platform: string; profile: string }> = {
+  salesforce: { agents: 'agentforce', platform: 'platform', profile: 'data-cloud' },
+  hubspot: { agents: 'service', platform: 'data', profile: 'data' }
+}
 
 type PartnerAsset = { id: string; file: string; kind: string }
 
@@ -351,13 +373,20 @@ export const partnerFile = (id: string): { ref: string; asset: SurfaceAssetReque
 }
 
 /** El ícono oficial de un producto (`sales`, `service`…), validado contra la lista cerrada de la receta. */
-export const productIcon = (name: unknown, what: string): { ref: string; asset: SurfaceAssetRequest } => {
-  if (typeof name !== 'string' || !(PRODUCT_ICONS as readonly string[]).includes(name)) {
-    throw new SurfacePieceError(`${what}: el ícono de producto es uno de ${PRODUCT_ICONS.join(' · ')}.`, 'invalid-intent')
+export const productIcon = (name: unknown, what: string, line?: unknown): { ref: string; asset: SurfaceAssetRequest } => {
+  const partner = productPartnerOf(line)
+  const kit: readonly string[] = PRODUCT_ICON_KITS[partner]
+
+  if (typeof name !== 'string' || !kit.includes(name)) {
+    throw new SurfacePieceError(`${what}: el ícono de producto es uno de ${kit.join(' · ')}.`, 'invalid-intent')
   }
 
-  return partnerFile(`salesforce-icon-${name}`)
+  return partnerFile(`${partner}-icon-${name}`)
 }
+
+/** El ícono de un rol fijo de la receta (agentes, plataforma, perfil) en el kit de la línea. */
+export const productRoleIcon = (role: keyof (typeof PRODUCT_ROLE_ICONS)[ProductIconPartner], what: string, line?: unknown) =>
+  productIcon(PRODUCT_ROLE_ICONS[productPartnerOf(line)][role], what, line)
 
 /** Junta assets sin repetir la misma referencia. */
 export const uniqueAssets = (assets: SurfaceAssetRequest[]): SurfaceAssetRequest[] => {

@@ -1,0 +1,160 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-07T01:02:24.992Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:backlinks.backlinks.live",
+      "method": "POST",
+      "path": "/v3/backlinks/backlinks/live"
+    },
+    "family": "backlinks",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "target": "pibank.pe",
+        "include_subdomains": true,
+        "limit": 20,
+        "rank_scale": "one_hundred"
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.02472,
+    "estimateStatus": "available",
+    "maxUsd": 0.025,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/backlinks/backlinks/live/",
+      "sourceModifiedAt": "2026-07-22T16:17:46.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 906,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 906,
+        "costUsd": 0.024036,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10070102-1987-0269-0000-23f791f44989",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.024036,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.024036,
+    "tasks": [
+      {
+        "id": "10070102-1987-0269-0000-23f791f44989",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.0954 sec.",
+        "cost": 0.024036,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "backlinks",
+          "backlinks",
+          "live"
+        ],
+        "data": {
+          "api": "backlinks",
+          "function": "backlinks",
+          "target": "pibank.pe",
+          "include_subdomains": true,
+          "limit": 20,
+          "rank_scale": "one_hundred"
+        },
+        "result": [
+          {
+            "target": "pibank.pe",
+            "mode": null,
+            "custom_mode": null,
+            "total_count": 1,
+            "items_count": 1,
+            "items": [
+              {
+                "type": "backlink",
+                "domain_from": "afluenta.pe",
+                "url_from": "https://afluenta.pe/pibank-peru-cuenta-de-ahorros-digital-beneficios-trea-y-como-abrirla/",
+                "url_from_https": true,
+                "domain_to": "pibank.pe",
+                "url_to": "https://pibank.pe/",
+                "url_to_https": true,
+                "tld_from": "pe",
+                "is_new": true,
+                "is_lost": false,
+                "backlink_spam_score": 5,
+                "rank": 18,
+                "page_from_rank": 0,
+                "domain_from_rank": 40,
+                "domain_from_platform_type": [
+                  "cms",
+                  "blogs"
+                ],
+                "domain_from_is_ip": false,
+                "domain_from_ip": "172.241.24.147",
+                "domain_from_country": "PE",
+                "page_from_external_links": 1,
+                "page_from_internal_links": 16,
+                "page_from_size": 108235,
+                "page_from_encoding": "utf-8",
+                "page_from_language": "en",
+                "page_from_title": "Pibank Perú: cuenta de ahorros digital, beneficios, TREA y cómo abrirla – Prestamos",
+                "page_from_status_code": 200,
+                "first_seen": "2026-09-29 17:42:58 +00:00",
+                "prev_seen": null,
+                "last_seen": "2026-09-29 17:42:58 +00:00",
+                "item_type": "anchor",
+                "attributes": [
+                  "noopener",
+                  "noreferrer"
+                ],
+                "dofollow": true,
+                "original": true,
+                "alt": null,
+                "image_url": null,
+                "anchor": "Visitar Pibank Perú",
+                "text_pre": "¿Quieres conocer la Cuenta Soles Pibank? Consulta directamente las condiciones, tasa vigente y requisitos antes de realizar la apertura.",
+                "text_post": null,
+                "semantic_location": "article",
+                "links_count": 2,
+                "group_count": 0,
+                "is_broken": false,
+                "url_to_status_code": null,
+                "url_to_spam_score": null,
+                "url_to_redirect_target": null,
+                "ranked_keywords_info": {
+                  "page_from_keywords_count_top_3": 0,
+                  "page_from_keywords_count_top_10": 0,
+                  "page_from_keywords_count_top_100": 0
+                },
+                "is_indirect_link": false,
+                "indirect_link_path": null
+              }
+            ],
+            "search_after_token": "eyJDdXJyZW50T2Zmc2V0IjowLCJSYXdSZXF1ZXN0Ijp7InRhcmdldCI6InBpYmFuay5wZSIsImxpbWl0IjoyMCwiYmFja2xpbmtzX3N0YXR1c190eXBlIjoibGl2ZSIsImluY2x1ZGVfc3ViZG9tYWlucyI6dHJ1ZSwiZXhjbHVkZV9pbnRlcm5hbF9iYWNrbGlua3MiOnRydWUsInJhbmtfc2NhbGUiOiJvbmVfaHVuZHJlZCIsImFpZCI6MTk4NzkyLCJ0YXNrX2lkIjoiMTAwNzAxMDItMTk4Ny0wMjY5LTAwMDAtMjNmNzkxZjQ0OTg5In0sIlNlYXJjaEFmdGVyRGF0YSI6eyJWZXJzaW9uIjoxLCJTZWFyY2hBZnRlclZhbHVlcyI6eyJyYW5rIjoxOCwibGFzdF9zZWVuIjoiMjAyNi0wOS0yOVQxNzo0Mjo1OCswMDowMCJ9LCJUb2tlblJlYWxPZmZzZXQiOjF9fQ=="
+          }
+        ]
+      }
+    ]
+  }
+}

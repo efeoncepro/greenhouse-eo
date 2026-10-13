@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "32671ff77a0dd9e06815dc036d5b84e5a15e4c1d1a4c88f104b5ad1caf94f5f2",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:H1b-estratega-uniforme-lens-440x440",
+      "path": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+      "sha256": "bbf6edd89997b9ba72534597520ee920548bf897ca52b879a36ff17b2ac07f48"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -145,3 +145,21 @@
   **SIEMPRE** separar las clases, o el defecto vuelve con el siguiente consumer del otro fondo.
 - **SIEMPRE** que un medidor propio muestree píxeles, muestrear **dentro** de la caja del elemento y
   descartar los píxeles que se parecen al color del texto: las dos trampas fallan hacia el falso verde.
+
+### Botones de Nexa — Nexa Mark + Shiny Button (navy) (convención de marca, desde 2026-06-20)
+
+Todo botón/CTA que **invoque o represente a Nexa** (ej. "Pregúntale a Nexa", "Seguir con Nexa") usa la marca de Nexa, no un botón genérico:
+
+- **Nexa Mark obligatorio:** el ícono es el **Nexa Mark** (`GreenhouseNexaBrandMark` desde `@/components/greenhouse/primitives`), NUNCA un ícono Tabler genérico (`tabler-message-*`, `tabler-sparkles`, etc.) ni texto solo. Para botón sobre fondo oscuro usar `kind='inlineMarkOnDark'`.
+- **Shiny Button para el navy de Nexa:** el color característico de Nexa (midnight navy) se expresa con el **Shiny Button** — `GreenhouseShinyBorder asButton variant='cta' palette='nexa'` (desde `@/components/greenhouse/primitives`), pasando el Mark + label como `children`. NO usar un MUI `<Button color='primary'>` plano para un CTA de Nexa.
+
+Patrón canónico (copiar este shape):
+
+```tsx
+<GreenhouseShinyBorder asButton variant='cta' palette='nexa' ariaLabel={…} onClick={…}>
+  <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' />
+  {GH_NEXA.insight_ask_nexa_cta}
+</GreenhouseShinyBorder>
+```
+
+**Referencias vivas:** el bridge CTA de `KnowledgeNexaCompositionLens` ("Seguir con Nexa") y el CTA "Pregúntale a Nexa" de `NexaInsightDetailView` (TASK-1182). El copy visible va en `src/lib/copy/nexa.ts` (`GH_NEXA`), validado con `greenhouse-ux-writing`. **NUNCA** pintar un botón de Nexa con `<Button>` MUI plano + ícono genérico; **NUNCA** hardcodear el navy (sale del `palette='nexa'` de la primitive).

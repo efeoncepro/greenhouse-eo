@@ -46,6 +46,14 @@ No duplicar lifecycle editorial ni prioridad en Greenhouse o componentes UI, no 
 aprobado en publicación. Tasks1667/1668/1669 siguen to-do, según ADR de estrategia §14 Accepted
 2026-10-04; la documentación no certifica tools nuevas ni rollout.
 
+## TASK-1905: Studio desplegado, federación pendiente (2026-10-04)
+
+Studio main 74073de sirve API 1.6.0 y catálogo v1 con 52 canales. ICP real y federación MCP siguen pendientes; verificar disponibilidad en la sesión antes de usar.
+`studio.channels.list`/`studio.channel.get` devuelven la versión de catálogo, que se conserva con el plan.
+No usar aliases históricos como claves canónicas ni copiar límites de un formato a otro. `studio.customer_model.get`
+requiere TASK-1906/1892; sin modelo, referencia pendiente explícita. T1 por MCP espera TASK-2003, no TASK-1899
+(retirada); T2 sigue en CLI del operador. La existencia del contrato no acredita federación ni rollout.
+
 ## Entradas
 
 | Entrada | Obligatoria | Cómo se obtiene si falta |
@@ -81,8 +89,8 @@ El detalle de parámetros, orden de llamadas y trampas está en `references/work
    falsables (qué creemos, cómo lo sabremos, criterio de parada). Con `gtm-architect` si la campaña abre
    posicionamiento o motion nuevos.
 3. **Matriz de audiencias.** Persona (BP del context pack + rol en el buying group) × etapa (TOFU/MOFU/BOFU del
-   journey y stage del bow-tie de HubSpot) × **canal canónico** (lista cerrada en
-   `references/channels-and-measurement.md`). Cada celda: job, trigger, mensaje, acción y destino. Una pieza sin
+   journey y stage del bow-tie de HubSpot) × **canal canónico** del catálogo versionado cuando esté disponible;
+   `references/channels-and-measurement.md` distingue catálogo de valores históricos. Cada celda: job, trigger, mensaje, acción y destino. Una pieza sin
    rol asignado no se produce.
 4. **Message house.** Promesa central, 3–4 pilares con su prueba (dato/caso/mecanismo con fuente), lo que **no**
    se promete, vocabulario sí/no. Sale del brief; si el plan necesita una promesa que el brief no tiene, se
@@ -131,18 +139,18 @@ manifiesto vigente (lista de tools de la sesión o `GET /api/v1/tool-manifest`),
 
 ### Mañana — modo escritura (cuando existan las tools)
 
-> **Delta 2026-10-02:** los commands de escritura ya existen en la API de Studio (`1.4.0`), pero el gateway no los
-> federa hasta TASK-1899, y CMP-001…005 siguen gobernadas por OneDrive hasta su corte (`409
-> campaign_not_studio_owned`). Ver el delta de `references/studio-write-mapping.md` antes de escribir.
+> **Vigente 2026-10-04:** API1.6.0 expone 59 tools; MCP T1 espera TASK-2003 en paralelo. TASK-1899 está retirada.
+> La CLI local Greenhouse `pnpm studio` descubre la API y opera con sus scopes; no concede delegación ni
+> salta autoridad OneDrive. Ver `references/studio-write-mapping.md` antes de escribir.
 
-La sección «Cuando existan las tools de escritura» de `references/studio-write-mapping.md` mapea cada sección del
+La referencia `references/studio-write-mapping.md` mapea cada sección del
 plan a su command. Niveles de gobierno:
 
 | Nivel | Qué | Cómo |
 |---|---|---|
 | **T0** | Lecturas | Directas (`studio.*` de lectura, tools SEO sin costo). |
 | **T1** | Borradores y ediciones (brief en borrador, conceptos, piezas planificadas, copys, anuncios configurados, flight, líneas `proposed`, posts programados, borrador de prompts AEO) | Directas con la identidad delegada de la persona, `Idempotency-Key` por intento lógico, `If-Match` con la `revision` leída y procedencia registrada. Nacen en borrador / `pending_review`. |
-| **T2** | Aprobaciones, publicación, gasto y acciones destructivas | `dryRun` → `proposalDigest` → **confirmación humana explícita** → ejecución con ese digest. Si el estado cambió, el digest no coincide y no se escribe. |
+| **T2** | Aprobaciones, publicación, gasto y acciones destructivas | En Studio permanecen en el carril de operador con autorización humana; el protocolo proposalDigest fue retirado. Los proveedores externos conservan su protocolo propio de gasto/publicación. |
 
 **El agente nunca aprueba, publica ni gasta solo.** Toda pieza de IA (plan, brief, copy, concepto) registra su
 **procedencia**: modelo exacto, entradas (ids y `revision` leídos, brief con fecha), fuentes con fecha y skill que
@@ -192,7 +200,7 @@ la produjo.
 - Esta skill se espeja byte a byte en `.codex/skills/efeonce-campaign-planning/`
   (`rsync -a --delete .claude/skills/efeonce-campaign-planning/ .codex/skills/efeonce-campaign-planning/` y
   `pnpm skills:mirrors`). Se edita `.claude/` y se espeja.
-- Cuando una task de EPIC-049 (TASK-1894, TASK-1899 o las de la capa de estrategia) publique commands o tools de
+- Cuando una task de EPIC-049 (TASK-1894, TASK-2003 o las de la capa de estrategia) publique commands o tools de
   escritura, actualizar `references/studio-write-mapping.md` con los nombres **del registro de operaciones**
   (verificado contra el manifiesto, con fecha) y mover la regla de modo si cambia.
 - Especificaciones de canal y convención UTM llevan fecha de verificación; al cambiar, se actualiza la fecha y la

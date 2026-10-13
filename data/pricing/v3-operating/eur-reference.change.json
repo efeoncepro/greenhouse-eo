@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-eur-reference-2026-10-09",
+  "baseDigest": "b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02",
+  "nextVersion": "operating-review-2026-10-09-v2",
+  "actor": "operator-authorized-agent",
+  "reason": "Add EUR and dated ECB EUR/USD reference for Magnific simulation, preserve historical records.",
+  "dimensions": {
+    "countriesAdd": [],
+    "currenciesAdd": [
+      {
+        "code": "EUR",
+        "precision": 2
+      }
+    ]
+  },
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "fx:EUR:USD:ECB:2026-10-09",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "fx:EUR:USD:ECB:2026-10-09",
+        "revision": 1,
+        "kind": "fx",
+        "value": {
+          "from": "EUR",
+          "to": "USD",
+          "rate": "1.1206"
+        },
+        "source": {
+          "reference": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "confirmed"
+        },
+        "note": "ECB reference dated2026-10-09; informational simulation only, not contractual/bank transaction rate."
+      }
+    }
+  ]
+}

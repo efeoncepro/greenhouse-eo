@@ -1,0 +1,34 @@
+{
+  "as_of_local": "2026-10-07",
+  "timezone": "America/Santiago",
+  "method": "Una lectura GET pública de portada y producto, sin sesión/admin/registro",
+  "conclusion": "WordPress para sitio comercial público; tema pibank y señales Yoast SEO",
+  "scope_exclusions": [
+    "Tecnología del registro y app",
+    "Acceso administrador/CMS concedido",
+    "Onboarding o medición completos",
+    "Versión exacta de WordPress"
+  ],
+  "observations": [
+    {
+      "url": "https://pibank.pe/",
+      "status": 200,
+      "wp_content_occurrences": 60,
+      "wp_includes_occurrences": 4,
+      "wp_json_occurrences": 4,
+      "theme_asset_path": "/wp-content/themes/pibank/",
+      "yoast_comment_present": true,
+      "registration_destination": "https://registro.pibank.pe/"
+    },
+    {
+      "url": "https://pibank.pe/cuenta-soles-pibank/",
+      "status": 200,
+      "wp_content_occurrences": 57,
+      "wp_includes_occurrences": 4,
+      "wp_json_occurrences": 4,
+      "theme_asset_path": "/wp-content/themes/pibank/",
+      "yoast_comment_present": true,
+      "registration_destination": "https://registro.pibank.pe/"
+    }
+  ]
+}

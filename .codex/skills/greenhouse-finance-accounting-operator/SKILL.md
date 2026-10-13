@@ -351,3 +351,78 @@ For execution work, also include:
 - `Changes Applied`: code, doc, task, or config changes made
 - `Rollout Notes`: what should happen before or after deploy/close
 - `Residual Risk`: what remains unresolved or intentionally provisional
+
+## Cotizador V3: atribución local y evidencia económica
+
+Para costear roles/servicios con licencias, plataforma o créditos, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+Finance conserva ownership de nómina real/coberturas, provisiones, impuestos, FX contable, caja y reconciliación;
+el kernel Decimal calcula desde fuentes versionadas. **El costo de personas del cotizador no es la nómina:** es el
+nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), así que el margen real en personas hoy
+es mayor que el que muestra V3. No «corregirlo» con payroll ni proponer conectarlo, y nunca escribir el pago de una
+persona en un artefacto o documento de cotización. Dos ejes de país: el de la persona cambia el **costo** (factor de
+talento, base Chile) y el del cliente cambia el **precio** de la parte humana (factor de mercado). Los factores de
+país están cerrados: el CEO los cerró el 2026-10-11 y son valores de política confirmados desde el 2026-10-12, no
+estimaciones a la espera de su decisión; uno se revisa sólo si una contratación o un negocio real lo contradice. El FX de cotización es política del CEO con USD de referencia (CLP 1000 ·
+COP 3650 · MXN 19,25 · PEN 3,70), no el tipo contable ni spot; cada moneda redondea hacia arriba (CLP 10.000 ·
+USD 10 · PEN 50 · COP 50.000 · MXN 100) y en EUR aún no se emite.
+No introducir cifras del expediente como costos centrales sin fuente/fecha/mantenimiento gobernado.
+
+Portfolio reconcilia cuentas + interno + sin asignar contra capacidad declarada; no inventa clientes ni reparte
+capacidad ociosa al comprador. Adobe va como se factura: CLP con IVA (decisión del CEO), tres licencias por producto,
+Creative Cloud Pro para diseño (incluye Express) y Adobe Express para perfiles de contenido; el 50% de descuento de
+Creative Cloud Pro termina pronto y, por decisión del CEO (2026-10-11), se cotiza desde ya sin él (`current`); el
+importe facturado (`invoiced-with-discount`) sólo si el CEO lo elige para un encargo corto. Cuánto se paga una
+licencia ya tomada (CEO): Adobe hasta que renueva su contrato anual (2026-11-16); Microsoft 365 y Notion, mes a mes.
+Seats nominativos no se reducen por FTE y un costo compartido no autoriza compartir login. Se declaran como se
+compran: varios planes en un periodo, un asiento pagado sin uso (`idleSeats` con motivo; su costo se queda en la
+cotización, sobre las líneas que usan la herramienta, y `compose commitments` lo informa como `idle_seat`) o un
+asiento que usan varias personas (`seatSharing` con motivo; es una declaración, V3 no valida que el proveedor lo
+permita). Cada asiento pagado queda usado, compartido o declarado ocioso, o la cotización no calcula; nunca se quita
+la tarea de una persona para que la cuenta cuadre. GCP/Vercel requieren escenario y denominador;
+créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y remanentes/validez separados.
+FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
+`trial-*` son costos no medidos y no provisiones aprobadas. La puesta en marcha de una persona por dedicación ya es
+provisión estimada: onboarding USD 200 una vez por persona (por defecto) y reclutamiento USD 500 sólo si hay que
+contratar; la regla del Excel de «un mes del recurso» no se usa. Margen sobre venta y markup no son intercambiables;
+`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta (`margin.pricingPolicies[]`,
+`belowPolicyFloor`); ya no compara contra un 40/35 genérico, y nunca otorga aprobación. Un precio acordado se
+declara de una de tres maneras, según cómo se acordó: `agreed_total` por el trabajo completo (un neto por todo el
+plazo; con impuesto exclusivo, el impuesto de la cotización es el de la tasa sobre ese total); `agreed_total` con
+`per: "period"` para un valor mensual con todo incluido (cada mes neta el mismo monto y la puesta en marcha lleva
+su parte dentro de su mes, sin bonificarse: las filas de ese mes pueden quedar bajo su piso aunque el plazo quede
+sobre la política, y eso se informa); y `agreed_net` para un valor por periodo de una sola clase de cobro. El piso
+que falta se lee en el total `marginFloor.netShortOfFloor` (las filas vienen plegadas por mes: no sumarlas a mano).
+La dedicación de cada línea lleva su evidencia y una estimada cuenta como costo estimado; cada asignación de
+herramienta declara la suya en `evidence` (plan, asientos y parte que carga la cuenta), y `compose assess` levanta
+`ALLOCATION_EVIDENCE_REQUIRED` si falta, no está confirmada o no rige en la fecha de la cotización: lo que diga el
+texto de `reason` no se interpreta
+([procedimiento](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#39-el-precio-acordado)).
+Hay tres ofertas, todas del CEO: servicio gestionado creativo (`creative-managed-service`, objetivo 45%, piso 45%),
+servicio gestionado SEO/AEO (`seo-aeo-managed-service`, objetivo 55%, piso 45%, desde 2026-10-11) y una persona
+vendida por dedicación (staff augmentation, `talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%, desde
+2026-10-11); sobre el piso el objetivo sube según el caso y nunca se baja un piso para que un precio pase.
+On-Demand no es una cuarta oferta ni un delivery model: es la forma del compromiso declarada en la cotización, +10% al
+precio sobre On-Going con el mismo piso; arranque, coordinación y compromisos con proveedores van como costo.
+Las cifras y sus excepciones las decide el CEO (SKY social care 2027 es una y no es referencia): el agente
+lleva una recomendación verificada contra sus datos.
+
+Explain/replay reconstruyen snapshots; preview redactado sigue simulación. Mantenimiento crea sucesores con
+preview/apply/digests/impacto y evidencia nueva para montos cambiados; nunca repricea artifacts. Este carril no
+registra ledger/payroll/pagos/CRM, no compra tools y no promueve automáticamente el motor al canon.
+Tres lecturas de un artefacto: calendario de pagos (no es factura ni cobro), caja (nunca es margen ni decide precio) y
+compromisos con proveedores (una licencia Adobe comprada para un encargo de un mes se sigue cobrando hasta que renueva
+el contrato si nadie más la usa). Desde el contrato 1.4.0 (2026-10-11) una cotización lleva los costos de terceros
+que se compran y refacturan, cada uno como fila propia con la regla de su categoría (producción, talento e impresión:
+10% de gestión con piso 5%; medios y licencias: al costo; un costo que el cliente paga directo es una nota sin total),
+y un servicio gestionado On-Demand lleva una reserva de contingencia de 12% del costo de personas, como costo: se vende
+con el margen de la oferta y sale sólo por una renuncia declarada con motivo; staff augmentation no la lleva. Son
+estimaciones propuestas por el agente y aceptadas por el CEO. 🔴 Con terceros hay dos márgenes: el piso de la oferta se
+compara contra el del trabajo propio (`ownWork`), nunca contra el mezclado, que baja con todo lo refacturado cerca del
+costo. La caja nueva a proveedores incluye lo refacturado; la reserva no es caja ni pasivo. Sin modelar: cuándo se le
+paga al proveedor, una compra que obliga más allá del encargo (derechos de uso), comisión sobre lo que paga el cliente,
+tarifario de proveedores y el buffer de un On-Going de licitación con multas. La duración del contrato y la fecha de
+inicio del servicio no son un pendiente: están fuera del cotizador por decisión del CEO (2026-10-11; una cotización
+no es un contrato). El precio de
+HubSpot no es un insumo pendiente (CEO: hoy no se necesita en cotizaciones).

@@ -1,5 +1,18 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-10-09
+
+- **Dirección visual convergida con La órbita (en exploración, sin aprobar).** Diseño de partida:
+  [Content Hub Landing Design](https://claude.ai/artifact/R6cXzuh9prfCrSQRbmeJMR) (home del hub; v3 con el logo de
+  Marketing con Manzanitas en la portada) y [estados del hub](https://claude.ai/artifact/G83zJ5PhbyzpFptqK6HeMP)
+  (archivo paginado, filtros, búsqueda, newsletter, degradados). Versión convergida:
+  [Content Hub · La órbita](https://claude.ai/artifact/3sQNzMA9kwiqcvdwnVa63D).
+- **Decisiones del operador (2026-10-09):** los formatos se distinguen por ícono AXIS y el color queda para el tema;
+  el hub web es una aplicación nueva de la sub-línea MCM. Regla completa en
+  `.claude/skills/efeonce-graphic-line/references/manzanitas.md` §4.7.
+- Sin cambios de `Lifecycle` ni de bloqueantes: siguen el inventario multiformato, el canonical de video y la
+  confirmación del nombre visible (el diseño asume «Marketing con Manzanitas»). No se tocó el sitio público.
+
 ## Delta 2026-09-10
 
 - **`PDR-020` (canales propios) confirma y acota el alcance multiformato de esta task.** El blog queda

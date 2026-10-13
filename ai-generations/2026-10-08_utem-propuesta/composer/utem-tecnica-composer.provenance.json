@@ -1,0 +1,31 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "cd96fb8ef4bded3186738ef353d392d40c610b63ed1e54cc052fff42b66e445e",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 2,
+  "contentTypes": [
+    "deck.cover-proposal",
+    "deck.close-proposal"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3f-contra-horizonte-engine",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/plates/BR3f-contra-horizonte-engine.png",
+      "sha256": "d1f5a8d2b4ceab0d2b03257934b63166d8b6a81278fb0e2455bfbd6430d821ea"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:logo-v3-blanco",
+      "path": "ai-generations/2026-10-08_utem-propuesta/logos-cliente/logo-v3-blanco.svg",
+      "sha256": "37db96c084e9b1f023ab11aaf435d564f852e2efa10f4505595396aa7f4d0af2"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

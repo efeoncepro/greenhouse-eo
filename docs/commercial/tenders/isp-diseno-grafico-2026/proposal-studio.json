@@ -1,0 +1,21 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "isp-diseno-grafico-2026",
+  "workspacePath": "docs/commercial/tenders/isp-diseno-grafico-2026",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "05/10/2026: documentos formales A4 preparados y revisados para evaluación de Compra Ágil; no se declara deck final ni render gobernado.",
+    "Preflight canónico read-only resolvió owner Efeonce y cliente Instituto de Salud Pública de Chile. No se creó Proposal ni se cruzó un gate de GO sin costos completos y precio aprobado.",
+    "Cotización V1 por CLP4.760.000 IVA incluido es propuesta, no aprobada. Archivos de técnica/económica/plan/muestras sincronizados a carpeta comercial OneDrive; no presentada.",
+    "05/10/2026 — NO-BID por decisión expresa de Julio Reyes: no continuar con ISP diseño. El operador indica disponer de cartas del GORE y poca experiencia documental en licitaciones públicas; no se ha acreditado el umbral de cinco años exigido para obtener los 40 puntos de experiencia. La falta de ese respaldo afecta puntaje, no constituye por sí sola inhabilidad ni exclusión. No hubo oferta presentada ni rechazo del comprador. Se conservan los borradores como historial; no continuar preparación. HubSpot no modificado ni reconsultado en este corte."
+  ]
+}

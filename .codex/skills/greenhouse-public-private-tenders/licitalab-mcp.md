@@ -118,10 +118,13 @@ Reparto: **el agente busca, filtra y lee; el humano elige candidatas y decide**.
 1. **Buscar.** `pnpm licitalab search --view all --max 200 --match "<término>" --enrich --no-login`
    (o `--view recommended --max 50`). `--match` filtra sólo lo recolectado: para un barrido amplio sube `--max`,
    y si el término es corto o ambiguo corre varias búsquedas en vez de una.
-2. **Filtrar.** Descarta sin leer bases lo que no es servicio de Efeonce (licencias, hardware, bienes físicos),
-   lo que no llega a tiempo (cierre < preparación realista) y lo que `--enrich` muestra como cerrado. Entrega 3–5
-   candidatas con una línea de por qué y cierre/monto. El score de LicitaLAB ordena; nunca justifica.
-3. **Confirmación humana** de qué candidatas analizar a fondo. No se analiza en masa sin ese paso.
+2. **Filtrar con el alcance pedido.** En un barrido completo usa `all` y cubre CRM, diseño/creativos, web y
+   licencias Claude/OpenAI si están solicitadas, además de las categorías aplicables de Efeonce. No excluir
+   licencias automáticamente: evaluar condiciones de suministro, SKU, soporte y economía. Registrar descartes
+   por alcance, plazo o estado y límites de cobertura. El score de LicitaLAB ordena; nunca justifica.
+3. **Analizar dentro de la autorización.** Si el operador ya pidió revisión profunda de todo el universo, avanzar
+   sin reconfirmar candidatas. En un screening acotado entregar selección priorizada y acordar ampliaciones.
+   Método: `platform-bids-and-administrative-package.md`.
 4. **Análisis por candidata:**
    - `opportunity <código>` → estado, ítems, fechas, monto. `multiple_matches` = mostrar candidatos y pedir elegir.
    - `documents <código>` → inventario; los `✗` no se leen con RAG: decláralos como no revisados.
@@ -176,7 +179,9 @@ una página puede describir “oportunidades monitoreadas” aunque la sesión n
 | `unsupported` | Informa que el país/tipo no soporta esa lectura.                                        |
 | `error`       | Conserva el fallo como fallo técnico y reintenta; no lo conviertas en “sin resultados”. |
 
-Nunca afirmes haber leído bases cuando el estado no sea `ok` ni `partial`.
+Nunca afirmes haber leído bases cuando el estado no sea `ok` ni `partial`. Incluso con `ok`, declarar
+«texto recuperado por RAG»; sólo la descarga/lectura de originales permite afirmar revisión íntegra. Para
+originales, ruta Compra Ágil, expediente y QA usar `platform-bids-and-administrative-package.md`.
 
 ## Límites observados y guardrails
 

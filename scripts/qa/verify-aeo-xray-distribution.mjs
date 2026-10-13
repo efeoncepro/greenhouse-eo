@@ -27,7 +27,7 @@ if (
   manifest.schema !== 'axis.aeo-xray-distribution.v1' ||
   manifest.source !== 'axis-design-system' ||
   manifest.contract !== 'efeonce.aeo-xray' ||
-  manifest.version !== '0.1.0'
+  !['0.1.0', '0.2.0'].includes(manifest.version)
 )
   throw new Error('Unsupported X-Ray distribution provenance')
 if (JSON.stringify(Object.keys(manifest.files ?? {}).sort()) !== JSON.stringify([...files].sort()))

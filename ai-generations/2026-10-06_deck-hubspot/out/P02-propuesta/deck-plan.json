@@ -1,0 +1,90 @@
+{
+  "tenderId": "hs-P02-propuesta-voz",
+  "slides": [
+    {
+      "slideId": "deck-proposal-service",
+      "contentType": "deck.proposal-service",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 140,
+          "bodyTop": 440,
+          "bodyPx": 26,
+          "bodyWidth": 900,
+          "lensLeft": "--gl-ps-lens-left=1300px",
+          "lensTop": "--gl-ps-lens-top=110px",
+          "lensSize": "--gl-ps-lens-size=440px",
+          "cardsTop": "--gl-ps-cards-top=680px",
+          "cardWidth": "--gl-ps-card-width=395px",
+          "cardHeight": "--gl-ps-card-height=270px",
+          "cardGutter": "--gl-ps-card-gutter=20px",
+          "cardRadius": "--gl-ps-card-radius=16px",
+          "cardPadding": "--gl-ps-card-padding=26px",
+          "cardStroke": "--gl-ps-card-stroke=1.5px",
+          "cardShadowY": "--gl-ps-card-shadow-y=30px",
+          "cardShadowBlur": "--gl-ps-card-shadow-blur=70px",
+          "cardShadowOpacity": "--gl-ps-card-shadow-opacity=40%",
+          "nameGap": "--gl-ps-name-gap=10px",
+          "descGap": "--gl-ps-desc-gap=12px",
+          "kickerPx": "--gl-ps-kicker-px=15px",
+          "namePx": "--gl-ps-name-px=38px",
+          "descPx": "--gl-ps-desc-px=19px",
+          "footTop": "--gl-ps-foot-top=1000px",
+          "footLeft": "--gl-ps-foot-left=660px",
+          "footPx": "--gl-ps-foot-px=16px"
+        },
+        "lens": {
+          "src": "asset-ref:layer:proposal-service-lens-revenue-hubspot"
+        },
+        "photo": {
+          "src": "asset-ref:plate:H1b-estratega-uniforme-lens-440x440",
+          "alt": "Una estratega de growth con el polo navy de Efeonce, de pie tras una mesa de nogal en el estudio de noche, justo después de salir en vivo una campaña"
+        },
+        "voice": {
+          "question": "¿Cómo vende más mi CRM?",
+          "answer": "Con agentes",
+          "eyebrow": "Nuestra propuesta · RevOps"
+        },
+        "body": "HubSpot operado como servicio: de la evaluación a la operación gestionada, con agentes que trabajan dentro de tu CRM.",
+        "steps": [
+          {
+            "kicker": "Empieza aquí · sin costo",
+            "name": "Evaluación",
+            "desc": "Sin costo: dónde está tu CRM y qué le falta."
+          },
+          {
+            "kicker": "Proyecto",
+            "name": "Blueprint",
+            "desc": "El diseño pagado de tu operación de revenue."
+          },
+          {
+            "kicker": "Proyecto",
+            "name": "Implementación",
+            "desc": "Implementación o migración, lista para operar."
+          },
+          {
+            "kicker": "On-Going",
+            "name": "Operación gestionada",
+            "desc": "HubSpot y agentes operados por nosotros, mes a mes."
+          }
+        ],
+        "footnote": "Marketing, ventas, servicio, datos y Agent Hub.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none"
+        }
+      },
+      "template": "ProposalService"
+    }
+  ]
+}

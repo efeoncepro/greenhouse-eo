@@ -53,7 +53,9 @@ requiere que el operador guarde el original desde Chrome.
 
 El runner es de lectura. No pulsa acciones como participar, descartar, enviar mensajes, cargar archivos,
 presentar oferta o firmar. Esas acciones requieren una instrucción explícita y, para envío o firma,
-confirmación humana final.
+autorización humana específica. Una autorización vigente que ya cubre la firma no se pide otra vez;
+no amplía la autoridad a envío. Regla general de plataformas, consultas y expediente:
+`platform-bids-and-administrative-package.md`.
 
 ## Criterio de salida
 
@@ -80,16 +82,60 @@ Centro de mensajes que la interfaz muestra de forma diferida. Si no hay evidenci
 revísalas en la UI autenticada antes de cerrar el dictamen. Esta lectura sigue siendo read-only: no pulses
 `Nueva pregunta`, no respondas ni envíes mensajes sin instrucción explícita y confirmación humana.
 
+**El Centro de mensajes muestra las preguntas de todos los proveedores y sus respuestas, no sólo las propias.**
+Léelo entero y vuelve a leerlo **antes de congelar cada documento** (técnica, anexos, económica): las respuestas
+llegan en tandas (en el caso, el 05, el 06 y el 09/10). Caso fuente, licitación 1164 (medido el 12/10/2026): respuestas dadas a otros
+proveedores definieron el alcance a cotizar, que la muestra de video podía ser storyboard o animatic, que para
+punto de venta sólo se pedía el diseño, que la volumetría era una referencia para comparar ofertas y que las
+condiciones de pago se revisarían con quienes avanzaran. Una de ellas pedía además una propuesta de SLA por
+niveles de complejidad; se leyó el 12/10, con el deck técnico ya cerrado, y obligó a agregar una lámina y reexportar.
+Cada requisito que nace en una respuesta se anota con fecha y hora y entra a la matriz de cumplimiento
+(`propuesta-tecnica-economica.md`).
+
+## Anatomía de la oferta en el portal (medido el 12/10/2026, licitación 1164)
+
+La interfaz cambia entre licitaciones; esto es lo observado en una y sirve para saber dónde mirar, no como
+contrato del portal.
+
+- **Pasos:** «Información y preguntas» → «1. Servicio licitado» → «2. Condiciones y archivos adjuntos» →
+  «3. Resumen y enviar oferta». El clic sobre el rótulo de un paso no navega; se avanza con «Siguiente »».
+  Recorrerlos para leer, sin completar campos, no modificó nada: la licitación ya estaba en «Editando» antes.
+  Si un paso exige completar o guardar algo para avanzar, detente y pide instrucción.
+- **«1. Servicio licitado» puede traer un solo servicio** (cantidad 1) con **un monto total**, un **selector de
+  moneda** (USD, EUR, MXN, CLP, PEN, COP; estaba en MXN) y la leyenda **«NO considera IVA»**. Consecuencias: la
+  moneda de la oferta puede resolverse aquí aunque la pregunta no se haya respondido por mensaje; el monto es
+  neto; y el desglose no cabe en el portal, vive en la oferta económica adjunta, cuyo total debe ser ese monto.
+- **La pestaña «Información»** trae los datos de facturación del comprador (razón social, identificador fiscal y
+  dirección) y las condiciones de pago, que en el caso decían «Por definir». Wherex rotula el identificador como
+  «RUT» aunque el comprador sea de otro país (en el caso era un RFC mexicano): cópialo con su etiqueta real. De
+  ahí sale `buyer.taxId` de la plantilla A4.
+- **La hora de cierre se muestra en la hora local del usuario**, sin zona visible: 19:00 en Santiago era 16:00 en
+  Ciudad de México. Se confirmó preguntando. Registra el cierre con las dos zonas y nunca asumas que la hora
+  visible es la del comprador.
+- **Adjuntos (paso 2):** tres casilleros —administrativos, técnicos y económicos— y un límite de peso por archivo que
+  configura cada comprador: en el caso, **20 MB** (leído el 13/10/2026). El reel pesaba 23 MB y no se adjuntó; se ve por el
+  QR y el enlace del deck. Comprueba el límite antes de exportar los finales y ten lista la copia liviana.
+- **Condiciones (paso 2):** «Precio de oferta incluye traslado al lugar solicitado por el cliente», «Plazo de pago» y
+  «Comentario general». En el caso quedaron «Sí», «Sí, Por definir» y vacío.
+- **El monto (paso 1):** con un solo servicio de cantidad 1, «Precio unitario» y «Total Oferta» son la misma cifra; el
+  portal muestra además el nombre y el código del servicio del proveedor («Fee - Agencia Creativa (EF-10001)»).
+- **Después de enviar:** el estado pasa a «Enviada» con autor, fecha y hora. Mientras la licitación siga publicada, editar
+  exige «Retirar oferta» y reenviar: nunca lo pulses al leer. Tras el envío del operador, lee estado, monto, moneda y
+  adjuntos y déjalos en un registro de presentación del expediente (`PRESENTACION-<fecha>.md`), con lo que no pudiste
+  verificar (el portal trunca los nombres de archivo y no muestra su huella).
+
 ## De propuesta preparada a postulación en Wherex
 
 Esta etapa empieza sólo cuando el operador instruye explícitamente preparar o presentar una oferta. La interfaz y
 los requisitos varían por licitación: verifica los campos y adjuntos de la ficha vigente, no reutilices una lista
-de otro proceso como si fuera una condición contractual.
+de otro proceso como si fuera una condición contractual. Regla del operador: presentar, cargar archivos o enviar
+mensajes en Wherex sólo con su confirmación expresa **en ese momento**.
 
-1. En **Servicio licitado**, abre cada ítem con `Ofertar` y completa cantidad, precio unitario y moneda sólo desde
-   la cotización aprobada. Revisa el total y su base fiscal; Wherex puede declarar que los valores no consideran
-   IVA. Nunca uses el máximo presupuestario como precio automático ni confundas un valor mensual con el total del
-   contrato.
+1. En **Servicio licitado**, mira primero la estructura que pide esa ficha: varios ítems con `Ofertar`, cantidad y
+   precio unitario, o un solo servicio con un monto total. Completa sólo desde la cotización aprobada y en la
+   moneda del selector. Revisa el total y su base fiscal; Wherex puede declarar que los valores no consideran
+   IVA. Con un solo monto, compáralo con el total de la oferta económica adjunta: deben ser iguales. Nunca uses
+   el máximo presupuestario como precio automático ni confundas un valor mensual con el total del contrato.
 2. En **Condiciones y archivos adjuntos**, confirma entrega, plazo de pago, vigencia y comentario general. No
    aceptes ni sustituyas una condición comercial sin aprobación de Comercial/Finance. Carga cada documento
    obligatorio exactamente en su campo y respeta el límite de tamaño/formato; una cotización y una presentación
@@ -152,10 +198,10 @@ nombre parecido. Aplica además el contrato común de `crm-portfolio-operating-m
    con la empresa. Distingue un deal histórico/cerrado de la oportunidad vigente y no dupliques una asociación válida.
 3. Consulta las propiedades y opciones reales antes de proponer un alta: HubSpot, no la memoria ni un documento,
    gobierna pipelines, etapas y valores permitidos.
-4. Antes de todo write, muestra la tabla exacta de cambios y obtén confirmación explícita del operador. Para una
-   empresa inexistente, crea primero la empresa con los datos mínimos verificados y vuelve a leer su ID. Luego
-   muestra y confirma por separado el deal y su asociación a esa empresa concreta. Esta segunda confirmación es
-   obligatoria: una asociación no se aprueba contra un nombre ambiguo.
+4. Antes de escribir, preparar el conjunto exacto de cambios y aplicar la autorización vigente. Para una
+   empresa inexistente, crear los datos mínimos autorizados y releer su ID antes de asociar. Si el lote aprobado
+   ya identifica inequívocamente empresa, proceso y asociación, no pedir otra aprobación sólo porque el ID
+   acaba de generarse. Resolver cualquier identidad ambigua antes del write correspondiente.
 5. Crea sólo las propiedades necesarias y usa el owner/pipeline/stage vigentes. Para una licitación privada nueva,
    la clasificación comercial debe quedar trazable, sin inventar propiedades que no existan.
 6. Relee el deal y busca la empresa asociada por ID. Repite el readback después de que hayan podido correr
@@ -165,8 +211,9 @@ nombre parecido. Aplica además el contrato común de `crm-portfolio-operating-m
 7. Actualiza `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` y, si existe Deal,
    `docs/commercial/CRM_DEAL_REGISTER.md` con el mismo `deal_id` y el estado del último readback.
 
-El MCP exige confirmación aun si el operador había autorizado en general crear los registros. Nunca actualices un
-deal o empresa existente para "hacerlo coincidir" sin mostrar el cambio puntual y recibir esa aprobación.
+Una autorización general no cubre cambios ajenos al alcance aprobado ni resuelve una identidad ambigua.
+No inventar requisitos universales del MCP: respetar los controles efectivos de la tool. No actualizar registros
+existentes para «hacerlos coincidir» fuera del alcance autorizado; conservar prestate y readback.
 
 ### 3. Entrega al operador
 

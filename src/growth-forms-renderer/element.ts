@@ -1,3 +1,4 @@
+import type { GrowthInputBehaviorFactory } from './input-behavior-adapter'
 /**
  * TASK-1231 — Growth Forms portable renderer · custom element `<greenhouse-form>`.
  *
@@ -31,6 +32,9 @@ const el = (doc: Document, tag: string, attrs: Record<string, string> = {}, text
 }
 
 export class GreenhouseFormElement extends HTMLElement {
+  /** Optional host composition: set before connecting. Published embeds retain legacy behavior. */
+  inputBehaviors?: GrowthInputBehaviorFactory
+
   static readonly observedAttributes = [
     'form',
     'form-key',
@@ -39,7 +43,7 @@ export class GreenhouseFormElement extends HTMLElement {
     'base-url',
     'embed-key',
     'appearance',
-    'initial-values',
+    'initial-values'
   ]
 
   private internals: ElementInternals | null = null
@@ -102,7 +106,7 @@ export class GreenhouseFormElement extends HTMLElement {
       // segmento de ruta (formRef) en vez del slug. Backward-compatible con `form`.
       formKey: this.getAttribute('form-key') || undefined,
       surfaceId: this.getAttribute('surface') || undefined,
-      embedKey: this.getAttribute('embed-key') || undefined,
+      embedKey: this.getAttribute('embed-key') || undefined
     }
   }
 
@@ -150,6 +154,7 @@ export class GreenhouseFormElement extends HTMLElement {
 
     this.renderer?.destroy()
     this.renderer = new FormRenderer({
+      inputBehaviors: this.inputBehaviors,
       root,
       contract,
       api: this.apiConfig,
@@ -161,7 +166,7 @@ export class GreenhouseFormElement extends HTMLElement {
       // El custom element ES el scope (declara tokens + container-type + box-sizing vía
       // el selector `greenhouse-form`). El wrapper interno NO lleva `.ghf-scope` para no
       // sombrear los overrides del host (appearance="bare" + tokens del sitio).
-      hosted: true,
+      hosted: true
     })
     this.renderer.mount()
   }
@@ -172,7 +177,7 @@ export class GreenhouseFormElement extends HTMLElement {
     return {
       pageUri: window.location?.href,
       pageName: this.ownerDocument?.title || undefined,
-      referrer: this.ownerDocument?.referrer || undefined,
+      referrer: this.ownerDocument?.referrer || undefined
     }
   }
 
@@ -196,7 +201,7 @@ export class GreenhouseFormElement extends HTMLElement {
             typeof value === 'boolean' ||
             (Array.isArray(value) && value.every(item => typeof item === 'string'))
           )
-        }),
+        })
       )
     } catch {
       return {}
@@ -212,7 +217,7 @@ export class GreenhouseFormElement extends HTMLElement {
       class: 'ghf-skeleton',
       role: 'status',
       'aria-busy': 'true',
-      'aria-label': ariaLabel,
+      'aria-label': ariaLabel
     })
 
     wrap.appendChild(el(doc, 'span', { class: 'ghf-skeleton-row' }))

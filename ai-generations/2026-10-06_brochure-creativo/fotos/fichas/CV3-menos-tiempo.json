@@ -1,0 +1,46 @@
+{
+ "formato": "16:9",
+ "impacto": true,
+ "linea": "brand",
+ "palanca": "luz-motivada",
+ "atmosfera": "bruma",
+ "registro": "cine",
+ "alcance": "deck-seccion",
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark studio space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "id": "CV3-menos-tiempo",
+ "desde": "C4S04",
+ "identidad": [
+  {
+   "persona": "nexa",
+   "expresion": "complicidad"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "nexa"
+  }
+ ],
+ "escena": "SCENE (cinematic, a real SIX-SECOND long-exposure photograph taken on a tripod in a busy dark film studio at night): Nexa, as in her reference, stands perfectly still and SHARP with her face at about 72 % of the frame width, framed from the waist up, wearing the Efeonce hoodie exactly as in its reference, both arms relaxed at her sides; her head stays almost frontal and her eyes turn toward the empty dark left of the frame, where the text will sit, with calm complicity; between the left edge of the frame and her body there is a wide band of empty darkness. Around her the whole production keeps moving during the six seconds: ONE crew member's soft translucent ghost passes just behind the camera-right side of her body at about 80 % of the frame width, ONE more at the right edge of the frame, and ONE far in the depth of the studio at about 66 %; a camera dolly left a long smear at the right edge; dozens of pieces carried on a rail behind her are long horizontal streaks of cool white-azure light (#0375DB) that start behind her body and race out to the right edge. Every ghost, smear and streak lives entirely inside the right 40 % of the frame; nothing that moves is visible to the left of her body. The pieces streaking past are versions of the same campaign as the finished piece. Beside her, on the camera-right side of her body, at about 84 % of the frame width, on a slim matte black stand at chest height, ONE finished campaign piece on a small screen stays razor sharp and perfectly still; on it, ONE single tiny point glows vivid orange (#FF6500), the only accent in the frame; it lights nothing around it. Everything that moves is blurred; only she and the finished piece are sharp. The streaks never cross her face and never pass into the left half of the frame. LIGHT: the screen of the finished piece is the only key light, cool white, from the camera-right side at chest height; NO fill light, the far side of her face in shadow with the nose shadow legible; the streaks behind her only outline her hair and shoulders. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm. Real long-exposure physics. Thin haze catches the streaks. The LEFT 60 % of the frame is calm, deep dark studio space with only faint haze: no objects, no light shapes, no streaks, no pieces; everything lit lives in the right 40 %. Rich contrast, deep navy blacks, real sensor grain, genuine depth of field. No readable text, no letters, no numbers, no logos of any other brand.",
+ "lecho": {
+  "objeto": "the near-black matte edge of a director's monitor cart right in front of the lens, out of focus, outside every light",
+  "tono": "DARK near black"
+ },
+ "llave": {
+  "fuente": "the screen of the finished piece",
+  "lado": "from the camera-right side of her body, at chest height",
+  "tamano": "a 13-inch screen",
+  "distancia": "about forty centimetres from her face"
+ },
+ "fondo": "the moving studio behind her, melted into long horizontal light streaks and soft cool bokeh",
+ "fenomeno": {
+  "que": "a six-second long exposure: the whole production races past in streaks while she and the finished piece stay sharp and still",
+  "esServicio": "producción más rápida con la marca intacta: se acelera el proceso, no se mueve la marca"
+ },
+ "primerPlano": "the dark out-of-focus handle of the camera dolly close to the lens, cut by the frame at the bottom right corner"
+}

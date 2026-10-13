@@ -1,0 +1,29 @@
+{
+  "args": [
+    "explain",
+    "--input",
+    "<tmp>/broken.artifact.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 249,
+    "sha256": "5bb97b0044095b65341b3cbfd730ad330c01d146d0ebaeefe5bc1250d88ec750",
+    "text": "{\n  \"error\": {\n    \"code\": \"INPUT_NOT_JSON\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"input\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "broken.artifact.json",
+      "mode": "644",
+      "content": {
+        "bytes": 15,
+        "sha256": "129fd86008ceca429954dd37d4e94e9839eec679778b4b90593883161e4b5668",
+        "text": "not an artifact"
+      }
+    }
+  ]
+}

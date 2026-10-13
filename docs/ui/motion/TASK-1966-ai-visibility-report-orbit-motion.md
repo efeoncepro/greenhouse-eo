@@ -1,5 +1,21 @@
 # TASK-1966 — Órbita Engine en la landing
 
+## Contrato vigente · 2026-10-04
+
+- **Estado:** hero demostrativo publicado en Think `6aab907`; geometría amplia publicada en `56a300a`, Vercel success y readback público a 1710/2560 px. El hover azul profundo posterior permanece local.
+- **Escena:** `EngineHeroOrbit.astro` conserva el SVG oficial y demuestra consulta → respuesta → mención de «Tu marca» → cita `tu-sitio.ejemplo`. Es un ejemplo, no un run real ni una respuesta atribuida a un proveedor. La descripción accesible lo identifica; por decisión del operador no hay pie visible.
+- **Ciclo:** 12 s continuo, coreografía propia autorizada para esta landing; no reemplaza tokens ni motion de logo de AXIS. Rotación de la órbita, entrada del texto de respuesta, énfasis de mención y aparición de cita/insight. El énfasis anima el fondo de la mención: no afirmar que todo sea compositor-only.
+- **Control:** clic/toque sobre toda la escena pausa/reanuda. Área transparente de botón nativo con nombre «Pausar/Reanudar demostración», foco visible y activación Enter/espacio. No hay enlace ni botón de pausa separado. No se usa live region para repetir el contenido.
+- **Suspensión:** `IntersectionObserver`, visibilidad de pestaña y preferencia de movimiento reducido. El custom element limpia listeners/observer al desconectarse. La pausa manual se conserva al salir/volver a pantalla.
+- **Fallback:** sin JS o con movimiento reducido, escena completa estática y control oculto. CTA y formulario siguen disponibles.
+- **Geometría:** shell máximo 1360 px, escena máxima 500 px; móvil/tablet en flujo normal. Evita que el aspect-ratio de la escena empuje indefinidamente el formulario. Readback público: escena 500 px y formulario y=678 tanto a 1710 como a 2560.
+- **Botones del formulario:** sin elevación; último ajuste local sólo de color: Engine accent 70% + ground 30%, texto blanco, contraste 6,80:1. No agrega efectos ni modifica renderer/políticas compartidos.
+- **Evidencia:** [hero demostrativo y correcciones](../reviews/TASK-1966-ai-visibility-report-landing-la-orbita/hero-demo-2026-10-04/README.md). Clic pausa seis elementos; Enter reanuda; espacio pausa. Reduced-motion, suspensión fuera de viewport y foco CTA comprobados localmente. Build/tipos PASS. No hay medición de FPS, energía o INP ni smoke de envío real nuevo.
+
+## Registro histórico — versiones sustituidas
+
+Lo siguiente conserva decisiones y evidencia de las entradas finita y de tarjetas abstractas. Sus afirmaciones de cero JavaScript, ausencia de loop/control, estado local y aceptación pendiente pertenecen a esos cortes; no describen el contrato vigente anterior.
+
 ## Revisión del operador — 2026-10-04 (propuesta local)
 
 El operador considera que la entrada finita dejó la landing demasiado estática y perdió atractivo. La versión publicada del 03/10 permanece como registro histórico; la propuesta local sustituye sólo su motion por una escena de respuestas: SVG oficial intacto, recorrido continuo de una vuelta cada 12 s y relevo de tarjetas conceptuales ChatGPT/Gemini/Claude cada 4 s, sin cifras ni resultados inventados. El ciclo de 12 s es **propuesta específica de esta superficie**, no un token AXIS aprobado ni una modificación del brand-close oficial. Canonización del ciclo después de aceptación visual.

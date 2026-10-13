@@ -1,0 +1,73 @@
+{
+  "reference": "EO–PIBANK–2027–01",
+  "revision": "2026-10-09 · compromiso inicial de seis meses y renovación trimestral",
+  "verifiedAt": "2026-10-09T12:12:15.442424+00:00",
+  "sourceVersions": {
+    "USD": "v2",
+    "PEN": "pen-v4"
+  },
+  "supersedes": {
+    "USD": "v1",
+    "PEN": "pen-v3"
+  },
+  "preservedVersionedCopies": [
+    "Cotizacion detallada 2027/2026-10-08-v1",
+    "Cotizacion detallada 2027/2026-10-08-PEN-v1"
+  ],
+  "fxSnapshot": "fx/usd-pen-2026-10-08.json",
+  "annualNet": {
+    "USD": 79200,
+    "PEN": 272210.4
+  },
+  "firstSemester": {
+    "USD": 42500,
+    "PEN": 146072.5
+  },
+  "sent": false,
+  "localCopyVerified": true,
+  "remoteSyncAudited": false,
+  "files": [
+    {
+      "currency": "USD",
+      "format": "pdf",
+      "source": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/v2/Pibank-Cotizacion-detallada-2027-USD.pdf",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Cotizacion-detallada-2027-USD.pdf",
+      "versionedCopy": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Cotizacion detallada 2027/2026-10-09-v2/Pibank-Cotizacion-detallada-2027-USD.pdf",
+      "bytes": 739877,
+      "sha256": "b820020e842c1643c39280692753e0ae9d09a06f1725d4d44f56ab721c7f75e6",
+      "localCopyVerified": true,
+      "pages": 19
+    },
+    {
+      "currency": "USD",
+      "format": "html",
+      "source": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/v2/Pibank-Cotizacion-detallada-2027-USD.html",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Cotizacion-detallada-2027-USD.html",
+      "versionedCopy": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Cotizacion detallada 2027/2026-10-09-v2/Pibank-Cotizacion-detallada-2027-USD.html",
+      "bytes": 1802196,
+      "sha256": "c370cf2c4d59325061efef54f9564f48d9e6d661e4a7d04876102585baf19a9f",
+      "localCopyVerified": true
+    },
+    {
+      "currency": "PEN",
+      "format": "pdf",
+      "source": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/pen-v4/Pibank-Cotizacion-detallada-2027-PEN.pdf",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Cotizacion-detallada-2027-PEN.pdf",
+      "versionedCopy": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Cotizacion detallada 2027/2026-10-09-PEN-v2/Pibank-Cotizacion-detallada-2027-PEN.pdf",
+      "bytes": 739342,
+      "sha256": "ad850405560e8d21fac7f7ac7f857354e7d82a2ea8a2fcc91a98c66e9e8906ac",
+      "localCopyVerified": true,
+      "pages": 19
+    },
+    {
+      "currency": "PEN",
+      "format": "html",
+      "source": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/pen-v4/Pibank-Cotizacion-detallada-2027-PEN.html",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Pibank-Cotizacion-detallada-2027-PEN.html",
+      "versionedCopy": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Banco Pichincha/Cotizacion detallada 2027/2026-10-09-PEN-v2/Pibank-Cotizacion-detallada-2027-PEN.html",
+      "bytes": 1802483,
+      "sha256": "14c1dffa90d76d6f08a84ade2841effa5d4575b9321b940a63994ac8ae1e2741",
+      "localCopyVerified": true
+    }
+  ]
+}

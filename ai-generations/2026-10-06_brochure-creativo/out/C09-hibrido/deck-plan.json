@@ -1,0 +1,66 @@
+{
+  "tenderId": "C09-hibrido",
+  "slides": [
+    {
+      "slideId": "deck-method-hybrid-workforce",
+      "contentType": "deck.method-hybrid-workforce.scene",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 280,
+          "answerPx": 160,
+          "bodyTop": 640,
+          "bodyPx": 28,
+          "bodyWidth": 600
+        },
+        "photo": {
+          "src": "asset-ref:plate:HW1-mismo-trabajo",
+          "alt": "Una estratega de Efeonce con polo y lanyard señala el gráfico en un monitor grande mientras un agente trabaja las imágenes de la misma pieza"
+        },
+        "voice": {
+          "question": "¿Quién hace la pieza?",
+          "answer": "y agentes",
+          "eyebrow": "Personas y agentes",
+          "answerLead": "Personas"
+        },
+        "body": "Sobre la misma pieza, al mismo tiempo. El agente suma capacidad; la persona dirige, decide y responde por la marca.",
+        "selection": {
+          "targets": [
+            {
+              "label": "Estrategia",
+              "anchor": "bottom-start",
+              "participantKind": "department",
+              "box": {
+                "left": 1606,
+                "top": 388,
+                "right": 1866,
+                "bottom": 530
+              }
+            },
+            {
+              "label": "Agente IA",
+              "anchor": "top-start",
+              "participantKind": "department",
+              "color": "#0375db",
+              "box": {
+                "left": 1614,
+                "top": 172,
+                "right": 1872,
+                "bottom": 368
+              }
+            }
+          ],
+          "scale": 1.25,
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "participantKind": "department"
+        }
+      },
+      "template": "MethodHybridWorkforceScene"
+    }
+  ]
+}

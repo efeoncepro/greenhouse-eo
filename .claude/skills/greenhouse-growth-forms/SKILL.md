@@ -22,6 +22,26 @@ hold business logic, mapping, secrets or PII.
 > the admin cockpit, Nexa, MCP and any host are all **clients of the same contract**. Never build
 > form behavior into a single UI/host.
 
+## AXIS input behavior (2026-10-04)
+
+El adapter opt-in `inputBehaviors` comparte formato, nunca autoridad de validación. Cargar
+[decisión de adopción](../../../docs/architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+AXIS `a0c6130` está en `main` (ajuste de assets `6fff346`); primitives 0.5.0 sigue sin publicar.
+El port del renderer es local y no está activado: no cambiar pins/hosts ni inferir adopción desde el Lab.
+`display` es texto editable y `value` puede ser null: conservar/rechazar, nunca vaciar ni truncar.
+Formato al salir; no transformar durante IME. El producto conserva reset y validación de servidor;
+`ready` no prueba validez de negocio. Correo sin máscara, preservando alias y mayúsculas; RUT sin
+verificación de dígito. Teléfono/URL/correo/RUT son mappings explícitos; moneda y documentos de otros
+países requieren contrato. Configurar `inputBehaviors` antes de conectar el custom element.
+
+El selector vigente deriva **18 países/prefijos** de `CALLING_CODES` en
+`src/lib/growth/forms/validators/phone.ts`; no es una allowlist estricta de números internacionales con
+`+`. AXIS ofrece `phoneCountryOptions(locale, allowlist?)` en `/input-phone` (245 países/territorios en
+la metadata actual), pero ni el port ni el host amplían el catálogo automáticamente. Para adoptarlo,
+definir cobertura de producto, consumir el helper publicado y verificar payload/validación del motor.
+No copiar tablas ni imponer 245 como constante eterna. `PhoneField.countrySearch` habilita búsqueda
+React con mensajes explícitos; no introduce React ni ese control en el web component de Growth Forms.
+
 ## When to invoke
 
 - Authoring/lifecycle of forms (draft → review → publish → deprecate → archive), versions, copy.
@@ -367,6 +387,40 @@ each governed by a capability + tenant auth + audit).
   (duplicates the lead — secure-submit is not idempotent).
 - HubSpot adapter: mapping + `formGuid` + portal stay server-only. Use `captureWithDomain` (never
   `Sentry.captureException` directly).
+
+### HubSpot destination registry (2026-10-09)
+
+Each public-site Growth Form has **its own HubSpot form**; destinations are never shared. The
+mapping lives in `scripts/growth/hubspot-destinations.registry.ts` and is applied with
+`pnpm growth:forms:activate-hubspot-destinations` (dry-run by default; flags `--apply-hubspot`,
+`--smoke`, `--apply-greenhouse`, `--only=<slug>`). Select options are derived from the published
+`field_schema`, so HubSpot cannot drift from the Greenhouse contract.
+
+- **`status='delivered'` does not prove HubSpot delivery.** Without an enabled `direct`
+  destination the dispatcher marks the submission as delivered *to the ledger*. Proof is a
+  `form_destination_attempt` row with `status=succeeded`, HTTP 200 and `external_id`.
+- **Three non-retryable 400s send a lead to dead-letter**, and the tool's contract check covers
+  all three: `FIELD_NOT_IN_FORM_DEFINITION` (mapped property missing from the HubSpot form),
+  `VALUE_NOT_IN_FIELD_DEFINITION` (option mismatch) and `REQUIRED_FIELD` (a HubSpot-required field
+  Greenhouse does not guarantee, e.g. `lastname` for a one-word name). HubSpot forms used as
+  destinations keep everything but `email` optional: Greenhouse owns validation.
+- **HubSpot forms built in the new editor (`embedType: V4`, e.g. "AEO - Lead Form") cannot be
+  modified through the Forms API** (403 "not allowlisted to perform an operation to v4 forms").
+  Add their fields in the HubSpot UI, then re-run the tool; it reports the gap instead of failing.
+  New forms are created as V3 by cloning "Contact Form - EO".
+- A PATCH with a field group of more than 3 fields is rejected even if the form already had it.
+- **`--apply-greenhouse` always checks the live HubSpot form**, never the dry-run projection.
+- The portal has non-HubSpot form capture on (`leadin`), which records every `<form>` submit as
+  "<page title>: <form class>" — a second conversion per lead, fired even when validation blocks
+  the submit. The renderer opts out by rendering `<form class="ghf-form" data-hs-do-not-collect>`
+  (`HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE` in `renderer.ts`; HubSpot evaluates it when it discovers
+  the node, so it must exist before insertion). **Consequence: a Growth Form reaches HubSpot only
+  through its governed destination.** A form without an enabled `direct` destination no longer
+  shows up in HubSpot at all — add it to the registry instead of relying on the scraper.
+  Rollout is per bundle: `renderer-latest.js` ships with the Greenhouse release; the WordPress
+  plugin's pinned bundles (`content-marketing-forms.js`, `hubspot-forms.js`) need their own rebuild
+  and plugin rollout. Never switch the portal-level capture off: the footer newsletter (CF7) and
+  the meeting scheduler (`.ghm-form`) still depend on it.
 
 ### HubSpot form definition fields
 

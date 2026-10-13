@@ -1,0 +1,38 @@
+{
+  "args": [
+    "current",
+    "set",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v10.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v10.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--reason",
+    "Golden baseline: replace the pointer.",
+    "--out",
+    "<tmp>/pointer.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 253,
+    "sha256": "70d17c651a1190745d5fac7b0714f8947a7e4c5359063dbfc13c3b5af206fdc0",
+    "text": "{\n  \"error\": {\n    \"code\": \"MISSING_ARGUMENT\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"confirm\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "pointer.json",
+      "mode": "644",
+      "content": {
+        "bytes": 802,
+        "sha256": "2a3dd661a106807551d8f55e070ac0b64fdbf7ce80481fbfd69a3177e17be401",
+        "text": "{\n  \"schemaVersion\": \"pricing-v3-current/1\",\n  \"updatedAt\": \"2026-10-11\",\n  \"reason\": \"Golden baseline: a pointer that names immutable versions.\",\n  \"catalog\": {\n    \"path\": \"data/pricing/v3-operating/catalog.review-v11.json\",\n    \"version\": \"operating-review-2026-10-11-v11\",\n    \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\"\n  },\n  \"policy\": {\n    \"path\": \"data/pricing/v3-operating/resources.review-v11.json\",\n    \"version\": \"operating-review-2026-10-11-v11\",\n    \"digest\": \"7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406\"\n  },\n  \"credits\": {\n    \"path\": \"data/pricing/v3-resources/ai-credits.review-v1.json\",\n    \"version\": \"operator-screenshots-2026-10-09-v1\",\n    \"digest\": \"6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d\"\n  }\n}\n"
+      }
+    }
+  ]
+}

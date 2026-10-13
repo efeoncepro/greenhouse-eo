@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-12",
+  "status": "internal-comparison-not-approved-as-anchor",
+  "prompt": {
+    "file": "prompts/AB-NEXA-ORQUESTA.txt",
+    "sha256": "941fee51bcd5a1d217debb3750cb4c18dc7d250e0fd9e8d80c51a4604c4e328a",
+    "compiler": "foto:prompt construirPrompt",
+    "characterCount": 16426
+  },
+  "references": "transport/provenance.json",
+  "sameReferenceOrderAndBytes": true,
+  "runs": [
+    {
+      "model": "gpt-image-2.5-sunburst",
+      "provider": "openai-direct",
+      "quality": "max",
+      "width": 3840,
+      "height": 2160,
+      "elapsedSeconds": 97.42842388153076,
+      "usage": {
+        "inputImageTokens": 11153,
+        "inputTextTokens": 3697,
+        "outputTokens": 13342
+      },
+      "estimatedUsd": 0.507969,
+      "costBasis": "Standard token rates, no assumed cache, not invoice"
+    },
+    {
+      "model": "dola-seedream-5-0-pro-260628",
+      "provider": "byteplus-direct",
+      "optimize_prompt_options": {
+        "mode": "standard"
+      },
+      "watermark": false,
+      "width": 2864,
+      "height": 1611,
+      "elapsedSeconds": 227.0539608001709,
+      "attempt": 2,
+      "usage": {
+        "input_images": 8,
+        "generated_images": 1,
+        "output_tokens": 18023,
+        "total_tokens": 18023
+      },
+      "estimatedUsd": 0.0999,
+      "costBasis": "account image area + seven additional refs, not invoice"
+    }
+  ],
+  "unknownCosts": [
+    {
+      "model": "dola-seedream-5-0-pro-260628",
+      "attempt": 1,
+      "status": "timeout at 180 s before response",
+      "requestId": null,
+      "chargedUsd": null,
+      "estimatedIfChargedUsd": 0.0999
+    }
+  ],
+  "files": [
+    {
+      "file": "fichas/AB-NEXA-ORQUESTA.json",
+      "sha256": "5a9d9e0be6def82e97be3b2bc359fade3ea16809f4a505ef891d1b952d91f130",
+      "bytes": 6613
+    },
+    {
+      "file": "plates/sunburst-max.png",
+      "sha256": "4fc989c44ab44c73d3e4a945ced787b5ccba416616b8eab8a7a8a04b66fb0e46",
+      "bytes": 9474598
+    },
+    {
+      "file": "plates/seedream5-pro-standard.png",
+      "sha256": "18c57960fd6ffd6d4426d56ed588ef77acea83c65242e43b5a807a49ff8f80a9",
+      "bytes": 7028126
+    },
+    {
+      "file": "final/sunburst-max.png",
+      "sha256": "317ea5e691af74f2a944fef3045c6b6d343bca2705b53d45b9103a0e7ce981ec",
+      "bytes": 13699828
+    },
+    {
+      "file": "final/seedream5-pro-standard.png",
+      "sha256": "667ecbfdb556f47eeac4ebe2dfb7169365fac5bd1b37fa9f97f930e31e86770c",
+      "bytes": 11921327
+    }
+  ],
+  "imageEdits": "only canonical photographic SVG signature, no plate correction, upscale, crop, scrim or grade",
+  "signatureQa": "final/signature-qa.json",
+  "globalReserves": "both 2/4, not approved for full text layout"
+}

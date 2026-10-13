@@ -1103,6 +1103,51 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // ── TASK-2025 — Cotizador V3 en la plataforma (EPIC-053) ──
+  // Capacidades propias: ninguna del cotizador actual se reutiliza, así que quien tiene
+  // `commercial.quotation:approve` no hereda nada de V3. Dos de ellas además exigen una persona identificada,
+  // regla que vive en la base y en la puerta (`src/lib/commercial/quoter/authz.ts`), no en el permiso: activar el
+  // catálogo y aprobar una excepción bajo el piso.
+  {
+    // Leer el catálogo, la política y los créditos; `update` guarda un documento sucesor y NO lo activa.
+    key: 'commercial.quoter.catalog',
+    module: 'commercial',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // Mover el puntero de versiones vigentes.
+    key: 'commercial.quoter.catalog.activate',
+    module: 'commercial',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.quoter.simulate',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.quoter.quote',
+    module: 'commercial',
+    actions: ['read', 'create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // Emitir, y retirar lo emitido. Dentro de política lo hace también un agente (decisión 7 del ADR).
+    key: 'commercial.quoter.issue',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    // Aprobar o revocar una excepción bajo el piso.
+    key: 'commercial.quoter.exception',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'commercial.contract',
     module: 'commercial',
@@ -2526,6 +2571,13 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   },
   {
     key: 'marketing_studio.campaign.write',
+    module: 'marketing_studio',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1905 — gobernar el catálogo global de canales; separado de editar campañas y de aprobar piezas.
+  {
+    key: 'marketing_studio.catalog.manage',
     module: 'marketing_studio',
     actions: ['create', 'update'] as const,
     defaultScope: 'tenant'

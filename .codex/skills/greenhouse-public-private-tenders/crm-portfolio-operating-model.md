@@ -18,8 +18,11 @@ El flujo es `search → propose → confirm → write → readback → automatio
    - `id_de_licitacion`: identidad visible del proceso;
    - `gh_idempotency_key`: pública `hubspot-public-tender:<país>:<ID>` o privada
      `hubspot-private-tender:<plataforma>:<ID>`.
-4. Para un proceso nuevo aprobado, usa `pipeline=default` y `dealstage=qualifiedtobuy`, salvo que el proceso real
-   ya esté en una etapa posterior verificada.
+4. La investigación/alta de prospectos permanece en etapa lead hasta calificación efectiva; una señal, fit o
+   autorización de crear contactos no bastan para crear Deal. Sólo promover cuando la calificación y el alta
+   de Deal estén cubiertas por la instrucción. Leer pipeline/etapa live y elegirlos por evidencia, nunca aplicar
+   `qualifiedtobuy` por defecto a todo hallazgo. Si el operador instruye conservar Deals existentes, no
+   retrocorregirlos ni borrarlos por este criterio; registrar la excepción y la calificación pendiente.
 5. La relación comercial manda sobre el mecanismo de compra:
    - cliente existente, renovación o expansión → `Core Pipeline` + `existingbusiness`;
    - cuenta nueva seleccionada como apuesta → `Strategic Bets` + `newbusiness`;
@@ -30,6 +33,30 @@ El flujo es `search → propose → confirm → write → readback → automatio
    demuestra estado estable.
 7. Tras cada mutación verificada, actualiza `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` y, si existe Deal,
    `docs/commercial/CRM_DEAL_REGISTER.md` con el mismo `deal_id`.
+
+## Nuevo proceso de una cuenta ya registrada
+
+1. Una misma Company puede participar en varios RFP: deduplica por ID de proceso y llave de idempotencia,
+   no sólo por empresa. Un ID distinto requiere su propio Deal cuando el alta está autorizada. No sobrescribas
+   el alcance, precio, propuesta o estado del proceso anterior.
+2. Lee el brief completo y registra archivo, ruta, fecha, integridad y qué procede de captura frente a lectura
+   viva del portal. No conviertas un estado capturado en vigencia comprobada ni deduzcas zona horaria del país.
+   Sin zona verificada, conserva el plazo textual y deja pendiente el datetime; no lo copies a `closedate`.
+3. Reutiliza Company legal y contactos reales asociados. Si el brief no designa responsable, un contacto de
+   relación puede asociarse dentro del alcance autorizado, dejando responsabilidad, cargo y autoridad pendientes
+   en la nota. Asociación con la empresa no acredita ser comprador de este RFP. No inventes email ni cargo.
+4. La nota debe asociarse al Deal y a Company/Contact pertinentes, con intención exacta, requisitos de archivos,
+   calendario, alcance, supuestos y pendientes. Presupuesto ausente queda ausente; moneda default del portal
+   no es moneda de oferta. Un objetivo del comprador no es un compromiso de resultado aceptado por Efeonce.
+5. Relee también `pipeline_bucket`, `dealtype` y Primary después de automatizaciones. Guarda propuesto y
+   observado por separado; no atribuyas la deriva a un workflow concreto sin identificarlo, ni la corrijas a
+   ciegas. Un bucket Core derivado no prueba cliente existente. Para los segmentos de registros reutilizados,
+   aplica `hubspot-as-a-service/references/prospecting-segmentation.md`: preservar valores y comprobar miembros.
+6. Si el operador pide un nuevo chat, registra su ID/enlace en el workspace y en el registro de licitaciones.
+   El handoff incluye rutas reales, IDs CRM, incertidumbres, qué leer, qué está pendiente y autorizaciones.
+   Creación del chat no demuestra propuesta terminada ni autoriza enviar/postular. No crear otro por inferencia.
+
+Caso y evidencia fechada: [Sika LIC-1169](../../../docs/commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md).
 
 ## Estados de decisión
 

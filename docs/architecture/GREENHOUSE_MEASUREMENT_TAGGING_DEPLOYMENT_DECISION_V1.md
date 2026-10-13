@@ -69,3 +69,11 @@ Capa delgada a construir (esta decisión la habilita):
 - `pnpm growth:forms-tracking-audit` — DB/live vs `TRACKING-PLAN.md` (advisory).
 
 Documentar el uso en `docs/reference/measurement-gtm-ga4/` + la skill `greenhouse-gtm-ga4-operator`.
+
+## Delta 2026-10-13 — alcance de servidor
+
+La estrategia de despliegue gobernado se conserva. [ADR Meta CAPI](GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md)
+añade la dirección servidor elegida por el operador y [runbook 08](../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md).
+El snapshot/drift implementado sólo cubre `GTM-NGHPGRLZ` web; no demuestra sGTM/CAPI.
+Server requiere inventario, Clients/templates, ingress y readback Meta propios, con exports
+redactados porque los tags pueden contener tokens. Provisión/publicación fueron autorizadas posteriormente; estado vivo en la auditoría CAPI.

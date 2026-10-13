@@ -179,14 +179,16 @@ export { SELECT_COLUMNS as CONTRACTOR_ENGAGEMENT_SELECT_COLUMNS }
 // ── Readers ─────────────────────────────────────────────────────────────────
 
 export const getContractorEngagementById = async (
-  contractorEngagementId: string
+  contractorEngagementId: string,
+  client?: PoolClient
 ): Promise<ContractorEngagement | null> => {
-  const rows = await query<ContractorEngagementRow>(
-    `SELECT ${SELECT_COLUMNS}
+  const sql = `SELECT ${SELECT_COLUMNS}
      FROM greenhouse_hr.contractor_engagements
-     WHERE contractor_engagement_id = $1`,
-    [contractorEngagementId]
-  )
+     WHERE contractor_engagement_id = $1`
+
+  const rows = client
+    ? (await client.query<ContractorEngagementRow>(sql, [contractorEngagementId])).rows
+    : await query<ContractorEngagementRow>(sql, [contractorEngagementId])
 
   return rows[0] ? mapContractorEngagement(rows[0]) : null
 }

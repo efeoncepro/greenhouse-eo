@@ -2,6 +2,11 @@
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
+## Delta 2026-10-05 — TASK-2002 calendario de activaciones
+
+- La hoja de blog del calendario de TASK-2002 (V3-BlogPre/BlogPost) espera el dossier SEO/AEO de esta task; hoy se
+  muestra como «no medido». El resto del calendario está en producción de Studio en sólo lectura.
+
 ## Status
 
 - Lifecycle: `to-do`

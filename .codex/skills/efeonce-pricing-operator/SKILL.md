@@ -13,6 +13,37 @@ Es agnóstica a la línea de negocio: sirve para Efeonce Digital, Wave, Globe, R
 Creative Studio y futuras capabilities. No reemplaza Strategy/Commercial, Finance, Legal/IP, Operations, Product
 ni Architecture; coordina sus decisiones y deja explícito qué está aprobado, qué es hipótesis y qué requiere gate.
 
+## Compra Ágil: presupuesto y precio del programa
+
+El presupuesto máximo del comprador no demuestra costo ni precio competitivo. Cuando el operador prioriza calidad al menor costo sostenible, separar costos fijos ya existentes, dedicación incremental, capacidad comprometida, costos externos y caja; no tratar el trabajo humano como gratuito por tener el equipo contratado. La ausencia de un costeo medido se registra, no se rellena con cero ni con un margen inventado.
+
+El precio aprobado y presentado gobierna la cotización; las recomendaciones anteriores quedan históricas. Mostrar neto, IVA y total del plazo completo. Una división por meses es referencia aritmética mientras las bases no confirmen cobro mensual. Para CRM, conciliar la unidad comercial con el importe total neto del programa; mantener presupuesto comprador e impuestos separados. Si el precio del programa pasa por el Cotizador V3, se declara como `agreed_total` (un neto por todo el plazo) y el documento lo imprime como una línea «1 programa» con `combine`; lleva hitos de pago sólo si las bases los fijan, y declara lo que las bases exigen como lo piden; el presupuesto máximo del comprador y su fórmula de puntaje no están modelados ahí ([procedimiento](references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme)).
+
+Caso fechado: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). El importe acordado no se convierte en rate card, mínimo sostenible comprobado ni margen validado.
+
+## Elegir el carril: documento de licitación o sistema Greenhouse
+
+- **Oferta económica documental rápida:** ante licitación/Compra Ágil urgente, HTML para PDF y alcance/precio/condiciones ya aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Puede emitir una oferta formal para presentar. El ejemplo no autoriza copiar sus precios, alcance ni supuestos. La plantilla tiene dos versiones de datos: la **1** cotiza un único precio en cuatro páginas (`net` representa el programa completo y la división mensual sólo es referencial); la **2** cotiza varias líneas con precio y pagina su sección de inversión, sin reducir la tipografía.
+- **Cotización de una cotización V3 («la cotización»):** el documento que recibe el cliente de una cotización V3 congelada es esa misma plantilla, versión 2 (decisión del CEO, 2026-10-11). Sus cifras **no se digitan**: las emite `pricing:v3 compose document` desde el artefacto, y el agente sólo escribe los textos. Pasos en [Cotizador V3](#cotizador-v3-flujo-completo-local-para-agentes).
+- **Sistema Greenhouse:** si se pide operar catálogo, pricing engine, Quote Builder, snapshots, maker-checker o quote-to-cash, seguir [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y sus contratos, verificando la superficie disponible. No responder a ese encargo generando el HTML local. Número de cotización, versiones, verificación por QR, firmas, aprobación, envío y CRM existen sólo ahí; la plantilla no los tiene.
+
+Los datos de la plantilla son datos documentales con dos orígenes: un precio aprobado fuera de V3 se digita en un documento versión 1 (o versión 2, si son varias líneas aprobadas); un precio que viene de V3 lo emite `compose document` y **no se edita a mano**: si una cifra debe cambiar, se cambia la cotización y se vuelve a correr. En ambos casos el generador sólo comprueba sumas y deriva impuestos/total: no crea `quoteId`, costea, verifica margen, aprueba precio, ejecuta maker-checker ni registra CRM/facturación/envío. Un documento salido de V3 es un borrador (`status: draft`) de una cotización en revisión; no es un precio aprobado ni una cotización emitida. Conservar fuente y autoridad del precio aprobado en el expediente; costos o margen sin comprobar siguen sin validar. La aprobación comercial existente no se reabre por cambiar de formato ni obliga a recrear la oferta UTEM presentada. La revisión del PDF y la presentación son pasos separados. El documento no satisface un `quotation_id` persistido ni el GO de Proposal Studio; nunca inventar un ID o un margen para vincularlo.
+
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer. La versión 2 se emite en una sola moneda y rechaza la conversión FX: un documento salido de V3 va en la moneda de la cotización, y otra moneda es otra cotización V3, nunca una conversión en el documento.
+
+Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
+
+## Fuentes y ownership
+
+Leer primero el modelo concreto en `docs/business-models/`, después `docs/documentation/finance/pricing-comercial.md`,
+`.codex/skills/gtm-architect/modules/03_OFFER_PACKAGING_PRICING.md`, `.codex/skills/commercial-expert/`,
+`.codex/skills/greenhouse-finance-accounting-operator/` y `.codex/skills/legal-privacy-ip-operator/`.
+
+No mezclar product service, delivery model, engagement, operating mode, value metric, billing unit, revenue
+stream, economics y contract. Ejemplos de delivery: Productized Service, Managed Squad, Staff Augmentation,
+Studio Access, Implementation, Advisory y Platform-enabled Service. Ejemplos de engagement: On-Going, On-Demand
+y Sample Sprint.
+
 Antes de fijar packaging o pricing, usar `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` para
 separar Product Service, nivel de productización, delivery model, operating mode y engagement. Pricing no debe
 convertir un delivery model —por ejemplo Managed Squad o Staff Augmentation— en una oferta distinta sin decisión
@@ -29,180 +60,151 @@ El pricing de servicios 2028 debe poder operar sobre Product Services AI-native:
 agent/provider usage, governance, implementation, risk, rights y recurring economics; no asumir que AI-native implica
 self-service o eliminar personas.
 
-## Fuentes y ownership
+## Workflow
 
-Leer primero el modelo concreto en `docs/business-models/`, después:
+1. Enmarcar oferta, ICP, buyer, JTBD, trigger, resultado controlable, exclusiones, owner, geografía, moneda,
+   capacidad y estado.
+   Si ICP, JTBD, buying group o decision process no están modelados, cargar `efeonce-customer-model-operator`.
+2. Elegir la métrica de valor: capacidad/lane, implementation, retainer, usage, workspace/tenant, outcome,
+   licencia/IP, mínimo comprometido o híbrido.
+3. Diseñar `wedge → core → expansion`; usar hasta tres tiers sólo con evidencia y fences por valor/capacidad/
+   riesgo/governance.
+4. Separar revenue de diagnóstico, implementación, recurrente, squad/capacity, staff augmentation, platform,
+   usage, pass-through, IP/licensing, rights, comisión y revenue share.
+5. Calcular fully loaded cost, cost-to-serve, margen, utilization, realization, provider cost, support, reserve,
+   DSO, FX, GRR, NRR y expansión por oferta/cuenta/delivery/operating mode/provider/cohorte.
+6. Aplicar mínimo, piso de margen, descuentos, maker-checker, effective dates, snapshots, audit trail y blast
+   radius de cotizaciones.
+7. Validar con experimento, muestra, threshold, stop condition, owner, plazo y evidence ledger.
 
-- `docs/business-models/README.md` y `efeonce-business-model-operator`;
-- `docs/documentation/finance/pricing-comercial.md` para el catálogo, engine y quote runtime;
-- `.codex/skills/gtm-architect/modules/03_OFFER_PACKAGING_PRICING.md` para packaging y motion;
-- `.codex/skills/commercial-expert/` para negociación y venta;
-- `.codex/skills/greenhouse-finance-accounting-operator/` para costos, margen, cash y reconocimiento;
-- `.codex/skills/legal-privacy-ip-operator/` para derechos, providers, datos y liability.
+## Valoración de casos SEO/AEO para captación bancaria
 
-| Decisión | Owner |
-|---|---|
-| Oferta, buyer, packaging y motion | Strategy + Commercial + práctica |
-| Cost-to-serve, margen, cash y reconocimiento | Finance |
-| Derechos, pass-through, providers y liability | Legal/IP + Commercial |
-| Catálogo, cotización, approval y snapshots | Product + Finance + Architecture |
-| Delivery, capacidad, SLA y RACI | Practice + Operations |
+Cargar `docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md` cuando la decisión sea invertir en captación.
+Separar apertura, cuenta fondeada y saldo retenido por cohorte: depósitos captados no son ingresos ni margen del
+banco. Finanzas del cliente valida un método de valoración, horizonte y costos; no sumar beneficios económicos
+superpuestos. Costear el programa completo y su capacidad real, y calcular sensibilidad, costo por cuenta
+incremental fondeada y punto de equilibrio con supuestos visibles. Una meta o moneda inferida autorizada para el
+borrador no aprueba presupuesto ni pricing; sin valoración bancaria, presentar captación y contribución mínima
+requerida para recuperar la inversión como escenarios, sin declarar ROI confirmado. La propuesta conserva los
+gates de Finance, Commercial y Operations para precio, capacidad y compromisos.
 
-## Invariante central: separar capas
+## Compromiso inicial en programas por resultado (delta 2026-10-09)
 
-Nunca inferir una capa desde otra:
+Cuando el comprador pide «empezar mensual» o «por tres meses» un programa cuyo valor aparece con el tiempo (SEO/AEO,
+contenido, autoridad), mostrar el valor mensual abierto, pero fijar el **compromiso inicial en el plazo en que la
+propuesta promete las primeras señales**; después, renovación por periodos más cortos. No ofrecer una salida antes de
+que haya algo que medir: un compromiso más corto que ese plazo deja al cliente evaluando un programa que no alcanzó a
+ejecutarse. Caso Pibank (propuesta v13 enviada): base US$4.500/mes, compromiso inicial de seis meses con revisión en
+M3 y decisión en M6, renovación trimestral con aviso de 30 días, base sin recargo por la renovación corta; tres meses
+se descartó. La regla de forma (lámina «Cómo empezar») vive en `deck-studio`,
+`references/propuesta-tecnica-seo-sin-presentador.md`.
 
-| Capa | Pregunta |
-|---|---|
-| Market category | ¿Cómo se ubica? |
-| Product service / offer | ¿Qué compra y qué resultado controlable recibe? |
-| Delivery model | ¿Cómo se entrega y quién responde? |
-| Engagement | ¿Por cuánto tiempo y con qué cadencia? |
-| Operating mode | ¿Quién opera cada lane? |
-| Value metric | ¿Qué unidad representa el valor? |
-| Billing unit | ¿Qué se factura? |
-| Revenue stream | ¿Cómo se reconoce y renueva? |
-| Economics | ¿Qué consume margen, capacidad y cash? |
-| Contract | ¿Qué se promete, excluye y protege? |
-
-Ejemplos de delivery: Productized Service, Managed Squad, Staff Augmentation, Studio Access, Implementation,
-Advisory y Platform-enabled Service. Ejemplos de engagement: On-Going, On-Demand y Sample Sprint. Un cambio de
-delivery no crea automáticamente un producto nuevo.
-
-## Workflow obligatorio
-
-### 1. Enmarcar
-
-Registrar oferta, ICP, buyer, JTBD, trigger, resultado controlable, alternativa desplazada, owner, geografía,
-moneda, capacidad, estado y decisión que el pricing debe habilitar. Si ICP, JTBD, buying group o decision process
-no están modelados, cargar `efeonce-customer-model-operator`. Separar hechos, decisiones, hipótesis y unknowns.
-
-### 2. Elegir la métrica de valor
-
-Evaluar, según la oferta:
-
-- capacidad gobernada o lane;
-- implementación, sprint o milestone;
-- retainer por scope y cadencia;
-- uso gobernado;
-- workspace, tenant, seat o acceso;
-- outcome verificable;
-- licencia/IP;
-- mínimo comprometido;
-- híbrido base + variable.
-
-La métrica debe crecer con el valor del cliente y ser explicable. No usar horas, piezas, artículos, prompts o
-tokens como unidad pública principal si eso commoditiza la oferta; pueden ser inputs internos de capacity/costing.
-
-### 3. Diseñar packaging
-
-Construir `wedge → core → expansion`. Usar hasta tres tiers sólo cuando haya evidencia de segmentos o willingness-
-to-pay distintos. Cada tier debe declarar:
-
-- alcance incluido y excluido;
-- capacidad, límites, cadence y SLA;
-- dependencias y responsabilidades del cliente;
-- overage, change order, pause, refund y stop-loss;
-- renovación, expansión y downgrade;
-- riesgos, rights y providers incluidos/pass-through.
-
-No crear fences artificiales por features si no cambian valor, capacidad, riesgo o governance.
-
-### Creative Velocity y modular production
-
-La unidad pública recomendada es capacity envelope/outcome gobernado, no horas ni piezas. Separar Diagnostic,
-Sprint, Flex/Managed Capacity, Dedicated Creative Pod, Performance Creative Lane y Modular Production Lane. Una
-experiencia modular puede tener líneas distintas para capacidad, implementación/IP, gobierno/plataforma, derechos y
-pass-through; no convertir templates, assets o créditos en una calculadora de piezas.
-
-En SKY, Adobe Express y SharePoint son evidencia de delivery y herramientas de una implementación; no autorizan por
-sí solos precio de producto, equivalencias por asset o margin assumptions. Validar tiempo de configuración, template
-maintenance, QA, derechos, portabilidad, cost-to-serve y capacidad antes de pricear un producto independiente.
-
-`Embedded Managed Pod` no puede pricearse como Staff Augmentation. La capacidad reservada debe incluir integration
-cost: immersion, rituales, coordinación, memoria, continuidad, backup, soporte y governance. Separar fee de
-capacidad, implementación/immersion, platform/governance, rights y pass-through; validar margen y cost-to-serve por
-cuenta.
-
-Cuando Efeonce absorbe equipo, infraestructura, computadores, licencias, contratación, payroll, provisionales,
-reemplazos y soporte, el modelo es `Fully Managed Creative Capacity`: un fee mensual integral por una capacity
-envelope definida. No usar “llave en mano” para ocultar límites ni convertirlo en unlimited.
-
-La economía se calcula por país y pod: costo humano, infraestructura, licencias, administración laboral, impuestos,
-FX, proveedores, seguros, DPA, working capital, soporte y reserva de riesgo. La cobertura global de Efeonce no elimina
-la parametrización jurídica, fiscal y laboral local.
-
-### 4. Construir revenue architecture
-
-Separar fee de diagnóstico, implementación, recurrente, squad/capacity, staff augmentation, platform/governance,
-usage, provider pass-through, IP/licensing, rights, comisión y revenue share. Registrar por línea:
-
-`value_trigger`, `billing_unit`, `frequency`, `minimum_commitment`, `included`, `excluded`, `cost_driver`,
-`renewal_trigger`, `expansion_trigger`, `recognition_boundary` y `evidence`.
-
-### 5. Costear y validar economics
-
-Calcular por oferta × cuenta × delivery model × operating mode × provider × cohorte:
-
-- fully loaded cost y cost-to-serve;
-- gross margin y contribution margin;
-- utilization, realization, capacity y bench;
-- provider/compute/storage/licensing;
-- retries, support, reserve, refunds y bad debt;
-- DSO, FX y working capital;
-- CAC/payback cuando exista muestra;
-- GRR, NRR, expansion y sensitivity base/downside/upside.
-
-No esconder costo humano dentro de usage, credits o pass-through. Separar capacidad operacional de horas billable
-de pricing. Finance debe reconciliar la aritmética y el tratamiento contable.
-
-### 6. Aplicar governance
-
-Validar mínimo comprometido, piso de margen, bandas de descuento, maker-checker, effective dates, versionado de
-cotización, FX snapshot, audit trail y blast radius sobre quotes/contratos activos. Un cambio de catálogo no
-reescribe cotizaciones históricas.
-
-### 7. Validar demanda
-
-Entregar hipótesis, experimento, muestra, métrica primaria, threshold, stop condition, owner, plazo y evidence
-ledger. `Approved for validation` permite sólo pilotos/SOW gobernados; no venta general, checkout ni claims de
-tracción.
-
-## Guardrails transversales
+## Guardrails
 
 - ASaaS no equivale a SaaS, ARR ni producto software.
 - No hay pricing defendible sin cost-to-serve, margen objetivo y sensibilidad.
 - Revenue recurrente necesita trigger contractual y evidencia de renovación.
 - Project, recurring, platform, usage, IP, pass-through y credits se separan.
 - Product Service no es sinónimo de oferta, proyecto ni entregable; pricing no puede otorgar esa madurez por etiqueta.
-- Credits nunca son dinero, horas, tokens, piezas ni derechos; requieren ledger, policy, expiración y owner.
-- Un servicio compuesto no transfiere ownership ni permite doble cobro de shared services.
-- Providers de agentes son adapters/pass-through gobernados, no automáticamente productos o partnerships.
-- La cara contractual y relacional puede ser Efeonce aunque una marca de producto nombre la solución.
-- Ningún precio se considera aprobado por aparecer en un documento, CSV, deck o seed.
-- Una cifra externa necesita fuente y fecha; una cifra interna necesita fuente de costos y confidence.
+- Credits no son dinero, horas, tokens, piezas ni derechos.
+- Ningún precio queda aprobado por aparecer en un documento, CSV, deck o seed.
+- La cara contractual puede ser Efeonce aunque una marca de producto nombre la solución.
 
-## Output: Pricing Integrity Pack
+## Output
 
-Emitir:
+Emitir un `Pricing Integrity Pack`: offer/packaging matrix, delivery matrix, value metric/billing unit,
+revenue architecture, cost-to-serve y margin scenarios, discount/approval guardrails, quote/version policy,
+validation plan, evidence ledger, owners, review date y verdict (`hypothesis_only`, `approved_for_validation`,
+`commercially_approved`, `blocked_by_finance`, `blocked_by_legal`, `scale_constrained` o `superseded`).
 
-1. offer/packaging matrix;
-2. delivery and engagement matrix;
-3. value metric/billing unit decision;
-4. revenue architecture;
-5. cost-to-serve and margin scenarios;
-6. discount, approval and effective-date guardrails;
-7. quote/version/snapshot policy;
-8. validation plan and evidence ledger;
-9. open decisions, owners and review date;
-10. verdict: `hypothesis_only`, `approved_for_validation`, `commercially_approved`, `blocked_by_finance`,
-    `blocked_by_legal`, `scale_constrained` o `superseded`.
+Referencia canónica load-on-demand: `.codex/skills/efeonce-pricing-operator/references/general-pricing-patterns.md`.
 
-## Referencias load-on-demand
+## Capacidad, horizonte y reputación en casos SEO/AEO
 
-- [General pricing patterns](references/general-pricing-patterns.md) — métodos, métricas, packaging, delivery,
-  governance y economics.
-- `docs/documentation/finance/pricing-comercial.md` — catálogo, engine y quote builder de Greenhouse.
-- `.codex/skills/gtm-architect/modules/03_OFFER_PACKAGING_PRICING.md` — estrategia de packaging.
-- `.codex/skills/creative-practice/modules/04_PRICING.md` — Creative Studio cuando aplique.
-- Modelo concreto de la oferta en `docs/business-models/` — la skill no lo sustituye.
+Para valorar o dimensionar una propuesta SEO/AEO, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Costear todos los roles,
+meses, revisiones, PR, herramientas y reserva; comparar valor neto por cohorte con costos del mismo
+horizonte. Capacidad estimada, roster, costo y fee son estados separados bajo la autoridad vigente.
+
+## Costeo local sin UI (Excel de pricing)
+
+Cuando el operador quiera revisar el Excel o costear sin la UI del cotizador, usar
+`pnpm --silent pricing:workbook`: `search`, `role`, `audit`, `scenario`, `estimate` y `compare`.
+[Manual](../../../docs/manual-de-uso/finance/consultar-excel-pricing-por-cli.md) y
+[contrato](../../../docs/architecture/GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md).
+La extracción JSON conserva celdas/fórmulas y verifica SHA256; los planes JSON permiten costos
+reemplazados con fuente/fecha. Declarar capacidad vendible, dedicación, gastos y margen sobre venta.
+Dedicado absorbe costo completo; compartido exige hipótesis explícita de venta restante.
+Es una alternativa local usable sin UI/DB; no remitir al operador a una UI que no le funciona.
+Sus resultados son hipótesis sobre costos históricos/declarados, no precios aprobados ni cotizaciones
+emitidas. No importar al catálogo, tocar payroll ni publicar costos internos por inferencia.
+
+## Cotizador V3: flujo completo local para agentes
+
+Ante un pedido de cotizar un negocio sin UI (una persona por dedicación, un servicio gestionado, un programa, un
+proyecto, una oferta de licitación), cargar el
+[procedimiento V3](references/cotizador-v3-agent-workflow.md) y seguirlo en orden: decidir qué cotizar → componer la
+demanda → cotizar y leer → revisar → documento para el cliente. Trae la tabla de decisión por tipo de negocio, los
+diagnósticos con su arreglo, lo que no está modelado y un ejemplo que cotiza por cada tipo
+([`references/examples/`](references/examples/)). El
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) lo acompaña con tablas y casos.
+
+Lo que hay que saber antes de abrirlo:
+
+1. **El agente interpreta; el dominio calcula.** `pnpm --silent pricing:v3`, siempre con `--current` (las versiones
+   vigentes las nombra `data/pricing/v3-operating/current.json`; `current show` las muestra). Cadena: `resources
+   inspect` → `compose scaffold` → `compose quote --out` → `compose assess` → `compose document` → generador de la
+   [plantilla A4](../../../docs/commercial/templates/cotizacion-a4/README.md). Exit `3` es una cotización calculada
+   en revisión, `2` falta un insumo, `1` rechazo, `0` operación técnica. Una simulación calculada no es costo
+   validado, precio aprobado ni cotización emitida, y no cruza la frontera de la
+   [promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
+2. **Qué se cotiza sale del negocio, no de una preferencia.** Tres ofertas, cada una con su objetivo y su piso
+   (decisiones del CEO): `creative-managed-service` (45 % / 45 %), `seo-aeo-managed-service` (55 % / 45 %) y
+   `talent-assurance-staffing` (30–40 % por tier / 25 %). La **unidad comercial es un hecho del catálogo** (las dos
+   gestionadas se venden como `managed_service`, un fee; staffing como `role_capacity`, línea por línea) y una
+   demanda que la contradice no calcula. La forma (`engagementForm`) se declara siempre: `on_demand` para un
+   trabajo con alcance, inicio, término y aceptación (+10 % y, en un servicio gestionado, la reserva de
+   contingencia); `on_going` para un servicio mensual continuo. No existe una oferta para proyectos únicos: hoy van
+   con la oferta gestionada de su práctica, On-Demand y a un precio.
+3. **El precio acordado se declara y se vuelve a cotizar; nunca se calcula una tasa a mano.** Hay tres maneras, y
+   se elige por cómo se acordó: un precio por el trabajo completo (programa, proyecto) es `agreed_total`, un neto
+   por todo el plazo, que el documento imprime como «1 programa» o «1 proyecto» con `combine`; un valor mensual con
+   todo incluido (la puesta en marcha adentro) es `agreed_total` con `per: "period"`, que el documento imprime
+   como «n meses» × el valor mensual con `combine` `per: "period"`; un valor mensual de una sola clase de cobro, con
+   la puesta en marcha aparte, es `agreed_net`. El piso se juzga por fila y contra el de la propia oferta
+   (`compose assess` → `margin.pricingPolicies[]`, `belowPolicyFloor`): una fila bajo su piso es un incumplimiento
+   real —también las del mes de la puesta en marcha de un valor mensual con todo incluido— y la excepción es del
+   CEO, nunca del agente ni referencia para otro cliente.
+4. **Lo que se informa junto al precio:** el margen real (`marginRateRoundedDown`; con terceros refacturados,
+   también `ownWork.marginRateRoundedDown`, que es el que se compara con el piso), las filas marcadas con el total
+   `marginFloor.netShortOfFloor` (las entradas vienen plegadas por mes: no se suman a mano), qué parte del costo es
+   estimada (`estimateExposure`; una dedicación sin evidencia o estimada nunca se lee como confirmada), los
+   supuestos tomados, las asignaciones de herramientas sin evidencia confirmada y `runNotices`. Los costos de
+   persona son el costo objetivo que fijó el CEO, no la nómina: no proponer conectarla.
+5. **Tres reglas de la demanda que no admiten variantes:** `work[].tasks` lleva sólo tareas más allá de la receta
+   del perfil (vacío si no hay); un cupo `planned-*` se queda mientras nadie esté asignado y pasa a un id anónimo
+   estable sólo cuando hay una persona específica; y cada asignación declara en `evidence` de dónde sale (lo que
+   diga `reason` no se interpreta). Dos alternativas de una oferta son dos cotizaciones y dos documentos.
+
+**«La cotización» para el cliente** es el PDF de la plantilla A4 (versión 2), cuyos datos emite `compose document`
+desde la cotización congelada. El agente escribe sólo textos: **nunca digitar ni editar una cifra** en el brief ni
+en los datos emitidos; si un número debe cambiar, se cambia la demanda y se vuelve a correr. Una cotización no es un
+contrato (decisión del CEO): la fecha de inicio y la duración del contrato no se piden ni se listan como pendiente,
+y el documento de una cotización comercial no dice lo obvio; en una licitación, lo que las bases exigen que la
+oferta declare se declara como lo piden. `buyer.unit`, `buyer.contact` («Atención: …») y `schedule.note` son
+opcionales y se omiten cuando no dicen nada. Los hitos de pago se declaran sólo cuando el negocio los tiene (los
+acordó el operador o los fijan las bases); el documento lleva la fecha de la cotización. El
+PDF se entrega como borrador mientras el operador no apruebe el precio: no es `quotation_id`, precio aprobado ni
+cotización emitida. Opciones, incrementos, cortesías, hitos con su impuesto y lo que queda como texto de
+condiciones: [sección 6 del procedimiento](references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente).
+
+## Programmatic dentro de la oferta integral de medios
+
+Cargar el [pack programático vigente](../../../docs/business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md)
+y el [método compartido](../digital-marketing/references/programmatic-media-operations.md). Su tarifario está aprobado;
+costo/margen y aceptación por caso siguen por comprobar. Comparar cargos externos con dedicación propia en managed
+externo y operación DSP acompañada. Porcentajes ilustrativos no son oferta. En cuenta integral costear gestión
+conjunta, tareas ya cubiertas/incrementales/externas y no sumar fees completos por canal; excepciones del operador.
+Conservar medios separados al costo, setup único y diferencia entre fórmula de piso 45% y objetivo 55% del pack.
+No trasladar automáticamente recargos o markups genéricos de un simulador a esta política aprobada.

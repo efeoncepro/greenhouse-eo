@@ -1,0 +1,103 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-agent-supervisor",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Agent Hub · equipos híbridos",
+    "question": "¿Quién responde por el agente?",
+    "answer": [
+      "Una",
+      "persona"
+    ]
+  },
+  "body": "Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y **quién** lo aprueba.",
+  "note": "Ejemplo ilustrativo · cada ficha se define con tu equipo",
+  "supervisor": {
+    "kicker": "Persona responsable",
+    "role": "Supervisora de servicio",
+    "initials": "SV",
+    "duty": "Aprueba, corrige y detiene"
+  },
+  "agents": [
+    {
+      "title": "Tickets",
+      "job": "Clasifica, responde con knowledge y escala.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Historial y knowledge",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Respuesta al cliente",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Enrutar dentro del SLA",
+          "state": "y"
+        },
+        {
+          "kind": "Aprueba",
+          "value": "La supervisora",
+          "state": "n"
+        }
+      ]
+    },
+    {
+      "title": "Prospección",
+      "job": "Investiga cuentas y sugiere el siguiente paso.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Contactos y actividad",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Siguiente paso",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Sólo tareas y recordatorios",
+          "state": "h"
+        },
+        {
+          "kind": "Nunca",
+          "value": "Enviar sin revisión",
+          "state": "n"
+        }
+      ]
+    },
+    {
+      "title": "Campañas",
+      "job": "Prepara variantes para audiencias con consentimiento.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Segmentos consentidos",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Variantes y audiencia",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Nada sin aprobación",
+          "state": "n"
+        }
+      ]
+    }
+  ],
+  "pendingApproval": "Respuesta propuesta al ticket #4821"
+}

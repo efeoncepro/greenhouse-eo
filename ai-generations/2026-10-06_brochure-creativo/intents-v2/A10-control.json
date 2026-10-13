@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Tu marca, tus reglas",
+    "question": "¿Pierdo el control de mi marca?",
+    "answer": [
+      "Nunca"
+    ]
+  },
+  "items": [
+    {
+      "title": "Apruebas tú",
+      "desc": "La aprobación final y los claims son tuyos: nada sale sin tu visto bueno."
+    },
+    {
+      "title": "Tu prioridad manda",
+      "desc": "Decides qué se produce primero en la priorización de cada semana."
+    },
+    {
+      "title": "Rondas pactadas",
+      "desc": "De dos a tres rondas por pieza; la siguiente se conversa como cambio."
+    },
+    {
+      "title": "Derechos por escrito",
+      "desc": "Uso por canal, territorio y plazo, definidos antes de producir."
+    }
+  ],
+  "progress": {
+    "sections": 4,
+    "current": 3
+  },
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  },
+  "line": "brand",
+  "use": "brochure"
+}

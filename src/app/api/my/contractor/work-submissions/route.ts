@@ -11,10 +11,7 @@ import {
   CONTRACTOR_WORK_SUBMISSION_TYPES,
   CONTRACTOR_WORK_SUBMISSION_UNITS
 } from '@/lib/contractor-engagements/work-submissions'
-import {
-  createContractorWorkSubmission,
-  submitContractorWorkSubmission
-} from '@/lib/contractor-engagements/work-submissions/store'
+import { saveOwnContractorSubmission } from '@/lib/contractor-engagements/work-submissions/self-service'
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireMyTenantContext } from '@/lib/tenant/authorization'
@@ -32,7 +29,7 @@ export const dynamic = 'force-dynamic'
  * reject stays an HR surface (hr.contractor_work_submission.review).
  *
  * Body: { submissionType, title?, servicePeriodStart?, servicePeriodEnd?, quantity?,
- *         unit?, grossAmount?, currency?, submit? }
+ *         idempotencyKey, contractorWorkSubmissionId?, invoiceAssetId?, evidenceAssetId?, submit? }
  */
 
 const isMember = <T extends string>(values: readonly T[], value: unknown): value is T =>
@@ -44,7 +41,7 @@ const optionalString = (value: unknown): string | null =>
 const optionalNumber = (value: unknown): number | null =>
   typeof value === 'number' && Number.isFinite(value) ? value : null
 
-const SUBMITTABLE_STATUSES = new Set(['active', 'ending'])
+const SUBMITTABLE_STATUSES = new Set(['active'])
 
 export async function POST(request: Request) {
   const { tenant, memberId, errorResponse } = await requireMyTenantContext()
@@ -108,37 +105,35 @@ export async function POST(request: Request) {
     }
 
     const unit = body.unit
-    const unitValue = unit === undefined || unit === null ? null : isMember(CONTRACTOR_WORK_SUBMISSION_UNITS, unit) ? unit : undefined
+
+    const unitValue =
+      unit === undefined || unit === null ? null : isMember(CONTRACTOR_WORK_SUBMISSION_UNITS, unit) ? unit : undefined
 
     if (unitValue === undefined) {
       throw new ContractorEngagementValidationError('La unidad del envío no es válida.', 'invalid_submission_unit')
     }
 
-    const created = await createContractorWorkSubmission({
+    const result = await saveOwnContractorSubmission({
       contractorEngagementId: engagement.contractorEngagementId,
+      identityProfileId,
+      memberId,
+      actorUserId: tenant.userId,
+      idempotencyKey: optionalString(body.idempotencyKey) ?? '',
+      contractorWorkSubmissionId: optionalString(body.contractorWorkSubmissionId),
       submissionType: body.submissionType,
       title: optionalString(body.title),
       servicePeriodStart: optionalString(body.servicePeriodStart),
       servicePeriodEnd: optionalString(body.servicePeriodEnd),
       quantity: optionalNumber(body.quantity),
-      unit: unitValue,
-      grossAmount: optionalNumber(body.grossAmount),
-      currency: optionalString(body.currency) ?? engagement.currency,
-      actorUserId: tenant.userId
+      invoiceAssetId: optionalString(body.invoiceAssetId),
+      evidenceAssetId: optionalString(body.evidenceAssetId),
+      submit: body.submit === true
     })
-
-    const submission =
-      body.submit === true
-        ? await submitContractorWorkSubmission({
-            contractorWorkSubmissionId: created.contractorWorkSubmissionId,
-            actorUserId: tenant.userId
-          })
-        : created
 
     clearContractorSelfServiceCacheForProfile(identityProfileId)
     __clearContractorHrWorkbenchCache()
 
-    return NextResponse.json({ submission, created: true }, { status: 201 })
+    return NextResponse.json(result, { status: result.created ? 201 : 200 })
   } catch (error) {
     if (!(error instanceof ContractorEngagementValidationError)) {
       captureWithDomain(error, 'identity', {

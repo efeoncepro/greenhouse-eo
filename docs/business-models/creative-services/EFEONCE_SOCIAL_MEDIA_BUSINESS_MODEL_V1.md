@@ -2,8 +2,8 @@
 
 > **Status:** `Approved for validation`
 > **Owner:** Efeonce Strategy + Social Media Practice + Commercial + Finance
-> **Version:** V1.0
-> **Date:** 2026-07-29
+> **Version:** V1.1 — [delta 2026-10-10](#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta): el brochure «Marketing de Contenidos» entra a la oferta por decisión del operador; estado, bandas, guardrails y gates sin cambio
+> **Date:** 2026-07-29 · delta 2026-10-10
 > **Validated as of:** 2026-07-29
 > **Review cadence:** después de cada piloto y al menos trimestralmente
 > **Related service:** [`Social Media Product Service Contract V1`](../../services/creative-services/EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md)
@@ -15,6 +15,95 @@
 > **Run & Gun offer:** [`Efeonce Run & Gun Production — Offer V1`](../../services/creative-services/EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md)
 
 > **Session integration:** este modelo incorpora el posicionamiento, ICP, composición Search + Social, operating model, pricing hypotheses y arquitectura `Efeonce Run & Gun Studio` / `Efeonce Run & Gun Production` definidos el 2026-07-29.
+
+---
+
+## Delta 2026-10-10 — brochure «Marketing de Contenidos»: lo que entra a la oferta
+
+**Estado: sin cambio (`Approved for validation`).** Este delta registra una decisión de oferta. No registra una validación, un costeo ni un precio.
+
+**Qué decidió el operador.** El 2026-10-10 aprobó el deck/brochure comercial «Marketing de Contenidos» (57 láminas) y pidió llevar al modelo de negocio lo que trae de nuevo: «Me encantó todo, queda aprobado» y, después, «Esto quedó aprobado, canonizalo, adicional hay muchas cosas de acá que quiero incorporar al modelo de negocio, hazlo». Las dos citas las entregó la sesión que canoniza el deck. La fuente del contenido es `ai-generations/2026-10-09_deck-contenidos/deck/INVENTARIO-TEXTO.md` (texto de las 57 láminas en el orden publicado); las láminas registradas una por una están en el [catálogo de recetas de deck](../../operations/brand-graphic-line/deck-recipes/README.md).
+
+**Qué cubre.** Que las piezas de este delta forman parte de lo que Efeonce ofrece en Social Media y pueden aparecer en propuestas y SOW gobernados, con el nombre que les da el brochure.
+
+**Qué no cubre.** Capacidad operando hoy, costo, precio, SLA ni evidencia de compra. Varias piezas las redactó la sesión que armó el deck y el operador las aprobó en conjunto, no una por una: comunidad en canales cerrados, series, «probar y escalar» (lo orgánico prueba, la pauta escala), social conectado al CRM, los cuatro compromisos de producción con IA y la cifra «+85».
+
+**Qué no cambia.** El estado del modelo, las bandas del pricing pack, los guardrails, el anti-ICP, los claims no autorizados, el beachhead, los gates de §11 y la regla de que Globe / Creative Studio queda fuera de la promesa y del precio base. Donde el brochure choca con el modelo, el modelo queda como está y el choque se anota en §12.
+
+**Cómo se rotula cada pieza.** `Oferta: operador 2026-10-10` significa que entra por la decisión citada. `Capacidad: por validar`, `Economía: sin costear` y `Precio: sin fijar` significan que falta la evidencia que piden §6 y §11. El tipo comercial (Core, Configurable, Add-on, Composición, Futuro) es el del [catálogo de subservicios](../../services/creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md).
+
+### Cómo se presenta la oferta: frentes, momentos y programas
+
+El brochure ordena la oferta en tres grupos. Son una forma de presentar y de vender; no crean líneas de negocio ni cambian quién es dueño de cada capacidad.
+
+| Grupo | Elemento del brochure | Dónde vive en este modelo | Dueño | Cómo se cobra (§5) |
+|---|---|---|---|---|
+| **Frentes** — corren todo el año | Social media management | Lanes de dirección, sistema editorial, platform craft, content operations y publishing (§3B) | Social Media | Social Media Core |
+| | Influencer marketing | Composición | [Creator Influence & Content](../media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) (Media & Distribution) | Línea Creator/UGC, con fees, derechos y medios aparte |
+| | Creadores y UGC | Composición | Mismo dueño | Misma línea |
+| | Listening y trendjacking | Lane Listening & trends (§3B) | Social Media | Core, con profundidad por nivel |
+| | Social care | El lane Community engagement llega hasta community management; atender y resolver casos no es core | Social Media coordina; el cliente o CX resuelve | Intensidad de Community o add-on; ver decisión abierta 8 |
+| | Paid social | Composición | [Performance & Commerce Distribution](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) (Media & Distribution) | Línea Paid Social, fee separado y medios pass-through |
+| **Momentos** — plan propio y equipo reforzado por unos días | Lanzamientos | Activación especial | Social Media, con las composiciones que pida el plan | Sprint con SOW propio |
+| | Cobertura en vivo | Activación especial | Social Media | Proyecto con horarios, accesos y equipo definidos |
+| | Crisis y reputación | Add-on de crisis | Social Media; el cliente conserva la decisión institucional | Add-on o proyecto; nunca dentro del fee base |
+| **Programas** — relaciones de largo plazo | Programa de creadores | Composición | Creator Influence & Content | Programa del dueño |
+| | Voz ejecutiva / Ejecutivos en LinkedIn | Pieza nueva; conecta con el pilar «autoridad experta» y con `Executive / Interview Capture` | Por definir; ver decisión abierta 13 | Sin unidad ni precio |
+| | Embajadores de marca | Pieza nueva; la más cercana hoy es Community Programs & Advocacy del catálogo | Por definir | Sin unidad ni precio |
+
+§5 no tiene una línea llamada «Momentos» ni una llamada «Programas». Hasta que Finance y Commercial decidan si las necesitan, un momento se cotiza con las líneas que ya existen (Producción Especial, Intensidad de Community y los módulos de composición) y un programa no tiene línea propia.
+
+### Piezas que entran a Social Media
+
+| Pieza | Qué dice el brochure | Dónde quedó detallada | Rótulo |
+|---|---|---|---|
+| Series | Formatos con nombre, día y estructura; se mide episodio contra episodio | Catálogo, delta sobre B1 | Ya era Core; el delta precisa la definición. `Capacidad: por validar` para la medición por episodio |
+| Adaptación nativa por formato | Una idea se escribe y se edita para cada plataforma | Catálogo B4 | Ya cubierta |
+| Producción con IA | Sí, con cuatro compromisos: dirección creativa humana en cada pieza; marca y producto reales, nunca inventados; derechos y uso comercial revisados; revisión humana antes de publicar | Catálogo, Product Service Contract y Operating Model, deltas | `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Economía: sin costear` · decisión abierta 9 |
+| Comunidad en canales cerrados | Canales de difusión en WhatsApp e Instagram, comunidades con reglas y moderación, beneficios para miembros, piezas pensadas para compartirse por mensaje | Catálogo, delta | `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Precio: sin fijar` · decisión abierta 12 |
+| Listening «de ruido a señales» | Menciones, sentimiento, competencia, alertas e informe mensual | Catálogo E1 | Ya cubierto |
+| Trendjacking con filtro y ventana | Tres preguntas antes de entrar y publicar antes del peak, con aprobación exprés | Catálogo, delta sobre E3; Operating Model | Ya cubierto; el delta nombra el filtro |
+| Social search conectado con SEO y visibilidad en IA | Mapa de búsquedas por red y conexión con SEO | Catálogo E4 y [composición Search + Social](../search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) | Ya cubierto; la parte web y de IA es de Search Visibility 360 |
+| Social care con base de conocimiento, agentes de IA y personas | Los agentes resuelven lo frecuente; las personas toman los casos sensibles | Catálogo y Operating Model, deltas | `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Economía: sin costear` · decisión abierta 8 |
+| Probar y escalar | Lo orgánico es el laboratorio; la pauta va a las piezas que ya funcionaron | Catálogo, delta sobre B7 | El testing orgánico ya existía como Configurable; el traspaso a pauta es composición con Media & Distribution |
+| Social conectado al CRM | Cada contacto llega con su origen por red, pieza y creador; seguimiento en HubSpot o Salesforce | Catálogo, delta sobre F4 | Composición con RevOps & CRM. `Capacidad: por validar` |
+| Marketing Studio y Efeonce Insights | El cliente ve plan, social y resultados; el reporte sale de Insights | Operating Model, delta | `Capacidad: por validar` · decisión abierta 11 |
+| Squad de ocho roles, un interlocutor | Responsable de Cuenta como único interlocutor | Operating Model, delta | Vista comercial del squad; la composición de referencia no cambia |
+
+### Medición en tres niveles
+
+El brochure presenta la medición en tres niveles. Se leen sobre las familias de §10; no las reemplazan.
+
+| Nivel del brochure | Qué muestra | Familias de §10 que lo sostienen |
+|---|---|---|
+| Entrega | Cumplimiento, aprobaciones, disclosure y derechos vigentes | Delivery y Riesgo |
+| Contenido y creadores | Engagement real, retención, comentarios y costo por pieza | Social; lo de creadores lo mide su dueño |
+| Negocio | Tráfico, búsqueda de marca y leads; ventas atribuidas con tracking acordado | Valor cliente y el objetivo «Conversación/negocio» del contrato de medición |
+
+Dos límites siguen vigentes. El nivel Negocio sólo se reporta cuando Growth/CRM y el cliente entregan tracking y ownership (§10), y con el [contrato de medición Search + Social](../search-visibility-360/SEARCH_SOCIAL_MEASUREMENT_CONTRACT_V1.md) cuando la cuenta es compuesta. Y «costo por pieza» es una lectura de eficiencia, no la unidad de cobro: el fee sigue siendo por capacidad.
+
+### Entrada «Empiezas chico» y «Cómo se compra»
+
+| Brochure | Equivalente en este modelo |
+|---|---|
+| 01 Diagnóstico | Social Diagnostic (§5); la revisión introductoria gratuita sigue siendo acotada y distinta del diagnóstico pagado (§12) |
+| 02 Sprint de prueba: un frente acotado y pagado, con objetivos acordados | Sample Sprint (§3 y §5). El brochure no dice cuánto dura; el modelo valida la continuidad con un piloto pagado de 90 días. Ver decisión abierta 15 |
+| 03 Servicio continuo: squad On-Going | `On-Going + Managed Squad` (§3) |
+| Fee Efeonce fijo, por capacidad | Fee mensual por capacidad gobernada y scope (§3, §5) |
+| Fees de creadores a costo y aparte; derechos y uso pagado en línea propia; whitelisting y medios en línea propia | Pass-through, derechos y media separados del ingreso de Efeonce (§5). La regla de cobro sobre terceros es del [pricing pack de creadores](../media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) |
+| Comisión por resultado, sólo si se acuerda | No existe como línea de Social Media. Ver decisión abierta 16 |
+
+### Evidencia que agrega este delta
+
+| ID | Claim | Tipo | Confidence | Próxima prueba |
+|---|---|---|---|---|
+| E6 | El comprador entiende la oferta organizada en frentes, momentos y programas | Decisión de oferta del operador; sin señal de comprador | Baja | Presentar el brochure en conversaciones calificadas y registrar qué piden y qué no entienden |
+| E7 | El squad puede operar canales cerrados, voz ejecutiva y embajadores con margen dentro de guardrails | Hipótesis Efeonce | Baja | Primer SOW acotado con costeo de Finance |
+| E8 | Agentes de IA resuelven lo frecuente en social care con una persona en cada caso sensible | Hipótesis Efeonce; la referencia más cercana es de otra práctica ([Customer Agent gestionado en HubSpot](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md)) | Baja | Diseño con CX y RevOps & CRM, con cobertura, autoridad y costo por cuenta |
+| E9 | Los cuatro compromisos de producción con IA se pueden garantizar en cada pieza | Compromiso de servicio sin contraste con Legal | Baja | Revisión con Legal/IP y la [decisión de gobierno de datos y derechos de IA](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md), hoy `Proposed` |
+| E10 | El caso Sky del brochure prueba escala | Caso de producción creativa publicado; no es un piloto de Social Media | No aplica a este ledger | Mantenerlo como prueba de la casa, no como evidencia de este servicio |
+
+---
 
 ## 1. Decisión ejecutiva
 
@@ -323,6 +412,24 @@ Decisiones abiertas:
 5. herramienta de calendario/inbox/reporting;
 6. tratamiento de campañas, crisis, viajes y producción especial;
 7. evidence pack de los primeros pilotos.
+
+#### Decisiones abiertas del delta 2026-10-10
+
+En cada una el modelo queda como está hasta que el operador decida. De la 8 a la 17 son choques entre el brochure aprobado y este modelo; la 18 es una consecuencia de capacidad, la 19 un vacío de evidencia y la 20 un tema de otro pack. Los demás documentos de Social Media citan estos números.
+
+8. **Social care.** El brochure lo presenta como uno de los seis frentes que corren todo el año: «cada DM y cada comentario se responde a tiempo», «Nadie queda sin respuesta», con agentes de IA que resuelven lo frecuente. El modelo dice que customer care no es core, que Social Media clasifica y deriva pero no resuelve casos, que la cobertura base es de lunes a viernes en horario hábil y que mezclar customer care dentro del fee es anti-ICP. Falta decidir si social care es un add-on con scope, sistema, autoridad y SLA propios (lo que hoy exige el Operating Model §7) o si pasa a ser parte del servicio, y con qué cobertura se puede prometer «nadie queda sin respuesta».
+9. **Producción con IA.** El brochure dice que sí se produce con IA y compromete cuatro cosas. El modelo define el servicio como operado por personas, deja Globe / Creative Studio fuera de la promesa y del precio base, y prohíbe mezclar costo humano con uso de IA (§6). El brochure no nombra Globe ni Creative Studio; nombra herramientas de terceros. Falta decidir: si producir con IA con herramientas de terceros dentro del squad es una práctica del servicio distinta de «acceso a Globe»; quién paga el uso de IA y en qué línea; y si los compromisos «nunca inventados» y «derechos y uso comercial revisados» se pueden garantizar. Esto último lo decide Legal/IP con la [decisión de gobierno de IA](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md), que sigue `Proposed`.
+10. **Un solo squad con seis frentes.** El brochure promete «seis frentes con una estrategia, un calendario y un solo interlocutor» e incluye en el squad a un especialista en creadores y a uno de paid social. El modelo dice que Paid Social y Creator/UGC no son niveles sino módulos de Media & Distribution, con dueño, alcance, precio y evidencia propios (§3). «Marketing de Contenidos» no tiene modelo, dueño ni pricing como oferta paraguas. Falta decidir si es una composición comercial entre prácticas, como [Search + Social](../search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md), o una oferta con dueño único; y quién responde ante el cliente cuando el interlocutor es uno y los dueños son tres.
+11. **Marketing Studio y «métricas en vivo».** El brochure dice que el cliente ve en Marketing Studio cada activación antes de publicar, que ve ahí sus resultados y que el servicio continuo trae «métricas en vivo». Este modelo no promete una superficie de cliente, tiene abierta la herramienta de calendario, inbox y reporting (decisión 5) y el posicionamiento no permite afirmar métricas en vivo completas para cada cliente sin evidencia. Marketing Studio está en vivo según su [arquitectura](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md); este delta no verificó que una persona cliente pueda entrar a ver su plan y sus resultados. Falta decidir qué ve el cliente, desde cuándo y qué se puede decir mientras tanto.
+12. **Comunidad en canales cerrados.** El brochure la pone dentro de Social Media. Media & Distribution tiene una familia de delivery llamada «Dark Channels & Organic Amplification» (WhatsApp y mensajería, comunidades, referral) en su [catálogo](../../services/media-distribution/README.md), y el catálogo de Social Media trata las comunidades privadas como add-on o futura composición, sin plataforma comunitaria. Falta decidir el dueño, el tipo comercial y los requisitos de consentimiento, moderación y cobertura.
+13. **Voz ejecutiva y embajadores.** El brochure los vende como programas, con ghostwriting y un plan por ejecutivo. La vocería ejecutiva y el ghostwriting figuran en la familia «PR & Communications» de Media & Distribution; `Executive / Interview Capture` de Run & Gun excluye el ghostwriting ilimitado; y este modelo no tiene subservicio, unidad ni precio para ninguno de los dos programas. Falta decidir el dueño, la unidad de cobro y quién aprueba dentro del cliente.
+14. **Contenido de los niveles.** El brochure pone «inteligencia cultural y social search» en Integrated. El catálogo incluye social search desde Foundation (fundamentos) y como sistema en Growth, y trata la inteligencia cultural como add-on. Falta decidir cuál de las dos lecturas manda; hasta entonces manda la matriz del catálogo.
+15. **Entrada «Empiezas chico».** El brochure ofrece un sprint de prueba acotado y pagado sin decir cuánto dura ni si el diagnóstico de la llamada a la acción es la revisión gratuita o el diagnóstico pagado. El modelo valida la continuidad con un piloto pagado de 90 días y un mínimo inicial de tres meses. Falta decidir si el sprint de prueba es ese piloto, una pieza más corta que lo antecede o un reemplazo.
+16. **Comisión por resultado.** El brochure la lista como línea posible «sólo si se acuerda». El pricing pack de Social Media no tiene línea de resultado y prohíbe ofrecer performance-only. Falta decidir si la comisión existe sólo en las composiciones de creadores y pauta, bajo las reglas de sus packs, o también en Social Media.
+17. **Segmento y redes.** El brochure usa una marca de consumo como ejemplo y declara nueve redes atendidas. El beachhead prioritario del modelo es B2B experto, con LinkedIn como superficie primaria, y el customer model dice que no se vende presencia en todas las redes por defecto. Falta decidir si el brochure es collateral del segundo beachhead, de ambos, o si cambia la prioridad.
+18. **Varias versiones por idea.** El brochure presenta como método publicar varias versiones de cada idea y pautar las ganadoras. El catálogo trata el testing creativo como configurable o add-on. Si pasa a ser parte del método, cambia la capacidad de producción de cada nivel y requiere costeo.
+19. **Prueba y cifras del brochure.** El caso Sky es de producción creativa, no un piloto de este servicio (E10). La cifra «+85 expertos más en Latam» viene del operador y no tiene fuente ni definición en el repo. Y falta verificar que Efeonce opere Metricool, Sprout Social y Favikon y con qué costo, que es la decisión 5 con nombres propios.
+20. **«Fees de creadores, a costo».** El [pricing pack de creadores](../media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) admite un fee de coordinación sobre el pass-through administrado. La reconciliación es de ese pack; se anota aquí porque el brochure es uno solo.
 
 ### Stop conditions del modelo
 

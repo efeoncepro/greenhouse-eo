@@ -32,6 +32,12 @@ export interface PackFontEntry {
    * catálogos; con extensión, sólo los que la declaran en `packExtensions`.
    */
   extension?: string
+  /**
+   * Rango Unicode que cubre esta cara (`unicode-range`). Sirve para que una familia tome de otro archivo del pack
+   * los glifos que no trae (las flechas y figuras que Poppins no tiene salen de Geist): sin esto el navegador cae a
+   * una fuente del sistema y el render deja de ser hermético.
+   */
+  unicodeRange?: string
 }
 
 export interface CatalogTokensBuild {
@@ -86,7 +92,7 @@ export interface CatalogTokensOptions {
 /**
  * La TIPOGRAFÍA es marca: el font pack vive en el BRAND PACK, no en el catálogo. El compilador lo
  * materializa dentro del catálogo (CSS + binarios copiados) para que el render sea hermético — sin
- * red, sin Google Fonts, sin fallback silencioso.
+ * red, sin Google Fonts, sin fallback silencioso (los glifos que una familia no trae se declaran con `unicodeRange`).
  */
 const buildFontsCss = (
   packDir: string,
@@ -119,6 +125,7 @@ const buildFontsCss = (
       `  font-weight: ${font.weight};`,
       `  font-display: block;`,
       `  src: url('${font.file}') format('truetype');`,
+      ...(font.unicodeRange ? [`  unicode-range: ${font.unicodeRange};`] : []),
       '}'
     )
   }

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "historia",
+    "dominante": [
+      "¿Te nombra?"
+    ],
+    "ratioDominanteEntrada": 3.9,
+    "contraste": {
+      "entrada": 15.33,
+      "dominante": 15.46,
+      "cierre-frase": 15.7,
+      "logo": 12.39
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 29,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 24,
+        "ratioDominante": 0.1
+      }
+    ],
+    "seleccion": null
+  }
+]

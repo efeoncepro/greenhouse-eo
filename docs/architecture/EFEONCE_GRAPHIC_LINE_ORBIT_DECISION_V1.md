@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (delta: el deck de la línea se compone entero desde el Artifact Composer, 69 de 69, con D1 medido por el gate). Antes, 2026-09-27 (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
+> **Última actualización:** 2026-10-08 por Claude (delta: marca de Efeonce Rooms, «eslabón leve», y dos reglas de toda la línea: la esfera nunca va en un cruce de órbitas y una letra dentro de una órbita nunca es R). Antes, 2026-09-28 (delta: el deck de la línea se compone entero desde el Artifact Composer, 69 de 69, con D1 medido por el gate). Antes, 2026-09-27 (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -56,6 +56,11 @@ Brand» (Globe); web, infraestructura, SEO y medición → «Empower your Engine
 your Voice» (Reach, por confirmar); Efeonce → «Growth», con **Greenhouse** como su producto, la plataforma que controla
 todas las líneas (su interfaz sigue con `DESIGN.md`). Pendiente: palabra de RevOps y CRM y de Growth Strategy, y si los
 acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §7 y §8.1.
+
+> **Superado en parte el 2026-10-09:** el lockup «Producto by efeonce» se retiró. Wave, Reach y Globe van junto a
+> Efeonce con el lockup «Efeonce | Producto» y su logotipo solo donde el producto está solo
+> ([ADR de la familia H3](brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md); manual §7.5). La regla «Efeonce firma todo»
+> no cambia.
 
 ### Delta 2026-09-26 (b) — La lente lleva la órbita; la esfera final es parte del texto
 
@@ -269,6 +274,22 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
   Spec técnica: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md); norma:
   [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 
+### Delta 2026-10-08 — Efeonce Rooms: su marca y dos reglas para toda la línea
+
+- **Marca de Rooms, «eslabón leve»** (aprobada por el operador): «Rooms» en Poppins Bold a contornos, con las dos «o»
+  como dos órbitas enlazadas como eslabones (quien propone y quien decide, en la misma sala), centros a 1,6 × el radio
+  medio y una sola esfera a la 1:30 de la segunda órbita, en el acento Growth, como Factory, Marketing Studio y
+  Creative Studio. 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (AXIS `main` `1dfb95c`, `f249e82` y
+  `6e1621b`; publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages)), sólo en el paquete hasta
+  fragmentar el índice de logos del Lab; generador `scripts/brand/build-rooms-logos.mjs`. Decisión, alternativas y
+  consecuencias en su [ADR](rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); norma en el manual §7.4.
+- **Regla nueva de toda la línea: la esfera nunca va en un cruce de órbitas.** La primera versión aprobada de Rooms
+  ponía la esfera en el cruce de arriba («el punto de encuentro»); el operador advirtió que una esfera en la punta de
+  la almendra que forman dos círculos superpuestos se lee, sin contexto, como una figura anatómica propia de la
+  publicidad íntima femenina, y se descartó el mismo día, antes de publicar. Manual §1.3.
+- **Regla nueva de toda la línea: una letra dentro de una órbita no puede ser R**, porque se lee como ®. Manual §1.3.
+- Descartado también en esta marca: dos órbitas que sólo se tocan, sin enlazar, se leen como anteojos o ∞ (genérico).
+
 ## Alternativas descartadas
 
 | Alternativa | Por qué no |
@@ -313,3 +334,28 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
   La línea que termina en la esfera va una vez; los partners abren su propia zona con una regla fina **sin esfera**.
   Contrato AXIS `efeonce.email-signature` 0.3.0 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del
   Lab. Detalle en el manual §10.2.
+
+## Addendum 2026-10-07 — La órbita como design system de Efeonce Rooms
+
+**Accepted, instrucción explícita del operador:** «Sobre la estética y tipografía hay que ajustar todos los documentos porque efeonce-graphic-line es el nuevo design system».
+
+La órbita gobierna la totalidad de las superficies propias de Rooms: autoría, exploración, presentación, consola y evaluación. Bricolage editorial/Poppins funcional; paleta, componentes, iconografía y motion canónicos. AXIS es la infraestructura de distribución de ese sistema. La propuesta histórica Poppins/Geist para Rooms queda reemplazada. La composición específica sigue su revisión de píxeles; no se impone el formato pregunta/respuesta a las propuestas y no se altera el arte cliente.
+
+La adopción de Rooms está documentada en [su ADR](rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md), [dirección visual](../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) y [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). No implica migrar automáticamente el runtime de Greenhouse, modificar pins ni publicar nuevos assets. Decisión contrastada con tokens locales AXIS `f4dd2fe`, sin rollout Rooms.
+
+## Aplicación al reproductor compartido
+
+La órbita aporta tokens y geometría funcional a Cinema, Editorial y Review; no modifica el contenido del
+video ni exige una firma permanente. AXIS mantiene el renderer portable, controles curvos propios y replay
+dentro de la órbita estática. Cada host conserva medios, autoridad y persistencia; las presentaciones
+`embedded`/`contextual` y las skins son decisiones independientes del modelo.
+
+La decisión específica del componente vive en
+[AXIS, VIDEO_PLAYER_SKINS_DECISION_V1](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/VIDEO_PLAYER_SKINS_DECISION_V1.md)
+y conserva su estado **Proposed**; la publicación del package no cambia por sí sola el estado del ADR.
+Primitives `0.6.3` está publicado y Think lo consume; WordPress aún no está activado. Esto no promueve el
+catálogo Trazo/Plastilina ni migra la UI de Greenhouse.
+
+[Distribución, evidencias y pendientes](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Norma de aplicación](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#reproductor-de-video-compartido) ·
+[Historia conservada](../audits/2026-10-07-axis-video-documentation-history.md).

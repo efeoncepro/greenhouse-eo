@@ -1,0 +1,32 @@
+[
+  {
+    "id": "01-austral-baker-termo",
+    "place": "Carretera Austral · río Baker",
+    "moment": "Pausa con termo"
+  },
+  {
+    "id": "02-austral-queulat-mochila",
+    "place": "Carretera Austral · Queulat",
+    "moment": "Ajustar mochila en el sendero"
+  },
+  {
+    "id": "03-cancun-delfines-toalla",
+    "place": "Cancún · Playa Delfines",
+    "moment": "Volver del mar y secarse"
+  },
+  {
+    "id": "04-cancun-delfines-sandalia",
+    "place": "Cancún · Playa Delfines",
+    "moment": "Sacudir arena de la sandalia"
+  },
+  {
+    "id": "05-rio-ipanema-sombrilla",
+    "place": "Río de Janeiro · Ipanema",
+    "moment": "Acomodar la sombrilla con viento"
+  },
+  {
+    "id": "06-rio-copacabana-coco",
+    "place": "Río de Janeiro · Copacabana",
+    "moment": "Recibir un coco en la playa"
+  }
+]

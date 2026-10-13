@@ -116,6 +116,9 @@ export interface ContractorRemittanceItem {
  */
 export interface ContractorSelfServiceScenario {
   kind: ContractorScenarioKind
+  supportSubmissionId?: string | null
+  requiresInvoice?: boolean
+  requiresWorkApproval?: boolean
   eyebrow: string
   title: string
   summary: string

@@ -1,0 +1,40 @@
+{
+  "id": "CT9b-voz-ejecutiva",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark executive office at night with thin haze): Sophia, the analytical strategist with thin gold-wire glasses, wearing the ROYAL-BLUE EFEONCE HOODIE, sits at a long dark meeting table on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Beside her, on her frame-right and slightly farther from the camera, between 74 % and 92 % of the frame width, sits a company executive of the client, an illustrative person: a Latin American man in his late forties with short salt-and-pepper hair and a trimmed grey-flecked beard, in his own charcoal blazer over a dark grey knit, no tie, no logos and nothing blue; he is a little softer in focus than her. A thin tablet lies flat on the table between them, its screen dark and off, showing nothing. THE MOMENT: the post they wrote together has just been published: from just above the tablet a network of light rises and opens up and to the frame-right behind them, like a professional network lighting up: dozens of small cool white nodes joined by hair-thin azure-blue (#0375DB) lines, near and sharp close to the tablet, far and soft high on the right. Sophia points at one near node with her left hand; the executive looks at the network with a proud, quiet smile; neither looks at the other and neither looks at the lens; both heads almost frontal, only their eyes turn down toward the near nodes just above the tablet. The bright origin of the network just above the tablet is the only key light and lights both faces from below and in front, cool white; both pairs of eyes stay readable, with a catchlight. A long dark matte meeting table runs between the camera and them, its near edge just in front of the lens; the table top is matte black and non-reflective; only its far end around the tablet catches light, and its near half stays black. The network, the tablet and everything lit stay inside the RIGHT 50% of the frame. The LEFT 50% is calm, deep dark space with faint haze only. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte meeting table edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "SA1",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "sophia"
+    }
+  ],
+  "llave": {
+    "fuente": "the bright origin of the network of light just above the tablet",
+    "lado": "below and to the frame-right of her face, at chest height",
+    "distancia": "about 50 cm from her face"
+  },
+  "fondo": "the far, high part of the network of light melted into cold round bokeh against the dark office wall",
+  "fenomeno": {
+    "que": "the post an executive just published lights up his professional network",
+    "esServicio": "Posicionamiento de ejecutivos en LinkedIn: lo escribimos con él, lo firma él y su red lo ve"
+  },
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38). Extra del cliente según el precedente acotado de SA1: ficticio, sin marca, en gris y carbón, en positivo, junto a una protagonista del equipo."
+}

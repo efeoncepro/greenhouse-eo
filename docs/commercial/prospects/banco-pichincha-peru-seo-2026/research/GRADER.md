@@ -39,3 +39,7 @@ Dueño de corrección: src/lib/growth/ai-visibility/providers/google-ai-overview
 
 La prueba es independiente: no completa, reescribe ni recalcula EO-GRUN-00056. No se implementó ni desplegó un fix de producto como parte de esta operación comercial.
 
+
+## Uso posterior a discovery — 06-10-2026
+
+La [reunión](../MEETING-2026-10-06.md) precisa Pibank como necesidad real. Este Grader de **Banco Pichincha**, con alcance/QA históricos descritos arriba, conserva valor de antecedente. No es baseline Pibank ni evidencia de aperturas, saldo o retorno. Una evaluación Pibank requiere identidad, producto, consultas y cobertura propios. Esta edición no reejecutó ni corrigió/publicó el run o PDF.

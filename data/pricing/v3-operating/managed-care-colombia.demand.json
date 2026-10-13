@@ -1,0 +1,260 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "accountId": "managed-care-simulation",
+    "offerMarketCountry": "CO",
+    "outputCurrency": "COP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "primary",
+        "profile": "ECG-007",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyId": "allocation:dedicated",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": [
+          {
+            "requirementId": "assurance",
+            "resourceId": "provision-backfill-coverage"
+          },
+          {
+            "requirementId": "operations",
+            "resourceId": "provision-on-call-alert-guard"
+          }
+        ]
+      },
+      {
+        "lineId": "backup",
+        "profile": "ECG-007",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.95"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "lead",
+        "profile": "ECG-001",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "account",
+        "profile": "ECG-016",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "agent-ops",
+        "profile": "ECG-021",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "analyst",
+        "profile": "ECG-019",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "primary",
+      "assigneeIds": [
+        "managed-care-primary"
+      ],
+      "tasks": [
+        "social-care"
+      ],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "social-publishing",
+          "reason": "This role answers comments; it does not schedule or publish content."
+        }
+      ]
+    },
+    {
+      "lineId": "backup",
+      "assigneeIds": [
+        "managed-care-backup"
+      ],
+      "tasks": [
+        "social-care"
+      ],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "social-publishing",
+          "reason": "This role answers comments; it does not schedule or publish content."
+        }
+      ]
+    },
+    {
+      "lineId": "lead",
+      "assigneeIds": [
+        "managed-care-lead"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "account",
+      "assigneeIds": [
+        "managed-care-account"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "agent-ops",
+      "assigneeIds": [
+        "managed-care-agent-ops"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "crm-automation",
+          "reason": "This role maintains the agents and the knowledge base; no CRM automation in scope."
+        }
+      ]
+    },
+    {
+      "lineId": "analyst",
+      "assigneeIds": [
+        "managed-care-analyst"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [
+    "agent-runtime-usage"
+  ],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "6",
+      "serviceShare": "0.4",
+      "seatCapacity": 6,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "6",
+        "allocatedUnits": "2.4"
+      },
+      "reason": "Simulation hypothesis: six named seats; the service carries 2.4 of 6, close to its declared dedication. Not a real portfolio or an access grant."
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "public-standard-teams-monthly",
+      "quantity": "6",
+      "serviceShare": "0.4",
+      "seatCapacity": 6,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "6",
+        "allocatedUnits": "2.4"
+      },
+      "reason": "Simulation hypothesis: six named seats; the service carries 2.4 of 6, close to its declared dedication. Not a real portfolio or an access grant."
+    },
+    {
+      "periodId": 1,
+      "toolId": "social-inbox",
+      "priceId": "sprout-advanced-annual",
+      "quantity": "2",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "named-seats",
+        "totalUnits": "2",
+        "allocatedUnits": "2"
+      },
+      "reason": "Simulation hypothesis: 2 named Sprout Social Advanced seats dedicated to this service, one per person who works the inbox. Public annual-billing price; no contract is confirmed.",
+      "seatCapacity": 2
+    },
+    {
+      "periodId": 1,
+      "toolId": "agent-runtime-usage",
+      "priceId": "hypothesis-per-1000-items",
+      "quantity": "10",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "thousand-items-processed",
+        "totalUnits": "10",
+        "allocatedUnits": "10"
+      },
+      "reason": "Simulation hypothesis: about 10,000 inbound items classified a month. Not metered."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

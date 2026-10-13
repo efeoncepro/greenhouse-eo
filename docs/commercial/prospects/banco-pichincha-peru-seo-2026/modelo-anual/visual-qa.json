@@ -1,0 +1,20 @@
+{
+  "status": "visually_reviewed",
+  "workbook_sha256": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a",
+  "render_engine": "Bundled LibreOffice PDF export",
+  "rendered_pages": 11,
+  "inspection": [
+    "All11pages contact sheet",
+    "Summary full resolution: labels, units, Jan-Dec2027 and financialN/D",
+    "Source demand table full resolution: direct/conditional/education/futureUSD separated",
+    "Final cohort matrix full resolution: first funding dates, monthly totals, external origin and labels"
+  ],
+  "changes_from_first_review": [
+    "Removed blank overflow pages (16→11)",
+    "Numeric cell padding separates values from units",
+    "Short cohort scenario label avoids clipping",
+    "Added funding-date labels to each cohort section",
+    "Merged section labels across metadata columns"
+  ],
+  "unverified": "Excel Desktop UI and client/bank approval were not performed."
+}

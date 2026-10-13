@@ -132,12 +132,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
     referrer: typeof body.referrer === 'string' ? body.referrer : undefined,
     honeypot: typeof body.honeypot === 'string' ? body.honeypot : undefined,
     idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : undefined,
+    measurementContext: body.measurementContext,
   }
 
   try {
     const result = await submitForm(input, {
       origin: request.headers.get('origin'),
       ip: getClientIp(request),
+      userAgent: request.headers.get('user-agent'),
+      requestGlobalPrivacyControl: request.headers.get('sec-gpc')?.trim() === '1',
       captchaToken: typeof body.captchaToken === 'string' ? body.captchaToken : null,
       requestId: null,
       uploadedFiles,

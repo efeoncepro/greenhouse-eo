@@ -1,0 +1,22 @@
+{
+  "args": [
+    "resources",
+    "inspect",
+    "--policy",
+    "<tmp>/missing.json",
+    "--date",
+    "2026-10-11"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 251,
+    "sha256": "3afcde5444bfccfa97c4e5cda34f1bccdab2bd665c324224409cd57b41366dc0",
+    "text": "{\n  \"error\": {\n    \"code\": \"INPUT_NOT_FOUND\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"policy\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

@@ -1,0 +1,388 @@
+{
+  "schema": "axis.surface-composition.v1",
+  "contract": {
+    "id": "efeonce.surface-composition",
+    "version": "0.1.2",
+    "lifecycle": "candidate"
+  },
+  "status": "resolved",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "cover",
+  "recipe": {
+    "id": "cover-brochure",
+    "status": "approved",
+    "role": "cover"
+  },
+  "use": "brochure",
+  "layout": "line",
+  "line": "growth",
+  "theme": "dark",
+  "palette": {
+    "background": "#001a33",
+    "accent": "#36c8bf",
+    "ink": "#ffffff",
+    "soft": "#e2e2e2",
+    "text": "#E6EDF3",
+    "rule": "#1D3A57"
+  },
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px",
+    "format": "16x9"
+  },
+  "safeArea": {
+    "marginOfWidth": 0.07291666666666667,
+    "marginPx": 140
+  },
+  "reserves": [
+    {
+      "band": "logo",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTopRange": [
+        0.1852,
+        0.2778
+      ]
+    },
+    {
+      "band": "eyebrow",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTopRange": [
+        0.3611,
+        0.4537
+      ]
+    },
+    {
+      "band": "question",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTopRange": [
+        0.4056,
+        0.4981
+      ]
+    },
+    {
+      "band": "answer",
+      "side": "start",
+      "inset": 0.0729,
+      "fromTopRange": [
+        0.463,
+        0.5556
+      ]
+    }
+  ],
+  "type": {
+    "eyebrow": {
+      "family": "Poppins",
+      "weight": 500,
+      "px": 22,
+      "lineHeight": 1.2,
+      "tracking": "0.24em",
+      "uppercase": true,
+      "color": "#e2e2e2"
+    },
+    "question": {
+      "family": "Poppins",
+      "weight": 300,
+      "px": 40,
+      "lineHeight": 1.2,
+      "tracking": null,
+      "uppercase": false,
+      "color": "#ffffff"
+    },
+    "answer": {
+      "family": "Bricolage Grotesque",
+      "weight": 760,
+      "px": 124,
+      "lineHeight": 0.95,
+      "tracking": "-0.035em",
+      "uppercase": false,
+      "color": "#ffffff"
+    },
+    "body": {
+      "family": "Poppins",
+      "weight": 400,
+      "px": 28,
+      "lineHeight": 1.3,
+      "tracking": null,
+      "uppercase": false,
+      "color": "#ffffff"
+    }
+  },
+  "dominance": {
+    "ratio": 3.1,
+    "min": 3,
+    "ok": true
+  },
+  "steps": null,
+  "signature": {
+    "mode": "logo",
+    "logoOnly": [
+      "cover",
+      "close",
+      "brand-is-subject"
+    ],
+    "photoSlideLogo": false,
+    "anchor": "top-start",
+    "widthPx": 500,
+    "urlBubble": false,
+    "assetId": "efeonce-logo-negative",
+    "alt": "Efeonce",
+    "minContrast": 4.5,
+    "orbitDelegate": "surface-owned"
+  },
+  "timeline": null,
+  "rules": [
+    {
+      "id": "efeonce-dark-ground",
+      "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+    },
+    {
+      "id": "one-sphere-per-piece",
+      "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+    },
+    {
+      "id": "one-orbit-per-piece",
+      "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+    },
+    {
+      "id": "accent-text-min-size",
+      "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+    },
+    {
+      "id": "timings-from-tokens",
+      "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+    },
+    {
+      "id": "answer-dominates-3x",
+      "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+    },
+    {
+      "id": "figures-with-source",
+      "text": "Cifras sólo con fuente; precios siempre como marcador."
+    },
+    {
+      "id": "isotype-composed",
+      "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+    },
+    {
+      "id": "cine-only-nexa-or-proposal",
+      "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+    },
+    {
+      "id": "no-close-gaze-pairs",
+      "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+    },
+    {
+      "id": "semantic-reserves-only",
+      "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+    },
+    {
+      "id": "photo-slide-no-logo",
+      "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+    },
+    {
+      "id": "url-bubble-in-footer",
+      "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+    },
+    {
+      "id": "selection-one-thing-per-slide",
+      "text": "La selección toma una sola cosa por lámina."
+    },
+    {
+      "id": "third-party-logos-one-tone-same-ink",
+      "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+    },
+    {
+      "id": "cover-full-voice",
+      "text": "La portada lleva la voz completa de la línea: eyebrow (Poppins 500, mayúsculas espaciadas) · pregunta con su anillo en el acento · respuesta de 1 a 3 palabras con su esfera, al menos 3 veces la pregunta · evidencia (Poppins 400, una palabra en negrita). Nada de títulos sueltos sin voz, tipo «Servicios 2026» (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-bound-to-use",
+      "text": "Las portadas y contraportadas de brochure y de propuesta no se cruzan: cada una admite sólo su uso, porque el cliente (sólo en la propuesta), la foto y el mensaje del cierre dependen del documento (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-photo-alternates",
+      "text": "Portada y contraportada alternan foto y sin foto: si la portada lleva fotografía, la contraportada va sin fotografía, y al revés. Vale para el brochure y para la propuesta comercial (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-logo-min-screen",
+      "text": "El logo de portada y contraportada mide 500 px en 1920 (480 en la portada de propuesta al amanecer): así se lee a efeonceGraphicLine.logo.minScreenPx (96 px) o más en un teléfono de 390 px, que pide 473 px o más en 1920. Los 230 y 220 px de las recetas clásicas no llegan (operador, 2026-09-27)."
+    },
+    {
+      "id": "slogan-only-in-close",
+      "text": "El eslogan va sólo en el cierre, nunca en la portada: la recarga, repite la respuesta y la esquina inferior derecha es del sujeto o de la órbita (operador, 2026-09-27)."
+    },
+    {
+      "id": "giant-orbit-cover-is-proposal",
+      "text": "La órbita gigante sin foto es el recurso de la portada de propuesta, no de la portada de brochure (se retiró como tal); en el brochure va sólo como contraportada sin foto (operador, 2026-09-27)."
+    },
+    {
+      "id": "photo-reserves-start-45",
+      "text": "La placa reserva el 45 % izquierdo como estudio oscuro y calmo para el texto."
+    },
+    {
+      "id": "text-clears-orbit-and-subject",
+      "text": "Ningún texto cruza la órbita ni al sujeto de la foto: la columna vive en el 45 % izquierdo oscuro. Si una pregunta o la evidencia cruza un haz, una mano o la órbita, se acorta la pregunta («¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?») o se parte la evidencia en 2 o 3 líneas (operador, 2026-09-27)."
+    },
+    {
+      "id": "frame-selection-text-or-client-logo",
+      "text": "En portada y contraportada la selección toma sólo la columna de texto o el logo del cliente, nunca a la persona de la foto; en 16:9, un solo cursor (propio o de un colaborador). Las fotos de cine van sin interfaz por defecto (operador, 2026-09-27)."
+    },
+    {
+      "id": "line-cover-takes-line-accent",
+      "text": "Cada portada de línea de servicio toma el acento de su línea (efeonceGraphicLine.lines) en el anillo y en la esfera, y lista como evidencia las categorías de la línea, del catálogo docs/services/ (operador, 2026-09-27)."
+    },
+    {
+      "id": "partner-claim-readback",
+      "text": "La insignia de partner es un claim: va sólo con la referencia de su autorización o de su readback vigente en el registro de partnerships del consumidor (la «Salesforce Partner» está autorizada por Salesforce desde el 2026-09-29 y el deck Salesforce la lleva por defecto). Sin esa referencia, la portada dice «Operamos sobre» con el logo de la plataforma y la contraportada va sin insignia. Nunca es un elemento fijo de la receta."
+    }
+  ],
+  "references": [
+    {
+      "id": "cover-brochure-line-growth",
+      "title": "Brochure · portada de Growth Strategy: «¿Lo medimos? Siempre.»",
+      "status": "approved",
+      "image": "/references/surfaces/deck/cover-brochure-line-growth.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPortadaLineaGrowth.dc.html"
+    },
+    {
+      "id": "cover-brochure-line-brand",
+      "title": "Brochure · portada de Creative Services: «¿Quién crea mi contenido? Tu squad.»",
+      "status": "approved",
+      "image": "/references/surfaces/deck/cover-brochure-line-brand.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPortadaLineaBrand.dc.html"
+    },
+    {
+      "id": "cover-brochure-line-engine",
+      "title": "Brochure · portada de Digital Services: «¿Te encuentra la IA? Visible.»",
+      "status": "approved",
+      "image": "/references/surfaces/deck/cover-brochure-line-engine.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPortadaLineaEngine.dc.html"
+    },
+    {
+      "id": "cover-brochure-line-voice",
+      "title": "Brochure · portada de Media & Distribution: «¿Dónde invierto? Donde rinde.»",
+      "status": "approved",
+      "image": "/references/surfaces/deck/cover-brochure-line-voice.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPortadaLineaVoice.dc.html"
+    },
+    {
+      "id": "cover-brochure-line-revenue",
+      "title": "Brochure · portada de RevOps & CRM: «¿Y el reporte del viernes? Ya lo viste.»",
+      "status": "approved",
+      "image": "/references/surfaces/deck/cover-brochure-line-revenue.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckPortadaLineaRevenue.dc.html"
+    },
+    {
+      "id": "cover-brochure-line-revenue-salesforce",
+      "title": "Brochure · portada de Servicios Salesforce: «¿Tu Salesforce ya actúa? Por ti.» (línea revenue-salesforce, con la insignia «Salesforce Partner» autorizada)",
+      "status": "approved",
+      "image": "/references/surfaces/deck/cover-brochure-line-revenue-salesforce.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckSalesforcePortada.dc.html"
+    }
+  ],
+  "delegates": {
+    "orbit": [
+      {
+        "scene": "main",
+        "contract": "efeonce.graphic-line-orbit",
+        "intent": {
+          "canvas": {
+            "width": 1920,
+            "height": 1080,
+            "line": "growth",
+            "surface": "dark",
+            "channel": "deck"
+          },
+          "elements": [
+            {
+              "kind": "voice",
+              "id": "voice",
+              "questionId": "question",
+              "answerId": "answer",
+              "answerText": "Mucho más"
+            }
+          ]
+        }
+      }
+    ],
+    "close": null,
+    "selection": [],
+    "icons": [],
+    "photo": {
+      "placement": "bleed",
+      "register": "cine",
+      "lensMm": 85,
+      "cameraDistanceM": 2,
+      "reserve": {
+        "side": "start",
+        "share": 0.45,
+        "form": "calm-deep-dark"
+      },
+      "bed": "dark-bottom",
+      "accentLight": "line",
+      "emblem": "compose-from-axis-brand-assets",
+      "lookAtLens": true,
+      "subjectPlacement": {
+        "side": "end",
+        "framing": "waist-up"
+      },
+      "subject": "person",
+      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-C.png",
+      "alt": "Una líder de RevOps de Efeonce con la chaqueta dirige con la mano el nudo de un moño de luz magenta y azul, con agentes robot en el flujo",
+      "native": null,
+      "focus": null,
+      "cine": {
+        "lensMm": 85,
+        "cameraDistanceM": 2
+      }
+    }
+  },
+  "content": {
+    "eyebrow": "Brochure · Servicios HubSpot",
+    "question": "¿Mi HubSpot puede hacer más?",
+    "answer": [
+      "Mucho más"
+    ],
+    "answerSphere": "closes-last-line",
+    "body": "**Seis** soluciones:\nMarketing y AEO · Ventas y pipeline\nRevenue lifecycle · Servicio\nDatos y CRM · Operación con agentes",
+    "proof": null,
+    "measure": null,
+    "progress": null,
+    "cta": null,
+    "variants": null,
+    "levels": null,
+    "note": null,
+    "panels": null,
+    "figures": null,
+    "nav": null,
+    "title": null,
+    "frames": null,
+    "chapter": null,
+    "shots": null,
+    "subtitles": null,
+    "lines": null,
+    "slogan": null
+  },
+  "adapterChecks": [
+    "text-inside-its-reserve",
+    "text-never-crosses-ring",
+    "answer-dominates-3x-painted",
+    "accent-text-min-size",
+    "signature-where-the-surface-says",
+    "subject-outside-text-reserve",
+    "last-frame-is-static-fallback",
+    "legibility-at-reading-distance"
+  ],
+  "issues": []
+}

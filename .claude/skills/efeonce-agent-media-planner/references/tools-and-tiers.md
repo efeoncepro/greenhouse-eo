@@ -1,10 +1,9 @@
 # Planificador de medios · tools permitidas y niveles
 
-Verificado contra el repo el 2026-09-26: manual servido `docs/mcp/skills/marketing-studio/SKILL.md` (Studio sólo
-lectura), ADR de la capa de estrategia §4.7 y §5, mapa de escritura de
-`efeonce-campaign-planning/references/studio-write-mapping.md` y las tools del MCP oficial de Meta Ads visibles en una
-sesión de operador. Si una tool no aparece en la sesión, se declara la limitación y se usa la fuente documental,
-marcada como tal. **Los nombres del manifiesto vigente mandan sobre esta tabla.**
+Verificado 2026-10-04: Studio API1.6.0 publica 59 tools y catálogo v1 con 52 canales; las nuevas tools
+no están certificadas por MCP. TASK-2003 habilita T1 delegado en paralelo; TASK-1899/proposalDigest fue retirada.
+El rol usa sólo tools disponibles en la sesión y su autoridad; una CLI HTTP local no amplía sus permisos.
+Referencia: `efeonce-campaign-planning/references/studio-write-mapping.md`. El manifiesto vigente manda sobre esta tabla.
 
 ## T0 · Lecturas (directas)
 
@@ -19,6 +18,9 @@ marcada como tal. **Los nombres del manifiesto vigente mandan sobre esta tabla.*
 | `studio.campaign.ads.list` | configuraciones de anuncio: canal, placement, audiencia, objetivo, UTM, `status`, `checksPending` |
 | `studio.campaign.copies.list` | cobertura de copy por canal (literal, con conteo de caracteres) |
 | `studio.campaign.assets.list` · `studio.asset.get` | qué ratios/placements tienen pieza (para marcar faltantes, no para inventar exports) |
+| `studio.channels.list` · `studio.channel.get` | specs versionadas: compra y aparición separadas; conservar versión y procedencia |
+| `studio.campaign.channel_findings.list` | hallazgos persistidos; éxito en warn no certifica cumplimiento |
+| `studio.customer_model.get` | sólo si el reader autorizado está disponible; sin modelo dejar referencia pendiente, nunca inventar ICP |
 | `studio.calendar.get` | choques de fechas con otras campañas (`from` incluido, `to` excluido) |
 
 ### MCP oficial de Meta Ads (si la persona lo conectó) — sólo estas lecturas
@@ -53,15 +55,15 @@ Plan de campaña (`PLAN-IA-<fecha>.md`), `BRIEF.md`, `MANIFIESTO-PAUTA.json`, CD
 
 ## T1 · Borradores (cuando existan las escrituras)
 
-Nombres de trabajo de TASK-1894 / TASK-1899 y de la capa de estrategia. Todos con la identidad delegada de la
-persona, `Idempotency-Key` estable por intento lógico, `If-Match` con la `revision` leída (`412` ⇒ releer y proponer
+Los commands base existen en API; el rol sólo los ejecutará por MCP cuando se habilite TASK-2003 con identidad
+delegada de la persona, `Idempotency-Key` estable por intento lógico, `If-Match` con la `revision` leída (`412` ⇒ releer y proponer
 de nuevo) y procedencia.
 
 | Sección del plan de medios | Tool (nombre de trabajo) | Nota |
 |---|---|---|
 | Flights | `studio.media_plan.flight.create` · `.update` | |
 | Reparto | `studio.media_plan.budget_line.set` | **sólo `kind: proposed`**; `actual` nunca por command; mezclar kinds = `422 budget_kind_violation` |
-| Audiencias de canal | ‹command de audiencia de canal› | referencia ICP obligatoria; sin ella, pendiente visible |
+| Audiencias de canal | `studio.campaign.audience.upsert` | ICP real requiere el reader habilitado; fallback `pendingNote` con referencias null; bow-tie independiente del funnel creativo |
 | Configuraciones de anuncio | `studio.ad.create` · `.update` | configurado ≠ activo; `checksPending` visible |
 | Borrador del plan | ‹command de borrador de plan› | hasta que exista, el plan vive en el documento |
 
@@ -69,7 +71,7 @@ de nuevo) y procedencia.
 
 | Acción | Tool (nombre de trabajo) | Qué hace el rol |
 |---|---|---|
-| Aprobar una línea | `studio.media_plan.budget_line.approve` | la lista en el checklist con su `dryRun`/`proposalDigest` |
+| Aprobar una línea | `studio.media_plan.budget_line.approve` | la lista en el checklist con evidencia y validación disponible; deriva al operador, sin inventar digest |
 | Quitar una línea | `studio.media_plan.budget_line.remove` | ídem |
 | Autorizar medios | `studio.campaign.media.authorize` | ídem |
 | Conectar una cuenta publicitaria (OAuth/credenciales) | — | lo pide a la persona, con la identidad de menor privilegio |

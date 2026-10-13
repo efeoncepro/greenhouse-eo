@@ -1,0 +1,10 @@
+id,capability,price_usd,billing_unit,full_plan_units,scope,activation_terms
+BASE,Servicio continuo SEO/AEO,4500,mes,12,"SEO técnico y schema pertinentes dentro de 8h CMS/mes, Panel AEO de 24 preguntas en 3 superficies: 72 observaciones iniciales y 144/mes desde M2, hasta 5 artículos/mes, evolución de contenidos y FAQ según evidencia, implementación web priorizada, medición, CRO y dirección",12 meses; revisión trimestral
+HUB,Content hub WordPress,3000,proyecto,1,"Arquitectura y diseño, hasta tres plantillas sobre sitio existente, implementación y QA",50% inicio y 50% aceptación; referencia M1–M2
+CALCULADORA,Mejora de calculadora existente,1200,proyecto,1,"Revisión y mejora de una calculadora existente, fórmula, UX y QA",50% inicio y 50% aceptación; referencia M2
+COMPARADOR,Comparador de ahorro,4000,proyecto,1,"Una herramienta para hasta cinco productos, criterios/fuentes aprobados y actualización manual",50% inicio y 50% aceptación; referencia M3–M4
+PLANIFICADOR,Planificador de ahorro,3000,proyecto,1,"Una herramienta para meta, aporte y plazo; método validado y QA",50% inicio y 50% aceptación; referencia M5–M6
+COMUNIDAD,Comunidad y distribución,1000,mes activo,12,"Una newsletter, cuatro adaptaciones y hasta 16h de escucha/moderación mensual en canales acordados",Activación mínima 3 meses; luego mensual
+PR,Campaña de PR y autoridad,2000,campaña,4,"Recurso/dossier sobre activo existente, 3 ángulos, 12 propuestas a medios, vocería y seguimiento",6–8 semanas por campaña; 50% inicio y 50% cierre de entregables
+REFUERZO_PR,Refuerzo de gestión editorial y enlaces,500,ronda,4,Revisión de hasta 10 oportunidades adicionales; hasta 6 gestiones personalizadas y un seguimiento por gestión; verificación de referencias sin duplicar campañas,3–4 semanas por ronda; 50% inicio y 50% cierre; no garantiza publicaciones/enlaces
+CUIDADO,Mantenimiento de herramientas,200,mes activo,10,"Hasta 4h/mes para hasta tres herramientas entregadas; fórmulas, condiciones y QA menor",Desde entrega y fin de garantía correctiva; mensual

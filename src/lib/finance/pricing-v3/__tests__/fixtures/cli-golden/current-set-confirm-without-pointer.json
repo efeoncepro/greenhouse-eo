@@ -1,0 +1,30 @@
+{
+  "args": [
+    "current",
+    "set",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v10.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v10.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--reason",
+    "Golden baseline: replace the pointer.",
+    "--confirm",
+    "0000000000000000000000000000000000000000000000000000000000000000",
+    "--out",
+    "<tmp>/pointer.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 262,
+    "sha256": "dba32cbe3ef519f5f9164cf66b19e77e674731df94c96884f600a87765870422",
+    "text": "{\n  \"error\": {\n    \"code\": \"CURRENT_VERSIONS_CONFLICT\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"confirm\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

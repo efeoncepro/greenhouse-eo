@@ -1,0 +1,249 @@
+{
+  "tenderId": "pibank-fotos",
+  "slides": [
+    {
+      "slideId": "p01-deck-section-split",
+      "contentType": "deck.section-split",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "layout": "corner-top",
+          "margin": 140,
+          "questionTop": 600,
+          "answerTop": 670,
+          "answerPx": 120,
+          "numberTop": "--gl-number-top=260px",
+          "labelTop": "--gl-label-top=450px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "panelWidth": "--gl-panel-width=960px",
+          "panelRadius": "--gl-panel-radius=300px",
+          "photoLeft": "--gl-photo-left=660px",
+          "photoWidth": "--gl-photo-width=1260px",
+          "panelLeft": "--gl-panel-left=0px",
+          "columnWidth": "--gl-column-width=820px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:section-split-indicator-corner-top-1-of-5-growth"
+        },
+        "photo": {
+          "src": "asset-ref:plate:SX4-busqueda-y-respuesta",
+          "alt": "Una caja de búsqueda y un composer de IA flotan en una nave oscura; sus haces de luz se unen en un solo punto sobre el piso"
+        },
+        "progress": {
+          "number": "01",
+          "label": "Sección 1 de 5"
+        },
+        "voice": {
+          "question": "¿Dónde decide quien ahorra?",
+          "answer": "Al buscar"
+        }
+      },
+      "template": "SectionSplit"
+    },
+    {
+      "slideId": "p02-deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 648,
+          "bodyPx": 25,
+          "bodyWidth": 640,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:SE1-te-encuentran-isotipo",
+          "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz con constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita"
+        },
+        "voice": {
+          "question": "¿Quién encuentra a Pibank?",
+          "answer": "Quien ahorra",
+          "eyebrow": "Qué haremos · SEO y contenido"
+        },
+        "body": "SEO técnico en WordPress, contenido por decisión de ahorro y herramientas para comparar, para que quien busca dónde ahorrar llegue a Cuenta Soles.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:busqueda-engine-dark-44",
+            "kicker": "M1",
+            "name": "Diagnóstico"
+          },
+          {
+            "icon": "asset-ref:icon:contenido-engine-dark-44",
+            "kicker": "M1 a M12",
+            "name": "Hub y artículos"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-engine-dark-44",
+            "kicker": "M2 a M5",
+            "name": "Herramientas"
+          },
+          {
+            "icon": "asset-ref:icon:informe-engine-dark-44",
+            "kicker": "Cada mes",
+            "name": "Informe"
+          }
+        ],
+        "note": "No prometemos posiciones: medimos y reportamos lo que se mueve.",
+        "selection": {
+          "label": "Pibank",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    },
+    {
+      "slideId": "p03-deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:DV1-lo-hacemos",
+          "alt": "Una ingeniera front-end de Efeonce, con la chaqueta del equipo, mira a cámara mientras arrastra un bloque de código dentro de una landing holográfica de luz azul"
+        },
+        "voice": {
+          "question": "¿Y si hay que tocar código?",
+          "answer": "Lo hacemos",
+          "eyebrow": "Qué haremos · WordPress"
+        },
+        "body": "Hasta 8 horas al mes de ajustes en el WordPress de pibank.pe. Si depende de TI o del proveedor, entregamos la especificación y lo verificamos.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:codigo-engine-dark-44",
+            "kicker": "Plantillas",
+            "name": "Canonical y schema"
+          },
+          {
+            "icon": "asset-ref:icon:web-engine-dark-44",
+            "kicker": "Velocidad",
+            "name": "Core Web Vitals"
+          },
+          {
+            "icon": "asset-ref:icon:nube-engine-dark-44",
+            "kicker": "CMS",
+            "name": "WordPress y Yoast"
+          },
+          {
+            "icon": "asset-ref:icon:checklist-engine-dark-44",
+            "kicker": "Cada cambio",
+            "name": "QA y continuidad"
+          }
+        ],
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    },
+    {
+      "slideId": "p04-deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:AE2b-la-ia-te-elige-isotipo",
+          "alt": "Una estratega SEO con el polo de Efeonce mira a cámara; detrás, entre miles de tarjetas oscuras, el haz azul de una burbuja de respuesta de IA ilumina una sola tarjeta"
+        },
+        "voice": {
+          "question": "¿Qué dice la IA de Pibank?",
+          "answer": "Lo sabremos",
+          "eyebrow": "Qué haremos · Respuestas de IA"
+        },
+        "body": "24 preguntas sobre ahorro en tres superficies de IA, dos veces al mes: presencia, exactitud, fuentes y competidores, para corregir lo que dice de Cuenta Soles.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:busqueda-engine-dark-44",
+            "kicker": "M1",
+            "name": "Línea base"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-engine-dark-44",
+            "kicker": "Desde M2",
+            "name": "144 al mes"
+          },
+          {
+            "icon": "asset-ref:icon:contenido-engine-dark-44",
+            "kicker": "Cada mes",
+            "name": "Correcciones"
+          },
+          {
+            "icon": "asset-ref:icon:informe-engine-dark-44",
+            "kicker": "Cada mes",
+            "name": "Informe"
+          }
+        ],
+        "note": "Una mención no es una visita ni una cuenta: es una señal que se sigue.",
+        "selection": {
+          "label": "Pibank",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

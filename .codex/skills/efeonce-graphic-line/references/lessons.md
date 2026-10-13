@@ -585,6 +585,61 @@
 - **Una foto cuya luz ya es una órbita no lleva lente.** Las novedades cine del login (`LG1`, `LG2e`) van sin lente
   (una órbita por pieza); la foto en registro B (`LG3e`) sí la lleva. El operador lo aceptó.
 
+## 2026-10-07 (portada de propuesta con el arte del cliente, Sika LIC-1164)
+
+- **El arte de un cliente pegado sobre una foto terminada siempre se lee pegado.** Dos intentos rechazados («se ve
+  horrible», «se nota demasiado lo determinístico»): nueve piezas con homografía sobre tarjetas de luz de un plate
+  ajeno, y un Master Graphic sobre un lightbox en blanco con la persona recortada y movida. Causa: el **orden** (el
+  arte no recibe la luz de la escena, la escena no recibe luz del arte; la persona movida conserva la luz de su lugar
+  original). Regla: generar la escena **con el arte como referencia** (`foto:generar --dry` + `ai:image` con imagen
+  extra), componer el arte exacto encima y terminar sólo con materia y luz (`ai:inpaint image` Sunburst). Nunca mover
+  una persona recortada: se regenera la toma.
+- **El acabado Sunburst reinventa texto chico aunque el prompt lo prohíba** («PURFORM» → «PUREFORM», «-119» → «-119S»)
+  y vira el amarillo de marca a limón (b alto). Se resuelve fuera del modelo: híbrido de frecuencias (alta frecuencia
+  del arte exacto + baja del acabado, sigma 10) y ganancia de color sólo en los píxeles del color de marca; una
+  corrección global tiñe blancos y azules.
+- **`ai:image:rmbg` toma un lightbox brillante como sujeto:** la máscara de la persona sólo vale en su zona; las manos
+  se recortan con `rmbg` sobre un recorte local.
+- **`foto:expandir` con reposición deja costura vertical en fondos oscuros;** con `--reponer no` queda limpio pero el
+  modelo puede recortar el arte: se repone sólo el arte exacto encima.
+- Detalle y archivos: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md` §3.5.
+
+## 2026-10-08 (propuesta técnica Pibank v11: borrar la selección sobre fichas superpuestas)
+
+- **Síntoma:** al borrar la selección por defecto de `content-team` con `borrar-seleccion.mjs`, quedaron guiones
+  sueltos (las manijas del centro de cada lado) y la línea derecha, que cruzaba el nombre de la ficha vecina, dejó la
+  «D» de «Daniela» corrida.
+- **Causa:** el script interpola a través del trazo; donde el recuadro pasa sobre texto de otra ficha, interpola con
+  píxeles de letra.
+- **Regla:** después de borrar, mirar al 100 % los costados del recuadro. Los guiones se rellenan interpolando en
+  horizontal; el texto cruzado se restaura desde la composición original **sin** la columna del punteado, y esa
+  columna se rellena con el fondo de la ficha interpolando en vertical. Además, `method-eeat` admite 24 caracteres en
+  `meterTopic` y `content-team` exige cinco fichas (un rol por asignar va con ficha neutra, nunca con la foto de otra
+  persona).
+
+## 2026-10-07 (recetas del compositor en la propuesta técnica Pibank v10)
+
+- **La selección colaborativa no se apaga en `cover-proposal`, `content-team` ni `content-clients`.** Síntoma: las
+  tres láminas salen siempre con un recuadro de selección y cursor que nadie pidió (el operador rechaza selecciones sin
+  sentido). Causa: la receta pinta la selección por defecto; `selection: false` se ignora, `null` rompe el render y
+  `"none"` es inválido. Regla: hoy se borra en post (`borrar-seleccion.mjs`, `quitar-seleccion-portada.mjs` en
+  `ai-generations/2026-10-07_pibank-propuesta/`) y se revisa al 100 % que no quede resto. **Pendiente:** corregir la
+  receta para que la selección sea opcional; al hacerlo, borrar esta línea.
+- **`content-measure-formulas` no agranda la tarjeta con el texto.** Síntoma: una fórmula de tres líneas empuja
+  «Dueño · Efeonce» fuera de la tarjeta. Causa: la tarjeta tiene alto fijo. Regla: fórmulas de **dos líneas** como
+  máximo y mirar la lámina al 100 % antes de darla por buena.
+- **El límite de largo de la respuesta no es arbitrario.** En esa misma receta la respuesta tiene un tope (≈15
+  caracteres) porque a 150 px el texto se desborda. Regla: acortar la respuesta, nunca subir el límite ni bajar el
+  cuerpo para que quepa.
+- **`method-eeat` y `content-day` pintan los realces en turquesa aunque la línea sea Engine.** Causa: toman la tinta
+  del anillo, no el acento de la línea. Lo mismo pasa con láminas importadas de otros decks (esfera y anillo de los
+  casos). Regla: llevar la lámina a un solo acento con `teal2engine.cjs` (corre los tonos 155–192° a 208°) y revisar
+  fotos al 100 %, porque el corrimiento de tono también las toca.
+- **`productMark` (lockup de submarca) no es campo del intent.** Regla: se superpone en post, como `bake.cjs` del deck
+  SEO/AEO; en el reporte con Insights quedó en (140, 44) con alto 40.
+- Método completo de esta propuesta y su checklist: skill `deck-studio`,
+  [propuesta-tecnica-seo-sin-presentador.md](../../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos
@@ -604,3 +659,114 @@
 
 Regla: al tocar cualquiera de estos puntos, corregir la fuente (código o doc), borrar la línea de aquí y anotarlo en el
 registro.
+
+### 2026-10-07 · Foco residual y autoocultado de video
+
+Verificado contra AXIS release `7fb549a` (primitives 0.6.3), 2026-10-07. `:focus-within` persistía tras Play y anulaba el fade de Media Chrome. Distinguir foco de teclado con `keyboardcontrol`; usar `autohideovercontrols` para puntero inmóvil, sin temporizador paralelo. Probar Play sin blur, subtítulos, fullscreen, hover inmóvil y menús abiertos. WebKit podía cerrar el menú por focusout antes del click de su header, enviando el gesto al video; prevenir `mousedown` del cierre preserva el click y su retorno de foco. Cancelar `pointerdown` suprime el click táctil y no sirve. Pruebas Chrome/WebKit pasan; no equivale a certificación física.
+
+### 2026-10-07 · Compacto no significa pegado al marco
+
+Una fila de controles reduce altura, pero necesita margen exterior además del padding de targets. En video embedded: 12 px de separación al marco, botones 44×44 y thumb con ≥9 px de aire frente a Play. En Media Chrome, un time-range estilizado como block no reparte gaps como el volume-range flex: medir el thumb real y usar padding del wrapper. Probar proporciones verticales y CSS del host (Think/WordPress), no sólo el ancho de viewport del Lab.
+
+- Video: un canvas con fotogramas y currentTime avanzando no prueba que el usuario vea imagen. Ante superficie azul, comparar captura pintada, decoder, video nativo y reproducción completa; conservar el incidente abierto si recargar sólo recupera. No añadir estilos o ciclos de reload sin causa comprobada. Replay es una acción orbital estática con nombre accesible, no un loader. Ver `video-player.md` (2026-10-07).
+
+### 2026-10-07 · Distribución compartida y costo de CI
+
+Síntoma: Think funcionaba localmente y fallaba en Vercel al resolver `/video-player`. Causa: `link:`
+a un checkout hermano ausente en cloud. Regla: paquete privado publicado, pin exacto + lockfile y credencial
+de lectura en el entorno de build; instalación limpia antes del push. No copiar/vendorear el reproductor
+ni confundir una preview local con un despliegue. Resuelto en Think `cd428c7`, primitives 0.6.3.
+
+Síntoma: publicación prolongada por reintentos y suites completas. Los primeros fallos fueron timeout de
+matrices agregadas y click tapado por header; después, instalación lenta de dependencias del runner Ubuntu.
+Regla: estabilizar casos locales, verificar exports baratos antes de navegador y distinguir CI, release y deploy
+por SHA. Documentación sola no justifica otro release. Reutilizar evidencia del mismo artefacto sería una mejora
+futura del pipeline, no una optimización ya entregada. No atribuir costo monetario sin medición.
+
+Verificado contra: release `37630788367` SUCCESS (`7fb549a`), main documental `15b1898` — 2026-10-07.
+
+## 2026-10-08 — Lámina importada a Engine: manchas del recolor y el título vacío que dibuja puntos (UTEM)
+
+- **Síntoma:** al pasar una lámina compuesta de turquesa a Engine con `teal2engine.cjs` (corte por saturación > 0,18), el
+  operador vio «manchas teal» en la plataforma de `content-team`; y al dejar `center.title` vacío con U+2800 aparecieron
+  seis circulitos sobre el logo del cliente.
+- **Causa:** el umbral de saturación deja islas sin recolorear en los degradados suaves; U+2800 es el patrón braille
+  vacío y la fuente lo dibuja con puntos. Borrar la palabra del centro con interpolación dejaba además un rectángulo,
+  porque la palabra lleva brillo detrás.
+- **Regla:** recolorear con peso continuo por tono (`ai-generations/2026-10-08_utem-propuesta/recolor-engine.mjs`,
+  `RECOLOR_LO=156` para no tocar el verde de Greenhouse); para poner un logo al centro de `content-team`, componer con
+  título vacío, borrar sólo los puntos del U+2800 y componer el logo encima, sin parche. Revisar siempre al 100 % y con
+  contraste aumentado: el rectángulo y las manchas no se ven a tamaño de hoja de contacto.
+
+## 2026-10-08 — Cotización A4: HTML para PDF y conservación del paquete (UTEM)
+
+La cotización vertical de cuatro páginas fue aprobada por Julio y presentada como parte del proceso UTEM. El HTML es fuente editable para exportar el PDF: tamaño físico A4, saltos definidos, encabezado/pie reservados y fuentes/logos oficiales incluidos. Verificar todos los folios del **PDF exportado**, texto extraíble, fuentes incrustadas y montos; un screenshot del HTML no sustituye esa revisión. Este documento comercial no amplía ni cambia las recetas de deck o los tokens de La órbita.
+
+Tras la presentación, actualizar metadatos y continuidad conservando los bytes/hashes aprobados. [Registro de la presentación y archivos](../../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). El caso no autoriza variantes nuevas de logos, eslóganes ni reglas de composición.
+
+## 2026-10-08 — Cotización A4 guardada como plantilla
+
+Por mandato de Julio, el HTML aprobado se guardó como [plantilla A4 para oferta económica documental rápida de licitación](../../../../docs/commercial/templates/cotizacion-a4/README.md): `template.html` con data slots, CSS, JSON de ejemplo y generador `scripts/documents/render-cotizacion-a4.mjs`. Usarla ante una licitación/Compra Ágil urgente que requiere HTML para PDF, desde alcance, precio y condiciones aprobados. Puede emitir una oferta formal; sólo el ejemplo es sin validez comercial.
+
+Conserva cuatro hojas, recursos AXIS y pie institucional; calcula neto/IVA/total y referencia mensual opcional. Los datos se sustituyen en el JSON; no se editan tokens ni recetas de deck. El generador rechaza desborde y versiones firmadas/presentadas; cada PDF exige revisión visual propia. La cotización enviada a UTEM permanece intacta.
+
+Es un artefacto documental local: no crea `quoteId`, costea/valida margen, aprueba precio, ejecuta maker-checker ni registra CRM/facturación/envío. Pedir operar el sistema de cotizaciones Greenhouse activa [Cotizador](../../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../../docs/documentation/finance/pricing-comercial.md), con catálogo/engine/Quote Builder/snapshots y estado runtime verificado; no activa esta plantilla por compartir el nombre «cotización». Su manifiesto no es el de Artifact Composer ni un snapshot del sistema.
+
+## 2026-10-09 — Halo recortado en cuadrado: región de filtro sin declarar (Pibank v13, `method-surround-cycle`)
+
+- **Síntoma:** en la lámina del ciclo (Pibank v13, lámina 22) el halo detrás del ícono «Crear» terminaba en un borde
+  cuadrado.
+- **Causa raíz:** en la receta `method-surround-cycle`
+  (`src/lib/brand-surfaces/recipes/seo-aeo/method-surround-cycle.ts`) los filtros SVG `sur-sphere-glow` y
+  `sur-lit-glow` no declaraban región. Por defecto, un filtro SVG pinta sólo dentro de la caja del objeto más 10 % por
+  lado (`objectBoundingBox`, `-10%`/`120%`): un desenfoque amplio se corta en ese rectángulo.
+- **Corrección:** declarar la región en coordenadas del lienzo completo:
+  `filterUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%"`. Snapshot actualizado (1 línea) y visual-gate
+  de La órbita a cero píxeles en el resto del set. La lámina aprobada se recompuso y se transplantaron sólo los píxeles
+  que cambian, sin tocar la zona post-procesada (logo del cliente).
+- **Regla:** todo filtro con desenfoque o resplandor que pueda exceder su objeto declara su región. Ante un artefacto
+  visual, se corrige la **receta** del compositor, no se atenúa el síntoma en la imagen: el primer intento (difuminar
+  el borde a mano) fue rechazado por el operador porque «no se ve que se resolvió, solo atenuaste»; además dejaba el
+  defecto vivo para la próxima composición.
+
+## 2026-10-12 — Deck técnico para un cliente en línea Brand, con generador propio, y el motion de su campaña (Sika, Wherex N.º 1164)
+
+Mismo cliente que la entrada del 2026-10-07 («LIC-1164» allá); aquélla es el anexo gráfico, ésta el deck técnico (21
+láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
+
+- **Qué sale del compositor y qué no.** El deck lo arma un generador propio (`build-tecnica.py`, molde «propuesta para
+  leer sin presentador»): un solo script produce el HTML local (PNG y PDF) y los tableros del lienzo. Del compositor
+  (`pnpm brand:compose`) salen **sólo** tres láminas: portada (`cover-proposal`, layout `dawn`, línea `brand`), cierre
+  (`close-proposal`, línea `brand`) y caso (`decision-case`). De `@efeoncepro/axis-graphic-line` salen la navegación en
+  anillo y los íconos Trazo (`deckSlideHtml`, `resolveIcon`, `auditIconGroup`; `axis-assets.mjs`). Regla: lo que ya
+  existe aprobado se toma de su fuente; el generador propio cubre lo que el catálogo no tiene, no lo que sí tiene.
+- **La selección «Cliente» de `cover-proposal` · `dawn` tampoco se apaga desde el intent.** Es el mismo pendiente de la
+  entrada del 2026-10-07 (Pibank v10), en el layout `dawn`. Se quitó con `quitar-seleccion-dawn.mjs` (en la carpeta del
+  taller): `dawn` es simétrica en x = 960, así que la etiqueta y el cursor se reponen con el espejo del lado izquierdo;
+  el recuadro se rellena interpolando en vertical y los píxeles del logo del cliente se devuelven intactos. Sus cajas
+  están en coordenadas de 1920 px de ancho y medidas sobre esa portada. Regla: mirar al 100 % después de borrar; la
+  receta sigue pendiente.
+- **Una respuesta de dos líneas en esa portada se monta sobre la burbuja URL.** Regla: respuesta de una línea (la
+  portada quedó con «Así lo hacemos»).
+- **`decision-case` sólo compone en claro y en la línea `growth`.** Con línea Brand en claro falla el contrato
+  `line-piece-keeps-efeonce-dark` (una pieza de línea es oscura). En un deck Brand entra como lámina clara de Efeonce
+  en `growth`, a página completa, tal como la entrega el compositor. Ya estaba en la
+  [norma](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) («Recetas sólo claras»);
+  aquí se volvió a medir con Brand.
+- **El caso de éxito es la lámina aprobada, no una hecha a mano** (regla del operador, 2026-10-12). El generador traía
+  una lámina de caso propia y el operador la rechazó: va `decision-case` con la foto correcta del caso (pidió el avión
+  de Sky en lugar del ala al amanecer). Es la misma disciplina del sello y la firma de más abajo: lo aprobado se
+  reutiliza desde su generador.
+- **La lámina de equipo del compositor truncaba los nombres completos** y traía la selección «Cliente». Aquí se armó en
+  el generador con las fotos reales del squad (`src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`). Queda
+  como hecho del caso, no como regla: choca con la anterior («lo aprobado se reutiliza») y la corrección de fondo es
+  de la receta.
+- **En la capa de motion de un video de campaña del cliente manda el manual de esa campaña.** Síntoma: el operador
+  preguntó «¿Sientes que el video sigue la línea gráfica que se armó?»; no la seguía, y el agente había inventado una
+  caja «2 EN 1». Regla: el elemento aprobado se **reutiliza desde su generador** (el sello de lanzamiento salió de
+  `gen.sello_lanz` del manual, no se redibujó), nunca se inventa una variante; y **no se usa un elemento que el manual
+  reserva** (el triángulo rojo suelto queda para la firma y el logo). Lo mismo en la página del reel: la firma de la
+  campaña es el render de `gen.firma`. Inventar o redibujar lo aprobado fue rechazado dos veces en este caso.
+- **El generador en modo lienzo fallaba en silencio** cuando una imagen nueva no tenía su blob en `blobs.json`: al
+  sumar una imagen, revisar primero esa entrada.
+- Página del reel y su reproductor: [video-player.md](video-player.md#página-suelta-de-muestra-en-think-2026-10-12).

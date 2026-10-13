@@ -107,7 +107,7 @@ export const decisionPlatformCoexistence: RecipeBuilder = ({ intent, manifest, r
   const cards = exactly<PlatformIntent>(intent.platforms, platforms.count, 'Las plataformas que conviven (`platforms`)')
   const rows = exactly<CapabilityIntent>(intent.capabilities, decisions.rows, 'Las capacidades de la tabla (`capabilities`)')
   const selected = indexIn(intent.selectedCapability, decisions.rows, 'La fila elegida (`selectedCapability`)')
-  const icons = cards.map((card, i) => productIcon(card.icon, `La plataforma ${i + 1} (\`platforms[${i}].icon\`)`))
+  const icons = cards.map((card, i) => productIcon(card.icon, `La plataforma ${i + 1} (\`platforms[${i}].icon\`)`, line))
 
   const verdicts = rows.map((row, i) => {
     const value = req(row.verdict, `El veredicto de la fila ${i + 1} (\`capabilities[${i}].verdict\`)`)

@@ -1,0 +1,858 @@
+{
+  "as_of": "2026-10-06",
+  "cli_version": "1.1.0",
+  "available_catalog_endpoints": [
+    {
+      "id": "post:ai.optimization.ai.keyword.data.keywords.search.volume.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/ai_keyword_data/keywords_search_volume/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/ai_keyword_data/keywords_search_volume/live/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.ai.keyword.data.locations.and.languages",
+      "method": "GET",
+      "path": "/v3/ai_optimization/ai_keyword_data/locations_and_languages",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/ai_keyword_data/locations_and_languages/",
+      "free": true
+    },
+    {
+      "id": "post:ai.optimization.chat.gpt.llm.responses.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/chat_gpt/llm_responses/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_responses/live/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.responses.models",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_responses/models",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_responses/models/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.responses.task.get.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_responses/task_get/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_responses/task_get/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.chat.gpt.llm.responses.task.post",
+      "method": "POST",
+      "path": "/v3/ai_optimization/chat_gpt/llm_responses/task_post",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_responses/task_post/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.responses.tasks.ready",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_responses/tasks_ready",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_responses/tasks_ready/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.scraper.languages",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/languages",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/languages/",
+      "free": true
+    },
+    {
+      "id": "post:ai.optimization.chat.gpt.llm.scraper.live.advanced",
+      "method": "POST",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/live/advanced",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/live/advanced/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.chat.gpt.llm.scraper.live.html",
+      "method": "POST",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/live/html",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/live/html/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.scraper.locations",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/locations",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/locations/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.scraper.locations.country",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/locations/$country",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/locations/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.scraper.task.get.advanced.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/task_get/advanced/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/task_get/advanced/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.scraper.task.get.html.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/task_get/html/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/task_get/html/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.chat.gpt.llm.scraper.task.post",
+      "method": "POST",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/task_post",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/task_post/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.chat.gpt.llm.scraper.tasks.ready",
+      "method": "GET",
+      "path": "/v3/ai_optimization/chat_gpt/llm_scraper/tasks_ready",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/tasks_ready/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.claude.llm.responses.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/claude/llm_responses/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/claude/llm_responses/live/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.claude.llm.responses.models",
+      "method": "GET",
+      "path": "/v3/ai_optimization/claude/llm_responses/models",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/claude/llm_responses/models/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.claude.llm.responses.task.get.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/claude/llm_responses/task_get/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/claude/llm_responses/task_get/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.claude.llm.responses.task.post",
+      "method": "POST",
+      "path": "/v3/ai_optimization/claude/llm_responses/task_post",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/claude/llm_responses/task_post/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.claude.llm.responses.tasks.ready",
+      "method": "GET",
+      "path": "/v3/ai_optimization/claude/llm_responses/tasks_ready",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/claude/llm_responses/tasks_ready/",
+      "free": true
+    },
+    {
+      "id": "post:ai.optimization.gemini.llm.responses.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/gemini/llm_responses/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_responses/live/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.responses.models",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_responses/models",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_responses/models/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.responses.task.get.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_responses/task_get/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_responses/task_get/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.gemini.llm.responses.task.post",
+      "method": "POST",
+      "path": "/v3/ai_optimization/gemini/llm_responses/task_post",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_responses/task_post/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.responses.tasks.ready",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_responses/tasks_ready",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_responses/tasks_ready/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.scraper.languages",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/languages",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/languages/",
+      "free": true
+    },
+    {
+      "id": "post:ai.optimization.gemini.llm.scraper.live.advanced",
+      "method": "POST",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/live/advanced",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/live/advanced/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.gemini.llm.scraper.live.html",
+      "method": "POST",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/live/html",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/live/html/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.scraper.locations",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/locations",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/locations/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.scraper.task.get.advanced.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/task_get/advanced/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/task_get/advanced/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.scraper.task.get.html.id",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/task_get/html/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/task_get/html/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.gemini.llm.scraper.task.post",
+      "method": "POST",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/task_post",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/task_post/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.gemini.llm.scraper.tasks.ready",
+      "method": "GET",
+      "path": "/v3/ai_optimization/gemini/llm_scraper/tasks_ready",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/tasks_ready/",
+      "free": true
+    },
+    {
+      "id": "get:ai.optimization.llm.mentions.available.filters",
+      "method": "GET",
+      "path": "/v3/ai_optimization/llm_mentions/available_filters",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/filters/",
+      "free": true
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.historical.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/historical/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/historical/live/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.llm.mentions.locations.and.languages",
+      "method": "GET",
+      "path": "/v3/ai_optimization/llm_mentions/locations_and_languages",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/locations_and_languages/",
+      "free": true
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.multi.target.metrics.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/multi_target_metrics/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/multi_target_metrics/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.search.mentions.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/search_mentions/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/search_mentions/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.target.metrics.lite.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/target_metrics_lite/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/target_metrics_lite/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.target.metrics.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/target_metrics/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/target_metrics/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.timeseries.delta.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/timeseries_delta/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/timeseries_delta/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.timeseries.new.lost.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/timeseries_new_lost/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/timeseries_new_lost/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.brand.categories.lite.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_brand_categories_lite/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_brand_categories_lite/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.brand.categories.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_brand_categories/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_brand_categories/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.brands.lite.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_brands_lite/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_brands_lite/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.brands.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_brands/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_brands/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.domains.lite.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_domains_lite/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_domains_lite/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.domains.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_domains/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_domains/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.pages.lite.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_pages_lite/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_pages_lite/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.llm.mentions.top.mentioned.pages.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/llm_mentions/top_mentioned_pages/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/llm_mentions/top_mentioned_pages/live/",
+      "free": false
+    },
+    {
+      "id": "post:ai.optimization.perplexity.llm.responses.live",
+      "method": "POST",
+      "path": "/v3/ai_optimization/perplexity/llm_responses/live",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/perplexity/llm_responses/live/",
+      "free": false
+    },
+    {
+      "id": "get:ai.optimization.perplexity.llm.responses.models",
+      "method": "GET",
+      "path": "/v3/ai_optimization/perplexity/llm_responses/models",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "ai_optimization",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/ai_optimization/perplexity/llm_responses/models/",
+      "free": true
+    },
+    {
+      "id": "get:serp.google.ai.mode.languages",
+      "method": "GET",
+      "path": "/v3/serp/google/ai_mode/languages",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/languages/",
+      "free": true
+    },
+    {
+      "id": "post:serp.google.ai.mode.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/live/advanced",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/advanced/",
+      "free": false
+    },
+    {
+      "id": "post:serp.google.ai.mode.live.html",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/live/html",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/html/",
+      "free": false
+    },
+    {
+      "id": "get:serp.google.ai.mode.task.get.advanced.id",
+      "method": "GET",
+      "path": "/v3/serp/google/ai_mode/task_get/advanced/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/task_get/advanced/",
+      "free": false
+    },
+    {
+      "id": "get:serp.google.ai.mode.task.get.html.id",
+      "method": "GET",
+      "path": "/v3/serp/google/ai_mode/task_get/html/$id",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/task_get/html/",
+      "free": false
+    },
+    {
+      "id": "post:serp.google.ai.mode.task.post",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/task_post",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/task_post/",
+      "free": false
+    },
+    {
+      "id": "get:serp.google.ai.mode.tasks.ready",
+      "method": "GET",
+      "path": "/v3/serp/google/ai_mode/tasks_ready",
+      "execution": {
+        "status": "executable",
+        "internalFamily": "serp",
+        "reason": null,
+        "enablement": null
+      },
+      "documentation_url": "https://docs.dataforseo.com/v3/serp/google/ai_mode/tasks_ready/",
+      "free": false
+    }
+  ],
+  "live_free_preflight": {
+    "mentions_peru": [
+      {
+        "location_code": 2604,
+        "location_name": "Peru",
+        "available_languages": [
+          {
+            "available_platforms": [
+              "google"
+            ],
+            "language_name": "Spanish",
+            "language_code": "es",
+            "responses_count": 987733
+          }
+        ]
+      }
+    ],
+    "chatgpt_models_count": 49,
+    "chatgpt_web_search_models": [
+      "o4-mini",
+      "o4-mini-2025-04-16",
+      "gpt-6.1-sol",
+      "gpt-6-sol",
+      "gpt-6-luna",
+      "gpt-6-astra",
+      "gpt-5.6-terra",
+      "gpt-5.6-sol",
+      "gpt-5.6-luna",
+      "gpt-5.5",
+      "gpt-5.5-2026-04-23",
+      "gpt-5.4-nano",
+      "gpt-5.4-nano-2026-03-17",
+      "gpt-5.4-mini",
+      "gpt-5.4-mini-2026-03-17",
+      "gpt-5.4",
+      "gpt-5.4-2026-03-05",
+      "gpt-5.2",
+      "gpt-5.2-2025-12-11",
+      "gpt-5.1",
+      "gpt-5.1-2025-11-13",
+      "gpt-5-nano",
+      "gpt-5-nano-2025-08-07",
+      "gpt-5-mini",
+      "gpt-5-mini-2025-08-07",
+      "gpt-5",
+      "gpt-5-2025-08-07",
+      "gpt-4o-mini",
+      "gpt-4o-mini-2024-07-18",
+      "gpt-4o",
+      "gpt-4o-2024-05-13",
+      "gpt-4o-2024-08-06",
+      "gpt-4o-2024-11-20",
+      "gpt-4.1-mini",
+      "gpt-4.1-mini-2025-04-14",
+      "gpt-4.1",
+      "gpt-4.1-2025-04-14"
+    ],
+    "observed_cost_usd": 0
+  },
+  "captures_for_pibank": {
+    "llm_responses": false,
+    "consumer_scraper": false,
+    "ai_mode": false,
+    "llm_mentions": false
+  },
+  "baseline": "not_measured",
+  "notes": [
+    "Mentions Perú/es sólo google, noChatGPT; responses_count es tamaño corpus delproveedor no búsquedas ni mencionesPibank",
+    "APIResponses no equivalen consumerinterface; disponibilidadcatálogo no certifica benchmark",
+    "OrganicSERP may contain provider cached AI features; report separately if returned, never portray as paidLLMbenchmark",
+    "No special schema or AIfile required per Google official AIfeatures documentation"
+  ]
+}

@@ -1,0 +1,25 @@
+
+> @efeoncepro/axis-design-system-workspace@0.1.0 typecheck /Users/jreye/Documents/axis-design-system
+> pnpm -r typecheck
+
+Scope: 6 of 7 workspace projects
+packages/tokens typecheck$ tsc -p tsconfig.json --noEmit
+packages/tokens typecheck: Done
+packages/brand-assets typecheck$ tsc -p tsconfig.json --noEmit
+packages/brand-assets typecheck: Done
+packages/contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/contracts typecheck: Done
+packages/graphic-line typecheck$ tsc -p tsconfig.json --noEmit
+packages/registry typecheck$ tsc -p tsconfig.json --noEmit
+packages/registry typecheck: Done
+packages/graphic-line typecheck: Done
+apps/lab typecheck$ astro check
+apps/lab typecheck: 09:22:14 [content] Syncing content
+apps/lab typecheck: 09:22:14 [content] Synced content
+apps/lab typecheck: 09:22:14 [types] Generated 333ms
+apps/lab typecheck: 09:22:14 [check] Getting diagnostics for Astro files in /Users/jreye/Documents/axis-design-system/apps/lab...
+apps/lab typecheck: Result (53 files): 
+apps/lab typecheck: - 0 errors
+apps/lab typecheck: - 0 warnings
+apps/lab typecheck: - 0 hints
+apps/lab typecheck: Done

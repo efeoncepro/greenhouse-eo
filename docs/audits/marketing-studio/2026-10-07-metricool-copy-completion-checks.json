@@ -1,0 +1,253 @@
+{
+  "verifiedAt": "2026-10-07T11:31:13.522797+00:00",
+  "correctedCopies": 25,
+  "newActivationsWithLiteralCopy": 26,
+  "newActivations": 0,
+  "calendarActivations": 29,
+  "previousSkyPreserved": 3,
+  "unlinkedPending": 0,
+  "unlinkedHistorical": 31,
+  "sourceImport": {
+    "copiesAdded": 23,
+    "campaignMetadataAndConceptTitlesPreserved": true
+  },
+  "studioCopiesCreated": 2,
+  "datesAccountsAssetsAndExecutionPreserved": true,
+  "campaignReorganizationApplied": false,
+  "records": [
+    {
+      "activationId": "ACT-000007",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381374989",
+      "providerRef": "381374989",
+      "characters": 814,
+      "sha256": "4ef0817d5b3b1acd8cc4672afdc2fdd169d12140f0b843c9d2f0329d6c45d5d0",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000008",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381374962",
+      "providerRef": "381374962",
+      "characters": 406,
+      "sha256": "8e398d172964dbaf794e2608a7b8807bd63bf8b89ffd5e9c40b3e52f8021c757",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000009",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375135",
+      "providerRef": "381375135",
+      "characters": 930,
+      "sha256": "a5c9f0c0492d1e50e16b5bd911209cfd9b1ae4c4b7435aca4cf747cfc8e571d5",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000010",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381374856",
+      "providerRef": "381374856",
+      "characters": 474,
+      "sha256": "c31486586d27afcd04cb9643e40a25a902fa32704513f78327d06a52ab51c55a",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000011",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375186",
+      "providerRef": "381375186",
+      "characters": 619,
+      "sha256": "d2748fcbb3b31d62e268c063a7c3cfc01d0699b4f9c637d76eeb4f46e328ef8d",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000012",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375326",
+      "providerRef": "381375326",
+      "characters": 455,
+      "sha256": "bde726e123e98eb40835b89717468a5ac81630c8d9cba0c23969cde45db3286d",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000013",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375084",
+      "providerRef": "381375084",
+      "characters": 670,
+      "sha256": "e1810c4e9cd95dcab4200f2586e2e2832ee5ed922dc927ef4e7da7857f34606c",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000014",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375256",
+      "providerRef": "381375256",
+      "characters": 869,
+      "sha256": "35d4155c0549dd74697d2edf823a7598bd8f4d28646c3fee3d53e20e54205af7",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000015",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375293",
+      "providerRef": "381375293",
+      "characters": 681,
+      "sha256": "f194623d894d45909a70907e8c311834d17a4a5ce3d8a8ba739f4103fa83a164",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000016",
+      "campaignId": "CMP-006",
+      "copyId": "CMP-006-copy-4e1d0a8d6f",
+      "providerRef": "375165858",
+      "characters": 438,
+      "sha256": "910ac6ca5eef77cf4e76daf0322137e77edd1e1b605bcd22d9f4b6265e1db835",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000017",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375121",
+      "providerRef": "381375121",
+      "characters": 410,
+      "sha256": "e9a8007c5356a5b3a03ad1cef39752b893083ba79a33d37183b1a1c58df92ff9",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000018",
+      "campaignId": "CMP-006",
+      "copyId": "CMP-006-copy-2370ceedaa",
+      "providerRef": "375165897",
+      "characters": 234,
+      "sha256": "9456a6d30de3b1df0dbb49b9398c54460024a11ace96a1dfcf99e6abce24890b",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000019",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375007",
+      "providerRef": "381375007",
+      "characters": 401,
+      "sha256": "d8a3c6877665181ec076687cd29b3c184b7f092799cfed2ed20f32dbd100c85b",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000020",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375210",
+      "providerRef": "381375210",
+      "characters": 907,
+      "sha256": "71aba7893eb0a42e2c58ce5db778cae22ccf11ddd016b2f9ce3bb6ee1f9c478f",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000021",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375309",
+      "providerRef": "381375309",
+      "characters": 673,
+      "sha256": "02e8075793a2fe9e73b6f9328e80f34d8e3e38a557e7a6ae4cb47beb1f4823de",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000022",
+      "campaignId": "CMP-001",
+      "copyId": "copy-08-linkedin-a",
+      "providerRef": "387560873",
+      "characters": 1176,
+      "sha256": "d99d4255af3f2198bddb11da647e4735dd061ef8dc0e8f54d98337ab5e6f6e75",
+      "revision": 2
+    },
+    {
+      "activationId": "ACT-000023",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375099",
+      "providerRef": "381375099",
+      "characters": 815,
+      "sha256": "0287c8d4b66cd744767e22d9f24cbc89cdb4dd107d2ea1dc22cb9b0e38355dd6",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000024",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375024",
+      "providerRef": "381375024",
+      "characters": 668,
+      "sha256": "0e2b69675a5c1dce47b619b2238dfa3175a073cb746533479950c56676f56bd3",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000025",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375059",
+      "providerRef": "381375059",
+      "characters": 473,
+      "sha256": "2b66c7a1ebc673d90cfb0f5b89982b0c9368c656e81e4d49783aab6d7934ecbe",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000026",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381374755",
+      "providerRef": "381374755",
+      "characters": 413,
+      "sha256": "dcb033d6f8e5dc35d390f17e900663aa3fb79cf38ac3d8f4adc69e059d7a3f8c",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000027",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381374917",
+      "providerRef": "381374917",
+      "characters": 847,
+      "sha256": "cdcff2e52ed9941c1dcdcd7a9bb8565c6f61e099d666aa854978954b47976483",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000028",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375340",
+      "providerRef": "381375340",
+      "characters": 775,
+      "sha256": "054283014151745fa0d0e3ab588354aabda6c2ca98bbe15c1b6bc119b89c415e",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000029",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381375199",
+      "providerRef": "381375199",
+      "characters": 419,
+      "sha256": "ae8ef2f5d1940381e1785649e301af77e76436bce02aafea98ef59c60ef33407",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000030",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375156",
+      "providerRef": "381375156",
+      "characters": 459,
+      "sha256": "e1339edae2a0e16bb055e908c76038a9b54812bdbf9f48ecb0aab67efbe271ae",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000031",
+      "campaignId": "CMP-002",
+      "copyId": "CMP-002-copy-metricool-381374938",
+      "providerRef": "381374938",
+      "characters": 676,
+      "sha256": "b241c0b714f52616547dc8ee1bfdc85c9bbefaa85e3f6adf07983a8bc37ce288",
+      "revision": 3
+    },
+    {
+      "activationId": "ACT-000032",
+      "campaignId": "CMP-001",
+      "copyId": "CMP-001-copy-metricool-381375235",
+      "providerRef": "381375235",
+      "characters": 450,
+      "sha256": "38131fe1c39a29aef4c1feb5aa477e5d896fc51a79f64e6eb34770392a708612",
+      "revision": 3
+    }
+  ]
+}

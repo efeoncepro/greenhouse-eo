@@ -1,0 +1,1137 @@
+{
+  "artifactVersion": "pricing-v3-local-artifact/1",
+  "calculationId": "local-0508be7853064ab4d7297330",
+  "replayDigest": "0508be7853064ab4d7297330b875fcf50bc94ef268e061c9bc708c289cafb614",
+  "semantic": {
+    "engineVersion": "pricing-v3-local/1.0.0",
+    "input": {
+      "request": {
+        "schemaVersion": "1.0.0",
+        "quoteDate": "2026-10-09",
+        "offerId": "talent-assurance-staffing",
+        "deliveryModel": "staffing",
+        "engagementCode": "monthly",
+        "offerMarketCountry": "CL",
+        "outputCurrency": "USD",
+        "duration": {
+          "unit": "month",
+          "periods": 3
+        },
+        "lines": [
+          {
+            "lineId": "design",
+            "profileId": "ECG-002",
+            "seniorityCode": "senior",
+            "talentCountry": "CO",
+            "headcount": 1,
+            "dedication": {
+              "unit": "fte",
+              "value": "1"
+            },
+            "allocationMode": "shared",
+            "allocationPolicyRef": "hyp-shared",
+            "assignments": [
+              {
+                "resourceId": "hyp-ETG-001",
+                "allocationId": "hyp-assignment-hyp-ETG-001",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-ETG-015",
+                "allocationId": "hyp-assignment-hyp-ETG-015",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-ETG-016",
+                "allocationId": "hyp-assignment-hyp-ETG-016",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-ETG-007",
+                "allocationId": "hyp-assignment-hyp-ETG-007",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-platform",
+                "allocationId": "hyp-assignment-hyp-platform",
+                "scope": "person",
+                "scopeRef": "prototype-person",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-assurance",
+                "allocationId": "hyp-assignment-hyp-assurance",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-ops",
+                "allocationId": "hyp-assignment-hyp-ops",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "monthly"
+              },
+              {
+                "resourceId": "hyp-onboarding",
+                "allocationId": "hyp-assignment-hyp-onboarding",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "quantity": "1",
+                "share": "1",
+                "cashTiming": "start"
+              }
+            ],
+            "notApplicable": []
+          }
+        ],
+        "adjustments": [],
+        "taxTreatment": {
+          "kind": "not_resolved"
+        }
+      },
+      "snapshot": {
+        "schemaVersion": "1.0.0",
+        "snapshotId": "hyp-historical-co-cl-design",
+        "version": "hypothesis-2026-10-09-v1",
+        "mode": "historical",
+        "calculationCurrency": "USD",
+        "countries": [
+          "CO",
+          "CL"
+        ],
+        "currencies": [
+          {
+            "code": "USD",
+            "precision": 2
+          },
+          {
+            "code": "CLP",
+            "precision": 0
+          }
+        ],
+        "profiles": [
+          {
+            "profileId": "ECG-002",
+            "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+            "seniorityCode": "senior",
+            "tierCode": "hyp-historical-tier-2",
+            "cost": {
+              "amount": "1310",
+              "currency": "USD",
+              "source": {
+                "reference": "hypothesis-only:human-cost-CO-assumed",
+                "effectiveFrom": "2026-10-09",
+                "effectiveUntil": "2026-10-09",
+                "status": "estimated"
+              },
+              "localization": {
+                "kind": "specific",
+                "country": "CO"
+              },
+              "unit": "month",
+              "covers": [
+                "human_salary",
+                "human_bonuses"
+              ]
+            },
+            "requiredCoverages": [
+              "human_salary",
+              "human_bonuses",
+              "tool:design",
+              "tool:tracking",
+              "tool:collaboration",
+              "tool:ai",
+              "platform_fee",
+              "talent_assurance",
+              "operations",
+              "setup"
+            ]
+          }
+        ],
+        "allocationPolicies": [
+          {
+            "policyId": "hyp-shared",
+            "mode": "shared",
+            "hoursPerFteMonth": "180",
+            "minimumBilledFte": "0",
+            "dedicatedBilledFte": "1",
+            "source": {
+              "reference": "hypothesis-only:shared-capacity-180",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            }
+          },
+          {
+            "policyId": "hyp-dedicated",
+            "mode": "dedicated",
+            "hoursPerFteMonth": "180",
+            "minimumBilledFte": "0",
+            "dedicatedBilledFte": "1",
+            "source": {
+              "reference": "hypothesis-only:dedicated-full-commitment",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            }
+          }
+        ],
+        "pricingPolicies": [
+          {
+            "profileId": "ECG-002",
+            "tierCode": "hyp-historical-tier-2",
+            "offerId": "talent-assurance-staffing",
+            "engagementCode": "monthly",
+            "method": "markup",
+            "rate": "0.30",
+            "basis": "all_costs",
+            "minimumMargin": "0",
+            "source": {
+              "reference": "hypothesis-only:historical-markup-no-approved-floor",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            }
+          }
+        ],
+        "talentFactors": [],
+        "marketFactors": [
+          {
+            "country": "CL",
+            "factor": "1",
+            "source": {
+              "reference": "hypothesis-only:neutral-market-experiment",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            }
+          }
+        ],
+        "resources": [
+          {
+            "amount": "20",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:tool-ETG-001",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-ETG-001",
+            "label": "HISTÓRICO ATRIBUIDO — Adobe Creative Cloud",
+            "kind": "tool",
+            "unit": "month",
+            "scope": "account",
+            "covers": [
+              "tool:design"
+            ]
+          },
+          {
+            "amount": "24",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:tool-ETG-015",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-ETG-015",
+            "label": "HISTÓRICO ATRIBUIDO — Notion",
+            "kind": "tool",
+            "unit": "month",
+            "scope": "account",
+            "covers": [
+              "tool:tracking"
+            ]
+          },
+          {
+            "amount": "16",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:tool-ETG-016",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-ETG-016",
+            "label": "HISTÓRICO ATRIBUIDO — Microsoft 365",
+            "kind": "tool",
+            "unit": "month",
+            "scope": "account",
+            "covers": [
+              "tool:collaboration"
+            ]
+          },
+          {
+            "amount": "5",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:tool-ETG-007",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-ETG-007",
+            "label": "HISTÓRICO ATRIBUIDO — ChatGPT Plus",
+            "kind": "tool",
+            "unit": "month",
+            "scope": "account",
+            "covers": [
+              "tool:ai"
+            ]
+          },
+          {
+            "amount": "49",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:full-platform-fee",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-platform",
+            "label": "HISTÓRICO — fee genérico completo",
+            "kind": "platform_fee",
+            "unit": "month",
+            "scope": "person",
+            "covers": [
+              "platform_fee"
+            ]
+          },
+          {
+            "amount": "25",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:test-assurance-cost",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-assurance",
+            "label": "PRUEBA, NO COSTO MEDIDO — Talent Assurance de prueba",
+            "kind": "talent_assurance",
+            "unit": "month",
+            "scope": "account",
+            "covers": [
+              "talent_assurance"
+            ]
+          },
+          {
+            "amount": "25",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:test-operations-cost",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-ops",
+            "label": "PRUEBA, NO COSTO MEDIDO — Operación de prueba",
+            "kind": "operations",
+            "unit": "month",
+            "scope": "account",
+            "covers": [
+              "operations"
+            ]
+          },
+          {
+            "amount": "100",
+            "currency": "USD",
+            "source": {
+              "reference": "hypothesis-only:test-onboarding-cost",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            },
+            "resourceId": "hyp-onboarding",
+            "label": "PRUEBA, NO COSTO MEDIDO — Onboarding de prueba",
+            "kind": "setup",
+            "unit": "once",
+            "scope": "account",
+            "covers": [
+              "setup"
+            ]
+          }
+        ],
+        "fx": [
+          {
+            "from": "USD",
+            "to": "CLP",
+            "rate": "1000",
+            "source": {
+              "reference": "hypothesis-only:historical-FX-not-current",
+              "effectiveFrom": "2026-10-09",
+              "effectiveUntil": "2026-10-09",
+              "status": "estimated"
+            }
+          }
+        ]
+      }
+    },
+    "result": {
+      "engineVersion": "pricing-v3-local/1.0.0",
+      "binding": false,
+      "calculationStatus": "calculated",
+      "reviewStatus": "requires_review",
+      "dataMode": "historical",
+      "calculationCurrency": "USD",
+      "outputCurrency": "USD",
+      "diagnostics": [
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.marketFactors",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "HISTORICAL_ONLY",
+          "fieldPath": "snapshot.mode",
+          "severity": "review",
+          "message": "Pricing input requires attention: HISTORICAL_ONLY",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "request.lines.0.allocationPolicyRef",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.pricingPolicies.ECG-002",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.profiles.ECG-002.cost",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-ETG-001",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-ETG-015",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-ETG-016",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-ETG-007",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-platform",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-assurance",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-ops",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        },
+        {
+          "code": "ESTIMATED_SOURCE",
+          "fieldPath": "snapshot.resources.hyp-onboarding",
+          "lineId": "design",
+          "severity": "review",
+          "message": "Pricing input requires attention: ESTIMATED_SOURCE",
+          "resolution": "Supply or correct the explicitly referenced record; no implicit fallback is applied."
+        }
+      ],
+      "lines": [
+        {
+          "lineId": "design:1:monthly",
+          "parentLineId": "design",
+          "periodId": 1,
+          "kind": "monthly",
+          "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+          "cost": "1474.00",
+          "undiscountedPrice": "1916.20",
+          "discount": "0.00",
+          "net": "1916.20",
+          "marginAmount": "442.20",
+          "components": [
+            {
+              "componentId": "design:human",
+              "kind": "human",
+              "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+              "cost": "1310",
+              "price": "1703",
+              "cashCommitment": "1310",
+              "coverage": [
+                "human_salary",
+                "human_bonuses"
+              ],
+              "trace": {
+                "billedFte": "1",
+                "requestedFte": "1",
+                "headcount": "1",
+                "costFactor": "1",
+                "costLocalization": "specific",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-001",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Adobe Creative Cloud",
+              "cost": "20",
+              "price": "26",
+              "cashCommitment": "20",
+              "coverage": [
+                "tool:design"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-015",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Notion",
+              "cost": "24",
+              "price": "31.2",
+              "cashCommitment": "24",
+              "coverage": [
+                "tool:tracking"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-016",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Microsoft 365",
+              "cost": "16",
+              "price": "20.8",
+              "cashCommitment": "16",
+              "coverage": [
+                "tool:collaboration"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-007",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — ChatGPT Plus",
+              "cost": "5",
+              "price": "6.5",
+              "cashCommitment": "5",
+              "coverage": [
+                "tool:ai"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-platform",
+              "kind": "platform_fee",
+              "label": "HISTÓRICO — fee genérico completo",
+              "cost": "49",
+              "price": "63.7",
+              "cashCommitment": "49",
+              "coverage": [
+                "platform_fee"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "person",
+                "scopeRef": "prototype-person",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-assurance",
+              "kind": "talent_assurance",
+              "label": "PRUEBA, NO COSTO MEDIDO — Talent Assurance de prueba",
+              "cost": "25",
+              "price": "32.5",
+              "cashCommitment": "25",
+              "coverage": [
+                "talent_assurance"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ops",
+              "kind": "operations",
+              "label": "PRUEBA, NO COSTO MEDIDO — Operación de prueba",
+              "cost": "25",
+              "price": "32.5",
+              "cashCommitment": "25",
+              "coverage": [
+                "operations"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            }
+          ],
+          "minimumMargin": "0"
+        },
+        {
+          "lineId": "design:1:setup",
+          "parentLineId": "design",
+          "periodId": 1,
+          "kind": "setup",
+          "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+          "cost": "100.00",
+          "undiscountedPrice": "130.00",
+          "discount": "0.00",
+          "net": "130.00",
+          "marginAmount": "30.00",
+          "components": [
+            {
+              "componentId": "hyp-assignment-hyp-onboarding",
+              "kind": "setup",
+              "label": "PRUEBA, NO COSTO MEDIDO — Onboarding de prueba",
+              "cost": "100",
+              "price": "130",
+              "cashCommitment": "100",
+              "coverage": [
+                "setup"
+              ],
+              "trace": {
+                "unit": "once",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            }
+          ],
+          "minimumMargin": "0"
+        },
+        {
+          "lineId": "design:2:monthly",
+          "parentLineId": "design",
+          "periodId": 2,
+          "kind": "monthly",
+          "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+          "cost": "1474.00",
+          "undiscountedPrice": "1916.20",
+          "discount": "0.00",
+          "net": "1916.20",
+          "marginAmount": "442.20",
+          "components": [
+            {
+              "componentId": "design:human",
+              "kind": "human",
+              "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+              "cost": "1310",
+              "price": "1703",
+              "cashCommitment": "1310",
+              "coverage": [
+                "human_salary",
+                "human_bonuses"
+              ],
+              "trace": {
+                "billedFte": "1",
+                "requestedFte": "1",
+                "headcount": "1",
+                "costFactor": "1",
+                "costLocalization": "specific",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-001",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Adobe Creative Cloud",
+              "cost": "20",
+              "price": "26",
+              "cashCommitment": "20",
+              "coverage": [
+                "tool:design"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-015",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Notion",
+              "cost": "24",
+              "price": "31.2",
+              "cashCommitment": "24",
+              "coverage": [
+                "tool:tracking"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-016",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Microsoft 365",
+              "cost": "16",
+              "price": "20.8",
+              "cashCommitment": "16",
+              "coverage": [
+                "tool:collaboration"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-007",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — ChatGPT Plus",
+              "cost": "5",
+              "price": "6.5",
+              "cashCommitment": "5",
+              "coverage": [
+                "tool:ai"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-platform",
+              "kind": "platform_fee",
+              "label": "HISTÓRICO — fee genérico completo",
+              "cost": "49",
+              "price": "63.7",
+              "cashCommitment": "49",
+              "coverage": [
+                "platform_fee"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "person",
+                "scopeRef": "prototype-person",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-assurance",
+              "kind": "talent_assurance",
+              "label": "PRUEBA, NO COSTO MEDIDO — Talent Assurance de prueba",
+              "cost": "25",
+              "price": "32.5",
+              "cashCommitment": "25",
+              "coverage": [
+                "talent_assurance"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ops",
+              "kind": "operations",
+              "label": "PRUEBA, NO COSTO MEDIDO — Operación de prueba",
+              "cost": "25",
+              "price": "32.5",
+              "cashCommitment": "25",
+              "coverage": [
+                "operations"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            }
+          ],
+          "minimumMargin": "0"
+        },
+        {
+          "lineId": "design:3:monthly",
+          "parentLineId": "design",
+          "periodId": 3,
+          "kind": "monthly",
+          "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+          "cost": "1474.00",
+          "undiscountedPrice": "1916.20",
+          "discount": "0.00",
+          "net": "1916.20",
+          "marginAmount": "442.20",
+          "components": [
+            {
+              "componentId": "design:human",
+              "kind": "human",
+              "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+              "cost": "1310",
+              "price": "1703",
+              "cashCommitment": "1310",
+              "coverage": [
+                "human_salary",
+                "human_bonuses"
+              ],
+              "trace": {
+                "billedFte": "1",
+                "requestedFte": "1",
+                "headcount": "1",
+                "costFactor": "1",
+                "costLocalization": "specific",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-001",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Adobe Creative Cloud",
+              "cost": "20",
+              "price": "26",
+              "cashCommitment": "20",
+              "coverage": [
+                "tool:design"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-015",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Notion",
+              "cost": "24",
+              "price": "31.2",
+              "cashCommitment": "24",
+              "coverage": [
+                "tool:tracking"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-016",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — Microsoft 365",
+              "cost": "16",
+              "price": "20.8",
+              "cashCommitment": "16",
+              "coverage": [
+                "tool:collaboration"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ETG-007",
+              "kind": "tool",
+              "label": "HISTÓRICO ATRIBUIDO — ChatGPT Plus",
+              "cost": "5",
+              "price": "6.5",
+              "cashCommitment": "5",
+              "coverage": [
+                "tool:ai"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-platform",
+              "kind": "platform_fee",
+              "label": "HISTÓRICO — fee genérico completo",
+              "cost": "49",
+              "price": "63.7",
+              "cashCommitment": "49",
+              "coverage": [
+                "platform_fee"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "person",
+                "scopeRef": "prototype-person",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-assurance",
+              "kind": "talent_assurance",
+              "label": "PRUEBA, NO COSTO MEDIDO — Talent Assurance de prueba",
+              "cost": "25",
+              "price": "32.5",
+              "cashCommitment": "25",
+              "coverage": [
+                "talent_assurance"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            },
+            {
+              "componentId": "hyp-assignment-hyp-ops",
+              "kind": "operations",
+              "label": "PRUEBA, NO COSTO MEDIDO — Operación de prueba",
+              "cost": "25",
+              "price": "32.5",
+              "cashCommitment": "25",
+              "coverage": [
+                "operations"
+              ],
+              "trace": {
+                "unit": "month",
+                "quantity": "1",
+                "share": "1",
+                "scope": "account",
+                "scopeRef": "prototype-account",
+                "marketFactor": "1",
+                "pricingMultiplier": "1.3",
+                "calculationCurrency": "USD",
+                "outputFx": "1"
+              }
+            }
+          ],
+          "minimumMargin": "0"
+        }
+      ],
+      "totals": {
+        "cost": "4522.00",
+        "undiscountedPrice": "5878.60",
+        "discount": "0.00",
+        "net": "5878.60",
+        "marginAmount": "1356.60",
+        "marginRate": "0.23076923076923076923076923076923076923076923076923076923076923076923076923076923",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "4522.00",
+        "uniformMonthlyNet": "1916.20"
+      },
+      "precisionPolicy": "decimal-80-half-up-final-line-largest-remainder-v1"
+    }
+  },
+  "execution": {
+    "createdAt": "2026-10-09T12:33:11.336Z"
+  }
+}

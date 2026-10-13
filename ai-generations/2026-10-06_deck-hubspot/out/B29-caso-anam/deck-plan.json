@@ -1,0 +1,84 @@
+{
+  "tenderId": "hs-B29-r3",
+  "slides": [
+    {
+      "slideId": "deck-decision-case",
+      "contentType": "deck.decision-case",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 104,
+          "questionTop": 210,
+          "answerTop": 280,
+          "answerPx": 124,
+          "panelWidth": "--gl-dc-panel-width=1000px",
+          "panelRadius": "--gl-dc-panel-radius=300px",
+          "photoLeft": "--gl-dc-photo-left=660px",
+          "logoGap": "--gl-dc-logo-gap=22px",
+          "logoMaxWidth": "--gl-dc-logo-max-width=200px",
+          "logoMaxHeight": "--gl-dc-logo-max-height=70px",
+          "figuresTop": "--gl-dc-figures-top=470px",
+          "figuresWidth": "--gl-dc-figures-width=760px",
+          "figuresRowGap": "--gl-dc-figures-row-gap=34px",
+          "figuresColumnGap": "--gl-dc-figures-column-gap=50px",
+          "figureRule": "--gl-dc-figure-rule=2px",
+          "figurePadTop": "--gl-dc-figure-pad-top=16px",
+          "figurePx": "--gl-dc-figure-px=104px",
+          "figureWght": "--gl-dc-figure-wght=300",
+          "figureLeading": "--gl-dc-figure-leading=0.95",
+          "figureTracking": "--gl-dc-figure-tracking=-0.04em",
+          "labelPx": "--gl-dc-label-px=22px",
+          "labelGap": "--gl-dc-label-gap=8px",
+          "sourceTop": "--gl-dc-source-top=938px",
+          "sourcePx": "--gl-dc-source-px=16px",
+          "sourceWidth": "--gl-dc-source-width=760px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:T3-mide",
+          "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente"
+        },
+        "voice": {
+          "question": "¿Qué ganó su equipo?",
+          "answer": "Tiempo",
+          "eyebrow": "Caso de cliente"
+        },
+        "clientLogo": {
+          "src": "asset-ref:file:anam",
+          "alt": "ANAM"
+        },
+        "figures": [
+          {
+            "value": "−57 %",
+            "label": "carga comercial"
+          },
+          {
+            "value": "+32 %",
+            "label": "ventas en 7 meses"
+          },
+          {
+            "value": "5",
+            "label": "rutas hacia una persona"
+          },
+          {
+            "value": "23",
+            "label": "fuentes de conocimiento"
+          }
+        ],
+        "source": "Fuente: ANAM, 2026 · casos publicados de ANAM en efeoncepro.com, julio de 2026",
+        "selection": {
+          "label": "HubSpot",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionCase"
+    }
+  ]
+}

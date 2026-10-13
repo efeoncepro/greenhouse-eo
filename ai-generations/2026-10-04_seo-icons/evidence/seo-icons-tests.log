@@ -1,0 +1,68 @@
+
+> @efeoncepro/axis-graphic-line@0.17.0 test /Users/jreye/Documents/axis-design-system/packages/graphic-line
+> node --test dist/*.test.js
+
+✔ the nine recipes paint from their data and pass every check of the register (2.872917ms)
+✔ geometric parity with the canvas v39 (same data, same numbers) (0.434375ms)
+✔ the measure is measureSvg: the sphere sits where AXIS puts it, at 0.05, 0.38, 0.62, 0.9 and 1 (3.025584ms)
+✔ the topic line paints the accent; accentPaint swaps it for a CSS value everywhere (0.767458ms)
+✔ a recipe never paints invalid data: it throws the contract code (0.491917ms)
+✔ the checks catch a broken piece: small accent text, a loose circle, a second sphere (0.367458ms)
+✔ deterministic, and La órbita never receives the charts: the root export does not re-export them (1.694292ms)
+✔ contract 0.3.0: the labels travel in the chart data; an explicit option still wins (0.243541ms)
+✔ Approved AEO glyphs keep margin and sphere clearance at regular and small optical widths (3.293208ms)
+✔ AEO collection delegates to canonical icons at every size, surface and state (3.752208ms)
+✔ mention, citation and recommendation remain three separate concepts (0.133583ms)
+✔ Approved check inputs match package geometry exactly (2.072042ms)
+✔ SEO geometry keeps the grid, margin, replacement rule and clearance at both optical widths (7.956917ms)
+✔ SEO review separates twelve candidates from twelve unchanged canonical glyphs (3.990666ms)
+✔ SEO candidates do not duplicate one another or any canonical glyph, including AEO (0.3435ms)
+✔ SEO review validates keys and escapes accessible labels through the shared painter (0.189459ms)
+✔ the catalog holds the approved set: 60 stroke and 49 plastilina glyphs, unique keys (0.58725ms)
+✔ stroke glyphs: the sphere keeps 0.5 of air from every stroke at width 1.5 (sampled geometry) (2.168334ms)
+✔ stroke glyphs: every axis point stays inside the margin (the stroke edge may reach 1.25) (6.544208ms)
+✔ stroke optical width: 1.75 at 20 px or less, 1.5 between, capped at 4 px on screen above 64 (0.079959ms)
+✔ response draws one sphere in the accent of the piece line; rest draws none (0.190416ms)
+✔ a response below 20 px falls back to rest with a warning; plastilina below 32 px is refused (0.20575ms)
+✔ plastilina response knocks the sphere out of the body; gesture only where it is drawn, in ink (0.224167ms)
+✔ icons are decorative by default and named when labelled; unknown glyphs point to the method (0.070166ms)
+✔ the icon ground is #001a33 for every line (D21) and the voice follows the line (0.056666ms)
+✔ group audit: one voice, one response, no response when the piece already has a sphere (0.122916ms)
+✔ skewed orbit hero: object at rest, back half before it, front half and arc after, one sphere (0.371791ms)
+✔ one orbit comes entirely from the tokens of its line (1.93725ms)
+✔ the painter is deterministic: server and client render the same bytes (0.267167ms)
+✔ an explicit circle is the ring, without the air the contract adds around a target (0.109ms)
+✔ Efeonce signs a composition on any line (0.135166ms)
+✔ adapter checks: text never crosses the ring, the SVG stays decorative (0.519917ms)
+✔ motion follows the brand close of the tokens and honors reduced motion (0.095375ms)
+✔ React and Web Component render the same SVG on the server (2.701125ms)
+✔ the static orbits of axis-brand-assets are exactly what this package draws (byte by byte) (2.478333ms)
+✔ trajectory norm: a datum is where the sphere is, with its short trail over the faint travelled path (0.496542ms)
+✔ the canvas forms: satellites fade in without sphere, family map, spotlight, flat orbit and state (0.382583ms)
+✔ recipes rebuild the canvas cases: lens (wall, deck cover, post, story) and spotlight, text never across the ring (0.7365ms)
+✔ 4.5 · the orbit around a portrait and the divider that ends in the sphere (0.400917ms)
+✔ 4.2 · deck navigation: cover short arc, sections add their stretch, content indicator 80 px, close completes (0.372833ms)
+✔ motion: the piece closes with its signature, the spotlight sweeps, and any instant is a still frame (0.074458ms)
+✔ the sphere is part of the answer: guides, crop marks and a selection measure the words WITH it (0.085333ms)
+✔ every fixed-format recipe paints its canvas piece: ring, arc and sphere as measured (1.3, 1.4, 4.2) (0.664125ms)
+✔ the generic orbit is the canvas orbit: ring 16 %, accent arc 200° → 250° and the sphere at the low end (1.2, 3.2) (0.0905ms)
+✔ a recipe with something inside draws one ring: no inner orbits in the lens, the deck or a brand close (0.1715ms)
+✔ different pieces never share an id by default, identical ones with their own prefix; url(#…) stays in its svg (0.212ms)
+✔ the same piece renders the same bytes twice (server and client), and <AxisOrbit> scopes its ids with useId (0.370584ms)
+✔ 4.2 · each deck slide lays out its text and logo as the canvas piece (0.229ms)
+✔ the travelled path (contract 0.5.0): from 12 o'clock to the sphere, under the trail, in its color (0.290541ms)
+✔ the report cover orbit reproduces the approved geometry and colors only the travelling part (0.625541ms)
+✔ the report cover draws the travelled path: 3 px at 60 % under the 4 px trail, full ring at 100, none at 0 (0.16225ms)
+✔ without a measurement: ring and origin tick only; never a zero; mismatches throw (0.129542ms)
+✔ measureSvg carries the severity color and the sphere glow through the contract (0.989083ms)
+✔ spark rig: on the server (no customElements) defining the element is a no-op (0.75125ms)
+✔ spark rig: every expression draws two eyes (or two eye groups) and a mouth inside the visor (0.420709ms)
+✔ spark rig: the element loads every layer of the kit and the contract points at the same public mirror (0.549417ms)
+ℹ tests 56
+ℹ suites 0
+ℹ pass 56
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 97.228167

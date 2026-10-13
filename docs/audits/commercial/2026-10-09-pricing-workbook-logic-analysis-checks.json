@@ -1,0 +1,746 @@
+{
+  "source": {
+    "path": "data/pricing/efeonce-pricing-model-v1.xlsx",
+    "sha256": "68a0c361e7ec3b188419cc5d5c7b758419e4d4d499eba5d9242b3f78a1c78d1b"
+  },
+  "scope": "read_only_logic_analysis",
+  "checks": {
+    "roles": {
+      "populated": 32,
+      "cellsCompared": 512,
+      "placeholderSkus": [
+        "ECG-033",
+        "ECG-034",
+        "ECG-035",
+        "ECG-036",
+        "ECG-037",
+        "ECG-038",
+        "ECG-039",
+        "ECG-040",
+        "ECG-041",
+        "ECG-042",
+        "ECG-043",
+        "ECG-044",
+        "ECG-045",
+        "ECG-046",
+        "ECG-047",
+        "ECG-048",
+        "ECG-049",
+        "ECG-050",
+        "ECG-051",
+        "ECG-052",
+        "ECG-053",
+        "ECG-054",
+        "ECG-055",
+        "ECG-056",
+        "ECG-057",
+        "ECG-058",
+        "ECG-059",
+        "ECG-060",
+        "ECG-061",
+        "ECG-062",
+        "ECG-063",
+        "ECG-064",
+        "ECG-065",
+        "ECG-066",
+        "ECG-067",
+        "ECG-068",
+        "ECG-069",
+        "ECG-070",
+        "ECG-071",
+        "ECG-072",
+        "ECG-073",
+        "ECG-074",
+        "ECG-075",
+        "ECG-076",
+        "ECG-077",
+        "ECG-078",
+        "ECG-079",
+        "ECG-080",
+        "ECG-081",
+        "ECG-082",
+        "ECG-083",
+        "ECG-084",
+        "ECG-085",
+        "ECG-086"
+      ]
+    },
+    "tools": {
+      "populated": 26,
+      "cellsCompared": 52,
+      "annualRows": [
+        {
+          "sku": "ETG-009",
+          "name": "Cloudways VPS",
+          "frequency": "Anual",
+          "allocationDivisor": 1,
+          "proratedCost": 240.0,
+          "markedUpPrice": 276.0,
+          "markupSource": "G2"
+        },
+        {
+          "sku": "ETG-010",
+          "name": "Elementor Pro",
+          "frequency": "Anual",
+          "allocationDivisor": 3,
+          "proratedCost": 33.333333333333336,
+          "markedUpPrice": 38.333333333333336,
+          "markupSource": "G2"
+        },
+        {
+          "sku": "ETG-011",
+          "name": "WP Rocket",
+          "frequency": "Anual",
+          "allocationDivisor": 3,
+          "proratedCost": 19.666666666666668,
+          "markedUpPrice": 22.616666666666667,
+          "markupSource": "G2"
+        },
+        {
+          "sku": "ETG-012",
+          "name": "Crocoblock Suite",
+          "frequency": "Anual",
+          "allocationDivisor": 12,
+          "proratedCost": 10.833333333333334,
+          "markedUpPrice": 12.458333333333334,
+          "markupSource": "G2"
+        }
+      ],
+      "nonnumericRows": [
+        {
+          "sku": "ETG-005",
+          "name": "HubSpot",
+          "frequency": "Mensual",
+          "allocationDivisor": null,
+          "proratedCost": "N/A",
+          "markedUpPrice": "",
+          "markupSource": "G2"
+        }
+      ],
+      "parameterizedMarkupRows": "K2:K15",
+      "hardcodedMarkupRows": "K16:K37"
+    },
+    "composition": {
+      "populatedItemRows": 21,
+      "cellsCompared": 66,
+      "lines": [
+        {
+          "row": 2,
+          "service": "EFG-001",
+          "kind": "Rol",
+          "label": "Consultor HubSpot",
+          "quantity": 4,
+          "cost": 249.42222222222222
+        },
+        {
+          "row": 3,
+          "service": "EFG-001",
+          "kind": "Herramienta",
+          "label": "Notion",
+          "quantity": 1,
+          "cost": 24.0
+        },
+        {
+          "row": 4,
+          "service": "EFG-001",
+          "kind": "Herramienta",
+          "label": "Microsoft 365",
+          "quantity": 1,
+          "cost": 16.0
+        },
+        {
+          "row": 5,
+          "service": "EFG-001",
+          "kind": "Herramienta",
+          "label": "ChatGPT Plus",
+          "quantity": 1,
+          "cost": 5.0
+        },
+        {
+          "row": 6,
+          "service": "EFG-001",
+          "kind": "Rol",
+          "label": "Implementador HubSpot",
+          "quantity": 18,
+          "cost": 784.9
+        },
+        {
+          "row": 7,
+          "service": "EFG-001",
+          "kind": "Herramienta",
+          "label": "Microsoft 365",
+          "quantity": 1,
+          "cost": 16.0
+        },
+        {
+          "row": 8,
+          "service": "EFG-001",
+          "kind": "Herramienta",
+          "label": "Notion",
+          "quantity": 1,
+          "cost": 24.0
+        },
+        {
+          "row": 10,
+          "service": "EFG-002",
+          "kind": "Rol",
+          "label": "Creative Operations Lead",
+          "quantity": 180,
+          "cost": 1949.0
+        },
+        {
+          "row": 11,
+          "service": "EFG-002",
+          "kind": "Rol",
+          "label": "Senior Visual Designer",
+          "quantity": 180,
+          "cost": 1359.0
+        },
+        {
+          "row": 12,
+          "service": "EFG-002",
+          "kind": "Rol",
+          "label": "Senior Visual Designer",
+          "quantity": 180,
+          "cost": 1359.0
+        },
+        {
+          "row": 13,
+          "service": "EFG-002",
+          "kind": "Herramienta",
+          "label": "Envato Elements",
+          "quantity": 1,
+          "cost": 8.25
+        },
+        {
+          "row": 14,
+          "service": "EFG-002",
+          "kind": "Herramienta",
+          "label": "Adobe Creative Cloud",
+          "quantity": 3,
+          "cost": 60.0
+        },
+        {
+          "row": 15,
+          "service": "EFG-002",
+          "kind": "Herramienta",
+          "label": "Freepik",
+          "quantity": 1,
+          "cost": 8.25
+        },
+        {
+          "row": 16,
+          "service": "EFG-002",
+          "kind": "Herramienta",
+          "label": "Notion",
+          "quantity": 3,
+          "cost": 72.0
+        },
+        {
+          "row": 17,
+          "service": "EFG-002",
+          "kind": "Herramienta",
+          "label": "Microsoft 365",
+          "quantity": 3,
+          "cost": 48.0
+        },
+        {
+          "row": 18,
+          "service": "EFG-002",
+          "kind": "Herramienta",
+          "label": "Deel",
+          "quantity": 3,
+          "cost": 36.75
+        },
+        {
+          "row": 20,
+          "service": "EFG-003",
+          "kind": "Rol",
+          "label": "Paid Media Manager",
+          "quantity": 54,
+          "cost": 944.6999999999999
+        },
+        {
+          "row": 21,
+          "service": "EFG-003",
+          "kind": "Rol",
+          "label": "Creative Designer",
+          "quantity": 36,
+          "cost": 206.8
+        },
+        {
+          "row": 22,
+          "service": "EFG-003",
+          "kind": "Herramienta",
+          "label": "Notion",
+          "quantity": 2,
+          "cost": 48.0
+        },
+        {
+          "row": 23,
+          "service": "EFG-003",
+          "kind": "Herramienta",
+          "label": "Microsoft 365",
+          "quantity": 2,
+          "cost": 32.0
+        },
+        {
+          "row": 24,
+          "service": "EFG-003",
+          "kind": "Herramienta",
+          "label": "Adobe Creative Cloud",
+          "quantity": 1,
+          "cost": 20.0
+        }
+      ],
+      "missingUnitCostFormulaOnTemplate": "H32:H51",
+      "subtotalMarkers": "A9,A19,A25=TOTAL"
+    },
+    "services": {
+      "completeCompositions": 3,
+      "cellsCompared": 24,
+      "values": [
+        {
+          "sku": "EFG-001",
+          "name": "Onboarding HubSpot Marketing Pro",
+          "costUsd": 1119.322222222222,
+          "tierMarkup": 0.55,
+          "modelSurcharge": 0.1,
+          "rawPriceUsd": 1846.8816666666667,
+          "priceUsd": 1850,
+          "priceClp": 1850000,
+          "marginAfterRounding": 0.39496096096096106
+        },
+        {
+          "sku": "EFG-002",
+          "name": "Servicio de Diseño Digital Full Funnel",
+          "costUsd": 4900.25,
+          "tierMarkup": 0.45,
+          "modelSurcharge": 0.1,
+          "rawPriceUsd": 7595.3875,
+          "priceUsd": 7600,
+          "priceClp": 7600000,
+          "marginAfterRounding": 0.35523026315789474
+        },
+        {
+          "sku": "EFG-003",
+          "name": "Servicio de Performance y Paid Ads",
+          "costUsd": 1251.5,
+          "tierMarkup": 0.45,
+          "modelSurcharge": 0,
+          "rawPriceUsd": 1814.675,
+          "priceUsd": 1820,
+          "priceClp": 1820000,
+          "marginAfterRounding": 0.31236263736263736
+        }
+      ],
+      "namedWithoutComposition": ["EFG-004", "EFG-005", "EFG-006", "EFG-007"],
+      "unnamedPlaceholderCount": 43,
+      "priceFormulaTemplateEndsAt": "J35",
+      "costFormulaTemplateEndsAt": "H46"
+    },
+    "references": {
+      "formulaCount": 1480,
+      "invalidReferences": [],
+      "staticFormulaCycles": [],
+      "crossSheetEdges": [
+        {
+          "from": "Precios Servicios",
+          "to": "Estructura de Servicios",
+          "references": 94
+        },
+        {
+          "from": "Precios personal",
+          "to": "Estructura de Servicios",
+          "references": 27
+        },
+        {
+          "from": "Herramientas",
+          "to": "Estructura de Servicios",
+          "references": 27
+        },
+        {
+          "from": "Datos",
+          "to": "Precios personal",
+          "references": 131
+        },
+        {
+          "from": "Tier Datos",
+          "to": "Precios personal",
+          "references": 118
+        },
+        {
+          "from": "Tipos de Cambio",
+          "to": "Precios personal",
+          "references": 630
+        },
+        {
+          "from": "Estructura de Servicios",
+          "to": "Precios Servicios",
+          "references": 87
+        },
+        {
+          "from": "Tier Servicios",
+          "to": "Precios Servicios",
+          "references": 78
+        },
+        {
+          "from": "Modelo comercial",
+          "to": "Precios Servicios",
+          "references": 34
+        },
+        {
+          "from": "Tipos de Cambio",
+          "to": "Precios Servicios",
+          "references": 250
+        },
+        {
+          "from": "Addons - Overheads",
+          "to": "Herramientas",
+          "references": 14
+        }
+      ]
+    },
+    "parameterSensitivity": {
+      "hours180to160": {
+        "seniorDesignerHourlyBefore": 9.815,
+        "seniorDesignerHourlyAfter": 11.041875000000001,
+        "ftePriceUnchanged": 1766.7,
+        "guideFte50PercentLiteralRemains": "90 h/mes",
+        "newDerived50PercentHours": 80,
+        "onboardingCostBefore": 1119.322222222222,
+        "onboardingCostAfter": 1248.6125
+      },
+      "serviceUsesCostNotRolePrice": {
+        "onboardingTierRoleChangeHasNoCostEffect": true
+      },
+      "toolMarkup15to20": {
+        "adobeSalePriceBefore": 23.0,
+        "adobeSalePriceAfter": 24.0,
+        "notionSalePriceRemains": 27.599999999999998,
+        "serviceCostRemains": true
+      },
+      "addLineToExistingServiceBelowItsTotal": {
+        "serviceLookupUsesFixedTotalCell": true,
+        "hypotheticalAddedLineCost": 100,
+        "priceChangeUntilTotalRangeUpdated": 0
+      }
+    },
+    "nativeXml": {
+      "formulaCacheStates": [
+        {
+          "type": "str",
+          "state": "present",
+          "count": 49
+        },
+        {
+          "type": "n",
+          "state": "present",
+          "count": 1146
+        },
+        {
+          "type": "str",
+          "state": "empty",
+          "count": 285
+        }
+      ],
+      "note": "285 empty string cached results are not missing recalculation caches",
+      "extensionValidations": [
+        {
+          "part": "xl/worksheets/sheet9.xml",
+          "formula": ["Datos!$K$2:$K$3"],
+          "ranges": ["C52:C164"]
+        },
+        {
+          "part": "xl/worksheets/sheet9.xml",
+          "formula": ["'Precios personal'!$C$2:$C$88"],
+          "ranges": ["E37:E540 D2 D6 D10:D18 D20:D24 D26:D540"]
+        },
+        {
+          "part": "xl/worksheets/sheet9.xml",
+          "formula": ["Herramientas!$C$2:$C$88"],
+          "ranges": ["G89:G838 F2:F8 F10:F18 F20:F24 F26:F838"]
+        },
+        {
+          "part": "xl/worksheets/sheet9.xml",
+          "formula": ["'Precios Servicios'!$A$2:$A$51"],
+          "ranges": ["A2:A8 A10:A18 A20:A24 A26:A51"]
+        },
+        {
+          "part": "xl/worksheets/sheet9.xml",
+          "formula": ["'Precios Servicios'!$C$2:$C$51"],
+          "ranges": ["B2:B8 B10:B18 B20:B24 B26:B61"]
+        },
+        {
+          "part": "xl/worksheets/sheet10.xml",
+          "formula": ["Datos!$C$2:$C$5"],
+          "ranges": ["E88:E496"]
+        },
+        {
+          "part": "xl/worksheets/sheet12.xml",
+          "formula": ["Datos!$E$2:$E$12"],
+          "ranges": ["B2:B84"]
+        },
+        {
+          "part": "xl/worksheets/sheet12.xml",
+          "formula": ["Datos!$G$2:$G$9"],
+          "ranges": ["D2:D34"]
+        },
+        {
+          "part": "xl/worksheets/sheet12.xml",
+          "formula": ["Datos!$F$2:$F$7"],
+          "ranges": ["E2:E34"]
+        },
+        {
+          "part": "xl/worksheets/sheet12.xml",
+          "formula": ["Datos!$H$2:$H$7"],
+          "ranges": ["I2:I34"]
+        },
+        {
+          "part": "xl/worksheets/sheet12.xml",
+          "formula": ["Datos!$I$2:$I$5"],
+          "ranges": ["G2:G33"]
+        },
+        {
+          "part": "xl/worksheets/sheet12.xml",
+          "formula": ["Datos!$J$2:$J$3"],
+          "ranges": ["M2:M41"]
+        }
+      ],
+      "macros": false,
+      "externalWorkbookLinks": 0,
+      "namedRangeTipoCambio": "'Tipos de Cambio'!$C$1",
+      "namedRangeUsedInFormulas": false
+    },
+    "formulaFamilyUniformity": {
+      "Precios personal": [
+        {
+          "formula": "= (F2 + G2 + H2 + I2 + J2 + K2 + L2)",
+          "count": 32,
+          "first": "M2",
+          "last": "M33"
+        },
+        {
+          "formula": "=M2/Datos!$O$3",
+          "count": 32,
+          "first": "N2",
+          "last": "N33"
+        },
+        {
+          "formula": "=N2*Datos!$O$3",
+          "count": 63,
+          "first": "O2",
+          "last": "O64"
+        },
+        {
+          "formula": "=N2*(1+VLOOKUP(E2,'Tier Datos'!$A$2:$B$5,2,FALSE))",
+          "count": 32,
+          "first": "P2",
+          "last": "P33"
+        },
+        {
+          "formula": "=IFERROR(VLOOKUP(E2,'Tier Datos'!$A$2:$B$5,2,FALSE),\"\")",
+          "count": 86,
+          "first": "Q2",
+          "last": "Q87"
+        },
+        {
+          "formula": "=P2*VLOOKUP(\"CLP\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 64,
+          "first": "R2",
+          "last": "R65"
+        },
+        {
+          "formula": "=P2*VLOOKUP(\"CLF\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 64,
+          "first": "S2",
+          "last": "S65"
+        },
+        {
+          "formula": "=P2*VLOOKUP(\"COP\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 64,
+          "first": "T2",
+          "last": "T65"
+        },
+        {
+          "formula": "=P2*VLOOKUP(\"MXN\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 64,
+          "first": "U2",
+          "last": "U65"
+        },
+        {
+          "formula": "=P2*VLOOKUP(\"PEN\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 64,
+          "first": "V2",
+          "last": "V65"
+        },
+        {
+          "formula": "=P2*Datos!$O$3",
+          "count": 36,
+          "first": "W2",
+          "last": "W37"
+        },
+        {
+          "formula": "=W2*VLOOKUP(\"CLP\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 56,
+          "first": "X2",
+          "last": "X57"
+        },
+        {
+          "formula": "=W2*VLOOKUP(\"CLF\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 56,
+          "first": "Y2",
+          "last": "Y57"
+        },
+        {
+          "formula": "=W2*VLOOKUP(\"COP\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 68,
+          "first": "Z2",
+          "last": "Z69"
+        },
+        {
+          "formula": "=W2*VLOOKUP(\"MXN\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 62,
+          "first": "AA2",
+          "last": "AA63"
+        },
+        {
+          "formula": "=W2*VLOOKUP(\"PEN\",'Tipos de Cambio'!$B:$C,2,FALSE)",
+          "count": 68,
+          "first": "AB2",
+          "last": "AB69"
+        }
+      ],
+      "Precios Servicios": [
+        {
+          "formula": "='Estructura de Servicios'!I9",
+          "count": 1,
+          "first": "H2",
+          "last": "H2"
+        },
+        {
+          "formula": "=IFERROR(\nVLOOKUP(G2,'Tier Servicios'!$A:$C,2,FALSE),\n\"\"\n)",
+          "count": 44,
+          "first": "I2",
+          "last": "I45"
+        },
+        {
+          "formula": "=IFERROR(\nROUNDUP(\nH2 * (\n1 +\nVLOOKUP(G2,'Tier Servicios'!$A:$C,2,FALSE) +\nVLOOKUP(F2,'Modelo comercial'!$A:$C,2,FALSE)\n),\n-1),\n\"Verificar tier/modelo\")",
+          "count": 34,
+          "first": "J2",
+          "last": "J35"
+        },
+        {
+          "formula": "=IFERROR(J2*VLOOKUP(\"CLP\",'Tipos de Cambio'!$B:$C,2,FALSE),\"\")",
+          "count": 50,
+          "first": "K2",
+          "last": "K51"
+        },
+        {
+          "formula": "=IFERROR(J2*VLOOKUP(\"CLF\",'Tipos de Cambio'!$B:$C,2,FALSE),\"\")",
+          "count": 50,
+          "first": "L2",
+          "last": "L51"
+        },
+        {
+          "formula": "=IFERROR(J2*VLOOKUP(\"COP\",'Tipos de Cambio'!$B:$C,2,FALSE),\"\")",
+          "count": 50,
+          "first": "M2",
+          "last": "M51"
+        },
+        {
+          "formula": "=IFERROR(J2*VLOOKUP(\"MXN\",'Tipos de Cambio'!$B:$C,2,FALSE),\"\")",
+          "count": 50,
+          "first": "N2",
+          "last": "N51"
+        },
+        {
+          "formula": "=IFERROR(J2*VLOOKUP(\"PEN\",'Tipos de Cambio'!$B:$C,2,FALSE),\"\")",
+          "count": 50,
+          "first": "O2",
+          "last": "O51"
+        },
+        {
+          "formula": "='Estructura de Servicios'!I18",
+          "count": 1,
+          "first": "H3",
+          "last": "H3"
+        },
+        {
+          "formula": "='Estructura de Servicios'!I23",
+          "count": 1,
+          "first": "H4",
+          "last": "H4"
+        },
+        {
+          "formula": "=SUMIF('Estructura de Servicios'!$A:$A,A2,'Estructura de Servicios'!$I:$I)",
+          "count": 42,
+          "first": "H5",
+          "last": "H46"
+        }
+      ],
+      "Herramientas": [
+        {
+          "formula": "=IF(OR(H2=\"\",H2=0),F2,F2/VALUE(H2))",
+          "count": 36,
+          "first": "J2",
+          "last": "J37"
+        },
+        {
+          "formula": "=IF(OR(J2=\"\",J2=\"N/A\"),\"\",J2*(1+'Addons - Overheads'!$G$2))",
+          "count": 14,
+          "first": "K2",
+          "last": "K15"
+        },
+        {
+          "formula": "=IF(OR(J2=\"\",J2=\"N/A\"),\"\",J2*1.15)",
+          "count": 22,
+          "first": "K16",
+          "last": "K37"
+        }
+      ],
+      "Estructura de Servicios": [
+        {
+          "formula": "=IF(B2=\"\",\"\",INDEX('Precios Servicios'!$A:$A,MATCH(B2,'Precios Servicios'!$C:$C,0)))",
+          "count": 47,
+          "first": "A2",
+          "last": "A51"
+        },
+        {
+          "formula": "=IF(C2=\"Rol\",\nVLOOKUP(D2,'Precios personal'!$C:$N,12,FALSE),\nIF(C2=\"Herramienta\",\nVLOOKUP(F2,Herramientas!$C:$K,8,FALSE),\n\"\"))",
+          "count": 27,
+          "first": "H2",
+          "last": "H31"
+        },
+        {
+          "formula": "=IF(C2=\"Rol\",E2*H2,IF(C2=\"Herramienta\",G2*H2,\"\"))",
+          "count": 47,
+          "first": "I2",
+          "last": "I51"
+        },
+        {
+          "formula": "=SUM(I2:I8)",
+          "count": 1,
+          "first": "I9",
+          "last": "I9"
+        },
+        {
+          "formula": "=SUM(I10:I18)",
+          "count": 1,
+          "first": "I19",
+          "last": "I19"
+        },
+        {
+          "formula": "=SUM(I20:I24)",
+          "count": 1,
+          "first": "I25",
+          "last": "I25"
+        }
+      ]
+    }
+  },
+  "mismatches": [],
+  "independentComparisonCount": 654,
+  "sourceUnchanged": true,
+  "verificationLimits": "Read-only independent arithmetic and static dependency analysis; no native Excel/LibreOffice session recalculation performed. Sensitivities evaluate explicit arithmetic from inspected formulas without editing the workbook."
+}

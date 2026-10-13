@@ -794,6 +794,41 @@ export default [
     }
   },
 
+  // Pricing V3 — todo rechazo del cotizador sale con un código REGISTRADO. El CLI reporta el
+  // `code` de cualquier `PricingV3Error` sin mantener lista propia; un `throw new Error('X')`
+  // suelto sale como `ADAPTER_FAILURE` y el agente que lo consume no puede corregirse. La lista a
+  // mano que esto reemplaza ya había derivado: 10 códigos lanzados y no reportados.
+  // Relanzar una excepción ajena (`throw error`) sigue permitido: eso sí es un caso sin clasificar.
+  {
+    files: [
+      'src/lib/finance/pricing-v3/**/*.ts',
+      'scripts/commercial/pricing-v3.ts',
+      'scripts/commercial/pricing-v3-storage-file.ts'
+    ],
+    ignores: ['**/__tests__/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "ThrowStatement > :matches(NewExpression, CallExpression)[callee.name='Error']",
+          message:
+            "Throw `new PricingV3Error('CODE')` with a code registered in src/lib/finance/pricing-v3/errors.ts. A bare Error reaches the caller as ADAPTER_FAILURE."
+        }
+      ]
+    }
+  },
+
+
+  {
+    files: ['scripts/measurement/hubspot-consent-bridge.js'],
+    // This canonical browser asset is already deployed byte-for-byte in WP/Think.
+    // Keep semantic linting; do not reformat it or rename its ES5 catch binding.
+    rules: {
+      'padding-line-between-statements': 'off',
+      'newline-before-return': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { caughtErrorsIgnorePattern: '^_$' }]
+    }
+  },
 
   /*
     Prettier compat — DEBE ir al final. Apaga reglas que conflictuan con

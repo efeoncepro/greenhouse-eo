@@ -1,0 +1,42 @@
+{
+  "id": "CT6-social-care",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a vast dark room at night with thin haze): Antonio, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; his left shoulder is at about 62 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and his body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. From the deep darkness behind him on the right, hundreds of small glowing message bubbles (direct messages and comments) drift toward him like a slow swarm of fireflies, dim cool azure (#0375DB) and anonymous, softly out of focus. THE MOMENT: he holds a modern phone low at chest height on the frame-right side of his body and has just replied to one of them; the phone's screen is dim and adds no light to his face: that single answered bubble hovers beside his face on the frame-right side, glowing clear cool white, sharp and bright, the light on his face; behind it, the bubbles he has already answered settle into a calm, orderly glowing line that recedes into the depth on the right. Head almost frontal, only his eyes turn toward the answered bubble, a warm, attentive half-smile. A long dark matte desk runs between the camera and him, its near edge just in front of the lens. The swarm, the line and every bubble stay inside the RIGHT 50% of the frame. The LEFT 50% is calm, deep dark space with faint haze only. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte desk edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)",
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "llave": {
+    "fuente": "the single answered message bubble glowing cool white beside his face",
+    "lado": "to the frame-right of his face, at cheek height",
+    "distancia": "about 30 cm from his face"
+  },
+  "fondo": "the far depth of the room where the swarm of message bubbles melts into cold round bokeh",
+  "fenomeno": {
+    "que": "a swarm of arriving messages becomes a calm line of answered ones",
+    "esServicio": "Social care: cada mensaje y comentario recibe respuesta, a tiempo y con la voz de tu marca"
+  }
+}

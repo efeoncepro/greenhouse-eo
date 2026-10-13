@@ -33,6 +33,14 @@
 > multimodal` en Search Console; alcance visual, despliegue y límite de API
 > documentados en `modules/07_MEASUREMENT.md`.
 
+## Evidencia de categoría y representación — 2026-10-12
+
+El registro de fuentes y límites de Pew (2025-07-22), Ahrefs (2026-02-04) y Google está en
+`docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §7. Distingue presión sobre CTR
+observada de la inferencia estratégica adoptada. Ninguno demuestra 90–95% de tráfico B2B branded,
+desaparición del non-brand, lift garantizado por cita ni liderazgo de mercado. Reverificar datos volátiles
+antes de usarlos comercialmente; no reutilizar una muestra externa como medición del prospecto.
+
 ## 1. Niveles de volatilidad (qué reverificar y cada cuánto)
 
 **Verificado 2026-08-30:** [Search Central updates](https://developers.google.com/search/updates):

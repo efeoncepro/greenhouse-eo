@@ -22,4 +22,8 @@ Jefe directo, presupuesto, agencias finalistas, proceso formal de compra, plazo 
 
 Correo vigente: **juan.vargas@pichincha.pe**, entregado por Jesús en su respuesta del 28-09-2026 (HubSpot 251530718551). Los candidatos inferidos jesus.vargas@pichincha.pe, jesus.vargass@pichincha.pe y el histórico de Surgir devolvieron invalid/mailbox_not_found; ZeroBounce no evaluó la dirección vigente, así que no hay falso negativo.
 
-Jesús aceptó la reunión del martes 06-10-2026 a las 11:00 Lima. Estado completo en [PROSPECT-CASE §9](../PROSPECT-CASE.md#9-estado-actual-y-próximos-pasos).
+Jesús aceptó la reunión del martes 06-10-2026 a las 11:00 Lima. Estado previo documentado en [PROSPECT-CASE §9](../PROSPECT-CASE.md#9-estado-actual-y-próximos-pasos).
+
+## Señal y pendientes actualizados — 06-10-2026
+
+[Reunión celebrada](../MEETING-2026-10-06.md): Jesús precisó Pibank/ahorro/2027, vio la metodología y pidió propuesta técnica con aporte potencial a aperturas. Él revisa proveedores hasta 09-10 y lleva casos a gerencia semana 19-10; esto evidencia función de evaluador/puente, no presupuesto o autoridad económica. Proceso y plazo están parcialmente conocidos; siguen abiertos jefe directo, gerencia específica, criterios, competidores/finalistas, budget y exigencia de presencia local. No contactar por fuera de su proceso.

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "role_capacity",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-09",
+    "offerId": "talent-assurance-staffing",
+    "engagementCode": "monthly",
+    "accountId": "example-account",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "USD",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-002",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.5"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ]
+  },
+  "work": [
+    {
+      "lineId": "design",
+      "assigneeIds": [
+        "design-slot"
+      ],
+      "tasks": [],
+      "aiToolIds": [
+        "higgsfield",
+        "chatgpt"
+      ],
+      "creditDemand": [
+        {
+          "periodId": 1,
+          "toolId": "higgsfield",
+          "credits": 1000
+        }
+      ],
+      "aiSelectionReason": "Planned image generation and text assistance for this design test."
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "0.25",
+      "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-simulation-service-units",
+        "totalUnits": "100",
+        "allocatedUnits": "25"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "0.2",
+      "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-simulation-service-units",
+        "totalUnits": "100",
+        "allocatedUnits": "20"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "adobe",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "0.25",
+      "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-simulation-service-units",
+        "totalUnits": "100",
+        "allocatedUnits": "25"
+      }
+    },
+    {
+      "periodId": 1,
+      "toolId": "chatgpt",
+      "priceId": "historical-plus",
+      "quantity": "1",
+      "serviceShare": "1",
+      "reason": "Explicit hypothetical allocation for prototype; not actual portfolio, access permission or approved cost policy.",
+      "driver": {
+        "unit": "declared-simulation-service-units",
+        "totalUnits": "100",
+        "allocatedUnits": "100"
+      }
+    }
+  ],
+  "creditBudgets": [
+    {
+      "periodId": 1,
+      "toolId": "higgsfield",
+      "purchaseDate": "2026-10-09",
+      "useBy": "2026-10-31",
+      "subscriptionCreditsAllocated": 400,
+      "subscriptionCreditsAvailable": 400,
+      "activeSubscription": true,
+      "allowRepeatedPacks": false
+    }
+  ],
+  "fxRecordIds": []
+}

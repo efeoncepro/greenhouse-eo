@@ -1,0 +1,73 @@
+{
+  "tenderId": "pibank-c2-v2",
+  "slides": [
+    {
+      "slideId": "p01-deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 648,
+          "bodyPx": 25,
+          "bodyWidth": 640,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:SE1-te-encuentran-isotipo",
+          "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz con constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita"
+        },
+        "voice": {
+          "question": "¿Cómo aparece Pibank?",
+          "answer": "Paso a paso",
+          "eyebrow": "Qué haremos"
+        },
+        "body": "Doce meses en pibank.pe: primero la base técnica y la medición, después contenido y herramientas para comparar, y cada mes un informe de lo que se movió.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:busqueda-engine-dark-44",
+            "kicker": "M1",
+            "name": "Diagnóstico"
+          },
+          {
+            "icon": "asset-ref:icon:contenido-engine-dark-44",
+            "kicker": "M1 a M12",
+            "name": "Hub y artículos"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-engine-dark-44",
+            "kicker": "M2 a M5",
+            "name": "Herramientas"
+          },
+          {
+            "icon": "asset-ref:icon:informe-engine-dark-44",
+            "kicker": "Cada mes",
+            "name": "Informe"
+          }
+        ],
+        "note": "No prometemos posiciones: medimos y reportamos lo que se mueve.",
+        "selection": {
+          "label": "Pibank",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

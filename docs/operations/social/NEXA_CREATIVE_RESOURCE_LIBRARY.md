@@ -37,8 +37,8 @@ y dos vistas de cuerpo (`nexa-cuerpo-perfil-izq`, `nexa-cuerpo-espalda`). Es un 
 fotográfica; la polera gris es vestuario neutro de referencia, no una prenda obligatoria para todas las piezas.
 
 Las anclas fotográficas y los registros de rostro/expresión están en
-[`ai-generations/_identidad-nexa/1-anclas/`](../../../ai-generations/_identidad-nexa/1-anclas/) y
-[`5-expresiones/`](../../../ai-generations/_identidad-nexa/5-expresiones/). Son referencias complementarias
+[`ai-generations/_identidad-nexa/1-anclas/`](../../../ai-generations/_identidad-nexa/1-anclas/) (frontal v2) y
+[`5-expresiones-frente/`](../../../ai-generations/_identidad-nexa/5-expresiones-frente/), las 25 casi de frente aprobadas el 2026-10-03. Son referencias complementarias
 de la misma identidad A, no una familia alternativa. El banco OneDrive `Poses y expresiones` sirve para estudiar
 actuación, gesto y cuerpo; **no es fuente de rostro ni reemplaza estas referencias aprobadas**. Los antiguos
 renders en `_identidad-nexa/2-angulos/` y `3-poses/` quedan retirados como identidad facial y no se deben
@@ -46,8 +46,18 @@ mezclar con el rostro aprobado.
 
 Para producción, pedir las vistas mediante `pnpm foto:prompt` y el catálogo de
 [`build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs); no copiar rutas manualmente ni usar el set histórico
-como ancla facial. Las seis expresiones fotográficas aprobadas que sí se distinguen con claridad se documentan en
-[`_identidad-nexa/LEEME.md`](../../../ai-generations/_identidad-nexa/LEEME.md).
+como ancla facial. La expresión viaja detrás del ancla y sólo da el gesto; en grupos no viaja.
+Claves vigentes en [`_identidad-nexa/LEEME.md`](../../../ai-generations/_identidad-nexa/LEEME.md);
+`5-expresiones/` (tres cuartos) queda como histórico.
+
+## Prueba cinematográfica portable — 2026-10-06
+
+La [prueba Nexa con Nano Banana 2.1](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md)
+usó el frontal v2, expresión `conviccion`, cuerpo, traje/lentes biónicos y dos Sparks: ocho referencias con roles
+separados, compiladas con `foto:prompt`. V2 pasó los medidores y quedó `APROBABLE` técnicamente, sin incorporarse
+al banco aprobado. La comparación con NX7d/Sunburst favoreció la naturalidad cinematográfica de NX7d y la
+resolución/reservas de Nano; no fue un A/B con prompt y referencias idénticos. La identidad vigente y el canon
+fotográfico se conservan con cualquier motor; operación en el [manual cine](../../manual-de-uso/creative/producir-foto-cine-de-marca.md).
 
 ## Selección segura y continuidad
 

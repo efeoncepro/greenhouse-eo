@@ -1,0 +1,57 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "voice",
+  "voice": {
+    "eyebrow": "Voice · Medios y distribución",
+    "question": "¿Dónde invierto?",
+    "answer": [
+      "Donde rinde"
+    ]
+  },
+  "body": "Estrategia de distribución, performance, influencia y earned, y medios gestionados: un mensaje que llega a muchas audiencias desde una sola operación.",
+  "proof": {
+    "text": "Lo orgánico prueba y la pauta escala, cada peso medido",
+    "source": "Método Efeonce, deck Marketing de Contenidos 2026"
+  },
+  "steps": [
+    {
+      "glyph": "busqueda",
+      "kicker": "Empieza aquí",
+      "name": "Auditoría de medios"
+    },
+    {
+      "glyph": "embudo",
+      "kicker": "Plan",
+      "name": "Distribución"
+    },
+    {
+      "glyph": "rayo",
+      "kicker": "Performance",
+      "name": "Paid y social"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "On-going",
+      "name": "Managed Media"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png",
+    "alt": "Una líder de medios de Efeonce frente a haces de luz naranja que se reparten en muchas pantallas"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

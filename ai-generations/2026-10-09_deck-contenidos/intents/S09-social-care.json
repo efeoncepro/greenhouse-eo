@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing de Contenidos · Social care",
+    "question": "¿Quién responde mis mensajes?",
+    "answer": [
+      "Tu voz"
+    ]
+  },
+  "body": "Atención integral en redes: cada DM y cada comentario se responde a tiempo y con la voz de tu marca.",
+  "steps": [
+    {
+      "glyph": "telefono",
+      "kicker": "Todos tus canales",
+      "name": "DM y comentarios"
+    },
+    {
+      "glyph": "lapiz",
+      "kicker": "Tono aprobado",
+      "name": "Protocolos"
+    },
+    {
+      "glyph": "cursor",
+      "kicker": "Ventas y soporte",
+      "name": "Derivación"
+    },
+    {
+      "glyph": "corazon",
+      "kicker": "Con cuidado",
+      "name": "Casos sensibles"
+    }
+  ],
+  "note": "Cada mensaje queda registrado, con su respuesta y su tiempo.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT6-social-care.png",
+    "alt": "Un especialista de Efeonce con hoodie acaba de responder desde su teléfono: una burbuja de mensaje brilla junto a su cara y detrás un enjambre de mensajes se ordena en una línea"
+  }
+}

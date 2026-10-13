@@ -1,9 +1,17 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.11
+> **Versión:** 1.20
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-30 por Claude (1.11: el deck SEO/AEO (Search Visibility 360) aprobado por el
+> **Última actualización:** 2026-10-10 por Claude (1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
+> Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
+> láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
+> a receta sin promoverlas (TASK-2013); sección «El brochure Agencia Creativa».
+> Antes, el mismo día, 1.12: el deck HubSpot aprobado por el operador — brochure de 27
+> láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes, cada uno con su `fit`;
+> sección «El deck HubSpot» (TASK-1943).
+> Antes, 1.11: el deck SEO/AEO (Search Visibility 360) aprobado por el
 > operador — seis recetas nuevas sin plantilla todavía (`content-brand-family`, `content-service-mockups`,
 > `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`; 100 en el catálogo, 94 con
 > plantilla), `productMark` opcional, `requiredUnless` en el eyebrow de `proposal-cinematic-seo`/`-aeo`,
@@ -202,7 +210,7 @@ Las láminas 02 a 18 son las mismas en los dos; en un brochure evergreen se quit
 comparten su plate de catálogo (`plate-repeated`). **El logo de 700 px es sólo de la contraportada Salesforce**; las
 contraportadas del 2026-09-27 siguen con el logo a 500 px.
 
-**Deck HubSpot pendiente:** [TASK-1943](../../../tasks/to-do/TASK-1943-hubspot-deck-content-series.md).
+**Deck HubSpot:** aprobado el 2026-10-06 con las mismas recetas de práctica; ver «El deck HubSpot», más abajo.
 
 ## El deck SEO/AEO (aprobado el 2026-09-30)
 
@@ -256,6 +264,194 @@ rotula ni los quita. En este deck, esa decisión manda sobre las reglas de recet
 ilustrativas». Contexto (sólo registro, en `DECISIONES.md`): las cifras reales de los casos no se han cargado; al
 2026-09-30 el correo de Insights que llega solo no está vivo y el modo presentación no se ha probado con una edición
 real. Los logos de BICECORP, Banco BICE y Berel siguen condicionados a su autorización (TASK-1937).
+
+## El deck HubSpot (aprobado el 2026-10-06)
+
+El deck de la práctica HubSpot (línea `revenue-hubspot`, tema oscuro), aprobado por el operador el 2026-10-06 («Bien,
+queda aprobado» · «Este Brochure está cerrado, canonízalo»): **brochure de 27 láminas** y **propuesta de 31**, en el
+canvas [https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU](https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU)
+(páginas «Brochure · 27» y «Propuesta · 31»). Siete actos: promesa → qué plataforma → qué hacemos y cómo se construye →
+comprar con criterio → lo que pregunta TI → cómo trabajamos → prueba → cierre. Recorrido, reglas y pendientes:
+[norma §4.6, «Deck HubSpot»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Task:
+[TASK-1943](../../../tasks/in-progress/TASK-1943-hubspot-deck-content-series.md).
+
+**Ninguna receta nueva.** Las 29 láminas distintas (más P02, que es el mismo intent que B02) son **33 usos aprobados en
+28 recetas existentes** (`approvedUses`, `deck: "HubSpot (línea revenue-hubspot)"`, cada uno con su `fit`). Todas
+componen con `pnpm brand:compose` desde su intent en `ai-generations/2026-10-06_deck-hubspot/intents/`; la portada
+aprobada sale de `comparacion/portada-B.json` con la insignia Gold superpuesta. Trece de las 16 recetas de práctica
+del deck Salesforce se reutilizan con datos e íconos oficiales de HubSpot (`hubspot-icon-*`,
+`@efeoncepro/axis-brand-assets` 0.4.25; no entran `content-season-launches`, `content-live-chat` ni
+`decision-diagnosis-verdict`). Las otras quince: las dos portadas y los dos cierres, `proposal-service-revops`,
+`proposal-cinematic-nexa` (dos usos), `section-cine-purpose` (cuatro), `decision-ai-market` (dos),
+`decision-difference`, `method-staircase`, `content-markets`, `decision-case`, `content-clients`, `content-bullets` y
+`content-pricing`.
+
+**Lo que dicen los `fit`** (detalle en cada uso):
+
+- **Dos largos pasan la receta, aprobados tal cual:** la pregunta de las dos portadas («¿Mi HubSpot puede hacer más?»,
+  28) contra 26 en `cover-brochure-line-revenue` y 24 en `cover-proposal-orbit`. Subir el máximo o acortar se decide
+  con el operador; hasta entonces, un plan que ligue esa pregunta falla con `slot-over-max-chars`.
+- **Usos fuera del propósito original, aprobados:** `section-cine-purpose` con pilares de datos, ley, salida y
+  evaluación (no los del Why de Efeonce) y con una persona del elenco sin Nexa (excepción del registro cine para
+  secciones); `content-markets` con regiones de datos de HubSpot en lugar de mercados de Efeonce; `decision-case` con
+  el plate T3-mide del tríptico en vez de una foto del caso.
+- **Recetas sólo claras:** `decision-case` y `content-clients` se componen como láminas de Efeonce en la línea
+  `growth` (el contrato `line-piece-keeps-efeonce-dark` no admite una pieza de línea clara).
+- **Insignia Gold = claim** con readback `hubspot-partner-readback-2026-10-06`; el sprocket 3D de HubSpot es de uso
+  interno (canvas, no PDF); sin mascotas de HubSpot.
+
+Los planes del brochure y de la propuesta validan con `pnpm brand:deck-plan -- --plan` sin errores ni avisos
+(secuencia, parejas, documento y plates; verificado el 2026-10-06 con planes armados desde los intents, sin slots; no
+quedaron como fixtures).
+
+## El brochure Agencia Creativa (aprobado el 2026-10-06)
+
+El brochure de la línea `brand` (tema oscuro, paraguas Agencia Creativa, PDR-004), aprobado por el operador el
+2026-10-06 («Me encantó… estarían ya listas todas, y entrégame el PDF» · «Necesito canonizar esto, este es el brochure
+de agencia creativa»): **27 láminas**, en el canvas
+[https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs](https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs) (página «Agencia
+Creativa»; «v1 · Servicios Creativos» no está vigente). Recorrido, PDF, reglas y pendientes:
+[norma §4.6, «Brochure Agencia Creativa»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+
+**Siete usos de recetas existentes** (`approvedUses`, `deck: "Agencia Creativa (línea brand)"`, cada uno con su
+`fit`), que componen con `pnpm brand:compose` desde su intent en `ai-generations/2026-10-06_brochure-creativo/intents-v2/`:
+
+| Lámina | Titular | id del catálogo | Receta AXIS del intent |
+|---|---|---|---|
+| 01 · A01 | ¿Mi equipo puede producir más? Mucho más. | `cover-brochure-line-brand` (plate `CR4`) | `cover-brochure` + `line` |
+| 14 · A05 | ¿Quién trabaja en mi marca? Personas reales. | `content-team` | `content-team` |
+| 20 · A09 | ¿Y si no me convence? Empiezas chico. | `proposal-service-creative` | `proposal-service` |
+| 21 · A10 | ¿Pierdo el control de mi marca? Nunca. | `content-bullets` | `content-bullets` |
+| 25 · A21 | ¿Dónde trabajan? En cinco países. | `content-markets` (plate `MK2-mercados`, del brochure SEO) | `content-markets` |
+| 26 · A15 | ¿Qué recibo primero? Un plan. | `decision-next-steps` | `decision-next-steps` |
+| 27 · A16 | ¿Conversamos? Cuando quieras. | `close-brochure-orbit` | `close-brochure` |
+
+Las siete salen del compositor con la receta tal cual (los slots se midieron contra `maxChars` al componer) y son siete
+de los ocho pares pregunta–respuesta del brochure; el octavo es la lámina 17, a mano.
+
+**Veinte láminas a mano, candidatas a receta.** Las otras 20 (02–13, 15–19 y 22–24) se hicieron a mano en
+`build-canvas-v7.py` y **quedan como candidatas** a receta del catálogo, **sin promoverlas ahora** (decisión del
+operador); las registra TASK-2013. Mientras no lo sean, no tienen id en este catálogo ni plantilla en el Artifact Composer:
+para reutilizarlas se parte del builder y del canvas.
+
+## El deck Servicios web (aprobado el 2026-10-09)
+
+El brochure de servicios web y digitales (línea `engine`, 29 láminas), aprobado por el operador el 2026-10-09 («este deck
+está listo»), en el canvas [https://claude.ai/artifact/SnJS7zHHPTBPwcJvv7e9t7](https://claude.ai/artifact/SnJS7zHHPTBPwcJvv7e9t7).
+Recorrido, reglas y pendientes: [norma §4.6, «Deck Servicios web»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Fuente:
+`ai-generations/2026-10-09_deck-web-nexa-spark/deck/` (`LEEME.md`).
+
+- **Sin recetas nuevas en el catálogo.** Las láminas se hicieron en el canvas. Según la sesión que armó el deck, siguen
+  una receta la portada (`cover-brochure-line-engine`), `content-service-lanes`, `method-surround-cycle`,
+  `decision-case`, `decision-plan`, `decision-next-steps` y `close-brochure-orbit`. Ninguna quedó registrada como
+  `approvedUses` y no hay intents en el repo (verificado el 2026-10-09).
+- **Variante de `decision-case` sin foto del caso:** maqueta de interfaz en HTML con perspectiva 3D a la derecha. No está
+  en la plantilla del compositor.
+- **Lámina nueva «Dónde construimos»** (plataformas con logo oficial en blanco): candidata a receta, sin promover.
+- **Dos casos con cifras sin respaldo** (Aguas Andinas con marcadores inventados; Berel con plazo por confirmar): el
+  deck no se envía a un prospecto hasta resolverlos.
+
+## La lámina «Día a día» con Marketing Studio (aprobada el 2026-10-10)
+
+El operador aprobó y pidió canonizar la lámina 25 del deck de Marketing de Contenidos (línea `brand`): «Aprobado, y hay
+que canonizar, me gustó». Es un **uso aprobado de `content-day-tools`** (`approvedUses`, `deck: "Marketing de Contenidos
+(línea brand)"`), con el panel cambiado: en vez de una captura lleva una vista social de **Marketing Studio construida
+en HTML** y exportada a PNG («constrúyelo no lo captures»).
+
+- **Compone con la receta:** `pnpm brand:compose -- --intent ai-generations/2026-10-09_deck-contenidos/intents/V0b-dia-tools-ms.json --out <carpeta> --artifact-id <id>`.
+  Interfaz: `ai-generations/2026-10-09_deck-contenidos/ui/ms-social.png` (fuente `ms-social.dc.html`, generador
+  `ms-social.generador.py`).
+- **Excepción a «interfaces genéricas»:** la interfaz es de un producto propio y construida, con el lockup oficial
+  «efeonce | Marketing Studio». Campaña y marca **ficticias** (Lanzamiento Cold brew, Mareas Café).
+- **Registro del deck:** el operador aprobó después el deck completo; ver «El deck Marketing de Contenidos».
+- **Condiciones abiertas** (en `conditions` del uso): las pestañas, la bandeja y el bloque de creadores no se
+  contrastaron con el producto real; las cifras son de muestra sin marca; falta verificar que Efeonce opere Metricool,
+  Sprout Social y Favikon y la autorización de sus logos (TASK-1937); y el par «¿Cómo trabajamos contigo? Así» no pasa la
+  regla de voz del 2026-10-06 (la pregunta es de Efeonce y «Así» no dice nada sola). Las decide el operador.
+
+## La lámina «Producción con IA» (aprobada el 2026-10-10)
+
+El operador aprobó y pidió canonizar otra lámina del deck de Marketing de Contenidos (línea `brand`): «Buenísimo, esta
+también hay que canonizarla». Es una **lámina a mano**, sin receta ni plantilla en el compositor: foto de cine a sangre
+con la voz a la izquierda y cuatro filas con ícono Plastilina plano.
+
+- **Texto:** eyebrow «Producción con IA» · pregunta «¿Producen con IA?» · respuesta «Sí, pero lo hacemos bien» · bajada
+  «La IA nos da velocidad y escala. El criterio, la marca y la última palabra los pone una persona.» · cuatro filas:
+  dirección creativa de una persona en cada pieza · tu marca y tu producto reales, nunca inventados · derechos y uso
+  comercial revisados · revisión humana antes de publicar. Burbuja URL al pie; sin indicador de navegación (lleva foto).
+- **Foto:** `CT24`, registrada como receta de cine en `scripts/foto/cine-recetas.json` (parte de CR4; ficha y prompt
+  en `ai-generations/2026-10-09_deck-contenidos/fotos/`). Se reutiliza con `pnpm foto:cine:nueva --desde CT24`.
+- **Estado en el catálogo:** candidata a receta, sin promover (como las láminas a mano del brochure Agencia Creativa,
+  TASK-2013). El generador de la lámina no está en el repo: para reutilizarla se parte del canvas del deck.
+- **Condiciones abiertas, las decide el operador:**
+  - «Nunca inventados» y «derechos y uso comercial revisados» son compromisos de servicio. El operador aprobó la lámina
+    en conjunto, no cada promesa: falta contrastarlos con lo que Efeonce garantiza (skill
+    `greenhouse-ai-creative-rights-governance`).
+  - La respuesta tiene cinco palabras; la voz de la línea pide de una a tres.
+
+## El patrón «franjas de foto» (aprobado el 2026-10-10)
+
+El operador pidió canonizar el estilo de franjas de foto del deck de Marketing de Contenidos (línea `brand`), en sus dos
+variantes: **seis franjas** («Seis frentes») y **tres franjas** («Momentos», «Programas»). Medidas, reglas, las tres
+excepciones aprobadas (varias esferas, foto de cine recortada, degradado bajo el título) y pendientes:
+[norma §4.6, «Franjas de foto»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+
+- **Cuándo usarlo:** de tres a seis frentes, momentos o programas, cada uno con una foto de cine que el deck ya tiene.
+  No se generan fotos para llenar franjas.
+- **Estado en el catálogo:** patrón aprobado, **candidato a receta sin promover**. No tiene id, slots ni plantilla en
+  el compositor. Fuente: `ai-generations/2026-10-09_deck-contenidos/laminas/` (`seis-frentes.dc.html`,
+  `momentos.dc.html`, `programas.dc.html`, `frentes.generador.py`, `nuevas.py`, `lib.py`, `ui.py`).
+- **Plates:** CT10, CT8, CT3, CT2, CT6 y CT7 en «Seis frentes»; CT18, CT22 y CT23 en «Momentos»; CT17, CT15 y CT14 en
+  «Programas» (según la sesión que armó el deck). De esos, sólo `CT24` está hoy en el índice de recetas de cine, y no
+  pertenece a estas láminas.
+
+## La lámina de equipo «Expertos multidisciplinarios» (aprobada el 2026-10-10)
+
+El operador pidió canonizar la lámina de equipo del deck de Marketing de Contenidos (línea `brand`) con su cifra: «Esto
+también con los +85 expertos me interesa canonizar». Es una **variante a mano de `content-team`**, no una receta nueva.
+
+- **Qué cambia frente a la receta:** el titular es «Expertos multidisciplinarios» (Bricolage 760 a 80 px, para que la
+  palabra larga no toque las fichas) en vez de «Personas reales», que el operador descartó; hay tres filas con ícono
+  Plastilina plano; y se suma un bloque de cifra, «+85» a 176 px con el «+» en el acento, junto a «expertos más en
+  Latam» y la línea «La red de Efeonce detrás de tu squad.».
+- **Lo que conserva:** eyebrow «Tu equipo», pregunta «¿Quién trabaja en mi marca?», la bajada del interlocutor único,
+  cinco fichas con retratos del catálogo (`deck-axis/assets/squad/`), la ficha central más grande y la órbita con «Tu
+  marca al centro de todo».
+- **Personas y cargos:** Andrés y Melkin (Senior Visual Designer), Valentina (Content Lead), Daniela (Creative
+  Operations Lead) y Julio al centro como «Responsable de Cuenta». Los cargos coinciden con los del
+  [roster](../../brand-photography/EFEONCE_TEAM_ROSTER_V1.md) (verificado el 2026-10-10); «Responsable de Cuenta» es el
+  rol de Julio en la cuenta, no su cargo (Managing & GTM Director).
+- **Estado en el catálogo:** variante aprobada, sin plantilla. Fuente:
+  `ai-generations/2026-10-09_deck-contenidos/laminas/expertos-multidisciplinarios.dc.html` y `equipo.generador.py`. Para
+  promoverla, `content-team` tendría que admitir un titular más largo a menor tamaño y un bloque de cifra.
+- **Condiciones abiertas, las decide el operador:**
+  - **La cifra 85 viene del operador y no tiene fuente en el repo.** La lámina no dice qué cuenta (personas del equipo,
+    red de colaboradores) ni a qué fecha. Si cambia, se actualiza en la lámina.
+  - El titular mide 80 px y la pregunta 38 px: no llega a las tres veces que pide la voz. En esta lámina el elemento
+    dominante es la cifra.
+  - La bajada, las tres filas y «La red de Efeonce detrás de tu squad.» los redactó la sesión; el operador aprobó el
+    deck en conjunto.
+  - El acento aparece cuatro veces (esfera, «+», filete de la ficha central y arco de la órbita). No rompe la regla: es
+    un solo color de acento y una sola esfera.
+
+## El deck Marketing de Contenidos (aprobado el 2026-10-10)
+
+El brochure de Marketing de Contenidos (línea `brand`, **57 láminas** y una ruta corta de 21), aprobado por el operador
+el 2026-10-10 («Me encantó todo, queda aprobado»), en el canvas
+[https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph](https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph). Recorrido, lo
+que fija y pendientes: [norma §4.6, «Deck Marketing de Contenidos»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+Fuente: `ai-generations/2026-10-09_deck-contenidos/deck/` (`LEEME.md`, con el orden de las 57).
+
+- **14 láminas de receta:** `cover-brochure`, `decision-case` (caso Sky), `method-hybrid-workforce` (social care, con un
+  Spark compuesto encima), stack, `content-day` en sus layouts `tools`, `live-progress` y `live-results`, control,
+  testimonio, clientes, partners, mercados, próximos pasos y contraportada. Sólo «Día a día» quedó registrada como
+  `approvedUses`; las otras trece tienen su intent en la carpeta del deck y no están en el JSON del catálogo.
+- **43 láminas a mano**, sin receta ni plantilla. Cuatro tienen registro propio en este README: las tres de franjas de
+  foto, «Producción con IA» y «Expertos multidisciplinarios». El resto son candidatas sin promover.
+- **Numeración vigente:** «Seis frentes» es la 4, «Producción con IA» la 10, «Momentos» la 28, «Programas» la 32, «Día a
+  día» la 40 y «Expertos multidisciplinarios» la 45. Las secciones de arriba citan los números que tenían al aprobarse.
+- **No se envía a un prospecto** hasta cerrar los pendientes de la norma: compromisos de servicio sin contrastar, «+85»
+  sin fuente, datos de muestra sin rótulo en «Día a día» y logos de terceros sin verificar.
 
 ## Anatomía de una receta (campos del JSON)
 
@@ -470,6 +666,7 @@ unos píxeles más ajustada.
 | Cifra escrita como texto plano | un slot `metric` que trae «68 %» como texto | `figure-source-missing` sólo detecta una cifra escrita como objeto con `value`; una cifra en texto plano pasa sin fuente. Escríbela como objeto con `source` para que el validador la vea. Abierto, sin task dueña |
 | Camino «ausente» de un slot opcional nuevo | toda plantilla compartida que suma un slot opcional (caso: la nota del pie de `proposal-cinematic`) | el probe del gate siempre rellena los slots opcionales, así que el gate **nunca ejercita** una receta existente sin el slot, y los snapshots de planes no renderizan. La nota emitía sus medidas sólo con nota y rompía la propuesta creativa sin nota (gl-css «undefined»); lo encontró el operador, no el gate. **Corregido** en `af32d9353` con `src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`. Regla vigente: todo slot opcional nuevo lleva un test que compone una receta existente sin él (misma clase de hueco que `CoverBrochure` con selección, TASK-1928) |
 | Las cinco `proposal-cinematic` sin mapa de slots | `proposal-cinematic-{creative,web,aeo,revops,seo}` (`slots: null` en `recipe-map.json`) | mapearlas juntas en `recipe-map.json`. Mientras tanto, la plantilla cine admite textos más largos que los de cada receta y el freno es `validateDeckPlan` (`slot-over-max-chars`), probado con un fixture adversarial. Dueña: TASK-1933 |
+| Halo de la esfera recortado en un cuadrado | `method-surround-cycle`, detrás del ícono de la estación 2 | **Resuelto el 2026-10-09** en `058df6ef8`: los filtros `sur-sphere-glow` y `sur-lit-glow` no declaraban región (por defecto, caja del objeto + 10 %) y el desenfoque salía cortado. Ahora usan `filterUnits="userSpaceOnUse"` con el lienzo entero. Snapshot de planes actualizado (una línea) y gate de La órbita a cero píxeles. Lo detectó el operador en la propuesta Pibank v13. Detalle: [spec §7.4](../../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md#74-filtros-svg-con-desenfoque-región-explícita-delta-2026-10-09) |
 | Plate SE1 fuera del banco | `proposal-service-seo`, `proposal-cinematic-seo` | declarado por ruta local (`ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png`), como los plates de las 69 recetas anteriores; se siembra en el banco de TASK-1931 |
 
 ## Qué sale hoy con un comando

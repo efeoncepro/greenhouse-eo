@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "use": "brochure",
+  "recipe": "decision-provider-fit",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Diagnóstico de encaje",
+    "question": "¿HubSpot, Salesforce o Zoho?",
+    "answer": [
+      "El que",
+      "encaje"
+    ]
+  },
+  "body": "No vendemos una plataforma: vendemos la **decisión**, con evidencia de tu operación.",
+  "note": "Ejemplo ilustrativo · el veredicto sale del diagnóstico",
+  "verdicts": [
+    {
+      "glyph": "embudo",
+      "title": "HubSpot",
+      "description": "Mid-market y enterprise que quieren valor en semanas y un solo CRM."
+    },
+    {
+      "glyph": "crm",
+      "title": "Salesforce",
+      "description": "Org compleja, gobierno enterprise, servicio a escala, varios países."
+    },
+    {
+      "glyph": "checklist",
+      "title": "Zoho",
+      "description": "Presupuesto de entrada y suite Zoho: si es lo tuyo, te lo decimos."
+    },
+    {
+      "glyph": "integracion",
+      "title": "Híbrida",
+      "description": "Cada plataforma donde rinde mejor, conectadas."
+    }
+  ],
+  "selectedVerdict": 1
+}

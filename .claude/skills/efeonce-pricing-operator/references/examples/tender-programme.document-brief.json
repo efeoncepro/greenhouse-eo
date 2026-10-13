@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "pricing-v3-quote-document-brief/1",
+  "reference": "Borrador · Programa SEO y AEO",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Comprador de ejemplo",
+    "taxId": "Identificación del comprador por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Programa",
+      "SEO y AEO."
+    ],
+    "subtitle": "Un programa de tres meses para Comprador de ejemplo, con un precio único por el programa completo.",
+    "netLabel": "Valor neto del programa"
+  },
+  "service": {
+    "name": "Programa SEO y AEO"
+  },
+  "scope": {
+    "title": [
+      "Un programa de",
+      "tres meses."
+    ],
+    "intro": "Borrador de alcance. La oferta final debe remitir a los entregables de la propuesta técnica.",
+    "rows": [
+      {
+        "title": "Diagnóstico",
+        "text": "Auditoría técnica y de contenidos del sitio."
+      },
+      {
+        "title": "Optimización",
+        "text": "Correcciones priorizadas y contenidos nuevos según el plan acordado."
+      },
+      {
+        "title": "Medición",
+        "text": "Informe mensual de avance y cierre del programa."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario del programa",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Diagnóstico",
+        "text": "Auditoría y plan de trabajo."
+      },
+      {
+        "label": "Mes 2",
+        "title": "Optimización",
+        "text": "Correcciones y contenidos."
+      },
+      {
+        "label": "Mes 3",
+        "title": "Optimización y cierre",
+        "text": "Contenidos, medición e informe final."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un precio por",
+      "el programa completo."
+    ],
+    "intro": "Valores en pesos chilenos (CLP). El precio es por el programa completo.",
+    "summary": "Programa completo · Pesos chilenos · IVA no incluido en el valor neto",
+    "taxNote": "El valor del programa es neto. El total incluye IVA."
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Precio del programa",
+        "text": "Un precio único por el alcance descrito en la propuesta técnica."
+      },
+      {
+        "title": "Plazo de ejecución",
+        "text": "Tres meses, contados como lo establecen las bases del proceso."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "La facturación y el pago son los que establecen las bases del proceso."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Borrador sin validez comercial. La oferta final debe indicar la vigencia que piden las bases."
+      }
+    ]
+  },
+  "combine": [
+    {
+      "keys": [
+        "fee"
+      ],
+      "label": "Programa SEO y AEO",
+      "detail": "Tres meses: diagnóstico, optimización y medición",
+      "unit": "programa"
+    }
+  ]
+}

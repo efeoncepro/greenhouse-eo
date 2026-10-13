@@ -1,0 +1,31 @@
+{
+  "roles": [
+    {
+      "sku": "ECG-021",
+      "hoursPerMonth": 140,
+      "monthlySellableHours": 140,
+      "allocationMode": "dedicated",
+      "roleCostOverrideUsd": 2400,
+      "roleCostSource": {
+        "reference": "Ejemplo hipotético de costo completo; reemplazar por costo real con fuente. No es payroll verificado.",
+        "asOf": "2026-10-09"
+      }
+    },
+    {
+      "sku": "ECG-027",
+      "hoursPerMonth": 4,
+      "monthlySellableHours": 140,
+      "allocationMode": "shared",
+      "assumeRemainingCapacitySold": true
+    }
+  ],
+  "targetMarginFraction": 0.40,
+  "transactionFeeFraction": 0.03,
+  "additionalMonthlyCostsUsd": [
+    { "label": "Gestión y QA — supuesto", "amount": 250 },
+    { "label": "Talent Assurance — reserva hipotética", "amount": 300 },
+    { "label": "Herramientas internas — supuesto", "amount": 80 }
+  ],
+  "setupCostUsd": 600,
+  "amortizationMonths": 3
+}

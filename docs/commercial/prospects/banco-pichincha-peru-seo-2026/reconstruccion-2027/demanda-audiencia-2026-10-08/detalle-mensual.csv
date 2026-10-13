@@ -1,0 +1,1189 @@
+scenario,month,family,origin,query,volume,basis,ready,capture,maturity,visits,openings,funded
+prudente,1,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.02,0.1,7.2,0.14400000000000002,0.0936
+prudente,1,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.02,0,0.0,0.0,0.0
+prudente,1,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.02,0.1,0.34,0.0068000000000000005,0.00442
+prudente,1,G05,panel_original,cuenta de ahorros sin mantenimiento,70,historical_estimate,1,0.02,0.1,0.14,0.0028000000000000004,0.00182
+prudente,1,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.02,0.1,0.020000000000000004,0.0004000000000000001,0.00026000000000000003
+prudente,1,C01,panel_original,cuentas de ahorro de alto rendimiento,2400,historical_estimate,2,0.02,0,0.0,0.0,0.0
+prudente,1,C02,panel_original,cuenta digital,1600,historical_estimate,1,0.02,0.1,3.2,0.064,0.0416
+prudente,1,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,590,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,C04,panel_original,que banco paga mas intereses en peru,70,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,B01,panel_original,cuenta de ahorro del bcp,8100,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,1,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,B03,panel_original,cuenta power scotiabank,1600,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,1,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,1,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,1,E01,panel_original,trea,2400,historical_estimate,1,0.02,0.1,4.800000000000001,0.09600000000000002,0.062400000000000004
+prudente,1,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,1,E03,panel_original,que es una cuenta de ahorro,590,historical_estimate,1,0.02,0.1,1.1800000000000002,0.023600000000000003,0.015340000000000001
+prudente,1,E04,panel_original,como ahorrar dinero,720,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,1,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,X03,ampliacion,cuenta independencia bbva,4400,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,1,X04,ampliacion,cuenta ganadora bbva,3600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,1,X05,ampliacion,financiera efectiva cuenta de ahorros,210,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,1,X06,ampliacion,agora cuenta de ahorros,390,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,1,X07,ampliacion,banbif cuenta de ahorros,590,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,1,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,1,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1900,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,X10,ampliacion,presupuesto familiar,210,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,1,X11,ampliacion,fondo de emergencia,110,historical_estimate,2,0.02,0,0.0,0.0,0.0
+prudente,1,X12,ampliacion,ahorro programado,170,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,1,X13,ampliacion,metas de ahorro,70,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,1,X14,ampliacion,calculadora interes compuesto,1900,historical_estimate,2,0.02,0,0.0,0.0,0.0
+prudente,2,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.02,0.2,11.600000000000001,0.23200000000000004,0.15080000000000002
+prudente,2,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.02,0.1,0.42000000000000004,0.008400000000000001,0.0054600000000000004
+prudente,2,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,G04,panel_original,abrir cuenta de ahorros,210,historical_estimate,1,0.02,0.2,0.8400000000000001,0.016800000000000002,0.010920000000000001
+prudente,2,G05,panel_original,cuenta de ahorros sin mantenimiento,50,historical_estimate,1,0.02,0.2,0.2,0.004,0.0026
+prudente,2,G06,panel_original,requisitos para abrir una cuenta de ahorros,40,historical_estimate,1,0.02,0.2,0.16000000000000003,0.0032000000000000006,0.0020800000000000003
+prudente,2,C01,panel_original,cuentas de ahorro de alto rendimiento,1600,historical_estimate,2,0.02,0.1,3.2,0.064,0.0416
+prudente,2,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,0.2,5.2,0.10400000000000001,0.0676
+prudente,2,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,480,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,C04,panel_original,que banco paga mas intereses en peru,50,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,B01,panel_original,cuenta de ahorro del bcp,6600,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,2,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,2,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,2,B05,panel_original,cuenta digital bbva,5400,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,2,E01,panel_original,trea,1900,historical_estimate,1,0.02,0.2,7.6000000000000005,0.15200000000000002,0.0988
+prudente,2,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,2,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,0.2,1.92,0.0384,0.02496
+prudente,2,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,2,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,2,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,2,X05,ampliacion,financiera efectiva cuenta de ahorros,170,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,2,X06,ampliacion,agora cuenta de ahorros,320,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,2,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,2,X08,ampliacion,depósito a plazo fijo,5400,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,2,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,X10,ampliacion,presupuesto familiar,210,historical_estimate,3,0.02,0,0.0,0.0,0.0
+prudente,2,X11,ampliacion,fondo de emergencia,90,historical_estimate,2,0.02,0.1,0.18000000000000002,0.0036000000000000003,0.00234
+prudente,2,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,2,X13,ampliacion,metas de ahorro,70,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,2,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.02,0.1,2.6,0.052000000000000005,0.0338
+prudente,3,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.02,0.35,25.2,0.504,0.3276
+prudente,3,G02,panel_original,cuenta de ahorro con intereses,390,historical_estimate,2,0.02,0.2,1.56,0.031200000000000002,0.02028
+prudente,3,G03,panel_original,mejores cuentas de ahorro peru,480,historical_estimate,3,0.02,0.1,0.96,0.0192,0.01248
+prudente,3,G04,panel_original,abrir cuenta de ahorros,320,historical_estimate,1,0.02,0.35,2.2399999999999998,0.0448,0.029119999999999997
+prudente,3,G05,panel_original,cuenta de ahorros sin mantenimiento,70,historical_estimate,1,0.02,0.35,0.49,0.0098,0.00637
+prudente,3,G06,panel_original,requisitos para abrir una cuenta de ahorros,110,historical_estimate,1,0.02,0.35,0.77,0.0154,0.01001
+prudente,3,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.02,0.2,7.6000000000000005,0.15200000000000002,0.0988
+prudente,3,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,0.35,9.1,0.182,0.11829999999999999
+prudente,3,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,480,historical_estimate,3,0.02,0.1,0.96,0.0192,0.01248
+prudente,3,C04,panel_original,que banco paga mas intereses en peru,40,historical_estimate,3,0.02,0.1,0.08000000000000002,0.0016000000000000003,0.0010400000000000001
+prudente,3,B01,panel_original,cuenta de ahorro del bcp,6600,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,3,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.02,0.1,3.8000000000000003,0.07600000000000001,0.0494
+prudente,3,B03,panel_original,cuenta power scotiabank,1600,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,3,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,3,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,3,E01,panel_original,trea,2400,historical_estimate,1,0.02,0.35,16.799999999999997,0.33599999999999997,0.21839999999999996
+prudente,3,E02,panel_original,fondo de seguro de depositos,1900,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,3,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,0.35,3.36,0.0672,0.04368
+prudente,3,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,3,X01,ampliacion,cuenta simple interbank,14800,historical_estimate,3,0.02,0.1,29.6,0.5920000000000001,0.3848
+prudente,3,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.02,0.1,8.8,0.17600000000000002,0.1144
+prudente,3,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,3,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,3,X05,ampliacion,financiera efectiva cuenta de ahorros,210,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,3,X06,ampliacion,agora cuenta de ahorros,320,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,3,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,3,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,3,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,historical_estimate,3,0.02,0.1,3.2,0.064,0.0416
+prudente,3,X10,ampliacion,presupuesto familiar,390,historical_estimate,3,0.02,0.1,0.78,0.015600000000000001,0.01014
+prudente,3,X11,ampliacion,fondo de emergencia,170,historical_estimate,2,0.02,0.2,0.68,0.013600000000000001,0.00884
+prudente,3,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,3,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.02,0,0.0,0.0,0.0
+prudente,3,X14,ampliacion,calculadora interes compuesto,1600,historical_estimate,2,0.02,0.2,6.4,0.128,0.0832
+prudente,4,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.02,0.5,36.0,0.72,0.46799999999999997
+prudente,4,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.02,0.35,1.47,0.0294,0.01911
+prudente,4,G03,panel_original,mejores cuentas de ahorro peru,390,historical_estimate,3,0.02,0.2,1.56,0.031200000000000002,0.02028
+prudente,4,G04,panel_original,abrir cuenta de ahorros,210,historical_estimate,1,0.02,0.5,2.1,0.042,0.0273
+prudente,4,G05,panel_original,cuenta de ahorros sin mantenimiento,30,historical_estimate,1,0.02,0.5,0.3,0.006,0.0039
+prudente,4,G06,panel_original,requisitos para abrir una cuenta de ahorros,40,historical_estimate,1,0.02,0.5,0.4,0.008,0.0052
+prudente,4,C01,panel_original,cuentas de ahorro de alto rendimiento,1600,historical_estimate,2,0.02,0.35,11.2,0.22399999999999998,0.14559999999999998
+prudente,4,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,0.5,13.0,0.26,0.16899999999999998
+prudente,4,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,260,historical_estimate,3,0.02,0.2,1.04,0.020800000000000003,0.013519999999999999
+prudente,4,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.02,0.2,0.08000000000000002,0.0016000000000000003,0.0010400000000000001
+prudente,4,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.02,0.1,10.8,0.21600000000000003,0.1404
+prudente,4,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.02,0.2,9.600000000000001,0.19200000000000003,0.12480000000000001
+prudente,4,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,4,B04,panel_original,cuenta digital scotiabank,2400,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,4,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,4,E01,panel_original,trea,2400,historical_estimate,1,0.02,0.5,24.0,0.48,0.312
+prudente,4,E02,panel_original,fondo de seguro de depositos,1900,historical_estimate,4,0.02,0.1,3.8000000000000003,0.07600000000000001,0.0494
+prudente,4,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,0.5,4.8,0.096,0.0624
+prudente,4,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.02,0,0.0,0.0,0.0
+prudente,4,X01,ampliacion,cuenta simple interbank,14800,historical_estimate,3,0.02,0.2,59.2,1.1840000000000002,0.7696
+prudente,4,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.02,0.2,14.4,0.28800000000000003,0.1872
+prudente,4,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,4,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,4,X05,ampliacion,financiera efectiva cuenta de ahorros,170,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,4,X06,ampliacion,agora cuenta de ahorros,210,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,4,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,4,X08,ampliacion,depósito a plazo fijo,5400,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,4,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.02,0.2,5.2,0.10400000000000001,0.0676
+prudente,4,X10,ampliacion,presupuesto familiar,720,historical_estimate,3,0.02,0.2,2.8800000000000003,0.057600000000000005,0.03744
+prudente,4,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.02,0.35,0.98,0.0196,0.01274
+prudente,4,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.02,0.1,0.22000000000000003,0.0044,0.00286
+prudente,4,X13,ampliacion,metas de ahorro,140,historical_estimate,4,0.02,0.1,0.28,0.005600000000000001,0.00364
+prudente,4,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.02,0.35,9.1,0.182,0.11829999999999999
+prudente,5,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.02,0.65,37.7,0.7540000000000001,0.49010000000000004
+prudente,5,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.02,0.5,2.1,0.042,0.0273
+prudente,5,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.02,0.35,2.2399999999999998,0.0448,0.029119999999999997
+prudente,5,G04,panel_original,abrir cuenta de ahorros,260,historical_estimate,1,0.02,0.65,3.3800000000000003,0.06760000000000001,0.04394
+prudente,5,G05,panel_original,cuenta de ahorros sin mantenimiento,20,historical_estimate,1,0.02,0.65,0.26,0.005200000000000001,0.0033799999999999998
+prudente,5,G06,panel_original,requisitos para abrir una cuenta de ahorros,70,historical_estimate,1,0.02,0.65,0.9100000000000001,0.018200000000000004,0.011830000000000002
+prudente,5,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.02,0.5,19.0,0.38,0.247
+prudente,5,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,0.65,16.900000000000002,0.338,0.2197
+prudente,5,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390,historical_estimate,3,0.02,0.35,2.73,0.0546,0.03549
+prudente,5,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.02,0.35,0.13999999999999999,0.0028,0.0018199999999999998
+prudente,5,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.02,0.2,21.6,0.43200000000000005,0.2808
+prudente,5,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.02,0.35,13.299999999999999,0.26599999999999996,0.17289999999999997
+prudente,5,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.02,0.1,2.0,0.04,0.026
+prudente,5,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.02,0.1,3.8000000000000003,0.07600000000000001,0.0494
+prudente,5,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,5,E01,panel_original,trea,2400,historical_estimate,1,0.02,0.65,31.200000000000003,0.6240000000000001,0.4056
+prudente,5,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.02,0.2,6.4,0.128,0.0832
+prudente,5,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,0.65,6.24,0.12480000000000001,0.08112
+prudente,5,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.02,0.1,0.96,0.0192,0.01248
+prudente,5,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.02,0.35,84.69999999999999,1.6939999999999997,1.1010999999999997
+prudente,5,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.02,0.35,25.2,0.504,0.3276
+prudente,5,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,5,X04,ampliacion,cuenta ganadora bbva,3600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,5,X05,ampliacion,financiera efectiva cuenta de ahorros,140,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,5,X06,ampliacion,agora cuenta de ahorros,260,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,5,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,5,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.02,0,0.0,0.0,0.0
+prudente,5,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.02,0.35,9.1,0.182,0.11829999999999999
+prudente,5,X10,ampliacion,presupuesto familiar,880,historical_estimate,3,0.02,0.35,6.16,0.1232,0.08008
+prudente,5,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.02,0.5,1.4000000000000001,0.028000000000000004,0.0182
+prudente,5,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.02,0.2,0.44000000000000006,0.0088,0.00572
+prudente,5,X13,ampliacion,metas de ahorro,110,historical_estimate,4,0.02,0.2,0.44000000000000006,0.0088,0.00572
+prudente,5,X14,ampliacion,calculadora interes compuesto,1600,historical_estimate,2,0.02,0.5,16.0,0.32,0.208
+prudente,6,G01,panel_original,cuenta de ahorros,2400,historical_estimate,1,0.02,0.8,38.400000000000006,0.7680000000000001,0.49920000000000003
+prudente,6,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.02,0.65,1.4300000000000002,0.028600000000000004,0.018590000000000002
+prudente,6,G03,panel_original,mejores cuentas de ahorro peru,260,historical_estimate,3,0.02,0.5,2.6,0.052000000000000005,0.0338
+prudente,6,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.02,0.8,2.72,0.054400000000000004,0.03536
+prudente,6,G05,panel_original,cuenta de ahorros sin mantenimiento,20,historical_estimate,1,0.02,0.8,0.32000000000000006,0.006400000000000001,0.0041600000000000005
+prudente,6,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.02,0.8,0.16000000000000003,0.0032000000000000006,0.0020800000000000003
+prudente,6,C01,panel_original,cuentas de ahorro de alto rendimiento,1300,historical_estimate,2,0.02,0.65,16.900000000000002,0.338,0.2197
+prudente,6,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,0.8,20.8,0.41600000000000004,0.2704
+prudente,6,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,260,historical_estimate,3,0.02,0.5,2.6,0.052000000000000005,0.0338
+prudente,6,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.02,0.5,0.2,0.004,0.0026
+prudente,6,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.02,0.35,37.8,0.756,0.49139999999999995
+prudente,6,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.02,0.5,24.0,0.48,0.312
+prudente,6,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.02,0.2,4.0,0.08,0.052
+prudente,6,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.02,0.2,6.4,0.128,0.0832
+prudente,6,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0.1,13.200000000000001,0.264,0.1716
+prudente,6,E01,panel_original,trea,2400,historical_estimate,1,0.02,0.8,38.400000000000006,0.7680000000000001,0.49920000000000003
+prudente,6,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.02,0.35,11.2,0.22399999999999998,0.14559999999999998
+prudente,6,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,0.8,7.68,0.1536,0.09984
+prudente,6,E04,panel_original,como ahorrar dinero,590,historical_estimate,5,0.02,0.2,2.3600000000000003,0.047200000000000006,0.030680000000000002
+prudente,6,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.02,0.5,121.0,2.42,1.573
+prudente,6,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.02,0.5,36.0,0.72,0.46799999999999997
+prudente,6,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.02,0.1,5.800000000000001,0.11600000000000002,0.07540000000000001
+prudente,6,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.02,0.1,5.800000000000001,0.11600000000000002,0.07540000000000001
+prudente,6,X05,ampliacion,financiera efectiva cuenta de ahorros,140,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,6,X06,ampliacion,agora cuenta de ahorros,140,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,6,X07,ampliacion,banbif cuenta de ahorros,390,historical_estimate,7,0.02,0,0.0,0.0,0.0
+prudente,6,X08,ampliacion,depósito a plazo fijo,4400,historical_estimate,6,0.02,0.1,8.8,0.17600000000000002,0.1144
+prudente,6,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.02,0.5,13.0,0.26,0.16899999999999998
+prudente,6,X10,ampliacion,presupuesto familiar,1000,historical_estimate,3,0.02,0.5,10.0,0.2,0.13
+prudente,6,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.02,0.65,1.8200000000000003,0.03640000000000001,0.023660000000000004
+prudente,6,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.02,0.35,0.63,0.0126,0.00819
+prudente,6,X13,ampliacion,metas de ahorro,140,historical_estimate,4,0.02,0.35,0.98,0.0196,0.01274
+prudente,6,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.02,0.65,16.900000000000002,0.338,0.2197
+prudente,7,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.02,1.0,58.0,1.16,0.754
+prudente,7,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.02,0.8,1.7600000000000002,0.0352,0.02288
+prudente,7,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.02,0.65,4.16,0.08320000000000001,0.054079999999999996
+prudente,7,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,7,G05,panel_original,cuenta de ahorros sin mantenimiento,30,historical_estimate,1,0.02,1.0,0.6,0.012,0.0078
+prudente,7,G06,panel_original,requisitos para abrir una cuenta de ahorros,20,historical_estimate,1,0.02,1.0,0.4,0.008,0.0052
+prudente,7,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.02,0.8,30.400000000000002,0.6080000000000001,0.3952
+prudente,7,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,7,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,320,historical_estimate,3,0.02,0.65,4.16,0.08320000000000001,0.054079999999999996
+prudente,7,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.02,0.65,0.26,0.005200000000000001,0.0033799999999999998
+prudente,7,B01,panel_original,cuenta de ahorro del bcp,4400,historical_estimate,4,0.02,0.5,44.0,0.88,0.572
+prudente,7,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.02,0.65,31.200000000000003,0.6240000000000001,0.4056
+prudente,7,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.02,0.35,7.0,0.14,0.091
+prudente,7,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.02,0.35,11.2,0.22399999999999998,0.14559999999999998
+prudente,7,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0.2,26.400000000000002,0.528,0.3432
+prudente,7,E01,panel_original,trea,2400,historical_estimate,1,0.02,1.0,48.0,0.96,0.624
+prudente,7,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.02,0.5,13.0,0.26,0.16899999999999998
+prudente,7,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,1.0,9.6,0.192,0.1248
+prudente,7,E04,panel_original,como ahorrar dinero,390,historical_estimate,5,0.02,0.35,2.73,0.0546,0.03549
+prudente,7,X01,ampliacion,cuenta simple interbank,9900,historical_estimate,3,0.02,0.65,128.70000000000002,2.5740000000000003,1.6731000000000003
+prudente,7,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.02,0.65,46.800000000000004,0.936,0.6084
+prudente,7,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.02,0.2,11.600000000000001,0.23200000000000004,0.15080000000000002
+prudente,7,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.02,0.2,11.600000000000001,0.23200000000000004,0.15080000000000002
+prudente,7,X05,ampliacion,financiera efectiva cuenta de ahorros,70,historical_estimate,7,0.02,0.1,0.14,0.0028000000000000004,0.00182
+prudente,7,X06,ampliacion,agora cuenta de ahorros,140,historical_estimate,7,0.02,0.1,0.28,0.005600000000000001,0.00364
+prudente,7,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.02,0.1,0.96,0.0192,0.01248
+prudente,7,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.02,0.2,26.400000000000002,0.528,0.3432
+prudente,7,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.02,0.65,16.900000000000002,0.338,0.2197
+prudente,7,X10,ampliacion,presupuesto familiar,480,historical_estimate,3,0.02,0.65,6.24,0.12480000000000001,0.08112
+prudente,7,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.02,0.8,2.24,0.044800000000000006,0.02912
+prudente,7,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.02,0.5,0.9,0.018000000000000002,0.0117
+prudente,7,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.02,0.5,0.9,0.018000000000000002,0.0117
+prudente,7,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.02,0.8,20.8,0.41600000000000004,0.2704
+prudente,8,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.02,1.0,58.0,1.16,0.754
+prudente,8,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.02,1.0,2.2,0.044000000000000004,0.0286
+prudente,8,G03,panel_original,mejores cuentas de ahorro peru,260,historical_estimate,3,0.02,0.8,4.16,0.08320000000000001,0.054079999999999996
+prudente,8,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,8,G05,panel_original,cuenta de ahorros sin mantenimiento,50,historical_estimate,1,0.02,1.0,1.0,0.02,0.013
+prudente,8,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.02,1.0,0.2,0.004,0.0026
+prudente,8,C01,panel_original,cuentas de ahorro de alto rendimiento,2900,historical_estimate,2,0.02,1.0,58.0,1.16,0.754
+prudente,8,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,8,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,320,historical_estimate,3,0.02,0.8,5.120000000000001,0.10240000000000002,0.06656000000000001
+prudente,8,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.02,0.8,0.32000000000000006,0.006400000000000001,0.0041600000000000005
+prudente,8,B01,panel_original,cuenta de ahorro del bcp,4400,historical_estimate,4,0.02,0.65,57.2,1.1440000000000001,0.7436
+prudente,8,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.02,0.8,30.400000000000002,0.6080000000000001,0.3952
+prudente,8,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.02,0.5,13.0,0.26,0.16899999999999998
+prudente,8,B04,panel_original,cuenta digital scotiabank,2400,historical_estimate,5,0.02,0.5,24.0,0.48,0.312
+prudente,8,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.02,0.35,46.199999999999996,0.9239999999999999,0.6005999999999999
+prudente,8,E01,panel_original,trea,2400,historical_estimate,1,0.02,1.0,48.0,0.96,0.624
+prudente,8,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.02,0.65,16.900000000000002,0.338,0.2197
+prudente,8,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.02,1.0,9.6,0.192,0.1248
+prudente,8,E04,panel_original,como ahorrar dinero,390,historical_estimate,5,0.02,0.5,3.9,0.078,0.050699999999999995
+prudente,8,X01,ampliacion,cuenta simple interbank,9900,historical_estimate,3,0.02,0.8,158.4,3.168,2.0592
+prudente,8,X02,ampliacion,cuenta millonaria interbank,2900,historical_estimate,3,0.02,0.8,46.400000000000006,0.9280000000000002,0.6032000000000001
+prudente,8,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.02,0.35,20.299999999999997,0.40599999999999997,0.26389999999999997
+prudente,8,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.02,0.35,20.299999999999997,0.40599999999999997,0.26389999999999997
+prudente,8,X05,ampliacion,financiera efectiva cuenta de ahorros,40,historical_estimate,7,0.02,0.2,0.16000000000000003,0.0032000000000000006,0.0020800000000000003
+prudente,8,X06,ampliacion,agora cuenta de ahorros,110,historical_estimate,7,0.02,0.2,0.44000000000000006,0.0088,0.00572
+prudente,8,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.02,0.2,1.92,0.0384,0.02496
+prudente,8,X08,ampliacion,depósito a plazo fijo,4400,historical_estimate,6,0.02,0.35,30.799999999999997,0.616,0.4003999999999999
+prudente,8,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.02,0.8,20.8,0.41600000000000004,0.2704
+prudente,8,X10,ampliacion,presupuesto familiar,590,historical_estimate,3,0.02,0.8,9.440000000000001,0.18880000000000002,0.12272000000000001
+prudente,8,X11,ampliacion,fondo de emergencia,170,historical_estimate,2,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,8,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.02,0.65,1.1700000000000002,0.023400000000000004,0.015210000000000001
+prudente,8,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.02,0.65,1.1700000000000002,0.023400000000000004,0.015210000000000001
+prudente,8,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,9,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,9,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.02,1.0,4.2,0.084,0.0546
+prudente,9,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.02,1.0,6.4,0.128,0.0832
+prudente,9,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.02,1.0,4.2,0.084,0.0546
+prudente,9,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,9,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,9,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,9,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,9,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.02,1.0,7.8,0.156,0.10139999999999999
+prudente,9,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.02,1.0,0.8,0.016,0.0104
+prudente,9,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.02,0.8,105.60000000000001,2.112,1.3728
+prudente,9,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.02,1.0,38.0,0.76,0.494
+prudente,9,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.02,0.65,16.900000000000002,0.338,0.2197
+prudente,9,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.02,0.65,24.7,0.494,0.3211
+prudente,9,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.02,0.5,66.0,1.32,0.858
+prudente,9,E01,panel_original,trea,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,9,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.02,0.8,25.6,0.512,0.3328
+prudente,9,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.02,1.0,11.8,0.23600000000000002,0.1534
+prudente,9,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.02,0.65,7.670000000000001,0.1534,0.09971000000000001
+prudente,9,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.02,1.0,242.0,4.84,3.146
+prudente,9,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.02,1.0,88.0,1.76,1.144
+prudente,9,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.02,0.5,36.0,0.72,0.46799999999999997
+prudente,9,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.02,0.5,29.0,0.58,0.377
+prudente,9,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.02,0.35,0.98,0.0196,0.01274
+prudente,9,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.02,0.35,1.8199999999999998,0.036399999999999995,0.023659999999999997
+prudente,9,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.02,0.35,3.36,0.0672,0.04368
+prudente,9,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.02,0.5,66.0,1.32,0.858
+prudente,9,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.02,1.0,32.0,0.64,0.416
+prudente,9,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.02,1.0,17.6,0.35200000000000004,0.2288
+prudente,9,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,9,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.02,0.8,1.7600000000000002,0.0352,0.02288
+prudente,9,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.02,0.8,2.24,0.044800000000000006,0.02912
+prudente,9,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,10,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,10,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.02,1.0,4.2,0.084,0.0546
+prudente,10,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.02,1.0,6.4,0.128,0.0832
+prudente,10,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.02,1.0,4.2,0.084,0.0546
+prudente,10,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,10,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,10,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,10,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,10,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.02,1.0,7.8,0.156,0.10139999999999999
+prudente,10,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.02,1.0,0.8,0.016,0.0104
+prudente,10,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.02,1.0,132.0,2.64,1.716
+prudente,10,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.02,1.0,38.0,0.76,0.494
+prudente,10,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.02,0.8,20.8,0.41600000000000004,0.2704
+prudente,10,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.02,0.8,30.400000000000002,0.6080000000000001,0.3952
+prudente,10,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.02,0.65,85.8,1.716,1.1154
+prudente,10,E01,panel_original,trea,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,10,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.02,1.0,32.0,0.64,0.416
+prudente,10,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.02,1.0,11.8,0.23600000000000002,0.1534
+prudente,10,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.02,0.8,9.440000000000001,0.18880000000000002,0.12272000000000001
+prudente,10,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.02,1.0,242.0,4.84,3.146
+prudente,10,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.02,1.0,88.0,1.76,1.144
+prudente,10,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.02,0.65,46.800000000000004,0.936,0.6084
+prudente,10,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.02,0.65,37.7,0.7540000000000001,0.49010000000000004
+prudente,10,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.02,0.5,1.4000000000000001,0.028000000000000004,0.0182
+prudente,10,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.02,0.5,2.6,0.052000000000000005,0.0338
+prudente,10,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.02,0.5,4.8,0.096,0.0624
+prudente,10,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.02,0.65,85.8,1.716,1.1154
+prudente,10,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.02,1.0,32.0,0.64,0.416
+prudente,10,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.02,1.0,17.6,0.35200000000000004,0.2288
+prudente,10,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,10,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.02,1.0,2.2,0.044000000000000004,0.0286
+prudente,10,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.02,1.0,2.8000000000000003,0.05600000000000001,0.0364
+prudente,10,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,11,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,11,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.02,1.0,4.2,0.084,0.0546
+prudente,11,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.02,1.0,6.4,0.128,0.0832
+prudente,11,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.02,1.0,4.2,0.084,0.0546
+prudente,11,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,11,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,11,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,11,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,11,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.02,1.0,7.8,0.156,0.10139999999999999
+prudente,11,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.02,1.0,0.8,0.016,0.0104
+prudente,11,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.02,1.0,132.0,2.64,1.716
+prudente,11,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.02,1.0,38.0,0.76,0.494
+prudente,11,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,11,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.02,1.0,38.0,0.76,0.494
+prudente,11,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.02,0.8,105.60000000000001,2.112,1.3728
+prudente,11,E01,panel_original,trea,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,11,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.02,1.0,32.0,0.64,0.416
+prudente,11,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.02,1.0,11.8,0.23600000000000002,0.1534
+prudente,11,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.02,1.0,11.8,0.23600000000000002,0.1534
+prudente,11,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.02,1.0,242.0,4.84,3.146
+prudente,11,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.02,1.0,88.0,1.76,1.144
+prudente,11,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.02,0.8,57.6,1.1520000000000001,0.7488
+prudente,11,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.02,0.8,46.400000000000006,0.9280000000000002,0.6032000000000001
+prudente,11,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.02,0.65,1.8200000000000003,0.03640000000000001,0.023660000000000004
+prudente,11,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.02,0.65,3.3800000000000003,0.06760000000000001,0.04394
+prudente,11,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.02,0.65,6.24,0.12480000000000001,0.08112
+prudente,11,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.02,0.8,105.60000000000001,2.112,1.3728
+prudente,11,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.02,1.0,32.0,0.64,0.416
+prudente,11,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.02,1.0,17.6,0.35200000000000004,0.2288
+prudente,11,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,11,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.02,1.0,2.2,0.044000000000000004,0.0286
+prudente,11,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.02,1.0,2.8000000000000003,0.05600000000000001,0.0364
+prudente,11,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,12,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,12,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.02,1.0,4.2,0.084,0.0546
+prudente,12,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.02,1.0,6.4,0.128,0.0832
+prudente,12,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.02,1.0,4.2,0.084,0.0546
+prudente,12,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,12,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.02,1.0,1.0,0.02,0.013
+prudente,12,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+prudente,12,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,12,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.02,1.0,7.8,0.156,0.10139999999999999
+prudente,12,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.02,1.0,0.8,0.016,0.0104
+prudente,12,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.02,1.0,132.0,2.64,1.716
+prudente,12,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.02,1.0,38.0,0.76,0.494
+prudente,12,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.02,1.0,26.0,0.52,0.33799999999999997
+prudente,12,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.02,1.0,38.0,0.76,0.494
+prudente,12,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.02,1.0,132.0,2.64,1.716
+prudente,12,E01,panel_original,trea,2900.0,flat_assumption,1,0.02,1.0,58.0,1.16,0.754
+prudente,12,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.02,1.0,32.0,0.64,0.416
+prudente,12,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.02,1.0,11.8,0.23600000000000002,0.1534
+prudente,12,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.02,1.0,11.8,0.23600000000000002,0.1534
+prudente,12,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.02,1.0,242.0,4.84,3.146
+prudente,12,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.02,1.0,88.0,1.76,1.144
+prudente,12,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.02,1.0,72.0,1.44,0.9359999999999999
+prudente,12,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.02,1.0,58.0,1.16,0.754
+prudente,12,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.02,0.8,2.24,0.044800000000000006,0.02912
+prudente,12,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.02,0.8,4.16,0.08320000000000001,0.054079999999999996
+prudente,12,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.02,0.8,7.68,0.1536,0.09984
+prudente,12,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.02,1.0,132.0,2.64,1.716
+prudente,12,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.02,1.0,32.0,0.64,0.416
+prudente,12,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.02,1.0,17.6,0.35200000000000004,0.2288
+prudente,12,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.02,1.0,3.4,0.068,0.044199999999999996
+prudente,12,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.02,1.0,2.2,0.044000000000000004,0.0286
+prudente,12,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.02,1.0,2.8000000000000003,0.05600000000000001,0.0364
+prudente,12,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.02,1.0,32.0,0.64,0.416
+trabajo,1,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.05,0.1,18.0,0.36,0.23399999999999999
+trabajo,1,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.05,0,0.0,0.0,0.0
+trabajo,1,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.05,0.1,0.8500000000000001,0.017,0.01105
+trabajo,1,G05,panel_original,cuenta de ahorros sin mantenimiento,70,historical_estimate,1,0.05,0.1,0.35000000000000003,0.007000000000000001,0.00455
+trabajo,1,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.05,0.1,0.05,0.001,0.00065
+trabajo,1,C01,panel_original,cuentas de ahorro de alto rendimiento,2400,historical_estimate,2,0.05,0,0.0,0.0,0.0
+trabajo,1,C02,panel_original,cuenta digital,1600,historical_estimate,1,0.05,0.1,8.0,0.16,0.104
+trabajo,1,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,590,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,C04,panel_original,que banco paga mas intereses en peru,70,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,B01,panel_original,cuenta de ahorro del bcp,8100,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,1,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,B03,panel_original,cuenta power scotiabank,1600,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,1,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,1,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,1,E01,panel_original,trea,2400,historical_estimate,1,0.05,0.1,12.0,0.24,0.156
+trabajo,1,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,1,E03,panel_original,que es una cuenta de ahorro,590,historical_estimate,1,0.05,0.1,2.95,0.059000000000000004,0.03835
+trabajo,1,E04,panel_original,como ahorrar dinero,720,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,1,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,X03,ampliacion,cuenta independencia bbva,4400,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,1,X04,ampliacion,cuenta ganadora bbva,3600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,1,X05,ampliacion,financiera efectiva cuenta de ahorros,210,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,1,X06,ampliacion,agora cuenta de ahorros,390,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,1,X07,ampliacion,banbif cuenta de ahorros,590,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,1,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,1,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1900,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,X10,ampliacion,presupuesto familiar,210,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,1,X11,ampliacion,fondo de emergencia,110,historical_estimate,2,0.05,0,0.0,0.0,0.0
+trabajo,1,X12,ampliacion,ahorro programado,170,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,1,X13,ampliacion,metas de ahorro,70,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,1,X14,ampliacion,calculadora interes compuesto,1900,historical_estimate,2,0.05,0,0.0,0.0,0.0
+trabajo,2,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.05,0.2,29.0,0.58,0.377
+trabajo,2,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.05,0.1,1.05,0.021,0.01365
+trabajo,2,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,G04,panel_original,abrir cuenta de ahorros,210,historical_estimate,1,0.05,0.2,2.1,0.042,0.0273
+trabajo,2,G05,panel_original,cuenta de ahorros sin mantenimiento,50,historical_estimate,1,0.05,0.2,0.5,0.01,0.0065
+trabajo,2,G06,panel_original,requisitos para abrir una cuenta de ahorros,40,historical_estimate,1,0.05,0.2,0.4,0.008,0.0052
+trabajo,2,C01,panel_original,cuentas de ahorro de alto rendimiento,1600,historical_estimate,2,0.05,0.1,8.0,0.16,0.104
+trabajo,2,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,0.2,13.0,0.26,0.16899999999999998
+trabajo,2,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,480,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,C04,panel_original,que banco paga mas intereses en peru,50,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,B01,panel_original,cuenta de ahorro del bcp,6600,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,2,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,2,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,2,B05,panel_original,cuenta digital bbva,5400,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,2,E01,panel_original,trea,1900,historical_estimate,1,0.05,0.2,19.0,0.38,0.247
+trabajo,2,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,2,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,0.2,4.800000000000001,0.09600000000000002,0.062400000000000004
+trabajo,2,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,2,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,2,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,2,X05,ampliacion,financiera efectiva cuenta de ahorros,170,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,2,X06,ampliacion,agora cuenta de ahorros,320,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,2,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,2,X08,ampliacion,depósito a plazo fijo,5400,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,2,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,X10,ampliacion,presupuesto familiar,210,historical_estimate,3,0.05,0,0.0,0.0,0.0
+trabajo,2,X11,ampliacion,fondo de emergencia,90,historical_estimate,2,0.05,0.1,0.45,0.009000000000000001,0.00585
+trabajo,2,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,2,X13,ampliacion,metas de ahorro,70,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,2,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.05,0.1,6.5,0.13,0.08449999999999999
+trabajo,3,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.05,0.35,62.99999999999999,1.2599999999999998,0.8189999999999998
+trabajo,3,G02,panel_original,cuenta de ahorro con intereses,390,historical_estimate,2,0.05,0.2,3.9000000000000004,0.07800000000000001,0.0507
+trabajo,3,G03,panel_original,mejores cuentas de ahorro peru,480,historical_estimate,3,0.05,0.1,2.4000000000000004,0.04800000000000001,0.031200000000000002
+trabajo,3,G04,panel_original,abrir cuenta de ahorros,320,historical_estimate,1,0.05,0.35,5.6,0.11199999999999999,0.07279999999999999
+trabajo,3,G05,panel_original,cuenta de ahorros sin mantenimiento,70,historical_estimate,1,0.05,0.35,1.2249999999999999,0.024499999999999997,0.015924999999999998
+trabajo,3,G06,panel_original,requisitos para abrir una cuenta de ahorros,110,historical_estimate,1,0.05,0.35,1.9249999999999998,0.0385,0.025024999999999995
+trabajo,3,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.05,0.2,19.0,0.38,0.247
+trabajo,3,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,0.35,22.75,0.455,0.29575
+trabajo,3,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,480,historical_estimate,3,0.05,0.1,2.4000000000000004,0.04800000000000001,0.031200000000000002
+trabajo,3,C04,panel_original,que banco paga mas intereses en peru,40,historical_estimate,3,0.05,0.1,0.2,0.004,0.0026
+trabajo,3,B01,panel_original,cuenta de ahorro del bcp,6600,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,3,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.05,0.1,9.5,0.19,0.1235
+trabajo,3,B03,panel_original,cuenta power scotiabank,1600,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,3,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,3,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,3,E01,panel_original,trea,2400,historical_estimate,1,0.05,0.35,42.0,0.84,0.5459999999999999
+trabajo,3,E02,panel_original,fondo de seguro de depositos,1900,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,3,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,0.35,8.399999999999999,0.16799999999999998,0.10919999999999998
+trabajo,3,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,3,X01,ampliacion,cuenta simple interbank,14800,historical_estimate,3,0.05,0.1,74.0,1.48,0.962
+trabajo,3,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.05,0.1,22.0,0.44,0.286
+trabajo,3,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,3,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,3,X05,ampliacion,financiera efectiva cuenta de ahorros,210,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,3,X06,ampliacion,agora cuenta de ahorros,320,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,3,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,3,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,3,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,historical_estimate,3,0.05,0.1,8.0,0.16,0.104
+trabajo,3,X10,ampliacion,presupuesto familiar,390,historical_estimate,3,0.05,0.1,1.9500000000000002,0.03900000000000001,0.02535
+trabajo,3,X11,ampliacion,fondo de emergencia,170,historical_estimate,2,0.05,0.2,1.7000000000000002,0.034,0.0221
+trabajo,3,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,3,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.05,0,0.0,0.0,0.0
+trabajo,3,X14,ampliacion,calculadora interes compuesto,1600,historical_estimate,2,0.05,0.2,16.0,0.32,0.208
+trabajo,4,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.05,0.5,90.0,1.8,1.17
+trabajo,4,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.05,0.35,3.675,0.0735,0.047775
+trabajo,4,G03,panel_original,mejores cuentas de ahorro peru,390,historical_estimate,3,0.05,0.2,3.9000000000000004,0.07800000000000001,0.0507
+trabajo,4,G04,panel_original,abrir cuenta de ahorros,210,historical_estimate,1,0.05,0.5,5.25,0.105,0.06824999999999999
+trabajo,4,G05,panel_original,cuenta de ahorros sin mantenimiento,30,historical_estimate,1,0.05,0.5,0.75,0.015,0.00975
+trabajo,4,G06,panel_original,requisitos para abrir una cuenta de ahorros,40,historical_estimate,1,0.05,0.5,1.0,0.02,0.013
+trabajo,4,C01,panel_original,cuentas de ahorro de alto rendimiento,1600,historical_estimate,2,0.05,0.35,28.0,0.56,0.364
+trabajo,4,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,0.5,32.5,0.65,0.4225
+trabajo,4,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,260,historical_estimate,3,0.05,0.2,2.6,0.052000000000000005,0.0338
+trabajo,4,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.05,0.2,0.2,0.004,0.0026
+trabajo,4,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.05,0.1,27.0,0.54,0.351
+trabajo,4,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.05,0.2,24.0,0.48,0.312
+trabajo,4,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,4,B04,panel_original,cuenta digital scotiabank,2400,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,4,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,4,E01,panel_original,trea,2400,historical_estimate,1,0.05,0.5,60.0,1.2,0.7799999999999999
+trabajo,4,E02,panel_original,fondo de seguro de depositos,1900,historical_estimate,4,0.05,0.1,9.5,0.19,0.1235
+trabajo,4,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,0.5,12.0,0.24,0.156
+trabajo,4,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.05,0,0.0,0.0,0.0
+trabajo,4,X01,ampliacion,cuenta simple interbank,14800,historical_estimate,3,0.05,0.2,148.0,2.96,1.924
+trabajo,4,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.05,0.2,36.0,0.72,0.46799999999999997
+trabajo,4,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,4,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,4,X05,ampliacion,financiera efectiva cuenta de ahorros,170,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,4,X06,ampliacion,agora cuenta de ahorros,210,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,4,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,4,X08,ampliacion,depósito a plazo fijo,5400,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,4,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.05,0.2,13.0,0.26,0.16899999999999998
+trabajo,4,X10,ampliacion,presupuesto familiar,720,historical_estimate,3,0.05,0.2,7.2,0.14400000000000002,0.0936
+trabajo,4,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.05,0.35,2.4499999999999997,0.048999999999999995,0.031849999999999996
+trabajo,4,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.05,0.1,0.55,0.011000000000000001,0.00715
+trabajo,4,X13,ampliacion,metas de ahorro,140,historical_estimate,4,0.05,0.1,0.7000000000000001,0.014000000000000002,0.0091
+trabajo,4,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.05,0.35,22.75,0.455,0.29575
+trabajo,5,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.05,0.65,94.25,1.885,1.22525
+trabajo,5,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.05,0.5,5.25,0.105,0.06824999999999999
+trabajo,5,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.05,0.35,5.6,0.11199999999999999,0.07279999999999999
+trabajo,5,G04,panel_original,abrir cuenta de ahorros,260,historical_estimate,1,0.05,0.65,8.450000000000001,0.169,0.10985
+trabajo,5,G05,panel_original,cuenta de ahorros sin mantenimiento,20,historical_estimate,1,0.05,0.65,0.65,0.013000000000000001,0.00845
+trabajo,5,G06,panel_original,requisitos para abrir una cuenta de ahorros,70,historical_estimate,1,0.05,0.65,2.275,0.0455,0.029574999999999997
+trabajo,5,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.05,0.5,47.5,0.9500000000000001,0.6174999999999999
+trabajo,5,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,0.65,42.25,0.845,0.54925
+trabajo,5,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390,historical_estimate,3,0.05,0.35,6.824999999999999,0.13649999999999998,0.08872499999999998
+trabajo,5,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.05,0.35,0.35,0.006999999999999999,0.004549999999999999
+trabajo,5,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.05,0.2,54.0,1.08,0.702
+trabajo,5,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.05,0.35,33.25,0.665,0.43224999999999997
+trabajo,5,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.05,0.1,5.0,0.1,0.065
+trabajo,5,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.05,0.1,9.5,0.19,0.1235
+trabajo,5,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,5,E01,panel_original,trea,2400,historical_estimate,1,0.05,0.65,78.0,1.56,1.014
+trabajo,5,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.05,0.2,16.0,0.32,0.208
+trabajo,5,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,0.65,15.600000000000001,0.31200000000000006,0.2028
+trabajo,5,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.05,0.1,2.4000000000000004,0.04800000000000001,0.031200000000000002
+trabajo,5,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.05,0.35,211.75,4.235,2.75275
+trabajo,5,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.05,0.35,62.99999999999999,1.2599999999999998,0.8189999999999998
+trabajo,5,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,5,X04,ampliacion,cuenta ganadora bbva,3600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,5,X05,ampliacion,financiera efectiva cuenta de ahorros,140,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,5,X06,ampliacion,agora cuenta de ahorros,260,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,5,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,5,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.05,0,0.0,0.0,0.0
+trabajo,5,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.05,0.35,22.75,0.455,0.29575
+trabajo,5,X10,ampliacion,presupuesto familiar,880,historical_estimate,3,0.05,0.35,15.399999999999999,0.308,0.20019999999999996
+trabajo,5,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.05,0.5,3.5,0.07,0.0455
+trabajo,5,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.05,0.2,1.1,0.022000000000000002,0.0143
+trabajo,5,X13,ampliacion,metas de ahorro,110,historical_estimate,4,0.05,0.2,1.1,0.022000000000000002,0.0143
+trabajo,5,X14,ampliacion,calculadora interes compuesto,1600,historical_estimate,2,0.05,0.5,40.0,0.8,0.52
+trabajo,6,G01,panel_original,cuenta de ahorros,2400,historical_estimate,1,0.05,0.8,96.0,1.92,1.248
+trabajo,6,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.05,0.65,3.575,0.07150000000000001,0.046475
+trabajo,6,G03,panel_original,mejores cuentas de ahorro peru,260,historical_estimate,3,0.05,0.5,6.5,0.13,0.08449999999999999
+trabajo,6,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.05,0.8,6.800000000000001,0.136,0.0884
+trabajo,6,G05,panel_original,cuenta de ahorros sin mantenimiento,20,historical_estimate,1,0.05,0.8,0.8,0.016,0.0104
+trabajo,6,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.05,0.8,0.4,0.008,0.0052
+trabajo,6,C01,panel_original,cuentas de ahorro de alto rendimiento,1300,historical_estimate,2,0.05,0.65,42.25,0.845,0.54925
+trabajo,6,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,0.8,52.0,1.04,0.6759999999999999
+trabajo,6,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,260,historical_estimate,3,0.05,0.5,6.5,0.13,0.08449999999999999
+trabajo,6,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.05,0.5,0.5,0.01,0.0065
+trabajo,6,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.05,0.35,94.5,1.8900000000000001,1.2285
+trabajo,6,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.05,0.5,60.0,1.2,0.7799999999999999
+trabajo,6,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.05,0.2,10.0,0.2,0.13
+trabajo,6,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.05,0.2,16.0,0.32,0.208
+trabajo,6,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0.1,33.0,0.66,0.429
+trabajo,6,E01,panel_original,trea,2400,historical_estimate,1,0.05,0.8,96.0,1.92,1.248
+trabajo,6,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.05,0.35,28.0,0.56,0.364
+trabajo,6,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,0.8,19.200000000000003,0.38400000000000006,0.24960000000000002
+trabajo,6,E04,panel_original,como ahorrar dinero,590,historical_estimate,5,0.05,0.2,5.9,0.11800000000000001,0.0767
+trabajo,6,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.05,0.5,302.5,6.05,3.9324999999999997
+trabajo,6,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.05,0.5,90.0,1.8,1.17
+trabajo,6,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.05,0.1,14.5,0.29,0.1885
+trabajo,6,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.05,0.1,14.5,0.29,0.1885
+trabajo,6,X05,ampliacion,financiera efectiva cuenta de ahorros,140,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,6,X06,ampliacion,agora cuenta de ahorros,140,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,6,X07,ampliacion,banbif cuenta de ahorros,390,historical_estimate,7,0.05,0,0.0,0.0,0.0
+trabajo,6,X08,ampliacion,depósito a plazo fijo,4400,historical_estimate,6,0.05,0.1,22.0,0.44,0.286
+trabajo,6,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.05,0.5,32.5,0.65,0.4225
+trabajo,6,X10,ampliacion,presupuesto familiar,1000,historical_estimate,3,0.05,0.5,25.0,0.5,0.325
+trabajo,6,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.05,0.65,4.55,0.091,0.059149999999999994
+trabajo,6,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.05,0.35,1.575,0.0315,0.020475
+trabajo,6,X13,ampliacion,metas de ahorro,140,historical_estimate,4,0.05,0.35,2.4499999999999997,0.048999999999999995,0.031849999999999996
+trabajo,6,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.05,0.65,42.25,0.845,0.54925
+trabajo,7,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.05,1.0,145.0,2.9,1.885
+trabajo,7,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.05,0.8,4.4,0.08800000000000001,0.0572
+trabajo,7,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.05,0.65,10.4,0.20800000000000002,0.1352
+trabajo,7,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.05,1.0,8.5,0.17,0.1105
+trabajo,7,G05,panel_original,cuenta de ahorros sin mantenimiento,30,historical_estimate,1,0.05,1.0,1.5,0.03,0.0195
+trabajo,7,G06,panel_original,requisitos para abrir una cuenta de ahorros,20,historical_estimate,1,0.05,1.0,1.0,0.02,0.013
+trabajo,7,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.05,0.8,76.0,1.52,0.988
+trabajo,7,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,1.0,65.0,1.3,0.845
+trabajo,7,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,320,historical_estimate,3,0.05,0.65,10.4,0.20800000000000002,0.1352
+trabajo,7,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.05,0.65,0.65,0.013000000000000001,0.00845
+trabajo,7,B01,panel_original,cuenta de ahorro del bcp,4400,historical_estimate,4,0.05,0.5,110.0,2.2,1.43
+trabajo,7,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.05,0.65,78.0,1.56,1.014
+trabajo,7,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.05,0.35,17.5,0.35000000000000003,0.22749999999999998
+trabajo,7,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.05,0.35,28.0,0.56,0.364
+trabajo,7,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0.2,66.0,1.32,0.858
+trabajo,7,E01,panel_original,trea,2400,historical_estimate,1,0.05,1.0,120.0,2.4,1.5599999999999998
+trabajo,7,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.05,0.5,32.5,0.65,0.4225
+trabajo,7,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,1.0,24.0,0.48,0.312
+trabajo,7,E04,panel_original,como ahorrar dinero,390,historical_estimate,5,0.05,0.35,6.824999999999999,0.13649999999999998,0.08872499999999998
+trabajo,7,X01,ampliacion,cuenta simple interbank,9900,historical_estimate,3,0.05,0.65,321.75,6.4350000000000005,4.1827499999999995
+trabajo,7,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.05,0.65,117.0,2.34,1.521
+trabajo,7,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.05,0.2,29.0,0.58,0.377
+trabajo,7,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.05,0.2,29.0,0.58,0.377
+trabajo,7,X05,ampliacion,financiera efectiva cuenta de ahorros,70,historical_estimate,7,0.05,0.1,0.35000000000000003,0.007000000000000001,0.00455
+trabajo,7,X06,ampliacion,agora cuenta de ahorros,140,historical_estimate,7,0.05,0.1,0.7000000000000001,0.014000000000000002,0.0091
+trabajo,7,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.05,0.1,2.4000000000000004,0.04800000000000001,0.031200000000000002
+trabajo,7,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.05,0.2,66.0,1.32,0.858
+trabajo,7,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.05,0.65,42.25,0.845,0.54925
+trabajo,7,X10,ampliacion,presupuesto familiar,480,historical_estimate,3,0.05,0.65,15.600000000000001,0.31200000000000006,0.2028
+trabajo,7,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.05,0.8,5.6000000000000005,0.11200000000000002,0.0728
+trabajo,7,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.05,0.5,2.25,0.045,0.029249999999999998
+trabajo,7,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.05,0.5,2.25,0.045,0.029249999999999998
+trabajo,7,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.05,0.8,52.0,1.04,0.6759999999999999
+trabajo,8,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.05,1.0,145.0,2.9,1.885
+trabajo,8,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.05,1.0,5.5,0.11,0.0715
+trabajo,8,G03,panel_original,mejores cuentas de ahorro peru,260,historical_estimate,3,0.05,0.8,10.4,0.20800000000000002,0.1352
+trabajo,8,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.05,1.0,8.5,0.17,0.1105
+trabajo,8,G05,panel_original,cuenta de ahorros sin mantenimiento,50,historical_estimate,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,8,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.05,1.0,0.5,0.01,0.0065
+trabajo,8,C01,panel_original,cuentas de ahorro de alto rendimiento,2900,historical_estimate,2,0.05,1.0,145.0,2.9,1.885
+trabajo,8,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.05,1.0,65.0,1.3,0.845
+trabajo,8,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,320,historical_estimate,3,0.05,0.8,12.8,0.256,0.1664
+trabajo,8,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.05,0.8,0.8,0.016,0.0104
+trabajo,8,B01,panel_original,cuenta de ahorro del bcp,4400,historical_estimate,4,0.05,0.65,143.0,2.86,1.859
+trabajo,8,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.05,0.8,76.0,1.52,0.988
+trabajo,8,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.05,0.5,32.5,0.65,0.4225
+trabajo,8,B04,panel_original,cuenta digital scotiabank,2400,historical_estimate,5,0.05,0.5,60.0,1.2,0.7799999999999999
+trabajo,8,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.05,0.35,115.49999999999999,2.3099999999999996,1.5014999999999998
+trabajo,8,E01,panel_original,trea,2400,historical_estimate,1,0.05,1.0,120.0,2.4,1.5599999999999998
+trabajo,8,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.05,0.65,42.25,0.845,0.54925
+trabajo,8,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.05,1.0,24.0,0.48,0.312
+trabajo,8,E04,panel_original,como ahorrar dinero,390,historical_estimate,5,0.05,0.5,9.75,0.195,0.12675
+trabajo,8,X01,ampliacion,cuenta simple interbank,9900,historical_estimate,3,0.05,0.8,396.0,7.92,5.148
+trabajo,8,X02,ampliacion,cuenta millonaria interbank,2900,historical_estimate,3,0.05,0.8,116.0,2.32,1.508
+trabajo,8,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.05,0.35,50.75,1.0150000000000001,0.65975
+trabajo,8,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.05,0.35,50.75,1.0150000000000001,0.65975
+trabajo,8,X05,ampliacion,financiera efectiva cuenta de ahorros,40,historical_estimate,7,0.05,0.2,0.4,0.008,0.0052
+trabajo,8,X06,ampliacion,agora cuenta de ahorros,110,historical_estimate,7,0.05,0.2,1.1,0.022000000000000002,0.0143
+trabajo,8,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.05,0.2,4.800000000000001,0.09600000000000002,0.062400000000000004
+trabajo,8,X08,ampliacion,depósito a plazo fijo,4400,historical_estimate,6,0.05,0.35,77.0,1.54,1.001
+trabajo,8,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.05,0.8,52.0,1.04,0.6759999999999999
+trabajo,8,X10,ampliacion,presupuesto familiar,590,historical_estimate,3,0.05,0.8,23.6,0.47200000000000003,0.3068
+trabajo,8,X11,ampliacion,fondo de emergencia,170,historical_estimate,2,0.05,1.0,8.5,0.17,0.1105
+trabajo,8,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.05,0.65,2.9250000000000003,0.0585,0.038025
+trabajo,8,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.05,0.65,2.9250000000000003,0.0585,0.038025
+trabajo,8,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.05,1.0,65.0,1.3,0.845
+trabajo,9,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,9,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,9,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.05,1.0,16.0,0.32,0.208
+trabajo,9,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,9,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,9,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,9,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,9,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.05,1.0,65.0,1.3,0.845
+trabajo,9,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.05,1.0,19.5,0.39,0.2535
+trabajo,9,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.05,1.0,2.0,0.04,0.026
+trabajo,9,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.05,0.8,264.0,5.28,3.432
+trabajo,9,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.05,1.0,95.0,1.9000000000000001,1.2349999999999999
+trabajo,9,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.05,0.65,42.25,0.845,0.54925
+trabajo,9,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.05,0.65,61.75,1.235,0.80275
+trabajo,9,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.05,0.5,165.0,3.3000000000000003,2.145
+trabajo,9,E01,panel_original,trea,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,9,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.05,0.8,64.0,1.28,0.832
+trabajo,9,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.05,1.0,29.5,0.59,0.3835
+trabajo,9,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.05,0.65,19.175,0.3835,0.249275
+trabajo,9,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.05,1.0,605.0,12.1,7.864999999999999
+trabajo,9,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.05,1.0,220.0,4.4,2.86
+trabajo,9,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.05,0.5,90.0,1.8,1.17
+trabajo,9,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.05,0.5,72.5,1.45,0.9425
+trabajo,9,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.05,0.35,2.4499999999999997,0.048999999999999995,0.031849999999999996
+trabajo,9,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.05,0.35,4.55,0.091,0.059149999999999994
+trabajo,9,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.05,0.35,8.399999999999999,0.16799999999999998,0.10919999999999998
+trabajo,9,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.05,0.5,165.0,3.3000000000000003,2.145
+trabajo,9,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.05,1.0,80.0,1.6,1.04
+trabajo,9,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.05,1.0,44.0,0.88,0.572
+trabajo,9,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.05,1.0,8.5,0.17,0.1105
+trabajo,9,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.05,0.8,4.4,0.08800000000000001,0.0572
+trabajo,9,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.05,0.8,5.6000000000000005,0.11200000000000002,0.0728
+trabajo,9,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,10,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,10,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,10,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.05,1.0,16.0,0.32,0.208
+trabajo,10,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,10,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,10,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,10,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,10,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.05,1.0,65.0,1.3,0.845
+trabajo,10,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.05,1.0,19.5,0.39,0.2535
+trabajo,10,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.05,1.0,2.0,0.04,0.026
+trabajo,10,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.05,1.0,330.0,6.6000000000000005,4.29
+trabajo,10,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.05,1.0,95.0,1.9000000000000001,1.2349999999999999
+trabajo,10,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.05,0.8,52.0,1.04,0.6759999999999999
+trabajo,10,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.05,0.8,76.0,1.52,0.988
+trabajo,10,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.05,0.65,214.5,4.29,2.7885
+trabajo,10,E01,panel_original,trea,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,10,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.05,1.0,80.0,1.6,1.04
+trabajo,10,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.05,1.0,29.5,0.59,0.3835
+trabajo,10,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.05,0.8,23.6,0.47200000000000003,0.3068
+trabajo,10,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.05,1.0,605.0,12.1,7.864999999999999
+trabajo,10,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.05,1.0,220.0,4.4,2.86
+trabajo,10,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.05,0.65,117.0,2.34,1.521
+trabajo,10,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.05,0.65,94.25,1.885,1.22525
+trabajo,10,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.05,0.5,3.5,0.07,0.0455
+trabajo,10,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.05,0.5,6.5,0.13,0.08449999999999999
+trabajo,10,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.05,0.5,12.0,0.24,0.156
+trabajo,10,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.05,0.65,214.5,4.29,2.7885
+trabajo,10,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.05,1.0,80.0,1.6,1.04
+trabajo,10,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.05,1.0,44.0,0.88,0.572
+trabajo,10,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.05,1.0,8.5,0.17,0.1105
+trabajo,10,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.05,1.0,5.5,0.11,0.0715
+trabajo,10,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.05,1.0,7.0,0.14,0.091
+trabajo,10,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,11,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,11,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,11,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.05,1.0,16.0,0.32,0.208
+trabajo,11,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,11,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,11,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,11,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,11,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.05,1.0,65.0,1.3,0.845
+trabajo,11,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.05,1.0,19.5,0.39,0.2535
+trabajo,11,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.05,1.0,2.0,0.04,0.026
+trabajo,11,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.05,1.0,330.0,6.6000000000000005,4.29
+trabajo,11,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.05,1.0,95.0,1.9000000000000001,1.2349999999999999
+trabajo,11,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.05,1.0,65.0,1.3,0.845
+trabajo,11,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.05,1.0,95.0,1.9000000000000001,1.2349999999999999
+trabajo,11,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.05,0.8,264.0,5.28,3.432
+trabajo,11,E01,panel_original,trea,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,11,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.05,1.0,80.0,1.6,1.04
+trabajo,11,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.05,1.0,29.5,0.59,0.3835
+trabajo,11,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.05,1.0,29.5,0.59,0.3835
+trabajo,11,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.05,1.0,605.0,12.1,7.864999999999999
+trabajo,11,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.05,1.0,220.0,4.4,2.86
+trabajo,11,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.05,0.8,144.0,2.88,1.8719999999999999
+trabajo,11,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.05,0.8,116.0,2.32,1.508
+trabajo,11,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.05,0.65,4.55,0.091,0.059149999999999994
+trabajo,11,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.05,0.65,8.450000000000001,0.169,0.10985
+trabajo,11,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.05,0.65,15.600000000000001,0.31200000000000006,0.2028
+trabajo,11,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.05,0.8,264.0,5.28,3.432
+trabajo,11,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.05,1.0,80.0,1.6,1.04
+trabajo,11,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.05,1.0,44.0,0.88,0.572
+trabajo,11,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.05,1.0,8.5,0.17,0.1105
+trabajo,11,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.05,1.0,5.5,0.11,0.0715
+trabajo,11,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.05,1.0,7.0,0.14,0.091
+trabajo,11,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,12,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,12,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,12,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.05,1.0,16.0,0.32,0.208
+trabajo,12,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.05,1.0,10.5,0.21,0.13649999999999998
+trabajo,12,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,12,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.05,1.0,2.5,0.05,0.0325
+trabajo,12,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+trabajo,12,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.05,1.0,65.0,1.3,0.845
+trabajo,12,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.05,1.0,19.5,0.39,0.2535
+trabajo,12,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.05,1.0,2.0,0.04,0.026
+trabajo,12,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.05,1.0,330.0,6.6000000000000005,4.29
+trabajo,12,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.05,1.0,95.0,1.9000000000000001,1.2349999999999999
+trabajo,12,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.05,1.0,65.0,1.3,0.845
+trabajo,12,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.05,1.0,95.0,1.9000000000000001,1.2349999999999999
+trabajo,12,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.05,1.0,330.0,6.6000000000000005,4.29
+trabajo,12,E01,panel_original,trea,2900.0,flat_assumption,1,0.05,1.0,145.0,2.9,1.885
+trabajo,12,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.05,1.0,80.0,1.6,1.04
+trabajo,12,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.05,1.0,29.5,0.59,0.3835
+trabajo,12,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.05,1.0,29.5,0.59,0.3835
+trabajo,12,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.05,1.0,605.0,12.1,7.864999999999999
+trabajo,12,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.05,1.0,220.0,4.4,2.86
+trabajo,12,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.05,1.0,180.0,3.6,2.34
+trabajo,12,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.05,1.0,145.0,2.9,1.885
+trabajo,12,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.05,0.8,5.6000000000000005,0.11200000000000002,0.0728
+trabajo,12,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.05,0.8,10.4,0.20800000000000002,0.1352
+trabajo,12,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.05,0.8,19.200000000000003,0.38400000000000006,0.24960000000000002
+trabajo,12,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.05,1.0,330.0,6.6000000000000005,4.29
+trabajo,12,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.05,1.0,80.0,1.6,1.04
+trabajo,12,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.05,1.0,44.0,0.88,0.572
+trabajo,12,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.05,1.0,8.5,0.17,0.1105
+trabajo,12,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.05,1.0,5.5,0.11,0.0715
+trabajo,12,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.05,1.0,7.0,0.14,0.091
+trabajo,12,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.05,1.0,80.0,1.6,1.04
+expansion,1,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.1,0.1,36.0,0.72,0.46799999999999997
+expansion,1,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.1,0,0.0,0.0,0.0
+expansion,1,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.1,0.1,1.7000000000000002,0.034,0.0221
+expansion,1,G05,panel_original,cuenta de ahorros sin mantenimiento,70,historical_estimate,1,0.1,0.1,0.7000000000000001,0.014000000000000002,0.0091
+expansion,1,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.1,0.1,0.1,0.002,0.0013
+expansion,1,C01,panel_original,cuentas de ahorro de alto rendimiento,2400,historical_estimate,2,0.1,0,0.0,0.0,0.0
+expansion,1,C02,panel_original,cuenta digital,1600,historical_estimate,1,0.1,0.1,16.0,0.32,0.208
+expansion,1,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,590,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,C04,panel_original,que banco paga mas intereses en peru,70,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,B01,panel_original,cuenta de ahorro del bcp,8100,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,1,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,B03,panel_original,cuenta power scotiabank,1600,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,1,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,1,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,1,E01,panel_original,trea,2400,historical_estimate,1,0.1,0.1,24.0,0.48,0.312
+expansion,1,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,1,E03,panel_original,que es una cuenta de ahorro,590,historical_estimate,1,0.1,0.1,5.9,0.11800000000000001,0.0767
+expansion,1,E04,panel_original,como ahorrar dinero,720,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,1,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,X03,ampliacion,cuenta independencia bbva,4400,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,1,X04,ampliacion,cuenta ganadora bbva,3600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,1,X05,ampliacion,financiera efectiva cuenta de ahorros,210,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,1,X06,ampliacion,agora cuenta de ahorros,390,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,1,X07,ampliacion,banbif cuenta de ahorros,590,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,1,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,1,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1900,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,X10,ampliacion,presupuesto familiar,210,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,1,X11,ampliacion,fondo de emergencia,110,historical_estimate,2,0.1,0,0.0,0.0,0.0
+expansion,1,X12,ampliacion,ahorro programado,170,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,1,X13,ampliacion,metas de ahorro,70,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,1,X14,ampliacion,calculadora interes compuesto,1900,historical_estimate,2,0.1,0,0.0,0.0,0.0
+expansion,2,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.1,0.2,58.0,1.16,0.754
+expansion,2,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.1,0.1,2.1,0.042,0.0273
+expansion,2,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,G04,panel_original,abrir cuenta de ahorros,210,historical_estimate,1,0.1,0.2,4.2,0.084,0.0546
+expansion,2,G05,panel_original,cuenta de ahorros sin mantenimiento,50,historical_estimate,1,0.1,0.2,1.0,0.02,0.013
+expansion,2,G06,panel_original,requisitos para abrir una cuenta de ahorros,40,historical_estimate,1,0.1,0.2,0.8,0.016,0.0104
+expansion,2,C01,panel_original,cuentas de ahorro de alto rendimiento,1600,historical_estimate,2,0.1,0.1,16.0,0.32,0.208
+expansion,2,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,0.2,26.0,0.52,0.33799999999999997
+expansion,2,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,480,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,C04,panel_original,que banco paga mas intereses en peru,50,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,B01,panel_original,cuenta de ahorro del bcp,6600,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,2,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,2,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,2,B05,panel_original,cuenta digital bbva,5400,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,2,E01,panel_original,trea,1900,historical_estimate,1,0.1,0.2,38.0,0.76,0.494
+expansion,2,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,2,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,0.2,9.600000000000001,0.19200000000000003,0.12480000000000001
+expansion,2,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,2,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,2,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,2,X05,ampliacion,financiera efectiva cuenta de ahorros,170,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,2,X06,ampliacion,agora cuenta de ahorros,320,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,2,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,2,X08,ampliacion,depósito a plazo fijo,5400,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,2,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,X10,ampliacion,presupuesto familiar,210,historical_estimate,3,0.1,0,0.0,0.0,0.0
+expansion,2,X11,ampliacion,fondo de emergencia,90,historical_estimate,2,0.1,0.1,0.9,0.018000000000000002,0.0117
+expansion,2,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,2,X13,ampliacion,metas de ahorro,70,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,2,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.1,0.1,13.0,0.26,0.16899999999999998
+expansion,3,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.1,0.35,125.99999999999999,2.5199999999999996,1.6379999999999997
+expansion,3,G02,panel_original,cuenta de ahorro con intereses,390,historical_estimate,2,0.1,0.2,7.800000000000001,0.15600000000000003,0.1014
+expansion,3,G03,panel_original,mejores cuentas de ahorro peru,480,historical_estimate,3,0.1,0.1,4.800000000000001,0.09600000000000002,0.062400000000000004
+expansion,3,G04,panel_original,abrir cuenta de ahorros,320,historical_estimate,1,0.1,0.35,11.2,0.22399999999999998,0.14559999999999998
+expansion,3,G05,panel_original,cuenta de ahorros sin mantenimiento,70,historical_estimate,1,0.1,0.35,2.4499999999999997,0.048999999999999995,0.031849999999999996
+expansion,3,G06,panel_original,requisitos para abrir una cuenta de ahorros,110,historical_estimate,1,0.1,0.35,3.8499999999999996,0.077,0.05004999999999999
+expansion,3,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.1,0.2,38.0,0.76,0.494
+expansion,3,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,0.35,45.5,0.91,0.5915
+expansion,3,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,480,historical_estimate,3,0.1,0.1,4.800000000000001,0.09600000000000002,0.062400000000000004
+expansion,3,C04,panel_original,que banco paga mas intereses en peru,40,historical_estimate,3,0.1,0.1,0.4,0.008,0.0052
+expansion,3,B01,panel_original,cuenta de ahorro del bcp,6600,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,3,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.1,0.1,19.0,0.38,0.247
+expansion,3,B03,panel_original,cuenta power scotiabank,1600,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,3,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,3,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,3,E01,panel_original,trea,2400,historical_estimate,1,0.1,0.35,84.0,1.68,1.0919999999999999
+expansion,3,E02,panel_original,fondo de seguro de depositos,1900,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,3,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,0.35,16.799999999999997,0.33599999999999997,0.21839999999999996
+expansion,3,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,3,X01,ampliacion,cuenta simple interbank,14800,historical_estimate,3,0.1,0.1,148.0,2.96,1.924
+expansion,3,X02,ampliacion,cuenta millonaria interbank,4400,historical_estimate,3,0.1,0.1,44.0,0.88,0.572
+expansion,3,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,3,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,3,X05,ampliacion,financiera efectiva cuenta de ahorros,210,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,3,X06,ampliacion,agora cuenta de ahorros,320,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,3,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,3,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,3,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,historical_estimate,3,0.1,0.1,16.0,0.32,0.208
+expansion,3,X10,ampliacion,presupuesto familiar,390,historical_estimate,3,0.1,0.1,3.9000000000000004,0.07800000000000001,0.0507
+expansion,3,X11,ampliacion,fondo de emergencia,170,historical_estimate,2,0.1,0.2,3.4000000000000004,0.068,0.0442
+expansion,3,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,3,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.1,0,0.0,0.0,0.0
+expansion,3,X14,ampliacion,calculadora interes compuesto,1600,historical_estimate,2,0.1,0.2,32.0,0.64,0.416
+expansion,4,G01,panel_original,cuenta de ahorros,3600,historical_estimate,1,0.1,0.5,180.0,3.6,2.34
+expansion,4,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.1,0.35,7.35,0.147,0.09555
+expansion,4,G03,panel_original,mejores cuentas de ahorro peru,390,historical_estimate,3,0.1,0.2,7.800000000000001,0.15600000000000003,0.1014
+expansion,4,G04,panel_original,abrir cuenta de ahorros,210,historical_estimate,1,0.1,0.5,10.5,0.21,0.13649999999999998
+expansion,4,G05,panel_original,cuenta de ahorros sin mantenimiento,30,historical_estimate,1,0.1,0.5,1.5,0.03,0.0195
+expansion,4,G06,panel_original,requisitos para abrir una cuenta de ahorros,40,historical_estimate,1,0.1,0.5,2.0,0.04,0.026
+expansion,4,C01,panel_original,cuentas de ahorro de alto rendimiento,1600,historical_estimate,2,0.1,0.35,56.0,1.12,0.728
+expansion,4,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,0.5,65.0,1.3,0.845
+expansion,4,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,260,historical_estimate,3,0.1,0.2,5.2,0.10400000000000001,0.0676
+expansion,4,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.1,0.2,0.4,0.008,0.0052
+expansion,4,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.1,0.1,54.0,1.08,0.702
+expansion,4,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.1,0.2,48.0,0.96,0.624
+expansion,4,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,4,B04,panel_original,cuenta digital scotiabank,2400,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,4,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,4,E01,panel_original,trea,2400,historical_estimate,1,0.1,0.5,120.0,2.4,1.5599999999999998
+expansion,4,E02,panel_original,fondo de seguro de depositos,1900,historical_estimate,4,0.1,0.1,19.0,0.38,0.247
+expansion,4,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,0.5,24.0,0.48,0.312
+expansion,4,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.1,0,0.0,0.0,0.0
+expansion,4,X01,ampliacion,cuenta simple interbank,14800,historical_estimate,3,0.1,0.2,296.0,5.92,3.848
+expansion,4,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.1,0.2,72.0,1.44,0.9359999999999999
+expansion,4,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,4,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,4,X05,ampliacion,financiera efectiva cuenta de ahorros,170,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,4,X06,ampliacion,agora cuenta de ahorros,210,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,4,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,4,X08,ampliacion,depósito a plazo fijo,5400,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,4,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.1,0.2,26.0,0.52,0.33799999999999997
+expansion,4,X10,ampliacion,presupuesto familiar,720,historical_estimate,3,0.1,0.2,14.4,0.28800000000000003,0.1872
+expansion,4,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.1,0.35,4.8999999999999995,0.09799999999999999,0.06369999999999999
+expansion,4,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.1,0.1,1.1,0.022000000000000002,0.0143
+expansion,4,X13,ampliacion,metas de ahorro,140,historical_estimate,4,0.1,0.1,1.4000000000000001,0.028000000000000004,0.0182
+expansion,4,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.1,0.35,45.5,0.91,0.5915
+expansion,5,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.1,0.65,188.5,3.77,2.4505
+expansion,5,G02,panel_original,cuenta de ahorro con intereses,210,historical_estimate,2,0.1,0.5,10.5,0.21,0.13649999999999998
+expansion,5,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.1,0.35,11.2,0.22399999999999998,0.14559999999999998
+expansion,5,G04,panel_original,abrir cuenta de ahorros,260,historical_estimate,1,0.1,0.65,16.900000000000002,0.338,0.2197
+expansion,5,G05,panel_original,cuenta de ahorros sin mantenimiento,20,historical_estimate,1,0.1,0.65,1.3,0.026000000000000002,0.0169
+expansion,5,G06,panel_original,requisitos para abrir una cuenta de ahorros,70,historical_estimate,1,0.1,0.65,4.55,0.091,0.059149999999999994
+expansion,5,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.1,0.5,95.0,1.9000000000000001,1.2349999999999999
+expansion,5,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,0.65,84.5,1.69,1.0985
+expansion,5,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390,historical_estimate,3,0.1,0.35,13.649999999999999,0.27299999999999996,0.17744999999999997
+expansion,5,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.1,0.35,0.7,0.013999999999999999,0.009099999999999999
+expansion,5,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.1,0.2,108.0,2.16,1.404
+expansion,5,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.1,0.35,66.5,1.33,0.8644999999999999
+expansion,5,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.1,0.1,10.0,0.2,0.13
+expansion,5,B04,panel_original,cuenta digital scotiabank,1900,historical_estimate,5,0.1,0.1,19.0,0.38,0.247
+expansion,5,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,5,E01,panel_original,trea,2400,historical_estimate,1,0.1,0.65,156.0,3.12,2.028
+expansion,5,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.1,0.2,32.0,0.64,0.416
+expansion,5,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,0.65,31.200000000000003,0.6240000000000001,0.4056
+expansion,5,E04,panel_original,como ahorrar dinero,480,historical_estimate,5,0.1,0.1,4.800000000000001,0.09600000000000002,0.062400000000000004
+expansion,5,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.1,0.35,423.5,8.47,5.5055
+expansion,5,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.1,0.35,125.99999999999999,2.5199999999999996,1.6379999999999997
+expansion,5,X03,ampliacion,cuenta independencia bbva,3600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,5,X04,ampliacion,cuenta ganadora bbva,3600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,5,X05,ampliacion,financiera efectiva cuenta de ahorros,140,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,5,X06,ampliacion,agora cuenta de ahorros,260,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,5,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,5,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.1,0,0.0,0.0,0.0
+expansion,5,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.1,0.35,45.5,0.91,0.5915
+expansion,5,X10,ampliacion,presupuesto familiar,880,historical_estimate,3,0.1,0.35,30.799999999999997,0.616,0.4003999999999999
+expansion,5,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.1,0.5,7.0,0.14,0.091
+expansion,5,X12,ampliacion,ahorro programado,110,historical_estimate,4,0.1,0.2,2.2,0.044000000000000004,0.0286
+expansion,5,X13,ampliacion,metas de ahorro,110,historical_estimate,4,0.1,0.2,2.2,0.044000000000000004,0.0286
+expansion,5,X14,ampliacion,calculadora interes compuesto,1600,historical_estimate,2,0.1,0.5,80.0,1.6,1.04
+expansion,6,G01,panel_original,cuenta de ahorros,2400,historical_estimate,1,0.1,0.8,192.0,3.84,2.496
+expansion,6,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.1,0.65,7.15,0.14300000000000002,0.09295
+expansion,6,G03,panel_original,mejores cuentas de ahorro peru,260,historical_estimate,3,0.1,0.5,13.0,0.26,0.16899999999999998
+expansion,6,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.1,0.8,13.600000000000001,0.272,0.1768
+expansion,6,G05,panel_original,cuenta de ahorros sin mantenimiento,20,historical_estimate,1,0.1,0.8,1.6,0.032,0.0208
+expansion,6,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.1,0.8,0.8,0.016,0.0104
+expansion,6,C01,panel_original,cuentas de ahorro de alto rendimiento,1300,historical_estimate,2,0.1,0.65,84.5,1.69,1.0985
+expansion,6,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,0.8,104.0,2.08,1.3519999999999999
+expansion,6,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,260,historical_estimate,3,0.1,0.5,13.0,0.26,0.16899999999999998
+expansion,6,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.1,0.5,1.0,0.02,0.013
+expansion,6,B01,panel_original,cuenta de ahorro del bcp,5400,historical_estimate,4,0.1,0.35,189.0,3.7800000000000002,2.457
+expansion,6,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.1,0.5,120.0,2.4,1.5599999999999998
+expansion,6,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.1,0.2,20.0,0.4,0.26
+expansion,6,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.1,0.2,32.0,0.64,0.416
+expansion,6,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0.1,66.0,1.32,0.858
+expansion,6,E01,panel_original,trea,2400,historical_estimate,1,0.1,0.8,192.0,3.84,2.496
+expansion,6,E02,panel_original,fondo de seguro de depositos,1600,historical_estimate,4,0.1,0.35,56.0,1.12,0.728
+expansion,6,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,0.8,38.400000000000006,0.7680000000000001,0.49920000000000003
+expansion,6,E04,panel_original,como ahorrar dinero,590,historical_estimate,5,0.1,0.2,11.8,0.23600000000000002,0.1534
+expansion,6,X01,ampliacion,cuenta simple interbank,12100,historical_estimate,3,0.1,0.5,605.0,12.1,7.864999999999999
+expansion,6,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.1,0.5,180.0,3.6,2.34
+expansion,6,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.1,0.1,29.0,0.58,0.377
+expansion,6,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.1,0.1,29.0,0.58,0.377
+expansion,6,X05,ampliacion,financiera efectiva cuenta de ahorros,140,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,6,X06,ampliacion,agora cuenta de ahorros,140,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,6,X07,ampliacion,banbif cuenta de ahorros,390,historical_estimate,7,0.1,0,0.0,0.0,0.0
+expansion,6,X08,ampliacion,depósito a plazo fijo,4400,historical_estimate,6,0.1,0.1,44.0,0.88,0.572
+expansion,6,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.1,0.5,65.0,1.3,0.845
+expansion,6,X10,ampliacion,presupuesto familiar,1000,historical_estimate,3,0.1,0.5,50.0,1.0,0.65
+expansion,6,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.1,0.65,9.1,0.182,0.11829999999999999
+expansion,6,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.1,0.35,3.15,0.063,0.04095
+expansion,6,X13,ampliacion,metas de ahorro,140,historical_estimate,4,0.1,0.35,4.8999999999999995,0.09799999999999999,0.06369999999999999
+expansion,6,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.1,0.65,84.5,1.69,1.0985
+expansion,7,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.1,1.0,290.0,5.8,3.77
+expansion,7,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.1,0.8,8.8,0.17600000000000002,0.1144
+expansion,7,G03,panel_original,mejores cuentas de ahorro peru,320,historical_estimate,3,0.1,0.65,20.8,0.41600000000000004,0.2704
+expansion,7,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.1,1.0,17.0,0.34,0.221
+expansion,7,G05,panel_original,cuenta de ahorros sin mantenimiento,30,historical_estimate,1,0.1,1.0,3.0,0.06,0.039
+expansion,7,G06,panel_original,requisitos para abrir una cuenta de ahorros,20,historical_estimate,1,0.1,1.0,2.0,0.04,0.026
+expansion,7,C01,panel_original,cuentas de ahorro de alto rendimiento,1900,historical_estimate,2,0.1,0.8,152.0,3.04,1.976
+expansion,7,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,1.0,130.0,2.6,1.69
+expansion,7,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,320,historical_estimate,3,0.1,0.65,20.8,0.41600000000000004,0.2704
+expansion,7,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.1,0.65,1.3,0.026000000000000002,0.0169
+expansion,7,B01,panel_original,cuenta de ahorro del bcp,4400,historical_estimate,4,0.1,0.5,220.0,4.4,2.86
+expansion,7,B02,panel_original,cuenta super tasa interbank,2400,historical_estimate,3,0.1,0.65,156.0,3.12,2.028
+expansion,7,B03,panel_original,cuenta power scotiabank,1000,historical_estimate,5,0.1,0.35,35.0,0.7000000000000001,0.45499999999999996
+expansion,7,B04,panel_original,cuenta digital scotiabank,1600,historical_estimate,5,0.1,0.35,56.0,1.12,0.728
+expansion,7,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0.2,132.0,2.64,1.716
+expansion,7,E01,panel_original,trea,2400,historical_estimate,1,0.1,1.0,240.0,4.8,3.1199999999999997
+expansion,7,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.1,0.5,65.0,1.3,0.845
+expansion,7,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,1.0,48.0,0.96,0.624
+expansion,7,E04,panel_original,como ahorrar dinero,390,historical_estimate,5,0.1,0.35,13.649999999999999,0.27299999999999996,0.17744999999999997
+expansion,7,X01,ampliacion,cuenta simple interbank,9900,historical_estimate,3,0.1,0.65,643.5,12.870000000000001,8.365499999999999
+expansion,7,X02,ampliacion,cuenta millonaria interbank,3600,historical_estimate,3,0.1,0.65,234.0,4.68,3.042
+expansion,7,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.1,0.2,58.0,1.16,0.754
+expansion,7,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.1,0.2,58.0,1.16,0.754
+expansion,7,X05,ampliacion,financiera efectiva cuenta de ahorros,70,historical_estimate,7,0.1,0.1,0.7000000000000001,0.014000000000000002,0.0091
+expansion,7,X06,ampliacion,agora cuenta de ahorros,140,historical_estimate,7,0.1,0.1,1.4000000000000001,0.028000000000000004,0.0182
+expansion,7,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.1,0.1,4.800000000000001,0.09600000000000002,0.062400000000000004
+expansion,7,X08,ampliacion,depósito a plazo fijo,6600,historical_estimate,6,0.1,0.2,132.0,2.64,1.716
+expansion,7,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.1,0.65,84.5,1.69,1.0985
+expansion,7,X10,ampliacion,presupuesto familiar,480,historical_estimate,3,0.1,0.65,31.200000000000003,0.6240000000000001,0.4056
+expansion,7,X11,ampliacion,fondo de emergencia,140,historical_estimate,2,0.1,0.8,11.200000000000001,0.22400000000000003,0.1456
+expansion,7,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.1,0.5,4.5,0.09,0.058499999999999996
+expansion,7,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.1,0.5,4.5,0.09,0.058499999999999996
+expansion,7,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.1,0.8,104.0,2.08,1.3519999999999999
+expansion,8,G01,panel_original,cuenta de ahorros,2900,historical_estimate,1,0.1,1.0,290.0,5.8,3.77
+expansion,8,G02,panel_original,cuenta de ahorro con intereses,110,historical_estimate,2,0.1,1.0,11.0,0.22,0.143
+expansion,8,G03,panel_original,mejores cuentas de ahorro peru,260,historical_estimate,3,0.1,0.8,20.8,0.41600000000000004,0.2704
+expansion,8,G04,panel_original,abrir cuenta de ahorros,170,historical_estimate,1,0.1,1.0,17.0,0.34,0.221
+expansion,8,G05,panel_original,cuenta de ahorros sin mantenimiento,50,historical_estimate,1,0.1,1.0,5.0,0.1,0.065
+expansion,8,G06,panel_original,requisitos para abrir una cuenta de ahorros,10,historical_estimate,1,0.1,1.0,1.0,0.02,0.013
+expansion,8,C01,panel_original,cuentas de ahorro de alto rendimiento,2900,historical_estimate,2,0.1,1.0,290.0,5.8,3.77
+expansion,8,C02,panel_original,cuenta digital,1300,historical_estimate,1,0.1,1.0,130.0,2.6,1.69
+expansion,8,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,320,historical_estimate,3,0.1,0.8,25.6,0.512,0.3328
+expansion,8,C04,panel_original,que banco paga mas intereses en peru,20,historical_estimate,3,0.1,0.8,1.6,0.032,0.0208
+expansion,8,B01,panel_original,cuenta de ahorro del bcp,4400,historical_estimate,4,0.1,0.65,286.0,5.72,3.718
+expansion,8,B02,panel_original,cuenta super tasa interbank,1900,historical_estimate,3,0.1,0.8,152.0,3.04,1.976
+expansion,8,B03,panel_original,cuenta power scotiabank,1300,historical_estimate,5,0.1,0.5,65.0,1.3,0.845
+expansion,8,B04,panel_original,cuenta digital scotiabank,2400,historical_estimate,5,0.1,0.5,120.0,2.4,1.5599999999999998
+expansion,8,B05,panel_original,cuenta digital bbva,6600,historical_estimate,6,0.1,0.35,230.99999999999997,4.619999999999999,3.0029999999999997
+expansion,8,E01,panel_original,trea,2400,historical_estimate,1,0.1,1.0,240.0,4.8,3.1199999999999997
+expansion,8,E02,panel_original,fondo de seguro de depositos,1300,historical_estimate,4,0.1,0.65,84.5,1.69,1.0985
+expansion,8,E03,panel_original,que es una cuenta de ahorro,480,historical_estimate,1,0.1,1.0,48.0,0.96,0.624
+expansion,8,E04,panel_original,como ahorrar dinero,390,historical_estimate,5,0.1,0.5,19.5,0.39,0.2535
+expansion,8,X01,ampliacion,cuenta simple interbank,9900,historical_estimate,3,0.1,0.8,792.0,15.84,10.296
+expansion,8,X02,ampliacion,cuenta millonaria interbank,2900,historical_estimate,3,0.1,0.8,232.0,4.64,3.016
+expansion,8,X03,ampliacion,cuenta independencia bbva,2900,historical_estimate,6,0.1,0.35,101.5,2.0300000000000002,1.3195
+expansion,8,X04,ampliacion,cuenta ganadora bbva,2900,historical_estimate,6,0.1,0.35,101.5,2.0300000000000002,1.3195
+expansion,8,X05,ampliacion,financiera efectiva cuenta de ahorros,40,historical_estimate,7,0.1,0.2,0.8,0.016,0.0104
+expansion,8,X06,ampliacion,agora cuenta de ahorros,110,historical_estimate,7,0.1,0.2,2.2,0.044000000000000004,0.0286
+expansion,8,X07,ampliacion,banbif cuenta de ahorros,480,historical_estimate,7,0.1,0.2,9.600000000000001,0.19200000000000003,0.12480000000000001
+expansion,8,X08,ampliacion,depósito a plazo fijo,4400,historical_estimate,6,0.1,0.35,154.0,3.08,2.002
+expansion,8,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1300,historical_estimate,3,0.1,0.8,104.0,2.08,1.3519999999999999
+expansion,8,X10,ampliacion,presupuesto familiar,590,historical_estimate,3,0.1,0.8,47.2,0.9440000000000001,0.6136
+expansion,8,X11,ampliacion,fondo de emergencia,170,historical_estimate,2,0.1,1.0,17.0,0.34,0.221
+expansion,8,X12,ampliacion,ahorro programado,90,historical_estimate,4,0.1,0.65,5.8500000000000005,0.117,0.07605
+expansion,8,X13,ampliacion,metas de ahorro,90,historical_estimate,4,0.1,0.65,5.8500000000000005,0.117,0.07605
+expansion,8,X14,ampliacion,calculadora interes compuesto,1300,historical_estimate,2,0.1,1.0,130.0,2.6,1.69
+expansion,9,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,9,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,9,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.1,1.0,32.0,0.64,0.416
+expansion,9,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,9,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,9,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,9,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,9,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.1,1.0,130.0,2.6,1.69
+expansion,9,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.1,1.0,39.0,0.78,0.507
+expansion,9,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.1,1.0,4.0,0.08,0.052
+expansion,9,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.1,0.8,528.0,10.56,6.864
+expansion,9,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.1,1.0,190.0,3.8000000000000003,2.4699999999999998
+expansion,9,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.1,0.65,84.5,1.69,1.0985
+expansion,9,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.1,0.65,123.5,2.47,1.6055
+expansion,9,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.1,0.5,330.0,6.6000000000000005,4.29
+expansion,9,E01,panel_original,trea,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,9,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.1,0.8,128.0,2.56,1.664
+expansion,9,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.1,1.0,59.0,1.18,0.767
+expansion,9,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.1,0.65,38.35,0.767,0.49855
+expansion,9,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.1,1.0,1210.0,24.2,15.729999999999999
+expansion,9,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.1,1.0,440.0,8.8,5.72
+expansion,9,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.1,0.5,180.0,3.6,2.34
+expansion,9,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.1,0.5,145.0,2.9,1.885
+expansion,9,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.1,0.35,4.8999999999999995,0.09799999999999999,0.06369999999999999
+expansion,9,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.1,0.35,9.1,0.182,0.11829999999999999
+expansion,9,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.1,0.35,16.799999999999997,0.33599999999999997,0.21839999999999996
+expansion,9,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.1,0.5,330.0,6.6000000000000005,4.29
+expansion,9,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.1,1.0,160.0,3.2,2.08
+expansion,9,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.1,1.0,88.0,1.76,1.144
+expansion,9,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.1,1.0,17.0,0.34,0.221
+expansion,9,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.1,0.8,8.8,0.17600000000000002,0.1144
+expansion,9,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.1,0.8,11.200000000000001,0.22400000000000003,0.1456
+expansion,9,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,10,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,10,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,10,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.1,1.0,32.0,0.64,0.416
+expansion,10,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,10,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,10,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,10,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,10,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.1,1.0,130.0,2.6,1.69
+expansion,10,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.1,1.0,39.0,0.78,0.507
+expansion,10,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.1,1.0,4.0,0.08,0.052
+expansion,10,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.1,1.0,660.0,13.200000000000001,8.58
+expansion,10,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.1,1.0,190.0,3.8000000000000003,2.4699999999999998
+expansion,10,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.1,0.8,104.0,2.08,1.3519999999999999
+expansion,10,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.1,0.8,152.0,3.04,1.976
+expansion,10,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.1,0.65,429.0,8.58,5.577
+expansion,10,E01,panel_original,trea,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,10,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.1,1.0,160.0,3.2,2.08
+expansion,10,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.1,1.0,59.0,1.18,0.767
+expansion,10,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.1,0.8,47.2,0.9440000000000001,0.6136
+expansion,10,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.1,1.0,1210.0,24.2,15.729999999999999
+expansion,10,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.1,1.0,440.0,8.8,5.72
+expansion,10,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.1,0.65,234.0,4.68,3.042
+expansion,10,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.1,0.65,188.5,3.77,2.4505
+expansion,10,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.1,0.5,7.0,0.14,0.091
+expansion,10,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.1,0.5,13.0,0.26,0.16899999999999998
+expansion,10,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.1,0.5,24.0,0.48,0.312
+expansion,10,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.1,0.65,429.0,8.58,5.577
+expansion,10,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.1,1.0,160.0,3.2,2.08
+expansion,10,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.1,1.0,88.0,1.76,1.144
+expansion,10,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.1,1.0,17.0,0.34,0.221
+expansion,10,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.1,1.0,11.0,0.22,0.143
+expansion,10,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.1,1.0,14.0,0.28,0.182
+expansion,10,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,11,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,11,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,11,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.1,1.0,32.0,0.64,0.416
+expansion,11,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,11,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,11,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,11,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,11,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.1,1.0,130.0,2.6,1.69
+expansion,11,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.1,1.0,39.0,0.78,0.507
+expansion,11,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.1,1.0,4.0,0.08,0.052
+expansion,11,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.1,1.0,660.0,13.200000000000001,8.58
+expansion,11,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.1,1.0,190.0,3.8000000000000003,2.4699999999999998
+expansion,11,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.1,1.0,130.0,2.6,1.69
+expansion,11,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.1,1.0,190.0,3.8000000000000003,2.4699999999999998
+expansion,11,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.1,0.8,528.0,10.56,6.864
+expansion,11,E01,panel_original,trea,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,11,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.1,1.0,160.0,3.2,2.08
+expansion,11,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.1,1.0,59.0,1.18,0.767
+expansion,11,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.1,1.0,59.0,1.18,0.767
+expansion,11,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.1,1.0,1210.0,24.2,15.729999999999999
+expansion,11,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.1,1.0,440.0,8.8,5.72
+expansion,11,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.1,0.8,288.0,5.76,3.7439999999999998
+expansion,11,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.1,0.8,232.0,4.64,3.016
+expansion,11,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.1,0.65,9.1,0.182,0.11829999999999999
+expansion,11,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.1,0.65,16.900000000000002,0.338,0.2197
+expansion,11,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.1,0.65,31.200000000000003,0.6240000000000001,0.4056
+expansion,11,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.1,0.8,528.0,10.56,6.864
+expansion,11,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.1,1.0,160.0,3.2,2.08
+expansion,11,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.1,1.0,88.0,1.76,1.144
+expansion,11,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.1,1.0,17.0,0.34,0.221
+expansion,11,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.1,1.0,11.0,0.22,0.143
+expansion,11,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.1,1.0,14.0,0.28,0.182
+expansion,11,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,12,G01,panel_original,cuenta de ahorros,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,12,G02,panel_original,cuenta de ahorro con intereses,210.0,flat_assumption,2,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,12,G03,panel_original,mejores cuentas de ahorro peru,320.0,flat_assumption,3,0.1,1.0,32.0,0.64,0.416
+expansion,12,G04,panel_original,abrir cuenta de ahorros,210.0,flat_assumption,1,0.1,1.0,21.0,0.42,0.27299999999999996
+expansion,12,G05,panel_original,cuenta de ahorros sin mantenimiento,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,12,G06,panel_original,requisitos para abrir una cuenta de ahorros,50.0,flat_assumption,1,0.1,1.0,5.0,0.1,0.065
+expansion,12,C01,panel_original,cuentas de ahorro de alto rendimiento,1600.0,flat_assumption,2,0.1,1.0,160.0,3.2,2.08
+expansion,12,C02,panel_original,cuenta digital,1300.0,flat_assumption,1,0.1,1.0,130.0,2.6,1.69
+expansion,12,C03,panel_original,en que banco puedo ahorrar mi dinero y ganar intereses,390.0,flat_assumption,3,0.1,1.0,39.0,0.78,0.507
+expansion,12,C04,panel_original,que banco paga mas intereses en peru,40.0,flat_assumption,3,0.1,1.0,4.0,0.08,0.052
+expansion,12,B01,panel_original,cuenta de ahorro del bcp,6600.0,flat_assumption,4,0.1,1.0,660.0,13.200000000000001,8.58
+expansion,12,B02,panel_original,cuenta super tasa interbank,1900.0,flat_assumption,3,0.1,1.0,190.0,3.8000000000000003,2.4699999999999998
+expansion,12,B03,panel_original,cuenta power scotiabank,1300.0,flat_assumption,5,0.1,1.0,130.0,2.6,1.69
+expansion,12,B04,panel_original,cuenta digital scotiabank,1900.0,flat_assumption,5,0.1,1.0,190.0,3.8000000000000003,2.4699999999999998
+expansion,12,B05,panel_original,cuenta digital bbva,6600.0,flat_assumption,6,0.1,1.0,660.0,13.200000000000001,8.58
+expansion,12,E01,panel_original,trea,2900.0,flat_assumption,1,0.1,1.0,290.0,5.8,3.77
+expansion,12,E02,panel_original,fondo de seguro de depositos,1600.0,flat_assumption,4,0.1,1.0,160.0,3.2,2.08
+expansion,12,E03,panel_original,que es una cuenta de ahorro,590.0,flat_assumption,1,0.1,1.0,59.0,1.18,0.767
+expansion,12,E04,panel_original,como ahorrar dinero,590.0,flat_assumption,5,0.1,1.0,59.0,1.18,0.767
+expansion,12,X01,ampliacion,cuenta simple interbank,12100,flat_assumption,3,0.1,1.0,1210.0,24.2,15.729999999999999
+expansion,12,X02,ampliacion,cuenta millonaria interbank,4400,flat_assumption,3,0.1,1.0,440.0,8.8,5.72
+expansion,12,X03,ampliacion,cuenta independencia bbva,3600,flat_assumption,6,0.1,1.0,360.0,7.2,4.68
+expansion,12,X04,ampliacion,cuenta ganadora bbva,2900,flat_assumption,6,0.1,1.0,290.0,5.8,3.77
+expansion,12,X05,ampliacion,financiera efectiva cuenta de ahorros,140,flat_assumption,7,0.1,0.8,11.200000000000001,0.22400000000000003,0.1456
+expansion,12,X06,ampliacion,agora cuenta de ahorros,260,flat_assumption,7,0.1,0.8,20.8,0.41600000000000004,0.2704
+expansion,12,X07,ampliacion,banbif cuenta de ahorros,480,flat_assumption,7,0.1,0.8,38.400000000000006,0.7680000000000001,0.49920000000000003
+expansion,12,X08,ampliacion,depósito a plazo fijo,6600,flat_assumption,6,0.1,1.0,660.0,13.200000000000001,8.58
+expansion,12,X09,ampliacion,diferencia entre cuenta corriente y cuenta de ahorros,1600,flat_assumption,3,0.1,1.0,160.0,3.2,2.08
+expansion,12,X10,ampliacion,presupuesto familiar,880,flat_assumption,3,0.1,1.0,88.0,1.76,1.144
+expansion,12,X11,ampliacion,fondo de emergencia,170,flat_assumption,2,0.1,1.0,17.0,0.34,0.221
+expansion,12,X12,ampliacion,ahorro programado,110,flat_assumption,4,0.1,1.0,11.0,0.22,0.143
+expansion,12,X13,ampliacion,metas de ahorro,140,flat_assumption,4,0.1,1.0,14.0,0.28,0.182
+expansion,12,X14,ampliacion,calculadora interes compuesto,1600,flat_assumption,2,0.1,1.0,160.0,3.2,2.08

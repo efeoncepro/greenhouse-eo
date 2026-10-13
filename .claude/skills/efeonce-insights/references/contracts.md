@@ -61,10 +61,29 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
   with `details.alive` (never mixes runs). Precondition failure (edition not `ready_for_review`, e.g. already issued) ⇒
   `not_ready`. `outputs` omitted ⇒ every output the edition declared, so an edition that declared `web` is rejected
   whole (`details.unsupported`) unless the caller passes the renderable ones; an undeclared output ⇒ `details.outside`.
+  Since 2026-10-04 the partial rejection also carries `details.requestable` (the requested targets with nothing alive).
+- **Way out of a terminal output (decided 2026-10-04, verified in code + real PG the same day):** the DB identity is the
+  partial unique index `insight_outputs_live_identity_uq` on `(organization_id, edition_id, output, audience) WHERE state
+  NOT IN ('dead_letter','cancelled')` (migration `20261004152040741_insights-outputs-live-identity-partial-unique`,
+  replaces the total `insight_outputs_identity_uq`). `dead_letter`/`cancelled` have no outgoing transition, so they free
+  their identity forever; `completed` stays alive (≤ 1 final asset per identity). Re-requesting a terminal target with
+  `POST …/editions/{id}/render {"outputs":[…]}` while the edition is still `ready_for_review` ⇒ `202` with a NEW output
+  row whose manifest is RECOMPOSED with the current mapper code over the same frozen plan; the terminal row stays as
+  history and the new output's `queued` event carries `detail.supersedes = <old insightOutputId>`. This is the canonical
+  exit after a code fix for a deterministic failure (`semantic_rejected`); `retry` is not (it reuses the sealed manifest)
+  and `revise` is only needed when the edition is no longer `ready_for_review` or the plan itself must change.
+  Concurrent re-requests: the index stops the second INSERT (`23505` on that index, matched by
+  `isInsightOutputLiveIdentityViolation`) and the command re-reads ⇒ `200 idempotent:true` if the winning run covers the
+  request, else `422 render_rejected` with `details.alive` — never `500 internal_error` (which is what the total index
+  produced on 2026-10-04 for the Berel canary).
+- Readers by edition (`findInsightOutputsForEdition`, ordered `created_at DESC, insight_output_id`) may return several
+  rows per target (one alive + terminal history). Every consumer (outputs port, delivery attachments, public download)
+  selects `state === 'completed' && outputAssetId`, never "the row of the target".
 - `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
   `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
-- `POST …/render-runs/{id}/retry` → re-queues only `failed` outputs (`idempotent:true` when none). `dead_letter` is terminal.
+- `POST …/render-runs/{id}/retry` → re-queues only `failed` outputs (`idempotent:true` when none) with their SEALED
+  manifest. `dead_letter` is terminal: its exit is a new render request (above), never `retry`.
 - `POST …/render-runs/{id}/cancel` → `{ run, outputs, cancelled, stillRunning, idempotent }`; running outputs are not lied about.
   `cancelled` is TERMINAL: `retry` on a cancelled run answers `200` without re-queuing (verified in staging 2026-09-16);
   to get the deck, request a new render.
@@ -239,8 +258,9 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   `validateChartSpecValues(spec, values)` in `editorial/chart-values.ts`, which calls `chart-geometry.ts` (rule codes
   `geometry_<reason>`, e.g. `geometry_stage_grows`, `geometry_empty_set`). It cannot live in `contracts/`: the
   composer's `pure` entry pulls Node crypto.
-- **Channels** — `contracts/channels.ts`: `INSIGHT_CHANNEL_IDS` = `google`, `google_ai_overview`, `chatgpt`, `gemini`,
-  `claude`, `perplexity`; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
+- **Channels** — `contracts/channels.ts`: `INSIGHT_CHANNEL_IDS` — six ids when this contract shipped (`google`,
+  `google_ai_overview`, `chatgpt`, `gemini`, `claude`, `perplexity`); today the 22 AXIS platforms, see § Glifos, isotipos y
+  tableros por plataforma; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
   `google_ai_overview`); unknown provider ⇒ field ABSENT (not null). On `EvidenceFactV1.channelId`,
   `ChartSeriesV1.channelId`, `ChartSpecV1.dimensionChannelIds` (parallel to `dimensionLabels`, null = not a channel) and
   the channel fields of bullet/waffle/venn/upset data. Rule (2026-09-25): `dimensionChannelIds` ONLY when the dimensions
@@ -538,10 +558,17 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
 
 ### Glifos, isotipos y tableros por plataforma (TASK-1990/1996 — code complete en develop 2026-10-04)
 
-- **Plataformas:** `INSIGHT_CHANNEL_IDS` = las 19 de `AXIS_PLATFORM_ASSETS` (test de deriva contra el paquete instalado);
+- **Plataformas:** `INSIGHT_CHANNEL_IDS` = las de `AXIS_PLATFORM_ASSETS` (test de deriva contra el paquete instalado): 22
+  desde `axis-brand-assets` 0.4.25 (las 19 originales más `facebook`, `threads` y `x`, alineadas el 2026-10-12);
   `channelForDomain(domain)` traduce un dominio citado (youtube.com, reddit.com, *.wikipedia.org, linkedin.com,
-  instagram.com, tiktok.com, facebook.com → meta). Los 19 isotipos están copiados en `catalogs/insights-*/assets/channels/`
-  (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`).
+  instagram.com, tiktok.com; desde el 2026-10-12 facebook.com → `facebook`, threads.net/threads.com → `threads` y
+  x.com/twitter.com → `x`; `meta` ya no sale de un dominio: es la empresa y su pauta). Los isotipos están copiados en
+  `catalogs/insights-*/assets/channels/`
+  (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`). **Alcance de
+  `channelForDomain`:** sólo lo usa la marca de fila de las tablas del PDF y el deck (`rowMarkOf` en
+  `render/report-mapper.ts`, para hechos `cited_source.*`). El modelo web envía únicamente el `channelId` propio del hecho
+  (`sharing/web-model.ts`), así que una fuente citada no llega a Think con canal: los isotipos de Think cubren el
+  vocabulario, no este mapeo.
 - **`metricIcon`:** glifo Trazo de la métrica (`presentation/metric-glyphs.ts`, `metricGlyphOf`), resuelto por
   `statItemView` y aditivo en el modelo web 1.4. Nunca junto a `channel`. Catálogo: campo `metricIcon` con resolver
   `*-metric-icon` en cifras, comparación, metas (A4 y deck) y tabla (A4); trazos sellados en
@@ -556,3 +583,63 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
   iguales; si varían, barras por canal). `chapter.stats` puede traer varios tableros.
 - **Color por rol:** partes sin rol actual → anterior → paso (→ gris medio en waffle); coral sólo con rol declarado.
 
+## Alcance de contenido (TASK-2033 — en staging y `ops-worker` desde 2026-10-12, Production sin release; verificado contra código y PostgreSQL real)
+
+**Regla.** `{ kind: 'prefix' | 'exact', path }`. La ruta empieza por `/`, no termina en `/`, no lleva query, fragmento
+ni espacios, y no es `/` (el sitio completo se declara con cero reglas). Máximo 50 reglas, 200 caracteres por ruta,
+etiqueta de hasta 60 caracteres y sin cifras (se imprime en una línea que no admite números).
+
+**Pertenencia.** Una página pertenece si su ruta es igual a una regla `exact`, igual a una regla `prefix` o empieza
+por `prefix + '/'`. `/articulos-viejos` no pertenece a `/articulos`. La ruta se compara sin esquema, host, query,
+fragmento ni barras finales; por bytes, distingue mayúsculas. Aplica a todos los hosts de la propiedad.
+
+**Versiones.** El alcance vigente es la versión de mayor número. Fijar las mismas reglas y etiqueta no escribe
+(`changed: false`). Cero reglas = sitio completo. Nunca se edita ni se borra una versión.
+
+**Qué cambia en la evidencia con alcance vigente:**
+
+| Hecho | Con alcance | Sin alcance |
+| --- | --- | --- |
+| `clicks`, `impressions`, `ctr`, `position`, `clicks_week.*` | páginas del alcance | propiedad completa |
+| `driver.query.*`, `driver.page.*` | páginas del alcance (las consultas son las que llevaron a ellas) | propiedad completa |
+| `site.organic_*` (GA4) | sesiones cuya página de entrada pertenece al alcance | sitio completo |
+| `keywords_tracked`, `page_one_keywords` | keywords cuyo último punto de la ventana posiciona con URL del alcance | todas |
+| `opportunity.*` | ítems de la cola con `target_url` en el alcance | toda la cola |
+| `organic_etv` | no se emite; rechazo `outside_content_scope` | como siempre |
+| `site_total.clicks`, `site_total.impressions` | propiedad completa, `role: 'reference'` | no se emiten |
+
+**Sellado.** Con alcance, toda fuente SEO del snapshot lleva `contentScope: { version, label, rules }` (las de la
+ventana de comparación también) y los `evidenceRef` terminan en `:scope_v<n>`. Ausente = sitio completo. El plan lee
+el alcance de las fuentes (`contentScopeOf`), no de la configuración.
+
+**Plan.** `scopeLines` de búsqueda: «Visibilidad orgánica de {etiqueta en minúscula inicial}: sus clics, impresiones y
+posiciones en Google, sin el resto del sitio.» Entrada del capítulo: «Cómo encuentra Google el contenido que
+trabajamos y cuántas visitas le trae.» Última afirmación del capítulo, rol `finding`, id
+`claim.seo.content_scope_context`: «Los clics de este contenido variaron {Δ} frente al período anterior; los de todo
+el sitio, {Δ}.» Cita el hecho `clicks` y la referencia `site_total.clicks`; sólo existe si ambos tienen período
+anterior distinto de cero. Límite del ETV: «Tráfico orgánico estimado: se estima para todo el sitio, no para el
+contenido que mide esta edición.»
+
+**Contrato de contenido.** `site_total.` responde `outcome` (como `measurement` rompía el gate: SEO no tiene productor
+de metas).
+
+**Nombre de una página (`pageLabelOf`).** Hasta 40 caracteres. Una ruta más larga se nombra por su último tramo
+(`…/tramo`); si tampoco cabe, por el comienzo y los últimos 12 caracteres del tramo con la elipsis a la vista
+(`…/como-elegir-la-pintura-co…clima-humedo`). `uniquePageLabels` distingue dos nombres abreviados iguales (` ·2`).
+
+**Línea semanal de clics (cambia para toda organización).** `chart.seo.line.clicks-week` dibuja SÓLO bloques
+completos de 7 días. El último bloque del mes tiene 2 o 3 días y su total junto al de una semana entera se veía como
+caída mientras el titular decía «subieron» (Berel, septiembre de 2026: 62 clics en 2 días al lado de 210 en 7). El
+bloque corto no se dibuja ni entra al equivalente tabular; la lectura lo nombra en «Lo que significa» («Fuera de la
+figura: 29–30 sept, que no completa una semana.») citando su hecho, que sigue en el snapshot y en el total del mes.
+Con menos de tres semanas completas no hay línea.
+
+**Textos de GA4.** «Visitas orgánicas» (antes «Visitas orgánicas al sitio»), «Visitas desde buscadores» y «Visitas
+orgánicas, con y sin interacción»: valen con y sin alcance. Cambian para toda organización.
+
+**Portada.** La línea del alcance sólo se imprime en la portada BLANCA del A4 (`coverPage`, rama `light`). La navy y la
+portada del deck no tienen esa zona; el alcance queda en la entrada del capítulo y en la afirmación de contexto, que
+no enumeran el contenido. La vista web sí recibe `scopeLines` en su modelo.
+
+**Fallo cerrado.** Si `readSeoContentScope` lanza, el adapter lanza y el orquestador registra el módulo SEO como
+límite. Nunca se mide el sitio completo por defecto.

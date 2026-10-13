@@ -1,4 +1,4 @@
-# Reference — Medición GTM + GA4 (Efeonce/Greenhouse)
+# Reference — Medición GTM + GA4 + Meta CAPI (Efeonce/Greenhouse)
 
 > **Referencia canónica de medición.** Una sola copia, leída por Claude, Codex, humanos y Nexa. Las skills (`growth-marketing-cro`, `greenhouse-growth-forms`, `digital-marketing`, `efeonce-public-site-wordpress`) apuntan aquí — no duplican.
 > Documentación oficial de Google Tag Manager + GA4 + best practice de taxonomía de eventos, más la house style de Greenhouse aterrizada al runtime real.
@@ -13,7 +13,7 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 |---|---|
 | **[TRACKING-PLAN.md](TRACKING-PLAN.md)** | **Registro vivo OBLIGATORIO** de forms & CTAs con su estado de tagging. Leer antes de crear un form/CTA; registrar su fila al crearlo (taggeado o no). |
 | **[LEARNINGS.md](LEARNINGS.md)** | Build-log de aprendizajes reales operando GTM/GA4 en runtime (gotchas verificados). Leer antes de construir tags. |
-| `container-snapshot.json` | Snapshot normalizado del config live del container (`pnpm gtm:snapshot`) — diff en git + drift detection. Estrategia: ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1`. |
+| `container-snapshot.json` | Snapshot normalizado del config live del container **web**, nunca prueba CAPI/sGTM (`pnpm gtm:snapshot`) — diff en git + drift detection. Estrategia: ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1`. |
 | **[04-greenhouse-gh-event-convention.md](04-greenhouse-gh-event-convention.md)** | **Empezar aquí.** House style `gh_<object>_<action>`, coordenadas reales (`GTM-NGHPGRLZ`, GA4 `486264460`), regla de decisión GA4-recomendado vs `gh_` + tabla de mapeo, allowlist/PII, naming GTM, loop de verificación, gobernanza. |
 | [01-ga4-event-model.md](01-ga4-event-model.md) | GA4: 4 tipos de evento, recomendados por vertical, reglas de naming + límites duros (nombres/prefijos reservados verbatim), key events, custom dimensions, Measurement Protocol. |
 | [02-gtm-and-datalayer.md](02-gtm-and-datalayer.md) | GTM: conceptos, web vs server-side, dataLayer en profundidad, tags/triggers/variables, consent mode v2, convenciones de naming de entidades. |
@@ -21,6 +21,8 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 | **[05-gtm-api-v2-tag-shapes.md](05-gtm-api-v2-tag-shapes.md)** | **Operador.** JSON exacto de la API v2 para crear tags/triggers/variables (`gaawe`, `customEvent`, `v`…) + workflow versions/publish. Usado por la skill `greenhouse-gtm-ga4-operator`. |
 | [06-gtm-tagging-as-code-and-ops.md](06-gtm-tagging-as-code-and-ops.md) | Operador. Container-as-code, deploy seguro, verificación, gobernanza, sGTM, diagnóstico "event not showing in GA4". |
 | [07-ga4-admin-api-ops.md](07-ga4-admin-api-ops.md) | Operador. GA4 Admin API: measurement ID, custom dimensions, key events, MP secrets, blueprint lead-gen. |
+| [09-hubspot-consent.md](09-hubspot-consent.md) | Banner HubSpot, bridge, categorías, PageView por destino, UUID sender, rollout/rollback WP–Think. |
+| [08-meta-conversions-api-server-side.md](08-meta-conversions-api-server-side.md) | Canon Meta CAPI por GTM **Server**: inventario live, ingreso web/backend, consentimiento, dedupe, secretos y verificación Meta; separado del Pixel web. |
 
 ## Regla de una línea
 
@@ -34,3 +36,6 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 - `src/lib/growth/forms/contracts.ts` · `src/growth-forms-renderer/telemetry.ts` — SoT del vocabulario + allowlist.
 
 > Frescura: GA4/GTM cambian cada trimestre (consent mode, features de reporting, límites). Antes de afirmar un límite exacto o una regla volátil, reverificar contra la doc oficial citada en cada archivo.
+
+Consentimiento HubSpot y sender publicado: [09-hubspot-consent.md](09-hubspot-consent.md);
+estado GTM server 5/web 5, QA y límites en [auditoría](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).

@@ -1,0 +1,106 @@
+{
+  "lead_company": {
+    "ok": true,
+    "data": [
+      {
+        "id": "34939665568",
+        "labels": [
+          "Primary"
+        ],
+        "labelsDisplay": "Primary",
+        "associationTypes": [
+          {
+            "category": "HUBSPOT_DEFINED",
+            "typeId": 610,
+            "fromObjectTypeId": null,
+            "toObjectTypeId": null
+          },
+          {
+            "category": "HUBSPOT_DEFINED",
+            "typeId": 580,
+            "label": "Primary",
+            "fromObjectTypeId": null,
+            "toObjectTypeId": null
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "next": null
+    }
+  },
+  "note_lead": {
+    "ok": true,
+    "data": [
+      {
+        "id": "595750420294",
+        "labels": [],
+        "labelsDisplay": "",
+        "associationTypes": [
+          {
+            "category": "HUBSPOT_DEFINED",
+            "typeId": 855,
+            "fromObjectTypeId": null,
+            "toObjectTypeId": null
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "next": null
+    }
+  },
+  "note_company": {
+    "ok": true,
+    "data": [
+      {
+        "id": "34939665568",
+        "labels": [],
+        "labelsDisplay": "",
+        "associationTypes": [
+          {
+            "category": "HUBSPOT_DEFINED",
+            "typeId": 190,
+            "fromObjectTypeId": null,
+            "toObjectTypeId": null
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "next": null
+    }
+  },
+  "lead_dedup_after": {
+    "ok": true,
+    "data": [
+      {
+        "id": "595750420294",
+        "properties": {
+          "hs_createdate": "2026-10-10T16:51:33.488Z",
+          "hs_lastmodifieddate": "2026-10-10T16:53:20.593Z",
+          "hs_lead_name": "Efeonce | INAPI — Campañas de marketing digital | 519302-9-LE26",
+          "hs_object_id": "595750420294",
+          "hs_pipeline_stage": "new-stage-id",
+          "hubspot_owner_id": "75788512"
+        },
+        "createdAt": "2026-10-10T16:51:33.488Z",
+        "updatedAt": "2026-10-10T16:53:20.593Z",
+        "archived": false,
+        "url": "https://app.hubspot.com/contacts/48713323/objects/0-136/views/all/list?leadId=595750420294"
+      }
+    ],
+    "meta": {
+      "next": null,
+      "total": 1
+    }
+  },
+  "deal_dedup_after": {
+    "ok": true,
+    "data": [],
+    "meta": {
+      "next": null,
+      "total": 0
+    }
+  }
+}

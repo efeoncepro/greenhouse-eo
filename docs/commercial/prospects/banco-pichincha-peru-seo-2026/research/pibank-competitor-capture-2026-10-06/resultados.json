@@ -1,0 +1,143 @@
+{
+  "as_of": "2026-10-06",
+  "lens": "estimated_market_DataForSEO",
+  "market": "PE/2604/es",
+  "banks_named_by_jesus": [
+    "BCP",
+    "Interbank",
+    "Scotiabank"
+  ],
+  "scotiabank_transcription_note": "ASR says Scorch; meeting summary normalizes Scotiabank",
+  "researcher_added_peer": [
+    "BBVA"
+  ],
+  "ranked_observations": 1476,
+  "exact_normalized_queries": 1286,
+  "manually_selected_families": 19,
+  "selected_ranked_unique_queries": 68,
+  "raw_selected_query_volume_sum_diagnostic_only": 83400,
+  "representative_basket_proxy_by_lane": {
+    "direct": 3740,
+    "conditional": 3330,
+    "competitor": 18300,
+    "assisted": 5680
+  },
+  "basket_is_total_market": false,
+  "basket_is_disjoint_audience": false,
+  "etv_consumed": false,
+  "incremental_provider_calls": 0,
+  "incremental_provider_cost_usd": 0,
+  "previous_ledger_cost_unknown": true,
+  "previous_unknown_request": "ranked-09-page2",
+  "coverage": [
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-01-provider.json",
+      "sha256": "4f24f79be6f375680998f0638d47ccc818706931de633c43288d7de1ca06d2c6",
+      "task_id": "10061915-1987-0381-0000-17d2f98aeb09",
+      "queried_at": "2026-10-06T19:15:58.455Z",
+      "target": "https://interbank.pe/cuentas/cuentas-ahorro/cuenta-super-tasa",
+      "total_count": 24,
+      "returned_rows": 24
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-02-provider.json",
+      "sha256": "9dec60fb0d03f8d4bbf3cf0e7748922aadf3d665841b6667ed81210cb923b285",
+      "task_id": "10061916-1987-0381-0000-2807795b1a2e",
+      "queried_at": "2026-10-06T19:16:04.741Z",
+      "target": "https://www.bbva.pe/personas/productos/cuentas/ahorro/cuenta-digital.html",
+      "total_count": 9,
+      "returned_rows": 9
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-03-provider.json",
+      "sha256": "77522525d60d1ba3203ffd68ddacd6392d1c2ebb631e1c230aa986822dd44e98",
+      "task_id": "10061916-1987-0381-0000-02dd35fc3c69",
+      "queried_at": "2026-10-06T19:16:09.506Z",
+      "target": "https://www.viabcp.com/abrir-cuenta",
+      "total_count": 1,
+      "returned_rows": 1
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-04-provider.json",
+      "sha256": "3242f0eb42ddcb817052536d9e03fa950af5656946cf4b19fe047abbd5e199c3",
+      "task_id": "10061916-1987-0381-0000-9a21212a5a39",
+      "queried_at": "2026-10-06T19:16:15.011Z",
+      "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+      "total_count": 6,
+      "returned_rows": 6
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-05-provider.json",
+      "sha256": "b9cdd9e4479e49093bafd7db2d0834841382968ec10a45594fba062676aa7ec6",
+      "task_id": "10061916-1987-0381-0000-92472ff16307",
+      "queried_at": "2026-10-06T19:16:20.536Z",
+      "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-digital",
+      "total_count": 19,
+      "returned_rows": 19
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-08-provider.json",
+      "sha256": "cb2c35e1f26040c141e47b3d365c2dd1448169fbf59806c7f60dd5040411a633",
+      "task_id": "10061916-1987-0381-0000-c011335956d7",
+      "queried_at": "2026-10-06T19:16:36.606Z",
+      "target": "viabcp.com",
+      "total_count": 917,
+      "returned_rows": 500
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-08-page2-provider.json",
+      "sha256": "7f903a6ccb42f8f6caa56a9569375569af54a7934f327de3ab3f7d83d18f1a46",
+      "task_id": "10061922-1987-0381-0000-9919d76c08e4",
+      "queried_at": "2026-10-06T19:22:42.646Z",
+      "target": "viabcp.com",
+      "total_count": 917,
+      "returned_rows": 417
+    },
+    {
+      "file": "research/pibank-expanded-2026-10-06/ranked-09-provider.json",
+      "sha256": "b0afcc1ecf27e71f44c8bfd914a447cb4e368442cea6b1614ed0da4a95d161cf",
+      "task_id": "10061916-1987-0381-0000-155364d725ca",
+      "queried_at": "2026-10-06T19:16:42.923Z",
+      "target": "bbva.pe",
+      "total_count": 1544,
+      "returned_rows": 500
+    }
+  ],
+  "model_assumptions": {
+    "ramp_sensitivity_not_measured": [
+      0,
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.45,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      1,
+      1
+    ],
+    "open_rate_not_measured": 0.02,
+    "funding_rate_not_measured": 0.65,
+    "annual_window_is_planning_not_confirmed_bank_goal": true
+  },
+  "five_percent_provisional_38m_first_deposit_goal": {
+    "funded_required": 760,
+    "eligible_visits_required": 58461.538461538454,
+    "required_visit_to_query_proxy_ratio_generic_flat_year": 0.689079897000689,
+    "required_visit_to_query_proxy_ratio_combined_flat_year": 0.19202975450511908,
+    "required_visit_to_query_proxy_ratio_generic_with_maturity_sensitivity": 1.3555670104931588,
+    "required_visit_to_query_proxy_ratio_combined_with_maturity_sensitivity": 0.3777634514854802,
+    "ratios_are_requirements_not_observed_CTR_or_market_share": true,
+    "currency_ticket_goal_period_and_definition_unconfirmed": true
+  },
+  "checks": {
+    "all_provider_tasks_ok": true,
+    "all_selected_volumes_measured_estimates": true,
+    "no_duplicate_family_assignments": true,
+    "all_source_files_exist": true,
+    "no_ETV_or_GSC_claim": true,
+    "no_assisted_or_IA_accounts_added": true
+  }
+}

@@ -154,6 +154,35 @@ compatible explícita, nunca usar el dato actual como histórico. Datos incomple
 bloquean la emisión por defecto. Una política explícita `allow_partial` puede emitir omisiones visibles,
 pero nunca salta los gates de seguridad, validez del instrumento o auditoría técnica.
 
+### 5.1 Alcance de contenido por organización (TASK-2033 — en staging y `ops-worker` desde 2026-10-12; Production sin release)
+
+Un informe mide lo que Efeonce trabaja, no todo lo que la fuente trae. Search Console entrega la propiedad completa
+de la organización; cuando Efeonce trabaja una parte del sitio (el contenido editorial), el resto decide la cifra y
+el informe deja de hablar del trabajo. El alcance de contenido resuelve eso sin cambiar las fuentes.
+
+- **Dueño:** el dominio SEO (`src/lib/growth/seo/content-scope/**`,
+  `greenhouse_growth.seo_content_scope_versions`). Se ancla a la organización, igual que la propiedad de Search
+  Console. Reglas de ruta `prefix` y `exact`, versiones append-only; la vigente es la de mayor número; cero reglas es
+  el sitio completo. Acceso sólo por `readSeoContentScope` y `setSeoContentScope`.
+- **Quién recorta:** los readers dueños (`readSeoOverviewKpisForWindow`, `readSeoWindowMovers`, `readSeoWorkQueue`,
+  `readGa4Analytics`), que reciben el alcance como parámetro opcional. El adapter de Insights lo resuelve una vez por
+  edición y lo pasa en la ventana actual y en la de comparación; no filtra filas ni lee tablas del dominio SEO.
+- **Qué se sella:** cada fuente SEO del snapshot lleva `contentScope` (versión, etiqueta, reglas). El plan lo lee de
+  ahí. Cambiar el alcance de la organización después no cambia lo que dice una edición sellada.
+- **Qué no se puede recortar:** el ETV es una estimación del dominio; con alcance no se emite y queda como límite
+  (`outside_content_scope`). La propiedad completa entra sólo como hechos de referencia (`site_total.*`), que una
+  afirmación de contexto cita.
+- **Fallo cerrado:** si el alcance no se puede leer, el adapter falla y el módulo queda como límite. Medir el sitio
+  completo por defecto sería el error que esta pieza existe para evitar.
+- **Dónde se lee:** en la portada blanca del A4 y en la vista web («Qué mide este informe»), en la entrada del capítulo
+  y en la afirmación de contexto. La portada navy y la del deck no tienen esa zona: con alcance, la portada blanca es
+  la única que enumera el contenido medido.
+- **Fuera:** el capítulo AEO (la marca no se mide por URL), el alcance por servicio contratado (`TASK-1960`) y la
+  escritura del alcance por API o MCP.
+
+Contrato completo en la skill `efeonce-insights` (`references/contracts.md` § Alcance de contenido); estado y
+evidencia en su `program-ledger.md` § TASK-2033.
+
 ## 6. Plan editorial, gráficos y salidas
 
 El plan contiene resumen ejecutivo, capítulos de módulos, hallazgos con evidencia, acciones con owner sólo
@@ -381,7 +410,7 @@ archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.0 (`insights-logo-*`, 
 | Favicon de Think | Falta: favicon genérico del hub | `efeonce-think/src/layouts/BaseLayout.astro` |
 | Receta de deck «resultados en vivo» | Usa el isotipo de Efeonce para la ficha de Insights | `deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
 | Portal (S1–S5) y MCP | Sin marca de producto | TASK-1849 (diseño); MCP sin superficie visual |
-| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.3.5: no trae los assets de Insights | `package.json:419` |
+| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.4.25 (desde el 2026-10-06): trae los assets de Insights; las portadas del PDF y el deck siguen con la composición tipográfica | `package.json` |
 
 **Pendiente de decisión (gaps, sin regla aprobada):** si el lockup oficial (aprobado el 2026-09-28 en el canvas
 «Insights en vivo») reemplaza la composición tipográfica de las portadas PDF/deck; marca en correo, favicon, portal y
@@ -1018,7 +1047,8 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 
 **Existe en código (develop):**
 - Schema: `insight_render_runs` (solicitud por edición), `insight_outputs` (unidad reclamable por target, UNIQUE
-  `(org, edición, output, audiencia)`), `insight_render_events` (append-only); columnas `lease_expires_at` +
+  `(org, edición, output, audiencia)` — parcial sobre los outputs vivos desde el Delta 2026-10-04 de abajo),
+  `insight_render_events` (append-only); columnas `lease_expires_at` +
   `fence_token` en `insight_outputs` **y** en `proposal_render_jobs` (additive; el reclamo de Proposal queda apagado).
 - Motor: `services/artifact-worker` despacha por `RenderConsumer` (registry con Proposal e Insights); claim
   atómico con lease, reclamo de lease vencido, fencing en la finalización, cuota por org, retry sólo de fallidos,
@@ -1033,6 +1063,35 @@ cero píxeles (Proposal intacto), `pnpm test` completo y `pnpm build` de producc
 
 **NO hecho / límites honestos:** target `web` y catálogo A4 (1847/1848); descarga autorizada del asset (1848); el render
 corre en producción desde 2026-09-16 (ver delta de producción); el defecto visual del slot `unit` de `MetricsSplit` es anterior y afecta decks ya entregados (issue aparte).
+
+#### Delta 2026-10-04 — salida canónica de un output terminal
+
+**Incidente:** canary interno de Berel en producción (edición `insed-658861b2…`, run `irun-329330e5…`): `report_pdf`
+quedó `dead_letter` (`semantic_rejected`). Tras el fix (release `7182af769`), re-encargar `report_pdf` respondió
+`500 internal_error`; se salió con `revise`. Causas: (1) `requestInsightRender` trataba `dead_letter`/`cancelled` como
+no vivos, pero `insight_outputs_identity_uq` era una UNIQUE total y el INSERT chocaba sin manejo; (2)
+`retryFailedInsightOutputs` sólo toma `failed` y reusa el manifest sellado.
+
+**Contrato decidido:** la identidad `(org, edición, output, audiencia)` se garantiza sobre los outputs **vivos**:
+índice parcial `insight_outputs_live_identity_uq … WHERE state NOT IN ('dead_letter','cancelled')` (migración
+`20261004152040741_insights-outputs-live-identity-partial-unique`, reemplaza la UNIQUE total). Como esos dos estados no
+tienen transición de salida, una fila terminal libera su identidad para siempre y nunca vuelve a ocuparla; `completed`
+sigue siendo vivo (a lo más un asset final por identidad). Con la edición todavía en `ready_for_review`, un encargo nuevo
+del target muerto crea una fila **nueva** cuyo manifest se recompone con el código vigente sobre el **mismo** plan
+congelado; la fila terminal queda como historial y el evento `queued` del output nuevo lleva `detail.supersedes`. No se
+viola la inmutabilidad: ningún manifest ni plan sellado cambia; se produce otro output del mismo plan.
+`retry` conserva su semántica (sólo `failed`, mismo manifest: fallos transitorios). `revise` sólo hace falta si la
+edición ya salió de `ready_for_review` o si el plan mismo debe cambiar. La carrera entre dos encargos simultáneos la
+frena el índice (`23505` de ESE índice) y el comando la traduce a `200 idempotent:true` o `422 render_rejected`, nunca a
+500. El encargo parcial (un target vivo + uno muerto) sigue rechazándose, ahora con `details.requestable`.
+
+**Estado:** código y migración probados (unitarios + `render-identity.live.test.ts` contra PostgreSQL real, con el
+perfil `ops`). **Migración aplicada en la instancia compartida el 2026-10-04 18:29Z** por el operador
+(`pnpm pg:connect:migrate`): queda sólo `insight_outputs_live_identity_uq` (parcial) y el live test pasa también con el
+estado aplicado. El código del comando que ya corre en producción (`7182af769`) tenía esa intención, así que re-encargar un
+target terminal ya no choca desde la aplicación. Lo nuevo de este cambio todavía no está liberado: `supersedes`, la
+carrera tratada como 422 en vez de 500 y `requestable`. Canary pendiente: re-encargar `report_pdf` de la edición de
+Berel `insed-658861b2…` (sigue en `ready_for_review`, con su `report_pdf` en `dead_letter`).
 
 #### Delta 2026-09-16 — runtime real, benchmark en Cloud Run y auditoría del actor
 
@@ -1599,7 +1658,9 @@ redactor; nunca llega al cliente.
   conectar la fuente»), en una sola frase si faltan los dos. Lo que falta por configuración interna (perfil del Grader,
   spaces, target SEO) no se le pide al cliente.
 - **Línea semanal**: la lectura compara sólo bloques COMPLETOS de 7 días (el último del mes puede ser de 2 o 3 días y
-  se leía como caída); la figura sigue mostrando el bloque corto con su etiqueta.
+  se leía como caída). Desde el 2026-10-12 la figura tampoco dibuja el bloque corto: junto a semanas enteras se veía
+  como caída bajo un titular que decía «subieron». La lectura lo nombra («Fuera de la figura: 29–30 sept, que no
+  completa una semana.»); su hecho sigue en el snapshot y en el total del mes.
 
 **Modelo web 1.3 — las decisiones de contenido viven en el API.** Cada frase del resumen y de las esenciales trae
 `module` y `evidence {chapterId, chartId}`; el modelo trae `essentialsByModule` (incluido 0), cada capítulo su `label`
@@ -1652,9 +1713,11 @@ cual; nunca calcula la variación, su tono ni el período. La resolución es `st
 la misma para PDF, deck y web.
 
 **Isotipo de canal en la tarjeta (TASK-1990/1996, aditivo en 1.4).** La plataforma de una cifra sale del hecho sellado
-(la fuente manda: Search Console, GA4 e ICO tienen su isotipo; si no, el `channelId`), con el vocabulario de 19 ids de
-`INSIGHT_CHANNEL_IDS`, igual a `AXIS_PLATFORM_ASSETS` (test de drift contra el paquete instalado); `channelForDomain`
-traduce un dominio citado a su plataforma. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
+(la fuente manda: Search Console, GA4 e ICO tienen su isotipo; si no, el `channelId`), con el vocabulario de 22 ids de
+`INSIGHT_CHANNEL_IDS` (19 del contrato 0.2.0 más `facebook`, `threads` y `x` desde `axis-brand-assets` 0.4.25), igual a
+`AXIS_PLATFORM_ASSETS` (test de drift contra el paquete instalado); `channelForDomain` traduce un dominio citado a su
+plataforma (YouTube, Reddit, Wikipedia, LinkedIn, Instagram, TikTok, Facebook, Threads y X; `meta` nunca sale de un
+dominio) y sólo marca las filas de tabla del PDF y el deck: el modelo web envía el `channelId` propio del hecho. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
 Search Console primero) y cada celda conserva su ícono. Tablero que mezcla motores de respuesta: cada celda trae
 `channel {platform, name}` y `context` (la métrica bajo la cifra). Isotipo o ícono, nunca los dos; título o celdas,
 nunca los dos: lo garantiza el resolver y lo prueban `stat-card-channels.test.ts` y `figure-slots.test.ts`. Cada cifra

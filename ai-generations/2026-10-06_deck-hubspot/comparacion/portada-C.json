@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Brochure · Servicios HubSpot",
+    "question": "¿Mi HubSpot puede hacer más?",
+    "answer": [
+      "Mucho más"
+    ]
+  },
+  "body": "**Seis** soluciones:\nMarketing y AEO · Ventas y pipeline\nRevenue lifecycle · Servicio\nDatos y CRM · Operación con agentes",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-portada-C.png",
+    "alt": "Una líder de RevOps de Efeonce con la chaqueta dirige con la mano el nudo de un moño de luz magenta y azul, con agentes robot en el flujo"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

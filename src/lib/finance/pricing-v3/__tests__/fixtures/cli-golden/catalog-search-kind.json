@@ -1,0 +1,22 @@
+{
+  "args": [
+    "catalog",
+    "search",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json",
+    "--kind",
+    "offer"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 2357,
+    "sha256": "60fcfc878d5b10b6c85c5aa487ee949f605711dfd2929ade13096c30f90b421b",
+    "text": "{\n  \"binding\": false,\n  \"mode\": \"historical\",\n  \"version\": \"operating-review-2026-10-11-v11\",\n  \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\",\n  \"resolution\": \"ambiguous\",\n  \"candidates\": [\n    {\n      \"recordId\": \"offer:creative-managed-service\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"policy:offer-commercial-unit-2026-10-11\",\n        \"effectiveFrom\": \"2026-10-10\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"confirmed\"\n      },\n      \"note\": \"Sold as one managed-service fee: the client sees the service and its price, never its team, hours or roles. Decided with the offer; declared in the catalog on 2026-10-11 after a managed-service quote was scaffolded as role capacity.\",\n      \"kind\": \"offer\",\n      \"value\": {\n        \"offerId\": \"creative-managed-service\",\n        \"label\": \"Managed service of the Creative practice\",\n        \"commercialUnit\": \"managed_service\"\n      }\n    },\n    {\n      \"recordId\": \"offer:seo-aeo-managed-service\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"policy:offer-commercial-unit-2026-10-11\",\n        \"effectiveFrom\": \"2026-10-11\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"confirmed\"\n      },\n      \"note\": \"Sold as one managed-service fee: the client sees the service and its price, never its team, hours or roles. Decided with the offer; declared in the catalog on 2026-10-11 after a managed-service quote was scaffolded as role capacity.\",\n      \"kind\": \"offer\",\n      \"value\": {\n        \"offerId\": \"seo-aeo-managed-service\",\n        \"label\": \"Managed service of the SEO/AEO practice\",\n        \"commercialUnit\": \"managed_service\"\n      }\n    },\n    {\n      \"recordId\": \"offer:talent-assurance-staffing\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"policy:offer-commercial-unit-2026-10-11\",\n        \"effectiveFrom\": \"2026-10-09\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"confirmed\"\n      },\n      \"note\": \"Sold line by line: each person and dedication is a line of the quote with its own price. Decided with the offer; declared in the catalog on 2026-10-11.\",\n      \"kind\": \"offer\",\n      \"value\": {\n        \"offerId\": \"talent-assurance-staffing\",\n        \"label\": \"Staff augmentation: a person sold by dedication\",\n        \"commercialUnit\": \"role_capacity\"\n      }\n    }\n  ]\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

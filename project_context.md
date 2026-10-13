@@ -2,27 +2,37 @@
 
 ## Estado vigente para agentes
 
+[Rooms](docs/architecture/rooms/README.md): creativo/SEO-AEO; sin go.
+
+[Factory](docs/services/factory/README.md): On-Demand.
+
+Studio: [readers y rollout TASK-2001](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+
 Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md).
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
-## Actualización documental reciente
+[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md).
 
-CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
+## Documentación
+
+CAPI: Handoff.md
+CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
 
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-HubSpot directo: [Agent CLI/MCP](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); portal y permisos separados.
+[Comercial](docs/commercial/README.md). [Prospección y secuencias](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
+[CRM](docs/context/11_hubspot-bowtie.md).
+Outlook de Julio: [envíos](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
 TeamBot: `pnpm teams:announce` sólo para grupos con menciones explícitas; 1:1 manual requiere dispatcher/audit, Entra e idempotencia. Performance Reports verifica mención publicada, no infiere sobrecarga por volumen. [Manual](docs/operations/manual-teams-announcements.md).
 
-AXIS: consumo privado interno/productivo; PAT temporal hasta identidad de máquina para rollout externo. Release
-`30502476429` y rollback: [runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Selección
-colaborativa `0.2.0` sigue `candidate`; Lab es el primer adapter, otros runtimes `pending`.
+AXIS privado/Lab: [composición](docs/manual-de-uso/creative/descubrir-y-componer-con-axis.md), [operación y QA](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+Iconos: [prueba mate](docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md).
 
 Globe (`../efeonce-globe`): Tailwind v4; hibernación/encendido en [estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 y [runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md); caller pausado hasta SQL/API y tenancy fresca.
@@ -66,11 +76,11 @@ para añadir o auditar proveedores: `greenhouse-globe-model-fleet` (espejado Cod
 sustituyen la autoridad live del reader. ADR-023 separa evidencia del proveedor, cables de integración y disponibilidad
 de Globe. “Imagen 2 de ChatGPT” se normaliza a
 `gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. La transparencia GPT Image 2 sigue en preview y gated hasta
-canary y readback. Desde 2026-09-08 existe `gpt-image-2.5` (Sunburst/Flare): provider-supported,
-sin ruta Globe, sin Batch y **sin calculadora de costo por imagen**; `gpt-image-2` no quedó deprecado y el
-helper local no transporta 2.5. Matriz canónica:
-`docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
-Omni 1.1 CLI: [ADR](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md). Globe: `TASK-1781` gated; modelo anterior cierra 30/09.
+canary y readback. `gpt-image-2.5` (Sunburst/Flare): provider-supported, sin ruta Globe ni Batch;
+el helper transporta 2.5. CLI `ai:image`: OpenAI,
+default `gpt-image-2`, con 2.5 seleccionable. [Matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+BytePlus: `pnpm ai:byteplus`/`ai:layers`, sin Globe.
+CLI: [Nano 2.1](docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) · [Omni](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md).
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana son superficies no públicas hasta tener ruta, binding, canary y readback
@@ -111,10 +121,13 @@ gobierna Vercel y `ops-worker` conjuntamente; no flip aislado. Contratos, crons 
 [arquitectura SEO](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [invariantes ops](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
-SEO: [ownership y trabajo pendiente](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md).
+SEO: [categoría y representación](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md).
 Greenhouse posee datos/prioridad/outcomes; Marketing Studio posee flujo editorial; Insights posee informes.
-[Evidencia del corte anterior](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md).
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
+
+Marketing Studio: skills `efeonce-marketing-studio` y `efeonce-campaign-planning`; el catálogo versionado
+rige canales y límites, no los aliases históricos. [Contrato](docs/documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).
+Disponibilidad y rollout: [handoff de Studio](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
 Insights: [estado y cierre de EPIC-045](docs/audits/insights/2026-10-04-epic-045-closure-review.md).
 
@@ -151,8 +164,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Este repo es el `starter-kit` Greenhouse; `full-version` es referencia visual/funcional, no source of truth ni producto activo. Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
 - El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Cada provider conserva policy y contratos; los manifiestos Greenhouse de tools/skills son SSOT (TASK-1780/1804).
 - Greenhouse, `auth.efeonce.org` y MCP aíslan cookies, sesiones y audiencias, pero resuelven un `identity_profile` y Account 360 con bindings auditados. Cada producto entra en su contexto: un first-party puede reutilizar sesión con assurance; MCP y terceros conservan consentimiento por cliente/scope y step-up. No nace otra identidad.
-- EPIC-044: emisor propio `auth.efeonce.org`, OAuth/sesiones y gateway multi-issuer; SSO no concede MCP. Grants, `gv` y tokens se revalidan antes del dispatch. `TASK-1813` cerró Efeonce ID/base-only y la matriz post-cutover; `TASK-1844` aporta v2 interna y altas elegibles sin reconectar ([manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md)). `TASK-1832` certificó clientes con un canary sintético, retirado el 2026-09-18 (readback cero, gates `false`); una corrida nueva sigue el runbook canary. `TASK-1841` separa el piloto real. [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`entrada/consentimiento`](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) · [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) · [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
-- La operación MCP se enruta por las skills espejo `efeonce-mcp-platform`, que componen la de cada provider. Una superficie hospedada puede compartir DCR/familia; la observación es read-only y atribuye negativos por timestamp + DCR run-owned + familia revocada. Arquitectura debe cargar ese router antes de cambiar OAuth.
+- EPIC-044: emisor `auth.efeonce.org`, OAuth/sesiones y gateway multi-issuer. SSO no concede MCP; grants, `gv` y tokens se revalidan antes del dispatch. TASK-1844 gobierna v2 interna ([manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md)). Canary TASK-1832 retirado; TASK-1841 separa el piloto real. Nuevas corridas: [runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md). Contratos: [entrada/consentimiento](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) y [autoridad interna](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
+- MCP: cargar `efeonce-mcp-platform` + skill del provider antes de cambiar OAuth. Superficies hospedadas pueden compartir DCR/familia; observación read-only, negativos por timestamp + DCR run-owned + familia revocada.
 - Hiring/ATS separa **etapa** (¿dónde está?) de **desenlace** (¿cómo terminó?), ejes ortogonales atados por el `CHECK` `(stage='closed') = (decision IS NOT NULL)`. `TASK-1754` dejó el vocabulario de etapas en **seis** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`) y `TASK-1765` el de desenlaces en seis; `HIRING_PIPELINE_STAGES` (cinco) es el subconjunto escribible por un cambio de etapa —`closed` no está: cerrar exige declarar el desenlace— y `TERMINAL_APPLICATION_STAGES` es la fuente única de lo terminal. **Un contract de enum se aplica DESPUÉS del release que retira sus escritores, nunca antes**, y la alcanzabilidad de un valor se deriva del contrato de la superficie desplegada, jamás del conteo de filas (`ISSUE-161`). El contract de etapas está escrito y **pendiente de aplicar** al 2026-08-23.
 - Hiring/ATS declara la **procedencia del dato en su nacimiento** (`data_origin`, `TASK-1739`, en producción desde 2026-08-19): dos raíces —persona y demanda— con copia derivada por trigger en la postulación, default `real` porque omitir debe dejar el dato visible, nunca ocultarlo. Una vacante no real no se publica; el gold set excluye sintéticos sin flag; retención y compliance son ciegos a la procedencia y ésta nunca gatea comunicaciones. El primitive canónico es `src/lib/hiring/data-origin/`; ningún reader escribe su propio predicado. `TASK-1748` cerró esa deuda **en `develop`** (readers y projection del Banco de Talento ya filtran por procedencia); en producción todavía no: `code complete, rollout pendiente`.
 - Hiring/ATS, caminos canónicos: reader de Application 360 para documentos y reveal de identidad con capability, motivo y auditoría append-only (`TASK-1714`/`TASK-1715`). `hiring.assessment.submitted` tiene consumer interno para People en producción (config `hiring_assessment_submitted_internal` ON); falta el smoke operativo de la primera entrega real. Banco de Talento person-first (`TASK-1723`–`TASK-1726`), operativo en producción interna: projection, búsqueda/Desk del operador, App API y los readers MCP `hiring.talent_pool.search`/`.profile.get` comparten policy, capability, purpose/audit y DTO allowlisted. Cohorte: 52 memberships (50 `active_process`, 2 `needs_reconsent`), sin consentimiento futuro inventado. Invite y self-service habilitados tras flags independientes desde 2026-08-16 por autorización operativa del CEO; el contacto futuro sigue exigiendo consentimiento explícito, tokenizado, vigente y reversible; no hay backfill ni outreach automático. Canary OAuth real: allow search/profile `200`, deny con cliente base-only `403`. Desde 2026-08-18 `TASK-1718` está activa internal-only: App API exacta y tools MCP `hiring.applications.review.list` / `hiring.application.review_packet.get` entregan chunks de CV minimizados/redactados y ligados a hash, con purpose/audit; canary OAuth/MCP 200, borde sin auth 401. Sin PDF crudo, contacto, ranking, writes ni B2B; sigue en progreso por firmas nombradas y pruebas de revocación/rollback. `TASK-1719` tiene D4 desplegado para el piloto manual SEO `EO-OPN-0674`; la automatización por etapa y `TASK-1720` (writes MCP) siguen inactivos. Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) conserva sus gates de claims y Quality Gate independientes.
@@ -201,7 +214,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Video | Motion/Audio: companions; CDR-008; ADR-025 |
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera aparte con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto; validar modelado, filtros, browser, permisos y sharing en sus references |
-| Modelos Efeonce: Group, Media, Growth, AEO y Search Visibility 360 | [ADR AEO](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md) + `docs/business-models/README.md` |
+| Modelos Efeonce y casos SEO/AEO | `docs/business-models/README.md` + `docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md`; naming: ADR AEO |
 | Qué contenido escribir para un cliente de SEO y cómo entregarlo | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`. Striking distance ya está en `/admin/growth/seo/keywords` (`TASK-1308`); verificar habilitación por org. Brief: `SEO_CONTENT_BRIEF_STRUCTURE_V1.md` |
 | SEO/AEO: site audit y X-Ray | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 + `seo-aeo/references/competitor-methodologies-2026-09.md`; X-Ray: `docs/think/README.md` + `.codex/skills/seo-aeo/references/aeo-xray.md` (sample autónoma ≠ grant Greenhouse) |
 | Grader: mercados y costo | [manual](docs/manual-de-uso/growth/configurar-mercados-aeo.md) + `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` |
@@ -212,11 +225,11 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo se estructura, vende y opera Creative Services: Creative Operations, rutas de entrada, Efeonce Run & Gun Studio/Production y sus composiciones | `docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md` + `docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md` + `docs/services/creative-services/README.md` + `.codex/skills/creative-practice/modules/03_OFERTA.md` + `.codex/skills/creative-practice/efeonce/EFEONCE_OVERLAY.md` |
 | Cómo gobernar derechos, consentimiento, provenance, providers, no-training, retención, contratos y entrega enterprise de creatividad generativa | `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/SKILL.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/references/` + Creative Services/Creative Studio docs + `legal-privacy-ip-operator` |
 | Cómo se estructura, vende y opera Social Media: beachhead B2B experto, Social Search + SEO/AEO y squad humano | `docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md` + `docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md` + `.codex/skills/social-media-studio/SKILL.md` |
-| Cómo se estructura y vende Media & Distribution: tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
+| Cómo vender y operar Media & Distribution y la oferta integral de medios Efeonce (incluye programmatic) | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
 | Cómo vender Revenue Operations & CRM y elegir HubSpot-first, Salesforce-first o híbrido | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + `docs/services/salesforce/README.md` + skills del provider + `.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md`; claims y reventa exigen evidencia vigente |
 | Cómo operar y entregar la landing, Customer Agent y handoff de Emma para ANAM | Skill `hubspot-as-a-service` → `anam-case.md` + canon CMS `anam-chat-landing.md` + entrega/soporte `anam-entrega-documentacion-y-soporte-2026-09-02.md`; cada superficie conserva ownership y readback separados |
-| Licitaciones y Proposal versionada | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md` + `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` + `docs/audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md` + expedientes aprobados + skills `greenhouse-public-private-tenders` y `deck-studio`; quote congelado, IVA, `pnpm tender:canonical-gate <slug>`, sin stubs/HOLD |
-| Cómo descubrir y calificar licitaciones públicas de LicitaLAB | skill espejo `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md` + `licitalab-mcp.md`; LicitaLAB sólo ve contratación pública. El radar entrega códigos al MCP documental. La promoción manual usa MCP HubSpot con confirmación, búsqueda por ID exacto + llave de idempotencia cuando esté poblada, asociaciones y readback; `gh_deal_origin` queda vacío mientras su enum sólo admita `greenhouse_quote_builder`. El bridge pendiente afecta automatización, no cargas manuales |
+| Licitaciones: Proposal versionada y oferta documental rápida | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `PROPOSAL_STUDIO_CLOSURE_SCHEMA.md`; quote congelado/IVA, `pnpm tender:canonical-gate <slug>`, sin stubs/HOLD. HTML/PDF local (multimoneda y FX explícito) → `docs/commercial/templates/cotizacion-a4/README.md`; cotizador → `docs/documentation/finance/cotizador.md`. Frontera y fuentes: `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`; skills `greenhouse-public-private-tenders`/`deck-studio`/`report-studio` |
+| LicitaLAB: discovery público, calificación y presentación | Skill `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md`, `licitalab-mcp.md`, `platform-bids-and-administrative-package.md`; códigos del radar al MCP documental. Promoción manual HubSpot: confirmación, ID exacto + llave poblada, asociaciones/readback. `gh_deal_origin` vacío mientras su enum sólo admite `greenhouse_quote_builder`. Bridge pendiente sólo para automatización |
 | Cómo descubrir y calificar oportunidades privadas de Wherex | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` + `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`; lectura protegida evidence-first, sin acción comercial |
 | Cómo funcionan partnerships/providers, licencias, co-selling y captura de valor | `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md` (vigente) + `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/README.md` (evidencia fechada) + `efeonce-agency` |
 | Cómo se priorizan beachheads, ofertas de entrada, rutas de expansión, proof y cross-sell | `docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` + `docs/context/13_icp-buyer-personas-jtbd.md` + `gtm-architect`/`efeonce-customer-model-operator` |

@@ -1,5 +1,23 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-10-05 (aa) — los símbolos que Poppins no trae salen del font pack, no del sistema
+
+<!-- sealed-by-freeze: 42a9b95d31c61dae8651ef27b63a139fce937ec801f72ab8a2da595c550727bd -->
+
+El gate de La órbita estaba en rojo en HEAD (ContentReportFormats 112 px, ContentServiceMockups 359 px) sin que nadie
+tocara esas plantillas: Poppins no trae flechas (`↗ →`) ni figuras (`▲ ▶ ◀`), y el navegador las tomaba de una fuente
+del sistema, que cambió en este equipo. El font pack `axis` declara ahora, para la extensión `graphic-line`, caras de
+«Poppins» con `unicode-range` (U+2190–21FF, U+25A0–25FF) que dibujan esos glifos con Geist, la fuente de texto del pack
+(campo `unicodeRange` nuevo en `compile-catalog-tokens.ts`). Un peso por cara, idéntico al de Poppins: con rangos de
+peso el navegador eligió la cara de símbolos para todo el texto (95 frames cambiados en el primer intento). `✓` sigue
+sin cobertura (no está en Poppins ni en Geist); hoy no cambia el render.
+
+Frames que cambian (existían):
+- `templates-graphic-line-deck/ContentCommitteeDeck.png` — cambia: `◀ ▶` dibujados con Geist
+- `templates-graphic-line-deck/ContentReportFormats.png` — cambia: `▲` del delta con Geist
+- `templates-graphic-line-deck/ContentServiceMockups.png` — cambia: `↗` de las fuentes con Geist (más compacta)
+- `templates-graphic-line-deck/MethodHybridWorkforce.png` — cambia: `→` con Geist
+
 ## 2026-10-04 (z) — TASK-1996: glifos Trazo en las métricas, isotipos en filas y leyendas, color por rol
 
 <!-- sealed-by-freeze: aff661687e0ee890445c4f29f4e889b1eaad4da21ea3eb718d61ca365ee6cb85 -->
@@ -1254,7 +1272,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: aff661687e0ee890445c4f29f4e889b1eaad4da21ea3eb718d61ca365ee6cb85 -->
+<!-- manifest-digest: 42a9b95d31c61dae8651ef27b63a139fce937ec801f72ab8a2da595c550727bd -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-08",
+  "model": "gpt-image-2.5-sunburst",
+  "operation": "edit",
+  "quality": "max",
+  "requestedSize": "3840x2096",
+  "actualSize": [
+    3840,
+    2096
+  ],
+  "format": "png",
+  "inputSha256": "ef29cbc723b8eac6f4b658e8b58d575ffcc37135846b3f2995fd32f554e89b80",
+  "promptSha256": "b0eba5997ac52a4e297bd1acfadf0e3151d03f5eaa88c118f8708a17ab84ebef",
+  "outputSha256": "fcdac563c814fe55953fd58b1614bc29fdf52281b01d8f7dcdef2292e9d494d1",
+  "outputBytes": 13966100,
+  "usage": {
+    "input_tokens": 2193,
+    "image_input_tokens": 1456,
+    "text_input_tokens": 737,
+    "output_tokens": 12541,
+    "total_tokens": 14734
+  },
+  "postprocessing": "none",
+  "releaseState": "proof-only"
+}

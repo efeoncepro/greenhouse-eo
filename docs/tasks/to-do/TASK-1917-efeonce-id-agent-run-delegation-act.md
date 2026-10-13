@@ -24,7 +24,7 @@
 - Status real: `Diseno — registrada 2026-09-26 como unidad U22 de EPIC-044 por decisión del operador (Julio Reyes): la delegación para corridas de agente en segundo plano vive en Efeonce ID, no en EPIC-049. Sin implementación`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `TASK-1899 (canje RFC 8693 por capability exacta de las escrituras de Studio y guarda «confirmación T2 sólo sin act») · TASK-1914 (lista blanca versionada de tools por rol, fuente de los scopes permitidos) · TASK-1913 (work item y assignment_id a los que se ata la delegación)`
+- Blocked by: `Nueva definición del contrato de escritura delegada de Studio (TASK-1899 retirada por el operador el 2026-10-04; no reactivarla automáticamente) · TASK-1914 (lista blanca versionada de tools por rol, fuente de los scopes permitidos) · TASK-1913 (work item y assignment_id a los que se ata la delegación)`
 - Branch: `Greenhouse develop (services/auth-server, src/lib/auth-server, src/lib/sister-platforms, docs) · efeonce-mcp rama + PR (verificación del token de corrida en el gateway) · efeonce-marketing-studio main sólo para el consumidor (TASK-1915); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

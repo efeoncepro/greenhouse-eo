@@ -1,5 +1,7 @@
 # Simular el precio de un servicio (estimado referencial)
 
+Este manual describe la simulación canónica V2 por Nexa/MCP/API, con permisos server-side. El [prototipo local Cotizador V3](../../documentation/finance/cotizador-v3-superficie-implementada.md) opera por [CLI para agentes](operar-cotizador-v3-con-agentes.md) y conserva frontera propia: el hecho de calcular por CLI no habilita estas capacidades con el motor V3 ni emite una oferta.
+
 > **Tipo:** Manual de uso (operador)
 > **Creado:** 2026-06-21 por Claude (TASK-1211)
 > **Para qué sirve:** estimar cuánto cuesta un servicio sin armar la cotización a mano, y entender quién ve qué.

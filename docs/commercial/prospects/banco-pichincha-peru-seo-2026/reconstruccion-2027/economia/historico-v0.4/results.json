@@ -1,0 +1,152 @@
+{
+  "as_of": "2026-10-06",
+  "status": "Decision requirements; prior projections withdrawn for client use",
+  "forecast": false,
+  "goal_status": "Contextual provisional bands, not agreed channel targets; period/definition of15200pending",
+  "selected_band_share": 0.01,
+  "goal_definition": "Aperturas",
+  "analysis_context": "Programa2027",
+  "active_window_months": 12,
+  "valuation_method": "Saldo medio externo",
+  "bank_value_horizon_months": 12,
+  "selected_accounts_required": 152,
+  "funded_within_window_conditional": 98.8,
+  "visits_required_at_test_rates": 7600,
+  "requirement_over_partial_panel_ratio": 0.228846732911774,
+  "average_external_balance_usd_equivalent_conditional": 74916.4922653669,
+  "external_balance_end_usd_equivalent_conditional": 142419.88475976,
+  "bank_value_conditional_by_selected_method": "N/D",
+  "investment_ceiling_conditional": "N/D",
+  "operating_price_floor_conditional": "N/D",
+  "compatible_capacity_hours_conditional": "N/D",
+  "roi_conditional": "N/D",
+  "payback_conditional": "N/D",
+  "bands": [
+    {
+      "share": 0.01,
+      "accounts_required": 152,
+      "definition": "Aperturas",
+      "visits_required_at_test_rates": 7600,
+      "average_external_balance_conditional": 74916.4922653669,
+      "investment_ceiling_conditional": "N/D",
+      "funded_within_window_conditional": 98.8,
+      "required_net_value_per_funded_account": [
+        {
+          "hypothetical_investment_usd": 10000,
+          "required_value_usd": 101.21457489878543,
+          "nature": "Requirement, not quote or bank value"
+        },
+        {
+          "hypothetical_investment_usd": 25000,
+          "required_value_usd": 253.03643724696357,
+          "nature": "Requirement, not quote or bank value"
+        },
+        {
+          "hypothetical_investment_usd": 50000,
+          "required_value_usd": 506.07287449392715,
+          "nature": "Requirement, not quote or bank value"
+        }
+      ]
+    },
+    {
+      "share": 0.05,
+      "accounts_required": 760,
+      "definition": "Aperturas",
+      "visits_required_at_test_rates": 38000,
+      "average_external_balance_conditional": 374582.461326834,
+      "investment_ceiling_conditional": "N/D",
+      "funded_within_window_conditional": 494.0,
+      "required_net_value_per_funded_account": [
+        {
+          "hypothetical_investment_usd": 10000,
+          "required_value_usd": 20.242914979757085,
+          "nature": "Requirement, not quote or bank value"
+        },
+        {
+          "hypothetical_investment_usd": 25000,
+          "required_value_usd": 50.607287449392715,
+          "nature": "Requirement, not quote or bank value"
+        },
+        {
+          "hypothetical_investment_usd": 50000,
+          "required_value_usd": 101.21457489878543,
+          "nature": "Requirement, not quote or bank value"
+        }
+      ]
+    },
+    {
+      "share": 0.1,
+      "accounts_required": 1520,
+      "definition": "Aperturas",
+      "visits_required_at_test_rates": 76000,
+      "average_external_balance_conditional": 749164.922653669,
+      "investment_ceiling_conditional": "N/D",
+      "funded_within_window_conditional": 988.0,
+      "required_net_value_per_funded_account": [
+        {
+          "hypothetical_investment_usd": 10000,
+          "required_value_usd": 10.121457489878543,
+          "nature": "Requirement, not quote or bank value"
+        },
+        {
+          "hypothetical_investment_usd": 25000,
+          "required_value_usd": 25.303643724696357,
+          "nature": "Requirement, not quote or bank value"
+        },
+        {
+          "hypothetical_investment_usd": 50000,
+          "required_value_usd": 50.607287449392715,
+          "nature": "Requirement, not quote or bank value"
+        }
+      ]
+    }
+  ],
+  "value_rate_experiments": [
+    {
+      "hypothetical_net_annual_rate": 0.01,
+      "conditional_value": 749.164922653668,
+      "nature": "Experimento; no benchmark"
+    },
+    {
+      "hypothetical_net_annual_rate": 0.02,
+      "conditional_value": 1498.32984530734,
+      "nature": "Experimento; no benchmark"
+    },
+    {
+      "hypothetical_net_annual_rate": 0.04,
+      "conditional_value": 2996.65969061467,
+      "nature": "Experimento; no benchmark"
+    },
+    {
+      "hypothetical_net_annual_rate": 0.06,
+      "conditional_value": 4494.98953592201,
+      "nature": "Extremo; no recomendado"
+    }
+  ],
+  "focused_candidate_capacity": {
+    "base_hours": 814,
+    "reserve_hours": 110,
+    "total_hours": 924,
+    "approved": false
+  },
+  "workbook": "Pibank-decision-inversion-2027.xlsx",
+  "valuation_basis": "ONE method: net annual rate×external average balance only within activewindow, OR Finance approved net present value per funded account over12/24/36m; no summation",
+  "required_net_value_per_funded_account": [
+    {
+      "hypothetical_investment_usd": 10000,
+      "required_value_usd": 101.214574898785,
+      "nature": "Arithmetic requirement, not quote or measured bank value"
+    },
+    {
+      "hypothetical_investment_usd": 25000,
+      "required_value_usd": 253.036437246964,
+      "nature": "Arithmetic requirement, not quote or measured bank value"
+    },
+    {
+      "hypothetical_investment_usd": 50000,
+      "required_value_usd": 506.072874493927,
+      "nature": "Arithmetic requirement, not quote or measured bank value"
+    }
+  ],
+  "funding_potential_after_window_excluded": 0
+}

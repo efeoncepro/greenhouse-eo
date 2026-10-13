@@ -663,6 +663,8 @@ export const publicSubmitInputSchema = z.object({
   fields: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string())])).default({}),
   consent: z.boolean(),
   consentCheckboxes: z.array(z.string()).default([]),
+  // Independently validated advertising context; malformed/legacy never rejects the form.
+  measurementContext: z.unknown().optional(),
   pageUri: z.string().max(2000).optional(),
   pageName: z.string().max(400).optional(),
   referrer: z.string().max(2000).optional(),

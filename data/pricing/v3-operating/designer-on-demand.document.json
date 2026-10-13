@@ -1,0 +1,139 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-11",
+  "reference": "Borrador · Diseño visual a demanda",
+  "currency": "CLP",
+  "vatRate": null,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de marketing",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Diseño visual",
+      "a demanda."
+    ],
+    "subtitle": "Un diseñador visual sénior con dedicación completa durante un mes para Cliente de ejemplo."
+  },
+  "service": {
+    "name": "Diseñador visual sénior a demanda"
+  },
+  "scope": {
+    "title": [
+      "Capacidad de diseño",
+      "lista para producir."
+    ],
+    "intro": "Borrador de alcance. La cotización final debe especificar las piezas, los formatos y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Capacidad contratada",
+        "text": "Un diseñador visual sénior con dedicación completa durante el mes de servicio, integrado al flujo de trabajo del cliente."
+      },
+      {
+        "title": "Producción",
+        "text": "Diseño y adaptación de piezas para los canales acordados, a partir de los lineamientos de marca que entrega el cliente."
+      },
+      {
+        "title": "Puesta en marcha",
+        "text": "Incorporación al equipo, accesos, revisión de lineamientos de marca y acuerdo del flujo de solicitudes y revisiones."
+      },
+      {
+        "title": "Coordinación",
+        "text": "Seguimiento semanal de la cola de solicitudes y de las prioridades con la contraparte del cliente."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de un mes",
+    "phases": [
+      {
+        "label": "Semana 1",
+        "title": "Puesta en marcha",
+        "text": "Accesos, lineamientos de marca, flujo de solicitudes y primeras piezas."
+      },
+      {
+        "label": "Semanas 2 a 4",
+        "title": "Producción",
+        "text": "Atención de la cola de solicitudes según las prioridades acordadas cada semana."
+      },
+      {
+        "label": "Cierre",
+        "title": "Entrega y traspaso",
+        "text": "Entrega de archivos editables y resumen del trabajo realizado."
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Facturación y pago",
+        "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente entrega los lineamientos de marca, prioriza las solicitudes y aprueba las piezas. Facilita los accesos acordados."
+      },
+      {
+        "title": "Límites del alcance",
+        "text": "Producción audiovisual, fotografía, licencias de terceros e impresión requieren un alcance independiente."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Borrador sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Una cotización por",
+      "la capacidad contratada."
+    ],
+    "intro": "Valores netos en pesos chilenos (CLP) para un mes de servicio y su puesta en marcha.",
+    "summary": "Un mes · Pesos chilenos · Impuestos por confirmar",
+    "taxNote": "Los valores son netos. El tratamiento tributario se confirma antes de emitir la cotización final."
+  },
+  "lines": [
+    {
+      "label": "Diseñador visual sénior",
+      "detail": "Dedicación completa",
+      "group": "Servicio",
+      "quantity": {
+        "value": 1,
+        "unit": "mes"
+      },
+      "unitNet": "2470000",
+      "net": "2470000"
+    },
+    {
+      "label": "Puesta en marcha del servicio",
+      "group": "Puesta en marcha",
+      "quantity": {
+        "value": 1,
+        "unit": "pago único"
+      },
+      "net": "320000"
+    }
+  ],
+  "net": "2790000",
+  "source": {
+    "system": "pricing-v3",
+    "calculationId": "composition-a375f9126902bb4fdd712836",
+    "digest": "a375f9126902bb4fdd712836be99de810862c26fb4cbc16a146404f149a120a1",
+    "engineVersion": "pricing-v3-local/1.3.0"
+  }
+}

@@ -46,17 +46,20 @@ is switched off in this runtime — report it and stop. Never tell a human that 
   `outputAssetId`; that id is not a download link and the document is not shared or sent.
 - **Retry** (`retry_insight_render`) re-queues only failed outputs; completed ones are never touched. A
   failure caused by the content (for example text that does not fit a slide) fails again with the same
-  cause and, after its attempts are exhausted, becomes `dead_letter`. Report the cause; the fix is a
-  corrected edition, not more retries.
+  cause and, after its attempts are exhausted, becomes `dead_letter`. Retry reuses the same sealed input,
+  so it never fixes that. Report the cause; once the product fix is live, request a new render of that
+  output alone (it is composed again from the same frozen plan). If the plan itself is wrong, the fix is a
+  corrected edition.
 - **Cancel** (`cancel_insight_render`) stops what has not started; what is already rendering finishes and
   the answer says so (`stillRunning`). A cancelled run is **terminal**: retrying it answers successfully
   but re-queues nothing. To get the document after cancelling, request a new render.
 - **Asking twice does not draw twice.** If the outputs you ask for already have a live render in one run
   (`queued`, `running`, `completed` or `failed`), `request_insight_render` answers with that same run and
   `idempotent: true`; nothing new is queued. A failed output is recovered with `retry_insight_render`; a new
-  render is possible only after `dead_letter` or a cancel. If only some of the requested outputs are live in
-  another run, the request is rejected with `render_rejected` naming them: follow that run, or ask for the
-  missing output alone.
+  render is possible only after `dead_letter` or a cancel; the dead or cancelled output stays as history. If
+  only some of the requested outputs are live in another run, the request is rejected with `render_rejected`
+  naming them and listing which outputs you can request (`requestable`): follow that run, or ask for those
+  alone.
 - **Only an edition in review renders.** The edition must be in `ready_for_review`; any other state (for
   example an issued one) answers `not_ready`.
 - **Name the outputs.** `outputs` must be outputs the edition declared. If you omit it, every declared output
@@ -161,6 +164,9 @@ Explain what a schedule will do next:
   nothing is re-rendered.
 - Before setting `dark` for an organization, tell the human that without a dark-ready logo the cover goes without the
   client's logo, and confirm.
+- The line that says what the report measures (`plan.scopeLines`) is printed only on the white report cover and on
+  the web view; the navy cover and the deck cover do not show it. For an organization with a content scope, a white
+  cover is the one that names the measured content: say so before choosing `dark`.
 - New editions carry the sealed cover in their frozen plan (`plan.cover`, with `cover.source` = `request`,
   `organization` or `auto`). Editions generated before the current editorial contract have no `cover` in their plan;
   they are immutable and keep the design they were sealed with. If one of these tools is not in your tool list, it is
@@ -243,8 +249,18 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
   `population`, `source`, `method.version`, `coverage`, `freshness.asOf`, `observation`
   (`observed` or `estimated`) and `comparisonFactId`. Report the unit and the as-of date with the number.
 - A `rejection` explains an absence: `unsupported_window`, `method_mismatch`, `insufficient_data`,
-  `suppressed`, `review_required`, `module_disabled`, `not_connected`, `target_ambiguous`, `no_data`.
-  **An absence is never a zero.** Say "not available for this window because …", never "0".
+  `suppressed`, `review_required`, `module_disabled`, `not_connected`, `target_ambiguous`, `no_data`,
+  `outside_content_scope`. **An absence is never a zero.** Say "not available for this window because …", never "0".
+- **Content scope.** An organization may have a declared content scope: the part of its site the agency works on
+  (for example its articles and tutorials). When it does, the search chapter measures only those pages — clicks,
+  impressions, position, weekly evolution, what moved the clicks, organic visits, tracked keywords and
+  opportunities — and every search source of the snapshot carries `contentScope` (`version`, `label`, `rules`). Read
+  the population from there and say it: "clicks to the measured content", never "clicks to the site". The whole site
+  appears only as `site_total.*` reference facts, used for context and never as the period's result. The estimated
+  organic traffic exists only for the whole domain, so a scoped edition does not carry it: it shows as a rejection
+  with `outside_content_scope`. The answer-engines chapter is never scoped. A snapshot without `contentScope`
+  measured the whole site. The scope is fixed when the edition is generated; an edition generated earlier keeps the
+  population it was sealed with.
 - ETV is `estimated` and carries its methodology version; Search Console figures are `observed`.
   Do not average, sum or compare across methods. ICO RpA may be `suppressed` by its evidence policy;
   OTD always carries its numerator and denominator per space and month — never average percentages

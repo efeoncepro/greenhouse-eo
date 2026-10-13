@@ -44,6 +44,7 @@ preserve it and request operator direction.
 | Identity/access | identity/workforce invariants and entitlements/roles architecture |
 | Workforce reentry / member identity transaction | `greenhouse-payroll-auditor`, `greenhouse-talent-people-operator`, `docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md` and `docs/operations/runbooks/workforce-reentry-recovery.md` |
 | Finance/payroll | finance or payroll specialist plus their canonical invariants |
+| Cotizador V3 local / futura extracción / CLI-UI-API-MCP | `efeonce-pricing-operator`, `docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md` and `docs/documentation/finance/cotizador-v3-promocion-canonica.md` |
 | Knowledge/Nexa | `greenhouse-nexa-conversational` and Knowledge/Nexa invariants |
 | HubSpot/CRM | `hubspot-greenhouse-bridge` or `hubspot-as-a-service` plus intake architecture |
 | Growth/SEO/forms/CTAs/meetings | routed growth/SEO/GTM skill, `docs/context/`, tracking/privacy contracts |
@@ -86,3 +87,13 @@ certification, not Customer B2B adoption or a reusable cohort. Customer access r
 require a consented real organization, its tenant/capability entitlements and revocation evidence under TASK-1841.
 Every write scope keeps its own consent, authority, spend/step-up and rollback gates; never expose one by widening a
 shared public client.
+
+## Cotizador V3 y fuente canónica
+
+El prototipo local conserva cálculo puro/adapters/snapshots y revisión económica. Cargar el ADR y mapa de
+promoción de la fila anterior para límites, owners y evidencia; reutilizar primitives de simulación/redacción/submit
+canónicos antes de crear consumers. Una salidaCLI, preview redactado o change-set local no prueba cutover,
+autoridad comercial, tenancy, inventario o rollout. El overlay sólo enruta estos contratos, no mantiene otra spec.
+Las versiones vigentes las nombra un puntero verificado (`data/pricing/v3-operating/current.json`, `--current`); no
+resolver «la última» por nombre de archivo ni borrar versiones viejas. El costo de personas del catálogo es el nivel
+salarial objetivo, no la nómina (decisión del CEO, 2026-10-11): no diseñar la extracción conectando nómina real.

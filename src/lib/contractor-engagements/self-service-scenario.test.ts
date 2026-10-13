@@ -116,15 +116,12 @@ const payable = (overrides: Partial<ContractorPayable> = {}): ContractorPayable 
   ...overrides
 })
 
-const invoiceAsset = (
-  role: ContractorInvoiceAsset['assetRole'],
-  id = role
-): ContractorInvoiceAsset => ({
+const invoiceAsset = (role: ContractorInvoiceAsset['assetRole'], id = role): ContractorInvoiceAsset => ({
   invoiceAssetId: `ia-${id}`,
   publicId: `ASSET-${id}`,
   contractorEngagementId: 'ce-1',
   contractorInvoiceId: null,
-  contractorWorkSubmissionId: null,
+  contractorWorkSubmissionId: 'ws-1',
   assetId: `asset-${id}`,
   assetRole: role,
   artifactKind: 'human_readable',
@@ -144,6 +141,23 @@ const labels = {
 }
 
 describe('deriveScenarioKind', () => {
+  it('does not display an invoice from another submission or an edited draft period as current support', () => {
+    for (const asset of [
+      { ...invoiceAsset('invoice_pdf'), contractorWorkSubmissionId: 'older-period' },
+      { ...invoiceAsset('invoice_pdf'), metadata: { servicePeriodStart: '2026-04-01', servicePeriodEnd: '2026-04-30' } }
+    ]) {
+      const scenario = mapEngagementToSelfServiceScenario({
+        engagement: baseEngagement(),
+        submissions: [submission()],
+        payables: [],
+        invoiceAssets: [asset],
+        latestPayableReadiness: null,
+        ...labels
+      })
+
+      expect(scenario.supportItems.find(item => item.kind === 'invoice')?.status).toBe('Pendiente')
+    }
+  })
   it('honorarios_ready when active with no submission/payable', () => {
     expect(deriveScenarioKind(baseEngagement(), null, null, null)).toBe('honorarios_ready')
   })
@@ -155,9 +169,7 @@ describe('deriveScenarioKind', () => {
   })
 
   it('disputed when latest submission is disputed', () => {
-    expect(deriveScenarioKind(baseEngagement(), submission({ status: 'disputed' }), null, null)).toBe(
-      'disputed'
-    )
+    expect(deriveScenarioKind(baseEngagement(), submission({ status: 'disputed' }), null, null)).toBe('disputed')
   })
 
   it('paid when latest payable is paid', () => {
@@ -312,7 +324,11 @@ describe('mapEngagementToSelfServiceScenario', () => {
     }
 
     const scenario = mapEngagementToSelfServiceScenario({
-      engagement: baseEngagement({ currency: 'USD', paymentCurrency: 'CLP', relationshipSubtype: 'international_contractor' }),
+      engagement: baseEngagement({
+        currency: 'USD',
+        paymentCurrency: 'CLP',
+        relationshipSubtype: 'international_contractor'
+      }),
       submissions: [submission({ status: 'approved' })],
       payables: [payable({ status: 'blocked', currency: 'USD', paymentCurrency: 'CLP' })],
       invoiceAssets: [invoiceAsset('invoice_pdf')],

@@ -55,6 +55,10 @@ Efeonce organiza el portfolio en líneas de negocio/prácticas. Las product bran
 | **Digital Services & Engineering** | Wave, Greenhouse | Transversal | visibilidad, web, measurement, agentes e integraciones |
 | **RevOps & CRM** | Kortex, HubSpot, Salesforce, Greenhouse | Tailor + Evolve | diagnóstico provider-fit, licencias cuando apliquen, implementación, managed ops e inteligencia CRM |
 
+**Dirección de medios 2026-10-12:** programmatic consolida la oferta integral de Efeonce como agencia de medios:
+planificación, compra/operación, creatividad, medición y gestión de inversión. Se compone dentro de las tres
+soluciones existentes; no crea marca ni aprueba todas sus capacidades. Canon de alcance, owners, estados y economía:
+[Media & Distribution §1.1](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
 **Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
 Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
 Creative Studio, **modo operativo por run** (`efeonce-managed`, `co-operated`, `client-operated`). Staff

@@ -99,3 +99,14 @@
 >
 > 🎯 **Cuando dudes, pregúntate: "¿esto lo diría el que le mintió?"**
 > **Si la respuesta es sí, no lo digas — aunque sea verdad.**
+
+## Categoría, representación y descubrimiento — 2026-10-12
+
+Canon: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`.
+
+- Tratar visibilidad de marca como sinónimo de consulta branded y abandonar descubrimiento non-brand.
+- Declarar crecimiento de demanda por una proporción branded mayor sin revisar valores absolutos.
+- Equiparar URL citada, nombre mencionado, descripción fiel, recomendación y elección del comprador.
+- Prometer liderazgo, inclusión/indexación/cita, recovery paid o ventas causales desde una correlación.
+- Presentar porcentaje de un panel como cuota real de mercado o contar fallos como ausencia.
+- Optimizar representación favorable con capacidades inventadas o publicar claims/casos sin evidencia y permiso.

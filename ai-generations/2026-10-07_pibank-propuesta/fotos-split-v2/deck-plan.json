@@ -1,0 +1,46 @@
+{
+  "tenderId": "pibank-split-v2",
+  "slides": [
+    {
+      "slideId": "p01-deck-section-split",
+      "contentType": "deck.section-split",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "layout": "corner-top",
+          "margin": 140,
+          "questionTop": 600,
+          "answerTop": 670,
+          "answerPx": 120,
+          "numberTop": "--gl-number-top=260px",
+          "labelTop": "--gl-label-top=450px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "panelWidth": "--gl-panel-width=960px",
+          "panelRadius": "--gl-panel-radius=300px",
+          "photoLeft": "--gl-photo-left=660px",
+          "photoWidth": "--gl-photo-width=1260px",
+          "panelLeft": "--gl-panel-left=0px",
+          "columnWidth": "--gl-column-width=820px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:section-split-indicator-corner-top-1-of-5-growth"
+        },
+        "photo": {
+          "src": "asset-ref:plate:SX4-busqueda-y-respuesta",
+          "alt": "Una caja de búsqueda y un composer de IA flotan en una nave oscura; sus haces de luz se unen en un solo punto sobre el piso"
+        },
+        "progress": {
+          "number": "01",
+          "label": "Sección 1 de 5"
+        },
+        "voice": {
+          "question": "¿Encuentran a Pibank al buscar?",
+          "answer": "Todavía no"
+        }
+      },
+      "template": "SectionSplit"
+    }
+  ]
+}

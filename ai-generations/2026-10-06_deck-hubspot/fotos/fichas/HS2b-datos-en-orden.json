@@ -1,0 +1,44 @@
+{
+  "id": "HS2b-datos-en-orden",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "antonio"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): he stands on the RIGHT third of the frame, his face at about 72 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Behind him, far in the dark, thousands of tiny glowing particles drift in disorder, scattered at every angle. His right hand is raised open at shoulder height on the camera-left side of his body, his elbow at about 62 % and his open hand at about 58 % of the frame width. As the particles pass that hand they snap into ORDER: they become a clean three-dimensional lattice of light — stacked horizontal layers joined by thin vertical links, like the floors and columns of a building made of light — that grows from that hand back and up into the depth behind him, layer after layer, with room to keep growing, and never crosses into the left 52 % of the frame. The ordered lattice is vivid magenta-pink (#E86BD0) and azure (#0375DB); the disordered particles behind are dim and faint. His head stays almost frontal and his eyes turn toward the empty dark left of the frame, where the text will sit, with a calm, assured closed-mouth half-smile. The light of the lattice paints his face, hand and jacket. Thin haze catches the light. The LEFT 52% of the frame is calm, deep dark studio space with only faint haze: no lattice, no particles, no objects. Rich contrast, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "linea": "revenue-hubspot",
+  "llave": {
+    "fuente": "the first layers of the ordered light lattice at his raised hand",
+    "lado": "to his right side, at shoulder height",
+    "tamano": "about one meter wide",
+    "distancia": "about 50 cm from his face"
+  },
+  "fondo": "scattered disordered particles of light far behind, melted into soft round bokeh",
+  "fenomeno": {
+    "que": "a chaos of scattered data particles becomes, as it passes his hand, an ordered lattice of light layers that keeps rising toward the background",
+    "esServicio": "orden de los datos y arquitectura de CRM escalable"
+  }
+}

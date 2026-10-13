@@ -1,0 +1,11 @@
+Use the reference images ONLY for the small robot character: the Efeonce Spark — keep it EXACTLY as in the references (spherical white head-body, glossy black visor with glowing azure LED eyes in a happy arc, three round azure lights on the lower body, thin white orbit ring with a small white sphere, small four-point azure star antenna, white-and-black jointed arms and black hands). Do NOT redesign it, no logos, no text on it.
+
+An EPIC, CINEMATIC 3D hero image: ONE WEBSITE READ BY THREE READERS. In the center, a large sleek glass browser window tilted in 3D perspective (turned to the left, receding to the right), showing a modern company website. The website EXPLODES FORWARD into thick glossy glass-and-acrylic layers floating at different depths toward the viewer: the navigation bar, a big hero block, a large glowing azure-blue (#0375db) primary call-to-action button, three content cards, an image tile. 
+Reader 1 (search engines): on the left, a floating glass search-results card with a search bar and stacked result rows peels out of the site, a thin azure light thread connecting it to the page.
+Reader 2 (AI agents): on the right, the Spark hovers beside the site and SCANS it with a fan of azure laser light from its visor, revealing a translucent wireframe skeleton of structured data blocks (nodes and brackets) floating above the page.
+Reader 3 (people): the glowing primary button is the brightest object, pulled closest to the camera.
+Lighting: dramatic and cinematic — the browser screen emits a powerful azure glow that rims every floating layer, volumetric azure light rays bursting toward the viewer, a hard white key light from the upper left with crisp specular highlights; real depth of field (nearest layers slightly soft, the screen sharp). Premium sci-fi product film still, ultra sharp, photographic realism.
+
+All interface content uses abstract shapes only — NO readable text, NO words, NO numbers, NO logos. NO mouse cursors, NO hands, NO people.
+
+ISOLATED on a fully TRANSPARENT background: only the browser, the floating layers, the Spark, the light threads and rays; no room, no floor, no ground shadow, no smoke. Wide landscape composition; the lowest floating layers may extend to the bottom edge.

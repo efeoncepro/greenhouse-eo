@@ -1,5 +1,12 @@
 # TASK-1942 — Canonizar el deck Salesforce de «La órbita»: 16 recetas nuevas, 4 usos de recetas existentes, Composer y AXIS
 
+## Delta 2026-10-06 — el deck HubSpot usa 13 de las 16 recetas de práctica
+
+- El brochure de servicios HubSpot (TASK-1943) quedó aprobado y registrado en `approvedUses` de 28 recetas, entre
+  ellas 13 de las 16 de práctica de esta task; no usa `content-season-launches`, `content-live-chat` ni
+  `decision-diagnosis-verdict`. Detalle en `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 («Deck HubSpot») — cerrado por
+  trabajo en TASK-1943.
+
 ## Delta 2026-09-29 (e) — cierre: gates completos, push y CI en verde
 
 - **Push a develop** coordinado con las sesiones vecinas: `9fe1a0cef` (hasta `b6946dcd9`, empujado por la sesión «Línea

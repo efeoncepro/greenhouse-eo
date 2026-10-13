@@ -660,7 +660,8 @@ Bad changes for `DESIGN.md`:
 
 **Arquitectura de marca: Efeonce (paraguas) vs Greenhouse (plataforma).** EFEONCE es la marca paraguas/institucional; Greenhouse es la plataforma/app de Efeonce. Los dos logos **coexisten** — la elección depende del contexto, NO son intercambiables:
 
-- **Logo Greenhouse** → todo lo de la **app**: navegación, dashboards, surfaces in-app, mockups del portal.
+- **Navegación del portal (decisión del operador, 2026-10-05)** → logo **Efeonce** en menú expandido y cabecera horizontal; isotipo **Efeonce** en menú colapsado. En el lateral navy se usa la variante blanca.
+- **Logo Greenhouse** → identificación de la plataforma en el **footer del portal** (layouts vertical y horizontal, interno y cliente), azul sobre claro y blanco sobre oscuro; también puede identificar surfaces y mockups específicos de la plataforma. La navegación no lleva Greenhouse. Canon: [arquitectura de marca, aplicación al chrome](docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md#aplicación-2026-10-05--identidad-del-chrome-de-greenhouse).
 - **Logo + eslogan Efeonce** → todo lo **institucional/externo**: recibos/comprobantes, reportes (p. ej. nómina de contractors), finiquitos, contratos, emails transaccionales, PDFs institucionales. Un documento institucional lleva marca Efeonce, no Greenhouse.
 
 Single source of truth: `src/config/efeonce-brand.ts`. Never hardcode the URL / address / slogan elsewhere — import from there.

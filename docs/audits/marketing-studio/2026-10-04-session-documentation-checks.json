@@ -1,0 +1,123 @@
+{
+  "verifiedAt": "2026-10-04T21:09:00.129245+00:00",
+  "scope": "Marketing Studio session documentation closure; no new runtime deployment",
+  "checks": {
+    "studio_cli_tests": {
+      "passed": 18,
+      "failed": 0
+    },
+    "mcp_manifest_tests": {
+      "files": 2,
+      "passed": 55,
+      "failed": 0
+    },
+    "live_studio_doctor": {
+      "apiVersion": "1.6.0",
+      "tools": 59,
+      "operations": 64,
+      "status": "ok",
+      "database": "reachable"
+    },
+    "task_1905_lint": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "docs_closure_scoped": {
+      "warnings": 0
+    },
+    "ops_lint_changed": {
+      "taskErrors": 0,
+      "taskWarnings": 0,
+      "epicErrors": 0,
+      "epicWarnings": 13,
+      "warningScope": "Other epics child-parity outside EPIC-049"
+    },
+    "skills_mirrors": "PASS",
+    "mcp_skills_check": "PASS",
+    "mcp_manifest_check": "PASS",
+    "context_strict": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "relative_markdown_links": {
+      "files": 57,
+      "links": 1101,
+      "missing": [],
+      "paths": [
+        ".claude/skills/efeonce-agent-media-planner/SKILL.md",
+        ".claude/skills/efeonce-agent-media-planner/references/tools-and-tiers.md",
+        ".claude/skills/efeonce-agent-seo-aeo/references/tools-and-tiers.md",
+        ".claude/skills/efeonce-campaign-planning/SKILL.md",
+        ".claude/skills/efeonce-campaign-planning/references/channels-and-measurement.md",
+        ".claude/skills/efeonce-campaign-planning/references/studio-write-mapping.md",
+        ".claude/skills/efeonce-campaign-planning/references/workflow-tools.md",
+        ".claude/skills/efeonce-marketing-studio/SKILL.md",
+        ".claude/skills/efeonce-marketing-studio/references/architecture-map.md",
+        ".claude/skills/efeonce-marketing-studio/references/contracts.md",
+        ".claude/skills/efeonce-marketing-studio/references/lessons.md",
+        ".claude/skills/efeonce-marketing-studio/references/operations.md",
+        ".claude/skills/efeonce-marketing-studio/references/program-ledger.md",
+        ".claude/skills/efeonce-mcp-platform/SKILL.md",
+        ".codex/skills/efeonce-agent-media-planner/SKILL.md",
+        ".codex/skills/efeonce-agent-media-planner/references/tools-and-tiers.md",
+        ".codex/skills/efeonce-agent-seo-aeo/references/tools-and-tiers.md",
+        ".codex/skills/efeonce-campaign-planning/SKILL.md",
+        ".codex/skills/efeonce-campaign-planning/references/channels-and-measurement.md",
+        ".codex/skills/efeonce-campaign-planning/references/studio-write-mapping.md",
+        ".codex/skills/efeonce-campaign-planning/references/workflow-tools.md",
+        ".codex/skills/efeonce-marketing-studio/SKILL.md",
+        ".codex/skills/efeonce-marketing-studio/references/architecture-map.md",
+        ".codex/skills/efeonce-marketing-studio/references/contracts.md",
+        ".codex/skills/efeonce-marketing-studio/references/lessons.md",
+        ".codex/skills/efeonce-marketing-studio/references/operations.md",
+        ".codex/skills/efeonce-marketing-studio/references/program-ledger.md",
+        ".codex/skills/efeonce-mcp-platform/SKILL.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "Handoff.archive.md",
+        "Handoff.md",
+        "changelog.md",
+        "docs/README.md",
+        "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md",
+        "docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md",
+        "docs/audits/marketing-studio/2026-10-04-studio-api-cli.md",
+        "docs/audits/marketing-studio/TASK-1905-local-verification.md",
+        "docs/documentation/marketing-studio/catalogo-canales-y-referencias-icp.md",
+        "docs/documentation/marketing-studio/efeonce-marketing-studio.md",
+        "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
+        "docs/manual-de-uso/marketing-studio/gobernar-catalogo-canales.md",
+        "docs/manual-de-uso/marketing-studio/operar-marketing-studio.md",
+        "docs/manual-de-uso/marketing-studio/operar-por-cli-api.md",
+        "docs/mcp/skills/marketing-studio/SKILL.md",
+        "docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md",
+        "docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md",
+        "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
+        "docs/tasks/in-progress/TASK-1905-marketing-studio-channel-catalog-risk-tiers-icp-reference.md",
+        "docs/tasks/plans/TASK-1905-plan.md",
+        "docs/ui/wireframes/TASK-1905-channel-attention.md",
+        "project_context.md",
+        "docs/architecture/DECISIONS_INDEX.md"
+      ]
+    },
+    "snapshot_integrity": {
+      "files": 3,
+      "validSha256": 3
+    }
+  },
+  "mcpSkillCatalog": {
+    "count": 9,
+    "hash": "2b262435cf4b11d4ee63c42819c72bf54e19f4855b32a2ccb8ea65f6a60c918f"
+  },
+  "runtimeLimits": [
+    "Human-reviewed alias/backfill pending",
+    "Greenhouse capability release pending",
+    "Real ICP dependencies/flag pending",
+    "TASK-2003 delegated T1 runtime/canary pending; API/CLI/UI do not wait",
+    "TASK-1899 T2/proposalDigest withdrawn",
+    "No production upload apply during CLI verification"
+  ]
+}

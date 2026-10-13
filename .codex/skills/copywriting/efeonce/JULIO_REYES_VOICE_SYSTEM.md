@@ -51,6 +51,28 @@ Determina primero `author`, `surface` y `speaker`. No elijas por intuición tona
 3. En una pieza híbrida, los cambios de speaker se atribuyen; nunca se mezclan de forma invisible.
 4. Julio puede autorizar una excepción. El agente no puede inventarla.
 
+### Aplicación: correo personal de prospección
+
+Todo envío autorizado desde Outlook debe cumplir la [política de firma oficial completa y BCC HubSpot](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Preparar copy no sustituye el preflight de firma según vía, CCO y destinatarios.
+
+En correo comercial firmado por Julio, cargar el
+[manual del Prospecting Agent](../../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md).
+La calibración del 2026-10-07 usó ocho mensajes propios de Outlook; no reemplaza este canon editorial ni
+convierte sus giros en voz institucional. Para otro remitente, obtener su propia muestra.
+
+Primero un motivo concreto, luego una capacidad pertinente y una invitación útil. La cercanía se expresa
+en atender el contexto y dejar decidir, con seguridad tranquila: no encadenar «quizás», «podría» y «no sé
+si es prioridad». Una pregunta o condición basta para una necesidad no confirmada. Usar la investigación
+para encontrar pertinencia, sin recitar el cargo o resumir la empresa; una señal pública no prueba un problema.
+
+Mantener el enlace de reunión configurado y permitir respuesta por correo como alternativa de la misma
+invitación. En el primer correo, enlazar la primera mención de Efeonce a https://efeoncepro.com/ dentro
+de la capacidad pertinente, como respaldo institucional: complementa la agenda, no añade otro CTA ni
+exige repetición en seguimientos. No explicar la ausencia del brochure.
+No inventar URL, duración, experiencia sectorial o resultados. Respetar negativas y reuniones
+ya agendadas. Párrafos cortos, una situación y una capacidad; los ejemplos de cadencia son referencias,
+nunca fórmulas obligatorias. No trasladar automáticamente el ritmo de una columna ni sus motivos a un correo frío.
+
 ## 3. Principio raíz
 
 **Pensar contigo, no dictarte desde arriba.**

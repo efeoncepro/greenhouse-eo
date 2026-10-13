@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "pricing-v3-quote-increment/1",
+  "binding": false,
+  "audience": "internal",
+  "base": {
+    "calculationId": "composition-69b97e5401bad85565a46f17",
+    "replayDigest": "69b97e5401bad85565a46f172f20dd9290ad8aaf221a73ab89456cf0b614a96a"
+  },
+  "withAddOn": {
+    "calculationId": "composition-c78637d1c8d9b68c4154b016",
+    "replayDigest": "c78637d1c8d9b68c4154b0168586a2944ab6679088021e88e87c666c7e63cb9f"
+  },
+  "commercialUnit": "managed_service",
+  "currency": "CLP",
+  "statement": "Internal reading: it holds cost and margin and is never shown to a client. The price, cost and margin of an add-on, read as the difference between two frozen quotes: the base, and the base with the add-on in it. Each figure is a frozen amount of one quote minus the same frozen amount of the other; nothing is recalculated. It is not a new price and it approves nothing.",
+  "basis": [
+    "increment = withAddOn - base, for net, cost and marginAmount, in each compared period and over them. The quote with the add-on holds each person as one line with the summed dedication, so a cost charged once per line (the platform fee, a part of the base tools) is in it once and is not part of the increment.",
+    "same_periods: the quote with the add-on has the periods of the base and each is compared with its own. totals is the difference between the totals of the two quotes.",
+    "comparable: both calculated; same currency, offer, commercial unit, account, tax treatment, form and code of engagement, market, quote date, mode and contingency declaration; same catalog, resource policy and credit catalog, by version and by content; the base contained in the quote with the add-on (its lines with their identity and at least their people and dedication, its third-party costs, its tools on their lines); a net that grows in every compared period.",
+    "costByComponentKind: frozen cost of the components by the kind the kernel gave each, at the output FX of each, rounded one by one for reading. An entry may miss by a unit; cost is the figure that adds up.",
+    "changed.tools: frozen cost of the components of each composed tool, read the same way, in the periods in which it moved."
+  ],
+  "versions": {
+    "catalog": "operating-review-2026-10-11-v10",
+    "policy": "operating-review-2026-10-11-v11",
+    "credits": "operator-screenshots-2026-10-09-v1"
+  },
+  "comparison": {
+    "mode": "same_periods",
+    "basePeriods": 3,
+    "withAddOnPeriods": 3,
+    "comparedPeriods": 3
+  },
+  "periods": [
+    {
+      "periodId": 1,
+      "basePeriodIds": [
+        1
+      ],
+      "base": {
+        "net": "5650000",
+        "cost": "3076309",
+        "marginAmount": "2573691",
+        "marginRateRoundedDown": "0.455520"
+      },
+      "withAddOn": {
+        "net": "5950000",
+        "cost": "3231405",
+        "marginAmount": "2718595",
+        "marginRateRoundedDown": "0.456906"
+      },
+      "increment": {
+        "net": "300000",
+        "cost": "155096",
+        "marginAmount": "144904",
+        "marginRateRoundedDown": "0.483013"
+      }
+    },
+    {
+      "periodId": 2,
+      "basePeriodIds": [
+        2
+      ],
+      "base": {
+        "net": "5650000",
+        "cost": "3076309",
+        "marginAmount": "2573691",
+        "marginRateRoundedDown": "0.455520"
+      },
+      "withAddOn": {
+        "net": "5950000",
+        "cost": "3231405",
+        "marginAmount": "2718595",
+        "marginRateRoundedDown": "0.456906"
+      },
+      "increment": {
+        "net": "300000",
+        "cost": "155096",
+        "marginAmount": "144904",
+        "marginRateRoundedDown": "0.483013"
+      }
+    },
+    {
+      "periodId": 3,
+      "basePeriodIds": [
+        3
+      ],
+      "base": {
+        "net": "5650000",
+        "cost": "3076309",
+        "marginAmount": "2573691",
+        "marginRateRoundedDown": "0.455520"
+      },
+      "withAddOn": {
+        "net": "5950000",
+        "cost": "3231405",
+        "marginAmount": "2718595",
+        "marginRateRoundedDown": "0.456906"
+      },
+      "increment": {
+        "net": "300000",
+        "cost": "155096",
+        "marginAmount": "144904",
+        "marginRateRoundedDown": "0.483013"
+      }
+    }
+  ],
+  "totals": {
+    "comparedPeriods": 3,
+    "base": {
+      "net": "16950000",
+      "cost": "9228927",
+      "marginAmount": "7721073",
+      "marginRateRoundedDown": "0.455520"
+    },
+    "withAddOn": {
+      "net": "17850000",
+      "cost": "9694215",
+      "marginAmount": "8155785",
+      "marginRateRoundedDown": "0.456906"
+    },
+    "increment": {
+      "net": "900000",
+      "cost": "465288",
+      "marginAmount": "434712",
+      "marginRateRoundedDown": "0.483013"
+    },
+    "costByComponentKind": [
+      {
+        "kind": "human",
+        "base": "5940000",
+        "withAddOn": "6396000",
+        "increment": "456000"
+      },
+      {
+        "kind": "platform_fee",
+        "base": "441000",
+        "withAddOn": "441000",
+        "increment": "0"
+      },
+      {
+        "kind": "talent_assurance",
+        "base": "600000",
+        "withAddOn": "600000",
+        "increment": "0"
+      },
+      {
+        "kind": "operations",
+        "base": "300000",
+        "withAddOn": "300000",
+        "increment": "0"
+      },
+      {
+        "kind": "tool",
+        "base": "1947930",
+        "withAddOn": "1957218",
+        "increment": "9288"
+      }
+    ]
+  },
+  "netIncrementPerPeriod": "300000",
+  "changed": {
+    "lines": [
+      {
+        "lineId": "lead",
+        "profile": "ECG-001",
+        "change": "dedication_grew",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              3
+            ],
+            "base": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.2"
+              }
+            },
+            "withAddOn": {
+              "headcount": 1,
+              "dedication": {
+                "unit": "fte",
+                "value": "0.28"
+              }
+            },
+            "capacityIncrement": "0.08"
+          }
+        ]
+      }
+    ],
+    "tools": [
+      {
+        "toolId": "notion",
+        "label": "Notion",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              3
+            ],
+            "base": "31200",
+            "withAddOn": "33120",
+            "increment": "1920"
+          }
+        ]
+      },
+      {
+        "toolId": "microsoft-365",
+        "label": "Microsoft 365 Business Standard",
+        "periods": [
+          {
+            "periodIds": [
+              1,
+              2,
+              3
+            ],
+            "base": "19110",
+            "withAddOn": "20286",
+            "increment": "1176"
+          }
+        ]
+      }
+    ],
+    "thirdPartyCosts": []
+  }
+}

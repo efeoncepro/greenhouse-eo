@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "2f10d4e801d553531cb172910f23c091c80c1c82bee782f1178259f897461ccb",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:T2-crea-lens-440x440",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+      "sha256": "bd682505064bf6f60ae0cdbf36d6e9aece0ab5479f53095d74c61f6df9c3a0ca"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

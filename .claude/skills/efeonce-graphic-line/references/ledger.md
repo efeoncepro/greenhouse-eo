@@ -1,5 +1,20 @@
 # Registro de decisiones y versiones
 
+> Delta mate uniforme verificado contra: petición y aprobación del operador, AXIS `de34866` y catálogo live
+> de 134 entradas — 2026-10-12; comparación local, sin publicación de paquetes ni incorporación al catálogo.
+
+> Delta propuesta técnica y página de muestra (Sika, Wherex N.º 1164) verificado contra: taller
+> `ai-generations/2026-10-12_sika-propuesta-tecnica/` (LEEME e intents del compositor) y Think `main` en `9a36dac` —
+> 2026-10-12; sin cambios en AXIS ni en recetas.
+
+> Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
+
+> Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
+
+> Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
+
+> Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
+
 > Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964) — 2026-10-02 (últimas filas: el login V4
 > de Greenhouse y el avatar como referencia de identidad, 2026-10-02 (b) y (c)); antes, AXIS `d54c873` (tag `v0.4.11`) — 2026-10-01 (el Spark 2D, 2026-10-01 (g)); antes, greenhouse-eo `develop` en `d1a41babb` — 2026-10-01 (últimas filas: los perfiles sociales de
 > Efeonce, 2026-10-01 a (d)); antes, `b84ec7084` — 2026-09-30 (el deck SEO/AEO aprobado y en el
@@ -19,6 +34,11 @@
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |
+| 2026-10-10 | Deck **Marketing de Contenidos** aprobado (brochure de 57 láminas, línea Brand, ruta corta de 21; «Me encantó todo, queda aprobado»). Deja cuatro cosas en el canon: el patrón **franjas de foto** en seis y tres franjas, con tres excepciones sólo para él (una esfera por franja, foto de cine recortada, degradado bajo el título); la lámina a mano **«Producción con IA»** con la foto `CT24` en el índice de cine; **«Día a día»** con una interfaz de Marketing Studio **construida, no capturada**, como uso de `content-day-tools`; y la lámina de equipo **«Expertos multidisciplinarios»** con «+85 expertos más en Latam» («Personas reales» deja de ser el titular preferido). No se envía a un prospecto hasta cerrar sus pendientes (compromisos de servicio, «+85» sin fuente, logos de terceros). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y deltas 2026-10-10 (a–e); catálogo: `deck-recipes/README.md`. |
+| 2026-10-09 | Deck **Servicios web y digitales** aprobado (brochure de 29 láminas, línea Engine; «este deck está listo»). Fija que una pieza de línea lleva el **fondo Efeonce `#001A33`** y sólo el acento de la línea (`#091951` es de piezas de producto), una variante de `decision-case` sin foto del caso y la lámina «Dónde construimos». Pendientes antes de enviarlo: cifras de los casos Aguas Andinas (marcadores) y Berel. Norma: §4.6, «Deck Servicios web». |
+| 2026-10-09 | Portada general del brochure: «¿Qué gano con Efeonce? **Crecimiento.**» reemplaza a «¿Qué hace Efeonce? Crecer.» («Efeonce GENERA crecimiento para nuestros clientes»; confirmado en el canvas «Brochure Efeonce»). Vale para la portada general y la lámina que abre servicios. Los plates no llevan texto: el par nuevo va en el intent y no se regenera ninguna foto (las imágenes de referencia del catálogo todavía muestran «Crecer.»). La pregunta va en voz del cliente: el operador eligió cumplir la regla 3 del delta 2026-10-06 sobre «¿Qué genera Efeonce?». |
+| 2026-10-07 | «efeonce-graphic-line es el nuevo design system»: Rooms adopta La órbita en toda su UI, Bricolage editorial/Poppins funcional, componentes/color/iconografía/motion canónicos. AXIS distribuye; sustituida la base Poppins/Geist propuesta. Arte cliente intacto y sin imponer narrativa pregunta/respuesta. Dossier y EPIC-052 corregidos; sin implementación, pins, release ni migración automática de Greenhouse. |
 | 2026-09-25 | «La órbita» es la línea gráfica canónica de la marca propia Efeonce y su familia: rodea, mide y enfoca. |
 | 2026-09-26 | Efeonce firma todas las piezas; Globe, Wave, Reach y Greenhouse son contexto. Verk y Kortex quedan fuera por ahora. |
 | 2026-09-26 | La palabra del eslogan es de la línea de servicio: Growth (Efeonce/Greenhouse, «el producto que controla todo»), Brand (Globe), Engine (Wave), Voice (Reach), Revenue (RevOps). |
@@ -116,6 +136,8 @@
 | 2026-10-02 (b) | **La línea en el login V4 de Greenhouse** (TASK-1964; dirección V4 aprobada por el operador ese día). Primera pantalla del producto Greenhouse con La órbita, contra el alcance escrito («No: la interfaz del producto Greenhouse»): **riesgo abierto declarado en la task**, no una regla nueva (ver Pendientes). Lo decidido: (1) la **Lente** del escenario se construye al canon de AXIS —anillo a 1,12 × el radio de la foto (`1 + orbit.ringAirRatio`), foto interior ampliada × `lens.zoom` (no saturada), exterior con `lens.outside`, trazos y esfera × ancho/794 con los pisos `orbit.arcStrokePx[0]`/`sphereRadiusPx[0]`, arco de 50° centrado en `upper-start` con la esfera en su punta y el acento de la línea de servicio de la novedad—; (2) las novedades **cine van sin lente**, porque su luz ya es la órbita de la pieza (aceptado por el operador); (3) la **voz**: «El ring y la esfera faltan como manda /efeonce-graphic-line» → anillo pequeño delante del kicker y la esfera como punto del titular, en el acento; (4) fotos del escenario aprobadas: `LG1`, `LG2e` (cine) y `LG3e` (registro B), con la excepción de cine para una persona de casting en el login (registro cine, delta 2026-10-02 (c)). Detalle: [applications.md](applications.md) §A12 |
 | 2026-10-02 (c) | **El avatar oficial con la bomber es la referencia de identidad del equipo** («Es el último, descarta los anteriores, es donde salen con la bomber»). Andrés, Daniela, Melkin, Humberly y Valentina se anclan en su avatar (maestro 1080 de `gs://efeonce-group-axis-public-media/team/avatars/v1/1080/`, copiado como `ai-generations/_identidad-equipo/<persona>/avatar-bomber-2026-09.png`); `actual` y `antiguo` quedan en disco, fuera de uso. Julio conserva su set propio. Aplicado en `scripts/foto/build-prompt.mjs` (`PERSONAS`), `scripts/foto/assets.lock.json` (376 assets), el roster y `_identidad-equipo/LEEME.md`. Reemplaza la regla del 2026-09-29 que trataba los avatares como derivados no aptos de referencia |
 | 2026-10-03 | **El cine también vale en superficies de producto** («Si, para producto también es necesario el estilo cine»). Caso 6 del registro cine, `alcance: "producto"` en `ALCANCES_CINE` (`scripts/foto/build-prompt.mjs`, con aviso y prueba): escenario del login, hero de producto; protagonista Nexa, roster con la prenda de su línea o casting anclado a su retrato; la superficie no dibuja otra órbita encima. `LG2e` pasa de `publicidad-prueba` a `producto`. **Pendiente:** llevarlo al contrato AXIS (`surfaces.photo.cine`, issue `cine-requires-nexa-or-proposal`) |
+| 2026-10-08 | **Marca de Efeonce Rooms aprobada («eslabón leve») y dos reglas para toda la línea:** la esfera nunca va en un cruce de órbitas (en la punta de la almendra de dos círculos se lee como figura anatómica; la primera versión aprobada se descartó el mismo día, antes de publicar) y una letra dentro de una órbita no puede ser R (se lee ®). Detalle en [2026-10-08 — Logo de Efeonce Rooms](#2026-10-08--logo-de-efeonce-rooms-18-piezas). |
+| 2026-10-09 | **Efeonce Wave, Efeonce Reach y Efeonce Globe entran a la familia por la ruta H3** («ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave»): cada producto conserva su logotipo y la familia vive en el lockup; se retira el endoso «by efeonce». Descartadas Ruta 1 (órbita), H1 (palabra en Poppins: perdía presencia) y H2 (símbolo en órbita). Detalle en [2026-10-09 — Wave, Reach y Globe en la familia](#2026-10-09--wave-reach-y-globe-en-la-familia-h3-33-piezas). |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
@@ -245,6 +267,9 @@
 
 ### Pendiente de implementación (decidido, falta código o texto)
 
+- Familia H3 (Wave, Reach, Globe; 2026-10-09): `axis-brand-assets` 0.4.28 en AXIS `main` (`7c96680` + `5346761`, tag
+  `v0.4.28` publicado; 0.4.29 en curso la deja pública en el Lab); falta que Greenhouse suba de 0.4.25 (TASK-2014, a 0.4.29), probar `*-isotype-small-*` en un favicon real y,
+  si se suma otro producto con colores propios, llevar los de Wave/Globe sobre oscuro a tokens de producto.
 - Íconos (D16–D22): **hecho y publicado** (tag `v0.3.6`: `axis-tokens` 0.3.6, `axis-graphic-line` 0.4.0). Falta que un
   consumidor los fije. Los SVG del set se exportan con `pnpm icons:export` (no van a `axis-brand-assets`).
 - Plastilina en volumen (D24): **hecho y publicado** (tag `v0.3.7`, 2026-09-27: `axis-tokens` **0.3.7** con
@@ -383,3 +408,473 @@ siendo pruebas.
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 
 Greenhouse: tokens y contracts 0.3.5, registry y brand-assets 0.3.1 en `develop` desde el 2026-09-26 (llega a producción con el próximo release); el adapter soporta el contrato de la órbita 0.3.1; no usa todavía el contrato de firma. Motion V1.1: las 30 variantes en el bucket (7596 archivos verificados) y en la galería del Lab (AXIS `d847b44`).
+
+## 2026-10-04 — Producción del set AEO autorizada; formas en revisión
+
+Operador: «Bien, hazlos todos», sobre la propuesta de diez glifos nuevos y ocho reutilizados. Se produjeron como
+colección Trazo/Engine candidata, con API de revisión, 72 SVG y Lab local. En esa primera entrega la geometría estaba pendiente de aprobación visual. Estado y promoción: [aeo-icons.md](aeo-icons.md).
+Verificado contra: `axis-design-system@c4bfefe` + cambios locales de esta colección — 2026-10-04.
+
+
+### Aprobación posterior — 2026-10-04
+
+Operador: «Las apruebo todas». Diez formas nuevas aprobadas, sin cambio geométrico. Alta en ICON_CATALOG,
+API AEO delegada al renderer canónico y Lab actualizado. 60 Trazo + 49 Plastilina; versión local 0.17.0.
+En esa etapa quedaban commit, push y publicación pendientes; la publicación `v0.17.0` documentada abajo cierra esos pasos.
+
+
+## 2026-10-04 — Colección SEO y corrección de redondez
+
+«Vamos con todos» autoriza los 24 conceptos (12 nuevos + 12 reutilizados). «Muy cuadrados deben ser mas redondeados»
+corrige R1. R2 redondea contornos, nodos y conexiones. Pendiente aprobación visual; no es canon ni release.
+Verificado contra axis-design-system@c4bfefe + cambios locales. [Inventario](seo-icons.md).
+
+
+## 2026-10-04 — Trece formas de autoridad y enlaces autorizadas
+
+«Bien, hagamos todos, adicional hoy con AEO se suma el concepto de Brand Authority». Doce off-page + autoridad-marca.
+Contornos redondeados; Brand Authority compartida SEO/AEO, con autoridad de dominio/página diferenciada.
+Producción y QA completos; aprobación visual pendiente. La publicación posterior de 0.17.0 conserva candidate. [Detalle](authority-icons.md).
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+
+## Aplicación en el Lab · 2026-10-04 · componentes
+
+> Verificado contra: axis-design-system@aee99d2 — 2026-10-04; componentes incorporados en `9eb3da9`.
+
+El operador pidió: «Quiero renovar los componentes y patrones con la nueva línea gráfica».
+Se aplica la línea en el catálogo y las fichas de AXIS, conservando la navegación aprobada.
+Implementación y límites: [lab-components.md](lab-components.md). No es promoción de
+contratos, adopción de Greenhouse ni publicación de paquetes. Aceptación visual final
+por el operador y publicación de paquetes siguen siendo evidencias separadas del deploy del Lab.
+
+
+## 2026-10-04 — Logos completos y agrupados
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04; logos incorporados en `617ee02`.
+
+El operador detectó que faltaban Wave, Globe, AEO y sus familias, Marketing Studio, Insights y Greenhouse.
+Decisión aplicada: un catálogo central en Marca → Logotipos, proyectado desde packages y descubierto por
+búsqueda global. No redibujar las marcas ni mantener listas de archivos paralelas en el Lab. Las identidades
+editoriales conservan su alcance; los logos de clientes y partners mantienen sus permisos separados.
+Código incorporado a `main` en `617ee02` y Lab publicado; export `/logos` y nuevos assets pendientes de release instalable.
+
+
+### 2026-10-04 — El operador pide también las otras marcas
+
+Verificado contra: axis-design-system@aee99d2 — 2026-10-04.
+Se incorpora la biblioteca existente de herramientas y plataformas al catálogo central, separada por
+colección y con procedencia visible. No se recrean logos ni se convierte un PNG en un supuesto SVG.
+Las restricciones previas de clientes y badges internos se conservan. Total: 52 marcas, 223 archivos;
+22 E2E de logos, búsqueda y agentes pasan en desktop y móvil. Push y Lab verificados; publicación npm pendiente.
+
+## 2026-10-04 — Entrada agentic, catálogo de iconos y tipografía editorial
+
+- `060174c`: entrada `/agents/` y manifest del registry; 41 capacidades conectan packages, Lab,
+  ejemplos, CLIs y adapters. Búsqueda global indexa recursos versionados sin DB de catálogo.
+- `bf93d3a`: «Ajusta eso entonces» tras detectar SEO/AEO ausentes en la galería principal. Un catálogo
+  de 134 únicos con estados, filtros y JSON, compartido con búsqueda. No cambia aprobación ni renderers.
+- `aee99d2`: «Corrígelo de forma robusta y escalable» tras detectar Poppins en títulos de Insights.
+  `LabHeading` deriva Bricolage del token; carga compartida, gates de fuentes y recorrido dinámico de
+  65 rutas / 132 casos E2E. Preserva specimens y tipografía de producto. Push solicitado por el operador;
+  Vercel success y readback HTTP 200 de Insights/Iconography/Agents confirmados; CI `37216960966` en curso al actualizar. Evidencia final en `docs/audits/2026-10-04-axis-documentation-closure.md`. [Implementación](lab-components.md).
+
+Estado de distribución: `axis-graphic-line` 0.17.0 publicado; nuevas exports de logos en fuente
+`axis-brand-assets` 0.4.18 pendientes de un nuevo release. No actualizar pins de consumidores por inferencia.
+
+## 2026-10-04 — Familia de botones, órbita y contexto de negocio
+
+Operador: loader con La órbita, CTA con flecha animada opcional, completar variantes y
+patrones compuestos, analizar adaptación por línea de negocio. Implementación: contexto
+optativo `line`, separado del tono funcional; seis líneas del canon, neutral/peligro invariantes.
+HTML/CSS portable, React opcional, 26 íconos funcionales y grupos/toggles/menús/split en el Lab.
+Release inicial v0.3.43 success (run 37221054045), instalación privada y Lab público verificados; adopción de productos separada.
+
+> Verificado contra: axis-design-system@1bccb3f — 2026-10-04.
+
+Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+Corte anterior de botones: primitives 0.1.1 y registry 0.4.1 (parche documental sin cambios
+de API/CSS), tokens 0.3.43 y contracts 0.4.0. Release e instalación privada verificados.
+Verificado contra: axis-design-system@31b146e, tag v0.4.1 — 2026-10-04.
+
+Distribución vigente verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+
+## 2026-10-04 — La órbita prevalece en la hoja de colores
+
+El operador establece: «Prevalece por encima de todo la órbita que es la nueva línea».
+Canon de identidad: `efeonceGraphicLine.color` y `.lines`; las rampas heredadas de Greenhouse
+no gobiernan la identidad nueva. La hoja `references/colors` aún muestra sólo `axisRamp` y
+requiere reorganización: paleta madre, seis líneas con acento claro/oscuro, semántica funcional
+y compatibilidad separadas. Decisión registrada; no se han cambiado tokens, consumidores ni Lab.
+Criterio completo: [criteria.md](criteria.md#prioridad-de-la-paleta-vigente-en-axis--2026-10-04).
+
+> Verificado contra: axis-design-system@13db367 — 2026-10-04.
+
+
+## Colores de La órbita en packages y Lab — 2026-10-04
+
+Decisión: La órbita prevalece como identidad; el operador exige tokens en packages y rampas propias.
+Implementación local en AXIS, base `13db367`, tokens **0.4.0 preparado, no publicado**:
+`axisColorSystem` (`axis.color-system.v1`) referencia `efeonceGraphicLine.color` y `.lines`;
+`resolveAxisColorRoles(line, surface)` entrega fondo, tinta, acento y contraste, con validación de claves.
+`axisOrbitRamp`, `axisOrbitRampContrast`, `axisOrbitRampMethod` aportan seis líneas × dos anclas
+× nueve pasos (100–900): 500 conserva el acento canónico; el resto son tonos técnicos derivados
+por `orbit-oklab-v1`, sin asignación automática de roles ni promoción a acentos canónicos.
+CSS genera `--axis-orbit-<paleta>`, `--axis-orbit-<linea>-<light|dark>-<background|text|accent>`
+y `--axis-orbit-<linea>-<light|dark>-<100…900>`. No transcribir HEX ni reconstruir las rampas.
+La hoja `/references/colors/`, su JSON y DESIGN.md consumen esta autoridad. `axisRamp` conserva
+compatibilidad de producto; no gobierna la identidad. El acento sólo en texto ≥24 px; el contraste
+se evalúa sin redondear. Estado no se comunica sólo por color. Botones conservan su contrato de estados.
+ADR dueño: AXIS `docs/architecture/COLOR_SYSTEM_ORBIT_DECISION_V1.md`; consumo en
+`packages/tokens/README.md`. Sin cambio de pins de Greenhouse ni publicación en esta sesión.
+
+> Verificado contra: axis-design-system@13db367 + cambios locales de color — 2026-10-04.
+
+
+### Destino de adopción Greenhouse — 2026-10-04
+
+El operador confirma que Greenhouse migrará eventualmente a los colores de La órbita.
+Las rampas heredadas son compatibilidad de transición, no una identidad paralela permanente.
+`axisColorSystem.adoption.greenhouse` declara el destino como `planned`; el mapeo de roles y el
+rollout siguen pendientes. La futura implementación debe mapear superficie, texto, borde, acción,
+foco y estados mediante un adapter semántico del theme sobre los tokens del package, preservando
+Vuexy y validando claro/oscuro y estados reales. El resolver de composición de marca no es todavía
+un theme completo de producto. Esta dirección no inicia la migración ni cambia pins de Greenhouse.
+
+
+## 2026-10-04 — Formularios, menús y cierre de packages
+
+El operador pide completar las primitives, rechaza los desplegables pobres y el doble contorno de
+foco, y pide íconos en los campos. AXIS `3299032` lleva diez contratos de formulario a packages
+y Lab; Select enriquecido y NativeSelect explícito, configuradores con la misma implementación,
+foco continuo e íconos funcionales mail/folder. Criterio: [criteria.md](criteria.md#formularios-claridad-y-foco-continuo--2026-10-04).
+
+El operador autoriza push, publicación de packages y actualización de docs/skills mediante
+subagentes. El tag `v0.7.0` (run `37238026404`) quedó detenido antes de publicar por overflow
+del chip removible a 400% en WebKit móvil/Linux. Los runs de `v0.7.1` se cancelaron antes de publicar tras detectar cinco timeouts en
+matrices que acumulaban doce contextos o diez rutas dentro de 30 segundos. La fuente `df2de61`
+separa las pruebas por contexto/ruta, con la misma cobertura y sin ampliar timeout.
+`v0.7.2` quedó publicado: release `37239150937` success; registry remoto e instalaciones limpias
+HTML/CSS sin React y SSR React 18.3.1/19.2.7 verificadas. Este corte reemplaza como
+estado de fuente los preparativos locales 0.4.0/0.3.0 de arriba: tokens 0.5.0, contracts 0.6.0,
+primitives 0.4.0 y registry 0.7.2. Estado instalable en
+[package-and-tokens.md](package-and-tokens.md#distribución-de-primitives-y-formularios--2026-10-04).
+Se conserva adopción Greenhouse `planned`, sin cambio de pins; lectores de pantalla/dispositivos
+físicos y baselines Linux pendientes. El catálogo de logos requiere otro release de brand-assets.
+
+> Verificado contra: axis-design-system@df2de61 — 2026-10-04.
+
+
+### 2026-10-05 — Agendador: AXIS primero
+
+El operador señala que Growth Meetings no está adaptado a La órbita y autoriza construir primero en AXIS;
+la adaptación del consumidor se evalúa después. Se implementa la composición candidata en packages y Lab,
+con tokens y controles de la línea. Esta decisión autoriza implementación local, no aprobación visual,
+publicación ni migración de Greenhouse. Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
+
+
+### 2026-10-05 — Revisión del agendador: disponibilidad y motion
+
+El operador valida la dirección visual y pide distinguir fecha/cantidad, señales explícitas de disponibilidad
+y transiciones más robustas. Se añaden check/cantidad etiquetada, guion/leyenda, total en horarios,
+View Transitions limitadas a la etapa y fallback Web Animations con reducción e interrupción.
+La validación de dirección no equivale a aceptación de esta revisión ni publicación.
+Verificado contra: axis-design-system@8adedef + WIP local — 2026-10-05.
+
+
+### 2026-10-05 — El operador sustituye el check del calendario
+
+En la revisión anotada pide calendario en vez de check, corregir celdas estrechas, consumir el Select
+canónico y añadir íconos en campos. Se sustituye check/«disp.» por calendario + cantidad; el Lab pasa
+a Field/Select/Button canónico. El problema observado era un `<select>` suelto en la demo, no un
+defecto demostrado del Select. Campos con persona/correo/empresa del catálogo funcional Tabler.
+AXIS @8adedef + WIP local; revisión implementada sin release ni adaptación de Growth Meetings.
+
+
+### 2026-10-05 — Confirmación: celebración y comprobante
+
+El operador solicita más intención visual y celebración en «Ya tenemos un espacio». Implementación
+local: emblema Tabler confetti, tarjeta de fecha/hora/zona con íconos, burst acotado y único tras el
+comprobante. Reduced motion mantiene el resultado estático. Tokens y renderer en AXIS; sin reserva
+real ni cambio en Growth Meetings. Verificado @8adedef + WIP local, aceptación final pendiente.
+
+
+### 2026-10-05 — Agendador AXIS aprobado visualmente
+
+Aprobación explícita del operador: «Bien, está aprobado...», tras revisar calendario/disponibilidad,
+Select canónico, campos con íconos y confirmación celebratoria. La revisión visual actual queda
+aprobada; reemplaza el estado de aceptación pendiente de las entradas anteriores. Implementación
+local sobre AXIS @8adedef + WIP; huella y alcance en `docs/quality/scheduler.md` de AXIS. Publicación
+de packages/Lab y adaptación de Growth Meetings siguen pendientes, sin autorización de release inferida.
+
+
+### 2026-10-05 — Push del agendador autorizado
+
+El operador solicita «Push». Entrega AXIS `eeb24e2`: agendador aprobado y CI de su suite, aislados
+del WIP de product primitives y AI Visibility Report. Instantánea de commit: build, typecheck,
+suite global, design gate, agent gate y 37 pruebas de navegador PASS; 3 SKIP por API scoped ausente,
+con fallback probado. Registro completo en `docs/quality/scheduler.md`. Esta autorización no incluye
+publicación de versiones de packages ni adaptación de Growth Meetings.
+
+
+### 2026-10-05 — Rechazo de la demo presentada como avance de Growth CTA
+
+El operador solicita corregir la composición y aclarar si se trabajó Growth CTA. Se confirma que esta
+entrega sólo desarrolló primitives y una demo en AXIS: el renderer y motor de Growth CTA no se
+modificaron. Se corrigen separación/jerarquía en primitives y ejemplo, con revisión del borrador real.
+No atribuir adopción del producto a una demo de infraestructura. La corrección no hereda la aprobación
+visual del agendador; queda local y pendiente de revisión.
+
+
+### 2026-10-05 — Growth CTA en AXIS, reusable por sitio público y Think
+
+El operador solicita revisar todas las formas de render y crear la versión de la línea Efeonce en
+AXIS; pregunta expresamente por su reutilización fuera del Lab. Decisión: implementación visual
+portable en packages, referencia propia `/references/growth-cta/`, inventario de lo implementado
+y lo sólo declarado. La futura adopción se hace en el renderer compartido Growth CTA, manteniendo
+política y eventos bajo Growth. No se autorizan por inferencia publicación, conversión real ni
+migración de hosts. Esta candidata no hereda la aprobación visual del agendador.
+Verificado contra: axis-design-system@eeb24e2 + WIP local — 2026-10-05.
+
+
+### 2026-10-05 — Rechazo visual de Growth CTA y dos formas de abrir la agenda
+
+«No tiene la forma y limpieza»; el operador pide premium/elegante/atractivo y rechaza el contenedor
+grueso del popup. Se revisan proporción, cierre, sombra, jerarquía y marco; se añade agenda modal
+o desplegada bajo el CTA para compararlas. La primera candidata queda rechazada visualmente; la
+segunda conserva estado pendiente, sin release ni adopción. Verificado contra:
+axis-design-system@eeb24e2 + revisión local — 2026-10-05.
+
+
+### 2026-10-05 — El titular del CTA se conserva; faltan anillo y esfera
+
+El operador señala el hover editorial sin aire y las marcas ausentes. Aclara que la pregunta está
+bien donde está. Se revierte la propuesta de cambiarla a pregunta chica/respuesta nueva, se restaura
+el padding canónico y se prepara la variante explícita headlineMarks=ring-and-sphere conservando
+el texto. La esfera usa answerHtml del package gráfico; el último término y la esfera no se separan.
+Esta prueba local no es aprobación ni nueva regla general de voz.
+Verificado contra: axis-design-system@eeb24e2 + WIP local — 2026-10-05.
+
+
+2026-10-05 — Corrección explícita: el anillo NO acompaña la esfera en el titular grande. Va en
+el título superior («VISIBILIDAD EN IA»); la pregunta conserva la esfera al cierre. Se corrige el
+renderer de AXIS y se agrega una aserción de anatomía para no repetir la interpretación errónea.
+
+
+2026-10-05 — El operador autoriza construir las dos propuestas de banner («Vamos con los dos»):
+editorial compacto y de marca. Se materializan en las apariencias minimal/spotlight de inline_banner
+y se exponen juntas en el Lab. Se conserva la corrección anterior: anillo arriba y esfera al cierre.
+Pendientes de revisión visual; no se publica ni migra al consumidor por inferencia.
+
+
+2026-10-05 — A petición del operador se añade contraste de pesos Bricolage a los Growth CTA:
+introducción 400, idea principal 700. Misma pregunta, sin salto forzado ni nueva paleta. API
+opt-in del package aplicada en ambas recetas de banner y las demás muestras. Revisión visual
+pendiente; sin publicación.
+
+
+### 2026-10-05 — Aprobación integral y cierre documental autorizado
+
+El operador aprueba explícitamente la entrega final: «Aprobado todo, lanza subagentes y actualiza
+toda la documentación y los skills que correspondan, luego push». Esto supersede la aceptación
+pendiente de las revisiones históricas del producto y de Growth CTA. Aprobado: composición ligera,
+anillo en eyebrow y esfera al cierre del titular, banners editorial compacto/de marca y contraste
+Bricolage 400/700 mediante énfasis exacto opt-in; agenda modal e inline con estado conservado.
+No se aprobó la primera candidata rechazada ni la interpretación de anillo junto a esfera en el
+titular. Ambas se mantienen como historia para evitar repetirlas.
+
+Verificado contra source local AXIS sobre `3c8a6dd`: 40/40 journeys CTA y 4/4 recorridos finales,
+build/typecheck, 198 contracts, design/agent PASS; evidencia dueña en `docs/quality/growth-cta.md`.
+La autorización de commit/push no acredita release de packages, instalación privada de los nuevos
+exports ni adopción en Growth/sitio público/Think. Estado de esos planos permanece pendiente hasta
+su readback independiente; el push final lo registra el coordinador con su SHA real.
+
+### 2026-10-06 — Logo de Creative Studio (24 piezas)
+
+El operador pidió el logo de Creative Studio «exactamente el mismo de Marketing Studio o parecido pero con el color de
+la línea brand» y lo aprobó para AXIS con sus 24 piezas («Las 24 piezas»): 8 formas (`logo`, `lockup`,
+`short-lockup`, `compact`, `stacked-lockup`, `short-stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`,
+`creative-studio-<forma>-<variante>.svg`. Acento Brand: `#bb1954` sobre papel, `#ff6500` sobre navy. Generador
+Greenhouse `scripts/brand/build-creative-studio-logos.mjs` (copia del de Marketing Studio con `GL.lines` key `brand` y
+la palabra «Creative»; usa `orbit-ring.mjs` y las terminaciones concéntricas de la familia). Destino:
+`@efeoncepro/axis-brand-assets` 0.4.26 (AXIS `f4dd2fe` en `main`, tag `v0.4.26`, 2026-10-06). Quedan sólo en el
+paquete, como las de HubSpot: el índice de búsqueda del Lab pasaba de 399 KB a 416 KB (`AXIS_LOGO_EXCLUSIONS` las
+lista); entran al catálogo público al fragmentar el índice (*Delta 2026-10-09: ocurrió en 0.4.29, AXIS `74bb2e7`; las 24
+piezas están en «Logotipos» del Lab*). **Regla de las piezas cortas:** las que dicen sólo
+«Studio» (`short-lockup`, `compact`, `short-stacked-lockup`, `isotype` S, `icon` con nave sobre «Studio») se parecen a
+las de Marketing Studio salvo por el acento; existen en el paquete, pero su uso visible queda sujeto a «Studio a secas
+es Marketing Studio» y a nombrar cada vista completa en superficies visibles (ADR `EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1`
+D9 y §7). Primer uso: encabezado de las interfaces del brochure Agencia Creativa (lockup «efeonce | Creative Studio»).
+Pendiente en el release AXIS: el README de `brand-assets` todavía dice que «Creative Studio» es sólo el descriptor de
+Globe.
+
+### 2026-10-08 — Logo de Efeonce Rooms (18 piezas)
+
+El operador pidió el logo de Efeonce Rooms (sala comercial, `rooms.efeonce.org`, EPIC-052) «al estilo de Marketing
+Studio, Creative Studio, Efeonce Factory» y con impacto. La regla «la órbita vive en la O» en una palabra con dos: las
+dos «o» son **dos órbitas enlazadas como eslabones** (arriba la segunda por encima, abajo la primera), separadas 1,6 ×
+el radio medio («eslabón leve»), con la **única esfera a la 1:30 de la segunda órbita**. Símbolo: las dos órbitas sin
+letra. **Lección:** la primera versión aprobada ponía la esfera en el cruce de arriba («el punto de encuentro») y el
+operador advirtió que una esfera en la punta de la almendra de dos círculos se lee como figura anatómica (publicidad
+íntima femenina); se cambió el mismo día, antes de publicar. **Regla: la esfera nunca va en un cruce de órbitas**, y una
+letra dentro de una órbita no puede ser R (se lee ®). Descartadas también: superposición plana (reaparece la almendra),
+órbitas que sólo se tocan (anteojos), escalón (la «o» flota) y eslabón profundo (se empasta). 6 formas (`logo`,
+`lockup`, `compact`, `stacked-lockup`, `isotype`, `icon`) × `positive`/`negative`/`white`. Generador
+`scripts/brand/build-rooms-logos.mjs` (cortes genéricos como contornos, nunca máscaras: una prueba de AXIS lo exige).
+El generador quita los espacios al final de línea que trae el logo de Efeonce (el gate `git diff --check` de AXIS
+los rechaza); regenerar = correr, copiar a `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y
+`pnpm seal`, nunca editar los SVG a mano. Destino `@efeoncepro/axis-brand-assets` 0.4.27: AXIS `6e1621b` (release) +
+`1dfb95c` (eslabón leve) + `f249e82` (sin espacios al final de línea), rebasados y empujados a `main`; **publicado en el release
+`v0.4.27`** (2026-10-08, readback en GitHub Packages). Sólo en
+el paquete, como Creative Studio (`AXIS_LOGO_EXCLUSIONS`). ADR `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md`.
+**Revisión de parecido (2026-10-08, búsqueda web, no asesoría legal):** el logotipo no se parece a marcas conocidas; el
+riesgo está en el **nombre** («room/rooms» es casi genérico en salas de venta y hay antecedentes ROOMS/ZOOM ROOMS en
+EE.UU.): búsqueda formal y solicitud **«EFEONCE ROOMS» mixta** (palabra + diseño), nunca «Rooms» suelto en publicidad;
+probar el símbolo solo a 16–32 px frente a 🔗, ⚣ y argollas de boda; **nunca** mover la esfera a un cruce. Pendientes:
+tag `v0.4.27`, prueba sin contexto del símbolo y búsqueda formal de marca. Aplicaciones del canvas «Efeonce Rooms —
+Logo» exploradas, no aprobadas como composiciones de la sala ([A13](applications.md#a13-efeonce-rooms--design-system-de-producto-2026-10-07)).
+*Delta 2026-10-09: el tag `v0.4.27` existe (pendiente cerrado); desde 0.4.29 (AXIS `74bb2e7`) las 18 piezas son
+públicas en «Logotipos» del Lab.*
+
+### 2026-10-09 — Wave, Reach y Globe en la familia (H3, 33 piezas)
+
+El operador pidió llevar Wave, Reach y Globe a la dinámica de Marketing Studio, Creative Studio, Factory y Rooms («ya no
+es Wave solo ni Wave by Efeonce, sino Efeonce Wave»). Se probaron Ruta 1 (redibujo con la órbita), H1 (palabra en
+Poppins con sólo el gesto: **perdía presencia**, la letra de cada marca es identidad) y H2 (gesto en órbita). Eligió
+**H3**: cada producto conserva su logotipo y la familia vive en el lockup — Efeonce adelante (30 de alto, 20 de aire,
+filete 1 × 26, 20 de aire), logotipo en el gris de la familia (`#6b6b6b` papel / `#6f89a2` oscuro) con sólo su gesto en
+color; tamaño por presencia (WAVE 21, REACH 20, globe 35) y base en la «n» de Efeonce. **Se retira «by efeonce»:**
+`*-logo-*` pasa a ser el logotipo solo (palabras en el navy de la familia `#023c70`). Gestos: Wave = la W (dos V),
+`#0375db` + `#091951` (los de Engine; reemplazan el `#082e8e` del archivo), oscuro `#2e8be8` + `#a6cdf5`; Reach = «a»
+con flecha `#f83902`, punta corrida 7 u (logotipo) / 16 u (isotipo) para no rozar el asta, en la palabra sobre oscuro la
+«a» va naranja maciza (blanca se funde con la «e»); Globe = globo `#bb1954` papel / `#ee4274` oscuro (**excepción de
+producto**: no toma el naranja Brand `#ff6500`, que queda para Creative Studio), sin la mota `#ff6500` suelta y con su
+despegue original. **Sobre oscuro, los tres isotipos van todo en blanco** (ajuste final del operador, antes de publicar
+el paquete: «son lo suficientemente distintivos para funcionar así»): `{wave,reach,globe}-isotype-negative` y
+`{reach,globe}-isotype-small-negative` son idénticos a su `-white`; el color sobre oscuro vive sólo en el logotipo y el
+lockup. Quedan superadas para el isotipo las exploraciones intermedias: Wave en dos azules claros, Reach con la «a»
+blanca y la punta naranja, Globe en frambuesa, la baldosa blanca y las variantes en gris. Isotipos
+chicos (≤ 24 px) sólo de Reach (ranura cerrada, chevrón más grueso) y Globe (gajos fundidos en un cuerpo paralelo al
+anillo). Paquete `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680`): 33 archivos, 12 reemplazados y 21 nuevos;
+ids `{wave,reach,globe}-{logo,lockup,isotype}-{positive,negative,white}` + `{reach,globe}-isotype-small-{positive,negative,white}`.
+Generador AXIS `packages/brand-assets/scripts/product-family.mjs` sobre `sources/product-family/` (originales
+versionados, nunca publicados); regenerar = generador + `pnpm seal`, nunca a mano; sólo contornos, sin máscaras ni
+`clipPath`. Las piezas nuevas quedan sólo en el paquete (`AXIS_LOGO_EXCLUSIONS`), como Creative Studio y Rooms; los
+`logo`/`isotype` de siempre siguen públicos con bytes nuevos. Tag `v0.4.28` no visto en el remoto al 2026-10-09;
+Greenhouse fija 0.4.25 y adopta en TASK-2014. ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`.
+*Delta 2026-10-09 (más tarde): tag `v0.4.28` publicado sobre `5346761` (contenido `7c96680` + `5346761`, isotipos todo
+en blanco sobre oscuro). En 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice de búsqueda del Lab está fragmentado (`/search-index/logos.json`) y todas las marcas Efeonce son públicas en «Logotipos» (`/references/logos/`) y en la búsqueda global, incluidas Rooms (18), Creative Studio (24) y las piezas nuevas de Wave, Reach y Globe; `AXIS_LOGO_EXCLUSIONS` ya no las lista.*
+
+### 2026-10-07 — Propuesta para un cliente (Sika LIC-1164): firma, portada y excepción
+
+- **Firma de Efeonce en una propuesta para la marca de un cliente:** pie navy `#001a33` en cada hoja con el lockup
+  `creative-studio-lockup-negative`, el texto de la licitación y la burbuja `url-bubble-baked-dark`; fuera del material
+  del cliente. Portadas y contraportada sin pie (operador: «para la portada únicamente esto no es necesario»).
+- **Excepción del operador, sólo para esa pieza:** portada cine con el arte aprobado del cliente dentro de la foto
+  (Karo presenta el Master Graphic de Sika en un lightbox), compuesta con `cover-brochure` layout `line` línea brand.
+  Primer precedente de arte de cliente en foto cine; no es regla. Aprobada: «Está perfecta».
+- Contraportada: `close-brochure-orbit` en línea brand; las `close-proposal` se descartaron porque sus fotos son de la
+  línea Growth.
+- Caso: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md`.
+
+### 2026-10-12 — Propuesta técnica y reel para un cliente (Sika, Wherex N.º 1164): deck, caso, motion y página de muestra
+
+Sigue a la entrada del 2026-10-07 (mismo proceso; «LIC-1164» allá). El operador presentó la oferta en Wherex el
+2026-10-13; el resultado no se conoce. Taller y procedimiento: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
+
+- **Dos documentos, no uno** (operador): el deck técnico va separado del anexo gráfico «POSIBLE» del 07/10.
+- **Deck técnico:** 22 láminas 16:9 (21 hasta la tarde del 12/10; se sumó «Tiempos por nivel»), línea Brand (Efeonce Creative Studio), con generador propio. Del compositor sólo
+  portada (`cover-proposal`, layout `dawn`, brand), cierre (`close-proposal`, brand, plate `BR4-contra-amanecer`) y
+  caso (`decision-case`); navegación e íconos Trazo, de `@efeoncepro/axis-graphic-line`. La entrada del 07/10 descartó
+  `close-proposal` en el anexo gráfico («sus fotos son de la línea Growth»); este deck sí cierra con ella, en línea
+  brand y con ese plate. No hay decisión registrada que reconcilie los dos usos: no generalizar ninguno.
+- **Decisión del operador: el caso de éxito es la lámina aprobada, no una hecha a mano.** Rechazó la lámina propia del
+  generador; va `decision-case` con la foto del caso (el avión de Sky), compuesta en claro y en línea `growth` porque el
+  contrato rechaza Brand en claro. La autorización de Sky para citar el caso fuera sigue sin verificar.
+- **Equipo con nombre y tamaño** (operador): fotos reales del squad y «+85 profesionales en toda Latinoamérica»,
+  cifra del operador sin fuente en el repo. Esa lámina se armó en el generador (la del compositor truncaba nombres).
+- **Motion del reel de la campaña del cliente** (operador: «¿Sientes que el video sigue la línea gráfica que se
+  armó?»): la capa de motion se rehízo con el manual de la campaña; el sello de lanzamiento aprobado se tomó de su
+  generador y el triángulo rojo suelto no se usó, porque el manual lo reserva para la firma y el logo. Reel v2.2
+  aprobado: «Bien, vamos con ese».
+- **Página de muestra en Think** (operador: «una página en Think con el reproductor canónico de Efeonce… premium, con
+  el logo de la campaña… y en la propuesta un QR y el enlace»): `https://think.efeoncepro.com/muestras/sika-posible-dde148ea051c`,
+  Think `9a36dac`, en producción desde el 2026-10-12 con push autorizado. Primer uso del reproductor con el medio de
+  una propuesta; sin release ni cambios en AXIS. Modelo y reglas: [video-player.md](video-player.md#página-suelta-de-muestra-en-think-2026-10-12).
+- **Sin decidir, no resolver por cuenta propia:** la selección opcional en `cover-proposal` (se sigue borrando en
+  post), el uso de la marca del cliente en la portada (TASK-1937) y el escaneo del QR con un teléfono real.
+- Trampas medidas: [lessons.md](lessons.md), entrada del 2026-10-12.
+
+
+
+### 2026-10-07 — Skins de reproductor compartido
+
+Registro histórico de decisiones; el estado vigente está en [video-player.md](video-player.md).
+Las primeras iteraciones locales quedaron superadas por la publicación descrita al final.
+
+1. El operador pidió un reproductor portable en AXIS y confirmó tres usos: editorial, demos y revisión creativa.
+   «Vamos con todo», aprovechando la skill sin forzar recursos, autorizó implementación; no certificación visual.
+2. Pidió redondez, rechazó la propuesta Tabler y solicitó geometrías nuevas de UI moderna: familia propia curva,
+   márgenes de hover, cápsulas y targets desde tokens; sin promoción al catálogo de marca.
+3. «Vamos con todos» autorizó islas flotantes, profundidad/motion, timeline precisa, menú móvil y paneles por uso.
+   Sus reportes corrigieron volumen desbordado, controles persistentes, corte inferior vertical y hover rectangular.
+4. «Ajustemos todo» autorizó presentación embedded/contextual: el blog ocupa sólo la caja del video;
+   contexto opcional, nombre accesible conservado y controles superpuestos autoocultables.
+5. «Hazlos todos» autorizó la auditoría; eligió Think y el último artículo público para validar integración.
+   Reset de Think, subtítulos y separación thumb/Play requirieron regresiones consumidoras, no sólo el Lab.
+6. Solicitó replay dentro de La órbita y autorizó documentar/pushear: acción estática, glifo curvo número 14,
+   nombre accesible. La imagen azul reapareció; nunca se cerró por decoder o por un smoke corto.
+7. Los pushes iniciales a `codex/video-player-20261007` no eran publicación. Think Preview falló por el link
+   local a AXIS; fuente inicial `8a1c206`, deployment `dpl_3MAWPHcmSmkFtnHtFc6iKhRCp6ed`.
+8. «El paquete de axis publicalo» autorizó la publicación; «Axis y think hay que pushear a main» autorizó
+   promoción. Se descartó vendorizar: cada producto consume versión publicada exacta y lockfile.
+9. Los intentos v0.6.1/v0.6.2 no publicaron; v0.6.3 completó gates y publicó. La demora por suites repetidas
+   y dependencias Ubuntu motivó revisar la eficiencia de CI; una simplificación completa no está implementada.
+
+### Corte histórico de distribución 0.6.3 — 2026-10-07
+
+Publicados primitives 0.6.3 / tokens 0.6.0 / contracts 0.7.0, fuente `7fb549a`,
+[release 37630788367 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37630788367).
+Instalación limpia y exports/CSS/SSR verificados. AXIS `main` documental `15b1898` y Think `main` `cd428c7`,
+ambos Vercel Production Ready; Think usa registry, sin link local. WordPress permanece candidato sin activar.
+Contrato video 0.5.0 candidate; el estado de contrato no cambia por distribuir el paquete.
+El incidente azul sigue ABIERTO; AT/dispositivos físicos y streaming real no certificados.
+La referencia vigente y QA AXIS poseen evidencia y próximos pasos, sin duplicar todo el historial aquí.
+
+### Distribución vigente 0.6.5 — 2026-10-07
+
+Primitives 0.6.5 publicado; tokens 0.6.0, contracts 0.7.0 y contrato video 0.5.0 candidate conservan
+sus versiones. Fuente `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070).
+El patch distribuye la corrección de visibilidad de la órbita de replay cuando coexiste el CSS de botones.
+La corrección nació en fuente `419e3c657c23a46798db8fdf65e7c92909667d22`; el release 0.6.4
+[37664229695](https://github.com/efeoncepro/axis-design-system/actions/runs/37664229695) falló sin publicar.
+El harness móvil esperaba un click hasta el final del clip y disparaba replay; la 0.6.5 verifica la pausa
+tras aparecer los controles. Evidencia AXIS: `docs/evidence/video-player-2026-10-07/mobile-pause-trace.json`.
+Suite local completa: 80 PASS y diez exclusiones existentes; focal móvil: 3/3 PASS. El core JS no cambia.
+Think consume 0.6.5 con pin/lockfile; SHA y despliegue se registran en el runbook, sin inferirlos del release.
+El bundle WordPress exige procedencia/hash del paquete instalado y continúa sin activar. La compatibilidad
+Ohio pertenece al adapter. Imagen azul y aviso WebKit ResizeObserver permanecen abiertos; pruebas de
+callbacks en memoria no certifican persistencia, dispositivos físicos, AT ni proveedor de streaming.
+| 2026-10-12 | **Plate `HW1` reemplazado por `HW1-mismo-trabajo-sin-lanyard.png`** (operador: «el lanyard está encima del brazo y mal montado»). Borrado con `pnpm ai:inpaint erase`, resto de la foto idéntico; repuntado en catálogo, ejemplos, referencias, brochure 360 y canvas Agencia Creativa (v1). Mismo día: las tres láminas diseñadas de Revenue (`decision-provider-fit`, `content-service-lanes`, `method-agent-supervisor`) rechazadas en el 360 por la luz magenta del escenario («no sirve de acento sino de luz»); el arreglo es TASK-2012 Slice 3 (tokens AXIS), pendiente del visto bueno del operador. |

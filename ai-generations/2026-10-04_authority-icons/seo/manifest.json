@@ -1,0 +1,1711 @@
+{
+  "schema": "axis.seo-iconography-export.v1",
+  "status": "candidate",
+  "revision": "r3-authority",
+  "catalog": [
+    {
+      "key": "autoridad-dominio",
+      "label": "Autoridad de dominio",
+      "meaning": "Fortaleza estimada del dominio según una metodología declarada.",
+      "avoid": "DA de Moz, DR de Ahrefs y Authority Score de Semrush son métricas distintas; mostrar proveedor y fecha.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "autoridad-pagina",
+      "label": "Autoridad de página",
+      "meaning": "Fortaleza estimada de una URL individual.",
+      "avoid": "No equivale a autoridad de dominio. PA y UR conservan su proveedor, alcance y método.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "autoridad-marca",
+      "label": "Brand Authority",
+      "meaning": "Reconocimiento y credibilidad de una marca dentro de su categoría.",
+      "avoid": "Concepto compartido por SEO y AEO. No es DA, una mención aislada ni un score universal de IA. Si se usa Brand Authority de Moz, declarar ese proveedor y su método.",
+      "group": "Autoridad",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "backlink",
+      "label": "Backlink",
+      "meaning": "Enlace que llega desde otro sitio hacia una página.",
+      "avoid": "Un enlace entrante no equivale a un dominio referente único.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "dominios-referentes",
+      "label": "Dominios referentes",
+      "meaning": "Dominios únicos que enlazan al sitio o URL analizada.",
+      "avoid": "Varios enlaces desde el mismo dominio no se cuentan como varios dominios referentes.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "perfil-enlaces",
+      "label": "Perfil de enlaces",
+      "meaning": "Conjunto y distribución de los enlaces observados.",
+      "avoid": "El dibujo no codifica calidad ni un porcentaje; la evaluación necesita datos y criterios.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "anchor-text",
+      "label": "Anchor text",
+      "meaning": "Texto visible que sirve de ancla a un enlace.",
+      "avoid": "No representa la keyword objetivo ni demuestra relevancia por sí solo.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlaces-nuevos",
+      "label": "Enlaces nuevos",
+      "meaning": "Enlaces detectados por primera vez dentro del periodo observado.",
+      "avoid": "Nuevo para el proveedor no prueba la fecha exacta de creación del enlace.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlaces-perdidos",
+      "label": "Enlaces perdidos",
+      "meaning": "Enlaces que el proveedor dejó de observar en el periodo.",
+      "avoid": "La pérdida observada requiere verificación; no equivale automáticamente a una eliminación definitiva.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlaces-rotos",
+      "label": "Enlaces rotos",
+      "meaning": "Enlaces cuyo destino falla o no entrega el contenido esperado.",
+      "avoid": "Un enlace roto y un backlink perdido son estados distintos.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "brecha-backlinks",
+      "label": "Brecha de backlinks",
+      "meaning": "Fuentes que enlazan a competidores y faltan en el perfil analizado.",
+      "avoid": "Una brecha es una oportunidad a evaluar, no una recomendación automática de adquisición.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "relevancia-tematica",
+      "label": "Relevancia temática",
+      "meaning": "Afinidad entre el tema de una fuente y el contenido al que enlaza.",
+      "avoid": "Relevancia temática no es una puntuación de autoridad ni una garantía de posicionamiento.",
+      "group": "Perfil de enlaces",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "riesgo-enlaces",
+      "label": "Riesgo del perfil",
+      "meaning": "Señales que requieren revisión del perfil de enlaces.",
+      "avoid": "Un score de spam o toxicidad no demuestra una penalización ni autoriza un disavow automático.",
+      "group": "Evolución y diagnóstico",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "rastreo",
+      "label": "Rastreo",
+      "meaning": "Recorrido del crawler por las páginas.",
+      "avoid": "Rastrear una URL no demuestra que esté indexada.",
+      "group": "Acceso y descubrimiento",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "indexacion",
+      "label": "Indexación",
+      "meaning": "Incorporación de una página al índice.",
+      "avoid": "Estar indexada no garantiza aparecer para una consulta.",
+      "group": "Acceso y descubrimiento",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "sitemap",
+      "label": "Sitemap",
+      "meaning": "Inventario de URLs para facilitar su descubrimiento.",
+      "avoid": "Un sitemap no garantiza indexación ni representa un cluster temático.",
+      "group": "Acceso y descubrimiento",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "canonical",
+      "label": "Canonical",
+      "meaning": "URL representativa entre páginas duplicadas o similares.",
+      "avoid": "La declaración canonical no redirige al visitante.",
+      "group": "Estructura del sitio",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "redireccion",
+      "label": "Redirección",
+      "meaning": "Cambio de destino de una URL.",
+      "avoid": "El icono no distingue una redirección permanente de una temporal; se etiqueta.",
+      "group": "Estructura del sitio",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "datos-estructurados",
+      "label": "Datos estructurados",
+      "meaning": "Propiedades del contenido expresadas en un formato legible por máquinas.",
+      "avoid": "El marcado no garantiza resultados enriquecidos.",
+      "group": "Interpretación del contenido",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "renderizado",
+      "label": "Renderizado",
+      "meaning": "Código convertido en contenido visible en la página.",
+      "avoid": "El renderizado observado en un navegador no prueba el comportamiento de todos los bots.",
+      "group": "Interpretación del contenido",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlazado-interno",
+      "label": "Enlazado interno",
+      "meaning": "Conexiones entre páginas de un mismo sitio.",
+      "avoid": "No equivale a backlinks de otros dominios.",
+      "group": "Estructura del sitio",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "intencion-busqueda",
+      "label": "Intención de búsqueda",
+      "meaning": "Necesidad que la persona busca resolver con una consulta.",
+      "avoid": "Una keyword puede expresar distintas intenciones según el contexto.",
+      "group": "Estrategia de contenido",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "cluster-tematico",
+      "label": "Cluster temático",
+      "meaning": "Tema central y contenidos relacionados.",
+      "avoid": "La agrupación semántica no demuestra autoridad por sí sola.",
+      "group": "Estrategia de contenido",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "canibalizacion",
+      "label": "Canibalización",
+      "meaning": "URLs que compiten por la misma intención de búsqueda.",
+      "avoid": "Tener varias URLs sobre un tema no basta para diagnosticar canibalización.",
+      "group": "Estrategia de contenido",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "hreflang",
+      "label": "Hreflang",
+      "meaning": "Alternativas de una página por idioma y región.",
+      "avoid": "Idioma y país no son equivalentes; los códigos se declaran en texto.",
+      "group": "SEO internacional",
+      "origin": "new",
+      "status": "candidate",
+      "voice": "stroke"
+    },
+    {
+      "key": "busqueda",
+      "label": "Búsqueda",
+      "meaning": "Búsqueda de información.",
+      "avoid": "No representa un buscador específico.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "keyword",
+      "label": "Keyword",
+      "meaning": "Término de búsqueda analizado.",
+      "avoid": "Volumen estimado no equivale a tráfico medido.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "contenido",
+      "label": "Contenido",
+      "meaning": "Producción y optimización de contenido.",
+      "avoid": "Publicar no garantiza posicionamiento.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "enlace",
+      "label": "Enlace",
+      "meaning": "Enlaces y backlinks.",
+      "avoid": "Un enlace no demuestra autoridad o calidad por sí mismo.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "competencia",
+      "label": "Competencia",
+      "meaning": "Comparación con otros sitios o marcas.",
+      "avoid": "Declarar el conjunto y la metodología de comparación.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "ubicacion",
+      "label": "Ubicación",
+      "meaning": "Lugar o área atendida; contexto de SEO local.",
+      "avoid": "La ubicación no prueba presencia en un resultado local.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "posicion",
+      "label": "Posición",
+      "meaning": "Posición observada en resultados de búsqueda.",
+      "avoid": "Indicar fuente, consulta, país, dispositivo y periodo relevantes.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "impresion",
+      "label": "Impresión",
+      "meaning": "Exposición registrada en resultados.",
+      "avoid": "Una impresión no es una visita.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "clic",
+      "label": "Clic",
+      "meaning": "Clic registrado en un resultado.",
+      "avoid": "Un clic no equivale a una sesión ni una conversión.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "ctr",
+      "label": "CTR",
+      "meaning": "Proporción de clics respecto de impresiones.",
+      "avoid": "La cifra requiere el mismo alcance y periodo en numerador y denominador.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "visita",
+      "label": "Visita",
+      "meaning": "Visitas o sesiones atribuidas al canal declarado.",
+      "avoid": "Añadir la etiqueta de canal para hablar de tráfico orgánico.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    },
+    {
+      "key": "informe",
+      "label": "Informe",
+      "meaning": "Diagnóstico o reporte de SEO.",
+      "avoid": "Un snapshot conserva su fecha; no es un dato actualizado automáticamente.",
+      "group": "Herramientas y métricas",
+      "origin": "existing",
+      "status": "canonical",
+      "voice": "stroke"
+    }
+  ],
+  "files": [
+    {
+      "file": "seo-autoridad-dominio-rest-dark.svg",
+      "glyph": "autoridad-dominio",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-dominio-response-dark.svg",
+      "glyph": "autoridad-dominio",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-dominio-rest-light.svg",
+      "glyph": "autoridad-dominio",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-dominio-response-light.svg",
+      "glyph": "autoridad-dominio",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-pagina-rest-dark.svg",
+      "glyph": "autoridad-pagina",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-pagina-response-dark.svg",
+      "glyph": "autoridad-pagina",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-pagina-rest-light.svg",
+      "glyph": "autoridad-pagina",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-pagina-response-light.svg",
+      "glyph": "autoridad-pagina",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-marca-rest-dark.svg",
+      "glyph": "autoridad-marca",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-marca-response-dark.svg",
+      "glyph": "autoridad-marca",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-marca-rest-light.svg",
+      "glyph": "autoridad-marca",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-autoridad-marca-response-light.svg",
+      "glyph": "autoridad-marca",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-backlink-rest-dark.svg",
+      "glyph": "backlink",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-backlink-response-dark.svg",
+      "glyph": "backlink",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-backlink-rest-light.svg",
+      "glyph": "backlink",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-backlink-response-light.svg",
+      "glyph": "backlink",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-dominios-referentes-rest-dark.svg",
+      "glyph": "dominios-referentes",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-dominios-referentes-response-dark.svg",
+      "glyph": "dominios-referentes",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-dominios-referentes-rest-light.svg",
+      "glyph": "dominios-referentes",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-dominios-referentes-response-light.svg",
+      "glyph": "dominios-referentes",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-perfil-enlaces-rest-dark.svg",
+      "glyph": "perfil-enlaces",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-perfil-enlaces-response-dark.svg",
+      "glyph": "perfil-enlaces",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-perfil-enlaces-rest-light.svg",
+      "glyph": "perfil-enlaces",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-perfil-enlaces-response-light.svg",
+      "glyph": "perfil-enlaces",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-anchor-text-rest-dark.svg",
+      "glyph": "anchor-text",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-anchor-text-response-dark.svg",
+      "glyph": "anchor-text",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-anchor-text-rest-light.svg",
+      "glyph": "anchor-text",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-anchor-text-response-light.svg",
+      "glyph": "anchor-text",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-nuevos-rest-dark.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-nuevos-response-dark.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-nuevos-rest-light.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-nuevos-response-light.svg",
+      "glyph": "enlaces-nuevos",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-perdidos-rest-dark.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-perdidos-response-dark.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-perdidos-rest-light.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-perdidos-response-light.svg",
+      "glyph": "enlaces-perdidos",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-rotos-rest-dark.svg",
+      "glyph": "enlaces-rotos",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-rotos-response-dark.svg",
+      "glyph": "enlaces-rotos",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-rotos-rest-light.svg",
+      "glyph": "enlaces-rotos",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlaces-rotos-response-light.svg",
+      "glyph": "enlaces-rotos",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-brecha-backlinks-rest-dark.svg",
+      "glyph": "brecha-backlinks",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-brecha-backlinks-response-dark.svg",
+      "glyph": "brecha-backlinks",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-brecha-backlinks-rest-light.svg",
+      "glyph": "brecha-backlinks",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-brecha-backlinks-response-light.svg",
+      "glyph": "brecha-backlinks",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-relevancia-tematica-rest-dark.svg",
+      "glyph": "relevancia-tematica",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-relevancia-tematica-response-dark.svg",
+      "glyph": "relevancia-tematica",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-relevancia-tematica-rest-light.svg",
+      "glyph": "relevancia-tematica",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-relevancia-tematica-response-light.svg",
+      "glyph": "relevancia-tematica",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-riesgo-enlaces-rest-dark.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-riesgo-enlaces-response-dark.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-riesgo-enlaces-rest-light.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-riesgo-enlaces-response-light.svg",
+      "glyph": "riesgo-enlaces",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-rastreo-rest-dark.svg",
+      "glyph": "rastreo",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-rastreo-response-dark.svg",
+      "glyph": "rastreo",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-rastreo-rest-light.svg",
+      "glyph": "rastreo",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-rastreo-response-light.svg",
+      "glyph": "rastreo",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-indexacion-rest-dark.svg",
+      "glyph": "indexacion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-indexacion-response-dark.svg",
+      "glyph": "indexacion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-indexacion-rest-light.svg",
+      "glyph": "indexacion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-indexacion-response-light.svg",
+      "glyph": "indexacion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-sitemap-rest-dark.svg",
+      "glyph": "sitemap",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-sitemap-response-dark.svg",
+      "glyph": "sitemap",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-sitemap-rest-light.svg",
+      "glyph": "sitemap",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-sitemap-response-light.svg",
+      "glyph": "sitemap",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canonical-rest-dark.svg",
+      "glyph": "canonical",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canonical-response-dark.svg",
+      "glyph": "canonical",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canonical-rest-light.svg",
+      "glyph": "canonical",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canonical-response-light.svg",
+      "glyph": "canonical",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-redireccion-rest-dark.svg",
+      "glyph": "redireccion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-redireccion-response-dark.svg",
+      "glyph": "redireccion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-redireccion-rest-light.svg",
+      "glyph": "redireccion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-redireccion-response-light.svg",
+      "glyph": "redireccion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-datos-estructurados-rest-dark.svg",
+      "glyph": "datos-estructurados",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-datos-estructurados-response-dark.svg",
+      "glyph": "datos-estructurados",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-datos-estructurados-rest-light.svg",
+      "glyph": "datos-estructurados",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-datos-estructurados-response-light.svg",
+      "glyph": "datos-estructurados",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-renderizado-rest-dark.svg",
+      "glyph": "renderizado",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-renderizado-response-dark.svg",
+      "glyph": "renderizado",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-renderizado-rest-light.svg",
+      "glyph": "renderizado",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-renderizado-response-light.svg",
+      "glyph": "renderizado",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlazado-interno-rest-dark.svg",
+      "glyph": "enlazado-interno",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlazado-interno-response-dark.svg",
+      "glyph": "enlazado-interno",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlazado-interno-rest-light.svg",
+      "glyph": "enlazado-interno",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-enlazado-interno-response-light.svg",
+      "glyph": "enlazado-interno",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-intencion-busqueda-rest-dark.svg",
+      "glyph": "intencion-busqueda",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-intencion-busqueda-response-dark.svg",
+      "glyph": "intencion-busqueda",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-intencion-busqueda-rest-light.svg",
+      "glyph": "intencion-busqueda",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-intencion-busqueda-response-light.svg",
+      "glyph": "intencion-busqueda",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-cluster-tematico-rest-dark.svg",
+      "glyph": "cluster-tematico",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-cluster-tematico-response-dark.svg",
+      "glyph": "cluster-tematico",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-cluster-tematico-rest-light.svg",
+      "glyph": "cluster-tematico",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-cluster-tematico-response-light.svg",
+      "glyph": "cluster-tematico",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canibalizacion-rest-dark.svg",
+      "glyph": "canibalizacion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canibalizacion-response-dark.svg",
+      "glyph": "canibalizacion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canibalizacion-rest-light.svg",
+      "glyph": "canibalizacion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-canibalizacion-response-light.svg",
+      "glyph": "canibalizacion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-hreflang-rest-dark.svg",
+      "glyph": "hreflang",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-hreflang-response-dark.svg",
+      "glyph": "hreflang",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-hreflang-rest-light.svg",
+      "glyph": "hreflang",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-hreflang-response-light.svg",
+      "glyph": "hreflang",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "candidate"
+    },
+    {
+      "file": "seo-busqueda-rest-dark.svg",
+      "glyph": "busqueda",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-busqueda-response-dark.svg",
+      "glyph": "busqueda",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-busqueda-rest-light.svg",
+      "glyph": "busqueda",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-busqueda-response-light.svg",
+      "glyph": "busqueda",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-keyword-rest-dark.svg",
+      "glyph": "keyword",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-keyword-response-dark.svg",
+      "glyph": "keyword",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-keyword-rest-light.svg",
+      "glyph": "keyword",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-keyword-response-light.svg",
+      "glyph": "keyword",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-contenido-rest-dark.svg",
+      "glyph": "contenido",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-contenido-response-dark.svg",
+      "glyph": "contenido",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-contenido-rest-light.svg",
+      "glyph": "contenido",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-contenido-response-light.svg",
+      "glyph": "contenido",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-enlace-rest-dark.svg",
+      "glyph": "enlace",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-enlace-response-dark.svg",
+      "glyph": "enlace",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-enlace-rest-light.svg",
+      "glyph": "enlace",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-enlace-response-light.svg",
+      "glyph": "enlace",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-competencia-rest-dark.svg",
+      "glyph": "competencia",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-competencia-response-dark.svg",
+      "glyph": "competencia",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-competencia-rest-light.svg",
+      "glyph": "competencia",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-competencia-response-light.svg",
+      "glyph": "competencia",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ubicacion-rest-dark.svg",
+      "glyph": "ubicacion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ubicacion-response-dark.svg",
+      "glyph": "ubicacion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ubicacion-rest-light.svg",
+      "glyph": "ubicacion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ubicacion-response-light.svg",
+      "glyph": "ubicacion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-posicion-rest-dark.svg",
+      "glyph": "posicion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-posicion-response-dark.svg",
+      "glyph": "posicion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-posicion-rest-light.svg",
+      "glyph": "posicion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-posicion-response-light.svg",
+      "glyph": "posicion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-impresion-rest-dark.svg",
+      "glyph": "impresion",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-impresion-response-dark.svg",
+      "glyph": "impresion",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-impresion-rest-light.svg",
+      "glyph": "impresion",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-impresion-response-light.svg",
+      "glyph": "impresion",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-clic-rest-dark.svg",
+      "glyph": "clic",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-clic-response-dark.svg",
+      "glyph": "clic",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-clic-rest-light.svg",
+      "glyph": "clic",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-clic-response-light.svg",
+      "glyph": "clic",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ctr-rest-dark.svg",
+      "glyph": "ctr",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ctr-response-dark.svg",
+      "glyph": "ctr",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ctr-rest-light.svg",
+      "glyph": "ctr",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-ctr-response-light.svg",
+      "glyph": "ctr",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-visita-rest-dark.svg",
+      "glyph": "visita",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-visita-response-dark.svg",
+      "glyph": "visita",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-visita-rest-light.svg",
+      "glyph": "visita",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-visita-response-light.svg",
+      "glyph": "visita",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-informe-rest-dark.svg",
+      "glyph": "informe",
+      "state": "rest",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-informe-response-dark.svg",
+      "glyph": "informe",
+      "state": "response",
+      "surface": "dark",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-informe-rest-light.svg",
+      "glyph": "informe",
+      "state": "rest",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    },
+    {
+      "file": "seo-informe-response-light.svg",
+      "glyph": "informe",
+      "state": "response",
+      "surface": "light",
+      "line": "engine",
+      "size": 96,
+      "status": "canonical"
+    }
+  ]
+}

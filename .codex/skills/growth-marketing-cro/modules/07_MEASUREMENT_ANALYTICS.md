@@ -32,7 +32,7 @@ Convenciones canónicas:
 ```
 1. Consent management (base legal; Consent Mode v2)          → legalidad + señal
 2. First-party & zero-party data capture                     → el activo propio
-3. Server-side event routing (CAPI / sGTM)                   → resiliencia a bloqueadores
+3. Server-side event routing (CAPI / sGTM)                   → control del envío y datos
 4. Analytics (GA4) + producto (Amplitude/Mixpanel)           → comportamiento
 5. Warehouse (BigQuery/Snowflake) + dashboard                → una fuente de verdad
 6. Medición modelada: MMM y/o incrementality                 → asignación causal
@@ -40,8 +40,12 @@ Convenciones canónicas:
 
 - **Consent Mode v2:** alta adopción en EEA pero ~67% mal implementado; solo ~23%
   recupera el dato prometido. Implementarlo bien es condición para medir, no un checkbox.
-- **Server-side tracking (CAPI/server-GTM):** envía eventos desde el servidor → resiste
-  ITP/adblockers, controla el dato, mejora la calidad de conversión enviada a plataformas.
+- **Server-side tracking (CAPI/server-GTM):** procesa/envía desde el servidor, pero el
+  ingreso originado en navegador sigue sujeto a pérdida de señal. No garantiza evasión
+  de ITP/adblockers ni autorización para enviar. Para Efeonce, CAPI usa GTM **Server**:
+  [runbook canónico](../../../../docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md)
+  + skill `greenhouse-gtm-ga4-operator`; Lead procede del backend tras aceptación comercial,
+  consentimiento y dedupe. Pixel web y GA4 no certifican entrega CAPI.
 - **Warehouse-native:** métricas calculadas en el warehouse = una sola fuente de verdad
   (evita el "las métricas del tool no cuadran con negocio"). Habilita experimentación
   warehouse-native (Eppo/GrowthBook, `04`).

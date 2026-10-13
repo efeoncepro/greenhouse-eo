@@ -1,0 +1,25 @@
+{
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:image",
+    "--model",
+    "gpt-image-2.5-flare",
+    "--quality",
+    "max",
+    "--size",
+    "2048x2048",
+    "--background",
+    "opaque",
+    "--image",
+    "../axis-design-system/docs/agent-composition/iconography/plastilina-style-reference.png",
+    "--prompt-file",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/prompts/sheet.txt",
+    "--out",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flat/sheet.png",
+    "--timeout",
+    "600000"
+  ],
+  "elapsedSeconds": 53.3239381313324,
+  "exitCode": 0
+}

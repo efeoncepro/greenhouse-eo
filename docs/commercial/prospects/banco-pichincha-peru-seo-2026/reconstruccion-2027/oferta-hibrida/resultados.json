@@ -1,0 +1,227 @@
+{
+  "date": "2026-10-07",
+  "status": "proposed_hybrid_not_contract_or_activated_services",
+  "base_monthly_usd": 4500,
+  "prior_fixed_fee_usd": 8000,
+  "fixed_commitment_reduction_pct": 0.4375,
+  "prior_cost_sources_preserved": true,
+  "cost_updated_for_five_articles": true,
+  "writer_full_monthly_cost_in_base": true,
+  "articles_monthly_capacity_max": 5,
+  "capacity_hours_before": 2216,
+  "capacity_hours_now": 2924,
+  "sessions_removed": true,
+  "pr_reinforcement_hours_per_round": 20,
+  "production_is_capacity_not_traffic_forecast": true,
+  "evolutionary_delivery": true,
+  "faq_fixed_quota_removed": true,
+  "editorial_improvement_hours_reallocated": 36,
+  "productive_hours_per_role_month": 120,
+  "aeo_questions": 24,
+  "aeo_surfaces": 3,
+  "aeo_baseline_observations": 72,
+  "aeo_monthly_observations_from_m2": 144,
+  "aeo_annual_observations": 1656,
+  "aeo_extra_SEO_hours": 92,
+  "aeo_hours_per_month": 12,
+  "original_funnel_and_research_unchanged": true,
+  "fixed_SEO_hiring_cost_in_base": true,
+  "monthly_other_cost_not_paid_media": true,
+  "catalog": [
+    {
+      "id": "BASE",
+      "capability": "Servicio continuo SEO/AEO",
+      "price_usd": 4500,
+      "billing_unit": "mes",
+      "full_plan_units": 12,
+      "scope": "SEO técnico y schema pertinentes dentro de 8h CMS/mes, Panel AEO de 24 preguntas en 3 superficies: 72 observaciones iniciales y 144/mes desde M2, hasta 5 artículos/mes, evolución de contenidos y FAQ según evidencia, implementación web priorizada, medición, CRO y dirección",
+      "activation_terms": "12 meses; revisión trimestral"
+    },
+    {
+      "id": "HUB",
+      "capability": "Content hub WordPress",
+      "price_usd": 3000,
+      "billing_unit": "proyecto",
+      "full_plan_units": 1,
+      "scope": "Arquitectura y diseño, hasta tres plantillas sobre sitio existente, implementación y QA",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M1–M2"
+    },
+    {
+      "id": "CALCULADORA",
+      "capability": "Mejora de calculadora existente",
+      "price_usd": 1200,
+      "billing_unit": "proyecto",
+      "full_plan_units": 1,
+      "scope": "Revisión y mejora de una calculadora existente, fórmula, UX y QA",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M2"
+    },
+    {
+      "id": "COMPARADOR",
+      "capability": "Comparador de ahorro",
+      "price_usd": 4000,
+      "billing_unit": "proyecto",
+      "full_plan_units": 1,
+      "scope": "Una herramienta para hasta cinco productos, criterios/fuentes aprobados y actualización manual",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M3–M4"
+    },
+    {
+      "id": "PLANIFICADOR",
+      "capability": "Planificador de ahorro",
+      "price_usd": 3000,
+      "billing_unit": "proyecto",
+      "full_plan_units": 1,
+      "scope": "Una herramienta para meta, aporte y plazo; método validado y QA",
+      "activation_terms": "50% inicio y 50% aceptación; referencia M5–M6"
+    },
+    {
+      "id": "COMUNIDAD",
+      "capability": "Comunidad y distribución",
+      "price_usd": 1000,
+      "billing_unit": "mes activo",
+      "full_plan_units": 12,
+      "scope": "Una newsletter, cuatro adaptaciones y hasta 16h de escucha/moderación mensual en canales acordados",
+      "activation_terms": "Activación mínima 3 meses; luego mensual"
+    },
+    {
+      "id": "PR",
+      "capability": "Campaña de PR y autoridad",
+      "price_usd": 2000,
+      "billing_unit": "campaña",
+      "full_plan_units": 4,
+      "scope": "Recurso/dossier sobre activo existente, 3 ángulos, 12 propuestas a medios, vocería y seguimiento",
+      "activation_terms": "6–8 semanas por campaña; 50% inicio y 50% cierre de entregables"
+    },
+    {
+      "id": "REFUERZO_PR",
+      "capability": "Refuerzo de gestión editorial y enlaces",
+      "price_usd": 500,
+      "billing_unit": "ronda",
+      "full_plan_units": 4,
+      "scope": "Revisión de hasta 10 oportunidades adicionales; hasta 6 gestiones personalizadas y un seguimiento por gestión; verificación de referencias sin duplicar campañas",
+      "activation_terms": "3–4 semanas por ronda; 50% inicio y 50% cierre; no garantiza publicaciones/enlaces"
+    },
+    {
+      "id": "CUIDADO",
+      "capability": "Mantenimiento de herramientas",
+      "price_usd": 200,
+      "billing_unit": "mes activo",
+      "full_plan_units": 10,
+      "scope": "Hasta 4h/mes para hasta tres herramientas entregadas; fórmulas, condiciones y QA menor",
+      "activation_terms": "Desde entrega y fin de garantía correctiva; mensual"
+    }
+  ],
+  "plans": [
+    {
+      "plan": "base",
+      "fixed_annual_fee_usd": 54000,
+      "optional_planned_usd": 0,
+      "total_planned_usd": 54000,
+      "average_monthly_usd": 4500.0,
+      "peak_monthly_usd": 4500,
+      "central_cost_usd": 44645.44166666666,
+      "central_gross_margin": 0.17323256172839518,
+      "high_cost_usd": 49726.53,
+      "high_cost_gross_margin": 0.07913833333333331,
+      "articles_capacity_max": 60,
+      "faq_policy": "segun_evidencia_sin_cuota",
+      "newsletters": 0,
+      "adaptations": 0,
+      "pr_campaigns": 0,
+      "pr_reinforcement_rounds": 0,
+      "new_tools": 0,
+      "units": {
+        "BASE": 12,
+        "HUB": 0,
+        "CALCULADORA": 0,
+        "COMPARADOR": 0,
+        "PLANIFICADOR": 0,
+        "COMUNIDAD": 0,
+        "PR": 0,
+        "REFUERZO_PR": 0,
+        "CUIDADO": 0
+      }
+    },
+    {
+      "plan": "integral",
+      "fixed_annual_fee_usd": 54000,
+      "optional_planned_usd": 35200.0,
+      "total_planned_usd": 89200.0,
+      "average_monthly_usd": 7433.333333333333,
+      "peak_monthly_usd": 9700.0,
+      "central_cost_usd": 62548.90416666666,
+      "central_gross_margin": 0.2987791012705532,
+      "high_cost_usd": 71323.565,
+      "high_cost_gross_margin": 0.20040846412556046,
+      "articles_capacity_max": 60,
+      "faq_policy": "segun_evidencia_sin_cuota",
+      "newsletters": 12,
+      "adaptations": 48,
+      "pr_campaigns": 4,
+      "pr_reinforcement_rounds": 4,
+      "new_tools": 2.0,
+      "units": {
+        "BASE": 12,
+        "HUB": 1.0,
+        "CALCULADORA": 1,
+        "COMPARADOR": 1.0,
+        "PLANIFICADOR": 1.0,
+        "COMUNIDAD": 12,
+        "PR": 4,
+        "REFUERZO_PR": 4,
+        "CUIDADO": 10
+      }
+    },
+    {
+      "plan": "gradual",
+      "fixed_annual_fee_usd": 54000,
+      "optional_planned_usd": 25200.0,
+      "total_planned_usd": 79200.0,
+      "average_monthly_usd": 6600.0,
+      "peak_monthly_usd": 7700,
+      "central_cost_usd": 57897.950657894726,
+      "central_gross_margin": 0.26896526947102617,
+      "high_cost_usd": 65789.8846491228,
+      "high_cost_gross_margin": 0.16931963826865148,
+      "articles_capacity_max": 60,
+      "faq_policy": "segun_evidencia_sin_cuota",
+      "newsletters": 10,
+      "adaptations": 40,
+      "pr_campaigns": 2,
+      "pr_reinforcement_rounds": 2,
+      "new_tools": 1.0,
+      "units": {
+        "BASE": 12,
+        "HUB": 1.0,
+        "CALCULADORA": 1,
+        "COMPARADOR": 1.0,
+        "PLANIFICADOR": 0,
+        "COMUNIDAD": 10,
+        "PR": 2,
+        "REFUERZO_PR": 2,
+        "CUIDADO": 10
+      }
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "reconstruccion-2027/conexion-demanda-plan/costeo-interno.csv",
+      "sha256": "b14dcdd52a633e3698cb3970df26266c88040be88e356403980260e2182ca59a"
+    },
+    {
+      "path": "reconstruccion-2027/conexion-demanda-plan/capacidad-por-mes.csv",
+      "sha256": "a9937b641c04736b222e4b3caa4caa1cf8a7f9d4cd36a5fcc31fad8c0006e508"
+    },
+    {
+      "path": "reconstruccion-2027/conexion-demanda-plan/inputs.json",
+      "sha256": "707cb26fbb20046d8f7fe8dec915d93afd4bc267f39ac8e39f7087e3b741d643"
+    },
+    {
+      "path": "reconstruccion-2027/economia/Pibank-decision-inversion-2027.xlsx",
+      "sha256": "d87c2aabdf7a3a04ff59a719c48a747ab19a3d689eaa14e6d22427d455f7207e"
+    },
+    {
+      "path": "research/pibank-gap-closure-2026-10-06/plan-busquedas.csv",
+      "sha256": "0731a5188dd1f54b642766b6390b7834ecd2f6bb70170b2582a4275f15919b79"
+    }
+  ]
+}

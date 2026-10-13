@@ -1,0 +1,41 @@
+{
+  "id": "CT16-seleccion-creadores",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark casting room at night with thin haze): Isabella, wearing the ROYAL-BLUE EFEONCE HOODIE, stands behind a long dark table on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. On the far half of the table, on her frame-right, stands ONE neat row of exactly FIVE identical matte dark-grey cards the size of a postcard, each upright on a tiny black stand and facing the camera: the FIRST at about 72 % of the frame width, the FIFTH at about 96 %, evenly spaced and receding slightly in depth; each shows only a plain pale-grey head-and-shoulders silhouette, no face, no text; they give no light of their own and are lit only faintly by the card she holds: dim, but clearly readable as cards. THE MOMENT: with the hand on the frame-right side of her body she has just lifted a SIXTH card from the row and holds it upright at lower-chest height, at about 80 % of the frame width, clear of her chest so the mark on her hoodie stays fully visible; this one card glows cool white from within, its edges traced by a hair-thin azure-blue (#0375DB) glow, and shows the same plain head-and-shoulders silhouette, now bright; at its top corner sits one small crisp orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. She looks at the glowing card with a sure, satisfied half-smile; head almost frontal, only her eyes turn slightly down toward the card; her upper eyelids stay above the irises. The glowing card is the only key light and lights her face from below and from the frame-right, cool white; both eyes stay readable, with a catchlight. Her whole arm is visible; the hand is no longer from wrist to fingertips than her face from chin to hairline. The table top is matte black and non-reflective; its near edge runs just in front of the lens and its near half stays black. The cards and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the plain unlit black wall of the room: no lamps, no screens and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte table edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "SA1",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "llave": {
+    "fuente": "the single glowing card she holds upright",
+    "lado": "below and to the frame-right of her face, at lower-chest height",
+    "distancia": "about 45 cm from her face"
+  },
+  "fondo": "the dark wall of the casting room far behind her on the right, with two or three small cold bokeh points",
+  "fenomeno": {
+    "que": "among six identical dark cards, the one she lifts is the only one that lights up",
+    "esServicio": "Selección de creadores: de muchos candidatos, el que encaja con la marca"
+  },
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "atmosfera": "bruma"
+}

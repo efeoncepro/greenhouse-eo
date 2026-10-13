@@ -137,12 +137,21 @@ export const toolIsotype = (name: unknown, what: string): { ref: string; asset: 
   return { ref, asset: { ref, kind: 'file', path: `${TOOL_DIR}/${name}-isotype.svg` } }
 }
 
-/** Una herramienta del intent: un isotipo del catálogo o `sf-icon:<producto>` (ícono oficial de Salesforce). */
+/**
+ * Una herramienta del intent: un isotipo del catálogo, `sf-icon:<producto>` (ícono oficial de Salesforce) o
+ * `hs-icon:<hub>` (ícono oficial de un Hub de HubSpot, TASK-1943).
+ */
 const toolMark = (value: unknown, what: string): { key: string; ref: string; asset: SurfaceAssetRequest } => {
   if (typeof value === 'string' && value.startsWith('sf-icon:')) {
     const product = value.slice('sf-icon:'.length)
 
     return { key: product, ...productIcon(product, what) }
+  }
+
+  if (typeof value === 'string' && value.startsWith('hs-icon:')) {
+    const hub = value.slice('hs-icon:'.length)
+
+    return { key: `hubspot-${hub}`, ...productIcon(hub, what, 'revenue-hubspot') }
   }
 
   return { key: String(value), ...toolIsotype(value, what) }
@@ -184,7 +193,7 @@ export const contentDayReleaseCycle: RecipeBuilder = ({ intent, manifest, recipe
 
   const r = (intent.release ?? {}) as ReleaseIntent
   const current = indexIn(r.currentStep, steps.labels.length, 'El paso actual del ciclo (`release.currentStep`)')
-  const icon = productIcon(r.icon, 'El producto del release (`release.icon`)')
+  const icon = productIcon(r.icon, 'El producto del release (`release.icon`)', line)
   const videoTool = toolIsotype(r.videoTool, 'La herramienta del video (`release.videoTool`)')
   const duration = req(r.videoDuration, 'La duración del video (`release.videoDuration`)')
 

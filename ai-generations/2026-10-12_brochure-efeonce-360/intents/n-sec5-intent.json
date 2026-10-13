@@ -1,0 +1,21 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.1",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "section",
+  "recipe": "section-classic",
+  "line": "growth",
+  "theme": "light",
+  "progress": {
+    "sections": 5,
+    "current": 5
+  },
+  "voice": {
+    "question": "¿Cómo sé que crezco?",
+    "answer": [
+      "Con números"
+    ]
+  },
+  "use": "brochure"
+}

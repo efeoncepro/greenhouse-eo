@@ -1,4 +1,4 @@
-import { Geist, Poppins } from 'next/font/google'
+import localFont from 'next/font/local'
 
 import { getLocale } from 'next-intl/server'
 
@@ -18,6 +18,7 @@ import { getSystemMode } from '@core/utils/serverHelpers'
 import { localeDirections } from '@/i18n/locales'
 
 import type { Locale } from '@/lib/copy'
+import { PORTAL_DEFAULT_TITLE } from '@/lib/copy/portal-metadata'
 
 // Style Imports
 import '@/app/globals.css'
@@ -32,17 +33,21 @@ import '@flaticon/flaticon-uicons/css/regular/rounded.css'
 // Geist Sans = product UI base (body, controls, tables, KPIs, IDs, amounts via tabular-nums)
 // Poppins = display only, restricted to h1-h4 in mergedTheme.ts
 // Source of truth: docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md §3 (v1.2)
-const geist = Geist({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+const geist = localFont({
+  src: '../assets/fonts/web/Geist-Latin-Variable.woff2',
+  weight: '400 800',
+  style: 'normal',
   variable: '--font-geist',
   display: 'swap',
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
 })
 
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
+const poppins = localFont({
+  src: [
+    { path: '../assets/fonts/web/Poppins-Latin-600.woff2', weight: '600', style: 'normal' },
+    { path: '../assets/fonts/web/Poppins-Latin-700.woff2', weight: '700', style: 'normal' },
+    { path: '../assets/fonts/web/Poppins-Latin-800.woff2', weight: '800', style: 'normal' }
+  ],
   variable: '--font-poppins',
   display: 'swap',
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
@@ -53,7 +58,7 @@ const poppins = Poppins({
 // Declararlo en ambos lados sirve /favicon.ico en 404 y deja al navegador mostrando el
 // ícono viejo cacheado antes de pintar el nuestro. Regenerar: pnpm branding:favicon
 export const metadata: Metadata = {
-  title: 'Greenhouse Portal',
+  title: PORTAL_DEFAULT_TITLE,
   description: 'Client portal for project visibility, delivery performance, and sprint health.'
 }
 

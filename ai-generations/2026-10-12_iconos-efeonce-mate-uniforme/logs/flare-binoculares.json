@@ -1,0 +1,30 @@
+{
+  "lane": "flare",
+  "icon": "binoculares",
+  "elapsedSeconds": 48.948670864105225,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:image",
+    "--model",
+    "gpt-image-2.5-flare",
+    "--quality",
+    "max",
+    "--size",
+    "2048x2048",
+    "--background",
+    "opaque",
+    "--format",
+    "png",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/prompts/binoculares.txt",
+    "--image",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/binoculares.png",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/binoculares.png",
+    "--timeout",
+    "600000"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/binoculares.png"
+}

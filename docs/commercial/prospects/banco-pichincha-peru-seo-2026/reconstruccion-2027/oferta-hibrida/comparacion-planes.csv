@@ -1,0 +1,4 @@
+plan,fixed_annual_fee_usd,optional_planned_usd,total_planned_usd,average_monthly_usd,peak_monthly_usd,central_cost_usd,central_gross_margin,high_cost_usd,high_cost_gross_margin,articles_capacity_max,faq_policy,newsletters,adaptations,pr_campaigns,pr_reinforcement_rounds,new_tools
+base,54000,0,54000,4500.0,4500,44645.44166666666,0.17323256172839518,49726.53,0.07913833333333331,60,segun_evidencia_sin_cuota,0,0,0,0,0
+integral,54000,35200.0,89200.0,7433.333333333333,9700.0,62548.90416666666,0.2987791012705532,71323.565,0.20040846412556046,60,segun_evidencia_sin_cuota,12,48,4,4,2.0
+gradual,54000,25200.0,79200.0,6600.0,7700,57897.950657894726,0.26896526947102617,65789.8846491228,0.16931963826865148,60,segun_evidencia_sin_cuota,10,40,2,2,1.0

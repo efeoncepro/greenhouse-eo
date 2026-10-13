@@ -1,0 +1,152 @@
+{
+  "as_of": "2026-10-07T00:16:51.811861+00:00",
+  "nature": "Requisitos desde la meta; no forecast ni metas de canal acordadas",
+  "planning_window_months": 12,
+  "bank_goal_period_confirmed": false,
+  "goal_usd_equivalent_provisional": 38000000,
+  "ticket_usd_equivalent_provisional": 2500,
+  "conversion_tests": {
+    "visit_to_open": 0.02,
+    "open_to_funded": 0.65
+  },
+  "funded_goal_rows": [
+    {
+      "share": 1,
+      "initial_deposits_required_usd_equivalent": 38000000,
+      "funded_accounts_required": 15200.0,
+      "openings_required": 23384.615384615383,
+      "eligible_visits_required": 1169230.769230769,
+      "annual_average_monthly_visits": 97435.89743589742,
+      "requirement_over_partial_eligible_panel": 35.20718967873439,
+      "display": {
+        "funded": 15200,
+        "opened": 23385,
+        "visits": 1169231
+      }
+    },
+    {
+      "share": 0.1,
+      "initial_deposits_required_usd_equivalent": 3800000.0,
+      "funded_accounts_required": 1520.0,
+      "openings_required": 2338.4615384615386,
+      "eligible_visits_required": 116923.07692307692,
+      "annual_average_monthly_visits": 9743.589743589744,
+      "requirement_over_partial_eligible_panel": 3.520718967873439,
+      "display": {
+        "funded": 1520,
+        "opened": 2339,
+        "visits": 116924
+      }
+    },
+    {
+      "share": 0.05,
+      "initial_deposits_required_usd_equivalent": 1900000.0,
+      "funded_accounts_required": 760.0,
+      "openings_required": 1169.2307692307693,
+      "eligible_visits_required": 58461.53846153846,
+      "annual_average_monthly_visits": 4871.794871794872,
+      "requirement_over_partial_eligible_panel": 1.7603594839367196,
+      "display": {
+        "funded": 760,
+        "opened": 1170,
+        "visits": 58462
+      }
+    },
+    {
+      "share": 0.01,
+      "initial_deposits_required_usd_equivalent": 380000.0,
+      "funded_accounts_required": 152.0,
+      "openings_required": 233.84615384615384,
+      "eligible_visits_required": 11692.307692307691,
+      "annual_average_monthly_visits": 974.3589743589743,
+      "requirement_over_partial_eligible_panel": 0.3520718967873439,
+      "display": {
+        "funded": 152,
+        "opened": 234,
+        "visits": 11693
+      }
+    }
+  ],
+  "opening_goal_alternative": {
+    "openings": 15200,
+    "funded_conditional": 9880.0,
+    "initial_deposit_conditional": 24700000.0,
+    "visits_required": 760000.0
+  },
+  "visit_sensitivity": [
+    {
+      "opening_rate_test": 0.01,
+      "funding_rate_test": 0.65,
+      "visits_for_all_goal": 2338461.538461538,
+      "visits_for_5pct_goal": 116923.07692307692
+    },
+    {
+      "opening_rate_test": 0.02,
+      "funding_rate_test": 0.65,
+      "visits_for_all_goal": 1169230.769230769,
+      "visits_for_5pct_goal": 58461.53846153846
+    },
+    {
+      "opening_rate_test": 0.04,
+      "funding_rate_test": 0.65,
+      "visits_for_all_goal": 584615.3846153845,
+      "visits_for_5pct_goal": 29230.76923076923
+    }
+  ],
+  "cutoff_stock_sensitivity": [
+    {
+      "external_share_test": 1,
+      "retained_balance_factor_at_cutoff_test": 1,
+      "funded_required": 15200.0,
+      "openings_required": 23384.615384615383,
+      "visits_required": 1169230.769230769
+    },
+    {
+      "external_share_test": 1,
+      "retained_balance_factor_at_cutoff_test": 0.8,
+      "funded_required": 19000.0,
+      "openings_required": 29230.76923076923,
+      "visits_required": 1461538.4615384615
+    },
+    {
+      "external_share_test": 0.7,
+      "retained_balance_factor_at_cutoff_test": 0.8,
+      "funded_required": 27142.85714285714,
+      "openings_required": 41758.241758241755,
+      "visits_required": 2087912.0879120878
+    }
+  ],
+  "reverse_search_5pct_acquisition_only": {
+    "capture_visits_per_eligible_search_test": 0.1,
+    "eligibility_test": 0.75,
+    "proxy_searches_monthly_required": 64957.264957264946,
+    "interpretation": "Sólo si toda la contribución procediera de adquisición orgánica nueva; tasa efectiva de captura de prueba, no CTR medido ni TAM"
+  },
+  "partial_panel": {
+    "proxy_searches_monthly": 3690,
+    "planning_months": 12,
+    "annual_proxy_searches": 44280,
+    "eligibility_test": 0.75,
+    "eligible_proxy_searches": 33210.0,
+    "meaning": "canasta parcial con solapamiento residual; no TAM, visitas, personas ni forecast SEO"
+  },
+  "traffic_conversion_example": {
+    "reference_visits_test": 10000,
+    "old_opening_rate_test": 0.02,
+    "new_opening_rate_test": 0.03,
+    "additional_openings_conditional": 100,
+    "funding_rate_fixed_test": 0.65,
+    "additional_funded_conditional": 65,
+    "additional_initial_deposit_conditional": 162500
+  },
+  "activation_example": {
+    "reference_openings_test": 10000,
+    "old_funding_rate_test": 0.65,
+    "new_funding_rate_test": 0.75,
+    "additional_funded_conditional": 1000,
+    "additional_initial_deposit_conditional": 2500000
+  },
+  "validation": "7 independent arithmetic identities PASS; no rounding propagated",
+  "source_inputs_sha256": "f12263f1dd914485b9e2658980ff1fc5749d975e7b7e534f56a3bdc1e69c7aaf",
+  "client_outputs_modified": false
+}

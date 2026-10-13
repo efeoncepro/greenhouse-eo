@@ -28,6 +28,24 @@ medir 24 meses de pipeline, win/loss, segmento, margen, demanda y expansión por
 
 ---
 
+## Efeonce Factory — vía On-Demand aceptada el 2026-10-05
+
+Factory complementa la base de retainers con encargos rentables por sí mismos y caja adicional. Empaque mínimo y
+venta en paralelo, con web, contenidos, audiovisual, medios y otras capacidades actuales. Campaña y kit son
+ejemplos opcionales; el alcance y equipo se configuran por oportunidad. Las cuatro entradas son licitaciones
+públicas, licitaciones privadas, prospección fría y paid media. Cada una converge en calificación, propuesta y
+activación del encargo; costo de adquisición, decisión y cobro se registran por separado. No cambia los
+porcentajes de motores ni supone conversión a retainer.
+
+Clasificación previa: Factory sólo On-Demand; servicios mensuales y operación continua bajo Efeonce. Las cuotas
+de un proyecto no prueban recurrencia ni MRR.
+
+La meta de caja, disponibilidad reportada, economics, OT/brief, CX y validación viven en el
+[Business Model Factory](../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md); la
+[guía de encargos](../services/factory/README.md) orienta el empaque y la compra. La
+[decisión](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) está aceptada; pricing, plazos,
+capacidad y demanda se validan por oferta/encargo. No acredita billing ni workflow Factory implementados.
+
 ## Narrativa go-to-market Q4 2026 – Q3 2027
 
 **«Tu IA no conoce tu negocio»** es la plataforma narrativa integrada (orgánica y pagada) del período: Efeonce
@@ -52,7 +70,7 @@ Las tres plataformas posicionan a Efeonce **fuera del comparison set de agencias
 
 ### Selección de demo por buyer persona (clave v1.3)
 
-La [venta con demostración contextual](../commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta el aprendizaje del operador en Berel y SKY y su aplicación a Banco Pichincha: mostrar oportunidad, ejecución y operación antes de cerrar el alcance. El operador reconoció como diferenciador hacer que el cliente experimente nuestra capacidad antes de comprarla (30/09/2026; mecanismo de marca en `09`). La sistematización operativa sigue propuesta; no hay una tasa de conversión demostrada ni un requisito de demo para todas las cuentas.
+La [venta con demostración contextual](../commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta el aprendizaje del operador en Berel y SKY y su aplicación a Banco Pichincha: mostrar oportunidad, ejecución y operación antes de cerrar el alcance. El operador reconoció como diferenciador hacer que el cliente experimente nuestra capacidad antes de comprarla (30/09/2026; mecanismo de marca en `09`). La sistematización operativa sigue propuesta; no hay una tasa de conversión demostrada ni un requisito de demo para todas las cuentas. El [método propuesto de casos de negocio SEO/AEO](../commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md) conecta esa demostración con una decisión de inversión mediante escenarios trazables, incrementalidad y economía validable del cliente.
 
 El demo ya no es genérico. Se elige la plataforma según el decisor:
 
@@ -73,7 +91,7 @@ El demo ya no es genérico. Se elige la plataforma según el decisor:
 
 Profundizar cuentas donde ya se demostró valor. Cada mes acumula historial en las tres plataformas. Cuentas ancla y sus playbooks (cada fase tiene un **Hito Producto**):
 
-**Sky Airlines** — retainer Agencia Creativa CLP 5.800.000/mes + IVA (ganado por licitación, 125 días). +127% tráfico orgánico vs. LATAM. Oportunidad inmediata: Content Lead ($18M) + Social Care ($21.6M) → llevaría Sky a $45.4M/mes (base neta). Hitos producto: demo Greenhouse en vivo → login activo + Content Calendar en Verk → Feedback Review desde Greenhouse → "Tu año con Efeonce" generado desde datos de Greenhouse + Verk + analytics.
+**Sky Airlines** — retainer Agencia Creativa CLP 5.800.000/mes + IVA (ganado por licitación, 125 días). +127% tráfico orgánico vs. LATAM. Expansiones potenciales: Content Lead y Social Care; los montos históricos del CRM (CLP18M y CLP21,6M) no acreditan fees mensuales ni deben sumarse al MRR. [Social Care 2027 — corte 09/10](../commercial/prospects/sky-social-care-2027/README.md): Jaime pidió cotizar 1.300 respuestas/mes en 13 cuentas; propuesta y economía pendientes. Hitos producto: demo Greenhouse en vivo → login activo + Content Calendar en Verk → Feedback Review desde Greenhouse → "Tu año con Efeonce" generado desde datos de Greenhouse + Verk + analytics.
 
 > **Actualización 2026-09-23:** Sky sumó una segunda línea: el **Blog SEO/AEO** (licitación privada vía Wherex, adjudicada el 2026-09-23; CLP 3.000.000 netos/mes + IVA × 24 meses; inicio 2026-11-01, vigente hasta 2028), comprado por el **equipo de Marca**, distinto del equipo de Performance que compra la Agencia Creativa. Análisis del patrón de cuenta, riesgos (concentración, capacidad, squad compartido) y qué replicar: [`sky-blog-2026/ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md`](../commercial/tenders/sky-blog-2026/ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md).
 
@@ -144,3 +162,11 @@ Lo que el corpus comercial declara que Greenhouse necesita tener operativo (= tu
 ---
 
 *Fuente: Estrategia Comercial Efeonce Q2–Q3 2026 v1.3. Documentos relacionados: Sistema Comercial Pipeline Core, Anatomía Core Pipeline v1.1, Arquitectura Bow-tie v1.1, BDR Prospecting Playbook 2026. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064).*
+
+## Composición integral de medios
+
+Desde la dirección del operador del 12-10, programmatic fortalece la oferta integral como agencia de medios de
+Efeonce. En expansión de cuenta, calificar el problema de mix/inversión y presentar alcance y responsabilidad
+conjuntos; fee adicional sólo por capacidad incremental a lo contratado, con medios/externos separados. Formación
+y acceso DSP acompañados se evalúan sin inferir licencia, crédito ni autonomía. Canon de composición y estados:
+[modelo de Media & Distribution §1.1](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).

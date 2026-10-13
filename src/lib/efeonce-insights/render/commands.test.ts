@@ -132,6 +132,98 @@ describe('requestInsightRender', () => {
     expect((await requestInsightRender(scope)).idempotent).toBe(false)
     expect(render.insertInsightRenderRun).toHaveBeenCalledTimes(1)
   })
+
+  // Incidente 2026-10-04 (canary de Berel): `report_pdf` en dead_letter y re-encargarlo daba 500.
+  describe('salida de un output terminal (índice parcial insight_outputs_live_identity_uq)', () => {
+    const liveIdentityViolation = () => Object.assign(new Error('duplicate key value violates unique constraint'), { code: '23505', constraint: 'insight_outputs_live_identity_uq' })
+    const reportEdition = () => edition({ outputs: ['deck_pdf', 'report_pdf'] })
+
+    beforeEach(() => {
+      stores.getInsightEditionById.mockResolvedValue(reportEdition())
+      primeFrozen()
+    })
+
+    it('re-encargar un dead_letter crea un output NUEVO con manifest recompuesto y nombra al que reemplaza', async () => {
+      const { requestInsightRender } = await import('./commands')
+
+      render.findInsightOutputsForEdition.mockResolvedValue([
+        { insightOutputId: 'iout-deck', renderRunId: 'irun-9', output: 'deck_pdf', state: 'completed' },
+        { insightOutputId: 'iout-dead', renderRunId: 'irun-9', output: 'report_pdf', state: 'dead_letter' }
+      ] as never)
+
+      const result = await requestInsightRender({ ...scope, outputs: ['report_pdf'] })
+
+      expect(result.idempotent).toBe(false)
+      const inserted = (render.insertInsightRenderRun.mock.calls[0] as unknown as [{ outputs: Array<{ output: string; catalogName: string; supersedesOutputId: string | null }> }])[0]
+
+      expect(inserted.outputs).toEqual([expect.objectContaining({ output: 'report_pdf', catalogName: 'insights-report', supersedesOutputId: 'iout-dead' })])
+    })
+
+    it('cancelled también libera la identidad; un output sin antecesor terminal no declara supersedes', async () => {
+      const { requestInsightRender } = await import('./commands')
+
+      render.findInsightOutputsForEdition.mockResolvedValue([{ insightOutputId: 'iout-x', renderRunId: 'irun-9', output: 'deck_pdf', state: 'cancelled' }] as never)
+      await requestInsightRender(scope)
+
+      const inserted = (render.insertInsightRenderRun.mock.calls[0] as unknown as [{ outputs: Array<{ output: string; supersedesOutputId: string | null }> }])[0]
+
+      expect(inserted.outputs).toEqual([
+        expect.objectContaining({ output: 'deck_pdf', supersedesOutputId: 'iout-x' }),
+        expect.objectContaining({ output: 'report_pdf', supersedesOutputId: null })
+      ])
+    })
+
+    it('pedir un target vivo junto a uno muerto se rechaza con causa y dice qué sí se puede encargar', async () => {
+      const { requestInsightRender } = await import('./commands')
+
+      render.findInsightOutputsForEdition.mockResolvedValue([
+        { insightOutputId: 'iout-deck', renderRunId: 'irun-9', output: 'deck_pdf', state: 'completed' },
+        { insightOutputId: 'iout-dead', renderRunId: 'irun-9', output: 'report_pdf', state: 'dead_letter' }
+      ] as never)
+
+      await expect(requestInsightRender(scope)).rejects.toMatchObject({ code: 'render_rejected', statusCode: 422, details: { requestable: ['report_pdf'] } })
+      expect(render.insertInsightRenderRun).not.toHaveBeenCalled()
+    })
+
+    it('carrera: el índice frena el segundo INSERT y, si el run ganador cubre lo pedido, responde idempotente (nunca 500)', async () => {
+      const { requestInsightRender } = await import('./commands')
+
+      render.findInsightOutputsForEdition
+        .mockResolvedValueOnce([{ insightOutputId: 'iout-dead', renderRunId: 'irun-9', output: 'report_pdf', state: 'dead_letter' }] as never)
+        .mockResolvedValueOnce([
+          { insightOutputId: 'iout-new', renderRunId: 'irun-win', output: 'report_pdf', state: 'queued' },
+          { insightOutputId: 'iout-dead', renderRunId: 'irun-9', output: 'report_pdf', state: 'dead_letter' }
+        ] as never)
+      render.insertInsightRenderRun.mockRejectedValueOnce(liveIdentityViolation())
+      render.getInsightRenderRun.mockResolvedValue({ renderRunId: 'irun-win', state: 'pending' })
+
+      const result = await requestInsightRender({ ...scope, outputs: ['report_pdf'] })
+
+      expect(result.idempotent).toBe(true)
+      expect(result.run.renderRunId).toBe('irun-win')
+    })
+
+    it('carrera sin run que cubra lo pedido ⇒ render_rejected 422 con los vivos, no internal_error', async () => {
+      const { requestInsightRender } = await import('./commands')
+
+      render.findInsightOutputsForEdition
+        .mockResolvedValueOnce([] as never)
+        .mockResolvedValueOnce([{ insightOutputId: 'iout-new', renderRunId: 'irun-win', output: 'report_pdf', state: 'queued' }] as never)
+      render.insertInsightRenderRun.mockRejectedValueOnce(liveIdentityViolation())
+
+      await expect(requestInsightRender(scope)).rejects.toMatchObject({ code: 'render_rejected', statusCode: 422 })
+    })
+
+    it('otra unique violation (otro índice) no se disfraza: se propaga', async () => {
+      const { requestInsightRender } = await import('./commands')
+      const other = Object.assign(new Error('dup'), { code: '23505', constraint: 'otro_uq' })
+
+      render.findInsightOutputsForEdition.mockResolvedValue([] as never)
+      render.insertInsightRenderRun.mockRejectedValueOnce(other)
+
+      await expect(requestInsightRender(scope)).rejects.toBe(other)
+    })
+  })
 })
 
 describe('InsightOutputsPort real', () => {

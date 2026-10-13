@@ -1,0 +1,68 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "line": "engine",
+  "sections": 5,
+  "use": "proposal",
+  "pages": [
+    {
+      "role": "method",
+      "recipe": "method-eeat",
+      "voice": {
+        "eyebrow": "E-E-A-T · Banca",
+        "question": "¿Qué hace citable a Pibank?",
+        "answer": [
+          "Lo",
+          "verificable"
+        ]
+      },
+      "body": "Fuentes vigentes, autoría y revisión, condiciones claras y datos consistentes. Cada entregable construye una de estas señales.",
+      "meterTopic": "Dónde cuentan",
+      "meter": [
+        {
+          "label": "En Google",
+          "value": "Relevantes",
+          "fill": 0.8
+        },
+        {
+          "label": "En respuestas de IA",
+          "value": "Relevantes",
+          "fill": 0.8
+        }
+      ],
+      "builtWithLabel": "Lo construimos con",
+      "letters": [
+        {
+          "letter": "E",
+          "name": "Experiencia",
+          "description": "Contenido de quien opera la cuenta y conoce al ahorrador.",
+          "builtWith": "Preguntas reales de clientes",
+          "deliverable": "Contenido y hub"
+        },
+        {
+          "letter": "E",
+          "name": "Pericia",
+          "description": "Tasas, TREA y condiciones exactas, con fuente vigente.",
+          "builtWith": "Revisión de Producto y Cumplimiento",
+          "deliverable": "Contenido y herramientas"
+        },
+        {
+          "letter": "A",
+          "name": "Autoridad",
+          "description": "Que medios y sitios de referencia hablen de Pibank.",
+          "builtWith": "PR, enlaces y entidad clara",
+          "deliverable": "Comunidad y PR"
+        },
+        {
+          "letter": "T",
+          "name": "Confianza",
+          "description": "Respaldo y condiciones del banco, fáciles de verificar.",
+          "builtWith": "Datos estructurados y fuentes oficiales",
+          "deliverable": "SEO técnico"
+        }
+      ]
+    }
+  ]
+}

@@ -37,6 +37,24 @@ Read only the sources required by the change:
 Do not route this capability through `hubspot-greenhouse-integration`; that Cloud Run bridge owns a
 different CRM write/webhook contract.
 
+## AXIS visual composition — approved source, adoption pending (2026-10-05)
+
+The native AXIS scheduler was approved visually and its source pushed previously. Growth CTA's
+final AXIS presentation, including both banner recipes and `meetingPresentation: 'dialog' | 'inline'`,
+is now approved by the operator. The two surfaces share the same adapter and retained state; they
+never create another booking operation. Calendar cells show day number plus calendar/count and
+an explicit unavailable marker; fields retain labels/icons and confirmation celebrates only an
+explicit confirmed receipt, with static reduced-motion behavior.
+
+AXIS owns tokens and portable presentation (`axisScheduler`, `/scheduler`, `/growth-cta`); Growth
+Meetings retains its controller, config/availability/booking contracts, provider, CAPTCHA,
+idempotency and receipt-gated conversion. Current `src/growth-meeting-renderer` is unchanged:
+no adoption or public-host rollout is implied by approval or push. New composition exports require
+release/install and a separately verified adapter before replacing that renderer.
+Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live in sibling AXIS
+`SCHEDULER_COMPOSITION_DECISION_V1.md`, `GROWTH_CTA_COMPOSITION_DECISION_V1.md` and their
+`docs/quality/` dossiers. Greenhouse continuity: TASK-2007.
+
 ## Operating loop
 
 1. **Resolve the boundary.** Identify whether the change belongs to provider policy, public transport,
@@ -89,6 +107,19 @@ different CRM write/webhook contract.
 - Extend `MEETING_GTM_EVENTS`, `MEETING_STEPS`, `MEETING_TELEMETRY_PAYLOAD_KEYS`, the renderer mirror,
   parity tests and Tracking Plan together.
 - Preserve server-confirmed ledger truth; GA4 remains a browser-reported mirror to reconcile.
+- Meta CAPI via sGTM: reuse the confirmed `generate_lead` with `lead_source=meeting_booking`
+  and a separate scheduler/surface eligibility filter. Load the canonical runbook
+  `docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md`. Meeting CAPI
+  identity uses an opaque browser UUID only on a fresh eligible confirmation. The sender
+  prefers a valid renderer UUID and otherwise uses the consent bridge Crypto UUID cached by
+  the local GTM event counter (never transmitted). Load `09-hubspot-consent.md`. Sender live
+  2026-10-13; local renderer enhancement remains unreleased and is not a recovery dependency.
+  Never repurpose the private receipt or internal IDs.
+  Preserve the UUID across a failed dataLayer push and suppress repeat emission of the same effect.
+  Interaction/replay/disabled telemetry emit no conversion UUID. Entropy failure keeps UX/GA4
+  working without an ID and makes the strict server UUID gate block CAPI. This single browser
+  sender does not define a durable backend identity; an outbox sender needs a shared-ID decision.
+  No CAPI conversion from opening the scheduler, selecting a slot, attempts, errors or replays.
 
 ## Verification minimum
 

@@ -42,6 +42,15 @@ Contrato vigente:
   `reliability-verify.yml`; los workflows especializados por contrato (`task-contract`,
   `design-contract`, `claude-md-governance`, etc.) conservan sus propios triggers.
 
+## Fuentes en build (ISSUE-178)
+
+La compilación no consulta Google Fonts. `next/font/local` consume WOFF2 versionados en
+`src/assets/fonts/web/`; `scripts/run-next-build.mjs` verifica su manifest y rechaza imports
+remotos antes de invocar Next. Ante drift, revisar origen/licencia/bytes; nunca actualizar hashes
+sin revisar el asset ni limpiar caché como solución permanente. Procedimiento de actualización:
+`src/assets/fonts/web/README.md`. Familias y roles siguen el contrato tipográfico de §3 de
+`GREENHOUSE_DESIGN_TOKENS_V1.md` y el ADR de ownership AXIS.
+
 ## Key environment variables
 
 | Variable | Purpose |

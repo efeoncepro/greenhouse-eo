@@ -1,0 +1,30 @@
+{
+  "args": [
+    "current",
+    "show",
+    "--input",
+    "<tmp>/pointer.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 857,
+    "sha256": "25caab843a727006c25970147737c0e0423c0f906565d4a45ebe004366af96ee",
+    "text": "{\n  \"error\": {\n    \"code\": \"SCHEMA_INVALID\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"issues\": [\n      {\n        \"path\": \"schemaVersion\",\n        \"rule\": \"invalid_literal\"\n      },\n      {\n        \"path\": \"updatedAt\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"string\"\n      },\n      {\n        \"path\": \"reason\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"string\"\n      },\n      {\n        \"path\": \"catalog\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"object\"\n      },\n      {\n        \"path\": \"policy\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"object\"\n      },\n      {\n        \"path\": \"credits\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"object\"\n      }\n    ]\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "pointer.json",
+      "mode": "644",
+      "content": {
+        "bytes": 3,
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+        "text": "{}\n"
+      }
+    }
+  ]
+}

@@ -32,26 +32,26 @@ Estas dos pantallas cierran el ciclo de un contratista, desde que entrega su tra
 
 ## Paso a paso
 
-### Contratista — subir boleta y evidencia
+### Contratista — preparar el período y adjuntar soporte
 
-1. Entra a **Mis Servicios Contractor** (`/my/contractor`).
-2. En el panel de soporte, usa el cargador para adjuntar tu **boleta o factura** del periodo.
-3. Adjunta tambien la **evidencia de tu trabajo** (los archivos que respaldan lo entregado).
-4. Confirma. Los archivos quedan asociados a tu contratacion como archivos privados.
+> Actualización TASK-2009/2010 del 05/10: validada localmente, pendiente de promoción al portal y worker. En producción todavía aplica el comportamiento anterior hasta ese release.
 
-### Contratista — preparar y enviar una entrega
+1. Entra a **Mis Servicios Contractor** (`/my/contractor`) y abre **Preparar envío**. Si el período anterior está pagado o en revisión, usa **Preparar otro período**.
+2. Selecciona **Inicio del servicio** y **Fin del servicio** para el trabajo que estás cobrando. Las fechas nuevas empiezan vacías.
+3. Adjunta la **boleta o factura de ese período** y su **evidencia del servicio** dentro del mismo formulario. Los documentos de otro envío no acreditan el nuevo período.
+4. Si la tarifa es por hora o día, declara la cantidad. El monto y moneda se toman del acuerdo de HR; no se editan desde tu cuenta. Para un prorrateo autorizado, HR prepara su registro con la excepción documentada.
+5. **Guardar borrador** permite continuar el mismo registro durante la sesión. **Enviar a revisión** guarda y vincula documentos y presenta el envío juntos; HR revisa antes de que Finanzas prepare el pago.
+6. Si aparece un error, los datos y documentos se conservan: reintenta en ese formulario. Un éxito de envío limpia el formulario para el próximo período.
 
-1. Abre el panel para **preparar un envio**.
-2. Completa los datos de tu entrega de trabajo.
-3. Revisa que la boleta o factura y la evidencia esten adjuntas.
-4. **Envia** la entrega a revision. A partir de aca queda en manos de HR.
+### Contratista — responder una observación
 
-### Contratista — responder una observacion
+1. Abre **Responder observación** y lee lo solicitado por HR.
+2. Escribe la respuesta y adjunta la **evidencia corregida**.
+3. Confirma la respuesta. Se vuelve a presentar el mismo envío observado; conserva sus fechas y montos y vuelve a revisión.
 
-1. Cuando HR observa tu entrega, lo ves en tu pagina con la razon que escribieron.
-2. Abre el panel para **responder la observacion**.
-3. Adjunta la **evidencia corregida** segun lo que te pidieron.
-4. **Vuelve a enviar** la entrega.
+### Consultar y preparar el pago
+
+**Ver envío**, **Ver comprobante** y **Ver pendientes** llevan a sus secciones existentes. La corrida mensual toma obligaciones Finance comprometidas y pendientes de ordenar: no crea un cobro desde la tarifa ni registra una boleta enviada sólo por correo. Si falta un envío, regístralo y completa revisión/readiness antes de preparar la corrida. Las órdenes quedan pendientes de aprobación; iniciar la corrida no transfiere dinero.
 
 ### HR — revisar la cola
 

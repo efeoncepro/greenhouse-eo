@@ -75,8 +75,21 @@ The relying-party boundary is fixed by
 
 ## Hard rules
 
-- **Marketing Studio (TASK-1891):** provider `marketing-studio` con 12 tools de lectura `studio.*` registradas desde el manifiesto sincronizado de Studio (`pnpm studio:manifest:sync`, hash verificado al cargar). Studio no conoce personas: cada llamada canjea antes el token Entra de la persona en Greenhouse (cliente `efeonce-mcp-marketing-studio`, `can(persona, 'marketing_studio.campaign.read')`) y sólo entonces consulta Studio con el bearer de servicio del gateway; el bearer canjeado nunca viaja a Studio. Nativo `unsupported` (D10). Un manual servido de un proveedor externo declara `provider` en el manifiesto de manuales de Greenhouse, y el guard del gateway verifica su `appliesTo` contra el manifiesto sincronizado.
-  **Delta 2026-10-02 (`TASK-1894`, gateway `v1.10.0`):** PR `efeonce-mcp#23` mergeada (`1ddc7db`) y desplegada por el operador con `deploy.yml` (run `37062592574`, revisión `efeonce-mcp-gateway-00064-q6w` al 100 %, `/health` ok). Superficie **72 → 74 tools**: `studio.asset.download` (de `TASK-1893`, que no se había sincronizado) y `studio.campaign.brief.get`. El manifiesto de Studio `1.4.0` trae 44 tools (las 12 lecturas de `TASK-1891` pasaron a 14 federadas), de las cuales **30 son escrituras que viajan en el manifiesto pero NO se federan hasta `TASK-1899`**: `MARKETING_STUDIO_FEDERATED_TOOLS` (sólo lecturas) es la lista que usan el proveedor, `tool-policy`, `src/surface.ts` y la paridad; `call()` rechaza escrituras y cualquier método no-GET; la paridad marca `write_tool_without_scope_class` sólo si una escritura llega a registrarse. 🔴 **Lección:** antes de este cambio el gateway federaba TODAS las tools del manifiesto y el proveedor llama siempre con GET, así que sincronizar un manifiesto con escrituras habría federado tools rotas. **NUNCA** sincronices el manifiesto de un provider hermano que declare escrituras sin un filtro explícito de federación: un provider puede declarar escrituras en su manifiesto, pero el gateway sólo federa las que tienen clase de scope y confirmación (`TASK-1899`). La regla vive en `AGENTS.md` del gateway (§Marketing Studio — escrituras en el manifiesto, fuera de la federación). El deploy del gateway es manual (`deploy.yml`), no sale solo con el merge. ⚠️ Choque de versión: la rama `feat/task-1921-brand-render` del gateway también sube a `1.10.0`; la que mergee segunda mueve la versión.
+- **Marketing Studio (estado verificado 2026-10-04):** el proveedor `marketing-studio` conserva la federación de
+  lectura: 14 tools tras el despliegue de gateway PR #23 (histórico `00064-q6w`, 2026-10-02); el manifiesto 1.5.0
+  se sincronizó después sin cambiar superficie. Studio ya sirve API1.6.0 / 59 tools en producción (`74073de`),
+  pero esta sesión no sincronizó/desplegó sus nuevas tools en el gateway. No confundir inventario del provider con
+  exposición real; verificar `tools/list` y la revisión vigente para certificar una sesión.
+  La autoridad vigente canjea el token Entra de la persona en Greenhouse antes de leer Studio con el bearer del
+  gateway; el token canjeado no viaja a Studio. Nativo sigue unsupported. `MARKETING_STUDIO_FEDERATED_TOOLS`
+  filtra lecturas; `call()` rechaza writes/no-GET. Nunca sincronizar escrituras sin filtro/autoridad real.
+  TASK-2003 aporta actor delegado y T1, en paralelo; TASK-1899/proposalDigest fue retirada. T2 queda en el carril
+  de operador. No condicionar implementación API/CLI/UI a MCP operativo, ni afirmar paridad runtime por el schema.
+  La CLI Greenhouse `pnpm studio` es un cliente HTTP local, no federación ni fuente de permisos; guía en
+  `docs/manual-de-uso/marketing-studio/operar-por-cli-api.md`. Nunca suplir una tool MCP ausente usando ese bearer.
+  El catálogo publicado v1 tiene 52 canales; warn e ICPfalse. Nuevas lecturas/catálogo/T1 requieren sync,
+  autoridad, despliegue y canary separados según `efeonce-marketing-studio`. Manual externo con `provider`;
+  su `appliesTo` se verifica contra el manifiesto sincronizado. El deploy gateway sigue siendo manual.
 
 - Keep `https://mcp.efeonce.org/mcp` as the single canonical resource. Do not create a second OAuth resource for an alias.
 - Default every provider or capability to disabled, read-only and fail-closed. Enabled internal providers and the

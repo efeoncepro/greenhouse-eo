@@ -1,0 +1,101 @@
+{
+  "batch_estimate_usd": 0.22452,
+  "requests": [
+    {
+      "id": "ranked-08-page2",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "viabcp.com",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 417,
+        "offset": 500,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ],
+        "filters": [
+          "ranked_serp_element.serp_item.relative_url",
+          "regex",
+          "(?i)(cuenta|ahorr|deposit|transfer)"
+        ]
+      },
+      "estimate_usd": 0.06204
+    },
+    {
+      "id": "ranked-09-page2",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "bbva.pe",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 1000,
+        "offset": 500,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ],
+        "filters": [
+          "ranked_serp_element.serp_item.relative_url",
+          "regex",
+          "(?i)(cuenta|ahorr|deposit|transfer)"
+        ]
+      },
+      "estimate_usd": 0.132
+    },
+    {
+      "id": "ranked-09-page3",
+      "kind": "ranked",
+      "endpoint": "/v3/dataforseo_labs/google/ranked_keywords/live",
+      "task": {
+        "target": "bbva.pe",
+        "location_code": 2604,
+        "language_code": "es",
+        "limit": 44,
+        "offset": 1500,
+        "item_types": [
+          "organic"
+        ],
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ],
+        "filters": [
+          "ranked_serp_element.serp_item.relative_url",
+          "regex",
+          "(?i)(cuenta|ahorr|deposit|transfer)"
+        ]
+      },
+      "estimate_usd": 0.01728
+    },
+    {
+      "id": "overview-manual-new",
+      "kind": "overview",
+      "endpoint": "/v3/dataforseo_labs/google/keyword_overview/live",
+      "task": {
+        "keywords": [
+          "como depositar en pibank",
+          "como transferir a pibank",
+          "pibank es seguro",
+          "pibank peru",
+          "cuenta soles pibank",
+          "requisitos abrir cuenta de ahorros",
+          "como fondear cuenta bancaria",
+          "primer deposito cuenta de ahorros",
+          "depositar dinero en cuenta",
+          "seguridad bancaria"
+        ],
+        "location_code": 2604,
+        "language_code": "es",
+        "include_serp_info": true
+      },
+      "estimate_usd": 0.0132
+    }
+  ],
+  "manual_seeds": "Seeds retained when provider has no row; NULL, not zero"
+}

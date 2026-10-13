@@ -1,0 +1,32 @@
+{
+  "id": "CT9-voz-ejecutiva",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a vast dark auditorium at night with thin haze): a company executive, an illustrative client, a Latin American man in his late forties with short salt-and-pepper hair, a trimmed grey-flecked beard and a calm, credible face, wearing his own charcoal blazer over a dark crew-neck knit, no tie, no logos and nothing blue, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 60 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and his body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: he has just finished speaking and pauses, one hand resting open at chest height, looking slightly off-lens toward the frame-right with a quiet, assured half-smile; head almost frontal. ONE single hard follow-spot of azure-blue (#0375DB) and white light, the blue of the scene, falls on him from high above on the frame-right, its cone clearly visible in the haze as one clean volumetric beam with sharp edges, the only strong light: it sculpts his face from the side, the far side of his face falling into deep shadow. Far behind him on the right, deep in the dark, hundreds of people listen: only tiny cool points of light from their phones and laptops, melted into round bokeh, no faces. A long dark matte stage edge runs between the camera and him, its near edge just in front of the lens. The beam, the audience lights and everything lit stay inside the RIGHT 50% of the frame. The LEFT 50% is calm, deep dark space with faint haze only. No warm light, no readable text, no logos of any brand.",
+  "lecho": {
+    "objeto": "the dark matte stage edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "registro": "cine",
+  "desde": "SP1",
+  "alcance": "deck-seccion",
+  "excepcion": "Pedido del operador 2026-10-10: lámina del programa de posicionamiento de ejecutivos en LinkedIn; el protagonista es un ejecutivo del cliente, persona ilustrativa con su ropa y sin marca Efeonce (precedentes SP1 y SA1), en su momento de logro",
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "llave": {
+    "fuente": "one hard follow-spot whose cone is visible in the haze",
+    "lado": "from high above on the frame-right of his face",
+    "distancia": "about 4 m above him"
+  },
+  "fondo": "the audience far behind him, hundreds of tiny cool phone and laptop lights melted into round bokeh",
+  "fenomeno": {
+    "que": "a single follow-spot puts one executive in the light in front of an audience of hundreds",
+    "esServicio": "Posicionamiento de ejecutivos en LinkedIn: la voz de la empresa, con nombre y rostro"
+  }
+}

@@ -1,5 +1,14 @@
 # TASK-1915 — Marketing Studio: despachador de corridas de agente con adaptadores Claude/OpenAI
 
+## Decisión vigente 2026-10-04 — desarrollo sin TASK-1899
+
+El operador retiró TASK-1899 por la fricción que añadiría en esta etapa. Su diseño de escritura MCP deja de ser
+prerrequisito de desarrollo y cierre del alcance API/CLI/UI de esta task. La federación de escrituras MCP y su
+verificación se retiran del alcance actual, pendientes de una nueva decisión; nunca se declaran operativas por
+cerrar ese alcance. Esta decisión prevalece sobre las referencias y criterios MCP de TASK-1899 conservados más
+abajo. API-first, dependencias funcionales y controles de acceso existentes siguen vigentes.
+
+
 ## Actualización de proveedor — DevDay 2026-09-29
 
 El [inventario de lanzamientos](../../audits/platform/OPENAI_DEVDAY_2026_09_29_LAUNCH_INVENTORY.md) confirma Agents API gestionada con computer use y GPT-6.1 Sol. Son candidatos para evaluación por rol, no un quinto adaptador ni una ruta de modelo aprobada. Antes de modificar el contrato de cuatro adaptadores de esta task, comparar Agents API con Agents SDK/Responses para datos, residencia, ZDR, sesiones, identidad delegada, MCP, costo y recuperación, y registrar el delta del ADR. La Agents API actualmente declara residencia solo en EE. UU. y no ofrece ZDR aun con sandbox propio. Las evals públicas de Sol no sustituyen las de Studio.
@@ -42,7 +51,7 @@ Decisiones de Julio Reyes (operador) del 2026-09-26 aplicadas en esta task:
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de operación híbrida con agentes (§3.3 D, §4.4, §4.5, §4.6, §4.7, §12); ningún slice empezado. Plan de respaldo: modo interactivo primero (Slices 1–3), independiente de EPIC-044`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1913 (work items y evento de asignación) · TASK-1914 (tarjetas, compilador portable, lista blanca, kill switch, política por organización) · TASK-1899 (escritura MCP delegada). El modo delegado en segundo plano (Slice 5) está BLOQUEADO por TASK-1917 (EPIC-044 U22, decisión del operador 2026-09-26): Efeonce ID aún no emite delegación por corrida con claim act. El modo programado (Slice 6) necesita la identidad de servicio por rol. Habilitar segundo plano o programado exige además evaluación aprobada (TASK-1916)`
+- Blocked by: `TASK-1913 (work items y evento de asignación) · TASK-1914 (tarjetas, compilador portable, lista blanca, kill switch, política por organización). El modo delegado en segundo plano (Slice 5) está BLOQUEADO por TASK-1917 (EPIC-044 U22, decisión del operador 2026-09-26): Efeonce ID aún no emite delegación por corrida con claim act. El modo programado (Slice 6) necesita la identidad de servicio por rol. Habilitar segundo plano o programado exige además evaluación aprobada (TASK-1916)`
 - Branch: `efeonce-marketing-studio main (ledger de corridas, despachador, adaptadores, infra) · Greenhouse develop (docs, manual servido) · efeonce-mcp rama + PR (verificación de tokens de corrida) · Efeonce ID vía EPIC-044; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

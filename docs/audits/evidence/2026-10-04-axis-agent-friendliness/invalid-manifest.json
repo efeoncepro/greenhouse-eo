@@ -1,0 +1,15 @@
+{
+  "schema": "axis.surface-composition.v1",
+  "contract": {
+    "id": "efeonce.surface-composition",
+    "version": "0.1.2",
+    "lifecycle": "candidate"
+  },
+  "status": "invalid",
+  "issues": [
+    {
+      "code": "format-invalid-for-surface",
+      "path": "format"
+    }
+  ]
+}

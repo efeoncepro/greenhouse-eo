@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "2447d872c645f6fd1962174234c1d69f51d84a3dac95a17d2c14512eef4cb48e",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT6-social-care",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT6-social-care.png",
+      "sha256": "b77a02e241a777fd054cf9f69109c2a3633e54cfe482cf22cd375b3e5ce2b688"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -6,6 +6,24 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-10 — Product Design 360 aprobado por el operador
+
+- El operador aprobó Product Design 360 completo: el 2026-10-09 dijo «Si, incluyela como algo definitivo por qué
+  está aprobado» y el 2026-10-10 ordenó «Todo product design hay que ponerlo aprobado». El business model pasó a
+  `Approved` y el ADR propio a `Accepted`; la aprobación cubre la familia, el modelo, la ficha, el nombre público
+  «Product Design 360» y la venta — cerrado por la sincronización documental del 2026-10-10.
+- **Gate de estado del modelo: cumplido.** La escalera `Proposed → Approved for validation → Commercially approved`
+  quedó superada en el modelo. Donde esta task, su wireframe o su flow exigen `Approved for validation` (fase B) o
+  `Commercially approved` (fase C), léase `Approved` por el operador; la evidencia del estado es el encabezado del
+  modelo. El supuesto «el business model está en `Proposed`: la página no puede publicarse todavía» ya no rige.
+- **Nombre público: aprobado** (D1 resuelta). La regla «"Product Design 360" no aparece en la página» queda
+  levantada; usarlo en el titular sigue siendo una decisión de copy, con la nota de que en LATAM «product design»
+  puede leerse como diseño industrial.
+- **Lo que sigue condicionando la publicación** es trabajo propio de la task: dirección visual aprobada, slug
+  validado, copy sin claims de resultado sin evidencia, binding de la meeting surface, QA de accesibilidad y la
+  autorización del operador para publicar. Las fases A → B → C se conservan como orden de salida.
+- Sin cambio de lifecycle, alcance ni slices.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -34,8 +52,9 @@
 Landing pública de la **superficie de producto** de Product Design 360: capacidad de diseño —investigación, UX/UI,
 design system, accesibilidad, design ops— para **empresas que ya tienen equipo de diseño in-house** y no alcanzan a
 cubrir su demanda. Se dirige al Head of Design (operador, campeón y veto) y le da al CPO/CTO un argumento que no es
-estético. Se construye completa pero **se publica por fases atadas al estado del business model**: hoy la oferta
-está en `Proposed` y el modelo prohíbe claims públicos, así que la página no se indexa hasta `Commercially approved`.
+estético. Se construye completa pero **se publica por fases atadas al estado del business model**: al crearse la task
+(2026-09-10) la oferta estaba en `Proposed` y el modelo prohibía claims públicos. Desde el 2026-10-10 el modelo está
+`Approved` por el operador y el gate de estado quedó cumplido (ver Delta 2026-10-10).
 
 ## Why This Task Exists
 

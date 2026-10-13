@@ -1,0 +1,24 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "c307f146c5f72bf98397a86d8355be2fa45268eaf16bb3e8700099560cbf52ec",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.section-split"
+  ],
+  "plates": [
+    {
+      "ref": "asset-ref:plate:SX4-busqueda-y-respuesta",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/SX4-busqueda-y-respuesta.png",
+      "sha256": "39c1ffe4f1dff6bf9524ce8f41a8c9e4d18e16ff10741d1ed1fd0b32712a7859"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

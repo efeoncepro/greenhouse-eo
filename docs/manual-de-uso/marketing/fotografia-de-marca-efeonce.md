@@ -435,6 +435,7 @@ citada queda protegida y no se puede archivar.
 | Canon y archivo | [Almacenamiento de `ai-generations/`](../../operations/AI_GENERATIONS_STORAGE_V1.md) · `scripts/foto/canon-sync.mjs` |
 | Medidor de proporción de la cara | `scripts/foto/rostro.mjs` (`pnpm foto:rostro`) |
 | Producir una foto cine sin consultar a nadie | [Producir una foto de marca en registro cine](../creative/producir-foto-cine-de-marca.md) · [Casebook](../../operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md) |
+| Nexa cine con Nano Banana 2.1 explícito, 4K/high | [Desvío de generación](../creative/producir-foto-cine-de-marca.md#generar-con-nano-banana-21-cuando-lo-elige-el-operador) · [Prueba y comparación con Sunburst](../../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md); mismos gates, sin cambio de defaults ni alta de receta |
 | Nexa con su traje biónico y lentes (sólo cine) | [Usar el traje biónico de Nexa en fotos](../creative/usar-traje-bionico-de-nexa-en-fotos.md) |
 | Evidencia (prompts y scripts) | `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` |
 | CLI de imagen | `scripts/ai/generate-image.ts` (`pnpm ai:image --help`) |

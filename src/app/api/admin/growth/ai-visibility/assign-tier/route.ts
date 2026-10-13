@@ -22,6 +22,8 @@ interface AssignTierBody {
   tier?: unknown
   reason?: unknown
   expiresAt?: unknown
+  /** Países ISO que el contrato incluye además del principal. Sólo `contracted`; lo valida el command. */
+  marketsIncluded?: unknown
 }
 
 const asNonEmptyString = (value: unknown): string | null =>
@@ -67,7 +69,8 @@ export async function POST(request: Request) {
       tier: body.tier as never,
       reason,
       requestedBy: tenant.userId,
-      expiresAt
+      expiresAt,
+      marketsIncluded: body.marketsIncluded as never
     })
 
     return NextResponse.json(
@@ -78,6 +81,7 @@ export async function POST(request: Request) {
         status: result.status,
         idempotent: result.idempotent,
         supersededAssignmentId: result.supersededAssignmentId,
+        marketsIncluded: result.marketsIncluded,
         profile: result.profile
           ? {
               profileId: result.profile.profileId,

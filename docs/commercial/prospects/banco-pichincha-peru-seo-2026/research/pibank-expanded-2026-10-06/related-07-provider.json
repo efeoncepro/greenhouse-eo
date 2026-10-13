@@ -1,0 +1,115 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-06T19:15:08.823Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:dataforseo.labs.google.related.keywords.live",
+      "method": "POST",
+      "path": "/v3/dataforseo_labs/google/related_keywords/live"
+    },
+    "family": "labs",
+    "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "consumer": "seo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "depositar dinero en cuenta",
+        "location_code": 2604,
+        "language_code": "es",
+        "include_seed_keyword": true,
+        "include_serp_info": true,
+        "depth": 3,
+        "limit": 300,
+        "order_by": [
+          "keyword_data.keyword_info.search_volume,desc"
+        ]
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.048,
+    "estimateStatus": "available",
+    "maxUsd": 0.048,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live/",
+      "sourceModifiedAt": "2026-08-14T14:55:46.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 987,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 987,
+        "costUsd": 0.012,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10061915-1987-0387-0000-9b8bfea4a220",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.012,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.012,
+    "tasks": [
+      {
+        "id": "10061915-1987-0387-0000-9b8bfea4a220",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "0.0595 sec.",
+        "cost": 0.012,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "dataforseo_labs",
+          "google",
+          "related_keywords",
+          "live"
+        ],
+        "data": {
+          "api": "dataforseo_labs",
+          "function": "related_keywords",
+          "se_type": "google",
+          "keyword": "depositar dinero en cuenta",
+          "location_code": 2604,
+          "language_code": "es",
+          "include_seed_keyword": true,
+          "include_serp_info": true,
+          "depth": 3,
+          "limit": 300,
+          "order_by": [
+            "keyword_data.keyword_info.search_volume,desc"
+          ]
+        },
+        "result": [
+          {
+            "se_type": "google",
+            "seed_keyword": "depositar dinero en cuenta",
+            "seed_keyword_data": null,
+            "location_code": 2604,
+            "language_code": "es",
+            "total_count": null,
+            "items_count": 0,
+            "items": null
+          }
+        ]
+      }
+    ]
+  }
+}

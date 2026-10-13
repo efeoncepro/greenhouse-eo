@@ -1,9 +1,11 @@
 # Línea gráfica Efeonce — La órbita · V1
 
+> **Decisión vigente 2026-10-07 — Rooms:** La órbita (`efeonce-graphic-line`) es su design system completo: Bricolage editorial/Poppins funcional, color, componentes, iconografía y motion. AXIS distribuye el sistema. Aplica a autoría, exploración y presentación; las piezas del cliente mantienen su diseño. [Dossier](../../architecture/rooms/README.md). La composición y runtime siguen pendientes; no se migra automáticamente Greenhouse ni se impone narrativa pregunta/respuesta.
+
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.21
+> **Versión:** 1.24
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-10-01 por Claude (1.21: §10.1.1 nueva — perfiles sociales de Efeonce aprobados por el operador: portadas de LinkedIn (página y perfil personal), Facebook y YouTube en dos mensajes × cuatro fotos de cine con Nexa, avatar de redes, nueve destacados de Instagram como mezcla de recursos y su historia completa 9:16, medidas y zonas seguras verificadas, reglas del logo, la idea propia y el registro cine con Nexa; §10.1 y §12 remiten. Antes, 2026-09-29, 1.20: §1.3 — la medida dibuja su recorrido desde las 12, en su color, al 60 % y con 0,75 × el trazo de la estela (`efeonceGraphicLine.trajectory.measure.travelledPath`, contrato `efeonce.graphic-line-orbit` 0.5.0); §10.2.1 nueva — módulos canónicos de correo (pie, CTA principal, agenda y bloque de marca), «Suscribirme» retirado, PNG para correo y contrato `efeonce.email-modules` 0.1.0; §13.1 con AXIS `v0.3.38`; Greenhouse aún fija 0.3.37 y lo adopta TASK-1944. Antes, 1.19: §1 — el color de la medida apunta al token `efeonceGraphicLine.measureSeverity` y al contrato `efeonce.graphic-line-orbit` 0.4.0, publicados en AXIS `v0.3.30`; §7.2, §8.5, §8.6 y §13.1 con ese juego y el contrato `efeonce.ai-visibility-report` 0.1.0 del AI Visibility Report; Greenhouse aún fija 0.3.29. Antes, 1.18: §1 — color de la medida con gravedad, excepción aprobada para la portada del AI Visibility Report. Antes, 1.17: §7.2 nueva — submarcas de producto SEO/AEO (SV360, AEO, AEO Assessment, AI Visibility Report), «la órbita vive en la O», línea Engine, lockups y variante `white`; §8.6 con `axis-brand-assets` 0.4.2 publicado el 2026-09-29. Antes, 2026-09-28, 1.16: §7.1 precisada contra el código — página del Lab de Insights aún sin publicar, variante negativa también en la portada de presentación, mini-lockups de capítulo, tamaños en uso en Think, imagen OG, pantallas de estado, recetas del deck y la decisión abierta del color de «INSIGHTS» en las portadas PDF. Antes, 1.15: §7.1 nueva — Insights, marca de producto que acompaña: construcción, reglas, lockup, dónde se aplica y gaps; §8.6 con `axis-brand-assets` 0.4.0. Antes, 1.14: §10.0 al día con el cierre de TASK-1928 — las 69 recetas del deck con plantilla en el Artifact Composer, AXIS fijado en `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19, enlace a la spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`. Antes, 2026-09-27, 1.13: §10.0 al día con el cierre de TASK-1927 — contrato `efeonce.surface-composition` 0.1.2 publicado en AXIS `v0.3.14` y fijado en Greenhouse; el deck con sus 16 plantillas, incluidas las portadas y contraportadas, y el documento completo con `pnpm brand:compose`; el contenido de una lámina es dato del intent. Antes, 1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-10-09 por Claude (1.24: §7.5 nueva — Efeonce Wave, Reach y Globe entran a la familia por la ruta H3, aprobada por el operador: logotipo propio, lockup «Efeonce | Producto» con el logotipo en el gris de la familia y sólo su gesto en color, se retira «by efeonce», globo de Globe frambuesa `#ee4274` sobre oscuro en el logotipo y el lockup, los tres isotipos todo en blanco sobre oscuro, isotipos chicos de Reach y Globe a 24 px o menos, `axis-brand-assets` 0.4.28; ajustes en §2, §7, §8.1, §8.3, §8.4, §8.6 y §11. Antes, 2026-10-08, 1.23: §7.4 nueva — la marca de Efeonce Rooms, «eslabón leve», aprobada por el operador: 18 piezas `rooms-*` con el acento Growth, `axis-brand-assets` 0.4.27 y la norma en su ADR; §1.3 y §11 con dos reglas nuevas de toda la línea: la esfera nunca va en un cruce de órbitas y una letra dentro de una órbita nunca es R. Antes, 2026-10-06, 1.22: §7.3 nueva — la marca de Creative Studio, aprobada por el operador: 24 piezas `creative-studio-*` con el acento Brand y la regla de las piezas cortas; la norma vive en el ADR de nombre y marca. Antes, 2026-10-01, 1.21: §10.1.1 nueva — perfiles sociales de Efeonce aprobados por el operador: portadas de LinkedIn (página y perfil personal), Facebook y YouTube en dos mensajes × cuatro fotos de cine con Nexa, avatar de redes, nueve destacados de Instagram como mezcla de recursos y su historia completa 9:16, medidas y zonas seguras verificadas, reglas del logo, la idea propia y el registro cine con Nexa; §10.1 y §12 remiten. Antes, 2026-09-29, 1.20: §1.3 — la medida dibuja su recorrido desde las 12, en su color, al 60 % y con 0,75 × el trazo de la estela (`efeonceGraphicLine.trajectory.measure.travelledPath`, contrato `efeonce.graphic-line-orbit` 0.5.0); §10.2.1 nueva — módulos canónicos de correo (pie, CTA principal, agenda y bloque de marca), «Suscribirme» retirado, PNG para correo y contrato `efeonce.email-modules` 0.1.0; §13.1 con AXIS `v0.3.38`; Greenhouse aún fija 0.3.37 y lo adopta TASK-1944. Antes, 1.19: §1 — el color de la medida apunta al token `efeonceGraphicLine.measureSeverity` y al contrato `efeonce.graphic-line-orbit` 0.4.0, publicados en AXIS `v0.3.30`; §7.2, §8.5, §8.6 y §13.1 con ese juego y el contrato `efeonce.ai-visibility-report` 0.1.0 del AI Visibility Report; Greenhouse aún fija 0.3.29. Antes, 1.18: §1 — color de la medida con gravedad, excepción aprobada para la portada del AI Visibility Report. Antes, 1.17: §7.2 nueva — submarcas de producto SEO/AEO (SV360, AEO, AEO Assessment, AI Visibility Report), «la órbita vive en la O», línea Engine, lockups y variante `white`; §8.6 con `axis-brand-assets` 0.4.2 publicado el 2026-09-29. Antes, 2026-09-28, 1.16: §7.1 precisada contra el código — página del Lab de Insights aún sin publicar, variante negativa también en la portada de presentación, mini-lockups de capítulo, tamaños en uso en Think, imagen OG, pantallas de estado, recetas del deck y la decisión abierta del color de «INSIGHTS» en las portadas PDF. Antes, 1.15: §7.1 nueva — Insights, marca de producto que acompaña: construcción, reglas, lockup, dónde se aplica y gaps; §8.6 con `axis-brand-assets` 0.4.0. Antes, 1.14: §10.0 al día con el cierre de TASK-1928 — las 69 recetas del deck con plantilla en el Artifact Composer, AXIS fijado en `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19, enlace a la spec técnica `GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`. Antes, 2026-09-27, 1.13: §10.0 al día con el cierre de TASK-1927 — contrato `efeonce.surface-composition` 0.1.2 publicado en AXIS `v0.3.14` y fijado en Greenhouse; el deck con sus 16 plantillas, incluidas las portadas y contraportadas, y el documento completo con `pnpm brand:compose`; el contenido de una lámina es dato del intent. Antes, 1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Hoy AXIS publica el contrato 0.5.0 y `axis-graphic-line` 0.13.0 (tag `v0.3.38`, 2026-09-29; §13.1). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -116,6 +118,15 @@ un progreso, un foco), **se declara a propósito** y nunca va por defecto en una
 sujeto de la foto, las reservas de texto, el lecho ni la firma. Una pieza con foto conserva la composición que le da el
 lenguaje fotográfico; la órbita se suma sólo si hace uno de sus tres trabajos.
 
+**La esfera nunca va en un cruce de órbitas** (operador, 2026-10-08; aplica a toda la línea). Donde dos órbitas se
+cortan —hoy, la marca de Rooms (§7.4)—, la esfera va en su posición sobre una sola órbita, nunca en el punto donde se
+cruzan: una esfera en la punta de la almendra que forman dos círculos superpuestos se lee, sin contexto, como una
+figura anatómica propia de la publicidad íntima femenina. La primera versión aprobada de Rooms la ponía en el cruce
+(«el punto de encuentro») y se descartó el mismo día, antes de publicar.
+
+**Una letra dentro de una órbita nunca es R** (operador, 2026-10-08; aplica a toda la línea): una R rodeada por un
+anillo se lee como ®. Vale para toda marca o pieza que lleve una letra en la órbita, como «la órbita vive en la O» (§7.2).
+
 **Origen verificado en producción:** `src/lib/artifact-composer/catalogs/insights-report/report-cover.html`,
 `report-cover-light.html` y `report-back-cover.html`.
 
@@ -159,6 +170,10 @@ corto de 50° y la esfera en su punta (radio 5,6 px), medidos por 794 px de anch
 Contrastes medidos de la esfera: Efeonce 8,5:1 (oscuro) y 3,9:1 (claro) · Globe 5,6:1 y 5,8:1 · Wave 3,6:1 y
 4,3:1 · Reach 4,4:1 y 3,5:1. La esfera es gráfico, no texto; el texto cumple 4,5:1 siempre.
 
+Las dos filas de productos son **acentos de línea** (esfera, arco, anillo). Los gestos de los logotipos de Wave, Reach y
+Globe tienen sus propios colores (§7.5): sobre oscuro, en el logotipo y el lockup, el globo de Globe va frambuesa
+`#ee4274`, nunca en el naranja de la línea Brand. Sobre oscuro, los isotipos de los tres van todo en blanco.
+
 **Regla de contraste del acento** (decisión del operador, 2026-09-26). El acento de la línea debe llegar a **3:1 contra
 su fondo** cuando es gráfico (arco, esfera, halo) o texto de **24 px o más**. **Nunca** se usa para texto de menos de
 24 px: ahí va navy `#023C70` sobre claro y blanco sobre oscuro. Medido sobre los tokens publicados, los que quedan más
@@ -177,6 +192,25 @@ Engine y Voice **conservan su color** (no cambian). Los valores viven en el toke
 `#091951`) y `accentOnLight` `#8E1B82` (7,5:1 sobre papel). El naranjo de HubSpot no se usa: choca con Globe y Reach y
 es el color del partner.
 
+**El acento de la línea es puntuación, no luz** (decisión del operador, 2026-10-06, sobre el deck HubSpot). El acento
+marca: la esfera, el anillo de la pregunta, el arco que mide, la palabra final del eslogan y, en la foto, **detalles
+mínimos** (unas pocas partículas, no más de una de cada veinte, o un objeto chico como un ícono). **Nunca es la luz de
+la escena:** en la foto, la luz es el azul de Efeonce (`photo-blue` `#0375DB`) con blanco frío, como pide §9; el acento
+no tiñe caras, prendas, haces ni fondos. Caso fuente: con el magenta de Revenue-HubSpot como luz ambiente, el deck se
+leía «rosado» de punta a punta. Se compararon tres versiones en la misma toma (A: magenta en todo; B: luz azul y magenta
+sólo como puntuación; C: Growth en todo) y el operador eligió **B**: la línea sigue reconocible sin teñir la pieza, y
+el acento aprobado no cambia. Aplica a todas las líneas con acento propio (Brand, Engine, Voice, Revenue), en cine y
+en cualquier registro. Fotos aprobadas antes de esta regla que la contradicen (por ejemplo RV1b, con la luz magenta)
+se reemplazan al reutilizarlas; las variantes B y C de esa toma quedaron en el banco de
+`ai-generations/2026-10-06_deck-hubspot/fotos/`.
+
+**Estado en las láminas diseñadas (2026-10-06): pendiente, a propósito.** El compositor de decks
+(`src/lib/brand-surfaces/recipes/line-stage/`) todavía pinta con el acento el halo, la plataforma y los haces de
+31 recetas, porque así lo declaran los tokens AXIS (`stage.halo`, `platform.fill`, `platform.arc`, `beam`). Cambiarlo
+mueve todas las láminas aprobadas de todas las líneas y obliga a rebasar `composer:visual-gate`; el operador decidió no
+hacerlo como parche dentro del deck HubSpot. Se resuelve en AXIS (tokens de escenario con la luz en azul de Efeonce) y
+luego en el compositor, con rebaseline revisado. Hasta entonces la regla manda en la foto y en lo que se diseñe a mano.
+
 **Reglas:** una marca, un acento por pieza · el teal es sólo de Efeonce y nunca aparece en una pieza de producto ·
 el halo toma el color del acento · nunca dos acentos en la misma órbita · los valores son sRGB: la conversión a
 CMYK o Pantone se fija con prueba física del proveedor, nunca sin prueba.
@@ -194,6 +228,81 @@ CMYK o Pantone se fija con prueba física del proveedor, nunca sin prueba.
 ---
 
 ## 4. La voz: pregunta y respuesta
+
+### Delta 2026-10-06 — La voz por defecto es la decisión; el par es un recurso (operador)
+
+**Decisión del operador (2026-10-06):** leída en secuencia, como la lee un cliente, la pregunta y respuesta en cada
+lámina **se vuelve absurda**. Las láminas se aprobaron una a una; el defecto sólo aparece al leer el deck entero. De
+96 pares revisados en los decks aprobados (SEO/AEO, Salesforce, HubSpot, recetas y pares por línea), los que fallan
+lo hacen por tres causas: se escribe al revés (primero la respuesta con golpe, después una pregunta que la habilite),
+el tope de tres palabras recorta la respuesta hasta que deja de responder, y el slot de voz es obligatorio en todas las
+recetas, así que el recurso se repite 16, 24 o 33 veces por deck.
+
+**Alcance: toda La órbita** (el operador lo confirmó el 2026-10-06 en la sesión de la línea gráfica, sobre una primera
+redacción que lo acotaba a decks). En decks, brochures y propuestas, el par va en una de cada tres láminas como máximo.
+En piezas de una pantalla (hero web, DOOH, motion, publicidad y social), la voz por defecto también es el titular de
+decisión, y el par se usa sólo cuando pasa las cinco pruebas; en una serie o campaña, la densidad se cuenta sobre la
+serie. Las piezas aprobadas con par se revisan con las cinco pruebas al reutilizarse. Llevar la regla a la norma de
+web, DOOH y motion (composición por superficie) y al gate de tres voces de publicidad (`foto:cta:gate`) es parte de la
+task de sistema; hasta entonces, esas normas siguen como están escritas.
+
+**Desde hoy, en decks y documentos:**
+
+1. **La voz por defecto de una lámina es un titular de decisión:** una afirmación corta, en Bricolage, cerrada con la
+   esfera. La identidad de la línea está en la respuesta con su esfera, el anillo y el foco, no en la pregunta.
+2. **El par pregunta–respuesta es un recurso escaso:** portada, aperturas de sección, objeciones reales y cierre;
+   alrededor de **una de cada tres láminas** como máximo, nunca todas.
+3. **Habla siempre el cliente.** La pregunta es suya, en primera persona («¿Cómo sé que funciona?»). Nunca Efeonce
+   preguntándose a sí misma («¿Cómo trabajamos?», «¿Qué hacemos en…?», «¿Quiénes somos?»).
+4. **Se aprueba leyendo la secuencia completa** en voz alta y en orden, no lámina por lámina.
+
+**Las cinco pruebas de un par** (sale sólo si pasa las cinco):
+
+| Prueba | Pregunta que se hace | Falla así |
+|---|---|---|
+| Conversación | ¿Un cliente lo diría tal cual en una reunión, y un consultor respondería así? | «¿Cuántos Salesforce tienes? Uno.» |
+| Calce | ¿La forma de la respuesta corresponde al tipo de pregunta? (tabla de abajo) | «¿Te encuentra la IA? Visible.» |
+| Autonomía | ¿La respuesta sola, como titular, dice algo? | «Así.» · «Por esto.» · «Uno.» |
+| Sustitución | ¿Una agencia competidora podría firmar el mismo par sin cambiar nada? | «¿Cómo crecemos? Con foco.» |
+| Prueba | ¿Lo que muestra la lámina demuestra la respuesta? | una respuesta que el visual no sostiene |
+
+**Calce por tipo de pregunta:**
+
+| Tipo | La respuesta | Calza | No calza |
+|---|---|---|---|
+| Abierta (qué, quién, dónde, cómo, cuánto) | llena el hueco | ¿Dónde busca tu cliente? **En la IA.** | ¿Cómo te ve la IA? **Mídelo.** |
+| Sí o no | sí o no con matiz: siempre · ahora sí · casi siempre · no por defecto · todavía no · cuando quieras | ¿Hay que migrar a Next? **No por defecto.** | ¿Tu Salesforce ya actúa? **Por ti.** |
+| Disyuntiva | elige o reformula | ¿Salesforce o HubSpot? **El que encaje.** | — |
+| Objeción («¿Y si…?») | despeja el riesgo | ¿Y si no funciona? **Empiezas chico.** | ¿Y el reporte del viernes? **Ya lo viste.** (acertijo sin contexto) |
+
+**Respuestas vacías aunque calcen:** las que señalan la lámina («Así», «Esto», «Ésta», «Este equipo», «Cinco temas»);
+los abstractos que cualquiera firmaría («Con foco», «Con método», «Con sistema», «La base», «En ciclo», «Crecer»); las
+promesas sin prueba («Marcas líderes», «Con lo mejor»).
+
+**Reglas de serie:** las preguntas siguen la compra real (problema → opciones → cómo funciona → riesgos → prueba →
+siguiente paso); el tipo de pregunta varía (nunca tres «¿Cómo…?» seguidas); tres palabras es lo deseable, no un tope
+que justifique recortar el sentido.
+
+**Pares aprobados que fallan las pruebas** (pendientes de reemplazo por el operador; se usan hasta entonces y la tabla
+de abajo los marca):
+Portada general «¿Qué hace Efeonce? Crecer.» (Efeonce se pregunta a sí misma y responde con un abstracto; **reemplazado
+el 2026-10-09** por «¿Qué gano con Efeonce? Crecimiento.»: el operador lo confirmó porque Efeonce genera crecimiento para
+sus clientes; la pregunta es del cliente, en primera persona, y la respuesta cabe en los 12 caracteres de la portada) ·
+Portada de propuesta «¿Cómo crecemos en 2027? Con foco.» (falla sustitución: «Con foco» lo firma cualquiera) ·
+Engine «¿Te encuentra la IA? Visible.» (sí o no sin calce; candidato: «Ahora sí.») · Revenue «¿Y el reporte del
+viernes? Ya lo viste.» (acertijo; candidatos: «¿Tus números están al día? Siempre.» · «¿Cuándo ves tu pipeline? En
+vivo.»). Pasan: Growth, Brand, Voice y la contraportada.
+
+**Estado de la implementación:** el contrato AXIS `efeonce.surface-composition` todavía exige pregunta y respuesta en
+toda lámina con voz y limita la respuesta a `type.answer.maxWords` (3). El cambio necesita, en el contrato: una voz
+`decision` sin pregunta con su propio tope de palabras (y otro para el par, para que el gate no recorte el sentido); la
+jerarquía del titular medida contra el eyebrow o la bajada, porque sin pregunta la regla 3× pierde su referencia; y
+reescribir la «base común» del deck de la [composición por superficie](./EFEONCE_SURFACE_COMPOSITION_V1.md), que hoy
+exige pregunta en toda lámina. Además, recetas y compositor, más un aviso en `pnpm brand:deck-plan` para lo que se puede detectar solo
+(sí o no sin calce, respuestas que señalan la lámina, preguntas en primera persona plural, densidad de pares). Hasta
+entonces, los decks se corrigen con pares que pasen las cinco pruebas.
+
+---
 
 Siempre hay dos voces, y a veces una tercera:
 
@@ -220,13 +329,13 @@ y se usan tal cual en las piezas que indica la tabla. Norma de uso, piezas y med
 
 | Pieza | Pregunta | Respuesta | Evidencia |
 |---|---|---|---|
-| Portada de brochure | ¿Qué hace Efeonce? | **Crecer.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
-| Portada de propuesta comercial | ¿Cómo crecemos en 2027? | **Con foco.** | Preparada para **[Cliente]** · Confidencial |
+| Portada de brochure *(reemplazado por el operador el 2026-10-09: Efeonce genera crecimiento para sus clientes, y la pregunta es del cliente según la regla del 2026-10-06; antes «¿Qué hace Efeonce? Crecer.»)* | ¿Qué gano con Efeonce? | **Crecimiento.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
+| Portada de propuesta comercial *(reemplazo pendiente)* | ¿Cómo crecemos en 2027? | **Con foco.** | Preparada para **[Cliente]** · Confidencial |
 | Portada de brochure · Growth | ¿Lo medimos? | **Siempre.** | **Seis** capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación |
 | Portada de brochure · Brand | ¿Quién crea mi contenido? | **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun |
-| Portada de brochure · Engine | ¿Te encuentra la IA? | **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización |
+| Portada de brochure · Engine *(reemplazo pendiente)* | ¿Te encuentra la IA? | **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización |
 | Portada de brochure · Voice | ¿Dónde invierto? | **Donde rinde.** | **Tres** soluciones y una operación: Estrategia de distribución · Performance · Influencia y earned · Managed Media |
-| Portada de brochure · Revenue (HubSpot) | ¿Y el reporte del viernes? | **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes |
+| Portada de brochure · Revenue (HubSpot) *(reemplazo pendiente)* | ¿Y el reporte del viernes? | **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes |
 | Contraportada de brochure | ¿Conversamos? | **Cuando quieras.** | — (el eslogan firma debajo, §5) |
 
 - En las portadas por línea, el **anillo y la esfera toman el acento de la línea** (no el teal) y la evidencia lista
@@ -312,8 +421,9 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
 - **Igual en toda la familia:** la esfera y el anillo (forma, 0,20 em, comportamiento) · el oficio a la vista y
   los cursores AXIS · la voz · Bricolage + Poppins · el papel como fondo claro.
 - **Cómo aparece un producto como contexto:** su nombre dentro de la pieza (antetítulo o etiqueta), su interfaz en un
-  mockup o su isotipo pequeño dentro de su propia superficie. El lockup «Producto by efeonce» vive sólo en superficies
-  del propio producto (aplicación, ingreso, página del producto), nunca como firma de una pieza.
+  mockup o su isotipo pequeño dentro de su propia superficie. Cuando el producto aparece con su marca junto a Efeonce,
+  va el lockup «Efeonce | Producto» (§7.5), nunca como firma de una pieza: la firma sigue siendo el logo de Efeonce. El
+  endoso «by efeonce» se retiró el 2026-10-09.
 - **Cada pieza toma el color de su línea** (operador, 2026-09-26): la esfera, el anillo y la palabra final del
   eslogan van en el acento de la línea; el logo que firma sigue siendo el de Efeonce. Los acentos viven en los tokens
   `family` de AXIS (hoy colgados del producto; deuda: pasarlos a la línea). RevOps y CRM toma el color de la plataforma
@@ -383,7 +493,7 @@ de 24 px». Cambiarlo toca el contrato de fidelidad de TASK-1889. Los pies de ca
 tipográfica de las portadas PDF y deck; marca en el correo de entrega (hoy plantilla Efeonce), favicon del hub (hoy el
 genérico), portal y MCP (sin marca de producto); la receta de deck «resultados en vivo» usa el isotipo de Efeonce para
 la ficha de Insights y «herramientas del día» tiene el ícono y la nota desalineados; el color de «INSIGHTS» en las
-portadas PDF (decisión abierta, arriba); Greenhouse fija `axis-brand-assets` 0.3.5 y no trae los archivos; las copias de Think son
+portadas PDF (decisión abierta, arriba); Greenhouse fija `axis-brand-assets` 0.4.25 y ya trae los archivos; las copias de Think son
 manuales. Mapa técnico: [arquitectura de Insights §6.3](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
 
 ### 7.2 Submarcas de producto SEO/AEO: «la órbita vive en la O» (aprobadas el 2026-09-29)
@@ -430,7 +540,7 @@ Engine quedó aprobada con la portada del informe aprobada en el canvas.
 **Archivos.** `@efeoncepro/axis-brand-assets` **0.4.2** (tag `v0.4.2`, **publicado el 2026-09-29, AXIS `main` `7f9c8bb`**): 33 SVG nuevos
 (58 en total), export `AXIS_SEO_AEO_BRANDS` y la variante nueva `white`. Referencia visual en el Lab de AXIS:
 `/references/seo-aeo/` y `/references/seo-aeo.json`, con la guía `docs/agent-composition/seo-aeo.md` (publicados el
-2026-09-29; responden 200). Greenhouse fija `axis-brand-assets` 0.4.1: los archivos llegan cuando se implemente TASK-1938.
+2026-09-29; responden 200). Greenhouse fija `axis-brand-assets` 0.4.25: el PDF del AI Visibility Report (TASK-1938) lee los lockups del paquete, rasterizados y sellados en `public/branding/pdf/` (`ai-visibility-assets.manifest.json`); se re-sellan en cada cambio de versión del paquete.
 **Desde 0.4.3** (tag `v0.3.30`, AXIS `main` `26097c5`, 2026-09-29) el paquete re-sella las órbitas estáticas sin cambiar el
 dibujo. El AI Visibility Report tiene canon propio en AXIS: token `aiVisibilityReport` (`axis-tokens` 0.3.30), contrato
 `efeonce.ai-visibility-report` 0.1.0 (`candidate`, `axis-ui-contracts` 0.3.30), receta `@efeoncepro/axis-graphic-line/report`
@@ -440,6 +550,116 @@ dibujo. El AI Visibility Report tiene canon propio en AXIS: token `aiVisibilityR
 del AI Visibility Report y post 1:1 de SV360. **Primera aplicación en producto:** el PDF del informe del Grader
 (TASK-1938) lleva el lockup «Efeonce | AI Visibility Report» en sus dos versiones (cliente / no cliente) y pasa a la
 paleta Engine.
+
+### 7.3 Creative Studio (marca aprobada el 2026-10-06)
+
+Creative Studio nombra la vista creativa de Efeonce Studio y abarca a Globe, su motor de producción
+([ADR de la vista](../../architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md), D9). Su marca es
+la misma construcción que la de Marketing Studio —la órbita en la «o» de Studio— con la palabra «Creative» y la esfera
+en el acento **Brand** (`#bb1954` sobre papel, `#ff6500` sobre navy): 24 SVG `creative-studio-*` (8 piezas × positivo,
+negativo y blanco) en `@efeoncepro/axis-brand-assets` 0.4.26, generados por `scripts/brand/build-creative-studio-logos.mjs`.
+Las piezas cortas, que dicen sólo «Studio», van sólo donde el contexto ya dice Creative Studio; por defecto, el lockup
+«efeonce | Creative Studio». Norma y estado de publicación:
+[ADR de nombre y marca, delta del 2026-10-06](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_NAMING_AND_MARK_DECISION_V1.md).
+Primer uso: las interfaces de Creative Studio del brochure Agencia Creativa
+([composición por superficie §4.6](./EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck)).
+
+### 7.4 Efeonce Rooms (marca aprobada el 2026-10-08)
+
+[Efeonce Rooms](../../architecture/rooms/README.md) es la sala de venta de Efeonce: sirve a propuestas creativas y
+SEO/AEO, a veces en la misma sala. Su marca, la variante **«eslabón leve»**, es «Rooms» en Poppins Bold a contornos con
+las dos «o» como **dos órbitas enlazadas como eslabones** (quien propone y quien decide, en la misma sala): arriba la
+segunda pasa por encima de la primera y abajo la primera por encima de la segunda. Los centros van a **1,6 × el radio
+medio**: el cruce es corto, la almendra central queda angosta y vacía, y la palabra se sigue leyendo «oo». **Una sola
+esfera**, a la **1:30 de la segunda órbita** —la posición de Factory, Marketing Studio y Creative Studio— y en el acento
+**Growth** (`#0e8c82` sobre papel, `#36c8bf` sobre navy), porque Rooms sirve a varias líneas. Misma geometría que la
+familia: anillo de 64 u, esfera de 88, aire de 22 y terminaciones concéntricas a la esfera; los cortes se calculan como
+contornos, nunca como máscaras.
+
+- **Piezas:** 18 SVG `rooms-*` (seis piezas × `positive`, `negative` y `white`): `lockup` «Efeonce | Rooms» (por
+  defecto), `compact` (sin filete), `stacked-lockup`, `isotype` (las dos órbitas enlazadas sin letra: favicon, avatar de
+  la sala e ícono de app; nunca junto al nombre), `icon` (la nave de Efeonce sobre «Rooms» liso) y `logo` (la palabra).
+- **Junto a Efeonce,** «Rooms» va en el gris medido de la familia (§7.2) y sólo la esfera conserva el acento.
+- **Siempre con la firma «efeonce | Rooms»;** nunca «Rooms» suelto en publicidad: «rooms» es casi genérico en la
+  categoría (revisión de parecido del 2026-10-08, en el ADR).
+- **Archivos:** `@efeoncepro/axis-brand-assets` **0.4.27** (AXIS `main`: `1dfb95c` eslabón leve, `f249e82` sin espacios
+  al final de línea, `6e1621b` release). Publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages). Hasta
+  0.4.28, como Creative Studio, vivían sólo en el paquete (`AXIS_LOGO_EXCLUSIONS`); desde 0.4.29 (AXIS `74bb2e7`,
+  tag `v0.4.29`) el índice de búsqueda del Lab está fragmentado y están en la página «Logotipos» y en la búsqueda
+  global.
+- **Nunca se editan a mano:** se regeneran con `scripts/brand/build-rooms-logos.mjs`, se copian a
+  `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y se sellan con `pnpm seal`. El generador quita
+  los espacios al final de línea que trae el logo de Efeonce (gate `git diff --check` de AXIS).
+- **Descartado:** la órbita sólo en la primera «o» (la segunda queda suelta), la esfera en un cruce (§1.3), la R en
+  órbita (®), las órbitas que sólo se tocan (anteojos, ∞), el eslabón profundo (se empasta a 16 px), dos esferas y el
+  acento de una sola línea.
+
+Norma, alternativas y consecuencias: [ADR de la marca](../../architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md). Las
+aplicaciones del canvas [«Efeonce Rooms — Logo»](https://claude.ai/artifact/GxQAjo17CqRKTDvQVMa8R1) (enlace compartido,
+invitación, modo presentación, ícono de app, placa de sala, lanzamiento y la apertura en movimiento) son exploraciones:
+no aprueban composiciones de la sala, que siguen sujetas a los contratos de UI y al go de
+[EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md), ni una animación de logo nueva.
+Pendiente: la prueba sin contexto del símbolo a 16–32 px, en claro y oscuro, frente a 🔗, ⚣ y argollas de boda; si
+confunde, el símbolo va siempre junto a la palabra.
+
+### 7.5 Efeonce Wave, Reach y Globe en la familia (ruta H3, aprobada el 2026-10-09)
+
+Wave, Reach y Globe nacieron como marcas propias «by efeonce» —tres tipografías, tres colores, tres isotipos y el
+endoso chico abajo— y se leían como marcas distintas que Efeonce respalda. Desde el 2026-10-09 entran a la familia por la
+ruta **H3**: **cada producto conserva su logotipo y la familia vive en el lockup**, como Marketing Studio, Creative
+Studio, Factory y Rooms («ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave», operador). La letra es parte de
+la identidad —REACH es modular, WAVE es un bloque en mayúsculas y globe es redondo y amable—; pasarlas a Poppins les
+quitaba presencia.
+
+- **Lockup:** Efeonce adelante con las medidas de la familia (Efeonce de 30 de alto, 20 de aire, filete de 1 × 26 y 20
+  de aire) y el logotipo en el **gris de la familia** (`#6b6b6b` sobre papel, `#6f89a2` sobre oscuro) con **sólo su
+  gesto en color**: así Efeonce predomina. Tamaño por presencia, no por altura de mayúscula (WAVE a 21, REACH a 20 y
+  globe a 35), y la base plana de cada logotipo apoyada en la línea base de Efeonce.
+- **Gestos y colores:**
+
+  | Producto | Gesto | Papel | Oscuro (logotipo y lockup) |
+  |---|---|---|---|
+  | Wave | la W (dos V) | `#0375db` + `#091951` | `#2e8be8` + `#a6cdf5` |
+  | Reach | la «a» con flecha | `#f83902` | `#f83902` |
+  | Globe | el globo | `#bb1954` | `#ee4274` |
+
+  Sobre oscuro, Wave y Globe usan colores propios de producto, fuera de los acentos de línea (§2). **El globo nunca va
+  en el naranja de la línea Brand** (`#ff6500`, que sigue siendo el de Creative Studio, §7.3): el globo frambuesa es el
+  objeto, no un acento.
+- **Isotipos sobre oscuro: todo en blanco** (decisión del operador, 2026-10-09: «son lo suficientemente distintivos
+  para funcionar así»). `isotype-negative` = `isotype-white` en los tres, y `isotype-small-negative` =
+  `isotype-small-white` en Reach y Globe. El color sobre oscuro vive sólo en el logotipo y el lockup.
+- **Afinados:** en Reach, la punta de la flecha se corrió para que no roce el asta; sobre oscuro, en la palabra la «a»
+  va **naranja maciza** (blanca se funde con la «e»); el isotipo suelto, como los otros dos, va todo blanco. En Globe
+  se quitó la mota naranja suelta del archivo original.
+- **Se retira el endoso «by efeonce».** `*-logo-*` es el logotipo solo, en el navy de la familia `#023c70` con su
+  gesto en color: va donde el producto está solo. Junto a Efeonce va siempre el lockup, que es un archivo y nunca se
+  rearma con los dos logos.
+- **Piezas:** 33 SVG en `positive`, `negative` y `white`: `{wave,reach,globe}-lockup` (por defecto: encabezados, decks,
+  informes, correo), `-logo` (el logotipo solo), `-isotype` (los corchetes de Wave, la «a» de Reach, el globo de Globe)
+  y, sólo en Reach y Globe, `-isotype-small` para **24 px o menos** (favicon, chips): en Reach la ranura de la «a» se
+  cierra y el chevrón se engrosa; en Globe los cuatro gajos se funden en un solo cuerpo. Wave no necesita versión chica.
+- **Archivos:** `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680` + `5346761`; tag `v0.4.28` publicado): 12
+  reemplazados (`logo` e `isotype`, positivo y negativo) y 21 nuevos. En 0.4.28 los `logo` e `isotype` de siempre
+  seguían en el catálogo público del Lab con sus bytes nuevos y las piezas nuevas quedaban sólo en el paquete
+  (`AXIS_LOGO_EXCLUSIONS`). Desde 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice de búsqueda del Lab está
+  fragmentado (los logos en `/search-index/logos.json`) y todas las marcas Efeonce son públicas: la página «Logotipos»
+  (`/references/logos/`) y la búsqueda global incluyen Rooms (18), Creative Studio (24) y las piezas nuevas de Wave,
+  Reach y Globe; `AXIS_LOGO_EXCLUSIONS` ya no las lista. Greenhouse fija 0.4.25 y sus copias locales de
+  `public/branding/SVG/` conservan el dibujo anterior; adoptar el paquete entra en
+  [TASK-2014](../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md).
+- **Nunca se editan a mano:** se regeneran con `packages/brand-assets/scripts/product-family.mjs` de AXIS (lee los
+  originales de `packages/brand-assets/sources/product-family/`) y se sellan con `pnpm seal`. Todo son contornos,
+  nunca máscaras: una prueba de AXIS lo exige.
+- **Descartado:** la ruta 1 (rediseño con la órbita), H1 (el gesto en Poppins), H2 (el símbolo en órbita), el isotipo
+  de Wave en blanco + azul sobre oscuro (se leía una Z), Globe en naranja Brand sobre oscuro y los isotipos de color
+  sobre oscuro (Wave en dos azules claros, Reach con la punta de la flecha naranja, Globe en frambuesa, la baldosa
+  blanca detrás y las variantes en gris): sobre oscuro, el isotipo va todo en blanco.
+
+Norma, alternativas y consecuencias: [ADR de la familia H3](../../architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md).
+Uso paso a paso: [usar las marcas de Wave, Reach y Globe](../../manual-de-uso/creative/usar-marcas-wave-reach-globe.md).
+La regla de §7 no cambia: los productos son contexto y nunca firman una pieza. Pendiente: probar los isotipos chicos en
+un favicon real.
 
 ---
 
@@ -454,8 +674,9 @@ paleta Engine.
   (norma de composición §4.6, operador 2026-09-27).
 - **Isotipo:** avatar, favicon, ícono de app, pin, sticker, credencial, lomo de cuaderno, marca de agua en video.
 - **Nunca los dos en la misma vista.**
-- Productos: **nunca firman una pieza**; la firma es siempre Efeonce (§7). Su isotipo o su lockup «by efeonce» sólo
-  dentro de su propia superficie (aplicación, ingreso, página del producto).
+- Productos: **nunca firman una pieza**; la firma es siempre Efeonce (§7). Junto a Efeonce va el lockup «Efeonce |
+  Producto»; el logotipo solo o el isotipo, donde el producto está solo (su propia superficie). El endoso «by efeonce»
+  está retirado (§7.5).
 
 ### 8.2 Logo — uso correcto
 
@@ -493,8 +714,8 @@ Zona calma o cambia la foto; no se oscurece encima. En objetos, el logo va en el
 12. En texto corrido (párrafos, interfaz, tamaño chico): el logo no reemplaza una palabra. En titulares de display sí, con las reglas de §8.2.
 
 La causa es siempre la misma: tratar el logo como una imagen editable. **Si ninguna versión funciona, cambia el
-fondo o la foto, no el logo.** Si falta una versión (por ejemplo, un negativo todo blanco de Wave), se pide a
-diseño; no se arma en la pieza.
+fondo o la foto, no el logo.** Si falta una versión (por ejemplo, un lockup de un producto que todavía no lo
+tiene), se pide a diseño; no se arma en la pieza.
 
 ### 8.4 Isotipo — uso correcto, incorrecto y tamaño mínimo
 
@@ -509,8 +730,10 @@ El isotipo ya es una órbita: no se le agrega nada.
   ponerle otra órbita · recortarlo en un círculo que lo corta (el círculo contiene; no corta) · armar un lockup
   propio (isotipo + palabra tipeada no es el logo) · sin contraste · mezclarlo con otro isotipo.
 
-**Aviso conocido:** el isotipo de Wave en negativo (repo y OneDrive) conserva media figura en azul. Si existe una
-versión toda blanca, se reemplaza.
+**Aviso resuelto (2026-10-09):** el isotipo de Wave en negativo conservaba media figura en el azul de papel. Desde
+`axis-brand-assets` 0.4.28 va todo en blanco, igual que `wave-isotype-white` (lo mismo en Reach y Globe); las copias
+de `public/branding/SVG/` y de OneDrive siguen siendo las anteriores hasta que se reemplacen (§7.5). Para Reach y Globe a
+24 px o menos se usa `-isotype-small`, no el isotipo normal reducido.
 
 ### 8.5 La URL: siempre en su burbuja
 
@@ -556,7 +779,10 @@ suma además 48 órbitas estáticas (SVG + PNG), generadas desde `@efeoncepro/ax
 (2026-09-28) son 25 SVG: suma la marca de Insights (logo e isotipo, positivo y negativo) y su lockup con Efeonce (§7.1). Desde 0.4.2
 (2026-09-29, tag `v0.4.2`) son 58 SVG: suma las submarcas SEO/AEO en `positive`, `negative` y la variante nueva
 `white` (§7.2). Desde 0.4.3 (2026-09-29, tag `v0.3.30`) las órbitas estáticas se re-sellaron; el dibujo es el
-mismo. Greenhouse fija 0.4.1.
+mismo. Desde 0.4.28 (2026-10-09, AXIS `7c96680` + `5346761`, tag `v0.4.28`) Wave, Reach y Globe cambian de dibujo (sin «by efeonce») y suman
+lockup con Efeonce, variante `white` e isotipos chicos (§7.5). Desde 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el
+Lab publica todas las marcas Efeonce, incluidas Rooms, Creative Studio y esas piezas nuevas (índice fragmentado). Greenhouse fija 0.4.25; la adopción de las versiones
+nuevas entra en TASK-2014.
 
 ---
 
@@ -848,6 +1074,8 @@ fuente del manual en PDF.
 
 ### 10.2 Firma de mail
 
+**Envíos por agentes desde el Outlook de Julio (operador, 2026-10-08):** firma completa en texto por conector o gráfica oficial por Outlook UI, y CCO `48713323@bcc.hubspot.com`, también en respuestas/reenvíos; prevalece sobre la recomendación abreviada de esta sección. [Política de envío, fuente HTML y readback](../EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+
 **Aprobada el 2026-09-26 (v3.1) en sus dos versiones:** **A · sobre papel** y **B · tarjeta navy**. HTML de correo
 con tablas y estilos en línea, 460 px en escritorio y fluida en móvil. Contrato AXIS `efeonce.email-signature` 0.3.0
 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del Lab y guía
@@ -1072,7 +1300,7 @@ material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prom
 | Elemento | Sí | No |
 |---|---|---|
 | Esfera | al final de la respuesta, 0,2 em, en el acento; una por pieza | en preguntas, como viñeta, repetida, con volumen o brillo |
-| Órbita | anillo fino al 16–22 %, arco y esfera, al costado del texto; declarada a propósito, en casos específicos | anillos gruesos o muchos, detrás del texto, alrededor del logo, por defecto en toda pieza, sobre el sujeto, las reservas, el lecho o la firma |
+| Órbita | anillo fino al 16–22 %, arco y esfera, al costado del texto; declarada a propósito, en casos específicos | anillos gruesos o muchos, detrás del texto, alrededor del logo, por defecto en toda pieza, sobre el sujeto, las reservas, el lecho o la firma; la esfera en un cruce de órbitas; una R dentro de la órbita |
 | Firma de pieza gráfica | el logo de Efeonce centrado abajo; la burbuja URL centrada y fusionada sólo si el logo ya está en la imagen | la burbuja por defecto, a un costado o junto al logo; firma y burbuja a la vez |
 | Arco de avance | mide un dato real | decorativo o inventado |
 | Voz | pregunta chica, respuesta grande de 1–3 palabras | pregunta grande, respuesta larga y chica |
@@ -1083,6 +1311,7 @@ material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prom
 | Foto | oficio real, luz con carácter, sin emblema legible | velo navy encima, foto de banco |
 | Logo | archivo oficial, con resguardo X y contraste; en titulares puede ocupar el lugar de la palabra Efeonce; dentro de la órbita sólo en cierres de marca (deck, video, recepción) | los doce usos incorrectos de §8.3; la órbita alrededor del logo en el banner de LinkedIn o el reverso de la tarjeta |
 | Isotipo | solo, en formatos chicos, ≥ 24 px | con otra órbita, recoloreado, rotado, combinado |
+| Productos (Wave, Reach, Globe) | lockup «Efeonce \| Producto» junto a Efeonce; logotipo solo donde el producto está solo; `-isotype-small` de Reach y Globe a 24 px o menos; sobre oscuro, el isotipo todo en blanco | «by efeonce»; el lockup rearmado a mano; el globo naranja sobre oscuro; la «a» blanca en la palabra de Reach sobre oscuro; un isotipo de color sobre oscuro |
 | Terceros | satélites de canal que muestran dónde medimos | logos de terceros como si fueran alianzas |
 
 ---
@@ -1262,6 +1491,20 @@ operador.
 | `scripts/creative/brand-motion/` (`render-orbit-motion.mjs`, `orbit-sound.mjs`, `encode-orbit-motion.mjs`) | Render, sonido y codificación de las animaciones del logo V1.1 (reveal, apertura y sting). Lee cada tiempo y proporción de `efeonceGraphicLine.motion`; spec en [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md) y reglas en [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) |
 | `src/config/efeonce-brand-assets.test.ts` | Guarda de deriva: las copias locales del logo y de la burbuja deben ser el mismo dibujo que el paquete de assets |
 
+## Actualización de iconografía y distribución — 2026-10-04
+
+El inventario vigente se consulta en [Iconografía AXIS](https://axis.efeonce.org/references/iconography/)
+y su manifest: 134 entradas únicas, 109 canónicas (60 Trazo, 49 Plastilina) y 25 candidatas. Las colecciones AEO,
+SEO y Autoridad se superponen; Brand Authority tiene una identidad compartida. La geometría nueva SEO/Autoridad
+usa remates y encuentros redondeados. Estar distribuido no equivale a promover una referencia candidata.
+`axis-graphic-line@0.17.0` está publicado; los candidatos usan `resolveSeoIcon` desde `/icons/seo`, mientras
+`resolveIcon` y `icons:export` conservan el catálogo canónico. Las cifras y pins de D22–D26 abajo son históricos.
+El catálogo de [logos](https://axis.efeonce.org/references/logos/) organiza familias propias y de terceros con
+procedencia y restricciones; su API `/logos` requiere nuevo release del package. No reconstruir lockups.
+[Manual de consumo](../../manual-de-uso/creative/descubrir-y-componer-con-axis.md) ·
+[Estado de distribución](../AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) ·
+[Auditoría de cierre](../../audits/2026-10-04-axis-documentation-closure.md).
+
 ## 14. Iconografía: Trazo y Plastilina
 
 La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22), en **dos voces de una familia**:
@@ -1287,11 +1530,11 @@ La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22
 `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos
 `pnpm icons:export|check|vectorize`, la página [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/)
 y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: publicado por primera vez el
-2026-09-26 con el tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0); el catálogo vigente, con el tag `v0.6.0`. La firma de correo y la de equipo siguen
+2026-09-26 con el tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0); el corte D26, con el tag `v0.6.0`. La firma de correo y la de equipo siguen
 con íconos Tabler hasta que el operador decida el reemplazo. Criterio e historia: skill `efeonce-graphic-line`,
 `references/iconography.md`.
 
-**El set: 36 Trazo + 43 Plastilina = 79 glifos** (AXIS main@cf77452 (2026-09-27)). La base de D22 tenía 12 de
+**El set histórico D26: 36 Trazo + 43 Plastilina = 79 glifos** (AXIS main@cf77452 (2026-09-27)). La base de D22 tenía 12 de
 Trazo y 18 de Plastilina. El **2026-09-27 (D25)** el operador aprobó **30 íconos de oficio**, objetos del trabajo diario
 que el set no tenía, producidos con el método de alta de cada voz y revisados en el canvas «Íconos de La órbita»
 (sección 7): 15 de Trazo (correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist, código,
@@ -1315,7 +1558,7 @@ Gemini); hoodie y gorra van sin logo dibujado: la marca la pone la esfera (en la
 de uso: influencer (Trazo) al responder se parece a talent, así que no van juntos; chispa no va con estrella ni varita;
 galería y biblioteca se parecen y se usan separados; prompt es el más débil a 32 px. Publicados con el tag `v0.6.0`:
 `axis-graphic-line` **0.6.0** y `axis-brand-assets` **0.3.4** (`axis-tokens` va en 0.3.8, publicado con superficies, y
-no cambia por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4. La lista completa con claves y
+no cambia por D26). En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4. La lista completa con claves y
 notas vive en la guía de AXIS §«Catálogo aprobado» (delta del ADR «IA, social y staff: 19 glifos nuevos (D26)») y en la
 skill (`references/iconography.md` §13).
 
@@ -1357,5 +1600,26 @@ la guía `iconography.md` §9 y la sección 05 del Lab
 **publicados** con el tag `v0.3.7` (2026-09-27, sobre `main@c0020b6`; la 0.3.7 de tokens salió coordinada junto con los
 cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27). El volumen del oficio
 (D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`) y el de IA, social y staff (D26) en 0.3.4 (tag `v0.6.0`): el Lab
-muestra los 43 volúmenes. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+muestra los 43 volúmenes. En ese corte, Greenhouse fijaba axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
+
+
+## Reproductor de video compartido
+
+Cinema, Editorial y Review son aplicaciones funcionales de La órbita distribuidas desde AXIS. Paleta,
+tipografía, motion y medidas proceden de tokens; la composición del video permanece bajo autoridad de su
+contenido. Los controles usan una familia UI curva propia, sin promoverla al catálogo Trazo/Plastilina.
+El replay se contiene en la órbita canónica estática y conserva nombre accesible; el motivo no añade una
+firma permanente ni un anillo decorativo sobre el video.
+
+`embedded` y `contextual` son presentaciones independientes de la skin. El diseño conserva aire entre controles
+y marco, adapta densidad al ancho del contenedor y separa subtítulos de controles transitorios. El host aporta
+medios, permisos, persistencia y datos de contexto; la identidad compartida no impone una implementación local
+por plataforma ni adopta La órbita automáticamente en Greenhouse.
+
+La implementación se distribuye en primitives `0.6.3`; Think ya consume esa versión publicada. WordPress
+mantiene un adapter candidato sin activación. La publicación no certifica la corrección del incidente de pintura
+azul en sesiones antiguas, dispositivos físicos/AT ni streaming real.
+[Estado y evidencia vigentes](../AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Skill de aplicación](../../../.claude/skills/efeonce-graphic-line/references/video-player.md) ·
+[Historia de iteraciones](../../audits/2026-10-07-axis-video-documentation-history.md).

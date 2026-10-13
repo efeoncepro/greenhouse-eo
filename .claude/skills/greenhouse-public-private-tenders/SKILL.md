@@ -8,6 +8,11 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 
 # greenhouse-public-private-tenders — Operador de Licitaciones
 
+## Envíos desde el Outlook de Julio
+
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+
+
 > **Skill de dominio (método + conocimiento), NO un módulo runtime.** Esta skill es el "cerebro" reutilizable del ciclo de licitación. Hay DOS runtimes que alimenta: (a) el **discovery público** (ingesta Mercado Público, `public_tenders*`) del programa **RESEARCH-007** (TASK-673/675–687), y (b) el **Proposal Studio SHIPPED** (TASK-1392/1393/1391 + 1412/1413/1415, 2026-07-12→16): aggregate `Proposal` + Artifact Composer + render pipeline gobernado + versionado derivado de artefactos + superficie de portal para ver/descargar (`/admin/commercial/proposals`) + **motor de chapter-authors** (TASK-1415: autoría agéntica de láminas servicio-agnóstica, propose→confirm, flag OFF — `proposals/authoring/**`) — su manual de uso/evolución es el companion **`proposal-studio-runtime.md`**. Esta skill _alimenta y opera_ esos módulos; **no los reimplementa**. Si te piden construir/extender runtime, carga también `arch-architect` (overlay Greenhouse) y `greenhouse-backend`.
 
 > 🏆 **Hito 2026-09-23 — primera licitación GANADA con el flujo agéntico de licitaciones.** La propuesta SKY Blog (Wherex) se construyó con el método de la skill `greenhouse-public-private-tenders` (bases → admisibilidad → diagnóstico → oferta) y se compuso con el **Artifact Composer**: deck desde catálogo, oferta técnica y económica y Excel generados desde fuente versionada, y evidencia viva (AI Visibility Grader y Radiografía AEO). La operó el operador junto a un agente. La adjudicación **no se atribuye sólo al flujo**: pesaron la relación existente con SKY, las reuniones de ronda 2, la negociación humana y el ajuste económico por alcance. Pero es la **primera validación en el mercado** de lo construido: una oferta producida con este flujo compitió contra ~15 propuestas y ganó, y lo hizo en una **cuenta de talla enterprise** (SKY Airline, aerolínea), no en un piloto menor.
@@ -15,6 +20,8 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 ## Cuándo invocar
 
 - Descubrir/filtrar oportunidades de compra pública o privada (radar comercial).
+- Calificar una solicitud pública de proveedor y preparar su abordaje según fecha, estado y rol →
+  `prospect-intent-segmentation.md`; la operación de cohortes/segmentos pertenece a `hubspot-as-a-service`.
 - Decidir si Efeonce participa: screening + **bid/no-bid con margen sobre loaded cost**.
 - Leer/entender bases (administrativas, técnicas, económicas), plazos, criterios y garantías.
 - Preparar el paquete de oferta (técnica + económica + administrativa) y su matriz de cumplimiento.
@@ -26,6 +33,7 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
   LicitaLAB no es una fuente de RFP/RFQ privados.
 - Consultar el estado rápido de bid, CRM y postulación →
   `docs/commercial/tenders/LICITATION_CRM_REGISTER.md`; es un índice operativo, no una fuente de verdad.
+- Para otro RFP de una cuenta ya registrada, cargar `crm-portfolio-operating-model.md` → «Nuevo proceso de una cuenta ya registrada»: Deal por proceso, contactos reutilizados con autoridad explícita y handoff trazable.
 - Para una licitación ya promovida a Deal, consultar también `docs/commercial/CRM_DEAL_REGISTER.md`, la vista
   transversal de negocios activos.
 - Revisar Wherex mediante la CLI Playwright protegida, leyendo ficha y adjuntos antes de clasificar el fit → `wherex-radar-chrome-playwright.md`.
@@ -44,6 +52,9 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 ├─ Decidir participar / priorizar / scoring bid-no-bid ......... bid-lifecycle-go-no-go.md
 ├─ Precio, garantías (boleta/póliza), cashflow, factoring ...... pricing-garantias-finance.md
 ├─ Armar la oferta técnica/económica/administrativa ............ propuesta-tecnica-economica.md
+├─ Plataformas, contacto, originales, OneDrive y anexos ........ platform-bids-and-administrative-package.md
+├─ Oferta económica que ve el comprador: plantilla A4 (por
+│  defecto; Excel sólo si las bases exigen planilla) .......... propuesta-tecnica-economica.md + docs/commercial/templates/cotizacion-a4/README.md
 ├─ Producir el DECK de la propuesta: catálogo de plantillas,
 │  molde visual, selector, 3D icons, fotos del equipo ......... deck-visual-system.md
 ├─ Otro país LATAM (portal, registro, umbrales) ............... latam-portales-matriz.md
@@ -58,6 +69,7 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 ├─ Estado rápido CRM/bid/postulación compartido .............. docs/commercial/tenders/LICITATION_CRM_REGISTER.md
 ├─ Vista transversal de deals activos ........................ docs/commercial/CRM_DEAL_REGISTER.md
 ├─ Promoción CRM común + priorización de cartera .............. crm-portfolio-operating-model.md
+├─ Señal explícita/histórica, comprador y abordaje por cohorte .. prospect-intent-segmentation.md
 ├─ Radar Wherex con CLI Playwright protegida .................. wherex-radar-chrome-playwright.md
 └─ OPERAR/EVOLUCIONAR el runtime SHIPPED (Proposal aggregate,
    render jobs, artifact-worker, agentes propose→confirm) ..... proposal-studio-runtime.md
@@ -99,6 +111,9 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 4. **No identidades paralelas.** La oportunidad extiende el modelo canónico 360: `public_opportunity → deal → quote → SOW → delivery`. El comprador público mapea a `organization/account`. Ver `data-sources-apis.md` + `arch-architect`.
 5. **Señales no canónicas ≠ servicios.** Los hits de medios/PR/influencers/staff-aug que aún no son servicio canónico del catálogo se guardan como `signals`, **nunca** dentro de `servicios_matched` (hallazgo TASK-673).
 6. **Human-in-control en la presentación.** La skill/agente **prepara** el paquete; **nunca** envía una oferta ni firma sin confirmación humana explícita. No almacenar credenciales ni cookies de los portales, salvo los runners locales autorizados expresamente de Wherex y LicitaLAB: `.auth/` ignorado, `0600`, perfil aislado y sin exponer valores.
+   Una autorización específica vigente no se solicita otra vez: aplicar su alcance y comprobar hechos antes
+   de insertar firma. Carpeta, originales, anexos y criterio general de contacto por plataforma:
+   `platform-bids-and-administrative-package.md`.
    **Frontera LicitaLAB: sólo discovery público.** Toda oportunidad obtenida desde su UI o MCP se clasifica como
    `public_tender`/`public_opportunity`, su comprador es un organismo público y su evidencia debe contrastarse con
    las bases y la fuente oficial de contratación. Nunca uses LicitaLAB para inferir cobertura de RFP/RFQ privados,
@@ -111,10 +126,18 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
    `Strategic Bets`. Compra Ágil nueva permanece `policy_required` hasta decisión del operador.
 7. **Evidence-first.** Toda clasificación (fit, monto, plazo, riesgo) cita el campo/documento que la sustenta (nombre vs bases técnicas vs items). Nombre pesa menos que bases técnicas.
    Antes de responder dónde está una licitación, lee `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` y
-   confirma el estado vivo en HubSpot/LicitaLAB o la fuente oficial. Después de cualquier cambio de bid, CRM,
+   confirma el estado vivo en HubSpot/LicitaLAB o la fuente oficial. Tras presentar, aplicar evidencia, preservación del paquete y conciliación CRM del companion `platform-bids-and-administrative-package.md` (§Después de presentar); no repetir el envío. Después de cualquier cambio de bid, CRM,
    plazo, postulación o resultado, actualiza el registro; nunca lo trates como source of truth.
    Si ya existe un Deal HubSpot, sincroniza también `docs/commercial/CRM_DEAL_REGISTER.md` usando el mismo
    `deal_id`; una oportunidad todavía en radar no entra al registro comercial general.
+   La revisión amplia cubre todas las categorías pedidas y el universo `all`, no sólo recomendadas; no descartar
+   licencias Claude/OpenAI por etiqueta. El análisis autorizado no requiere otra selección previa.
+   7 bis. **Fit, petición y vigencia son datos distintos.** Una contratación histórica, un cargo público o un
+   correo enriquecido no prueban compra abierta, autoridad ni permiso para enviar. Conserva fecha de señal,
+   fecha de verificación, plazo y estado por separado; no conviertas una petición CRM/Zoho/SEO/IA en demanda
+   HubSpot/AEO/GEO sin evidencia expresa. Para preparar personalización, delimita primero la cohorte autorizada
+   y después usa atributos; coordina una sola entrada por cuenta y entrega dudas/limitaciones al operador.
+   Método: `prospect-intent-segmentation.md`.
 8. **es-CL neutro, tuteo.** Sin voseo ni modismos rioplatenses. Copy visible pasa por `copywriting` / `greenhouse-ux-writing`.
 9. **Creative Studio se cotiza por capas, no por una falsa tarifa por pieza.** Si el bid incluye producción generativa, separa acceso/gobernanza, capacidad humana, Studio Credits, implementación/IP y derechos/licencias/pass-through. El precio total exigido por las bases puede consolidarse hacia afuera, pero la hoja económica interna conserva las cinco líneas y su margen.
 
@@ -128,9 +151,10 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
     embebido deriva de la misma cotización aprobada; si existen artefactos independientes, cada uno conserva
     narrativa, `deck-plan`, output, manifest y capturas propios. Nunca reemplaces el deck de otra licitación
     ni mezcles sus assets.
-11. **Usa `PricingFull` para presentar la inversión.** La oferta económica debe mostrar la opción
+11. **En el deck, usa `PricingFull` para presentar la inversión.** La lámina económica debe mostrar la opción
     recomendada, el desglose cotizado y las condiciones comerciales desde una cotización aprobada;
-    no autorices una tabla libre que omita la estructura del catálogo.
+    no autorices una lámina libre que omita la estructura del catálogo. La oferta documental A4 independiente
+    sigue su plantilla aprobada, descrita abajo; no se convierte en una lámina del deck.
 12. **Declara siempre la base fiscal.** Cada monto client-facing debe indicar de forma visible si es
     neto y si el IVA está excluido o incluido. La propuesta económica y el deck deben decir lo mismo.
 13. **Cuando aplique, presenta HubSpot CRM como beneficio incluido.** Especifica la configuración
@@ -139,6 +163,28 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 14. **Cierra con revisión visual completa.** Después de componer, inspecciona todos los frames
     exportados de cada deck y verifica recortes, legibilidad, jerarquía, condiciones fiscales, assets
     y consistencia. Los tests técnicos no bastan para declarar la oferta lista.
+
+### Oferta económica documental rápida para licitación
+
+**Delta 2026-10-12 — es la vía por defecto, no sólo la urgente.** La oferta económica que ve el comprador se compone con esta plantilla; `pnpm economica:build` (Excel) se usa sólo cuando las bases exigen una planilla. Caso fuente: Sika 1164, donde el agente la armó en Excel por precedente y el operador la devolvió a «un render de Efeonce armado que funciona bien y tiene todo de Efeonce». Cómo se desglosa una oferta creativa (evolución de marca → conceptualización → entregables, no por pieza suelta), el riesgo del componente de pago único y lo que no se inventa (forma de pago, condiciones pospuestas): `propuesta-tecnica-economica.md` → «Oferta económica». Lo aprendido del portal (pasos, moneda, «NO considera IVA», datos fiscales del comprador, hora de cierre, Centro de mensajes completo): `wherex-radar-chrome-playwright.md` → «Anatomía de la oferta en el portal».
+
+Ante una licitación o Compra Ágil urgente que requiere HTML para PDF, con **alcance, precio y condiciones ya aprobados para ese proceso**, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Produce una oferta económica formal para incorporar al paquete de presentación; sólo el ejemplo carece de validez comercial. Su origen es la cotización UTEM aprobada, no una nueva modalidad de pricing. Tiene dos versiones de datos: la **1** cotiza un único precio en cuatro páginas; la **2** cotiza varias líneas con precio (perfiles, servicio con puesta en marcha, costos de terceros) y pagina su sección de inversión según el contenido, sin reducir la tipografía.
+
+Desde la raíz del repo, copiar el JSON de ejemplo al expediente, reemplazar todos los datos y generar en una carpeta nueva o vacía:
+
+```sh
+node scripts/documents/render-cotizacion-a4.mjs --data ruta/cotizacion.json --out ruta/cotizacion-v1
+```
+
+Si el precio viene de una cotización del Cotizador V3, las cifras **no se digitan**: `pnpm --silent pricing:v3 compose document` emite los datos versión 2 desde la cotización congelada y el agente sólo escribe los textos en un brief. Nunca editar una cifra en ese brief ni en los datos emitidos; si un número debe cambiar, se cambia la cotización y se vuelve a correr. Pasos y rechazos: [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente). Ese documento puede llevar además **servicios opcionales** (cada uno es una cotización V3 propia, pasada con `--option`, o —si sólo amplía a personas que ya están en la cotización base— la cotización de la base con el opcional adentro, pasada con `--increment` y leída con `compose increment`; se imprimen en un bloque aparte, fuera del neto, del impuesto y del total de la oferta) y una **línea de cortesía** («Bonificado», con su valor de referencia) cuando la cotización bonifica una fila y el brief la marca `courtesy: true`. Ni el precio de una opción ni un valor de referencia se digitan. Un precio aprobado fuera de V3 se sigue digitando en el JSON, con su fuente en el expediente.
+
+`status: draft` es preparación documental; no es un estado de quote persistida ni prueba falta de aprobación del precio. Los data slots y el JSON son datos del documento. El generador calcula neto/IVA/total, pero **no crea `quoteId`, valida costos/margen, aprueba el precio, ejecuta maker-checker, registra CRM/facturación ni envía la oferta**. Registrar por separado fuente y autoridad del alcance/precio y cada acción posterior. Revisar todos los folios del PDF final; conservar los bytes de documentos firmados o presentados.
+
+Si el pedido es operar el **sistema de cotizaciones Greenhouse**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y el contrato de Quote Builder/catálogo/engine/snapshots/aprobaciones, verificando su disponibilidad real. No sustituir ese trabajo por este HTML ni tratar su manifiesto local como snapshot del sistema. Tampoco satisface el `quotation_id` ni el GO de Proposal Studio: no inventar IDs o margen para pasar esos gates. El deck y Proposal Studio conservan sus propios catálogos, identidades y gates; emitir este documento no cierra una Proposal ni exige recrear el paquete UTEM ya aprobado/presentado.
+
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer. La versión 2 se emite en una sola moneda y rechaza la conversión FX: otra moneda es otra cotización, no una conversión en el documento.
+
+Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
 
 ## Sinergias — tabla de hand-off
 
@@ -185,3 +231,68 @@ Esta skill **decide y estructura**; delega el craft especializado. Declara siemp
 | `crm-portfolio-operating-model.md`  | Contrato común LicitaLAB/Wherex para identidad, idempotencia, deadline separado de `closedate`, asociaciones, segundo readback tras automatizaciones, HOLD/NO-BID/Expirada y priorización de cartera en top bids, RFI livianos y gates                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `wherex-radar-chrome-playwright.md` | Radar privado de Wherex con `pnpm wherex:radar`: Chrome aislado en `.auth/`, estados Nueva + Editando, lectura de ficha y adjuntos, clasificación evidence-first y límite read-only; continuidad de adjuntos originales en OneDrive y empresa/deal/asociación verificados por MCP HubSpot                                                                                                                                                                                                                                                                                                                                                                             |
 | `proposal-studio-runtime.md`        | **El runtime SHIPPED (TASK-1392/1393/1391 + 1415, 2026-07-12→16)**: cómo USAR el pipeline completo (Proposal → evidencia → manifest → render job gobernado → `artifact-worker` → PDF versionado en asset store → ver/descargar en el portal) y cómo EVOLUCIONARLO (costuras: catálogo nuevo, outputTarget, brand pack, fase agéntica con el molde propose→confirm→execute, **un chapter-author nuevo** — implementar la interface de `proposals/authoring/`, jamás tocarla —, failure codes, constraints del RFP) — lo primero que lee un agente nuevo que va a tocar el motor                                                                                        |
+
+## Propuestas SEO/AEO desde discovery
+
+Para una propuesta SEO/AEO con caso de negocio, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md): investigación interna,
+requisitos frente a forecast, alcance costeado y dependencias explícitas. Aplicar los companions de bid
+cuando existan bases; una propuesta directa no requiere inventar RFP, criterios o admisibilidad.
+
+Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (comité, gerencia, compras), usar la
+alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
+enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
+No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.
+
+## Costeo reproducible de una demanda con Cotizador V3
+
+Si el operador pide una simulación local desde perfiles/alcance del expediente, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+El expediente aporta demanda, tareas, dedicación, países, plazo y supuestos explícitos; el catálogo versionado
+aporta salario/provisiones/tools/factores/FX. No reemplazar costos centrales con totales del deck ni inventar cero
+para faltantes. Mantener variantes/país del talento/mercado del cliente independientes. Seleccionar baseNotion/M365,
+tools específicas y presupuesto IA por proveedor/mes; repartir plataforma por capacidad declarada con interno y
+sin asignar separados. Plantilla o escenario Pibank no es rate card ni roster disponible.
+Usar las versiones vigentes con `--current` (no nombrar catálogo/política a mano). El salario del catálogo es el
+nivel objetivo del Excel de pricing, no la nómina actual: el margen real en personas es mayor que el simulado y no
+se propone conectar payroll. Cotizar en la moneda que piden las bases (FX de política del CEO y redondeo por moneda;
+nunca convertir a mano; en EUR aún no se emite). Precio y excepción bajo el piso los decide el CEO. Tres ofertas:
+servicio gestionado creativo (`creative-managed-service`, objetivo y piso 45%), servicio gestionado SEO/AEO
+(`seo-aeo-managed-service`, objetivo 55%, piso 45%) y una persona vendida por dedicación (staff augmentation,
+`talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%); elegir por práctica y unidad vendida, y la
+excepción de una cuenta nunca es referencia para otra.
+Si las bases piden un trabajo acotado (alcance, plazo y aceptación), decláralo `engagementForm: "on_demand"`: es la
+forma del compromiso, no una cuarta oferta (+10% al precio sobre On-Going, mismo piso). **Una licitación cotiza un
+precio de programa:** declara ese precio como `agreed_total` (un neto por todo el plazo, todos los periodos juntos;
+`agreed_net` y `agreed_total` con `per: "period"` son por periodo y no sirven para esto) y en el documento imprime
+la línea como «1 programa» con `combine` y `cover.netLabel`. **Los hitos de pago se declaran sólo si las bases los
+fijan**, con sus porcentajes y sus momentos (con impuesto exclusivo, cada uno sale con su neto, su impuesto y su
+total); si las bases no fijan cuotas, el documento no lleva calendario de pagos y la forma de pago va como condición,
+remitida a las bases: nunca inventar cuotas mensuales porque el programa dura varios meses. **Lo que las bases
+exigen que la oferta declare (plazo de ejecución, vigencia de la oferta, forma de pago) se declara en el documento
+como lo piden**; la regla de no escribir lo obvio sobre el inicio vale para una cotización comercial, no para un
+requisito de las bases. La unidad comercial la fija el catálogo (un servicio gestionado es `managed_service`). El
+presupuesto máximo del comprador y su fórmula de puntaje no están modelados. Pasos y ejemplo que cotiza:
+[procedimiento](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme). Antes de comprometer la oferta revisa `compose
+schedule` (calendario de pagos, cuando las bases fijan hitos) y `compose commitments` (compromisos con proveedores
+que sobreviven al encargo); `compose cash` no es margen ni decide precio. Una licitación con producción y medios ya se cotiza completa
+(contrato 1.4.0, 2026-10-11): cada costo que se compra y se refactura es una fila propia con la regla de su categoría
+(producción, talento e impresión: 10% de gestión con piso 5%; medios y licencias: al costo) y lo que el cliente paga
+directo es una nota sin total. 🔴 Con terceros el piso se lee sobre el margen del trabajo propio (`ownWork`), nunca
+sobre el mezclado: juzgar por el mezclado rechaza una oferta sana o lleva a bajarle el precio al equipo. Un servicio
+gestionado declarado On-Demand lleva una reserva de contingencia de 12% del costo de personas, que sale sólo por una
+renuncia declarada con motivo. Sin modelar: el buffer de un servicio On-Going con multas (el caso típico de una
+licitación), cuándo se le paga al proveedor y derechos de uso que sobreviven al encargo:
+costéalos aparte y declara el supuesto. El plazo del contrato y la fecha de inicio del servicio no son un pendiente
+del cotizador: están fuera de él por decisión del CEO (2026-10-11; una cotización no es un contrato). La cotización
+lleva los periodos que se cotizan; el plazo y el inicio que fijan las bases son materia del contrato.
+
+Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
+gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. `compose document` emite desde esa
+cotización congelada los datos de la oferta económica A4 (versión 2; sección anterior): es un borrador, sus cifras no
+se digitan ni se editan, y no lleva número de cotización, firma ni aprobación. managed_service proyecta fee,
+no vende por defecto las horas internas. Este carril no genera quotation_id remoto ni satisface GO de Proposal
+Studio: emisión, precio aprobado, garantías/caja y presentación del expediente conservan contratos propios.
+No adjuntar el artifact interno al cliente ni tratar exit3 como aprobación. Sólo promover al canon mediante
+[handoff formal](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).

@@ -21,7 +21,13 @@ automático de toda guía o Pillar editorial.** El placement de Pillars se decid
 con [PDR-018](../public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
 y la route-ownership matrix.
 
+Rooms incorporará la experiencia SEO/AEO de X-ray junto al perfil creativo mediante contenido estructurado y un adapter gobernado. [Contrato y límites](../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md); no altera las rutas/muestras actuales ni acredita una migración ejecutada.
+
 ## Indice
+
+- [Efeonce Rooms — dirección vigente](../architecture/rooms/README.md): plataforma propia en `rooms.efeonce.org`, nombre, frontera y design system La órbita acordados; arquitectura/experiencia propuestas antes del go final. El [análisis inicial](creative-proposal-experience-stack-analysis-2026-10-07.md) queda como investigación histórica. Las rutas actuales de Insights y X-Ray conservan sus contratos hasta una migración explícita.
+
+- [Banco Pichincha / Pibank — continuidad comercial](../commercial/prospects/banco-pichincha-peru-seo-2026/README.md): muestra histórica y nuevo mandato 2027; no cambia el estado de publicación.
 
 - [Arquitectura de patrones UI Think](architecture-ui-patterns.md)
 - [Landing Brand Visibility](brand-visibility-landing.md)
@@ -31,6 +37,15 @@ y la route-ownership matrix.
 - **[AEO X-Ray — preparar otro cliente](aeo-xray-nuevo-cliente.md)** · [Manual operativo](../manual-de-uso/growth/aeo-xray.md) · [Handoff de publicación](aeo-xray-release-handoff.md)
 - Efeonce Insights — vista web compartida por token (decisión 2026-09-15; contrato en [arquitectura Insights §8](../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#8-acceso-web-compartido); render en TASK-1875 sobre `InsightWebModelV1` de TASK-1848). Patrón: [Shared Tokenized Report](architecture-ui-patterns.md#pattern-shared-tokenized-report-efeonce-insights); dossier visual en [`docs/ui/reviews/TASK-1875-…`](../ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/)
 
+## Integración del reproductor AXIS
+
+Think consume `@efeoncepro/axis-ui-primitives@0.6.5` con pin/lockfile desde registry privado,
+sin dependencia de un checkout hermano. La ruta `/preview/video-player` es una demostración
+de integración; no incorpora medios en informes de clientes. El adapter Astro vive en
+`efeonce-think/src/components/AxisVideoPlayer.astro`.
+[Versiones, QA y pendientes](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07) ·
+[Manual de consumo](../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado).
+
 ## Herramientas vivas en Think
 
 | Herramienta | Qué es | Ruta |
@@ -39,6 +54,7 @@ y la route-ownership matrix.
 | **Efeonce Insights (informe compartido)** | Lectura ejecutiva de una edición de Insights para el cliente, por enlace con token. Greenhouse compone y gobierna el acceso; Think presenta: hallazgos que se expanden, escenas por módulo, modo presentación y descargas PDF. En producción desde 2026-09-28 (Think `bbf8522`); lee Greenhouse de producción, donde `INSIGHTS_SHARING_ENABLED` sigue OFF hasta el flip del operador. | `/insights/r/<token>` |
 | **Efeonce Insights (muestra para clientes)** | El mismo render con datos de ejemplo y una marca ficticia, para mostrar el producto en venta: aviso visible, sin descargas ni llamadas a Greenhouse, `noindex`, fuera del sitemap. | `/insights/muestra` |
 | **Radiografía AEO / AEO X-Ray** | Muestra de trabajo SEO/AEO: La oportunidad → La pieza → La radiografía → Dónde más vive. Extiende el mismo renderer con landing/artículo, marca y tokens por cliente, módulos completos, fuentes, acoplamiento, motion y derivados. Banco Pichincha publicado autónomamente en Think el 30/09/2026; integración gobernada Greenhouse aún pendiente. | `/muestras/<slug>-<token>` legacy · `/aeo-xray/r/sample_<clave>` autónomo · `/aeo-xray/r/xrg_<grant>` gobernado futuro |
+| **Muestra de video suelta** | Página sin índice ni analítica para ver un video de muestra de una propuesta con el reproductor de AXIS (skin Cinema); se llega por el enlace o el QR del documento. No es una Radiografía: es un archivo estático, sin payload. El token es discreción, no seguridad: el MP4 queda público por su URL directa. Primer caso el 12/10/2026 (reel 9:16, Think `9a36dac`). [Receta, retiro y despliegue](../../.claude/skills/astro/efeonce-overlay.md#página-suelta-de-video-de-muestra-2026-10-12) · [modelo del reproductor](../../.claude/skills/efeonce-graphic-line/references/video-player.md#página-suelta-de-muestra-en-think-2026-10-12). | `/muestras/<slug>-<token>` (archivo `src/pages/muestras/<slug>-<token>.astro` + medios en `public/muestras/<slug>-<token>/`) |
 
 ## Principios
 

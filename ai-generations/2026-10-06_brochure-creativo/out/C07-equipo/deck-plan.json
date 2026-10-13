@@ -1,0 +1,171 @@
+{
+  "tenderId": "C07-equipo",
+  "slides": [
+    {
+      "slideId": "deck-content-team",
+      "contentType": "deck.content-team",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 140,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-tm-question-width=470px",
+          "answerLeading": "--gl-tm-answer-leading=0.9",
+          "answerTracking": "--gl-tm-answer-tracking=-0.05em",
+          "answerInset": "--gl-tm-answer-inset=-8px",
+          "answerShadowY": "--gl-tm-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-tm-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-tm-answer-shadow-opacity=35%",
+          "perspective": "--gl-tm-perspective=1800px",
+          "originX": "--gl-tm-origin-x=1300px",
+          "originY": "--gl-tm-origin-y=450px",
+          "fillFrom": "--gl-tm-fill-from-color=#0e2a44",
+          "fillTo": "--gl-tm-fill-to-color=#081c30",
+          "leadRadius": "--gl-tm-lead-radius=24px",
+          "restRadius": "--gl-tm-rest-radius=20px",
+          "leadBorder": "--gl-tm-lead-border=2px",
+          "leadBorderColor": "--gl-tm-lead-border-color=#72ded8",
+          "leadBorderOpacity": "--gl-tm-lead-border-opacity=85%",
+          "restBorder": "--gl-tm-rest-border=1px",
+          "restBorderColor": "--gl-tm-rest-border-color=#ffffff",
+          "restBorderOpacity": "--gl-tm-rest-border-opacity=16%",
+          "shadowY": "--gl-tm-shadow-y=40px",
+          "shadowBlur": "--gl-tm-shadow-blur=90px",
+          "shadowColor": "--gl-tm-shadow-color=#000610",
+          "shadowOpacity": "--gl-tm-shadow-opacity=70%",
+          "haloColor": "--gl-tm-halo-color=#72ded8",
+          "leadGlowBlur": "--gl-tm-lead-glow-blur=90px",
+          "leadGlowOpacity": "--gl-tm-lead-glow-opacity=45%",
+          "restGlowBlur": "--gl-tm-rest-glow-blur=40px",
+          "restGlowOpacity": "--gl-tm-rest-glow-opacity=16%",
+          "leadPadTop": "--gl-tm-lead-pad-top=18px",
+          "leadPadX": "--gl-tm-lead-pad-x=20px",
+          "leadPadBottom": "--gl-tm-lead-pad-bottom=20px",
+          "restPadTop": "--gl-tm-rest-pad-top=14px",
+          "restPadX": "--gl-tm-rest-pad-x=16px",
+          "restPadBottom": "--gl-tm-rest-pad-bottom=16px",
+          "leadNamePx": "--gl-tm-lead-name-px=30px",
+          "restNamePx": "--gl-tm-rest-name-px=22px",
+          "leadRolePx": "--gl-tm-lead-role-px=18px",
+          "restRolePx": "--gl-tm-rest-role-px=15px",
+          "roleGap": "--gl-tm-role-gap=3px",
+          "roleColor": "--gl-tm-role-color=#c9d6e2",
+          "reflectGap": "--gl-tm-reflect-gap=14px",
+          "reflectFrom": "--gl-tm-reflect-from=72%",
+          "reflectOpacity": "--gl-tm-reflect-opacity=16%",
+          "centerLeft": "--gl-tm-center-left=1050px",
+          "centerTop": "--gl-tm-center-top=815px",
+          "centerWidth": "--gl-tm-center-width=500px",
+          "centerPx": "--gl-tm-center-px=46px",
+          "centerTracking": "--gl-tm-center-tracking=-0.03em",
+          "centerGlowBlur": "--gl-tm-center-glow-blur=30px",
+          "centerGlowOpacity": "--gl-tm-center-glow-opacity=45%",
+          "centerNotePx": "--gl-tm-center-note-px=19px",
+          "centerNoteGap": "--gl-tm-center-note-gap=4px"
+        },
+        "stage": {
+          "src": "asset-ref:layer:content-team-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:content-team-platform"
+        },
+        "voice": {
+          "question": "¿Quién trabaja en tu cuenta?",
+          "answer": "reales",
+          "eyebrow": "Tu equipo",
+          "answerLead": "Personas"
+        },
+        "body": "Un squad que orbita tu marca y <strong>un</strong> solo interlocutor: tu Responsable de Cuenta.",
+        "team": [
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=790px",
+            "top": "--gl-tm-top=330px",
+            "width": "--gl-tm-width=190px",
+            "photoHeight": "--gl-tm-photo-height=213px",
+            "rotate": "--gl-tm-rotate=18deg",
+            "z": "--gl-tm-z=2",
+            "src": "asset-ref:file:squad-andres",
+            "alt": "Andrés, Senior Visual Designer",
+            "name": "Andrés",
+            "title": "Senior Visual Designer"
+          },
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=952.5px",
+            "top": "--gl-tm-top=300px",
+            "width": "--gl-tm-width=225px",
+            "photoHeight": "--gl-tm-photo-height=252px",
+            "rotate": "--gl-tm-rotate=12deg",
+            "z": "--gl-tm-z=3",
+            "src": "asset-ref:file:squad-valentina",
+            "alt": "Valentina, Content Lead",
+            "name": "Valentina",
+            "title": "Content Lead"
+          },
+          {
+            "role": "lead",
+            "left": "--gl-tm-left=1155px",
+            "top": "--gl-tm-top=240px",
+            "width": "--gl-tm-width=290px",
+            "photoHeight": "--gl-tm-photo-height=325px",
+            "rotate": "--gl-tm-rotate=0deg",
+            "z": "--gl-tm-z=5",
+            "src": "asset-ref:file:squad-julio",
+            "alt": "Julio, Responsable de Cuenta",
+            "name": "Julio",
+            "title": "Responsable de Cuenta"
+          },
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=1452.5px",
+            "top": "--gl-tm-top=300px",
+            "width": "--gl-tm-width=225px",
+            "photoHeight": "--gl-tm-photo-height=252px",
+            "rotate": "--gl-tm-rotate=-12deg",
+            "z": "--gl-tm-z=3",
+            "src": "asset-ref:file:squad-daniela",
+            "alt": "Daniela, Creative Operations Lead",
+            "name": "Daniela",
+            "title": "Creative Operations Lead"
+          },
+          {
+            "role": "rest",
+            "left": "--gl-tm-left=1705px",
+            "top": "--gl-tm-top=330px",
+            "width": "--gl-tm-width=170px",
+            "photoHeight": "--gl-tm-photo-height=190px",
+            "rotate": "--gl-tm-rotate=-18deg",
+            "z": "--gl-tm-z=2",
+            "src": "asset-ref:file:squad-melkin",
+            "alt": "Melkin, Senior Visual Designer",
+            "name": "Melkin",
+            "title": "Senior Visual Designer"
+          }
+        ],
+        "center": {
+          "title": "Tu marca",
+          "note": "al centro de todo"
+        },
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 3
+        }
+      },
+      "template": "ContentTeam"
+    }
+  ]
+}

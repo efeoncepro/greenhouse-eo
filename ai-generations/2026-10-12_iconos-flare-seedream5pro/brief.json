@@ -1,0 +1,21 @@
+{
+  "models": [
+    "gpt-image-2.5-flare",
+    "dola-seedream-5-0-pro-260628"
+  ],
+  "qualities": [
+    "max",
+    "standard"
+  ],
+  "size": "2048x2048",
+  "background": "uniform neutral light gray, opaque for controlled material comparison",
+  "icons": [
+    "01-lupa",
+    "02-grafico",
+    "03-carpeta",
+    "04-escudo"
+  ],
+  "samePrompts": true,
+  "references": [],
+  "status": "internal material comparison, no canonical icon adoption"
+}

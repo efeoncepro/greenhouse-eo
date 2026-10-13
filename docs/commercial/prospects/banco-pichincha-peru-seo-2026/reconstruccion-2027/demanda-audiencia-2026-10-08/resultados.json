@@ -1,0 +1,355 @@
+{
+  "as_of": "2026-10-08",
+  "type": "conditional_counterfactual_partial_search_panel",
+  "audience": "NSE A/B, age 35–55: editorial targeting, not observed query segmentation",
+  "audience_share_measured": null,
+  "product_available_from": "2026-01 hypothetical",
+  "monthly_snapshot": 66030.0,
+  "annual_queries": 767640.0,
+  "families": 33,
+  "opening_rate": 0.02,
+  "funding_rate": 0.65,
+  "lead_rate": null,
+  "capture_assumption": "same 2/5/10% mature rates as previous model; not measured rankings or CTR",
+  "maturity": [
+    0.1,
+    0.2,
+    0.35,
+    0.5,
+    0.65,
+    0.8,
+    1.0
+  ],
+  "provider_cost_usd": 0.01344,
+  "fresh_status": [
+    {
+      "query": "fondo de emergencia",
+      "status": "returned_volume"
+    },
+    {
+      "query": "fondo de emergencia peru",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "cuanto ahorrar al mes",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "ahorro programado",
+      "status": "returned_volume"
+    },
+    {
+      "query": "ahorro automatico",
+      "status": "returned_volume"
+    },
+    {
+      "query": "ahorrar para la universidad de mis hijos",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "ahorrar para comprar una casa",
+      "status": "returned_volume"
+    },
+    {
+      "query": "ahorrar para la jubilacion",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "ahorrar a los 40",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "ahorrar a los 50",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "donde ahorrar mi gratificacion",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "como invertir mi gratificacion",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "ahorro familiar",
+      "status": "returned_volume"
+    },
+    {
+      "query": "metas de ahorro",
+      "status": "returned_volume"
+    },
+    {
+      "query": "calculadora de ahorro",
+      "status": "returned_volume"
+    },
+    {
+      "query": "calculadora interes compuesto",
+      "status": "returned_volume"
+    },
+    {
+      "query": "ahorrar o invertir",
+      "status": "returned_volume"
+    },
+    {
+      "query": "ahorro para emergencias",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "ahorrar sin riesgo",
+      "status": "unknown_not_zero"
+    },
+    {
+      "query": "donde guardar mis ahorros",
+      "status": "returned_volume"
+    },
+    {
+      "query": "ahorrar para viajar",
+      "status": "returned_volume"
+    },
+    {
+      "query": "como depositar en pibank",
+      "status": "unknown_not_zero"
+    }
+  ],
+  "summaries": [
+    {
+      "scenario": "prudente",
+      "capture": 0.02,
+      "visits": 7260.11,
+      "original_panel_visits": 3643.9,
+      "added_visits": 3616.2099999999996,
+      "openings": 145.2022,
+      "funded": 94.38143,
+      "ticket_equivalent_usd": 235953.57499999998,
+      "share_of_funded_goal": 0.006209304605263158,
+      "funded_if_one_month_lag": 77.25939,
+      "monthly": [
+        {
+          "month": 1,
+          "query_volume": 71100,
+          "visits": 16.880000000000003
+        },
+        {
+          "month": 2,
+          "query_volume": 60570,
+          "visits": 33.92
+        },
+        {
+          "month": 3,
+          "query_volume": 69800,
+          "visits": 122.38
+        },
+        {
+          "month": 4,
+          "query_volume": 65890,
+          "visits": 212.41
+        },
+        {
+          "month": 5,
+          "query_volume": 63670,
+          "visits": 314.3
+        },
+        {
+          "month": 6,
+          "query_volume": 58460,
+          "visits": 451.90000000000003
+        },
+        {
+          "month": 7,
+          "query_volume": 57650,
+          "visits": 596.73
+        },
+        {
+          "month": 8,
+          "query_volume": 56380,
+          "visits": 748.3
+        },
+        {
+          "month": 9,
+          "query_volume": 66030.0,
+          "visits": 1051.83
+        },
+        {
+          "month": 10,
+          "query_volume": 66030.0,
+          "visits": 1158.74
+        },
+        {
+          "month": 11,
+          "query_volume": 66030.0,
+          "visits": 1235.64
+        },
+        {
+          "month": 12,
+          "query_volume": 66030.0,
+          "visits": 1317.08
+        }
+      ]
+    },
+    {
+      "scenario": "trabajo",
+      "capture": 0.05,
+      "visits": 18150.275,
+      "original_panel_visits": 9109.75,
+      "added_visits": 9040.525000000001,
+      "openings": 363.00550000000004,
+      "funded": 235.953575,
+      "ticket_equivalent_usd": 589883.9375,
+      "share_of_funded_goal": 0.015523261513157895,
+      "funded_if_one_month_lag": 193.148475,
+      "monthly": [
+        {
+          "month": 1,
+          "query_volume": 71100,
+          "visits": 42.2
+        },
+        {
+          "month": 2,
+          "query_volume": 60570,
+          "visits": 84.8
+        },
+        {
+          "month": 3,
+          "query_volume": 69800,
+          "visits": 305.95
+        },
+        {
+          "month": 4,
+          "query_volume": 65890,
+          "visits": 531.025
+        },
+        {
+          "month": 5,
+          "query_volume": 63670,
+          "visits": 785.75
+        },
+        {
+          "month": 6,
+          "query_volume": 58460,
+          "visits": 1129.75
+        },
+        {
+          "month": 7,
+          "query_volume": 57650,
+          "visits": 1491.825
+        },
+        {
+          "month": 8,
+          "query_volume": 56380,
+          "visits": 1870.75
+        },
+        {
+          "month": 9,
+          "query_volume": 66030.0,
+          "visits": 2629.575
+        },
+        {
+          "month": 10,
+          "query_volume": 66030.0,
+          "visits": 2896.85
+        },
+        {
+          "month": 11,
+          "query_volume": 66030.0,
+          "visits": 3089.1
+        },
+        {
+          "month": 12,
+          "query_volume": 66030.0,
+          "visits": 3292.7
+        }
+      ]
+    },
+    {
+      "scenario": "expansion",
+      "capture": 0.1,
+      "visits": 36300.55,
+      "original_panel_visits": 18219.5,
+      "added_visits": 18081.050000000003,
+      "openings": 726.0110000000001,
+      "funded": 471.90715,
+      "ticket_equivalent_usd": 1179767.875,
+      "share_of_funded_goal": 0.03104652302631579,
+      "funded_if_one_month_lag": 386.29695,
+      "monthly": [
+        {
+          "month": 1,
+          "query_volume": 71100,
+          "visits": 84.4
+        },
+        {
+          "month": 2,
+          "query_volume": 60570,
+          "visits": 169.6
+        },
+        {
+          "month": 3,
+          "query_volume": 69800,
+          "visits": 611.9
+        },
+        {
+          "month": 4,
+          "query_volume": 65890,
+          "visits": 1062.05
+        },
+        {
+          "month": 5,
+          "query_volume": 63670,
+          "visits": 1571.5
+        },
+        {
+          "month": 6,
+          "query_volume": 58460,
+          "visits": 2259.5
+        },
+        {
+          "month": 7,
+          "query_volume": 57650,
+          "visits": 2983.65
+        },
+        {
+          "month": 8,
+          "query_volume": 56380,
+          "visits": 3741.5
+        },
+        {
+          "month": 9,
+          "query_volume": 66030.0,
+          "visits": 5259.15
+        },
+        {
+          "month": 10,
+          "query_volume": 66030.0,
+          "visits": 5793.7
+        },
+        {
+          "month": 11,
+          "query_volume": 66030.0,
+          "visits": 6178.2
+        },
+        {
+          "month": 12,
+          "query_volume": 66030.0,
+          "visits": 6585.4
+        }
+      ]
+    }
+  ],
+  "inputs_sha256": {
+    "research/pibank-gap-closure-2026-10-06/plan-busquedas.csv": "0731a5188dd1f54b642766b6390b7834ecd2f6bb70170b2582a4275f15919b79",
+    "reconstruccion-2027/conexion-demanda-plan/inputs.json": "707cb26fbb20046d8f7fe8dec915d93afd4bc267f39ac8e39f7087e3b741d643",
+    "reconstruccion-2027/conexion-demanda-plan/conexion-familias.csv": "2483da1a6efd1f4d73a4b5ef824f2d5ab7ef0cccca3c29a26ae1639df4a96280",
+    "research/pibank-demand-2026-10-06/keyword-overview-provider.json": "99fea2a1b024c984647290783287a262163ccc9b1da42ed095883de5430a3835",
+    "research/pibank-expanded-2026-10-06/ranked-01-provider.json": "4f24f79be6f375680998f0638d47ccc818706931de633c43288d7de1ca06d2c6",
+    "research/pibank-expanded-2026-10-06/suggestion-01-provider.json": "945cfe9224ad3a376be1545fa59dd788819315b9d2b3286259e8100f43e42320",
+    "research/pibank-expanded-2026-10-06/ranked-05-provider.json": "b9cdd9e4479e49093bafd7db2d0834841382968ec10a45594fba062676aa7ec6",
+    "research/pibank-expanded-2026-10-06/ranked-08-provider.json": "cb2c35e1f26040c141e47b3d365c2dd1448169fbf59806c7f60dd5040411a633",
+    "research/pibank-expanded-2026-10-06/ranked-04-provider.json": "3242f0eb42ddcb817052536d9e03fa950af5656946cf4b19fe047abbd5e199c3",
+    "research/pibank-expanded-2026-10-06/ranked-09-provider.json": "b0afcc1ecf27e71f44c8bfd914a447cb4e368442cea6b1614ed0da4a95d161cf",
+    "research/pibank-expanded-2026-10-06/extra-related-01-provider.json": "6f6bac1d0e32213cfc859426f0f523324b5f7f11d44a5cce11dc45c8cb56e341",
+    "research/pibank-expanded-2026-10-06/keyword-dataset.json": "74a70af6088099f7d21ac7885d2beda3420fe238dbd5b9b84f1f18853aadc254",
+    "research/pibank-audience-2026-10-08/overview-provider.json": "33df1681f73264f2aea4a663579aa3e9195c7dafbb0aff159c11d3afa8dea0d5",
+    "reconstruccion-2027/complemento-2026-10-08/resultados.json": "fd0e23b087a1f3b4de15f538d9e1eb9013ec6451856ac424b3deae6d39110241",
+    "research/pibank-audience-2026-10-08/overview-request.json": "fab1458f5aec29f5c03d728391e0eae3fd3ad70b4fd9c2e57bc46a2542f6e8ce"
+  }
+}

@@ -453,7 +453,7 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
 - **Gate:** `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; 32 frames (26 hasta el
   2026-09-27) en `scripts/frontend/baselines/artifact-composer/templates-glitch/`; rebaseline sólo declarado en
   `BASELINE_DELTAS.md` (secciones g y p; la p, sellada, trae las seis del Flash y el chip «LA NOTICIA»).
-- **Tras un bump de AXIS:** `pnpm glitch:tokens` **y** `pnpm brand:tokens`, los dos con `--check`, antes del commit
+- **Tras un bump de `axis-tokens`** (un bump de `axis-brand-assets` tiene su propia lista: `axis-design-system` → SKILL.md, 2026-10-12)**:** `pnpm glitch:tokens` **y** `pnpm brand:tokens`, los dos con `--check`, antes del commit
   ([lessons.md](lessons.md), 2026-09-28: el CI de `53002b352` falló por regenerar sólo uno).
 - **Fuera del comando:** publicar (LinkedIn vía Metricool, blog vía WordPress, con confirmación humana), el motion
   animado (taller, §12) y la ruta productiva (TASK-1921).

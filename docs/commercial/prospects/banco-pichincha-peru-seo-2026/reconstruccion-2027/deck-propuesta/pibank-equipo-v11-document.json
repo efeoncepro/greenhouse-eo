@@ -1,0 +1,71 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "pages": [
+    {
+      "line": "engine",
+      "role": "content",
+      "recipe": "content-team",
+      "voice": {
+        "eyebrow": "El equipo",
+        "question": "¿Quién trabaja en la cuenta?",
+        "answer": [
+          "Expertos",
+          "por área"
+        ]
+      },
+      "body": "SEO, contenido y diseño, con un **Responsable de Cuenta**. Más roles por asignar.",
+      "team": [
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+            "alt": "Andrés, SEO Specialist"
+          },
+          "name": "Andrés",
+          "role": "SEO Specialist"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+            "alt": "Valentina, Redactora SEO"
+          },
+          "name": "Valentina",
+          "role": "Redactora SEO"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+            "alt": "Julio, Responsable de Cuenta"
+          },
+          "name": "Julio",
+          "role": "Responsable de Cuenta"
+        },
+        {
+          "photo": {
+            "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+            "alt": "Daniela, Creative Operations Lead"
+          },
+          "name": "Daniela",
+          "role": "Creative Operations Lead"
+        },
+        {
+          "photo": {
+            "path": "ai-generations/2026-10-07_pibank-propuesta/equipo/por-asignar.png",
+            "alt": "Diseño visual, especialista por asignar antes del inicio"
+          },
+          "name": "Por asignar",
+          "role": "Diseño visual"
+        }
+      ],
+      "center": {
+        "title": "Pibank",
+        "note": "al centro de todo"
+      },
+      "selection": false
+    }
+  ]
+}

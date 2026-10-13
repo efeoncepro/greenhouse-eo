@@ -154,6 +154,12 @@ describe('prepareMonthlyContractorPaymentRun', () => {
     )
   })
 
+  it('dry run does not advertise a full contractor payment for an already partial obligation', async () => {
+    queryMock.mockResolvedValueOnce([{ obligation_id: 'partial', contractor_payable_id: 'pay-partial', currency: 'CLP', amount: '1000', obligation_status: 'partially_paid', due_date: null }])
+    await expect(prepareMonthlyContractorPaymentRun({ periodYear: 2026, periodMonth: 5, triggeredByUserId: 'finance', dryRun: true, ...CAL })).rejects.toMatchObject({ code: 'contractor_partial_payment_unsupported' })
+    expect(createOrderMock).not.toHaveBeenCalled()
+  })
+
   it('failure: marca la corrida failed + re-lanza (sin complete)', async () => {
     queryMock.mockResolvedValueOnce([
       { obligation_id: 'o1', contractor_payable_id: 'p1', currency: 'CLP', amount: '100.00', due_date: '2026-05-10' }

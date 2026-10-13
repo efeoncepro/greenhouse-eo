@@ -1,0 +1,1324 @@
+{
+  "schemaVersion": "efeonce.pricing-v3.parameter-review.v1",
+  "preparedAt": "2026-10-09",
+  "runtimeUse": "review_only",
+  "commercialStatus": "hypothesis_only",
+  "v3OperationalReady": false,
+  "priorityScenario": {
+    "talentCountry": "CO",
+    "offerMarketCountry": "CL",
+    "status": "operator_selected_scenario",
+    "confirmedAt": "2026-10-09",
+    "costLocalizationStatus": "pending",
+    "note": "Escenario elegido por el operador; no localiza ni actualiza los costos históricos."
+  },
+  "source": {
+    "sourceId": "pricing-workbook-history",
+    "path": "data/pricing/efeonce-pricing-model-v1.xlsx",
+    "sha256": "68a0c361e7ec3b188419cc5d5c7b758419e4d4d499eba5d9242b3f78a1c78d1b",
+    "fileModifiedAt": "2026-02-11 00:52:10",
+    "costEffectiveDate": null,
+    "note": "Fecha de archivo no equivale a fecha efectiva de costos."
+  },
+  "statusDefinitions": {
+    "historical": "Dato verificado en el libro; vigencia comercial no validada.",
+    "confirmed_meaning": "Interpretación confirmada por el operador; no actualiza automáticamente cifra/fecha/país.",
+    "proposed": "Definición propuesta para revisar.",
+    "pending": "Dato o decisión ausente; no tratar como cero."
+  },
+  "profiles": [
+    {
+      "profileId": "ECG-002",
+      "sourceName": "Senior Visual Designer",
+      "family": "visual-design",
+      "variantCode": "senior",
+      "variantStatus": "proposed_mapping",
+      "seniorityCode": "senior",
+      "seniorityStatus": "historical_name",
+      "sourceType": "Staff",
+      "legacyTierLabel": "Tier 2: Especializado",
+      "tierAssignmentStatus": "historical_not_approved_for_v3",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A3:AB3"
+      },
+      "components": [
+        {
+          "component": "salaryBase",
+          "amount": "950",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "F3"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusJiT",
+          "amount": "150",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "G3"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusRpA",
+          "amount": "75",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "H3"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusAR",
+          "amount": "35",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "I3"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusOverachievement",
+          "amount": "100",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "J3"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "employmentCharges",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "K3"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "platformFee",
+          "amount": "49",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "L3"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        }
+      ],
+      "historicalHumanMonthlySubtotalUsd": "1310",
+      "historicalRecordedMonthlyTotalUsd": "1359",
+      "historicalMonthlyPriceUsd": "1766.70",
+      "historicalMarkupFraction": "0.30",
+      "costEffectiveDate": null,
+      "talentCountry": null,
+      "currentCostStatus": "pending",
+      "kitRef": "visual-design-core",
+      "kitStatus": "proposed",
+      "operatorConfirmations": [],
+      "missingForOperationalQuote": [
+        "localized_current_cost",
+        "cost_coverage",
+        "talent_country",
+        "seniority_if_required",
+        "tier_pricing_policy",
+        "capacity_policy",
+        "tool_assignments_and_prices",
+        "market_factor",
+        "talent_assurance_cost",
+        "margin_floor",
+        "fx_if_converted"
+      ]
+    },
+    {
+      "profileId": "ECG-025",
+      "sourceName": "Implementador HubSpot",
+      "family": "hubspot",
+      "variantCode": "implementation",
+      "variantStatus": "proposed_mapping",
+      "seniorityCode": null,
+      "seniorityStatus": "pending",
+      "sourceType": "Servicio",
+      "legacyTierLabel": "Tier 4: IP Propietaria",
+      "tierAssignmentStatus": "historical_not_approved_for_v3",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A26:AB26"
+      },
+      "components": [
+        {
+          "component": "salaryBase",
+          "amount": "7200",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "F26"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusJiT",
+          "amount": "250",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "G26"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusRpA",
+          "amount": "150",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "H26"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusAR",
+          "amount": "50",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "I26"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusOverachievement",
+          "amount": "150",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "J26"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "employmentCharges",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "K26"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "platformFee",
+          "amount": "49",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "L26"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        }
+      ],
+      "historicalHumanMonthlySubtotalUsd": "7800",
+      "historicalRecordedMonthlyTotalUsd": "7849",
+      "historicalMonthlyPriceUsd": "12558.40",
+      "historicalMarkupFraction": "0.60",
+      "costEffectiveDate": null,
+      "talentCountry": null,
+      "currentCostStatus": "pending",
+      "kitRef": "hubspot-core",
+      "kitStatus": "proposed",
+      "operatorConfirmations": [],
+      "missingForOperationalQuote": [
+        "localized_current_cost",
+        "cost_coverage",
+        "talent_country",
+        "seniority_if_required",
+        "tier_pricing_policy",
+        "capacity_policy",
+        "tool_assignments_and_prices",
+        "market_factor",
+        "talent_assurance_cost",
+        "margin_floor",
+        "fx_if_converted"
+      ]
+    },
+    {
+      "profileId": "ECG-026",
+      "sourceName": "Desarrollador HubSpot",
+      "family": "hubspot",
+      "variantCode": "development",
+      "variantStatus": "proposed_mapping",
+      "seniorityCode": null,
+      "seniorityStatus": "pending",
+      "sourceType": "Servicio",
+      "legacyTierLabel": "Tier 4: IP Propietaria",
+      "tierAssignmentStatus": "historical_not_approved_for_v3",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A27:AB27"
+      },
+      "components": [
+        {
+          "component": "salaryBase",
+          "amount": "3000",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "F27"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusJiT",
+          "amount": "250",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "G27"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusRpA",
+          "amount": "150",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "H27"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusAR",
+          "amount": "75",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "I27"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusOverachievement",
+          "amount": "150",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "J27"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "employmentCharges",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "K27"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "platformFee",
+          "amount": "49",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "L27"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        }
+      ],
+      "historicalHumanMonthlySubtotalUsd": "3625",
+      "historicalRecordedMonthlyTotalUsd": "3674",
+      "historicalMonthlyPriceUsd": "5878.40",
+      "historicalMarkupFraction": "0.60",
+      "costEffectiveDate": null,
+      "talentCountry": null,
+      "currentCostStatus": "pending",
+      "kitRef": "hubspot-development",
+      "kitStatus": "proposed",
+      "operatorConfirmations": [],
+      "missingForOperationalQuote": [
+        "localized_current_cost",
+        "cost_coverage",
+        "talent_country",
+        "seniority_if_required",
+        "tier_pricing_policy",
+        "capacity_policy",
+        "tool_assignments_and_prices",
+        "market_factor",
+        "talent_assurance_cost",
+        "margin_floor",
+        "fx_if_converted"
+      ]
+    },
+    {
+      "profileId": "ECG-027",
+      "sourceName": "Consultor HubSpot",
+      "family": "hubspot",
+      "variantCode": "consulting-standard",
+      "variantStatus": "proposed_mapping",
+      "seniorityCode": null,
+      "seniorityStatus": "pending",
+      "sourceType": "Servicio",
+      "legacyTierLabel": "Tier 4: IP Propietaria",
+      "tierAssignmentStatus": "historical_not_approved_for_v3",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A28:AB28"
+      },
+      "components": [
+        {
+          "component": "salaryBase",
+          "amount": "10400",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "F28"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusJiT",
+          "amount": "300",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "G28"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusRpA",
+          "amount": "200",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "H28"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusAR",
+          "amount": "75",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "I28"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusOverachievement",
+          "amount": "200",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "J28"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "employmentCharges",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "K28"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "platformFee",
+          "amount": "49",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "L28"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        }
+      ],
+      "historicalHumanMonthlySubtotalUsd": "11175",
+      "historicalRecordedMonthlyTotalUsd": "11224",
+      "historicalMonthlyPriceUsd": "17958.40",
+      "historicalMarkupFraction": "0.60",
+      "costEffectiveDate": null,
+      "talentCountry": null,
+      "currentCostStatus": "pending",
+      "kitRef": "hubspot-core",
+      "kitStatus": "proposed",
+      "operatorConfirmations": [
+        {
+          "date": "2026-10-09",
+          "statement": "Costo mensual de una persona",
+          "sourceField": "salaryBase",
+          "sourceCell": "F28",
+          "confirms": "meaning_of_the_10400_usd_value",
+          "doesNotConfirm": [
+            "country",
+            "effective_date",
+            "bonuses",
+            "employment_charges",
+            "platform_fee",
+            "commercial_approval"
+          ]
+        }
+      ],
+      "missingForOperationalQuote": [
+        "localized_current_cost",
+        "cost_coverage",
+        "talent_country",
+        "seniority_if_required",
+        "tier_pricing_policy",
+        "capacity_policy",
+        "tool_assignments_and_prices",
+        "market_factor",
+        "talent_assurance_cost",
+        "margin_floor",
+        "fx_if_converted"
+      ]
+    },
+    {
+      "profileId": "ECG-032",
+      "sourceName": "Consultor HubSpot Premium",
+      "family": "hubspot",
+      "variantCode": "consulting-premium",
+      "variantStatus": "proposed_mapping",
+      "seniorityCode": null,
+      "seniorityStatus": "pending",
+      "sourceType": "Servicio",
+      "legacyTierLabel": "Tier 4: IP Propietaria",
+      "tierAssignmentStatus": "historical_not_approved_for_v3",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Precios personal",
+        "range": "A33:AB33"
+      },
+      "components": [
+        {
+          "component": "salaryBase",
+          "amount": "23140",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "F33"
+          },
+          "validation": "current_cost_and_coverage_not_validated"
+        },
+        {
+          "component": "bonusJiT",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "G33"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "bonusRpA",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "H33"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "bonusAR",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "I33"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "bonusOverachievement",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "J33"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "employmentCharges",
+          "amount": "0",
+          "currency": "USD",
+          "status": "historical",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "K33"
+          },
+          "validation": "zero_requires_applicability_validation"
+        },
+        {
+          "component": "platformFee",
+          "amount": null,
+          "currency": "USD",
+          "status": "pending",
+          "source": {
+            "sourceId": "pricing-workbook-history",
+            "sheet": "Precios personal",
+            "range": "L33"
+          },
+          "validation": "blank_is_not_zero"
+        }
+      ],
+      "historicalHumanMonthlySubtotalUsd": "23140",
+      "historicalRecordedMonthlyTotalUsd": "23140",
+      "historicalMonthlyPriceUsd": "37024.00",
+      "historicalMarkupFraction": "0.60",
+      "costEffectiveDate": null,
+      "talentCountry": null,
+      "currentCostStatus": "pending",
+      "kitRef": "hubspot-core",
+      "kitStatus": "proposed",
+      "operatorConfirmations": [],
+      "missingForOperationalQuote": [
+        "localized_current_cost",
+        "cost_coverage",
+        "talent_country",
+        "seniority_if_required",
+        "tier_pricing_policy",
+        "capacity_policy",
+        "tool_assignments_and_prices",
+        "market_factor",
+        "talent_assurance_cost",
+        "margin_floor",
+        "fx_if_converted",
+        "platform_fee_or_confirmed_not_applicable"
+      ]
+    },
+    {
+      "profileId": "PILOT-SALESFORCE-CONSULTANT",
+      "sourceName": "Consultor Salesforce",
+      "family": "salesforce",
+      "variantCode": null,
+      "variantStatus": "pending",
+      "seniorityCode": null,
+      "source": null,
+      "components": [],
+      "costEffectiveDate": null,
+      "talentCountry": null,
+      "currentCostStatus": "pending",
+      "historicalRecordedMonthlyTotalUsd": null,
+      "historicalMonthlyPriceUsd": null,
+      "kitRef": "salesforce-core",
+      "kitStatus": "proposed",
+      "note": "Identificador provisional de revisión, no SKU canónico. No hay registro Salesforce en el Excel; no heredar costo HubSpot.",
+      "missingForOperationalQuote": [
+        "product_and_variant",
+        "profile_id_and_seniority",
+        "all_cost_components",
+        "talent_country",
+        "all_pricing_and_allocation_policies",
+        "tool_access_and_costs",
+        "talent_assurance_cost",
+        "fx_if_converted"
+      ]
+    }
+  ],
+  "toolReferences": [
+    {
+      "toolId": "ETG-001",
+      "name": "Adobe Creative Cloud",
+      "historicalProviderAmountUsd": "80",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "4",
+      "historicalDivisorUnit": "Proyectos/mes",
+      "historicalAttributedAmountUsd": "20",
+      "historicalNote": "Incluye Photoshop, Illustrator, After Effects",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A2:N2"
+      }
+    },
+    {
+      "toolId": "ETG-002",
+      "name": "Envato Elements",
+      "historicalProviderAmountUsd": "33",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "4",
+      "historicalDivisorUnit": "Proyectos/mes",
+      "historicalAttributedAmountUsd": "8.25",
+      "historicalNote": "Stock, plantillas, fuentes",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A3:N3"
+      }
+    },
+    {
+      "toolId": "ETG-005",
+      "name": "HubSpot",
+      "historicalProviderAmountUsd": null,
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": null,
+      "historicalDivisorUnit": null,
+      "historicalAttributedAmountUsd": null,
+      "historicalNote": "Incluido como partner",
+      "status": "pending",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A6:N6"
+      }
+    },
+    {
+      "toolId": "ETG-006",
+      "name": "Zapier",
+      "historicalProviderAmountUsd": "49",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "5",
+      "historicalDivisorUnit": "Automatizaciones",
+      "historicalAttributedAmountUsd": "9.8",
+      "historicalNote": "Costo compartido",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A7:N7"
+      }
+    },
+    {
+      "toolId": "ETG-007",
+      "name": "ChatGPT Plus",
+      "historicalProviderAmountUsd": "20",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "4",
+      "historicalDivisorUnit": "Proyectos",
+      "historicalAttributedAmountUsd": "5",
+      "historicalNote": "Incluye uso Promptcraft",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A8:N8"
+      }
+    },
+    {
+      "toolId": "ETG-008",
+      "name": "Midjourney",
+      "historicalProviderAmountUsd": "30",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "6",
+      "historicalDivisorUnit": "Proyectos",
+      "historicalAttributedAmountUsd": "5",
+      "historicalNote": "Uso en renders creativos",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A9:N9"
+      }
+    },
+    {
+      "toolId": "ETG-015",
+      "name": "Notion",
+      "historicalProviderAmountUsd": "144",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "6",
+      "historicalDivisorUnit": "Usuarios/mes",
+      "historicalAttributedAmountUsd": "24",
+      "historicalNote": "Costo operativo",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A16:N16"
+      }
+    },
+    {
+      "toolId": "ETG-016",
+      "name": "Microsoft 365",
+      "historicalProviderAmountUsd": "80",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "5",
+      "historicalDivisorUnit": "Clientes activos",
+      "historicalAttributedAmountUsd": "16",
+      "historicalNote": "Cuentas corporativas",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A17:N17"
+      }
+    },
+    {
+      "toolId": "ETG-018",
+      "name": "Gemini",
+      "historicalProviderAmountUsd": "23",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "4",
+      "historicalDivisorUnit": "Proyectos/mes",
+      "historicalAttributedAmountUsd": "5.75",
+      "historicalNote": "Asistente de IA generativa para prompts, textos y soporte creativo (IA generativa Google).",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A19:N19"
+      }
+    },
+    {
+      "toolId": "ETG-019",
+      "name": "Figma",
+      "historicalProviderAmountUsd": "60",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "3",
+      "historicalDivisorUnit": "Proyectos/mes",
+      "historicalAttributedAmountUsd": "20",
+      "historicalNote": "Plataforma de diseño colaborativo UI/UX y prototipado para Globe y Wave.",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A20:N20"
+      }
+    },
+    {
+      "toolId": "ETG-021",
+      "name": "Freepik",
+      "historicalProviderAmountUsd": "33",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "4",
+      "historicalDivisorUnit": "Proyectos/mes",
+      "historicalAttributedAmountUsd": "8.25",
+      "historicalNote": "Recurso gráfico complementario (vectores, íconos, plantillas).",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A22:N22"
+      }
+    },
+    {
+      "toolId": "ETG-022",
+      "name": "Frame.io",
+      "historicalProviderAmountUsd": "75",
+      "historicalBillingPeriod": "Mensual",
+      "historicalDivisor": "5",
+      "historicalDivisorUnit": "Proyectos/mes",
+      "historicalAttributedAmountUsd": "15",
+      "historicalNote": "Plataforma de revisión colaborativa de video y control de versiones.",
+      "status": "historical",
+      "providerPlan": null,
+      "costEffectiveDate": null,
+      "assignmentPolicy": null,
+      "operationalUse": "disabled_until_plan_unit_price_and_assignment_validated",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "A23:N23"
+      }
+    }
+  ],
+  "proposedKits": [
+    {
+      "kitId": "visual-design-core",
+      "status": "proposed",
+      "requirements": [
+        {
+          "requirement": "work_email_and_collaboration",
+          "candidateToolIds": ["ETG-016"],
+          "required": true
+        },
+        {
+          "requirement": "work_tracking_and_documentation",
+          "candidateToolIds": ["ETG-015"],
+          "required": true
+        },
+        {
+          "requirement": "ai_assistance",
+          "candidateToolIds": ["ETG-007", "ETG-018"],
+          "required": true,
+          "selection": "choose_one_plan_when_scope_requires_ai"
+        },
+        {
+          "requirement": "design_suite",
+          "candidateToolIds": ["ETG-001"],
+          "required": true
+        },
+        {
+          "requirement": "stock_assets",
+          "candidateToolIds": ["ETG-002", "ETG-021"],
+          "required": false
+        },
+        {
+          "requirement": "image_generation",
+          "candidateToolIds": ["ETG-008"],
+          "required": false
+        },
+        {
+          "requirement": "review_platform",
+          "candidateToolIds": ["ETG-022"],
+          "required": false
+        },
+        {
+          "requirement": "interface_prototyping",
+          "candidateToolIds": ["ETG-019"],
+          "required": false,
+          "condition": "scope_requires_it; public_offer_rules_remain_separate"
+        }
+      ]
+    },
+    {
+      "kitId": "hubspot-core",
+      "status": "proposed",
+      "requirements": [
+        {
+          "requirement": "work_email_and_collaboration",
+          "candidateToolIds": ["ETG-016"],
+          "required": true
+        },
+        {
+          "requirement": "work_tracking_and_documentation",
+          "candidateToolIds": ["ETG-015"],
+          "required": true
+        },
+        {
+          "requirement": "ai_assistance",
+          "candidateToolIds": ["ETG-007", "ETG-018"],
+          "required": true,
+          "selection": "choose_one_plan_when_scope_requires_ai"
+        },
+        {
+          "requirement": "hubspot_client_workspace_and_test_access",
+          "candidateToolIds": ["ETG-005"],
+          "required": true,
+          "accessStatus": "pending",
+          "clientProvided": "unconfirmed"
+        },
+        {
+          "requirement": "external_automation",
+          "candidateToolIds": ["ETG-006"],
+          "required": false
+        }
+      ]
+    },
+    {
+      "kitId": "hubspot-development",
+      "status": "proposed",
+      "extends": "hubspot-core",
+      "requirements": [
+        {
+          "requirement": "development_and_test_tooling",
+          "candidateToolIds": [],
+          "required": true,
+          "costStatus": "pending"
+        }
+      ]
+    },
+    {
+      "kitId": "salesforce-core",
+      "status": "proposed",
+      "requirements": [
+        {
+          "requirement": "work_email_and_collaboration",
+          "candidateToolIds": ["ETG-016"],
+          "required": true
+        },
+        {
+          "requirement": "work_tracking_and_documentation",
+          "candidateToolIds": ["ETG-015"],
+          "required": true
+        },
+        {
+          "requirement": "ai_assistance",
+          "candidateToolIds": ["ETG-007", "ETG-018"],
+          "required": true,
+          "selection": "choose_one_plan_when_scope_requires_ai"
+        },
+        {
+          "requirement": "salesforce_product_workspace_and_test_access",
+          "candidateToolIds": [],
+          "required": true,
+          "product": "pending",
+          "accessStatus": "pending",
+          "clientProvided": "unconfirmed"
+        }
+      ]
+    }
+  ],
+  "parameters": [
+    {
+      "id": "talent_country_and_current_cost_by_profile",
+      "value": null,
+      "status": "pending",
+      "reason": "El Excel no localiza el costo por país ni declara fecha efectiva de cada costo."
+    },
+    {
+      "id": "offer_market_factors",
+      "value": null,
+      "status": "pending",
+      "reason": "Separar mercados de segmentos; no usar Factor País como costo del talento."
+    },
+    {
+      "id": "talent_country_cost_factors",
+      "value": null,
+      "status": "pending",
+      "reason": "Sin tabla de costo por origen validada."
+    },
+    {
+      "id": "labor_hours_per_month",
+      "value": "180",
+      "status": "historical",
+      "reason": "Referencia recuperada; jornada vigente/vendible pendiente.",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Datos",
+        "range": "O3"
+      }
+    },
+    {
+      "id": "shared_allocation_policy",
+      "value": null,
+      "status": "pending",
+      "reason": "Distinguir horas laborales y vendibles, reservas y capacidad remanente."
+    },
+    {
+      "id": "dedicated_allocation_policy",
+      "value": null,
+      "status": "pending",
+      "reason": "Definir capacidad comprometida y costo absorbido; no asumir prorrateo lineal."
+    },
+    {
+      "id": "platform_fee_monthly_reference_usd",
+      "value": "49",
+      "status": "historical",
+      "reason": "Concepto genérico; revisar cobertura y costo actual; separar de herramientas y no duplicar.",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "F18"
+      }
+    },
+    {
+      "id": "platform_fee_historical_shared_reference_usd",
+      "value": "12.25",
+      "status": "historical",
+      "reason": "División por cuatro clientes, no política vigente ni proporción de jornada.",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Herramientas",
+        "range": "H18:J18"
+      }
+    },
+    {
+      "id": "talent_assurance_cost",
+      "value": null,
+      "status": "pending",
+      "reason": "Costear capacitación, QA, gestión, continuidad/reemplazo y ramp-up, evitando coberturas duplicadas."
+    },
+    {
+      "id": "margin_target_and_floor",
+      "value": null,
+      "status": "pending",
+      "reason": "No confundir bandas manuales Tiers con markup calculado en Tier Datos."
+    },
+    {
+      "id": "transaction_fee_and_base",
+      "value": null,
+      "status": "pending",
+      "reason": "Separar costo sobre ingreso, proveedor de contratación/pagos y licencias."
+    },
+    {
+      "id": "setup_scope_and_cost",
+      "value": null,
+      "status": "pending",
+      "reason": "Registrar onboarding/inmersión una vez y decidir tratamiento comercial."
+    },
+    {
+      "id": "tax_treatment",
+      "value": null,
+      "status": "pending",
+      "reason": "No inferir impuestos por país; permitir simulación neta."
+    },
+    {
+      "id": "operational_fx_source_and_freshness",
+      "value": null,
+      "status": "pending",
+      "reason": "Las tasas del libro son históricas; no convertir una propuesta vigente con ellas por defecto."
+    }
+  ],
+  "legacyProfileMarkups": [
+    {
+      "tier": 1,
+      "markupFraction": "0.25",
+      "status": "historical",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tier Datos",
+        "range": "B2"
+      },
+      "v3PricingPolicy": null
+    },
+    {
+      "tier": 2,
+      "markupFraction": "0.30",
+      "status": "historical",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tier Datos",
+        "range": "B3"
+      },
+      "v3PricingPolicy": null
+    },
+    {
+      "tier": 3,
+      "markupFraction": "0.50",
+      "status": "historical",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tier Datos",
+        "range": "B4"
+      },
+      "v3PricingPolicy": null
+    },
+    {
+      "tier": 4,
+      "markupFraction": "0.60",
+      "status": "historical",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tier Datos",
+        "range": "B5"
+      },
+      "v3PricingPolicy": null
+    }
+  ],
+  "proposedTierNames": [
+    {
+      "tier": 1,
+      "name": "Generalista"
+    },
+    {
+      "tier": 2,
+      "name": "Especializado"
+    },
+    {
+      "tier": 3,
+      "name": "Estratégico"
+    },
+    {
+      "tier": 4,
+      "name": "Alta especialización"
+    }
+  ],
+  "tierProposalNote": "Tiers propuestos conservan cuatro códigos; porcentajes/assignments no aprobados. Premium es variante de perfil y no otro tier por defecto. Un tier alto no acredita IP propietaria.",
+  "historicalFx": [
+    {
+      "from": "USD",
+      "to": "CLP",
+      "rate": "1000",
+      "rateDate": "2025-11-09",
+      "status": "historical",
+      "convention": "amount_to = amount_from * rate",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "B2:E2"
+      }
+    },
+    {
+      "from": "USD",
+      "to": "COP",
+      "rate": "4200",
+      "rateDate": "2025-11-09",
+      "status": "historical",
+      "convention": "amount_to = amount_from * rate",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "B3:E3"
+      }
+    },
+    {
+      "from": "USD",
+      "to": "MXN",
+      "rate": "18.5",
+      "rateDate": "2025-11-09",
+      "status": "historical",
+      "convention": "amount_to = amount_from * rate",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "B4:E4"
+      }
+    },
+    {
+      "from": "USD",
+      "to": "PEN",
+      "rate": "3.8",
+      "rateDate": "2025-11-09",
+      "status": "historical",
+      "convention": "amount_to = amount_from * rate",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "B5:E5"
+      }
+    },
+    {
+      "from": "USD",
+      "to": "CLF",
+      "rate": "0.024",
+      "rateDate": "2025-11-10",
+      "status": "historical",
+      "convention": "amount_to = amount_from * rate",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "B6:E6"
+      }
+    },
+    {
+      "from": "USD",
+      "to": "USD",
+      "rate": "1",
+      "rateDate": "2025-11-10",
+      "status": "historical",
+      "convention": "amount_to = amount_from * rate",
+      "source": {
+        "sourceId": "pricing-workbook-history",
+        "sheet": "Tipos de Cambio",
+        "range": "B7:E7"
+      }
+    }
+  ],
+  "talentCostFactors": [],
+  "offerMarketFactors": [],
+  "operationalEnabledProfiles": []
+}

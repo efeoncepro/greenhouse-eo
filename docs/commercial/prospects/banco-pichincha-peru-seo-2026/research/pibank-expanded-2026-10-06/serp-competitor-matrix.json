@@ -1,0 +1,738 @@
+{
+  "scope": "Explicit9query panel including ownbrand; no marketSoV derived",
+  "queries": [
+    "cuenta de ahorros",
+    "cuenta digital",
+    "mejor cuenta de ahorros peru",
+    "cuenta de alto rendimiento peru",
+    "que banco paga mas intereses en peru",
+    "cuenta de ahorros sin mantenimiento",
+    "fondo de seguro de depositos",
+    "pibank peru",
+    "abrir cuenta de ahorros online"
+  ],
+  "source": "serp-competitors-01-provider.json",
+  "position_method": "Provider Labs snapshot rank positions; ETV/visibility discarded",
+  "domains": [
+    {
+      "domain": "www.viabcp.com",
+      "avg_position": 10.5,
+      "median_position": 2,
+      "keywords_count": 4,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          21
+        ],
+        "cuenta digital": [
+          2
+        ],
+        "cuenta de alto rendimiento peru": [
+          18
+        ],
+        "cuenta de ahorros": [
+          1
+        ]
+      },
+      "relevant_serp_items": 4
+    },
+    {
+      "domain": "comparabien.com.pe",
+      "avg_position": 11.75,
+      "median_position": 7,
+      "keywords_count": 4,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          4
+        ],
+        "cuenta digital": [
+          24
+        ],
+        "cuenta de alto rendimiento peru": [
+          7
+        ],
+        "cuenta de ahorros": [
+          12
+        ]
+      },
+      "relevant_serp_items": 4
+    },
+    {
+      "domain": "interbank.pe",
+      "avg_position": 14.5,
+      "median_position": 12,
+      "keywords_count": 4,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          12
+        ],
+        "cuenta digital": [
+          12
+        ],
+        "cuenta de alto rendimiento peru": [
+          16
+        ],
+        "cuenta de ahorros": [
+          18
+        ]
+      },
+      "relevant_serp_items": 4
+    },
+    {
+      "domain": "www.youtube.com",
+      "avg_position": 19,
+      "median_position": 10,
+      "keywords_count": 4,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          8
+        ],
+        "cuenta digital": [
+          19
+        ],
+        "cuenta de alto rendimiento peru": [
+          10
+        ],
+        "cuenta de ahorros": [
+          39
+        ]
+      },
+      "relevant_serp_items": 4
+    },
+    {
+      "domain": "www.facebook.com",
+      "avg_position": 20.75,
+      "median_position": 16,
+      "keywords_count": 4,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          7
+        ],
+        "cuenta digital": [
+          18
+        ],
+        "cuenta de alto rendimiento peru": [
+          42
+        ],
+        "cuenta de ahorros": [
+          16
+        ]
+      },
+      "relevant_serp_items": 4
+    },
+    {
+      "domain": "www.sbs.gob.pe",
+      "avg_position": 4,
+      "median_position": 4,
+      "keywords_count": 3,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          2
+        ],
+        "cuenta de alto rendimiento peru": [
+          6
+        ],
+        "cuenta de ahorros": [
+          4
+        ]
+      },
+      "relevant_serp_items": 3
+    },
+    {
+      "domain": "www.scotiabank.com.pe",
+      "avg_position": 4.333333333333333,
+      "median_position": 3,
+      "keywords_count": 3,
+      "keywords_positions": {
+        "cuenta digital": [
+          1
+        ],
+        "cuenta de alto rendimiento peru": [
+          9
+        ],
+        "cuenta de ahorros": [
+          3
+        ]
+      },
+      "relevant_serp_items": 3
+    },
+    {
+      "domain": "www.bbva.pe",
+      "avg_position": 4.666666666666667,
+      "median_position": 3,
+      "keywords_count": 3,
+      "keywords_positions": {
+        "cuenta digital": [
+          3
+        ],
+        "cuenta de alto rendimiento peru": [
+          2
+        ],
+        "cuenta de ahorros": [
+          9
+        ]
+      },
+      "relevant_serp_items": 3
+    },
+    {
+      "domain": "www.bancofalabella.pe",
+      "avg_position": 5,
+      "median_position": 6,
+      "keywords_count": 3,
+      "keywords_positions": {
+        "cuenta digital": [
+          8
+        ],
+        "cuenta de alto rendimiento peru": [
+          1
+        ],
+        "cuenta de ahorros": [
+          6
+        ]
+      },
+      "relevant_serp_items": 3
+    },
+    {
+      "domain": "www.pichincha.pe",
+      "avg_position": 7.666666666666667,
+      "median_position": 5,
+      "keywords_count": 3,
+      "keywords_positions": {
+        "cuenta digital": [
+          15
+        ],
+        "cuenta de alto rendimiento peru": [
+          3
+        ],
+        "cuenta de ahorros": [
+          5
+        ]
+      },
+      "relevant_serp_items": 3
+    },
+    {
+      "domain": "www.banbif.com.pe",
+      "avg_position": 7,
+      "median_position": 6,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta digital": [
+          6
+        ],
+        "cuenta de ahorros": [
+          8
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.cajaarequipa.pe",
+      "avg_position": 7.5,
+      "median_position": 5,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          5
+        ],
+        "cuenta de ahorros": [
+          10
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.compartamos.com.pe",
+      "avg_position": 8,
+      "median_position": 2,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          14
+        ],
+        "cuenta de ahorros": [
+          2
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.interseguro.pe",
+      "avg_position": 13,
+      "median_position": 13,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          13
+        ],
+        "cuenta de alto rendimiento peru": [
+          13
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.prestamype.com",
+      "avg_position": 21.5,
+      "median_position": 20,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          20
+        ],
+        "cuenta de alto rendimiento peru": [
+          23
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.bn.com.pe",
+      "avg_position": 21.5,
+      "median_position": 17,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta digital": [
+          17
+        ],
+        "cuenta de ahorros": [
+          26
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "gestion.pe",
+      "avg_position": 25,
+      "median_position": 16,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          16
+        ],
+        "cuenta digital": [
+          34
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.tiktok.com",
+      "avg_position": 26.5,
+      "median_position": 15,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          38
+        ],
+        "cuenta de alto rendimiento peru": [
+          15
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.bancoripley.com.pe",
+      "avg_position": 29,
+      "median_position": 28,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          30
+        ],
+        "cuenta de ahorros": [
+          28
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "www.santanderconsumer.com.pe",
+      "avg_position": 29,
+      "median_position": 25,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          33
+        ],
+        "cuenta de ahorros": [
+          25
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "comparabancaperu.com",
+      "avg_position": 33.5,
+      "median_position": 20,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          20
+        ],
+        "cuenta de ahorros": [
+          47
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "infomercado.pe",
+      "avg_position": 42.5,
+      "median_position": 30,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          30
+        ],
+        "cuenta digital": [
+          55
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "rpp.pe",
+      "avg_position": 46.5,
+      "median_position": 37,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          37
+        ],
+        "cuenta digital": [
+          56
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "diariocorreo.pe",
+      "avg_position": 47,
+      "median_position": 40,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          40
+        ],
+        "cuenta de ahorros": [
+          54
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "fsd.org.pe",
+      "avg_position": 1,
+      "median_position": 1,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          1
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "cp.com.pe",
+      "avg_position": 3,
+      "median_position": 3,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          3
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "productos.cajaarequipa.pe",
+      "avg_position": 4,
+      "median_position": 4,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta digital": [
+          4
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.mibanco.com.pe",
+      "avg_position": 4,
+      "median_position": 4,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          4
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "cuentadigital.bancom.pe",
+      "avg_position": 5,
+      "median_position": 5,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta digital": [
+          5
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "losandes.pe",
+      "avg_position": 6,
+      "median_position": 6,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          6
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "kambista.com",
+      "avg_position": 53.5,
+      "median_position": 53,
+      "keywords_count": 2,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          54
+        ],
+        "cuenta de ahorros": [
+          53
+        ]
+      },
+      "relevant_serp_items": 2
+    },
+    {
+      "domain": "ahorros.mibanco.com.pe",
+      "avg_position": 7,
+      "median_position": 7,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de ahorros": [
+          7
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "russellbedford.pe",
+      "avg_position": 9,
+      "median_position": 9,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          9
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.prexpe.com.pe",
+      "avg_position": 9,
+      "median_position": 9,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta digital": [
+          9
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "actualidadempresarial.pe",
+      "avg_position": 10,
+      "median_position": 10,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          10
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "revistasinvestigacion.unmsm.edu.pe",
+      "avg_position": 11,
+      "median_position": 11,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          11
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "fsdcoop.org.pe",
+      "avg_position": 14,
+      "median_position": 14,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          14
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.cajapiura.pe",
+      "avg_position": 14,
+      "median_position": 14,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de ahorros": [
+          14
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.infobae.com",
+      "avg_position": 15,
+      "median_position": 15,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          15
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.bancom.pe",
+      "avg_position": 15,
+      "median_position": 15,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de ahorros": [
+          15
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "confianza.pe",
+      "avg_position": 20,
+      "median_position": 20,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de ahorros": [
+          20
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.instagram.com",
+      "avg_position": 21,
+      "median_position": 21,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          21
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "www.efectibank.pe",
+      "avg_position": 21,
+      "median_position": 21,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de ahorros": [
+          21
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "tyba.pe",
+      "avg_position": 22,
+      "median_position": 22,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          22
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "ligo.pe",
+      "avg_position": 22,
+      "median_position": 22,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta digital": [
+          22
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "coggle.it",
+      "avg_position": 23,
+      "median_position": 23,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          23
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "es.scribd.com",
+      "avg_position": 24,
+      "median_position": 24,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          24
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "banbif.com.pe",
+      "avg_position": 24,
+      "median_position": 24,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta de alto rendimiento peru": [
+          24
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "ahorraseguros.pe",
+      "avg_position": 25,
+      "median_position": 25,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "fondo de seguro de depositos": [
+          25
+        ]
+      },
+      "relevant_serp_items": 1
+    },
+    {
+      "domain": "cuentadigital.cajaica.pe",
+      "avg_position": 25,
+      "median_position": 25,
+      "keywords_count": 1,
+      "keywords_positions": {
+        "cuenta digital": [
+          25
+        ]
+      },
+      "relevant_serp_items": 1
+    }
+  ]
+}

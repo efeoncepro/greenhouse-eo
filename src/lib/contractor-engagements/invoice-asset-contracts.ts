@@ -64,29 +64,19 @@ const DRAFT_TO_FINAL_CONTEXT: Record<ContractorInvoiceAssetContext, GreenhouseAs
   provider_payout_statement: 'provider_payout_statement'
 }
 
-export const isContractorInvoiceAssetContext = (
-  value: string
-): value is ContractorInvoiceAssetContext =>
+export const isContractorInvoiceAssetContext = (value: string): value is ContractorInvoiceAssetContext =>
   (CONTRACTOR_INVOICE_ASSET_CONTEXTS as readonly string[]).includes(value)
 
-export const resolveFinalAttachContext = (
-  assetContext: string
-): GreenhouseAssetContext | null =>
-  isContractorInvoiceAssetContext(assetContext)
-    ? DRAFT_TO_FINAL_CONTEXT[assetContext]
-    : null
+export const resolveFinalAttachContext = (assetContext: string): GreenhouseAssetContext | null =>
+  isContractorInvoiceAssetContext(assetContext) ? DRAFT_TO_FINAL_CONTEXT[assetContext] : null
 
 export const isContractorInvoiceAssetRole = (value: string): value is ContractorInvoiceAssetRole =>
   (CONTRACTOR_INVOICE_ASSET_ROLES as readonly string[]).includes(value)
 
-export const isContractorInvoiceArtifactKind = (
-  value: string
-): value is ContractorInvoiceArtifactKind =>
+export const isContractorInvoiceArtifactKind = (value: string): value is ContractorInvoiceArtifactKind =>
   (CONTRACTOR_INVOICE_ARTIFACT_KINDS as readonly string[]).includes(value)
 
-export const isContractorInvoiceAssetSource = (
-  value: string
-): value is ContractorInvoiceAssetSource =>
+export const isContractorInvoiceAssetSource = (value: string): value is ContractorInvoiceAssetSource =>
   (CONTRACTOR_INVOICE_ASSET_SOURCES as readonly string[]).includes(value)
 
 export interface ContractorInvoiceAsset {
@@ -106,6 +96,8 @@ export interface ContractorInvoiceAsset {
 }
 
 export interface AttachContractorInvoiceAssetInput {
+  /** Required on the self-service contractor_upload lane. */
+  ownerMemberId?: string
   contractorEngagementId: string
   contractorInvoiceId?: string | null
   /** TASK-792 — link the evidence asset to a work submission (e.g. work_evidence). */

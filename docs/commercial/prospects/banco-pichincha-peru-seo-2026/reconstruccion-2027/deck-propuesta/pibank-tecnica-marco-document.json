@@ -1,0 +1,47 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "sections": 5,
+  "pages": [
+    {
+      "role": "cover",
+      "recipe": "cover-proposal",
+      "layout": "orbit",
+      "voice": {
+        "eyebrow": "Propuesta técnica · Octubre 2026",
+        "question": "¿Quién nos encuentra?",
+        "answer": [
+          "Quien",
+          "ahorra"
+        ]
+      },
+      "body": "Preparada para **Pibank** · Confidencial",
+      "selection": {
+        "target": "client-logo",
+        "label": "Pibank",
+        "participantKind": "role"
+      },
+      "column": {
+        "topPx": 220
+      },
+      "clientLogo": {
+        "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo.svg",
+        "alt": "Pibank"
+      }
+    },
+    {
+      "role": "close",
+      "recipe": "close-proposal",
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+        "alt": "Nexa, de espaldas, camina hacia una órbita de luz teal que se levanta como un portal en el horizonte"
+      }
+    }
+  ]
+}

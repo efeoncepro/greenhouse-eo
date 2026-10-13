@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "status": "draft",
+  "date": "2026-10-08",
+  "reference": "DDSoft · Micrositio · 08/10/2026",
+  "currency": "CLP",
+  "net": 1200000,
+  "vatRate": 0.19,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "DDSoft",
+    "unit": "DDSoft · Jorge Zepeda",
+    "taxId": "RUT 76.613.599-4",
+    "logo": {
+      "path": "logo-cliente.png",
+      "source": "https://ddsoft.cl/"
+    }
+  },
+  "cover": {
+    "label": "Diseño y desarrollo web",
+    "title": [
+      "Un micrositio",
+      "listo para",
+      "conectar."
+    ],
+    "subtitle": "Diseño en Figma, construcción en WordPress + Elementor y captura de datos para DDSoft."
+  },
+  "service": {
+    "name": "Diseño e implementación de micrositio web",
+    "detail": "4 a 5 secciones, diseño en Figma, WordPress + Elementor, un formulario y una conexión de datos. Incluye pruebas, publicación y entrega."
+  },
+  "scope": {
+    "title": [
+      "Del diseño a la captura",
+      "de contactos."
+    ],
+    "intro": "Una página en español con 4 a 5 secciones y navegación interna: inicio, presentación, servicios, respaldo y contacto, según estructura acordada.",
+    "rows": [
+      {
+        "title": "Diseño en Figma",
+        "text": "Una plantilla personalizada a la marca, con vistas de escritorio y móvil, componentes reutilizables y dos rondas de ajustes."
+      },
+      {
+        "title": "WordPress + Elementor",
+        "text": "4 a 5 secciones editables, adaptadas a escritorio, tablet y móvil. Carga y ajuste editorial de textos e imágenes aportados por DDSoft."
+      },
+      {
+        "title": "Formulario",
+        "text": "Hasta 8 campos, validación, antispam, aceptación de privacidad, mensajes de resultado y aviso por correo al destinatario acordado."
+      },
+      {
+        "title": "Datos",
+        "text": "Registro de envíos y una conexión a Excel en OneDrive/SharePoint o panel existente con API/webhook. Mapeo de campos y prueba de recepción."
+      },
+      {
+        "title": "SEO y medición",
+        "text": "Títulos, descripciones y encabezados SEO, imágenes y carga optimizadas. GA4 y evento de formulario con cuenta y permisos de DDSoft."
+      },
+      {
+        "title": "Pruebas y salida",
+        "text": "Pruebas de navegación, enlaces, formulario, recepción de datos y móvil. Publicación en dominio/hosting acordado, con HTTPS y respaldo previo."
+      },
+      {
+        "title": "Entrega y soporte",
+        "text": "Figma editable, administración, guía y capacitación remota de 60 minutos. Corrección de defectos del alcance entregado durante 30 días."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Plazo estimado: 4 semanas",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {
+        "label": "Semana 1",
+        "title": "Diseño",
+        "text": "Estructura, campos y destino de datos. Figma y aprobación visual."
+      },
+      {
+        "label": "Semanas 2–3",
+        "title": "Construcción",
+        "text": "WordPress + Elementor, contenido, móvil y conexión del formulario."
+      },
+      {
+        "label": "Semana 4",
+        "title": "Entrega",
+        "text": "Pruebas, ajustes, aprobación, publicación y capacitación."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Precio fijo por",
+      "el proyecto completo."
+    ],
+    "intro": "Una inversión única por el diseño y la implementación del alcance descrito. Todos los valores se expresan en pesos chilenos (CLP).",
+    "summary": "Proyecto único · Pesos chilenos · IVA no incluido",
+    "taxNote": "El valor neto es $1.200.000. IVA 19%: $228.000. Total del proyecto: $1.428.000. Licencias e infraestructura se rigen por las condiciones comerciales.",
+    "monthly": null
+  },
+  "conditions": {
+    "title": [
+      "Condiciones para iniciar",
+      "y entregar el proyecto."
+    ],
+    "rows": [
+      {
+        "title": "Plazo e inicio",
+        "text": "4 semanas de ejecución desde aceptación, anticipo y recepción de contenido, accesos y destino de datos. DDSoft consolida revisiones; demoras de aprobación desplazan el calendario."
+      },
+      {
+        "title": "Pago propuesto",
+        "text": "50% al iniciar y 50% contra aprobación final, antes de publicar: cada pago corresponde a $600.000 netos + $114.000 de IVA = $714.000. Modalidad sujeta a aceptación de DDSoft."
+      },
+      {
+        "title": "Contenido y aprobaciones",
+        "text": "DDSoft aporta marca, textos, imágenes con derechos de uso y aviso de privacidad. Incluye dos rondas de diseño y una revisión funcional consolidada. Se publica tras aprobación expresa."
+      },
+      {
+        "title": "Accesos y servicios externos",
+        "text": "DDSoft aporta dominio, hosting, HTTPS, correo de envío y licencias vigentes de Elementor Pro, conectores y Microsoft 365 cuando sean necesarias. Sus compras y renovaciones no están incluidas."
+      },
+      {
+        "title": "Integración y alcance",
+        "text": "Un destino de datos, con permisos y API/webhook o tabla Excel accesible. Paneles nuevos, sincronización bidireccional, e-commerce, idiomas adicionales y migraciones quedan fuera del precio."
+      },
+      {
+        "title": "Entrega, soporte y vigencia",
+        "text": "Transferencia del Figma y administración del sitio al cierre. 30 días de corrección de defectos; contenidos nuevos y mantenimiento posterior se cotizan aparte. Oferta vigente hasta el 07/11/2026."
+      }
+    ]
+  }
+}

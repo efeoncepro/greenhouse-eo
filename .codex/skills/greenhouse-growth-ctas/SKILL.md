@@ -39,6 +39,33 @@ ledger** where only `server_confirmed` counts as conversion truth.
   measurement. To build/publish GTM tags → skill `greenhouse-gtm-ga4-operator`.
 - Embedding on a host (Think dock, WordPress snippet), rollout/flags, `growth.cta.*` signals.
 
+## AXIS presentation approved; adoption pending — 2026-10-05
+
+The operator approved the AXIS source visually («Aprobado todo»). The native portable render lives
+in the sibling `axis-design-system`, `/references/growth-cta/`, package `/growth-cta` and
+`/growth-cta.css`, model `GrowthCtaModel`, tokens `axisGrowthCta`. It implements `embedded`,
+`inline_banner`, `slide_in`, all three appearances and the five current actions. `sticky_banner`,
+`popup_modal` and `floating_button` remain inventoried as unimplemented; a meeting dialog is not
+proof of a `popup_modal` placement. The generic product consultation demo is not this engine.
+
+Approved recipes: compact editorial `inline_banner/minimal` and brand `inline_banner/spotlight`.
+The preserved headline carries sphere at its end; ring belongs only in the eyebrow above.
+`content.headlineMarks: 'ring-and-sphere'` is explicit opt-in. `content.headlineEmphasis` identifies
+one exact, unique phrase: Bricolage 400 introduces and 700 directs attention to the main idea,
+without HTML, changed copy or inferred keyword emphasis. `meetingPresentation: 'dialog' | 'inline'`
+is a presentation option of one meeting action; selection and draft survive collapse/reopen.
+Load `efeonce-graphic-line` and `axis-design-system/references/ui-primitives.md` before modifying it.
+
+This is approved local source, **not adopted** by `src/growth-cta-renderer`. New AXIS exports remain
+unreleased. First release/install the compatible set including CSS and graphic-line dependency;
+then adapt the shared renderer, preserve `attachDisclosureFocus` for in-place reveals, verify modal
+focus separately, and exercise policy, exposure, dismiss, consent, events, Shadow DOM and bundle
+in each host. No targeting, visitor state, telemetry or conversions moved to AXIS. No consumer
+pins, WordPress/Think deployment or real submission/booking changed in this delivery.
+Canonical API/decision/QA: sibling AXIS `packages/primitives/README.md`,
+`docs/architecture/GROWTH_CTA_COMPOSITION_DECISION_V1.md`, `docs/quality/growth-cta.md`.
+Greenhouse tracking: `docs/tasks/in-progress/TASK-2007-axis-product-primitives.md`.
+
 ## Mental model — end to end
 
 ```text

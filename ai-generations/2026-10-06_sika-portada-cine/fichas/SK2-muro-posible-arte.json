@@ -1,0 +1,39 @@
+{
+  "id": "SK2-muro-posible-arte",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "deck-portada",
+  "impacto": true,
+  "linea": "brand",
+  "identidad": [
+    {
+      "persona": "karo"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "llave": {
+    "fuente": "a hard cold white spotlight in a small fixture, outside the frame",
+    "lado": "high on the left of her face, slightly in front",
+    "distancia": "about 3 meters from her"
+  },
+  "fenomeno": {
+    "que": "a giant backlit lightbox showing the Sika campaign artwork, glowing as the brightest object of the studio, its light falling softly on the floor and wall right next to it",
+    "esServicio": "Creative Studio: la campaña que proponemos para Sika ya existe a escala real, como un afiche retroiluminado en nuestro estudio"
+  },
+  "escena": "SCENE (staged cinematic editorial photograph, a large dark creative studio at night, the moment of a campaign reveal): the back wall is a deep matte charcoal wall. On it hangs a GIANT frameless backlit fabric lightbox (a tension-fabric print lit from behind), perfectly flat and perfectly FRONTAL to the camera (no perspective, no tilt), a clean 16:9 rectangle with four sharp straight edges and four visible square corners: its left edge at about 46 % of the frame width, its right edge at about 93 %, its top edge at about 7 % of the frame height and its bottom edge at about 56 %. The lightbox PRINTS the campaign artwork shown in image 6, filling it edge to edge in the same layout: the yellow left part with the big black word and the black headline, a diagonal cut, and on the right the photograph of the two cartridges standing in splashing water. It is a real backlit print: even light, the fabric texture faintly visible, slightly brighter at the centre. Its glow falls softly on the charcoal wall just around it and on the floor below it, fading within half a meter; the rest of the room stays dark and cool. The art director, wearing the EFEONCE HOODIE in its royal blue, stands about two meters in front of the lightbox at the RIGHT edge of the frame: the centre of her body at about 84 % of the frame width, her near shoulder at about 73 %, her curls never further left than 70 %, the far side of her body cut by the right edge of the frame. Camera about five meters from her at chest height, 85mm f/2.8; she is framed from the waist up, the top of her head at about 30 % of the frame height. Her head and shoulder overlap only the lower right corner of the lightbox; everything of the lightbox to the left of 70 % of the frame width stays fully visible. She stands relaxed and confident, one hand in the hoodie pocket, body turned slightly toward the lightbox, head almost frontal, eyes straight into the lens with a sly half smile. Her face is lit by the hard cold white key from the left; behind her, the lightbox draws only a thin bright edge on her curls and shoulder. The LEFT 42 % of the frame is the charcoal wall in deep shadow: no light, no glow, no bokeh, no objects. The whole frame outside the lightbox is cool and contemporary: cold white and deep blue-black, nothing amber, orange or golden, no tungsten, no retro glow. No other text anywhere, no other logos.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a worktable close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the charcoal wall in deep shadow on the left 42% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Excepción del operador (2026-10-07): gráfica aprobada del cliente (Master Graphic Sika) dentro de una portada cine de Efeonce para la licitación Wherex 1164. Método de la sesión línea gráfica: escena generada CON el arte como referencia (imagen 6, pieza en uso) → arte exacto compuesto con homografía → acabado de materia y luz con ai:inpaint image Sunburst sólo en el lightbox."
+}

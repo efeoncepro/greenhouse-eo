@@ -1,5 +1,7 @@
 # Contacto `/contacto/` — TASK-1801
 
+> **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-contacto` v4 entrega en `direct` al formulario HubSpot «Contact Form - EO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+
 Estado live verificado 2026-09-15: página `20729` reconstruida con cinco widgets Elementor propios, Growth Form
 `efeonce-contacto`, dos Growth CTA de agenda y narración de Nexa. El hero conserva el header/footer globales,
 usa `clb__dark_section`, omite el eyebrow redundante y mantiene una zona de respeto superior para que la imagen

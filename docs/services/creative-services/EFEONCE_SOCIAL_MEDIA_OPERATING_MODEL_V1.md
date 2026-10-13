@@ -2,8 +2,68 @@
 
 > **Status:** `Approved for validation`  
 > **Owner:** Social Media Practice + Delivery Operations  
-> **Version:** V1.0 · 2026-07-29  
+> **Version:** V1.1 · 2026-07-29 · [delta 2026-10-10](#delta-2026-10-10--brochure-marketing-de-contenidos) (la operación base no cambia)  
 > **Applies to:** human-operated recurrent service; Globe is not a dependency
+
+---
+
+## Delta 2026-10-10 — brochure «Marketing de Contenidos»
+
+La decisión del operador, sus citas y lo que cubre están en el [delta del Business Model](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta). Este documento registra qué le pide el brochure a la operación. **El squad de referencia, la capacidad por nivel, la cobertura, los objetivos de SLA y los fallbacks no cambian.** Nada de lo que sigue prueba que la capacidad opere hoy.
+
+### El ciclo de cinco pasos
+
+El brochure explica el trabajo mensual como un ciclo: escuchar, planificar, producir, publicar y atender, medir. Es la misma operación de este documento contada para el comprador.
+
+| Paso del brochure | Qué incluye según el brochure | Dónde está en este documento |
+|---|---|---|
+| 01 Escuchar | Listening, tendencias y comunidad | Ritual quincenal de señales y Social Search (§5) |
+| 02 Planificar | Pilares, calendario y creadores | Ritual semanal de prioridades y aprobaciones (§5); los creadores los planifica su práctica |
+| 03 Producir | Piezas nativas y contenido con creadores | Capacidad del nivel (§3); producción especial y creadores, fuera de ella |
+| 04 Publicar y atender | Canales, pauta y social care | Publicación y community dentro de la cobertura (§8); pauta y social care sólo si están contratados |
+| 05 Medir | Resultados y plan del ciclo siguiente | Ritual mensual: reporte, learning log y recomendación (§5) |
+
+El brochure muestra también un mes tipo (semana 1, plan; semana 2, producción; semana 3, en vivo; semana 4, lectura) y lo rotula como ejemplo: «el ritmo se acuerda en cada plan». La cadencia que manda es la de §5. La revisión trimestral no aparece en el mes tipo y sigue siendo obligatoria.
+
+### Squad, interlocutor y momentos
+
+- **Ocho roles, un interlocutor.** El brochure muestra ocho roles; la equivalencia con el squad de §2 está en el [Product Service Contract](EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md#composición-humana-lo-que-muestra-el-brochure). El «Responsable de Cuenta» es el Account / Delivery Lead. El especialista en creadores y el de paid social son de Media & Distribution y no están en las dedicaciones de §2.
+- **Momentos.** Lanzamientos, cobertura en vivo y crisis piden, según el brochure, «un plan propio y un equipo reforzado por unos días». Esa capacidad está fuera de la tabla de §3, que excluye crisis activa y campañas extraordinarias. De dónde sale el refuerzo, con qué aviso y con qué backup no está definido.
+- **Crisis y reputación.** El «antes, durante y después» del brochure (mapa de riesgos, protocolos y voceros; sala de crisis y respuestas aprobadas; informe y ajuste del protocolo) es el flujo de §9 contado en tres tiempos. La respuesta activa sigue siendo add-on o proyecto.
+
+### Trendjacking: filtro y aprobación exprés
+
+El brochure fija tres preguntas antes de entrar a una tendencia (¿tiene que ver con la marca?, ¿hay riesgo de tono o de derechos?, ¿llegamos antes del peak?) y una «aprobación exprés» con el equipo del cliente. El filtro es compatible con la reserva reactiva de §3 y con el fallback «trend incompatible: abstención justificada» de §10.
+
+La aprobación exprés no está diseñada: el objetivo de aprobación de contenido de §8 es de uno a dos días hábiles, y una tendencia dura menos. Para ofrecerla hace falta un carril acordado por cuenta, con aprobador y backup disponibles, un tiempo máximo y qué pasa si no responden. Sin eso, la respuesta por defecto es abstenerse.
+
+### Social care con base de conocimiento, agentes y personas
+
+El brochure describe la atención con tres piezas: una base de conocimiento armada con el equipo del cliente, agentes de IA que responden lo frecuente y clasifican el resto, y personas para casos sensibles, ventas y crisis. La separación de §7 entre community y customer care no cambia, y la lista de condiciones para que Efeonce resuelva casos tampoco: base de conocimiento, sistema de tickets, autoridad, entrenamiento, privacidad, supervisor del cliente y cobertura explícita.
+
+Para operar esta pieza falta definir, por cuenta:
+
+- quién mantiene la base de conocimiento y cada cuánto se actualiza;
+- qué herramienta hace de bandeja y de agente, y quién paga licencia y consumo;
+- en qué tramo de autoridad parte el agente (leer y clasificar, proponer respuesta, responder lo frecuente, actuar con aprobación) y quién autoriza subir de tramo;
+- qué casos van siempre a una persona (el brochure nombra reclamos y temas de salud);
+- la ventana de cobertura. «Nadie queda sin respuesta» sólo se puede sostener dentro de la cobertura contratada; fuera de ella valen §8 y el add-on correspondiente.
+
+El diseño y la operación de agentes son de RevOps & CRM: [Customer Agent gestionado en HubSpot](../hubspot-as-a-service/hubspot-customer-agent-managed-service.md) y [transformación de equipos humano-agente](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
+
+### Comunidad en canales cerrados
+
+Canales de difusión y comunidades con moderación son una superficie nueva para el community owner. Antes de operar una hay que definir quién modera y en qué ventana, las reglas de la comunidad, cómo se da de alta y de baja un miembro, la política de la plataforma y qué se reporta. Hasta entonces no entra en la dedicación del Community Manager de §2.
+
+### Producción con IA
+
+El brochure compromete dirección creativa humana, marca y producto reales, derechos revisados y revisión humana antes de publicar. Falta decidir en qué paso del flujo se verifica cada compromiso y quién firma. La revisión humana ya existe como QA interno y aprobación del cliente. Se aplica el mismo criterio que §10 usa para Globe: si una herramienta de IA no está disponible o un compromiso no se puede cumplir, la operación es manual y no se promete la capacidad.
+
+### Superficie y herramientas que nombra el brochure
+
+El brochure nombra doce herramientas en tres capas (gestionar: Metricool, Sprout Social y Favikon; coordinar: Notion, Teams y Frame.io; crear: Photoshop, Premiere, After Effects, Firefly, Higgsfield y Magnific), más Marketing Studio como lugar donde el cliente ve su plan y sus resultados y Efeonce Insights para el reporte. La decisión de herramienta de publishing, listening y reporting de §12 sigue abierta: el brochure propone nombres, no costos ni licencias. El [catálogo de recetas de deck](../../operations/brand-graphic-line/deck-recipes/README.md) dejó como condición abierta verificar que Efeonce opere Metricool, Sprout Social y Favikon. El acceso de una persona cliente a Marketing Studio y la entrega del reporte de Insights se verifican por cuenta antes de prometerlos.
+
+---
 
 ## 1. Operating decision
 
@@ -124,3 +184,7 @@ La práctica toma como referencias de proceso el enfoque de complaint handling d
 ## 12. Decisiones pendientes
 
 Antes de vender volumen sostenido se deben validar staffing real, herramienta de publishing/listening/reporting, SLA por tier, costos p50/p95 de comunidad, backup coverage y margen mínimo. Cualquier cambio que convierta estos elementos en un contrato compartido de runtime debe pasar por el ADR gate correspondiente.
+
+### Pendientes del delta 2026-10-10
+
+Antes de operar lo que agrega el brochure «Marketing de Contenidos» faltan: el carril de aprobación exprés para trendjacking; el origen del equipo reforzado de los momentos; el diseño por cuenta de social care con agentes; las reglas de operación de los canales cerrados; el paso del flujo donde se verifica cada compromiso de producción con IA; y la verificación de herramientas, licencias y acceso de clientes a Marketing Studio e Insights. Las decisiones que dependen del operador están numeradas en el [Business Model §12](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10): 8, 9, 10, 11, 12, 13 y 19.

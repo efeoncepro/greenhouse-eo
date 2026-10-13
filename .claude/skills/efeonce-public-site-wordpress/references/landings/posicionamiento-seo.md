@@ -1,5 +1,7 @@
 # Landing: Posicionamiento SEO `/servicios/posicionamiento-seo/`
 
+> **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-seo-diagnostic` v4 entrega en `direct` al formulario HubSpot «Lead Gen - SEO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+
 ## Identity
 
 - URL: `https://efeoncepro.com/servicios/posicionamiento-seo/`

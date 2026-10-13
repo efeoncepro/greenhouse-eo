@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "managed-care-extended-example-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "hypothesis-only:managed-care-capacity",
+      "effectiveFrom": "2026-10-10",
+      "effectiveUntil": "2026-12-31",
+      "status": "estimated"
+    }
+  },
+  "drivers": [
+    {
+      "driverId": "conversations",
+      "label": "Public conversations answered",
+      "unit": "conversation",
+      "unitsPerMonth": "1300",
+      "minutesPerUnit": "5",
+      "source": {
+        "reference": "hypothesis-only:managed-care-volume",
+        "effectiveFrom": "2026-10-10",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "fixedWork": [
+    {
+      "workId": "service-upkeep",
+      "label": "Knowledge base upkeep, handoffs and quality review",
+      "hoursPerMonth": "70",
+      "source": {
+        "reference": "hypothesis-only:managed-care-fixed-work",
+        "effectiveFrom": "2026-10-10",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "primary",
+      "driverShares": [
+        {
+          "driverId": "conversations",
+          "share": "0.5"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "service-upkeep",
+          "share": "1"
+        }
+      ],
+      "reason": "Owns the queue in core hours and the fixed upkeep."
+    },
+    {
+      "lineId": "backup",
+      "driverShares": [
+        {
+          "driverId": "conversations",
+          "share": "0.5"
+        }
+      ],
+      "fixedWorkShares": [],
+      "presenceHoursPerMonth": "165",
+      "reason": "Takes the rest of the queue and staffs the hours the primary does not cover."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.05"
+  }
+}

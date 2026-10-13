@@ -1,0 +1,18 @@
+[
+  {
+    "id": "sunburst-max",
+    "exitCode": 0,
+    "stdout": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro/final/sunburst-max.png logo blanco 17.37:1",
+    "compositor": "canonical-photo-signature",
+    "logoShortSide": 0.2,
+    "logoCenterHeight": 0.935
+  },
+  {
+    "id": "seedream5-pro-standard",
+    "exitCode": 0,
+    "stdout": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro/final/seedream5-pro-standard.png logo blanco 8.69:1",
+    "compositor": "canonical-photo-signature",
+    "logoShortSide": 0.2,
+    "logoCenterHeight": 0.935
+  }
+]

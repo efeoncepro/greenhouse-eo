@@ -1,0 +1,37 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "brochure",
+  "recipe": "method-hybrid-workforce",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Social care · equipos híbridos",
+    "question": "¿Quién responde, al final?",
+    "answer": [
+      "Personas",
+      "y agentes"
+    ]
+  },
+  "body": "En social care, personas y agentes de IA comparten la bandeja. El agente gana autoridad por tramos y una persona conserva la responsabilidad.",
+  "ladderTitle": "La autoridad del agente crece por tramos",
+  "ladder": [
+    "Leer y clasificar",
+    "Proponer respuesta",
+    "Responder lo frecuente",
+    "Actuar con aprobación"
+  ],
+  "path": "Base de conocimiento → agente que propone → agente que responde → operación híbrida",
+  "selection": {
+    "target": "answer",
+    "label": "Social care",
+    "participantKind": "department"
+  },
+  "progress": {
+    "sections": 5,
+    "current": 3
+  }
+}

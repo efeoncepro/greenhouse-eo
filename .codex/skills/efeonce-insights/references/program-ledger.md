@@ -22,8 +22,9 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1962 | Contrato de contenido (8 preguntas), causas SEO, entrega ICO, acciones/peticiones y GA4 | **in-progress — desplegado; candidata a cierre tras verificación productiva** | `fe261ca2745f` y `36a73e7b7e19`; Think `0c5701a`, modelo 1.4; 116 pruebas focales PASS 04/10 | — |
 | TASK-1974 | Criterio de selección de figuras en el planner: pregunta → familia, tarjeta de cifra en el plan (`chapter.stats`), un dato una figura (`duplicated_fact`), modelo web 1.4, matriz v3 (dona y apiladas con evidencia GA4) | **complete 2026-10-03** — en producción (release `36a73e7b7e19`, orquestador `37158679961`, PR #250) | Vercel + Job `artifact-worker` (render) + Think `0c5701a` | — |
 | TASK-1975 | Páginas A4/deck y Think de cifra, cascada, waffle, dona y apiladas | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; revisión Berel/Sky, promoción de fixes posteriores y decisión de color pendientes | — |
-| TASK-1990 | Contrato de tarjeta por canal | **in-progress — base en producción; Slice 1 local** | `36a73e7b7e19`; `03e19f3ee` (19 plataformas/channelForDomain) pendiente de promover; metricIcon/visitas por asistente pendientes | — |
+| TASK-1990 | Contrato de tarjeta por canal | **in-progress — base en producción; Slice 1 local** | `36a73e7b7e19`; 19 plataformas, `channelForDomain`, metricIcon y tableros en producción desde `9a906a164677` (2026-10-04, según el `Status real` de TASK-1990); 22 plataformas y dominios de Facebook, Threads y X en `develop` (`7877dfe89`, `d4f1149b5`, 2026-10-12, sin release) | — |
 | TASK-1996 | Render de tarjeta con isotipo y glifos Trazo | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; cifra única adaptable local en `03e19f3ee`; glifos y 10 isotipos sin productor pendientes | — |
+| TASK-2033 | Alcance de contenido por organización: el informe SEO mide sólo lo que Efeonce trabaja | **in-progress — Slices 1–5 en staging y `ops-worker`; Production sin release** | Cloud SQL: migración y alcance v1 de Berel (2026-10-12); Vercel staging y `ops-worker-00773-z98` con `d9a1c6a2d` | — |
 
 ## Auditoría técnica SEO — ownership y residual (2026-10-04)
 
@@ -656,8 +657,84 @@ color por rol de parte en waffle y dona (hoy por orden: en la dona real de Berel
 **Hand-off:** TASK-1958 (jerarquía visual en Think y PDF) hereda la tarjeta y el orden del capítulo; la adopción del
 paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan para el operador.
 
+## TASK-2033 — alcance de contenido por organización (in-progress, 2026-10-12)
+
+**Por qué:** el informe SEO de Berel medía la propiedad completa de Search Console. Efeonce trabaja artículos,
+tutoriales, inspiración y dos guías de la raíz: 5,6 % de los clics de septiembre de 2026 (799 de 14.156). El mes en
+que ese contenido subió 20,9 %, el informe decía que los clics habían caído 13,6 %.
+
+**Qué existe (en `develop`; desplegado en staging y `ops-worker`, ver la matriz):**
+
+- Dominio SEO, `src/lib/growth/seo/content-scope/`: contrato y matcher puros (`contracts.ts`), fragmentos SQL
+  (`sql.ts`), store con `readSeoContentScope` y `setSeoContentScope` (`store.ts`). Tabla
+  `greenhouse_growth.seo_content_scope_versions`, append-only por versión (migración
+  `20261012145214417_task-2033-growth-seo-content-scope.sql`, **aplicada el 2026-10-12**).
+- Readers dueños con `scope` opcional: `readSeoOverviewKpisForWindow`, `readSeoWindowMovers`, `readSeoWorkQueue`
+  (por `target_url`) y `readGa4Analytics` (`landingMatch`, varias reglas).
+- Adapter SEO: resuelve el alcance una vez, lo pasa a los readers en las dos ventanas, emite `site_total.clicks` y
+  `site_total.impressions` como referencia, cuenta sólo las keywords que posicionan con una URL del alcance, no emite
+  ETV (`outside_content_scope`) y sella `contentScope` en cada fuente.
+- Plan: «Qué mide este informe» y la entrada del capítulo nombran el contenido medido; la última afirmación del
+  capítulo lo pone frente al sitio completo (`claim.seo.content_scope_context`); el ETV sale como límite.
+- CLI `pnpm seo:content-scope` (dry-run por defecto; lista las páginas fuera del alcance con más clics).
+
+**Dato real (Berel, alcance v1, leído con el SQL del reader):**
+
+| | Agosto 2026 | Septiembre 2026 | Cambio |
+| --- | --- | --- | --- |
+| Clics del alcance | 661 | 799 | +20,9 % |
+| Impresiones del alcance | 144.492 | 168.690 | +16,7 % |
+| Clics de la propiedad completa | 16.390 | 14.156 | −13,6 % |
+| Visitas orgánicas GA4 por páginas del alcance | 8.296 | 3.994 | −51,9 % |
+
+La caída de GA4 es real y viene de agosto: las semanas del 17 y del 24 de agosto tuvieron 1.863 y 4.657 sesiones
+orgánicas en el contenido, contra 700–1.000 de una semana normal. Sin ese pico, la serie semanal sube. El informe
+lo imprime tal cual; quien revise la edición antes de emitir debe saberlo.
+
+**Verificado:** 402 pruebas de Insights; `test:live` del alcance 9/9 contra PostgreSQL real (paridad SQL ≡ TS sobre
+todas las páginas reales, suma independiente por página); store ejercitado con la escritura real de Berel (v1, segunda
+corrida sin cambios, regla inválida rechazada); filtro de GA4 contra la propiedad real (50.730 sesiones por el filtro
+de la API frente a 50.727 sumando por página en TS en una semana: 3 de diferencia, sin causa determinada); vista
+previa real de septiembre de 2026 con GA4 conectado, A4 de 27 páginas y deck de 21 láminas, 0 violaciones, abiertos
+página por página.
+
+**Matriz de despliegue:**
+
+| Runtime | Componente | Estado | Evidencia |
+| --- | --- | --- | --- |
+| Cloud SQL (instancia única) | tabla `seo_content_scope_versions` | aplicada 2026-10-12 | `pgmigrations` + `to_regclass` |
+| Cloud SQL | alcance de Berel v1 | fijado 2026-10-12 por CLI | fila única, `operator_cli` |
+| Vercel staging | adapter y plan con alcance | desplegado 2026-10-12 | commit `d9a1c6a2d`, CI verde, status Vercel `success` |
+| `ops-worker` | tick de schedules con alcance | desplegado 2026-10-12 | revisión `ops-worker-00773-z98`, 100 %, `GIT_SHA=d9a1c6a2d` |
+| Vercel Production | adapter y plan con alcance | NO desplegado | falta el release a `main` |
+
+Las ediciones que arme el `ops-worker` y las creadas desde staging ya miden el alcance de Berel; las creadas desde
+Vercel Production siguen midiendo la propiedad completa hasta el release. No se generó ninguna edición después del
+deploy: el alcance está desplegado, no observado todavía en una edición real de esos runtimes.
+
+**Fuera, a propósito:** capítulo AEO (la marca no se mide por URL; las visitas desde asistentes de IA siguen siendo
+del sitio completo), ETV por ruta (no hay captura), escribir el alcance por API o MCP, UI en el portal, alcance por
+servicio (`TASK-1960`).
+
+**También el 2026-10-12, por pedido del operador:** logos oficiales de Berel cargados en la organización (`default`
+y `on_dark`; el anterior era una imagen generada con IA), portada de Berel fijada en blanca, línea semanal con sólo
+semanas completas, y los PDF de la vista previa de septiembre copiados a la carpeta interna de informes de Berel en
+OneDrive para que el operador los envíe.
+
+**Pendiente:** Slice 6 (tool MCP de lectura `get_seo_content_scope` + federación), release a `main` (Vercel
+Production), revisar y emitir la edición de septiembre de Berel, observar `contentScope` en una edición real de
+staging o del worker, y un render desde producción con los logos nuevos (quedaron en el bucket `-dev`).
+
+**Hand-off:** `TASK-1992` debe pasar el alcance a todo hecho nuevo por URL o por página; `TASK-1672` debe declarar si
+sus hallazgos por página lo respetan.
+
 ## Sessions (append as you go; newest first)
 
+- 2026-10-12 · Claude · la línea semanal de clics dibuja sólo semanas completas y la lectura nombra el bloque que queda fuera (el operador vio en el deck de Berel una línea que caía bajo un titular que decía «subieron»). Aplica a toda organización. Push a `develop` y deploy del `ops-worker` con TASK-2033 Slices 1–5, por instrucción del operador.
+- 2026-10-12 · Claude · Berel: logos oficiales cargados en la organización (`default` y `on_dark`; el anterior era una imagen generada con IA) y portada fijada en blanca. Con variante oscura la regla `auto` elegía navy, y la portada navy no tiene la zona «Qué mide este informe»: el alcance de contenido desaparecía de la portada del A4. `preview-edition.ts` acepta `--cover=light|dark`.
+- 2026-10-12 · Claude · TASK-2033 Slices 1–5 en develop local (sin push): alcance de contenido por organización, migración aplicada y alcance v1 de Berel fijado con autorización del operador. La vista previa real encontró tres fallas que ninguna prueba vio: el render fallaba cerrado con slugs de artículo de 65 caracteres (`pageLabelOf`), la lectura sin nombre decía «La página que más cambió fue subió…», y el predicado por fila tardaba 5 s por consulta. GA4 del contenido cae 51,9 % por un pico de agosto. Pendiente: Slice 6 (MCP), release.
+- 2026-10-12 · Claude · deriva del pin `axis-brand-assets` 0.4.25 (subido en `596bfab90` sin regenerar): `INSIGHT_CHANNEL_IDS` pasa de 19 a 22 (`facebook`, `threads`, `x`, con nombre visible e isotipo en los dos catálogos), se re-sellan Manzanitas y los cuatro lockups del PDF del AI Visibility Report. Después, a pedido del operador: `channelForDomain` lleva facebook.com a `facebook`, threads.net/threads.com a `threads` y x.com/twitter.com a `x`; Think recibe los tres isotipos y su mapa (`efeonce-think` `236d549`, en producción el 2026-10-12: los tres SVG responden 200 y son idénticos al paquete). Gate visual de Insights 37 frames a 0 píxeles; export real del PDF del AI Visibility Report, 10 exports PASS. Greenhouse sigue en `develop` sin release. Corrección del mismo día: `channelForDomain` sólo marca filas de tabla del PDF y el deck; el modelo web no lo usa, así que Think no recibe esos canales por dominio citado y no hay orden obligado entre los dos despliegues. Barrido de docs y skills con tres subagentes.
+- 2026-10-04 · Claude · salida canónica de un output `dead_letter`/`cancelled` (incidente del canary de Berel: re-encargar `report_pdf` daba 500). Migración `20261004152040741_insights-outputs-live-identity-partial-unique` (índice parcial `insight_outputs_live_identity_uq`; **aplicada por el operador 2026-10-04 18:29Z**, live 5/5 también con el estado aplicado), `requestInsightRender` registra `supersedes` y convierte la carrera `23505` en idempotente/422, `retry` sigue sólo con `failed`. Unit 12/12, live 5/5 contra PG real (perfil `ops` para el DDL). Pendiente: push + release del código y canary re-encargando `report_pdf` de `insed-658861b2…` (sigue `ready_for_review` con ese output en `dead_letter`).
 - 2026-10-04 · Claude («Canvas tarjeta cifra») · pedido del operador: aprovechar íconos e isotipos. AXIS `axis-graphic-line` 0.16.0 (tag `v0.16.0`, seis glifos D31); Greenhouse `6656fe1d0` (metricIcon, tableros por motor y asistente, isotipos en filas/leyendas/aperturas, 19 isotipos, color por rol, gate sección (z)); Think `fd83a3b` en producción. Falta release de Greenhouse y canary del contrato.
 - 2026-10-04 · Codex · reconciliación documental y revisión de cierre: releases #248/#250 y runs success; alias Vercel Production READY; ocho flags INSIGHTS exactos ON; 116 pruebas PASS; lectura de PG sin planes congelados post-release. Cloud Run no se revalidó por reautenticación requerida de gcloud. Ninguna hija cerrada sin evidencia faltante; epic sincronizado a in-progress. Auditoría: `docs/audits/insights/2026-10-04-epic-045-closure-review.md`.
 

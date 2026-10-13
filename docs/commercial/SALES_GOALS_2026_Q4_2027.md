@@ -89,6 +89,10 @@ se reportan aparte.
 | [Brightcell Landing · `63308560391`](https://app.hubspot.com/contacts/48713323/record/0-3/63308560391) | On-Demand                        | Artefacto interno, sin prueba de envío                                  |                  <10% | `excluded`  | Sin monto, contacto, actividad y fecha vigente                            |
 | Licitaciones/RFP abiertos                                                                              | Principalmente On-Demand o mixto | Procesos en evaluación                                                  |         No comparable | `upside`    | Bajo control, admisibilidad/capacidad/economics y contacto incompletos    |
 
+### Delta operativo Factory — 2026-10-05
+
+[Readback y cambios CRM](tenders/FACTORY_HUBSPOT_CHANGESET_2026-10-05.md): veinte licitaciones públicas vencidas salieron del pipeline abierto como `closedlost`; cinco nuevas quedaron en preparación (tres Factory On-Demand y dos Efeonce de servicio continuo), con gates de admisibilidad/capacidad/economics pendientes. Las veinte cerradas quedan `excluded`; las cinco nuevas sólo son `upside`, no `commit`, ingreso ni caja. UNAP sin amount por discrepancia presupuestaria. El snapshot de agosto y las metas aprobadas se conservan; los conteos antiguos no describen el inventario actual.
+
 ### Lectura del forecast
 
 - El único negocio cercano a cierre es SKY Blog; no pasa todavía a `commit`.

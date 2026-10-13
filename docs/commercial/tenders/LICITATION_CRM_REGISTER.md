@@ -1,16 +1,182 @@
 # Registro operativo CRM de licitaciones
 
+## INAPI y SERNATUR Arica — alta completa de radar 10/10/2026
+
+**Decisión posterior de Julio:** Arica1330-22-COT26 descartada. Lead595750420295 Disqualified/NO_INTEREST, nota118333867172 ampliada y tarea Cancelada, con readback. [Decisión y evidencia](../follow-up-agent/runs/2026-10-10-arica-no-bid.md).
+
+Alta autorizada por Julio, con readback propio HubSpot/Notion. **Alta inicial de dos Leads New; decisión posterior: Arica NO-BID / Disqualified y tarea Cancelada; INAPI sigue New por calificar**, empresas existentes reutilizadas, notas de investigación, documentos y tareas de Julio; sin Deals, forecast, contactos nuevos o GO. Arica queda fuera de seguimiento activo por decisión de Julio; INAPI mantiene las puertas de referencias y discrepancia de metas.
+
+| Caso / expediente | Lead / Company / nota | Cierre externo Chile | Tarea / meta interna |
+| --- | --- | --- | --- |
+| [INAPI — Campañas de marketing digital · 519302-9-LE26](inapi-marketing-digital-519302-9-le26/README.md) | [Lead 595750420294](https://app.hubspot.com/contacts/48713323/objects/0-136/views/all/list?leadId=595750420294&utm_source=codex&utm_medium=ai_agent); Company 34939665568; nota 118339677186 | 02/11 16:00, oficial + LicitaLAB | [Julio · Alta · Sin empezar](https://app.notion.com/p/3f539c2fefe78108bd57fef0ab6e5002?pvs=204); 16/10 12:00 |
+| [SERNATUR Arica — Campaña medios online · 1330-22-COT26](sernatur-arica-medios-online-1330-22-cot26/README.md) | [Lead 595750420295](https://app.hubspot.com/contacts/48713323/objects/0-136/views/all/list?leadId=595750420295&utm_source=codex&utm_medium=ai_agent); Company 31640422315; nota 118333867172 | 12/10 18:00, LicitaLAB; oficial SPA no corroborado | [Julio · Cancelada · NO-BID](https://app.notion.com/p/3f539c2fefe781e6a035df7493f63a1e?pvs=204); control cancelado |
+
+[Seguimiento focal](../follow-up-agent/runs/2026-10-10-inapi-arica-intake.md). INAPI: tres DOCX originales, PDF RE381 pendiente por reCAPTCHA; Arica: original completo de 7 páginas. Ver matrices para requisitos, costos/pagos y dudas.
+
+## Grupo Socopur — agencia digital 2027 — revisión completa 10-10-2026
+
+**Recuperación de ingreso tardío, HSP-0017.** [Expediente y cinco láminas](socopur-agencia-marketing-digital-2027/README.md): redes, pauta, audiovisual/diseño, SEO/web y analítica. Manifestación cerró 5/10; calendario prevé Q&A 8–13/10, preparación 14–30/10, presentaciones 2–6/11 y selección 9–13/11. Año 2026 contextual, sin hora/zona publicadas. **No hay reapertura ni ingreso tardío confirmados.** Nuevo detalle: equipo técnico/creativo exclusivo y discrepancia entre experiencia sectorial mínima (lámina) o preferida (post). Primer contacto: credencial/portafolio PDF; RFP completo pendiente.
+
+Company `59118554799`, Contact `254187252267` y nota `118330098975` existentes; nota ampliada y readback exacto verificado con autorización de Julio. **Actualización posterior autorizada:** [Deal 65871170058](https://app.hubspot.com/contacts/48713323/record/0-3/65871170058?utm_source=codex&utm_medium=ai_agent) creado, `default/qualifiedtobuy`, Strategic Bets, newbusiness, owner Julio; Company Primary, contacto y nota asociados y verificados. Sin amount; **closedate previsto 13-11-2026**, fin del período publicado de selección/comunicación, por instrucción de Julio. Lead automático `595727275161` conservado; correo enviado por Julio. [Auditoría y excepción de empresa duplicada por dominio](socopur-agencia-marketing-digital-2027/research/hubspot-verificacion-2026-10-10-INTERNO.md). Próximo paso: esperar respuesta de Katherine sobre admisión y bases antes de finalizar Q&A; no hay autorización de seguimiento automático. Presupuesto, capacidad exclusiva, admisibilidad y GO pendientes.
+
+**Actualización de envío 10/10:** Julio confirmó que envió el correo a Katherine. Próximo paso vigente: esperar respuesta sobre ingreso tardío y bases. Envío declarado por remitente, sin inspección de Enviados ni recepción confirmada; sustituye indicaciones anteriores de envío pendiente. Sin seguimiento automático autorizado.
+
+## Pierre Fabre Chile — licitación agencia integral 2027 — 09-10-2026
+
+**Aclaración del enlace y contacto de credenciales:** [expediente con formulario completo verificado y requisitos](pierre-fabre-agencia-integral-2027/README.md). La URL copiada que termina en «…» está truncada. Contacto de credenciales `254011713292` registrado y asociado a la misma Company/Deal; fuente: apartado 10 del formulario, sin cargo ni entregabilidad inferidos. Descripción y nota CRM actualizadas; sin envío.
+
+Alta expresa de Julio: [Company 59076520008](https://app.hubspot.com/contacts/48713323/record/0-2/59076520008?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch), [Deal 65843869022](https://app.hubspot.com/contacts/48713323/record/0-3/65843869022?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) y nota 118286393402. Dos lecturas: `default/qualifiedtobuy`, `newbusiness`, `Strategic Bets`, owner Julio 75788512; Company Primary verificada. Selección del operador para crear Deal; presupuesto, admisibilidad, margen y GO de participación pendientes. Sin amount/closedate ni fecha-hora inventada. Company en ACTIVE187, cohorte09. Contacto 254010206318 creado y asociado a Company Primary, Deal y nota tras confirmación de créditos Apollo. Identidad/cargo corroborados; calidad del correo contradictoria entre Apollo y validador, documentada en CRM para revalidación antes de envío. Consumo 2 créditos. Membresía efectiva ACTIVE182 verificada por CRM search; un solo contacto por email.
+
+Convocatoria abierta del 06-10 al **30-10-2026** para preinscripción; preselección23-11, caso18-12, adjudicación28-12, inicioenero2027. Ficha [LinkedIn4474064758](https://cl.linkedin.com/jobs/view/licitaci%C3%B3n-agencia-integral-de-medios-2027-at-pierre-fabre-laboratories-4474064758); llave `hubspot-private-tender:linkedin:4474064758`. El formulario público fue leído completo: antecedentes, cobertura directa, experiencia, inversión administrada, hasta tres referencias, herramientas, IA/automatización, conflictos y credenciales por correo. Admite propuestas conjuntas identificadas. Requisitos y destinatario están en nota/descripcion CRM; sin envío ni inscripción. Grupo internacional grande califica por instrucción de Julio; tamaño global separado del local. Evidencia y datos privados en el expediente local `hubspot-saas-prospecting/pierre-fabre-hubspot-2026-10-09.json`.
+
+## USACH CRM descartada — 08/10/2026
+
+**NO-BID por decisión de Julio — 08/10/2026:** USACH CRM `5067-2456-COT26` descartada por presupuesto insuficiente (CLP690.000 para 12 meses). HubSpot Lead `595416937995`: **Disqualified**, razón `BUDGET_CONSTRAINTS`; Company USACH preservada. No invertir en propuesta ni reabrir sin nueva instrucción/evidencia. USACH difusión `564162-139-LE26` conserva su estado. Cartera de esta ronda: 18 Leads New, uno Disqualified y 15 Deals anteriores.
+
+## Leads nuevos y empresas de rondas anteriores — 08/10/2026 19:05
+
+**34 procesos con Company Primary verificada:** 19 Leads nativos nuevos por calificar y 15 Deals existentes. Se crearon nueve empresas, se reutilizaron 19 y se completaron las 13 asociaciones pendientes de la ronda anterior; ProChile/UNAP ya tenían Company. [IDs, empresas, notas y dos readbacks](licitalab-novedades-2026-10-08/HUBSPOT-ALTA-Y-EMPRESAS.md).
+
+UTEM conserva oferta presentada, etapa `presentationscheduled` y CLP4.800.000 netos; ahora tiene Company UTEM. Las demás etapas anteriores se preservaron. Los 19 Leads permanecen `new-stage-id`; no son Deals calificados ni suman presupuesto comprador como forecast. No se enviaron ofertas ni comunicaciones. Este corte actualiza las menciones históricas de Company pendiente de las trece altas.
+
+## UTEM · presentada — actualización puntual 08-10-2026
+
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Evidencia y readback](utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). La fila vigente de UTEM prevalece sobre el estado histórico de las trece altas.
+
 > Índice rápido compartido para Codex y Claude. **No reemplaza HubSpot, LicitaLAB, Mercado Público, las bases ni el comprobante de postulación.** Antes de decidir, escribir o afirmar un estado, confirma el dato en su fuente de verdad y luego actualiza este archivo.
+
+## Criterio operativo posterior al alta · 08-10-2026
+
+Julio corrigió la clasificación comercial: **una señal o lead no equivale a una oportunidad calificada**. Los Deals ya creados se conservan por instrucción expresa; `qualifiedtobuy` no acredita calificación completa. Para nuevas señales, calificar desde lead antes de promover y reutilizar registros/segmentos activos existentes.
+
+UTEM fue seleccionada para preparación y luego presentada por Julio. El expediente enlazado y la fila vigente registran la confirmación de Mercado Público, precio final y readbacks CRM/Notion. No exigir contacto previo ni repetir la preparación o la decisión de presentación. Las trece altas y sus valores iniciales se conservan como evidencia histórica.
+
+## Altas LicitaLAB verificadas — 2026-10-08
+
+Trece altas autorizadas por Julio, verificadas con dos lecturas y deduplicación final. [Change set, evidencia y límites](licitalab-deep-review-2026-10-07/HUBSPOT_ALTA_2026-10-08.md). **Estado histórico de la ronda de altas:** todas nacieron `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`, amount/closedate vacíos y sin postulación. UTEM fue actualizada después de presentar: ver fila vigente y registro de presentación; las otras doce altas no se modificaron en esta operación. Presupuesto comprador separado y asociación Company pendiente.
+
+Bucket propuesto Strategic Bets; lectura posterior: nueve Core Pipeline y cuatro Strategic Bets. Regla responsable no identificada; no se corrigió en bucle ni se infirió relación previa.
+
+| Proceso / Deal | Presupuesto comprador CLP | Cierre oferta Chile | Bucket live | Próximo paso |
+| --- | ---: | --- | --- | --- |
+| `5251-1060-COT26` · [Efeonce — UTEM — SEO/GEO/AEO · 65832566144](https://app.hubspot.com/contacts/48713323/record/0-3/65832566144?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 6,800,000 | 08-10-2026 18:00 | Core Pipeline | **Presentada / En decisión.** Mercado Público confirmó envío; HubSpot Presentación de soluciones, amount CLP4.800.000 netos por tres meses (IVA912.000, total5.712.000). Revisar evaluación/resultado; costo/capacidad medidos y panel pendientes internos. |
+| `609-107-COT26` · [Efeonce — INDAP — Claude Team Premium · 65806293639](https://app.hubspot.com/contacts/48713323/record/0-3/65806293639?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 7,180,000 | 08-10-2026 14:00 | Core Pipeline | Cotizar canal y soporte hoy; estrecha holgura al precio público. Cierra 8/10 14:00. |
+| `757-422-COT26` · [Efeonce Factory — MINSAL — Diseño SANNA · 65806331396](https://app.hubspot.com/contacts/48713323/record/0-3/65806331396?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 2,000,000 | 09-10-2026 09:00 | Core Pipeline | Candidato Factory acotado; contar páginas/adaptaciones y horas. No asumir impresión física incluida. |
+| `757-429-COT26` · [Efeonce Factory — MINSAL — Adaptación de videos y dípticos · 65832763160](https://app.hubspot.com/contacts/48713323/record/0-3/65832763160?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 4,000,000 | 13-10-2026 11:00 | Core Pipeline | Confirmar tema, cantidades, fuentes editables y revisiones antes de precio cerrado. |
+| `1108660-10-LE26` · [Efeonce — FUCOA/CNR — Portal institucional y aula virtual · 65832737849](https://app.hubspot.com/contacts/48713323/record/0-3/65832737849?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 13,000,000 | 14-10-2026 15:30 | Core Pipeline | Candidato nuevo principal de web. Acreditar proyectos 2023–2025 y presupuestar Moodle/SSO y garantía. |
+| `2432-31-LE26` · [Efeonce — Estación Central — Continuidad web municipal · 65806250773](https://app.hubspot.com/contacts/48713323/record/0-3/65806250773?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 28,000,000 | 13-10-2026 15:20 | Core Pipeline | Recomiendo calificar: inventario técnico, transferencia, certificaciones, alcance SLA y costo de guardia antes del GO. |
+| `1562-76-LE26` · [Efeonce — SERNAGEOMIN — ChatGPT Business · 65806299318](https://app.hubspot.com/contacts/48713323/record/0-3/65806299318?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 9,000,000 | 16-10-2026 15:01 | Core Pipeline | Priorizar cotización de canal; aclarar modelos históricos y SKU actual antes de declarar cumplimiento. |
+| `1375757-32-LP26` · [Efeonce — SLEP Puelche — ChatGPT y Claude por líneas · 65832650852](https://app.hubspot.com/contacts/48713323/record/0-3/65832650852?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 101,220,000 | 19-10-2026 17:00 | Core Pipeline | Priorizar línea 11; línea 10 solo con costo viable y modalidad oficial. Contrato de suministro 18 meses, activaciones a requerimiento. |
+| `918434-271-COT26` · [Efeonce — Ministerio de la Mujer — Claude Team Premium · 65806334790](https://app.hubspot.com/contacts/48713323/record/0-3/65806334790?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 3,000,000 | 12-10-2026 12:30 | Core Pipeline | Cotizar modalidad corporativa y margen; precio oficial vigente permite equipos desde 2 usuarios, no aplicar memoria antigua de mínimo 5. |
+| `1040538-11-LP26` · [Efeonce — SERNATUR Ñuble — Campaña turística · 65806359148](https://app.hubspot.com/contacts/48713323/record/0-3/65806359148?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 135,000,000 | 26-10-2026 15:00 | Strategic Bets | Validar referencias, comisión rentable, costo de extras y financiamiento; separar inversión en medios de honorarios. |
+| `1332-12-LP26` · [Efeonce — SERNATUR Aysén — Campaña de promoción · 65832697782](https://app.hubspot.com/contacts/48713323/record/0-3/65832697782?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 200,000,000 | 21-10-2026 15:00 | Strategic Bets | Acreditar campañas multimedio, revisar subcontratación 30%, costear producción/medios y verificar caja. |
+| `757-90-LP26` · [Efeonce — MINSAL — Campaña de actividad física · 65832645385](https://app.hubspot.com/contacts/48713323/record/0-3/65832645385?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 130,000,000 | 27-10-2026 15:00 | Strategic Bets | Preparar concepto y briefing; cerrar referencias, producción, pauta y calendario que menciona fines de octubre pese al cierre 27/10. |
+| `1177296-23-LP26` · [Efeonce — Protección de la Niñez — Familias de Acogida · 65806377357](https://app.hubspot.com/contacts/48713323/record/0-3/65806377357?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | 270,699,000 | 02-11-2026 15:01 | Strategic Bets | Acreditar referencias, obtener tres cotizaciones de productoras exigidas por bases, separar fee/producción/medios y costear hitos 50/30/20 con caja suficiente. |
+
+ProChile `65678232118` y UNAP `65678277469` continúan sin nuevas escrituras. No se ejecutó la higiene de oportunidades históricas.
 
 ## Alcance y corte
 
 - Inicio del registro operativo: **2026-08-28**.
-- Última actualización documentada: **2026-09-01, America/Santiago**.
-- Universo documentado: 35 oportunidades revisadas (23 públicas y 12 privadas); 29 cuentan con Deal HubSpot verificado: 28 abiertos y uno `closedlost`.
+- Última actualización documentada: **2026-10-08, America/Santiago**, actualización puntual UTEM; no nuevo barrido global.
+- Snapshot histórico 2026-09-01: 35 oportunidades revisadas (23 públicas y 12 privadas); 29 cuentan con Deal HubSpot verificado: 28 abiertos y uno `closedlost`.
 - El readback live del 2026-09-01 encontró 29 Deals de licitación abiertos: 28 pertenecen a esta admisión y uno corresponde al RFI CRM Mineduc `1588-33-RFI26`, anterior al corte de este registro.
 - Screening comparativo: [`LICITALAB_SCREENING_2026-08-28.md`](LICITALAB_SCREENING_2026-08-28.md).
 - El snapshot histórico previo identificó 99 deals vinculados a LicitaLAB en HubSpot. Esos registros **no fueron migrados ni enumerados aquí**; siguen consultándose en HubSpot.
 - Una fila en este archivo no demuestra que la oferta fue enviada. `Postulada` requiere comprobante, fecha/hora y fuente verificable.
+
+## Admisión Sika México Q4 Home Center — 2026-10-07
+
+**Estado local vigente: HOLD — en espera de respuesta de Sika**, por instrucción del operador el 07/10. [Análisis y ocho preguntas](sika-mexico-campana-q4-home-center-1169/research/ACLARACIONES-Y-ESPERA-INTERNO.md): envío no confirmado, sin respuestas recibidas en este chat. El brief no asigna expresamente ejecución física integral ni promotores a la agencia. Propuesta/escenarios/costeo detenidos; borrador previo de OneDrive no aprobado. Este cambio documental no modifica HubSpot ni consulta Wherex.
+
+[Workspace LIC-1169](sika-mexico-campana-q4-home-center-1169/README.md) · [Deal 65827529551](https://app.hubspot.com/contacts/48713323/record/0-3/65827529551?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1169). Distinta de LIC-1164. Brief de cinco páginas leído completo; dos frentes, 34 tiendas Home Depot, noviembre–diciembre, creatividad/medios geodirigidos/apoyo en tienda/medición y tres escenarios.
+
+Company existente `59084984648` Primary y contacto existente `253487637159` asociados; nota `118213040416` leída y asociada a los tres. Contacto de relación, responsable específico sin confirmar. Datos personales en CRM/OneDrive. `default/qualifiedtobuy`, owner Julio `75788512`, `newbusiness`; segundo readback muestra `Core Pipeline` automático tras proponer `Strategic Bets`, sin acreditar cliente existente. Monto/cierre comercial vacíos; moneda sin acordar.
+
+Cierre en captura: 16/10/2026 19:00 sin zona visible. Cotización desglosada y presentación general obligatorias; pago según alta proveedor. Presupuesto, SKU, inventario, objetivo cuantitativo y ejecución/costeo pendientes. Datos sensibles sólo a seleccionada según brief; no garantizar incremento de venta. Membership actual del contacto ACTIVE 174/176 y Company 177 confirmado; atributos/cohorte preservados. Registro guardado localmente en OneDrive `Sika/3. Campaña Q4/CRM-REGISTRO-INTERNO.md`; sin comprobante de presentación.
+
+Chat de trabajo Q4: [Sika México · LIC-1169 · Campaña Q4 Home Center](codex://threads/01a11883-e170-7a00-8cbe-09a54ae2b0bc), abierto el 07/10 con brief, IDs y pendientes. Leer su estado antes de afirmar avance de propuesta; registro no demuestra entrega.
+
+## Admisión Sika México — 2026-10-06
+
+[Workspace LIC-1164](sika-mexico-campana-creativa-1164/README.md) · [Deal 65771827631](https://app.hubspot.com/contacts/48713323/record/0-3/65771827631?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1164) · [Sika Mexicana 59084984648](https://app.hubspot.com/contacts/48713323/record/0-2/59084984648?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1164).
+
+Participación confirmada por el operador; estado local **En desarrollo**, CRM `default/qualifiedtobuy`, owner Julio `75788512`. Empresa México creada tras deduplicación, distinta de Sika Chile. Contacto individual proporcionado por el operador y nota de intención asociados; México verificada como Primary de contacto y deal. Datos personales en CRM/OneDrive.
+
+Origen Wherex, evolución de campaña «Innovar es hacerlo posible, innovar es hacerlo Sika». Ficha: publicación 02/10/2026 15:41, cierre 16/10/2026 19:00 **sin zona visible**; no se inventó UTC ni cierre comercial. Monto no informado. `Core Pipeline/newbusiness` live por automatización (readback CRM 06/10) no acredita cliente existente. Corte de propuesta 07/10: brief/PDF completos, seis preguntas/cuatro respuestas/dos pendientes y un anuncio revisados en Wherex vivo. [Técnica Codex eliminada](sika-mexico-campana-creativa-1164/oferta-tecnica.md) por instrucción del operador, con gráfica POSIBLE preservada; Master + lanzamiento tipo como base económica, storyboard/animatic admitido para muestra. Faltan definiciones por red/producto, marca, zona, facturación, capacidad, derechos y costeo; no hay comprobante de postulación. CRM no releído/modificado en este corte.
+
+Cohorte `research_2026_10_06`: nuevo contacto en ACTIVE 174/176; nueva empresa en ACTIVE **177 Química y materiales**, por atributos. Readback de conjuntos exactos: 81 empresas, 81 contactos, 63 individuales con email, 51 creativos, CRM 26 y 177 con una empresa. Sin inscripción manual en listas estáticas.
+
+**Delta 13/10/2026:** oferta **presentada** por el operador en Wherex a las 08:56 (estado «Enviada», leído ese día): un servicio, MXN 64.000 netos, sin IVA; cierre 16/10 a las 16:00 de Ciudad de México (19:00 de Santiago). Estado local **Presentada**; evaluación y resultado pendientes. El operador movió el deal a `default` / `presentationscheduled` el 13/10/2026 (08:58 de Santiago) y pidió cargar valor y fecha de cierre. El agente escribió por el conector de HubSpot, a las 09:16: `amount` 64000, `deal_currency_code` MXN, y `closedate` y `fecha_de_cierre_de_licitacion` en 2026-10-16T22:00:00Z (16:00 de Ciudad de México, 19:00 de Santiago: el cierre de la licitación; no hay fecha de adjudicación informada). Readback posterior: los cuatro valores, `amount_in_home_currency` 3477,25, etapa, `pipeline_bucket` Core Pipeline y `dealtype` newbusiness sin cambios; owner Julio `75788512`. [Registro de la presentación](sika-mexico-campana-creativa-1164/PRESENTACION-2026-10-13.md).
+
+## Criterio de clasificación y priorización — 2026-10-05
+
+- **Factory:** encargos On-Demand, con alcance y término definidos. Un proyecto de varios meses o pagado por hitos puede seguir siendo Factory.
+- **Efeonce:** servicios mensuales o de operación continua, bajo la práctica responsable. La forma de pago no define por sí sola el engagement; una oportunidad mixta separa ambos compromisos.
+- **Selección de propuestas:** el fit con las capacidades y la posibilidad de acreditar los requisitos mandan. La disponibilidad actual de personas no fija un máximo de propuestas ni es motivo automático de descarte.
+- **Preparar ≠ comprometer producción:** se puede desarrollar un borrador mientras se cierran evidencias y economía. Antes de presentar una oferta vinculante se verifica capacidad de ejecución, costos completos, margen, proveedores, caja y compromisos ante adjudicaciones simultáneas.
+- Presupuesto del comprador, fee de agencia, pass-through de medios, importe ofertado y cobro son valores separados. Una candidata sin Deal verificado permanece en radar; no se inventa alta ni avance CRM.
+
+Autoridad: correcciones del operador en esta conversación. Canon de engagement: [decisión Factory](../../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md). [Cola ampliada, fit y borradores](LICITALAB_PRIORITY_QUEUE_2026-10-05.md).
+
+## Cola vigente Efeonce y Factory — 2026-10-05
+
+Alta de cinco nuevas autorizada por el operador; owner Julio `75788512`. Modalidad: tres Factory On-Demand;
+ISP diseño y UNAP bajo Efeonce por servicio continuo. La cadencia de pagos no sustituye esta clasificación. `Preparación` autoriza preparar propuesta; costing/capacidad/admisibilidad y postulación siguen pendientes. [Change set y readbacks](FACTORY_HUBSPOT_CHANGESET_2026-10-05.md) y [screening](FACTORY_LICITALAB_SCREENING_2026-10-05.md).
+
+| ID / Deal | Company | Presupuesto referencial | Cierre de oferta (Chile) | Estado | Siguiente paso |
+| --- | --- | ---: | --- | --- | --- |
+| `813-655-COT26` · [Deal `65678411411`](https://app.hubspot.com/contacts/48713323/record/0-3/65678411411?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | [Company `58970137230`](https://app.hubspot.com/contacts/48713323/record/0-2/58970137230?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | CLP 7.000.000 | 06/10/2026 14:00 | `NO-BID local` · último CRM `default/qualifiedtobuy` | Diseño gráfico y estrategia digital, campañas, banners, newsletters, presentaciones y manual digital; ejecución octubre–diciembre. Cotización detallada completa y cartas de conformidad. Pago 30/30/40 por hitos aceptados, 30 días tras factura. 05/10 preparación: técnica, cotización detallada V1 y cronograma en OneDrive. Precio propuesto $4.000.000 neto / $4.760.000 IVA incluido, no aprobado. Mercado Público confirma 813-652-COT26 CANCELADA y 655 vigente; una sola oportunidad. NO-BID por instrucción del operador 05/10: no acredita cinco años mediante cartas; pierde potencialmente 40 puntos, sin causal de exclusión. Preparación suspendida. No presentada; sin nueva escritura/readback CRM. |
+| `813-654-COT26` · [Deal `65678240928`](https://app.hubspot.com/contacts/48713323/record/0-3/65678240928?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | [Company `58970137230`](https://app.hubspot.com/contacts/48713323/record/0-2/58970137230?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | CLP 7.000.000 | 06/10/2026 14:00 | `Preparación` · `default/qualifiedtobuy` | 15 cápsulas según grilla, guion, grabación/entrevistas y edición; octubre–diciembre. Cotizar todas las cápsulas; cartas de conformidad. Pago por cápsula aceptada a 30 días de factura. Antes de postular: confirmar rodajes, capacidad audiovisual externa/interna, costo completo y margen. Radar también registra 813-653-COT26 similar: no promover ni sumar sin leer bases y resolver si se relaciona con este proceso. |
+| `1138297-11-LE26` · [Deal `65678232118`](https://app.hubspot.com/contacts/48713323/record/0-3/65678232118?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | [Company `31209269815`](https://app.hubspot.com/contacts/48713323/record/0-2/31209269815?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | CLP 21.000.000 | 09/10/2026 13:00 | `Preparación` · `default/qualifiedtobuy` | Diseño y producción promocional y optimización web para 25 empresas creativas, 15 nuevas y 10 actualizadas; entrevistas/fotografía/video en Atacama, fichas bilingües y QR. Máximo dos meses. Validar experiencia 2022–2026, viajes, equipo, costo completo y margen. Anticipo eventual del segundo hito (60 %) sujeto a presupuesto y garantía del 100 %, no caja asegurada. |
+| `2305-29-COT26` · [Deal `65678397325`](https://app.hubspot.com/contacts/48713323/record/0-3/65678397325?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | [Company `58986233874`](https://app.hubspot.com/contacts/48713323/record/0-2/58986233874?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | CLP 2.660.000 | 07/10/2026 15:00 | `Preparación` · `default/qualifiedtobuy` | Hasta 60 esquemas Illustrator, dos informes de 60–80 páginas InDesign, cartillas y tres videos de 1–2 minutos con editables. 20 días hábiles por producto tras insumos completos; entregas escalonadas hasta enero–febrero 2027. Pagos 820.000 / 920.000 / 920.000 CLP por aceptación; tercer pago con presupuesto 2027. Confirmar horas, volumen y margen antes de postular. |
+| `2013-13-LE26` · [Deal `65678277469`](https://app.hubspot.com/contacts/48713323/record/0-3/65678277469?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | [Company `32122156698`](https://app.hubspot.com/contacts/48713323/record/0-2/32122156698?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | Pendiente de aclaración | 08/10/2026 19:00 | `Preparación` · `default/qualifiedtobuy` | Campañas digitales, generación/integración de leads con CRM y contenidos; seis meses octubre–marzo. Presupuesto inconsistente: ficha 15.000.000 CLP, certificado 9.900.000 CLP, bases 9.000.000 CLP; amount se deja vacío hasta aclaración. Cotización separa honorarios y pauta, no todo el presupuesto es fee. Pagos 33/33/34 por informes bimestrales aceptados. Leer aclaraciones, verificar experiencia educacional/CRM, capacidad, costo completo y margen. Company existente por nombre exacto; domain uvirtual.org y vínculo Party se preservan, RUT del comprador 70.777.500-9 no contrastado contra Party. |
+
+Segunda lectura: cinco `default/qualifiedtobuy`, bucket live `Core Pipeline`, tipo `newbusiness`; automatización sustituyó `Strategic Bets`. UNAP sin amount por contradicción presupuestaria. No se crearon otros Deals para los procesos ISP similares.
+
+### Verificación posterior al cierre de AGCID — 2026-10-05
+
+LicitaLAB consultado nuevamente: `813-655-COT26` y `813-652-COT26` siguen `Publicada`, con presupuesto CLP 7.000.000 y cierre 06/10/2026 14:00 Chile. Relación entre ambas publicaciones pendiente; no sumar sus presupuestos. Evidencia local: `.auth/licitalab-radar-reports/next-813-655-COT26-live.json` y `next-813-652-COT26-live.json`. Se recomienda continuar con ISP diseño por fit; no representa GO ni oferta enviada. Sin nuevos cambios ni readback de HubSpot en esta verificación.
+
+### AGCID: cerrada, oferta no presentada — 2026-10-05
+
+La ficha oficial de Mercado Público se verificó en estado `Cerrada` tras el cierre de las 15:10; las 15:11 correspondían a apertura. El intento autorizado no terminó: cero adjuntos cargados, oferta sin enviar y sin comprobante. Paquete conservado; evidencia y registro en `agcid-ciberseguridad-diseno-2026/research/REGISTRO-DE-ENTREGA-INTERNO.json`. Sin Deal HubSpot verificado ni cambio CRM.
+
+`1606-32-LE26`, AGCID/ANCI: Factory On-Demand; EUR 15.000 máximo impuestos incluidos; cierre publicado
+05/10/2026 15:10 Chile, confirmado en ficha LicitaLAB durante la preparación. Sin alta HubSpot verificada.
+Por instrucción del operador se creó `Alineación/4. Comercial/Licitaciones/AGCID` en OneDrive: cinco originales,
+técnica/metodología Word/PDF de revisión, Carta Gantt, anexos de trabajo y muestras SKY/Berel/Bresler/Gobierno
+de Santiago. Existencia remota leída mediante SharePoint. [Workspace y pendientes](agcid-ciberseguridad-diseno-2026/README.md).
+Anexos 1/2/4/8 completados con firma gráfica autorizada; declaraciones 1/2 y programa propio confirmados por Julio. Técnica/metodología firmadas para revisión; programa actualizado. Anexo 5 EUR 12.000 total IVA incluido aprobado por Julio y firmado: EUR 10.084,03 netos + EUR 1.915,97 IVA. Recomendación EUR 14.280 descartada. Costos/margen, disponibilidad contractual SKY y respaldo real de difusión pendientes; habilitación confirmada por Julio; sin GO ni comprobante de oferta presentada.
+
+### Cierre administrativo de oportunidades anteriores — 2026-10-05
+
+| ID | Deal | Cierre de oferta UTC original | Estado CRM / operativo |
+| --- | --- | --- | --- |
+| `1016414-50-COT26` | [CNTV - Diseño digital de material para CNTV Infantil · `64521733176`](https://app.hubspot.com/contacts/48713323/record/0-3/64521733176?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-10T18:00:00Z` | `closedlost` / `Expirada` |
+| `1658-203-LE26` | [Municipalidad de Temuco - Campaña Temuco 150 años · `64532229714`](https://app.hubspot.com/contacts/48713323/record/0-3/64532229714?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-10T21:00:00Z` | `closedlost` / `Expirada` |
+| `599-35-LE26` | [JUNJI - Plan de medios Campaña de Asistencia 2026 · `64529115746`](https://app.hubspot.com/contacts/48713323/record/0-3/64529115746?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-10T21:00:00Z` | `closedlost` / `Expirada` |
+| `5531-4-B226` | [Universidad de Chile - Servicios de publicidad digital DII · `64544277070`](https://app.hubspot.com/contacts/48713323/record/0-3/64544277070?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-21T19:00:00Z` | `closedlost` / `Expirada` |
+| `1725-196-LE26` | [Subsecretaría de las Culturas - Difusión plataforma Chile Cultura · `64528962434`](https://app.hubspot.com/contacts/48713323/record/0-3/64528962434?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-17T14:59:00Z` | `closedlost` / `Expirada` |
+| `1725-193-LE26` | [Subsecretaría de las Culturas - Estrategia y Plan de Medios · `64498934284`](https://app.hubspot.com/contacts/48713323/record/0-3/64498934284?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-09T15:00:00Z` | `closedlost` / `Expirada` |
+| `1305527-35-COT26` | [SLEP del Pino - Plataforma de Gestión de Solicitudes · `64471694515`](https://app.hubspot.com/contacts/48713323/record/0-3/64471694515?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-08-31T13:30:00Z` | `closedlost` / `Expirada` |
+| `1498185-35-LE26` | [CCLM - Monitoreo de Medios y Redes Sociales · `64474119987`](https://app.hubspot.com/contacts/48713323/record/0-3/64474119987?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-08-31T19:30:00Z` | `closedlost` / `Expirada` |
+| `1878-9-LP26` | [Sernatur - Campaña Comunicacional Posicionamiento Turístico · `64465215819`](https://app.hubspot.com/contacts/48713323/record/0-3/64465215819?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-02T19:00:00Z` | `closedlost` / `Expirada` |
+| `2465-18-RFI26` | [Universidad de Talca - RFI Planificación y Difusión Digital RRSS · `64481086492`](https://app.hubspot.com/contacts/48713323/record/0-3/64481086492?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-08T23:00:19Z` | `closedlost` / `Expirada` |
+| `1007793-16-LE26` | [CFT Los Lagos - Marketing y Campaña de Admisión 2027 · `64483101221`](https://app.hubspot.com/contacts/48713323/record/0-3/64483101221?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-07T18:30:00Z` | `closedlost` / `Expirada` |
+| `875-6-LP26` | [InvestChile - Servicio de Marketing Digital · `64481242885`](https://app.hubspot.com/contacts/48713323/record/0-3/64481242885?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-14T19:00:00Z` | `closedlost` / `Expirada` |
+| `1595-19-RFI26` | [JUNJI - RFI Software Gestión de Tickets · `64469523247`](https://app.hubspot.com/contacts/48713323/record/0-3/64469523247?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-09T15:00:27Z` | `closedlost` / `Expirada` |
+| `2427-73-LE26` | [Municipalidad de Valparaíso - Marketing digital para redes sociales · `64469214508`](https://app.hubspot.com/contacts/48713323/record/0-3/64469214508?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-03T20:00:00Z` | `closedlost` / `Expirada` |
+| `918434-14-LP26` | [Ministerio de la Mujer - Campaña Nacional VCM 2026 · `64466272830`](https://app.hubspot.com/contacts/48713323/record/0-3/64466272830?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-28T23:00:00Z` | `closedlost` / `Expirada` |
+| `1205889-3-LE26` | [Ministerio de Educación - Estrategia de medios Beneficios Estudiantiles 2027 · `64482321775`](https://app.hubspot.com/contacts/48713323/record/0-3/64482321775?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-08T18:01:00Z` | `closedlost` / `Expirada` |
+| `889473-1673-COT26` | [Universidad de O'Higgins - Creación y mantención de página web · `64466117716`](https://app.hubspot.com/contacts/48713323/record/0-3/64466117716?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-08-31T14:00:00Z` | `closedlost` / `Expirada` |
+| `1062018-22-L126` | [Defensoría de la Niñez - Diseño gráfico Informe Anual DDN · `64471071912`](https://app.hubspot.com/contacts/48713323/record/0-3/64471071912?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-08-31T20:30:00Z` | `closedlost` / `Expirada` |
+| `1082957-26-LE26` | [ProChile - Conceptualización, Diseño y Producción de Piezas Gráficas y Audiovisuales · `64482163516`](https://app.hubspot.com/contacts/48713323/record/0-3/64482163516?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-08-31T19:01:00Z` | `closedlost` / `Expirada` |
+| `1098710-22-LP26` | [Subsecretaría de Ciencia - Campaña Festival de Ciencia y Tecnología 2026 · `64461187076`](https://app.hubspot.com/contacts/48713323/record/0-3/64461187076?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch) | `2026-09-16T18:00:00Z` | `closedlost` / `Expirada` |
+
+Veinte retiradas de producción por oferta no producida antes del cierre, según instrucción del operador. Estado operativo `Expirada`, CRM `closedlost`: no se atribuye una pérdida competitiva sin resolución. Fecha de cierre administrativo `2026-10-05T14:24:57Z`; motivos y plazos originales conservados.
+
+RFI Mineduc `1588-33-RFI26` / Deal `63837046880` queda fuera de producción Factory pero continúa abierto: deadline CRM 30/10, registro de colaboración HubSpot. Ocho RFP privados abiertos conservados fuera del alcance de limpieza LicitaLAB. No se alteraron Deals ganados/cerrados anteriores. Los siguientes cortes de agosto/septiembre son históricos; esta cola prevalece para producción.
 
 ## Relación con el registro comercial general
 
@@ -47,7 +213,7 @@ Si una fuente no fue releída, usa `No verificado`; nunca interpretes una celda 
 | `HOLD`                   | Evaluación retenida por evidencia, documento o capacidad faltante; no equivale a `No bid`. |
 | `Expirada`               | Cerró sin postulación y sin una decisión anterior más precisa.                             |
 
-## Cola operativa — 2026-08-29
+## Cola histórica — 2026-08-29
 
 De los 23 Deals abiertos de esta admisión, 20 son postulaciones potenciales y tres son RFI de respuesta liviana. La cartera no es una lista plana: sólo las diez prioridades siguientes deben entrar primero a producción; las demás requieren gate de admisibilidad, capacidad y economía antes de consumir esfuerzo de propuesta.
 
@@ -98,7 +264,7 @@ Esta prioridad es un snapshot operativo, no una propiedad permanente: debe recal
 Los cinco Deals quedaron en `default` / `qualifiedtobuy`, con owner `75788512`, llave de idempotencia y asociación
 Deal ↔ Company verificadas mediante readback. No se crearon contactos sin identidad comprobada.
 
-## Fichas activas
+## Fichas históricas — estados al corte original
 
 ### `1098710-22-LP26` — Campaña Festival de Ciencia y Tecnología 2026
 
@@ -276,3 +442,41 @@ Actualiza este registro inmediatamente después de cualquiera de estos hitos:
 `ID` · `tipo público/privado` · `fuente` · `organismo/empresa` · `modalidad` · `monto y moneda` · `cierre oficial y zona horaria` · `estado` · `decisión` · `postulación` · `Company/deal HubSpot` · `owner` · `próximo control` · `última verificación`.
 
 No almacenes credenciales, cookies, tokens, datos personales no necesarios ni documentos sensibles en este registro.
+
+## Preparación ISP — lectura oficial 05/10/2026
+
+Mercado Público confirma 813-655-COT26 publicada y 813-652-COT26 cancelada por error en acreditación de experiencia; supersede la consulta LicitaLAB anterior de ambas publicadas. Primer cierre 06/10/2026 14:00 Chile. Expediente en OneDrive preparado para revisión, CLP4.760.000 total propuesto; cotización detallada de tres hitos, técnica, plan y muestras. Carta SKY 2025 y recepción GORE 2026 no acreditan cinco años. Costos editorial/dirección estimados: no GO Finance. Sin envío ni nuevo cambio/readback HubSpot.
+
+## Decisión comercial ISP y siguiente prioridad — 05/10/2026
+
+05/10/2026 — NO-BID por decisión expresa de Julio Reyes: no continuar con ISP diseño. El operador indica disponer de cartas del GORE y poca experiencia documental en licitaciones públicas; no se ha acreditado el umbral de cinco años exigido para obtener los 40 puntos de experiencia. La falta de ese respaldo afecta puntaje, no constituye por sí sola inhabilidad ni exclusión. No hubo oferta presentada ni rechazo del comprador. Se conservan los borradores como historial; no continuar preparación. HubSpot no modificado ni reconsultado en este corte.
+
+ProChile Atacama pasa a primera prioridad activa. Experiencia privada admitida mediante contrato íntegro firmado, OC privada aprobada/firmada o carta/certificado firmado. Hasta cuatro servicios 2022–2026, cada uno de al menos CLP4M facturados, terminados o con 90 días ejecutados. Referencias aún no acreditadas por Efeonce; no GO ni envío.
+
+
+## TVN — oportunidad CRM para revalidación — 2026-10-06
+
+Deal verificado [65757239717](https://app.hubspot.com/contacts/48713323/record/0-3/65757239717?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch); Company `53943439754`; Contact `253395427741` (Eduardo Ramírez de la Barra, Subgerente Ingeniería y TI; autoridad de compra no confirmada). Owner Julio Reyes `75788512`. Origen `rfp_privado`, movimiento adquisición, modalidad `no_verificada`; ID de licitación no publicado. Estado operativo En evaluación, creado por instrucción explícita del operador pese al plazo publicado de registro. `default/appointmentscheduled` es la primera etapa técnica disponible y no acredita una cita real. Segunda lectura: `Core Pipeline/newbusiness` por automatización, distinto del bucket propuesto `Opportunistic / Administrative`; no demuestra relación cliente ni gate comercial aprobado. Monto/moneda y closedate sin definir, fuera de forecast comprometido.
+
+[Fuente TVN](https://ww2.tvn.cl/corporativo/licitaciones): suministro, implementación e integración de nuevo sistema comercial CRM; contempla HubSpot o Zoho. Registro publicado desde `29-09-2029` hasta `05-10-2026`: inicio inconsistente, fin corresponde al registro publicado y no acredita finalización del proceso. No se confirma prórroga ni admisión vigente. Presupuesto, usuarios, integraciones y migración pendientes.
+
+[OneDrive — Licitaciones/TVN](https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/TVN) creada y abierta. Tres archivos verificados remotamente: `TVN-aviso-publico-CRM-2026-10-06.jpg` (172762 bytes), `.txt` (726 bytes), `TVN-estado-documental-2026-10-06.md` (1648 bytes). Son evidencia del aviso y ficha interna, no bases. Bases administrativas/técnicas y anexos siguen pendientes: detalle Ver deshabilitado, sin enlaces de descarga en la fila; búsquedas públicas sin originales. Próximo paso: confirmar admisión/proceso posterior y obtener bases. Sin comunicación enviada ni oferta postulada. Nota HubSpot `118121106749` vinculada a Deal, Company y Contact.
+
+
+### TVN — detalle público localizado — 2026-10-06
+
+El HTML del botón Ver conserva un `onclick` hacia [detalle público CRM](https://ww2.tvn.cl/implementacion-nuevo-sistema-comercial-de-tvn-crm), que abre directamente sin modificar controles ni enviar formularios. Muestra Área TI / Comercial, estado En Proceso y fecha de inicio 05-10-2026; conserva período de registro 29-09-2029 a 05-10-2026, inconsistente. TVN exige registro, validación Compliance y posterior invitación por Compras. Regístrate Aquí deshabilitado; no se muestran bases ni anexos descargables. No hay evidencia de admisión fuera de plazo. Evidencia adicional TXT/JPG conservada en OneDrive Licitaciones/TVN; no sustituye bases. Deal `65757239717`.
+
+
+### TVN — contactos de Compras verificados — 2026-10-06
+
+Guillermo Díaz, Analista de Compras: [Contact 253395802939](https://app.hubspot.com/contacts/48713323/record/0-1/253395802939?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch), `guillermo.diaz@tvn.cl`; Mercedes Garnica, Ingeniero de Compras: [Contact 253353012041](https://app.hubspot.com/contacts/48713323/record/0-1/253353012041?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch), `mercedes.garnica@tvn.cl`. LinkedIn leído en navegador y Apollo coinciden con cargo actual TVN. Ambos emails Apollo `Verified`, ZeroBounce `valid` (06/10/2026 08:04:25Z), no inferidos. Guillermo recomendado como primera entrada; no se confirma quién gestiona esta licitación ni autoridad de admisión. Mercedes mantiene entrada CorreosChile abril 2024 sin rango, conservada como ambigüedad frente al current de Apollo.
+
+Dos contactos creados y releídos en HubSpot y Apollo; asociados a Company `53943439754` y Deal `65757239717`. Nota `118115066177` contiene procedencia, intención institucional observada, próximo paso y borrador NO ENVIADO. Apollo request `-3949524283185478571`, 4 créditos consumidos y saldo 2375. Sin correo, llamada, mensaje, formulario ni invitación enviada/recibida. Siguiente paso: consultar admisión y ruta para recibir invitación/bases mediante Compras.
+
+
+## Corte documental de fuentes — 10-10-2026 (sin readback CRM nuevo)
+
+[Índice de 18 casos y expedientes](RADAR_CASES_2026-10-10.md). Estudios, no altas CRM ni decisión de participar. La fuente oficial reportada para [Aysén 1332-12-LP26](sernatur-aysen-1332-12-lp26/README.md) cierra **23-10-2026 15:00 America/Santiago (18:00 UTC)**; sustituye para planificación el 21-10 de las filas históricas. Resolución explicativa pendiente; CRM Deal 65832697782 no releído ni modificado aquí. La coordinación de actualización CRM se realiza por separado.
+
+Ñuble conserva Deal 65806359148. GORE conserva Lead 595417344321, Company 32146470729 y nota 118262917392 con revisión de bases del 08-10; no degradar ese contexto ni duplicar. Pierre Fabre conserva Deal 65843869022 y workspace previo, con formulario no revalidado en este corte. Las señales sin Deal no se añaden al registro comercial general. Ninguna de estas fichas certifica admisibilidad completa ni ausencia de adendas.

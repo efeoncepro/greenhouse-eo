@@ -13,6 +13,16 @@ Manual invocation (Claude Code): `/greenhouse-talent-people-operator [role to hi
 
 This skill is a **decision aid, not legal advice**. For statutory pay, contract law, tax, immigration, or AI-Act conformity sign-off, verify against official sources and defer to the specialists below.
 
+## Accepted Talent Assurance and regional CRM capacity
+
+Load [Talent Assurance Decision V1](../../../docs/architecture/GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md),
+its target architecture and economic guardrails when promising verified client capacity. Operator acceptance
+2026-10-09 covers the transversal standard; TASK-1602 still owns claim taxonomy, verifier, validity, appeal
+and privacy policy. Do not infer a live badge, Quality Gate or autonomous verification from acceptance.
+For CRM/RevOps, load [service](../../../docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) and
+[activation](../../../docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); map roles to real capacity, finance learning/QA/backup,
+and validate contracting per configuration. Keep evidence contextual and human decisions traceable.
+
 ## When to invoke
 
 | Trigger                                                                                                           | Lane                                                                                                                                                                                                                                                                           |
@@ -1027,3 +1037,39 @@ SCIM recovery lane. Verify all four closure layers and the actual payroll period
 an audited statement, not proof that Finance has reconciled its obligations. Keep that dependency explicit.
 Source case: `docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md` (dated evidence,
 not current status for future runs). Do not repeat the closed operation during docs/skills maintenance.
+
+## Handoff de capacidad al Cotizador V3
+
+Para simular una persona o squad con costos y herramientas, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Talent define perfil/variante/seniority, país del talento, dedicación (FTE u horas al mes: 180 horas = 1 FTE-mes) con
+su evidencia (`dedicationEvidence`: confirmada o estimada; una estimada cuenta como costo estimado), headcount, las
+tareas que van más allá de la receta del perfil (la receta se aplica sola y no se escribe) y, sólo cuando hay una
+persona específica asignada, su id anónimo estable sin PII (mientras nadie esté asignado, el cupo `planned-*` se
+queda); una persona por dedicación se cotiza con `talent-assurance-staffing` como `role_capacity`
+([procedimiento y ejemplo](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#71-una-persona-por-dedicación--person-by-dedication));
+Commercial conserva el mercado del comprador; las cifras salen del catálogo versionado y el precio lo decide el CEO.
+**El costo del cotizador no es la nómina actual:** es el nivel salarial objetivo del Excel de pricing (decisión del
+CEO, 2026-10-11), así que el margen real en personas hoy es mayor que el que muestra V3. No proponer conectarlo a
+payroll, no leerlo como lo que Efeonce paga hoy y nunca escribir el pago de una persona en un blueprint, artefacto
+o documento de cotización. Dos ejes de país: el de la persona cambia el **costo** (factor de talento, base Chile;
+el CEO los cerró el 2026-10-11 como valores de política, confirmados desde el 2026-10-12: uno se revisa sólo si una
+contratación real en ese país lo contradice, y ese dato lo aporta Talent) y el del cliente
+cambia el **precio** de la parte humana (factor de mercado). Mantener escalas de consultoría separadas:
+una necesidad SEO o CRM no autoriza sustituir el salario de la variante elegida. `planned-*` son slots,
+no personas contratadas, licencias asignadas ni capacidad disponible. No promover demanda local a Hiring por inferencia.
+Puesta en marcha de una persona por dedicación (staff augmentation): onboarding USD 200 una vez por persona, por
+defecto, y reclutamiento USD 500 sólo si Talent declara que hay que contratar para ese cliente; ambos estimados, a medir
+en las próximas dos incorporaciones. La regla del Excel de «un mes del recurso» no se usa: plazo mínimo al reclutar y
+cláusula de conversión si el cliente contrata a la persona son materia de contrato y revisión legal, no de precio.
+Persona nueva en un encargo corto: una licencia Adobe comprada para ella se sigue cobrando hasta el fin del contrato de
+doce meses si nadie más la usa (`compose commitments` lo muestra); Microsoft 365 y Notion bajan al quitar el seat.
+Una persona por dedicación no lleva reserva de contingencia (el cliente dirige el trabajo); la reserva de 12% del costo
+de personas existe sólo en un servicio gestionado vendido On-Demand (contrato 1.4.0, 2026-10-11).
+
+Notion/M365 son base; tools nominativas necesitan capacidad y acceso, no descuento automático por dedicación50%.
+Portfolio declarado separa clientes/interno/sin asignar; no certifica ICO ni inventario live. Talent Assurance
+aceptado implica respaldo/capacitación bajo su canon, pero `trial-*` no acredita costo de esas actividades ni
+permite garantías inéditas. Rol vendido y funciones internas para un servicio conservan unidades distintas:
+managed_service proyecta fee sin publicar equipo/costos internos; sigue requiriendo SOW y ownership de delivery.
+El blueprint no calcula precio ni altera payroll/contratos: usa CLI/snapshot y entrega sus gaps a Finance/Operations.

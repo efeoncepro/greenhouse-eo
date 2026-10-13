@@ -1,0 +1,53 @@
+{
+  "as_of": "2026-10-06",
+  "version": "v0.6",
+  "source_directory": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/economia",
+  "delivery_directory": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/reconstruccion-2027/economia",
+  "files": [
+    {
+      "name": "Pibank-decision-inversion-2027.xlsx",
+      "bytes": 59357,
+      "sha256": "d87c2aabdf7a3a04ff59a719c48a747ab19a3d689eaa14e6d22427d455f7207e"
+    },
+    {
+      "name": "README.md",
+      "bytes": 12136,
+      "sha256": "7a0c961d02d825a3a065eb6b7cec2b37379987047ec58607f89044de692c216e"
+    },
+    {
+      "name": "build_model.py",
+      "bytes": 39417,
+      "sha256": "ce12cd14786875c6b37157b74a3261e0155b6d0b75f12ba7357fc7263c731093"
+    },
+    {
+      "name": "inputs.json",
+      "bytes": 1992,
+      "sha256": "6b380318e10f99fb2d2771339f5bf531d15b45174e08ace25e2e797549cf55fa"
+    },
+    {
+      "name": "results.json",
+      "bytes": 5378,
+      "sha256": "f1744c61b7aa9e13ca8a6a397c47ee65481ad9d7edf3d65364f042fb0d3e7d2e"
+    },
+    {
+      "name": "sources.json",
+      "bytes": 3976,
+      "sha256": "70a460c10fca91bb947a7087a0a3d29f74bcc9b75eb82b62a7b2ad1602be7b53"
+    },
+    {
+      "name": "validate_model.py",
+      "bytes": 12552,
+      "sha256": "3d2175762523fa58db5e6272c4442da7369c238bef46b6c89718f7675949bd5b"
+    },
+    {
+      "name": "validation.json",
+      "bytes": 23659,
+      "sha256": "ad092add5ee358285989c113400b3d34e2543bc498b30b188188222559d0e77e"
+    },
+    {
+      "name": "visual-qa.json",
+      "bytes": 932,
+      "sha256": "e97e38a84d706b1a04ed7baedf4f9e71021b7147468b769ac0bc674d569acc25"
+    }
+  ]
+}

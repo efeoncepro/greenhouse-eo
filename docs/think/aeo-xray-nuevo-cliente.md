@@ -145,3 +145,59 @@ carril gobernado y tienen aceptación separada. Las muestras SKY existentes cons
 > deep links. Verifica contenido, píxeles, playback y CSS compilada antes de publicar solamente Think,
 > si esa publicación está autorizada. No copies datos ni permisos de otro cliente y no despliegues
 > Greenhouse. Deja SHA, deployment, readback, límites y procedimiento de retiro en evidencia privada.
+
+## Bloques de experiencia temprana (contrato 0.2.0, 2026-10-09)
+
+Opcionales y aditivos: un intent 0.1.0 sigue resolviendo igual. Sirven para que el cliente viva cómo sería trabajar con
+Efeonce, con datos reales, y no sólo vea la pieza terminada. Declarar `version: "0.2.0"` en el intent.
+
+| Campo | Qué muestra | Dónde aparece en Think |
+|---|---|---|
+| `experience.aiPanel` | Preguntas reales a la IA: si aparece la marca, si el dato es correcto, si cita el sitio propio y qué fuentes cita | Paso 1, debajo de la observación SEO |
+| `experience.today` | Lo que la máquina lee hoy de la página real del cliente frente a la pieza (se conserva, se mejora o se suma) | Paso 1 |
+| `experience.review` | Cada dato con su documento, responsable y estado, más comentarios de ejemplo | Paso 2, debajo de la pieza |
+| `experience.measure` | Las métricas de la propuesta, en reemplazo del texto genérico | «Cómo mediríamos esta pieza», paso 2 |
+| `experience.nextStep` | Invitación final con botón (`https:` o `mailto:`) | Cierre del paso 4 |
+| `ui.welcomeTitle` / `ui.welcomeEnter` | Texto de la cortina de entrada | Cortina |
+| `brand.logoOnDarkAssetId` | Logo oficial para fondos oscuros: se muestra sobre el navy sin recuadro claro | Encabezado y cortina |
+
+Reglas: el panel de IA usa sólo capturas reales con fecha; una fila sin mención va como `not-mentioned`. El «hoy» se
+escribe en tono factual y reconoce lo que el sitio ya hace bien (`verdict: keep`). La revisión es un ejemplo del flujo y lo
+dice en su nota. Caso de referencia: muestra de Pibank Perú (expediente `09-XRay-Pibank/build-intent.py`). Contrato y
+pruebas en AXIS (`docs/agent-composition/aeo-xray.md`, `packages/contracts/src/aeo-xray.test.ts`).
+
+## Delta 2026-10-09 — trampas de producción y video de «Dónde más vive»
+
+Aprendido al publicar la segunda muestra del carril `sample_*` (Pibank Perú, junto a Pichincha). Registro de la
+sesión: [Pibank · X-Ray y propuesta v12](../audits/commercial/2026-10-09-pibank-xray-experiencia-temprana-y-propuesta-v12.md).
+
+- **La vista local sólo carga raster.** El cargador `fixture-case` acepta webp/png/jpg/avif: un logo SVG o un mp4 no
+  aparecen con `XRAY_CASE_DIR`. El carril publicado sí sirve mp4; el video se revisa en la vista publicada o en una
+  copia aislada del runtime, no en el fixture.
+- **Tabla de condiciones de la landing.** El módulo agrupa por la primera columna y muestra la tercera como cifra
+  grande. Usar pocas categorías cortas (por ejemplo Tasa/Costos/Uso) y valores cortos («Digital», no «100% digital»);
+  si no, desborda a 320 px.
+- **La fecha de la observación SERP es `preparedAt`.** No sale de la captura: si la SERP es de otro día, re-capturarla
+  el mismo día de `preparedAt` (en Pibank se reemplazó la del 06/10 por una del 08/10).
+- **Vista local aislada.** `astro dev` no admite dos servidores en el mismo repo. Para ver un caso sin detener otro,
+  copiar el repo de Think al scratchpad con `node_modules` clonado (`cp -cR`); un symlink a `node_modules` rompe la
+  resolución de Vite.
+- **Panel AEO con DataForSEO.** Con `--target`, DataForSEO responde 40102 «No Search Results» cuando el dominio no
+  aparece en la SERP: es un resultado (la marca no está), no una falla.
+
+### Patrón de video para «Dónde más vive»
+
+El video vertical vive en el formato «Story + video» de cada pieza, campo `reel`. Receta probada en Pibank (12 s,
+9:16, expediente `09-XRay-Pibank/video/`):
+
+1. Cuadros clave verticales editados desde las fotos ya aprobadas del X-Ray (`pnpm ai:image --image …`), no escenas
+   nuevas.
+2. Animación image-to-video con Gemini Omni 1.1 (`pnpm ai:omni --task image … --aspect 9:16 --resolution 1080p
+   --duration 5`). Requiere gasto autorizado y ADC vigente.
+3. Capa gráfica determinística en HTML con `seek(t)` por cuadro, exportada como PNG con alfa a 30 fps (titulares,
+   tarjetas, cortina y logo del cliente inyectado como SVG).
+4. Montaje por segmentos con ffmpeg; un filtro único con zoompan + xfade puede quedar trabado sin consumir CPU.
+5. Música generada sin voz (verificada con `whisper-cli`) y mezcla a −16 LUFS con fades.
+
+Logo del cliente sobre fondo oscuro: versión blanca con su color propio, sin recuadro claro (`brand.logoOnDarkAssetId`).
+Sobre un fondo del mismo color que el acento del logo, resolver el caso aparte.

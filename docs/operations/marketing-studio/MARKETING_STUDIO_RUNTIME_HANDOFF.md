@@ -1,16 +1,72 @@
 # Efeonce Marketing Studio — Runtime handoff
 
+## AXIS video — operativo, 2026-10-07
+
+Studio main `da2a02a` desplegado en `studio.efeonce.org`; worker staging `00008-n9x` y producción `00006-9lq`.
+Migración/CORS verificados en ambos ambientes; backfill 4/4 y 7/7, pending/failed/deferred=0 en producción.
+Reproducción, replay, móvil y miniaturas visibles verificados. [Evidencia y límites](../../audits/marketing-studio/2026-10-07-axis-video-adoption.md).
+Subida web, providers YouTube/Vimeo y distribución pública quedan separados; gateway sin cambios.
+Incidente de cierre recuperado: dependencia `email_evidence` aplicada por migración canónica acotada en
+ambos ambientes; Metricool HTTP 200 y deep health worker/Metricool/derivados OK. Flags owned/email OFF;
+avisos de verificaciones/mapeo separados conservados. Evidencia en la auditoría enlazada.
+Migrador `1c0e7ae`: excepción única del orden owned-email/timeline validada bajo lock; dry-run staging y
+producción exit 0 sin migraciones pendientes. Timestamps intactos; worker conserva su imagen.
+
+## Discovery de tácticas y canales — 2026-10-07
+
+[Discovery completo](../../audits/marketing-studio/2026-10-07-initiatives-channels-discovery.md): nombre y definición de **táctica** acordados en la [precisión del ADR](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md#precisión-aceptada-2026-10-07--tácticas-dentro-de-campaña). Intervención opcional por campaña, con contexto/enfoque y asociación explícita en activación; modalidades/canales independientes. Readback del discovery: API 1.9.0, catálogo v1 de 52 canales, 3 cuentas Metricool y 29 activaciones scheduled en 07/10–31/12. Sin cambios productivos ni reorganización de CMP-006. Próximo paso: diseño contractual y slices backend/UI; editorial SEO y migración histórica separados. Checks y límites en el dossier.
+
+## Copys de las activaciones y Seasonalities — 2026-10-07
+
+Readback 11:31 UTC: corregidas 25 asociaciones de copy omitidas en la carga; las 26 nuevas activaciones muestran texto literal coincidente con Metricool. Fuente OneDrive + import acotado (23 variantes) y commands Studio (2 variantes), sin alterar fechas, cuentas, piezas, campañas ni aprobaciones. UI comprobada en ACT-000007/26. Persisten gaps de catálogo orgánico, brief de CMP-006 y estados creativos; [dossier y checks](../../audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md#revisión-posterior-copys-y-completitud). [Comparación de Seasonalities](../../audits/marketing-studio/2026-10-07-seasonalities-model-comparison.md) a petición del operador; elección pendiente, sin reorganización.
+
+## Calendario Metricool — conciliación verificada 2026-10-07
+
+A las 09:32 UTC: 26 publicaciones existentes incorporadas mediante commands autorizados; calendario octubre–diciembre con 29 programadas (26 nuevas + 3 SKY), cero PENDING sin vincular y 31 evidencias históricas conservadas. CMP-001: 12 nuevas; CMP-002: 12 y slug registrado por CLI administrativa con autorización expresa; CMP-006: Día de Muertos, 2 borradores vinculados a evidencia scheduled, video ingresado por API y pendiente de revisión. Sin escrituras Metricool, cambios de permisos o deploy. Identidad, estado y límites en el [dossier y readback](../../audits/marketing-studio/2026-10-07-metricool-calendar-reconciliation.md). Los snapshots siguientes conservan sus fechas históricas.
+
+
+## TASK-1899 retirada (2026-10-04)
+
+Por decisión del operador se revirtió su implementación local en Greenhouse y Studio. No hubo commit, push,
+deploy ni migraciones de TASK-1899 en staging/producción; el gateway quedó sin cambios. El PostgreSQL temporal de
+pruebas quedó detenido. No hay un candidato de TASK-1899 pendiente de desplegar. Las escrituras MCP continúan
+fuera de la federación; TASK-1899 ya no es requisito para desarrollar API/CLI/UI. TASK-2003 es el carril paralelo vigente de escrituras T1 delegadas; no reactiva las aprobaciones/digest retirados.
+
+
 > **Tipo:** runbook operativo
-> **Versión:** 1.5
+> **Versión:** 1.8
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-10-02 (noche) por Claude (TASK-1894 Entregable B verificado en staging, sin desplegar en producción: §Commands del catálogo; antes, el mismo día: Entregable A en producción: §Subidas; antes, 2026-09-26: cierre en producción de TASK-1893 y TASK-1896)
+> **Última actualización:** 2026-10-05 (tarde) por Claude — TASK-2002: filtros v3.4, formulario y fecha/hora v3.5 en producción (Studio `main` `5d962c4`) y ventana temporal de escritura en modo `open` hasta el 2026-10-12T10:00Z. Antes, 2026-10-05: calendario en producción en solo lectura (`d0ec7e0`). Anterior, 2026-10-04: rollout de activaciones TASK-2001, backfill CL y canary Metricool/CLI/scheduler.
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
 
 Este documento dice **cómo operar** Studio. El porqué y los contratos viven en la arquitectura; no se repiten acá.
 
-## Estado vivo (2026-09-26)
+## Estado vivo verificado (2026-10-04, después del release)
+
+> Actualización 2026-10-05: Studio `main` avanzó a `d0ec7e0` con el calendario de TASK-2002 (Vercel Production Ready
+> `otc14ubb7`). La tabla de abajo conserva el estado del release del 04/10; lo nuevo está en
+> [TASK-2002 — calendario de activaciones, estado al 2026-10-05](#task-2002--calendario-de-activaciones-estado-al-2026-10-05).
+
+Fuente: [release autorizado de Studio](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md) y
+[readback estructurado](../../audits/marketing-studio/TASK-2001-release-2026-10-04-checks.json).
+
+| Pieza | Estado verificado |
+| --- | --- |
+| Web/API | Studio `main aa6fa0771ff0`, Vercel Production Ready `dpl_Atr8ThFhy4UNG8HGtAXYkL529pmA`; health 200, API 1.7.0, database reachable, acceso open. |
+| Contrato | 75 tools de negocio, 80 operaciones HTTP; manifiesto `d9f5db8f7729255d59921dd591c2f9963f0abe8a637bf288c235fceb6fd1ccc2`. Servido no significa federado. |
+| Catálogo/schema | Catálogo previo y cinco migraciones TASK-2001 (`1791149145299`…`1791151780000`) aplicadas staging y producción; catálogo v1 published, 52 canales. UPDATE de especificación publicada rechazado en ambas bases (23514). |
+| Datos productivos | 5 campañas y 103 assets conservados. Backfill activaciones: 6 evidencias legacy vinculadas a 6 planes CL; 63 evidencias totales/57 sin vincular. Aliases TASK-1905 (134 unmapped) siguen pendientes. |
+| Flags | Web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`, `STUDIO_CUSTOMER_MODEL_ENABLED=false`. No promoción a enforce. Activaciones ON web/workers; discovery sólo producción ON, owned OFF. |
+| Worker | Staging `00007-kt9`, producción `00005-wc5`, Ready/100%, `/health` 200; misma imagen `aa6fa0771ff0`, digest `sha256:3001726da1f901843c3c4b19e8b52e00ce3be0cf0c7e172d956bc0376df1f5d2`. |
+| Canaries | Producción: org ajena404, bearer inválido401, escritura de activación con bearer read-only403 sin write; 44/44 thumbs 200. Plan/reschedule/cancel/replay HTTP staging PASS; descubrimiento real 62/replay 0 cambios, scheduler OIDC PASS. Tres overdue CMP-001 sin fecha publicada; CMP-003 scheduled. |
+| Greenhouse/gateway/ICP | Sin release Greenhouse ni gateway en esta entrega. Capability pendiente de activar; nueva federación MCP pendiente. ICP real depende1906/1892 y sigue disabled; T1 delegado corresponde2003 en paralelo. |
+| CLI HTTP Greenhouse | `pnpm studio` local, API-only: 18 tests/lint PASS; discovery, lectura autenticada y upload dry-run reales. No carga aplicada productiva ni release Greenhouse. [Auditoría](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). |
+
+## Snapshot histórico (2026-09-26, ampliado 2026-10-02)
+
+La tabla siguiente conserva las verificaciones anteriores; versiones, conteos y revisiones aquí no sustituyen el estado vivo de arriba.
 
 | Pieza | Estado |
 |---|---|
@@ -69,12 +125,16 @@ Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets version
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/183008134038/locations/global/workloadIdentityPools/vercel/providers/greenhouse-eo` | igual |
 | `GCP_SERVICE_ACCOUNT_EMAIL` | `marketing-studio-runtime@efeonce-group.iam.gserviceaccount.com` | `marketing-studio-runtime-stg@…` |
 | `STUDIO_ACCESS_MODE` | sin definir (= `open`) | `open` |
+| `STUDIO_CHANNEL_VALIDATION_MODE` | `warn` (release 2026-10-04) | staging observado en `warn`; verificar cada preview |
+| `STUDIO_CUSTOMER_MODEL_ENABLED` | `false` (release 2026-10-04) | staging `false`; consumer real pendiente |
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` | — |
 | `STUDIO_MEDIA_URL_SECRET` | secreto HMAC de los enlaces de imagen (sensitive, ≥ 32 caracteres) | **uno distinto** por ambiente |
 | `NODE_AUTH_TOKEN` | `_authToken` del registro AXIS (encrypted) | igual |
 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry (configurado 2026-09-26) | igual (environment `preview` se deriva de `VERCEL_ENV`) |
 | `SENTRY_AUTH_TOKEN` | token de source maps (encrypted; **sin configurar**: el build no sube source maps) | igual |
 | `STUDIO_MEDIA_BUCKET` | `efeonce-marketing-studio-media` (sonda del health profundo; si falta se deduce de las renditions) | `efeonce-marketing-studio-media-staging` |
+| `STUDIO_OPEN_WRITE_UNTIL` | `2026-10-12T10:00:00Z` (ventana temporal de escritura, TASK-2002; retirar con TASK-1898) | sin definir |
+| `STUDIO_OPEN_WRITE_ORGS` | `org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce) | sin definir |
 
 Opcional: `STUDIO_PG_MAX_CONNECTIONS` (pool por instancia; por defecto 3 en Vercel, 5 fuera). Cambiar una variable
 exige redeploy.
@@ -420,7 +480,7 @@ SELECT kind, status, counts, started_at FROM studio.worker_run ORDER BY started_
   queda por validar en TASK-1895. La CLI no depende de CORS.
 - **Pendientes fuera de Studio:** capability `marketing_studio.asset.write` en Greenhouse (en `develop` desde
   2026-10-02, release a producción sin autorizar; hoy no bloquea) y `pnpm studio:manifest:sync` en el gateway (las tools de escritura quedarían fuera por
-  `write_tool_without_scope_class` hasta TASK-1899).
+  `write_tool_without_scope_class`; T1 delegado corresponde a TASK-2003 y TASK-1899 está retirada).
 
 ## Commands del catálogo (TASK-1894 Entregable B)
 
@@ -469,7 +529,7 @@ Respuestas a esperar (observadas en staging el 2026-10-02):
 | `invalid_state_transition` (409) | La transición no está en la máquina de estados |
 | `precondition_required` (428) / `revision_conflict` (412) | Falta `--if-match` o la revisión cambió; releer y repetir |
 | T2 sin `--confirm` | La CLI no escribe |
-| `confirmation_required` (403) | T2 por API: sólo `operator_cli` hasta TASK-1899 |
+| `confirmation_required` (403) | T2 por API no habilitada: sigue `operator_cli`; TASK-1899 retirada |
 | `approval_requires_person` (403) | Un `api_client` intentó aprobar |
 
 Canary HTTP (como se hizo el 2026-10-02, contra la preview con `vercel curl … --deployment <preview> --scope
@@ -496,8 +556,35 @@ bearer → `approval_requires_person`; CMP-004 → 409; brief literal (comillas 
    registra; test nuevo. Pasos: aplicar el cambio → `pnpm studio:manifest:sync` → test → PR → merge → deploy. La única
    lectura federada nueva es `studio.campaign.brief.get`.
 3. **Release de Greenhouse a producción** con las dos capabilities (no autorizado aún).
-4. Entregable C (corte de las campañas existentes) diferido por el operador; TASK-1898/1899 para persona por sesión,
+4. Entregable C (corte de las campañas existentes) diferido por el operador; TASK-1898 para persona por sesión y TASK-2003 para delegación MCP,
    confirmación T2 por API y federación de escrituras.
+
+## Reproducción de video (TASK-1998/1999)
+
+Estado: **en producción desde el 2026-10-04** (rollout autorizado por el operador).
+
+| Paso | Estado |
+|---|---|
+| 1. Worker staging | ✅ `marketing-studio-media-worker-staging-00004-6v7` (imagen `35093c39f748`); barrido `repaired 1, failed 0` |
+| 2. Migración `marketing_studio` | ✅ `1791129772182`; tres constraints en `pg_constraint` |
+| 3. Worker producción | ✅ `marketing-studio-media-worker-00003-hrw` (imagen `aa35e0202de5`); barrido `repaired 6, failed 0` |
+| 4. Push Studio `main` | ✅ `aa35e02` y `c52eb4a`; health `1.5.0`; `302` → `206 video/mp4` verificado con «Los Sparks» |
+| 5. Gateway | ✅ manifiesto 1.5.0 sincronizado (efeoncepro/efeonce-mcp#24, mergeado `454d80eb6`); sin deploy necesario (superficie sin cambios) |
+
+Orden de rollout:
+
+1. Worker staging: `bash apps/worker/deploy.sh --env staging --apply` (flag `true` en `deploy.sh`).
+2. Migración en `marketing_studio` (migrator, proxy local) y verificación en `pg_constraint`.
+3. `PLAYBACK_ENABLED="true"` de producción en `deploy.sh` → commit → `deploy.sh --env production --apply` →
+   `gcloud scheduler jobs run marketing-studio-reconcile-derivatives --project efeonce-group --location us-east4` →
+   6 filas `kind='playback'` (CMP001-01 ×3, CMP001-08 ×2, CMP003-01) y `worker_run` sin `failed`.
+4. `git push origin main` en Studio → `/api/v1/health` `1.5.0` → `curl -m 10 -I` del `playback.url` de
+   `CMP001-08-video-16x9` → `302` → `curl -m 10 -r 0-1023` a la `Location` → `206 video/mp4`; abrir
+   `studio.efeonce.org/campaigns/CMP-001?piece=CMP001-08-video-16x9` y reproducir.
+5. Gateway: `pnpm studio:manifest:sync` + versión + PR + dispatch (sólo descripciones; el campo ya viaja).
+
+Rollback: flag `false` + redeploy del worker (las filas existentes siguen sirviendo); revert del deploy web;
+`migrate down` sólo después de borrar las filas `playback`.
 
 ## DNS (aplicado 2026-09-25)
 
@@ -580,3 +667,196 @@ Rollback: DSN vacío en Vercel + redeploy (Sentry); `pnpm migrate down` de `ops_
 - **`next dev` reescribe archivos.** Genera `apps/web/AGENTS.md`/`CLAUDE.md` (commiteados) y reescribe `next-env.d.ts`: no commitear la variante de dev.
 - **`GRANT CONNECT` lo da el dueño de la base.** Para los roles `marketing_studio_restore` y `marketing_studio_worker` el `GRANT CONNECT` debe correrlo `marketing_studio_migrator` (dueño de las bases), no el admin de la instancia; los scripts de Studio ya lo hacen así (`f9e6cbb`, `82aeab6`).
 - **Gate de versión del gateway.** Mide la superficie construida con todos los providers habilitados: un provider nuevo debe declararse en `src/surface.ts` y en el test de cobertura de políticas, o sus tools quedan fuera de la cuenta.
+
+## TASK-1905 — Studio en producción 2026-10-04; integración y backfill pendientes
+
+Catálogo versionado de 52 canales y taxonomía/UTM; validación en writers e importador, snapshots, hallazgos,
+audiencias y referencia ICP opcional. API 1.6.0 / 59 tools (15 operaciones nuevas), publicada en el release descrito abajo. `pnpm check` y build
+local pasan; DB aislada y atención desktop/mobile verificadas. [Dossier](../../audits/marketing-studio/TASK-1905-local-verification.md),
+[contrato](../../documentation/marketing-studio/catalogo-canales-y-referencias-icp.md) y
+[manual](../../manual-de-uso/marketing-studio/gobernar-catalogo-canales.md).
+
+Studio fue publicado posteriormente con autorización expresa: main `74073de`, Vercel Ready
+`dpl_61kJPNWNXabGYetKC6dxwch2s2uW`, API pública 1.6.0 y catálogo v1 de 52 canales. Worker producción
+`00004-j4h` / staging `00006-p8q`, misma imagen y health 200. Migraciones Studio aplicadas en ambas bases.
+[Evidencia de release y rollback](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md).
+Flag explícito web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`;
+`off` desactiva validación y `enforce` exige publicación/backfill revisado y un release observado en warn.
+`STUDIO_CUSTOMER_MODEL_ENABLED=false` explícito en web/worker. Activarlo no provisiona un consumer real; depende de TASK-1906/1892.
+Federación de writes T1 depende de TASK-2003. Gateway quedó intacto en rama ajena `feat/task-1921-brand-render`.
+SQL de capability Greenhouse parqueado en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
+owner operador release: recrear timestamp, aplicar staging y readback. Dry-run productivo: 134 registros unmapped; cinco aliases
+pendientes de revisión por efeonce_operations (detalle y conteos en el dossier). No se aplicó backfill ni se
+activó enforce. El canary API pasó. Federación/canary de las nuevas lecturas MCP pendientes; las escrituras T1 requieren TASK-2003. No se bloquea desarrollo ni operación API/CLI/UI por TASK-1899. Greenhouse y gateway no se publicaron.
+
+
+
+### Capability Greenhouse y autoridad pendiente
+
+`marketing_studio.catalog.manage` existe en código (`src/config/entitlements-catalog.ts`) y grants efectivos
+calculados (`src/lib/entitlements/runtime.ts`): acciones `create`/`update`, sólo `efeonce_admin` y
+`efeonce_operations`. Coverage de 33 tests PASS; account/designer, acciones delete/all y roles no efectivos no
+conceden acceso. Esto acredita implementación local en Greenhouse, no registro/grant efectivo en producción.
+El SQL está en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
+el operador de release debe recrearlo con `pnpm migrate:create`, aplicar y verificar el registry y canje.
+No hubo release Greenhouse en el release Studio ni al entregar la CLI HTTP. Un bearer de servicio no gobierna
+el catálogo: el canary productivo devuelve 403. TASK-2003 resuelve el carril delegado T1 en paralelo; no es
+prerrequisito de toda TASK-1905. ICP real sigue desactivado y depende de TASK-1906/TASK-1892.
+
+## CLI HTTP desde Greenhouse (2026-10-04, entrega local)
+
+`pnpm studio` descubre OpenAPI/manifiesto vivos; no necesita checkout Studio ni acceso SQL. `list`, `describe`,
+`call`, `upload`, `download` y `doctor` consumen la API; escritura en dry-run por defecto, `--apply` explícito,
+idempotencia y revisión. `--confirm` de T2 expresa intención local, nunca concede autoridad ni sustituye una persona.
+
+[Manual API-only](../../manual-de-uso/marketing-studio/operar-por-cli-api.md) y
+[auditoría de 18 tests + HTTP real](../../audits/marketing-studio/2026-10-04-studio-api-cli.md). Operación verificada:
+discovery59/64, catálogo de 52 canales, lectura autenticada de asset y carga dry-run sin ticket ni bytes. Transferencias/applies
+se probaron con servidor local controlado; no se afirma carga aplicada en producción.
+
+La CLI HTTP y las CLIs de mantenimiento del repo Studio son carriles distintos: el bearer existente de cargas no
+concede `studio:write` general, y el catálogo global responde403 con bearer de servicio. Seed/backfill siguen siendo
+mantenimiento autorizado por operador en Studio. Las cinco campañas OneDrive conservan su frontera de escritura.
+
+## Candidato local TASK-2001 — 2026-10-04 (histórico pre-rollout)
+
+**Sin push, deploy ni cambios de datos remotos.** Studio main incorpora slices hasta 4094da0, incluyendo el corte final de
+backfill/contrato documentado en [QA local](../../audits/marketing-studio/TASK-2001-local-verification.md). API 1.7.0,
+75 tools/80 operaciones; el runtime productivo verificado arriba conserva su versión anterior. La UI TASK-2002 no fue implementada.
+
+Orden de rollout, sólo con autorización: cinco migraciones aditivas (`1791149145299`, `1791149983810`, `1791150800150`,
+`1791151430000`, `1791151780000`) → configurar bindings/dominios → worker/readback → revisar slugs antiguos y backfill
+→ web con flag → canary de lectura/escritura → sync/federación y canary con TASK-2003. Conservar scheduled_post;
+[retiro diferido](../../tasks/pending-migrations/README.md) no se ejecuta con este release.
+
+| Config | Default / dueño / verificación pendiente |
+| --- | --- |
+| STUDIO_ACTIVATIONS_ENABLED | false, runtime web y CLIs/domain; activar sólo después de migrar. OFF vuelve al calendario legacy. |
+| MEDIA_WORKER_METRICOOL_DISCOVERY_ENABLED | false en deploy.sh; bindings intersectan METRICOOL_BLOG_IDS. Job /jobs/metricool-discovery. |
+| MEDIA_WORKER_OWNED_READBACK_ENABLED | false en deploy.sh; job /jobs/owned-readback. |
+| STUDIO_EXECUTION_BINDINGS | [] en deploy.sh; owner registra organizationId/provider/providerAccountRef. Para WordPress/other el ref es el origen HTTPS del sitio del cliente. Registro de cuenta no amplía esta autorización. |
+| STUDIO_TRACKING_DOMAINS | {} por defecto, objeto org→lista de hostnames exactos (sin wildcard). Owner confirma dominios propios; nunca los toma del body del cliente. |
+| HubSpot readback | Puerto de Greenhouse con identidad de consumer, org/portal y complete=true; endpoint/credencial del owner siguen pendientes. Config ausente falla cerrado. No existe canary HubSpot en esta entrega. |
+
+Los jobs registran worker_run y cada cuenta su frescura. El health profundo añade activations_overdue y frescura de
+descubrimiento/owned. Incluir permisos, canary tenant deny y fallos de proveedor antes de encender. Rollback: flags OFF;
+migrate down sólo sin datos protegidos. Las bases de prueba fueron Postgres local descartable, nunca staging/prod.
+
+### Nuevo alcance email — implementación pendiente (2026-10-04)
+
+El operador requiere Resend (mayor volumen), HubSpot, Marketing Cloud Engagement y Marketing Cloud Next. La
+implementación 4094da0 y su QA no cubren la ampliación: el lector actual está acoplado a HubSpot. Debe generalizarse
+por provider/cuenta/envío, añadir catálogo versionado y adapters independientes, empezando por la evidencia Resend
+ya gobernada en Greenhouse. No existe todavía soporte runtime de los nuevos proveedores. Ver delta email y plan
+TASK-2001; flags OFF, sin push ni envíos. CLI/API/MCP deben conservar las mismas operaciones de activación.
+
+## Rollout TASK-2001 — estado vigente 2026-10-04
+
+[Release completo y límites](../../audits/marketing-studio/TASK-2001-release-2026-10-04.md). Studio aa6fa07 pushed/desplegado; cinco migraciones en staging/prod. Seis posts preservados y vinculados a ACT-000001…000006 con CL confirmado, hora America/Santiago y versiones verificadas por hash. No hubo envíos ni publicaciones nuevas.
+
+Activaciones ON en web preview/producción y ambos workers; library default false. Discovery ON sólo producción, bindings Efeonce × 3961547/5105024. Scheduler marketing-studio-metricool-discovery ENABLED (`7,37 * * * *`, Santiago), OIDC probado. Lectura 62 ejecuciones, replay 0 cambios/0 errores; 63 evidencias almacenadas (una legacy no retornada por la ventana), 57 sin vincular. Owned OFF: faltan bindings y adapters/owner Greenhouse. Tracking permite efeoncepro.com por organización, web preview/prod.
+
+CLI HTTP producción verificada: doctor, calendario, activación y unlinked; no concede identidad personal por usar --confirm. Backfill real por command CLI autorizado. Tres CMP-001 overdue: sin fecha publicada aunque dos provider_status sean PUBLISHED; conciliación pendiente sin inventar timestamps. Email multiproveedor, owned, MCP delegado TASK-2003 y UI TASK-2002 conservan sus pendientes. Rollback: pausar discovery, flags OFF/redeploy, mantener schema/datos; ninguna migración down con evidencia.
+
+
+## Candidato local 2026-10-04 — owned Resend/HubSpot/WordPress
+
+[Evidencia y checklist de rollout](../../audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
+Nuevo corte sin push: Studio API 1.8.0, migración 1791155100000 y catálogo email aditivo; Greenhouse f06f61efb aporta
+el puerto de evidencia sister-platforms con resolvers canónicos. Adapters verificados contra proveedores reales,
+pero transporte M2M, consumer/binding, secretos worker, migración remota, publicación de catálogo y scheduler owned
+siguen pendientes de release. No modificar flags productivas ni afirmar owned operativo desde este candidato.
+Marketing Cloud Engagement/Next preparados, sin entorno de prueba por decisión del operador. El worker mantiene
+owned OFF y deploy.sh conserva los knobs del endpoint y consumer; su configuración forma parte del próximo commit
+de rollout revisado. No hay pipeline alterno de envío ni importación de destinatarios.
+
+### TASK-2001 — Greenhouse en develop/staging (04/10, Codex)
+
+Greenhouse `20f57c4cd` y corrección documental `f08029b0f` enviados a develop.
+Staging `dpl_7Ms4ikwChYfdXerim1jwSBux22hs` READY, alias dev-greenhouse confirmado;
+health 200/ready, sesión 200 y puerto sin token 401. CI 37244791203 y cinco workflows
+de workers PASS; gates documentales corregidos PASS. Los workers de develop incluyen
+recursos compartidos: no equivale a ausencia de cambios fuera de Vercel staging.
+Main sin promoción; Studio/gateway sin push en este pase. Puerto email default OFF,
+consumer/binding y canary M2M autenticado aún pendientes.
+[Evidencia del pase](../../audits/marketing-studio/TASK-2001-greenhouse-staging-2026-10-04.md).
+
+
+## 2026-10-05 — readers de hojas email/web, local
+
+TASK-2002 está productiva según el operador; UI reservada a Claude e intacta. API 1.9.0 añade `email`/`web` al
+reader compartido, Growth Forms público validado y metadata/últimas métricas desde Resend/HubSpot por Greenhouse.
+[Handoff exacto y QA](../../audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+Sin push/deploy ni cambios de flags; sin migración. Próximo paso autorizado: publicar ambos readers/manifiesto,
+verificar permisos de listas/metrics y configuración owned y ejecutar readback/canary API/CLI. Datos antiguos
+permanecen null hasta una lectura nueva. No usar los resultados locales como certificación de proveedores live.
+
+
+## TASK-2002 — calendario de activaciones, estado al 2026-10-05
+
+UI del calendario (`/calendar`) en producción. Desde el 2026-10-05 (tarde) **acepta escrituras T1 de la organización
+Efeonce** por la ventana temporal de escritura del modo `open`, que vence el **2026-10-12T10:00:00Z** (ver abajo);
+fuera de ella rige solo lectura. Contrato y composición:
+[arquitectura, Delta 2026-10-05](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#delta-2026-10-05--task-2002-calendario-de-activaciones).
+
+| Pieza | Estado verificado |
+| --- | --- |
+| Código | Studio `main`: push `aa6fa07..10513ef` (incluyó 4 commits locales de Codex: `e62b5e3`, `055860d`, `ade6765`, `f72e408`) y `10513ef..d0ec7e0`. Commits de la etapa: `f7b9790` (Mes/Semana), `dc579e4` (Día), `c201fb4` (Línea de tiempo), `7bde589` (Paid + is-today), `acea0dc` (Hoja), `ff74abf` (Popover), `00a51e5` (estados), `c2014ba` (diálogos), `fce8d99` (ajustes tras verificar), `10513ef` (formatos), `d0ec7e0` (A11y/States32/MobFilters); antes `985354b`, `036dbd6`, `0856ee0`, `e90fb6e`, `ea93590`. |
+| Código (2026-10-05, tarde) | Studio `main`: `c767283` (dimensiones en español; `SERVED_MARKETS` CL·MX·CO·PE·US), `1f003c1` (ventana temporal de escritura en modo `open`, `server/runtime.ts` + `open-write-window.test.ts`), `bef0ecf` (menús de filtro v3.4: `FilterMenu.tsx`, `flags.ts`, conteos por opción), `e656f2a` (campos de selección del formulario con el menú v3.4), `6dddbfa` (isotipo de X desde AXIS 0.4.21), `5d962c4` (fecha, hora e inicio/fin v3.5: `write/datetime.tsx`, reemplaza `DateTimeField`). |
+| Deploy | Vercel Production Ready (`otc14ubb7`). Después, en orden: `kc4tcvuod` (`3048f96`), `phmizd8u0` (`1f003c1`), `kr5mfmw19` (`bef0ecf`), `b53xls9w2` (`6dddbfa`, incluye `e656f2a`), `p1ng5wy75` (`5d962c4`). |
+| Envs (Production, por nombre) | `STUDIO_ACTIVATIONS_ENABLED=true`, `STUDIO_ACCESS_MODE=open`, `STUDIO_TRACKING_DOMAINS` presente. Desde 2026-10-05 (sólo Production): `STUDIO_OPEN_WRITE_UNTIL=2026-10-12T10:00:00Z` (07:00 de Chile del lunes 12 de octubre) y `STUDIO_OPEN_WRITE_ORGS=org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce). |
+| Gates | `pnpm check` completo (gates, lint, manifiesto MCP, typecheck, tests de todos los paquetes) y `pnpm --filter @studio/web build` verdes antes de cada push; tests web 22/22 (incluye paridad UI↔API). |
+| Producción | `studio.efeonce.org/calendar` 200 con el calendario v3 (en solo lectura al release del 2026-10-04). Datos reales: 3 activaciones en octubre, **50 ejecuciones sin activación** (tope `limit: 50` de la consulta; podrían ser más) y todas las piezas importadas «Pieza sin aprobar». |
+| Escrituras | Hasta el 2026-10-05: en modo `open` los botones quedaban `aria-disabled` y la API respondía 403 `write_not_allowed` (verificado con `POST …/cancel`). Con la ventana abierta (2026-10-05): `permissions.writable=true`, `cancel` con `dryRun=true` 200 en ACT-000001 (no se escribió nada real) y sin pastilla «Solo lectura». Aprobar sigue exigiendo persona (`operator_cli`). `/login` y `/api/auth/session` responden 404; `efeonce_id` falla cerrado (401). |
+| Verificación en producción (2026-10-05, tarde) | Menús: Plataforma con LinkedIn e Instagram conectadas y el resto «Sin cuenta conectada»; Mercado con banderas; México en cero → calendario vacío explicado. Formulario: X con su logo; elegir LinkedIn cierra el menú. Fecha: punto en el único día con activación de la cuenta; «Mañana» → mar 6 oct 2026. Hora: «1830» → 18:30 · Santiago. `pnpm check` y `pnpm --filter @studio/web build` verdes antes de cada push. |
+| Verificación local de escrituras | Postgres 18 descartable (`127.0.0.1:55461/marketing_studio`), servidor `studio-2002-local` :3102, actor `operator_cli` temporal en `runtime.ts` **autorizado por el operador**, no commiteado y revertido. Planificar (vista previa 200 → 201, hoja nueva ACT-000008), editar (PATCH 200), reprogramar, cancelar, vincular, crear desde ejecución (201, ACT-000009); bandeja de 3 a 1. `STUDIO_TRACKING_DOMAINS` agregado y revertido en `.claude/launch.json`. |
+| Greenhouse | TASK-2002 actualizada (`97ea8e7fb`, `7fcb21977`, `0c25e85d0`): criterios tildados y diferencias pendientes con su dependencia. |
+| Hojas email/web (2026-10-05) | Studio `3048f96` (push `1f2a0ef..3048f96`, Vercel Production Ready `kc4tcvuod`): `OwnedSheet.tsx` + `DeviceViews.tsx` sobre `ActivationDto.email`/`web` (API 1.9.0, `1f2a0ef`, que salió en el mismo deploy). Producción: `GET /api/v1/calendar` ya trae las claves `email`/`web` (null en las 6 activaciones, todas sociales); hoja social ACT-000001 sin regresión. Verificación de las hojas sólo en local con datos de prueba en la base descartable (migración `1791155100000_owned-email-providers` aplicada allí; email en ACT-001012, landing en ACT-001013). |
+
+**Pendientes y dependencia.**
+
+| Qué | Depende de |
+| --- | --- |
+| Escrituras en la web de producción (definitivas, con persona en el audit) | Login Efeonce ID TASK-1898 (to-do; bloqueada por TASK-1834 OIDC y TASK-1895). Mientras tanto, ventana temporal hasta 2026-10-12T10:00Z |
+| Retirar la ventana temporal de escritura | Al llegar TASK-1898 o al vencer el 2026-10-12 (borrar las dos variables; ver abajo) |
+| Motion y rendimiento percibido (operador: 3/5, «tarda un poco y motion casi inexistente») | Sin task todavía. Diagnóstico: ~8 lecturas en cadena en `page.tsx`; `router.push` recarga todo el RSC sin estado pendiente; sólo `--motion-fast`/`--motion-standard`; sin View Transitions, salidas ni feedback de escritura. Plan: (1) medir y acelerar lo percibido (paralelizar, Suspense, caché del catálogo, prefetch, `useTransition`); (2) sistema de motion desde `axisMotion`, diseñado primero en el canvas («v3.6 · Motion (para aprobar)») |
+| Mercados del filtro y del formulario desde la configuración de la organización (hoy `SERVED_MARKETS` en el código web) | Deuda declarada; necesario cuando Studio tenga otros clientes |
+| Plataformas del catálogo sin etiqueta en Studio (Discord, Slack, foros, Circle…) no aparecen en el filtro | Etiquetas en Studio |
+| Conteos del filtro limitados por el tope de 200 activaciones del período | Es el mismo tope de lectura del calendario; sin task |
+| Comentario del operador en V3-Popover («no se implementó») | Respondido: está implementado; se ofreció marcar el número del día como clickeable (círculo al pasar el mouse). Espera respuesta |
+| Escrituras por MCP | TASK-2003 (T1 delegado) |
+| Datos reales en las hojas de email/landing (UI hecha, `3048f96`) | Publicar el lado Greenhouse de los readers (metadata y métricas HubSpot/Resend) + readback |
+| Hoja de blog (V3-BlogPre/BlogPost) | TASK-1667/1669 (hoy «no medido») |
+| «Línea de tiempo» en el selector de Semana | Decisión del operador (desvío deliberado) |
+| Encabezado global (lockup y riel) | Fuera de TASK-2002 |
+| V3-Gantt, V3-Later, V3-Quarter, V3-SheetMore, V3-Bulk | TASK-2005/2006 |
+| Capabilities `marketing_studio.asset.write` / `campaign.write` | En develop (`9d0d698d4`); release a producción espera decisión del operador |
+
+**Ventana temporal de escritura (abierta 2026-10-05, vence 2026-10-12T10:00:00Z).** Decisión temporal del operador
+para probar las escrituras de la UI antes de TASK-1898 (contrato en
+[arquitectura §5](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md#5-acceso)). Mientras
+esté abierta, cualquiera con el link puede escribir en la organización Efeonce y el audit registra
+`api_client:open-write-window`, no una persona.
+
+- **Vencimiento solo:** al pasar `STUDIO_OPEN_WRITE_UNTIL` vuelve a solo lectura sin redeploy. Después hay que borrar igual las dos variables para no dejar configuración muerta.
+- **Cerrar antes de tiempo:** en Vercel `efeonce-marketing-studio` → Production, borrar `STUDIO_OPEN_WRITE_UNTIL` y
+  `STUDIO_OPEN_WRITE_ORGS` (o poner en `STUDIO_OPEN_WRITE_UNTIL` una fecha pasada) **y redeploy**: cambiar una
+  variable de Vercel exige redeploy para tomar el valor nuevo (ver «Variables en Vercel»).
+- **Verificar el cierre (resultado esperado):** el reader devuelve `permissions.writable=false`, vuelve la pastilla «Solo lectura» y
+  `POST …/cancel` con `dryRun=true` responde 403 `write_not_allowed`.
+- **No extender** con una fecha a más de 7 días: se ignora y la ventana queda cerrada.
+
+**Trampas de operación (para la próxima sesión).**
+
+- Instalar dependencias de GitHub Packages en local: `NODE_AUTH_TOKEN=$(gh auth token) pnpm install`.
+
+- Para ver los diálogos en local hace falta un actor con permiso: en modo `open` el actor anónimo no escribe ni en
+  `dryRun`. Pedir autorización explícita al operador (el clasificador lo bloquea como debilitamiento de seguridad) y
+  revertir al terminar.
+- La vista previa del plan necesita `STUDIO_TRACKING_DOMAINS` (`{org:[dominios]}`) o devuelve 422
+  `tracking_destination_invalid`.
+- Reiniciar el servidor de desarrollo después de `pnpm install` (factories de módulo rotas).
+- La clase global `.today` de la página Hoy choca con el calendario: usar `is-today`.
+
+**Rollback.** Esta etapa no documentó un procedimiento propio. Rigen la sección «Rollback» general de este runbook y
+el rollback de activaciones de TASK-2001 descrito arriba (flags OFF/redeploy, sin migración down).

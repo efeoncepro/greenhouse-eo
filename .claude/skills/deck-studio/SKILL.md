@@ -13,7 +13,7 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck SEO", "deck SV360". En marca
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "brochure Agencia Creativa", "brochure creativo", "brochure servicios web", "deck web", "deck SEO", "deck SV360". En marca
   propia Efeonce, elige láminas del catálogo de 100 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/;
   incluye las nueve SEO/AEO, las 16 del deck de práctica Salesforce y las seis del deck SEO/AEO), valida el plan con
   pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose), liga los datos reales de los slots con
@@ -181,6 +181,121 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   ni quitar; el contexto queda como registro en `DECISIONES.md`. Logos de clientes sólo con su autorización
   (TASK-1937). Anotaciones «de ejemplo» fuera de la lámina; una sola sección partida. Detalle: norma §4.6 «Deck SEO/AEO», manual «El deck SEO/AEO» y
   `efeonce-graphic-line` (`references/applications.md` §L); el uso comercial por objeción, en `seo-aeo-practice`.
+- **Brochure de servicios HubSpot (cerrado y aprobado 2026-10-06, TASK-1943).** El deck de referencia para
+  **mid-market y enterprise que comparan HubSpot con Salesforce o Zoho y que evalúa también TI**. 27 láminas en siete
+  actos ordenados **por la compra real**: promesa → qué plataforma (HubSpot/Salesforce/Zoho, un CRM, el CRM que se
+  actualiza solo) → qué hacemos y cómo se construye → comprar con criterio (licencias, créditos) → **lo que pregunta TI**
+  (Ley 21.719, seguridad, residencia de datos, permiso, salida) → cómo trabajamos → prueba (caso ANAM, clientes) →
+  cierre. Línea `revenue-hubspot` en oscuro; el caso ANAM (`decision-case`) y clientes (`content-clients`) son recetas
+  sólo `light` y se componen como láminas de Efeonce en línea `growth`. La **propuesta** (31) suma B11 olas, B27 consumo
+  de workflows y «¿Hay costos escondidos? Ninguno.» (montos `[monto]`); el costo no va en el brochure (operador).
+  **Canvas** (privado): <https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU> (páginas «Brochure · 27», «Propuesta · 31»,
+  «Comparación de color», «Banco de fotos»). **PDF** (16:9): OneDrive
+  `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`, armado con
+  `node ai-generations/2026-10-06_deck-hubspot/exp/brochure-pdf.mjs <brochure-files.json> <salida.pdf>` desde las
+  láminas del canvas verificadas por sha256 (portada con la insignia Gold; **sin** el sprocket 3D, de uso interno).
+  Pipeline: `ai-generations/2026-10-06_deck-hubspot/` (`build-intents.py`, `nuevas.py`, `ti.py`, `build-canvas.py`,
+  `fotos/LEEME.md` con banco y descartes). Pendientes antes de usarlo con prospectos y el uso comercial: skill
+  `hubspot-solutions-partner`. **Lecciones de oficio medidas en esta corrida:**
+  - **Voz.** El titular no repite lo que ya dice el logo («En ANAM» bajo el logo de ANAM se rechazó → «¿Qué ganó su
+    equipo? Tiempo.»). Se dice dónde **están** las cosas, no dónde no están («Fuera de Chile» se lee mal en Chile → «En
+    Estados Unidos» + las cinco regiones). Lo que se vende es asesoría, no una prohibición: «¿Cuántos créditos
+    necesito? A medida.», no «no compres».
+  - **Largo de la respuesta por receta.** `section-cine` ≤ 9 caracteres en una línea; `proposal-cinematic` `hero` sólo
+    respuestas cortas («Ya no», «Nunca»: con dos tramos se monta sobre la bajada); `decision-ai-market` ≤ 9 y una línea,
+    y su centro no aguanta una cifra de cinco caracteres («5.000» se sale de la tarjeta).
+- **Brochure «Agencia Creativa» (aprobado 2026-10-06, TASK-2013).** El collateral vigente de Creative Services, bajo
+  el paraguas Agencia Creativa (PDR-004: «Tu equipo dirige. Nosotros producimos a escala»); **reemplaza** a la v1
+  «Servicios Creativos» (15 láminas, no vigente). 27 láminas en línea Brand (acento `#ff6500` sobre oscuro, `#bb1954`
+  sobre papel; un punto por foto, como puntuación). Orden: portada → mapa de las cuatro rutas (3) → capítulos en el
+  orden de las rutas (4–12: Creative Velocity, Brand Systems, Run & Gun, set híbrido, herramientas por etapa) → seis
+  capacidades (13) → personas, cómo trabajamos, Creative Studio y día a día (14–17) → cómo se compra, con el talento
+  embebido en la 19 (18–21) → prueba: caso y testimonio SKY, clientes, cinco países (22–25) → plan y contraportada.
+  Sólo **7 salen del Artifact Composer** (`cover-brochure`, `content-team`, `proposal-service`, `content-bullets`,
+  `content-markets`, `decision-next-steps`, `close-brochure`; `pnpm brand:compose` desde `intents-v2/`); las otras **20
+  son a mano** y quedan como candidatas a receta, no recetas (TASK-2013). **Canvas** (privado):
+  <https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs> (páginas «Agencia Creativa», «Interfaces · Creative Studio» con
+  `CS-Campaigns` y `CS-Home`, y «v1 · Servicios Creativos», histórica). **PDF** (16:9, 27 páginas): OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`, copia en
+  `ai-generations/2026-10-06_brochure-creativo/`; builder `build-canvas-v7.py` en esa carpeta (láminas a mano,
+  componentes CS y `canvas.json`). **El PDF se rasteriza:** render local con el runtime real del canvas (`dc-runtime.js`
+  del tipo Design + un shim `support.js`), servidor estático que mapea `/_blob/<id>` a los assets bajados con
+  `Artifact read path=<id>`, captura Playwright 1920×1080 a `deviceScaleFactor` 2 en JPEG q88 y una imagen a sangre por
+  página. El PDF vectorial (`page.pdf` por lámina) dejaba un borde blanco y aplanaba el `preserve-3d` de la lámina 17;
+  el costo es que el texto no se puede seleccionar. Script:
+  `node ai-generations/2026-10-06_brochure-creativo/exp/render-pdf.mjs <render-dir> <salida.pdf>`. Uso comercial: skill `creative-practice`. **Lecciones de oficio
+  medidas en esta corrida:**
+  - **Voz.** 8 de 27 con par pregunta–respuesta (01, 14, 17, 20, 21, 25, 26, 27), todas en boca del cliente; el resto,
+    titular de decisión (delta §4 de `EFEONCE_GRAPHIC_LINE_V1`, como máximo 1 de cada 3, y TASK-2012). Seis de los ocho
+    van en el último tercio, donde están las objeciones y el cierre.
+  - **Interfaces con campañas ficticias.** Las láminas 16 y 17 usan las vistas reales del artifact de Marketing Studio,
+    renombradas Creative Studio, con campañas inventadas (CMP-101 Volta … CMP-105 Casa Mar; «Buenos días, Camila»).
+    Nunca campañas propias ni de clientes reales en una interfaz de brochure (operador). El encabezado lleva el lockup
+    «efeonce | Creative Studio» como la app real (positivo en claro, negativo en oscuro, 20 px).
+  - **Perspectiva 3D.** La 17 monta la vista Hoy y la órbita sobre un plano inclinado (`rotateX` 20°, `rotateY` −17°),
+    la vista Campañas detrás en profundidad y cuatro tiles de herramientas (Teams, Notion, Frame.io, Adobe) a distinta
+    altura z, con hilo y punto. Por esa lámina el PDF va raster.
+  - **Foto corrida con borde fundido.** Si el plate cine igual deriva al centro, en la lámina la foto se corre 130–150 px
+    a la derecha con el borde fundido a su propio negro; la causa y cómo evitarla en la ficha, en `design-studio`.
+  - **Narrativa: el mapa antes de los capítulos.** En la pasada final, los capítulos Creative Velocity y Brand Systems
+    iban antes de la lámina de las cuatro rutas que los presenta. Se movió el mapa a la 3 y los capítulos siguen el
+    orden de las rutas; las seis capacidades cierran el «qué» y abren el «quién».
+- **Brochure «Servicios web y digitales» (aprobado 2026-10-09).** El collateral vigente para vender las familias de
+  Wave y Experience LaunchOps: todo lo que Efeonce vende en servicios web y digitales, **firmado por Efeonce** en la
+  línea Engine (acento `#0375db`, sin teal; fondo `#001A33`). 29 láminas 16:9 en cuatro actos: **apertura** (01–05:
+  portada, tesis «Humanos y agentes», el contexto con tres cifras con fuente, visibilidad en IA, qué hacemos) →
+  **servicios** (06–13: Web Experience 360, «Dónde construimos», Experience LaunchOps, Search Visibility 360,
+  Measurement & Analytics, Agent Systems & Platforms, Automation & Integrations y Product Design 360, que el operador
+  dio por aprobada y va como definitiva, sin «Próximamente») → **«¿Por qué con ustedes? Un solo equipo»** (14–21: la
+  diferencia, clientes, casos Berel y Aguas Andinas, partners, equipo, mercados) → **«¿Cómo empezamos? Contigo»**
+  (22–28: resultados en vivo con Efeonce Insights, puertas de entrada —AEO Assessment, Lista para agentes, Diagnóstico
+  de lanzamientos—, plan de 90 días, cómo contratar —Sample Sprint, On-Demand, On-Going—, riesgos, próximos pasos) →
+  contraportada (29). **Siguen una receta del catálogo:** `decision-ai-market` (03), `decision-ai-answer` (04),
+  `content-service-lanes` (05), `decision-difference` (15), `content-clients` (16), `decision-case` (17 y 18),
+  `content-partners` (19), `content-team` (20), `content-markets` (21), `content-day-live-results` (23),
+  `decision-plan` (25, tres tramos de 4 semanas: calza con el contrato de medición de SV360), `decision-risk` (27),
+  `decision-next-steps` (28), `cover-brochure-line-engine` (01) y `close-brochure-orbit` (29), más
+  `method-surround-cycle` y `content-text`. Se rehicieron en el canvas: **no hay intents en el repo ni
+  `approvedUses` en el catálogo**, así que no salen de `pnpm brand:compose`. **A mano, candidatas a receta, no
+  recetas:** la tesis y las láminas de servicio (06, 08–13), en registro 3D cinematográfico con Spark y Nexa en
+  PNG transparente, cursores multiplayer y selección AXIS; y la 07 «Dónde construimos», un muro 3D de plataformas con
+  su logo oficial en blanco (WordPress, Webflow, Lovable, Adobe Experience Manager, Astro, **HubSpot Content Hub** —
+  así se llama hoy, no «HubSpot CMS») y una tarjeta de papel «A la medida» (Next.js · React). **Canvas** (privado):
+  <https://claude.ai/artifact/SnJS7zHHPTBPwcJvv7e9t7>. **PDF** (16:9, 29 páginas, ~14,9 MB, rasterizado): OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Web/Efeonce-Brochure-Servicios-Web.pdf`, copia y fuente
+  (`project/*.dc.html`, `canvas.json`, `order.json`, `blobs/`) en `ai-generations/2026-10-09_deck-web-nexa-spark/deck/`
+  (`LEEME.md`: orden, assets y pendientes). Se rehace con el mismo render del brochure Agencia Creativa:
+  `node ai-generations/2026-10-09_deck-web-nexa-spark/deck/exp/render-pdf.mjs ai-generations/2026-10-09_deck-web-nexa-spark/deck <salida.pdf>`
+  (antes hay que traer `artifact-type/dc-runtime.js` del canvas a `project/`: no va en git). **Antes de enviarlo a un
+  prospecto:** las cifras del caso Aguas Andinas (18) son marcadores inventados a pedido del operador; el caso Berel
+  (17) dice «12 meses» y la cuenta se adjudicó en mayo de 2026; las láminas 26 y 27 repiten el titular «Empiezas
+  chico»; logos de clientes sólo con autorización (TASK-1937). Detalle: norma §4.6 «Deck Servicios web» y manual
+  «El brochure Servicios web y digitales». **Lecciones de oficio medidas en esta corrida** (todas, correcciones del
+  operador):
+  - **Fondo según quién firma.** Pieza de línea firmada por Efeonce = `#001A33` (norma §3, regla 1; manual de la línea
+    §2, «Oscuro Efeonce»). `#091951` es sólo de piezas de producto (Globe, Wave, Reach). El deck salió en `#091951` y
+    hubo que cambiar las 29 láminas: se decide antes de la primera lámina.
+  - **Halo de escenario en todas las láminas.** Radial de radio 900 (0.28 → 0.10 al 35 % → 0) más piso `#000814` de 0 a
+    0.55 desde y 778. Sin él, las láminas se leen planas.
+  - **Español primero.** El deck se rechazó por exceso de inglés: el nombre en español va grande y el producto en
+    inglés, como sublínea chica («Datos que viajan solos» / Data Pipeline).
+  - **Sin marcadores «[N]».** «N días no le dice nada al cliente»: «[N] días» pasó a ser el plan de 90 días. En un
+    tablero de muestra van números de muestra coherentes, marcados «Datos de muestra».
+  - **Logo donde se nombra la marca.** El logo de Efeonce en vez del texto «Efeonce» (La diferencia, chip «Con
+    Efeonce») y el lockup oficial de Efeonce Insights (`axis-brand-assets/insights-lockup-negative.svg`) en la
+    notificación de la 23. Un logo con el isotipo dentro de un cuadrado de color (Aguas Andinas) **no** se pasa a un
+    tono con máscara, porque queda un bloque: sobre papel va el oficial a color. Una marca sin logo propio usa el de su
+    casa (AEM, el corporativo de Adobe); el de Lovable sale de Iconify (`logos:lovable`).
+  - **Caso de éxito = `decision-case`** (split de papel + visual bajo la curva), no una composición propia: el operador
+    la pidió por nombre. **Variante medida sin foto del caso:** el lado derecho puede ser una interfaz en HTML con
+    perspectiva 3D sobre el escenario oscuro (aquí, una bandeja de Service Hub); Berel reutiliza la foto CS3b del deck
+    SEO/AEO.
+  - **Imágenes.** El rótulo «Imagen ilustrativa» sobra; una imagen protagonista que se corta sangra hasta el borde;
+    el warp es sutil (pocas estelas); Nexa y Spark, en PNG transparente con
+    `pnpm ai:image --model gpt-image-2.5-sunburst --background transparent`.
+  - **Titular de equipo.** «Expertos multidisciplinarios», no «Personas reales, un solo interlocutor».
+  - **PDF rasterizado, no `page.pdf` por lámina.** El vectorial deja borde blanco y aplana el 3D (Partners,
+    Plataformas, Resultados en vivo, Caso Aguas Andinas).
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`
@@ -272,7 +387,7 @@ la evidencia en 2–3 líneas.
 
   | Línea (token) | Par | Plate |
   |---|---|---|
-  | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
+  | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png` |
   | Creative Services (`brand`) | ¿Quién crea mi contenido? **Tu squad.** | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
   | Digital Services & Engineering (`engine`) | ¿Te encuentra la IA? **Visible.** | `2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png` |
   | Media & Distribution (`voice`) | ¿Dónde invierto? **Donde rinde.** | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
@@ -814,6 +929,14 @@ Cloud SQL (`pnpm pg:connect`); `--sources` corre el núcleo puro sobre un fixtur
 `docs/manual-de-uso/creative/componer-deck-con-recetas.md`; qué slot sale de qué fuente: «Datos reales por slot» en el
 README del catálogo de recetas.
 
+### Propuesta técnica SEO/AEO para leer sin presentador — alternativa aprobada (2026-10-07)
+
+Para una licitación o propuesta técnica SEO/AEO que el cliente lee sin nosotros, hay un estilo aprobado como **alternativa** (caso Pibank 2027, 44 láminas; segundo caso UTEM Compra Ágil, 2026-10-08, 35 láminas): canvas Design con láminas HTML de tokens para los datos del cliente, láminas del compositor para lo que tiene receta, cinco capítulos con pregunta, franja «Qué significa para…» en cada lámina con datos, cadena búsqueda → cuenta con SEO/AEO equilibrado frente al negocio, anexo de supuestos y PDF 16:9. **No reemplaza** el brochure ni la propuesta de recetas: para brochure manda el set aprobado. Método, reglas y rechazos: [references/propuesta-tecnica-seo-sin-presentador.md](references/propuesta-tecnica-seo-sin-presentador.md). Delta 2026-10-09 (Pibank v12): lámina «Muestra X-Ray» con mockup dibujado, QR y enlace leídos fuera de git; enlaces clicables en el PDF; logo blanco del cliente sin recuadro sobre fondos oscuros. Delta 2026-10-09 (Pibank v13, enviada): inversión que se explica sola (valor del mes + módulos con precio y cuándo entran + suma anual rotulada), «Cómo empezar» con compromiso inicial ≥ plazo de las primeras señales, retorno en barras de la métrica que crece (nunca ROI con depósitos), stack con `content-stack`, USD con soles para Perú.
+
+### Propuesta técnica de campaña creativa para leer sin presentador (2026-10-12)
+
+Para una licitación de servicio creativo (evolución de línea gráfica, concepto, piezas de muestra y método de producción) existe el molde hermano, con la misma técnica y otro argumento: el deck abre con el trabajo, sigue con una lámina de cumplimiento en las palabras de la ficha y recorre propuesta → producción → equipo → continuidad e inicio. Caso fuente: Sika Mexicana, Wherex N.º 1164, 22 láminas, línea Brand (presentada por el operador el 13/10/2026; resultado desconocido). Orden, las nueve correcciones del operador, cómo se enlaza un video (QR + enlace clicable), mecánica, trampas medidas y lista de control: [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md). Difiere del molde SEO/AEO en dos cosas que no se mezclan: títulos directos sin pregunta y respuesta, y el rótulo «Qué significa para ustedes». Las láminas HTML a mano de ambos moldes son sólo para datos del cliente sin receta; lo que tiene lámina aprobada (portada, cierre, caso) sale del compositor.
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**
@@ -949,6 +1072,13 @@ garantía, un plan de salida, una referencia verificable.
 **Traducción a láminas:** por cada lámina de "por qué esto", debe haber una de **"por qué es
 seguro"**. Riesgos nombrados con su mitigación. El plan de arranque. Qué pasa si sale mal.
 
+**Seguro no es defensivo.** La seguridad se le da al comprador con lo que **él** gana: quién aprueba y
+cuándo, un plazo, un equipo con nombre, un caso medido, un primer paso. Lo que **nos** protege a
+nosotros (exclusiones, «fuera del servicio», tarifas de extras, bloques «no se garantiza», riesgos
+que nadie planteó) no reduce su indecisión y el operador lo ha retirado en tres propuestas (Pibank,
+UTEM, Sika 2026-10-12: «¿Es realmente necesario decir esto? ¿Para qué?»). Un riesgo entra cuando el
+comprador lo nombró o cuando callarlo sería engañar; entonces va con su mitigación.
+
 ### 2. El problema no es falta de información — es EXCESO
 
 **Gartner (2019, n > 1.000 compradores B2B):** el **89% dijo que la información que encontró era de
@@ -1068,8 +1198,14 @@ Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Can
 ├─ QUÉ puede afirmar: evidencia trazable, anti-
 │  fabricación, accesibilidad, entrega que no se rompe . evidence-integrity.md
 ├─ GRÁFICOS en un deck (≠ dashboard) .................. data-storytelling.md
+├─ PROPUESTA TÉCNICA que se lee sin presentador:
+│  SEO/AEO · campaña creativa .......................... references/propuesta-tecnica-*.md
 └─ FUENTES verificadas + LOS MITOS QUE NO SE CITAN .... SOURCES.md
 ```
+
+### Deck dentro de un paquete de decisión
+
+Si comparte alcance, calendario o cifras con una propuesta, informe y modelo editable, carga [coherencia del paquete](references/decision-package.md) y el QA conjunto de `report-studio`. Verifica la decisión y las copias finales junto con sus fuentes; no basta el render de láminas.
 
 ## Sinergias — quién decide qué (para que no se pisen)
 
@@ -1101,6 +1237,14 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   se reemplaza por una tabla improvisada ni por texto de otra plantilla.
 - **Haz visibles los valores fiscales.** Cada monto client-facing debe declarar explícitamente si es
   neto y si el IVA está excluido o incluido. La condición no puede quedar solo en una nota escondida.
+- **Cumplimiento con las palabras del comprador.** La lámina de cumplimiento copia el texto literal de
+  la ficha o las bases, responde con un hecho y dice en qué lámina, página de anexo o archivo está
+  cada punto; va al principio del deck. Antes de congelarla, relee la ficha y **todas** las
+  respuestas del portal, también las dadas a otros proveedores (Sika 2026-10-12: una exigencia de SLA
+  por niveles de complejidad se leyó tarde, con el deck ya exportado: hubo que agregar una lámina y reexportar).
+- **Si las bases piden un formato, se entrega ese formato.** Un video pedido se entrega como video,
+  con QR y enlace clicable desde la lámina, no sólo como storyboard (detalle en
+  [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md)).
 - **Conserva outputs y planes separados.** Cada licitación y cada deck tiene su propio `deck-plan`,
   output, manifest y carpeta de captura; nunca se reutilizan ni se sobrescriben artefactos de otra
   licitación.
@@ -1146,8 +1290,19 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   **pasaban los 92 tests** del composer. Los encontró una revisión visual.
 - **SIEMPRE** una lámina de *"por qué es seguro"* por cada lámina de *"por qué esto"*. **Tu competidor
   es la indecisión** (JOLT), no el otro oferente.
+- **NUNCA** confundas seguro con defensivo: en un deck para el cliente no van exclusiones, «fuera del
+  servicio», tarifas de extras, condiciones de pago ni advertencias **que el comprador no pidió**. Si
+  una lámina o una línea no le aporta a quien decide, sale entera (§«Tu competidor real es la
+  indecisión»).
 - **SIEMPRE** en material client-facing: **registro formal de usted**. Un documento contractual que
   evalúa un comité no es un blog.
+- **SIEMPRE** el deck que se entrega al cliente **le habla a quien lo recibe**: segunda persona
+  (ustedes, su brief, sus respuestas). **NUNCA** narres al cliente en tercera persona («<Cliente>
+  pidió / indicó / confirmó»); su nombre queda sólo como nombre de marca. Cuando el operador corrige
+  un tono, se barre **todo** el documento y sus anexos, con grep sobre la salida (operador, Sika
+  2026-10-12: cerca de 60 frases).
+- **SIEMPRE** lo aprobado se reutiliza **desde su generador** (lámina de caso, sello, firma, portada):
+  redibujarlo a mano o inventar una variante se rechaza aunque se parezca.
 - **SIEMPRE** cita la **dirección**, no los decimales. Y cuando exista fuente **peer-reviewed sin
   interés comercial**, cítala a ella en vez del vendor.
 
@@ -1164,3 +1319,16 @@ Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evid
 ## Metodología de deck ejecutivo mensual
 
 Para resumir una auditoría o informe en un deck para directorio, cargar `docs/operations/EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`: continuidad de evidencia, producción mensual frente a acumulada, On-time con denominadores, narrativa ejecutiva, selección visual antes de implementación, marcas/pie/contraportada, HTML como insumo del PDF A4 y verificación del archivo final. El caso Berel conserva sus decisiones y límites; las cifras no se reutilizan entre meses.
+
+## Cifras de propuesta desde Cotizador V3
+
+Para incorporar una simulación local de costos/precio, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Usar preview redactado para cifras presentables pendientes de revisión; artifact/explain permanecen internos.
+No convertir el costo de las funciones de `managed_service` en horas o roles vendidos: conservar fee/plazo/setup
+y alcance de servicio. Otra moneda es otra cotización (FX de política y redondeo propios), nunca una conversión a
+mano en la lámina; en EUR aún no se emite. Si la cotización lleva costos de terceros (contrato 1.4.0), el preview
+trae el fee del servicio, un ítem por costo refacturado y, aparte de los totales, lo que el cliente paga directo en su
+propia moneda: no sumes eso último al total ni muestres proveedor, costo, tasa o margen. Una lámina renderizada no valida salarios, herramientas, reparto, margen, impuestos,
+SOW o aprobación comercial; seguir la autoridad del expediente y documentar estado de simulación cuando aplique.
+No borrar ese estado, emitir precio ni enviar propuesta por generar el deck. Mantener piso y contratos de la práctica.

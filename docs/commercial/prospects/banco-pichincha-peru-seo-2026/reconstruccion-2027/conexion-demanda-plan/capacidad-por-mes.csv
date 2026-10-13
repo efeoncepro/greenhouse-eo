@@ -1,0 +1,296 @@
+work_id,work,cost_group,role_sku,month,base_hours
+D01,Dirección mensual,direction,ECG-001,1,6
+D01,Dirección mensual,direction,ECG-001,2,6
+D01,Dirección mensual,direction,ECG-001,3,6
+D01,Dirección mensual,direction,ECG-001,4,6
+D01,Dirección mensual,direction,ECG-001,5,6
+D01,Dirección mensual,direction,ECG-001,6,6
+D01,Dirección mensual,direction,ECG-001,7,6
+D01,Dirección mensual,direction,ECG-001,8,6
+D01,Dirección mensual,direction,ECG-001,9,6
+D01,Dirección mensual,direction,ECG-001,10,6
+D01,Dirección mensual,direction,ECG-001,11,6
+D01,Dirección mensual,direction,ECG-001,12,6
+D02,Revisión trimestral,direction,ECG-001,3,8
+D02,Revisión trimestral,direction,ECG-001,6,8
+D02,Revisión trimestral,direction,ECG-001,9,8
+D02,Revisión trimestral,direction,ECG-001,12,8
+D03,Inicio,direction,ECG-001,1,4
+S01,SEO técnico inicial,seo,,1,32
+S02,SEO seguimiento,seo,,2,8
+S02,SEO seguimiento,seo,,3,8
+S02,SEO seguimiento,seo,,4,8
+S02,SEO seguimiento,seo,,5,8
+S02,SEO seguimiento,seo,,6,8
+S02,SEO seguimiento,seo,,7,8
+S02,SEO seguimiento,seo,,8,8
+S02,SEO seguimiento,seo,,9,8
+S02,SEO seguimiento,seo,,10,8
+S02,SEO seguimiento,seo,,11,8
+S02,SEO seguimiento,seo,,12,8
+S03,Panel AEO inicial,seo,,1,8
+S04,36 observaciones AEO mensuales,seo,,2,4
+S04,36 observaciones AEO mensuales,seo,,3,4
+S04,36 observaciones AEO mensuales,seo,,4,4
+S04,36 observaciones AEO mensuales,seo,,5,4
+S04,36 observaciones AEO mensuales,seo,,6,4
+S04,36 observaciones AEO mensuales,seo,,7,4
+S04,36 observaciones AEO mensuales,seo,,8,4
+S04,36 observaciones AEO mensuales,seo,,9,4
+S04,36 observaciones AEO mensuales,seo,,10,4
+S04,36 observaciones AEO mensuales,seo,,11,4
+S04,36 observaciones AEO mensuales,seo,,12,4
+S05,Pilar/CRO inicial,seo,,1,24
+S06,Experimentos y continuidad,seo,,2,6
+S06,Experimentos y continuidad,seo,,3,6
+S06,Experimentos y continuidad,seo,,4,6
+S06,Experimentos y continuidad,seo,,5,6
+S06,Experimentos y continuidad,seo,,6,6
+S06,Experimentos y continuidad,seo,,7,6
+S06,Experimentos y continuidad,seo,,8,6
+S06,Experimentos y continuidad,seo,,9,6
+S06,Experimentos y continuidad,seo,,10,6
+S06,Experimentos y continuidad,seo,,11,6
+S06,Experimentos y continuidad,seo,,12,6
+S07,Medición implementación,seo,,1,24
+S07,Medición implementación,seo,,2,24
+S08,Analítica e informe,seo,,2,6
+S08,Analítica e informe,seo,,3,6
+S08,Analítica e informe,seo,,4,6
+S08,Analítica e informe,seo,,5,6
+S08,Analítica e informe,seo,,6,6
+S08,Analítica e informe,seo,,7,6
+S08,Analítica e informe,seo,,8,6
+S08,Analítica e informe,seo,,9,6
+S08,Analítica e informe,seo,,10,6
+S08,Analítica e informe,seo,,11,6
+S08,Analítica e informe,seo,,12,6
+S09,"Eficiencia SEO–SEM, análisis",seo,,1,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,2,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,3,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,4,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,5,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,6,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,7,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,8,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,9,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,10,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,11,4
+S09,"Eficiencia SEO–SEM, análisis",seo,,12,4
+S10,Datos para cuatro recursos PR,seo,,3,12
+S10,Datos para cuatro recursos PR,seo,,5,12
+S10,Datos para cuatro recursos PR,seo,,8,12
+S10,Datos para cuatro recursos PR,seo,,11,12
+S11,Método calculadora,seo,,1,8
+S12,Método comparador,seo,,3,10
+S12,Método comparador,seo,,4,10
+S13,Método planificador,seo,,5,6
+S13,Método planificador,seo,,6,6
+E01,"Dos artículos, investigación y redacción",writer,,1,24
+E01,"Dos artículos, investigación y redacción",writer,,2,24
+E01,"Dos artículos, investigación y redacción",writer,,3,24
+E01,"Dos artículos, investigación y redacción",writer,,4,24
+E01,"Dos artículos, investigación y redacción",writer,,5,24
+E01,"Dos artículos, investigación y redacción",writer,,6,24
+E01,"Dos artículos, investigación y redacción",writer,,7,24
+E01,"Dos artículos, investigación y redacción",writer,,8,24
+E01,"Dos artículos, investigación y redacción",writer,,9,24
+E01,"Dos artículos, investigación y redacción",writer,,10,24
+E01,"Dos artículos, investigación y redacción",writer,,11,24
+E01,"Dos artículos, investigación y redacción",writer,,12,24
+E02,Revisión artículos,writer,,1,6
+E02,Revisión artículos,writer,,2,6
+E02,Revisión artículos,writer,,3,6
+E02,Revisión artículos,writer,,4,6
+E02,Revisión artículos,writer,,5,6
+E02,Revisión artículos,writer,,6,6
+E02,Revisión artículos,writer,,7,6
+E02,Revisión artículos,writer,,8,6
+E02,Revisión artículos,writer,,9,6
+E02,Revisión artículos,writer,,10,6
+E02,Revisión artículos,writer,,11,6
+E02,Revisión artículos,writer,,12,6
+E03,Dos mejoras FAQ,writer,,1,3
+E03,Dos mejoras FAQ,writer,,2,3
+E03,Dos mejoras FAQ,writer,,3,3
+E03,Dos mejoras FAQ,writer,,4,3
+E03,Dos mejoras FAQ,writer,,5,3
+E03,Dos mejoras FAQ,writer,,6,3
+E03,Dos mejoras FAQ,writer,,7,3
+E03,Dos mejoras FAQ,writer,,8,3
+E03,Dos mejoras FAQ,writer,,9,3
+E03,Dos mejoras FAQ,writer,,10,3
+E03,Dos mejoras FAQ,writer,,11,3
+E03,Dos mejoras FAQ,writer,,12,3
+E04,Newsletter,writer,,1,5
+E04,Newsletter,writer,,2,5
+E04,Newsletter,writer,,3,5
+E04,Newsletter,writer,,4,5
+E04,Newsletter,writer,,5,5
+E04,Newsletter,writer,,6,5
+E04,Newsletter,writer,,7,5
+E04,Newsletter,writer,,8,5
+E04,Newsletter,writer,,9,5
+E04,Newsletter,writer,,10,5
+E04,Newsletter,writer,,11,5
+E04,Newsletter,writer,,12,5
+E05,QA final entregas,writer,,1,4
+E05,QA final entregas,writer,,2,4
+E05,QA final entregas,writer,,3,4
+E05,QA final entregas,writer,,4,4
+E05,QA final entregas,writer,,5,4
+E05,QA final entregas,writer,,6,4
+E05,QA final entregas,writer,,7,4
+E05,QA final entregas,writer,,8,4
+E05,QA final entregas,writer,,9,4
+E05,QA final entregas,writer,,10,4
+E05,QA final entregas,writer,,11,4
+E05,QA final entregas,writer,,12,4
+E06,Guion sesión,writer,,3,4
+E06,Guion sesión,writer,,5,4
+E06,Guion sesión,writer,,8,4
+E06,Guion sesión,writer,,11,4
+G01,Diseño hub,designer,,1,20
+G02,Diseño comparador,designer,,3,10
+G02,Diseño comparador,designer,,4,10
+G03,Diseño planificador,designer,,5,8
+G03,Diseño planificador,designer,,6,8
+G04,Cuatro adaptaciones,designer,,1,8
+G04,Cuatro adaptaciones,designer,,2,8
+G04,Cuatro adaptaciones,designer,,3,8
+G04,Cuatro adaptaciones,designer,,4,8
+G04,Cuatro adaptaciones,designer,,5,8
+G04,Cuatro adaptaciones,designer,,6,8
+G04,Cuatro adaptaciones,designer,,7,8
+G04,Cuatro adaptaciones,designer,,8,8
+G04,Cuatro adaptaciones,designer,,9,8
+G04,Cuatro adaptaciones,designer,,10,8
+G04,Cuatro adaptaciones,designer,,11,8
+G04,Cuatro adaptaciones,designer,,12,8
+W01,WordPress hub,wordpress,ECG-012,1,40
+W02,Carga artículos,wordpress,ECG-012,1,2
+W02,Carga artículos,wordpress,ECG-012,2,2
+W02,Carga artículos,wordpress,ECG-012,3,2
+W02,Carga artículos,wordpress,ECG-012,4,2
+W02,Carga artículos,wordpress,ECG-012,5,2
+W02,Carga artículos,wordpress,ECG-012,6,2
+W02,Carga artículos,wordpress,ECG-012,7,2
+W02,Carga artículos,wordpress,ECG-012,8,2
+W02,Carga artículos,wordpress,ECG-012,9,2
+W02,Carga artículos,wordpress,ECG-012,10,2
+W02,Carga artículos,wordpress,ECG-012,11,2
+W02,Carga artículos,wordpress,ECG-012,12,2
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,1,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,2,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,3,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,4,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,5,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,6,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,7,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,8,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,9,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,10,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,11,8
+W03,Implementación SEO/CRO CMS,wordpress,ECG-012,12,8
+T01,QA hub,development,ECG-015,2,20
+T02,Calculadora desarrollo y QA,development,ECG-015,2,32
+T03,Comparador desarrollo,development,ECG-015,3,30
+T03,Comparador desarrollo,development,ECG-015,4,30
+T04,Comparador QA,development,ECG-015,4,20
+T05,Planificador desarrollo,development,ECG-015,5,22
+T05,Planificador desarrollo,development,ECG-015,6,22
+T06,Planificador QA,development,ECG-015,6,16
+T07,Mantenimiento tools,development,ECG-015,3,4
+T07,Mantenimiento tools,development,ECG-015,4,4
+T07,Mantenimiento tools,development,ECG-015,5,4
+T07,Mantenimiento tools,development,ECG-015,6,4
+T07,Mantenimiento tools,development,ECG-015,7,4
+T07,Mantenimiento tools,development,ECG-015,8,4
+T07,Mantenimiento tools,development,ECG-015,9,4
+T07,Mantenimiento tools,development,ECG-015,10,4
+T07,Mantenimiento tools,development,ECG-015,11,4
+T07,Mantenimiento tools,development,ECG-015,12,4
+C01,Escucha y moderación,community,ECG-007,1,16
+C01,Escucha y moderación,community,ECG-007,2,16
+C01,Escucha y moderación,community,ECG-007,3,16
+C01,Escucha y moderación,community,ECG-007,4,16
+C01,Escucha y moderación,community,ECG-007,5,16
+C01,Escucha y moderación,community,ECG-007,6,16
+C01,Escucha y moderación,community,ECG-007,7,16
+C01,Escucha y moderación,community,ECG-007,8,16
+C01,Escucha y moderación,community,ECG-007,9,16
+C01,Escucha y moderación,community,ECG-007,10,16
+C01,Escucha y moderación,community,ECG-007,11,16
+C01,Escucha y moderación,community,ECG-007,12,16
+C02,Newsletter técnica,automation,ECG-021,1,2
+C02,Newsletter técnica,automation,ECG-021,2,2
+C02,Newsletter técnica,automation,ECG-021,3,2
+C02,Newsletter técnica,automation,ECG-021,4,2
+C02,Newsletter técnica,automation,ECG-021,5,2
+C02,Newsletter técnica,automation,ECG-021,6,2
+C02,Newsletter técnica,automation,ECG-021,7,2
+C02,Newsletter técnica,automation,ECG-021,8,2
+C02,Newsletter técnica,automation,ECG-021,9,2
+C02,Newsletter técnica,automation,ECG-021,10,2
+C02,Newsletter técnica,automation,ECG-021,11,2
+C02,Newsletter técnica,automation,ECG-021,12,2
+C03,Sesión soporte técnico,automation,ECG-021,3,2
+C03,Sesión soporte técnico,automation,ECG-021,5,2
+C03,Sesión soporte técnico,automation,ECG-021,8,2
+C03,Sesión soporte técnico,automation,ECG-021,11,2
+C04,Producción sesión,session,ECG-028,3,8
+C04,Producción sesión,session,ECG-028,5,8
+C04,Producción sesión,session,ECG-028,8,8
+C04,Producción sesión,session,ECG-028,11,8
+P01,Mapa PR,pr,ECG-024,1,20
+P02,Gestión PR,pr,ECG-024,2,8
+P02,Gestión PR,pr,ECG-024,3,8
+P02,Gestión PR,pr,ECG-024,4,8
+P02,Gestión PR,pr,ECG-024,5,8
+P02,Gestión PR,pr,ECG-024,6,8
+P02,Gestión PR,pr,ECG-024,7,8
+P02,Gestión PR,pr,ECG-024,8,8
+P02,Gestión PR,pr,ECG-024,9,8
+P02,Gestión PR,pr,ECG-024,10,8
+P02,Gestión PR,pr,ECG-024,11,8
+P02,Gestión PR,pr,ECG-024,12,8
+P03,Editorial PR,pr,ECG-024,1,5
+P03,Editorial PR,pr,ECG-024,2,5
+P03,Editorial PR,pr,ECG-024,3,5
+P03,Editorial PR,pr,ECG-024,4,5
+P03,Editorial PR,pr,ECG-024,5,5
+P03,Editorial PR,pr,ECG-024,6,5
+P03,Editorial PR,pr,ECG-024,7,5
+P03,Editorial PR,pr,ECG-024,8,5
+P03,Editorial PR,pr,ECG-024,9,5
+P03,Editorial PR,pr,ECG-024,10,5
+P03,Editorial PR,pr,ECG-024,11,5
+P03,Editorial PR,pr,ECG-024,12,5
+P04,Preparación vocería,pr,ECG-024,3,3
+P04,Preparación vocería,pr,ECG-024,5,3
+P04,Preparación vocería,pr,ECG-024,8,3
+P04,Preparación vocería,pr,ECG-024,11,3
+P05,QA/medición PR,pr,ECG-024,1,2
+P05,QA/medición PR,pr,ECG-024,2,2
+P05,QA/medición PR,pr,ECG-024,3,2
+P05,QA/medición PR,pr,ECG-024,4,2
+P05,QA/medición PR,pr,ECG-024,5,2
+P05,QA/medición PR,pr,ECG-024,6,2
+P05,QA/medición PR,pr,ECG-024,7,2
+P05,QA/medición PR,pr,ECG-024,8,2
+P05,QA/medición PR,pr,ECG-024,9,2
+P05,QA/medición PR,pr,ECG-024,10,2
+P05,QA/medición PR,pr,ECG-024,11,2
+P05,QA/medición PR,pr,ECG-024,12,2
+M01,Coordinación,coordination,ECG-016,1,6
+M01,Coordinación,coordination,ECG-016,2,6
+M01,Coordinación,coordination,ECG-016,3,6
+M01,Coordinación,coordination,ECG-016,4,6
+M01,Coordinación,coordination,ECG-016,5,6
+M01,Coordinación,coordination,ECG-016,6,6
+M01,Coordinación,coordination,ECG-016,7,6
+M01,Coordinación,coordination,ECG-016,8,6
+M01,Coordinación,coordination,ECG-016,9,6
+M01,Coordinación,coordination,ECG-016,10,6
+M01,Coordinación,coordination,ECG-016,11,6
+M01,Coordinación,coordination,ECG-016,12,6

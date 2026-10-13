@@ -1,0 +1,45 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-ai-market",
+  "voice": {
+    "eyebrow": "HubSpot Credits",
+    "question": "¿Cuántos créditos necesito?",
+    "answer": [
+      "A medida"
+    ]
+  },
+  "body": "Los agentes y la IA de HubSpot funcionan con créditos. Calculamos cuántos necesitas según lo que hará **cada agente**.",
+  "figures": [
+    {
+      "value": "50",
+      "label": "créditos por conversación que resuelve Customer Agent.",
+      "detail": "Cada acción de IA en un workflow usa 10.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "0",
+      "label": "créditos pasan al mes siguiente.",
+      "detail": "Por eso se calculan: ni de más, que vencen, ni de menos.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    },
+    {
+      "value": "100",
+      "label": "créditos por cada lead que recomienda Prospecting Agent.",
+      "detail": "Lo extra cuesta USD 10 por cada 1.000 créditos.",
+      "source": "HubSpot",
+      "year": "2026",
+      "sourceLogo": "public/images/logos/axis/hubspot-logotype.svg"
+    }
+  ],
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

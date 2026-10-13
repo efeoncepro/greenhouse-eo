@@ -1,0 +1,43 @@
+{
+  "id": "CT10-social-sistema",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a vast dark studio at night with thin haze): Nexa, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 60 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. On the frame-right side of her floats ONE perfectly even row of exactly SEVEN thin frameless vertical 9:16 light frames, a whole week of content, receding level and dead straight into the depth behind her shoulder, all at the same height: the FIRST, nearest one, under her hand at about 72 % of the frame width, as tall as her head and chest, sharp; then five more, evenly spaced, each smaller and softer than the one before; the SEVENTH and last, small and soft, at about 94 % of the frame width; no frame after it and none anywhere else. Each frame is joined to the next by one hair-thin azure-blue (#0375DB) line, so the seven read as one connected system. The frames glow cool white and azure with abstract, unreadable content; their colors stay inside each frame and throw no colored light. THE MOMENT: with her left hand she slides the nearest frame into its place in the row, and it locks in with a small flare; on that frame sits one small orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. Her hand is small and slender, in natural proportion to her face; the hoodie cuff covers her left wrist down to the base of the palm: no watch, no bracelet and no ring on that hand. Head almost frontal, only her eyes turn toward the frame under her hand on the frame-right; she does not look toward the dark left side of the frame; a focused, satisfied half-smile. The frame under her hand is the only key light and lights her face from the frame-right, cool white; both eyes stay readable, with a catchlight. A long dark matte desk runs between the camera and her, its near edge just in front of the lens; its top is matte black and non-reflective. The row and everything lit stay inside the RIGHT half of the frame. The left half of the frame is calm, deep dark space with faint haze only. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte desk edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "conviccion"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco y Nexa con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the nearest light frame, the one she slides into the row",
+    "lado": "to the frame-right of her face, at shoulder height",
+    "distancia": "about 35 cm from her face"
+  },
+  "fondo": "the far end of the row of frames and the depths of the studio melted into cold round bokeh",
+  "fenomeno": {
+    "que": "seven pieces of a week lock into one connected row as she places the last one",
+    "esServicio": "Social media management: un sistema editorial, no publicaciones sueltas"
+  }
+}

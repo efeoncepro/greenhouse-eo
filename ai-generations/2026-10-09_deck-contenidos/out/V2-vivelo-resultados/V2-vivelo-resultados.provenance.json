@@ -1,0 +1,35 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "56817baad12bf922ea48eb206318592e2d2433b74830850adadb0fb7f6404bb0",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day.live-results",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:greenhouse-seo-dashboard",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png",
+      "sha256": "280263abb9678bfe5364f710bcc86c01c8d6ca7438798f6bb4e8b1251c42acec"
+    },
+    {
+      "ref": "asset-ref:file:teams-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "sha256": "fb94647100f67df8a6faf8ed52bc900ad30fdbeb15690fbdbba613335ef098db"
+    },
+    {
+      "ref": "asset-ref:file:negative-isotipo-green",
+      "path": "public/images/greenhouse/SVG/negative-isotipo-green.svg",
+      "sha256": "c35ceea63282dd9b3d3f2a0b821c69e42e0486f083d535c9036fe4e08f1c0e96"
+    },
+    {
+      "ref": "asset-ref:file:efeonce-isotype-negative",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/efeonce-isotype-negative.svg",
+      "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

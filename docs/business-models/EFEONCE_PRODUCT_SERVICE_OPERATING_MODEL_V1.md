@@ -200,7 +200,8 @@ Efeonce
     │   ├── Web Experience 360
     │   ├── Measurement & Analytics
     │   ├── Agent Systems & Platforms
-    │   └── Digital Automation & Integrations
+    │   ├── Digital Automation & Integrations
+    │   └── Product Design 360 (sexta familia de Wave; aprobada por el operador, 2026-10-10)
     ├── Creative Services (Globe / Creative Studio product brand cuando aplica)
     │   ├── Studio Access / platform-enabled
     │   ├── Creative Production

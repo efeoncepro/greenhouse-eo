@@ -1,0 +1,68 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "brochure",
+  "recipe": "decision-difference",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Por qué 360°",
+    "question": "¿Otra agencia más?",
+    "answer": [
+      "Un sistema"
+    ]
+  },
+  "body": "Cinco proveedores son cinco verdades y ningún dueño del resultado. Un solo equipo opera la vuelta completa y responde por el **número final**.",
+  "alternative": {
+    "kicker": "La alternativa",
+    "title": "Una agencia por canal"
+  },
+  "efeonce": {
+    "kicker": "Efeonce",
+    "title": "Un sistema 360°"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Cada canal reporta su propia verdad",
+      "efeonce": "Una sola métrica de negocio, con fuente y dueño"
+    },
+    {
+      "alternative": "Cinco briefs, cinco reuniones, cinco facturas",
+      "efeonce": "Un responsable de cuenta y una operación"
+    },
+    {
+      "alternative": "Lo que aprende un canal no llega al otro",
+      "efeonce": "Lo que mide búsqueda lo usa contenido, medios y CRM"
+    },
+    {
+      "alternative": "Reporte el viernes, en un PDF",
+      "efeonce": "Resultados en vivo en tu portal, cada día"
+    },
+    {
+      "alternative": "Personas o agentes, según el proveedor",
+      "efeonce": "Personas y agentes en el mismo equipo, con supervisión"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y si lo hace mi equipo?",
+    "title": "Complemento, no reemplazo",
+    "pillars": [
+      {
+        "title": "Velocidad",
+        "description": "Capacidad lista desde la primera semana"
+      },
+      {
+        "title": "Método",
+        "description": "Un sistema probado en cinco países"
+      },
+      {
+        "title": "Foco",
+        "description": "Tu equipo dirige; nosotros operamos"
+      }
+    ]
+  }
+}

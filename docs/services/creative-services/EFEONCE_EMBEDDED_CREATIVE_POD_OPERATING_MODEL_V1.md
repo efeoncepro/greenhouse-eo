@@ -36,6 +36,18 @@ integración cultural y operativa
 
 Si una persona trabaja bajo dirección cotidiana del cliente y Efeonce sólo aporta disponibilidad, es Staff Augmentation. Si Efeonce diseña y dirige el sistema, es Embedded Managed Pod.
 
+### Delta 2026-10-06 — Cómo se vende hacia afuera (brochure Agencia Creativa, lámina 19)
+
+El comprador busca «staff augmentation». Por decisión del operador, el brochure aprobado usa esa palabra **sólo en el
+eyebrow** («Talento embebido · Staff augmentation») y vende este modelo: titular «Tu equipo, con talento de Efeonce
+adentro.»; bajada «Sumas el talento que tu equipo necesita, sin contratar, y con una agencia que responde por la
+entrega.»; las tres configuraciones de §4 como **Remoto** (con tus herramientas), **Embebido** (en tu oficina) y
+**Co-operado** (adentro y en estudio); y cuatro diferencias: reemplazo sin vacío, calidad gobernada, un fee mensual
+(sueldos, cargas, licencias y equipo por cuenta de Efeonce, §9) y «Tú diriges», que aquí significa que el cliente
+conserva prioridad, contexto, aprobación y autoridad de marca (§8 y §9), no la dirección cotidiana del pod. La regla no
+cambia: el cliente no compra personas sueltas y esto no es Staff Augmentation; la palabra del eyebrow es una decisión
+de reconocimiento, no de delivery model. Collateral: [README § Collateral comercial](README.md#collateral-comercial).
+
 ## 3. Por qué el fit cultural es una variable operativa
 
 El fit cultural no es un claim blando. Afecta:
@@ -277,3 +289,39 @@ Antes de comercializarlo como `Commercially approved`:
 - demostrar que el fee único no oculta margen negativo de infraestructura, licencias o soporte.
 
 Estado: **Approved for validation**.
+
+## 14. Costeo local reusable y presentación del fee
+
+[Pricing V3](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) permite seleccionar
+el equipo interno y las herramientas necesarias, prorratear paquetes/plataforma por capacidad declarada y
+planear créditos IA adicionales. El expediente aporta demanda; el catálogo/policy aporta precios, unidades,
+variantes y reglas. Adobe se selecciona según el trabajo (Creative Cloud Pro para diseño, Adobe Express para perfiles
+de contenido), IA según necesidad; no todo perfil recibe toda suite. Notion/Microsoft 365 son base interna. Creative
+Cloud Pro ya incluye Express: no se cargan ambos a la misma persona; capacidad nominativa y acceso contratado siguen
+verificándose.
+
+En `managed_service`, el preview muestra fee por período y setup cuando corresponde; personas, proveedores,
+rates, margen y país del talento quedan internos. Esa proyección respeta la unidad del pod; no convierte costo
+de equipo en suficiencia de delivery ni sustituye lane, RACI, derechos, aceptación o capacidad financiada.
+El piso bruto 45% de esta práctica se conserva: la propuesta 40%/35% del piloto de capacidad no lo reemplaza.
+
+Delta 2026-10-11 — decisiones del operador (CEO). El 45% es la norma de los servicios gestionados de la práctica
+creativa: donde se puede ganar más se sube el margen objetivo de esa oferta, no el piso. Una excepción bajo el piso
+la decide el CEO para un cliente concreto y nunca sirve de referencia de margen para otro. El costo de las personas
+en el cotizador es el nivel salarial objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella: el
+margen real sobre personas hoy es mayor que el simulado. El país de cada persona ajusta su costo y el país del
+cliente ajusta el precio del componente humano; donde ese factor baja el precio, el piso se lee sobre el precio del
+mercado base. Cada moneda redondea a su múltiplo, el tipo de cambio de cotización es un valor de política y todavía
+no se puede cotizar en EUR; los valores vigentes están en el manual.
+Adobe se costea como se factura: dos productos, tres licencias cada uno, en CLP y con IVA por decisión del CEO, con
+contrato de doce meses pagado al mes. Creative Cloud Pro tiene un 50% de descuento que el CEO espera que termine en unos
+dos meses: un pod que dure más se cotiza con el precio de renovación. El onboarding por persona que el cotizador costea
+desde ese día (USD 200, estimado; reclutamiento USD 500 sólo si hay que contratar) aplica a una persona vendida por
+dedicación; el kit de servicio gestionado no trae requisito de puesta en marcha, así que el onboarding/immersion del §10
+no entra solo a la cotización del pod.
+
+Explicación/replay usan snapshots congelados. Readiness distingue cálculo de validación económica y aprobación.
+Portfolio declara clientes, interno y no asignado; no prueba inventario real. Cambios de salarios/licencias/packs
+crean sucesores con impacto, sin modificar quotes o contratos anteriores. Estado permanece `Approved for validation`;
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
+[pendientes](../../../data/pricing/v3-operating/operational-gaps.json) definen ejecución y owners.

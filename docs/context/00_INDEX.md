@@ -19,9 +19,10 @@
 | Nombrar una métrica, propiedad, columna o KPI | `06_glosario-metricas` |
 | Entender el sistema de medición (ICO Engine, bonos, dashboards) | `07_ico` + `06_glosario-metricas` |
 | Trabajar un módulo de Greenhouse | `04_greenhouse-producto` |
-| Entender cómo Greenhouse conversa con Kortex/Verk/Creative Studio/HubSpot | `03_ecosistema-producto` |
+| Entender cómo Greenhouse conversa con Kortex/Verk/Globe/Studio/HubSpot | `03_ecosistema-producto` |
 | Priorizar features con justificación comercial (cuentas, cross-sell, Pulse) | `08_estrategia-comercial` |
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
+| Liderazgo de categoría y representación en búsqueda tradicional/IA | `09_marca-agencia` + [método SEO/AEO](../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) |
 | Definir Content Engineering, una Pillar Experience o un cluster federado | `09_marca-agencia` + `docs/public-site/decisions/PDR-017-content-engineering-territorio-editorial.md` + `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md` + skill `content-marketing-studio` |
 | Operar o abrir un canal propio de marca (blog, LinkedIn, YouTube, Instagram, Threads, Glitch) | `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md` (rol y catálogo por canal, franquicias, vocero) + `PDR-019` (territorios) + skill `social-media-studio` |
 | Diseñar la experiencia/onboarding del cliente en el portal | `10_experiencia-cliente` |
@@ -29,6 +30,8 @@
 | Operar o vender Salesforce CRM, Marketing Cloud Engagement o Marketing Cloud Next | `docs/services/salesforce/README.md` + skill Salesforce dueña; partnership/licensing desde el registry |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
+| Costear un rol o servicio con agentes, tools y capacidad compartida | `08_estrategia-comercial` + `14_modelo-negocio-asaas` + [contrato V3 local](../documentation/finance/cotizador-v3-superficie-implementada.md) + skill `efeonce-pricing-operator`; evidencia de costos, políticas comerciales y emisión canónica son decisiones separadas |
+| Trabajar Efeonce Factory, venta rápida y encargos On-Demand | `08_estrategia-comercial` + [decisión Factory](../architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md) + [modelo y validación](../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md) |
 | Conectar decisiones de marca con producción, automatización, escala o salida al mercado | `09_marca-agencia` + `14_modelo-negocio-asaas` + [`Decisiones de marca y ejecución escalable`](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md) |
 | Entender el panorama competitivo, el benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |
 | Impregnar cultura interna, hiring, onboarding, performance o rituales de equipo | `09_marca-agencia` + `docs/operations/EFEONCE_OPERATING_CODE_V1.md` |

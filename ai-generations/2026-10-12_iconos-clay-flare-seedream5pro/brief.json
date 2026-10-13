@@ -1,0 +1,23 @@
+{
+  "models": [
+    "gpt-image-2.5-flare",
+    "dola-seedream-5-0-pro-260628"
+  ],
+  "qualities": [
+    "max",
+    "standard"
+  ],
+  "size": "2048x2048",
+  "style": "hand-sculpted matte clay 3D, warm white and pastel ice-cyan",
+  "background": "opaque neutral studio",
+  "icons": [
+    "01-lupa",
+    "02-grafico",
+    "03-carpeta",
+    "04-escudo"
+  ],
+  "samePromptsPerPair": true,
+  "references": [],
+  "relationshipToPreviousTest": "same four concepts and model parameters; entirely new independent generations, clay-only materials",
+  "status": "internal comparison, no canonical icon adoption"
+}

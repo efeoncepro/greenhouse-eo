@@ -100,3 +100,18 @@ no se convierte en agencia. Se conserva el gate de categoría y los flags de tra
 La corrección de datos de Efeonce no es un default ni una excepción en código para esa marca.
 Operador/portal/recurrencia usan batches; formularios y API directa usan el mismo command. La futura
 exposición MCP de TASK-1861 debe consumir ese contrato, sin duplicar generación ni ejecución.
+
+## Delta 2026-10-12 — cobertura por contrato: un predicado, un camino de escritura (ISSUE-181)
+
+- La pregunta «¿este mercado está cubierto por el contrato?» tiene una sola implementación,
+  `src/lib/growth/ai-visibility/markets/contract-coverage.ts` (TS + SQL). La usan el chokepoint de
+  corrida, el scheduler recurrente y el command de cadencia. Antes sólo la respondía el chokepoint:
+  el scheduler reclamaba y el command habilitaba mercados que éste rechazaba.
+- `aeo_markets_included` se escribe únicamente con `assignAeoTier({ marketsIncluded })` (route
+  `assign-tier` o `pnpm growth:aeo-contracted-markets`). Supersede el assignment y conserva su
+  metadata; `undefined` no toca lo declarado.
+- El punto 4 de la decisión decía «no se presume que Sky tenga seis mercados contratados». El
+  operador lo confirmó el 2026-10-12 y quedaron declarados AR, BR, CL, CO, PE, US y UY.
+- Declarar un mercado compromete gasto: cada mercado con cadencia prendida compra una medición
+  `full` por ciclo (techo USD 2) contra la cuota mensual de la organización.
+

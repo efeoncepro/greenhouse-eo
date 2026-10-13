@@ -1,0 +1,145 @@
+{
+  "status": "prepared",
+  "binding": false,
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-10",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "accountId": "sky-airline-simulation",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "titular",
+        "profile": "ECG-007",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyId": "allocation:dedicated",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": [
+          {
+            "requirementId": "assurance",
+            "resourceId": "provision-backfill-coverage"
+          },
+          {
+            "requirementId": "operations",
+            "resourceId": "provision-on-call-alert-guard"
+          }
+        ]
+      },
+      {
+        "lineId": "lider",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "cuenta",
+        "profile": "ECG-016",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.05"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "agentes",
+        "profile": "ECG-021",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "analista",
+        "profile": "ECG-019",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.05"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "untouchedLineIds": [
+    "lider",
+    "cuenta",
+    "agentes",
+    "analista"
+  ],
+  "workload": {
+    "schemaVersion": "pricing-v3-workload-result/1",
+    "binding": false,
+    "status": "prepared",
+    "version": "sky-social-care-una-persona-2026-10-10",
+    "mode": "simulation",
+    "totals": {
+      "driverHours": [
+        {
+          "driverId": "conversations",
+          "unit": "conversation",
+          "hours": "65"
+        }
+      ],
+      "fixedHours": "60",
+      "workHours": "125",
+      "fte": "1"
+    },
+    "lines": [
+      {
+        "lineId": "titular",
+        "workHours": "125",
+        "presenceHours": "0",
+        "fteByWork": "1",
+        "fteByPresence": "0",
+        "fte": "1",
+        "bindingConstraint": "work",
+        "reason": "Una sola persona dedicada: atiende toda la cola en horario hábil y mantiene la base. Sin holgura a 1.300 conversaciones."
+      }
+    ],
+    "diagnostics": [],
+    "note": "Dimensioned from declared volume and hours. It is not a staffing commitment, an availability check or a measured productivity."
+  },
+  "note": "Dedication derived from declared volume. Review the assumptions before quoting; the brief is not a commitment."
+}

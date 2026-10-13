@@ -1,0 +1,51 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "brand",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "tools",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo trabajamos contigo?",
+    "answer": [
+      "Así"
+    ]
+  },
+  "body": "Cada cosa en su herramienta y **todo** a la vista en Marketing Studio, sin esperar el informe.",
+  "tools": [
+    {
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/metricool-on-black.svg",
+      "name": "Metricool",
+      "label": "Publicamos"
+    },
+    {
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/sprout-social-isotype.svg",
+      "name": "Sprout Social",
+      "label": "Escuchamos y atendemos"
+    },
+    {
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/favikon-isotype.png",
+      "name": "Favikon",
+      "label": "Elegimos creadores"
+    }
+  ],
+  "insights": {
+    "name": "Efeonce Insights",
+    "label": "Reportes automáticos"
+  },
+  "panel": {
+    "path": "ai-generations/2026-10-09_deck-contenidos/ui/ms-social.png",
+    "alt": "La campaña en Marketing Studio: semana de publicaciones por red, bandeja de mensajes y creadores",
+    "logo": {
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/marketing-studio-isotype-negative.svg",
+      "alt": "Marketing Studio"
+    },
+    "title": "Tu plan en Marketing Studio",
+    "note": "todo en un solo lugar, en vivo"
+  }
+}

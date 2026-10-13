@@ -3,6 +3,7 @@
 > **Estado:** `hypothesis_only` — bandas internas de validación; no son tarifario público ni autorización de venta
 > **Owner:** Strategy + Commercial + Finance + Media & Distribution
 > **Versión:** V1 · 2026-09-10 · **Revisión:** después del primer piloto de cada motion
+> **Último delta:** 2026-10-10 — paid social en el deck «Marketing de Contenidos» (§13); sin cambio de bandas ni de veredicto
 > **Moneda de referencia:** USD; cotizar en moneda del contrato con snapshot FX aprobado (referencia de cálculo:
 > USD 1 = CLP 925,97, dólar observado 2026-09-10)
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
@@ -123,22 +124,28 @@ escala: 12% hasta USD 30 mil · 9% sobre el tramo 30–100 mil · 6% sobre el ex
 - **Administración de pagos:** preferir que el cliente pague directo a plataformas y partners. Si Efeonce adelanta
   fondos, se agrega una línea de administración del 3–5% de la inversión administrada por capital de trabajo, DSO y FX,
   con aprobación de Finance. Nunca se combina con la escala híbrida sobre el mismo peso sin excepción aprobada.
-- **Partner: Real Audiences** (seleccionado 2026-09-10; fees desconocidos). En modo managed, su fee de servicio es
-  pass-through declarado. En modo autogestionado no hay fee de servicio del partner: el trabajo del trader certificado de
-  Efeonce va dentro del nivel y el cliente paga plataforma y medios. Antes de cotizar se necesitan sus fees por escrito.
-  **2026-09-19:** Real Audiences declaró por escrito que no tiene mínimos, que factura desde su LLC en EE.UU. y que a las
-  agencias partner les ofrece **rebates o comisiones según inversión** (sin porcentaje todavía). CPM estimados de su deck:
-  display 0,20–0,25, video 0,33–0,38, push 0,15–0,20, audio 3–4 USD; pDOOH sin precio. Detalle y alertas en la
-  [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md#lo-que-real-audiences-declaró-por-escrito--2026-09-19).
-- **Rebates de partners (decisión pendiente de CEO + Finance).** Un rebate sobre la inversión del cliente nunca se
-  retiene en silencio: o se traspasa al cliente como descuento, o se declara en propuesta y contrato como ingreso de
-  Efeonce. No reemplaza al fee de Efeonce ni convierte el modelo en porcentaje de inversión. Si el partner paga desde
-  EE.UU., Finance define el tratamiento tributario antes de la primera liquidación.
-- **Partner en evaluación: Basis** (contacto 2026-09-17, reunión por agendar). Se compara con la misma lista que Real
-  Audiences; gana el costo total declarado y la cláusula de transparencia, no el rebate más alto.
-- **Gate para pasar a autogestionado:** dos campañas managed auditadas, trader certificado con backup y checklist de
-  brand safety y reporte. **Seat en otro DSP:** sólo si Real Audiences no cubre CTV o ABM B2B y la inversión en ese
-  frente supera USD 50 mil/mes sostenida dos trimestres.
+- **Proveedores seleccionados: Basis + Real Audiences** (dirección aceptada 2026-10-09). Selección de ejecución por
+  campaña, sin exclusividad o reparto obligatorio. El [pack específico de programmatic](PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md)
+  gobierna sus costos, fee, caja y escenarios; no aplicar bandas de retainer completo automáticamente a un flight.
+- **Aprobación comercial acotada 2026-10-09:** el servicio programático, su tarifario base y cobro están aprobados por
+  el operador en ese pack específico; estas bandas de Performance conservan su estado de hipótesis. El precio
+  programático usa fee fijo con piso, markup 0% y no añade híbrido ni recargo financiero por defecto.
+- **Real Audiences:** oferta temporal de comisión 10% hasta 2026-12-31; inversión en plataforma como base declarada,
+  definición contractual y liquidación pendientes. Su crédito a 30 días sin anticipo también primera campaña no está
+  aprobado. **Basis:** deck y modalidades recibidos; costos, mínimos, entidad y crédito por negociar.
+- **Rebates/comisiones:** no reemplazan el fee ni sostienen el margen base. Se trasladan al cliente o se declaran
+  como remuneración Efeonce en propuesta/contrato; nunca retención oculta. Finance valida liquidación y tributos.
+- **Autogestión:** gate por proveedor, con dos campañas managed o acompañadas auditadas, capacitación específica, trader con backup,
+  permisos, soporte y costo de seat comprobados. La restricción histórica de otro DSP sólo por carencias de Real
+  Audiences queda reemplazada por la [decisión dual](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).
+
+- **Actualización 12-10:** reunión y demo registradas; operación directa Efeonce con formación/soporte como ruta a
+  evaluar, no capacidad activa. Porcentajes ilustrativos no son tarifas ni acreditan ahorro. Ver
+  [evidencia](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
+- **Cuenta integral de medios:** costear alcance y gestión conjunta, sin sumar fees completos de canales ni repetir
+  tareas cubiertas por retainer. El [pack programático §2.3](PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#23-calibración-del-tarifario-y-composición-integral)
+  mantiene tarifa aprobada y distingue piso de margen, objetivo, costos externos y trabajo incremental; estas bandas
+  de Performance conservan `hypothesis_only`.
 
 ### 7.1 Canales emergentes y bajo pedido
 
@@ -213,3 +220,49 @@ operations_review: pending
 
 **Verdict:** `hypothesis_only`. Pasa a `approved_for_validation` cuando Finance confirme el costo del Performance Lead,
 el overhead real y el piso de margen, y resuelva `EFG-003`.
+
+## 13. Delta 2026-10-10 — paid social en el deck «Marketing de Contenidos» (sin cambio de bandas)
+
+El operador aprobó el 2026-10-10 el deck comercial «Marketing de Contenidos» y pidió incorporar su contenido al modelo
+de negocio (cita y alcance en la [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md),
+sección «Paid social en el plan de contenidos»). Un precio no queda aprobado por aparecer en un deck: este delta **no
+cambia ninguna banda, piso, escala ni condición de pago**, y el veredicto sigue `hypothesis_only`.
+
+### 13.1 Lectura del «Cómo se compra» del deck
+
+| Línea del deck | Regla vigente de este pack | Coincide |
+|---|---|---|
+| Fee Efeonce · «fijo, por capacidad» | §1 y §3: fee por nivel de complejidad; métrica de valor = capacidad gobernada | sí, como default. El híbrido porcentual de la §5 sigue existiendo como alternativa contractual con piso (DA-03) |
+| Whitelisting y medios · «línea propia» | §1 y §9: la inversión en medios es pass-through y la paga el cliente a la plataforma. La licencia de whitelisting no es de este pack: es un costo de creadores | sí |
+| Comisión por resultado · «sólo si se acuerda» | §6: bono por pipeline, opcional, hasta 15% del fee base, sólo en el motion B, con baseline y definiciones de etapa firmadas. §8: no se ofrece performance-only | parcial: el acuerdo es necesario, no suficiente (DA-04) |
+| Derechos y uso pagado · «línea propia» | fuera de este pack; `excluded: derechos` en la §12 | sí |
+
+### 13.2 Cómo se cotiza hoy el «paid social» del plan de contenidos
+
+No existe una unidad de cobro llamada «paid social». Mientras no se decida otra cosa (DA-01):
+
+- se cotiza con el nivel de Managed Performance que corresponda a su complejidad, con su piso y su mínimo de tres
+  meses, o con Diagnostic y Sprint;
+- el «sprint de prueba» del deck no tiene banda propia: las bandas de Sprint de la §3 corresponden a 10 semanas de
+  remediación de señal y takeover de cuentas, que es un alcance mayor que «un frente acotado» (DA-05);
+- una lane más liviana, sólo para amplificar contenido, **no tiene costo medido ni precio**. Crearla exige costeo de
+  Finance con equipo, horas y piso propios; no se deriva recortando el nivel 1.
+
+### 13.3 Lo incorporado que no tiene precio en este pack
+
+- «Lo orgánico prueba, la pauta escala»: la lectura del orgánico y la selección de piezas consumen horas que el
+  cost-to-serve de la §3 no contempla. Se miden en el primer caso antes de asumir que caben en el nivel;
+- UGC patrocinado: sobre la misma amplificación pueden coincidir el fee de governance de Amplification & Whitelisting
+  (pack de creadores) y el fee por nivel de este pack. Falta la regla de no doble cobro entre ambos packs (DA-06);
+- Thought Leader Ads en LinkedIn: cuenta como parte del canal LinkedIn para el nivel; sin evidencia de costo;
+- social commerce y live shopping: sin banda. La operación de tienda, catálogo y checkout no es de este pack;
+- origen por red, pieza y creador en el CRM: la integración se cotiza en RevOps & CRM, como en la §6.
+
+### 13.4 Validación que se suma
+
+| Hipótesis | Experimento | Señal | Stop condition |
+|---|---|---|---|
+| El comprador de contenidos acepta pagar paid social como fee por nivel, separado del plan social | registrar la reacción en cada propuesta que componga ambos | el buyer acepta fee y medios separados del fee de social media | exige que la pauta venga «incluida» en el plan |
+| La selección por señal orgánica cabe en el cost-to-serve del nivel | medir horas reales del primer caso | el margen del nivel se sostiene | las horas de lectura y selección rompen el piso |
+
+Cada resultado entra al evidence ledger con fuente, fecha, owner, confidence y decisión.

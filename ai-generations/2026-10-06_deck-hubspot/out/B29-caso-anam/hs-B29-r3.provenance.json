@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "83ab32acc4db505557d36a967955f515d17b305c65ef842f471ed01f03f2b832",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-case",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:T3-mide",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+      "sha256": "0a5a720b73927976557bebda45f1be9194229e73013d18e234e79dd38a93cf17"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

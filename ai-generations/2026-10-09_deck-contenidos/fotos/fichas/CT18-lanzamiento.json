@@ -1,0 +1,42 @@
+{
+  "id": "CT18-lanzamiento",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark launch stage at night with thin haze): Hum, the strategist with a sleek straight bob, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Beside her, on her frame-right, between 74 % and 86 % of the frame width, stands a slim matte black pedestal about 1.1 m high, reaching her lower chest. THE MOMENT: with the arm on the frame-right side of her body she has just swept a dark charcoal cloth up and off the pedestal and still grips one corner of it in her raised hand, at head height and at about 94 % of the frame width; the cloth streams from her hand down toward the pedestal in one long diagonal sweep, frozen mid-swing, its trailing end just leaving the top of the cube and never hiding it; its folds catch the cool light of the cube from below and read clearly against the dark; on the pedestal, just revealed, stands ONE plain cube of cool white light, about 25 cm on a side, with no logo and no text, its edges traced by a hair-thin azure-blue (#0375DB) glow, and a soft column of cool white light rises from it into the haze; just above the cube floats one small crisp orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. She looks at the cube with a proud, expectant half-smile; head almost frontal, only her eyes turn slightly down toward the cube; her upper eyelids stay above the irises; she does not look toward the dark left side of the frame. The cube is the only key light and lights her face from below and from the frame-right, cool white; both eyes stay readable, with a catchlight. Her whole arm is visible and the cloth never covers the mark on her hoodie. The matte black lid of a road case stands on the stage floor between the camera and her, its near edge just in front of the lens; it is non-reflective and outside every light. The cube, the cloth and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the tall matte black side drape of the stage, unlit: no lamps, no screens and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the matte black lid of a road case on the stage floor close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "hum"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the plain cube of cool white light just revealed on the pedestal",
+    "lado": "below and to the frame-right of her face, at chest height",
+    "distancia": "about 60 cm from her face"
+  },
+  "fondo": "the dark depth of the stage far behind her on the right, with a few small cold bokeh points",
+  "fenomeno": {
+    "que": "a cloth flies off a pedestal and a cube of light is revealed for the first time",
+    "esServicio": "Lanzamientos: el momento de la revelación, preparado y coordinado"
+  }
+}

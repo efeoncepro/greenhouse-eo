@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Experience LaunchOps · En ciclo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#cfe4fa}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: #001a33; color: #ffffff; font-family: 'Poppins', system-ui, sans-serif;">
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0;">
+    <defs>
+      <radialGradient id="stageL" cx="1290" cy="600" r="900" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="{{accent}}" stop-opacity="0.28"></stop>
+        <stop offset="0.35" stop-color="{{accent}}" stop-opacity="0.10"></stop>
+        <stop offset="1" stop-color="{{accent}}" stop-opacity="0"></stop>
+      </radialGradient>
+      <radialGradient id="innerL" cx="1290" cy="600" r="380" gradientUnits="userSpaceOnUse" gradientTransform="translate(0 378) scale(1 0.37)">
+        <stop offset="0" stop-color="{{accent}}" stop-opacity="0.22"></stop>
+        <stop offset="1" stop-color="{{accent}}" stop-opacity="0"></stop>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#stageL)"></rect>
+    <defs><linearGradient id="floorX" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"></stop><stop offset="1" stop-color="#000814" stop-opacity="0.55"></stop></linearGradient></defs>
+    <rect x="0" y="778" width="1920" height="302" fill="url(#floorX)"></rect>
+    <ellipse cx="1290" cy="600" rx="380" ry="140" fill="url(#innerL)"></ellipse>
+    <ellipse cx="1290" cy="600" rx="380" ry="140" fill="none" stroke="{{accent}}" stroke-opacity="0.22" stroke-width="2"></ellipse>
+    <path d="M 1290 460 A 380 140 0 0 1 1650.6 555.8" fill="none" stroke="{{accent}}" stroke-width="6" stroke-linecap="round"></path>
+    <circle cx="1650.6" cy="555.8" r="13" fill="{{accent}}"></circle>
+    <g fill="{{accent}}" fill-opacity="0.7">
+      <path d="M -7 -6 L 7 0 L -7 6 Z" transform="translate(1558.7 501) rotate(20.2)"></path>
+      <path d="M -7 -6 L 7 0 L -7 6 Z" transform="translate(1558.7 699) rotate(159.8)"></path>
+      <path d="M -7 -6 L 7 0 L -7 6 Z" transform="translate(1021.3 699) rotate(200.2)"></path>
+      <path d="M -7 -6 L 7 0 L -7 6 Z" transform="translate(1021.3 501) rotate(-20.2)"></path>
+    </g>
+    <g fill="#001a33" stroke="{{accent}}" stroke-opacity="0.6" stroke-width="2">
+      <circle cx="1290" cy="460" r="40"></circle>
+      <circle cx="1670" cy="600" r="40"></circle>
+      <circle cx="1290" cy="740" r="40"></circle>
+      <circle cx="910" cy="600" r="40"></circle>
+    </g>
+  </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="position: absolute; left: 1268px; top: 438px;"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6l1.75 1.75l3 -3"></path><path d="M11 6h9.5"></path><path d="M3.5 12l1.75 1.75l3 -3"></path><path d="M11 12h9.5"></path><path d="M11 18h9.5"></path></g></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="position: absolute; left: 1648px; top: 578px;"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5l-4.5 4.5l4.5 4.5"></path><path d="M16.5 7.5l4.5 4.5l-4.5 4.5"></path><path d="M13.75 5l-3.5 14"></path></g></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="position: absolute; left: 1268px; top: 718px;"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3z"></path><path d="M4 10h16"></path><path d="M7.25 7h.01"></path><path d="M10.5 7h.01"></path></g></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="position: absolute; left: 888px; top: 578px;"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"></path><path d="M7 16v-3"></path><path d="M12 16v-7"></path><path d="M17 16v-11"></path></g></svg>
+  <div style="position: absolute; left: 1090px; top: 556px; width: 400px; text-align: center;">
+    <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 44px; font-weight: 760; letter-spacing: -0.025em; line-height: 1;">Tu lanzamiento</div>
+    <div style="margin-top: 8px; font-size: 18px; font-weight: 400; color: #cfe4fa;">mejora en cada vuelta</div>
+  </div>
+  <div style="position: absolute; left: 1110px; top: 150px; width: 360px; box-sizing: border-box; padding: 22px 24px; border-radius: 16px; background: rgba(207, 228, 250, 0.08); border: 2px solid {{accent}}; display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff;">01 · Empieza aquí</div>
+    <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 36px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05;">Especificar</div>
+    <div style="font-size: 16px; font-weight: 400; line-height: 1.4;">El pedido y su especificación, con lo que necesita para buscadores y medición desde el inicio.</div>
+  </div>
+  <div style="position: absolute; left: 1560px; top: 300px; width: 300px; box-sizing: border-box; padding: 20px 22px; border-radius: 16px; background: rgba(207, 228, 250, 0.06); border: 1px solid rgba(207, 228, 250, 0.18); display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.1em; color: #cfe4fa;">02</div>
+    <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 36px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05;">Construir</div>
+    <div style="font-size: 16px; font-weight: 400; line-height: 1.4;">Diseño y desarrollo, con SEO/AEO y medición revisados antes de publicar.</div>
+  </div>
+  <div style="position: absolute; left: 1110px; top: 806px; width: 360px; box-sizing: border-box; padding: 20px 24px; border-radius: 16px; background: rgba(207, 228, 250, 0.06); border: 1px solid rgba(207, 228, 250, 0.18); display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.1em; color: #cfe4fa;">03</div>
+    <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 36px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05;">Aprobar y publicar</div>
+    <div style="font-size: 16px; font-weight: 400; line-height: 1.4;">Una persona aprueba; recién ahí se publica en tu sitio.</div>
+  </div>
+  <div style="position: absolute; left: 620px; top: 664px; width: 300px; box-sizing: border-box; padding: 20px 22px; border-radius: 16px; background: rgba(207, 228, 250, 0.06); border: 1px solid rgba(207, 228, 250, 0.18); display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 14px; font-weight: 600; letter-spacing: 0.1em; color: #cfe4fa;">04</div>
+    <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 36px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05;">Verificar y aprender</div>
+    <div style="font-size: 16px; font-weight: 400; line-height: 1.4;">Medimos lo publicado y el siguiente lanzamiento parte mejor.</div>
+  </div>
+  <div style="position: absolute; left: 140px; top: 112px; font-size: 18px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff;">Lanzamientos web · Experience LaunchOps</div>
+  <div style="position: absolute; left: 140px; top: 196px; display: flex; align-items: center; gap: 16px; font-size: 40px; font-weight: 300; line-height: 1.25;">
+    <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 9999px; border: 3px solid {{accent}}; box-sizing: border-box; flex: none;"></span>
+    <span>¿Quién coordina mi lanzamiento?</span>
+  </div>
+  <div style="position: absolute; left: 132px; top: 268px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 150px; font-weight: 760; letter-spacing: -0.04em; line-height: 0.9; font-variation-settings: 'opsz' 96; white-space: pre-line;">Un solo
+equipo<span aria-hidden="true" style="display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.04em; border-radius: 9999px; background: {{accent}};"></span></div>
+  <div style="position: absolute; left: 140px; top: 640px; width: 450px; font-size: 28px; font-weight: 300; line-height: 1.35;">Del brief a la experiencia publicada: estrategia, contenido, diseño, desarrollo, SEO/AEO y medición sobre el mismo plan. <strong style="font-weight: 600;">Tú apruebas.</strong></div>
+  <img src="/_blob/a6c69b68160be2538955abce07cff3af" alt="efeoncepro.com" style="position: absolute; left: 140px; bottom: 52px; width: 216px; height: auto;">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0375db","options":["#0375db","#36c8bf","#ff6500","#f83902"]},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#0375db' };
+  }
+}
+</script>
+</body>
+</html>

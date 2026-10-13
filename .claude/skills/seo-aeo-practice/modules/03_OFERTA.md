@@ -1,110 +1,38 @@
-# 03 · La oferta — qué vendemos, exactamente
+# 03 · Oferta — referencia de categoría con representación fiel
 
-> **La decisión que ordena todo:** 🎯 **vendemos VISIBILIDAD, entrando por SEO.**
-> *(Igual que en el hub de HubSpot: entras por la query commodity y vendes la cosa grande.)*
+Canon: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` (2026-10-12).
+El método actualiza objetivo, prueba y compromisos; no aprueba nuevos precios, packaging o disponibilidad.
 
----
+## 1. Qué objetivo proponemos
 
-## 1. Los tres encuadres posibles — y por qué B
+Ser descubiertos, comprendidos y considerados como opción de referencia para una categoría, comprador,
+situación de compra y mercado delimitados. Liderazgo es aspiración estratégica; no se promete una posición,
+selección del motor ni superioridad sin evidencia. Entrar por SEO/AEO cuando ese es el problema reconocido
+por el comprador y explicar el alcance con sus necesidades y pruebas.
 
-| | Qué es | Se vende… | Precio | Riesgo |
-|---|---|---|---|---|
-| **A · "SEO + AEO"** | La categoría tal cual | **Fácil** *(lo buscan)* | 🔴 **Commodity** — compites con freelancers de USD 500 | La métrica se está muriendo |
-| 🎯 **B · Visibilidad total** | **Dondequiera que se tome la decisión**: Google · IA · Reddit · YouTube | **Difícil** *(nadie lo busca)* | **Defendible** | Hay que educar |
-| **C · Outcome / revenue** | Pago por resultado | Máxima confianza | Máximo | 🔴 **Atribución que NO existe** *(→ `01_MERCADO`)* |
+La presencia de una marca ante consultas non-brand es descubrimiento genérico, incluso si no hay clic.
+Conservar tráfico branded/non-brand y su intención; no vender el abandono del tráfico genérico, el blog
+ni un supuesto 90–95% branded universal. Fuente, mención, fidelidad y recomendación son resultados distintos.
 
-### 🎯 La decisión: **B, entrando por A**
+## 1.5 Qué trabajo se contrata
 
-**No lo inventé: el repo ya se inclinó solo.**
-**EPIC-022 se llama "Search Visibility 360"**, y **`/servicios/posicionamiento-seo`** (live) + **`/aeo-2/`**
-(live) **ya son las dos puertas de entrada**.
+Investigar decisiones de compra y cobertura, revisar fundamentos técnicos, convertir capacidad en pruebas
+útiles, hacer comprensible la marca, distribuir evidencia autorizada, medir y corregir. El orden responde
+al diagnóstico; no imponer el mismo volumen editorial, formato o todos los canales a cualquier cliente.
 
-```
-ENTRAS por          →   VENDES
-"posicionamiento SEO"   la operación de visibilidad completa
-"AEO"                   (Google + motores de IA + la prueba de que funcionó)
-```
+Relacionar cada brecha con acción, owner, dependencia, aceptación y resultado a observar. La cantidad de
+piezas delimita capacidad cuando corresponda; no es la unidad de valor ni prueba de liderazgo.
 
-🔴 **Y C queda descartado por dato, no por cobardía:** los estudios de conversión de tráfico LLM **van de
-+900% a −13%** (`01_MERCADO` § 3). **Firmar outcome sobre algo que nadie sabe medir es firmar una pelea
-futura.**
+## 2. Cómo explicarlo al comprador
 
----
+> «Trabajamos para que tu empresa sea descubierta y comprendida como una opción pertinente cuando tus
+> compradores buscan resolver [necesidad]. Empezamos por [brecha verificada], construimos [prueba/acción]
+> y evaluamos presencia, representación y avance comercial con fuentes y límites visibles».
 
-## 1.5 🔴 "Entonces… ¿no vendemos AEO?" — la objeción INTERNA
-
-**La va a tener el operador, el vendedor y todo el que lea `01_MERCADO`.
-Contéstala antes de que la pregunten.**
-
-### La respuesta: **vendemos MÁS AEO, y se queda.**
-
-**Lo que está muerto no es el producto. Es el pitch.**
-
-| | |
-|---|---|
-| 🔴 **Humo** *(lo que vende todo el mercado)* | *"Hacemos AEO y **ChatGPT te va a traer clientes**"* — **el canal** |
-| ✅ **Vendible, urgente y verificable** | *"**Tus clics se están desplomando**, y estar citado es lo que los recupera — y de paso **te abarata el paid**"* — **la defensa** |
-
-### Por qué el pitch honesto vende MÁS
-
-| | |
-|---|---|
-| **1. La urgencia es mayor** | *"Hay un canal nuevo con el 1% del tráfico"* **se posterga.** *"Estás perdiendo el 58% de tus clics"* **es un incendio. Nadie posterga un incendio** |
-| **2. El presupuesto es mayor** | 🎯 El **−68% del CTR pagado** saca la plata del **presupuesto de medios**, no del de marketing. **Una bolsa 10× más grande — y es plata que ya está gastando mal** |
-| **3. Sobrevive al mes 6** | 🔴 El que compró *"tráfico de ChatGPT"* abre su GA4, ve el 1%, **y cancela.** El que compró *"recupero mis clics"* abre su GA4 **y ve exactamente lo que le prometiste** |
-| **4. Cobras más** | El mercado vende el AEO **como línea aparte desde USD 900/mes** ✅. **Nosotros lo regalamos adentro** |
-
-### 🔴 Y lo que de verdad está en juego
-
-```
-2015-2022   "Te llevamos a la primera página"
-            → no funcionó → hoy el 100% de los prospectos tiene una cicatriz
-            → y por eso vender SEO es tan difícil
-
-2025-2026   "Te hacemos AEO, ChatGPT te va a recomendar"
-            → el tráfico es el 1% → NO va a funcionar
-            → 🔴 en 18 meses "AEO" va a ser una palabra tan quemada como "SEO"
-```
-
-> 🎯 **Todas las agencias que hoy venden la fantasía del canal están fabricando la cicatriz de 2028.**
-> **Esta práctica está construida para ser la que sobrevive a eso — la que no va a tener que cambiarse el
-> nombre en dos años, porque nunca prometió lo que no podía.**
-
-### El pitch de AEO, palabra por palabra
-
-> *"Google ya pone un resumen de IA en la mitad de las búsquedas. Y donde lo pone, **el que está primero
-> pierde el 58% de sus clics.** Hace ocho meses perdía el 34%. **Va hacia abajo y no ha parado.**
->
-> Y no es solo el orgánico: **tus anuncios perdieron el 68% del CTR.** Estás pagando lo mismo por un tercio
-> del resultado.
->
-> **Lo único que lo compensa es aparecer citado dentro del resumen.** Las marcas que están adentro reciben
-> **35% más clics orgánicos y 91% más clics pagados.**
->
-> **Hoy tú no estás citado en {N} de 7 motores. Eso es lo que hacemos: que estés adentro.**"*
-
-🎯 **Mismo trabajo, misma capa técnica, mismo contenido. Cambia de qué le sirve — y por eso se queda.**
-
-### 🔴 La precisión que hace la diferencia
-
-| ✅ | 🔴 |
-|---|---|
-| *"**Las marcas citadas reciben** 35% más clics orgánicos y 91% más pagados"* | *"**Tú vas a recibir** 35% más clics"* |
-| **Es una correlación fuerte, verificable, de un estudio** | **Es una promesa que no controlas** |
-| **Dicho así, es imbatible** | 🔴 **Dicho así, volvemos al humo** |
-
----
-
-## 2. 🔴 El reframe que cambia la venta
-
-| ❌ Lo que dice todo el mercado | ✅ Lo que decimos nosotros |
-|---|---|
-| *"Te posicionamos en Google"* | *"El clic orgánico está cayendo 58% donde hay IA. **Te mantenemos existiendo.**"* |
-| *"Te hacemos AEO, vas a salir en ChatGPT"* | *"El tráfico de IA es el 1% y nadie sabe cuánto convierte. **Pero las marcas citadas reciben 35% más clics orgánicos y 91% más pagados.**"* |
-| *"Te medimos la visibilidad en IA"* | *"Semrush te la mide por 99 dólares. **Nosotros te decimos qué hacer con ella.**"* |
-| *"Te entregamos 8 artículos al mes"* | *"Operamos tu visibilidad. **Los artículos son un borde del alcance, no lo que compras.**"* |
-
-> ## Nadie paga por un número. Pagan por saber qué hacer con él.
+Adaptar a la evidencia de la cuenta. Distinguir la aspiración compartida de los entregables contratados.
+No presumir caída de tráfico, mala experiencia anterior ni ahorro en paid. Un estudio externo de CTR no
+promete recuperar clics para ese prospecto. Referencias/conversiones pueden medirse; causalidad exige
+un diseño defendible y no se deduce de simultaneidad.
 
 ---
 
@@ -156,8 +84,8 @@ Estrategia editorial · producción · publicación · on-page · citabilidad.
 > sin pedirnos un reporte y sin tener que creernos nada."**
 
 🎯 **Esto NO es "medición" (eso lo regala Semrush). Es transparencia como producto.**
-**Y en una categoría donde el 100% de los compradores tiene una cicatriz, la transparencia no es una feature:
-es el moat.**
+La transparencia permite evaluar trabajo, cobertura y pendientes; no presupone una mala experiencia
+previa de todos los compradores.
 
 🔴 **Es lo único que un freelancer no puede tener. NUNCA se descuenta.**
 
@@ -240,7 +168,7 @@ EXPANSIÓN (opcional)
 
 ## 6. Reglas duras
 
-1. 🔴 **Vendes visibilidad, entras por SEO.** *(No al revés: si vendes "SEO", te compran commodity.)*
+1. **Conecta visibilidad y representación con una necesidad pertinente.** La puerta SEO/AEO y el diagnóstico dependen del estado de la cuenta.
 2. 🔴 **Cero "etc" en el alcance.** Lista cerrada o no hay oferta.
 3. 🔴 **El AEO es línea propia.** El mercado lo cobra aparte. **Nosotros lo regalamos y es el único que no.**
 4. 🔴 **El portal es línea propia y NUNCA se descuenta.**

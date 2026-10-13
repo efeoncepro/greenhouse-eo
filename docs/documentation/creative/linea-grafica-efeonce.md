@@ -1,11 +1,15 @@
 # Línea gráfica Efeonce — La órbita
 
+> **Decisión vigente 2026-10-07 — Rooms:** La órbita (`efeonce-graphic-line`) es su design system completo: Bricolage editorial/Poppins funcional, color, componentes, iconografía y motion. AXIS distribuye el sistema. Aplica a autoría, exploración y presentación; las piezas del cliente mantienen su diseño. [Dossier](../../architecture/rooms/README.md). La composición y runtime siguen pendientes; no se migra automáticamente Greenhouse ni se impone narrativa pregunta/respuesta.
+
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.20
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-10-02 por Claude (1.20: delta — registro cine: cómo se produce una foto de cine sin consultar a nadie (recetas aprobadas, ficha con los campos del oficio, revisor, medidor y las siete decisiones del operador). Antes, 1.19: delta — el traje biónico de Nexa y sus lentes, sólo en fotos de cine, con las marcas ya puestas; sus 12 expresiones; la escena con los Sparks que sirve de modelo. Antes, 1.18: delta — los Sparks, los agentes de Efeonce, entran como personajes propios de la marca y único robot permitido en una foto. Antes, 1.17: delta — los perfiles sociales de Efeonce (portadas de LinkedIn, Facebook y YouTube, avatar de redes, destacados de Instagram y las portadas de LinkedIn personales del equipo) entran a la línea; fila nueva en «Dónde está cada cosa» y pendiente de publicación. Antes, 2026-09-28, 1.16: delta — los slots de datos de un deck (logo del cliente, cifras, casos, testimonios, logos, montos y equipo) se llenan desde Greenhouse con su fuente, o quedan sin ligar y la lámina no sale (TASK-1930). Antes, 1.15: delta — el plan de un deck se valida contra el catálogo de recetas y un agente puede proponerlo, con `pnpm brand:deck-plan` (TASK-1929). Antes, 1.14: las 69 láminas del deck se componen solas con `pnpm brand:compose` (TASK-1928), incluida la portada de brochure con la selección de Nexa; enlace a la documentación funcional de la composición de decks y brochures. Antes, 1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
+
+> **Actualización AXIS 2026-10-04:** catálogo unificado de íconos, logos y workflow de agentes en [AXIS: packages y Lab](../../documentation/creative/axis-packages-y-lab.md). Los releases y pins fechados en el historial inferior describen esos cortes; consulta el [runbook vigente](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md) antes de instalar.
 
 ## Qué es
 
@@ -197,7 +201,9 @@ La línea Voice (medios) todavía no tiene voz fija: se elige con criterio y se 
 | **La órbita sesgada es la firma de Plastilina** | una elipse inclinada alrededor del objeto protagonista; una por pieza, nunca cruza el texto y **nunca mide** (lo que mide sigue en la órbita circular) |
 | **Un ícono que falta no se dibuja en la pieza** | se pide, se verifica y entra al set con la aprobación del operador |
 
-Hay **79 íconos aprobados**: 36 de Trazo y 43 de Plastilina. Los primeros 30 (12 y 18) se aprobaron el 26 de septiembre de
+El catálogo actual tiene **109 íconos canónicos** (60 Trazo y 49 Plastilina) y **25 candidatos**, con filtros AEO, SEO y Autoridad. [Uso y estados](../../manual-de-uso/creative/descubrir-y-componer-con-axis.md).
+
+Como historia de las primeras incorporaciones, al 27 de septiembre había 79 aprobados (36 Trazo y 43 Plastilina). Los primeros 30 (12 y 18) se aprobaron el 26 de septiembre de
 2026; al día siguiente el operador sumó **30 íconos de oficio**, cosas que el equipo usa todos los días y que no estaban:
 
 | Voz | Íconos de oficio |

@@ -1,5 +1,7 @@
 # Desarrollo de sitios web landing
 
+> **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-desarrollo-web-cotizacion` v3 entrega en `direct` al formulario HubSpot «Lead Gen - Desarrollo Web» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+
 ## Runtime
 
 - URL: `https://efeoncepro.com/desarrollo-sitios-web/`

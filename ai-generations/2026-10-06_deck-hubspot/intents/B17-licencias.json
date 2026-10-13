@@ -1,0 +1,26 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "hero",
+  "voice": {
+    "eyebrow": "Licencias con criterio",
+    "question": "¿Compro licencias de más?",
+    "answer": [
+      "Nunca"
+    ]
+  },
+  "body": "Seats por rol, el tier que tu operación necesita y uso revisado antes de cada renovación.",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+    "alt": "Nexa, con la chaqueta de Efeonce, junto a una grilla de doce seats de luz azul donde tres se apagan porque nadie los usa"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

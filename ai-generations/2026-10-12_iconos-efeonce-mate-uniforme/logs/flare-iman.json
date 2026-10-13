@@ -1,0 +1,30 @@
+{
+  "lane": "flare",
+  "icon": "iman",
+  "elapsedSeconds": 48.82694625854492,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:image",
+    "--model",
+    "gpt-image-2.5-flare",
+    "--quality",
+    "max",
+    "--size",
+    "2048x2048",
+    "--background",
+    "opaque",
+    "--format",
+    "png",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/prompts/iman.txt",
+    "--image",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/iman.png",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/iman.png",
+    "--timeout",
+    "600000"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/flare/iman.png"
+}

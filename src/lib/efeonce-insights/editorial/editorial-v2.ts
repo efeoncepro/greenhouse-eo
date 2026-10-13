@@ -11,13 +11,13 @@
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import { bulletItemDirection, type ChartSpecV1 } from '../contracts/chart-spec'
-import type { EvidenceFactV1 } from '../contracts/evidence'
+import type { EvidenceContentScopeV1, EvidenceFactV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { PlanChapterV1, PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
 import { PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { essentialTitleOf, hasFigurePage } from '../render/figure-slots'
 import { canProduceFamily } from './family-evidence-matrix'
-import { formatDeltaForUnit, formatFactValue } from './format'
+import { formatDeltaForUnit, formatDeltaPercent, formatFactValue } from './format'
 
 /** Líneas de tendencia: la matriz exige ≥ 3 meses; el render admite hasta 3 series por figura (gris distinguible). */
 export const LINE_MIN_POINTS = 3
@@ -561,9 +561,51 @@ export const readingsFor = (charts: ChartSpecV1[], byId: Map<string, EvidenceFac
 
 // ─── Plan ────────────────────────────────────────────────────────────────────────────────────────
 
-export const openingFor = (moduleKey: InsightModule): PlanClaimV1 => ({ claimId: `opening.${moduleKey}`, text: GH_INSIGHTS.chapterOpenings[moduleKey], factIds: [] })
+/**
+ * TASK-2033 — alcance de contenido sellado en las fuentes SEO del snapshot (todas llevan el mismo; se toma el
+ * primero). `null` = la edición midió el sitio completo. El plan lo lee del snapshot, nunca de la configuración viva:
+ * así un re-armado del plan dice lo mismo aunque el alcance de la organización haya cambiado después.
+ */
+export const contentScopeOf = (sources: readonly EvidenceSourceV1[]): EvidenceContentScopeV1 | null =>
+  sources.find(source => source.module === 'seo' && source.contentScope)?.contentScope ?? null
 
-export const scopeLinesFor = (modules: InsightModule[]): string[] => modules.map(moduleKey => GH_INSIGHTS.scopeLines[moduleKey])
+const lowerInitial = (text: string): string => (/^\p{Lu}\p{Ll}/u.test(text) ? `${text.charAt(0).toLocaleLowerCase('es')}${text.slice(1)}` : text)
+
+export const openingFor = (moduleKey: InsightModule, contentScope: EvidenceContentScopeV1 | null = null): PlanClaimV1 => ({
+  claimId: `opening.${moduleKey}`,
+  text: moduleKey === 'seo' && contentScope ? GH_INSIGHTS.contentScope.chapterOpening : GH_INSIGHTS.chapterOpenings[moduleKey],
+  factIds: []
+})
+
+/** «Qué mide este informe»: una línea por módulo. Con alcance de contenido, la de búsqueda nombra el contenido medido. */
+export const scopeLinesFor = (modules: InsightModule[], contentScope: EvidenceContentScopeV1 | null = null): string[] =>
+  modules.map(moduleKey =>
+    moduleKey === 'seo' && contentScope
+      ? `${GH_INSIGHTS.contentScope.scopeLineLead} ${lowerInitial(contentScope.label)}: ${GH_INSIGHTS.contentScope.scopeLineTail}`
+      : GH_INSIGHTS.scopeLines[moduleKey]
+  )
+
+/**
+ * TASK-2033 — lectura de contexto del capítulo de búsqueda: cuánto variaron los clics del contenido medido y cuánto los
+ * del sitio completo. Cita los dos hechos (el del alcance y la referencia `site_total.clicks`) y sus comparables, así
+ * que las dos variaciones pasan la validación de cifras. Sin alcance, sin período anterior en alguno de los dos, o con
+ * un anterior en cero, no hay lectura: nunca una variación contra nada.
+ */
+export const contentScopeContextClaim = (facts: readonly EvidenceFactV1[], references: readonly EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1 | null => {
+  const scoped = facts.find(fact => fact.metricId === 'clicks')
+  const site = references.find(fact => fact.metricId === 'site_total.clicks')
+  const scopedPrevious = scoped?.comparisonFactId ? byId.get(scoped.comparisonFactId) : undefined
+  const sitePrevious = site?.comparisonFactId ? byId.get(site.comparisonFactId) : undefined
+
+  if (!scoped || !site || scoped.value === null || site.value === null || scopedPrevious?.value == null || sitePrevious?.value == null) return null
+
+  const scopedChange = formatDeltaPercent(scoped.value, scopedPrevious.value, locale)
+  const siteChange = formatDeltaPercent(site.value, sitePrevious.value, locale)
+
+  if (!scopedChange || !siteChange) return null
+
+  return { ...claim('claim.seo.content_scope_context', `${GH_INSIGHTS.contentScope.contextLead} ${scopedChange}${GH_INSIGHTS.contentScope.contextMiddle} ${siteChange}.`, [scoped.factId, site.factId]), role: 'finding' }
+}
 
 /** Conclusiones de un capítulo en orden de peso editorial: metas primero, luego tendencias, luego comparaciones. */
 const conclusionsOf = (chapter: PlanChapterV1): PlanClaimV1[] => {

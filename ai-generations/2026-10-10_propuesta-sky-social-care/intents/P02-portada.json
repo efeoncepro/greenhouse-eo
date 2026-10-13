@@ -1,0 +1,32 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Propuesta · Social care 2027",
+    "question": "¿Quién responde en 2027?",
+    "answer": [
+      "Un equipo",
+      "híbrido"
+    ]
+  },
+  "body": "Preparada para **SKY** · Octubre 2026 · Confidencial",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce"
+  },
+  "clientLogo": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky-on-dark.svg",
+    "alt": "SKY Airline"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

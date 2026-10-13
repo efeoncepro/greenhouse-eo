@@ -2,10 +2,63 @@
 
 > **Status:** `Approved for validation`
 > **Owner:** Strategy + Commercial + Finance + Social Media Practice
-> **Version:** V1.0 · 2026-07-29
+> **Version:** V1.1 · 2026-07-29 · [delta 2026-10-10](#delta-2026-10-10--brochure-marketing-de-contenidos) (ninguna banda cambia; ninguna pieza nueva tiene precio)
 > **Moneda de referencia:** CLP; cotizar con snapshot FX si el contrato no es CLP
 > **Nota:** ninguna banda es precio público ni autorización de venta
 > **Recalibración de validación:** [`Pricing Validation Addendum 2026-07-29`](EFEONCE_SOCIAL_MEDIA_PRICING_VALIDATION_ADDENDUM_2026-07-29.md) propone una ladder superior para probar con el beachhead B2B; no reemplaza este pack hasta validación de Finance.
+
+---
+
+## Delta 2026-10-10 — brochure «Marketing de Contenidos»
+
+La decisión del operador, sus citas y lo que cubre están en el [delta del Business Model](EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta). La decisión es de oferta: las piezas entran a lo que Efeonce puede proponer. **No fija precio, margen, mínimo ni unidad de cobro para ninguna.** El verdict de este pack sigue siendo `hypothesis_only` dentro de `approved_for_validation`, y las bandas de §2 no cambian.
+
+### «Cómo se compra» frente a este pack
+
+El brochure muestra cinco líneas de costo y cierra con «los montos se definen en cada propuesta», que es coherente con no tener precio público.
+
+| Línea del brochure | Equivalente en este pack | Estado |
+|---|---|---|
+| Fee Efeonce: fijo, por capacidad | Fee mensual por capacidad y scope gobernado (§1) | Coincide |
+| Fees de creadores: a costo, aparte | Pass-through separado (§1, §4) | Coincide en separar. Si Efeonce cobra o no por coordinar y pagar a terceros lo define el [pricing pack de creadores](../media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md), que admite un fee de coordinación sobre el pass-through administrado. «A costo» no puede prometer más de lo que ese pack permite |
+| Derechos y uso pagado: línea propia | Derechos separados del fee (§2 fórmula, §4) | Coincide |
+| Whitelisting y medios: línea propia | Medios y derechos como pass-through (§1) | Coincide; el gobierno del whitelisting lo cotiza el pack de creadores |
+| Comisión por resultado: sólo si se acuerda | No existe en este pack. §4 prohíbe ofrecer performance-only | Decisión abierta. La comisión de resultado está modelada sólo en el pack de creadores, con fee base obligatorio, tracking y tope |
+
+### «Empiezas chico» frente a este pack
+
+| Paso del brochure | Línea de este pack | Lo que falta |
+|---|---|---|
+| Diagnóstico | Social Diagnostic / Sample Sprint (§2, primera fila) | Decir en la propuesta si es la revisión introductoria gratuita y acotada o el diagnóstico pagado |
+| Sprint de prueba: un frente acotado y pagado | Misma fila | No está validado que un sprint sobre un frente quepa en esa banda; depende del frente y de su costo |
+| Servicio continuo | Foundation, Growth o Integrated | El mínimo inicial de tres meses de §4 sigue vigente |
+
+Para decidir la duración del sprint de prueba vale la regla transversal del pricing operator: el compromiso inicial cubre el plazo en que la propuesta promete las primeras señales. Un sprint que termina antes de que haya algo que medir no prueba el encaje.
+
+### Cómo entra cada pieza nueva al costeo
+
+Ninguna de estas filas es un precio. Son la línea donde la pieza debería cotizarse y lo que Finance tiene que costear antes de ofrecerla con monto.
+
+| Pieza | Línea candidata | Qué mueve el costo | Estado |
+|---|---|---|---|
+| Series y medición por episodio | Dentro del fee de capacidad | Tiempo de análisis por serie | Sin efecto en bandas; capacidad por validar |
+| Varias versiones por idea | Hoy, testing creativo como configurable o add-on | Multiplica piezas por idea en producción y revisión | Si pasa a ser método de todos los niveles, hay que recostear los niveles |
+| Producción con IA | Sin línea | Herramientas y uso de IA, revisión humana, revisión de derechos | El Business Model §6 prohíbe mezclar costo humano con uso de IA: se costea aparte. No se asume que baja el costo por pieza |
+| Comunidad en canales cerrados | Add-on a costear, como Community intensiva | Número de canales y comunidades, ventana de moderación, volumen, beneficios para miembros | `Precio: sin fijar` |
+| Social care con agentes | Add-on a costear | Volumen de mensajes, cobertura, mantenimiento de la base de conocimiento, supervisión humana, licencia y consumo del agente | Licencia y consumo son costo de plataforma, separado del fee. `Economía: sin costear` |
+| Voz ejecutiva | Sin unidad | Número de ejecutivos, cadencia, entrevistas, rondas de aprobación | `Precio: sin fijar` |
+| Embajadores de marca | Sin unidad | Número de embajadores, formación, kit mensual | `Precio: sin fijar` |
+| Momentos (lanzamiento, cobertura en vivo, crisis) | Producción especial como proyecto; Community intensiva; crisis como add-on | Días de equipo reforzado, horarios, cobertura fuera de horario | Líneas existentes; sin banda propia |
+| Social conectado al CRM | Fuera de este pack | Trabajo de RevOps & CRM | Se cotiza con la práctica dueña |
+| Marketing Studio e Insights | Sin línea | Plataforma | No está decidido si van dentro del fee o en línea propia |
+
+El score de complejidad de §3 no suma dimensiones: las piezas nuevas suben las que ya existen (Community, Producción, Governance y Riesgo).
+
+### Guardrails que el brochure no cambia
+
+No incluir Paid Social, creators, derechos ni Globe por defecto. No prometer community 24/7 sin equipo, fee y escalamiento. No ofrecer performance-only. Fee Efeonce, pass-through, impuestos, derechos y contingencia separados en toda cotización.
+
+---
 
 ## 1. Decisión de pricing
 
@@ -174,3 +227,18 @@ No basta con que un prospecto diga que la oferta “se ve bien”. Señales fuer
 - si Foundation debe existir o si la entrada debe ser Growth;
 - condiciones de pausa, cancelación y kill fee;
 - fecha de revisión posterior a los dos primeros pilotos.
+
+### Abiertas por el delta 2026-10-10
+
+Numeradas en el [Business Model §12](EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10). Las que son de pricing:
+
+- comisión por resultado: si existe en Social Media o sólo en las composiciones de creadores y pauta (16);
+- «fees de creadores, a costo» frente al fee de coordinación del pack de creadores (20);
+- duración, alcance y banda del sprint de prueba, y si el diagnóstico de entrada es gratuito o pagado (15);
+- línea y costo del uso de IA en producción (9);
+- si social care con agentes es add-on con economía propia y quién paga licencia y consumo (8);
+- unidad de cobro de voz ejecutiva, embajadores y canales cerrados (12, 13);
+- si los momentos y los programas necesitan línea propia en la arquitectura de ingresos;
+- si Marketing Studio e Insights van dentro del fee o en línea de plataforma (11);
+- qué nivel incluye social search e inteligencia cultural (14);
+- si las variantes por idea entran al método y obligan a recostear los niveles (18).

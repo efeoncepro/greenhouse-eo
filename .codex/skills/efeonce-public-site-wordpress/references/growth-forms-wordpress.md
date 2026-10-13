@@ -113,6 +113,7 @@ For form work, verify:
 - Turnstile path without exposing secret;
 - submit without token fails as expected and creates no lead;
 - HubSpot delivery is async through the dispatcher, never inline from WordPress;
+- since 2026-10-09 all eight public-site forms deliver in `direct`, each to its own HubSpot form; `status=delivered` alone is not proof — check `form_destination_attempt` (HTTP 200);
 - no horizontal overflow at desktop and mobile 390px;
 - no technical/internal metadata is visible in public copy.
 - AEO-specific live gate: `pnpm public-website:verify-aeo-live-contract` verifies WordPress has `<greenhouse-form>` in `convers`, no bridge, protected `heroans`, public API by slug/formKey + fail-closed captcha, typography, visual integrity desktop/mobile 390, premium dropdowns, focus/ARIA, corporate email gate, Turnstile `captchaToken` boundary, and dataLayer no-PII. This is strict for AEO, but for other forms treat it as a reusable pattern to scale, not a mandatory command.

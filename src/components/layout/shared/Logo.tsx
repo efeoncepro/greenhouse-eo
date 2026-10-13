@@ -8,8 +8,7 @@ import { useColorScheme } from '@mui/material/styles'
 import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
-import { resolveBrandAssets } from '@/components/greenhouse/brand-assets'
+import { getBrandDisplayLabel, resolveBrandAssets } from '@/components/greenhouse/brand-assets'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -63,24 +62,24 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   const currentMode = mode === 'system' ? systemMode : mode
   const useNegativeWordmark = variant === 'sidebar' || (variant === 'default' && (settings.semiDark || currentMode === 'dark'))
 
-  // Greenhouse platform logos for sidebar, Efeonce brand for default
-  const isSidebar = variant === 'sidebar'
+  // Efeonce owns the navigation identity; Greenhouse identifies the platform in the footer.
   const efeonceAssets = resolveBrandAssets('efeonce')
+  const brandLabel = getBrandDisplayLabel('efeonce')
 
-  const wordmarkSrc = isSidebar
-    ? '/images/greenhouse/SVG/negative-sin-claim.svg'
-    : useNegativeWordmark ? efeonceAssets?.negativeWordmarkSrc || '/branding/logo-negative.svg' : efeonceAssets?.wordmarkSrc || '/branding/logo-full.svg'
+  const wordmarkSrc = useNegativeWordmark
+    ? efeonceAssets?.negativeWordmarkSrc
+    : efeonceAssets?.wordmarkSrc
 
-  const markSrc = isSidebar
-    ? '/images/greenhouse/SVG/negative-isotipo.svg'
-    : useNegativeWordmark ? efeonceAssets?.negativeMarkSrc || '/branding/avatar.png' : efeonceAssets?.markSrc || '/branding/avatar.png'
+  const markSrc = useNegativeWordmark
+    ? efeonceAssets?.negativeMarkSrc
+    : efeonceAssets?.markSrc
 
   const showCollapsedMarkOnly = variant === 'sidebar' && layout === 'collapsed' && !isHovered && !isBreakpointReached
 
   return (
-    <div className='flex items-center min-bs-8'>
+    <div className='flex items-center min-bs-8' data-capture='portal-navigation-brand'>
       {showCollapsedMarkOnly ? (
-        <BrandMark src={markSrc} alt={`${themeConfig.templateName} mark`} variant={variant} />
+        <BrandMark src={markSrc} alt={brandLabel} variant={variant} />
       ) : (
         <WordmarkSlot
           isHovered={isHovered}
@@ -89,7 +88,7 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
           isBreakpointReached={isBreakpointReached}
           variant={variant}
         >
-          <Wordmark src={wordmarkSrc} alt={themeConfig.templateName} variant={variant} />
+          <Wordmark src={wordmarkSrc} alt={brandLabel} variant={variant} />
         </WordmarkSlot>
       )}
     </div>

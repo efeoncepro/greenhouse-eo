@@ -390,7 +390,7 @@
       "surface": "photo-bleed",
       "photo": {
         "uses": true,
-        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png"
+        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png"
       },
       "pairs": {
         "coverClose": [
@@ -469,7 +469,7 @@
           "photo": {
             "register": "cine",
             "subject": "nexa",
-            "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+            "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
             "alt": "Una estratega de Efeonce con polo y lanyard revisa un tablero de resultados en un monitor, de noche"
           },
           "column": {
@@ -4615,7 +4615,7 @@
       "surface": "photo-bleed",
       "photo": {
         "uses": true,
-        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png"
+        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png"
       },
       "pairs": {
         "coverClose": [],
@@ -4691,7 +4691,7 @@
           "photo": {
             "register": "documental",
             "subject": "person",
-            "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+            "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
             "alt": "Una estratega de Efeonce con polo y lanyard señala el gráfico en un monitor grande mientras un agente trabaja las imágenes de la misma pieza"
           },
           "selectionTargets": [

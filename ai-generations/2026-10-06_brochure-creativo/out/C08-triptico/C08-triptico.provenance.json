@@ -1,0 +1,30 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "6901e277d1ca7ec6cdf58dcbf4a0c53d1b78e4cf625bda37d0f63d2e5c6e05c0",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.triptych",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:T1-escucha",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png",
+      "sha256": "28d629283023a4b5478dda712a4ba089457bab0ab6e4dc14d847a1f7aaf804b2"
+    },
+    {
+      "ref": "asset-ref:plate:T2-crea",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+      "sha256": "bd682505064bf6f60ae0cdbf36d6e9aece0ab5479f53095d74c61f6df9c3a0ca"
+    },
+    {
+      "ref": "asset-ref:plate:T3-mide",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+      "sha256": "0a5a720b73927976557bebda45f1be9194229e73013d18e234e79dd38a93cf17"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -25,6 +25,11 @@ literal design values. Consult
 has an opt-in consumer pilot verified at package `0.1.4`; do not infer product-promotion
 readiness from the pilot alone.
 
+For AXIS buttons, chips, badges or forms, load [the primitive consumption guide](../axis-design-system/references/ui-primitives.md).
+It identifies packaged exports, La órbita roles, rich Select/native fallback and visual/interaction checks.
+Use it to evaluate reuse or an explicit adapter; it does not supersede Greenhouse's MUI/Vuexy controls,
+typography or adoption gates. A Lab specimen and a published package are different evidence.
+
 ## Canonical sources
 
 Read before decisions:

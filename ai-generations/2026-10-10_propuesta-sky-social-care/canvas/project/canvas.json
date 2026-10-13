@@ -1,0 +1,583 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-10T15:00:00Z"
+  },
+  "title": "Propuesta Sky",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [
+    {
+      "id": "propuesta",
+      "name": "Propuesta"
+    },
+    {
+      "id": "insights",
+      "name": "Prototipo de Insights"
+    },
+    {
+      "id": "marca",
+      "name": "Marca Social Care"
+    }
+  ],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "01 · Portada (receta)"
+    },
+    "00-resumen.dc.html": {
+      "x": 2000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "02 · Resumen"
+    },
+    "02-encargo.dc.html": {
+      "x": 4000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "03 · El encargo"
+    },
+    "02b-cuentas.dc.html": {
+      "x": 6000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "04 · Las 13 cuentas y sus mercados"
+    },
+    "03b-sin-respuesta.dc.html": {
+      "x": 8000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "05 · El costo de no responder"
+    },
+    "05-propuesta.dc.html": {
+      "x": 10000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "06 · La propuesta"
+    },
+    "06-tres-caminos.dc.html": {
+      "x": 12000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "07 · Tres caminos"
+    },
+    "07-personas-agentes.dc.html": {
+      "x": 14000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "08 · Personas y agentes"
+    },
+    "07b-equipo-hibrido.dc.html": {
+      "x": 0,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "09 · Equipo híbrido"
+    },
+    "09-tiempos.dc.html": {
+      "x": 2000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "10 · Cobertura y tiempos"
+    },
+    "10-campanas.dc.html": {
+      "x": 4000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "11 · Campañas"
+    },
+    "10c-resguardos.dc.html": {
+      "x": 6000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "12 · Calidad y resguardos"
+    },
+    "11f-insights-web.dc.html": {
+      "x": 8000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "13 · Reportería en Efeonce Insights"
+    },
+    "12b-caso.dc.html": {
+      "x": 10000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "14 · El caso de negocio"
+    },
+    "14-inversion.dc.html": {
+      "x": 12000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "15 · Inversión"
+    },
+    "15-siguiente.dc.html": {
+      "x": 14000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "16 · Supuestos y próximos pasos"
+    },
+    "00a-cap-encargo.dc.html": {
+      "x": 0,
+      "y": 3000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A01 · Capítulo 01 · El encargo"
+    },
+    "03-sin-dueno.dc.html": {
+      "x": 2000,
+      "y": 3000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A02 · Lo que queda sin dueño"
+    },
+    "04-piloto.dc.html": {
+      "x": 4000,
+      "y": 3000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A03 · Lo que dejó el piloto"
+    },
+    "00b-cap-propuesta.dc.html": {
+      "x": 0,
+      "y": 4200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A04 · Capítulo 02 · La propuesta"
+    },
+    "05b-alcance.dc.html": {
+      "x": 2000,
+      "y": 4200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A05 · Alcance: dentro y fuera"
+    },
+    "06c-decision.dc.html": {
+      "x": 4000,
+      "y": 4200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A06 · Reglas de respuesta"
+    },
+    "06b-conversacion.dc.html": {
+      "x": 6000,
+      "y": 4200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A07 · La conversación completa"
+    },
+    "00c-cap-operacion.dc.html": {
+      "x": 0,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A08 · Capítulo 03 · La operación"
+    },
+    "06d-proceso.dc.html": {
+      "x": 2000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A09 · El recorrido de un comentario"
+    },
+    "08-escalera.dc.html": {
+      "x": 4000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A10 · La autoridad del agente (receta)"
+    },
+    "07c-agentes-ficha.dc.html": {
+      "x": 6000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A11 · Ficha de rol de cada agente"
+    },
+    "08b-base.dc.html": {
+      "x": 8000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A12 · Base de conocimiento"
+    },
+    "08c-equipo.dc.html": {
+      "x": 10000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A13 · Equipo"
+    },
+    "10b-contingencia.dc.html": {
+      "x": 12000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A14 · Contingencias"
+    },
+    "10d-traspasos.dc.html": {
+      "x": 14000,
+      "y": 5400,
+      "w": 1920,
+      "h": 1080,
+      "title": "A15 · Traspaso de reclamos"
+    },
+    "00d-cap-resguardos.dc.html": {
+      "x": 0,
+      "y": 6600,
+      "w": 1920,
+      "h": 1080,
+      "title": "A16 · Capítulo 04 · Los resguardos"
+    },
+    "10g-herramientas.dc.html": {
+      "x": 2000,
+      "y": 6600,
+      "w": 1920,
+      "h": 1080,
+      "title": "A17 · Herramientas"
+    },
+    "10e-seguridad.dc.html": {
+      "x": 4000,
+      "y": 6600,
+      "w": 1920,
+      "h": 1080,
+      "title": "A18 · Seguridad y datos"
+    },
+    "10f-continuidad.dc.html": {
+      "x": 6000,
+      "y": 6600,
+      "w": 1920,
+      "h": 1080,
+      "title": "A19 · Continuidad"
+    },
+    "00e-cap-medicion.dc.html": {
+      "x": 0,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A20 · Capítulo 05 · La medición"
+    },
+    "11-medicion.dc.html": {
+      "x": 2000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A21 · Medición"
+    },
+    "11b-indicadores.dc.html": {
+      "x": 4000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A22 · Catálogo de indicadores"
+    },
+    "11l-satisfaccion.dc.html": {
+      "x": 6000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A23 · Encuesta de esfuerzo (CES)"
+    },
+    "11c-objetivos.dc.html": {
+      "x": 8000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A24 · Objetivos iniciales"
+    },
+    "11d-reporteria.dc.html": {
+      "x": 10000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A25 · Reportería"
+    },
+    "11e-insights.dc.html": {
+      "x": 12000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A26 · Todo se reporta en Insights"
+    },
+    "11g-insights-esencial.dc.html": {
+      "x": 14000,
+      "y": 7800,
+      "w": 1920,
+      "h": 1080,
+      "title": "A27 · Insights · lo esencial del mes"
+    },
+    "11h-insights-capitulo.dc.html": {
+      "x": 0,
+      "y": 9000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A28 · Insights · capítulo Social care"
+    },
+    "11i-insights-mapa.dc.html": {
+      "x": 2000,
+      "y": 9000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A29 · Insights · qué reporta cada sección"
+    },
+    "11j-insights-pdf.dc.html": {
+      "x": 4000,
+      "y": 9000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A30 · Insights · modo presentación"
+    },
+    "11k-insights-mcp-api.dc.html": {
+      "x": 6000,
+      "y": 9000,
+      "w": 1920,
+      "h": 1080,
+      "title": "A31 · Insights · por MCP y por API"
+    },
+    "00f-cap-acuerdo.dc.html": {
+      "x": 0,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A32 · Capítulo 06 · El acuerdo"
+    },
+    "12-quien-hace-que.dc.html": {
+      "x": 2000,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A33 · Quién hace qué"
+    },
+    "13b-puerta.dc.html": {
+      "x": 4000,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A34 · Los primeros 90 días"
+    },
+    "14b-salida.dc.html": {
+      "x": 6000,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A35 · Salida y transición"
+    },
+    "14c-preguntas-negocio.dc.html": {
+      "x": 8000,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A36 · Preguntas: negocio y atención"
+    },
+    "14d-preguntas-riesgo.dc.html": {
+      "x": 10000,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "A37 · Preguntas: riesgo y contrato"
+    },
+    "16-cierre.dc.html": {
+      "x": 12000,
+      "y": 10200,
+      "w": 1920,
+      "h": 1080,
+      "title": "Cierre · Contraportada (receta)"
+    },
+    "marca-a-orbita.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "Ruta A · la órbita en la O",
+      "page": "marca"
+    },
+    "marca-b-burbuja.dc.html": {
+      "x": 2000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "Ruta B · la órbita como globo",
+      "page": "marca"
+    },
+    "ins-live-01-hero.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 960,
+      "title": "Insights live · portada",
+      "page": "insights"
+    },
+    "ins-live-02-esencial.dc.html": {
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1500,
+      "title": "Insights live · lo esencial",
+      "page": "insights"
+    },
+    "ins-live-03-capitulo.dc.html": {
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 3560,
+      "title": "Insights live · capítulo Social care",
+      "page": "insights"
+    },
+    "ins-a4-01-apertura.dc.html": {
+      "x": 4680,
+      "y": 0,
+      "w": 794,
+      "h": 1123,
+      "title": "Insights A4 · apertura de capítulo",
+      "page": "insights"
+    },
+    "ins-a4-02-cifras.dc.html": {
+      "x": 5594,
+      "y": 0,
+      "w": 794,
+      "h": 1123,
+      "title": "Insights A4 · cifras del período",
+      "page": "insights"
+    },
+    "ins-a4-03-objetivos.dc.html": {
+      "x": 6508,
+      "y": 0,
+      "w": 794,
+      "h": 1123,
+      "title": "Insights A4 · resultado contra el objetivo",
+      "page": "insights"
+    },
+    "ins-a4-04-respaldo.dc.html": {
+      "x": 7422,
+      "y": 0,
+      "w": 794,
+      "h": 1123,
+      "title": "Insights A4 · tabla de respaldo",
+      "page": "insights"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "00-resumen.dc.html",
+    "02-encargo.dc.html",
+    "02b-cuentas.dc.html",
+    "03b-sin-respuesta.dc.html",
+    "05-propuesta.dc.html",
+    "06-tres-caminos.dc.html",
+    "07-personas-agentes.dc.html",
+    "07b-equipo-hibrido.dc.html",
+    "09-tiempos.dc.html",
+    "10-campanas.dc.html",
+    "10c-resguardos.dc.html",
+    "11f-insights-web.dc.html",
+    "12b-caso.dc.html",
+    "14-inversion.dc.html",
+    "15-siguiente.dc.html",
+    "00a-cap-encargo.dc.html",
+    "03-sin-dueno.dc.html",
+    "04-piloto.dc.html",
+    "00b-cap-propuesta.dc.html",
+    "05b-alcance.dc.html",
+    "06c-decision.dc.html",
+    "06b-conversacion.dc.html",
+    "00c-cap-operacion.dc.html",
+    "06d-proceso.dc.html",
+    "08-escalera.dc.html",
+    "07c-agentes-ficha.dc.html",
+    "08b-base.dc.html",
+    "08c-equipo.dc.html",
+    "10b-contingencia.dc.html",
+    "10d-traspasos.dc.html",
+    "00d-cap-resguardos.dc.html",
+    "10g-herramientas.dc.html",
+    "10e-seguridad.dc.html",
+    "10f-continuidad.dc.html",
+    "00e-cap-medicion.dc.html",
+    "11-medicion.dc.html",
+    "11b-indicadores.dc.html",
+    "11l-satisfaccion.dc.html",
+    "11c-objetivos.dc.html",
+    "11d-reporteria.dc.html",
+    "11e-insights.dc.html",
+    "11g-insights-esencial.dc.html",
+    "11h-insights-capitulo.dc.html",
+    "11i-insights-mapa.dc.html",
+    "11j-insights-pdf.dc.html",
+    "11k-insights-mcp-api.dc.html",
+    "00f-cap-acuerdo.dc.html",
+    "12-quien-hace-que.dc.html",
+    "13b-puerta.dc.html",
+    "14b-salida.dc.html",
+    "14c-preguntas-negocio.dc.html",
+    "14d-preguntas-riesgo.dc.html",
+    "16-cierre.dc.html",
+    "ins-live-01-hero.dc.html",
+    "ins-live-02-esencial.dc.html",
+    "ins-live-03-capitulo.dc.html",
+    "ins-a4-01-apertura.dc.html",
+    "ins-a4-02-cifras.dc.html",
+    "ins-a4-03-objetivos.dc.html",
+    "ins-a4-04-respaldo.dc.html",
+    "marca-a-orbita.dc.html",
+    "marca-b-burbuja.dc.html"
+  ],
+  "notes": {
+    "titulo": {
+      "x": 0,
+      "y": -300,
+      "text": "Propuesta para SKY · 16 láminas · sigue el anexo",
+      "kind": "title1",
+      "maxW": 15920
+    },
+    "insights": {
+      "x": 0,
+      "y": -300,
+      "text": "Prototipo · Efeonce Insights con el módulo Social care · informe web y PDF A4 · cifras de ejemplo",
+      "kind": "title1",
+      "maxW": 8216,
+      "page": "insights"
+    },
+    "anexo": {
+      "x": 0,
+      "y": 2700,
+      "text": "Anexo · detalle de la operación · 37 láminas · la contraportada cierra el deck",
+      "kind": "title1",
+      "maxW": 15920
+    },
+    "marca": {
+      "x": 0,
+      "y": -300,
+      "text": "Efeonce Social Care · propuesta de marca · dos rutas, sin aprobar",
+      "kind": "title1",
+      "maxW": 3920,
+      "page": "marca"
+    }
+  },
+  "designSystems": [
+    {
+      "title": "Efeonce — La órbita",
+      "namespace": "efeonce-la-orbita",
+      "artifact": "https://claude.ai/code/artifact/0f7107f2-2ef1-460c-af82-5bf59e2f8785",
+      "version": "1791045370-2874",
+      "copiedAt": "2026-10-10T15:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "as_of": "2026-10-06",
+  "repo_directory": "/Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/modelo-anual",
+  "delivery_directory": "/Users/jreye/Documents/Banco Pichincha Peru — Prospect Case/02-Uso-interno/propuesta-2027-anual/modelo",
+  "files": [
+    {
+      "name": "Pibank-caso-negocio-anual-2027.xlsx",
+      "sha256": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a",
+      "bytes": 62534
+    },
+    {
+      "name": "README.md",
+      "sha256": "bc6f27447a6f1af48f24aa4776ff9665da4a331b06fb8c391fb155d34a8fdd3e",
+      "bytes": 8905
+    },
+    {
+      "name": "build_model.py",
+      "sha256": "5aba4c05e30fef196e0581614b09960ef95ab7a0f7af8c3c33def7d9853be823",
+      "bytes": 38372
+    },
+    {
+      "name": "inputs.json",
+      "sha256": "a572eea69964c2b53b8211b81a53338302aea9865aa087ce7a35f2d960c27a63",
+      "bytes": 3177
+    },
+    {
+      "name": "results.json",
+      "sha256": "f1b8e6a814aa599be6fbf15dbebf347ea5436a3166712e35a95f4a6706ca010a",
+      "bytes": 18663
+    },
+    {
+      "name": "source-demand.json",
+      "sha256": "654b91679a8d74cfed2bbc19aa7216fdc897245e9489ba0433f7bb074f04392b",
+      "bytes": 31023
+    },
+    {
+      "name": "validate_model.py",
+      "sha256": "de7e53d0064d83faae1c7008b3ec66acae92b59627b33dcde90b88a5c5bbd85f",
+      "bytes": 9621
+    },
+    {
+      "name": "validation.json",
+      "sha256": "90dfdfbbc324169e7325b3c067fe86eb91f736831b08c6f5742b4caf6835cc18",
+      "bytes": 13546
+    },
+    {
+      "name": "visual-qa.json",
+      "sha256": "acc48db6d4ba6fdc3d63db5fbd96e3aac4561a5642504cba726d1959089c6269",
+      "bytes": 913
+    }
+  ]
+}

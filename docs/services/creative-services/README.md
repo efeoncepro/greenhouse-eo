@@ -29,6 +29,14 @@ Globe / Creative Studio es una product brand y plataforma de producción creativ
 con workspace, memoria, provenance, operaciones generativas, métricas y governance; no reemplaza a la línea de
 negocio ni representa por sí solo toda la agencia creativa.
 
+### Compra On-Demand mediante Efeonce Factory
+
+[Efeonce Factory](../factory/README.md) es la vía comercial aceptada el 2026-10-05 para encargos acotados que
+generen margen y caja adicional. Es transversal; Creative Services aporta contenido, diseño y audiovisual.
+Campaña puntual y kit comercial son ejemplos opcionales de empaque, sin delimitar la vía.
+Creative Services conserva oficio y accountability; Factory no sustituye la operación recurrente de Social Media.
+Economics y activación en el [modelo Factory](../../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md).
+
 ## Catálogo inicial
 
 | Código | Servicio | Resultado controlable | Modalidad natural | Estado |
@@ -142,7 +150,8 @@ Antes de convertir un servicio en `Commercially approved`, su ficha debe declara
 - **Media & Distribution:** performance creative, distribución y medios. Reach puede habilitar la capacidad; el laboratorio creativo puede
   componer esta línea, pero no sustituye su ownership.
 - **Wave:** ownership de Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems &
-  Platforms y Digital Automation & Integrations. Creative Services puede aportar assets, pero no asume esas familias.
+  Platforms, Digital Automation & Integrations y Product Design 360 (sexta familia, aprobada por el operador en
+  octubre de 2026). Creative Services puede aportar assets, pero no asume esas familias.
 - **Media & Distribution:** distribución, pauta y medios. Reach puede habilitarla. Una campaña creativa no incluye media buying por
   defecto.
 - **RevOps & CRM / Kortex:** CRM, lifecycle y RevOps. El trabajo creativo puede producir contenido para esas
@@ -159,6 +168,39 @@ intake → brief/inventory → diagnose → concept/design → produce → revie
 
 La oferta no incluye rondas ilimitadas. El SOW debe fijar rondas, owner de aprobación, canales/territorio/plazo de
 uso, adaptaciones incluidas, dependencias del cliente, derechos y change order.
+
+## Collateral comercial
+
+- **Brochure «Agencia Creativa»** (27 láminas, 16:9; aprobado por el operador el 2026-10-06,
+  [TASK-2013](../../tasks/to-do/TASK-2013-agencia-creativa-brochure-slide-recipe-candidates.md)): el collateral
+  vigente de la línea, bajo el paraguas de Agencia Creativa (PDR-004): «Tu equipo dirige. Nosotros producimos a
+  escala». Primero el mapa de las cuatro rutas (lámina 3), después un capítulo por ruta en ese orden, las seis
+  capacidades, el equipo, Creative Studio, cómo se compra, la prueba (caso SKY y clientes) y el cierre. PDF en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Agencia Creativa/Efeonce-Brochure-Agencia-Creativa.pdf`; canvas privado en
+  <https://claude.ai/artifact/WbQEN3xR1DqQSELTDbkHrs> (página «Agencia Creativa»). **Reemplaza** a la v1 «Servicios
+  Creativos» (15 láminas, página «v1 · Servicios Creativos» del mismo canvas), que deja de ser vigente. **Antes de
+  usarlo con prospectos** falta verificar si las cifras del caso SKY («25 % menos de tiempo de producción») y su
+  testimonio requieren la misma autorización de cliente que el caso ANAM del brochure HubSpot. Uso comercial: skill
+  `creative-practice`; armado: skill `deck-studio`.
+- **Brochure «Marketing de Contenidos»** (57 láminas, 16:9, línea Brand; aprobado por el operador el 2026-10-10):
+  collateral de Social Media y de sus composiciones con Media & Distribution. Organiza la oferta en seis frentes, tres
+  momentos y tres programas. PDF en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Marketing de Contenidos/Efeonce-Brochure-Marketing-de-Contenidos.pdf` (y una
+  ruta corta de 21 láminas para presentar); canvas privado en <https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph>;
+  fuente y pendientes en `ai-generations/2026-10-09_deck-contenidos/deck/LEEME.md`. Lo que entra al modelo y lo que
+  choca con él está en el
+  [delta del Business Model](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta)
+  y, para creadores, UGC y paid social, en el
+  [§10 de Media & Distribution](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md).
+  **Antes de usarlo con prospectos** faltan: la fuente de la cifra «+85», la autorización del caso y testimonio de Sky,
+  verificar que Efeonce opere Metricool, Sprout Social y Favikon, y las frases «Nadie queda sin respuesta» y «métricas
+  en vivo», que hoy no tienen cobertura ni superficie verificadas.
+- **Talento embebido (lámina 19; decisión del operador, 2026-10-06).** Cuando el comprador pide «staff augmentation»,
+  el brochure responde con talento creativo embebido con respaldo de Efeonce: la palabra del comprador va **sólo en el
+  eyebrow** («Talento embebido · Staff augmentation») y la oferta es la del
+  [Embedded Creative Pod](EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md) (tres modalidades: remoto, embebido y
+  co-operado; fee mensual integral de §9). No abre Staff Augmentation puro —perfiles bajo dirección del cliente, sin
+  responsabilidad de entrega de Efeonce—: el brochure no lo ofrece y la tabla de «Separación de capas» no cambia.
 
 ## Estado y siguientes gates
 
@@ -180,3 +222,11 @@ El catálogo es una base comercial para validación, no una autorización de ven
 - [Creative Practice — oferta](../../../.codex/skills/creative-practice/modules/03_OFERTA.md)
 - [Product Service Operating Model](../../business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
 - [Portfolio, brands and business lines](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
+
+## Costeo de capacidad y servicios compuestos
+
+El [modelo Embedded Creative Pod](EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md#14-costeo-local-reusable-y-presentación-del-fee)
+conecta el costeo local V3 con la venta por fee de servicio. [Manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md):
+selección de roles internos y herramientas por trabajo, atribución de paquetes/plataforma y packs IA,
+explicación/replay y preview allowlisted. Mantener lane, alcance, governance, derechos y piso de la práctica;
+una simulación de diseñador al 50% no certifica pod completo, precio público ni modalidad comercial nueva.

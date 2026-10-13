@@ -66,12 +66,47 @@ description: >-
    explica los comandos y la [decisión técnica](../../../docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
    gobierna transporte, allowlist, costos y lifecycle.
 
+### Liderazgo de categoría y representación de marca
+
+Para estrategia de descubrimiento, visibilidad de marca, liderazgo de categoría o evaluación non-brand,
+cargar el [método operativo](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) y usar
+[plan de categoría](templates/category-leadership-plan.md). Norte: ser descubiertos, comprendidos y
+considerados como opción de referencia para categoría, comprador y situación delimitados. El liderazgo
+es aspiración; no garantía ni resultado probado por un ranking/panel. Visibilidad de marca puede surgir
+ante consultas non-brand: separar intención, presencia, cita, fidelidad y recomendación, luego conectar
+con consideración y negocio observados. Branded/non-brand, tráfico absoluto y métricas por superficie
+se conservan; nunca convertir un panel sintético en cuota real de mercado ni citas en ventas causales.
+
 ### AEO X-Ray / Radiografía AEO
 
 Para preparar, extender o revisar una muestra de trabajo, cargar
 [`references/aeo-xray.md`](references/aeo-xray.md): cuatro pasos, landing/artículo completos,
 evidencia por bloque, composición neutral, distribución, telón y QA. Es una demostración;
 Assessment, AI Visibility Report e Insights conservan su función y metodología propias.
+
+### Caso de negocio después de discovery
+
+Para conectar diagnóstico y propuesta con resultados comerciales, cargar
+`docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md` junto a `seo-aeo-practice`.
+Reidentificar entidad, marca, producto, dominio, mercado y periodo: una demo o baseline de otra marca no mide la
+superficie recién descubierta. Si el operador autoriza avanzar sin datos privados, preparar un borrador con
+evidencia pública fechada, supuestos y sensibilidad; no presentar esos supuestos como observaciones del cliente.
+Contrastar demanda alcanzable (bottom-up) con visitas requeridas por la meta (top-down), separando tráfico de
+marca/genérico, apertura, fondeo y saldos por cohorte. Atribución no demuestra incrementalidad; citas de IA no
+equivalen a conversiones. El acceso a onboarding, app y resultados bancarios se verifica antes de prometer medición
+o implementación. Los datos particulares y las inferencias de moneda viven en el expediente de cuenta.
+
+
+Diseñar horizonte y revisiones según implementación y maduración: M1 valida preparación y entregables, no
+ROI temprano. Ampliar demanda y revisar el corpus antes de fijar contribución; dimensionar capacidad por
+rol/mes y lotes, sin duplicar mecánicamente un horizonte previo. Duración y cifras de cliente permanecen
+en su expediente; no crean mínimos ni política comercial general.
+
+Antes de presentar contribución, contrastar cobertura del modelo y alcance vendido. Un panel parcial no mide
+el programa completo; ampliar sólo con evidencia, sin desechar resultados bajos ni inventar conversiones
+para otros carriles. Las bandas del modelo inverso son requerimientos de decisión, no forecasts. Separar
+propuesta para comprador y expediente interno; capacidad y precio se sustentan en costo y valor, no en duración.
 
 ### SEO/AEO como competencia de selección
 
@@ -125,15 +160,10 @@ la tienda y convertir la ficha) · descubrimiento por IA (Ask Play, Gemini, Pers
 Collections, Siri/Spotlight). Para un cliente con app, la tienda es una superficie más del
 mismo trabajo, no otra disciplina → `modules/10_ASO_APP_DISCOVERY.md`.
 
-**Por qué importa ahora (data verificada 2026-06):**
-
-- AI Overviews aparecen en ~**48–50%** de las búsquedas en Google (Mar 2026).
-- **65%** de las búsquedas terminan sin click; **83%** cuando hay AI Overview.
-- Pero las marcas **citadas dentro** del AI Overview ganan ~**35% más** clicks
-  orgánicos que el #1 orgánico debajo de la respuesta. → El juego pasó de
-  "rankear #1" a "ser la fuente citada".
-- Solo **~11%** de los dominios citados se solapan entre ChatGPT y Perplexity
-  (sobre 680M citas). → No hay un único "AEO". Cada motor es un canal.
+**Evidencia y límites:** las respuestas de IA pueden asociarse con menos clics; los estudios de Pew y
+Ahrefs, con muestras/fechas y límites, están en el método de liderazgo §7. Eso no demuestra que el
+90–95% del tráfico B2B será branded ni que desaparece el descubrimiento genérico. Recuperación y
+medición se verifican por plataforma; no hay señal universal que garantice cita o recomendación.
 
 ---
 
@@ -437,23 +467,22 @@ una estimación como medición.
 
 ## 7. Principios cross-cutting (válidos en todos los módulos)
 
-1. **Entidad > keyword.** En 2026 los motores (clásicos e IA) razonan por
-   entidades. Construir la entidad de marca (`03_EEAT_ENTITY.md`) es el
-   multiplicador de fondo de todo lo demás.
+1. **Necesidad, capacidad y entidad coherentes.** Delimitar categoría/comprador/situación y hacer
+   verificable qué marca ofrece qué; no afirmar un pipeline universal de selección (`03_EEAT_ENTITY.md`).
 2. **Claridad editorial.** Encabezados descriptivos, respuestas directas y
    contexto suficiente ayudan a las personas. Los mecanismos de recuperación y
    las señales de cita se verifican por plataforma; no hay estructura universal
    que garantice ser citado (`04_AEO_GEO.md`).
-3. **Las menciones de marca pesan ~3× más que los backlinks** para visibilidad
-   IA (data 2026). Off-page moderno ≠ solo links (`05_OFFPAGE_AUTHORITY.md`).
+3. **Reconocimiento externo con evidencia.** Menciones y enlaces se observan por separado;
+   correlación de un corpus no es peso algorítmico ni causalidad universal (`05_OFFPAGE_AUTHORITY.md`).
 4. **La frescura es una señal que se prueba por motor, query set y vertical.** El contenido no se
    publica y se olvida; se mantiene, pero no uses el claim retirado «<2 meses → +28% citas»:
    `SOURCES.md` no pudo localizar una fuente reproducible para esa cifra.
 5. **Cada plataforma y superficie tiene su evidencia.** No transfieras una
    observación de Google a Perplexity, ChatGPT o Claude; declara qué motor y
    modo verificaste, y separa documentación oficial de estudios externos.
-6. **Mide o no existió.** GSC/GA4 para clásico; Share of Voice + tráfico IA para
-   AEO. Sin medición, no hay caso.
+6. **Evidencia con alcance.** Separar descubrimiento/representación, comportamiento y negocio;
+   datos nativos y paneles conservan fuente, cobertura y denominador (`07_MEASUREMENT.md`).
 7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable
    deben derivar del mismo contenido gobernado. Schema, FAQ, entidades y respuestas nunca mantienen una versión
    manual paralela a lo visible.
@@ -480,3 +509,21 @@ Revisar correspondencia entre claim, diagnóstico y destino antes de entregar co
 ## Lanzamiento del grader y programación aprobada
 
 Para copy de lanzamiento del grader, cargar [framework BeX](efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md) y [producto](efeonce/AI_VISIBILITY_GRADER.md). Explicar muestra de respuestas, señales públicas y prioridades; separar percepción y operabilidad. No presentar monitoreo recurrente o auditoría completa como incluido en un diagnóstico gratuito, ni inferioridad de competidores sin verificación actual. Caso: [CMP-001](../../../docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md).
+
+## Caso de negocio y propuesta ejecutable
+
+Al pasar de discovery o investigación a contribución comercial, cargar
+[caso de negocio y propuesta](references/caso-negocio-y-propuesta.md): elegibilidad desde competidores,
+modelo inverso como requisitos, mecanismos sin doble conteo, duración por maduración y PR con capacidad.
+El método enlazado conserva el canon; los datos y benchmarks del prospecto permanecen en su expediente.
+
+## Demanda SEO y cotización local V3
+
+Cuando el diagnóstico/alcance se traduzca a costos de roles/tools, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+La práctica declara tareas SEO, capacidad, plataformas y límites; el agente selecciona valores centrales y la
+CLI calcula. Copywriter+tareaSEO requiere SEMrush sin cambiar automáticamente su variante salarial. Adobe/IA se
+añaden sólo cuando el trabajo los necesita; Notion/M365 son base. Fuente pública no acredita plan/permisos reales.
+Costeo de servicio mantiene funciones internas y fee externo; explain interno y preview de simulación no prueban
+aprobación/SOW ni autorizan enviar precio. La política específica de `seo-aeo-practice` conserva sus pisos/gates;
+en V3 un programa SEO/AEO gestionado usa la oferta `seo-aeo-managed-service` (objetivo 55%, piso 45%).

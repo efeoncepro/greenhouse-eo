@@ -1,0 +1,44 @@
+{
+  "schema": "efeonce.brand-surface-document.provenance.v1",
+  "intentSha256": "b9a9b594ce8b4b4e63146450eb39a1fcca5f4893e975bf8f48834b5013d35712",
+  "catalog": "graphic-line-deck",
+  "use": "proposal",
+  "pageCount": 1,
+  "contentTypes": [
+    "deck.content-team"
+  ],
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:squad-andres",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-andres.png",
+      "sha256": "ae9b16d7e72588b7d88d12cdabf34b80015e1d5b50f1e9e2e06f05de9ca56c6e"
+    },
+    {
+      "ref": "asset-ref:file:squad-valentina",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-valentina.png",
+      "sha256": "c268125b320560a51815243e9d2a223288d41e4c3a954a744d95edaf6ab5e18b"
+    },
+    {
+      "ref": "asset-ref:file:squad-julio",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-julio.png",
+      "sha256": "71728dfe3a8fccac6ec99338ebf176dc8eca6247f22beb0714a633657f9bf27e"
+    },
+    {
+      "ref": "asset-ref:file:squad-daniela",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/squad/squad-daniela.png",
+      "sha256": "09f855e35b9532ccb7cad4f8a29b375df1ae686a949856ea4267d754fb0f1a53"
+    },
+    {
+      "ref": "asset-ref:file:por-asignar",
+      "path": "ai-generations/2026-10-07_pibank-propuesta/equipo/por-asignar.png",
+      "sha256": "ded6bf2c03cec1ca6be1fcf1ac84fa46799bc7bd59485095f7bf2895cd8a83a2"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

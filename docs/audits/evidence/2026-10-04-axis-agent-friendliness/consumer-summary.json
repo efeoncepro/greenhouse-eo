@@ -1,0 +1,49 @@
+{
+  "surfaceStatus": "resolved",
+  "manifestSchema": "axis.surface-composition.v1",
+  "manifestRules": 17,
+  "recipe": {
+    "id": "close-classic",
+    "status": "approved",
+    "role": "close"
+  },
+  "delegatedElements": [
+    "voice",
+    "progress"
+  ],
+  "textInSvg": false,
+  "requiredChecks": [
+    "text-never-crosses-ring",
+    "ring-center-on-target-center",
+    "sphere-on-arc-end",
+    "lens-subject-inside-circle",
+    "url-as-bubble-never-text",
+    "decorative-svg-hidden-from-accessibility-tree",
+    "signature-centered",
+    "signature-min-contrast",
+    "accent-text-min-size",
+    "orbit-never-over-subject-or-reserves",
+    "accent-arc-never-reads-as-data",
+    "answer-period-part-of-text",
+    "measure-shows-value-and-source"
+  ],
+  "checksMinimal": [
+    {
+      "check": "decorative-svg",
+      "ok": true
+    }
+  ],
+  "checksMeasured": [
+    {
+      "check": "decorative-svg",
+      "ok": true
+    },
+    {
+      "check": "text-never-crosses-ring",
+      "ok": false,
+      "detail": "text 0 crosses progress"
+    }
+  ],
+  "externalOrbitBytes": 1082,
+  "authorityIconStatus": "candidate"
+}

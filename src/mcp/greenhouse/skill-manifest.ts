@@ -182,6 +182,8 @@ export const GREENHOUSE_MCP_SKILL_MANIFEST: readonly GreenhouseMcpSkillManifestE
       'studio.campaign.assets.list',
       'studio.asset.get',
       'studio.asset.preview',
+      'studio.asset.download',
+      'studio.campaign.brief.get',
       'studio.campaign.copies.list',
       'studio.campaign.ads.list',
       'studio.campaign.media_plan.get',

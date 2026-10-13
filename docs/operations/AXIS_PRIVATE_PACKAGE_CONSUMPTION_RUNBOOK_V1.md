@@ -1,5 +1,203 @@
 # AXIS Private Package Consumption Runbook V1
 
+## Corte vigente — replay 0.6.6 y publicación incremental (2026-10-07)
+
+Primitives 0.6.6 / tokens 0.6.1 publicados por release `37696704305` SUCCESS, tag en `5062ba9`.
+Think `d36ba40` y Studio `3ba7cff` adoptan pins registry con Vercel SUCCESS; WordPress sólo bundle candidato.
+AXIS público verificado: póster final, anillo 1.25 px y arco 2 px. Contrato/API permanecen compatibles.
+
+Para publicar desde AXIS: commit + push main, luego `pnpm release:packages <version>`.
+Espera CI exitoso del mismo SHA antes de enviar tag. La selección de release usa diff completo desde
+un release ancestro exitoso: hereda sólo familias sin cambios y exige evidencia actual para las afectadas.
+Bumps de sólo version no disparan toda la batería; cambios de dependencias/exports/scripts/lockfile,
+fundaciones o control CI sí. Canon: `docs/architecture/CI_COST_AND_VERIFICATION_DECISION_V1.md` de AXIS.
+55 tests locales y readback de reuso real PASS; la duración de un futuro release incremental no está medida.
+Los cortes inferiores son históricos.
+
+
+## Reproductor publicado — estado verificado 2026-10-07
+
+La distribución privada del reproductor está publicada. Este bloque es el estado vigente; las tablas
+fechadas de releases anteriores describen sus propios cortes y no sustituyen estas versiones.
+
+| Entrega | Evidencia / estado |
+| --- | --- |
+| Paquetes publicados | `@efeoncepro/axis-ui-primitives@0.6.5`, `@efeoncepro/axis-tokens@0.6.0`, `@efeoncepro/axis-ui-contracts@0.7.0` |
+| Publicación | [Release v0.6.5, run 37669427070](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070), SUCCESS; fuente `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d` |
+| Verificación del tarball | Instalación limpia, exports DOM/React/integrations, SSR e igualdad byte a byte de JS/CSS con el build verificado: PASS |
+| AXIS | `main` `d33ed9a44eafa70bc3b13f096c33917cf4ffc604`; [Lab desplegado](https://axis.efeonce.org/references/video-player/) |
+| Think | `main` `474250195059ad0db42ec3aa3f2d24ad60f3e7fc`; siete pruebas focales y build PASS; Vercel Production Ready `dpl_8oa3mZNZMXWL1xPup8WHLuWqbvef`; HTTP 200, medios/captions/miniaturas verificados; [demostración de integración](https://think.efeoncepro.com/preview/video-player) |
+| WordPress | Adapter `eo-axis-video` preparado; sin activación ni modificación del artículo público `251941` |
+
+### Contrato de adopción
+
+- Cada producto fija una versión publicada y su lockfile. Think instala `0.6.5` desde GitHub Packages;
+  no usa `link:`, una carpeta hermana ni una copia del renderer. Las actualizaciones requieren QA del host.
+- El scope `@efeoncepro` resuelve a `https://npm.pkg.github.com`. En Think, `NPM_RC` sensible está configurado
+  para Production y Preview de `codex/video-player-20261007` desde el secreto vigente
+  `axis-packages-read-token`. Nunca guardar valores en código, logs ni documentación.
+- El package aporta presentación, ciclo de vida y callbacks; el host conserva medios, acceso, persistencia
+  de comentarios/progreso y analítica. [API de integración](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md).
+- El contrato `efeonce.video-player` conserva su versión propia `0.5.0`; no es el número del package.
+  El paquete registry `0.7.2` conserva su inventario anterior: no inferir descubrimiento de video desde él.
+
+### Paridad de adapters — ampliación 2026-10-07
+
+Think recibe modelo completo, opciones serializables y callbacks cliente por `axis-video:configure`;
+`axis-video:ready` devuelve `{player}`. Montaje, cancelación y teardown pertenecen al adapter. La muestra
+incluye cuatro capítulos, 12 cues, subtítulos y VTT con diez miniaturas reales. WordPress ofrece esos campos
+en Gutenberg y valida el modelo en PHP; callbacks/persistencia siguen siendo responsabilidad de la plataforma.
+La dirección posterior de WordPress incluye **bloque Gutenberg y widget Elementor**. El bloque ya existe
+como candidato sin activar; el widget Elementor está **pendiente de implementación**. Ambas superficies
+mapearán controles al mismo modelo, validación PHP, renderer y bundle publicado, con las mismas capacidades;
+no se copiará el core. La preview/lifecycle de Elementor necesita QA propia y no se acredita con el snapshot
+Gutenberg. La activación y la inserción en contenido real siguen siendo acciones posteriores.
+La compatibilidad de Ohio restaura únicamente el panel Review contextual que el tema ocultaba con una
+regla global sobre `aside`, conservando tabs móviles y embedded.
+Su bundle candidato se reconstruyó desde el package publicado 0.6.5: `size-report.json` registra versión,
+procedencia y hashes de cada archivo. Esto no activa el plugin ni modifica el artículo.
+
+Replay, iconos, targets y estados compartidos conservan implementación única en las tres skins; una pestaña
+abierta con JS anterior no acredita el estado del release. Antes de evaluar diferencias, comprobar el recurso
+realmente cargado. Una prueba de paridad debe fallar si faltan medios/datos, sin completarlos en el harness.
+El [manual AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/video-player.md#consumidores-y-paquete-standalone)
+y los README de cada adapter mantienen la API. La ampliación de datos no cambia el core. La colisión adicional con `button.css` sí requiere 0.6.4;
+[release 37664229695](https://github.com/efeoncepro/axis-design-system/actions/runs/37664229695) falló en una prueba móvil de pausa (79 PASS, diez exclusiones existentes); no publicó. El trace confirmó un click tardío del harness tras autoocultado; 0.6.5 corrige la espera táctil y publica la corrección CSS, sin cambiar el core JavaScript.
+El aviso WebKit `ResizeObserver` en ajustes/velocidad sigue abierto; se registra, no se silencia.
+
+### Evidencia y límites
+
+El release aprobó 80 pruebas de video y conservó 10 exclusiones intencionales, además de sus otros gates.
+Publicación, CI general y despliegue son comprobaciones distintas. No se declara verde un CI posterior por
+heredar el resultado del release. [Dossier QA y pendientes](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/video-player-0.5.0.md).
+
+Permanece **ABIERTO** el incidente de imagen azul intermitente en sesiones antiguas del navegador integrado:
+una sesión fresca satisfactoria no prueba su corrección. Dispositivos físicos, tecnologías de asistencia y
+streaming real requieren validación adicional. Publicar el package no activa WordPress ni adopta el componente
+en Greenhouse, Globe o Studio.
+
+[Funcionamiento](../documentation/creative/axis-packages-y-lab.md#reproductor-compartido) ·
+[Manual de integración](../manual-de-uso/creative/descubrir-y-componer-con-axis.md#integrar-el-reproductor-publicado) ·
+[Historia documental preservada](../audits/2026-10-07-axis-video-documentation-history.md).
+
+### Iteración y costo
+
+CI proporcional implementado en AXIS `0706485`: documentación sin install/build/navegadores; cambios dedicados ejecutan sus familias; cambios compartidos o desconocidos ejecutan cobertura completa. Release reutiliza solamente gates de push/main exitoso con SHA exacto, cobertura y digest del build iguales; lo restante se ejecuta. PR obsoletas se cancelan; main conserva evidencia por SHA. No publicar una versión por cambios documentales. Primera ruta documental: [run 37672045123 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37672045123), 20 s de job / 23 s desde creación; sin install/build/navegadores. El primer reuso remoto de release sigue pendiente de una publicación real. [Contrato y medición](https://github.com/efeoncepro/axis-design-system/blob/main/docs/quality/ci-efficiency.md).
+
+## Fuente aprobada — producto, scheduler y Growth CTA, 2026-10-05
+
+El operador aprobó visualmente la entrega AXIS y autorizó documentación/skills y push.
+[Estado y evidencia](../tasks/in-progress/TASK-2007-axis-product-primitives.md) distingue source,
+distribución y adopción. Nuevo `/growth-cta`/CSS y product exports siguen **unreleased** en el
+inventario de availability; source aprobado no acredita tarball ni instalación privada. Scheduler
+ya tuvo push de fuente independiente; su distribución/adopción tampoco se infiere del push.
+
+AXIS posee presentación portable: banners minimal/spotlight, anillo en eyebrow y esfera al cierre,
+énfasis exacto Bricolage400/700, agenda dialog/inline. Growth conserva controller/policy/network,
+booking y medición. API y QA dueños están en AXIS `packages/primitives/README.md`, decisiones de
+Product/Scheduler/Growth CTA y dossiers `docs/quality/`. Antes de adopción: publicar set compatible,
+instalar y comprobar exports/CSS/graphic-line, adaptar renderer compartido y verificar cada host.
+Sin cambios de pins, theme, flags, campañas ni hosts en esta entrega. Las tablas históricas siguientes
+acreditan únicamente sus cortes fechados; no prueban exports posteriores.
+
+## Corte de distribución — formularios y La órbita, 2026-10-04
+
+**Publicados e instalados desde GitHub Packages**: source `df2de61`, tag `v0.7.2`, release
+`37239150937` SUCCESS. Instalaciones nuevas sin React y con React `18.3.1` / `19.2.7` PASS;
+HTML/CSS, forms.css, diez builders, exports React/SSR, 52 capacidades y `/evidence` verificados.
+Vercel SUCCESS y readback público de Field/Select. El CI general `37239148653` también finalizó SUCCESS;
+la publicación tiene su propio workflow completado. Los intentos fallidos/cancelados y su corrección
+quedan trazados en el dossier.
+
+| Package privado | Versión publicada | Superficie |
+| --- | --- | --- |
+| `@efeoncepro/axis-tokens` | `0.5.0` | Roles y ramps de La órbita, `axisButton`, `axisCompact`, `axisForms` |
+| `@efeoncepro/axis-ui-contracts` | `0.6.0` | Contratos/resolvers de botones, chips/badges y diez familias de formularios |
+| `@efeoncepro/axis-ui-primitives` | `0.4.0` | HTML/CSS portable y adapters React opcionales |
+| `@efeoncepro/axis-ui-registry` | `0.7.2` | Descubrimiento de contratos y exports; 52 capacidades |
+
+La evidencia y los pendientes de distribución se centralizan en el
+[dossier de formularios](../audits/2026-10-04-axis-forms-release.md). El tag identifica esta tanda,
+no una versión uniforme de todos los paquetes. La publicación no actualiza los consumidores.
+Greenhouse conserva los pins leídos en `package.json`: tokens `0.3.41`, contracts `0.3.40`, registry
+`0.3.1`, brand-assets `0.4.15` y graphic-line `0.11.0`; no incorpora primitives en este cambio.
+Las versiones de esta tabla pertenecen al corte del 4 de octubre; el bloque vigente del reproductor al inicio registra las publicaciones posteriores.
+
+### Contrato de consumo de primitives
+
+- Importar el CSS publicado una vez: `/button.css`, `/compact.css` (aliases `/chip.css` y `/badge.css`)
+  y `/forms.css` según lo usado. Cargar Poppins en el consumidor. Nunca copiar CSS/componentes del Lab.
+- La entrada raíz entrega HTML/CSS sin React; `/react` es optativa. `FormProvider` transmite
+  línea/superficie/tamaño/densidad, con prioridad de props explícitas. `Field` y sus partes compuestas
+  vinculan etiqueta, ayuda y mensaje al control. Los iconos `mail`/`folder` son apoyo decorativo, no etiquetas.
+- React `Select` mejora progresivamente el picker nativo con descripciones, marca seleccionada,
+  typeahead y menú compartido con `Combobox`. `NativeSelect` y `selectHtml` preservan el picker de plataforma.
+  No asumir descripciones enriquecidas en HTML sin React. El select nativo conserva name/form, validación,
+  FormData y ref; su foco se redirige al trigger visible tras hidratar.
+- `Select`: flechas/Home/End/PageUp/PageDown recorren; Enter/Espacio/Tab confirman y Escape cancela.
+  `Combobox` separa query de valor elegido y enviado; no acepta valor libre ni selección múltiple.
+  La posición y el foco se verifican también dentro del modal consumidor.
+- Un único contorno continuo identifica foco en campos; no agregar un segundo outline al input interno.
+  La línea de negocio modifica identidad, nunca el significado de error/advertencia/éxito.
+- La aplicación posee validación de servidor, permisos, persistencia, borradores, retry, fetching y
+  cancelación de respuestas obsoletas. En modo controlado también restaura valores en `onReset`.
+
+### Adopción y rollback
+
+1. Verificar release exitoso, versiones exactas del registry y exports del tarball instalado con acceso privado.
+2. Fijar sólo los paquetes requeridos en el producto y conservar el lockfile anterior como rollback.
+3. Componer una ruta optativa con API/CSS publicado, siguiendo la
+   [guía de formularios](https://axis.efeonce.org/docs/forms/) y el
+   [manual de AXIS](../manual-de-uso/creative/descubrir-y-componer-con-axis.md).
+4. Verificar formulario real: estados, envío/reset, teclado, popup en modal, autofill, contraste y móvil.
+   Los 148 casos automáticos y 28 baselines macOS de AXIS no sustituyen VoiceOver/NVDA ni dispositivo físico.
+5. Promover sólo con evidencia del producto; para revertir, retirar la ruta optativa o restaurar pins/lockfile
+   y ejecutar sus gates. Los mappers de tokens se regeneran y comprueban según los deltas de este runbook.
+
+La órbita gobierna la nueva identidad y es destino planificado del tema Greenhouse. Las ramps legadas
+permanecen como compatibilidad transitoria. La migración necesita un adapter semántico por rol y superficie;
+no se sustituye `axisRamp` ni se asigna un paso de ramp a hover/error por su número.
+
+
+## Delta 2026-10-04 — botones portables y líneas de negocio
+
+Primer release de `@efeoncepro/axis-ui-primitives@0.1.0` (AXIS `1bccb3f`, tag `v0.3.43`),
+con tokens 0.3.43 y contracts/registry 0.4.0. Release `37221054045` success e instalación privada
+limpia verificados. HTML/CSS funciona sin React (`npm install --omit=peer`); los cinco componentes
+`/react` funcionan con React/React DOM 18.3.1 y los recorridos del Lab con React 19.
+`/button.css` se importa desde el package, y Poppins desde el pipeline del consumidor.
+
+`line` es opcional y sólo altera tono brand; neutral/destructivo conservan función. No actualizar
+pins ni reemplazar MUI/Vuexy sólo por disponibilidad. La instalación con el usuario operador
+no prueba permisos `GITHUB_TOKEN` de otros repositorios para este package nuevo. Los consumidores
+conservan sus pins y fixtures de status/progress; adoptar botones exige evidencia propia y rollback.
+Parche documental previo: primitives 0.1.1 y registry 0.4.1 (`31b146e`, tag v0.4.1);
+API/CSS sin cambios, instalación privada repetida y verificada.
+[Evidencia, versiones y alcance](../audits/2026-10-04-axis-buttons-release.md).
+La extensión de controles incluye contexto heredado, selección exclusiva, toolbar, menús controlados
+y portales modales; consulta el mismo dossier para versiones y readback. La matriz automática cubre
+cuatro perfiles; VoiceOver/NVDA manual y zoom nativo requieren evidencia independiente.
+
+
+
+Distribución anterior verificada: primitives **0.2.1**, registry **0.5.1**, tokens 0.3.43 y contracts 0.4.0
+(AXIS `13db367`, tag `v0.5.1`, release `37223839523` success, 2026-10-04). Instalación privada limpia:
+HTML/CSS sin React y ocho componentes con React 18.3.1. Lab público y menús modales comprobados.
+52 recorridos y 32 referencias visuales; VoiceOver/NVDA manual, zoom nativo e iPhone físico pendientes.
+
+## Corte de distribución — 2026-10-04
+
+Para descubrir y componer: [manual de AXIS](../manual-de-uso/creative/descubrir-y-componer-con-axis.md).
+Estado y evidencia: [cierre documental](../audits/2026-10-04-axis-documentation-closure.md).
+`axis-graphic-line@0.17.0` está publicado (tag `v0.17.0`). Los cambios posteriores de navegación, agentes,
+logos, iconografía unificada y tipografía están en `main` y desplegados en el Lab. Esto no publica packages:
+la nueva API `@efeoncepro/axis-brand-assets/logos` y sus archivos requieren un nuevo release; el workspace
+conserva `0.4.18`, por lo que instalar el tarball histórico de esa versión no garantiza estos exports.
+Las nuevas APIs de capacidades/evidencia del registry también requieren verificar el tarball antes de consumirlas.
+Los pins de Greenhouse, Globe y Marketing Studio no se actualizaron en este trabajo. El owner de release AXIS
+publica una versión nueva con preflight y lectura del registry; cada owner consumidor fija y valida su adopción
+por separado. Las verificaciones fechadas siguientes permanecen como historia y no son permisos vigentes.
+
 ## Purpose
 
 This runbook describes how Greenhouse, Globe and future Efeonce products consume the
@@ -8,7 +206,12 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-29 (noche) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.37`, `axis-ui-contracts`
+> **Actualizado 2026-10-12 — estado vigente:** Greenhouse fija `axis-tokens` `0.3.41`, `axis-ui-contracts` `0.3.40`,
+> `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.25` (desde `596bfab90`, 2026-10-06) y `axis-ui-registry` `0.3.1`
+> (`package.json`). Los dependientes de `axis-brand-assets` quedaron regenerados el 2026-10-12; ver **Delta 2026-10-12**.
+> La adopción del juego publicado es TASK-2014. Las notas siguientes quedan como historia.
+
+> **Actualizado 2026-09-29 (noche) — superado por la nota de arriba:** Greenhouse fija `axis-tokens` `0.3.37`, `axis-ui-contracts`
 > `0.3.37`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1` (`package.json`,
 > bump `bacd6a4ea`, tag `v0.3.37`). AXIS ya publicó `v0.3.38` (`main` `c92160b`), que Greenhouse **todavía no fija**, y
 > el adapter de la órbita está rojo con el juego actual. Ver **Delta 2026-09-29 (i)**. La nota siguiente queda como
@@ -108,6 +311,25 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-10-12 — todo cambio de versión de `axis-brand-assets` regenera sus dependientes
+
+- **Qué pasó:** el pin pasó de `0.4.15` a `0.4.25` el 2026-10-06 (`596bfab90`, para traer las marcas de HubSpot) sin
+  regenerar lo que depende del paquete. Entre esas versiones AXIS sumó Facebook y Threads (0.4.19) y X (0.4.21) a
+  `AXIS_PLATFORM_ASSETS` y redibujó los lockups de las submarcas con terminación concéntrica (`2651192`). Quedaron tres
+  tests rojos hasta el 2026-10-12 (`7877dfe89`, `d4f1149b5`).
+- **Regla:** todo cambio de versión de `@efeoncepro/axis-brand-assets` corre, antes del commit:
+  1. `pnpm manzanitas:tokens` (el snapshot sella la versión de los cuatro paquetes AXIS, no sólo la de `axis-tokens`).
+  2. `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` (re-sella los PNG del PDF del AI Visibility
+     Report y `public/branding/pdf/ai-visibility-assets.manifest.json`; lo vigila `report-pdf-assets.test.ts`).
+  3. Los tests de deriva de canales `src/lib/efeonce-insights/contracts/channels.test.ts` y
+     `src/config/insights-channel-isotypes.test.ts`: si AXIS sumó una plataforma, se agrega el id a
+     `INSIGHT_CHANNEL_IDS`, su nombre a `GH_INSIGHTS.channels`, su entrada a `CHANNEL_ISOTYPES` y el SVG en color a
+     `assets/channels/` de `insights-report` e `insights-deck`.
+  4. `pnpm brand:tokens --check`, `pnpm glitch:tokens --check` y `src/config/efeonce-brand-assets.test.ts`, que también
+     copian o comparan archivos del paquete.
+- Un lockup re-sellado cambia un PDF que está en producción: se mira el antes y el después y se avisa al operador.
+- Se suma a la regla de `axis-tokens` del Delta 2026-09-28 (g); no la reemplaza.
 
 ## Delta 2026-09-29 (i) — `v0.3.38` publicado, no fijado: módulos de correo y recorrido de la medida
 
@@ -912,3 +1134,51 @@ version in the consumer lockfile and deployment evidence.
 - Package foundation: `TASK-1589`.
 - Registry/Lab: `TASK-1590` and `TASK-1592`.
 - Package repository: `../axis-design-system`.
+
+
+## Publicación verificada · 2026-10-04
+
+Estado posterior a la producción local descrita arriba: AXIS `main` y tag `v0.17.0` en
+`a41e81f92c8b3e0e7f03219366e0d57623f5cd66`. Publicado **@efeoncepro/axis-graphic-line@0.17.0**;
+[CI verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202238028),
+[release verde](https://github.com/efeoncepro/axis-design-system/actions/runs/37202260863) y
+[versión leída en GitHub Packages](https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/1334240140).
+Build, typecheck, 485 tests y design:check pasaron en una copia limpia sin WIP ajeno.
+El tarball contiene JS y tipos de `/icons/aeo`, `/icons/seo` y `/icons/authority`.
+Vercel confirmó success para el mismo SHA; manifests públicos leídos HTTP 200 con AEO 19, SEO 37 y
+Autoridad 13 entradas, Brand Authority presente en las tres. Render de Autoridad inspeccionado en navegador.
+Publicación no cambia aprobación: 10 AEO nuevos canónicos; 12 SEO R2 y 13 autoridad candidatos.
+Lab: [AEO](https://axis.efeonce.org/references/aeo-iconography/),
+[SEO](https://axis.efeonce.org/references/seo-iconography/),
+[Autoridad](https://axis.efeonce.org/references/authority-iconography/).
+No se modificaron pins de consumidores ni se publicaron cambios de Greenhouse.
+
+## Próxima adopción: entradas especializadas
+
+Source AXIS `a0c6130` (entradas) y `6fff346` (assets) en `main`; primitives 0.5.0 todavía **sin publicar**.
+El catálogo `/input-phone` entrega 245 países/territorios en este corte, localizado y con lista opcional
+por consumidor; `PhoneField.countrySearch` permite explorar listas amplias. No instalar 0.5.0 hasta
+verificar release, tarball e instalación privada. La tabla publicada de arriba conserva primitives 0.4.0.
+
+Growth Forms tiene un adapter opt-in local, verificado contra los exports compilados reales. No activa
+embeds, no cambia pins y no sustituye el selector de 18 países. El owner AXIS debe publicar la versión
+exacta; el owner Growth Forms debe fijarla, mapear su catálogo si corresponde y ejecutar el piloto en
+host con payloads/errores/consentimiento intactos. [Decisión, prueba reproducible y gates del consumidor](../architecture/GROWTH_FORMS_AXIS_INPUT_BEHAVIOR_DECISION_V1.md).
+
+
+## Iteración continua de AXIS — 2026-10-07
+
+Usar `pnpm dev` en el checkout AXIS activo para revisar ajustes; Lab vivo en 4349. Compila packages
+al iniciar y recompila sólo el paquete editado y sus dependientes al guardar, sin instalar, publicar ni
+cambiar pins. Astro usa su API pública para mantener el servidor bajo el supervisor en sesiones de agentes.
+Manifest/dependencias modificados requieren reiniciar para recargar el grafo. La preview estática queda
+para validar el build final. Canon: AXIS `docs/quality/continuous-development.md`.
+
+Agrupar revisión visual, commit/push y distribución por entrega. Una aprobación de apariencia no implica
+por sí sola publicar ni desplegar todos los consumidores; si el operador lo solicita expresamente,
+completar ese alcance. Producción sigue usando versiones exactas publicadas. El CI de distribución
+compila packages para comparar digest y sólo reconstruye el Lab si quedan browsers pendientes.
+
+Evidencia local: startup packages 6,9 s + Astro 898 ms; cambio CSS de primitives 1,3 s y lectura real en
+la pestaña sin reload manual. Marca de prueba retirada. 60 tests del tooling PASS. Estos tiempos no
+miden CI/cloud; no se inicia un release ficticio ni rollout de consumidores por optimizar este flujo.

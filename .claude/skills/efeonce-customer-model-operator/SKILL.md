@@ -10,6 +10,9 @@ Companion transversal para Claude. Su fuente canónica de método es
 `.codex/skills/efeonce-customer-model-operator/`; cargar primero su `SKILL.md` y, cuando corresponda,
 `references/customer-model-method.md` y `references/customer-model-integrity-pack-template.md`.
 
+Para investigar cuentas/personas y preparar rutas de acceso, usar
+[efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md); este owner conserva ICP/JTBD y buying group.
+
 ## Contrato
 
 No producir buyer personas decorativas ni declarar ICP, urgencia, champion, economic buyer, presupuesto o WTP sin
@@ -38,6 +41,17 @@ reduces it, what evidence reaches the sponsor and what risk appears when the ope
 The model must also test the Why: the offer increases client capability and leaves useful memory for the next cycle.
 Do not call opaque dependency that the client cannot explain, transfer or port “retention.”
 
+## Continuidad de discovery en propuestas SEO/AEO
+
+Cuando la reunión cambia el objetivo de una propuesta, separar entidad legal, marca comercial, producto,
+dominio y oportunidad antes de reutilizar investigación o demos. Registrar la decisión que debe poder defender el
+interlocutor y los roles de evaluación/compra como conocidos o pendientes; interés y recepción positiva no prueban
+champion, presupuesto ni adjudicación. Con autorización del operador, avanzar el borrador con evidencia pública
+y supuestos explícitos aunque falten datos privados, dejando owner y siguiente validación; una moneda inferida por
+aritmética sigue sin confirmar. Datos de cuenta en su expediente, método reusable en
+`docs/commercial/SEO_AEO_BUSINESS_CASE_METHOD_V1.md` y operación en
+`docs/manual-de-uso/comercial/construir-caso-negocio-seo-aeo.md`.
+
 ## Resultado obligatorio
 
 Entregar un Customer Model Integrity Pack con: decisión y alcance, segmentos/beachhead, ICP/anti-ICP, JTBD y teoría
@@ -50,7 +64,8 @@ research, pricing, finance, legal y operations.
 - GTM decide category, positioning, segmentación y motion.
 - Commercial ejecuta discovery, qualification, negociación y next steps.
 - Research diseña evidencia, VoC, entrevistas, triangulación y confidence.
-- Pricing/Finance decide WTP, packaging, margen, capacidad y economics.
+- Pricing/Finance calculan y recomiendan WTP, packaging, margen, capacidad y economics; la cifra comercial y sus
+  excepciones las decide el CEO.
 - Legal/Operations decide procurement, datos, IP, riesgo, contrato y delivery.
 
 La especialización de línea de negocio siempre conserva sus invariantes; esta skill aporta el modelo transversal.
@@ -68,3 +83,31 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 El brief CMP registra JTBD situado y roles operador/sponsor/validadores; mid-market/enterprise son contextos,
 no equivalencias rígidas entre cargo, autoridad o conversión. Etiquetar inferencias y validar con compradores;
 una skill o una recepción positiva del concepto no certifica demanda. Conservar alternativas y frenos de compra.
+
+## Contrato de éxito y dependencias en SEO/AEO
+
+Al convertir discovery SEO/AEO en propuesta, cargar
+[caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Reconciliar producto,
+uso, etapa del outcome y periodo de la meta; registrar buying group, owners y alternativas de acceso,
+revisión e instrumentación. Una aspiración de contribución no es forecast ni presupuesto confirmado.
+
+## Demanda del comprador y Cotizador V3
+
+Al convertir necesidades de una cuenta en una simulación de precio, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Declarar mercado de oferta separadamente del país del talento; willingness-to-pay e ICP no se prueban con un
+factor histórico. Una búsqueda de persona/freelancer CRM es un trigger de problema, no intención de comprar
+Staff Augmentation o servicio gestionado. Confirmar dirección del trabajo, buying group, alcance y objeciones.
+Las tareas permiten seleccionar recursos (SEO→SEMrush, diseño→Adobe, IA por motivo) sin cambiar variante salarial.
+El agente interpreta demanda; pricing calcula. Tools del cliente exigen evidencia de acceso y vigencia; no
+asumirlas por nombre/partner. Base Notion/M365 sigue del equipo. Simulación, capacity declared y preview redactado
+no prueban roster real, presupuesto, aprobación comercial o contrato; conservar gaps/owner y validación del caso.
+
+## Cuenta integral de medios
+
+Cargar el [método compartido](../digital-marketing/references/programmatic-media-operations.md) y el
+[modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+Calificar objetivo, mix, inversión, acceso a señal, alcance ya contratado, operador del cliente y buying group.
+Separar adopción del cliente de formación del equipo Efeonce que opera el DSP. Una reunión de proveedor y pedidos
+regionales declarados no prueban compra, presupuesto ni demanda pagada. Integrar expansión con capacidad incremental
+costeada; conservar decisión de mix, aceptación, renovación y aprendizaje como evidencia del cliente.

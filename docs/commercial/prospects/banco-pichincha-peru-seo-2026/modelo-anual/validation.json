@@ -1,0 +1,482 @@
+{
+  "status": "passed",
+  "engine": "Bundled LibreOffice",
+  "workbook_sha256": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a",
+  "native_recalculation_tests": 22,
+  "checks": [
+    {
+      "test": "Delivered cached Base,12 months, cohorts, maturity and sensitivity",
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Conservador",
+      "changed_inputs": {
+        "D4": 1
+      },
+      "result": {
+        "case": "Conservador",
+        "funded_incremental": 9.99759375,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 18841.322318412163,
+        "external_balance_end2027_usd_equivalent": 13188.925622888513,
+        "average_external_balance_2027_usd_equivalent": 4077.634658969391,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Favorable",
+      "changed_inputs": {
+        "D4": 3
+      },
+      "result": {
+        "case": "Favorable",
+        "funded_incremental": 146.95425,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 342807.44347550673,
+        "external_balance_end2027_usd_equivalent": 239965.2104328547,
+        "average_external_balance_2027_usd_equivalent": 71060.04878443042,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "December funding lower",
+      "changed_inputs": {
+        "Q47": 0.325
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 45.8713125,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 98111.5203293919,
+        "external_balance_end2027_usd_equivalent": 68678.06423057432,
+        "average_external_balance_2027_usd_equivalent": 23619.013680437583,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Finance only keeps ROI N/D",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D15": 0.08
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Finance and complete investment",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": 1000
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": -0.840174183998696,
+        "payback": "No en2027"
+      }
+    },
+    {
+      "test": "Missing December expense",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Zero expense not unknown",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 0,
+        "G22": 0,
+        "H22": 0,
+        "I22": 0,
+        "J22": 0,
+        "K22": 0,
+        "L22": 0,
+        "M22": 0,
+        "N22": 0,
+        "O22": 0,
+        "P22": 0,
+        "Q22": 0
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Blank unselected driver",
+      "changed_inputs": {
+        "F31": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Blank selected driver",
+      "changed_inputs": {
+        "F32": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": "N/D",
+        "balance_end2027_usd_equivalent": "N/D",
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Blank eligibility",
+      "changed_inputs": {
+        "D13": null
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": "N/D",
+        "balance_end2027_usd_equivalent": "N/D",
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Zero eligibility",
+      "changed_inputs": {
+        "D13": 0
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 0.0,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 0.0,
+        "external_balance_end2027_usd_equivalent": 0.0,
+        "average_external_balance_2027_usd_equivalent": 0.0,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Funding lag1",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": 1000,
+        "D18": 1
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 41.374125,
+        "funded_scheduled_after2027": 8.994374999999998,
+        "balance_end2027_usd_equivalent": 90256.0479349662,
+        "external_balance_end2027_usd_equivalent": 63179.23355447635,
+        "average_external_balance_2027_usd_equivalent": 18097.01631795155,
+        "roi": -0.87935322454699,
+        "payback": "No en2027"
+      }
+    },
+    {
+      "test": "Funding lag2",
+      "changed_inputs": {
+        "D18": 2
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 33.2791875,
+        "funded_scheduled_after2027": 17.0893125,
+        "balance_end2027_usd_equivalent": 73189.44420608108,
+        "external_balance_end2027_usd_equivalent": 51232.610944256754,
+        "average_external_balance_2027_usd_equivalent": 13272.646537330738,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Funding lag12 excludes all2027",
+      "changed_inputs": {
+        "D18": 12
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 0,
+        "funded_scheduled_after2027": 50.3685,
+        "balance_end2027_usd_equivalent": 0.0,
+        "external_balance_end2027_usd_equivalent": 0.0,
+        "average_external_balance_2027_usd_equivalent": 0.0,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "December origin external30pct sticks to cohort",
+      "changed_inputs": {
+        "Q82": 0.3
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 67583.74860557432,
+        "average_external_balance_2027_usd_equivalent": 23568.319577615006,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Funding day1",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": 1000,
+        "D19": 1
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 107259.27913429054,
+        "external_balance_end2027_usd_equivalent": 75081.49539400337,
+        "average_external_balance_2027_usd_equivalent": 26846.391002058695,
+        "roi": -0.821024059986275,
+        "payback": "No en2027"
+      }
+    },
+    {
+      "test": "Funding day28",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": 1000,
+        "D19": 28
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 110749.3262204392,
+        "external_balance_end2027_usd_equivalent": 77524.52835430743,
+        "average_external_balance_2027_usd_equivalent": 21240.49417150719,
+        "roi": -0.858396705523286,
+        "payback": "No en2027"
+      }
+    },
+    {
+      "test": "Observed historical shape as hypothesis",
+      "changed_inputs": {
+        "D26": "Historia"
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.03247104607724,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 108409.10288268661,
+        "external_balance_end2027_usd_equivalent": 75886.37201788061,
+        "average_external_balance_2027_usd_equivalent": 23479.92124736111,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Zero December expense is measured zero",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": 0
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": -0.825644564362213,
+        "payback": "No en2027"
+      }
+    },
+    {
+      "test": "Negative expense rejected by financial gates",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0.08,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": -1000
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": "N/D",
+        "payback": "N/D"
+      }
+    },
+    {
+      "test": "Validated zero net value",
+      "changed_inputs": {
+        "D14": "Sí",
+        "D16": "Sí",
+        "D15": 0,
+        "F22": 1000,
+        "G22": 1000,
+        "H22": 1000,
+        "I22": 1000,
+        "J22": 1000,
+        "K22": 1000,
+        "L22": 1000,
+        "M22": 1000,
+        "N22": 1000,
+        "O22": 1000,
+        "P22": 1000,
+        "Q22": 1000
+      },
+      "result": {
+        "case": "Base",
+        "funded_incremental": 50.3685,
+        "funded_scheduled_after2027": 0.0,
+        "balance_end2027_usd_equivalent": 109054.6765793919,
+        "external_balance_end2027_usd_equivalent": 76338.27360557432,
+        "average_external_balance_2027_usd_equivalent": 23973.872400195647,
+        "roi": -1,
+        "payback": "No en2027"
+      }
+    }
+  ],
+  "unverified": "Excel desktop UI not operated; native control/formula/cache changes tested in LibreOffice."
+}

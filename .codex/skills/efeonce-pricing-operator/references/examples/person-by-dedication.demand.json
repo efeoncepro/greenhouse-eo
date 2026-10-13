@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "role_capacity",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-12",
+    "offerId": "talent-assurance-staffing",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "example-person-by-dedication",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 6,
+    "lines": [
+      {
+        "lineId": "copy",
+        "profile": "ECG-011",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "hours_per_month",
+          "value": "90"
+        },
+        "dedicationEvidence": {
+          "reference": "example: 90 hours a month agreed with the buyer in the brief of the request",
+          "effectiveFrom": "2026-10-01",
+          "effectiveUntil": "2027-04-30",
+          "status": "confirmed"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "example:iva-cl-19",
+      "source": {
+        "reference": "example: IVA 19 % declared for this example; not a tax ruling for any client",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    }
+  },
+  "work": [
+    {
+      "lineId": "copy",
+      "assigneeIds": [
+        "planned-copy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.5",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.5"
+      },
+      "reason": "Example: one named seat for the person; this account carries the half of it that matches the declared dedication (90 of 180 hours). Not a real portfolio or an access grant.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-04-30",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.5",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.5"
+      },
+      "reason": "Example: one named seat for the person; this account carries the half of it that matches the declared dedication (90 of 180 hours). Not a real portfolio or an access grant.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-04-30",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

@@ -1,0 +1,179 @@
+{
+  "tenderId": "utem-vista",
+  "slides": [
+    {
+      "slideId": "p01-deck-content-day",
+      "contentType": "deck.content-day.live-progress",
+      "slots": {
+        "frame": {
+          "line": "engine",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 176,
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-cd-question-width=470px",
+          "answerLeading": "--gl-cd-answer-leading=0.9",
+          "answerTracking": "--gl-cd-answer-tracking=-0.05em",
+          "answerInset": "--gl-cd-answer-inset=-8px",
+          "answerShadowY": "--gl-cd-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-cd-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-cd-answer-shadow-opacity=35%",
+          "perspective": "--gl-cd-perspective=1600px",
+          "originX": "--gl-cd-origin-x=1200px",
+          "originY": "--gl-cd-origin-y=480px",
+          "deepY": "--gl-cd-deep-y=50px",
+          "deepBlur": "--gl-cd-deep-blur=110px",
+          "deepColor": "--gl-cd-deep-color=#000610",
+          "deepOpacity": "--gl-cd-deep-opacity=75%",
+          "deepEdge": "--gl-cd-deep-edge=16%",
+          "deepHaloBlur": "--gl-cd-deep-halo-blur=90px",
+          "deepHaloOpacity": "--gl-cd-deep-halo-opacity=22%",
+          "haloColor": "--gl-cd-halo-color=#72ded8",
+          "reflectGap": "--gl-cd-reflect-gap=14px",
+          "reflectFrom": "--gl-cd-reflect-from=72%",
+          "reflectOpacity": "--gl-cd-reflect-opacity=16%",
+          "docFill": "--gl-cd-doc-color=#ffffff",
+          "docInk": "--gl-cd-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-cd-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-cd-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-cd-doc-chip-color=#f5f7fa",
+          "docShadowColor": "--gl-cd-doc-shadow-color=#000610",
+          "docShadowY": "--gl-cd-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-cd-doc-shadow-blur=110px",
+          "docShadowOpacity": "--gl-cd-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-cd-doc-halo-blur=90px",
+          "docHaloOpacity": "--gl-cd-doc-halo-opacity=22%",
+          "docEdgeOpacity": "--gl-cd-doc-edge-opacity=16%",
+          "planLeft": "--gl-cdp-plan-left=650px",
+          "planTop": "--gl-cdp-plan-top=200px",
+          "planWidth": "--gl-cdp-plan-width=540px",
+          "planRadius": "--gl-cdp-plan-radius=22px",
+          "planRotateY": "--gl-cdp-plan-rotate-y=22deg",
+          "planRotateX": "--gl-cdp-plan-rotate-x=6deg",
+          "planOpacity": "--gl-cdp-plan-opacity=0.96",
+          "reviewLeft": "--gl-cdp-review-left=1070px",
+          "reviewTop": "--gl-cdp-review-top=170px",
+          "reviewWidth": "--gl-cdp-review-width=720px",
+          "reviewRadius": "--gl-cdp-review-radius=24px",
+          "reviewRotateY": "--gl-cdp-review-rotate-y=-13deg",
+          "reviewRotateX": "--gl-cdp-review-rotate-x=6deg",
+          "pieceWidth": "--gl-cdp-piece-width=340px",
+          "pieceHeight": "--gl-cdp-piece-height=425px",
+          "pinLeft": "--gl-cdp-pin-left=206px",
+          "pinTop": "--gl-cdp-pin-top=84px",
+          "pinSize": "--gl-cdp-pin-size=38px",
+          "accentColor": "--gl-cdp-accent-color=#0375db"
+        },
+        "stage": {
+          "src": "asset-ref:layer:content-day-progress-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:content-day-progress-platform"
+        },
+        "beam": {
+          "src": "asset-ref:layer:content-day-progress-beam"
+        },
+        "plan": {
+          "tool": "asset-ref:file:notion-isotype",
+          "kicker": "En Notion",
+          "title": "Plan editorial",
+          "meta": "Mes 1 · 3 de 5"
+        },
+        "columns": [
+          {
+            "name": "En curso",
+            "cards": [
+              {
+                "role": "rest",
+                "title": "Cómo elegir diplomado",
+                "tag": "Artículo 4"
+              },
+              {
+                "role": "rest",
+                "title": "Página Gestión Pública",
+                "tag": "Página existente"
+              }
+            ]
+          },
+          {
+            "name": "En revisión",
+            "cards": [
+              {
+                "role": "lead",
+                "title": "Análisis de datos",
+                "tag": "Esperando tu visto bueno"
+              }
+            ]
+          },
+          {
+            "name": "Listo",
+            "cards": [
+              {
+                "role": "rest",
+                "title": "Auditoría y línea base",
+                "tag": "Entregado"
+              },
+              {
+                "role": "rest",
+                "title": "Plan editorial mes 1",
+                "tag": "Aprobado"
+              }
+            ]
+          }
+        ],
+        "review": {
+          "tool": "asset-ref:file:frameio-isotype",
+          "kicker": "En Frame.io",
+          "title": "Artículo · datos"
+        },
+        "piece": {
+          "src": "asset-ref:plate:articulo-analisis-datos-review-340x425",
+          "alt": "El artículo en revisión: guía para elegir un diplomado en análisis de datos, en el sitio de Educación Continua UTEM",
+          "pin": "1"
+        },
+        "secondary": "Comentar",
+        "versions": [
+          {
+            "role": "rest",
+            "label": "v1"
+          },
+          {
+            "role": "lead",
+            "label": "v2"
+          }
+        ],
+        "comments": [
+          {
+            "role": "rest",
+            "mark": "1",
+            "author": "UTEM",
+            "version": "· v1",
+            "text": "¿Sumamos los requisitos?"
+          },
+          {
+            "role": "lead",
+            "author": "Efeonce",
+            "version": "· v2",
+            "text": "Listos, y con su ficha SEO."
+          }
+        ],
+        "cta": {
+          "text": "Aprobar",
+          "cursorScale": 1
+        },
+        "voice": {
+          "question": "¿Cómo avanza cada artículo?",
+          "answer": "vista",
+          "eyebrow": "Tu día a día con Efeonce",
+          "answerLead": "A la"
+        },
+        "body": "Sigues el plan en Notion y apruebas cada artículo comentando <strong>sobre</strong> la página, antes de publicar."
+      },
+      "template": "ContentDayProgress"
+    }
+  ]
+}

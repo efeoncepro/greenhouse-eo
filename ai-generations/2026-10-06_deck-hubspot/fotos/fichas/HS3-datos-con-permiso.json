@@ -1,0 +1,44 @@
+{
+  "id": "HS3-datos-con-permiso",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "antonio"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): he stands on the RIGHT third of the frame, his face at about 72 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. His right hand is raised at chest height on the camera-left side of his body, palm up and slightly cupped, his elbow at about 70 % and his hand at about 64 % of the frame width; his left arm hangs relaxed at his side, out of the action. Resting on that palm floats a translucent SPHERE of fine azure light lines (#0375DB), about the size of a football, about 25 cm across, like a shell of light that protects what is inside: ONE PERSON'S DATA, a tiny head-and-shoulders silhouette smaller than his hand, drawn only with points of cool white light, with NO face, NO eyes, NO mouth and NO features. The left edge of the sphere never goes further left than 58 % of the frame width; between the left edge of the frame and the sphere there is a wide band of empty darkness. Far behind him and to the right, in the depth of the hall, streams of loose dim blue particles drift toward the sphere from behind his shoulders, never from the left half of the frame; where they touch its surface they stop and fade, they never get inside. On the surface of the sphere ONE single tiny point glows magenta-pink (#E86BD0), the only accent in the frame. It lights nothing around it: his face, hands, jacket, the haze and the background take only the cool azure and white light. His head stays almost frontal and his eyes turn toward the empty dark left of the frame, where the text will sit, with a calm, assured closed-mouth half-smile. The light of the sphere paints his face, hand and jacket. Thin haze catches the light. The LEFT 52% of the frame is calm, deep dark studio space with only faint haze: no sphere, no particles, no objects. Rich contrast, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "linea": "revenue-hubspot",
+  "llave": {
+    "fuente": "the cool white-blue light of the translucent sphere resting on his raised right palm",
+    "lado": "to his right side, at chest height, below his face",
+    "tamano": "about 25 cm across",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "loose dim blue particles drifting far behind, melted into soft round bokeh",
+  "fenomeno": {
+    "que": "a shell of light protects one person's data portrait; loose particles that reach it stop and fade without getting in",
+    "esServicio": "datos personales con permiso y acceso controlado (Ley 21.719)"
+  }
+}

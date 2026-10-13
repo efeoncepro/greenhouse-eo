@@ -1,0 +1,20 @@
+{
+  "args": [
+    "compose",
+    "workload",
+    "--input",
+    "data/pricing/v3-operating/managed-care.workload.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 1596,
+    "sha256": "7ef535cbe0fdcdbc2c521721bbf6eda2174b3dccb45c74dd0d783a52f813f6d3",
+    "text": "{\n  \"schemaVersion\": \"pricing-v3-workload-result/1\",\n  \"binding\": false,\n  \"status\": \"prepared\",\n  \"version\": \"managed-care-extended-example-v1\",\n  \"mode\": \"simulation\",\n  \"totals\": {\n    \"driverHours\": [\n      {\n        \"driverId\": \"conversations\",\n        \"unit\": \"conversation\",\n        \"hours\": \"108.333333\"\n      }\n    ],\n    \"fixedHours\": \"70\",\n    \"workHours\": \"178.333333\",\n    \"fte\": \"1.95\"\n  },\n  \"lines\": [\n    {\n      \"lineId\": \"primary\",\n      \"workHours\": \"124.166667\",\n      \"presenceHours\": \"0\",\n      \"fteByWork\": \"0.993333\",\n      \"fteByPresence\": \"0\",\n      \"fte\": \"1\",\n      \"bindingConstraint\": \"work\",\n      \"reason\": \"Owns the queue in core hours and the fixed upkeep.\",\n      \"evidence\": {\n        \"reference\": \"workload:managed-care-extended-example-v1\",\n        \"effectiveFrom\": \"2026-10-10\",\n        \"effectiveUntil\": \"2026-12-31\",\n        \"status\": \"estimated\"\n      }\n    },\n    {\n      \"lineId\": \"backup\",\n      \"workHours\": \"54.166667\",\n      \"presenceHours\": \"165\",\n      \"fteByWork\": \"0.433333\",\n      \"fteByPresence\": \"0.916667\",\n      \"fte\": \"0.95\",\n      \"bindingConstraint\": \"presence\",\n      \"reason\": \"Takes the rest of the queue and staffs the hours the primary does not cover.\",\n      \"evidence\": {\n        \"reference\": \"workload:managed-care-extended-example-v1\",\n        \"effectiveFrom\": \"2026-10-10\",\n        \"effectiveUntil\": \"2026-12-31\",\n        \"status\": \"estimated\"\n      }\n    }\n  ],\n  \"diagnostics\": [],\n  \"note\": \"Dimensioned from declared volume and hours. It is not a staffing commitment, an availability check or a measured productivity.\"\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

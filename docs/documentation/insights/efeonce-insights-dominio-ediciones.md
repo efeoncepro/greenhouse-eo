@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.21
+> **Version:** 1.24
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-04 por Codex (1.21: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-10-13 por Claude (1.24: el alcance está desplegado en staging y en el proceso de ediciones programadas; portada blanca para leerlo, línea semanal con semanas completas y tres nombres de Analytics. Historia: 1.23: alcance de contenido por organización, el informe mide sólo lo que trabajamos. 1.22: fuentes citadas con logo en las tablas del PDF y el deck, y las tres redes nuevas. Historia: 1.21 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 > **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
@@ -51,7 +51,75 @@ a `ready_for_review` y un interno la emite después de revisarla.
   simplemente no existe para ese actor.
 - **Misma clave de idempotencia + mismo encargo = misma edición.** Misma clave con encargo distinto se
   rechaza.
+- **El informe mide lo que trabajamos.** Si la organización tiene declarado un alcance de contenido, el capítulo
+  de búsqueda mide sólo esas páginas; el resto del sitio aparece en una frase de contexto. Ver «Alcance de contenido».
 - **La IA no calcula ni emite.** Sólo puede reescribir frases; si cambia una cifra se descarta.
+
+## Alcance de contenido: medir sólo lo que trabajamos
+
+> Construido el 2026-10-12 (`TASK-2033`). Berel ya tiene su alcance. El cambio está desplegado en staging y en el
+> proceso que arma las ediciones programadas; las que se creen desde el portal de producción siguen midiendo el sitio
+> completo hasta el release a producción.
+
+Search Console mide el sitio entero de un cliente. Cuando Efeonce trabaja una parte —en Berel, los artículos,
+tutoriales, inspiración y dos guías— el resto del sitio pesa mucho más y decide la cifra del informe. En septiembre de
+2026 el contenido que trabajamos subió 20,9 % en clics y el informe decía que los clics habían caído 13,6 %, porque
+inicio, productos y colores son casi el 95 % de los clics del sitio.
+
+Con un alcance declarado, el capítulo de búsqueda cambia así:
+
+| Qué | Cómo se mide |
+| --- | --- |
+| Clics, impresiones, CTR, posición y evolución semanal | Sólo las páginas del alcance |
+| Consultas y páginas que más cambiaron | Sólo las del alcance |
+| Visitas orgánicas (Google Analytics 4) | Las que entraron por una página del alcance |
+| Keywords en primera página | Las que posicionan con una página del alcance |
+| Oportunidades recomendadas | Las que apuntan a una página del alcance |
+| Tráfico orgánico estimado | No aparece: sólo existe para el sitio completo, y el informe lo dice en sus límites |
+| El sitio completo | Una frase de contexto al final del capítulo |
+
+«Qué mide este informe», en la portada, nombra el contenido medido. La frase de contexto compara las dos
+variaciones, por ejemplo: «Los clics de este contenido variaron +20,9 % frente al período anterior; los de todo el
+sitio, -13,6 %.»
+
+Qué conviene saber:
+
+- **Las cifras se ven más chicas.** 799 clics al mes en vez de 14.156. Es lo normal en contenido informativo, y la
+  portada dice qué se está midiendo.
+- **Una edición ya creada no cambia.** El alcance rige para las ediciones nuevas; corregir una anterior es crear una
+  versión nueva de ese informe.
+- **El capítulo de motores de respuesta no se recorta.** La visibilidad en IA es de la marca, no de una página.
+- **Search Console y Analytics no cuentan lo mismo.** Search Console sólo guarda los clics de consultas con texto;
+  Analytics cuenta todas las visitas desde buscadores. Sobre el mismo contenido los números difieren y pueden moverse
+  distinto.
+- **Una página nueva fuera de las secciones declaradas no entra sola.** En Berel, una guía publicada en la raíz del
+  sitio hay que agregarla al alcance.
+
+- **La portada blanca es la única que lo dice.** La línea «Qué mide este informe» sólo existe en la portada blanca del
+  informe A4 y en la página web. La portada azul oscuro y la del deck no la tienen. Si la organización tiene un logo
+  para fondo oscuro, su portada sale azul oscuro por defecto: hay que fijarla en blanca para que el alcance se lea en
+  la portada. Berel está en blanca.
+- **Un mes con una pieza que explotó se lee como caída al mes siguiente.** En agosto de 2026 un solo artículo de Berel
+  recibió cerca de 4.900 visitas en una semana; septiembre aparece con la mitad de visitas orgánicas aunque el resto
+  del contenido creció. El informe no explica esos picos: hay que contarlo al entregarlo.
+
+Una organización sin alcance declarado recibe el mismo informe de siempre.
+
+### La línea de clics por semana
+
+Desde el 2026-10-12, en los informes de todas las organizaciones, la figura de clics por semana dibuja sólo semanas
+completas. Los últimos dos o tres días del mes no forman una semana; dibujados junto a semanas enteras hacían ver una
+caída que no existía. Esos días siguen contando en el total del mes, y la nota de la figura dice cuáles quedaron
+fuera.
+
+### Tres nombres que cambiaron
+
+«Visitas orgánicas» (antes «Visitas orgánicas al sitio»), «Visitas desde buscadores» y «Visitas orgánicas, con y sin
+interacción». Con alcance, esas visitas son las que entran por el contenido medido, así que «al sitio» ya no era
+cierto. El cambio aplica a todas las organizaciones.
+
+> Detalle técnico: [arquitectura §5.1](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) ·
+> `src/lib/growth/seo/content-scope/` · `src/lib/efeonce-insights/adapters/seo-adapter.ts`
 
 ## Qué ve cada persona
 
@@ -301,7 +369,9 @@ Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no m
 > le da página propia en el PDF y el deck a las cinco figuras nuevas y la tarjeta al informe web. Salieron juntas en el
 > mismo release de Greenhouse, con la página de Think y la publicación de AXIS. Una tarjeta cuyas cifras salen de una
 > misma plataforma (por ejemplo Search Console) muestra su logo junto al título; si las cifras vienen de motores de IA
-> distintos, cada una lleva el suyo.
+> distintos, cada una lleva el suyo. En las tablas del PDF y del deck, una fuente citada que es una red o plataforma
+> (YouTube, Reddit, Wikipedia, LinkedIn, Instagram, TikTok y, desde el próximo release, Facebook, Threads y X) lleva su
+> logo en la fila; cualquier otro sitio lleva el ícono de la métrica. El informe web no recibe la plataforma de una fuente citada.
 
 **El principio: cada gráfico responde una pregunta.** Un gráfico no adorna: es un argumento. Antes de elegir su forma
 se pregunta qué quiere saber el lector sobre ese dato («¿cuánto es?», «¿cómo evolucionó?», «¿cumplimos la meta?») y

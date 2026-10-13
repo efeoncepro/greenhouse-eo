@@ -1,0 +1,17 @@
+{
+  "args": [
+    "calculate"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 251,
+    "sha256": "a7e3c820695c518efa69f29d558121b60b2c7dcd608460cbc90ef8e13d6068ee",
+    "text": "{\n  \"error\": {\n    \"code\": \"MISSING_ARGUMENT\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"input\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

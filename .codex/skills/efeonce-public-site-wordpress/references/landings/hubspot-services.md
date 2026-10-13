@@ -1,5 +1,7 @@
 # Landing: HubSpot Services
 
+> **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-hubspot-scope` v4 entrega en `direct` al formulario HubSpot «Lead Gen - Servicios HubSpot» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+
 ## Identity and owners
 
 - URL: `https://efeoncepro.com/servicios-contratar-hubspot/`; WordPress page `244079`, published.

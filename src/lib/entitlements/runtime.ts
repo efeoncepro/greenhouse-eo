@@ -3213,6 +3213,71 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // ── TASK-2025 — Cotizador V3 (`commercial.quoter.*`) ──
+  // Por ROL explícito además de por el grupo de rutas `commercial`: `can()` no deriva grupos de rutas del rol, y el
+  // sujeto máquina de un binding interno (rol `efeonce_account`, `routeGroups: ['internal']`) tiene que recibir lo
+  // mismo que una persona con ese rol. Ningún rol de cliente recibe nada de esto.
+  const quoterCommercialRole =
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ANALYST)
+
+  if (quoterCommercialRole || hasRouteGroup(subject, 'commercial')) {
+    const source: TenantEntitlementSource = quoterCommercialRole ? 'role' : 'route_group'
+
+    addEntitlement(entries, { module: 'commercial', capability: 'commercial.quoter.catalog', action: 'read', scope: 'tenant', source })
+    addEntitlement(entries, { module: 'commercial', capability: 'commercial.quoter.simulate', action: 'read', scope: 'tenant', source })
+
+    for (const action of ['read', 'create', 'update'] as const) {
+      addEntitlement(entries, { module: 'commercial', capability: 'commercial.quoter.quote', action, scope: 'tenant', source })
+    }
+  }
+
+  // Emitir y retirar lo emitido: tres roles, y por `efeonce_account` también un agente (decisión 7, CEO 2026-10-12).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
+  ) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quoter.issue',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  // Guardar un documento de catálogo y activar el puntero: el catálogo es de Commercial/Finance.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quoter.catalog',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quoter.catalog.activate',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  // Aprobar una excepción bajo el piso: sólo `efeonce_admin`, y además sólo una persona.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quoter.exception',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-1894 — escritura en Marketing Studio (subir/versionar piezas y crear/editar campañas) con autoridad de
   // persona. Los roles que operan campañas más diseño, que produce las piezas. La aprobación es aparte (TASK-1899).
   if (
@@ -3231,6 +3296,20 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
           source: 'role'
         })
       }
+    }
+  }
+
+  // TASK-1905 — sólo administración y operaciones gobiernan el catálogo compartido.
+  // Operar una cuenta o producir piezas no concede esta autoridad.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)) {
+    for (const action of ['create', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'marketing_studio',
+        capability: 'marketing_studio.catalog.manage',
+        action,
+        scope: 'tenant',
+        source: 'role'
+      })
     }
   }
 

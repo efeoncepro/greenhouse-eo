@@ -113,12 +113,13 @@ El [maestro, registro C](../../../../docs/operations/brand-photography/EFEONCE_P
 **Fuente vigente:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
 (2026-09-27). Los dos deltas cine del maestro quedan como historia. **Cárgalo completo antes de escribir una ficha
 cine**: aquí va sólo lo operativo. Es **ficción declarada**: el servicio (o lo digital) en acción como fotograma de
-una película de gran presupuesto, y **el color de la línea sale de la escena como luz** —anillo, haz, holograma, moño
-de partículas, esferas—, nunca pintado encima ni puesto como grade.
+una película de gran presupuesto. La luz sale de una fuente de la escena —anillo, haz, holograma, moño de
+partículas, esferas—, nunca pintada encima ni puesta como grade. Para tomas nuevas rige la [falla 34 del casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-de-servicios-hubspot-2026-10-06--lo-que-aprendimos):
+**luz azure/blanco frío y acento como puntuación, que no ilumina**; los precedentes aprobados conservan su historia.
 
 🔴 **Producir cine (2026-10-02): sigue el [casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).**
 El flujo: casebook → `pnpm foto:cine:nueva --desde <id> --id <nuevo> --dir <carpeta> [--formato] [--alcance]`
-(`--listar` muestra las 12 recetas aprobadas de `scripts/foto/cine-recetas.json`; ninguna vertical todavía) → reescribe la
+(`--listar` muestra las recetas aprobadas de `scripts/foto/cine-recetas.json`: 32 al 2026-10-06; ninguna vertical todavía) → reescribe la
 escena marcada «REESCRIBIR» (`foto:generar` no gasta mientras siga así) y completa `__completar` y `__revisar` → campos
 cine: `llave { fuente, lado, distancia, tamano }`, `primerPlano`, `fondo`, `fenomeno { que, esServicio }` y `alcance`
 (`nexa` · `proposal-cinematic` · `deck-seccion` · `deck-portada` · `manzanitas` · `social-nexa` · `publicidad-prueba`;
@@ -126,6 +127,15 @@ uno inválido aborta) → `pnpm foto:prompt` (los compila en «CINEMATIC CRAFT»
 `cine-reviewer` sobre la ficha → `pnpm foto:generar <ficha> --quality high` → `pnpm foto:validar:cine` +
 `pnpm foto:validar` + `pnpm foto:emblema` → `cine-reviewer` sobre el plate. El revisor calibra contra el plate de la
 receta de partida y su APROBABLE no es la aprobación del operador.
+
+**Motor elegido explícitamente (prueba 2026-10-06):** para Nano Banana 2.1, conserva ficha, prompt compilado y orden
+de referencias; sustituye sólo la llamada de generación por `pnpm ai:nano` (`4K`, `16:9`, `thinking high` en esta
+corrida), y aplica los mismos gates. Procedimiento y correcciones: [casebook, prueba portable](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable).
+V2 `NB21-NEXA-CINE` dio 5504×3072 y reservas 4/4 PASS; quedó APROBABLE, sin alta en recetas ni AXIS. En la
+comparación visual con NX7d se prefirió Sunburst por naturalidad de la escena; Nano destacó en reservas y fidelidad
+del kit. No fue un A/B del motor: cambiaron expresión, referencias y prompt. [Evidencia y límites](../../../../docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md).
+La ruta habitual de `foto:generar` y el default OpenAI de `ai:image` permanecen vigentes.
+
 En cine, `foto:prompt` reemplaza las frases documentales de los bloques compartidos (`AJUSTES_CINE`) e inyecta solo:
 llave única sin relleno, lecho mate y real (no banda) separado del primer plano, fenómeno y fondo bajo el 36 % del alto
 en 4:5 y 9:16, escala por encuadre con `identidad`, mirada al panel con `alcance: deck-seccion`, uniforme navy (el
@@ -133,6 +143,36 @@ hoodie conserva su royal del kit), aros de Nexa dorados y la reserva izquierda d
 `"reservas": {"texto": {"lado": "izquierda", …}}`. Los demás registros no cambian: si tocas `build-prompt.mjs`, corre
 `scripts/foto/regresion-prompt.mjs` antes (`--foto`) y después (`--comparar`).
 Nunca reconstruyas la receta de memoria ni consultes a otra sesión: si el casebook no cubre tu caso, agrégale la fila.
+**Brochure HubSpot (2026-10-06):** siete plates cine aprobados son recetas nuevas en `cine-recetas.json` (`HS2d`,
+`HS3b`, `HS4`, `HS5b`, `HS6b`, `CMP-crm-B`, `CMP-portada-B`, cada una con su `ojo`). Antes de partir de ellas lee la
+[sección del casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-de-servicios-hubspot-2026-10-06--lo-que-aprendimos):
+deriva del objeto hacia la reserva, objeto al otro lado del sujeto, acento de un solo punto y tic de pose (fallas 32–35).
+**Brochure Agencia Creativa (2026-10-06):** siete plates cine aprobados (`CV1b`, `CV2b`, `CV3b`, `BS1c`, `RG1b`,
+`HB2`, `SA1`; `SA1` como precedente acotado, ver 5) y la foto de lugar `SK1` (fuera del registro cine); fichas en git en `ai-generations/2026-10-06_brochure-creativo/fotos/fichas/`, plates fuera de
+git en `fotos/plates/`, banco y descartes en `fotos/LEEME.md`. Los siete plates cine son recetas de `cine-recetas.json` y las lecciones siguientes son las fallas 36–43 del
+[casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md).
+1. **Deriva al centro por geometría.** Con 85 mm a 3–4 m la escena no cabe en la mitad derecha. Se ordena en
+   profundidad, con porcentaje de ancho por persona y una «banda de oscuridad vacía» entre el borde izquierdo y la
+   espalda, y se aleja la cámara; si igual deriva, la lámina corre la foto 130–150 px a la derecha con el borde fundido
+   a su propio negro.
+2. **La mirada al texto de `deck-seccion` se vuelve tic en serie** (operador: «ya van 3»). Se dosifica como el acento:
+   la escena la contradice a propósito (mirar la pieza, el manual o la cámara). Candidato: campo `mirada` en la ficha.
+3. **Identidad de Julio.** El bloque IDENTITY se exagera a distancia media («dos kilos de frente», «piel de IA»); por
+   pedido del operador va Antonio. Antonio es línea revenue y `foto:prompt` lo bloquea en `linea: brand`: la ficha HB2
+   va sin `linea`, por pedido explícito.
+4. **Con `luz-motivada`, un monitor como llave anula la palanca** (compila «never a monitor») y deja el acento de
+   espaldas: el fenómeno tiene que ser el servicio (SA1: hoja de piezas de luz sobre la mesa del cliente).
+5. **SA1 aprobada como precedente acotado** (operador, 2026-10-06: «Pero la 19 se ve muy bien, quiero mantenerla»).
+   Vale sólo con sus condiciones: extras del cliente ficticios, sin marca, en gris y carbón, nada azul, en positivo
+   (colaborando, nunca en su dolor), junto a una protagonista del roster con su prenda, y con el hoodie royal como único
+   azul, lo que dice quién viene de afuera; texto a la izquierda. La regla general del §2 del registro cine para otros
+   casos la lleva la sesión de línea gráfica: fuera de este precedente, el cliente sale sólo en `panel-end` y nunca en
+   su dolor (SP1).
+6. **El modelo nunca dibuja marcas.** Dibujó el isotipo de Efeonce como «marca ficticia» (BS1, descartado); el muro de
+   la lámina 9 se compuso por máscara con 35 piezas reales porque el modelo reescribía sus textos; el logo de SKY va
+   compuesto sobre un avión sin librea (SK1).
+7. **Run & Gun con equipo moderno** (gimbal, cine, LED), nunca vintage.
+8. **Plastilina: la mano de «Aprobación» se leía mal** (fálica); se usa el lápiz.
 
 **Marcador rápido — estás en cine si se cumple todo esto:**
 

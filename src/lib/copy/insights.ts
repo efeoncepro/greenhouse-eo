@@ -92,15 +92,41 @@ export const GH_INSIGHTS = {
     // TASK-1962 — visitas desde asistentes de IA (GA4), por asistente.
     ai_source: 'Visitas desde cada asistente de IA',
     // TASK-1962 — visitas orgánicas al sitio (GA4), en el capítulo de búsqueda.
-    site: 'Visitas orgánicas al sitio'
+    // TASK-2033 — sin «al sitio»: con alcance de contenido son las visitas que entran por el contenido medido.
+    site: 'Visitas orgánicas'
   } as Readonly<Record<string, string>>,
+
+  /**
+   * TASK-2033 — alcance de contenido: el informe mide sólo la parte del sitio que Efeonce trabaja. Las poblaciones
+   * son trazabilidad del snapshot (no se imprimen); la línea y la lectura sí llegan al documento.
+   */
+  contentScope: {
+    gscPopulation: 'Consultas de Search Console hacia el contenido medido',
+    rankPopulation: 'Keywords monitoreadas que posicionan con el contenido medido',
+    queuePopulation: 'Cola de trabajo SEO priorizada, sobre el contenido medido',
+    ga4Population: 'Sesiones del canal Organic Search que entraron por el contenido medido',
+    /**
+     * «Qué mide este informe» del capítulo de búsqueda cuando hay alcance: nombra el contenido medido (la etiqueta
+     * sellada, en minúscula inicial) entre las dos partes. Sin cifras: el validador del plan las rechazaría.
+     */
+    scopeLineLead: 'Visibilidad orgánica de',
+    scopeLineTail: 'sus clics, impresiones y posiciones en Google, sin el resto del sitio.',
+    /** Entrada del capítulo de búsqueda con alcance. Sin cifras. */
+    chapterOpening: 'Cómo encuentra Google el contenido que trabajamos y cuántas visitas le trae.',
+    /**
+     * Lectura de contexto: el contenido medido frente al sitio completo, con la variación de clics de cada uno.
+     * Se arma «{contextLead} {variación}{contextMiddle} {variación}.»; sólo existe cuando ambos tienen período anterior.
+     */
+    contextLead: 'Los clics de este contenido variaron',
+    contextMiddle: ' frente al período anterior; los de todo el sitio,'
+  },
 
   /** TASK-1962 — población de los hechos de GA4 (trazabilidad del snapshot; no se imprime como cifra). */
   ga4: {
     organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
     aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada',
-    tableTitle: { seo: 'Visitas al sitio desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
-    tableLead: 'Sesiones medidas por Google Analytics 4 en el sitio, según su agrupación de canales.',
+    tableTitle: { seo: 'Visitas desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
+    tableLead: 'Sesiones medidas por Google Analytics 4, según su agrupación de canales.',
     /** TASK-1974 — la porción que suma a los asistentes fuera de los 2 que más traen. */
     otherAssistants: 'Otros asistentes'
   },
@@ -141,7 +167,9 @@ export const GH_INSIGHTS = {
     noComparison: 'sin comparación con el período anterior en esta edición',
     insufficientData: 'sin datos suficientes en este período',
     /** TASK-1962 — una fuente que el cliente todavía no conectó (la petición del plan lo pide). */
-    notConnected: 'falta conectar la fuente'
+    notConnected: 'falta conectar la fuente',
+    /** TASK-2033 — la fuente mide el sitio completo y la edición mide una parte (p. ej. el tráfico estimado). */
+    outsideContentScope: 'se estima para todo el sitio, no para el contenido que mide esta edición'
   },
 
   rejections: {
@@ -153,7 +181,8 @@ export const GH_INSIGHTS = {
     module_disabled: 'el módulo está apagado',
     not_connected: 'la fuente no está conectada',
     target_ambiguous: 'hay más de un mercado activo',
-    no_data: 'sin datos'
+    no_data: 'sin datos',
+    outside_content_scope: 'la fuente mide el dominio completo, no el alcance de contenido'
   },
 
   /**
@@ -169,7 +198,7 @@ export const GH_INSIGHTS = {
     citation_share: 'Respuestas que citan tu sitio',
     gsc: 'Search Console',
     ga4: 'Google Analytics 4',
-    'site.organic_sessions': 'Visitas orgánicas al sitio',
+    'site.organic_sessions': 'Visitas orgánicas',
     'site.organic_engaged_sessions': 'Visitas orgánicas con interacción',
     'site.organic_unengaged_sessions': 'Visitas orgánicas sin interacción',
     ai_sessions: 'Visitas desde asistentes de IA',
@@ -177,6 +206,9 @@ export const GH_INSIGHTS = {
     'driver.page': 'Páginas que más cambiaron',
     rank: 'Posiciones en buscadores',
     organic_etv: 'Tráfico orgánico estimado',
+    // TASK-2033 — la propiedad completa cuando el informe mide un alcance de contenido: sólo contexto.
+    'site_total.clicks': 'Clics orgánicos del sitio completo',
+    'site_total.impressions': 'Impresiones del sitio completo',
     overall_score: 'Puntaje de visibilidad en IA',
     rpa: 'Rondas de revisión por pieza',
     otd: 'Entregas a tiempo',
@@ -221,6 +253,9 @@ export const GH_INSIGHTS = {
     instagram: 'Instagram',
     tiktok: 'TikTok',
     meta: 'Meta',
+    facebook: 'Facebook',
+    threads: 'Threads',
+    x: 'X',
     frameio: 'Frame.io',
     greenhouse: 'Greenhouse'
   } as Readonly<Record<string, string>>,
@@ -270,7 +305,9 @@ export const GH_INSIGHTS = {
     currentTotal: 'Este período',
     weeklyTitle: 'Clics orgánicos por semana',
     weeklyLead: 'Los clics por semana',
-    weeklyPrevious: 'En el período anterior, de'
+    weeklyPrevious: 'En el período anterior, de',
+    /** TASK-2033 — el bloque del mes que no completa una semana y por eso la línea no dibuja («29–30 sept»). */
+    weeklyOutside: (labels: string) => `Fuera de la figura: ${labels}, que no completa una semana.`
   },
 
   /**
@@ -315,7 +352,7 @@ export const GH_INSIGHTS = {
     estimated: 'Estimado',
     lowerIsBetter: 'Menor es mejor',
     /** TASK-1974 — barras apiladas de visitas orgánicas (subconjunto en dos períodos). */
-    engagementTitle: 'Visitas orgánicas al sitio, con y sin interacción',
+    engagementTitle: 'Visitas orgánicas, con y sin interacción',
     engagedSegment: 'Con interacción',
     unengagedSegment: 'Sin interacción',
     labels: {
@@ -383,6 +420,12 @@ export const GH_INSIGHTS = {
     /** TASK-1962 — hallazgos de descomposición: dicen DÓNDE cambió, nunca por qué. */
     driverQueryLead: 'La consulta que más cambió fue',
     driverPageLead: 'La página que más cambió fue',
+    /**
+     * TASK-2033 — la misma frase cuando el nombre no cabe en el molde y se omite: sin «fue», que sin nombre dejaba
+     * «La página que más cambió fue subió…» (Berel con alcance de contenido: las rutas de artículos son largas).
+     */
+    driverQueryLeadUnnamed: 'La consulta que más cambió',
+    driverPageLeadUnnamed: 'La página que más cambió',
     clicksWord: 'clics',
     homePage: 'Página de inicio',
     variation: 'variación',
@@ -462,7 +505,7 @@ export const GH_INSIGHTS = {
     ftr: { subject: 'La primera entrega correcta', plural: false },
     rpa: { subject: 'Las rondas de revisión por pieza', plural: true },
     'delivered.completed': { subject: 'Las piezas entregadas', plural: true },
-    'site.organic_sessions': { subject: 'Las visitas orgánicas al sitio', plural: true },
+    'site.organic_sessions': { subject: 'Las visitas orgánicas', plural: true },
     'site.organic_engaged_sessions': { subject: 'Las visitas orgánicas con interacción', plural: true },
     ai_sessions: { subject: 'Las visitas desde asistentes de IA', plural: true }
   } as Readonly<Record<string, { subject: string; plural: boolean }>>,

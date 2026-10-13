@@ -1,9 +1,11 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.15
+> **Version:** 1.17
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-04 por Claude — v1.15: 🔁 **corrige una regla sobregeneralizada de Seedance.** La guía decía que Seedance rechaza personas reales y marcas en las referencias (filtro ByteDance) y recomendaba evitarlo con ese material. La evidencia es más acotada: **dos** rechazos medidos en fal el 2026-09-16, tras encolar y cobrados (`422 content_policy_violation` / `partner_validation_failed`: el isotipo de Efeonce, «potential copyright violation», y un video de barista, «likenesses of real people») [verificado 2026-09-16]; las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22]; y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]. El rechazo es un **riesgo observado en casos puntuales, no un filtro sistemático**; qué lo dispara: [sin dato]. Seedance vuelve a ser candidato con personas y marcas, presupuestando el posible rechazo cobrado (prueba corta y a baja resolución antes del final) y con Flux 3 / Wan 3.0 como alternativa si rechaza (§3, §4.3, §5.2, §5.3, §5.4, §5.6, §5.7, §6.8, §6.9, §6.12, §7.3, §7.4, §10.3).
+> **Ultima actualizacion:** 2026-10-12 por Codex — v1.17: BytePlus directo por defecto para sus modelos de media, incluido Layerize; secretos, CLI y evidencia por transporte en su ADR/manual.
+> **Antes (v1.16):** 2026-10-06 por Codex — v1.16: CLI Nano Banana 2.1 separada; generación real Nexa 4K/high y comparación visual acotada con NX7d Sunburst (§10.1). OpenAI conserva su default `gpt-image-2`.
+> **Antes (v1.15):** 2026-10-04 por Claude — v1.15: 🔁 **corrige una regla sobregeneralizada de Seedance.** La guía decía que Seedance rechaza personas reales y marcas en las referencias (filtro ByteDance) y recomendaba evitarlo con ese material. La evidencia es más acotada: **dos** rechazos medidos en fal el 2026-09-16, tras encolar y cobrados (`422 content_policy_violation` / `partner_validation_failed`: el isotipo de Efeonce, «potential copyright violation», y un video de barista, «likenesses of real people») [verificado 2026-09-16]; las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22]; y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]. El rechazo es un **riesgo observado en casos puntuales, no un filtro sistemático**; qué lo dispara: [sin dato]. Seedance vuelve a ser candidato con personas y marcas, presupuestando el posible rechazo cobrado (prueba corta y a baja resolución antes del final) y con Flux 3 / Wan 3.0 como alternativa si rechaza (§3, §4.3, §5.2, §5.3, §5.4, §5.6, §5.7, §6.8, §6.9, §6.12, §7.3, §7.4, §10.3).
 > **Antes (v1.14):** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
 > **Antes (v1.13):** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
 > **Antes (v1.12):** 2026-10-03 por Claude — v1.12 (TASK-1965 + TASK-1973): el árbol de imagen (§2.2) cubre cada técnica de edición de una foto existente con ganador medido, alternativa y «evita» — editar una zona, borrar, mover, incorporar, expandir, separar en capas, cambiar el fondo, rehacer un detalle y reiluminar—; receta §6.17; costo de Layerize con la base (§6.13); hallazgos de Seedream edit dentro de `pnpm ai:inpaint` (§5.2); pendientes BFL FLUX Tools, relight y video con máscara (§8.4); y la nueva §10.3 **Reiluminar (relight) — estudio de mercado 2026-10-03** (imagen y video, todo sin verificar en vivo).
@@ -12,16 +14,43 @@
 > **Historial anterior:** 2026-09-24 por Claude — v1.8: la CLI `higgsfield` **ya tiene sesión** (1.1.26, mkt@efeoncepro.com, workspace Private ultra); Recraft V4.1 por CLI pasa de «sin sesión» a «con sesión, salida SVG sin corrida real» (§6.14, §8.4, §10.1). Además quedan instalados los puentes MCP locales de Blender, Illustrator y Photoshop (skill `higgsfield-provider`), fuera del alcance de esta guía.
 > 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
 > 2026-09-23 por Claude — v1.6: 🔴 `--mask` de 2.5 no sirve para mover material que ya está en la foto: sobre un primer plano oscuro y desenfocado, Sunburst rellenó toda la zona editable con un panel plano de borde recto y borró un objeto que el prompt pedía conservar [verificado 2026-09-23] (§5.1). · v1.5: primer motion de Efeonce producido («No fuiste tú», CMP-001). Tres hallazgos medidos: **`h3max-r2v` SÍ acepta `--aspect`, y sin él devuelve 1920×1080 horizontal** aunque todas las referencias sean verticales (§5.5); **`--aspect adaptive` NO adopta el ratio de las referencias** (1152×1440 → 1920×1080); y 🔴 **ningún motor de video del carril soporta 4:5** — medido en los cinco, todos ofrecen `3:4` — siendo 4:5 el formato principal de los estáticos de Efeonce: se genera en 3:4 y se recorta (§3, §4.2). · v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
-> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI), `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API) y `pnpm ai:omni` (Gemini Omni 1.1 Cloud), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados. Desde v1.9, además, la música de marca vía fal (§5.9), que no pasa por esos CLIs.
+> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI), `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API) y `pnpm ai:omni` (Gemini Omni 1.1 Cloud), `pnpm ai:nano` (Nano Banana 2.1 Google directo), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados. Desde v1.9, además, la música de marca vía fal (§5.9), que no pasa por esos CLIs.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
 > [Generador de assets visuales](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) ·
 > [Manual del CLI fal](../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md) ·
 > [Manual del CLI Omni](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) ·
+> [Manual del CLI Nano](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) ·
 > [Selección de motor por contrato de fidelidad](../../.claude/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md)
-> **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `src/lib/ai/higgsfield-capabilities.ts` + `higgsfield-schemas.json` (registro Higgsfield), `scripts/ai/higgsfield-lane.ts` (carril Higgsfield), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/gemini-omni-cli.ts` + `scripts/ai/gemini-omni.ts` (CLI `ai:omni`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/fal.ts` (cuentas).
+> **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `src/lib/ai/higgsfield-capabilities.ts` + `higgsfield-schemas.json` (registro Higgsfield), `scripts/ai/higgsfield-lane.ts` (carril Higgsfield), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/gemini-omni-cli.ts` + `scripts/ai/gemini-omni.ts` (CLI `ai:omni`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/nano-banana-cli.ts` + `scripts/ai/nano-banana.ts` (CLI `ai:nano`), `src/lib/ai/fal.ts` (cuentas).
 
 ---
+
+## Ruta del fabricante BytePlus
+
+Para Seedream, Layerize, Seedance y Seed Speech del contrato Johor, usa `pnpm ai:byteplus` directo por defecto;
+`pnpm ai:layers` usa BytePlus Pro. [Manual y catálogo operativo](../manual-de-uso/creative-studio/byteplus-directo.md),
+[ADR](creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md). Las tarifas ya contienen el descuento de la cuenta.
+Los slugs, precios y mediciones de Fal/Higgsfield conservados abajo pertenecen a esos proveedores, que siguen
+como alternativas explícitas o para capacidades sin equivalencia directa. Esta elección local no habilita Globe.
+
+**Prueba propia 2026-10-12:** [Nexa cine, Seedream 5 Pro standard directo y Sunburst max](../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md).
+Pro conserva rostro, traje y atmósfera a menor costo; Sunburst sigue mejor acción/geografía en esa pareja.
+Una salida por motor, tamaños nativos distintos; sin ranking universal ni cambio de anclas/default OpenAI.
+[Seedance 2.5: costo API 720p/1080p](../audits/creative-studio/BYTEPLUS_DIRECT_PRICING_COMPARISON_2026-10-12.md)
+separa tarifa BytePlus de cuenta, Fal e Higgsfield API antes de descuento; excluye el conector por créditos.
+
+[Cuatro iconos 3D, Flare max vs Pro standard directo](../audits/ai-tooling/2026-10-12-iconos-flare-vs-seedream5-pro.md):
+mismos prompts, ambos PNG 2048²; Flare conserva mejor acabado mate y detalle fino, Pro resuelve los conceptos
+pero deriva a porcelana brillante. Cuatro salidas: US$1,72 / US$0,324 estimados. Fondo opaco controlado;
+no prueba alfa ni adopta nuevos glifos de Efeonce/AXIS.
+La segunda tanda del mismo informe, **clay 3D**, mantiene mate en ambos motores: Pro aporta marcas de
+modelado creíbles y Flare formas más infladas/regulares. Pro viable para clay genérico a US$0,081 por icono;
+revisar silueta/color y detalles añadidos, sin trasladar el juicio de vidrio/porcelana a todos los materiales.
+[Mate uniforme Efeonce](../audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md): cuatro formas nuevas,
+referencias planas aprobadas. Flare max más liso y regular en una pasada (US$1,751348/4); Pro standard conserva
+grano inicial (US$0,324/4), mejora con edición de superficie (otras US$0,324/4). Diferenciar primera pasada
+controlada y proceso final de dos pasadas; alfa derivado por color-key, avisos de geometría y sin adopción del catálogo. El operador seleccionó Flare para esta ronda; la evidencia Pro se conserva.
 
 ## 0. Cómo usar esta guía
 
@@ -73,7 +102,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | Materialidad, atmósfera, look development, lotes baratos, capas editables | `pnpm ai:fal` (Seedream 5) | Rango de aspecto 1/16–16, Lite a USD 0,035, único con layerize [oficial] |
 | Modelos propios de Higgsfield (SOUL 2, Marketing Studio) o familias que fal no expone (Ideogram 4.0, Qwen Image 3, Z-Image, PixVerse 6, LTX 2.5, Happy Horse, Kling 3.0/Omni/O3, Grok Imagine) | `pnpm ai:fal --capability hf-*` (Higgsfield API) | Precio exacto por API antes de encolar [contrato]; **sólo 1 de 44 verificada en real** (`hf-zimage-turbo`, 2026-09-17); las demás tienen precio y esquema validados pero **no salida**. Los créditos ya se cargaron [verificado 2026-09-22] (§5.8) |
 | Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; CLI **con sesión desde 2026-09-24**, salida SVG **sin corrida real** (§8.4). El Recraft de la **API** de Higgsfield (`hf-recraft41`): SVG **sin confirmar** (§5.8) |
-| Nano Banana 2 / Pro | Google directo (Vertex) | [decisión] nunca por fal; no hay CLI (§10) |
+| Nano Banana 2.1 / Pro | Google directo (Vertex) | [decisión] nunca por fal; 2.1 por `pnpm ai:nano`, Pro sin CLI (§10) |
 
 ### 2.2 Árbol
 
@@ -1238,10 +1267,22 @@ OpenArt 9–11: HappyHorse 1.1 · Grok Imagine 1.5 · PixVerse V6. Subcategoría
 
 | Carril | Motor | Estado | Regla |
 |---|---|---|---|
+| Google directo (Vertex `global`), CLI `pnpm ai:nano` | **Nano Banana 2.1** = `gemini-nano-banana-2.1` (default exacto del CLI) | Local: 1K, edición iterativa/stream/búsqueda 2K y Nexa 4K/high con ocho referencias verificadas 2026-10-06; [manual](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) | Texto/edición/referencias/video/PDF, 1K–4K, 14 ratios, thinking, búsqueda web/imagen; Batch/Interactions remoto/máscaras no implementados. No cambia el runtime del producto ni Globe |
 | Google directo (Vertex, location `global`), runtime `generateImage` provider `google-gemini-image` | **Nano Banana 2** = `gemini-3.1-flash-image` (default del provider; sobrescribible con `GOOGLE_GEMINI_IMAGE_MODEL`) | En runtime del producto; **sin CLI** [contrato] | Cambiar la env cambia todo el carril del producto [contrato] |
 | Google directo (Vertex) | **Nano Banana Pro** = `gemini-3-pro-image` | Disponible (models.get OK 2026-09-16) pero **ninguna superficie lo usa**; `gemini-3.1-pro-image` responde 404 [verificado] | Siempre directo por Google, nunca por fal [decisión]; exponerlo es decisión pendiente |
 | Google directo (Cloud Interactions `global`) | **Gemini Omni 1.1 Flash** (`gemini-omni-1.1-flash-preview`) | `pnpm ai:omni` local, seis operaciones verificadas con MP4 reales el 2026-09-24; [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) | Directo por Google, nunca por fal; separado de Globe y del ID Developer `gemini-omni-1.1-flash` |
 | Higgsfield CLI `~/.local/bin/higgsfield` 1.1.26 (cuenta mkt@efeoncepro.com, workspace Private), out-of-band | **Recraft V4.1** vectores reales (SVG) | Con sesión desde 2026-09-24 [verificado]; SVG real sin corrida | La 0.2.1 ya no puede iniciar sesión: actualizar con el instalador oficial antes de `auth login`, y `workspace set <id>` después. Distinto del carril Higgsfield **API** de `ai:fal` (§5.8) |
+
+**Nexa cine, evidencia visual 2026-10-06.** La [comparación de NB21 V2 con NX7d Sunburst](../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md)
+favorece Sunburst para esas dos imágenes por naturalidad de pose, luz y escena; Nano aporta
+5504×3072 nativo, identidad/emblema sostenidos y mejores reservas de composición. V2 pasó cine y
+4/4 reservas y quedó APROBABLE técnicamente, en estado `proof-only`. Mayor resolución o un gate
+técnico aprobado no demuestra superioridad artística. Prompt, expresión y referencias difieren: no
+es A/B controlado, ranking general ni benchmark de costo/velocidad. Para continuar ese registro,
+conservar la dirección de Sunburst NX7d; para probar Nano, usar la ficha y `pnpm foto:prompt`,
+`--resolution 4K --thinking high`, revisar a escala real y pasar la misma rúbrica cine.
+`high` es el mayor thinking del contrato Nano; no equivale a `quality max` de OpenAI. El default de
+`pnpm ai:image` sigue siendo `gpt-image-2`, sin cambio del runtime/Globe.
 
 ### 10.2 Evaluados y NO conectados (no usar como si existieran)
 

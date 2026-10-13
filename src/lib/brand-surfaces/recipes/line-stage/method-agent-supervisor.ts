@@ -27,7 +27,7 @@ import {
   lineVoiceFrame,
   lumVars,
   noteVars,
-  productIcon,
+  productRoleIcon,
   req,
   stageLayers,
   uniqueAssets,
@@ -126,7 +126,7 @@ export const methodAgentSupervisor: RecipeBuilder = ({ intent, manifest, recipe 
   const s = (intent.supervisor ?? {}) as SupervisorIntent
   const list = exactly<AgentIntent>(intent.agents, agents.count, 'Los agentes (`agents`)')
   const pending = noAmount(req(intent.pendingApproval, 'La propuesta que espera aprobación (`pendingApproval`)'), 'La propuesta (`pendingApproval`)')
-  const icon = productIcon('agentforce', 'El ícono de los agentes')
+  const icon = productRoleIcon('agents', 'El ícono de los agentes', line)
 
   const cards = list.map((agent, i) => {
     const where = `el agente ${i + 1} (\`agents[${i}]\`)`

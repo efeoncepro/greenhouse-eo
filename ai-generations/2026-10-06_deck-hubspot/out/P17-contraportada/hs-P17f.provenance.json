@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "4221b941fc7f0062f8a9b8a1f34c71ca8440ebcae0c462fd3ba12a10ef2c8b10",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3-contra-horizonte",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+      "sha256": "0463d21a42b850c7d169271d967c35c01b7bc3e333f5432e7586f3ded4cc4d7d"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

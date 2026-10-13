@@ -1,0 +1,323 @@
+{
+  "request": {
+    "schemaVersion": "1.0.0",
+    "quoteDate": "2026-10-09",
+    "offerId": "talent-assurance-staffing",
+    "deliveryModel": "staffing",
+    "engagementCode": "monthly",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "USD",
+    "duration": {
+      "unit": "month",
+      "periods": 3
+    },
+    "lines": [
+      {
+        "lineId": "design",
+        "profileId": "TEST-DESIGN",
+        "seniorityCode": "senior",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.5"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "shared-explicit",
+        "assignments": [
+          {
+            "resourceId": "design-suite",
+            "allocationId": "assignment-design-suite",
+            "scope": "account",
+            "scopeRef": "test-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "start"
+          },
+          {
+            "resourceId": "payment-platform",
+            "allocationId": "assignment-payment-platform",
+            "scope": "account",
+            "scopeRef": "test-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "assurance",
+            "allocationId": "assignment-assurance",
+            "scope": "account",
+            "scopeRef": "test-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "ops",
+            "allocationId": "assignment-ops",
+            "scope": "account",
+            "scopeRef": "test-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "onboarding",
+            "allocationId": "assignment-onboarding",
+            "scope": "account",
+            "scopeRef": "test-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "start"
+          }
+        ],
+        "notApplicable": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "test-discount",
+        "kind": "discount",
+        "rate": "0.10",
+        "lineIds": [
+          "design"
+        ],
+        "reason": "Synthetic test, not commercial policy"
+      }
+    ],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "snapshot": {
+    "schemaVersion": "1.0.0",
+    "snapshotId": "synthetic-co-cl",
+    "version": "test-1",
+    "mode": "synthetic",
+    "calculationCurrency": "USD",
+    "countries": [
+      "CO",
+      "CL",
+      "US"
+    ],
+    "currencies": [
+      {
+        "code": "USD",
+        "precision": 2
+      },
+      {
+        "code": "CLP",
+        "precision": 0
+      }
+    ],
+    "profiles": [
+      {
+        "profileId": "TEST-DESIGN",
+        "label": "Diseñador senior (prueba sintética)",
+        "seniorityCode": "senior",
+        "tierCode": "test-tier",
+        "cost": {
+          "amount": "1000",
+          "currency": "USD",
+          "unit": "month",
+          "source": {
+            "reference": "synthetic-test-only",
+            "effectiveFrom": "2026-01-01",
+            "effectiveUntil": "2026-12-31",
+            "status": "confirmed"
+          },
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "US"
+          },
+          "covers": [
+            "human_salary"
+          ]
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "tool:design",
+          "platform_fee",
+          "talent_assurance",
+          "operations"
+        ]
+      }
+    ],
+    "allocationPolicies": [
+      {
+        "policyId": "shared-explicit",
+        "mode": "shared",
+        "hoursPerFteMonth": "160",
+        "minimumBilledFte": "0",
+        "dedicatedBilledFte": "1",
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      },
+      {
+        "policyId": "dedicated-explicit",
+        "mode": "dedicated",
+        "hoursPerFteMonth": "160",
+        "minimumBilledFte": "0",
+        "dedicatedBilledFte": "1",
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      }
+    ],
+    "pricingPolicies": [
+      {
+        "profileId": "TEST-DESIGN",
+        "tierCode": "test-tier",
+        "offerId": "talent-assurance-staffing",
+        "engagementCode": "monthly",
+        "method": "markup",
+        "rate": "0.5",
+        "basis": "all_costs",
+        "minimumMargin": "0.2",
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      }
+    ],
+    "talentFactors": [
+      {
+        "country": "CO",
+        "referenceCountry": "US",
+        "factor": "0.8",
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      }
+    ],
+    "marketFactors": [
+      {
+        "country": "CL",
+        "factor": "1.2",
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      }
+    ],
+    "resources": [
+      {
+        "resourceId": "design-suite",
+        "label": "Suite de diseño de prueba",
+        "kind": "tool",
+        "amount": "1200",
+        "unit": "year",
+        "currency": "USD",
+        "scope": "account",
+        "covers": [
+          "tool:design"
+        ],
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      },
+      {
+        "resourceId": "payment-platform",
+        "label": "Plataforma de contratación de prueba",
+        "kind": "platform_fee",
+        "amount": "50",
+        "unit": "month",
+        "currency": "USD",
+        "scope": "account",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      },
+      {
+        "resourceId": "assurance",
+        "label": "Talent Assurance de prueba",
+        "kind": "talent_assurance",
+        "amount": "25",
+        "unit": "month",
+        "currency": "USD",
+        "scope": "account",
+        "covers": [
+          "talent_assurance"
+        ],
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      },
+      {
+        "resourceId": "ops",
+        "label": "Operación de prueba",
+        "kind": "operations",
+        "amount": "25",
+        "unit": "month",
+        "currency": "USD",
+        "scope": "account",
+        "covers": [
+          "operations"
+        ],
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      },
+      {
+        "resourceId": "onboarding",
+        "label": "Onboarding de prueba",
+        "kind": "setup",
+        "amount": "100",
+        "unit": "once",
+        "currency": "USD",
+        "scope": "account",
+        "covers": [
+          "setup"
+        ],
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      }
+    ],
+    "fx": [
+      {
+        "from": "USD",
+        "to": "CLP",
+        "rate": "1000",
+        "source": {
+          "reference": "synthetic-test-only",
+          "effectiveFrom": "2026-01-01",
+          "effectiveUntil": "2026-12-31",
+          "status": "confirmed"
+        }
+      }
+    ]
+  }
+}

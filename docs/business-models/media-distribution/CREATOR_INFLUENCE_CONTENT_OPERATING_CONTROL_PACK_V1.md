@@ -5,6 +5,7 @@
 > **Mercados iniciales:** Chile, Colombia, México y Perú
 > **Owner:** Media & Distribution + Commercial + Legal/IP + Finance
 > **Versión:** V1 · 2026-07-29
+> **Último delta:** 2026-10-10 — controles para lo incorporado desde el deck «Marketing de Contenidos» (§11); el estado no cambia
 
 Este documento convierte la oferta de Influencer Marketing, Creator Content y UGC en un sistema operable. No es un
 contrato, una opinión legal, una tarifa pública ni una promesa de performance. Las bandas económicas son hipótesis que
@@ -249,5 +250,114 @@ Estado actual: `approved_for_validation` + `scale_constrained`.
 Antes de cerrar venta general, validar con campañas reales: tres negociaciones regionales, conciliación de costos,
 exposición de caja, fees de derechos, impuestos, capacidad, satisfacción y un caso con expiry/takedown. Legal debe
 convertir checklists en contratos ejecutables y validar la versión vigente de cada norma antes de firmar o publicar.
+
+## 11. Delta 2026-10-10 — controles para lo incorporado desde el deck «Marketing de Contenidos»
+
+El operador aprobó el deck el 2026-10-10 y pidió incorporar su contenido al modelo (cita y alcance en el
+[Business Model, §11](CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md#11-delta-2026-10-10--incorporaciones-del-deck-marketing-de-contenidos)).
+Este delta traduce esas incorporaciones a registros y gates. No relaja ningún gate existente; todo lo que agrega va
+en la dirección de más control. El estado sigue `approved_for_validation` + `scale_constrained`, y las bandas de la
+§5 no cambian.
+
+### 11.1 Selección por función y nivel (Gate 2)
+
+El scorecard de cada candidato suma tres campos:
+
+- **función en la cartera:** alcance, credibilidad, producción, acceso a una audiencia o aprendizaje;
+- **nivel:** nano, micro, macro o celebridad, con la fuente y la fecha del dato de audiencia. No existe una tabla de
+  umbrales aprobada: el nivel se asigna por mercado y plataforma y se justifica en la shortlist (`por validar`);
+- **autenticidad de audiencia:** resultado del chequeo de fraude o anomalías, la herramienta usada y la fecha del
+  snapshot. Si no hay dato, el campo queda `unknown`, nunca como supuesto favorable.
+
+La shortlist no puede presentarse al cliente como «audiencia verificada» sin ese registro.
+
+### 11.2 Programa de creadores: roster y revisión por creador
+
+- El Creator Record suma mercado, audiencia, función y nivel, para ordenar el roster como lo promete la oferta.
+- La Renewal Queue pasa a tener **una decisión por creador en cada revisión trimestral**: renovar, reemplazar o
+  cerrar, con la evidencia y el derecho que vence. Un creador no se renueva por haber publicado mucho.
+
+### 11.3 De orgánico a pauta
+
+«Lo orgánico prueba, la pauta escala» no crea una vía rápida. Para que una pieza con un creador pase de orgánico a
+anuncio:
+
+1. se registra por qué se eligió: señal usada (retención, guardados, comentarios), período, fuente y contra qué se
+   comparó;
+2. se cumple el **Gate 6 — Amplify ready** completo. Haber publicado en orgánico, o que la pieza haya funcionado, no
+   concede uso pagado;
+3. si el derecho de pauta no se contrató al firmar, se negocia y se registra en la Rights Matrix antes de activar;
+4. el aprendizaje vuelve al Creator Record y a la campaña.
+
+Promocionar una publicación desde la cuenta de la marca también es uso pagado.
+
+### 11.4 UGC patrocinado: permisos por plataforma
+
+Cada activación desde el perfil del creador registra, además de la licencia contractual:
+
+| Formato | Evidencia mínima en el registro |
+|---|---|
+| Partnership ads (Instagram, Facebook) | permiso otorgado en la plataforma, cuenta, fecha, vencimiento y cómo se revoca |
+| Spark Ads (TikTok) | autorización del creador para la pieza, plazo autorizado y vencimiento |
+| Thought Leader Ads (LinkedIn) | aprobación de la persona dueña del perfil, pieza, plazo y revocación — `por validar` |
+
+La mecánica exacta de cada permiso cambia con la plataforma: se verifica contra su documentación vigente antes de
+cada activación; este pack no la fija. Si el permiso de plataforma y el contrato no coinciden en cuenta, pieza o
+plazo, la activación queda `blocked`. LinkedIn no tiene todavía overlay de derechos: no se activa sin revisión de
+Legal.
+
+Si el perfil amplificado es de un ejecutivo o de un empleado del cliente, no es un creador contratado: no entra por
+este pack hasta que exista una decisión sobre dueño y derechos (DA-07).
+
+### 11.5 Contenido de clientes reales y de la comunidad
+
+Contenido publicado por personas sin contrato con la marca (`por validar`, sin oferta propia):
+
+- una mención, una etiqueta o un hashtag no son una licencia;
+- para repostearlo o pautarlo hace falta una autorización escrita de la persona, registrada como cualquier otro
+  derecho en la Rights Matrix, con canales, plazo y retiro;
+- menores, terceros identificables y música siguen la regla general de terceros: sin clearance revisado, no se usa;
+- hasta que Legal entregue el formato de autorización, este contenido no se pauta.
+
+### 11.6 Social commerce y vivo con creadores
+
+Antes de comprometer una activación con formatos comprables o live shopping:
+
+- confirmar que el formato existe en la plataforma y el mercado del cliente en la fecha de la campaña;
+- confirmar quién opera tienda, catálogo, precios, stock y checkout: no es Efeonce por defecto y se cotiza aparte;
+- en vivo no hay ronda de aprobación previa de la pieza: se aprueban antes la lista de claims permitidos, el guion
+  base, el disclosure visible durante toda la transmisión y quién puede cortarla;
+- la grabación del vivo es un asset nuevo: sus derechos de reutilización se contratan aparte;
+- aplica el protocolo de crisis de la §7, con un responsable de la marca disponible durante la transmisión.
+
+Todo esto está `por validar`: no hay caso ejecutado.
+
+### 11.7 Creadores en reserva para un lanzamiento
+
+Dejar creadores «en reserva» antes de una fecha de lanzamiento es comprometer talento: aplican el Gate 4 y las reglas
+de caja de la §5 (no se reservan fechas sin fondos del cliente ni contrato). El contrato suma confidencialidad sobre
+el producto no anunciado y la fecha a partir de la cual el creador puede publicar (`por validar` con Legal).
+
+### 11.8 Origen por creador en el CRM
+
+Cuando el cliente compra la lectura «del social al CRM»:
+
+- cada creador y cada pieza tienen un identificador estable en enlaces, códigos y nombres de anuncio; la convención
+  se acuerda antes de publicar y se registra en la campaña;
+- el creador no recibe datos personales de los contactos;
+- recibir o enviar datos de contactos a plataformas o al CRM exige base de licitud revisada por Legal;
+- la integración con HubSpot o Salesforce no es parte de este pack: la implementa y la cotiza RevOps & CRM;
+- en el reporte, «origen» es atribución declarada. Aplica la jerarquía de evidencia de la §6: no se presenta como
+  incrementalidad ni como causalidad.
+
+Estado: `por validar`.
+
+### 11.9 Nota sobre las bandas de la §5
+
+Las bandas y el mínimo de activación de la §5 difieren de los del
+[Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) (§2 y §7). La diferencia es anterior
+al deck y no se resolvió en este delta: está registrada como decisión abierta DA-13 en el
+[modelo de la línea](MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#10-riesgos-y-decisiones-abiertas). Hasta que se decida, una
+cotización declara cuál de los dos documentos usó.
 
 Documentos complementarios: [Business Model](CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md), [Pricing Integrity Pack](CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md), [Rights & Usage Integrity Pack](CREATOR_INFLUENCE_CONTENT_RIGHTS_AND_USAGE_INTEGRITY_PACK_V1.md), [Service](../../services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md), [Manual](../../manual-de-uso/media-distribution/operar-creator-influence-content.md).

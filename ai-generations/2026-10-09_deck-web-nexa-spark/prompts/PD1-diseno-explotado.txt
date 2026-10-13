@@ -1,0 +1,9 @@
+An EPIC, CINEMATIC 3D hero image of a product-design workspace EXPLODING out of a screen toward the viewer.
+
+At the back, a large sleek glass design-tool window tilted in 3D perspective (turned to the left, receding to the right), its canvas glowing with a clean mobile app checkout screen being designed. From that screen, the interface BURSTS FORWARD in layered 3D depth toward the camera, each element floating at a different distance, as thick glossy glass-and-acrylic objects with real thickness and soft refraction: a big rounded primary button in vivid azure blue (#0375db), an input field, a product card, a toggle switch, a row of colour swatches (azure, deep navy, white), a large letterform "Aa" type specimen block, a grid of small component tiles, a layers panel strip, and thin alignment guide lines with small square selection handles around the button. The closest elements are larger and slightly out of focus, creating real cinematic depth of field; the screen in the back is sharp.
+
+Lighting: dramatic and cinematic — the screen emits a powerful azure-blue glow that rims every floating object from behind, volumetric azure light rays bursting out of the screen toward the viewer, a hard white key light from the upper left adding crisp specular highlights on the glossy edges. Deep contrast, premium sci-fi product-film look, ultra sharp, high-end 3D render with photographic realism.
+
+All interface content uses abstract shapes only — NO readable text, NO words, NO numbers, NO logos (the only glyph allowed is the large "Aa"). NO mouse cursors, NO hands, NO people, NO robots.
+
+ISOLATED on a fully TRANSPARENT background: only the window, the floating elements and their light rays; no room, no floor, no shadow on a ground, no smoke. Wide landscape composition with comfortable margins.

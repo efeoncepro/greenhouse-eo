@@ -1,5 +1,7 @@
 # Landing: Influencer Marketing, Creators & UGC
 
+> **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-creator-influence-brief` v3 entrega en `direct` al formulario HubSpot «Lead Gen - Influencer Marketing» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+
 - **Status:** published + index eligible; WordPress page `251627`, parent `/servicios/` page `251077`.
 - **Live URL:** `https://efeoncepro.com/servicios/agencia-de-influencers/`.
 - **Owner task:** `TASK-1598`.

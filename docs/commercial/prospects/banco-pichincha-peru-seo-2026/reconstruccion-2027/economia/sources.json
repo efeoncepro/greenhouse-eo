@@ -1,0 +1,92 @@
+{
+  "as_of": "2026-10-06",
+  "direct_panel_proxy_monthly": 3740,
+  "source_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/resultados.json",
+  "source_sha256": "8cc3cedc9c45eee3adff6c42c4426f2677e58bbe2178b207c1e410a034a28023",
+  "curated_families_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/oportunidades-curadas.csv",
+  "curated_families_sha256": "07c55215bc92f085a5f69c2d8899b7213e9f2ca2223dd43c3bc0354c6b4ffe23",
+  "coverage_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/OPORTUNIDAD-Y-COBERTURA.md",
+  "coverage_sha256": "d8e608e9685823d5cb5fdfe12895b201a932527cf925538b6fd7bc66ac4fe405",
+  "family_count": 32,
+  "family_volumes_aggregated": false,
+  "current_brand_baseline": null,
+  "current_funnel_conversion": null,
+  "eligible_multichannel_traffic": null,
+  "external_balance_bank_value": null,
+  "historical_artifacts": [
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/modelo-anual/Pibank-caso-negocio-anual-2027.xlsx",
+      "sha256": "6eaf70e9aa23b69fbde5b1c3df4b1d5b729d7196bafbaabdc7d1ca725712234a",
+      "status": "withdrawn_for_client_use; preserved historical"
+    },
+    {
+      "path": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/modelo/Pibank-caso-negocio-2027.xlsx",
+      "sha256": "275722eabca7c1d373203acf6a0c1ceb9adaa9e29a8ad9a10e899a969606c9a9",
+      "status": "withdrawn_for_client_use; preserved historical"
+    }
+  ],
+  "capacity_candidate": {
+    "authority": "bottom-up SEO/GEO + PR; no Operations approval",
+    "base_hours": 1066,
+    "reserve_hours": 150,
+    "total_hours": 1216,
+    "roles_base_hours": {
+      "Dirección": 72,
+      "SEO técnico": 134,
+      "Editorial": 236,
+      "Implementación CMS": 102,
+      "Datos y medición": 70,
+      "AEO": 52,
+      "QA": 76,
+      "Coordinación": 72,
+      "Relaciones con medios": 108,
+      "Editorial PR": 60,
+      "Datos PR": 48,
+      "Preparacion de voceria": 12,
+      "QA y medicion PR": 24
+    },
+    "bounds": "1dominioPE/es;12entregas sustanciales6newmax+6existing;24FAQ;12CMS≤8h;12preguntas3superficies1rep36obsmonthly; sinapp/core/deploy asumido;4campañasPR/12angulos/48propuestas/4voceria",
+    "fee": null,
+    "roster": null
+  },
+  "competitor_families_file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/plan-busquedas.csv",
+  "competitor_families": 19,
+  "ranked_observations": 2278,
+  "exact_queries": 1594,
+  "proxy_by_lane": {
+    "direct": 3740,
+    "conditional": 3330,
+    "competitor": 18300,
+    "assisted": 5680
+  },
+  "scope": "bounded_competitor_capture_not_TAM",
+  "current_backlink_baseline": {
+    "target": "pibank.pe",
+    "queried_at": "2026-10-07T01:01:39.681Z",
+    "provider": "DataForSEO",
+    "rank_scale": "one_hundred",
+    "domain_rank": 8,
+    "backlinks_summary": 2,
+    "referring_domains_summary": 1,
+    "backlinks_spam_score": 5,
+    "target_spam_score": 0,
+    "detail_returned": 1,
+    "detail_items": [
+      {
+        "url_from": "https://afluenta.pe/pibank-peru-cuenta-de-ahorros-digital-beneficios-trea-y-como-abrirla/",
+        "url_to": "https://pibank.pe/",
+        "anchor": "Visitar Pibank Perú",
+        "dofollow": true,
+        "is_lost": false,
+        "first_seen": "2026-09-29 17:42:58 +00:00",
+        "last_seen": "2026-09-29 17:42:58 +00:00"
+      }
+    ],
+    "cost_usd": 0.048072,
+    "source_files": [
+      "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/backlinks-summary-provider.json",
+      "docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-gap-closure-2026-10-06/backlinks-detail-provider.json"
+    ],
+    "limitation": "Provider index snapshot, not full web census;summary2/detail1 are separate endpoint observations, not forced to agree. Not Moz DA/Brand Authority, not earned program results."
+  }
+}

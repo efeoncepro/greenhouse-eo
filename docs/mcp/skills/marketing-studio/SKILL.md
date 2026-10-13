@@ -1,17 +1,20 @@
 ---
 name: marketing-studio
-description: How to read Efeonce Marketing Studio through MCP — find what needs attention, open a campaign, read its pieces, copies, ad configurations, media plan and calendar, look at a piece, and report states and budgets without inventing. Load it before answering anything about a campaign, a creative piece, a media budget or a publishing date.
+description: How to use available Efeonce Marketing Studio MCP tools — find what needs attention, open a campaign, read its pieces, copies, ad configurations, media plan and calendar, look at a piece, use versioned channels and validation findings when available, and report states and budgets without inventing. Load it before answering anything about a campaign, a creative piece, a media budget or a publishing date.
 ---
 
-# Reading Efeonce Marketing Studio
+# Using Efeonce Marketing Studio
 
 Efeonce Marketing Studio is the system of record for Efeonce campaigns: brief and decisions, creative concepts,
 pieces (images and videos) with their versions, literal copies per channel, ad configurations, the media plan and
-the publishing calendar. This manual teaches you to read it correctly through its `studio.*` tools. It grants no
+the publishing calendar. This manual teaches you to use the available `studio.*` tools and interpret their results. It grants no
 permission: every call is scoped server-side to the organizations your connection may see.
 
-Everything here is read-only today. You cannot create, edit or approve anything yet; if a person asks for a change,
-say so and point them to the Studio web app.
+Discover the tools actually available in the current session before acting. The versioned channel catalog
+requires a compatible Studio deployment and gateway configuration. Delegated T1 writes also require the
+connection to carry the corresponding authority. T2 actions remain in the operator lane. A name in this manual
+or in Studio's provider manifest does not prove federation or permission. If a required tool is absent, report the limitation
+and prepare a reviewable proposal; do not claim the write happened or substitute a service identity.
 
 ## Recommended flow
 
@@ -29,7 +32,8 @@ say so and point them to the Studio web app.
    - to actually look at a piece → `studio.asset.preview`. It returns the image itself: by default the
      thumbnail (longest side 640 px), which is enough to recognize and describe a piece. Ask for
      `size: "preview"` (1600 px) only when you must read fine detail such as small text. For a video it is a
-     single frame, not the video;
+     single frame, not the video; whether the person can watch it in Studio is the piece's `playback` (null = no
+     light web version yet), not something you can play;
    - copies → `studio.campaign.copies.list`;
    - ad configurations → `studio.campaign.ads.list`;
    - budget, flight and audiences → `studio.campaign.media_plan.get`;
@@ -75,9 +79,13 @@ them. Mentions, emojis and line breaks are intentional. Character counts are giv
 
 ## Pieces and versions
 
-- A piece has versions; the current one is the latest. Two versions with the same fingerprint are the same file.
+- A piece has versions; the current one is the latest imported or approved version. A newly uploaded version
+  may still be pending review and is not automatically current. Two versions with the same fingerprint are the same file.
 - The original file may live in the team's working folder; the piece still exists in Studio with its versions and
   previews. Do not tell a person a piece "is missing" because its original is not stored in Studio.
+- `playback` is a light web copy of a video for watching in Studio (up to 720 px on the short side). It is not the
+  original and not what gets published; its `url` is temporary like the previews. `null` means the piece is not a
+  video or its web copy is not ready yet, never that the video is missing.
 - `thumbUrl` and `previewUrl` are temporary links (one to two weeks). Do not store them or hand them out as
   permanent; read the resource again to get fresh ones, or use `studio.asset.preview` to look at the piece.
 - An ad configuration (piece + copy + channel + placement + audience + tracking parameters) is not an active ad.
@@ -111,3 +119,95 @@ simply answers as not found. Omit the filter unless the person asked about a spe
 - That a post was published because its scheduled date passed.
 - An approval that is not recorded in the states.
 - Any number, date or text that the tools did not return.
+
+## Versioned channels and ICP (use only tools available in the session)
+
+- Read `studio.channels.list`, optionally with an exact `version`; `studio.channel.get` gives one channel.
+  Keep the returned version with the plan. `studio.channel_catalog.versions.list` describes publication history.
+  Published and superseded specifications are immutable; publishing another version does not revalidate content.
+- A canonical channel separates modality/family from buying platform and appearance. Market and account belong
+  to the activation; LinkedIn personal is an account, and UGC is asset content source. Never infer canonical keys
+  from historical values such as `linkedin`, `meta` or `meta-vertical`.
+- Tracking is scoped by appearance/placement. Null tracking with an unresolved reason is incomplete coverage,
+  not permission to invent UTMs. GA4 classification describes manual traffic only; automatic tagging is separate.
+- For legacy channels, read `studio.channel_aliases.list`; propose an exact rawValue → channelKey/version mapping
+  for human review. When authorized and available, `studio.channel_alias.map` uses that mapping plus status,
+  idempotency key and the alias's current revision when it exists. Mapping an alias does not rewrite old snapshots.
+  The operator-only backfill CLI is separate and defaults to dry-run.
+- Read `studio.campaign.channel_findings.list` for evidence. `channelCatalogVersion` identifies the original
+  validation, and `validatedWithPreviousSpec` means a newer catalog exists, not that the record is invalid.
+  `studio.campaign.channels.revalidate` is an explicit T1 write: first dry-run with the campaign revision, review
+  findings, then apply when authorized. Only records without hard findings advance; blocked records retain their
+  snapshot. Reread findings and affected records after applying.
+- Copy remains literal. In warn mode a hard finding can accompany a successful write; that success does not
+  certify compliance. In enforce mode blocking findings reject the write. Fix the proposed content or reference
+  deliberately, never silently truncate copy to pass.
+- Catalog governance uses `studio.channel_catalog.draft.create`, `.draft.channel.upsert`, `.version.publish` and
+  `.draft.discard`, with `marketing_studio.catalog.manage` (admin/operations). Catalog scope is global, not a
+  fabricated organization. Service tokens cannot govern it. Discard is T2 and is not newly federated by this work.
+- `studio.customer_model.get` intersects organization authority and returns a versioned Greenhouse model only
+  when the customer-model reader is provisioned. Disabled/unavailable is not an empty model. Never fabricate names or ids.
+  `studio.campaign.audience.upsert` stores ids/version/buying role and a bow-tie stage independently of creative
+  funnel phase; an explicit pending note is the supported fallback. `.audience.remove` is T2.
+  `studio.campaign.customer_model_version.set` reports incompatible references without migrating audiences.
+
+These workflows grant no permission and certify no deployment, approval, media launch or spend.
+
+
+## API clients and available write tools
+
+The operator has a separate HTTP client for the same versioned API, including file uploads and original downloads.
+That client does not expose additional MCP tools or grant your connection its credentials. Discover the tools in
+this session; if a needed tool is absent, leave a reviewable proposal and report the limitation.
+
+When a T1 tool is available and authorized, read its current schema and target revision. Validate with dry-run when
+supported, keep one idempotency key per logical write and send the required revision. On an uncertain outcome,
+reread before retrying; on a revision conflict, resolve the change rather than forcing a newer revision. A successful
+write in warn mode may contain hard channel findings: report them and do not treat it as approval.
+
+For uploads, bytes go directly to storage through the ticket, never inside a tool call. The service verifies the
+size and recomputed fingerprint before creating a pending-review version. Pending verification is not completion;
+resuming confirmation does not resume an interrupted byte transfer. An existing fingerprint can resolve as a
+duplicate without creating another version. Preserve usage rights and do not claim that downloading grants a license.
+
+The current catalog separates paid/organic/owned/earned modality, family, buying platform, appearance platforms,
+placements and formats; spec version, provenance and verification date belong with decisions. Do not collapse
+buying and appearance platforms into a single label or infer a market/account from the channel key. API availability,
+local-client support and real MCP delegation are separate facts; approvals remain in the authorized operator lane.
+
+## Activation plan and execution evidence
+
+Discover availability before using these tools. A declared API capability is not proof that this connection can invoke it.
+Use `studio.activation.accounts.list` and `studio.campaign.activations.list` with their cursors. `studio.activation.get`
+returns the plan, exact asset versions, local account time, execution evidence, warnings and actor-attributed events.
+
+Use `studio.activation.plan`, `.update`, `.reschedule` and `.cancel` with the required revisions and dry-run first.
+Rescheduling changes the plan only. Publication and paid delivery require observed evidence; elapsed time is not proof.
+Unlinked observations come from `studio.execution.unlinked.list`; link/unlink using `studio.activation.execution.link`
+and `.unlink`, including both revisions. `studio.activation.from_execution` can prefill from tool evidence but requires
+an explicit campaign and exact pieces before creating a plan. Never infer campaign identity from post text.
+
+`studio.activation.tracking.preview` derives catalog-based parameters. Before an activation id exists, the result can
+require that id and omit the final URL. Read the created activation for its snapshot. Missing or mismatched published
+tracking produces warnings; published or delivery evidence freezes attribution. Do not concatenate tags yourself.
+
+An owned site declares its CMS separately from its domain. A Notion draft link is stored only; these operations do not
+read or write Notion. Without a CMS reader, public URL evidence needs a person-confirmed publication date before the
+activation becomes published. `studio.activation.publication.confirm`, `studio.campaign.tracking_slug.set` and
+`studio.execution.legacy.backfill` require a person; a service identity cannot impersonate one. Backfill preserves old
+observations and requires separate confirmation of activation plans. These tools do not publish content or authorize spend.
+
+
+## Email and web activation details
+
+When the server supports these fields, activation detail and calendar return `email` and `web`. Preserve literal
+`email.subject.text` and `email.preheader.text`; characterCount counts Unicode codepoints and copyLimits come
+from the activation's pinned catalog. Sender and audience metadata carry source/observedAt. Never sum list
+sizes into recipients. `email.delivered`, `opens`, `clicks` and audience contactCount are latest snapshots with
+value/source/observedAt and optional window bounds, not series or necessarily unique people. Null is absent.
+
+`web.destinationActivationCount` counts other noncancelled activations pointing to that exact URL within the
+organization, excluding archived campaigns. `web.connectedForms[].provider` is growth_forms and id is its
+public form_key. Do not confuse it with a downstream HubSpot delivery destination or claim lead delivery from
+an observed form. `formReadStatus=unavailable` is a reader warning; missing evidence is unknown, never false.
+Check the deployed schema and reader freshness; fields absent on older servers do not authorize substitutions.

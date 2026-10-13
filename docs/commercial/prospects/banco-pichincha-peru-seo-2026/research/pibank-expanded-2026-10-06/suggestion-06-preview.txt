@@ -1,0 +1,43 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 dataforseo /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/dataforseo/cli.ts -- run /v3/dataforseo_labs/google/keyword_suggestions/live --file /Users/jreye/Documents/greenhouse-eo/docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-expanded-2026-10-06/suggestion-06-request.json --consumer seo --org org-2df565fb-98aa-42f7-b324-ea9a2209017f --estimated-usd 0.06 --max-usd 0.06 --dry-run
+
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "dryRun": true,
+  "surface": "dataforseo-cli",
+  "endpoint": {
+    "id": "post:dataforseo.labs.google.keyword.suggestions.live",
+    "method": "POST",
+    "path": "/v3/dataforseo_labs/google/keyword_suggestions/live"
+  },
+  "family": "labs",
+  "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+  "consumer": "seo",
+  "taskCount": 1,
+  "requestCount": 1,
+  "requestBatchSize": null,
+  "tasks": [
+    {
+      "keyword": "fondo de seguro de depositos",
+      "location_code": 2604,
+      "language_code": "es",
+      "include_seed_keyword": false,
+      "include_serp_info": true,
+      "limit": 400,
+      "offset": 0,
+      "order_by": [
+        "keyword_info.search_volume,desc"
+      ]
+    }
+  ],
+  "batchLimit": null,
+  "estimatedCostUsd": 0.06,
+  "estimateStatus": "available",
+  "maxUsd": 0.06,
+  "source": {
+    "documentationUrl": "https://docs.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live/",
+    "sourceModifiedAt": "2026-08-14T14:59:52.000Z"
+  }
+}

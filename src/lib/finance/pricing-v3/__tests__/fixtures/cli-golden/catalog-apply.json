@@ -1,0 +1,35 @@
+{
+  "args": [
+    "catalog",
+    "apply",
+    "--input",
+    "data/pricing/v3-catalog/examples/illustrative-increase.json",
+    "--impact",
+    "data/pricing/v3-catalog/examples/update-impact-briefs.json",
+    "--confirm",
+    "a413b30207d3c7f0e9d058057cf080b23530a099196a2790c07bb04e27660eb9",
+    "--out",
+    "<tmp>/catalog.next.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 156,
+    "sha256": "17294828a1148331b1f9fa255343cd7bff1e4b61e6fa4a54a7af98dc8940c0f8",
+    "text": "{\n  \"updated\": true,\n  \"version\": \"review-example-v2\",\n  \"digest\": \"21f260a93ca7fbfea1b4305da3e63f30b737d5b6cef68d4145d486ee262825c9\",\n  \"binding\": false\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "catalog.next.json",
+      "mode": "600",
+      "content": {
+        "bytes": 165516,
+        "sha256": "dc6337143a4e254e70b677568ea4587a1767c881709c688d066448edd0a0c0d7"
+      }
+    }
+  ]
+}

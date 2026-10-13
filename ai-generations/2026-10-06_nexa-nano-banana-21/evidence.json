@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-06",
+  "scope": "Internal visual experiment requested by operator",
+  "state": "proof-only",
+  "selectedVersion": 2,
+  "runs": [
+    {
+      "version": 1,
+      "file": "ai-generations/2026-10-06_nexa-nano-banana-21/plates/NB21-NEXA-CINE-v1.png",
+      "sha256": "c1bb715ba44795c5a3f4c60ed3be2d1c96a6a720ef766bd1c45134d9f55cb285",
+      "model": "gemini-nano-banana-2.1",
+      "resolutionRequest": "4K",
+      "thinking": "high",
+      "width": 5504,
+      "height": 3072,
+      "latencyMs": 86594,
+      "usage": {
+        "promptTokenCount": 12468,
+        "candidatesTokenCount": 3844,
+        "totalTokenCount": 20398,
+        "cachedContentTokenCount": 7983,
+        "trafficType": "ON_DEMAND",
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 8960
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 3508
+          }
+        ],
+        "cacheTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 5737
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 2246
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 64
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3780
+          }
+        ],
+        "thoughtsTokenCount": 4086
+      },
+      "nominalVisualUsd": 0.0756
+    },
+    {
+      "version": 2,
+      "file": "ai-generations/2026-10-06_nexa-nano-banana-21/plates/NB21-NEXA-CINE-v2.png",
+      "sha256": "c9be423c85fdaa95f42a35f145fea959410efbb2fc28b6151110853a6e941b4d",
+      "model": "gemini-nano-banana-2.1",
+      "resolutionRequest": "4K",
+      "thinking": "high",
+      "width": 5504,
+      "height": 3072,
+      "latencyMs": 62354,
+      "usage": {
+        "promptTokenCount": 12559,
+        "candidatesTokenCount": 3780,
+        "totalTokenCount": 19463,
+        "cachedContentTokenCount": 7985,
+        "trafficType": "ON_DEMAND",
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 8960
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 3599
+          }
+        ],
+        "cacheTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 2288
+          },
+          {
+            "modality": "IMAGE",
+            "tokenCount": 5697
+          }
+        ],
+        "candidatesTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 3780
+          }
+        ],
+        "thoughtsTokenCount": 3124
+      },
+      "nominalVisualUsd": 0.0756
+    }
+  ],
+  "review": {
+    "verdict": "APROBABLE; operator approval pending",
+    "cineShadowShare": 0.6711134453781512,
+    "textColumnShare": 0.46,
+    "signatureBedContrastWhite": 5.32,
+    "reservations": "4/4 PASS",
+    "identityAndEmblem": "reviewed at original pixel scale",
+    "remainingNotes": "Lens reflections visible; both pupils readable. Native ratio approximate16:9; output preserved without crop/resize/grade."
+  }
+}

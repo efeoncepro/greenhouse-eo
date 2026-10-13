@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "sections": 5,
+  "pages": [
+    {
+      "role": "cover",
+      "recipe": "cover-proposal",
+      "layout": "orbit",
+      "voice": {
+        "eyebrow": "Propuesta técnica · Octubre 2026",
+        "question": "¿Dónde nace una postulación?",
+        "answer": [
+          "En la",
+          "búsqueda"
+        ]
+      },
+      "body": "Preparada para **Educación Continua UTEM** · Compra Ágil 5251-1060-COT26",
+      "column": {
+        "topPx": 220
+      },
+      "clientLogo": {
+        "path": "ai-generations/2026-10-08_utem-propuesta/logos-cliente/logo-v3-blanco.svg",
+        "alt": "UTEM · Dirección de Educación Continua"
+      }
+    },
+    {
+      "role": "close",
+      "recipe": "close-proposal",
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-10-07_pibank-propuesta/plates/BR3f-contra-horizonte-engine.png",
+        "alt": "Nexa, de espaldas, camina hacia una órbita de luz azul Efeonce que se levanta como un portal en el horizonte"
+      }
+    }
+  ]
+}

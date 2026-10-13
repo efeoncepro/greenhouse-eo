@@ -59,3 +59,14 @@ confirmación explícita de una persona sobre **esa** lista. Studio nunca las ej
 `studio.campaign.get` · `studio.campaign.ads.list` (URL destino con UTM) · `studio.campaign.posts.list` ·
 `studio.calendar.get`. Mañana (T1): ‹command de referencias SEO/AEO del plan› — referencia al sujeto de SV360 + snapshot
 fechado (valor, métrica, fecha, lane, `etvMethodology.version`), nunca copia de series.
+
+
+### Catálogo y operación disponible (2026-10-04)
+
+Studio API1.6.0 expone catálogo versionado y validación: si están disponibles en la sesión, leer
+`studio.channels.list` / `studio.channel.get` con versión y procedencia, y `studio.campaign.channel_findings.list`
+para hallazgos. Comprador/plataforma de aparición/placement no son una sola dimensión; preservar tracking
+incompleto como desconocido, sin inventar UTM. `studio.customer_model.get` conserva el modelo de Greenhouse;
+flag deshabilitada o consumer ausente no equivale a modelo vacío. La CLI local HTTP de Greenhouse opera el
+contrato bajo sus scopes, pero no concede al rol tools ni autoridad MCP. TASK-2003 T1 corre en paralelo;
+TASK-1899 está retirada y la aprobación/gasto sigue fuera de ejecución autónoma.

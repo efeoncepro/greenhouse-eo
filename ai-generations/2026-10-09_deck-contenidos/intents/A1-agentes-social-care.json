@@ -1,0 +1,103 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "brochure",
+  "recipe": "method-agent-supervisor",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Social care · equipos híbridos",
+    "question": "¿Quién responde por el agente?",
+    "answer": [
+      "Una",
+      "persona"
+    ]
+  },
+  "body": "Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y **quién** lo aprueba.",
+  "note": "Ejemplo ilustrativo · cada ficha se define con tu equipo",
+  "supervisor": {
+    "kicker": "Persona responsable",
+    "role": "Líder de comunidad",
+    "initials": "LC",
+    "duty": "Aprueba, corrige y detiene"
+  },
+  "agents": [
+    {
+      "title": "Respuestas",
+      "job": "Responde lo frecuente con la base de conocimiento.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Base de conocimiento",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Respuesta al mensaje",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Sólo preguntas frecuentes",
+          "state": "h"
+        },
+        {
+          "kind": "Aprueba",
+          "value": "La líder, en lo demás",
+          "state": "n"
+        }
+      ]
+    },
+    {
+      "title": "Clasificación",
+      "job": "Ordena, etiqueta y deriva cada mensaje.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "DM y comentarios",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Etiqueta y prioridad",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Derivar a ventas o soporte",
+          "state": "y"
+        },
+        {
+          "kind": "Nunca",
+          "value": "Cerrar un reclamo",
+          "state": "n"
+        }
+      ]
+    },
+    {
+      "title": "Alertas",
+      "job": "Detecta alzas y temas sensibles.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Menciones y sentimiento",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Alerta con contexto",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Nada sin aprobación",
+          "state": "n"
+        }
+      ]
+    }
+  ],
+  "pendingApproval": "Respuesta sugerida a un reclamo"
+}

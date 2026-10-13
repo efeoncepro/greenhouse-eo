@@ -1,0 +1,22 @@
+{
+  "id": "NS2-nexa-cine-spark-hombro",
+  "formato": "9:16",
+  "registro": "cine",
+  "alcance": "nexa",
+  "impacto": true,
+  "identidad": [{ "persona": "nexa", "expresion": "determinacion" }],
+  "objetos": [
+    { "objeto": "traje-bionico-nexa" },
+    { "objeto": "spark", "vista": "cine-tres-cuartos" }
+  ],
+  "llave": { "fuente": "one hard narrow strip softbox", "lado": "left", "distancia": "close, slightly above eye level", "tamano": "narrow" },
+  "primerPlano": "none: isolated cutout on a transparent background",
+  "fondo": "none: fully transparent background, the figure only",
+  "fenomeno": {
+    "que": "the azure glow of the suit seams and the Spark's LED eyes, the only blue light on her",
+    "esServicio": "La luz azul de Engine es la capa digital que ella opera junto a su agente."
+  },
+  "lecho": "sin-lecho",
+  "sinLechoPorque": "Recorte aislado con fondo transparente para una lámina de deck: la figura se compone sobre la plataforma de luz y la firma vive en la lámina.",
+  "escena": "SCENE (cinematic, Hollywood blockbuster hero still, ISOLATED CUTOUT on a fully transparent background, no environment at all): she (the woman of the references, her face exactly as in the references) stands FULL BODY from head to boots, a heroic power stance full of attitude: weight on her back leg, her body turned a little to her right in a three-quarter stance, one hand resting firmly on her hip, the other arm relaxed and slightly away from the body, shoulders back, chin lifted a touch, head almost frontal, looking straight into the lens with a fearless, determined, closed-lips smirk — lips closed, NO teeth showing. Nothing stiff: a natural contrapposto with a slight lean, her long dark wavy hair moving as if caught by a light breeze. REALISTIC ADULT PROPORTIONS: the camera is about five meters away at waist height with an 85mm lens, nothing foreshortened, her head about one eighth of her height. She wears the bionic suit exactly as in its reference, WITH the small navy Efeonce isotype inlaid on her chest plate on her left side exactly as in the reference and the macro (no other logo, no lettering), and no watch, bracelet or ring. ONE Spark, copied EXACTLY from its reference, sits on her right shoulder, sharp, leaning forward with the same attitude, one tiny fist raised, its LED eyes glowing azure; it is smaller than her head. Lighting: a single hard narrow key light from the left sculpts her face and suit with deep contrast, NO fill light, a cool azure rim light from behind outlines her hair, shoulders and the Spark so the silhouette separates cleanly; the suit seams glow softly azure. Crisp edges everywhere for a clean cutout. NO floor, NO cast shadow, NO haze, NO lens flare, NO background objects. No readable text anywhere."
+}

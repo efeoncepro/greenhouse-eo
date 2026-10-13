@@ -1,0 +1,7 @@
+existing_visits_example,opening_rate_test,funding_rate_test,funded_reference_test,funded_improved_test,difference_test,nature
+10000,0.03,0.65,130.0,195.0,65.0,sensitivity_not_observed_volume_not_causal_lift_not_added_to_panel
+10000,0.02,0.75,130.0,150.0,20.0,sensitivity_not_observed_volume_not_causal_lift_not_added_to_panel
+10000,0.03,0.75,130.0,225.0,95.0,sensitivity_not_observed_volume_not_causal_lift_not_added_to_panel
+100000,0.03,0.65,1300.0,1950.0,650.0,sensitivity_not_observed_volume_not_causal_lift_not_added_to_panel
+100000,0.02,0.75,1300.0,1500.0,200.0,sensitivity_not_observed_volume_not_causal_lift_not_added_to_panel
+100000,0.03,0.75,1300.0,2250.0,950.0,sensitivity_not_observed_volume_not_causal_lift_not_added_to_panel

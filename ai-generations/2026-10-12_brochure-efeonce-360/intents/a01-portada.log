@@ -1,0 +1,23 @@
+✓ deck.cover-brochure → graphic-line-deck
+  /private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/c4e3c349-150a-454e-a366-3ec7dbc9bb43/scratchpad/intents/out/a01-portada
+{
+  "deckPlan": {
+    "tenderId": "a01-portada",
+    "slides": [
+      {
+        "slideId": "deck-cover-brochure",
+        "contentType": "deck.cover-brochure",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "logoLeft": "--gl-logo-left=140px",
+            "logoTop": "--gl-logo-top=300px",
+            "eyebrowTop": 490,
+            "questionTop": 538,
+            "answerTop": 600,
+            "answerPx": 124,
+            "answerInset": "--gl-answer-inset=-4px",
+            "bodyTop": 752,
+            "bodyPx": 28,
+            "bodyWi

@@ -1,0 +1,32 @@
+{
+  "args": [
+    "compose",
+    "schedule",
+    "--input",
+    "data/pricing/v3-operating/designer.artifact.json",
+    "--milestones",
+    "<tmp>/milestones.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 360,
+    "sha256": "5bef9aad349b951d2b79044aa0b46ed168d031e064440d49148a8d78ac1be39b",
+    "text": "{\n  \"error\": {\n    \"code\": \"SCHEDULE_MILESTONES_INVALID\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"milestones\",\n    \"issues\": [\n      {\n        \"path\": \"milestones\",\n        \"rule\": \"empty\"\n      }\n    ]\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "milestones.json",
+      "mode": "644",
+      "content": {
+        "bytes": 2,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "text": "[]"
+      }
+    }
+  ]
+}

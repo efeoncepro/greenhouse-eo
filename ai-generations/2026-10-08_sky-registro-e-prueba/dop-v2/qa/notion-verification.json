@@ -1,0 +1,12 @@
+{
+  "pageId": "5e4b2473-c791-4933-a3e6-5531bb72c885",
+  "lastEdited": "2026-10-08T18:16:38.802Z",
+  "verification": {
+    "allSixUpdatesPresent": true,
+    "originalDPrefixAndUntouchedETailPreserved": true,
+    "uploadedEvidenceImages": 5,
+    "operatorApproval": "pending",
+    "DOriginalPixels": "inaccessible in this run; exact match unverified"
+  },
+  "afterSha256": "7067951823895fcd9ae4b1fc14f3ea40a919a4c0de67bb84232eb4e7ed43652a"
+}

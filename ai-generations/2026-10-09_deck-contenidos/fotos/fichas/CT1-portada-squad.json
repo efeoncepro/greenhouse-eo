@@ -1,0 +1,42 @@
+{
+  "id": "CT1-portada-squad",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (staged, cinematic high-impact editorial photograph, a city rooftop at night, cold blue hour just ended): Karo, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; her left shoulder is at about 62 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: she has just posted a vertical video and lifts her modern frameless phone at shoulder height on the frame-right side of her body; she looks straight into the lens with a playful, confident half-smile, head almost frontal. From the phone's screen one solid vertical column of cool white-azure light shoots straight up into the haze like a searchlight, standing just to the frame-right of her face. Across the city far behind her, dozens of tiny vertical 9:16 glows light up in distant windows and rooftops, the same video now playing everywhere: abstract, unreadable moments, no faces, no products. The column, the skyline and every lit window and glow exist ONLY in the RIGHT 50% of the frame. The LEFT 50% of the frame is an empty, deep dark night sky with soft haze above a completely unlit, black part of the city: no lit windows, no screens, no glows, no lights, no people. No warm light, rich contrast, no logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the dark rooftop concrete parapet close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-portada",
+  "identidad": [
+    {
+      "persona": "karo"
+    }
+  ],
+  "llave": {
+    "fuente": "the rising column of cool white light from her phone, just beside her face",
+    "lado": "to the frame-right of her face, at head height",
+    "distancia": "about 40 cm from her face"
+  },
+  "fondo": "the city skyline far behind her, melted into large cold round bokeh",
+  "fenomeno": {
+    "que": "one posted video shoots up as a searchlight and lights up dozens of screens across the city",
+    "esServicio": "Social media: una idea publicada que llega a todas partes"
+  },
+  "excepcion": "Operador 2026-10-09: elenco sin línea fija y con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)"
+}

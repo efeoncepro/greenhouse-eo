@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce · **Product brand habilitadora:** Reach, cuando aporte método o tooling
 > **Estado:** `Proposed` — la solución sigue `Approved for validation` en el catálogo de la línea; esta ficha propone su
 > estructura V1 y no autoriza precios públicos, claims ni venta general
-> **Fecha:** 2026-09-10 · **Última actualización:** 2026-09-19 (programmatic: respuesta de Real Audiences y Basis en evaluación) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
+> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-12 (composición integral y operación DSP acompañada en evaluación; tarifas sin cambio) · 2026-10-10 (paid social en el deck «Marketing de Contenidos»; estado sin cambio) · 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
 > **Pricing:** [`Pricing Integrity Pack V1`](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md)
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
@@ -44,7 +44,7 @@ de asignación para el siguiente ciclo.
 | 2 | **Growth Activation Sprint** | señal remediada, cuentas reestructuradas o tomadas, primera matriz creativa, línea base | 8–12 semanas, precio fijo | `Proposed` |
 | 3 | **Managed Performance** | operación mensual de los canales del motion, testing, reporting y gobierno trimestral | mensual por nivel, mínimo 3 meses | `Proposed` |
 | 4 | **Incrementality & Media Investment Architecture** | experimentos y MMM para una pregunta de asignación | por estudio | `Proposed`, sólo con madurez |
-| 5 | **Programmatic vía partner DSP** (Real Audiences seleccionado; Basis en evaluación) | display, video, audio, pDOOH y push dentro del mix | canal dentro de 2 o 3; managed y luego autogestionado | pendiente de términos; demo RA 2026-09-22 |
+| 5 | **Programmatic con DSP habilitante** (Basis y Real Audiences seleccionados) | display, native, video, CTV, audio y pDOOH; push selectivo | campaña o mensual; managed externo o directa acompañada en evaluación; autonomía con gate | servicio/tarifa/cobro aprobados 2026-10-09; composición integral 12-10; activación por caso |
 | 6 | **ChatGPT Ads** | campañas donde OpenAI lo habilita (MX, BR, EE.UU., España…) | canal selectivo dentro de 3 | `Proposed` |
 | 7 | **Preparación para anuncios en IA** | intents, landings y medición listos para cuando ChatGPT Ads llegue a Chile | dentro de 1 o con Search Visibility 360 | `Proposed` |
 | 8 | **Staff Augmentation** | perfil de performance dirigido por el cliente | tarifa de rol del catálogo | vigente en catálogo |
@@ -127,13 +127,13 @@ y su fuente vive en la [investigación de mercado 2026-09-10](../../audits/comme
 | TikTok | `core` si hay capacidad creativa nativa | `no ofrecido` por defecto | cuenta del cliente | sin producción nativa, no se activa. TikTok Shop y GMV Max operan en México y Brasil; en Chile sin fecha oficial a 2026-08 |
 | LinkedIn | `selectivo` | `core` | Campaign Manager del cliente | caro por diseño: se justifica por la calidad de la cuenta alcanzada |
 | Microsoft Advertising | `selectivo` | `selectivo` | cuenta del cliente | búsqueda incremental en audiencias corporativas |
-| Programmatic display, video, rich media e interstitials | `vía partner` | `vía partner` (ABM por confirmar) | Real Audiences, managed o autogestionado (Basis en evaluación) | cláusula de transparencia obligatoria |
-| pDOOH (pantallas digitales en vía pública) | `selectivo` vía partner | `no ofrecido` por defecto | Real Audiences (sin CPM cotizado a 2026-09-19) | se compone con la capacidad ATL, OOH & DOOH de la línea y con Channel & Commerce cuando la pantalla está cerca del punto de venta |
+| Programmatic display, video, rich media e interstitials | `vía partner` | `vía partner` (ABM por confirmar) | Basis o Real Audiences, según brief y términos | cláusula de transparencia obligatoria |
+| pDOOH (pantallas digitales públicas/comerciales, interiores o exteriores) | `selectivo` vía partner | `no ofrecido` por defecto | Basis o Real Audiences; inventario y precio por campaña | se compone con la capacidad ATL, OOH & DOOH de la línea y con Channel & Commerce cuando la pantalla está cerca del punto de venta |
 | Notificaciones push | `selectivo` vía partner | `no ofrecido` | Real Audiences | sólo con revisión de calidad del inventario |
-| CTV / OTT | `vía partner` | `no ofrecido` por defecto | por confirmar con Real Audiences; si no lo cubre, alternativa | sólo con escala y objetivo de alcance |
+| CTV / OTT | `vía partner` | `no ofrecido` por defecto | Basis lo declara en su deck; validar disponibilidad y términos; RA por confirmar | sólo con escala y objetivo de alcance |
 | Retail media (redes de cadenas, marketplaces) | `core` cuando hay commerce | `no ofrecido` | cuenta del cliente en cada red | requiere acceso a venta y catálogo. En Chile: Mercado Ads, Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media |
 | Amazon Ads | `selectivo` sólo en México | `no ofrecido` | cuenta del cliente | Amazon no opera su programa de partners en Chile |
-| Audio digital | `vía partner` | `no ofrecido` | Real Audiences | selectivo |
+| Audio digital | `vía partner` | `no ofrecido` | Basis o Real Audiences según mercado | selectivo |
 | **ChatGPT Ads** | `selectivo` donde existe | `selectivo` donde existe | Ads Manager del cliente | self-service en 52 países; en LATAM sólo Brasil y México. **En Chile no hay anuncios ni self-service** a 2026-09-10 |
 | Anuncios en AI Overviews / AI Mode de Google | vía Search/PMax/AI Max | vía Search/AI Max | cuenta Google del cliente | no se compra aparte; hoy sólo en inglés y en 12 países, Chile no incluido |
 | **X Ads** | `selectivo` bajo pedido | `selectivo` bajo pedido | cuenta del cliente | sólo con revisión de brand safety y verificación de terceros |
@@ -144,39 +144,33 @@ Estados: `core` = lo operamos con equipo propio; `selectivo` = lo operamos cuand
 = un partner opera el seat y Efeonce planifica, gobierna y audita; `no ofrecido` = no entra en propuesta sin decisión
 explícita.
 
-## Programmatic vía Real Audiences
+## Programmatic con Basis y Real Audiences
 
-Efeonce no tiene seat propio en un DSP. El partner programático seleccionado por el CEO el 2026-09-10 es **Real
-Audiences**, un DSP con sede en Miami y oficinas en Chile, México, Colombia, Ecuador, Argentina, Uruguay y Reino Unido.
-Declara inventario y campañas activas en los cinco países de Efeonce: Chile, Colombia, México, Perú y EE.UU. Formatos
-declarados: display, video, rich media, audio, interstitials, pDOOH y notificaciones push, con segmentación
-geolocalizada.
+**Servicio aprobado 2026-10-09:** oferta, tarifario base y política de cobro para clientes de Efeonce con **ambos proveedores
+seleccionados**. Efeonce mantiene la estrategia, relación comercial y rendición de cuentas; el proveedor opera la
+compra conforme al contrato de cada campaña. La aprobación comercial no acredita partnership oficial, precios externos
+ni crédito concedido por proveedores; el tarifario y cobro Efeonce sí están aprobados en su pack específico.
 
-Se usan dos modos, en secuencia:
+La regla vigente reemplaza el proveedor único y a Basis como segunda opción de septiembre. Una campaña usa uno o
+ambos según inventario, calidad, medición, costo total, caja y soporte; no se reparte 50/50 por defecto.
 
-| Modo | Quién opera | Cuándo |
-|---|---|---|
-| **Managed por briefing** | Real Audiences opera; Efeonce define y audita | primeras campañas, hasta pasar el gate |
-| **Autogestionado** | un trader de Efeonce certificado por Real Audiences (4 sesiones: campañas, tags y tracking, audiencias y listas, formatos, reportes) | después del gate: más control, aprendizaje propio y sin fee de servicio del partner |
+- [Decisión acotada aceptada](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).
+- [Ficha programmatic: cómo presentarlo, alcance y métricas](PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md).
+- [Modelo de negocio y operación](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md).
+- [Pricing Integrity Pack](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md).
+- [Manual para preparar propuestas](../../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 
-En modo managed, la división del trabajo es:
+**Cláusula de transparencia obligatoria para cada proveedor antes de comprar:** fees de tecnología, datos y
+servicio separados; ningún markup no declarado; reporte por dominio/app/placement o ubicación/pantalla/horario
+según canal; controles auditables de brand safety, fraude y MFA; derechos de acceso, exportación y custodia de
+información del cliente explícitos. En pDOOH, proof of play y método de audiencia. No confundir reporte disponible
+con garantía de métricas causales o de datos personales portables.
 
-| Efeonce | Real Audiences |
-|---|---|
-| objetivo, audiencias, listas de cuentas, exclusiones, frecuencia, brand safety | operación del seat, trafficking, optimización táctica |
-| auditoría del supply path y de los reportes por dominio, app y placement | reporte a nivel de dominio, app y placement |
-| lectura de resultados junto al resto del mix | fees de tecnología y de servicio declarados |
-
-**Cláusula de transparencia — sin esto no se compra:**
-
-1. fee de tecnología, fee de datos y fee de servicio del partner declarados por separado;
-2. ningún markup no declarado sobre el costo del inventario;
-3. reporte por dominio, app y placement con acceso para el cliente;
-4. listas de exclusión de brand safety y de sitios hechos para arbitraje publicitario (MFA) aplicadas y auditables;
-5. derecho del cliente a auditar y a llevarse listas, audiencias y aprendizajes al terminar.
-
-**Gate para pasar a autogestionado:** dos campañas managed entregadas y auditadas contra la cláusula, un trader
-certificado con backup y un checklist de brand safety y reporte aprobado.
+**Operación por ruta:** managed externo con Efeonce definiendo/auditando como inicio recomendado; operación directa
+acompañada por el proveedor como alternativa a evaluar desde el 12-10. Antes de operación directa, formación,
+trader/backup, permisos, soporte, RACI y economía/caja comprobados; antes de autonomía, dos campañas managed o
+acompañadas auditadas en ese proveedor. No hay habilitación por asistir a la demo. Un seat del proveedor no equivale
+automáticamente a una cuenta propiedad del cliente. Canon: modelo programático §12.3.
 
 ### Lo que Real Audiences declaró por escrito — 2026-09-19
 
@@ -186,7 +180,7 @@ palabra del partner, no un término firmado:
 | Tema | Declarado |
 |---|---|
 | Cobertura | inventario premium en los cinco países de Efeonce |
-| Modelo para agencias | **rebates, devoluciones o comisiones de agencia según la inversión en la plataforma**; sin porcentajes ni tramos todavía |
+| Modelo para agencias | **rebates, devoluciones o comisiones de agencia según la inversión en la plataforma**; al corte histórico sin porcentajes ni tramos |
 | Mínimos | sin mínimos por formato ni por país; recomiendan presupuesto por objetivo |
 | Facturación | invoice desde su LLC en EE.UU. hacia cada país de LATAM (Chile, México…); detalle pendiente |
 | Material recibido | presentación general y deck de formatos con CPM estimado |
@@ -206,50 +200,53 @@ CPM estimados en USD de su deck de formatos (2026-09):
 Especificaciones pDOOH declaradas: JPG a 72–150 DPI o MP4 a 30 fps y 6–10 Mbps en las dimensiones de cada pantalla;
 aprobación de contenido del dueño de la pantalla, por lo que la campaña se carga al menos 2 días hábiles antes del inicio.
 
-**Alertas abiertas.** Un CPM de display de USD 0,20–0,25 corresponde a inventario remanente o de cola larga, no a
-medios premium; se vuelve usable sólo con el reporte por dominio, app y placement y la verificación de terceros de la
-cláusula. Las notificaciones push tienen historial de tráfico de baja calidad. La facturación desde EE.UU. tiene efectos
-tributarios en Chile (retención de impuesto adicional o IVA según calificación del servicio) que Finance debe revisar
-antes de firmar.
+**Alertas abiertas.** Esos CPM son estimaciones históricas del proveedor, no cotizaciones vigentes ni evidencia de
+calidad. Antes de usarlos, validar inventario, alcance y fees; exigir reporte y verificación. Push requiere revisión
+específica de tráfico y condiciones de uso. Finance debe validar el tratamiento tributario de la factura extranjera
+según entidad, jurisdicción y calificación del servicio antes de firmar.
 
 **Rebates: decisión pendiente de CEO + Finance.** Un rebate por inversión del cliente es dinero que el partner paga a
 Efeonce sobre medios del cliente. Mientras no haya decisión, rige la cláusula 2: **ningún rebate se retiene sin
 declararlo al cliente por escrito**. Las dos salidas posibles son traspasarlo al cliente como descuento o declararlo como
 ingreso de Efeonce en la propuesta y en el contrato. Nunca queda oculto dentro del CPM.
 
-**Por confirmar con Real Audiences antes de la primera campaña:** porcentaje, tramos y liquidación del rebate; fees de
+**Pendientes del snapshot de septiembre; actualización debajo:** base contractual, tramos y liquidación del rebate; fees de
 plataforma, datos y servicio por separado; CPM de referencia pDOOH en Santiago, Bogotá, CDMX y Lima y qué dueños de
 pantallas usan; lista de dominios y apps del inventario de display y video; verificación de terceros (IAS, DoubleVerify
 u otra) y control de fraude; medición de exposición pDOOH (proof of play y metodología de audiencia); moneda, plazo y
 entidad de facturación; aceptación de la cláusula de transparencia; si cubre CTV y targeting B2B por cuenta; duración de
 la certificación y usuarios del seat. Sin acuerdo firmado: no se comunica como partnership.
 
-### Basis — segunda opción en evaluación
+### Actualización comercial — 2026-10-09
 
-**Basis** se presenta en su firma de correo como "Buy-Side Programmatic Platform" (premio Adweek Tech Stack). Por
-conocimiento general, no verificado todavía con ellos: es la antigua Centro, con sede en EE.UU., y vende un DSP
-autogestionado con capa de flujo de trabajo para agencias. Contacto: Manuel Ramos Bernard, VP LATAM, en CDMX. Él escribió el
-2026-09-17 pidiendo horarios; avisó que estará fuera del 22 al 24 de septiembre. **La reunión está por agendar.** Sobre
-Basis no hay nada verificado todavía: modelo, fees, inventario LATAM, pDOOH, CTV, B2B y mínimos se preguntan en esa
-reunión.
+**Real Audiences:** ofreció por escrito el 2026-09-23 comisión flat del **10% hasta 2026-12-31**, sobre inversión
+en plataforma y formatos disponibles; faltan definición contractual de base, exclusiones y liquidación. Efeonce
+mantiene **30 días sin anticipo, también primera campaña**. Bautista pidió el 2026-10-08 monto y fechas para evaluar
+crédito; todavía no aceptó esas condiciones. No se cuenta el rebate como margen base ni como acuerdo 2027.
 
-Real Audiences y Basis responden a dos modelos distintos, y la comparación debe hacerse con la misma lista:
+**Basis:** seleccionado junto a Real Audiences por instrucción del operador. Manuel Ramos Bernard envió el
+**Basis - DSP Deck LATAM.pdf** y agendó reunión para el **2026-10-12, 14:30–14:45 Chile**. El deck sí muestra presencia
+en México, Guatemala, Colombia, Perú, Chile y Argentina (p. 5), formatos omnicanales incluidos DOOH y CTV (p. 9), y
+tres modos de operación, incluido managed (p. 27). Presencia no es inventario cotizado. Costos, mínimos, crédito,
+entidad, soporte y derechos siguen pendientes; brand lift/footfall se presentan vía partners (p. 24).
 
-| Criterio | Real Audiences | Basis |
-|---|---|---|
-| Modelo | DSP con equipo que opera por briefing, y después seat autogestionado | por confirmar; se presenta como plataforma autogestionada |
-| Cómo gana la agencia | rebate según inversión (declarado) | por confirmar |
-| pDOOH en los 5 países | declarado, sin precio | por confirmar |
-| Transparencia por dominio/app y verificación de terceros | por confirmar | por confirmar |
-| CTV y ABM B2B | por confirmar | por confirmar |
-| Facturación | LLC EE.UU. → LATAM | por confirmar |
-| Mínimos | ninguno | por confirmar |
+Fuentes, páginas y condiciones en el [ledger fechado](../../audits/commercial/PROGRAMMATIC_PROVIDER_EVIDENCE_2026-10-09.md).
 
-**Regla de selección:** gana quien firme la cláusula de transparencia y cubra pDOOH en los mercados de Efeonce al menor
-costo total declarado (fees + CPM), no quien ofrezca el rebate más alto. No se usan dos DSP sin demanda que lo justifique.
+### Estado vigente — 2026-10-12: composición integral y ruta acompañada
 
-**Otras alternativas:** MiQ (compró Adsmovil LATAM) y TenX (DV360). El DSP de Microsoft (ex Xandr) cerró su compra en
-febrero de 2026. Estado vigente en el [Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+La reunión Basis se realizó y se leyó completa su transcripción HubSpot. Se registró demo con el equipo para
+21-10 18:00–19:00 Chile, entrenamiento/acompañamiento declarados y evaluación de acceso directo; fees y crédito
+siguen sin oferta aprobada. Los porcentajes utilizados son ejemplos. El snapshot 09-10 anterior es histórico;
+[evidencia vigente](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
+
+Programmatic consolida la [oferta integral de medios Efeonce](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
+con estrategia, operación, creatividad, medición y gestión de inversión. Esta composición no aprueba automáticamente
+las otras lanes ni convierte los canales en productos. Costear alcance y fee conjunto, sólo incremental a un retainer
+existente, y mantener owners Creative/Wave/RevOps. La ruta directa acompañada requiere RACI y
+[habilitación operativa](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md#123-evolución-de-la-operación);
+no presume trading gratuito, autonomía ni licencia del cliente. Tarifario programático sin cambio.
+Otras alternativas sólo se reabren si ambos no pueden cumplir el brief o los términos; estado vigente en el
+[Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 
 ## Anuncios en respuestas de IA
 
@@ -456,6 +453,162 @@ resultado.
 | No hacer nada | seguir con la agencia actual | el diagnóstico hace visible el desperdicio en su lenguaje |
 
 El detalle competitivo y de precios fechado vive en la investigación de mercado 2026-09-10.
+
+---
+
+# Paid social en el plan de contenidos — delta 2026-10-10
+
+El operador (Julio Reyes) aprobó el 2026-10-10 el deck comercial «Marketing de Contenidos» («Me encantó todo, queda
+aprobado») y pidió incorporar su contenido al modelo de negocio («…hay muchas cosas de acá que quiero incorporar al
+modelo de negocio, hazlo»). Texto fuente: `ai-generations/2026-10-09_deck-contenidos/deck/INVENTARIO-TEXTO.md` (ruta
+lógica). El deck presenta **«Paid social»** como el sexto frente de un squad de contenidos.
+
+Esa decisión define qué se ofrece. No acredita capacidad operando, costo, precio ni demanda, y varias piezas se
+aprobaron en conjunto con el deck, no una por una. Esta ficha sigue `Proposed`, su pricing pack sigue
+`hypothesis_only` y ningún invariante de la decisión de arquitectura cambia.
+
+## Qué es «Paid social» en esta ficha
+
+Es el nombre con que el comprador de contenidos pide la **cobertura de redes sociales** de esta solución: Meta
+(Instagram y Facebook), TikTok, LinkedIn y YouTube. No es un servicio nuevo ni un producto por canal: se entrega y
+se cotiza con los servicios 1–3 del catálogo, y los canales conservan su estado en «Cobertura de canales». Si debe
+existir una forma más liviana para amplificar contenido, con costeo propio, es una decisión abierta (DA-01).
+
+Las cuatro piezas con que el deck lo describe ya tienen módulo:
+
+| En el deck | Módulo de esta ficha | Quién hace qué |
+|---|---|---|
+| Estrategia, audiencias y estructura de campañas | Performance Media Operations | Performance |
+| Creatividad para performance y testing | Creative Performance System | Performance diseña el test y lee el aprendizaje; Creative Services / Social Media produce. La producción no entra en el fee |
+| Partnership ads con creadores | Performance Media Operations + composición con Creator Influence & Content | Performance compra los medios; derechos, whitelisting y gobierno del creador son de [Creator Influence & Content](CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) |
+| Optimización y lectura de resultados | Performance Media Operations + reporting | Performance |
+
+## «Lo orgánico prueba, la pauta escala»
+
+Estado: `decisión del operador 2026-10-10` como parte de la oferta; **método `por validar`**, sin caso ejecutado.
+
+Qué es: una forma de alimentar el Creative Performance System con lo que ya se publicó en orgánico.
+
+1. Social Media publica varias versiones de cada idea (en el deck: cuatro ideas con tres ganchos, como muestra).
+2. Se lee cuál retiene, con guardados y comentarios como señales de apoyo.
+3. Performance pone presupuesto en las piezas elegidas y registra por qué se eligieron.
+4. Lo que aprende la pauta vuelve al calendario editorial.
+
+Es una **composición**: el test orgánico y el calendario son de
+[Social Media](../creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md) (Creative Services); la selección
+para pauta, la compra y la lectura son de esta ficha.
+
+Condiciones y límites, que el deck no detalla:
+
+- una pieza que retiene en orgánico es una **hipótesis** de buen anuncio, no una prueba: la audiencia orgánica y la
+  pagada no son la misma y el objetivo de la campaña puede ser otro. El resultado se confirma en pauta;
+- no reemplaza el testing propio de pauta ni la señal de negocio: «presupuesto sólo a las ganadoras» orienta el
+  arranque, no prohíbe probar creatividades que no pasaron por orgánico;
+- necesita volumen orgánico suficiente para leer algo; con cuentas pequeñas la lectura es direccional;
+- si la pieza incluye a un creador, promocionarla es uso pagado: se pauta sólo con ese derecho contratado
+  (Gate 6 del [Operating Control Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md));
+- promocionar publicaciones orgánicas desde la cuenta de la marca usa la cuenta publicitaria del cliente, como toda
+  la operación de esta ficha.
+
+Cómo se valida: comparación controlada dentro de una misma campaña entre piezas elegidas por señal orgánica y piezas
+que no pasaron por orgánico, con la métrica primaria definida antes del test, período, fuente y owner.
+
+## UGC patrocinado
+
+El contenido de un creador amplificado como anuncio desde su propio perfil. Aquí vive la compra de medios; los
+permisos y derechos viven en Creator Influence & Content.
+
+| Formato | Plataforma | Estado en esta ficha |
+|---|---|---|
+| Partnership ads | Instagram y Facebook | dentro de Meta (`core` en el motion A, `selectivo` en el B) |
+| Spark Ads | TikTok | dentro de TikTok: `core` en el motion A sólo con capacidad creativa nativa; `no ofrecido` por defecto en el B |
+| Thought Leader Ads | LinkedIn | **`por validar`**. No estaba en esta ficha. Si se activa, aplica la regla de inversión mínima en LinkedIn del intake |
+
+Con Thought Leader Ads hay dos casos distintos: el perfil de un creador contratado, que sigue las reglas de creadores,
+y el perfil de un ejecutivo o empleado del cliente, que no tiene esas reglas y está sin dueño definido (DA-07). Ningún
+formato se activa sin el permiso de plataforma y el derecho contractual vigentes. Sobre la misma amplificación pueden
+coincidir el fee de governance de creadores y el fee por nivel de esta ficha: la regla para no cobrar dos veces la
+misma coordinación está pendiente (DA-06).
+
+## Anuncios por canal
+
+Cada anuncio se especifica para su red: formato, duración, gancho, zona segura y llamado a la acción propios, con
+variantes para testing. En el deck: Reels de Instagram, in-feed de TikTok, feed de LinkedIn y Shorts de YouTube.
+
+- La especificación —qué variantes, qué gancho, qué se compara— es parte de la matriz del Creative Performance System.
+- La producción de las piezas es de Creative Services / Social Media y se cotiza allá.
+- Los formatos dependen del estado del canal: YouTube Shorts entra con YouTube (`selectivo`); TikTok no se activa sin
+  producción nativa.
+- Mostrar un anuncio por red en el deck no convierte cada red en un producto: el canal sigue siendo cobertura.
+
+## Social commerce
+
+El deck lo presenta para «todos los frentes»: descubrimiento y recomendación, demostraciones y reseñas, unboxing y
+contenido con creadores, formatos comprables y live shopping, y aclara que «la operación de tienda, catálogo y
+checkout se cotiza aparte».
+
+| Parte | Dueño |
+|---|---|
+| Contenido de social commerce de la marca | [Social Media](../creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md) (subservicio de contenido para social commerce) |
+| Creadores: unboxing, reseñas, vivo | [Creator Influence & Content](CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) |
+| Pauta sobre esos contenidos | esta ficha: Performance Media Operations. Commerce Media Operations cubre retail media y marketplaces; no cubre por sí solo la tienda nativa de una red social |
+| Tienda nativa de la red, catálogo, precios, stock y checkout | **fuera de esta ficha**; el deck dice que se cotiza aparte y no hay dueño nombrado (DA-09). Sitio y commerce propios son de [Wave](../wave/README.md); el punto de venta físico es de [Channel & Commerce](../channel-commerce/README.md) |
+
+Estado: `decisión del operador 2026-10-10`; **`por validar`**. Los formatos comprables y el live shopping dependen de
+que la plataforma los ofrezca en el mercado del cliente: esta misma ficha registra que TikTok Shop opera en México y
+Brasil y no tiene fecha oficial en Chile a 2026-08. No se proponen sin confirmar disponibilidad en la fecha de la
+campaña.
+
+## Del social al CRM
+
+El deck promete que cada contacto llega al CRM con su origen por red, pieza y creador, y que los resultados se leen
+por negocio ganado.
+
+- Es la señal del **motion B · B2B Pipeline** llevada a redes sociales: anuncios con formulario, enlaces con
+  seguimiento y, cuando el cliente lo opera, mensajes que crean el contacto. La métrica ya existe en esta ficha:
+  pipeline con fuente y costo por oportunidad calificada.
+- Vale la condición de entrada del motion B: sin CRM con etapas confiables, se degrada al motion A con objetivo de
+  lead, y la propuesta lo declara.
+- La integración —formularios al CRM, campos de origen, sync de etapas— la implementa y la cotiza RevOps & CRM
+  ([HubSpot](../hubspot-as-a-service/README.md) o [Salesforce](../salesforce/README.md)); la instrumentación web, Wave.
+  No entra en el fee de esta ficha.
+- El origen «por creador» necesita una convención de nombres y enlaces acordada con Creator Influence & Content antes
+  de publicar.
+- Recibir datos de formularios y enviar etapas a las plataformas es tratamiento de datos personales: requisito 4 del
+  intake.
+- «Origen» es atribución declarada. No se presenta como incrementalidad: aplica la escalera de medición.
+- Los mensajes directos que crean contactos dependen de social care, que coordina Social Media, y de la integración
+  del CRM.
+
+Estado: `decisión del operador 2026-10-10`; **`por validar`**: sin implementación de referencia para origen por pieza y
+creador (DA-11).
+
+## Cómo se compra y cómo se empieza
+
+Las líneas del deck se leen sobre esta ficha así, sin cambiar nada del pricing pack:
+
+| En el deck | En esta ficha |
+|---|---|
+| Fee Efeonce fijo, por capacidad | fee por nivel de complejidad; el híbrido porcentual sigue siendo alternativa contractual, nunca default |
+| Whitelisting y medios, línea propia | la inversión en medios es del cliente y se declara aparte; la licencia de whitelisting es un costo de creadores |
+| Comisión por resultado, sólo si se acuerda | en esta ficha la única figura es el bono por pipeline del motion B, con sus condiciones; nunca performance-only |
+| Diagnóstico → sprint de prueba → servicio continuo | Performance Diagnostic → Growth Activation Sprint → Managed Performance |
+
+Diferencias sin resolver: el Diagnostic de esta ficha es pagado y el Sprint dura 8–12 semanas, mientras el deck habla
+de «un frente acotado» para probar (DA-05). El detalle está en el
+[pricing pack, delta 2026-10-10](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md).
+
+## Operador y grupo de compra de este caso
+
+Quien pide «paid social» dentro de un plan de contenidos puede no ser el operador de las dos motions: es probable que
+sea quien lleva redes o marca, no un Performance Lead. Es una hipótesis sin evidencia (`hypothesis_only`): se confirma
+en cada cuenta quién opera, quién aprueba presupuesto de medios y quién es dueño de las cuentas publicitarias, antes
+de proponer.
+
+## Decisiones abiertas
+
+Numeradas en el [modelo de la línea, §10](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#10-riesgos-y-decisiones-abiertas).
+Tocan esta ficha: DA-01, DA-03, DA-04, DA-05, DA-06, DA-07, DA-09, DA-10 y DA-11.
 
 ---
 

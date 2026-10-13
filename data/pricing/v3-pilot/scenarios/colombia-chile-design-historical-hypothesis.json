@@ -1,0 +1,387 @@
+{
+  "request": {
+    "schemaVersion": "1.0.0",
+    "quoteDate": "2026-10-09",
+    "offerId": "talent-assurance-staffing",
+    "deliveryModel": "staffing",
+    "engagementCode": "monthly",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "USD",
+    "duration": {
+      "unit": "month",
+      "periods": 3
+    },
+    "lines": [
+      {
+        "lineId": "design",
+        "profileId": "ECG-002",
+        "seniorityCode": "senior",
+        "talentCountry": "CO",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.5"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyRef": "hyp-shared",
+        "assignments": [
+          {
+            "resourceId": "hyp-ETG-001",
+            "allocationId": "hyp-assignment-hyp-ETG-001",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-ETG-015",
+            "allocationId": "hyp-assignment-hyp-ETG-015",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-ETG-016",
+            "allocationId": "hyp-assignment-hyp-ETG-016",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-ETG-007",
+            "allocationId": "hyp-assignment-hyp-ETG-007",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-platform",
+            "allocationId": "hyp-assignment-hyp-platform",
+            "scope": "person",
+            "scopeRef": "prototype-person",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-assurance",
+            "allocationId": "hyp-assignment-hyp-assurance",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-ops",
+            "allocationId": "hyp-assignment-hyp-ops",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "monthly"
+          },
+          {
+            "resourceId": "hyp-onboarding",
+            "allocationId": "hyp-assignment-hyp-onboarding",
+            "scope": "account",
+            "scopeRef": "prototype-account",
+            "quantity": "1",
+            "share": "1",
+            "cashTiming": "start"
+          }
+        ],
+        "notApplicable": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "snapshot": {
+    "schemaVersion": "1.0.0",
+    "snapshotId": "hyp-historical-co-cl-design",
+    "version": "hypothesis-2026-10-09-v1",
+    "mode": "historical",
+    "calculationCurrency": "USD",
+    "countries": [
+      "CO",
+      "CL"
+    ],
+    "currencies": [
+      {
+        "code": "USD",
+        "precision": 2
+      },
+      {
+        "code": "CLP",
+        "precision": 0
+      }
+    ],
+    "profiles": [
+      {
+        "profileId": "ECG-002",
+        "label": "PROTOTIPO HISTÓRICO — diseñador senior; costo CO supuesto",
+        "seniorityCode": "senior",
+        "tierCode": "hyp-historical-tier-2",
+        "cost": {
+          "amount": "1310",
+          "currency": "USD",
+          "unit": "month",
+          "localization": {
+            "kind": "specific",
+            "country": "CO"
+          },
+          "covers": [
+            "human_salary",
+            "human_bonuses"
+          ],
+          "source": {
+            "reference": "hypothesis-only:human-cost-CO-assumed",
+            "effectiveFrom": "2026-10-09",
+            "effectiveUntil": "2026-10-09",
+            "status": "estimated"
+          }
+        },
+        "requiredCoverages": [
+          "human_salary",
+          "human_bonuses",
+          "tool:design",
+          "tool:tracking",
+          "tool:collaboration",
+          "tool:ai",
+          "platform_fee",
+          "talent_assurance",
+          "operations",
+          "setup"
+        ]
+      }
+    ],
+    "allocationPolicies": [
+      {
+        "policyId": "hyp-shared",
+        "mode": "shared",
+        "hoursPerFteMonth": "180",
+        "minimumBilledFte": "0",
+        "dedicatedBilledFte": "1",
+        "source": {
+          "reference": "hypothesis-only:shared-capacity-180",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "policyId": "hyp-dedicated",
+        "mode": "dedicated",
+        "hoursPerFteMonth": "180",
+        "minimumBilledFte": "0",
+        "dedicatedBilledFte": "1",
+        "source": {
+          "reference": "hypothesis-only:dedicated-full-commitment",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "pricingPolicies": [
+      {
+        "profileId": "ECG-002",
+        "tierCode": "hyp-historical-tier-2",
+        "offerId": "talent-assurance-staffing",
+        "engagementCode": "monthly",
+        "method": "markup",
+        "rate": "0.30",
+        "basis": "all_costs",
+        "minimumMargin": "0",
+        "source": {
+          "reference": "hypothesis-only:historical-markup-no-approved-floor",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "talentFactors": [],
+    "marketFactors": [
+      {
+        "country": "CL",
+        "factor": "1",
+        "source": {
+          "reference": "hypothesis-only:neutral-market-experiment",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "resources": [
+      {
+        "resourceId": "hyp-ETG-001",
+        "label": "HISTÓRICO ATRIBUIDO — Adobe Creative Cloud",
+        "kind": "tool",
+        "amount": "20",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "tool:design"
+        ],
+        "source": {
+          "reference": "hypothesis-only:tool-ETG-001",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-ETG-015",
+        "label": "HISTÓRICO ATRIBUIDO — Notion",
+        "kind": "tool",
+        "amount": "24",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "tool:tracking"
+        ],
+        "source": {
+          "reference": "hypothesis-only:tool-ETG-015",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-ETG-016",
+        "label": "HISTÓRICO ATRIBUIDO — Microsoft 365",
+        "kind": "tool",
+        "amount": "16",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "tool:collaboration"
+        ],
+        "source": {
+          "reference": "hypothesis-only:tool-ETG-016",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-ETG-007",
+        "label": "HISTÓRICO ATRIBUIDO — ChatGPT Plus",
+        "kind": "tool",
+        "amount": "5",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "tool:ai"
+        ],
+        "source": {
+          "reference": "hypothesis-only:tool-ETG-007",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-platform",
+        "label": "HISTÓRICO — fee genérico completo",
+        "kind": "platform_fee",
+        "amount": "49",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "person",
+        "covers": [
+          "platform_fee"
+        ],
+        "source": {
+          "reference": "hypothesis-only:full-platform-fee",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-assurance",
+        "label": "PRUEBA, NO COSTO MEDIDO — Talent Assurance de prueba",
+        "kind": "talent_assurance",
+        "amount": "25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "talent_assurance"
+        ],
+        "source": {
+          "reference": "hypothesis-only:test-assurance-cost",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-ops",
+        "label": "PRUEBA, NO COSTO MEDIDO — Operación de prueba",
+        "kind": "operations",
+        "amount": "25",
+        "currency": "USD",
+        "unit": "month",
+        "scope": "account",
+        "covers": [
+          "operations"
+        ],
+        "source": {
+          "reference": "hypothesis-only:test-operations-cost",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      },
+      {
+        "resourceId": "hyp-onboarding",
+        "label": "PRUEBA, NO COSTO MEDIDO — Onboarding de prueba",
+        "kind": "setup",
+        "amount": "100",
+        "currency": "USD",
+        "unit": "once",
+        "scope": "account",
+        "covers": [
+          "setup"
+        ],
+        "source": {
+          "reference": "hypothesis-only:test-onboarding-cost",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ],
+    "fx": [
+      {
+        "from": "USD",
+        "to": "CLP",
+        "rate": "1000",
+        "source": {
+          "reference": "hypothesis-only:historical-FX-not-current",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "2026-10-09",
+          "status": "estimated"
+        }
+      }
+    ]
+  }
+}

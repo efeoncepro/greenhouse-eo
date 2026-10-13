@@ -1,0 +1,269 @@
+{
+  "schema": "axis.surface-composition.v1",
+  "contract": {
+    "id": "efeonce.surface-composition",
+    "version": "0.1.2",
+    "lifecycle": "candidate"
+  },
+  "status": "resolved",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "recipe": {
+    "id": "content-service-lanes",
+    "status": "approved",
+    "role": "content"
+  },
+  "use": "brochure",
+  "layout": null,
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "palette": {
+    "background": "#001a33",
+    "accent": "#e86bd0",
+    "ink": "#ffffff",
+    "soft": "#e2e2e2",
+    "text": "#E6EDF3",
+    "rule": "#1D3A57"
+  },
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px",
+    "format": "16x9"
+  },
+  "safeArea": {
+    "marginOfWidth": 0.07291666666666667,
+    "marginPx": 140
+  },
+  "reserves": [
+    {
+      "band": "eyebrow",
+      "side": "start",
+      "fromTop": 0.1019
+    },
+    {
+      "band": "question",
+      "side": "start",
+      "fromTop": 0.1574
+    },
+    {
+      "band": "answer",
+      "side": "start",
+      "fromTop": 0.2111
+    }
+  ],
+  "type": {
+    "eyebrow": {
+      "family": "Poppins",
+      "weight": 500,
+      "px": 16,
+      "lineHeight": null,
+      "tracking": "0.14em",
+      "uppercase": true,
+      "color": "#ffffff"
+    },
+    "question": {
+      "family": "Poppins",
+      "weight": 300,
+      "px": 40,
+      "lineHeight": 1.2,
+      "tracking": null,
+      "uppercase": false,
+      "color": "#ffffff"
+    },
+    "answer": {
+      "family": "Bricolage Grotesque",
+      "weight": 760,
+      "px": 124,
+      "lineHeight": 0.95,
+      "tracking": "-0.045em",
+      "uppercase": false,
+      "color": "#ffffff"
+    }
+  },
+  "dominance": {
+    "ratio": 3.1,
+    "min": 3,
+    "ok": true
+  },
+  "steps": null,
+  "signature": {
+    "mode": "url-bubble-footer",
+    "logoOnly": [
+      "cover",
+      "close",
+      "brand-is-subject"
+    ],
+    "photoSlideLogo": false,
+    "urlBubble": {
+      "form": "baked",
+      "insetOfWidth": 0.0729,
+      "bottomOfHeight": 0.0796,
+      "heightPx": 30,
+      "assetId": "url-bubble-baked-dark"
+    },
+    "orbitDelegate": "surface-owned"
+  },
+  "timeline": null,
+  "rules": [
+    {
+      "id": "efeonce-dark-ground",
+      "text": "El fondo Efeonce (#001a33) se mantiene en toda pieza de línea; la línea sólo aporta el acento (operador, 2026-09-26)."
+    },
+    {
+      "id": "one-sphere-per-piece",
+      "text": "Una esfera por pieza: cierra la respuesta; nunca es viñeta ni adorno."
+    },
+    {
+      "id": "one-orbit-per-piece",
+      "text": "Una órbita por pieza o lámina: anillo, lente, indicador o medida, uno solo."
+    },
+    {
+      "id": "accent-text-min-size",
+      "text": "El acento nunca colorea texto de menos de 24 px: ahí el texto va en blanco o suave sobre oscuro (navy sobre claro); el acento marca con un elemento de 24 px o más o con el ícono."
+    },
+    {
+      "id": "timings-from-tokens",
+      "text": "Los tiempos salen de efeonceGraphicLine (surfaces.*.timeline y motion); nunca se escriben en el script."
+    },
+    {
+      "id": "answer-dominates-3x",
+      "text": "La respuesta mide al menos 3 veces la pregunta (type.answer.minRatioOverQuestion)."
+    },
+    {
+      "id": "figures-with-source",
+      "text": "Cifras sólo con fuente; precios siempre como marcador."
+    },
+    {
+      "id": "isotype-composed",
+      "text": "El isotipo en prendas generadas se compone desde @efeoncepro/axis-brand-assets; nunca el que dibuja el modelo."
+    },
+    {
+      "id": "cine-only-nexa-or-proposal",
+      "text": "Registro cine sólo con Nexa protagonista o en las recetas de cine del deck (photo.cine.recipes: proposal-cinematic y, desde el 2026-09-27, la portada de brochure, las contraportadas con foto, la sección de cine, la lente de la propuesta sobria desde el 2026-09-28 y, como excepción aprobada con personas del equipo en luz dramática, la sección partida); proporciones reales (cámara a ~2 m, 85 mm)."
+    },
+    {
+      "id": "no-close-gaze-pairs",
+      "text": "Nunca dos personas mirándose de cerca: se lee romántico (rechazo del operador, 2026-09-27)."
+    },
+    {
+      "id": "semantic-reserves-only",
+      "text": "Sin coordenadas libres: regiones semánticas y fracciones que salen de tokens."
+    },
+    {
+      "id": "photo-slide-no-logo",
+      "text": "La lámina con foto no lleva logo: firman la portada y el cierre del deck."
+    },
+    {
+      "id": "url-bubble-in-footer",
+      "text": "En el deck la URL va en su burbuja, en el pie; el logo sólo en portada, cierre o cuando la marca es el sujeto."
+    },
+    {
+      "id": "selection-one-thing-per-slide",
+      "text": "La selección toma una sola cosa por lámina."
+    },
+    {
+      "id": "third-party-logos-one-tone-same-ink",
+      "text": "Logos de terceros en un solo tono y con el mismo peso óptico (misma área de tinta)."
+    },
+    {
+      "id": "third-party-product-icon-where-named",
+      "text": "El ícono oficial de un producto de terceros (Salesforce: Agentforce, Sales, Service, Marketing, Data 360, Platform, Slack, Tableau) va sólo donde la lámina nombra ese producto, en su color original y sin recolorear ni adornar; nunca en los pasos del método (ahí van los íconos Trazo) ni como decoración."
+    },
+    {
+      "id": "third-party-mark-authorization",
+      "text": "Una marca, ícono, personaje o wordmark de terceros entra sólo con la autorización de su titular (AXIS_PARTNER_ASSETS.authorization: authorized-by-partner o in-stack); mientras falte la autorización escrita de un titular (pending-written-authorization) la lámina no sale a clientes ni a pauta, y los slots opcionales de terceros (mascota, co-marca) quedan vacíos."
+    },
+    {
+      "id": "third-party-mascot-optional",
+      "text": "La mascota o el personaje de un tercero es un slot opcional sujeto a autorización: nunca fijo, nunca dentro de una foto, y sólo arte oficial o una interpretación aprobada que no se publica en un paquete."
+    },
+    {
+      "id": "one-orbit-per-slide",
+      "text": "Una sola órbita por lámina."
+    }
+  ],
+  "references": [
+    {
+      "id": "content-service-lanes",
+      "title": "Deck · nuestros servicios Salesforce: seis carriles y las cuatro fases, «Todo el ciclo.»",
+      "status": "approved",
+      "image": "/references/surfaces/deck/content-service-lanes.jpg",
+      "canvasPage": "deck",
+      "canvasBoard": "DeckSalesforceServicios.dc.html"
+    }
+  ],
+  "delegates": {
+    "orbit": [
+      {
+        "scene": "main",
+        "contract": "efeonce.graphic-line-orbit",
+        "intent": {
+          "canvas": {
+            "width": 1920,
+            "height": 1080,
+            "line": "revenue-hubspot",
+            "surface": "dark",
+            "channel": "deck"
+          },
+          "elements": [
+            {
+              "kind": "voice",
+              "id": "voice",
+              "questionId": "question",
+              "answerId": "answer",
+              "answerText": "Todo el ciclo"
+            },
+            {
+              "kind": "url-bubble",
+              "id": "url-bubble",
+              "medium": "pdf"
+            }
+          ]
+        }
+      }
+    ],
+    "close": null,
+    "selection": [],
+    "icons": [],
+    "photo": null
+  },
+  "content": {
+    "eyebrow": "Nuestros servicios HubSpot",
+    "question": "¿Qué hacen en HubSpot?",
+    "answer": [
+      "Todo el ciclo"
+    ],
+    "answerSphere": "closes-last-line",
+    "body": null,
+    "proof": null,
+    "measure": null,
+    "progress": null,
+    "cta": null,
+    "variants": null,
+    "levels": null,
+    "note": null,
+    "panels": null,
+    "figures": null,
+    "nav": null,
+    "title": null,
+    "frames": null,
+    "chapter": null,
+    "shots": null,
+    "subtitles": null,
+    "lines": null,
+    "slogan": null
+  },
+  "adapterChecks": [
+    "text-inside-its-reserve",
+    "text-never-crosses-ring",
+    "answer-dominates-3x-painted",
+    "accent-text-min-size",
+    "signature-where-the-surface-says",
+    "subject-outside-text-reserve",
+    "last-frame-is-static-fallback",
+    "legibility-at-reading-distance"
+  ],
+  "issues": []
+}

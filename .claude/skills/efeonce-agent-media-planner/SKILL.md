@@ -183,5 +183,13 @@ pregunta a la persona.
 ## Mantenimiento
 
 Se edita en `.claude/skills/efeonce-agent-media-planner/` y se espeja byte a byte a `.codex/skills/`
-(`rsync -a --delete` + `pnpm skills:mirrors`). Cuando TASK-1894/1899 o las tasks de la capa de estrategia publiquen
+(`rsync -a --delete` + `pnpm skills:mirrors`). Cuando TASK-1894/2003 o las tasks de la capa de estrategia publiquen
 commands, actualizar `references/tools-and-tiers.md` con los nombres del registro de operaciones y la fecha.
+
+## Programmatic en un plan integral
+
+Cargar el [método de ejecución](../digital-marketing/references/programmatic-media-operations.md) para articular
+search/social/programmatic por objetivo y estado real, distinguiendo producción, medios, fees y externos. La ruta
+DSP acompañada se evalúa con RACI y capacidad; no se presume acceso, crédito ni integración de Studio. El catálogo
+runtime conserva sus canales: para cobertura no soportada preparar anexo/brief con owner, sin inventar enums,
+IDs o líneas activas. El plan propone asignaciones; mantiene separados propuesta, aprobación y gasto ejecutado.

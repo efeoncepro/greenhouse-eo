@@ -7,6 +7,439 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-13 — Meta CAPI y consentimiento publicados
+
+- [ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
+  [contrato HubSpot](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md) y
+  [auditoría](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server en
+  `efeonce-group`, min 0/max 1; **server live 5/web live 5**, Meta v25 y forwarding GA4.
+- Banner español opt-in/GPC y routing activos WP/Think. PageView por destino, default denied,
+  URL limpia, UUID sender compatible, Lead accepted form/confirmed meeting; sin nuevo sender.
+- Meta Test Events Processed/Server y diez negativos sin salidas; navegación real ambos hosts
+  completó Meta/GA4. Lead QA accidental previo documentado y gate UUID corregido.
+- 16 tests bridge y 30 renderer PASS; renderer local sin release GH. Think promovido y WP
+  plugin scoped 1.0.3 con preferencias inline junto a enlaces legales, sin franja adicional. Próximos leads/replay reales pendientes.
+  Docs/skills espejo actualizados; sin commit/push, proyecto o suscripción nueva.
+- Requisito de remarketing registrado en [08 §4.1](docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#41-lead-utilizable-para-remarketing--requisito-confirmado-2026-10-13):
+  contacto en hash compatible, clasificadores y consentimiento por ingreso backend exclusivo.
+  Readback live 5/5 conserva transporte anterior; [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) agrega matching local probado, sin deploy.
+- GA4 UPD/ack y siete audiencias 90d activos/releídos; secretos scoped preparados. Meta Preview/Test Events
+  Processed/Server con em/ph/fn/ln y clasificadores, seis negativos bloqueados. 71 tests + 21 Client tests,
+  tipos/lint y builds PASS. Release acotado, SQL y flags pendientes por restricción del checkout compartido;
+  [evidencia y siguiente paso](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md).
+
+## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
+
+- [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
+  empatía, motivo para elegir Efeonce, brochure explicado y firma instalada en Outlook web; Enviados,
+  adjuntos y EMAIL de HubSpot comprobados por separado. Criterio enlazado desde las skills espejo de HubSpot.
+- [Registro de seis envíos](docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md),
+  estado focalizado y continuidad de WIN actualizados; Rafael excluido y salvedad de Paula conservada.
+  No renueva el corte global del pipeline ni concede autonomía recurrente de envío.
+- Mandato posterior: [seis secuencias HubSpot, 18 seguimientos](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md)
+  para 16/22/29 octubre en horas locales laborales. Inscripciones `Programado`, firma global Julio y
+  parada por respuesta verificados. Apollo inactivo, cero inscritos. Preferencia y alcance documentados.
+- [Módulo de secuencias en Prospecting](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md),
+  routing, cadencia/mensaje/respuesta/entregabilidad, template, manual y adapter HubSpot espejados.
+  Fixtures v9 P51–P55 cubren plataforma, autorización, programación, personalización y evidencia; sin nueva ejecución externa.
+
+## 2026-10-12 — Propuesta de campaña creativa: playbook y skills
+
+- [Playbook de punta a punta](docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md) (caso fuente Sika N.º 1164): cinco piezas, secuencia,
+  reglas del operador por pieza, trampas medidas y lista de control. Fila nueva en el router de `CLAUDE.md` y `AGENTS.md`.
+- La oferta económica que ve el comprador va con la [plantilla A4](docs/commercial/templates/cotizacion-a4/README.md), desglosada por componente de valor
+  (evolución gráfica → concepto → entregables); `economica:build` (Excel) sólo si las bases exigen planilla. Skills de licitaciones, práctica creativa y pricing actualizadas.
+- `deck-studio`: referencia nueva de propuesta técnica de campaña creativa (segunda persona, nada defensivo, cumplimiento con las palabras de la ficha).
+- `motion-design-studio` y `audio-studio`: workflow del reel de muestra (cuadros fijos → Seedance 2.5 → capa de motion de la campaña → montaje) y sus modos de falla.
+- `efeonce-graphic-line`, `astro` y `docs/think`: página suelta de video de muestra con el reproductor de AXIS.
+
+## 2026-10-12 — BytePlus: conexión directa de imagen, capas, video y Seed Speech
+
+- [CLI y manual](docs/manual-de-uso/creative-studio/byteplus-directo.md): catálogo de 21 entradas, secretos
+  separados en Secret Manager, recibos sin URLs firmadas y recuperación por task ID sin retry de generación.
+- Layerize Pro/Flash conserva el contrato de capas/máscaras; BytePlus es default para los modelos del fabricante
+  en las guías del operador. [ADR](docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md)
+  y [canary real](docs/audits/creative-studio/BYTEPLUS_DIRECT_CONNECTION_2026-10-12.md). Sin promoción de Globe,
+  deploy ni compra/clonación de voces.
+- [Precios API Seedance 2.5](docs/audits/creative-studio/BYTEPLUS_DIRECT_PRICING_COMPARISON_2026-10-12.md):
+  30 s 1080p, BytePlus US$17,06 frente a Fal/Higgsfield base US$34,12; descuento final HF sin confirmar.
+- [Nexa cine, Pro directo vs Sunburst max](docs/audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md):
+  una salida nativa por motor, mismos brief/referencias; Pro útil para variantes, Sunburst más fiel a la acción.
+  Espera HTTP de imágenes BytePlus 600 s, sin retry; primer timeout con consumo sin confirmar. Sin publicación.
+- [Cuatro iconos Flare max/Pro standard](docs/audits/ai-tooling/2026-10-12-iconos-flare-vs-seedream5-pro.md):
+  ocho PNG nativos 2048², mismos prompts; Flare conserva mejor mate/detalle, Pro US$0,081 por icono con
+  material a revisar. Comparación interna, fondo opaco; sin adopción de glifos ni cambio de UI.
+  Segunda tanda clay 3D: ambos mantienen mate, Pro modelado más artesanal y Flare formas más regulares;
+  ocho originales nuevos, prompts/recibos/costos guardados sin sustituir los anteriores.
+- [Iconos nuevos Efeonce mate uniforme](docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md):
+  binoculares, metrónomo, sello e imán, bases planas aprobadas; prueba Flare/Pro con originales y alfa derivado.
+  Ajuste adicional Pro y avisos geométricos documentados. Operador seleccionó Flare para esta ronda;
+  comparación preservada, sin publicación del catálogo ni cambio del default global.
+
+## 2026-10-12 — Medios: composición integral y operación programática acompañada
+
+- [Modelo de línea §1.1](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios):
+  estrategia, compra/operación, creatividad, medición y gestión de inversión bajo Efeonce; taxonomía/estados conservados.
+- Modelo programático V1.5 y pricing V1.4: ruta DSP directa acompañada en evaluación, RACI/gate, calibración y fee
+  incremental en cuenta integral; tarifa aprobada sin cambio, medios/externos separados y sin doble cobro.
+- [Evidencia HubSpot 12-10](docs/audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md): transcripción completa,
+  demo 21-10 registrada; ejemplos de fees no son cotización ni crédito. Catálogos, ADR/índices, manual/contexto y
+  skills Codex/Claude sincronizados. Sólo documentación: sin contrato, compra, integración, envío o publicación.
+
+## 2026-10-12 — Insights: el informe SEO puede medir sólo el contenido que Efeonce trabaja
+
+- Nuevo en `greenhouse_growth`: `seo_content_scope_versions`, el alcance de contenido de una organización (reglas de
+  ruta, versiones append-only). Aplicada a la base compartida. Berel tiene su alcance v1: `/articulos`, `/tutoriales`,
+  `/inspiracion` y dos guías de la raíz.
+- Comando nuevo `pnpm seo:content-scope`: muestra lo que un alcance mediría y las páginas que deja fuera; con
+  `--apply` lo fija.
+- Con alcance, el capítulo de búsqueda de Efeonce Insights mide sólo esas páginas, lo dice en la portada blanca, deja
+  el sitio completo como contexto y saca el tráfico estimado del dominio a los límites. Sin alcance, el informe no
+  cambia.
+- Cambian para toda organización: la línea de clics por semana dibuja sólo semanas completas (los últimos días del
+  mes ya no aparecen como una caída) y tres textos de Analytics pierden «al sitio» («Visitas orgánicas», «Visitas
+  desde buscadores», «Visitas orgánicas, con y sin interacción»).
+- Una página con un nombre más largo que la columna del informe ya no hace fallar el render: se abrevia por el
+  comienzo y el final de su ruta.
+- Berel: logos oficiales cargados en la organización (el anterior era una imagen generada con IA) y portada fijada en
+  blanca. `scripts/insights/preview-edition.ts` acepta `--cover=light|dark`.
+- **Desplegado** en Vercel staging y en el `ops-worker` (`d9a1c6a2d`). **Vercel Production sin release**: las
+  ediciones creadas desde el portal de producción siguen midiendo el sitio completo de Berel (`TASK-2033`).
+
+## 2026-10-12 — Cotizador V3: el registro de cotizaciones existe en la base
+
+- Nuevo en `greenhouse_commercial`: las tablas `quoter_*` (catálogo por huella, puntero de versiones vigentes,
+  cotizaciones con versiones inmutables, estados, destinataria, número y excepciones bajo el piso). Aplicadas a la
+  base compartida; el catálogo del repo quedó importado (24 documentos) y su puntero reflejado. Ninguna API ni
+  pantalla las usa todavía (`TASK-2026`, `TASK-2027`).
+- Comando nuevo `pnpm quoter:import plan | documents | pointer`: hay que correrlo cada vez que el catálogo del repo
+  cambie. Carril de pruebas nuevo `pnpm quoter:test:local` (PostgreSQL 16 local).
+- Seis capacidades nuevas `commercial.quoter.*`. La primera cotización real emitida será `EO-QTE-15001`.
+- [Modelo de datos](docs/architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md) ·
+  [manual del importador](docs/manual-de-uso/finance/importar-catalogo-v3-a-la-plataforma.md). `TASK-2025`.
+
+## 2026-10-12 — Growth: el regrade AEO respeta el contrato y la captura de rankings tiene segunda pasada
+
+- El regrade recurrente fallaba todos los días desde el 3 de octubre con los 6 mercados secundarios de Sky: tenían
+  cadencia prendida y el contrato no los declaraba. Ahora un solo predicado decide la cobertura para quien ejecuta,
+  quien reclama y quien habilita; `assignAeoTier` acepta `marketsIncluded` y existe `pnpm growth:aeo-contracted-markets`.
+  Sky quedó con AR, BR, CL, CO, PE, US y UY declarados (confirmación del operador). [ISSUE-181](docs/issues/open/ISSUE-181-aeo-regrade-claims-markets-outside-contract.md)
+- La captura diaria de rankings perdía keywords cuando DataForSEO tardaba más de 35 s y el resumen decía
+  `degraded=0 failed=0`. Se agrega la segunda pasada `ops-seo-rank-capture-retry` a las 07:00 (cuesta cero con el día
+  completo) y el log avisa los parciales. Rige tras el próximo deploy del `ops-worker`. [ISSUE-182](docs/issues/open/ISSUE-182-seo-rank-capture-partial-days-silent.md)
+
+## 2026-10-12 — AXIS: lo que depende de `axis-brand-assets` 0.4.25 queda regenerado
+
+- El pin subió de 0.4.15 a 0.4.25 el 2026-10-06 sin regenerar sus dependientes y `pnpm test` mostraba tres fallas.
+  Ahora los tokens de Manzanitas registran la versión instalada, el vocabulario de canales de Insights tiene las 22
+  plataformas de AXIS (se suman Facebook, Threads y X, con su isotipo en el PDF, el deck y Think) y los cuatro lockups
+  del PDF del AI Visibility Report llevan el dibujo vigente, con la terminación concéntrica del anillo.
+- En las tablas del PDF y del deck, una fuente citada de facebook.com muestra el isotipo de Facebook en vez del de
+  Meta, y los dominios de Threads y X también tienen el suyo. Rige para lo que se renderice después del próximo
+  release. El informe web no cambia: no recibe canal por dominio citado.
+
+## 2026-10-12 — HubSpot: los segmentos de industria leen la empresa, y Bancos queda dentro de Finanzas
+
+- El operador vio que los contactos del segmento de bancos casi no aparecían en el de finanzas. El de bancos
+  (188) enumeraba 14 empresas por ID y el de finanzas (153) leía una industria llenada a mano en cada contacto:
+  sólo 9 de 28 coincidían. Ahora los segmentos de contactos 151–155 leen la industria de la empresa principal
+  y 188 se define como banca en Chile. Trece empresas corregidas; membresía real igual a la simulada en los
+  seis segmentos. 188 pasa de 28 a 26: Consorcio sale por estar clasificada como seguros, pendiente de decisión.
+  Con la misma regla se creó Seguros Chile (195), contenido en Finanzas, tras prospectar BICE Vida.
+- La skill de prospección suma el módulo `segments-by-attribute` y el escenario P50; el adaptador de HubSpot,
+  la regla vigente y el lector de membresía que funciona con OAuth de usuario.
+  [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md) ·
+  [snapshot](docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json).
+
+## 2026-10-12 — Cotizador V3: la CLI lee y escribe a través de un puerto de almacenamiento
+
+- `TASK-2024` (fase 1 de `EPIC-053`): fuentes, puntero y artefactos de `pnpm pricing:v3` pasan por
+  `PricingV3Storage`, con un adaptador de archivos (el modo local de siempre) y uno en memoria. Ninguna salida,
+  código de salida, error ni archivo de la CLI cambió: lo prueba una línea base de 107 comandos capturada antes
+  del cambio. Quien cambie a propósito lo que un comando responde debe volver a capturarla y revisar el diff.
+  `pnpm pricing:v3:test` suma esa línea base, una batería de conformidad sobre los 48 artefactos congelados y una
+  guarda de imports del motor. [Contrato](docs/architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md).
+
+## 2026-10-12 — Prospección B2B: respuesta proporcional tras un diferencial ciego bajo Claude
+
+- Diez escenarios con y sin la skill, calificados a ciegas: la skill evita el alta de contactos sin correo,
+  pero respondía 74 % más largo. Se agrega proporcionalidad al método, veinte decisiones que cierran
+  ambigüedades (D2 y D6 aprobadas por el operador; D3 modificada: registrar contactos cubre crear la Company
+  verificada), módulo de sesión Claude y evals v7 con 49 escenarios. En HubSpot: fecha de investigación =
+  verificación, encaje de adyacentes por función propia y Lead sólo tras interacción real; apagada en el
+  portal la automatización que creaba un Lead por cada contacto en etapa `Lead` (2.222 de 2.251). Tras corregir: 20 de 20 sin fallos críticos y ruido de 1,55 a 0,60.
+  [Evidencia y límites](docs/audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
+  Sin runtime, créditos, CRM ni envíos.
+
+## 2026-10-12 — SEO/AEO: referencia de categoría y representación fiel
+
+- [Método de categoría](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) aceptado:
+  descubrimiento non-brand, representación y consideración con pruebas, sin garantizar liderazgo.
+  ADR/index, manual/plan, contexto, modelo SV360 y cuatro skills Codex/Claude alineados; oferta, prueba,
+  briefs y revisión distinguen entregas controlables, resultados observados y negocio. Se corrigen
+  promesas históricas de citación/recovery paid. [Cierre](docs/audits/seo/2026-10-12-category-leadership-docs-skills.md).
+  Sin cambios de runtime, scoring, precios o publicación.
+
+## 2026-10-11 — Cotizador V3: factores por país
+
+- Prospección: cinco recorridos operativos aprobados (señal→acción, entrada por situación, cadencia coordinada, respuestas y entregabilidad) con plantillas, Commercial, espejos y escenarios v5. [Verificación](docs/audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md). Sin acciones externas ni cambio de permisos.
+
+- [Inventario HubSpot](docs/audits/commercial/hubspot-properties-2026-10-11/README.md): 1.126 definiciones activas completas, CSV/JSON y guía por fase de Contact/Company/Deal/Lead, revisados por tres subagentes. Routing HubSpot/Prospecting/Commercial y contexto histórico conciliados; requiredness UI/etapa y Lead write siguen sin certificar. Sólo documentación y lectura de portal.
+  Skill actualizada por aprobación posterior: familias de campos y plan por objeto/fase con completar/conservar/pendiente/sistema, evidencia y requisitos por carril; plantillas de handoff/changeset Codex/Claude incorporan el plan. Sin nuevas escrituras CRM.
+
+- Prospección: adapter operativo HubSpot (Agent CLI/API por capability, roles globales vs iniciativa, cambios mínimos/readback), capacity/costo, discovery/proof y aprendizaje por iniciativa. Plantillas/mirrors y routing Commercial/HubSpot sincronizados; fixtures ampliados a 30 conservando los anteriores. [Verificación](docs/audits/commercial/2026-10-11-prospecting-operational-modules-update.md). Método aprobado, sin software nuevo, acciones SaaS o automatizaciones.
+
+- ABM/ABS incorporado a prospección: módulo por demanda, coordinación Digital Marketing/Commercial, inversión por cuenta y mapas por iniciativa, consenso, costo total y medición; plantillas/espejos y escenarios ampliados a 26. [Verificación](docs/audits/commercial/2026-10-11-abm-abs-skill-update.md). Método aprobado; piloto, gastos, CRM y envío conservan su propia autoridad.
+
+- [Prospección B2B](.codex/skills/efeonce-b2b-prospecting/SKILL.md): núcleo Codex/Claude compartido, módulos por recorrido, plantillas y evaluación offline; companion Commercial Codex, routing y adapter personal compatibles con HSP/radar. Sales opcional por fase. Buying group: base de 2–3 adicionales ampliable por roles/riesgos y suficiencia por fase; personas únicas y funciones separadas, sin comité completo antes del primer acercamiento. [Actualización](docs/audits/commercial/2026-10-11-buying-group-skill-update.md). [Decisión](docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md); sin nuevas automatizaciones, CRM, créditos o envíos.
+
+- Prospección B2B: investigar al objetivo y buscar inicialmente 2–3 adicionales relevantes con datos accionables, ampliando por funciones críticas de la oportunidad/fase; no crear Contact/Lead sin correo corporativo individual verificado. Sin correo del objetivo, preservar su señal en investigación o nota de empresa y continuar por personas adyacentes. Brechas y relaciones hipotéticas se declaran; la regla no cambia registros históricos, filtros ni autorizaciones de envío. [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b), manual, modelo funcional y skills Codex/Claude sincronizados.
+
+- Cotizador: se documentó la auditoría del cotizador actual del portal (dominio, base de datos e interfaz) y se aprobó el plan para llevar el cotizador V3 a la plataforma, en el orden API, CLI sobre la API, MCP e interfaz, con su decisión de arquitectura, una épica y ocho tareas. Es documentación: ningún comportamiento cambió.
+- Cotizador V3 local, tras una segunda prueba a ciegas: un precio mensual todo incluido se acuerda por periodo y el documento lo imprime así, la evidencia de cada asignación de herramienta se declara, la revisión de una cotización agrupa los pendientes por mes y entrega el total bajo el piso, el esqueleto sólo propone precios utilizables y el documento admite una persona de contacto. La skill y el manual quedaron con una sola regla por tema y un caso más (persona continua a precio mensual).
+- Cotizador V3 local, tras tres negocios reales más: un precio por todo el trabajo (`agreed_total`) con IVA exacto, la forma de venta de cada oferta como dato del catálogo (v11), evidencia de la dedicación en la cotización congelada, revisión contra el piso de la propia oferta, diagnósticos con su causa y un documento que imprime precio de programa o proyecto y cuotas con IVA. La skill y el manual se reescribieron como procedimiento por tipo de negocio.
+- Cotizador V3 local, tras el primer caso real: los asientos de una herramienta se declaran como se compran (varios planes en un mes, asiento ocioso, asiento compartido), los meses iguales se declaran una vez (`periodIds`), el documento imprime opcionales con precio desde sus propias cotizaciones y líneas bonificadas con valor de referencia, y `--out` sólo guarda una cotización calculada; un opcional que amplía la cotización principal se calcula como incremento (`compose increment`). La plantilla A4 suma el bloque de opcionales y la línea de cortesía, y mantiene los totales junto a su tabla. Las cotizaciones congeladas no cambian.
+- Cotizador V3 local: `compose document` produce el documento de cotización para el cliente con la [plantilla A4](docs/commercial/templates/cotizacion-a4/README.md) desde una cotización congelada; las cifras salen sólo de la cotización. La plantilla suma una versión 2 con varias líneas con precio, paginación de la sección de precios, IVA declarado, calendario de pagos y costos pagados directo por el cliente; la versión 1 queda idéntica. El documento es un borrador, no una cotización emitida.
+- Cotizador V3 local, contrato 1.4.0: una cotización puede llevar costos de terceros refacturados (productora, talento, imprenta, pauta, licencias), cada uno en su propia fila con la regla de precio de su categoría, y una reserva de contingencia para trabajo de alcance fijo que entra como costo. El resumen muestra el margen del trabajo propio junto al total, y la vista del cliente lista cada costo de terceros aparte y, fuera de todo total, lo que el cliente paga directo. Los factores por país quedan como valores de política confirmados. [Manual](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) · [decisión](docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+- [Prospección bancaria](docs/commercial/prospects/bancos-chile-2026-10/README.md): ACTIVE 188 con 28 personas de 14 bancos, por fecha de investigación, correo y empresa principal. Membresía completa sin faltantes/extras; propiedades y calidad de canal documentadas, manual y skills Codex/Claude sincronizados. Sin outreach ni cambios de esquema.
+
+- Cotizador V3 local: la forma del compromiso es un dato propio de la cotización (On-Going u On-Demand, con 10 % más de precio y el mismo piso), la puesta en marcha se costea (incorporación por persona y reclutamiento opcional) y las herramientas declaran cuánto tiempo hay que seguir pagando una licencia y cuándo renueva su contrato. Adobe, Microsoft 365 y Notion quedan según sus facturas; Adobe se cotiza sin su descuento. Cuatro lecturas nuevas de una cotización ya calculada: persona y kit de herramientas, calendario de cobro, caja del encargo y compromisos con proveedores. [Manual](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) · [decisión del contrato 1.3.0](docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+- Cotizador V3 local, catálogo v7: la venta de una persona por dedicación (staff augmentation) pasa del recargo histórico sin piso a margen objetivo por nivel (30 %, 35 % o 40 %) con piso de 25 %, decididos por el CEO. El cotizador marca la línea que queda bajo ese piso. El piso de 45 % de los servicios gestionados no cambia. [Decisión](docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
+- Cotizador V3 local: un puntero (`data/pricing/v3-operating/current.json`) nombra el catálogo, la política y el catálogo de créditos vigentes, y `--current` los carga verificados; los comandos dejan de nombrar versiones a mano. El precio unitario de una herramienta deja de vencer y lleva una fecha de revisión que avisa sin bloquear (policy v6). El resumen informa avisos de la corrida (`runNotices`) y qué datos estimados concentran el costo (`estimateExposure`). El costo de personas queda declarado como costo objetivo, no nómina. Documentación, manuales y skills actualizados. [Manual](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) · [decisión del puntero](docs/architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md).
+- Cotizador V3 local, motor 1.2: el país del cliente ajusta el precio de la parte humana y el país de la persona ajusta el costo; en los mercados con factor menor que 1 el piso de margen se lee sobre el precio del mercado base, y el margen real se informa siempre. Catálogo v5 con los sueldos del Excel declarados como referencia de Chile, factores de talento y de mercado, y España como país. Los contratos anteriores no cambian. [Decisión](docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+
+## 2026-10-10 — Brochure de servicios web y Product Design 360 aprobados
+
+- Cotizador V3 local, motor 1.1: el precio pactado se declara directo y el motor calcula el descuento o el recargo; los precios se redondean hacia arriba por moneda según el catálogo, sin dejar una línea bajo su piso por redondeo. El contrato anterior no cambia y cada cotización guardada se sigue verificando con el motor que la firmó. Catálogo v4 con redondeo, tipos de cambio de cotización y sueldos confirmados. [Decisión](docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+
+- Cotizador V3 local: la CLI reporta cada rechazo con su código desde un registro cerrado (`src/lib/finance/pricing-v3/errors.ts`), `compose prepare|quote` y `replay` imprimen un resumen derivado en vez del resultado completo, y `assess` informa las líneas que el motor marcó bajo el piso de su política. Sin cambios en kernel, códigos de salida ni artefactos congelados. [Delta del ADR](docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md). El precio acordado de SKY social care queda registrado como [excepción al piso de 45 %](docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+
+- Brochure [«Marketing de Contenidos»](ai-generations/2026-10-09_deck-contenidos/deck/LEEME.md) (línea Brand, 57 láminas + ruta corta de 21) aprobado y canonizado: fuente del canvas, PDF rasterizado, patrón «franjas de foto» y láminas a mano registradas en la [norma §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md); deltas 2026-10-10 en los modelos de [Social Media](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md) y [Media & Distribution](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md), con las diferencias entre el deck y el modelo como decisiones abiertas.
+
+- [Product Design 360](docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md): aprobada entera por el operador; ADR `Accepted`, [modelo](docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) `Approved`, Wave con seis familias en portfolio, catálogo de servicios, context pack e índice de decisiones; G1–G6 pasan a validación posterior. Sin precios nuevos.
+
+- Brochure [«Servicios web y digitales»](ai-generations/2026-10-09_deck-web-nexa-spark/deck/LEEME.md) (línea Engine, 29 láminas) aprobado y canonizado: fuente del canvas, PDF rasterizado y render; `deck-studio`, [manual](docs/manual-de-uso/creative/componer-deck-con-recetas.md), doc funcional, norma §4.6 y [collateral de Wave](docs/services/wave/README.md). Pendientes de contenido antes de enviarlo a prospectos.
+
+## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
+
+- [Publicidad programática aprobada](docs/architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md): modelo V1.4, pricing V1.3, ficha y manual con tarifario USD y cobro estándar; setup único, fee fijo, externos al costo, margen mínimo/objetivo 45%/55%, honorarios a 30 días y liquidación a 15. Catálogo/registry y evidencia sincronizados. PDF previo desactualizado; contratación externa y costos observados por campaña. Sin integración/runtime ni facturas/cotizaciones emitidas.
+
+- Cotizador V3: tres subagentes consolidaron arquitectura, modelos, manuales, contratos y skills Codex/Claude contra el código; routers e índices llevan a la [superficie completa](docs/documentation/finance/cotizador-v3-superficie-implementada.md). [Cobertura y cierre](docs/audits/commercial/2026-10-09-pricing-v3-docs-skills-consolidation.md); simulación local, datos económicos y promoción canónica conservan su revisión pendiente.
+
+- [Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md): propuesta técnica v13 (49 láminas) y cotización USD/PEN enviadas a Jesús Vargas Serpa; compromiso inicial de seis meses y renovación trimestral sobre el plan anual de US$79.200; deal en Presentación de soluciones. [Deck v13](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/deck-propuesta/README.md), [región de filtros SVG](docs/architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) en `method-surround-cycle` y [manual: `content-stack` y empalme](docs/manual-de-uso/creative/componer-deck-con-recetas.md).
+
+- Pricing V3: [operación para agentes](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md),32perfiles, herramientas por trabajo, reparto reconciliado, costosAdobe/Notion con fuentes, mantenimiento con impacto, evaluación y preview redactado. TASK-2022 completa local;213 testsV2/V3 y26operacionesCLI verificados; economíaTASK-2017 parcial e integración canónica pendiente.
+
+- Pricing V3: [composición por demanda](docs/manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md), base/roles/tareas, seats/pools y créditos integrados al quote; explain/replay congelados, tres casos y revisión obligatoria. TASK-2021 local; sin inventario live ni tarifa comercial aprobada.
+
+- Pricing V3: [presupuesto IA por CLI](docs/manual-de-uso/finance/presupuestar-creditos-ia-v3.md), suscripción y paquetes extra discretos, caja/remanente/vencimiento; TASK-2020 local, sin compra ni binding automático a quotes.
+
+- Pricing V3: [licencias/plataforma declaradas](data/pricing/v3-pilot/economics/resource-inputs/README.md) registradas con créditos, moneda, renovación Adobe y propuesta de reparto; asignaciones/normalización pendientes, sin cambiar catálogo histórico ni quotes.
+
+- Pricing V3: [policy/provisiones propuestas](docs/business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md), seis sensibilidades CLI y fuentes oficiales; TASK-2017 parcial.
+
+- Pricing V3: [selección y mantenimiento local](docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md), 32 perfiles históricos, kits, calendario, desglose y versiones con preview/apply. TASK-2019; tarifas vigentes y promoción runtime pendientes.
+
+- [Pricing V3 local](docs/manual-de-uso/finance/cotizar-v3-por-cli.md): núcleo decimal separado, CLI, snapshots/replay y borrador redactado. 49 pruebas V3 y 23 históricas; tipos/lint focal verdes. [Ficha Colombia→Chile](docs/documentation/finance/cotizador-v3-piloto-colombia-chile.md) preparada: diseñador senior 50%, ledger/readiness y cinco simulaciones históricas y [equipo Pibank Perú/Chile](docs/documentation/finance/cotizador-v3-prueba-pibank.md) con costo reconciliado y margen 40% de prueba; revisión y export bloqueado; costos/políticas pendientes; sin integración canónica o tarifas aprobadas. [Evidencia](docs/audits/commercial/2026-10-09-pricing-v3-local-prototype.md).
+
+- [CLI de pricing](docs/manual-de-uso/finance/consultar-excel-pricing-por-cli.md): Excel extraído con hash/celdas/fórmulas; búsqueda, auditoría, costos declarados, equipos y comparación de márgenes sin UI/DB. Escenarios hipotéticos; Excel/seeds y motor vigente intactos.
+
+- [Dirección regional aceptada](docs/architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md), [servicio](docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md), modelo y activación documentados: modalidades, buying group, economics, formación, continuidad y matriz contractual. Talent Assurance, arquitectura objetivo y guardrails pasan a aceptados por aprobación del operador; policy e implementación pendientes. Índices, task/epic, documentación funcional/manual y skills espejo conciliados. Sin nuevo runtime, precios, contratos ni envíos.
+
+## 2026-10-08 — Cotizaciones documentales multimoneda y entrega Pibank
+
+- [Plantilla A4](docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): presentación ISO, precisión decimal, FX explícito con fecha/fuente y tratamiento fiscal independiente. [Cotización Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/README.md): USD/PEN de 19 páginas y archivos en raíz de carpeta comercial, con copia por hash y procedencia registrada. Tres subagentes actualizaron docs/skills y auditaron aislamiento; sin cambios al cotizador Greenhouse, envío o CRM.
+
+## 2026-10-08 — Seguimiento comercial recurrente
+
+- [Outreach manual](docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md): tres correos conciliados en Outlook, tres notas HubSpot en seis contactos, tareas Notion reutilizadas/creada con borradores y cadencia finita. Skills Codex/Claude documentan evidencia, hilo único y avance por envío real. Sin secuencias ni emails enviados por el agente.
+
+- [Plantilla documental A4 para licitaciones](docs/commercial/templates/cotizacion-a4/README.md): HTML aprobado con slots/JSON, cálculo CLP de neto/IVA/total y PDF de cuatro páginas. Subagentes actualizaron docs y cinco pares de skills; routers distinguen preparación rápida de oferta y cotizador Greenhouse con registros/aprobación propios. Sin cambios runtime; paquete UTEM intacto.
+
+- [Política aceptada](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa + CCO `48713323@bcc.hubspot.com` en nuevos correos, respuestas y reenvíos autorizados; conector con firma en texto u Outlook UI con firma gráfica, ambas aprobadas. Prueba por conector verificada en Enviados; registro CRM sin verificar. Routers, manuales y skills sincronizados.
+
+- [UTEM presentada](docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md): Julio confirmó envío en Mercado Público; programa de tres meses por CLP4,8M netos /5,712M total. HubSpot Presentación de soluciones e importe neto verificados dos veces; Notion Enviada. Expediente, registros y skills Codex/Claude sincronizados. Costos/capacidad/panel y fuente Sky siguen como verificaciones internas pendientes; seguimiento de evaluación/resultado.
+
+- [Consolidación comercial y skills](docs/audits/commercial/2026-10-08-licitaciones-crm-continuidad-docs-skills.md): revisión LicitaLAB amplia, altas Diego/Emily y segmentos con evidencia; UTEM con originales/anexos firmados y datos corporativos confirmados. Tres subagentes sincronizaron documentos, seguimiento y 11 pares de skills. Manuales corrigen contacto previo, firma autorizada, leads y reutilización. Sin nuevos envíos ni postulación.
+
+- [Contrato y registro](docs/commercial/follow-up-agent/README.md): heartbeat Codex activo L–V 09:00/16:00 Chile, revisión de 251 registros y 41 abiertos, proyecto comercial con 23 tareas y tres borradores de texto en Notion. ADR de autonomía acotada; sin cambios CRM ni envíos. Outlook devolvió 403 al guardar borrador; primera corrida programada aún no observada.
+
+## 2026-10-07 — Prospecting Agent: voz de Julio y enlace de reunión
+
+- [Manual](docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md), ADR, snapshot exacto y skills Codex/Claude: contexto, una capacidad, invitación con agenda y alternativa de respuesta; guardar/aprobar/readback. Configuración de 7.969 caracteres verificada en HubSpot: añade enlace institucional en la primera mención de Efeonce y conserva agenda; QA del último borrador pendiente, sin envío.
+
+## 2026-10-07 — Firma Efeonce en HubSpot: instalación por HTML
+
+- [Manual](docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md#instalar-la-firma-en-hubspot) y skills HubSpot/línea gráfica (Codex y Claude): recuperar HTML aprobado, comprobar imágenes y pegar código fuente en HTML; fallo observado del pegado en Simple. Firma de Julio guardada y preview verificada; recepción no probada.
+
+## 2026-10-07 — Rooms y AXIS: experiencias y reproductor compartido
+
+- Studio: Fachada común para reproducción, galerías inertes y visor de grupos; worker existente suma timeline WebVTT/sprite. Paquete publicado, tests/build y QA local; Studio main `da2a02a`, migración y CORS verificados en staging/producción. [Decisión](docs/architecture/marketing-studio/EFEONCE_STUDIO_AXIS_VIDEO_DECISION_V1.md). Rollout completo: web/worker, backfill 7/7 y reproducción/miniaturas verificados en producción.
+
+**AXIS Video: publicación, adopción Think y documentación vigente (2026-10-07)**
+
+- Lab: Presentación/Superficie/Línea reutilizan `Field` + `Select` aprobado mediante `LabSelect.astro`; regla explícita en skill AXIS principal/consumo/primitives y gate contra nuevos selectores nativos. Excepciones heredadas inventariadas, sin copiar el dropdown ni publicar otra versión npm.
+
+- Cinema/Editorial/Review publicados en primitives 0.6.5; AXIS y Think main desplegados. Think usa registry privado + lockfile. [Distribución y QA](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+- Adapters Think/WordPress ampliados: modelo completo, callbacks cliente y ciclo de vida; muestras con subtítulos, diez miniaturas, cuatro capítulos y 12 cues. Bundle WordPress desde package publicado con hashes; sigue sin activación. Paridad documentada; 0.6.5 distribuye corrección de órbita oculta al coexistir con estilos de botones.
+- CI AXIS proporcional en main: documentación rápida, suites por impacto y reuso verificable por SHA/digest para releases; sin nueva versión por documentación.
+- Manuales y skills espejo separan contrato vigente de historia; controles integrados/contextuales, adapters y responsabilidades del consumidor documentados. Imagen azul intermitente abierta; WordPress preparado sin activación. Sin afirmar certificación física/AT/streaming.
+
+- Decisión explícita del operador: `efeonce-graphic-line` gobierna estética, tipografía, componentes, iconografía y motion de Rooms; Bricolage editorial/Poppins funcional, AXIS como distribución técnica. [Dossier](docs/architecture/rooms/README.md) y [EPIC-052](docs/epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md) corregidos, incluida autoría/consola; arte cliente intacto y sin narrativa pregunta/respuesta obligatoria.
+- [Política de stack Rooms](docs/architecture/rooms/EFEONCE_ROOMS_STACK_BASELINE_V1.md): últimas estables compatibles, baseline fechado y gate R01 para TS7/tooling, plugins ESLint10, Node LTS y consumidor AXIS. ADR/arquitectura/epic enlazados; sin instalación ni build conjunto verificado.
+- Alcance precisado por el operador: perfiles creativo y SEO/AEO de primera clase, combinables. Modelo de bloques/evidencia, continuidad nativa X-ray, experiencia y criterios de EPIC-052 actualizados; creatividad es el primer recorrido, no el límite de V1. Sin migración de Think/X-ray ni runtime nuevo.
+- ADR de marca con addendum, manuales, criterios/aplicación/QA y skill Codex/Claude sincronizados. Corrección documental; sin cambios de paquetes, implementación, publicación ni despliegue.
+
+## 2026-10-06 — Nano Banana 2.1 en CLI local
+
+- `pnpm ai:nano` usa `gemini-nano-banana-2.1` directo por Google `global`: generación/edición/fusión, sesiones privadas, contexto video/PDF, búsqueda web/imagen, 1K–4K, 14 ratios y thinking. Expone `generateContent`, `streamGenerateContent` y `countTokens`; Batch/Interactions remoto/máscaras no implementados.
+- 29 tests nuevos, TypeScript y canaries reales 1K + edición/stream/búsqueda 2K PASS; [evidencia y límites](docs/audits/ai-tooling/2026-10-06-nano-banana-2-1-cli.md). Manual, ADR embebido y skills espejo sincronizados. Sin push/deploy; runtime y Globe independientes.
+- Nexa cine 4K/`high`, ocho referencias: V2 5504×3072, reservas 4/4 y revisión `APROBABLE`; [prueba y comparación con NX7d/Sunburst](docs/audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md). Preferencia cinematográfica por Sunburst en estas imágenes; Nano destaca en resolución/reservas. No es A/B controlado. Canon, manuales y skills espejo actualizados; OpenAI/GPT Image 2 sigue default de `ai:image`, sin publicar la prueba.
+
+## 2026-10-06 — Pibank: caso de negocio, modelo y propuesta SEO/AEO
+
+- Conciliación 07-10: [técnica/resumen/oferta](docs/audits/commercial/2026-10-07-pibank-conciliacion-paquete.md) regenerados juntos, diagnóstico recuperado y gradual como alcance principal. 30 checks/12 páginas; precios/modelos intactos. Aporte y margen pendientes.
+
+- Oferta reforzada: AEO 24 preguntas/144 observaciones desde M2; PR gradual M3/M8 y refuerzos M6/M11; acuerdos de revisión y sensibilidad económica, con fee conservado. Modelo evolutivo sin cuota FAQ; PDF/Excel/Claude sincronizados. Híbrido 07-10: [base US$4.500 y activaciones](docs/audits/commercial/2026-10-07-pibank-oferta-hibrida.md), catálogo, calendario, selector y PDF; hasta 5 artículos/mes incluidos; ruta recomendada US$79.200, integral US$89.200. Sesiones sustituidas por refuerzos PR; técnico/schema explícitos en base. Fee US$8.000 anterior sustituido; investigación/embudo intactos.
+
+- Conexión 07-10: [demanda, plan y costo](docs/audits/commercial/2026-10-07-pibank-conexion-demanda-plan.md), investigación/embudo originales intactos; anexo con 19 familias, capacidad y fee propuesto US$8.000/mes. Aporte global y aprobación económica pendientes.
+
+- Integración 07-10 v0.7: [hub, pilar, tools, comunidad, PR y eficiencia SEO–SEM](docs/audits/commercial/2026-10-07-pibank-integracion-crecimiento-v0.7.md), alcance candidato/calendario/matriz y brief para Claude. PDFs6/2p revisados; SEM sólo análisis/recomendaciones. Modelo v0.6 intacto como referencia previa; aporte y costeo ampliados pendientes. Sin envío. [Revisión v0.6.1 anterior](docs/audits/commercial/2026-10-07-pibank-fuentes-para-deck.md).
+
+- Aprendizajes del caso incorporados al método/manual/lectura funcional y skills de SEO/AEO, negocio, cliente, pricing, licitaciones, DataForSEO, reportes/decks, growth y PR; continuidad v0.6 corregida, historia preservada. [Mapa y verificación](docs/audits/commercial/2026-10-06-pibank-aprendizajes-docs-skills.md). Preparación revisable, sin nuevos forecasts, precios, gasto o publicación.
+
+- Cierre v0.6: apertura M1, calculadora/fondeo M2, PR M3/M5/M8/M11; modelo integra1.216h y13costos por función,29pruebas nativas. Capturas competitivas ampliadas, costo BBVA conciliado y baseline de backlinks. PDFs revisados; precio/roster y datos bancarios pendientes. [Cierre de brechas](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/CIERRE-DE-BRECHAS-2027.md). Sin envío ni contacto a medios.
+
+- PR editorial añadido al plan y propuesta: cuatro campañas, 48 propuestas individuales y vocería; objetivos de cobertura/enlaces sin garantía. Capacidad candidata combinada 1.216h; Excel conserva base SEO/GEO. PDFs y deck actualizados, [evidencia PR](docs/audits/commercial/2026-10-06-pibank-pr-autoridad.md). Sin contacto a medios, gastos nuevos de datos ni publicación.
+- Exploración de demanda capturada por BCP/Interbank/Scotiabank y peer adicional BBVA: 1.476 observaciones / 1.286 consultas, 19 familias, volúmenes con procedencia y [plan de conquista anual](docs/commercial/prospects/banco-pichincha-peru-seo-2026/research/pibank-competitor-capture-2026-10-06/ANALISIS-Y-PLAN.md). Reutilización de capturas del mismo día y verificación pública; USD 0 adicional. Cobertura de dominios incompleta y ampliación preparada en preview, pendiente de conciliación de request BBVA abortado/costo desconocido. Proxies no son mercado, visitantes ni forecast; PDFs/XLSX permanecen sin nuevos resultados inventados.
+- Reunión completa leída por MCP: mandato Pibank 2027, preparación histórica de Banco Pichincha diferenciada y supuesto US$38m trazable al operador. Expediente, método, manual, documentación funcional y cuatro skills Codex/Claude actualizados.
+- [Evidencia y validación](docs/audits/commercial/2026-10-06-pibank-business-case-documentation.md). Reconstrucción v0.4: [propuesta cliente y modelo inverso](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/README.md); aperturas/fondeo separados, alcance enfocado de doce meses y escenario de lanzamiento. Tabla anterior retirada del uso cliente; historia y QA preservadas. M1 entrega; revisiones trimestrales según maduración. Inversión/valoración bancaria pendientes; sin envío, publicación ni cambios en CRM/runtime.
+
+## 2026-10-06 — Prospección HubSpot: cohortes y abordaje personalizados
+
+- Admisión 07/10: [Sika México LIC-1169 Q4 Home Center](docs/commercial/tenders/sika-mexico-campana-q4-home-center-1169/README.md), brief completo y Deal `65827529551`/nota asociados a empresa/contacto existentes. 34 tiendas, dos frentes, escenarios; presupuesto y responsable pendientes. Segmentos 174/176/177 verificados sin cambiar atributos; bucket automático Core Pipeline tras Strategic Bets propuesto. Registro local OneDrive; sin oferta enviada. Continuidad en chat Q4 enlazada; método CRM y skills Codex/Claude aclaran reutilización, contacto sin autoridad confirmada y lectura individual frente a totales.
+
+- Continuidad de segmentos: [modelo funcional y catálogo exacto](docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md), manual con preview/MCP/diagnóstico, decisión y routers actualizados; skills HubSpot espejadas. Nueva lectura verifica 34 definiciones y 19 conjuntos, sin nuevas escrituras CRM.
+- Alta autorizada [Sika México LIC-1164](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md): empresa México, contacto y deal asociados con nota; Primary corregida tras automatización por dominio. Cohorte 81/81, 19 ACTIVE; 63 individuales y 51 creativos, nuevo 177 Química y materiales con una empresa. Conjuntos exactos y registro OneDrive; sin propuesta enviada.
+- Corte inicial histórico: portal `48713323`, 15 segmentos globales conservados y 18 nuevos activos, con pertenencia obligatoria al lote antes de industria, país, tamaño o cargo. Lectura completa confirma conjuntos exactos y cero registros ajenos. 80 cuentas investigadas, 79 contactos nuevos; 61 individuales con email para preparación, no aprobación de envío.
+- Runbook Agent CLI/MCP, manual de cohortes, método de intención y skills HubSpot/licitaciones espejadas: `IN_LIST(list = ...)`, fit ≠ solicitud ≠ vigencia, persona ≠ buzón compartido, correo disponible ≠ envío validado. [Auditoría, pendientes y estrategia](docs/audits/commercial/2026-10-06-prospeccion-segmentacion-hubspot.md). El corte inicial no creó schemas ni envió outreach. Corrección posterior: cuatro definiciones creadas por Agent CLI, 160 registros con propiedades y 18 ACTIVE migrados en el mismo ID; incorporación automática verificada (62 individuales, Retail 11, roles 32, creativo 50, CRM 26), 15 reglas globales preservadas. Regla en skills: alta completa sólo con propiedades y membresía efectiva. [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
+
+## 2026-10-05 — Contractors: integridad de envíos y pagos (ISSUE-179, TASK-2009/2010)
+
+- Correcciones comunes de fechas, monto acordado, adjuntos por período/owner y reintentos atómicos; órdenes y cascade coherentes, sin parciales contractor. Revisiones adicionales cubren concurrencia, snapshot de tarifa y precisión de cantidades.
+- 333 pruebas focales, TypeScript/lint/build/workers y PostgreSQL local aislado PASS; suite global 18.014 PASS, un fallo ajeno de SVG AXIS y 48 skipped. [Auditoría](docs/audits/payroll/CONTRACTOR_FLOW_PRE_RELEASE_AUDIT_2026-10-05.md). Release, canary y recovery pendientes; sin push, deploy ni operaciones financieras reales.
+
+## 2026-10-05 — Efeonce Factory: su marca y la aplicación en Notion
+
+- Aprobada la ruta A: «Factory» en Poppins Bold con la órbita en su «o», esfera en Growth, la F en órbita como símbolo; terminaciones del anillo concéntricas a la esfera (única diferencia con la familia). ADR [`EFEONCE_FACTORY_MARK_DECISION_V1.md`](docs/architecture/EFEONCE_FACTORY_MARK_DECISION_V1.md).
+- `scripts/brand/build-factory-logos.mjs` genera 18 SVG; sellados en `axis-brand-assets` 0.4.22 (axis-design-system `dd82e11`, sin push ni publicar).
+- Portadas de Notion (Teamspace, Proyectos, Tareas, Sprints), avatar del teamspace y anuncio 16:9 sobre un estudio fuera de foco hecho con `pnpm foto:generar`; fichas en `ai-generations/2026-10-05_factory-notion-bokeh/` (las PNG no van a git).
+
+## 2026-10-05 — TASK-2002: calendario más rápido y sistema de motion v3.6 (local)
+
+- Studio `7e081d0` + `11ec7fa` sin push. Medido en producción: navegación congelada 0,36–1,4 s y RSC del mes 226 KB (la bandeja lateral pesaba ~150 KB). Lecturas en paralelo, catálogo en memoria, bandeja recortada (8 + «Ver las N restantes»), estado pendiente visible, hoja provisional y prefetch de períodos vecinos; local: render −30/−45 % y mes vecino sin petición.
+- Motion desde `axisMotion` aprobado en el canvas «v3.6»: View Transitions de mes y vista, FLIP al filtrar, entradas y salidas con origen, arrastrar para cerrar, check/halo/aviso con Deshacer; alternativa reducida por momento. [Contrato](docs/ui/motion/TASK-2002-marketing-studio-activations-calendar-motion.md). Deploy con señal del operador.
+
+## 2026-10-05 — Efeonce Factory: vía comercial On-Demand
+
+- Decisión explícita del operador: Factory convierte capacidad disponible en encargos con margen y caja adicional;
+  vía transversal: web, contenido, audiovisual, medios y más; campaña y kit son ejemplos opcionales.
+  Entradas: licitaciones públicas/privadas, prospección fría y paid media; costo, conversión y cobro por entrada.
+  [ADR aceptado](docs/architecture/EFEONCE_FACTORY_COMMERCIAL_ROUTE_DECISION_V1.md), modelo de negocio/fichas e
+  índices/contexto/skills Codex–Claude conectados. Economics y capacidad por encargo pendientes; sin runtime o envío.
+- [HubSpot verificado](docs/commercial/tenders/FACTORY_HUBSPOT_CHANGESET_2026-10-05.md): cinco nuevas en preparación,
+  veinte vencidas a perdido; registros/forecast actualizados. Corrección del operador: tres Factory On-Demand,
+  ISP diseño y UNAP bajo Efeonce por operación continua. Modelo V1.3/delta aceptado. UNAP sin amount; deriva de bucket anotada.
+- Priorización corregida a fit, sin cupo por horas libres; 14 fichas adicionales revisadas y ocho borradores técnicos específicos, con matrices y economía pendiente. [Cola y fuentes](docs/commercial/tenders/LICITALAB_PRIORITY_QUEUE_2026-10-05.md). Sin nuevas altas CRM ni ofertas presentadas en este corte.
+
+## 2026-10-05 — ADR: Creative Studio, vista creativa de las mismas campañas de Studio
+
+- Decisión del operador: Studio tiene dos vistas sobre un solo aggregate, Marketing Studio y Creative Studio (diseñador, director de arte, brand manager); la vista no autoriza y el switch conserva el foco. ADR `docs/architecture/marketing-studio/EFEONCE_STUDIO_CREATIVE_VIEW_DECISION_V1.md`, validado contra Studio `5d962c4`; roadmap de 7 slices, sin tasks ni runtime.
+- Creative Studio abarca la vista creativa y a Globe como su motor (no excluyentes; se juntan después); Globe queda registrado como hibernado según el operador. Actualizados índice de decisiones, arquitectura de Studio, EPIC-049, contexto 03/00, routers `CLAUDE.md`/`AGENTS.md` y skills `efeonce-marketing-studio`/`greenhouse-globe` (ambos espejos).
+
+## 2026-10-05 — TASK-2002: filtros, formulario, fecha y hora (v3.4/v3.5) y ventana de escritura temporal
+
+- Studio `c767283`…`5d962c4` en producción: filtros en español con menú propio (lista estable, conteo del período, cero elegible, plataformas con y sin cuenta, banderas de los cinco mercados), formulario con el mismo menú y selectores de fecha, hora e inicio/fin (puntos por día de la cuenta, hora ocupada con aviso, flight de la campaña). AXIS 0.4.21 suma el isotipo de X. Ventana de escritura en modo open para Efeonce hasta 2026-10-12T10:00Z (decisión del operador; vuelve sola a solo lectura). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
+
+## 2026-10-05 — títulos de pestaña del portal (local)
+
+- Título general `Efeonce | Greenhouse`; acceso, proyectos y resumen de finanzas usan Efeonce primero y etiquetas ES/EN. Copy centralizado, sin plantilla global que duplique marcas. ESLint y TypeScript PASS. Commit y push a `develop` autorizados; despliegue no verificado. [Detalle](docs/audits/ui/2026-10-05-portal-metadata.md).
+
+## 2026-10-05 — identidad del menú y footer de Greenhouse (local)
+
+- Por decisión del operador, Efeonce firma el menú (logo expandido, isotipo colapsado); Greenhouse pasa al footer vertical/horizontal, con variante clara/oscura. Assets existentes, texto alternativo corregido y canon de marca actualizado. Commit y push a `develop` autorizados; despliegue no verificado. [Evidencia](docs/audits/ui/2026-10-05-portal-brand-chrome.md).
+
+## 2026-10-05 — TASK-2002: hojas de email y página web en producción
+
+- Studio `3048f96` (Vercel `kc4tcvuod`): la hoja de un email muestra remitente, asunto y preheader literales con su conteo, audiencia, vista previa Escritorio/Móvil/Bandeja y evidencia programado/enviado/después del envío; la de una página web, vista previa y lista de destino, formulario conectado, URL en línea y publicación. Construidas sobre el contrato de Codex (`1f2a0ef`); null se muestra «Sin dato en la fuente» hasta que se publique el lado Greenhouse. [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
+
+## 2026-10-05 — TASK-2007: producto y Growth CTA AXIS aprobados
+
+Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset cancelable; feedback, disclosure, dialog y complementary con foco diferenciado; selección múltiple, tabs/paginación, fechas/rango y archivo nativos. Catálogo distingue releases observadas de exports locales. Composición `/references/product/`, pruebas y coste de bundle documentados en el repo AXIS. AXIS `447ea0c` enviado a main: Growth CTA portable, banners editorial/de marca, anillo superior, esfera al cierre, pesos Bricolage400/700 y agenda modal/inferior aprobados. CTA40/40 + final4/4; producto/Forms200 PASS + 4/4 tras corregir puerto del harness. Skills espejo y consumo sincronizados. Publicación de exports y adopción pendientes. [Task](docs/tasks/in-progress/TASK-2007-axis-product-primitives.md).
+
+## 2026-10-05 — TASK-2002: calendario de activaciones v3 en producción (sólo lectura)
+
+- Studio `main` `d0ec7e0`: `studio.efeonce.org/calendar` sigue la dirección v3 aprobada en Mes, Semana, Día, Línea de tiempo, Paid, Hoja, Popover del día, estados, filtros móvil y preview por formato, con barra inferior propia de evidencia de ejecución. Diálogos de escritura (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución) verificados en local; en producción no se montan hasta que exista login (TASK-1898). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
+
+## 2026-10-05 — TASK-2001: lectores de hojas email y landing
+
+- Local: API 1.9.0 amplía ActivationDto con email literal/límites/audiencias/métricas y web con destinos/Growth Forms validado. UI intacta, null ausente, sin series ni SQL entre productos. Postgres/check/build/CLI PASS; rollout pendiente. [Contrato y evidencia](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
+
+## 2026-10-04 — TASK-2002/2004: calendario de activaciones (lectura) e isotipos de plataforma en AXIS
+
+- Studio (local): el calendario pasa a ser de activaciones — vistas Mes, Semana, Día, Línea de tiempo y Pauta, filtros por dimensión en la URL, hoja con evidencia y tracking URL, bandeja «Ejecución sin activación», móvil y teclado. Las escrituras se muestran bloqueadas con su razón hasta que exista autoridad de escritura.
+- AXIS: `@efeoncepro/axis-brand-assets` 0.4.20 publica negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads, isotipos de Facebook y Threads y los logos de herramientas; `axis-tokens` 0.5.1.
+
+## 2026-10-04 — TASK-2001: conexiones owned locales
+
+- Resend/HubSpot con puerto Greenhouse autorizado por binding y evidencia completa/parcial; WordPress público paginado y cacheado. Marketing Cloud separado sin lector. API 1.8.0/catálogo aditivo, 288+7 Studio con PG, build y CLI/GVC básico PASS; navegación móvil en QA. Sin push ni rollout nuevo. [Evidencia](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
+
+## 2026-10-04 — TASK-2001: rollout de activaciones de Studio
+
+- Studio `aa6fa07` desplegado, API 1.7.0; cinco migraciones staging/prod, seis planes CL con evidencia legacy y eventos persona. Descubrimiento real62/replay0 cambios, scheduler OIDC, CLI y44 thumbs PASS. Email multiproveedor, owned y MCP delegado pendientes. [Evidencia](docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md).
+
+## 2026-10-04 — TASK-1899 retirada por el operador
+
+- Implementación local de escritura MCP revertida en Greenhouse y Studio; sin cambios de runtime desplegados. Se retira como requisito previo al desarrollo de Studio; futura federación pendiente de nueva decisión.
+
+## 2026-10-04 — AXIS: recursos, agentes, tipografía y botones
+
+- [Entradas especializadas y Growth Forms](docs/audits/2026-10-04-axis-specialized-inputs.md): AXIS `a0c6130`/`6fff346` subido; teléfono/correo/URL/documentos/decimales, 245 países con búsqueda y filas alineadas. Adapter Greenhouse opt-in y skills Codex/Claude sincronizadas. Primitives 0.5.0 pendiente de publicación; sin cambio de pins ni activación en hosts.
+
+- Colores y ramps de La órbita, siete compactos y diez familias de formularios distribuidos desde AXIS; foco continuo, iconos de apoyo y selectores enriquecidos. Docs y skills Codex/Claude sincronizados con tres subagentes. [Estado de publicación, instalación y límites](docs/audits/2026-10-04-axis-forms-release.md). Adopción y pins consumidores separados.
+
+- Familia portable de botones: contexto heredado, radio/toolbar, menús controlados y top layer modal; 52 recorridos en cuatro perfiles y 32 referencias visuales. Lab desplegado; VoiceOver/NVDA manual y zoom nativo pendientes. La adopción mantiene sus pins. [Release y evidencia](docs/audits/2026-10-04-axis-buttons-release.md).
+
+- Iconos AEO/SEO/Autoridad, logos propios y terceros, búsqueda, navegación, capacidades para agentes y Bricolage editorial centralizados en AXIS. `aee99d2` pushed y Lab desplegado; `graphic-line@0.17.0` publicado, nueva API `/logos` pendiente de release. Docs y skills Codex/Claude reconciliados sin cambiar pins consumidores. [Cierre, evidencias y alcance](docs/audits/2026-10-04-axis-documentation-closure.md).
+
+## 2026-10-04 — Marketing Studio: catálogo en producción y CLI HTTP local
+
+- Delta TASK-2001: email con Resend (volumen principal), HubSpot, Marketing Cloud Engagement y Next; contrato común, adapters separados y evidencia/completitud por envío. Registrado en task/ADR/plan; implementación pendiente, el QA anterior no certifica esta ampliación.
+
+- Studio separa plan y ejecución: ocho estados, cuentas/mercado/hora local, versiones exactas, tracking congelada, calendario/avisos/eventos, blog por CMS cliente y draft Notion sólo como referencia. Backfill preserva posts y exige revisión personal. API/MCP parity y CLI HTTP verificados con PostgreSQL real; flags OFF, sin push. [QA, commits y pendientes de runtime](docs/audits/marketing-studio/TASK-2001-local-verification.md).
+
+- Cierre documental con tres subagentes: arquitectura/operación/skills y routers reconciliados; estado local/desplegado separado, MCP futuro no bloquea API/CLI/UI. [Mapa completo y gates](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md).
+
+- CLI HTTP local `pnpm studio`: descubrimiento de 59 operaciones de negocio, cargas verificadas, dryRun/If-Match/idempotencia y credenciales privadas. [Manual](docs/manual-de-uso/marketing-studio/operar-por-cli-api.md) · [QA](docs/audits/marketing-studio/2026-10-04-studio-api-cli.md).
+
+- TASK-1905: catálogo versionado, 52 canales, validación transaccional, backfill revisable, audiencias/ICP y API 1.6.0/59 tools desplegados en Studio (`74073de`). [Release y límites](docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md); backfill humano, ICP y federación pendientes.
+
+- [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md): derivado `playback` (MP4 H.264, lado corto ≤ 720 px, faststart) en el worker con backfill por el barrido (6/6 videos de producción), `302` a URL firmada V4 (GCS atiende `Range`; ningún video pasa por Vercel), `Asset.playback`, API 1.5.0.
+- [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md): reproductor nativo en el panel de la pieza (feed y story, sin autoplay); el tablero muestra todas las piezas de un formato (la versión con intro para Instagram era invisible) y la duración.
+
+## 2026-10-04 — Build de fuentes independiente de Google Fonts
+
+- ISSUE-178: Geist/Poppins y Bricolage del login pasan a `next/font/local`, WOFF2 con origen/licencia/hash fijados. El build comprueba los archivos y bloquea la reintroducción de loaders remotos; roles y variables CSS preservados. Build completo, 90 tests y GVC en tres tamaños PASS; staging READY y fuentes/login/sesión verificados; producción sin promover.
+
+## 2026-10-04 — AI Visibility Report: hero, ancho y hover
+
+- Hero con demostración interactiva y pausa directa; shell/escena acotados en pantallas amplias. Think `6aab907`/`56a300a` publicados y verificados en producción a 1710/2560 px. Hover primario azul profundo `06449ca` validado y comprometido sólo local, pendiente de push.
+- [TASK-1966 y evidencia](docs/tasks/complete/TASK-1966-ai-visibility-report-landing-la-orbita.md): docs funcionales, motion, wireframe y skill espejo alineados. Contrato Marca primero sin activar; producción conserva Entrega primero. Sin envío real ni cambios de backend/PDF.
+
+## 2026-10-04 — Discovery de población cliente SEO
+
+- TASK-1690: [discovery](docs/audits/seo/2026-10-04-task-1690-discovery.md) de contratos, fixtures y UX con tres subagentes; decisión GSC clics/CTR y rank independiente, cobertura/null/cero y cola canónica documentados. Estado `Diseno`; selección visual e implementación pendientes. Baseline: 53 tests PASS. Sin código ni cambios runtime.
+
 ## 2026-10-04 — Ownership editorial y de informes SEO
 
 - El flujo editorial pertenece a Marketing Studio: TASK-1667/1669 → EPIC-049; TASK-1668 conserva medición/outcomes en EPIC-022. La auditoría técnica y su distribución especializada pertenecen a Insights: TASK-1672/1673 → EPIC-045, reusando renderer y transporte existentes.
@@ -137,482 +570,3 @@
 - La grilla de piezas de Studio tenía columnas fijas y escondía las 1,91:1 cargadas y aprobadas; ahora muestra las
   proporciones presentes en la campaña y rotula `191x100` como «1,91:1» (Studio `23e5787`, verificado en el navegador).
   Commits de este repo sin push.
-
-## 2026-10-02 — Marketing Studio: puerta de ingreso de originales en producción (TASK-1894, Entregable A)
-
-- Studio 1.3.0 recibe finales por una sola puerta: `studio.asset.upload.request` (URL firmada V4 directo al bucket)
-  y `studio.asset.version.create` (confirmación; el worker recalcula sha256, tamaño, tipo y proporción antes de crear
-  la versión en `pending_review`). Kernel de commands con autoridad, `riskTier`, idempotencia y `dryRun`; CLI
-  `pnpm studio:upload` (cliente de API `studio:assets:write`) y CLI de operador `pnpm studio:review`.
-- Migración `1790956839977_asset-ingest-door` aplicada en staging y producción; `STUDIO_UPLOADS_ENABLED` y
-  `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON. 33 piezas de CMP-004 cargadas en producción, pendientes de revisión.
-  Capability en Greenhouse y sync del gateway quedan pendientes.
-  [Task](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md).
-
-## 2026-10-02 — Kortex profundamente hibernado y forecast GCP reconciliado
-
-- Kortex queda reversible y sin compute productivo: Vercel pausado, Cloud Run internal/IAM/min0, Cloud Tasks
-  pausado/vacío y SQL `STOPPED/NEVER`. Septiembre registró CLP 10.480,64 netos; el residual ~CLP 3.500/mes y el
-  forecast consolidado CLP 237.068,14/mes (rango 230k–245k) siguen modelados hasta contar con ventanas completas
-  post-corte. [Estado, método y evidencia](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).
-
-## 2026-10-02 — CMP-004 reorientada por servicios y voz con el acento de la línea (CDR-012)
-
-CMP-004 pasa de cuatro conceptos a un ad por servicio de Creative Services (S01–S08). Los ocho pilotos 4:5 se regeneraron con geometría nativa de ad (banda oscura continua arriba, objeto negro mate al pie para la firma) y pasan `foto:cta:gate --reproducir`. El compositor de CTA suma `graphicLine`: el anillo y la esfera de la voz toman el acento de la línea desde AXIS (sin el campo, growth, idéntico a antes; regresión 183/184 iguales, mutante `voz-acento-de-linea`). El CTA queda en contorno naranja tras comparar 40 composiciones.
-
-## 2026-10-02 — Registro cine: siete decisiones del operador, segunda prueba ciega y barra de luz recalibrada (TASK-1926)
-
-El operador aceptó siete decisiones (aros de Nexa dorados, destacado «Agents» intacto, escala vertical por encuadre, mirada al panel en la sección partida, vestuario por persona real o por rol, luces prácticas como bokeh frío en cine, una sección partida por deck vía el validador del plan); `foto:prompt` aplica en cine las tres de toma. Segunda prueba ciega: tres sesiones nuevas llegaron solas usando `cine-reviewer`. Un experimento de luz mostró que las fotos aprobadas también llevan luz suave de frente: la barra del revisor quedó calibrada contra el plate de la receta. Además: hoodie royal en cine, restos documentales fuera, `__revisar` en `foto:cine:nueva` y revisor más barato. Demás registros sin cambio.
-
-## 2026-10-02 — El registro cine se opera sin consultor (TASK-1926, delta b)
-
-Ninguna sesión llegaba sola a una foto cine aprobable. La ficha cine gana cinco campos propios (`llave`, `primerPlano`, `fondo`, `fenomeno`, `alcance`) que `foto:prompt` compila y avisa cuando faltan; `pnpm foto:cine:nueva` parte de una de las diez fotos aprobadas (`scripts/foto/cine-recetas.json`) y `foto:generar` no gasta con la escena de la receta; `pnpm foto:validar:cine` mide sombra y reserva vertical (calibrado: stickers, relleno y azul rey bajo luz azul no se separan en píxeles y los revisa el agente `cine-reviewer`); casebook, manual y punteros en canon, regla y skills. Los demás registros no cambian: `scripts/foto/regresion-prompt.mjs` compara todas las fichas en disco (0 no cine cambiadas). AXIS: sección «Registro cine» en el banco fotográfico (commit local).
-
-## 2026-10-02 — Traje biónico de Nexa: kit, catálogo y escena cine con Sparks (TASK-1940)
-
-El traje de ficción de Nexa deja de describirse a mano: kit de 10 vistas desde `NX5b` (aisladas, puestas en Nexa A, macro de la placa y lentes biónicos), entradas `traje-bionico-nexa` y `lentes-bionicos-nexa` en `foto:prompt` con la guarda `validarTrajeNexa` (sólo Nexa, sólo `"registro": "cine"`), marcas armadas en la referencia (isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, con `foto:isotipo --marca logotipo`) y la escena aprobada `NX7d`, canonizada en el registro cine 1.7.
-
-## 2026-10-01 — Sparks: los agentes de Efeonce como personajes del kit (TASK-1941)
-
-Diseño elegido por el operador (el Spark de «Agents» alejado de Astro Bot: flota, chispa del Nexa Mark, órbita y tres ventanas de la nave). Spark base en 26 vistas + 4 escenas con Nexa, plantel de cinco con accesorio y gesto, entradas `spark-*` en `foto:prompt` con la guarda `validarRobots` (robots sólo como Sparks; nunca documental) y canon [`SPARKS_V1.md`](docs/operations/brand-characters/SPARKS_V1.md) con revisión de colisión del nombre. Kits en OneDrive `13- Branding/Sparks/`. Plantel aprobado; task cerrada.
-
-## 2026-10-01 — La órbita: perfiles sociales de Efeonce aprobados y documentados
-
-Portadas de LinkedIn (página y perfil personal), Facebook y YouTube, avatar de redes y nueve destacados de Instagram con su historia completa 9:16, aprobados por el operador; kit del equipo con «Tu portada de LinkedIn» y aviso 1:1. [Línea gráfica §10.1.1](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01) · [manual de uso](docs/manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md). Publicación en las redes pendiente.
-
-## 2026-10-01 — Workbench: producción modular y Lab premium integral documentados
-
-PR15 integra producción modular SKY e identidad Git; PR16/17 integran el Lab premium completo, superficies equilibradas, coreografía de scroll y menús de familias/tokens con teclado y fallback nativo. Snapshot v6 publicado inicialmente protegido; [acceso sin login autorizado y verificado](docs/operations/creative-production/WORKBENCH_LAB_ACCESS_STATE.md) para compartir el Lab. Skills espejo, [continuidad vigente](docs/operations/creative-production/WORKBENCH_CURRENT_STATE.md), funcional y manuales enlazan contratos/evidencia del repo Workbench. Base documental PR246 integrada en develop; contratos 0.2, Metric/onboarding/IA y Efeonce ID conservan sus pendientes independientes. Este cierre documental no cambia runtime ni CLIs de Greenhouse.
-
-Colección candidata de 101 familias / 1.919 variantes nativas y 303 originales, selección exacta por kind/tamaño y página `/iconos/` enlazada desde Recursos. Código/docs Workbench en commit local `af6f5e2`; skills Codex/Claude y manuales/continuidad sincronizados. [Cierre y evidencia](docs/audits/creative-workbench/2026-10-01-sky-icons-documentation-closure.md). Sin push/deploy ni admisión nueva a jobs; CLIs Greenhouse intactas.
-
-Corrección SKY local: contenido 1.5.0/destino 1.2.0, los 76 badges tarifarios LEFT, pie legal por función y relaciones de destino/promoción revisadas. Export v6 de 24 adaptaciones y 394 pruebas PASS; docs y ocho referencias de la skill sincronizadas con subagentes. [Cierre documental](docs/audits/creative-workbench/2026-10-01-sky-layout-feedback-closure.md). Aceptación visual pendiente; sin push/deploy ni cambios de motores Greenhouse.
-
-## 2026-09-30 — Efeonce: demostración contextual como diferenciador comercial
-
-El operador reconoce «hacer que el cliente experimente nuestra capacidad antes de comprarla» como diferenciador. [Metodología](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta Berel, SKY y Pichincha; canon de marca y estrategia, skills Agency/Brand/SEO con espejos y referencias actualizados. Intensidad, presupuestos y métricas siguen propuestas; no se promete conversión ni se cambia el pipeline.
-
-## 2026-09-30 — AEO X-Ray: demo multipieza aceptada, publicada y documentada
-
-- Think conserva y extiende el X-Ray original: landing y artículo por manifiesto, cuatro etapas, radiografía acoplada, oportunidad evidenciada, banners y derivados sociales/video, marcas oficiales, footer, iconografía, transiciones nativas, selector y telón de 1400 ms. Fix productivo de unidades CSS optimizadas `s`/`ms`; 44 checks de apertura pasaron también en producción.
-- Think `be8d484`, deployment `dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB` READY con alias; entrega comercial autónoma `sample_` aceptada. Foundation Greenhouse/contrato AXIS preparados y probados; migración/grant/runtime compartido pendientes, sin promoción Greenhouse. [Dossier](docs/think/aeo-xray-implementation-dossier-2026-09-30.md), triple documentación, kit multicliente y skills espejo actualizados.
-- HubSpot: deal 65352884246 → Presentación de soluciones por instrucción y readback; brochure alojado en HubSpot, correo previo a reunión redactado con enlaces X-Ray e Insights. Envío del correo no verificado.
-
-## 2026-09-30 — Deck SEO/AEO (Search Visibility 360) aprobado y en el catálogo de recetas (TASK-1949)
-
-- El operador aprobó el deck SEO/AEO de «La órbita» en tres documentos (completo 33, brochure 24, propuesta 29; cinco capítulos, línea Engine). Catálogo `efeonce.deck-slide-recipes.v1` a 100 recetas: seis nuevas sin plantilla todavía (`content-brand-family`, `content-service-mockups`, `content-report-formats`, `content-committee-deck`, `content-industries`, `content-markets`), `productMark` opcional (lockups de submarca), eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional y 27 usos aprobados; tres planes golden validados e intents de documento de ejemplo.
-- Reglas: anotaciones fuera del deck, una sola sección partida, casos con imagen de ambiente puesta en escena y el logo del cliente compuesto, logos de clientes con autorización. Por decisión del operador, las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler quedan tal cual, sin marca de «provisional» («asumo la responsabilidad»). Norma §4.6, catálogo, manual, doc funcional, arquitectura y skills al día. Plantillas del Composer (Slice 2) y AXIS (Slice 3) en curso.
-
-## 2026-09-30 — Keywords relevantes por URL en DataForSEO CLI 1.1.0 (TASK-1948)
-
-- `site-keywords` y `quick keywords-for-site` aceptan dominio, subdominio o URL con tipo explícito. Conservan path/query y entregan relevancia con categorías, tendencias y métricas Ads en JSON/CSV; no declaran rankings. Paginación acotada, entitlement SEO, techo progresivo y checkpoint bloquean recompra silenciosa tras fallo o costo desconocido.
-- [Manual](docs/manual-de-uso/growth/dataforseo-cli.md) y [auditoría](docs/audits/seo/2026-09-30-task-1948-site-keywords-cli-verification.md): 96 tests verdes, dry-runs y SemVer verificados; typecheck sin WIP ajeno pasa, global conserva 17 errores en deck HubSpot. Implementación local sin POST pagado, commit/push ni deploy.
-- Validación posterior autorizada en Berel **MX**: 20 keywords en dos páginas, JSON/CSV coincidentes, scope `matched` y resume de ambas páginas sin recompra; USD 0,0284 reconciliados. Manual/ADR y skills DataForSEO, SEO/AEO y Berel incorporan selección editorial del ruido, mercado explícito y límites de `total_count` y atribución de dominios. La captura CL anterior queda separada del resultado mexicano aplicable al cliente.
-
-## 2026-09-30 — Creative Workbench: rutas nativas selladas y `creative:status` por REST
-
-- Delta documental posterior: skill `efeonce-creative-workbench` completa y espejada Codex/Claude,
-  ADR de aislamiento, planes y evidencia SKY, TASK-1945/1946/1947 y TASK-1952 (Efeonce ID diferido).
-  Routers y [continuidad fechada](.codex/skills/efeonce-creative-workbench/references/state-continuity.md)
-  apuntan al harness activo en Workbench. Lotes PR 11 y contornos PR 12 integrados allí; referencias
-  corregidas con `--native-previews`, corridas antiguas requieren una ejecución nueva. Sólo docs en
-  Greenhouse: sin engines, auth nueva, sync total, broker deploy ni IA habilitada.
-- `export-manifest.json` gana `native.paths` (harness propio del workbench) y `native.reserved` (gates, workflow
-  `gates`, `CODEOWNERS`, `.workbench/**`). Lo nativo sale del plan; el sync lo **entrega** (lo suelta del sello sin
-  borrarlo), sella la lista en `sync.lock.json → native` y aborta si una ruta del plan ya existe en el workbench sin
-  estar sellada. Si `pnpm-lock.yaml` es nativo, no se regenera.
-- El gate `managed-drift` de la plantilla lee `native` **sólo del sello**: `.workbench/native-ownership.json` (PR #3 del
-  workbench, de Codex) deja de eximir. `creative:status` usa sólo REST, verifica la integridad del sello recalculando el
-  plan de su commit, marca PRs que tocan lo gestionado y lista dependencias que faltan en el `package.json` nativo.
-- Gate nuevo `native-policy` (reglas selladas para lo nativo): prueba el guardarraíl con sondas, exige denegaciones y
-  hook en `settings.json` y rechaza código fuera del broker que llame a un proveedor de IA. Sobre el estado del PR #3
-  sólo marca `tools/provider-doctor.ts` (llama a OpenAI directo con la llave de Secret Manager).
-- Tras una revisión adversarial con subagentes (y una segunda revisión con acceso a GCP) se endureció todo: `native-policy`
-  detecta además imports que llegan a los engines históricos, `import 'openai'`, `*_API_KEY`, `gcloud secrets` y Secret
-  Manager; el guard corre al final y en una copia con sondas
-  aleatorias, se detectan SDKs e imports del adaptador del broker, `disableAllHooks`, sellos sin commit, PRs que
-  cambian el sello sin ser sync (CI compara contra la base) y rutas nativas no canónicas.
-- Nota «En el Workbench»: el sync la inserta al inicio del `SKILL.md` de las 12 skills que mencionan `foto:*`, `ai:*`
-  o `assets:pull`, con sus equivalencias en el harness (`marca:*`); la fuente de la skill no cambia (ADR §8.7).
-- `creative:sync` y `creative:status` trabajan en un clon temporal del workbench: el checkout local (donde trabajan
-  la persona o Codex) no se toca; `--in-place` es opt-in y se niega si no está limpio, en `main` y al día (§8.8).
-- `control.json → clientesPorDefecto: "todos"`: por decisión del operador, todo el equipo produce para todas las
-  marcas (ADR §8.6).
-- Cierre de la revisión (tercera pasada): el guardarraíl debe bloquear también el push a `main` escondido (`/usr/bin/git`,
-  `sh -c`, `$(…)`, `+main`, `xargs`, `remote.origin.push`, `--mirror`) y, en la plantilla, cualquier push estando en
-  `main`; `native-policy` sigue imports con backticks y marca un archivo que nombra la ruta de un engine que llega al
-  proveedor (se ejecuta sin import). `clients/brands.json` queda nativo con riesgo residual documentado (§8.5). Sobre el
-  head `289a12e` del PR #3 la política nueva no da falsos positivos y sólo marca las seis formas de push que su guard
-  todavía deja pasar: el sync de transición espera a que el PR #3 las porte.
-- 37 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
-  del harness de Codex iguales antes y después. Decisión: §8 de
-  [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
-
-## 2026-09-29 — Glitch y Marketing con Manzanitas estables como sub-líneas de La órbita (AXIS `v0.3.37`)
-
-- El operador aprobó Manzanitas para usar y fijó su lugar: «no sustituye a la orbita es una sublinea dentro del design
-  system de la orbita igual que glitch». Con su autorización, AXIS `v0.3.37` pasa `glitchLine` y `manzanitasRegister` a
-  `canonical` y los contratos `efeonce.glitch-line` 0.2.0 y `efeonce.manzanitas-register` 0.3.0 a `stable`, sin cambio de
-  valores ni render. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.37 y regenera los tokens compilados; los
-  catálogos del Artifact Composer siguen `candidate` hasta la ruta productiva (TASK-1921).
-
-## 2026-09-29 — HubSpot Agent CLI y MCP como carriles de operación directa
-
-- Agent CLI 0.15.0 instalada y OAuth de Efeonce/Kortex `48713323` verificado con una lectura CRM real. El conector MCP y la CLI se eligen por portal, capability y forma del trabajo; comparten change set, aprobación y readback, no credenciales. Límites OAuth y comandos sin `--dry-run` registrados en el [runbook](docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md); skills Codex/Claude sincronizadas.
-
-## 2026-09-29 — `foto:isotipo --acabado`: el modelo termina el isotipo compuesto
-
-- `pnpm foto:isotipo … --acabado [--superficie "…"] [--lado px]` aplica la regla del operador del 2026-09-28: recorta
-  512 px alrededor de la marca, pide a `gpt-image-2.5-sunburst` (high, 1024×1024) sólo materia y luz y devuelve la
-  edición sólo sobre la silueta del isotipo, con el color corregido por el desplazamiento de la media. Escribe
-  `<plate>-isotipo-acabado.png`, el recorte, la edición, la hoja antes/después al 300 % y la procedencia (modelo,
-  prompt, hashes, conteos) en el `.json` de `foto:isotipo`.
-- Falla si cambia un píxel fuera de la marca (silueta + 8 px) y deja el resultado como `.rechazado.png`; exige el
-  archivo de la edición porque `ai:image` sale con 0 aunque falle. La silueta se mide contra la placa ya limpia: con la
-  limpieza encendida, la zona limpiada no recibe la luz del modelo. `--out` sin `.png` ahora se rechaza (el `.json`
-  pisaba la imagen).
-- Reinyectando la edición original, reproduce byte a byte las salidas de `MC1h` y `MC4g`. 10 pruebas nuevas con
-  `ai:image` simulado; las mutaciones halo, sin corrección de color y silueta contra el original las rompen. La regla
-  de fotografía y las skills `greenhouse-ai-image-generator` y `design-studio` apuntan al comando.
-
-## 2026-09-29 — Deck Salesforce aprobado completo; insignia «Salesforce Partner» autorizada y por defecto (TASK-1942)
-
-- El operador aprobó todo el deck y declaró la insignia «Salesforce Partner» autorizada por Salesforce: va por defecto
-  en la portada y en la contraportada de propuesta (intents de ejemplo y planes golden con
-  `partnerMark.readbackRef: salesforce-partner-authorization-2026-09-29`); «Operamos sobre» queda de respaldo y el
-  composer sigue fallando cerrado para otros partners (test con HubSpot).
-- SF20 aprobada como cierre del brochure, con intent de ejemplo (0 px contra la lámina aprobada); máximos de
-  `proposal-cinematic-revops.question` (30) y del nombre de paso de `proposal-service-revops` (28) subidos sin cambio de
-  render (gate `graphic-line` a 0 px); costo de color de los íconos de producto aprobado.
-- Registro de partnerships, oferta Salesforce (§Claims), norma §4.6, manual, doc funcional, arquitectura y skills al día.
-  AXIS `axis-brand-assets` con el estado nuevo, preparado sin publicar (las referencias del Lab exigen tokens 0.3.36).
-- Cierre de TASK-1942: AXIS `v0.3.36` (`302f7f7`) publicado y fijado en Greenhouse; develop `814255694` con CI 9/9 en verde; `pnpm test` completo y `pnpm build` de producción en verde; PDF de propuesta y de brochure con insignia.
-
-## 2026-09-29 — Deck de práctica Salesforce componible y documentado (TASK-1942)
-
-- Las 16 recetas del deck de práctica Salesforce tienen plantilla (familia `line-stage`): 94 de 94 recetas del
-  catálogo componen con `pnpm brand:compose` sobre AXIS 0.3.33 y `axis-brand-assets` 0.4.4; baseline `graphic-line`
-  sellado (sección (s), 89 frames a 0 px).
-- Marcas de terceros desde `AXIS_PARTNER_ASSETS` con procedencia y estado de autorización; la insignia de partner es un
-  claim (`partnerMark` falla cerrado sin `readbackRef`); mascota y co-marcas exigen `authorizationRef`.
-- `reservesByLine` (columna 190 sólo en la portada Salesforce) y `sloganBlock` (eslogan en bloque, logo 700 px sólo
-  en la contraportada Salesforce). PDF de la propuesta sin insignia (`render-src/pdf-propuesta.mjs`).
-- Barrido de skills (`efeonce-graphic-line`, `deck-studio`, Salesforce ×3, `hubspot-solutions-partner`,
-  `axis-design-system`) y de las tres capas de docs. Rollout pendiente: test/build de cierre, visto bueno de SF20,
-  autorizaciones escritas y readback de la insignia.
-
-## 2026-09-29 — Creative Workbench: repo del equipo creativo gobernado desde Greenhouse
-
-- Nuevo repo privado `efeoncepro/creative-workbench` para el equipo creativo (Claude y Codex; clientes Efeonce, Berel
-  y SKY). Recibe por `pnpm creative:sync` 17 skills espejadas, los CLIs `foto:*`/`ai:*` (cierre de imports calculado
-  con esbuild, falla si alcanza dominios prohibidos), docs de marca por allowlist y brand packs; todo sellado por
-  sha256 con gate `managed-drift` y hook `PreToolUse` de Claude.
-- El sync exporta un **ref de git**, nunca el working tree (el bootstrap arrastró trabajo sin commitear de otra
-  sesión; corregido el mismo día).
-- Acceso declarativo en `scripts/creative-workbench/control.json` (`creative:access`); infraestructura idempotente en
-  un proyecto GCP propio con llaves de IA dedicadas (`creative:provision`, aún sin aplicar).
-- ADR [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
-- TASK-1945/1946: preflight neutral con snapshots por corrida (14 pruebas Node y 13 Vitest); tres paquetes
-  SKY `0.1.0` candidatos con 108 tokens, logo sellado y contrato Always On (4 pruebas, build determinista).
-  ZIP Metric del operador verificado: 14 OTF fuera de repos; metadata portable sin fuentes binarias.
-  Sin publicación, sync o deploy; wrappers IA e identidad autenticada siguen pendientes.
-
-## 2026-09-29 — Efeonce AI Visibility Report canonizado en AXIS (TASK-1938)
-
-- AXIS `v0.3.30` (`26097c5`, registro verificado): `axis-tokens` 0.3.30 (`aiVisibilityReport` y
-  `efeonceGraphicLine.measureSeverity`, color de gravedad sólo para un puntaje con escala publicada),
-  `axis-ui-contracts` 0.3.30 (contrato `efeonce.ai-visibility-report` 0.1.0 `candidate`; `efeonce.graphic-line-orbit`
-  0.4.0), `axis-graphic-line` 0.12.0 (`/report`), `axis-brand-assets` 0.4.3 y `axis-ui-registry` 0.3.2. Lab
-  `/references/ai-visibility-report/`.
-- Greenhouse sigue en 0.3.29 y el renderer del PDF no cambió; TASK-1938, la dirección, el wireframe, el manual de La
-  órbita (1.19) y el runbook de AXIS apuntan al canon nuevo.
-
-## 2026-09-29 — Naming canónico de Efeonce AEO
-
-- [ADR](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md): **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (salida); aliases Grader preservados para trazabilidad y contratos. Se actualizaron docs y skills; el runtime visible requiere migración y verificación propias.
-
-## 2026-09-29 — Avatares oficiales y firmas del equipo
-
-- Seis avatares nuevos (bomber sobre polo piqué, fondo oscuro con el halo de la órbita) en GCP `team/avatars/v1/`, en el Kit media de OneDrive y en el repo (800 px: `squad/` y `public/images/greenhouse/team/`).
-- Firmas v3.1 para el equipo con esos avatares (`build-firmas.mjs`), fotos publicadas en `email-signature/v3.1/people/` y paquetes en `Kit media/Firmas/`.
-- Luis sale del roster de fotos y del dashboard de Efeonce; nombres, cargos y avatar de Julio corregidos ahí. Referencias de identidad en `ai-generations/_identidad-equipo/`.
-- El avatar de la firma pasa a 130 px (la marca de área, a 106 px), a la altura del bloque de texto de al lado: AXIS `axis-tokens` y `axis-ui-contracts` 0.3.35 (tag `v0.3.35`), fijados en Greenhouse. Las 9 firmas, sus páginas y los zip de OneDrive quedaron regenerados; en pantallas angostas el correo se parte antes de la «@».
-- Nueve fondos de Teams aprobados en la oficina moderna de Efeonce (formato `teams` y logo 3D de letrero/escritorio en el catálogo de `foto:prompt`); la página del kit de cada persona suma los fondos. Portadas de redes: exploración parqueada.
-- Página «Tu avatar nuevo» por persona (`…/team/kit/<nombre-apellido>.html`, descarga en un clic y dónde cambiar la foto) y del equipo; avatar y zip de firma en la carpeta de cada persona del Kit media; aviso por TeamBot 1:1 y en EO Team.
-
-## 2026-09-29 — Manzanitas sin decisiones abiertas: AXIS v0.3.29 y el equipo real en las fotos
-
-- AXIS `v0.3.29` (`f722a6f`): `axis-tokens` 0.3.29 (`closeCopy`, `teamPeople`, `slogan.widthEmByWord`, órbita del paso;
-  sin `sloganPx`), `axis-ui-contracts` 0.3.29 (contrato 0.3.0: `close-copy-too-long`, `chart-labels-invalid`, eslogan desde
-  el logo en el manifiesto), `axis-graphic-line` 0.11.0 (Trazo `republicar` y `enviar`, 88 glifos; `/charts` lee los rótulos
-  del dato). Lab con la contraportada nueva y sin decisiones abiertas.
-- Greenhouse (`2c95e60b2`): pins, tokens recompilados sin drift, gate a 0 px; el catálogo lee eslogan y órbita del token.
-- Roster del equipo en la fotografía de marca y seis identidades nuevas en `foto:prompt`, aprobadas por el operador.
-- El vestuario del equipo lo decide la línea de la pieza (hoodie en Servicios creativos; bomber o softshell en las líneas
-  de negocio): `foto:prompt` lo exige con `linea` en la ficha, y el polo debajo de la chaqueta ya no cuenta como mezcla de registros.
-
-## 2026-09-29 — Marketing con Manzanitas en el Artifact Composer (TASK-1939)
-
-- `1050036e8`: catálogos `manzanitas-carousel` (PDF) y `manzanitas-stills` (PNG), 18 plantillas para las 26 piezas
-  aprobadas; `pnpm manzanitas:tokens [--check]` (49 salidas desde `manzanitasRegister`) y `pnpm manzanitas:compose`
-  (intent del contrato `efeonce.manzanitas-register` 0.2.0 → PDF, PNG y procedencia sin reloj). Gráficos pintados con
-  `manzanitasChartSvg` y sus chequeos; Lente y órbita del paso con `axis-graphic-line`.
-- Fallan cerradas (el motor mide el recorte): respuesta en una línea y sin pisar «Desliza»; pregunta en una línea donde
-  hay contenido fijo bajo la voz. Eslogan de los cierres debajo del logo al 64 % de su ancho (regla del 2026-09-29).
-- Gate visual `--catalog=manzanitas`: 18 frames congelados. Carruseles aprobados por el operador; TASK-1939 cerrada el
-  2026-09-29 con `pnpm test` completo y `pnpm build` en verde sobre `814255694`.
-
-## 2026-09-28 — Marketing con Manzanitas publicado en AXIS (TASK-1936)
-
-- AXIS `v0.3.26` (`aca07c2`): `axis-tokens` 0.3.26 exporta `manzanitasRegister` (registro que complementa La órbita,
-  hereda por referencia, aislado de Glitch); `axis-ui-contracts` 0.3.24 exporta `efeonce.manzanitas-register` 0.1.0
-  (`pnpm manzanitas:resolve`, 45 códigos, `pending-decision`); `axis-graphic-line` 0.10.0 agrega `/charts` (9 gráficos
-  calculados desde el dato); `axis-brand-assets` 0.4.1 sella `AXIS_MANZANITAS_ASSETS`. Lab `/references/manzanitas/`.
-- AXIS `v0.3.27` (`6a1a912`): contrato 0.1.1, el carrusel empieza con su portada y termina con su contraportada.
-- Greenhouse: ADR, norma §14, doc funcional, manual y skills (`efeonce-graphic-line`, `axis-design-system`, espejo
-  `.codex/`) al día. Greenhouse no fija estas versiones todavía.
-
-## 2026-09-28 — Glitch: pendientes del Flash cerrados (ruta productiva, muletilla, licencia, numeración, Content Factory)
-
-- TASK-1921 (`c43862008`): `planBrandRender` despacha con `planGlitchManifest`; el Flash sale por la ruta productiva
-  (carrusel de 3 láminas + sueltas; nunca overlays) con `BRAND_RENDER_ENABLED`, sin cambio de schema ni worker.
-- Composer (`05e75f0ed`): `video.closingLine` → slot `closingLine` de los overlays CTA; `license.kind: press` sólo en
-  el Flash con aprobación por pieza (`approvers.json`) y `licenseExceptions` en la procedencia; `pnpm glitch:editions`
-  y `glitch:compose --check-published` leen el blog: la próxima semanal es la **#18**. Gate visual sección (q).
-- Content Factory (`c6f076e9f`): `kind: glitchDrop` (serialización idéntica a WordPress), `buttons`, `embed.caption`,
-  `table.style: stripes`; fix del write path con `wp_slash()`.
-- AXIS 0.3.25 (estela por contexto + decisiones resueltas) y motion del Flash en el taller: commits locales, sin
-  publicar.
-
-## 2026-09-28 — Glitch Flash en AXIS v0.3.24 y en el Artifact Composer
-
-- AXIS tag `v0.3.24` (`5b3056f`): `glitchLine.editions` (semanal | Flash) y contrato `efeonce.glitch-line` 0.2.0
-  (Flash sin número ni avance; 0.1.0 resuelve igual). Lab con la sección «El Glitch Flash».
-- Greenhouse fija `axis-tokens` 0.3.24 / `axis-ui-contracts` 0.3.22 (`53002b352`). El CI de ese commit falló en
-  `graphic-line-tokens-sync.test.ts`: el bump exige `pnpm brand:tokens` además de `pnpm glitch:tokens` (arreglo
-  `609353e83`). Lección registrada en las skills `axis-design-system` y `efeonce-graphic-line` y en el runbook.
-- Artifact Composer (`24e4c72ee`): `GlitchFlashManifest`, seis plantillas `flash-*`, estela de bytes determinista,
-  `pnpm glitch:compose` despacha semanal/Flash; chip «PORTADA» → «LA NOTICIA» en las portadas semanales; gate
-  visual Glitch 32/32 a 0 px (BASELINE_DELTAS (p)).
-- Docs y skills al día (graphic-line, axis-design-system, motion, contenido, deck, advertising, AGENTS.md) y
-  deltas en TASK-1921/1922/1923/1924/1337/1441–1444/1448. Pendiente: la ruta productiva (TASK-1921) no conoce el
-  Flash; tres medidas de la estela sin token; numeración #17 abierta.
-
-## 2026-09-28 — Primer Glitch lanzado con la nueva línea: Glitch Flash · Claude Sonnet 5.5
-
-- Glitch tiene dos formatos: edición semanal (lunes, numerada) y **Glitch Flash** (noticia puntual, sin número;
-  cabecera «NO ESPERA AL LUNES» + estela de bytes + «FLASH»; chip «LA NOTICIA»; sin avance n/8; muletilla Guttery
-  variable por edición). Registrado en la skill `efeonce-graphic-line` (glitch.md §14), la norma v1.13 y el ADR.
-- Lanzado de punta a punta: canvas de diseño, LinkedIn página y personal, Instagram y Threads vía Metricool, y post
-  del blog 251941 (`/glitch/glitch-flash-claude-sonnet-5-5/`) con callout `efeoncepro/glitch-drop` y banners propios.
-  Bitácora: `docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md`.
-- Skills `social-media-studio` y `efeonce-public-site-wordpress` actualizadas (receta de 4 redes, reemplazo en su
-  lugar en Metricool, inventario live de bloques Gutenberg y brecha de Content Factory, receta del Glitch Drop).
-- AXIS: rama local `feat/glitch-flash` (token `glitchLine.editions`, contrato `efeonce.glitch-line` 0.2.0, Lab) con
-  gates verdes; sin push ni release (pendiente de autorización del operador).
-- Abierto: numeración de ediciones (el blog ya publicó «#16» y «#17»), plantillas Flash en el Composer, chip
-  «LA NOTICIA» en las plantillas `CoverPhoto`/`BlogBannerPhoto`/`BlogSquarePhoto`, licencia de imágenes de terceros.
-
-## 2026-09-28 — Informe live de Efeonce Insights en Think y muestra pública para clientes (TASK-1875)
-
-- `think.efeoncepro.com/insights/r/<token>` está en producción (Think `bbf8522`): el informe compartido de Insights
-  en dirección «tablero de respuestas» (portada con la respuesta y una órbita, hallazgos que se abren como evidencia,
-  escenas narradas, las 15 familias de gráfico, plan, modo presentación, impresión de respaldo, es-CL/en-US).
-- Muestra pública para clientes en `think.efeoncepro.com/insights/muestra`: mismo render con datos de ejemplo y una
-  marca ficticia, aviso visible, sin descargas ni llamadas a Greenhouse, `noindex`.
-- Greenhouse (staging): `InsightWebModelV1` 1.1 aditivo (editorial v2, tasas del embudo, logo del cliente por
-  `/api/public/insights/shared/[token]/logo`) y excepción del guard del borde para Think por `x-efeonce-think-key`.
-- Verificado: canary sintético en staging (200 con cabeceras, PDF por el proxy, 410 tras revocar, 404 desconocido);
-  contraste AA y teclado en 1440/390. Producción de Greenhouse y `INSIGHTS_SHARING_ENABLED` siguen pendientes del
-  operador.
-
-## 2026-09-28 — Rutas públicas: guard en el Firewall de Vercel y conexiones de Vercel acotadas (TASK-1876, staging verificado)
-
-- Reglas versionadas del Firewall de Vercel para `/api/public/**` (20 req/10 s por IP; enforce en staging/preview,
-  observe en producción) en `src/lib/security/public-burst-guard/firewall-rules.ts`, sync con `pnpm security:public-burst-guard`.
-- Las sesiones PostgreSQL de Vercel piden `idle_session_timeout=60s`; el rol `greenhouse_app` conserva 5 min por
-  los workers. La señal de saturación lee el pico de 24 h de `num_backends` de Cloud SQL. Staging verificado con ráfaga controlada (`pnpm security:public-burst-guard:verify`); alerta
-  `num_backends > 85` activa. Producción en `observe` hasta el cutover (ISSUE-174 mitigado).
-
-## 2026-09-28 — Los slots de datos del deck «La órbita» se ligan desde Greenhouse (TASK-1930, parcial)
-
-- `bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`) llena logo del cliente (Account
-  360, variante oscura), cifras con evidencia `measured`, casos, testimonios y logos de terceros sólo con evidencia
-  `attested` y documento, y las láminas de muestra SEO/AEO; deja rastro por slot y falla cerrado. Montos siguen en
-  `[MONTO]` y equipo sin ligar hasta TASK-1417/TASK-1418. CLI: `pnpm brand:deck-plan -- --bind`.
-- `validateDeckPlan` acepta una lista de cifras en un slot `metric` (antes rechazaba las cuatro de `decision-case.stats`).
-
-## 2026-09-28 — El `--freeze` del composer sólo acepta la sección nueva sin sellar del ledger
-
-- Antes buscaba el nombre del frame en todo `BASELINE_DELTAS.md`, así que una declaración vieja de otra task lo
-  autorizaba para siempre (TASK-1928 re-promovió 10 frames sin declararlos). Ahora exige una sola sección `## ` sin el
-  marcador `sealed-by-freeze`, acepta sólo los frames que ella nombra, falla cerrado listando los demás y la sella al
-  promover. Regla en `scripts/artifact-composer/baseline-deltas-ledger.ts` (+ test);
-  [runbook §5](docs/operations/runbooks/composer-visual-gate.md). Las 44 secciones previas quedan `legacy-2026-09-28`.
-
-## 2026-09-28 — Las nueve láminas SEO/AEO del deck «La órbita» componen (TASK-1934)
-
-- El catálogo de recetas pasa de 69 a 78, todas con plantilla en `graphic-line-deck` sobre AXIS `axis-tokens` 0.3.23 /
-  `axis-ui-contracts` 0.3.21 (releases aditivos `v0.3.22` y `v0.3.23`). Siete plantillas nuevas y dos propuestas SEO sobre
-  plantillas existentes; gate de La órbita en 73 frames a 0 px, aprobados a ojo por el operador.
-- `validateDeckPlan`: `variant-both-in-deck` reemplaza a `variant-adjacent` (dos variantes nunca en el mismo deck),
-  `figure-source-missing` nuevo y `next-steps-after-diagnosis` por familia. Cifras con fuente, datos de muestra marcados e
-  interfaz de IA genérica quedan cubiertos por tests.
-- La portada «Tu squad.» tiene plate propio (CR4) y un brochure de Creative Services ya no repite plate; la plantilla
-  cine recupera la nota «Sin promesas de ranking».
-
-## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
-
-- La CLI llega a `1.0.0` con SemVer propio, historial append-only, digest de fuentes gobernadas, `version` visible
-  y un bump automatizado. `local:check` bloquea mejoras sin versión y registro; los recibos JSON llevan
-  `cliVersion`. [Contrato técnico](docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md).
-- `serp-compare` compara cualquier marca o entidad mediante aliases y múltiples dominios sobre una sola captura
-  por query/dispositivo. Exporta raw + JSON/CSV y separa orgánico, mención, enlace AI, cita AI y Shopping opcional;
-  explicita depth y frescura sin fabricar posiciones. `quick organic` ya transmite target/depth/AI Overview.
-- Organic Live Advanced se serializa a una task por request. El artefacto agrega diagnóstico por request, omite
-  filas de tasks fallidas y separa carga AI solicitada de frescura realmente devuelta. El canary desktop/mobile
-  completó dos tasks `20000` por USD 0,0055 reales frente a USD 0,016 estimados.
-
-- Delta: `pnpm dataforseo -- research` encadena minería Labs, gobernanza explícita de finalistas, enriquecimiento
-  SERP Standard y una matriz JSON/CSV con intención, cobertura, competidores, features, PAA, citas y procedencia.
-  Pagina y reanuda por checkpoint sin recomprar pasos; `keyword_ideas` y AI Overview quedan opt-in.
-
-- `pnpm dataforseo -- ai-research` ejecuta paneles versionados para Responses, Scraper, AI Keyword Data y Mentions,
-  separa API de consumer surface y normaliza citas, fan-out, entidades, modelos, costo y evidencia.
-
-- TASK-1651-A amplía el allowlist gobernado a `ai_optimization`: 53 rutas de LLM Responses, LLM Scraper,
-  AI Keyword Data y LLM Mentions quedan operables desde la CLI. GET de modelos/catálogos/polling es gratuito
-  y no exige organización; todo POST real exige organización, entitlement, estimación, ceiling y ledger AEO.
-  El CHECK quedó aplicado y validado. Un canary API con techo USD 0,012 costó USD 0,0101 y dejó una llamada
-  `consumer=aeo` en el ledger; repetirlo con `--resume` tuvo costo incremental cero y no elevó `call_count`.
-
-- `pnpm dataforseo` descubre 545 endpoints oficiales y separa los 320 ejecutables bajo el allowlist vigente de los
-  que sólo se pueden consultar en catálogo. Incluye presets diarios, payload por archivo/JSON/stdin, lifecycle async,
-  preview por defecto, techo de costo, salida machine-readable y el transporte canónico para GET/POST.
-- Un registro generado documenta las 225 rutas `catalog_only` sin habilitarlas: 216 rutas de producto con propósito
-  eventual y gate por familia, más 9 rutas de infraestructura/plantillas que no son capabilities. Prioriza Content
-  Analysis para brand monitoring y Business Data acotada para SEO local/reputación; Keywords Data queda condicional
-  y Merchant/App Data esperan un caso real.
-- Smokes reales: catálogo AI Mode gratuito (USD 0), AI Mode Perú con `location_code=2604` (USD 0,004) y Organic Chile
-  (USD 0,002), todos con task `20000`; `serp-compare` reutilizó cada captura para dos entidades y completó el panel
-  desktop/mobile por USD 0,0055, manteniendo separados orgánico, mención, enlace, cita y frescura. Commit local;
-  sin push, deploy ni cambio de flags.
-- La [auditoría transversal](docs/audits/seo/2026-09-28-dataforseo-cli-production-validation.md) consolida además
-  las pruebas de Falabella, Paris, `agencia seo en chile`, `agencia creativa en chile` y el research productivo de
-  servicios creativos. Registra task IDs, USD 0,25402 conocidos incluyendo reintentos, defectos corregidos y una
-  corrección de evidencia: las corridas de categoría no declararon `efeoncepro.com` como target y no prueban
-  presencia o ausencia propia.
-
-## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921) y Grader por mercado (TASK-1863)
-
-- Catálogo compartido LATAM/PR/ES/US y packs es/en/pt-BR/fr; Google AI Mode usa location_code e idioma
-  explícitos, sin fallback US. Canary real: 22 éxitos y Cuba skip por falta de ubicación.
-- Mercados/competidores versionados, snapshots, lotes atómicos y matriz sin promedio; ubicación nativa
-  declarada por proveedor, presupuesto total y cobertura honesta de motores en informe/PDF.
-- Staging verificado en Vercel y worker `d86edb784`: 11 informes, Google 66/66; Sky PE parcial por
-  Perplexity. Migraciones/backfill aplicados, históricos preservados y main en espera. [Evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
-- Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el
-  contrato AXIS y la receta aprobada antes de encolar, exige cada fuente como asset del uploader y es idempotente. Lo
-  llaman el lane App, el lane ecosystem y tres tools MCP (`request_brand_render`, `get_brand_render_request`,
-  `list_brand_render_requests`).
-- Tercer consumer del `artifact-worker` (La órbita y Glitch, seis catálogos), con despacho en el ops-worker, la señal
-  `brand.render.stuck_job` y `sharp` como dependencia de runtime. Flag `BRAND_RENDER_ENABLED` OFF en los tres runtimes:
-  code complete, rollout pendiente. En `develop`, sin promover a main.
-
-## 2026-09-28 — El plan de un deck se valida contra el catálogo de recetas (TASK-1929)
-
-- `pnpm brand:deck-plan -- --plan plan.json` valida el plan (recetas del catálogo por id): AXIS valida el documento
-  (portada, cierre, página de servicio, alternancia de foto) y el catálogo agrega pareja portada↔cierre, variantes
-  seguidas, plate repetido, slots y ritmo, sin duplicar códigos. `--propose` le pide al agente un plan validado que
-  falla cerrado; una persona confirma (TASK-1932 lo expone por API, Nexa y MCP). El catálogo de runtime se genera con
-  `pnpm brand:deck-recipes`.
-
-## 2026-09-28 — Las 69 recetas de deck de «La órbita» componen (TASK-1928)
-
-- El catálogo `graphic-line-deck` suma 34 plantillas para las 38 recetas pendientes: propuestas sobrias, método,
-  cotización y próximos pasos, prueba (clientes, partners, caso, gráfico, testimonio), secciones y «quiénes somos», y
-  contenido y día a día. Todas se componen con `pnpm brand:compose` y entran al gate visual (66 frames a 0 px).
-- Greenhouse sube a AXIS `v0.3.21` (tokens 0.3.21, ui-contracts 0.3.19). El compositor gana logos de terceros
-  normalizados, capas pintadas con foto adentro y recorte dirigido; el test de paridad exige que cada slot de la
-  receta tenga campo en su plantilla. La portada de brochure con la selección de Nexa compone con
-  la composición `document-selection` (el operador relajó la regla el 2026-09-28).
-  Aprobado por el operador; `pnpm build` verde, en `develop`.
-
-## 2026-09-27 — Una edición de Glitch se compone con `pnpm glitch:compose` (TASK-1923)
-
-- Tres catálogos de Glitch sobre una carpeta (`glitch-carousel`, `glitch-stills`, `glitch-overlays`, 26 plantillas
-  aprobadas): el carrusel de LinkedIn, los banners del blog (16:9, 1:1 y de noticia), la portada del reel, la miniatura
-  del vlog y los overlays del video en PNG con alfa.
-- El comando lee `GlitchEditionManifest`, elige la portada por rotación, valida cada lámina con `efeonce.glitch-line`,
-  desarma las fotos en bytes sin tocar rostros y verifica los límites de LinkedIn. El contrato de plantilla del motor
-  suma `render.minInkTileRatio` (aprobado). Detalle: [manual](docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md).
-  Local en `develop`; la ruta productiva es TASK-1921.
-
-## 2026-09-27 — El deck y el brochure de «La órbita» se componen con `pnpm brand:compose` (TASK-1927)
-
-- Greenhouse consume `efeonce.surface-composition` 0.1.2 (AXIS `v0.3.14`). El catálogo `graphic-line-deck` pasa de 6 a
-  16 plantillas: portadas y contraportadas aprobadas de brochure y propuesta, composiciones `hero` y `lines`, la
-  sección partida por la izquierda con tres composiciones y el tríptico de una palabra por toma.
-- `pnpm brand:compose` acepta un documento (`pages`) y entrega un PDF multipágina con su manifest y procedencia.
-  Detalle: [norma de superficie §2.1 y §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) y
-  [manual](docs/manual-de-uso/creative/componer-por-superficie-con-axis.md). Local en `develop`, sin runtime productivo.
-
-## 2026-09-27 — Glitch en AXIS: token `glitchLine`, contrato `efeonce.glitch-line` y archivos publicados (TASK-1922)
-
-Los valores de Glitch dejaron de vivir como literales en el Lab, la norma y el canvas. AXIS `v0.3.12` (`29a40b5`, push y
-tag autorizados por el operador) publica `axis-tokens` 0.3.12 con el token de franquicia `glitchLine` (lo heredado de La
-órbita, por referencia), `axis-ui-contracts` 0.3.10 con el contrato `efeonce.glitch-line` 0.1.0 candidate (23 códigos
-estables con mensaje es-CL, falla cerrado; `pnpm glitch:resolve`), `axis-brand-assets` 0.3.5 con el wordmark y la
-manzana aparte de la familia, y `axis-graphic-line` 0.7.0 con 5 glifos Plastilina nuevos y su volumen (84 glifos, 48
-volúmenes). El Lab lee el token. Greenhouse los fija en `4dfb147f7`; visual gate de graphic-line a 0 px. Decisión del
-operador durante la task: los íconos de acción de Glitch van en Plastilina plana, nunca en volumen.
-
-## 2026-09-27 — Glitch: motion, sonido y música listos para producir desde el taller (docs, manuales, skills)
-
-Con motion, sonido B y música aprobados, se sincronizó todo lo que un editor humano o agente necesita para producir una
-edición: norma de Glitch v1.8 con §13.13 como referencia única de comandos y argumentos (`--sound`, `--music`,
-`--deliver`, `--skip-render`…), manual nuevo `producir-motion-glitch.md` (runbook del taller) y manual del editor al día
-(mapa de la edición, pre-roll, cama y cortina, podcast), TASK-1924/1925/1922/1923 y EPIC-031, ADR del taller v1.1,
-AGENTS.md y skills graphic-line, motion-design-studio, audio-studio y hyperframes (+espejos). En el taller: la cama de la
-última noticia ya no suena bajo el cierre del host (`7ed6219`, kit re-entregado 95/95) y el comando `sonido`, declarado
-pero inexistente, quedó implementado. Pendiente abierto: si el reel abre con el pre-roll (rompe el bucle exacto).
-
-## 2026-09-27 — Glitch: música aprobada, publicada e integrada (tema B + cama post-punk), sólo Glitch
-
-El operador aprobó la música de Glitch: tema B (intro, cortina y salida: «Me parecen bien todas») y la cama post-punk bajo
-la noticia («Post-punk definitivamente»), que reemplaza «la voz sola bajo las noticias». Los 7 másteres (más versiones web)
-están en el bucket público `glitch/music/v1` con `index.json` y sha256 verificados; AXIS los publica en
-`/references/glitch/#musica` y `glitch.json → music` (PR #10, `87c3298`); el taller los integra con `music.mjs` y un pre-roll
-animado elegido por el operador (`2c8f36c`, `ed89a0b`). Lección medida: lo «arcade» es falta de medios (13 % entre 300 Hz y
-3 kHz contra 45 %); nunca síntesis pura ni recortar medios, el espacio para la voz lo da el ducking. Documentado con sus
-argumentos en la norma de Glitch (§13.12 «Por qué»), el ADR, DECISIONS_INDEX, la documentación funcional, el manual del
-editor, la identidad sonora de Efeonce (sólo punteros), la guía de selección de modelos (ficha §5.9) y las skills
-graphic-line, audio-studio, motion-design-studio, ai-model-selection y axis-design-system (+espejos). Único pendiente:
-probar la mezcla con la voz real del host.
-
-## 2026-09-27 — AXIS `axis-tokens` 0.3.10: `color.info`, motion de un solo valor y tokens CSS que existen
-
-AXIS corrigió el Lab, que usaba `var(--efeonce-spacing-5)` y `-7`: no existen (la escala publicada es `1/2/3/4/6/8`), y
-un `var()` de un token inexistente no avisa, porque la declaración entera vuelve a su valor inicial (`main@ed97c0b`).
-También reemplazó `color-error` por `color-danger` y `color-border-strong` por `color-border`, y quitó `shadow-sm`; un
-test nuevo del Lab (`design-tokens.test.ts`) falla si reaparece un token inexistente (`main@0a6da3b`). Publicó
-`@efeoncepro/axis-tokens` `0.3.10` (tag `v0.3.10`, `main@aa1a638`, run `36324516573` en verde; los demás paquetes no
-cambian): `--efeonce-color-info` (#1f6fd4), `efeonceTokens.motion` como alias de `axisMotion.duration` (`standard` pasa de
-220 a 200 ms en TS; el CSS ya emitía 200) y un build que falla si una propiedad sale con dos valores. Greenhouse sigue
-fijando `axis-tokens` 0.3.8: al subir a ≥ 0.3.10, `axis-package-drift.test.ts` falla hasta agregar
-`info: axisSemanticHex.info` a `COMPATIBILITY_ROLES`. Documentado en el runbook de consumo AXIS (Delta 2026-09-27 c), el
-mapa de continuidad, TASK-1927 (nota de dependencia), el registro cine, TASK-1926 y la skill `axis-design-system`
-(+espejo `.claude`), que ahora trae la regla de tokens CSS y corrige los pines de Greenhouse. Sin cambios de código en
-Greenhouse.
-
-## 2026-09-27 — Registro cine con documento propio, pruebas publicitarias, repo taller y AXIS 0.3.9
-
-El operador pidió documentar «con altísimo nivel de detalle» el estilo cinematográfico: nace
-[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (cámara,
-luz de la línea como fenómeno, color por línea, vestuario, emblema compuesto, robots agentes, reservas, ficha comentada,
-trampas, barra de juicio y evidencia), con punteros en el canon, la regla auto-load y diez skills (+espejo `.codex`).
-Primera tanda publicitaria 9:16 y 4:5 en prueba: la firma caía sobre el sujeto con el contraste pasando hasta usar un
-primer plano oscuro como lecho. Se creó el repo taller `efeoncepro/efeonce-brand-workshop` (ADR
-`EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1`, TASK-1925) para sacar la producción de marca de Greenhouse sin reactivar
-Globe. AXIS publicó `v0.3.9`: `efeonce.surface-composition` 0.1.2 (uso propuesta/brochure, portada y cierre, layouts de
-`proposal-cinematic`, documento brochure).

@@ -1,0 +1,25 @@
+# UTEM · propuesta técnica SEO/GEO/AEO
+
+**Estado vigente 08/10/2026:** oferta presentada por Julio en Mercado Público. Neto CLP 4.800.000 + IVA 912.000 = total 5.712.000, por tres meses. HubSpot: `presentationscheduled` / Presentación de soluciones, `amount=4800000`, CLP; dos readbacks verificados. Siguiente paso: evaluación/resultado, sin adjudicación confirmada. [Presentación y evidencia](PRESENTACION-2026-10-08.md).
+
+Compra Ágil **5251-1060-COT26**. Owner: Julio Reyes. Actualización: 08/10/2026.
+
+**Estado:** técnica v1.1 y matriz de cumplimiento para revisión; Markdown, HTML y PDF. Julio sustituyó el formato Word por HTML/PDF. Deck v2 y su PDF hechos por Claude ([registro](../../../audits/commercial/2026-10-08-utem-deck-propuesta-tecnica.md)). Cotización preparada por instrucción de Julio: **CLP 4.800.000 netos + IVA 912.000 = total 5.712.000**, servicio integral de tres meses. Cuatro páginas A4 verticales, HTML autocontenido y PDF revisado. La oferta fue presentada por Julio; la técnica y la cotización siguen sin firma gráfica añadida. No se modifican los entregables enviados.
+
+- [Fuente narrativa Markdown](oferta-tecnica.md).
+- [Cotización HTML editable](cotizacion/UTEM%20-%20Cotizacion%20SEO%20GEO%20AEO.html) y [PDF final](cotizacion/UTEM%20-%20Cotizacion%20SEO%20GEO%20AEO.pdf); [datos económicos](cotizacion/cotizacion.json) y [manifiesto de entrega y QA](cotizacion/delivery-manifest.json).
+- [Revisión para cotizar — INTERNO](REVISION-PARA-COTIZAR-INTERNO.md): bases y 35 láminas revisadas, ficha releída el 08/10 14:23 Chile; alcance, diferencia panel/Insights, condiciones de cobro y datos económicos pendientes.
+- [Guía para Claude — INTERNO](CLAUDE-HANDOFF-INTERNO.md): mapa del deck y parámetros propuestos pendientes de revisión.
+- [Manifiesto de entrega y QA](delivery-manifest.json): hashes, once páginas, 303 bloques cotejados con el PDF y cinco enlaces.
+- [Requisitos y preparación administrativa](../licitalab-deep-review-2026-10-07/UTEM-5251-1060-COT26-REVISION-2026-10-08.md).
+- [Tarea Notion](https://app.notion.com/3f339c2fefe7815bbf44df20bcf8f5db): actualización leída de vuelta.
+
+Archivos de entrega en OneDrive: `Alineación/4. Comercial/Licitaciones/UTEM/1. Agencia SEO-AEO/05. Propuesta tecnica/UTEM - Propuesta tecnica SEO GEO AEO.{md,html,pdf}`. Originales y anexos firmados se conservan en sus carpetas anteriores. Guardado local verificado; sincronización remota OneDrive no comprobada.
+
+El Markdown es la fuente; `node docs/commercial/tenders/utem-seo-aeo-2026/render-proposal.mjs` genera las copias HTML/PDF. El HTML es autocontenido. Revisar de nuevo el PDF si cambia la fuente.
+
+El builder `docs/commercial/tenders/utem-seo-aeo-2026/cotizacion/build-cotizacion.mjs` conserva la producción histórica desde `cotizacion/cotizacion.json` y rechaza regenerar cuando `submitted=true`. La cotización presentada permanece congelada; para otra oferta, usar la plantilla documental en un expediente nuevo. Las copias HTML/PDF están guardadas localmente en OneDrive, carpeta `06. Cotizacion`, con hashes cotejados. PDF: cuatro páginas A4, fuentes incrustadas, texto extraíble, encabezado/pie y folios revisados; sin cortes ni superposiciones. La división mensual de CLP 1.600.000 netos / 304.000 IVA / 1.904.000 total es una referencia aritmética, no un calendario de facturación. Una nueva versión sólo bajo mandato específico requiere repetir el QA visual y actualizar su propio manifiesto; el builder deja esas comprobaciones pendientes.
+
+Deck v2 (Claude, 08/10): [canvas Design](https://claude.ai/artifact/28wHXcgyA3ANNqaaeJcrfb), 35 láminas, y PDF `UTEM - Propuesta tecnica SEO GEO AEO - Deck.pdf` en la carpeta de OneDrive `05. Propuesta tecnica`; producción en `ai-generations/2026-10-08_utem-propuesta/`. Técnica v1.1 alineada (revisión pública §2.2, equipo nominal y experiencia §8.1).
+
+La cotización incorpora el alcance completo presentado en la técnica y el deck, incluidos reportes mensuales con Insights, revisión colaborativa y panel Greenhouse durante los tres meses, según fuentes disponibles y sin nuevas integraciones institucionales. Los parámetros propios —diez páginas existentes, dos rondas editoriales, diez destinos PR, quince consultas en dos sistemas— se describen como alcance ofertado por Efeonce, no exigencias atribuidas a UTEM. Se mantienen tres meses, quince artículos y mínimos íntegros de las bases. Pendientes separados: evaluación/resultado, capacidad/costeo/margen medidos, respaldo exacto del caso Sky y disponibilidad efectiva del panel para UTEM. La decisión de presentación quedó ejecutada por Julio; no reenviar ni regenerar los archivos del paquete aprobado. No se incorporaron costos internos, datos bancarios ni casos sin respaldo al documento técnico.

@@ -1,0 +1,115 @@
+
+> @efeoncepro/axis-design-system-workspace@0.1.0 build /Users/jreye/Documents/axis-design-system
+> pnpm -r build
+
+Scope: 6 of 7 workspace projects
+packages/tokens build$ tsc -p tsconfig.json && node scripts/emit-css.mjs
+packages/tokens build: Done
+packages/brand-assets build$ tsc -p tsconfig.json
+packages/brand-assets build: Done
+packages/contracts build$ tsc -p tsconfig.json
+packages/contracts build: Done
+packages/graphic-line build$ tsc -p tsconfig.json
+packages/registry build$ tsc -p tsconfig.json
+packages/registry build: Done
+packages/graphic-line build: Done
+apps/lab build$ node scripts/sync-brand-assets.mjs && astro build
+apps/lab build: brand assets: 315 files synced from @efeoncepro/axis-brand-assets (233 in email/, sparks-2d/, platforms/, cast-2d/, cast-photo/)
+apps/lab build: spark rig: 15 KB generados en public/references/sparks/rig/spark-rig.js
+apps/lab build: 08:47:58 [content] Syncing content
+apps/lab build: 08:47:58 [content] Synced content
+apps/lab build: 08:47:58 [types] Generated 309ms
+apps/lab build: 08:47:58 [build] output: "static"
+apps/lab build: 08:47:58 [build] mode: "static"
+apps/lab build: 08:47:58 [build] directory: /Users/jreye/Documents/axis-design-system/apps/lab/dist/
+apps/lab build: 08:47:58 [build] Collecting build info...
+apps/lab build: 08:47:58 [build] ✓ Completed in 331ms.
+apps/lab build: 08:47:58 [build] Building static entrypoints...
+apps/lab build: 08:47:58 [vite] ✓ built in 393ms
+apps/lab build: 08:47:59 [vite] ✓ built in 493ms
+apps/lab build: 08:47:59 [build] Rearranging server assets...
+apps/lab build:  generating static routes 
+apps/lab build: 08:47:59   ├─ /docs/index.html (+5ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.activity-timeline/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.advertising-typography/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.ai-search-composition/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.ai-visibility-report/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.border-beam/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.brand-logos/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.brand-motion/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.breadcrumbs/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.button/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.card-density/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.charts/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.chip/index.html (+6ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.collaboration-selection/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.composition-shell/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.disclosure/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.email-modules/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.floating-surface/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.gradients/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.graphic-line-orbit/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.insights-stat-card/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.leaderboard/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.loaders/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.motion/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.progress/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.roadmap-timeline/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.spark-rig/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.status/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.surface-recipes/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /patterns/efeonce.team-avatar-group/index.html (+0ms) 
+apps/lab build: 08:47:59   ├─ /references/aeo-iconography/index.html (+3ms) 
+apps/lab build: 08:47:59   ├─ /references/aeo-iconography.json (+0ms) 
+apps/lab build: 08:47:59   ├─ /references/ai-visibility-report/index.html (+4ms) 
+apps/lab build: 08:47:59   ├─ /references/ai-visibility-report.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/cast-2d/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/cast-2d.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/cast-photo/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/cast-photo.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/colors/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/creative-resources/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/creative-typography/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/elevation/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/email/index.html (+5ms) 
+apps/lab build: 08:47:59   ├─ /references/email.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/geometry/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/glitch/index.html (+4ms) 
+apps/lab build: 08:47:59   ├─ /references/glitch.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/graphic-line/index.html (+19ms) 
+apps/lab build: 08:47:59   ├─ /references/iconography/index.html (+4ms) 
+apps/lab build: 08:47:59   ├─ /references/iconography.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/insights/index.html (+5ms) 
+apps/lab build: 08:47:59   ├─ /references/insights.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/manzanitas/index.html (+5ms) 
+apps/lab build: 08:47:59   ├─ /references/manzanitas.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/nexa-suit/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/nexa-suit.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/photography/why/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/photography/why.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/photography/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/seo-aeo/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/seo-aeo.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/social-profiles/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/social-profiles.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/sonic-brand/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/sonic-brand.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/sparks/index.html (+4ms) 
+apps/lab build: 08:47:59   ├─ /references/sparks.json (+3ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/deck-recipes.json (+5ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/partner-assets.json (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/web/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/dooh-pdooh/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/motion/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/audiovisual/index.html (+2ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/deck/index.html (+32ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces/index.html (+4ms) 
+apps/lab build: 08:47:59   ├─ /references/surfaces.json (+7ms) 
+apps/lab build: 08:47:59   ├─ /references/typography/index.html (+1ms) 
+apps/lab build: 08:47:59   ├─ /index.html (+1ms) 
+apps/lab build: 08:47:59 ✓ Completed in 196ms.
+apps/lab build: 08:47:59 [build] ✓ Completed in 1.10s.
+apps/lab build: 08:47:59 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+apps/lab build: 08:47:59 [build] 60 page(s) built in 1.49s
+apps/lab build: 08:47:59 [build] Complete!
+apps/lab build: Done

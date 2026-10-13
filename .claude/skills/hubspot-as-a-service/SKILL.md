@@ -1,11 +1,32 @@
 ---
 name: hubspot-as-a-service
-description: "Deliver and operate HubSpot as a managed client service across Smart CRM, Marketing/Content/AEO, Sales, Revenue lifecycle, Service/Customer Success/Delivery, Data/Integration, and Agent Hub/agentic operations. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation."
+description: 'Deliver and operate HubSpot as a managed client service across Smart CRM, Marketing/Content/AEO, Sales, Revenue lifecycle, Service/Customer Success/Delivery, Data/Integration, and Agent Hub/agentic operations. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation.'
 ---
 
 # HubSpot as a Service
 
+## Envíos desde el Outlook de Julio
+
+Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
+
+
 Operate HubSpot as an accountable managed service, not as a collection of portal clicks.
+
+## Submitted proposals: reconcile the existing Deal
+
+For an operator-authorized stage and value update after submitting a proposal, read the existing Deal and the live pipeline stage IDs in the verified portal. Use the approved net value for the complete engagement as `amount`, with its currency; keep buyer budget, VAT and gross total separate and explain them in the description. A monthly arithmetic equivalent is not the full Deal value or a payment schedule. Do not infer or overwrite `closedate`, associations, bucket or customer relationship from submission alone.
+
+Reconcile stale descriptions that still claim no offer was submitted. Read back the exact changes and check stability after native automation; update both local CRM registers and the existing preparation task with submission evidence. Preserve the submitted deliverables. Case and dated readbacks: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). This task-specific authorization does not authorize other CRM changes or communications.
+
+## Regional CRM specialist capacity
+
+For vacancy-led capacity needs, load `docs/services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md`, the regional
+[decision](../../../docs/architecture/EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md) and [activation playbook](../../../docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md).
+Direction accepted 2026-10-09; offer `Approved for validation`. Separate client-directed Staff Augmentation
+from Efeonce-managed delivery; do not create a seventh solution family. Talent Assurance is an accepted
+standard, not an active claim store or universal badge. Confirm evidence, real capacity, fully loaded economics
+and contracting per client/person/employer/direction before commitments. Vacancy intent is not provider buying
+intent; lead registration does not authorize outreach.
 
 ## Commercial context
 
@@ -19,9 +40,75 @@ For human-agent team transformation, load
 `docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md`: portal configuration is only one
 part of workflow redesign, named human accountability, autonomy, handoffs, adoption, quality and cost. A first
 production team requires operator training and supervision capacity, not only an active agent toggle.
-Treat brochures as historical commercial input only; the review and quarantine rules live in
+Treat the brochures reviewed on 2026-07-26 as historical commercial input only; the review and quarantine rules live in
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.
+The current collateral is the HubSpot services brochure approved by the operator on 2026-10-06 (TASK-1943; 27
+slides for mid-market/enterprise buyers comparing HubSpot with Salesforce or Zoho, with IT in the evaluation). PDF:
+OneDrive `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`; private canvas:
+<https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU>. Its HubSpot facts were verified on 2026-10-06 and live in
+`hubspot-solutions-partner/SOURCES.md` (never claim ISO 27001/27017/27018/42001 for HubSpot or a LATAM data region).
+Sell credits as advice on **how many** the client needs, never as "don't buy". Before using it with prospects,
+ANAM must authorize the −57 % commercial-load and +32 % sales figures (see the ANAM authorization control below);
+the 3D sprocket stays internal until HubSpot approves it in writing. Open items and commercial use:
+`hubspot-solutions-partner` § «Collateral comercial vigente».
+
+## Manual outreach continuity
+
+For sent-email logging, reminders and repeated prospect touches, load [manual-outreach-follow-up.md](references/manual-outreach-follow-up.md). Reconcile actual recipients and sent evidence, reuse the account task and existing heartbeat, and keep future sending manual unless separately authorized.
+
+## Prospect segmentation handoff
+
+For Contact/Company/Deal/Lead field selection, creation or qualification, load
+[property-inventory](references/property-inventory.md): the complete dated portal dictionary and phase-based
+capture manual. Revalidate the fields being changed; writable metadata, API requirements and UI/stage
+requiredness are different. The historical Bow-tie design is not a live property or pipeline catalog.
+Prepare a capture plan per object and phase: complete supported relevant facts, preserve existing facts,
+declare pending fields and exclude system writers. Use the plan in the changeset template; a minimal create
+payload does not replace known actionable information or justify creating a Lead/Deal automatically.
+
+For account research, contact discovery and access strategy, load
+[efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). It owns the prospecting method; this skill
+retains CRM identity, dedupe, dictionaries, associations, writes and independent readback.
+
+For target accounts, ICP tiers, buying roles or initiative maps, load
+[account-based-prospecting](references/account-based-prospecting.md) and its changeset template. It distinguishes
+standard CRM fields from native Buying Groups graph capabilities, preserves multiselect values and scopes
+roles by initiative without inventing a Deal or schema. This is an agent operating adapter, not new software.
+
+For B2B prospecting, research the target AND always seek an initial 2–3 additional relevant account contacts
+with actionable corporate email. This is a search baseline, never a ceiling or proof of a complete buying group.
+Expand by opportunity, phase and critical decision roles/risks; report functional gaps, owners and access routes.
+Count distinct people separately from roles and distinguish participation, authority, email and engagement. **Never create a prospect Contact/Lead without an individual corporate email
+verified against that person's identity.** If the target has no email, keep the signal in research or a Company
+note and continue through adjacent people. Report missing coverage; do not invent addresses or relationships.
+Historical no-email records do not authorize new empty contacts. Credit spend and outreach retain their
+separate authorization requirements. The reference below owns the procedure and evidence checklist.
+
+For any prospect create/reuse or segment correction, load [prospecting-segmentation.md](references/prospecting-segmentation.md)
+and the [operator manual](../../../docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
+The [functional model](../../../docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) and
+[dated native filter catalog](../../../docs/operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json) identify
+which existing segment consumes each property. Revalidate the live definition/member set; never recreate the
+existing properties. Since 2026-10-11 an intake writes the research date
+`efeonce_prospecting_researched_on` on Company and Contact separately; dated cohort options are historical and
+are never added or assigned again. Reuse existing ACTIVE segments; populate the properties they consume instead of creating
+duplicates. Research remains a lead until effective qualification; preserve existing Deals the operator asks
+to leave unchanged. A successful CRM create is incomplete until automatic membership and associations are read back.
+
+For a bank/account selection, load the same reference's **Account-based continuous segments** section.
+Reuse ACTIVE **188** for the approved Chile-bank universe; its Company Primary condition covers the 14
+selected accounts, not every financial company or email domain. [Dated case and property gaps](../../../docs/commercial/prospects/bancos-chile-2026-10/README.md).
+
+## Firmas personales en HubSpot
+
+Para instalar o reparar una firma de correo de Efeonce, seguir el
+[manual de instalación en HubSpot](../../../docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md#instalar-la-firma-en-hubspot).
+Usar el HTML fuente completo de la firma aprobada en el editor **HTML**, con estilos inline e imágenes HTTPS.
+No confundir el botón «Copiar mi firma» (texto enriquecido para Outlook) con copiar código: el pegado en
+«Simple» perdió diseño e imágenes en la prueba del 2026-10-07. Verificar usuario/portal, recursos, vista previa
+completa, aviso de guardado y persistencia. Guardado/vista previa no certifican recepción; no enviar pruebas
+sin autorización. La identidad y composición siguen bajo `efeonce-graphic-line`.
 
 ## Provider-fit boundary
 
@@ -39,7 +126,9 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
    For direct portal operations, read [`HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md`](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) for the current CLI/MCP route and per-portal access evidence.
 3. Load only the workstream reference needed:
    - Customer Agent: [customer-agent.md](references/customer-agent.md)
+   - Prospecting Agent (native sales outreach), voice, advanced instructions and meeting CTA: [functional reference](../hubspot-solutions-partner/references/prospecting-agent.md) + [voice calibration manual](../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md). This is neither Customer Agent nor Agent CLI. Verify saved play configuration separately from generated drafts and sending.
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
+   - Prospect enrichment, native segments and preparation for personalized email: [prospecting-segmentation.md](references/prospecting-segmentation.md). Declare whether the universe is the entire CRM or a verified research cohort before creating filters; an active attribute segment alone does not restrict source or freshness.
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
    - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
@@ -54,14 +143,15 @@ For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_R
 
 ## Boundary router
 
-| Need | Owner |
-|---|---|
-| Sell, scope, price, partner economics, HubSpot product narrative | `hubspot-solutions-partner` + `commercial-expert` |
-| Operate CRM records directly | HubSpot MCP connector (`hubspot:hubspot`) or Agent CLI (`hubspot`), chosen per operation using the operator runbook |
-| Greenhouse-to-HubSpot Cloud Run bridge, webhooks, secrets | `hubspot-greenhouse-bridge` |
-| HubSpot CMS/landing/theme implementation | `docs/architecture/kortex/hubspot-cms/` and the CMS runbook |
-| Public Efeonce HubSpot landing positioning | `docs/public-site/` + `efeonce-public-site-wordpress` |
-| Client RevOps, portal configuration, Customer Agent, QA and managed operation | **this skill** |
+| Need                                                                          | Owner                                                                                                                     |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Sell, scope, price, partner economics, HubSpot product narrative              | `hubspot-solutions-partner` + `commercial-expert`                                                                         |
+| Operate CRM records directly                                                  | HubSpot MCP connector (`hubspot:hubspot`) or Agent CLI (`hubspot`), chosen per operation using the operator runbook       |
+| Segment an approved research cohort for personalized outreach preparation     | **this skill** → `references/prospecting-segmentation.md`; commercial qualification remains owned by the service practice |
+| Greenhouse-to-HubSpot Cloud Run bridge, webhooks, secrets                     | `hubspot-greenhouse-bridge`                                                                                               |
+| HubSpot CMS/landing/theme implementation                                      | `docs/architecture/kortex/hubspot-cms/` and the CMS runbook                                                               |
+| Public Efeonce HubSpot landing positioning                                    | `docs/public-site/` + `efeonce-public-site-wordpress`                                                                     |
+| Client RevOps, portal configuration, Customer Agent, QA and managed operation | **this skill**                                                                                                            |
 
 Do not conflate portal IDs, OAuth apps, CLI profiles, private-app tokens, Kortex OAuth, or the Greenhouse bridge.
 
@@ -95,6 +185,8 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 ## Non-negotiable controls
 
 - Never create a property because an email names a field. Confirm object, internal name, type, options, source, owner, requiredness, backfill and downstream consumers.
+- Keep research origin, service fit, observed purchase intent and email eligibility separate. A fresh CRM create date does not prove current employment, a live purchase process or a deliverable address. Cohort segments must retain their origin restriction in every OR branch; preparing segments does not authorize sending email or activating workflows/sequences.
+- Every approved prospect intake must populate the research date (`efeonce_prospecting_researched_on`, on both company and contact) and evidence-backed classification properties. Native ACTIVE segments consume those properties and incorporate qualifying records automatically; static-base enrollment is not the normal intake step. A contact/lead/note create alone is incomplete until properties and actual memberships are independently verified. Apply [prospecting-segmentation.md](references/prospecting-segmentation.md); preserve prior cohort values and do not force incompatible intent enums.
 - Never treat Customer Agent persona, knowledge, actions and handoff as one prompt. They are separate contracts.
 - Never conflate Customer Agent `Deployment > Workflows and bots` with agent knowledge, Customer Agent actions, or
   a workflow action that invokes an agent managed through Agent Hub/Agent Builder. Names and eligibility can change;
@@ -134,3 +226,19 @@ For non-trivial engagements, leave:
 ## Completion gate
 
 Close only when the configured runtime was verified, documentation matches it, rollback or recovery is understood, and external dependencies such as licenses, credits, trial expiry, publication or human availability are explicit.
+
+## Costeo de especialistas CRM por Cotizador V3
+
+Para dimensionar la capacidad regional CRM/Talent Assurance aceptada, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Resolver variante de consultor, seniority, país del talento y mercado de oferta sin colapsar escalas del Excel;
+el costo del catálogo es el nivel salarial objetivo, no la nómina vigente, y fuera de Chile el factor de talento es
+una estimación (`estimateExposure` del resumen dice cuál confirmar primero). La práctica define tareas/acceso necesarios y el motor calcula
+salario, provisiones, tools/plataforma y margen. La puesta en marcha se costea por persona: onboarding por defecto y
+reclutamiento sólo si hay que contratar para ese cliente (`choices`), ambos estimados. HubSpot es contrato anual, pero
+su precio vigente espera evidencia y aún no declara plazo: `compose commitments` no avisa de ese compromiso. No exigir comprar HubSpot si el cliente dispone acceso válido:
+`clientProvidedTools` exige evidencia/ventana/líneas; acceso de partner o Solutions Partner no lo demuestra.
+Notion/M365 permanecen base del equipo y las IA se seleccionan por motivo. Preservar cliente-dirigido vs managed
+service; un fee con roles internos no crea nueva solución comercial ni garantía. Explain es interno, preview
+simulación redactada. La CLI V3 no crea leads/deals, modifica HubSpot, emite quotes, autoriza outreach o confirma
+capacidad real; esas operaciones conservan su canal y autorización propios.

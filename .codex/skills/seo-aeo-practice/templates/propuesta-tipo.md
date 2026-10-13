@@ -1,135 +1,61 @@
-# Template — Propuesta-tipo de SEO/AEO
+# Propuesta SEO/AEO — categoría, evidencia y ejecución
 
-> 🔴 **Hoy NO existe una propuesta-tipo: cada una se arma de cero.** Esta es.
-> **Estructura derivada del deck de la licitación SKY** *(el único artefacto real que teníamos — y ganó: adjudicada a Efeonce el 2026-09-23)* —
-> que ya hacía lo correcto: **usar el Grader corrido sobre el cliente como diagnóstico y linkear el informe
-> público live.**
->
-> El deck se compone con **`deck-studio`** + Artifact Composer. La oferta económica sale del **cotizador**.
+Canon: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`.
+El deck se compone con `deck-studio`; la economía sale del cotizador y conserva aprobación por cuenta.
+Esta plantilla no define precios, mínimos de duración, número de motores ni disponibilidad de software.
 
----
+## 1. Necesidad y norte compartido
 
-## 🔴 El orden no se altera
+- Categoría reconocida / comprador y situación de compra / mercado-idioma / superficies.
+- Problema y decisión de inversión / fuente y fecha / hipótesis pendientes.
+- Aspiración: ser descubiertos, comprendidos y considerados como opción de referencia para…
+- Capacidades reales / diferencias defendibles / evidencia y límites.
 
-**Si abres con "quiénes somos", ya perdiste.** El comprador tiene una cicatriz *(`02_COMPRADOR`)*.
+## 2. Diagnóstico y oportunidades
 
-```
-1. El diagnóstico  (SU realidad)          ← evidencia, no promesa
-2. Dónde NO te ayudamos                   ← ADELANTE, no al final
-3. El terreno     (sus competidores)      ← la ventana de first-mover
-4. Lo que proponemos (las 4 capas)
-5. Cómo vas a saber si funcionó           ← en TU GA4, no en nuestro dashboard
-6. Lo que NOS NEGAMOS a prometer          ← más persuasivo que lo que prometemos
-7. La inversión                           ← 4 líneas, plataforma aparte
-8. Quién lo hace                          ← squad, sin nombres ni nómina
-```
+- Reusar evidencia vigente; Assessment, diagnóstico SEO o muestra contextual sólo si resuelven una duda.
+- Separar consultas non-brand de descubrimiento y branded de representación; intención aparte.
+- Tráfico absoluto y proporciones / presencia / cita / fidelidad / recomendaciones / fuentes.
+- Corpus versión / condiciones conocidas / cobertura y fallos / competidores comparables.
+- Contenido/pruebas existentes / brechas y razón de prioridad; no convertir el panel en cuota de mercado.
+- Contexto externo sólo si aporta: fuente, muestra, fecha y límites; nunca una caída o ahorro supuesto.
 
----
+## 3. Intervención y alcance
 
-## 1 · El diagnóstico *(su realidad)*
+| Brecha | Acción/entregable | Owner | Dependencia/aprobación | Aceptación controlable | Resultado a observar |
+|---|---|---|---|---|---|
+| | | | | | |
 
-- 🎯 **El Grader corrido sobre SU marca.** Score + los 7 ejes + los 5 motores.
-- 🎯 **Link al informe público live.** *(Que lo pueda abrir y compartir con su comité, sin nosotros.)*
-- 🎯 **Los Fix-It Artifacts:** *"Acá está el `json_ld` y el `llms.txt` que necesitas. **Son tuyos, aunque no
-  nos contrates.**"*
-- **El contexto que le importa:** ⚠️ **ajustar a su industria** *(salud −70% · e-commerce −30%)*:
-  - **AI Overviews en el 48% de las búsquedas**
-  - **−58% de CTR** en el #1 *(hace 8 meses: −34,5%. **No hay meseta**)*
-  - 🎯 **−68% de CTR PAGADO** ← **el dato que hace entrar al CFO**
-  - 🎯 **+35% orgánico / +91% pagado** si estás **citado**
+Incluir según diagnóstico: fundamentos, evidencia original, contenido útil, identidad/representación,
+reconocimiento externo autorizado, medición y aprendizaje. Ampliar/consolidar antes de asumir nuevas piezas.
+Capacidad/cadencia/plazo sustentados en corpus, implementación, dependencias y maduración.
 
----
+## 4. Qué se entrega y cómo se evalúa
 
-## 2 · 🔴 Dónde NO te vamos a poder ayudar *(OBLIGATORIO, y va acá)*
+- Compromisos: entregables y mejoras controlables, revisión, distribución/publicación en canales operados.
+- Resultados observados: indexación, rankings, presencia, citas, fidelidad, recomendación y tráfico.
+- Consideración/negocio: fuentes, definición de outcome, encaje, avance y motivos de elección.
+- Revisiones comparables / corpus y denominadores / fallos y cobertura / siguiente decisión.
+- Sin garantía de selección algorítmica, liderazgo alcanzado, tráfico o revenue causal desde una cita.
+- Escenarios de clics sólo con curva/muestra suficiente del sitio; sin base, prioridades/requisitos y límites.
+- Validar capacidades y permisos de portal, analítica y CRM antes de ofrecérselos al comprador.
 
-**Elige lo que aplique** *(→ `06_DESCALIFICACION`)*:
+## 5. Inversión y responsabilidades
 
-- *"Si esperas resultados en 3 meses, **esto no es lo tuyo — lo que necesitas es paid.**"*
-- *"**No te puedo garantizar posiciones. Y el que te las garantice te está mintiendo.**"*
-- *"En SEO, **la capa de autoservicio del portal está en construcción** — hoy te doy el reporte del equipo.
-  En visibilidad de IA sí tienes transparencia total, desde el día uno."* 🔴 *(→ `12_ACTIVOS` § 2. **No prometas
-  lo que no existe.**)*
-- *"**No te voy a decir cuánto revenue te va a dar, porque nadie lo sabe** — y quien te dé un número te lo está
-  inventando."*
+- Cotización gobernada / forma de compromiso / capacidad / variantes / impuestos.
+- Roles, responsabilidades, dependencias del cliente, permisos y aprobaciones.
+- Modelo económico y supuestos aparte del documento para comprador; política de margen vigente.
+- Fuera de alcance y condición de ampliación definidos, sin «etc».
 
----
+## Checklist antes de entregar
 
-## 3 · El terreno *(sus competidores)*
-
-- 🎯 **El Grader corrido sobre sus 2-3 competidores.**
-- 🎯 *"**Nadie en tu categoría ganó esto todavía.** La ventana está abierta — y el primero que instale la capa
-  se lleva el canal."* 🔴 **Verificado, nunca inventado.**
-- *(Es exactamente lo que hicimos en SKY: ni JetSMART ni Flybondi tenían la capa AEO.)*
-
----
-
-## 4 · Lo que proponemos — las 4 capas
-
-```
-DIAGNÓSTICO                                        GRATIS  ← ya te lo dimos
-FUNDACIÓN (una vez)                                USD X   ← técnico · entidad · schema
-OPERACIÓN DE VISIBILIDAD (mensual)                 USD Y   ← capacidad de hasta N piezas
-PLATAFORMA (mensual)                               USD Z   ← 🔴 nunca se descuenta
-AEO (mensual)                                      USD W   ← 🎯 línea propia (el mercado: 900+)
-EXPANSIÓN (opcional)                                       ← +mercado · +marca · +superficie
-```
-
-🔴 **Sin "etc". Sin precio por artículo. Sin promesa de rankings.**
-
----
-
-## 5 · Cómo vas a saber si funcionó
-
-| Prometemos | No prometemos |
-|---|---|
-| ✅ **Citabilidad** *(estás/no estás, en los 5 motores)* | 🔴 Rankings |
-| ✅ **Cobertura de superficie** | 🔴 Tráfico garantizado |
-| ✅ **Salud técnica** *(CWV, schema, indexación)* | 🔴 **Revenue atribuido a IA** |
-| ✅ **Velocidad de publicación** | |
-| ⚠️ Clics orgánicos *(se proyecta, no se garantiza — **y sólo si su sitio tiene muestra para su propia curva de CTR**)* | 🔴 Un **techo de clics** sobre un sitio sin muestra *(regla dura **10**)* |
-
-🔴 **Si el sitio del cliente todavía no tiene muestra en los buckets del top-10** *(pasa en sitios jóvenes y
-en marcas con poca superficie ranqueada)*, **no se pone un techo de clics en la propuesta.** Se pone el
-**orden** — *"estas son sus oportunidades ordenadas por impresiones reales y por cercanía a página 1"* — y se
-declara en una línea: *"la proyección en clics se habilita cuando su propia serie de Search Console acumule
-suficientes impresiones en esas posiciones; mejora sola con el tiempo, no hay nada que configurar"*.
-🎯 **Decirlo tú antes de que lo pregunte el comité es exactamente el gesto de §0.**
-
-🎯 **Y el puente:** *"Las marcas citadas reciben +35% de clics orgánicos y +91% de pagados.
-**Y eso se mide en TU GA4 y TU cuenta de Ads. No en un dashboard mío.**"*
-
----
-
-## 6 · 🎯 Lo que nos negamos a prometer
-
-**Enséñalo literalmente. Es más persuasivo que la lista de lo que sí.**
-
----
-
-## 7 · La inversión
-
-🔴 **Sale del cotizador. Piso: 45% de margen bruto** *(aprobado 2026-07-13)*.
-**Checklist obligatorio antes de mandar:** `templates/calculadora-piso.md`.
-
----
-
-## 8 · Quién lo hace
-
-**El squad: roles + seniority.** 🔴 **Sin nombres. Sin nómina.**
-*(El blueprint interno vive aparte — `greenhouse-talent-people-operator` → `client-squad-design.md`.)*
-
----
-
-## ✅ Checklist antes de mandar
-
-- [ ] 🔴 **¿El Grader está corrido sobre SU marca Y sobre 2 competidores?**
-- [ ] 🔴 **¿La sección 2 (dónde NO ayudamos) va ANTES que la 3?**
-- [ ] 🔴 **¿Le regalamos los Fix-It Artifacts, sin condiciones?**
-- [ ] 🔴 **¿Ajusté el dato de CTR a SU industria?** *(Salud −70% · e-commerce −30%)*
-- [ ] 🔴 **¿Llevé el dato del paid (−68%)?** *(Es el que abre el presupuesto grande)*
-- [ ] 🔴 **¿NO prometí la plataforma de SEO?** *(No existe todavía)*
-- [ ] 🔴 **¿Pasé por el cotizador y el margen es ≥ 45%?**
-- [ ] 🔴 **¿Ningún plan está dominado? ¿Ningún precio unitario por artículo?**
-- [ ] 🔴 **¿Cero casos inventados?**
-- [ ] 🔴 **¿Todo techo de clics que aparece tiene muestra detrás en la curva de CTR del cliente?** *(Si no: va
-      el orden, no el número — regla dura **10**.)*
+- [ ] Norte contextualizado; categoría con demanda pertinente y capacidades/pruebas reales.
+- [ ] Non-brand/branded, intención y capas de evidencia separadas.
+- [ ] Diagnóstico reutilizado cuando corresponda; muestras y casos con naturaleza/permiso visibles.
+- [ ] Plan trazable brecha→acción→owner→aceptación→medición.
+- [ ] Presencia, fidelidad, consideración y negocio no fusionados en un score/garantía.
+- [ ] Corpus comparable, cobertura/fallos y fuentes; panel no presentado como mercado real.
+- [ ] Proyecciones con muestra/supuestos o límite declarado; correlación no prometida como causalidad.
+- [ ] Capacidad, plazo y precio revisados por sus owners; no precio unitario por artículo.
+- [ ] Software/accesos/acciones/publicación comprobados para el alcance, sin inferencias.
+- [ ] Documento final revisado; preparado, aprobado, enviado y aceptado son estados distintos.

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "b7acb84f4e103e77063074e88216ddc5e6c880cf530025cf3b163f2e47fd618e",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic.hero",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CMP-crm-C",
+      "path": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-crm-C.png",
+      "sha256": "9d8d645ebe0055d1fa43dd4aef83a2b7abcdc060e3ef7f21bf4ad5ef5c342691"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

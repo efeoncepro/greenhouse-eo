@@ -78,7 +78,7 @@ Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba
 | `08` | [TASK-1860](../../tasks/to-do/TASK-1860-landing-trade-marketing-btl.md) | Trade Marketing & BTL | Diseño | ~880/mes, pero SERP informativo y laboral; el modificador comercial tiene ~10/mes | Validar PDR-021 |
 | `09` | [TASK-1803](../../tasks/to-do/TASK-1803-landing-branding-studio-sistema-marca.md) | Branding Studio | Estrategia y contratos UI listos | La ruta de Réditos incluye branding, pero está bloqueada | CTA/Brand Diagnostic, casos y derechos, SEO/canonical |
 | `10` | [TASK-1369](../../tasks/to-do/TASK-1369-about-us-identidad.md) | About Us | Diseño | Identidad y E-E-A-T, no captura | Bios reales del equipo + arte del hero |
-| `11` | [TASK-1859](../../tasks/to-do/TASK-1859-landing-product-design-360.md) | Product Design 360 | Diseño | Publicación por fases atada al business model | Aprobación comercial del modelo |
+| `11` | [TASK-1859](../../tasks/to-do/TASK-1859-landing-product-design-360.md) | Product Design 360 | Diseño | Publicación por fases atada al business model | Modelo `Approved` por el operador el 2026-10-10 (gate de estado cumplido); falta dirección visual aprobada y binding de la meeting surface |
 
 ### Habilitador transversal
 

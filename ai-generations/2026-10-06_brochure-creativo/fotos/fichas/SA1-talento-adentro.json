@@ -1,0 +1,44 @@
+{
+ "id": "SA1-talento-adentro",
+ "formato": "16:9",
+ "impacto": true,
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "karo"
+  }
+ ],
+ "palanca": "luz-motivada",
+ "escena": "SCENE (cinematic, Hollywood drama still, the client's own marketing office at night: a wide, deep, dark open-plan floor with real scale, where a creative from Efeonce works as one more member of the client's team). GEOGRAPHY IN DEPTH: from the left edge of the frame to beyond the middle there is only calm, deep dark empty office: dark floor, dark air and a dark wall, nothing lit, no screens, no people, no windows, no light shapes; on that left half the client's worktable exists only as its dark near edge at the very bottom. Everything lit lives in the RIGHT part of the frame. EXACTLY THREE PEOPLE and no one else. NEAREST, seated behind the client's long matte-black worktable and facing the lens almost frontally, Karo, as in her reference, wearing the Efeonce hoodie exactly as in its reference; her left shoulder is at about 63 % of the frame width, and between the left edge of the frame and her back there is a wide band of empty darkness. Her head stays almost frontal: both eyes, both brows and both cheeks visible, the far ear in frame; only her EYES turn to her left, toward the camera-right, to the glowing piece the client's woman is pointing at; with two fingers of one hand she slides that piece into its place, the other hand rests flat on the table; mid-sentence, an easy half-smile. She does NOT look at the lens, does NOT look at the other people's faces and does NOT look toward the left of the frame. ONE woman of the client's marketing team sits at the camera-right of Karo, about one metre deeper, her face at about 77 % of the frame width, in her own grey knit sweater, leaning toward the light and pointing at that same piece; she looks at the piece, not at Karo. ONE man of the client's team stands behind the two of them at about 87 % of the frame width, in a charcoal shirt, arms folded, listening, looking at the same piece. The two client people wear their own everyday business-casual clothes in grey and charcoal, nothing blue, no logos, no lanyards, nothing branded: the royal-blue Efeonce hoodie is the only blue garment in the frame and the only sign of who comes from outside. THE PHENOMENON, on the client's table at the camera-right of Karo, between her and the client's people: the client's own campaign hangs just above the tabletop as a low sheet of glowing cool azure-white layout pieces (image blocks and colour fields, no readable text), about seventy centimetres wide, its left edge never further left than Karo's shoulder. ONE single piece of the sheet, the one Karo is sliding in, carries one tiny vivid orange (#FF6500) point, the only accent in the frame; it lights nothing around it. LIGHT: that sheet is the only key light, low and to the camera-right of Karo, lighting the three faces the same cool azure-white; NO fill, the sides of the faces turned away from it fall into deep shadow with legible shape. The matte-black tabletop does not reflect it, and the near end of the table, by the lens, stays dark. Real photographic skin with irregular pores and fine facial hair, no smoothing. REALISTIC ADULT PROPORTIONS: camera about seven metres away at seated eye height, 85mm f/2, the three framed from the waist up; Karo razor sharp, the two client people slightly softer with distance. Rich contrast, deep navy blacks, real sensor grain. No readable text, no letters, no numbers, no logos of any brand on the light pieces or on any equipment.",
+ "lecho": {
+  "objeto": "the near end of the client's long worktable, matte black and non-reflective, right in front of the lens, out of focus, outside every light and every reflection",
+  "tono": "DARK near black"
+ },
+ "reservas": {
+  "texto": {
+   "muro": "the calm, deep dark office space on the left of the frame",
+   "tinta": "blanca"
+  }
+ },
+ "registro": "cine",
+ "desde": "CR4",
+ "alcance": "deck-seccion",
+ "linea": "brand",
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "llave": {
+  "fuente": "the low sheet of glowing campaign pieces hanging over the client's table",
+  "lado": "to the camera-right of Karo, just below face height",
+  "tamano": "about seventy centimetres wide",
+  "distancia": "about fifty centimetres from Karo's face"
+ },
+ "primerPlano": "the dark out-of-focus back of an empty office chair at the bottom right corner, very close to the lens, cut by the frame",
+ "fondo": "the client's dark open-plan office far behind on the right, empty of people: a few cold practical lights and the night city through a window, melted into small round bokeh; they light nothing",
+ "fenomeno": {
+  "que": "the client's own campaign hangs just above the client's worktable as a low sheet of glowing cool azure-white layout pieces, and Karo and the client's people build it together with their hands; Karo slides in the one piece that carries the orange point; the royal-blue Efeonce hoodie is the only sign she comes from outside",
+  "esServicio": "talento creativo embebido: la campaña del cliente se arma en su propia mesa, entre las manos de su equipo y del talento de Efeonce; la pieza con el punto naranja es el aporte de Efeonce, y Efeonce responde por la entrega"
+ }
+}

@@ -1,0 +1,81 @@
+{
+  "status": "flare-selected-this-round-unpublished",
+  "selectedConcepts": [
+    "binoculares",
+    "metronomo",
+    "sello-aprobacion",
+    "iman"
+  ],
+  "catalogCount": 134,
+  "catalogUrl": "https://axis.efeonce.org/references/iconography.json",
+  "absentFromLiveCatalog": [
+    "binoculares",
+    "metronomo",
+    "sello-aprobacion",
+    "iman"
+  ],
+  "variants": [
+    "binoculares-v1",
+    "metronomo-v1",
+    "sello-aprobacion-v1",
+    "iman-v1",
+    "binoculares-v2",
+    "metronomo-v2",
+    "sello-aprobacion-v2",
+    "iman-v2",
+    "binoculares-v3"
+  ],
+  "template": "AXIS plastilina-prompt.txt; only OBJETOS replaced",
+  "styleReference": "../axis-design-system/docs/agent-composition/iconography/plastilina-style-reference.png",
+  "promptSha256": "16cf6e5f332b8f30684dd566c5247440f815ebc41c9195d3024876dbe07c6584",
+  "operatorRequest": "new Efeonce icons, uniform smooth matte 3D, compare Flare/Seedream",
+  "volumePending": "canonical adoption separate; Flare round selection confirmed, QA warnings preserved",
+  "flatApproval": {
+    "date": "2026-10-12",
+    "answer": "Sí, continuar con las cuatro",
+    "scope": "four flat silhouettes approved for 3D comparison; publication excluded"
+  },
+  "requestedSize": "2048x2048",
+  "volumeSource": "exact AXIS volume-prompt.txt plus one line for operator uniform-surface requirement",
+  "models": [
+    "gpt-image-2.5-flare",
+    "dola-seedream-5-0-pro-260628"
+  ],
+  "qualities": [
+    "max",
+    "standard"
+  ],
+  "deliveryBackground": "derived transparent PNG plus native navy-background original",
+  "roundSelection": {
+    "date": "2026-10-12",
+    "status": "operator-selected-for-this-round",
+    "model": "gpt-image-2.5-flare",
+    "quality": "max",
+    "operatorAnswer": "Bien, quedemonos para esta ronda con los de flare, pero ya sabemos lo que puede hacer cada uno",
+    "scope": "four Flare variants selected for this round; no catalog publication or universal model default",
+    "files": [
+      {
+        "icon": "binoculares",
+        "file": "alpha/flare/binoculares.png",
+        "sha256": "901e1f241304af662707ea645788a1c892a029c020180b00abe0efce3e7ce033"
+      },
+      {
+        "icon": "metronomo",
+        "file": "alpha/flare/metronomo.png",
+        "sha256": "5f524cd3cd67df57d7fa30be9bf6133fb7560c21d6928c8afc61985074ddb525"
+      },
+      {
+        "icon": "sello-aprobacion",
+        "file": "alpha/flare/sello-aprobacion.png",
+        "sha256": "fc442227d62db4a868ca2d74443af1b297c920fcbde9e1c27201d74cc40cdd04"
+      },
+      {
+        "icon": "iman",
+        "file": "alpha/flare/iman.png",
+        "sha256": "324c52f20adf78dcaf356f08b0b23e172ab108bcd57e874e71d2835c04b99941"
+      }
+    ],
+    "comparisonPreserved": true,
+    "geometryQaWarningsPreserved": true
+  }
+}

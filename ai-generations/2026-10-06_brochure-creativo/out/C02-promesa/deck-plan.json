@@ -1,0 +1,71 @@
+{
+  "tenderId": "C02-promesa",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "stepsLayout": "inline",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 311,
+          "answerPx": 174,
+          "bodyTop": 535,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 870,
+          "stepsGap": 245,
+          "stepWidth": 235,
+          "iconPx": 50,
+          "kickerPx": 13,
+          "stepNamePx": 22,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CR2b-constelacion-isotipo",
+          "alt": "Una directora creativa con el hoodie de Efeonce dirige con las manos una órbita de pantallas flotantes"
+        },
+        "voice": {
+          "question": "¿Tu marca en cada pantalla?",
+          "answer": "En todas",
+          "eyebrow": "Servicios creativos"
+        },
+        "body": "Social, campañas, video, motion y creatividad para performance. Una idea que llega a cada formato, con capacidad creativa gobernada.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:rayo-brand-dark-50",
+            "kicker": "Empieza aquí",
+            "name": "Creative Sprint"
+          },
+          {
+            "icon": "asset-ref:icon:paleta-brand-dark-50",
+            "kicker": "Managed Squad",
+            "name": "Creative Capacity"
+          },
+          {
+            "icon": "asset-ref:icon:claqueta-brand-dark-50",
+            "kicker": "Producción",
+            "name": "Creative Studio"
+          }
+        ],
+        "proof": {
+          "text": "Sky: +2.000 piezas aprobadas en 12 meses",
+          "source": "caso publicado de Sky Airlines"
+        },
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

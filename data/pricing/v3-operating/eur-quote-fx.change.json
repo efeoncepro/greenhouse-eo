@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-eur-quote-fx-2026-10-11",
+  "baseDigest": "baf00bef35830b7fb7da725ad2a38d34aaa4612a866be00e2da4d9db55a2b40f",
+  "nextVersion": "operating-review-2026-10-11-v6",
+  "actor": "operator-authorized-agent",
+  "reason": "The only EUR to USD rate in the catalog was an ECB reference valid for 2026-10-09 alone, so any later quote needing a tool priced in EUR had no rate. Adds an open-ended quote FX under the CEO instruction of 2026-10-10 to use a prudential margin over spot.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "fx:EUR:USD",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "fx:EUR:USD",
+        "revision": 1,
+        "kind": "fx",
+        "source": {
+          "reference": "hypothesis-only:quote-fx-EUR-USD-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Quote FX for costs priced in EUR: 1.20 USD per EUR, about 7% above the ECB reference of 1.1206 (2026-10-09), the same prudential margin the CEO set for the other quote FX. On the cost side the prudent direction is a higher rate. Not explicitly decided for EUR; a policy value, not a market observation.",
+        "value": {
+          "from": "EUR",
+          "to": "USD",
+          "rate": "1.20"
+        }
+      }
+    }
+  ]
+}

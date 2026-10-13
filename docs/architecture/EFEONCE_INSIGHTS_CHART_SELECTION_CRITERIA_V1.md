@@ -206,7 +206,8 @@ de clics). El gate se suma a los existentes del dominio (consistencia del contra
 **Aprobada por el operador el 2026-10-03** (canvas de la tarjeta, tableros `Premium-Cifras-Canal`, `Deck-Cifras-Canal`,
 `Cifras-Canal-Norma` y `Cifras-Canal-Inventario`) y **en producción** desde el release `36a73e7b7e19` (TASK-1990 contrato,
 TASK-1996 render). Contrato de AXIS: `efeonce.insights-stat-card` 0.2.0; isotipos: `AXIS_PLATFORM_ASSETS` de
-`@efeoncepro/axis-brand-assets` (19 plataformas, el mismo vocabulario que `INSIGHT_CHANNEL_IDS`).
+`@efeoncepro/axis-brand-assets` (el mismo vocabulario que `INSIGHT_CHANNEL_IDS`: 19 plataformas en el contrato 0.2.0 y
+22 desde el paquete 0.4.25, que suma Facebook, Threads y X; alineadas en Greenhouse el 2026-10-12, después de ese release).
 
 - **De dónde sale la plataforma.** Del hecho sellado, nunca de un autor: la fuente manda sobre el canal (Search Console,
   GA4 e ICO tienen su isotipo aunque midan Google); si no, el `channelId` del hecho. Una sola resolución para PDF, deck y

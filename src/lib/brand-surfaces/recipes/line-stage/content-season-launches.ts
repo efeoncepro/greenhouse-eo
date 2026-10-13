@@ -96,7 +96,7 @@ export const contentSeasonLaunches: RecipeBuilder = ({ intent, manifest, recipe 
 
   if (launchesT.columnsXPx.length * perColumn !== launchesT.max) throw new SurfacePieceError('AXIS no midió una ficha por cada lugar de la temporada.', 'invalid-intent')
 
-  const icons = launches.map((launch, i) => productIcon(launch.icon, `El lanzamiento ${i + 1} (\`launches[${i}].icon\`)`))
+  const icons = launches.map((launch, i) => productIcon(launch.icon, `El lanzamiento ${i + 1} (\`launches[${i}].icon\`)`, line))
   const mascot = mascotOf(intent.mascot, recipe.mascot as MascotTokens | undefined, 'csn')
   const { stage, platform } = stageLayers(manifest, recipe, line, 'csn')
   const status = launchesT.status

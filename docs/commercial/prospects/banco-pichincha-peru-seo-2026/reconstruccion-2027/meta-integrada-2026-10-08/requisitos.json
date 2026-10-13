@@ -1,0 +1,52 @@
+{
+  "nature": "inverse_integrated_requirements_not_channel_forecast",
+  "goal_funded_accounts": 15200,
+  "ticket_usd": 2500,
+  "goal_usd": 38000000,
+  "period": "hypothetical January-December 2026 with product available",
+  "audience": "A/B 35–55; not observed in keyword data",
+  "deadline_funding_assumption": "same-period funding; lag must be modeled before promising year-close outcomes",
+  "unmeasured_traffic": null,
+  "sem_cpc": null,
+  "sem_budget": null,
+  "pr_incremental_visits": null,
+  "community_incremental_visits": null,
+  "scenarios": [
+    {
+      "scenario": "referencia",
+      "opening_rate_assumption": 0.02,
+      "funding_rate_assumption": 0.65,
+      "required_visits": 1169230.769230769,
+      "required_visits_ceil": 1169231,
+      "required_openings": 23384.615384615383,
+      "panel_visits_assumption": 18150.275,
+      "panel_funded_at_these_rates": 235.95357500000003,
+      "required_other_visits_if_panel_only_known": 1151080.494230769,
+      "required_other_funded": 14964.046425
+    },
+    {
+      "scenario": "mejora_intermedia",
+      "opening_rate_assumption": 0.03,
+      "funding_rate_assumption": 0.75,
+      "required_visits": 675555.5555555556,
+      "required_visits_ceil": 675556,
+      "required_openings": 20266.666666666668,
+      "panel_visits_assumption": 18150.275,
+      "panel_funded_at_these_rates": 408.3811875,
+      "required_other_visits_if_panel_only_known": 657405.2805555556,
+      "required_other_funded": 14791.6188125
+    },
+    {
+      "scenario": "mejora_alta",
+      "opening_rate_assumption": 0.04,
+      "funding_rate_assumption": 0.8,
+      "required_visits": 475000.0,
+      "required_visits_ceil": 475000,
+      "required_openings": 19000.0,
+      "panel_visits_assumption": 18150.275,
+      "panel_funded_at_these_rates": 580.8088000000001,
+      "required_other_visits_if_panel_only_known": 456849.725,
+      "required_other_funded": 14619.1912
+    }
+  ]
+}

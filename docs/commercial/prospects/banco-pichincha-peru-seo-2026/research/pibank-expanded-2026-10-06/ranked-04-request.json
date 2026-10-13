@@ -1,0 +1,15 @@
+[
+  {
+    "target": "https://www.scotiabank.com.pe/Personas/Ahorros/Cuentas-Bancarias/cuenta-power",
+    "location_code": 2604,
+    "language_code": "es",
+    "limit": 500,
+    "offset": 0,
+    "item_types": [
+      "organic"
+    ],
+    "order_by": [
+      "keyword_data.keyword_info.search_volume,desc"
+    ]
+  }
+]

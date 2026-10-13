@@ -1,0 +1,70 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "brochure",
+  "recipe": "content-day-live-console",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Operación gestionada",
+    "question": "¿Y después del go-live?",
+    "answer": [
+      "Lo",
+      "operamos"
+    ]
+  },
+  "body": "Releases, soporte, datos, permisos y agentes, con SLA y una revisión **trimestral** de valor.",
+  "console": {
+    "icon": "data",
+    "title": "Operación gestionada · este mes",
+    "subtitle": "Marketing · Sales · Service Hub · Agent Hub",
+    "sampleMark": "Datos de muestra",
+    "metrics": [
+      {
+        "value": "96 %",
+        "label": "Soporte en SLA",
+        "detail": "48 de 50 solicitudes"
+      },
+      {
+        "value": "3",
+        "label": "Releases",
+        "detail": "con pruebas y rollback"
+      },
+      {
+        "value": "0",
+        "label": "Workflows con error",
+        "detail": "monitoreo continuo"
+      }
+    ],
+    "checks": [
+      {
+        "label": "Calidad de datos · duplicados en contactos",
+        "status": "Bajo control",
+        "done": true
+      },
+      {
+        "label": "Revisión de permisos del trimestre",
+        "status": "Hecha",
+        "done": true
+      },
+      {
+        "label": "Consumo de créditos de HubSpot vs. presupuesto",
+        "status": "En rango",
+        "done": true
+      },
+      {
+        "label": "Nuevo workflow de reactivación",
+        "status": "En pruebas",
+        "done": false
+      }
+    ],
+    "review": {
+      "kicker": "Próxima revisión trimestral",
+      "title": "Arquitectura, adopción, deuda y prioridades",
+      "cta": "Ver agenda"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Evaluación sin costo",
+    "question": "¿Qué recibo primero?",
+    "answer": [
+      "Evidencia"
+    ]
+  },
+  "body": "Una decisión sobre tu **plataforma**, no una recomendación por defecto.",
+  "pillars": [
+    {
+      "label": "Encaje",
+      "text": "si HubSpot es tu plataforma, y con qué condición."
+    },
+    {
+      "label": "Riesgos",
+      "text": "lo que hoy frena tu operación."
+    },
+    {
+      "label": "Roadmap",
+      "text": "un plan por olas, con su primer valor."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS6b-una-decision.png",
+    "alt": "Julio Reyes, de Efeonce, sostiene en la palma el punto donde una maraña de rutas tenues se resuelve en un solo camino de luz"
+  },
+  "line": "revenue-hubspot",
+  "use": "brochure"
+}

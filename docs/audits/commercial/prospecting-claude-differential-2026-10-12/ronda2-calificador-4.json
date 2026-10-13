@@ -1,0 +1,270 @@
+{
+  "evaluador": 4,
+  "casos": {
+    "P39": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "No lista; separa verified de entrega, SPF leído de alineación, suppression/volumen/baseline pendientes, firma y CCO bloquean, descarta garantía de inbox, bot de warm-up y otro dominio con motivo; da orden de pasos y proporción para el envío único."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 4,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "Misma decisión y separa mensaje individual de ola; aporta dirección de CCO, teléfono y firma completa que no figuran en los hechos del caso (no verificables desde el caso: útiles si son reales, riesgo si no) y despacha warm-up/otro dominio con menos fundamento."
+      },
+      "preferida": "empate",
+      "motivo": "Ambas diagnostican igual; la 1 ordena mejor los pasos y la 2 da el texto de corrección, pero con datos que el caso no permite comprobar."
+    },
+    "P34": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 4,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "Cuatro tratamientos correctos con qué no se hace, condición de revisión y pendientes por responsable; celdas muy densas y nombra herramientas (HubSpot, Apollo, Outlook) que el caso no menciona."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "Cuatro tratamientos correctos; señala la ambigüedad de «nadie más», no asume la causa del unenrolled, y prioriza saber si el 5.7.1 es un caso o un patrón del emisor; fecha de retoma coherente (19/10 es lunes)."
+      },
+      "preferida": "2",
+      "motivo": "Mismas decisiones, más fáciles de encontrar y con la pregunta diagnóstica clave de Sur al frente."
+    },
+    "P28": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "Aritmética verificada (6 h y 2 h → 2 cuentas; 300+200+15 = 515; 1 cuenta = 365; caja incremental 0); costo por resultado indefinido sin proyectar tasa; seguimiento posterior pendiente y recomendación clara 2 condicionadas / 1 si no se confirma."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "Aritmética verificada (515 + 2·Tc; 365 + Tc; 157,50 + Tc; 257,50 + Tc); declara indefinido el costo por resultado pero añade escenarios hipotéticos por conversación y un reparto de licencia por mitades que no cambian la decisión."
+      },
+      "preferida": "1",
+      "motivo": "Mismo dimensionamiento correcto, sin los escenarios hipotéticos de costo por resultado y distinguiendo estimado, comprometido y consumido."
+    },
+    "P20": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "Responde no, entrega borrador con huecos marcados, un solo destinatario, brechas con cuándo se cierran y nada se envía/registra sin indicación; el borrador pide reunión de 20 minutos en el primer toque."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "Responde no, borrador como hipótesis con pregunta de una línea, objetivo como punto de entrada y no decisor, adicionales sin heredar respuesta, y autorización más vigencia pendientes antes de un envío."
+      },
+      "preferida": "empate",
+      "motivo": "Misma decisión y entregables equivalentes; la 2 es algo más breve y explícita en que la investigación no da permiso, la 1 detalla cuándo se cierra cada brecha."
+    },
+    "P18": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 4,
+        "sobrecautela": 1,
+        "ruido": 1,
+        "nota": "No crea el Contact vacío, CFO en mapa con autoridad y fuente, ruta por sponsor como pendiente y borrador; pero pone en duda la elegibilidad de los adicionales que el caso da por elegibles y deja su registro condicionado a confirmación persona por persona."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "No crea el Contact vacío, CFO en expediente con autoridad confirmada y brecha de correo/acceso visible, sponsor como oferta no como acceso probado, propone registrar a los cuatro elegibles dentro de la autorización y separa las escrituras que requieren OK."
+      },
+      "preferida": "2",
+      "motivo": "Usa la autorización dada para los cuatro elegibles en vez de reabrirla, y deja explícito que el sponsor es oferta y no acceso."
+    },
+    "P13": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "No cierra el mapa; cuatro personas una función; Finanzas, Seguridad, Compras y decisor como brechas con riesgo y vía; propuesta de aprobación parcial con brechas abiertas, exclusiones y condición para pasar a propuesta."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 4,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "No cierra el mapa; brechas de Finanzas, Seguridad y Compras con preguntas concretas vía el buyer; aprobación parcial explícita, aunque deja como pendiente confirmar qué aprobación preparar y no nombra la brecha de decisor/sponsor."
+      },
+      "preferida": "1",
+      "motivo": "Entrega la propuesta de aprobación ya armada con condición de paso a propuesta y cubre también la brecha de quién decide."
+    },
+    "P09": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "Fuera de piso, vacante no es demanda de agencia, buzón de reclutamiento no es canal comercial, ingreso de directorio no es presupuesto; dice qué cambiaría el veredicto. Cita un piso de 50 personas que el caso no enuncia (no verificable desde el caso, no lo contradice)."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 4,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "Misma decisión con las cuatro piezas del resultado esperado; la lista de condiciones de reapertura incluye señales especulativas (vacante abierta por semanas) y un ángulo de «necesidad recurrente» que los hechos no sostienen aún."
+      },
+      "preferida": "1",
+      "motivo": "Veredicto más directo y deja claro que confirmar ingresos por sí solo no cambia nada."
+    },
+    "P07": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "La pausa rige para toda la cuenta pese al Deal y a los correos verificados; no busca ni usa colegas; no pide fecha, revisión sujeta a la confirmación del comprador y chequeo interno sin habilitar envío; paradas propuestas, no aplicadas."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "parcial",
+        "omisiones": [
+          "Siguiente revisión condicionada a la confirmación: propone un mensaje de seguimiento pidiendo fecha estimada y fijar la revisión según la antigüedad del mensaje de espera"
+        ],
+        "errores_de_hecho": [],
+        "utilidad": 4,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "Acierta que la pausa gobierna y que no se entra por colegas, pero plantea escribir al contacto para pedirle fecha tras un «esperen, no avancen», lo que presiona la pausa aunque lo deje a decisión del operador."
+      },
+      "preferida": "1",
+      "motivo": "Respeta la pausa sin pedir fecha y deja la revisión atada a la confirmación del comprador."
+    },
+    "P03": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "No usa el correo de Banco Norte; «valid» no prueba que la casilla siga siendo suya; relación previa no se traslada al nuevo empleador; colegas de Banco Sur sólo como alternativa posterior sin cercanía fingida; CRM propuesto sin mover el Contact y pide revisar bajas previas."
+      },
+      "respuesta_2": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 0,
+        "nota": "No usa el correo anterior, descarta adivinar correo, usar colegas como puente y gastar créditos; reconexión manual para pedir el canal correcto; asume LinkedIn como red (el caso no la nombra) y propone, pendiente de autorización, pasar el registro a Banco Sur con correo vacío."
+      },
+      "preferida": "empate",
+      "motivo": "Misma decisión y siguiente paso; la 1 es más prudente con el CRM y revisa bajas previas, la 2 es más directa y su borrador no mezcla calificación."
+    },
+    "P01": {
+      "respuesta_1": {
+        "critico": false,
+        "evidencia_critico": "",
+        "veredicto": "pasa",
+        "omisiones": [],
+        "errores_de_hecho": [],
+        "utilidad": 5,
+        "sobrecautela": 0,
+        "ruido": 1,
+        "nota": "Autor y tercero sin Contact, dos colegas elegibles en registro preparado con nota que separa la demanda del autor, capacidad Colombia pendiente y cobertura explícita (4 investigadas, 2 elegibles); nombres de propiedades y de práctica interna no vienen del caso (no verificables desde el caso)."
+      },
+      "respuesta_2": {
+        "critico": true,
+        "evidencia_critico": "«Te dejo su registro preparado sin correo» y «el autor entra como registro incompleto (sin correo)»; la tabla «Registros propuestos» incluye al autor y al tercero con correo «—», «listo para cargar».",
+        "veredicto": "falla",
+        "omisiones": [
+          "Objetivo no se registra vacío (lo propone como registro incompleto sin correo)",
+          "Cobertura explícita como brecha del autor en vez de alta sin correo"
+        ],
+        "errores_de_hecho": [],
+        "utilidad": 3,
+        "sobrecautela": 1,
+        "ruido": 1,
+        "nota": "Separa bien la demanda del autor y deja pendiente la capacidad en Colombia, pero admite al autor como registro sin correo y a la vez reabre el criterio para los dos colegas que sí cumplen."
+      },
+      "preferida": "1",
+      "motivo": "No registra al autor vacío y deja el changeset de los dos elegibles listo con sus confirmaciones precisas."
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "pricing-v3-credit-budget/1",
+  "mode": "simulation",
+  "accountRef": "illustrative-client",
+  "providerId": "magnific",
+  "purchaseDate": "2026-10-09",
+  "useBy": "2026-10-31",
+  "requestedCredits": 25000,
+  "subscriptionCreditsAllocated": 15000,
+  "subscriptionCreditsAvailable": 15000,
+  "activeSubscription": true,
+  "allowRepeatedPacks": false
+}

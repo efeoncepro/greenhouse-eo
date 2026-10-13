@@ -1,5 +1,13 @@
 # TASK-1996 — Efeonce Insights: tarjetas de cifra con isotipo de canal y glifos Trazo en PDF, deck y Think
 
+## Delta 2026-10-12 — 22 isotipos
+
+- `CHANNEL_ISOTYPES` suma `facebook`, `threads` y `x` (versión en color de `axis-brand-assets` 0.4.25) en `insights-report`
+  e `insights-deck`; `src/config/insights-channel-isotypes.test.ts` los verifica byte a byte y exige uno por canal de
+  `INSIGHT_CHANNEL_IDS` (22). Think los tiene en producción (`efeonce-think` `236d549`). Greenhouse: develop, sin release.
+- `scripts/insights/sync-platform-isotypes.ts` (Slice 2) no existe: la copia es manual desde el paquete instalado y la
+  guarda es ese test. — por trabajo de deriva del pin AXIS (`7877dfe89`, `d4f1149b5`)
+
 ## Delta 2026-10-04 — glifos Trazo y los 19 isotipos (pedido del operador)
 
 - El operador pidió aprovechar los íconos e isotipos («reducen la carga cognitiva») y crear los que falten. Seis glifos
@@ -31,7 +39,7 @@
 - Motion: `docs/ui/motion/TASK-1975-efeonce-insights-stat-card-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Code complete en develop (2026-10-04, commit 6656fe1d0); Think en producción (fd83a3b). Falta el release de Greenhouse y la fidelidad contra las hojas Cifras-Canal (no medible: sin cromo de página)`
+- Status real: `En producción desde el release 9a906a164677 (2026-10-04); Think en producción (fd83a3b). Canary interno de Berel verde en producción (2026-10-04): la v1 rechazó el A4 por la metodología (9 líneas para 8), corregido en el release 7182af769; la revisión `insed-edd1f0b0…` renderizó A4 (27 págs.) y deck (20 láminas) al primer intento, con los tableros por asistente y por motor con sus isotipos. Falta la fidelidad contra las hojas Cifras-Canal (no medible: sin cromo de página)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1975` (tarjeta de cifra base en los catálogos y Think), `TASK-1990` (contrato con canal, contexto y glifo)
@@ -385,7 +393,7 @@ coincidencia, sólo el nombre.
 - [x] Se declaró `Execution profile: ui-ux`, `UI impact: layout` y el wireframe existe en `docs/ui/wireframes/TASK-1996-efeonce-insights-channel-stat-card-render.md`.
 - [ ] `UI ready` sigue en `no` hasta que las hojas aprobadas estén exportadas al repo y el wireframe y el contrato tengan mapping, GVC plan y decision log; si pasa a `yes`, `pnpm task:lint --task TASK-1996` queda sin hallazgos.
 - [x] AI Overview se dibuja con la lupa en color en A4, deck y Think (captura). Evidencia: `CHANNEL_ISOTYPES.google_ai_overview` y `EngineMark` de Think a `google-ai-overview`; `derivada-Cifras-Canal-Celdas.png`.
-- [x] Los 19 isotipos del catálogo coinciden con `PLATFORM_ASSET_SEALS` (el script falla si uno cambia). Parcial: los 9 que hoy tienen productor (motores, Google, Search Console, GA4, Greenhouse) están copiados y verificados byte a byte por `src/config/insights-channel-isotypes.test.ts`; los otros 10 entran con TASK-1991/1992, que producen sus hechos. Evidencia (2026-10-04): los 19 copiados y verificados byte a byte por `src/config/insights-channel-isotypes.test.ts`, que además exige uno por canal de `INSIGHT_CHANNEL_IDS`.
+- [x] Los 19 isotipos del catálogo coinciden con `PLATFORM_ASSET_SEALS` (el script falla si uno cambia). Desde 2026-10-12 son 22 (Facebook, Threads y X); la guarda es el test, no un script. Parcial: los 9 que hoy tienen productor (motores, Google, Search Console, GA4, Greenhouse) están copiados y verificados byte a byte por `src/config/insights-channel-isotypes.test.ts`; los otros 10 entran con TASK-1991/1992, que producen sus hechos. Evidencia (2026-10-04): los 19 copiados y verificados byte a byte por `src/config/insights-channel-isotypes.test.ts`, que además exige uno por canal de `INSIGHT_CHANNEL_IDS`.
 - [x] Un tablero mezclado lleva isotipo por celda con nombre del canal y contexto; un tablero de una plataforma lleva el canal sólo en el título; ninguna celda tiene isotipo y glifo juntos (fixtures y captura).
 - [x] Ningún ícono de cifra usa rutas Tabler; todos son glifos Trazo. Pendiente: el set Trazo no tiene glifo para clics, impresiones, CTR ni posición; hay que dibujarlos y aprobarlos antes del cambio. Evidencia (2026-10-04): campo `metricIcon` con glifos Trazo en cifras, comparación, metas y tabla; sello `metric-glyphs.axis.json` + `insights-metric-glyphs.test.ts`. Los íconos del antetítulo de figura siguen siendo el set de TASK-1889 (no son íconos de cifra).
 - [ ] Fidelidad ≤ 1 % contra `Premium-Cifras-Canal` y `Deck-Cifras-Canal` en color y en gris. No medible: las hojas del canvas no traen el cromo de página; revisión lado a lado en `docs/ui/visual-directions/TASK-1996-efeonce-insights-channel-stat-card-direction.md`. Las hojas aprobadas existentes siguen ≤ 1 % (cifras 0,05 % A4 y 0,53 % deck).

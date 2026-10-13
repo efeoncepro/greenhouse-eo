@@ -218,6 +218,21 @@ flag, 202 after.
   deploy / 154 s cold; task total 50–58 s. Local: 15 slides ~4.6 s, 25 slides ~7.2 s, RSS ≤ 365 MB.
 - Semantics seen live: `retry` re-queues only failed (completed untouched; content failures fail again, attempts →3 →
   `dead_letter`); `cancel` on a queued run ⇒ `cancelled`, 0 attempts; `retry` on cancelled ⇒ 200, no re-queue.
+- **Recovering a `dead_letter` / `cancelled` output (migration
+  `20261004152040741_insights-outputs-live-identity-partial-unique` APPLIED 2026-10-04 18:29Z; the already-deployed
+  command `7182af769` intended this, so it works now; `supersedes`/race-as-422/`requestable` arrive with the release):** ship the
+  fix first, then, with the edition still `ready_for_review`, `POST …/editions/<id>/render '{"outputs":["<target>"]}'`
+  with ONLY the dead targets (asking also for a target that is alive ⇒ `422` with `details.requestable`). Expect `202`, a
+  new run, the new output `queued` and its queued event with `detail.supersedes`. Do not `retry` (sealed manifest fails
+  again) and do not `revise` unless the edition left `ready_for_review` or the plan must change. Before the migration
+  is applied, the same request answers `500 internal_error` (total UNIQUE): the only path then is `revise`.
+- The migration is a relaxation, safe in both directions: apply it BEFORE releasing the command (the code before it
+  already intended this contract). Its Down fails on purpose once a terminal identity has a live successor; rows are
+  append-only, never delete to make the total index fit.
+- Live test of the index: `pnpm test:live src/lib/efeonce-insights/render` (needs the proxy on `127.0.0.1:15432`).
+  `render-identity.live.test.ts` runs as the `ops` profile and applies the migration's Up INSIDE a rolled-back
+  transaction (DDL needs the table owner; the runtime profile gets `must be owner of table insight_outputs`), so it
+  proves the real SQL without mutating the shared instance; it uses output `web`, which no real row has.
 - Staging canary (recipe used 2026-09-16; synthetic org "Greenhouse Demo", persona `agent-client`):
   1. `AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org pnpm staging:request POST /api/platform/app/insights/editions '<InsightRequestV1, outputs ["deck_pdf"]>'` → 202 `ready_for_review`.
   2. `… pnpm staging:request POST /api/platform/app/insights/editions/<editionId>/render '{}'` → 202, output `queued`.
@@ -386,3 +401,59 @@ revoked. Never record the one-time link token.
 - TASK-1962 necesita una edición nueva y lectura productiva de los campos de contenido; TASK-1957 necesita además el gate y la decisión AEO/copy. Crear/revisar/emitir/enviar no se ejecutó para arreglar documentación.
 - Cloud Run no se revalidó: gcloud exige reautenticación interactiva. No declarar salud o flags actuales del worker desde el Handoff. Ver auditoría y tareas para siguientes pasos.
 - Correcciones `8e4fbac7b`, `c782449f0` y `03e19f3ee` posteriores al release quedan pendientes de promoción/verificación; no son un release faltante del contrato de TASK-1962.
+
+## Alcance de contenido (TASK-2033 — tabla aplicada, Berel v1 fijado y código en staging + `ops-worker` desde 2026-10-12; Production sin release)
+
+**Sin flag.** Se activa por dato: una organización con una versión de alcance con reglas. Ninguna otra organización
+lo tiene.
+
+**Ver y fijar** (proxy Cloud SQL arriba; dry-run por defecto, sin `--apply` no escribe):
+
+```bash
+pnpm seo:content-scope --org=<organization_id> --label="Artículos y tutoriales" \
+  --prefix=/articulos --prefix=/tutoriales --exact=/guia-en-la-raiz
+```
+
+El dry-run muestra el alcance vigente, lo que el nuevo mediría frente al sitio completo en el último mes completo
+(`--from` / `--to` para otra ventana) y las 15 páginas con más clics que quedarían fuera. Con `--apply` exige
+`--reason="…"`. La tabla es append-only: no hay forma de borrar una versión, tampoco una de prueba.
+
+**Volver al sitio completo:** `pnpm seo:content-scope --org=<organization_id> --clear --reason="…" --apply`. Rige para
+la siguiente edición, sin deploy.
+
+**Estado por runtime (2026-10-12):** Vercel staging y `ops-worker` (`ops-worker-00773-z98`, `GIT_SHA=d9a1c6a2d`) ya
+leen el alcance; Vercel Production no, hasta el release a `main`. Mientras dure esa ventana, una edición programada
+(la arma el worker) o creada desde staging mide el alcance, y una creada desde el portal o la API de producción mide
+la propiedad completa. No se generó ninguna edición después del deploy: falta observar `contentScope` en las fuentes
+de una edición real de esos runtimes.
+
+**Orden de despliegue:** la tabla antes que el código (ya aplicada). El release debe incluir Vercel **y** el
+`ops-worker`: el tick de schedules arma ediciones con el adapter del worker, y un worker sin el cambio generaría la
+ocurrencia mensual con la propiedad completa. Verificar en una edición nueva que sus fuentes SEO traen `contentScope`.
+
+**Edición de septiembre de Berel:** las ediciones ya creadas (`insed-edd1f0b0…` v2 y anteriores) miden la propiedad
+completa y no cambian. Para la versión con alcance hay que revisar (`revise`) después del release y emitirla; los PDF
+entregados el 2026-10-12 son vistas previas locales y su portada dice «Sin emitir».
+
+**Leer una caída de GA4 antes de emitir:** en la edición de septiembre de Berel las visitas orgánicas al contenido
+bajan 51,9 % por UN artículo de agosto (`/articulos/como-bajar-la-temperatura-de-tu-casa`, 4.884 sesiones entre el 17 y
+el 30 de agosto, 90 % móvil, con Colombia, España y Venezuela; Search Console registró 8 clics de búsqueda en esas
+fechas). El patrón es el de Google Discover, que no se captura; se confirma en Search Console → Rendimiento →
+Discover. El informe no explica picos de una sola página: quien emite lo explica al entregar.
+
+**Mantenimiento del alcance de Berel:** `/articulos`, `/tutoriales`, `/inspiracion` (prefijos) y las guías
+`/pintura-y-barniz-para-madera-como-elegir` e `/impermeabilizante-para-azotea-como-elegir` (exactas). Una guía nueva
+publicada en la raíz no entra sola: hay que fijar una versión nueva que la incluya.
+
+**Portada y alcance:** la línea del alcance sólo aparece en la portada BLANCA del A4; la navy y el deck no tienen esa
+zona. Una organización con alcance y logo `on_dark` sale en navy por la regla `auto`: fijar su portada en blanca
+(`POST /api/platform/app/insights/cover-preference`, `coverTheme: light`) si el alcance debe verse en la portada.
+Berel está en blanca desde el 2026-10-12.
+
+**Vista previa real con alcance:** la de siempre (`scripts/insights/preview-edition.ts --editorial-v2`), con
+`GROWTH_SEO_WORK_QUEUE_ENABLED=true` y, para GA4, `GROWTH_GA4_ENABLED=true` más `GOOGLE_GA4_OAUTH_CLIENT_ID` y
+`GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF` del entorno de staging. Sin GA4 el informe sale con el límite «Google
+Analytics 4: sin datos suficientes» y cuatro páginas menos.
+
+**Pruebas en vivo (sólo lectura):** `pnpm test:live src/lib/growth/seo/content-scope`. Leer `passed`: sin credenciales
+se saltan en silencio.

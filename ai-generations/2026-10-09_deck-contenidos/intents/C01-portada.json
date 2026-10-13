@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Brochure · Marketing de Contenidos",
+    "question": "¿Quién crea mi contenido?",
+    "answer": [
+      "Tu squad"
+    ]
+  },
+  "body": "**Seis** frentes, un squad:\nSocial media · Influencers · Creadores y UGC\nListening · Social care · Paid social",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT1-portada-squad.png",
+    "alt": "Una creadora de Efeonce con hoodie, en una azotea de noche, levanta el teléfono con el que acaba de publicar un video: un haz de luz sube al cielo y el mismo video se enciende en pantallas por toda la ciudad"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

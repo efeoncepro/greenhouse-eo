@@ -1,0 +1,467 @@
+{
+  "reference": "EO–PIBANK–2027–01",
+  "status": "draft_for_review",
+  "currency": "PEN",
+  "sourceCurrency": "USD",
+  "presentation": {
+    "currency": "PEN",
+    "locale": "es-PE",
+    "fx": {
+      "from": "USD",
+      "to": "PEN",
+      "rate": "3.437",
+      "date": "2026-10-06",
+      "source": "BCRPData · TC Sistema bancario SBS · Venta · PD04640PD",
+      "sourceUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/diarias/resultados/PD04640PD/html",
+      "requestUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04640PD/json/2026-10-01/2026-10-08",
+      "retrievedAt": "2026-10-08T19:08:32.239055+00:00",
+      "purpose": "reference_conversion",
+      "quoteDate": "2026-10-08",
+      "rawSha256": "f7e0fef20d7fdb59a1ad94e5b485c65000108d6918bcb4c838447a84a2f5c9bb",
+      "unavailableDates": [
+        "2026-10-07",
+        "2026-10-08"
+      ],
+      "settlementRateAgreed": false
+    }
+  },
+  "principal": "gradual",
+  "annualNet": 272210.4,
+  "baseAnnual": 185598,
+  "activationsAnnual": 86612.4,
+  "sourceAnnualNet": 79200,
+  "tax": {
+    "status": "pending_billing_entity_and_tax_review",
+    "rate": null,
+    "amount": null,
+    "gross": null
+  },
+  "pages": 19,
+  "createdAt": "2026-10-08T19:18:33.601Z",
+  "review": {
+    "automaticLayout": {
+      "pages": [
+        {
+          "page": 1,
+          "contentBottom": 881.125,
+          "footerTop": 1032.171875,
+          "gap": 151.046875,
+          "overflow": false
+        },
+        {
+          "page": 2,
+          "contentBottom": 838.265625,
+          "footerTop": 1032.171875,
+          "gap": 193.90625,
+          "overflow": false
+        },
+        {
+          "page": 3,
+          "contentBottom": 934.125,
+          "footerTop": 1032.171875,
+          "gap": 98.046875,
+          "overflow": false
+        },
+        {
+          "page": 4,
+          "contentBottom": 944.5,
+          "footerTop": 1032.171875,
+          "gap": 87.671875,
+          "overflow": false
+        },
+        {
+          "page": 5,
+          "contentBottom": 1007.390625,
+          "footerTop": 1032.171875,
+          "gap": 24.78125,
+          "overflow": false
+        },
+        {
+          "page": 6,
+          "contentBottom": 957.609375,
+          "footerTop": 1032.171875,
+          "gap": 74.5625,
+          "overflow": false
+        },
+        {
+          "page": 7,
+          "contentBottom": 927.921875,
+          "footerTop": 1032.171875,
+          "gap": 104.25,
+          "overflow": false
+        },
+        {
+          "page": 8,
+          "contentBottom": 946.75,
+          "footerTop": 1032.171875,
+          "gap": 85.421875,
+          "overflow": false
+        },
+        {
+          "page": 9,
+          "contentBottom": 1008.703125,
+          "footerTop": 1032.171875,
+          "gap": 23.46875,
+          "overflow": false
+        },
+        {
+          "page": 10,
+          "contentBottom": 1005.640625,
+          "footerTop": 1032.171875,
+          "gap": 26.53125,
+          "overflow": false
+        },
+        {
+          "page": 11,
+          "contentBottom": 981.640625,
+          "footerTop": 1032.171875,
+          "gap": 50.53125,
+          "overflow": false
+        },
+        {
+          "page": 12,
+          "contentBottom": 916.828125,
+          "footerTop": 1032.171875,
+          "gap": 115.34375,
+          "overflow": false
+        },
+        {
+          "page": 13,
+          "contentBottom": 950,
+          "footerTop": 1032.171875,
+          "gap": 82.171875,
+          "overflow": false
+        },
+        {
+          "page": 14,
+          "contentBottom": 788.484375,
+          "footerTop": 1032.171875,
+          "gap": 243.6875,
+          "overflow": false
+        },
+        {
+          "page": 15,
+          "contentBottom": 922.75,
+          "footerTop": 1032.171875,
+          "gap": 109.421875,
+          "overflow": false
+        },
+        {
+          "page": 16,
+          "contentBottom": 1000.78125,
+          "footerTop": 1032.171875,
+          "gap": 31.390625,
+          "overflow": false
+        },
+        {
+          "page": 17,
+          "contentBottom": 941.09375,
+          "footerTop": 1032.171875,
+          "gap": 91.078125,
+          "overflow": false
+        },
+        {
+          "page": 18,
+          "contentBottom": 784.953125,
+          "footerTop": 1032.171875,
+          "gap": 247.21875,
+          "overflow": false
+        },
+        {
+          "page": 19,
+          "contentBottom": 833.09375,
+          "footerTop": 1032.171875,
+          "gap": 199.078125,
+          "overflow": false
+        }
+      ],
+      "brokenImages": 0,
+      "unresolvedSlots": false,
+      "fontStatus": "loading",
+      "fonts": [
+        {
+          "family": "Bricolage Grotesque",
+          "status": "loaded"
+        },
+        {
+          "family": "Poppins",
+          "status": "loaded"
+        },
+        {
+          "family": "Poppins",
+          "status": "loaded"
+        },
+        {
+          "family": "Poppins",
+          "status": "loaded"
+        },
+        {
+          "family": "Poppins",
+          "status": "unloaded"
+        }
+      ],
+      "horizontalOverflow": [],
+      "mobile": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "overflow": false
+      }
+    },
+    "moneyValidated": true,
+    "moneyAudit": {
+      "base": {
+        "annualMinor": "18559800",
+        "moduleSumMinor": "18559800",
+        "monthSumMinor": "18559800",
+        "monthsReconcile": true,
+        "unitsReconcile": true
+      },
+      "gradual": {
+        "annualMinor": "27221040",
+        "moduleSumMinor": "27221040",
+        "monthSumMinor": "27221040",
+        "monthsReconcile": true,
+        "unitsReconcile": true
+      },
+      "integral": {
+        "annualMinor": "30658040",
+        "moduleSumMinor": "30658040",
+        "monthSumMinor": "30658040",
+        "monthsReconcile": true,
+        "unitsReconcile": true
+      }
+    },
+    "visualPdf": "passed_all_19_pages",
+    "pdfTextAndPageAudit": "passed_19_a4_embedded_fonts_selectable_text",
+    "bankTargetsPreservedUSD": true,
+    "taxRemainsPending": true,
+    "pdfInspection": {
+      "initialAllPages": "pen-v2",
+      "identicalFinalPages": 16,
+      "reinspectedFinalPages": [
+        4,
+        10,
+        19
+      ],
+      "artifacts": "qa/",
+      "initialQaLocation": ".captures/pibank-cotizacion-pen-v2-2026-10-08/qa"
+    }
+  },
+  "sourceDataSha256": "398ba26c638388d5feed22861bcc1d4bce8cce1d7b78cd12580aa016c2c377d9",
+  "implementation": [
+    {
+      "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/cotizacion-detallada-2026-10-08/render.mjs",
+      "sha256": "89352d27c1971548e41d7ba6c5dabe6fe64678047d8a80895e6945bc2a3edd05"
+    },
+    {
+      "file": "scripts/documents/document-money.mjs",
+      "sha256": "8414e6cdecbf7844328c0aeb8b609009fb9f61e3785e3527f1d7d0576ab50a7a"
+    }
+  ],
+  "brand": {
+    "line": "engine",
+    "assets": [
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+        "source": "@efeoncepro/axis-brand-assets:efeonce-logo-positive",
+        "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e",
+        "bytes": 4383
+      },
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+        "source": "@efeoncepro/axis-brand-assets:url-bubble-baked-light",
+        "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8",
+        "bytes": 9410
+      },
+      {
+        "file": "docs/commercial/prospects/banco-pichincha-peru-seo-2026/propuesta/assets/pibank-logo-inverso.svg",
+        "source": "Paquete Pibank existente; referencia de identidad https://www.pibank.pe/",
+        "sha256": "9fe7a6e92874f08529a16f56bdcc31cd525ba28195398c2da346f3d716a12c6c",
+        "bytes": 7008
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+        "source": "axis-fonts",
+        "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682",
+        "bytes": 408496
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+        "source": "axis-fonts",
+        "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a",
+        "bytes": 158240
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+        "source": "axis-fonts",
+        "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016",
+        "bytes": 152860
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+        "source": "axis-fonts",
+        "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5",
+        "bytes": 151516
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+        "source": "axis-fonts",
+        "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e",
+        "bytes": 150292
+      }
+    ],
+    "orbit": {
+      "schema": "axis.graphic-line-orbit-composition.v1",
+      "contract": {
+        "id": "efeonce.graphic-line-orbit",
+        "version": "0.3.1"
+      },
+      "canvas": {
+        "width": 794,
+        "height": 1123,
+        "line": "engine",
+        "product": "wave",
+        "platform": null,
+        "surface": "light",
+        "channel": "print",
+        "scale": 1,
+        "socialMultiplierApplied": false
+      },
+      "palette": {
+        "accent": "#0375db",
+        "background": "#f7f8f6",
+        "ring": "#72ded8",
+        "halo": "#72ded8"
+      },
+      "elements": [
+        {
+          "kind": "orbit",
+          "id": "orbit",
+          "placement": {
+            "region": "center",
+            "radius": {
+              "ratio": 0.3,
+              "of": "width"
+            }
+          },
+          "ring": {
+            "strokePx": 1,
+            "opacity": 0.16,
+            "color": "#023c70",
+            "innerOrbits": [
+              {
+                "radiusRatio": 0.72,
+                "opacity": 0.11
+              },
+              {
+                "radiusRatio": 0.44,
+                "opacity": 0.06
+              }
+            ]
+          },
+          "innerOrbits": false,
+          "arc": {
+            "startDeg": 65,
+            "sweepDeg": 50,
+            "strokePx": 1.6,
+            "color": "#0375db",
+            "linecap": "round",
+            "gradient": false
+          },
+          "trajectory": {
+            "meaning": "accent",
+            "origin": null,
+            "direction": "clockwise",
+            "sweepDeg": 50,
+            "value": null,
+            "valueLabel": null,
+            "pairsWithNumber": false
+          },
+          "sphere": {
+            "radiusPx": 3.5,
+            "color": "#0375db",
+            "at": "arc-end",
+            "ring": null
+          },
+          "halo": null
+        }
+      ],
+      "adapterChecks": [
+        "text-never-crosses-ring",
+        "ring-center-on-target-center",
+        "sphere-on-arc-end",
+        "lens-subject-inside-circle",
+        "url-as-bubble-never-text",
+        "decorative-svg-hidden-from-accessibility-tree",
+        "signature-centered",
+        "signature-min-contrast",
+        "accent-text-min-size",
+        "orbit-never-over-subject-or-reserves",
+        "accent-arc-never-reads-as-data",
+        "answer-period-part-of-text",
+        "measure-shows-value-and-source"
+      ]
+    },
+    "contactSource": "src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json"
+  },
+  "sources": [
+    {
+      "file": "oferta-hibrida/OFERTA-PARA-PIBANK.md",
+      "sha256": "5374c4832f0f320fc7ffdc03dfbd3683e295562b74acc5b3f9a69291fe911cef"
+    },
+    {
+      "file": "oferta-hibrida/capacidades-y-precios.csv",
+      "sha256": "c43730442502c45ff301512c9b2441fda3c459a178c7ad2c8848fe21d554f4d2"
+    },
+    {
+      "file": "oferta-hibrida/activaciones-mensuales.csv",
+      "sha256": "e6688f4ebf802c009692754f05543e6d6a58c5c29d206271215abec080dfc0ac"
+    },
+    {
+      "file": "oferta-hibrida/ACUERDOS-DE-ENTREGA.md",
+      "sha256": "8835c3ec1a1efb5ce502eca5782c0bf2d5df0c0600f81998cc4f530e4edb1cfe"
+    },
+    {
+      "file": "oferta-hibrida/SEO-TECNICO-Y-AUTORIDAD.md",
+      "sha256": "7f4e3dc1c980e9774b5f147defa402fece809dec500a32f9649b44ee388aa53f"
+    },
+    {
+      "file": "oferta-hibrida/AEO-Y-AUTORIDAD.md",
+      "sha256": "4657601578133a781b700bc1c2defcc403ec12f30166df004d88d4c35d552a29"
+    },
+    {
+      "file": "oferta-hibrida/COMUNIDAD-Y-RECORRIDO.md",
+      "sha256": "ddac705000808458d1294f82019927c3626bda5a0f313ac0a8e909b0462e4aeb"
+    },
+    {
+      "file": "complemento-2026-10-08/README.md",
+      "sha256": "62ef83ff1aff323bb5260ac459f73baaf93615e4f594e869ded1e598e487fd3b"
+    },
+    {
+      "file": "estimacion-seo-aeo-2026-10-08/README.md",
+      "sha256": "f478f37b83993c480a9bf27a790f5f9cae6111ad8ba839f0e707ba2295a42e6d"
+    },
+    {
+      "file": "meta-integrada-2026-10-08/README.md",
+      "sha256": "8ad7ad392e05c60dddd7cd5bf6e2954421774116c78ed89400a00b30c47e713c"
+    }
+  ],
+  "outputs": [
+    {
+      "file": "Pibank-Cotizacion-detallada-2027-PEN.html",
+      "sha256": "c610fe79eff007b0b20a65bf84bd43a18879e8904b645b887a7897440b71190f",
+      "bytes": 1801960
+    },
+    {
+      "file": "Pibank-Cotizacion-detallada-2027-PEN.pdf",
+      "sha256": "0fe7cf0808e512a2a4a56ee90000130c572f15619b2e572044c375eb90e58cdf",
+      "bytes": 738423
+    }
+  ],
+  "authority": {
+    "commerciallyAccepted": false,
+    "sent": false,
+    "crmUpdated": false,
+    "greenhouseQuoteId": null
+  }
+}

@@ -130,6 +130,10 @@ export const AGGREGATE_TYPES = {
   proposal: 'proposal',
   // Efeonce Insights (TASK-1845): biblioteca de entregas congeladas por org
   insightReport: 'insight_report',
+  // Cotizador V3 en la plataforma (TASK-2025, EPIC-053): un documento fuente guardado por huella y el puntero de
+  // versiones vigentes. El aggregate de la cotización nace con los comandos de TASK-2027.
+  quoterSourceDocument: 'quoter_source_document',
+  quoterPointer: 'quoter_pointer',
   insightEdition: 'insight_edition',
   // TASK-1846 — render durable: la solicitud de outputs de una edición
   insightRenderRun: 'insight_render_run',
@@ -605,6 +609,10 @@ export const EVENT_TYPES = {
   // contenido de RFP, precios de costo ni evidencia cruda)
   proposalCreated: 'commercial.proposal.created',
   proposalStateTransitioned: 'commercial.proposal.state_transitioned',
+  // Cotizador V3 (TASK-2025) — payloads v1: rol, versión, huellas y origen. Nunca el texto de un documento ni de
+  // un puntero: llevan costos y márgenes internos.
+  quoterSourceDocumentStored: 'commercial.quoter.source_document.stored',
+  quoterPointerActivated: 'commercial.quoter.pointer.activated',
   proposalRfpIngested: 'commercial.proposal.rfp_ingested',
   proposalEvidenceRecorded: 'commercial.proposal.evidence_recorded',
   proposalRequirementDeclared: 'commercial.proposal.requirement_declared',

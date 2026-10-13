@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-service-lanes",
+  "voice": {
+    "eyebrow": "Seis capacidades",
+    "question": "¿Qué hace mi squad?",
+    "answer": [
+      "Todo el oficio"
+    ]
+  },
+  "lanes": [
+    {
+      "icon": "paleta",
+      "title": "Squad creativo",
+      "products": "Managed Creative Capacity",
+      "description": "Capacidad recurrente y priorizada, con responsabilidad de entrega."
+    },
+    {
+      "icon": "pincel",
+      "title": "Brand systems",
+      "products": "Estrategia e identidad",
+      "description": "Posicionamiento, identidad verbal y visual, y un sistema de marca usable."
+    },
+    {
+      "icon": "megafono",
+      "title": "Campañas",
+      "products": "Plataforma creativa",
+      "description": "Idea, key visual, mensajes y toolkit multicanal con sus adaptaciones."
+    },
+    {
+      "icon": "like",
+      "title": "Contenido y social",
+      "products": "Content & Social Ops",
+      "description": "Pilares, calendario, producción, publicación, comunidad y reporte."
+    },
+    {
+      "icon": "pelicula",
+      "title": "Audiovisual",
+      "products": "Video, motion y audio",
+      "description": "Producción, edición, motion, audio y finishing para cada formato."
+    },
+    {
+      "icon": "camara",
+      "title": "Run & Gun",
+      "products": "Captura ágil",
+      "description": "Entrevistas, b-roll, reels y testimonios en una jornada con crew."
+    }
+  ],
+  "phases": [
+    "Diagnóstico",
+    "Instalar",
+    "Operar",
+    "Expandir"
+  ],
+  "line": "brand",
+  "use": "brochure"
+}

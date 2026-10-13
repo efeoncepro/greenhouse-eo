@@ -1,14 +1,14 @@
 {
   "schema": "axis.aeo-xray-distribution.v1",
   "contract": "efeonce.aeo-xray",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "source": "axis-design-system",
   "task": "TASK-1950",
   "files": {
-    "aeo-xray-experience.js": "a891c15222f9a04f3119c700836f7e99f3687476873a7da0d178f4d62829da29",
-    "aeo-xray-experience.d.ts": "2ba81b8915a6187ab96584281377cff33fe13755bd23f1f26b365861e1db92bd",
-    "aeo-xray.js": "c44469871e394637f92cb501de51eb763ed611591ee9a2804f2b2a9d6937d86d",
-    "aeo-xray.d.ts": "b483011d750e7eb0cdb0a43d0abac64d7d1ef67ede1ef47dceed19498b03fc99",
+    "aeo-xray-experience.js": "ead166b2e64c7cf477bcec995361a6dc8a9b991ca31edb5df3b74009bd3b2ffd",
+    "aeo-xray-experience.d.ts": "e55159b18e1d77e1f608e4a97727e82ca20ff49c8bdafccf9cd1f1628d436f81",
+    "aeo-xray.js": "5dcc6dc8c5a2fdc7004ea7c48730292f521c4b06a77f81848e3939e0e9819a0c",
+    "aeo-xray.d.ts": "fd2176fffeb1dfc6f5f0241d1dbac4006f2dd5bd39a6227651257a42f3efced0",
     "aeo-xray-tokens.js": "e28fe5984e536a3dd400f4a42169f28998553c124becc2b8a5cc8c66d63b8912",
     "aeo-xray-tokens.d.ts": "9cd26c7bd9be7a2f710b1c58858969ffc976791d4460af8c2e15285fe2be6550",
     "tokens.json": "df9c2ac062aab8865bdd1b03ef142f0c3687200dbd8d480b0f33045008085c41"

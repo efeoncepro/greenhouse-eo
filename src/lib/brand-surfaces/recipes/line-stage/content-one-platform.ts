@@ -90,7 +90,7 @@ export const contentOnePlatform: RecipeBuilder = ({ intent, manifest, recipe }) 
   const areas = exactly<AreaIntent>(intent.workAreas, products.max, `Las áreas de trabajo (\`workAreas\`)`)
   const a = (intent.account ?? {}) as AccountIntent
   const facts = exactly<FactIntent>(a.facts, account.facts.max, 'Los hechos de la cuenta (`account.facts`)')
-  const icons = areas.map((area, i) => productIcon(area.icon, `El área ${i + 1} (\`workAreas[${i}].icon\`)`))
+  const icons = areas.map((area, i) => productIcon(area.icon, `El área ${i + 1} (\`workAreas[${i}].icon\`)`, line))
 
   const { stage, platform } = stageLayers(manifest, recipe, line, 'opl', { dx })
 

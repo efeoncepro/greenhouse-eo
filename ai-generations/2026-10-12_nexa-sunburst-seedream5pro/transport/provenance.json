@@ -1,0 +1,82 @@
+[
+  {
+    "source": "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png",
+    "file": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro/transport/nexa-ancla-1-rostro-frontal-v2.jpg",
+    "originalSha256": "2937f1fe3d37383d2e80b74282a8543eb30e161c92c25d98717552ac8a850aa2",
+    "transportSha256": "ebd649958883a3910e2915331a92080a2a65211e6fcec443ddc4411c1f5781a0",
+    "width": 2560,
+    "height": 3200,
+    "bytes": 3351261,
+    "conversion": "jpeg98 4:4:4, dimensions unchanged"
+  },
+  {
+    "source": "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-08-conviccion.png",
+    "file": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro/transport/nexa-expr-08-conviccion.jpg",
+    "originalSha256": "72613f246cc9abb8661e7b7bbfe874c6514ce2b19b21c0c80b99db4a9c6bfa0b",
+    "transportSha256": "e27a6505e75649d626b5e105ea287f0d06dfe0df95375ab5d59b5ee89c5ed58d",
+    "width": 2048,
+    "height": 2560,
+    "bytes": 2369675,
+    "conversion": "jpeg98 4:4:4, dimensions unchanged"
+  },
+  {
+    "source": "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png",
+    "file": "ai-generations/2026-10-12_nexa-sunburst-seedream5pro/transport/nexa-ancla-5-cuerpo-frontal.jpg",
+    "originalSha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1",
+    "transportSha256": "e6fd44062aaf709d9e31f506c892869957e02a0b8ca15bf6ed2d3d6531e03a99",
+    "width": 2304,
+    "height": 3456,
+    "bytes": 2900724,
+    "conversion": "jpeg98 4:4:4, dimensions unchanged"
+  },
+  {
+    "source": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png",
+    "file": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png",
+    "originalSha256": "db9ab79d68cfeece7a28a9c795df1e021e3599d70252d57cc44e3ef0865d416c",
+    "transportSha256": "db9ab79d68cfeece7a28a9c795df1e021e3599d70252d57cc44e3ef0865d416c",
+    "width": 1200,
+    "height": 1330,
+    "bytes": 2090220,
+    "conversion": "original bytes"
+  },
+  {
+    "source": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png",
+    "file": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png",
+    "originalSha256": "77314300dfd9b36df54ed9eab8a50d8449c02ee76ec4cfe022ad3839a464b196",
+    "transportSha256": "77314300dfd9b36df54ed9eab8a50d8449c02ee76ec4cfe022ad3839a464b196",
+    "width": 1600,
+    "height": 1600,
+    "bytes": 4470666,
+    "conversion": "original bytes"
+  },
+  {
+    "source": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-transparente.png",
+    "file": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-transparente.png",
+    "originalSha256": "524d6398be9ff3ad043595ce88995c7a62c125459415c7d3f62d6aaad57e9944",
+    "transportSha256": "524d6398be9ff3ad043595ce88995c7a62c125459415c7d3f62d6aaad57e9944",
+    "width": 1600,
+    "height": 1600,
+    "bytes": 244624,
+    "conversion": "original bytes"
+  },
+  {
+    "source": "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-05-cine.png",
+    "file": "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-reportes-05-cine.png",
+    "originalSha256": "0ce19fc8d7576f6aeca52970d44386052da04f4145857ec7b8f4f82a40cf3267",
+    "transportSha256": "0ce19fc8d7576f6aeca52970d44386052da04f4145857ec7b8f4f82a40cf3267",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 158945,
+    "conversion": "original bytes"
+  },
+  {
+    "source": "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-05-cine.png",
+    "file": "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-05-cine.png",
+    "originalSha256": "94aedf9b8d9ec051012a5491a18887c4e7246c5da30f98617c2fb3541c1801ca",
+    "transportSha256": "94aedf9b8d9ec051012a5491a18887c4e7246c5da30f98617c2fb3541c1801ca",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 176297,
+    "conversion": "original bytes"
+  }
+]

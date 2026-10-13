@@ -1,0 +1,113 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "engine",
+  "sections": 5,
+  "pages": [
+    {
+      "role": "decision",
+      "recipe": "decision-case",
+      "line": "growth",
+      "theme": "light",
+      "voice": {
+        "eyebrow": "Caso de éxito",
+        "question": "¿Qué cambió con Sky?",
+        "answer": [
+          "Más visible"
+        ]
+      },
+      "figures": [
+        {
+          "value": "+65 %",
+          "label": "impresiones orgánicas",
+          "source": "Sky, 6 meses de SEO/AEO editorial. Citabilidad: ChatGPT y Perplexity."
+        },
+        {
+          "value": "+39 %",
+          "label": "citabilidad en IA",
+          "source": "Sky, 6 meses de SEO/AEO editorial. Citabilidad: ChatGPT y Perplexity."
+        },
+        {
+          "value": "+27 %",
+          "label": "clics orgánicos",
+          "source": "Sky, 6 meses de SEO/AEO editorial. Citabilidad: ChatGPT y Perplexity."
+        },
+        {
+          "value": "6 meses",
+          "label": "de estrategia editorial",
+          "source": "Sky, 6 meses de SEO/AEO editorial. Citabilidad: ChatGPT y Perplexity."
+        }
+      ],
+      "clientLogo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+        "alt": "Sky Airline"
+      },
+      "selected": 2,
+      "photo": {
+        "register": "puesta-en-escena",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS2-banco-bice.png",
+        "alt": "Una viajera mira Santiago al amanecer desde una terraza, con su teléfono en la mano"
+      },
+      "selection": {
+        "target": "object",
+        "label": "AEO",
+        "participantKind": "department"
+      }
+    },
+    {
+      "role": "decision",
+      "recipe": "decision-case",
+      "line": "growth",
+      "theme": "light",
+      "voice": {
+        "eyebrow": "Caso de éxito",
+        "question": "¿Qué cambió con Berel?",
+        "answer": [
+          "Lo eligen"
+        ]
+      },
+      "figures": [
+        {
+          "value": "+54 %",
+          "label": "tráfico orgánico",
+          "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+        },
+        {
+          "value": "+120",
+          "label": "páginas de color",
+          "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+        },
+        {
+          "value": "×2",
+          "label": "citas en respuestas IA",
+          "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+        },
+        {
+          "value": "+38 %",
+          "label": "búsquedas de la marca",
+          "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+        }
+      ],
+      "clientLogo": {
+        "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+        "alt": "Berel"
+      },
+      "selected": 2,
+      "photo": {
+        "register": "puesta-en-escena",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS3b-berel-squad.png",
+        "alt": "La líder de marketing de Berel y una estratega de Efeonce eligen juntas un color entre las muestras de la temporada"
+      },
+      "selection": {
+        "target": "object",
+        "label": "SEO",
+        "participantKind": "department"
+      }
+    }
+  ]
+}

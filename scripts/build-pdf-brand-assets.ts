@@ -10,8 +10,10 @@
 //
 // Run on demand: pnpm tsx scripts/build-pdf-brand-assets.ts
 // TASK-1938 report only: pnpm tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report
+//   Re-run on every @efeoncepro/axis-brand-assets version change: the PNGs and ai-visibility-assets.manifest.json
+//   are sealed against the installed package (report-pdf-assets.test.ts fails otherwise).
 //
-// Re-run only when sub-brand logos change. Output is committed.
+// Legacy mode: re-run only when sub-brand logos change. Output is committed.
 
 import { mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'

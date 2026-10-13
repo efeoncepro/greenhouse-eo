@@ -1,0 +1,1053 @@
+{
+  "as_of": "2026-10-08",
+  "nature": "partial_panel_conditional_simulation_not_bank_forecast_or_incrementality",
+  "target_funded": 15200,
+  "ticket_usd": 2500,
+  "target_usd": 38000000,
+  "historical_coverage": "2026-01 through 2026-08, all 19 exact panel representatives",
+  "missing_history": "2026-09 through 2026-12: flat existing snapshot, explicitly assumed",
+  "retrospective_product_availability": "counterfactual assumption from January; not verified launch date",
+  "opening_rate": 0.02,
+  "funding_rate": 0.65,
+  "lead_rate": null,
+  "overlap_deduplicated_users": false,
+  "traffic_baseline": null,
+  "whole_program_incremental_forecast": null,
+  "provider_calls": 0,
+  "summaries": [
+    {
+      "period": "2027_plano",
+      "calendar": "original",
+      "scenario": "prudente",
+      "visits": 2993.2,
+      "openings": 59.864,
+      "funded_lag0": 38.91159999999999,
+      "usd_ticket_equivalent": 97278.99999999999,
+      "funded_by_december_if_all_fund_next_month": 31.7824,
+      "funded_next_january": 7.129199999999999,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 16.0,
+          "openings": 0.32,
+          "funded": 0.208
+        },
+        {
+          "month": 2,
+          "visits": 35.620000000000005,
+          "openings": 0.7124000000000001,
+          "funded": 0.46306
+        },
+        {
+          "month": 3,
+          "visits": 65.91999999999999,
+          "openings": 1.3183999999999998,
+          "funded": 0.8569599999999998
+        },
+        {
+          "month": 4,
+          "visits": 101.23,
+          "openings": 2.0246,
+          "funded": 1.31599
+        },
+        {
+          "month": 5,
+          "visits": 141.68,
+          "openings": 2.8336,
+          "funded": 1.84184
+        },
+        {
+          "month": 6,
+          "visits": 190.13000000000002,
+          "openings": 3.8026000000000004,
+          "funded": 2.47169
+        },
+        {
+          "month": 7,
+          "visits": 261.68,
+          "openings": 5.2336,
+          "funded": 3.40184
+        },
+        {
+          "month": 8,
+          "visits": 319.44,
+          "openings": 6.3888,
+          "funded": 4.1527199999999995
+        },
+        {
+          "month": 9,
+          "visits": 377.9,
+          "openings": 7.558,
+          "funded": 4.912699999999999
+        },
+        {
+          "month": 10,
+          "visits": 439.2,
+          "openings": 8.784,
+          "funded": 5.7096
+        },
+        {
+          "month": 11,
+          "visits": 496.0,
+          "openings": 9.92,
+          "funded": 6.4479999999999995
+        },
+        {
+          "month": 12,
+          "visits": 548.4,
+          "openings": 10.968,
+          "funded": 7.129199999999999
+        }
+      ]
+    },
+    {
+      "period": "2027_plano",
+      "calendar": "original",
+      "scenario": "trabajo",
+      "visits": 7483.0,
+      "openings": 149.66,
+      "funded_lag0": 97.279,
+      "usd_ticket_equivalent": 243197.5,
+      "funded_by_december_if_all_fund_next_month": 79.456,
+      "funded_next_january": 17.823,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 40.0,
+          "openings": 0.8,
+          "funded": 0.52
+        },
+        {
+          "month": 2,
+          "visits": 89.05,
+          "openings": 1.781,
+          "funded": 1.1576499999999998
+        },
+        {
+          "month": 3,
+          "visits": 164.8,
+          "openings": 3.2960000000000003,
+          "funded": 2.1424
+        },
+        {
+          "month": 4,
+          "visits": 253.075,
+          "openings": 5.0615,
+          "funded": 3.2899749999999996
+        },
+        {
+          "month": 5,
+          "visits": 354.2,
+          "openings": 7.084,
+          "funded": 4.6046
+        },
+        {
+          "month": 6,
+          "visits": 475.325,
+          "openings": 9.5065,
+          "funded": 6.179225
+        },
+        {
+          "month": 7,
+          "visits": 654.2,
+          "openings": 13.084000000000001,
+          "funded": 8.5046
+        },
+        {
+          "month": 8,
+          "visits": 798.6,
+          "openings": 15.972000000000001,
+          "funded": 10.3818
+        },
+        {
+          "month": 9,
+          "visits": 944.75,
+          "openings": 18.895,
+          "funded": 12.281749999999999
+        },
+        {
+          "month": 10,
+          "visits": 1098.0,
+          "openings": 21.96,
+          "funded": 14.274
+        },
+        {
+          "month": 11,
+          "visits": 1240.0,
+          "openings": 24.8,
+          "funded": 16.12
+        },
+        {
+          "month": 12,
+          "visits": 1371.0,
+          "openings": 27.42,
+          "funded": 17.823
+        }
+      ]
+    },
+    {
+      "period": "2027_plano",
+      "calendar": "original",
+      "scenario": "expansion",
+      "visits": 14966.0,
+      "openings": 299.32,
+      "funded_lag0": 194.558,
+      "usd_ticket_equivalent": 486395.0,
+      "funded_by_december_if_all_fund_next_month": 158.912,
+      "funded_next_january": 35.646,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 80.0,
+          "openings": 1.6,
+          "funded": 1.04
+        },
+        {
+          "month": 2,
+          "visits": 178.1,
+          "openings": 3.562,
+          "funded": 2.3152999999999997
+        },
+        {
+          "month": 3,
+          "visits": 329.6,
+          "openings": 6.5920000000000005,
+          "funded": 4.2848
+        },
+        {
+          "month": 4,
+          "visits": 506.15,
+          "openings": 10.123,
+          "funded": 6.579949999999999
+        },
+        {
+          "month": 5,
+          "visits": 708.4,
+          "openings": 14.168,
+          "funded": 9.2092
+        },
+        {
+          "month": 6,
+          "visits": 950.65,
+          "openings": 19.013,
+          "funded": 12.35845
+        },
+        {
+          "month": 7,
+          "visits": 1308.4,
+          "openings": 26.168000000000003,
+          "funded": 17.0092
+        },
+        {
+          "month": 8,
+          "visits": 1597.2,
+          "openings": 31.944000000000003,
+          "funded": 20.7636
+        },
+        {
+          "month": 9,
+          "visits": 1889.5,
+          "openings": 37.79,
+          "funded": 24.563499999999998
+        },
+        {
+          "month": 10,
+          "visits": 2196.0,
+          "openings": 43.92,
+          "funded": 28.548
+        },
+        {
+          "month": 11,
+          "visits": 2480.0,
+          "openings": 49.6,
+          "funded": 32.24
+        },
+        {
+          "month": 12,
+          "visits": 2742.0,
+          "openings": 54.84,
+          "funded": 35.646
+        }
+      ]
+    },
+    {
+      "period": "2026_contrafactual",
+      "calendar": "original",
+      "scenario": "prudente",
+      "visits": 2937.39,
+      "openings": 58.7478,
+      "funded_lag0": 38.186069999999994,
+      "usd_ticket_equivalent": 95465.17499999999,
+      "funded_by_december_if_all_fund_next_month": 31.056869999999996,
+      "funded_next_january": 7.129199999999999,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 16.880000000000003,
+          "openings": 0.33760000000000007,
+          "funded": 0.21944000000000002
+        },
+        {
+          "month": 2,
+          "visits": 31.140000000000004,
+          "openings": 0.6228000000000001,
+          "funded": 0.40482
+        },
+        {
+          "month": 3,
+          "visits": 70.08,
+          "openings": 1.4016,
+          "funded": 0.91104
+        },
+        {
+          "month": 4,
+          "visits": 101.67,
+          "openings": 2.0334,
+          "funded": 1.32171
+        },
+        {
+          "month": 5,
+          "visits": 136.36,
+          "openings": 2.7272000000000003,
+          "funded": 1.77268
+        },
+        {
+          "month": 6,
+          "visits": 164.11,
+          "openings": 3.2822000000000005,
+          "funded": 2.13343
+        },
+        {
+          "month": 7,
+          "visits": 240.81,
+          "openings": 4.8162,
+          "funded": 3.13053
+        },
+        {
+          "month": 8,
+          "visits": 314.84,
+          "openings": 6.296799999999999,
+          "funded": 4.0929199999999994
+        },
+        {
+          "month": 9,
+          "visits": 377.9,
+          "openings": 7.558,
+          "funded": 4.912699999999999
+        },
+        {
+          "month": 10,
+          "visits": 439.2,
+          "openings": 8.784,
+          "funded": 5.7096
+        },
+        {
+          "month": 11,
+          "visits": 496.0,
+          "openings": 9.92,
+          "funded": 6.4479999999999995
+        },
+        {
+          "month": 12,
+          "visits": 548.4,
+          "openings": 10.968,
+          "funded": 7.129199999999999
+        }
+      ]
+    },
+    {
+      "period": "2026_contrafactual",
+      "calendar": "original",
+      "scenario": "trabajo",
+      "visits": 7343.475,
+      "openings": 146.86950000000002,
+      "funded_lag0": 95.465175,
+      "usd_ticket_equivalent": 238662.9375,
+      "funded_by_december_if_all_fund_next_month": 77.642175,
+      "funded_next_january": 17.823,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 42.2,
+          "openings": 0.8440000000000001,
+          "funded": 0.5486
+        },
+        {
+          "month": 2,
+          "visits": 77.85,
+          "openings": 1.557,
+          "funded": 1.01205
+        },
+        {
+          "month": 3,
+          "visits": 175.2,
+          "openings": 3.504,
+          "funded": 2.2775999999999996
+        },
+        {
+          "month": 4,
+          "visits": 254.175,
+          "openings": 5.0835,
+          "funded": 3.304275
+        },
+        {
+          "month": 5,
+          "visits": 340.9,
+          "openings": 6.818,
+          "funded": 4.431699999999999
+        },
+        {
+          "month": 6,
+          "visits": 410.275,
+          "openings": 8.205499999999999,
+          "funded": 5.333575
+        },
+        {
+          "month": 7,
+          "visits": 602.025,
+          "openings": 12.0405,
+          "funded": 7.826325
+        },
+        {
+          "month": 8,
+          "visits": 787.1,
+          "openings": 15.742,
+          "funded": 10.2323
+        },
+        {
+          "month": 9,
+          "visits": 944.75,
+          "openings": 18.895,
+          "funded": 12.281749999999999
+        },
+        {
+          "month": 10,
+          "visits": 1098.0,
+          "openings": 21.96,
+          "funded": 14.274
+        },
+        {
+          "month": 11,
+          "visits": 1240.0,
+          "openings": 24.8,
+          "funded": 16.12
+        },
+        {
+          "month": 12,
+          "visits": 1371.0,
+          "openings": 27.42,
+          "funded": 17.823
+        }
+      ]
+    },
+    {
+      "period": "2026_contrafactual",
+      "calendar": "original",
+      "scenario": "expansion",
+      "visits": 14686.95,
+      "openings": 293.73900000000003,
+      "funded_lag0": 190.93035,
+      "usd_ticket_equivalent": 477325.875,
+      "funded_by_december_if_all_fund_next_month": 155.28435,
+      "funded_next_january": 35.646,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 84.4,
+          "openings": 1.6880000000000002,
+          "funded": 1.0972
+        },
+        {
+          "month": 2,
+          "visits": 155.7,
+          "openings": 3.114,
+          "funded": 2.0241
+        },
+        {
+          "month": 3,
+          "visits": 350.4,
+          "openings": 7.008,
+          "funded": 4.555199999999999
+        },
+        {
+          "month": 4,
+          "visits": 508.35,
+          "openings": 10.167,
+          "funded": 6.60855
+        },
+        {
+          "month": 5,
+          "visits": 681.8,
+          "openings": 13.636,
+          "funded": 8.863399999999999
+        },
+        {
+          "month": 6,
+          "visits": 820.55,
+          "openings": 16.410999999999998,
+          "funded": 10.66715
+        },
+        {
+          "month": 7,
+          "visits": 1204.05,
+          "openings": 24.081,
+          "funded": 15.65265
+        },
+        {
+          "month": 8,
+          "visits": 1574.2,
+          "openings": 31.484,
+          "funded": 20.4646
+        },
+        {
+          "month": 9,
+          "visits": 1889.5,
+          "openings": 37.79,
+          "funded": 24.563499999999998
+        },
+        {
+          "month": 10,
+          "visits": 2196.0,
+          "openings": 43.92,
+          "funded": 28.548
+        },
+        {
+          "month": 11,
+          "visits": 2480.0,
+          "openings": 49.6,
+          "funded": 32.24
+        },
+        {
+          "month": 12,
+          "visits": 2742.0,
+          "openings": 54.84,
+          "funded": 35.646
+        }
+      ]
+    },
+    {
+      "period": "2027_plano",
+      "calendar": "prioridad_propuesta",
+      "scenario": "prudente",
+      "visits": 3743.2,
+      "openings": 74.864,
+      "funded_lag0": 48.66159999999999,
+      "usd_ticket_equivalent": 121653.99999999999,
+      "funded_by_december_if_all_fund_next_month": 40.5886,
+      "funded_next_january": 8.073,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 16.0,
+          "openings": 0.32,
+          "funded": 0.208
+        },
+        {
+          "month": 2,
+          "visits": 35.620000000000005,
+          "openings": 0.7124000000000001,
+          "funded": 0.46306
+        },
+        {
+          "month": 3,
+          "visits": 68.53999999999999,
+          "openings": 1.3707999999999998,
+          "funded": 0.8910199999999998
+        },
+        {
+          "month": 4,
+          "visits": 119.67,
+          "openings": 2.3934,
+          "funded": 1.55571
+        },
+        {
+          "month": 5,
+          "visits": 181.03,
+          "openings": 3.6206,
+          "funded": 2.35339
+        },
+        {
+          "month": 6,
+          "visits": 263.79,
+          "openings": 5.2758,
+          "funded": 3.4292700000000003
+        },
+        {
+          "month": 7,
+          "visits": 358.34,
+          "openings": 7.166799999999999,
+          "funded": 4.65842
+        },
+        {
+          "month": 8,
+          "visits": 429.3,
+          "openings": 8.586,
+          "funded": 5.5809
+        },
+        {
+          "month": 9,
+          "visits": 495.67,
+          "openings": 9.913400000000001,
+          "funded": 6.44371
+        },
+        {
+          "month": 10,
+          "visits": 559.64,
+          "openings": 11.1928,
+          "funded": 7.27532
+        },
+        {
+          "month": 11,
+          "visits": 594.6,
+          "openings": 11.892000000000001,
+          "funded": 7.7298
+        },
+        {
+          "month": 12,
+          "visits": 621.0,
+          "openings": 12.42,
+          "funded": 8.073
+        }
+      ]
+    },
+    {
+      "period": "2027_plano",
+      "calendar": "prioridad_propuesta",
+      "scenario": "trabajo",
+      "visits": 9358.0,
+      "openings": 187.16,
+      "funded_lag0": 121.654,
+      "usd_ticket_equivalent": 304135.0,
+      "funded_by_december_if_all_fund_next_month": 101.47149999999999,
+      "funded_next_january": 20.182499999999997,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 40.0,
+          "openings": 0.8,
+          "funded": 0.52
+        },
+        {
+          "month": 2,
+          "visits": 89.05,
+          "openings": 1.781,
+          "funded": 1.1576499999999998
+        },
+        {
+          "month": 3,
+          "visits": 171.35,
+          "openings": 3.427,
+          "funded": 2.22755
+        },
+        {
+          "month": 4,
+          "visits": 299.175,
+          "openings": 5.9835,
+          "funded": 3.889275
+        },
+        {
+          "month": 5,
+          "visits": 452.575,
+          "openings": 9.0515,
+          "funded": 5.883475
+        },
+        {
+          "month": 6,
+          "visits": 659.475,
+          "openings": 13.1895,
+          "funded": 8.573174999999999
+        },
+        {
+          "month": 7,
+          "visits": 895.85,
+          "openings": 17.917,
+          "funded": 11.646049999999999
+        },
+        {
+          "month": 8,
+          "visits": 1073.25,
+          "openings": 21.465,
+          "funded": 13.95225
+        },
+        {
+          "month": 9,
+          "visits": 1239.175,
+          "openings": 24.7835,
+          "funded": 16.109275
+        },
+        {
+          "month": 10,
+          "visits": 1399.1,
+          "openings": 27.982,
+          "funded": 18.188299999999998
+        },
+        {
+          "month": 11,
+          "visits": 1486.5,
+          "openings": 29.73,
+          "funded": 19.3245
+        },
+        {
+          "month": 12,
+          "visits": 1552.5,
+          "openings": 31.05,
+          "funded": 20.182499999999997
+        }
+      ]
+    },
+    {
+      "period": "2027_plano",
+      "calendar": "prioridad_propuesta",
+      "scenario": "expansion",
+      "visits": 18716.0,
+      "openings": 374.32,
+      "funded_lag0": 243.308,
+      "usd_ticket_equivalent": 608270.0,
+      "funded_by_december_if_all_fund_next_month": 202.94299999999998,
+      "funded_next_january": 40.364999999999995,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 80.0,
+          "openings": 1.6,
+          "funded": 1.04
+        },
+        {
+          "month": 2,
+          "visits": 178.1,
+          "openings": 3.562,
+          "funded": 2.3152999999999997
+        },
+        {
+          "month": 3,
+          "visits": 342.7,
+          "openings": 6.854,
+          "funded": 4.4551
+        },
+        {
+          "month": 4,
+          "visits": 598.35,
+          "openings": 11.967,
+          "funded": 7.77855
+        },
+        {
+          "month": 5,
+          "visits": 905.15,
+          "openings": 18.103,
+          "funded": 11.76695
+        },
+        {
+          "month": 6,
+          "visits": 1318.95,
+          "openings": 26.379,
+          "funded": 17.146349999999998
+        },
+        {
+          "month": 7,
+          "visits": 1791.7,
+          "openings": 35.834,
+          "funded": 23.292099999999998
+        },
+        {
+          "month": 8,
+          "visits": 2146.5,
+          "openings": 42.93,
+          "funded": 27.9045
+        },
+        {
+          "month": 9,
+          "visits": 2478.35,
+          "openings": 49.567,
+          "funded": 32.21855
+        },
+        {
+          "month": 10,
+          "visits": 2798.2,
+          "openings": 55.964,
+          "funded": 36.376599999999996
+        },
+        {
+          "month": 11,
+          "visits": 2973.0,
+          "openings": 59.46,
+          "funded": 38.649
+        },
+        {
+          "month": 12,
+          "visits": 3105.0,
+          "openings": 62.1,
+          "funded": 40.364999999999995
+        }
+      ]
+    },
+    {
+      "period": "2026_contrafactual",
+      "calendar": "prioridad_propuesta",
+      "scenario": "prudente",
+      "visits": 3643.9,
+      "openings": 72.878,
+      "funded_lag0": 47.3707,
+      "usd_ticket_equivalent": 118426.75,
+      "funded_by_december_if_all_fund_next_month": 39.2977,
+      "funded_next_january": 8.073,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 16.880000000000003,
+          "openings": 0.33760000000000007,
+          "funded": 0.21944000000000002
+        },
+        {
+          "month": 2,
+          "visits": 31.140000000000004,
+          "openings": 0.6228000000000001,
+          "funded": 0.40482
+        },
+        {
+          "month": 3,
+          "visits": 72.92,
+          "openings": 1.4584000000000001,
+          "funded": 0.94796
+        },
+        {
+          "month": 4,
+          "visits": 120.15,
+          "openings": 2.403,
+          "funded": 1.56195
+        },
+        {
+          "month": 5,
+          "visits": 170.86,
+          "openings": 3.4172000000000002,
+          "funded": 2.22118
+        },
+        {
+          "month": 6,
+          "visits": 231.17000000000002,
+          "openings": 4.6234,
+          "funded": 3.00521
+        },
+        {
+          "month": 7,
+          "visits": 322.27,
+          "openings": 6.445399999999999,
+          "funded": 4.189509999999999
+        },
+        {
+          "month": 8,
+          "visits": 407.6,
+          "openings": 8.152000000000001,
+          "funded": 5.2988
+        },
+        {
+          "month": 9,
+          "visits": 495.67,
+          "openings": 9.913400000000001,
+          "funded": 6.44371
+        },
+        {
+          "month": 10,
+          "visits": 559.64,
+          "openings": 11.1928,
+          "funded": 7.27532
+        },
+        {
+          "month": 11,
+          "visits": 594.6,
+          "openings": 11.892000000000001,
+          "funded": 7.7298
+        },
+        {
+          "month": 12,
+          "visits": 621.0,
+          "openings": 12.42,
+          "funded": 8.073
+        }
+      ]
+    },
+    {
+      "period": "2026_contrafactual",
+      "calendar": "prioridad_propuesta",
+      "scenario": "trabajo",
+      "visits": 9109.75,
+      "openings": 182.195,
+      "funded_lag0": 118.42675,
+      "usd_ticket_equivalent": 296066.875,
+      "funded_by_december_if_all_fund_next_month": 98.24425,
+      "funded_next_january": 20.182499999999997,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 42.2,
+          "openings": 0.8440000000000001,
+          "funded": 0.5486
+        },
+        {
+          "month": 2,
+          "visits": 77.85,
+          "openings": 1.557,
+          "funded": 1.01205
+        },
+        {
+          "month": 3,
+          "visits": 182.29999999999998,
+          "openings": 3.646,
+          "funded": 2.3698999999999995
+        },
+        {
+          "month": 4,
+          "visits": 300.375,
+          "openings": 6.0075,
+          "funded": 3.9048749999999997
+        },
+        {
+          "month": 5,
+          "visits": 427.15,
+          "openings": 8.543,
+          "funded": 5.552949999999999
+        },
+        {
+          "month": 6,
+          "visits": 577.925,
+          "openings": 11.558499999999999,
+          "funded": 7.513024999999999
+        },
+        {
+          "month": 7,
+          "visits": 805.675,
+          "openings": 16.1135,
+          "funded": 10.473774999999998
+        },
+        {
+          "month": 8,
+          "visits": 1019.0,
+          "openings": 20.38,
+          "funded": 13.247
+        },
+        {
+          "month": 9,
+          "visits": 1239.175,
+          "openings": 24.7835,
+          "funded": 16.109275
+        },
+        {
+          "month": 10,
+          "visits": 1399.1,
+          "openings": 27.982,
+          "funded": 18.188299999999998
+        },
+        {
+          "month": 11,
+          "visits": 1486.5,
+          "openings": 29.73,
+          "funded": 19.3245
+        },
+        {
+          "month": 12,
+          "visits": 1552.5,
+          "openings": 31.05,
+          "funded": 20.182499999999997
+        }
+      ]
+    },
+    {
+      "period": "2026_contrafactual",
+      "calendar": "prioridad_propuesta",
+      "scenario": "expansion",
+      "visits": 18219.5,
+      "openings": 364.39,
+      "funded_lag0": 236.8535,
+      "usd_ticket_equivalent": 592133.75,
+      "funded_by_december_if_all_fund_next_month": 196.4885,
+      "funded_next_january": 40.364999999999995,
+      "monthly": [
+        {
+          "month": 1,
+          "visits": 84.4,
+          "openings": 1.6880000000000002,
+          "funded": 1.0972
+        },
+        {
+          "month": 2,
+          "visits": 155.7,
+          "openings": 3.114,
+          "funded": 2.0241
+        },
+        {
+          "month": 3,
+          "visits": 364.59999999999997,
+          "openings": 7.292,
+          "funded": 4.739799999999999
+        },
+        {
+          "month": 4,
+          "visits": 600.75,
+          "openings": 12.015,
+          "funded": 7.809749999999999
+        },
+        {
+          "month": 5,
+          "visits": 854.3,
+          "openings": 17.086,
+          "funded": 11.105899999999998
+        },
+        {
+          "month": 6,
+          "visits": 1155.85,
+          "openings": 23.116999999999997,
+          "funded": 15.026049999999998
+        },
+        {
+          "month": 7,
+          "visits": 1611.35,
+          "openings": 32.227,
+          "funded": 20.947549999999996
+        },
+        {
+          "month": 8,
+          "visits": 2038.0,
+          "openings": 40.76,
+          "funded": 26.494
+        },
+        {
+          "month": 9,
+          "visits": 2478.35,
+          "openings": 49.567,
+          "funded": 32.21855
+        },
+        {
+          "month": 10,
+          "visits": 2798.2,
+          "openings": 55.964,
+          "funded": 36.376599999999996
+        },
+        {
+          "month": 11,
+          "visits": 2973.0,
+          "openings": 59.46,
+          "funded": 38.649
+        },
+        {
+          "month": 12,
+          "visits": 3105.0,
+          "openings": 62.1,
+          "funded": 40.364999999999995
+        }
+      ]
+    }
+  ],
+  "sources_sha256": {
+    "research/pibank-gap-closure-2026-10-06/plan-busquedas.csv": "0731a5188dd1f54b642766b6390b7834ecd2f6bb70170b2582a4275f15919b79",
+    "reconstruccion-2027/conexion-demanda-plan/conexion-familias.csv": "2483da1a6efd1f4d73a4b5ef824f2d5ab7ef0cccca3c29a26ae1639df4a96280",
+    "reconstruccion-2027/conexion-demanda-plan/inputs.json": "707cb26fbb20046d8f7fe8dec915d93afd4bc267f39ac8e39f7087e3b741d643",
+    "reconstruccion-2027/conexion-demanda-plan/resultados.json": "8cacacfbc8824179ba57540da31b5b3efaa1c5f20115b15f67d9b9563de422b4",
+    "research/pibank-demand-2026-10-06/keyword-overview-provider.json": "99fea2a1b024c984647290783287a262163ccc9b1da42ed095883de5430a3835",
+    "research/pibank-expanded-2026-10-06/ranked-01-provider.json": "4f24f79be6f375680998f0638d47ccc818706931de633c43288d7de1ca06d2c6",
+    "research/pibank-expanded-2026-10-06/suggestion-01-provider.json": "945cfe9224ad3a376be1545fa59dd788819315b9d2b3286259e8100f43e42320",
+    "research/pibank-expanded-2026-10-06/ranked-05-provider.json": "b9cdd9e4479e49093bafd7db2d0834841382968ec10a45594fba062676aa7ec6",
+    "research/pibank-expanded-2026-10-06/ranked-08-provider.json": "cb2c35e1f26040c141e47b3d365c2dd1448169fbf59806c7f60dd5040411a633",
+    "research/pibank-expanded-2026-10-06/ranked-04-provider.json": "3242f0eb42ddcb817052536d9e03fa950af5656946cf4b19fe047abbd5e199c3",
+    "research/pibank-expanded-2026-10-06/ranked-09-provider.json": "b0afcc1ecf27e71f44c8bfd914a447cb4e368442cea6b1614ed0da4a95d161cf",
+    "research/pibank-expanded-2026-10-06/extra-related-01-provider.json": "6f6bac1d0e32213cfc859426f0f523324b5f7f11d44a5cce11dc45c8cb56e341"
+  }
+}
