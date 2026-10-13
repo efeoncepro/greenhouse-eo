@@ -57,14 +57,18 @@
   `/inspiracion` y dos guías de la raíz.
 - Comando nuevo `pnpm seo:content-scope`: muestra lo que un alcance mediría y las páginas que deja fuera; con
   `--apply` lo fija.
-- Con alcance, el capítulo de búsqueda de Efeonce Insights mide sólo esas páginas, lo dice en la portada, deja el
-  sitio completo como contexto y saca el tráfico estimado del dominio a los límites. Sin alcance, el informe no cambia.
-- Cambian para toda organización tres textos de Analytics: «Visitas orgánicas» (antes «Visitas orgánicas al sitio»),
-  «Visitas desde buscadores» y «Visitas orgánicas, con y sin interacción».
+- Con alcance, el capítulo de búsqueda de Efeonce Insights mide sólo esas páginas, lo dice en la portada blanca, deja
+  el sitio completo como contexto y saca el tráfico estimado del dominio a los límites. Sin alcance, el informe no
+  cambia.
+- Cambian para toda organización: la línea de clics por semana dibuja sólo semanas completas (los últimos días del
+  mes ya no aparecen como una caída) y tres textos de Analytics pierden «al sitio» («Visitas orgánicas», «Visitas
+  desde buscadores», «Visitas orgánicas, con y sin interacción»).
 - Una página con un nombre más largo que la columna del informe ya no hace fallar el render: se abrevia por el
   comienzo y el final de su ruta.
-- **Sin release:** el código vive en `develop` local. Producción sigue midiendo el sitio completo de Berel hasta
-  que se despliegue en Vercel y en el `ops-worker` (`TASK-2033`).
+- Berel: logos oficiales cargados en la organización (el anterior era una imagen generada con IA) y portada fijada en
+  blanca. `scripts/insights/preview-edition.ts` acepta `--cover=light|dark`.
+- **Desplegado** en Vercel staging y en el `ops-worker` (`d9a1c6a2d`). **Vercel Production sin release**: las
+  ediciones creadas desde el portal de producción siguen midiendo el sitio completo de Berel (`TASK-2033`).
 
 ## 2026-10-12 — Cotizador V3: el registro de cotizaciones existe en la base
 

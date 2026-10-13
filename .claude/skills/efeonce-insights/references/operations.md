@@ -402,7 +402,7 @@ revoked. Never record the one-time link token.
 - Cloud Run no se revalidó: gcloud exige reautenticación interactiva. No declarar salud o flags actuales del worker desde el Handoff. Ver auditoría y tareas para siguientes pasos.
 - Correcciones `8e4fbac7b`, `c782449f0` y `03e19f3ee` posteriores al release quedan pendientes de promoción/verificación; no son un release faltante del contrato de TASK-1962.
 
-## Alcance de contenido (TASK-2033 — tabla aplicada y Berel v1 fijado el 2026-10-12; código sin release)
+## Alcance de contenido (TASK-2033 — tabla aplicada, Berel v1 fijado y código en staging + `ops-worker` desde 2026-10-12; Production sin release)
 
 **Sin flag.** Se activa por dato: una organización con una versión de alcance con reglas. Ninguna otra organización
 lo tiene.
@@ -421,9 +421,25 @@ El dry-run muestra el alcance vigente, lo que el nuevo mediría frente al sitio 
 **Volver al sitio completo:** `pnpm seo:content-scope --org=<organization_id> --clear --reason="…" --apply`. Rige para
 la siguiente edición, sin deploy.
 
+**Estado por runtime (2026-10-12):** Vercel staging y `ops-worker` (`ops-worker-00773-z98`, `GIT_SHA=d9a1c6a2d`) ya
+leen el alcance; Vercel Production no, hasta el release a `main`. Mientras dure esa ventana, una edición programada
+(la arma el worker) o creada desde staging mide el alcance, y una creada desde el portal o la API de producción mide
+la propiedad completa. No se generó ninguna edición después del deploy: falta observar `contentScope` en las fuentes
+de una edición real de esos runtimes.
+
 **Orden de despliegue:** la tabla antes que el código (ya aplicada). El release debe incluir Vercel **y** el
 `ops-worker`: el tick de schedules arma ediciones con el adapter del worker, y un worker sin el cambio generaría la
 ocurrencia mensual con la propiedad completa. Verificar en una edición nueva que sus fuentes SEO traen `contentScope`.
+
+**Edición de septiembre de Berel:** las ediciones ya creadas (`insed-edd1f0b0…` v2 y anteriores) miden la propiedad
+completa y no cambian. Para la versión con alcance hay que revisar (`revise`) después del release y emitirla; los PDF
+entregados el 2026-10-12 son vistas previas locales y su portada dice «Sin emitir».
+
+**Leer una caída de GA4 antes de emitir:** en la edición de septiembre de Berel las visitas orgánicas al contenido
+bajan 51,9 % por UN artículo de agosto (`/articulos/como-bajar-la-temperatura-de-tu-casa`, 4.884 sesiones entre el 17 y
+el 30 de agosto, 90 % móvil, con Colombia, España y Venezuela; Search Console registró 8 clics de búsqueda en esas
+fechas). El patrón es el de Google Discover, que no se captura; se confirma en Search Console → Rendimiento →
+Discover. El informe no explica picos de una sola página: quien emite lo explica al entregar.
 
 **Mantenimiento del alcance de Berel:** `/articulos`, `/tutoriales`, `/inspiracion` (prefijos) y las guías
 `/pintura-y-barniz-para-madera-como-elegir` e `/impermeabilizante-para-azotea-como-elegir` (exactas). Una guía nueva

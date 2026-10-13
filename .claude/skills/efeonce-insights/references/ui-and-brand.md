@@ -375,6 +375,13 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
     de parte. Decisión pendiente del operador.
 
 
+11. **La portada navy y la portada del deck no dicen qué mide el informe (TASK-2033, 2026-10-12).** La zona «Qué mide
+    este informe» existe sólo en la portada blanca del A4. Una organización con alcance de contenido y portada navy
+    pierde en el PDF la única línea que enumera el contenido medido; Berel se fijó en blanca por eso. Agregar la zona
+    a la navy o al deck es un cambio de plantilla con su gate visual y aprobación del operador.
+12. **El logo del cliente se ve chico cuando es casi cuadrado.** El espacio «Preparado para» de las portadas es bajo;
+    el logo oficial de Berel (1181×1129) queda de unos 35 px de alto en la navy. Sin decisión.
+
 ## Delta 2026-10-04 — disponibilidad y límites de cierre
 
 Web/PDF/deck y tarjeta base se publicaron; los campos 1.1–1.3 forman parte del modelo vigente 1.4. Correo y recurrencias tienen flags ON desde 02/10 (Vercel revalidado 04/10), pero una recurrencia sólo crea borrador/render: no entrega automáticamente una edición. El diseño aprobado del correo sigue pendiente en TASK-1944/1774; no declarar «correo que llega solo» desde el estado de flags. La base compartida no ofrece planes congelados de ediciones creadas después del release #248 en el readback acotado. Conserva la revisión de Berel/Sky y el canary de contenido como pendientes, además de TASK-1958 para la jerarquía y plan/petición en PDF.

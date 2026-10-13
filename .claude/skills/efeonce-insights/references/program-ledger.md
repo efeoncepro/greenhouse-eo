@@ -663,7 +663,7 @@ paquete AXIS por Think (hoy copia los tokens) y la decisión de isotipos quedan 
 tutoriales, inspiración y dos guías de la raíz: 5,6 % de los clics de septiembre de 2026 (799 de 14.156). El mes en
 que ese contenido subió 20,9 %, el informe decía que los clics habían caído 13,6 %.
 
-**Qué existe (develop local, sin push):**
+**Qué existe (en `develop`; desplegado en staging y `ops-worker`, ver la matriz):**
 
 - Dominio SEO, `src/lib/growth/seo/content-scope/`: contrato y matcher puros (`contracts.ts`), fragmentos SQL
   (`sql.ts`), store con `readSeoContentScope` y `setSeoContentScope` (`store.ts`). Tabla
@@ -716,8 +716,14 @@ deploy: el alcance está desplegado, no observado todavía en una edición real 
 del sitio completo), ETV por ruta (no hay captura), escribir el alcance por API o MCP, UI en el portal, alcance por
 servicio (`TASK-1960`).
 
-**Pendiente:** Slice 6 (tool MCP de lectura `get_seo_content_scope` + federación), release (Vercel y `ops-worker`),
-decisión del operador sobre revisar la edición de septiembre de Berel, `pnpm build` de cierre.
+**También el 2026-10-12, por pedido del operador:** logos oficiales de Berel cargados en la organización (`default`
+y `on_dark`; el anterior era una imagen generada con IA), portada de Berel fijada en blanca, línea semanal con sólo
+semanas completas, y los PDF de la vista previa de septiembre copiados a la carpeta interna de informes de Berel en
+OneDrive para que el operador los envíe.
+
+**Pendiente:** Slice 6 (tool MCP de lectura `get_seo_content_scope` + federación), release a `main` (Vercel
+Production), revisar y emitir la edición de septiembre de Berel, observar `contentScope` en una edición real de
+staging o del worker, y un render desde producción con los logos nuevos (quedaron en el bucket `-dev`).
 
 **Hand-off:** `TASK-1992` debe pasar el alcance a todo hecho nuevo por URL o por página; `TASK-1672` debe declarar si
 sus hallazgos por página lo respetan.

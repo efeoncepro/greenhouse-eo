@@ -23,6 +23,11 @@ Insights usa el reader para visitas orgánicas y desde asistentes IA, conservand
 metodología. Flag OFF omite la fuente; sin conexión expresa not_connected; token inválido o consulta
 fallida expresa datos insuficientes, nunca visitas cero inventadas.
 
+Desde el 2026-10-12 el reader acepta varias reglas de página de entrada (prefijos y rutas exactas). Insights las usa
+cuando la organización tiene un alcance de contenido: cuenta sólo las visitas que entraron por esas páginas. Sin
+reglas, la consulta es la de siempre. En una semana real de Berel, el filtro dio 50.730 sesiones frente a 50.727
+sumando página por página; la diferencia de 3 no tiene causa determinada.
+
 Conversions aún no está admitido por el reader. Integración al grader y señal de salud de token siguen
 pendientes en TASK-1284. TASK-1787 entrega la serie de referrals IA de producto y consume la conexión
 existente; no duplica el resolver ni espera el cierre de todas las ampliaciones de TASK-1284.

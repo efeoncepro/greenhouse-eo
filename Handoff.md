@@ -59,17 +59,21 @@ Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](
 El informe SEO de Berel medía la propiedad completa de Search Console; lo que Efeonce trabaja es el 5,6 % de sus
 clics. [`TASK-2033`](docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md) agrega un alcance
 de contenido por organización (reglas de ruta, append-only) en `src/lib/growth/seo/content-scope/`; los readers dueños
-lo aplican y el adapter de Insights lo sella en cada fuente. Slices 1–5 en `develop` local, **sin push ni release**.
-**Aplicado en la base compartida** con autorización del operador: la migración
-`20261012145214417_task-2033-growth-seo-content-scope.sql` y el alcance v1 de Berel (`pnpm seo:content-scope`).
-Producción sigue midiendo el sitio completo: el código desplegado no lee el alcance. El release debe incluir Vercel y
-el `ops-worker` (el tick de schedules arma ediciones allí).
-Vista previa real de septiembre de 2026 con alcance: A4 27 páginas, deck 21 láminas, 0 violaciones; clics del contenido
-661 → 799 (+20,9 %) con el sitio en −13,6 %. **Para quien revise esa edición:** las visitas orgánicas de GA4 al
-contenido caen 51,9 % por un pico de dos semanas en agosto; el informe lo imprime.
-Pendiente: tool MCP de lectura (Slice 6), `pnpm build`, release, decisión del operador sobre revisar la edición de
-septiembre. Verificado: `pnpm test` completo (20.284 pruebas, 0
-fallas), `test:live` del alcance 9/9 contra PostgreSQL real, gate visual de Insights 37 frames a 0 píxeles, typecheck.
+lo aplican y el adapter de Insights lo sella en cada fuente.
+**Desplegado** en Vercel staging y en el `ops-worker` (`ops-worker-00773-z98`, `d9a1c6a2d`), con CI verde. **Vercel
+Production sin release**: una edición creada desde el portal de producción sigue midiendo el sitio completo; una
+programada (la arma el worker) ya mide el alcance. Falta observarlo en una edición real de esos runtimes.
+**Aplicado en la base compartida**, con autorización del operador: la migración, el alcance v1 de Berel
+(`pnpm seo:content-scope`), sus logos oficiales (`default` y `on_dark`; el anterior era una imagen generada con IA) y
+su portada en blanca, la única que imprime «Qué mide este informe».
+Cambios que tocan a toda organización: la línea semanal de clics dibuja sólo semanas completas, y tres textos de
+Analytics pierden «al sitio».
+Vista previa real de septiembre de 2026: clics del contenido 661 → 799 (+20,9 %) con el sitio en −13,6 %. Los PDF
+quedaron en el OneDrive interno de Berel para que el operador los envíe; su portada dice «Sin emitir». **Para quien
+emita esa edición:** las visitas orgánicas de GA4 al contenido caen 51,9 % por un artículo de agosto con patrón de
+Google Discover; el informe lo imprime sin explicarlo.
+Pendiente: release a `main`, revisar y emitir la edición de septiembre, tool MCP de lectura (Slice 6) y un render desde
+producción con los logos nuevos. `CLAUDE.md governance` está rojo por 37 tokens desde antes de este trabajo.
 
 ## 2026-10-12 — Arquitectura: desacople de Greenhouse por dominios de producto (decisión, nada ejecutado)
 

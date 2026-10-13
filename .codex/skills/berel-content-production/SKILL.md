@@ -327,6 +327,22 @@ El informe mensual de Efeonce Insights de Berel mide sólo el contenido que trab
 una versión nueva del alcance (`pnpm seo:content-scope`, ver la skill `efeonce-insights` → `operations.md`). Lo que se
 publica bajo `/articulos`, `/tutoriales` o `/inspiracion` entra sin hacer nada.
 
+**Dónde va el informe.** Los PDF mensuales se dejan en el OneDrive de Efeonce, en
+`Alineación / 1. Clientes (Interno) / Berel / Informes`, con el nombre `BEREL_INFORME_<MES>_<AÑO>_A4.pdf` y
+`BEREL_INFORME_<MES>_<AÑO>_DECK.pdf`. Es una carpeta interna: el cliente no la ve; el envío lo hace una persona.
+
+**Logo.** Los oficiales están en el OneDrive del squad, `Berel - Efeonce - Squad Berel / Workspace Oficial /
+01_Brand Assets / 02_Logotipo` (PNG y `SVG/`: principal, esfera cromática, negro y blanco). Desde el 2026-10-12 la
+organización en Greenhouse tiene cargados el principal y el blanco; antes tenía una imagen generada con IA. La portada
+del informe de Berel está fijada en blanca, que es la única que imprime «Qué mide este informe».
+
+**Antes de entregar, leer las visitas de Analytics con su serie semanal.** Una sola pieza puede mover el mes: en
+agosto de 2026 «Cómo bajar la temperatura de tu casa» recibió cerca de 4.900 visitas en una semana, casi todas desde
+celular y con mucha gente de fuera de México, mientras Search Console registró 8 clics de búsqueda. Ese patrón es el de
+Google Discover, que el informe no captura; septiembre salió con la mitad de visitas orgánicas aunque el resto del
+contenido creció. El informe imprime la caída sin explicarla: se explica en el correo de entrega y se confirma en
+Search Console → Rendimiento → Discover.
+
 ## Criterio de cierre
 
 Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura

@@ -941,6 +941,23 @@ reliability (módulo `insights`); ambas deben estar en `ok` (steady 0).
 
 ---
 
+## 12.1 Delta 2026-10-12 — alcance de contenido (TASK-2033)
+
+Este registro cubre la fundación. El alcance de contenido se construyó después y vive documentado en la
+[arquitectura §5.1](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) y en la skill `efeonce-insights`. Lo que agrega al inventario:
+
+| Pieza | Dónde | Qué hace |
+| --- | --- | --- |
+| Tabla | `greenhouse_growth.seo_content_scope_versions` | Alcance por organización, append-only por versión |
+| Dominio SEO | `src/lib/growth/seo/content-scope/` | Contrato, matcher, fragmentos SQL, reader y command |
+| Readers | `read-overview-kpis.ts`, `read-window-movers.ts`, `work-queue/reader.ts`, `analytics-ga4/reader.ts` | Reciben el alcance como parámetro opcional |
+| Adapter | `src/lib/efeonce-insights/adapters/seo-adapter.ts` | Resuelve el alcance, lo pasa y lo sella en cada fuente |
+| Contrato | `contracts/evidence.ts` | `EvidenceSourceV1.contentScope`, razón `outside_content_scope` |
+| Plan | `editorial/editorial-v2.ts`, `deterministic-planner.ts` | Línea de alcance, entrada del capítulo, afirmación de contexto |
+| CLI | `scripts/seo/set-content-scope.ts` | `pnpm seo:content-scope` |
+
+Desplegado en Vercel staging y en el `ops-worker` el 2026-10-12 (`d9a1c6a2d`). Vercel Production, sin release.
+
 ## 13. Referencias
 
 - Arquitectura: [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (§4 modelo,

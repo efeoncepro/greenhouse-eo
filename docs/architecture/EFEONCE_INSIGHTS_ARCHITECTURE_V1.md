@@ -154,7 +154,7 @@ compatible explícita, nunca usar el dato actual como histórico. Datos incomple
 bloquean la emisión por defecto. Una política explícita `allow_partial` puede emitir omisiones visibles,
 pero nunca salta los gates de seguridad, validez del instrumento o auditoría técnica.
 
-### 5.1 Alcance de contenido por organización (TASK-2033 — develop local 2026-10-12, sin release)
+### 5.1 Alcance de contenido por organización (TASK-2033 — en staging y `ops-worker` desde 2026-10-12; Production sin release)
 
 Un informe mide lo que Efeonce trabaja, no todo lo que la fuente trae. Search Console entrega la propiedad completa
 de la organización; cuando Efeonce trabaja una parte del sitio (el contenido editorial), el resto decide la cifra y
@@ -174,6 +174,9 @@ el informe deja de hablar del trabajo. El alcance de contenido resuelve eso sin 
   afirmación de contexto cita.
 - **Fallo cerrado:** si el alcance no se puede leer, el adapter falla y el módulo queda como límite. Medir el sitio
   completo por defecto sería el error que esta pieza existe para evitar.
+- **Dónde se lee:** en la portada blanca del A4 y en la vista web («Qué mide este informe»), en la entrada del capítulo
+  y en la afirmación de contexto. La portada navy y la del deck no tienen esa zona: con alcance, la portada blanca es
+  la única que enumera el contenido medido.
 - **Fuera:** el capítulo AEO (la marca no se mide por URL), el alcance por servicio contratado (`TASK-1960`) y la
   escritura del alcance por API o MCP.
 
@@ -1655,7 +1658,9 @@ redactor; nunca llega al cliente.
   conectar la fuente»), en una sola frase si faltan los dos. Lo que falta por configuración interna (perfil del Grader,
   spaces, target SEO) no se le pide al cliente.
 - **Línea semanal**: la lectura compara sólo bloques COMPLETOS de 7 días (el último del mes puede ser de 2 o 3 días y
-  se leía como caída); la figura sigue mostrando el bloque corto con su etiqueta.
+  se leía como caída). Desde el 2026-10-12 la figura tampoco dibuja el bloque corto: junto a semanas enteras se veía
+  como caída bajo un titular que decía «subieron». La lectura lo nombra («Fuera de la figura: 29–30 sept, que no
+  completa una semana.»); su hecho sigue en el snapshot y en el total del mes.
 
 **Modelo web 1.3 — las decisiones de contenido viven en el API.** Cada frase del resumen y de las esenciales trae
 `module` y `evidence {chapterId, chartId}`; el modelo trae `essentialsByModule` (incluido 0), cada capítulo su `label`

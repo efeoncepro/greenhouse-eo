@@ -583,7 +583,7 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
   iguales; si varían, barras por canal). `chapter.stats` puede traer varios tableros.
 - **Color por rol:** partes sin rol actual → anterior → paso (→ gris medio en waffle); coral sólo con rol declarado.
 
-## Alcance de contenido (TASK-2033 — develop local 2026-10-12; verificado contra código y PostgreSQL real)
+## Alcance de contenido (TASK-2033 — en staging y `ops-worker` desde 2026-10-12, Production sin release; verificado contra código y PostgreSQL real)
 
 **Regla.** `{ kind: 'prefix' | 'exact', path }`. La ruta empieza por `/`, no termina en `/`, no lleva query, fragmento
 ni espacios, y no es `/` (el sitio completo se declara con cero reglas). Máximo 50 reglas, 200 caracteres por ruta,
@@ -636,6 +636,10 @@ Con menos de tres semanas completas no hay línea.
 
 **Textos de GA4.** «Visitas orgánicas» (antes «Visitas orgánicas al sitio»), «Visitas desde buscadores» y «Visitas
 orgánicas, con y sin interacción»: valen con y sin alcance. Cambian para toda organización.
+
+**Portada.** La línea del alcance sólo se imprime en la portada BLANCA del A4 (`coverPage`, rama `light`). La navy y la
+portada del deck no tienen esa zona; el alcance queda en la entrada del capítulo y en la afirmación de contexto, que
+no enumeran el contenido. La vista web sí recibe `scopeLines` en su modelo.
 
 **Fallo cerrado.** Si `readSeoContentScope` lanza, el adapter lanza y el orquestador registra el módulo SEO como
 límite. Nunca se mide el sitio completo por defecto.

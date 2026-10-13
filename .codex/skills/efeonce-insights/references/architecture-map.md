@@ -49,7 +49,7 @@ Architecture `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`, ADR `EFEONCE_INSIGHTS_PLATFO
 runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-045 + master UI flow
 `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`, Think decision `docs/think/README.md`, flag ledger rows.
 
-## TASK-2033 — alcance de contenido (in-progress 2026-10-12; develop local)
+## TASK-2033 — alcance de contenido (in-progress; en staging y `ops-worker` desde 2026-10-12, Production sin release)
 
 - `src/lib/growth/seo/content-scope/contracts.ts` — `SeoContentScopeV1`, validación de reglas (rechaza, no corrige), `isPathInContentScope`, `contentScopeKey`. Puro, sin I/O.
 - `src/lib/growth/seo/content-scope/sql.ts` — `contentScopeSqlClause` (predicado por fila; conjuntos chicos) y `gscPagesInContentScopeSql` (el que se usa sobre `seo_gsc_daily`).
