@@ -159,7 +159,7 @@ Antes de dar por cerrada la propuesta técnica, cada anexo y la oferta económic
   piezas y el desarrollo de la pieza madre), que la muestra de video podía ser un storyboard o animatic, que para
   punto de venta sólo se pedía el diseño y que la volumetría era una referencia para comparar ofertas.
 - Una respuesta pedía una propuesta de SLA por niveles de complejidad. Se leyó el 12/10, con la propuesta técnica
-  ya cerrada, y quedó como pendiente sin cubrir.
+  ya cerrada, y obligó a agregar una lámina y volver a exportar.
 - Anota cada respuesta que cambie el alcance con su fecha y hora, y comprueba que la propuesta la cubre.
 
 ### Pasos

@@ -88,7 +88,7 @@ llegan en tandas (en el caso, el 05, el 06 y el 09/10). Caso fuente, licitación
 proveedores definieron el alcance a cotizar, que la muestra de video podía ser storyboard o animatic, que para
 punto de venta sólo se pedía el diseño, que la volumetría era una referencia para comparar ofertas y que las
 condiciones de pago se revisarían con quienes avanzaran. Una de ellas pedía además una propuesta de SLA por
-niveles de complejidad; se leyó el 12/10, con el deck técnico ya cerrado, y quedó como pendiente sin cubrir.
+niveles de complejidad; se leyó el 12/10, con el deck técnico ya cerrado, y obligó a agregar una lámina y reexportar.
 Cada requisito que nace en una respuesta se anota con fecha y hora y entra a la matriz de cumplimiento
 (`propuesta-tecnica-economica.md`).
 

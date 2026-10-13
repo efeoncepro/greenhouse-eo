@@ -1,9 +1,9 @@
 # Sika Mexicana · Wherex N.º 1164 · Propuesta técnica (deck 16:9)
 
-**Estado al 12/10/2026:** borrador v3 (21 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
+**Estado al 12/10/2026:** v3 (22 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
 **separado** del anexo gráfico «POSIBLE» (decisión del operador: no se presentan como una sola propuesta).
 
-- 21 láminas, línea Brand (el 12/10 salió «Piezas adicionales» y todo lo que limitaba alcance: el operador no le vio aporte) (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
+- 22 láminas, línea Brand (el 12/10 salió «Piezas adicionales» y todo lo que limitaba alcance: el operador no le vio aporte) (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
 - Títulos directos, sin pregunta y respuesta (instrucción del operador del 07/10). Registro formal, de usted.
 - Lienzo (privado): https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5 → página «3 · Propuesta técnica (documento aparte)».
 - PDF: OneDrive `Alineación/4. Comercial/Licitaciones/Sika/2. Campaña Creativa/Efeonce-Propuesta-Tecnica-Sika-1164.pdf` (reexportado el 12/10 por la noche; ver «Cierre del 12/10»).
@@ -30,8 +30,8 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 
 1 portada · 2 la idea (Master Graphic a página completa) · 3 cumplimiento · 4 punto de partida · 5 evolución (qué se conserva y
 qué se ordena) · 6 el sistema · 7 el brief, punto por punto · 8 audiencias · 9 muestras · 10 alcance · 11 método ·
-12 lanzamiento tipo · 13 reel · 14 plazo · 15 control · 16 equipo · 17 trabajo con México · 18 caso Sky · 19 continuidad ·
-20 inicio · 21 cierre. «Piezas adicionales» salió el 12/10. **Las tablas de abajo conservan la numeración de la v2 (19 láminas).**
+12 lanzamiento tipo · 13 reel · 14 plazo · 15 tiempos por nivel · 16 control · 17 equipo · 18 trabajo con México · 19 caso Sky ·
+20 continuidad · 21 inicio · 22 cierre. «Piezas adicionales» salió el 12/10 y «Tiempos por nivel» entró esa noche. **Las tablas de abajo conservan la numeración de la v2 (19 láminas).**
 
 Cambios de la v3, pedidos por el operador tras revisar la narrativa contra la ficha: salió el resumen de «tres
 documentos»; el deck abre con el trabajo; la lámina 4 dejó el tono de diagnóstico; se sumaron evolución, el cruce con el
@@ -129,7 +129,7 @@ En OneDrive, carpeta de la licitación:
 ## Cierre del 12/10 (noche)
 
 - La económica quedó desglosada por componente (evolución gráfica, conceptualización y entregables), no por pieza. Por eso las láminas 3 y 12 cambiaron una frase: «Valor de un lanzamiento tipo, por componente» y «La oferta económica detalla el valor de este lanzamiento tipo, por componente». PDF reexportado (sha256 `9532dc5ec71c5797…`), copia en OneDrive reemplazada y tableros `Tec-03` y `Tec-12` republicados en el lienzo.
-- Sin tocar, para decisión del operador: la lámina 10 dice «Son piezas de demostración: no forman parte del alcance base» y su fuente «Piezas adicionales, fuera de la oferta base».
-- Sin cubrir: Sika espera una propuesta de SLA por niveles de complejidad (respuesta del 09/10 a otro proveedor); el deck sólo trae diez días hábiles por lanzamiento.
+- A pedido del operador («ajusta e incorpora»): la lámina 10 perdió «Son piezas de demostración: no forman parte del alcance base» y «Piezas adicionales, fuera de la oferta base»; y se sumó la lámina 15, `s_sla` («Un plazo para cada nivel de solicitud»): adaptación 2 días hábiles, pieza nueva 3, desarrollo 4 hasta la primera aprobación; respuesta el mismo día hábil; urgencia de nivel 1 en 24 horas; cumplimiento a la vista y nivel comprometido a los tres meses. Responde al SLA por niveles que Sika espera (respuesta del 09/10 a otro proveedor). **Los tiempos son propuesta propia, sin visto bueno de operaciones.** La fila «Tiempos de entrega» de la lámina 3 remite a las láminas 14 y 15.
+- PDF final de 22 láminas, sha256 `561be44f61b80f59…`, en OneDrive (reemplaza al anterior); lienzo en la versión 93 (tablero nuevo `Tec-15`, los siguientes renumerados).
 - `pdf.mjs` ata el enlace del QR a `13.png` con un rectángulo fijo: si cambia el orden de las láminas, hay que mover `LINK`.
 - Aprendizajes generalizados: `docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md`.

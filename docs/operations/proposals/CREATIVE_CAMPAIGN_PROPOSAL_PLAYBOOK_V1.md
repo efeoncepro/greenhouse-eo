@@ -43,7 +43,7 @@ No aplica a:
 | # | Pieza | Formato en el caso | Con qué se produce | Documento dueño |
 |---|---|---|---|---|
 | 1 | Anexo gráfico: manual de identidad de la campaña, piezas de muestra y storyboard | PDF, 21 páginas | Lienzo de Claude Design: tableros `.dc.html` generados por código Python (`gen*.py`), exportados a PDF | [Manual de la parte gráfica](../../manual-de-uso/creative/propuesta-grafica-creativa-para-cliente.md) |
-| 2 | Propuesta técnica | Deck 16:9, 21 láminas, PDF | Generador propio del taller (`build-tecnica.py`, molde «propuesta para leer sin presentador», línea Brand); portada, cierre y lámina de caso con `pnpm brand:compose` | [LEEME del taller](../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md) · `deck-studio` |
+| 2 | Propuesta técnica | Deck 16:9, 22 láminas, PDF | Generador propio del taller (`build-tecnica.py`, molde «propuesta para leer sin presentador», línea Brand); portada, cierre y lámina de caso con `pnpm brand:compose` | [LEEME del taller](../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md) · `deck-studio` |
 | 3 | Reel de muestra | MP4 9:16, 25 s, 1080×1920, con locución y música | Cuadros fijos (GPT Image 2.5 Sunburst) → planos (Seedance 2.5 por BytePlus) → capa de motion (HTML + GSAP) → montaje (ffmpeg) → voz (Eleven v4) y música (ElevenLabs Music v2.5) | LEEME del taller, sección «Reel v2» · `motion-design-studio` · `audio-studio` |
 | 4 | Página para ver el reel | URL en Think + QR | Astro, `AxisVideoPlayer` (skin Cinema), `noindex`, sin analítica | Comentario de cabecera de la página en el repo `efeonce-think` |
 | 5 | Oferta económica | PDF A4, 4 páginas | Plantilla A4 de Efeonce, versión 2 (`render-cotizacion-a4.mjs`) | [Plantilla A4](../../commercial/templates/cotizacion-a4/README.md) |
@@ -65,7 +65,7 @@ No aplica a:
 
 Dos reglas cruzan toda la secuencia:
 
-- **Releer la ficha y el Centro de mensajes completo antes de congelar cada documento, y otra vez antes de la económica.** En el caso, una respuesta dada a otro proveedor (se espera una propuesta de SLA por niveles de complejidad) se leyó tarde y el deck quedó sin cubrirla.
+- **Releer la ficha y el Centro de mensajes completo antes de congelar cada documento, y otra vez antes de la económica.** En el caso, una respuesta dada a otro proveedor (se espera una propuesta de SLA por niveles de complejidad) se leyó tarde, con el deck ya exportado; hubo que agregar una lámina y volver a exportar.
 - **El operador revisa comentando sobre el tablero del lienzo**; el agente corrige el generador, vuelve a renderizar, mira el render, responde en el hilo y lo resuelve.
 
 ## 4. Reglas por pieza
@@ -104,7 +104,7 @@ Reglas **[operador]** (12/10/2026, sobre comentarios en el lienzo):
 | 8 | **Cumplimiento con las palabras de la ficha.** La lámina de cumplimiento cita literal lo que pide el comprador y dice en qué lámina o anexo está cada cosa | — |
 | 9 | **Si la ficha pide un video, se entrega un video.** | El comprador admitía storyboard; el operador decidió entregar el reel real ([§4.4](#44-reel-de-muestra)) |
 
-Orden de referencia (el del caso, 21 láminas): portada · la idea (pieza madre a página completa) · cumplimiento · punto de partida · evolución (qué se conserva y qué se ordena) · el sistema · el brief punto por punto · audiencias · muestras · alcance · método (cinco etapas, dos aprobaciones del cliente) · lanzamiento tipo · reel (QR y enlace) · plazo · control (aprobación, rondas, contenido técnico, IA, derechos) · equipo · trabajo con el país del cliente · experiencia (caso) · continuidad · inicio (cinco insumos) · cierre.
+Orden de referencia (el del caso, 22 láminas): portada · la idea (pieza madre a página completa) · cumplimiento · punto de partida · evolución (qué se conserva y qué se ordena) · el sistema · el brief punto por punto · audiencias · muestras · alcance · método (cinco etapas, dos aprobaciones del cliente) · lanzamiento tipo · reel (QR y enlace) · plazo · tiempos por nivel de complejidad (lo que el comprador llamó SLA) · control (aprobación, rondas, contenido técnico, IA, derechos) · equipo · trabajo con el país del cliente · experiencia (caso) · continuidad · inicio (cinco insumos) · cierre.
 
 Cómo se produjo en el caso (comandos completos y fuente de cada dato por lámina, en el [LEEME del taller](../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md)):
 
@@ -281,7 +281,7 @@ Sin validar al corte del 12/10/2026 (no documentar como resuelto):
 |---|---|
 | Resultado de la licitación | Desconocido |
 | Plazo de diez días hábiles por lanzamiento | **[propuesta propia]**, sin visto bueno de operaciones |
-| SLA por niveles de complejidad que espera el comprador | El deck no lo cubre |
+| SLA por niveles de complejidad que espera el comprador | Incorporado el 12/10 como lámina «Tiempos por nivel»: 2, 3 y 4 días hábiles según el nivel, urgencias y cumplimiento a la vista (primero se muestra el dato; el nivel comprometido se acuerda con tres meses de datos, según `creative-practice` módulo 11). Los tiempos son **[propuesta propia]**, sin visto bueno de operaciones |
 | Tratamiento del IVA y validez de 60 días | La validez es **[propuesta propia]**; el IVA lo decide Finance |
 | Evolución gráfica por lanzamiento o como pago único | Decisión del operador, abierta |
 | Reparto del total entre componentes | **[propuesta propia]** |
@@ -303,7 +303,7 @@ Es el caso del que salen las reglas, no una plantilla para copiar: el concepto, 
 | Cierre | 16/10/2026, 16:00 de Ciudad de México (19:00 de Santiago) |
 | Estado al 12/10/2026 | Paquete terminado para la revisión final del operador; nada presentado |
 | Anexo gráfico | «POSIBLE», 21 páginas |
-| Deck técnico | 21 láminas, línea Brand |
+| Deck técnico | 22 láminas, línea Brand |
 | Reel | «El agua siempre busca una entrada», 25 s, aprobado por el operador el 12/10 |
 | Página | `muestras/sika-posible-<token>` en Think, en producción desde el 12/10 |
 | Económica | PDF A4 de 4 páginas, en pesos mexicanos |

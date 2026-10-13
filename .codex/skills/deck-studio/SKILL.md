@@ -1241,7 +1241,7 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   la ficha o las bases, responde con un hecho y dice en qué lámina, página de anexo o archivo está
   cada punto; va al principio del deck. Antes de congelarla, relee la ficha y **todas** las
   respuestas del portal, también las dadas a otros proveedores (Sika 2026-10-12: una exigencia de SLA
-  por niveles de complejidad se leyó tarde y el deck no la cubre).
+  por niveles de complejidad se leyó tarde, con el deck ya exportado: hubo que agregar una lámina y reexportar).
 - **Si las bases piden un formato, se entrega ese formato.** Un video pedido se entrega como video,
   con QR y enlace clicable desde la lámina, no sólo como storyboard (detalle en
   [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md)).

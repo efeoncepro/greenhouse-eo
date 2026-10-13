@@ -2,13 +2,13 @@
 
 ## 2026-10-12 — Propuesta de campaña creativa: aprendizajes documentados (caso Sika N.º 1164)
 
-Paquete del caso terminado y **no presentado** en Wherex (cierre 16/10, 16:00 de Ciudad de México): anexo gráfico v2, deck técnico de 21 láminas,
+Paquete del caso terminado y **no presentado** en Wherex (cierre 16/10, 16:00 de Ciudad de México): anexo gráfico v2, deck técnico de 22 láminas,
 reel de 25 s con su página en Think y QR, y económica en la plantilla A4 (MXN 64.000 por lanzamiento tipo, por componente).
 Aprendizajes en el [playbook](docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md) y en las skills `greenhouse-public-private-tenders`,
 `deck-studio`, `creative-practice`, `efeonce-pricing-operator`, `motion-design-studio`, `audio-studio`, `efeonce-graphic-line` y `astro`; fila nueva en el router.
 Seis subagentes con alcance disjunto; espejos `.codex` sincronizados salvo `astro` y `efeonce-pricing-operator`, que ya diferían. Gates documentales PASS. Sin push.
-Abierto para el operador: IVA y validez de la económica, evolución gráfica por lanzamiento o pago único, SLA por niveles de complejidad (lo espera Sika; el deck
-no lo trae), texto de alcance de la lámina 10, y las reglas que chocan con lo ya escrito (precio unitario «nunca», spec work, tercera persona en SOW):
+Por la noche, a pedido del operador: lámina 10 sin texto que limite el alcance y lámina 15 nueva con tiempos por nivel de complejidad (el SLA que espera Sika;
+plazos sin visto bueno de operaciones). Abierto para el operador: IVA y validez de la económica, evolución gráfica por lanzamiento o pago único, y las reglas que chocan con lo ya escrito (precio unitario «nunca», spec work, tercera persona en SOW):
 [expediente](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md).
 
 ## 2026-10-12 — BytePlus: media directa del contrato Johor

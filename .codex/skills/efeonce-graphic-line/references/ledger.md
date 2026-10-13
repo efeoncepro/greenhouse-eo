@@ -805,7 +805,7 @@ Sigue a la entrada del 2026-10-07 (mismo proceso; «LIC-1164» allá). Al corte 
 Wherex; el resultado no se conoce. Taller y procedimiento: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
 
 - **Dos documentos, no uno** (operador): el deck técnico va separado del anexo gráfico «POSIBLE» del 07/10.
-- **Deck técnico:** 21 láminas 16:9, línea Brand (Efeonce Creative Studio), con generador propio. Del compositor sólo
+- **Deck técnico:** 22 láminas 16:9 (21 hasta la tarde del 12/10; se sumó «Tiempos por nivel»), línea Brand (Efeonce Creative Studio), con generador propio. Del compositor sólo
   portada (`cover-proposal`, layout `dawn`, brand), cierre (`close-proposal`, brand, plate `BR4-contra-amanecer`) y
   caso (`decision-case`); navegación e íconos Trazo, de `@efeoncepro/axis-graphic-line`. La entrada del 07/10 descartó
   `close-proposal` en el anexo gráfico («sus fotos son de la línea Growth»); este deck sí cierra con ella, en línea

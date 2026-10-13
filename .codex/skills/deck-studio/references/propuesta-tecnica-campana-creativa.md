@@ -2,7 +2,7 @@
 
 > **Estado:** referencia de oficio escrita el 2026-10-12 desde un solo caso: la propuesta técnica de
 > «conceptualización y despliegue creativo» para Sika Mexicana (licitación privada, Wherex N.º 1164), deck 16:9 de
-> 21 láminas, línea Brand (Efeonce Creative Studio). El operador la revisó lámina por lámina en el lienzo y sus
+> 22 láminas, línea Brand (Efeonce Creative Studio). El operador la revisó lámina por lámina en el lienzo y sus
 > correcciones son las reglas de abajo. **El paquete quedó terminado y exportado; no consta que se haya cargado en el
 > portal y el resultado de la licitación se desconoce.** No cites este caso como propuesta presentada ni ganada.
 >
@@ -36,19 +36,19 @@ contenido vive en la de cumplimiento) y **el deck abre con el trabajo**: tras la
 completa. Y la lámina de punto de partida dejó el tono de diagnóstico: parte de lo que el cliente ya hizo bien
 («Partimos de un concepto que ya funciona»), no de lo que tiene mal.
 
-### Orden de las 21 láminas
+### Orden de las 22 láminas
 
 | Tramo | Láminas | Función |
 |---|---|---|
 | **Apertura** | 1 portada · 2 la idea (Master Graphic a página completa) · 3 cumplimiento | Mostrar el trabajo antes de explicarlo y darle al evaluador el mapa: cada punto de la ficha, con sus palabras, y dónde está |
 | **La propuesta** (sección 1) | 4 punto de partida · 5 evolución (qué se conserva / qué se ordena) · 6 el sistema · 7 el brief, punto por punto · 8 audiencias · 9 muestras · 10 alcance del sistema | Demostrar que la idea nace del material del cliente, que evoluciona sin reemplazar, que responde a su brief y que escala a otros productos y canales |
-| **La producción** (sección 2) | 11 método (cinco etapas, dos aprobaciones del cliente) · 12 lanzamiento tipo · 13 reel (QR + enlace) · 14 plazo · 15 control (aprobación, rondas, contenido técnico, IA, derechos) | Convertir la idea en un servicio repetible: qué se entrega, en cuánto tiempo y quién decide |
-| **El equipo** (sección 3) | 16 equipo · 17 trabajo con el país del cliente · 18 experiencia (caso) | Quién lo hace, con nombre; cómo se atiende al cliente; prueba medida en otra cuenta |
-| **Continuidad e inicio** (sección 4) | 19 continuidad · 20 inicio (cinco insumos) | Un horizonte más largo que la muestra (el brief fijaba la campaña hasta diciembre de 2027) y un primer paso concreto |
-| **Cierre** | 21 contraportada | `close-proposal` del compositor |
+| **La producción** (sección 2) | 11 método (cinco etapas, dos aprobaciones del cliente) · 12 lanzamiento tipo · 13 reel (QR + enlace) · 14 plazo · 15 tiempos por nivel de complejidad · 16 control (aprobación, rondas, contenido técnico, IA, derechos) | Convertir la idea en un servicio repetible: qué se entrega, en cuánto tiempo y quién decide |
+| **El equipo** (sección 3) | 17 equipo · 18 trabajo con el país del cliente · 19 experiencia (caso) | Quién lo hace, con nombre; cómo se atiende al cliente; prueba medida en otra cuenta |
+| **Continuidad e inicio** (sección 4) | 20 continuidad · 21 inicio (cinco insumos) | Un horizonte más largo que la muestra (el brief fijaba la campaña hasta diciembre de 2027) y un primer paso concreto |
+| **Cierre** | 22 contraportada | `close-proposal` del compositor |
 
 Las cuatro secciones llevan la navegación en anillo de La órbita y el eyebrow del capítulo («La propuesta · Evolución»,
-«La producción · Plazo»). Las láminas 2, 3 y 18 y el marco van sin indicador.
+«La producción · Plazo»). Las láminas 2, 3 y 19 y el marco van sin indicador.
 
 Piezas que sostienen el argumento y conviene repetir:
 
@@ -199,7 +199,7 @@ catálogo y nombres del roster (`docs/operations/brand-photography/EFEONCE_TEAM_
 - **Lámina de equipo del compositor.** Trunca nombres completos y muestra la selección «Cliente» (ver tabla).
 - **Falla silenciosa por blob faltante.** El generador en modo lienzo fallaba en silencio cuando una imagen nueva no
   tenía su entrada en `blobs.json`. Sube el activo y agrega la entrada **antes** de generar los tableros, y comprueba
-  que el generador termine imprimiendo el conteo («21 láminas»: es su última línea, leído en el código) y que los
+  que el generador termine imprimiendo el conteo («22 láminas»: es su última línea, leído en el código) y que los
   tableros cambiaron.
 - **El enlace del PDF está atado a un número de página.** `pdf.mjs` pone la anotación en `13.png` con un rectángulo
   fijo (leído en el código, no medido como falla): si el orden o la posición de la ficha cambian, el enlace queda en
@@ -233,7 +233,7 @@ catálogo y nombres del roster (`docs/operations/brand-photography/EFEONCE_TEAM_
    tiene que coincidir con cómo quedaron. Medido el mismo día: las láminas 3 y 12 anuncian «el valor de cada pieza»,
    y la económica terminó desglosada por concepto (evolución gráfica, conceptualización, entregables). Ver
    [decision-package.md](decision-package.md).
-6. **`render.mjs` sin `DESBORDE`** y **las 21 láminas miradas al 100 %**, no en la hoja de contacto.
+6. **`render.mjs` sin `DESBORDE`** y **las 22 láminas miradas al 100 %**, no en la hoja de contacto.
 7. **Portada:** sin selección, respuesta en una línea, logo oficial del cliente. El uso de la marca del cliente en la
    portada y de su material en miniaturas sigue la autorización de logos (TASK-1937).
 8. **Caso:** la lámina del compositor, con la foto del caso y cada cifra con su fuente. Citar a ese cliente en una
@@ -251,12 +251,15 @@ catálogo y nombres del roster (`docs/operations/brand-photography/EFEONCE_TEAM_
 16. **Exportar sólo con el aviso del operador**, y nada se carga ni se envía en el portal sin su confirmación expresa
     en ese momento.
 
-## Lo que quedó sin cubrir
+## Lo que quedó sin cubrir o se cubrió tarde
 
-- **SLA por niveles de complejidad.** El comprador respondió a otro proveedor (09/10, en el Centro de mensajes) que
-  espera una propuesta de SLA por niveles de complejidad. Se leyó el 12/10 y **el deck no la trae**. No hay un SLA
-  aprobado que copiar: si el comprador lo pide, se define con operaciones y entra en el tramo de producción (junto a
-  plazo y control). Esa ubicación es sugerencia de esta referencia, sin validar.
+- **SLA por niveles de complejidad: cubierto tarde.** El comprador respondió a otro proveedor (09/10, en el Centro de mensajes) que
+  espera una propuesta de SLA por niveles de complejidad. Se leyó el 12/10 con el deck ya exportado y se incorporó esa noche, a pedido
+  del operador, como lámina 15 «Un plazo para cada nivel de solicitud»: tres niveles (adaptación 2 días hábiles, pieza nueva 3,
+  desarrollo 4 hasta la primera aprobación), respuesta el mismo día hábil, urgencias de nivel 1 en 24 horas y «cumplimiento a la
+  vista» (el dato se muestra desde el primer lanzamiento; el nivel comprometido se acuerda con tres meses de datos, como pide
+  `creative-practice`, módulo 11). No se usa la sigla en la lámina. Los tiempos son propuesta del agente, **sin visto bueno de
+  operaciones**. La fila «Tiempos de entrega» de la lámina de cumplimiento remite a las dos láminas.
 - **Plazo de diez días** sin visto bueno de operaciones.
 - **Autorización** del cliente del caso para citar sus cifras, y uso de la marca del comprador en la portada.
 - **Quiénes están en el país del cliente:** lo afirmó el operador; el repo no lo documenta.

@@ -222,7 +222,7 @@ def s_matriz():
     rows = [('Metodología de trabajo', 'Cinco etapas de trabajo, con dos aprobaciones suyas.', f'Láminas {ref("metodo")} y {ref("control")}'),
             ('Desarrollo y evolución gráfica de la campaña', 'Un sistema de campaña construido sobre sus materiales: firma, fórmula de titular y pieza madre.', f'Láminas {ref("partida")} a {ref("alcance")}'),
             ('1 imagen para Facebook, 1 para Instagram y 1 video tipo reel', 'Las tres piezas, para SikaSeal®-170. El reel se entrega como video de 25 segundos, con locución y música.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17 · Archivo de video'),
-            ('Tiempos de entrega', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
+            ('Tiempos de entrega', 'Diez días hábiles por lanzamiento y un plazo por nivel de complejidad para cada solicitud.', f'Láminas {ref("plazo")} y {ref("sla")}'),
             ('Propuesta económica desglosada', 'Valor de un lanzamiento tipo, por componente.', 'Documento aparte, en Wherex'),
             ('Además', 'Equipo con nombre y función, y un caso de éxito.', f'Láminas {ref("equipo")} a {ref("experiencia")}')]
     tpl = 'display: grid; grid-template-columns: 290px minmax(0, 1fr) 220px; column-gap: 26px'
@@ -353,9 +353,9 @@ def s_alcance():
                 frame('visco.jpg', 'Pieza para Sika ViscoCrete 45 HE', 1100, 200, 265, 265, 'Sika® ViscoCrete® · industria') +
                 frame('pdv.jpg', 'Colgante, cenefa y producto en un anaquel de tienda', 1380, 200, 400, 265, 'Punto de venta · colgante y cenefa', hero=True) +
                 frame('cenefa.jpg', 'Cenefa de anaquel para Sikaflex-119', 820, 560, 960, 168, 'Cenefa de anaquel, rehecha a partir de su material actual') +
-                left('La propuesta · Alcance del sistema', ['El sistema', 'llega a otros', 'productos y', 'a la tienda'], 'Para comprobar que la identidad escala, la aplicamos a Sikaflex®-119, a un producto de la línea industrial y al punto de venta. Son piezas de demostración: no forman parte del alcance base.', 80) +
+                left('La propuesta · Alcance del sistema', ['El sistema', 'llega a otros', 'productos y', 'a la tienda'], 'Para comprobar que la identidad escala, la aplicamos a Sikaflex®-119, a un producto de la línea industrial y al punto de venta.', 80) +
                 means('Consumo e industria comparten una misma identidad, de la publicación en redes al anaquel.',
-                      'Anexo gráfico, páginas 3 y 18 a 20. Piezas adicionales, fuera de la oferta base.'), section=1)
+                      'Anexo gráfico, páginas 3 y 18 a 20.'), section=1)
 
 
 add('alcance', 'Alcance del sistema', s_alcance)
@@ -452,6 +452,26 @@ def s_plazo():
 
 
 add('plazo', 'Plazo', s_plazo)
+
+
+# ── Tiempos por nivel de complejidad (SLA pedido por el comprador en la ronda de preguntas, 09/10) ─────────────────────
+def s_sla():
+    def lvl(n, name, days, desc, l, hero=False):
+        return obj(okicker(f'Nivel {n} · {name}') +
+                   f'<div style="display: flex; align-items: flex-end; gap: 14px; margin-top: 20px">{fig(days, 112)}<div style="font-size: 18px; font-weight: 500; line-height: 1.2; padding-bottom: 8px">días<br>hábiles</div></div>' +
+                   otext(desc, 16, '; margin-top: 18px'), l, 196, 300, hero, '; height: 300px')
+    cards = (lvl(1, 'Adaptación', '2', 'Cambio de formato, de medida o de texto sobre una pieza ya aprobada.', 820) +
+             lvl(2, 'Pieza nueva', '3', 'Publicación, historia o material de punto de venta derivado de la pieza madre.', 1150) +
+             lvl(3, 'Desarrollo', '4', 'Pieza madre de un producto nuevo, o guion y storyboard de un video, hasta su primera aprobación.', 1480, True) +
+             obj(icon('reloj', 44) + otitle('Respuesta y urgencias', 26, '; margin-top: 12px') + otext('Cada solicitud se confirma el mismo día hábil, con su nivel y su fecha de entrega. Una solicitud urgente de nivel 1 se entrega en 24 horas; las de nivel 2 y 3 se priorizan con un plazo acordado ese mismo día.', 18), 820, 520, 630, False, '; height: 274px') +
+             obj(icon('medicion', 40) + otitle('Cumplimiento a la vista', 24, '; margin-top: 10px') + otext('Ustedes ven la entrega a tiempo de cada pieza desde el primer lanzamiento. Con tres meses de datos acordamos el nivel comprometido.', 15), 1480, 520, 300, False, '; height: 274px'))
+    return page('Sika · Tiempos por nivel', halo(1300, 480, None) + cards +
+                left('La producción · Tiempos por nivel', ['Un plazo', 'para cada', 'nivel de', 'solicitud'], 'Un lanzamiento completo toma diez días hábiles. Las solicitudes sueltas se atienden según su complejidad, en días hábiles desde que recibimos el pedido completo.', 80) +
+                means('Saben cuánto tarda cada solicitud antes de pedirla y cómo se atiende una urgencia.',
+                      'Tiempos propuestos por Efeonce para este servicio. Su tiempo de revisión se agrega al calendario. Se confirman con ustedes en la reunión de inicio.'), section=2)
+
+
+add('sla', 'Tiempos por nivel', s_sla)
 
 
 # ── 10 · Control ───────────────────────────────────────────────────────────────────────────────────────────────

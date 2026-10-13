@@ -46,4 +46,4 @@ Estrategia y concepto: 30.000. Entregables: 34.000.
 3. **IVA.** «No aplica» supone factura de exportación de servicios desde Chile. Finance decide; se cambia `vatRate`/`taxStatus` en el JSON y se vuelve a emitir.
 4. **Validez (60 días).** Propuesta por el agente.
 5. **Tarifario de piezas extraordinarias.** Sika lo admite como opcional; no se incluyó.
-6. **SLA por niveles de complejidad.** El deck técnico propone diez días hábiles por lanzamiento, sin niveles.
+6. **Plazos.** El deck técnico propone diez días hábiles por lanzamiento y, desde el 12/10, tiempos por nivel de complejidad (lámina 15); ninguno tiene visto bueno de operaciones.

@@ -4,11 +4,11 @@
 
 ## Borrador vigente (12/10/2026)
 
-Deck 16:9 de 21 láminas, **documento separado** del anexo gráfico [POSIBLE](propuesta-grafica-creativa.md) (decisión del operador: no se presentan como una sola propuesta). Línea Brand, Efeonce Creative Studio; títulos directos, sin pregunta y respuesta; registro formal.
+Deck 16:9 de 22 láminas, **documento separado** del anexo gráfico [POSIBLE](propuesta-grafica-creativa.md) (decisión del operador: no se presentan como una sola propuesta). Línea Brand, Efeonce Creative Studio; títulos directos, sin pregunta y respuesta; registro formal.
 
 - Fuentes y cómo regenerarlo: [`ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`](../../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md).
 - Lienzo (privado): <https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5>, página «3 · Propuesta técnica (documento aparte)».
-- PDF (exportados el 12/10 con el visto bueno del operador), en la carpeta OneDrive de la licitación: `Efeonce-Propuesta-Tecnica-Sika-1164.pdf` (21 láminas), `Efeonce-Propuesta-Sika-POSIBLE-v2.pdf` (anexo gráfico con el storyboard nuevo) y `Efeonce-Reel-SikaSeal-170-POSIBLE.mp4`.
+- PDF (exportados el 12/10 con el visto bueno del operador), en la carpeta OneDrive de la licitación: `Efeonce-Propuesta-Tecnica-Sika-1164.pdf` (22 láminas, reexportado el 12/10 por la noche), `Efeonce-Propuesta-Sika-POSIBLE-v2.pdf` (anexo gráfico con el storyboard nuevo) y `Efeonce-Reel-SikaSeal-170-POSIBLE.mp4`.
 
 Secuencia: portada · la idea · cumplimiento · punto de partida · evolución · el sistema · el brief, punto por punto · audiencias · las tres muestras · alcance del sistema · método · lanzamiento tipo · reel · plazo · control · equipo · trabajo con México · caso Sky · continuidad · insumos para empezar · cierre.
 
@@ -32,6 +32,6 @@ La propuesta que hizo Codex se descartó y se eliminó por instrucción del oper
 
 ## Pendientes
 
-La económica está en borrador desde el 12/10: MXN 64.000 netos por lanzamiento tipo, desglosada en evolución gráfica, conceptualización creativa y entregables ([oferta-economica.md](oferta-economica.md)). Falta confirmar el reparto, el tratamiento del IVA y la validez. Pendiente en este deck: Sika espera una propuesta de SLA por niveles de complejidad (respuesta del 09/10 en Wherex). Presentar en Wherex exige la confirmación expresa del operador en ese momento.
+La económica está en borrador desde el 12/10: MXN 64.000 netos por lanzamiento tipo, desglosada en evolución gráfica, conceptualización creativa y entregables ([oferta-economica.md](oferta-economica.md)). Falta confirmar el reparto, el tratamiento del IVA y la validez. El 12/10 por la noche se sumó la lámina 15, «Tiempos por nivel» (2, 3 y 4 días hábiles según complejidad, urgencias y cumplimiento a la vista), que responde al SLA por niveles que Sika espera (respuesta del 09/10 en Wherex), y la lámina 10 perdió el texto que limitaba el alcance. Los plazos son propuesta propia, sin visto bueno de operaciones. Presentar en Wherex exige la confirmación expresa del operador en ese momento.
 
 [Estado del workspace](README.md) · [Evidencia de fuentes y registro histórico](research/2026-10-07-propuesta-tecnica-INTERNO.md).

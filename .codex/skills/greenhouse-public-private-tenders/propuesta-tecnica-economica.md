@@ -190,8 +190,8 @@ allí; no volver a preguntar hechos resueltos ni extrapolar declaraciones entre 
 - Cuidado: cada respuesta puede volver **obsoleto un anexo** que ya tenías armado — re-corre la matriz de cumplimiento tras cada tanda de respuestas.
 - **Relee la ficha y el Centro de mensajes completo antes de congelar cada documento, y otra vez antes
   de la económica.** No sólo las preguntas propias. En el mismo caso, la respuesta que pedía una
-  propuesta de SLA por niveles de complejidad se leyó el 12/10, con el deck técnico ya cerrado: quedó
-  como pendiente sin cubrir. Un requisito que nace en una respuesta entra a la matriz de cumplimiento
+  propuesta de SLA por niveles de complejidad se leyó el 12/10, con el deck técnico ya cerrado: obligó a
+  agregar una lámina y reexportar. Un requisito que nace en una respuesta entra a la matriz de cumplimiento
   con su fecha, igual que uno de las bases.
 - **Una pregunta sin respuesta puede estar resuelta en la plataforma.** La de la moneda nunca se
   respondió por mensaje; el selector de moneda del paso donde se ingresa el precio ya la resolvía.

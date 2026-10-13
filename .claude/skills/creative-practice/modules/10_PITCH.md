@@ -179,13 +179,13 @@ centro de mensajes, y ahí define qué se cotiza y qué va a comparar.
 🔴 **Regla:** releer la ficha y el centro de mensajes **completo** —incluidas las respuestas a otros proveedores—
 antes de congelar cada documento, y otra vez antes de la económica. Caso fuente (Sika Mexicana, Wherex N.º 1164,
 2026-10-12): el alcance a cotizar («lanzamiento tipo») lo definieron respuestas dadas a otros proveedores, y la
-expectativa de SLA por niveles se leyó tarde: el deck técnico no la cubre (pendiente abierto del caso).
+expectativa de SLA por niveles se leyó tarde, con el deck técnico ya exportado; se incorporó después como lámina de tiempos por nivel.
 
 | Señal del comprador | Qué significa | Qué se hace |
 |---|---|---|
 | **«Propuesta económica desglosada»** | Quiere ver de qué se compone el monto | Desglose por **componente de valor**, no por pieza → `04_PRICING` §7 (b.1) |
 | **La volumetría es «referencia para comparar ofertas»** | Es una canasta común, no el alcance final: formatos y cantidades pueden cambiar | Cotizar la canasta tal como la definieron; no leerla como volumen comprometido; dejar dicho cómo se ajusta el valor si cambia |
-| **Espera «SLA por niveles de complejidad»** | Va a comparar tiempos por tipo de entregable, no un plazo único | Responderlo con niveles en la técnica, o dejarlo como pendiente visible. Qué se firma como SLA → `11_METRICAS_COMPROMISO`; el plazo lo valida operaciones |
+| **Espera «SLA por niveles de complejidad»** | Va a comparar tiempos por tipo de entregable, no un plazo único | Responderlo con niveles en la técnica (en el caso: 2, 3 y 4 días hábiles por nivel, urgencias y el dato de cumplimiento a la vista, sin firmar un porcentaje el día uno). Qué se firma como SLA → `11_METRICAS_COMPROMISO`; el plazo lo valida operaciones |
 | **Para punto de venta, «sólo el diseño»** | No compra impresión ni producción | No costear ni ofrecer impresión |
 | **Las condiciones de pago «se revisan con quienes avancen»** | No es criterio de esta etapa | No proponer forma de pago: «se acuerdan al formalizar el servicio» |
 | **Un tarifario de piezas extraordinarias es «opcional»** | No lo exige | No se incluye |
