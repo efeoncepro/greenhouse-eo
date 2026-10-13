@@ -66,7 +66,7 @@ return r.json()
  if(!/^[a-f0-9]{64}$/.test(ingressToken))throw Error('credential_invalid')
  const digest=createHash('sha256').update(ingressToken).digest('hex')
  const list=await req(base+'/templates')
- let template=list.customTemplate?.find((t:any)=>t.name==='Efeonce backend Lead ingress')
+ let template=list.template?.find((t:any)=>t.name==='Efeonce backend Lead ingress')
 
  if(!template)template=await req(base+'/templates','POST',{name:'Efeonce backend Lead ingress',templateData})
  else template=await req(template.path+'?fingerprint='+encodeURIComponent(template.fingerprint),'PUT',{name:template.name,templateData})
