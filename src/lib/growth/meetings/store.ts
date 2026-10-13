@@ -3,6 +3,8 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { query, withTransaction } from '@/lib/db'
+import type { PreparedMeasurement } from '@/lib/growth/measurement/contracts'
+import { enqueueMeasurementConversion } from '@/lib/growth/measurement/store'
 
 export interface MeetingSurfaceAuthority {
   surfaceId: string
@@ -279,7 +281,26 @@ export const finalizeMeetingExecution = async (input: {
   safeOutcome: string
   safeErrorCategory?: string | null
   conversionReceiptHash?: string | null
+  measurement?: PreparedMeasurement | null
 }): Promise<boolean> => {
+  if (input.state === 'succeeded' && input.measurement) {
+    return withTransaction(async client => {
+      const result = await client.query<{ execution_id: string }>(
+        `UPDATE greenhouse_growth.meeting_booking_execution
+            SET state = 'succeeded', safe_outcome = $2, safe_error_category = $3,
+                conversion_receipt_hash = $4, completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+          WHERE execution_id = $1 AND state = 'provider_dispatched'
+          RETURNING execution_id`,
+        [input.executionId, input.safeOutcome, input.safeErrorCategory ?? null, input.conversionReceiptHash ?? null],
+      )
+
+      if (!result.rows.length) return false
+      await enqueueMeasurementConversion(client, 'meeting_booking', input.executionId, input.measurement)
+
+      return true
+    })
+  }
+
   const rows = await query<{ execution_id: string }>(
     `UPDATE greenhouse_growth.meeting_booking_execution
         SET state = $2,

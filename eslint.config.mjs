@@ -819,6 +819,17 @@ export default [
   },
 
 
+  {
+    files: ['scripts/measurement/hubspot-consent-bridge.js'],
+    // This canonical browser asset is already deployed byte-for-byte in WP/Think.
+    // Keep semantic linting; do not reformat it or rename its ES5 catch binding.
+    rules: {
+      'padding-line-between-statements': 'off',
+      'newline-before-return': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { caughtErrorsIgnorePattern: '^_$' }]
+    }
+  },
+
   /*
     Prettier compat — DEBE ir al final. Apaga reglas que conflictuan con
     el formatter para evitar fights.

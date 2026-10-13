@@ -7,6 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-13 — Meta CAPI y consentimiento publicados
+
+- [ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
+  [contrato HubSpot](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md) y
+  [auditoría](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server en
+  `efeonce-group`, min 0/max 1; **server live 5/web live 5**, Meta v25 y forwarding GA4.
+- Banner español opt-in/GPC y routing activos WP/Think. PageView por destino, default denied,
+  URL limpia, UUID sender compatible, Lead accepted form/confirmed meeting; sin nuevo sender.
+- Meta Test Events Processed/Server y diez negativos sin salidas; navegación real ambos hosts
+  completó Meta/GA4. Lead QA accidental previo documentado y gate UUID corregido.
+- 16 tests bridge y 30 renderer PASS; renderer local sin release GH. Think promovido y WP
+  plugin scoped 1.0.3 con preferencias inline junto a enlaces legales, sin franja adicional. Próximos leads/replay reales pendientes.
+  Docs/skills espejo actualizados; sin commit/push, proyecto o suscripción nueva.
+- Requisito de remarketing registrado en [08 §4.1](docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#41-lead-utilizable-para-remarketing--requisito-confirmado-2026-10-13):
+  contacto en hash compatible, clasificadores y consentimiento por ingreso backend exclusivo.
+  Readback live 5/5 conserva transporte anterior; [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) agrega matching local probado, sin deploy.
+- GA4 UPD/ack y siete audiencias 90d activos/releídos; secretos scoped preparados. Meta Preview/Test Events
+  Processed/Server con em/ph/fn/ln y clasificadores, seis negativos bloqueados. 71 tests + 21 Client tests,
+  tipos/lint y builds PASS. Release acotado, SQL y flags pendientes por restricción del checkout compartido;
+  [evidencia y siguiente paso](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md).
+
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 
 - [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
@@ -549,14 +570,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 - La grilla de piezas de Studio tenía columnas fijas y escondía las 1,91:1 cargadas y aprobadas; ahora muestra las
   proporciones presentes en la campaña y rotula `191x100` como «1,91:1» (Studio `23e5787`, verificado en el navegador).
   Commits de este repo sin push.
-
-## 2026-10-02 — Marketing Studio: puerta de ingreso de originales en producción (TASK-1894, Entregable A)
-
-- Studio 1.3.0 recibe finales por una sola puerta: `studio.asset.upload.request` (URL firmada V4 directo al bucket)
-  y `studio.asset.version.create` (confirmación; el worker recalcula sha256, tamaño, tipo y proporción antes de crear
-  la versión en `pending_review`). Kernel de commands con autoridad, `riskTier`, idempotencia y `dryRun`; CLI
-  `pnpm studio:upload` (cliente de API `studio:assets:write`) y CLI de operador `pnpm studio:review`.
-- Migración `1790956839977_asset-ingest-door` aplicada en staging y producción; `STUDIO_UPLOADS_ENABLED` y
-  `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON. 33 piezas de CMP-004 cargadas en producción, pendientes de revisión.
-  Capability en Greenhouse y sync del gateway quedan pendientes.
-  [Task](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md).

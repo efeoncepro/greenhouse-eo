@@ -1,9 +1,9 @@
 ---
 name: greenhouse-gtm-ga4-operator
-description: Operate Google Tag Manager + GA4 for Efeonce — create/edit tags, triggers and variables via the GTM API v2 (governed workspace → preview → confirm → publish), register GA4 custom dimensions and key events, and verify events land. Use when tagging Growth Forms, Growth CTAs, the native meeting scheduler or landings; wiring governed dataLayer events to GA4; building or auditing GTM container config; confirming a measurement ID/property; or diagnosing "event not showing in GA4". Operates the `src/lib/growth/{gtm,ga4}` clients and the measurement tracking plan; event semantics remain owned by their source domains.
+description: Operate Google Tag Manager Web/Server + GA4 + Meta Conversions API for Efeonce — create/edit tags, triggers and variables via the GTM API v2 (governed workspace → preview → confirm → publish), register GA4 custom dimensions and key events, and verify events land. Use when tagging Growth Forms, Growth CTAs, the native meeting scheduler or landings; wiring governed dataLayer events to GA4; building or auditing GTM container config; confirming a measurement ID/property; or diagnosing "event not showing in GA4". Operates the `src/lib/growth/{gtm,ga4}` clients and the measurement tracking plan; event semantics remain owned by their source domains.
 ---
 
-# Greenhouse GTM + GA4 Operator
+# Greenhouse GTM Web/Server + GA4 + Meta CAPI Operator
 
 Use this skill to **operate measurement instrumentation** for Efeonce: build and publish GTM tags/triggers/variables via the API v2, register GA4 custom dimensions and key events, and verify that events actually land in GA4. It is an **executing operator**, not a knowledge dump — the conceptual reference (event model, naming, taxonomy, house style) lives in **`docs/reference/measurement-gtm-ga4/`** (owner skill: `growth-marketing-cro`). Load that for the "what/why"; this skill is the "how to build/publish/verify".
 
@@ -21,11 +21,84 @@ Use this skill to **operate measurement instrumentation** for Efeonce: build and
 
 For **event naming / taxonomy / the gh_ house style** → `docs/reference/measurement-gtm-ga4/` (skill `growth-marketing-cro`). For **campaign/UTM measurement strategy** → `digital-marketing`.
 
+## Meta CAPI / sGTM — cargar antes de proponer o ejecutar
+
+Canon: `docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md` +
+ADR `GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md`. Para Efeonce, CAPI se opera por
+**GTM Server**, separado de Pixel/web; no proponer Pixel web como solución completa.
+Meta admite backend directo y Gateway, pero no son la ruta elegida. Inventariar primero:
+API 2026-10-13 confirmó `Efeonce Server` `GTM-K2X4ZTTK`, cuenta `6068297031`, container
+`191286361`, live 3, Client GA4 y tag CAPI para `708931297255942`; entrega actual pendiente.
+Releer `usageContext`, endpoints, Clients, template/SHA/permisos, versiones y fuentes.
+
+1. Recuperar el server existente antes de crear otro. Metadata/URL/token no prueban funcionamiento.
+   Hosting: leer billing mode, mínimos de servicio/revisión, máximos, CPU/RAM y costo antes de
+   provisionar. El contenedor Server requiere ejecución; la referencia USD/mes de instancia
+   always-on no es una tarifa fija ni una factura. min=0 no garantiza gratis y free tier se
+   comparte por billing. Ante cuota de vinculación, evaluar el proyecto canónico existente
+   antes de solicitar cuota o crear otro proyecto, con capacidad/costo explícitos.
+2. PageView requiere navegación consentida. Para recuperar Lead, reusar
+   `gh_form_submission_accepted → generate_lead → GA4 Client sGTM → Meta Lead`: accepted
+   se emite tras aceptación backend. No exigir otro emisor backend ni usar `gh_form_submitted`.
+   No enviar postulaciones, clics ni errores; un sender outbox futuro es otro carril con dedupe.
+   Reuniones: `gh_meeting_booking_confirmed → generate_lead` (`lead_source=meeting_booking`)
+   → CAPI Lead con filtro propio por scheduler/surface. Cargar `greenhouse-growth-meetings`: sólo
+   confirmación elegible, nunca apertura/intento/replay; UUID opaco renderer o fallback sender
+   Crypto memoizado por evento GTM. No exige release GH; nunca receipt/IDs internos. Futuro backend necesita identidad compartida.
+3. CAPI tag y token sólo servidor. No ampliar dataLayer/GA4 con PII; usar ingress separado,
+   allowlists por destino, gate Meta explícito (denegado/desconocido bloquea) y exports redactados.
+4. Identidad/tiempo estables por ocurrencia/retry; Pixel complementario comparte nombre/ID.
+   No crear dos senders independientes ni prometer que sGTM evita todos los bloqueadores.
+5. Preview Server → salida y respuesta Meta → Test Events Server → readback live/dedupe.
+   `/healthy`, tag disparado, GA4 smoke y snapshot web NO prueban CAPI.
+
+Lead para remarketing requiere el contrato **08 §4.1–4.2** y TASK-2034: Meta usa hashes
+SHA-256 sin salt y sin appendix SDK; Google normaliza por separado (Gmail dots y +E.164).
+No reutilizar HMAC interno. Prohibido PII/hash en eventos GA4 ordinarios, dimensiones,
+dataLayer y URLs. **UPD dedicado top-level MP es el carril permitido para Google**, con
+client_id real, sin events ni otro generate_lead; publicidad y analytics consentidos.
+El template Meta pin necesita `custom_properties` JSON string, no un objeto directo.
+Backend captura sólo aceptación/confirmación, veto adicional Sec-GPC, snapshot cifrado,
+UUID/tiempo durables y unique source. Worker comparte cadence Forms con fallo de medición
+aislado; destinos independientes, lease CAS y retención48h. Al cutover retirar los triggers
+Meta Lead browser12/17 antes de habilitar backend; PageView11/GA4 mirror continúan.
+2026-10-13: código local probado y draftworkspace8 Preview/Test Events Server muestran
+em/ph/fn/ln + clasificadores; **todavía sin deploy**. GA4 486264460 UPD/ack activos, automática
+OFF y siete audiencias90d releídas, Ads link9531478329 ya activo. Secretos scoped preparados.
+No asumir serving, matching efectivo ni atribución deduplicada por Processed. Google Signals
+no es prerrequisito de UPD. Respetar la restricción shared workspace antes del release.
+
+Verificado 2026-10-13: hosting del mismo `GTM-K2X4ZTTK` recuperado en `efeonce-group`,
+tagging + preview min 0/max 1, 1CPU/512MiB, instance-based; `/healthy` 200 y Preview funcional.
+GTM Web live **5**/Server live **5** publicados con autorización; HubSpot categoría opt-in y
+routing WP/Think activos. Test Events Server procesados y PageView real completó ambos destinos.
+Próximas conversiones comerciales/replay pendientes. Ver estado/URLs en la auditoría.
+Cargar `09-hubspot-consent.md`: API banner `_hsp`, boolean categories, nunca legacy `allowed`
+ni `_hsq`. Default inline denied antes de tags; analítica no concede Meta, GPC bloquea publicidad.
+PV explícito una vez/destino: `meta_only` gatea GA4, `meta_capi_page_view` + UUID gatean Meta.
+Forwarding GA4 gatea consentimiento nativo `x-ga-gcs` con `^G1[01]1$`; custom analytics_consent
+no está en todos los eventos automáticos y no sirve como único gate. Unknown/denied bloquea.
+SDK GA4 transporta `event_id` como **evnid**, Client normaliza a event_id: no concluir ID
+ausente por buscar sólo ep.event_id. Retirar Test Events code antes del publish/readback.
+SoT bridge `scripts/measurement/hubspot-consent-bridge.js`; WP/Think copias byte-idénticas.
+Preferencias de cookies = control de texto integrado al pie legal; nunca franja/CTA
+independiente debajo del sitio. Probar acceso móvil sin superposición del CTA de reuniones.
+Gates: **no usar regex `.+` para validar event_id**: acepta missing/`undefined` como string.
+Exigir UUID anclado y probar ausente + literal `undefined`; una prueba sintética alcanzó Meta
+antes de corregirlo. Positivos sólo con `test_event_code` real verificado; nunca un código inventado.
+Routing Think no cubre Site Kit en WordPress: inspeccionar el emisor/config inicial de cada host.
+Forwarding GA4 oficial server usa `sgtmgaaw`/`measurementId`, no la shape web `gaawe`.
+Sanear URL por destino: Regex Table server `remm` + transformación `tf_augment_event` sólo
+Meta; excluir referrer/controles con `tf_exclude_params`. UI rechaza literal vacío en aumento;
+excluir el campo. Validar variables y luego payload positivo Test Events; no igualar ambos.
+6. Workspaces aislados por contenedor; presentar diff/QA/rollback antes de publicar.
+   Documentación no autoriza provisionar cloud/DNS/IAM, rotar secretos ni enviar canaries.
+
 ## Canonical coordinates (Efeonce)
 
 | Recurso | Valor |
 |---|---|
-| GTM contenedor live | `GTM-NGHPGRLZ` · account `6291647045` · container `218104216` · workspace **Default (id=2)** |
+| GTM contenedor **web** live | `GTM-NGHPGRLZ` · account `6291647045` · container `218104216` · workspace **Default (id=2)** |
 | GTM Google tag (config) actual | type `googtag`, `tagId=G-KYPPY57M14` (firing All Pages) |
 | GA4 propiedad | `efeoncepro.com` · propertyId `486264460` · account GA4 `252968286` |
 | Hosts medidos (misma propiedad) | `efeoncepro.com` (page_view vía Site Kit) + `think.efeoncepro.com` (page_view vía GA4 Config gateado por hostname en el container; snippet GTM en `efeonce-think` repo). Subdominio = mismo stream, funnel unificado. |
@@ -75,7 +148,7 @@ enlazada”.
 - **SIEMPRE leer `docs/reference/measurement-gtm-ga4/LEARNINGS.md` + el doc `05` (shapes) ANTES de construir un tag.** Los gotchas verificados (`measurementIdOverride` no tagReference, scope `quick_preview`, consent en verificación, branch-from-version) evitan repetir errores ya pagados.
 - **NUNCA publicar a `GTM-NGHPGRLZ` sin (a) preview/Tag Assistant, (b) confirmación humana explícita en el turno.** Construir en el **workspace** es seguro (no toca el sitio); `create_version` + `publish` es la ÚNICA mutación live y requiere OK. Si lo opera un agente, es `propose → confirm → execute` (el humano confirma antes del publish).
 - **NUNCA hand-writear el bloque `gaawe` de memoria a ciegas.** Usar las plantillas verificadas de `docs/reference/measurement-gtm-ga4/05-gtm-api-v2-tag-shapes.md`; la API valida al crear en el workspace (un shape malo falla en el `POST`, no en producción) — crear, hacer `GET` de vuelta, confirmar shape.
-- **NUNCA taggear el contenedor equivocado.** Solo `GTM-NGHPGRLZ` (218104216) dispara en el sitio. `GTM-NS3RNNCD` es un duplicado huérfano.
+- **NUNCA taggear el contenedor equivocado.** Para la web, `GTM-NGHPGRLZ` (218104216); `GTM-NS3RNNCD` es un duplicado huérfano. Para CAPI, elegir el contenedor `usageContext=server` del inventario; no aplicar coordenadas web al carril servidor. Publicar server también requiere preview y aprobación explícita; provisioning cloud/secrets son mutaciones separadas.
 - **SIEMPRE registrar en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`** el estado de tagging del form/CTA (obligación espejada en la skill `greenhouse-growth-forms`).
 - **NUNCA PII ni valores crudos** en parámetros de eventos (allowlist `src/lib/growth/forms/contracts.ts`); registrar un parámetro como custom dimension en GA4 para poder reportarlo.
 - **Preferir el evento recomendado GA4** cuando existe (submit de lead → `generate_lead`, hereda key events/predictivos); custom `gh_` solo cuando no hay equivalente (regla en `docs/reference/measurement-gtm-ga4/04`).
@@ -116,6 +189,7 @@ Todo el conocimiento vive en la carpeta canónica `docs/reference/measurement-gt
 | **`LEARNINGS.md`** | **Leer ANTES de construir.** Build-log de aprendizajes reales en runtime (gotchas verificados: `measurementIdOverride`, scope de `quick_preview`, branch-from-version, propagación CDN, verificación `/g/collect`). |
 | `05-gtm-api-v2-tag-shapes.md` | **JSON copy-pasteable de la API v2**: `gaawe` (GA4 Event tag — `measurementIdOverride`/`measurementId` tagReference + `eventSettingsTable`), `googtag`, `customEvent` trigger, `v` (DLV), constant/lookup/CJS, built-in vars, workflow versions/publish, quotas/fingerprint. **La plantilla exacta para no adivinar.** |
 | `06-gtm-tagging-as-code-and-ops.md` | Container-as-code, deploy seguro (workspace→preview→staging→publish→rollback), verification tiers (Playwright `/g/collect`), gobernanza/permisos, sGTM, diagnostic ladder "event not showing in GA4". |
+| `08-meta-conversions-api-server-side.md` | Meta CAPI vía GTM Server: inventario, contrato, consentimiento, ingress, secretos, dedupe y readback Meta. |
 | `07-ga4-admin-api-ops.md` | GA4 Admin API: data streams (resolver measurement ID de `486264460`), custom dimensions, key events, MP secrets, access bindings; blueprint lead-gen. |
 | `04-greenhouse-gh-event-convention.md` | House style `gh_`, regla GA4-recomendado vs custom, coordenadas. |
 | `01/02/03` | Conocimiento base: GA4 event model · GTM/dataLayer · taxonomía de naming. |

@@ -1,5 +1,26 @@
 # Handoff
 
+## 2026-10-13 — Meta CAPI y consentimiento publicados
+
+[ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md), [consentimiento](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md)
+y [evidencia](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server, hosting
+`efeonce-group`, tagging/preview min 0/max 1; GTM **server live 5 / web live 5**.
+HubSpot español opt-in por categorías/GPC activo en ambos sitios, default denied;
+WP routing activo + plugin 1.0.3; Think `dpl_AH8YdErwaGg6haELFGzdk3DuddRX` promovido.
+Preferencias inline en pie legal de ambos hosts, sin franja extra; QA desktop/móvil PASS.
+Meta Test Events Processed/Server: PageView ambos hosts + Lead accepted form/confirmed meeting;
+10 negativos sin salidas. PageView real ambos hosts completó Meta/GA4 con versión live.
+Primera visita sin elección HubSpot: banner automático; sólo publicidad produjo PageView
+Procesado/Servidor de ambos hosts, UUID correlacionado navegador→Meta y GA4 bloqueado.
+UUID sender fallback compatible evita exigir release GH; renderer local 30 tests sin release.
+Incidente previo: Lead sintético fuera de Test Events por regex `.+`, corregido a UUID.
+No bookings/submissions/CRM creados. Preview cerrado; QA de preferencias desktop/mobile.
+Remarketing: [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) implementado localmente: consentimiento granular en POST, hashes Meta/Google separados, cola cifrada y retries por destino; 71 tests + 21 Client tests, tipos/lint y builds PASS.
+GA4 correcto 486264460: UPD/ack activos, siete audiencias 90d creadas/releídas, Ads link existente; tres secretos version1 con grant scoped, refs aún no configuradas. Preview workspace8 + Meta Test Events Processed/Server muestran em/ph/fn/ln y clasificadores en ambos hosts; seis negativos bloqueados, replay conserva ID (no prueba atribución deduplicada).
+Migración parked/flags/cutover/release pendientes. Live 5/5 conservado, test code draft retirado. El operador ordenó release completo develop→main el 13/10, rechazando el checkout acotado. Se mantiene el checkout compartido; revisión/preflight del batch completo en curso. [Auditoría y paquete](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md). No publicar un batch amplio por inferencia.
+Próximos leads comerciales/replay y calidad de coincidencia aún sin verificar. Docs/skills espejo
+actualizados; sin commit/push. Rollback y límites de costo en auditoría; no nuevo proyecto/suscripción.
+
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 
 El operador presentó la oferta el 13/10 a las 08:56 (estado «Enviada», leído en el portal sin tocar campos): un servicio, MXN 64.000 netos, tres archivos

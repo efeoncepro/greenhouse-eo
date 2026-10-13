@@ -2,6 +2,8 @@ import 'server-only'
 
 import { randomBytes } from 'node:crypto'
 
+import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+
 import { turnstileCaptchaVerifier, type CaptchaVerifier } from '@/lib/growth/public-submission/captcha'
 
 import type { MeetingBookingConfirmed, MeetingBookingRequest, MeetingPublicError } from './contracts'
@@ -123,6 +125,8 @@ export const bookMeeting = async (
   context: {
     origin: string | null
     ip: string | null
+    userAgent?: string | null
+    requestGlobalPrivacyControl?: boolean
     env?: NodeJS.ProcessEnv
     provider?: MeetingSchedulingProvider
     hasher?: MeetingPrivacyHasher
@@ -284,11 +288,22 @@ export const bookMeeting = async (
 
     const receipt = randomBytes(32).toString('base64url')
 
+    const measurement = await prepareMeasurementConversion({
+      scope: {
+        sourceKind: 'meeting_booking', sourceId: claim.executionId, origin: context.origin,
+        pageUri: input.attribution?.pagePath, surfaceId: input.surfaceId, schedulerKey: input.schedulerKey,
+      },
+      contact: input.contact, measurementContext: input.measurementContext,
+      ip: context.ip, userAgent: context.userAgent,
+      requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
+    }, env)
+
     const persisted = await finalizeMeetingExecution({
       executionId: claim.executionId,
       state: 'succeeded',
       safeOutcome: 'confirmed',
       conversionReceiptHash: hasher.hmac('receipt', receipt),
+      measurement,
     })
 
     if (!persisted) return error('provider_degraded', 'check_email', false)

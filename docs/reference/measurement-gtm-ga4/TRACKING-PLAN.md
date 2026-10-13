@@ -102,3 +102,33 @@ ORDER BY last_published_at DESC NULLS LAST;
 ```
 
 Al refrescar: agregar forms nuevos con tagging `⏳ pendiente`, no borrar filas (marcar `archived` si se archivó en la DB). El markdown mantiene la capa de medición que la DB no tiene.
+
+## Meta CAPI / servidor — 2026-10-13
+
+Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md) y
+[recuperación verificada](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+
+| Destino | Evento | Origen requerido | Estado | Evidencia pendiente |
+| --- | --- | --- | --- | --- |
+| Pixel/dataset `708931297255942` vía `GTM-K2X4ZTTK` Server | `PageView` | Navegación consentida de ambos hosts | Server live 5/Web live 5; HubSpot/routing activo ambos hosts; Server Processed Test Events y tags reales Completada | Observar volumen/recepción ordinaria y calidad de coincidencia |
+| Mismo destino/servidor | `Lead` formulario | `gh_form_submission_accepted → generate_lead` tras aceptación comercial backend | Web live 5/server live 5, accepted/UUID/ads gates; Lead Test Events Server Processed | Próxima conversión comercial real y reconciliación ledger |
+| Mismo destino/servidor | `Lead` reunión | `gh_meeting_booking_confirmed → generate_lead`, `lead_source=meeting_booking`; confirmación elegible fresca | Web live 5 tag 60/trigger 59; server live 5 trigger 17; UUID sender fallback, Lead Test Events Server Processed | Próxima reserva elegible/replay reales; renderer enhancement local sin release |
+
+Tagging/preview en `efeonce-group`: min 0/max 1 por servicio, 1CPU/512MiB, instance-based,
+`/healthy` 200/ok; contenedor existente asociado. Draft forwarding GA4 excluye datos Meta.
+Seis negativos Preview bloquean Meta y GA4 (marcador interno sólo para GA4). Un Lead sintético
+previo llegó a Meta por gate `.+` que aceptó missing; corregido a UUID anclado y retesteado.
+No cuenta como conversión real ni certifica producción. Versiones live web 4/server 3 sin cambiar.
+Inventario/borrador no constituye rollout ni elegibilidad de todos los Growth Forms.
+
+
+## Delta 2026-10-13 — matching de Leads
+
+[TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md): Meta
+recibió fixtures enriquecidas en Preview/Test Events Server; sin cutover productivo todavía.
+Google propiedad 486264460: UPD/ack y siete audiencias 90 d activos, dimensiones lead_source y
+scheduler_key añadidas. Lead browser generate_lead continúa como única conversión GA4;
+backend Google enviará sólo user_data dedicado con client_id real, consentimiento analytics+ads.
+PII/hash excluidos de parámetros ordinarios/dataLayer. Metadata comercial Meta se construye
+en custom_properties JSON string. Sender único MetaLead después del release, retirando
+triggers browser12/17. PageView 11 se conserva. [Estado/evidencia](../../audits/measurement/META_LEAD_MATCHING_2026-10-13.md).

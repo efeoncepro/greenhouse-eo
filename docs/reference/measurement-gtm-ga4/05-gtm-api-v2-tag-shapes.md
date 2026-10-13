@@ -6,6 +6,29 @@
 
 **Parameter `type` enum values are camelCase-lowercase in the REST JSON**, not the UPPERCASE tokens shown in Google's discovery document / client-library constants. In a raw HTTP body you write `"type": "template"`, **not** `"type": "TEMPLATE"`. Same for tag/trigger/variable `type` (`gaawe`, `googtag`, `customEvent`, `v`, `c`, `smm`, `jsm`).
 
+### Server shapes verified in UI + API, 2026-10-13
+
+These are Server container shapes, not substitutions for the Web examples below:
+
+- Official GA4 forwarding: tag `sgtmgaaw`, `measurementId` parameter of type `template`.
+  `epToExclude` is a `list` of `map` with `fieldName` (`template`); built-in Client Name
+  uses enum `clientName`. A negated trigger condition has parameter
+  `{ "type":"boolean", "key":"negate", "value":"true" }`, not a top-level property.
+- Regex Table variable: type `remm`, `input` template, `setDefaultValue`, `fullMatch`,
+  `replaceAfterMatch`, `ignoreCase` booleans; `map` list contains maps with template
+  keys `key` (regex) and `value` (e.g. `$1`). Explicit default may be an empty template.
+- Augment transformation: type `tf_augment_event`, `augmentEventTable` list of maps
+  with `paramName`/`paramValue` templates. Exclusion: `tf_exclude_params`,
+  `excludedParamsTable` list of maps with template `excludedParams`.
+  Both use `allTagsExcept=false` and `affectedTags` list of maps containing
+  `tagReference` of type `tagReference`, value tag **name**, to affect only Meta.
+  `matchingConditionsEnabled=false` applies always within that destination scope.
+  An empty literal augmentation value is rejected by UI: exclude a field instead.
+
+Preserve existing fingerprints and unknown parameters on updates. Read back, compile and
+test functionally; accepted JSON/quickPreview does not establish correct delivery.
+See [CAPI recovery evidence](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+
 ---
 
 ## 1. Base URL, path grammar, verbs

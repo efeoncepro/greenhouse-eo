@@ -25,6 +25,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `TASK-2034` | `in-progress` | Lead matching Meta CAPI y Google UPD/audiencias | `docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md` |
 | `TASK-2033` | `in-progress` | Efeonce Insights: alcance de contenido por organización (medir sólo lo que Efeonce trabaja) | `docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md` |
 | `TASK-2032` | `to-do` | Product reference prices computed by Pricing V3 | `docs/tasks/to-do/TASK-2032-product-reference-prices-from-pricing-v3.md` |
 | `TASK-2031` | `to-do` | Quoter V3 product identity: SKU binding, composite services and line versus custom items | `docs/tasks/to-do/TASK-2031-quoter-v3-product-identity.md` |
@@ -2626,3 +2627,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro 2026-10-12 (tarde): `EPIC-053` suma TASK-2031 (identidad de producto en el cotizador V3: vínculo con el SKU de Productos, servicios compuestos, line item y custom item, índice por línea para inteligencia de negocios) y TASK-2032 (precio de referencia de Productos calculado por V3); sólo planificación. TASK-2031 va antes de TASK-2027 y de la primera cotización real. Siguiente ID libre TASK-2033.
 
 > Registro 2026-10-12 (noche): `EPIC-045` suma TASK-2033 (alcance de contenido por organización en Efeonce Insights: reglas de ruta en el dominio SEO, readers dueños que las aplican, evidencia sellada con su alcance y línea «Qué mide este informe»; pedido del operador por Berel, que hoy se mide sobre el dominio completo). Siguiente ID libre TASK-2034.
+
+> Registro 2026-10-13: TASK-2034 reservada para matching de Leads Meta CAPI y Google UPD/audiencias (pedido explícito del operador). Implementación en `in-progress/`; siguiente ID libre TASK-2035.

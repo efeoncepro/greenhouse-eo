@@ -192,15 +192,36 @@ interface DataLayerWindow {
   dataLayer?: Array<Record<string, unknown>>
 }
 
+const conversionEventIds = new WeakMap<MeetingTelemetryEffect, string>()
+const emittedConversions = new WeakSet<MeetingTelemetryEffect>()
+const conversionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+const createConversionId = (win: Window): string => {
+  if (typeof win.crypto.randomUUID === 'function') return win.crypto.randomUUID()
+
+  const bytes = win.crypto.getRandomValues(new Uint8Array(16))
+
+  bytes[6] = (bytes[6] & 0x0f) | 0x40
+  bytes[8] = (bytes[8] & 0x3f) | 0x80
+
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')
+
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
+
 export const emitMeetingTelemetry = (
   host: HTMLElement,
   effect: MeetingTelemetryEffect,
   options: {
     dataLayerEnabled?: boolean
     win?: (Window & DataLayerWindow)
+    createConversionEventId?: () => string
   } = {},
 ): void => {
-  const detail = { ...effect.payload, event: effect.event }
+  const detail: Record<string, string> = { ...effect.payload, event: effect.event }
+
+  // Conversion identity is minted here, never adopted from a receipt or caller payload.
+  delete detail.event_id
 
   if (effect.dispatchHostEvent) {
     try {
@@ -214,9 +235,33 @@ export const emitMeetingTelemetry = (
 
   if (options.dataLayerEnabled === false || !win) return
 
+  const isConversion = effect.event === MEETING_GTM_EVENTS.bookingConfirmed
+
+  if (isConversion && emittedConversions.has(effect)) return
+
+  if (isConversion) {
+    try {
+      let eventId = conversionEventIds.get(effect)
+
+      if (!eventId) {
+        const candidate = options.createConversionEventId?.() ?? createConversionId(win)
+
+        if (conversionIdPattern.test(candidate)) {
+          eventId = candidate
+          conversionEventIds.set(effect, candidate)
+        }
+      }
+
+      if (eventId) detail.event_id = eventId
+    } catch {
+      // Keep the existing GA4 mirror; the CAPI gate rejects a missing identity.
+    }
+  }
+
   try {
     win.dataLayer = win.dataLayer || []
     win.dataLayer.push(detail)
+    if (isConversion) emittedConversions.add(effect)
   } catch {
     // Analytics blockers remain UX-safe.
   }

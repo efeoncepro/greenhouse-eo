@@ -23,6 +23,7 @@
     "wp-content/plugins/eo-vibe-coding-api",
     "wp-content/plugins/greenhouse-wp-bridge",
     "wp-content/plugins/eo-elementor-widgets",
+    "wp-content/plugins/eo-measurement-consent",
     "wp-content/mu-plugins/efeonce-admin-memory-guard.php"
   ],
   "initialBaseline": {

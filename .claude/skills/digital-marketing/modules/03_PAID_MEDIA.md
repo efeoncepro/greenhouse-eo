@@ -38,6 +38,15 @@
 - **Modeled conversions:** post-cookie, parte de las conversiones son modeladas; entiéndelo al
   leer resultados (no todo es determinístico).
 
+### Meta CAPI en Efeonce
+
+La ruta elegida es **GTM Server** existente, no una etiqueta Pixel en GTM Web.
+Cargar [runbook CAPI](../../../../docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md)
+y skill `greenhouse-gtm-ga4-operator`: Lead backend comercial aceptado, gate de consentimiento,
+identidad estable, readback Server en Meta y dedupe si se usa Pixel complementario.
+Configuración/tag disparado no prueba recepción, atribución ni match quality; no publicar
+ni provisionar desde una recomendación de paid media.
+
 ## 4. Signal loss post-cookie (los tres pilares)
 
 Para 2026, el éxito se apoya en:

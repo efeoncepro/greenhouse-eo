@@ -131,6 +131,7 @@ import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
 import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
+import { dispatchMeasurementConversionsSafely } from '@/lib/growth/measurement/dispatch'
 import { runGscDailySnapshotBatch } from '@/lib/growth/seo/gsc-daily-batch'
 import { runRankCaptureBatch } from '@/lib/growth/seo/rank-capture-batch'
 import { runSiteAuditEnqueueBatch } from '@/lib/growth/seo/site-audit/enqueue-batch'
@@ -1895,7 +1896,9 @@ const handleGrowthFormsDispatch = async (req: IncomingMessage, res: ServerRespon
   const limit = typeof body.limit === 'number' && body.limit > 0 ? Math.min(200, Math.floor(body.limit)) : 50
 
   if (!isFormsDispatchEnabled()) {
-    json(res, 200, { ok: true, skipped: 'forms_dispatch_disabled', processed: 0, delivered: 0, failed: 0 })
+    const measurement = await dispatchMeasurementConversionsSafely(limit)
+
+    json(res, 200, { ok: true, skipped: 'forms_dispatch_disabled', processed: 0, delivered: 0, failed: 0, measurement })
 
     return
   }
@@ -1904,13 +1907,14 @@ const handleGrowthFormsDispatch = async (req: IncomingMessage, res: ServerRespon
 
   try {
     const summary = await dispatchPendingSubmissions(limit)
+    const measurement = await dispatchMeasurementConversionsSafely(limit)
 
     console.log(
       `[ops-worker] /growth/forms/dispatch done — processed=${summary.processed} ` +
       `delivered=${summary.delivered} failed=${summary.failed}`
     )
 
-    json(res, 200, { ok: true, ...summary })
+    json(res, 200, { ok: true, ...summary, measurement })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown forms dispatch error'
 

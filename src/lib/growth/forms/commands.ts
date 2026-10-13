@@ -9,6 +9,9 @@ import 'server-only'
 
 import { z } from 'zod'
 
+import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+
+
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import {
@@ -273,6 +276,8 @@ const FORMS_EMAIL_SALT = 'gh-forms-email-v1'
 const FORMS_IP_SALT = 'gh-forms-ip-v1'
 
 export interface SubmitContext {
+  userAgent?: string | null
+  requestGlobalPrivacyControl?: boolean
   origin: string | null
   ip?: string | null
   captchaToken?: string | null
@@ -536,7 +541,21 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     }
   }
 
+  const measurement = await prepareMeasurementConversion({
+    scope: {
+      sourceKind: 'form_submission', sourceId: version.form_id, origin: context.origin,
+      pageUri: input.pageUri, surfaceId, formSlug: input.formSlug,
+    },
+    contact: {
+      email: normalizedFields.email, phone: normalizedFields.phone,
+      firstName: normalizedFields.firstName, lastName: normalizedFields.lastName,
+    },
+    measurementContext: input.measurementContext, ip: context.ip, userAgent: context.userAgent,
+    requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
+  })
+
   const submission = await persistAcceptedSubmission({
+    measurement,
     formId: version.form_id,
     formVersionId: version.form_version_id,
     surfaceId,

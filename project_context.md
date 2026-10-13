@@ -16,6 +16,7 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Documentación
 
+CAPI: Handoff.md
 CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
 

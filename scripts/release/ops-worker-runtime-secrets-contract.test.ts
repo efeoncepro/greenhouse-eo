@@ -13,6 +13,19 @@ const loadWorkflow = (relativePath: string) =>
   }
 
 describe('TASK-1888 ops-worker runtime secrets contract', () => {
+  it('keeps the Lead matching rollout switches persistent and disabled until configured', () => {
+    const workflow = readFileSync(join(REPO_ROOT, '.github/workflows/ops-worker-deploy.yml'), 'utf8')
+    const deploy = readFileSync(join(REPO_ROOT, 'services/ops-worker/deploy.sh'), 'utf8')
+
+    for (const flag of ['GROWTH_MEASUREMENT_META_ENABLED', 'GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED', 'GROWTH_MEASUREMENT_RETENTION_ENABLED']) {
+      expect(workflow).toContain(`${flag}: \${{ vars.${flag} || 'false' }}`)
+      expect(deploy).toContain(`${flag}=\"\${${flag}:-false}\"`)
+    }
+
+    for (const secret of ['payload-key', 'ingress-token', 'ga4-api-secret']) {
+      expect(deploy).toContain(`projects/efeonce-group/secrets/greenhouse-measurement-${secret}/versions/1`)
+    }
+  })
   it('forwards required runtime secrets through the production release workflow_call', () => {
     const orchestrator = loadWorkflow('.github/workflows/production-release.yml')
     const worker = loadWorkflow('.github/workflows/ops-worker-deploy.yml')

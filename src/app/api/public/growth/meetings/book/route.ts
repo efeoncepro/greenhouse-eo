@@ -58,6 +58,8 @@ export async function POST(request: Request) {
       {
         origin: request.headers.get('origin'),
         ip: clientIp(request),
+        userAgent: request.headers.get('user-agent'),
+        requestGlobalPrivacyControl: request.headers.get('sec-gpc')?.trim() === '1',
       },
     )
 

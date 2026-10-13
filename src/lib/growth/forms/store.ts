@@ -6,6 +6,9 @@
  */
 import 'server-only'
 
+import type { PreparedMeasurement } from '@/lib/growth/measurement/contracts'
+import { enqueueMeasurementConversion } from '@/lib/growth/measurement/store'
+
 import { query, withTransaction } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
@@ -483,6 +486,7 @@ return rows[0] ?? null
 // ─── Submissions (write path: in-tx submission + consent + outbox event) ──────
 
 export interface PersistSubmissionInput {
+  measurement?: PreparedMeasurement | null
   formId: string
   formVersionId: string
   surfaceId: string | null
@@ -539,6 +543,8 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
     )
 
     const submission = (submissionRows.rows as FormSubmissionRow[])[0]
+
+    await enqueueMeasurementConversion(client, 'form_submission', submission.submission_id, input.measurement)
 
     await client.query(
       `INSERT INTO greenhouse_growth.form_submission_consent_snapshot (

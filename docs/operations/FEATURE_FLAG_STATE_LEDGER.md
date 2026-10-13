@@ -179,6 +179,21 @@ no reutilizar esas notas históricas como estado actual.
 > **Delta 2026-06-22 (TASK-1210, release develop→main `3a39c68ba`, sign-off CEO):** los 8 flags MXN+CLF — `FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_CORE_CLF_INDEXED_ENABLED`, `FINANCE_CLF_INCOME_PROJECTION_ENABLED`, `FINANCE_CLF_OBLIGATIONS_ENABLED`, `FINANCE_CLF_REPORTING_ENABLED` — pasaron a **ON en producción**: Vercel prod (agregados + redeploy `greenhouse-midjr78bo`) + ops-worker Cloud Run (persistente via `services/ops-worker/deploy.sh`, `:-true`). Los `*_BACKFILL_APPLY_ENABLED` (gates de script) siguen OFF. Verdad live: `vercel env ls` + `gcloud run services describe ops-worker`.
 > **Doc relacionado:** [GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md](../architecture/GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md) (los flags PG declarativos — mecanismo distinto, ver abajo)
 
+## Delta 2026-10-13 — matching de Lead (TASK-2034)
+
+Production leído mediante env pull: cuatro flags **ausentes**, por tanto OFF por default.
+Código lector todavía no en main; no activar hasta release, SQL y runtime secrets verificados.
+Staging no inspeccionado en esta fase. Secrets version1 ya existen, refs no configuradas.
+
+| Flag | Dueño | Production | Rollout requerido |
+| --- | --- | --- | --- |
+| `GROWTH_MEASUREMENT_CAPTURE_ENABLED` | TASK-2034 | ausente/OFF default | source + renderer, SQL + payload key; captura tras aceptación/confirmación |
+| `GROWTH_MEASUREMENT_META_ENABLED` | TASK-2034 | ausente/OFF default | worker + ingress token + Client; retirar triggers Meta Lead12/17 antes de envío |
+| `GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED` | TASK-2034 | ausente/OFF default | worker + API secret; UPD/ack y Ads link ya verificados; no duplicar evento GA4 |
+| `GROWTH_MEASUREMENT_RETENTION_ENABLED` | TASK-2034 | ausente/OFF default | worker + SQL; mantener ON durante rollback para borrar ciphertext48h |
+
+[Contrato](../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13).
+
 ## Por qué existe este doc
 
 El desarrollo agéntico deja **deuda cognitiva**: una feature se implementa detrás de un flag `*_ENABLED` default-OFF, pasa todos los gates, se mergea… y **el flag nunca se prende** en staging/prod porque nadie lo registró en un lugar encontrable. Este ledger es ese lugar: un vistazo único de **qué flags están prendidos dónde** y **qué queda pendiente de prender**.

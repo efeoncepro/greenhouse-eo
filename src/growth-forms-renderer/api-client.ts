@@ -7,6 +7,7 @@
  *   POST {base}/api/public/growth/forms/{slug}/submit         → outcome
  * NUNCA recibe ni envía destination mapping, GUIDs, property names ni secrets.
  */
+import { readPublicMeasurementContext } from '../growth-measurement-context/context'
 import type { PublicSubmitOutcome, PublicSubmitResult, RenderContract } from './contract'
 
 export interface RendererApiConfig {
@@ -171,6 +172,7 @@ export const submitPublicForm = async (
     honeypot: payload.honeypot,
     idempotencyKey: payload.idempotencyKey,
     captchaToken: payload.captchaToken,
+    measurementContext: readPublicMeasurementContext(),
   }
 
   const files = payload.files ?? {}

@@ -1,5 +1,6 @@
 # Task Index
 
+- `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress; GA4 UPD y siete audiencias activos, backend/cutover en preparación; siguiente ID disponible: `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.
 - `TASK-2032` — [Product reference prices computed by Pricing V3](to-do/TASK-2032-product-reference-prices-from-pricing-v3.md), to-do; `EPIC-053`.
 - `TASK-2031` — [Quoter V3 product identity: SKU binding, composite services and line versus custom items](to-do/TASK-2031-quoter-v3-product-identity.md), to-do; `EPIC-053`.

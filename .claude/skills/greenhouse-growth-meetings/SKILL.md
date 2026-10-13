@@ -107,6 +107,19 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 - Extend `MEETING_GTM_EVENTS`, `MEETING_STEPS`, `MEETING_TELEMETRY_PAYLOAD_KEYS`, the renderer mirror,
   parity tests and Tracking Plan together.
 - Preserve server-confirmed ledger truth; GA4 remains a browser-reported mirror to reconcile.
+- Meta CAPI via sGTM: reuse the confirmed `generate_lead` with `lead_source=meeting_booking`
+  and a separate scheduler/surface eligibility filter. Load the canonical runbook
+  `docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md`. Meeting CAPI
+  identity uses an opaque browser UUID only on a fresh eligible confirmation. The sender
+  prefers a valid renderer UUID and otherwise uses the consent bridge Crypto UUID cached by
+  the local GTM event counter (never transmitted). Load `09-hubspot-consent.md`. Sender live
+  2026-10-13; local renderer enhancement remains unreleased and is not a recovery dependency.
+  Never repurpose the private receipt or internal IDs.
+  Preserve the UUID across a failed dataLayer push and suppress repeat emission of the same effect.
+  Interaction/replay/disabled telemetry emit no conversion UUID. Entropy failure keeps UX/GA4
+  working without an ID and makes the strict server UUID gate block CAPI. This single browser
+  sender does not define a durable backend identity; an outbox sender needs a shared-ID decision.
+  No CAPI conversion from opening the scheduler, selecting a slot, attempts, errors or replays.
 
 ## Verification minimum
 
