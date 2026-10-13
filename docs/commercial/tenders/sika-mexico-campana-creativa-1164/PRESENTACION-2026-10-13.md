@@ -49,7 +49,7 @@ y en la página 17 del anexo).
 
 ## HubSpot
 
-El operador actualizó el deal el 13/10/2026. Readback de ese día (sólo lectura): `default` / `presentationscheduled`, última modificación 13/10 a las 08:58 de Santiago, owner Julio `75788512`; monto, moneda y fecha de cierre siguen vacíos. El agente no escribió en el CRM.
+El operador movió el deal a `default` / `presentationscheduled` el 13/10/2026 (08:58 de Santiago) y pidió cargar valor y fecha de cierre. El agente escribió por el conector de HubSpot, a las 09:16: `amount` 64000, `deal_currency_code` MXN, y `closedate` y `fecha_de_cierre_de_licitacion` en 2026-10-16T22:00:00Z (16:00 de Ciudad de México, 19:00 de Santiago: el cierre de la licitación; no hay fecha de adjudicación informada). Readback posterior: los cuatro valores, `amount_in_home_currency` 3477,25, etapa, `pipeline_bucket` Core Pipeline y `dealtype` newbusiness sin cambios; owner Julio `75788512`.
 
 ## Lo que la oferta dejó propuesto sin validación interna
 
