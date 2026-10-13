@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "f8b08536f01a5d1096cefba160042d9ec10046b8f9d542e704654144ad99bc17",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR4-contra-amanecer",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR4-contra-amanecer.png",
+      "sha256": "69e10e42ec42730b74462a2e8d944783555470680bed61e73775e9df2d921f3a"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

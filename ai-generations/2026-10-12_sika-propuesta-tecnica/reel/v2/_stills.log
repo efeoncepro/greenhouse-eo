@@ -1,0 +1,19 @@
+  $ costo estimado ≈ USD 0.206 (5 × 1372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/stills/s1-gota.png …
+  ✓ 1805KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 215 (img 0 · txt 215) · out 1372 · total 1587
+→ ./ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/stills/s2a-regadera.png …
+  ✓ 2159KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 192 (img 0 · txt 192) · out 1372 · total 1564
+→ ./ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/stills/s2b-cocina.png …
+  ✓ 2277KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 184 (img 0 · txt 184) · out 1372 · total 1556
+→ ./ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/stills/s2c-ventana.png …
+  ✓ 2527KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 194 (img 0 · txt 194) · out 1372 · total 1566
+→ ./ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/stills/s3-aplicacion.png …
+  ✓ 1755KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 199 (img 0 · txt 199) · out 1372 · total 1571
+done
+FATAL: Unknown argument: --allow-brand
+FIN

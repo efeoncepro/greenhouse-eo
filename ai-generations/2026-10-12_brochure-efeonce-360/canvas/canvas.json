@@ -439,50 +439,50 @@
       "maxW": 13920
     },
     "n1": {
-      "x": 6000,
+      "x": 18200,
       "y": 0,
       "w": 560,
       "text": "Aperturas de tramo: las cinco portadas de línea aprobadas (foto de cine, par de la línea, capacidades). El validador del catálogo las cuenta como portadas y sólo admite una por documento: usarlas como aperturas de tramo es un uso nuevo que necesita tu aprobación.",
       "fill": "orange"
     },
     "n2": {
-      "x": 6000,
-      "y": 560,
+      "x": 18200,
+      "y": 1600,
       "w": 560,
       "text": "Pares reescritos el 2026-10-12 con la regla del 2026-10-06 (habla el cliente, cinco pruebas) y revisados por la sesión del brochure HubSpot: Engine «Ahora sí» (candidato del canon), Revenue «¿Cuándo veo mi pipeline? En vivo.», resultados «¿Y el reporte? Llega solo.», la idea «¿Mi cliente se va? Vuelve.», equipo «¿Hay alguien detrás? Personas.», partners «¿Con qué plataformas trabajan? Con las tuyas.» (la afirmación de partner queda sólo en el rótulo, hasta los readbacks). Zoho en «El que encaje» viene del brochure HubSpot: confirmar si va en el 360 (recomendación: sacarlo).",
       "fill": "blue"
     },
     "n27": {
-      "x": 6000,
-      "y": 8320,
+      "x": 18200,
+      "y": 7200,
       "w": 560,
       "text": "Casos y logos: Sky y Berel con cifras de sus decks de origen. Logos de clientes y partners sólo con autorización archivada (TASK-1937). Berel dice «12 meses» y la cuenta se adjudicó en mayo de 2026.",
       "fill": "blue"
     },
     "n0": {
-      "x": 6000,
-      "y": 1120,
+      "x": 18200,
+      "y": 800,
       "w": 560,
       "text": "Portada: la de cinco líneas (aprobada 2026-09-27). Las cinco esferas son la vuelta completa: cada una, una línea. La lámina «Cinco líneas» salió del recorrido porque usaba la misma foto.",
       "fill": "teal"
     },
     "n3b": {
-      "x": 6000,
-      "y": 3000,
+      "x": 18200,
+      "y": 2880,
       "w": 560,
       "text": "Revenue: la portada ya usa el plate CMP-portada-B (luz azul, magenta sólo como puntuación). Las tres láminas diseñadas («El que encaje», «Todo el ciclo», «Una persona») siguen con halo y plataforma magenta porque así lo declaran los tokens AXIS de escenario; cambiarlo es TASK-2012 (todas las líneas, rebaseline del visual-gate). Alternativa sin esperar: reemplazarlas por las fotos HubSpot con luz azul («Ya no», «Ordenado», ley 21.719).",
       "fill": "blue"
     },
     "n28": {
-      "x": 6000,
-      "y": 8900,
+      "x": 18200,
+      "y": 8000,
       "w": 560,
       "text": "Partners: los nueve logos figuran en EFEONCE_PARTNERSHIP_REGISTRY_V1 (HubSpot Gold leído 2026-10-06; BytePlus activo; Google Cloud registrado; Anthropic y OpenAI aceptados; Adobe, AWS, Microsoft y Salesforce declarados por el operador el 2026-09-26, con readback de programa e insignia pendiente). El rótulo «Partner oficial de» es el aprobado en el deck de contenidos; revisarlo si algún readback no confirma.",
       "fill": "blue"
     },
     "n29": {
-      "x": 6000,
-      "y": 4100,
+      "x": 18200,
+      "y": 4320,
       "w": 560,
       "text": "Portada Growth: el plate aprobado HW1 traía el lanyard montado sobre el antebrazo. Se borró con pnpm ai:inpaint erase (zona protegida idéntica bit a bit) y la portada se recompuso con el plate limpio HW1b. Cabe registrar HW1b como reemplazo de HW1 en el canon si lo apruebas.",
       "fill": "blue"

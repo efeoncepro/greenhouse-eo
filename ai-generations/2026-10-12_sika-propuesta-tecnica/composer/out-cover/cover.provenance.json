@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "c8ce59ed3b4c56b2e1632254718443478e9cc3f67836884b0ee5e492f33d1402",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal.dawn",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:sika-triangulo",
+      "path": "ai-generations/2026-10-12_sika-propuesta-tecnica/logos-cliente/sika-triangulo.png",
+      "sha256": "1c391b57335e5b6facb4d6cb8a598e57fb0eb9f40c8b6fa0326fea10fb391c05"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

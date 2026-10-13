@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "30090b14791b63f5e5e7dbb4fafae743dd29184e6cfda80257b000292a6e91ee",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-case",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:caso-sky-avion",
+      "path": "ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png",
+      "sha256": "5fff11dbe5c2beafb64ed5d7d6deae571d4fadaeee4406528e02afee9e68f911"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

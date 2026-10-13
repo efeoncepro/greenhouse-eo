@@ -1,0 +1,14 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 docs:context-check:strict /Users/jreye/Documents/greenhouse-eo
+> node scripts/check-context-handoff.mjs --strict
+
+Context/Handoff/Changelog governance check
+- AGENTS: 308 lines / ~11969 tokens (budget 20000)
+- project_context: 299 lines / ~11977 tokens (budget 12000)
+- Handoff: 188 lines / 11 sessions / ~9099 tokens
+- Handoff archive index: 41 lines / ~621 tokens
+- changelog: 545 lines / 60 entries / ~18117 tokens
+- changelog history index: 26 lines / ~210 tokens
+- Historical project_context deltas: 0
+- Errors: 0
+- Warnings: 0
