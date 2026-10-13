@@ -56,6 +56,62 @@ Esta variante conserva los datos y enlaces; no incluye foto, logo ni diseño gr�
 6. Leer **Elementos enviados** para comprobar remitente, destinatario, asunto, cuerpo/firma y BCC. Un envío aceptado, la entrega al destinatario y el registro en HubSpot son estados distintos.
 7. Verificar, cuando el acceso lo permita, la actividad de correo asociada en HubSpot. **BCC enviado no prueba ingestión, asociación a contacto/empresa/deal, apertura, clic ni seguimiento automático**. Si no hay readback CRM, informar «enviado por Outlook con BCC; registro en HubSpot pendiente de verificación».
 
+## Prospección personalizada — criterio confirmado el 13/10/2026
+
+Julio pidió primeros contactos individualizados, empáticos, con un motivo concreto para elegir Efeonce,
+diferenciadores pertinentes y **al menos un brochure relacionado con el contexto**, enviado desde su
+mailbox con la firma gráfica instalada. Aplicar este criterio al preparar próximos correos comerciales;
+conserva las dos vías aprobadas y la autorización específica de cada envío.
+
+- Leer la señal original y el historial de la cuenta. Una búsqueda de un colega no se atribuye al
+  destinatario; una vacante no se presenta como solicitud de agencia. Formular las inferencias como tales.
+- Explicar cómo trabajaríamos sobre su necesidad y por qué Efeonce encaja: capacidades, mecanismo y
+  experiencia autorizada. Evitar elogios genéricos, catálogo completo, promesas de resultados y experiencia
+  sectorial/regulatoria no acreditada. Respetar el trabajo que ya realiza el equipo interno.
+- Elegir la versión pertinente del brochure y explicar en el cuerpo qué encontrará y por qué se comparte.
+  Un enlace sin contexto no cumple. La presencia en OneDrive/HubSpot no valida cifras, casos, derechos o
+  compromisos pendientes: revisar el contenido y sus fuentes antes de usarlo. Si el enlace de Documents
+  fue creado para otro destinatario, generar uno propio o adjuntar el PDF; no reciclar su atribución.
+- Cerrar con una invitación proporcionada y una pregunta útil. No inventar agenda, duración ni URL.
+- Dirección cargada, dirección verificada y permiso de envío son estados distintos. La excepción
+  documentada de Paula en esta ronda no convierte direcciones deducidas en un canal validado ni en regla
+  para próximos envíos. No utilizar un envío de prueba como validación.
+
+### Ruta gráfica comprobada: Outlook web
+
+El 13/10 funcionó `https://outlook.office.com/mail/`, redirigido a
+`https://outlook.cloud.microsoft/mail/`, en el navegador integrado con sesión de Julio.
+Es una observación de esta sesión: comprobar identidad y conexión de nuevo, sin asumir sesión permanente.
+
+1. Crear un correo nuevo y comprobar la firma gráfica insertada: nombre/cargo, teléfono, correo,
+   foto, Efeonce, eslogan, enlaces y franja de partners. Reusar la firma instalada/oficial, no reconstruirla.
+2. Completar Para, asunto y CCO; comprobar que no haya CC ni destinatarios de negocio adicionales fuera
+   del mandato. Personalizar a una persona; coordinar las rutas alternativas por cuenta.
+3. Insertar el cuerpo como contenido enriquecido conservando **una** firma. En la ejecución se leyó
+   el fragmento visible de la firma del borrador y se pegó cuerpo HTML + ese fragmento una sola vez.
+   Verificar el resultado en el editor; los índices de UI de una sesión anterior no se reutilizan.
+4. Adjuntar mediante **Adjuntar archivo → Examinar este equipo** y la ruta local absoluta. Para PDFs
+   grandes, Outlook ofreció **Adjuntar como una copia**; se eligió esa opción. Descartar la sugerencia
+   posterior de Adobe de convertir el PDF en enlace público cuando el alcance es enviar una copia.
+5. Esperar a que termine la carga y comprobar nombre/tamaño del PDF, destinatario, CCO, texto y firma
+   antes de enviar una sola vez. Ante resultado incierto, conciliar Enviados antes de reintentar.
+6. Usar lectura independiente del conector para Enviados y `list_attachments` para nombre, tamaño y
+   tipo real del PDF. La UI preserva la firma; el conector de lectura aporta el readback. Un campo de
+   cuerpo convertido por el conector no es necesariamente HTML crudo reutilizable.
+7. En HubSpot `48713323`, verificar actividad EMAIL saliente `SENT`, remitente, destinatario, asunto y
+   asociación al contacto. No crear una nota/actividad duplicada sólo por haber enviado CCO.
+
+Resultado de referencia: [seis envíos, materiales, actividades CRM y límites](../commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md).
+
+### Seguimiento nativo autorizado en HubSpot — 13/10/2026
+
+El operador precisó que las secuencias de seguimiento se ejecutan **en HubSpot, no Apollo**.
+[Lote autorizado y readback](../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md): mailbox
+Outlook 365 conectado, firma global Julio verificada, documentos nativos contextualizados, horas locales
+laborales y desinscripción por respuesta. No duplicar firma ni afirmar CCO en una pantalla que no lo expone.
+Este caso usa registro nativo CRM y conserva el alcance separado de la política CCO para envíos por Outlook;
+no concede autorización general de futuros mensajes ni sustituye el readback de un envío real.
+
 ## Evidencia, alternativas y límites
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.

@@ -1,5 +1,18 @@
 # Registro de seguimiento comercial
 
+**Delta focalizado 13/10 · outreach personalizado:** seis primeros correos enviados a Paula Arciniegas,
+Nicol Cueva, Fiorella Marcos, Sergio Suárez, Hernán Ugarte y Jesús Rangel. Outlook web, firma gráfica y PDF
+contextual; Enviados, adjuntos y seis actividades HubSpot `SENT` verificados. Rafael Figueroa excluido;
+Diana Cavero/Juan Martín Ramírez no contactados en esta ronda. Correo de Paula deducido, no validado por
+el envío. [Registro y procedimiento](runs/2026-10-13-outreach-personalizado.md). Espera de respuesta;
+revisar hilo antes de proponer seguimiento. Sin secuencias, nuevos recordatorios ni cambio de autonomía.
+Este delta no renueva el corte global del pipeline de abajo.
+
+**Corte vigente: 12/10, 16:00 Chile.** [Reporte completo](runs/2026-10-12-1600.md): 260 Deals/45 abiertos, 290 Leads recientes, 104 correos con solapamiento48h, 16 borradores y 59 tareas; 19 fichas LicitaLAB revalidadas. **Decidir hoy Valparaíso (mañana09:00), SEGPRES cierra hoy18:30; preparar asistencia MINSAL mañana10:50.** UChile email/Claude y Mujer cerradas: conciliar comprobantes, no pérdidas inferidas. Brightcell y SKY Content Lead ya Closed Lost en CRM; mantener SKY Blog/Brandlift separados. Basis demo21Oct18:00; nueva técnica Sika1164 v2 en revisión, no enviada. Nueve tareas actualizadas y releídas, cero tareas/borradores nuevos, envíos o CRM writes. Wherex no accesible; HOLD/descartes preservados. Sin commit.
+
+**Corte histórico: 12/10, 09:00 Chile (sustituido por corte 16:00).** [Reporte completo](runs/2026-10-12-0900.md): 260 Deals/47 abiertos, 290 Leads recientes, 348 correos más nuevo enviado Momentum 09:03 y 17 borradores previos; 26 fichas LicitaLAB válidas. **Hoy UChile email 10:00, Claude 11:00, Mujer 12:30 y Basis 14:30; preparar Valparaíso antes del martes 09:00 y asistencia presencial MINSAL mañana 11:00 (llegar 10:50).** Momentum/UCSH/Haulmer ya enviados; Socopur espera admisión. FUCOA movida al19/10 15:30. 13 tareas actualizadas, 8 nuevas y un borrador Outlook Achievement First, todo con lectura independiente; cuatro subtareas SKY existentes reutilizadas. HOLD/descartes preservados. Wherex inaccesible; obligatoriedad de MINSAL y calendario exacto de Ñuble pendientes. Cero envíos/CRM/commit.
+
+
 **Decisión posterior 10/10 · SERNATUR Arica1330-22-COT26:** NO-BID por instrucción explícita de Julio. Lead Disqualified/NO_INTEREST y tarea Cancelada, verificados. Cancelado control12/10 09:00; no emitir nuevas alertas de preparación ni reabrir. [Decisión y evidencia](runs/2026-10-10-arica-no-bid.md).
 
 **Delta focalizado 10/10 · INAPI y SERNATUR Arica:** dos Leads New nuevos, dos notas asociadas a empresas reutilizadas y dos tareas de Julio verificadas, prioridad Alta / Sin empezar. Arica: **NO-BID posterior; revisión interna12/10 cancelada**, cierre **12/10 18:00 Chile** (LicitaLAB); fee ≤ CLP 710.000 sobre envolvente, pauta prefinanciada y presupuesto inconsistente. INAPI: revisión **16/10 12:00**, foro 19/10 15:00, cierre 02/11 16:00 Chile; referencias y discrepancia 20.000/25.000 sesiones. [Expedientes, tareas, IDs y evidencia](runs/2026-10-10-inapi-arica-intake.md). Sin GO, propuestas o envíos; no renueva la cobertura global 09/10.
@@ -8,7 +21,7 @@
 
 **Delta confirmado por Julio · 09/10:** SANNA y UNAP no se presentaron por falta de tiempo. Ambos Deals están en Cierre perdido y sus tareas Canceladas, con readback. Sus alertas de preparación/conciliación quedan resueltas. [Nota y evidencia](runs/2026-10-09-sanna-unap-no-presentadas.md).
 
-**Corte vigente: 09/10, 16:00 Chile.** [Reporte completo](runs/2026-10-09-1600.md): 256 Deals/44 abiertos; 216 leads recientes; 301 correos y13 borradores previos; 21 fichas LicitaLAB. **Pibank enviado13:41, no reenviar. Los Lagos cierra17:15 hoy; Momentum sigue pendiente. Valparaíso se movió al13/10 09:00: preparar lunes. ProChile y SENADIS descartadas por falta de tiempo; ver delta posterior al corte.** Tres tareas nuevas y siete actualizadas (Pierre Fabre reutilizada); 45 claves con readback. Borrador UCSH guardado sin envío; SKY accesos requiere correos reales. SANNA/UNAP perdidas y canceladas, UTEM presentada sin resultado confirmado. Wherex portal inaccesible. Este corte prevalece sobre la historia inferior.
+**Corte histórico: 09/10, 16:00 Chile (sustituido por 12/10).** [Reporte completo](runs/2026-10-09-1600.md): 256 Deals/44 abiertos; 216 leads recientes; 301 correos y13 borradores previos; 21 fichas LicitaLAB. **Pibank enviado13:41, no reenviar. Los Lagos cierra17:15 hoy; Momentum sigue pendiente. Valparaíso se movió al13/10 09:00: preparar lunes. ProChile y SENADIS descartadas por falta de tiempo; ver delta posterior al corte.** Tres tareas nuevas y siete actualizadas (Pierre Fabre reutilizada); 45 claves con readback. Borrador UCSH guardado sin envío; SKY accesos requiere correos reales. SANNA/UNAP perdidas y canceladas, UTEM presentada sin resultado confirmado. Wherex portal inaccesible. Este corte prevalece sobre la historia inferior.
 
 **Delta focalizado 08/10, outreach manual:** tres mensajes verificados en Enviados, tres notas CRM asociadas a seis contactos y tres tareas Notion con borradores (una nueva, dos reutilizadas). Próximo seguimiento interno 13/10 10:00 Chile; 19/10 y 26/10 tentativos. [IDs, evidencia y reglas](runs/2026-10-08-outreach-manual.md). Sustituye la preparación inicial pendiente de Yanbal/Olivos; no renueva el corte global de abajo.
 
@@ -268,3 +281,14 @@ Julio aportó la captura de Mercado Público «Cotización enviada correctamente
 ## Bitácora · 09/10/2026 · 16:00 Chile
 
 Revisión completa descrita en [corte16h](runs/2026-10-09-1600.md). Tres tareas creadas, siete actualizadas y borrador UCSH guardado; todas las escrituras leídas de vuelta. Cero cambios CRM/envíos/postulaciones. Pibank Enviada, nuevo seguimiento19/10; Valparaíso13/10 09h; Sika1169 HOLD y Metrogas1561 separado de1507. Continuidad persistida en state.json. Sin commit.
+
+## Bitácora · 12/10/2026 · corte 16:00
+
+**Corte vigente: 12/10, 16:00 Chile.** [Reporte completo](runs/2026-10-12-1600.md): 260 Deals/45 abiertos, 290 Leads recientes, 104 correos con solapamiento48h, 16 borradores y 59 tareas; 19 fichas LicitaLAB revalidadas. **Decidir hoy Valparaíso (mañana09:00), SEGPRES cierra hoy18:30; preparar asistencia MINSAL mañana10:50.** UChile email/Claude y Mujer cerradas: conciliar comprobantes, no pérdidas inferidas. Brightcell y SKY Content Lead ya Closed Lost en CRM; mantener SKY Blog/Brandlift separados. Basis demo21Oct18:00; nueva técnica Sika1164 v2 en revisión, no enviada. Nueve tareas actualizadas y releídas, cero tareas/borradores nuevos, envíos o CRM writes. Wherex no accesible; HOLD/descartes preservados. Sin commit.
+
+State conserva el corte09:00 como previous_run y sus fichas históricas. Los riesgos pendientes mantienen las mismas claves followup; consulta el reporte para tabla de plazos, tareas y borradores existentes.
+
+
+## 13/10/2026 — seguimiento programado autorizado en HubSpot
+
+[Seis secuencias y 18 correos](runs/2026-10-13-secuencia-hubspot.md) para Paula, Nicol, Fiorella, Sergio, Hernán y Jesús. Rafael excluido. Tres pasos: 16/22/29 octubre, horas locales laborales. Seis inscripciones Programado verificadas por lectura nueva; remitente corporativo, firma global Julio, brochures nativos contextualizados y parada por respuesta. Reuniones no desinscriben. Correos futuros aún no enviados. Apollo: seis borradores inactivos, cero inscritos; no retomarlos. No duplicar desde el heartbeat ni ampliar este lote. Se preserva el corte global de state.json y la procedencia no verificada del correo de Paula.

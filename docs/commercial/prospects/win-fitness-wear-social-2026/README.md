@@ -2,7 +2,15 @@
 
 Corte 08-10-2026. **Lead nuevo; solicitud activa observada.** Julio autorizó investigar y registrar a
 Fiorella Marcos Villegas y su empresa. La captura de LinkedIn es fuente de la convocatoria; el cierre o
-vigencia posterior debe confirmarse antes de postular. No se envió presentación, propuesta ni correo.
+vigencia posterior debe confirmarse antes de postular. En el corte del 08/10 no se envió correo.
+
+**Estado de contacto al 13/10:** primer correo a Fiorella enviado desde Outlook web, con firma gráfica y
+brochure de Marketing de Contenidos (ruta corta). Enviados/adjunto y actividad EMAIL
+[118406654112](https://app.hubspot.com/contacts/48713323/record/0-49/118406654112?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=search)
+`SENT` verificados. [Registro](../../follow-up-agent/runs/2026-10-13-outreach-personalizado.md).
+No confirma entrega, respuesta, vigencia de la convocatoria ni oportunidad calificada. Diana Cavero se
+conserva como alternativa; no recibió correo en esta ronda. Siguiente paso: revisar el hilo antes de
+proponer seguimiento, sin repetir el primer contacto ni contactar ambas rutas en paralelo.
 
 ## Registros y estado
 

@@ -48,3 +48,11 @@ Confirmaciones humanas ya registradas se reutilizan con su fecha y alcance; no s
 Preservar los Deals existentes por mandato de Julio y mantener lead hasta calificación efectiva. Para futuras altas autorizadas por separado, reutilizar segmentos activos existentes y completar propiedades respaldadas, sin duplicarlos ni borrar estáticos. Ni pertenencia a segmento ni alta en CRM equivalen a inscripción en Prospecting Agent. [Auditoría de alta y segmentos](../audits/commercial/2026-10-08-prospecting-agent-active-segments.md).
 
 El 403 de Outlook y los límites observados de Prospecting Agent son evidencia fechada del intento/corte original, no un estado perpetuo. Una nueva conexión requiere readback propio; una actualización de estos documentos no acredita recuperación de permisos, primera ejecución programada ni envío.
+
+## Mandato separado y acotado — 2026-10-13
+
+Julio autorizó 18 seguimientos personalizados para seis personas ya contactadas, con cadencia laboral
+y parada por respuesta, y precisó **secuencias en HubSpot, no Apollo**. [Alcance, IDs y readback](../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+Es una operación nativa de HubSpot sobre el mailbox conectado; no un nuevo worker ni una ampliación
+del heartbeat de preparación. No duplicar esos envíos desde el heartbeat. No extender destinatarios,
+mensajes o ciclos por inferencia; mantener la autoridad general anterior para las demás cuentas.

@@ -19,6 +19,13 @@ HubSpot es la fuente de objetos y etapas comerciales; Notion de tareas; Outlook 
 
 Aplicar [cadencia y reconciliación](../../../.codex/skills/hubspot-as-a-service/references/manual-outreach-follow-up.md). Yanbal, Lotus y Olivos tienen primer correo enviado el 08/10 y tareas con borradores para el 13/10; revisiones tentativas 19/10 y 26/10. [Evidencia y textos compartidos](runs/2026-10-08-outreach-manual.md). Una conversación por cuenta; no avanzar sin envío previo confirmado ni insistir ante respuesta/rechazo/rebote. El heartbeat existente prepara y alerta, sin envío automático.
 
+[Ronda del 13/10](runs/2026-10-13-outreach-personalizado.md): Paula, Nicol, Fiorella, Sergio, Hernán y Jesús
+ya tienen un primer correo enviado desde Outlook; seis actividades HubSpot `SENT` verificadas. No preparar
+otro primer contacto para ellos ni escribir a sus alternativas como efecto de la revisión. Rafael quedó
+excluido por Julio. Mandato posterior: [18 seguimientos programados en HubSpot](runs/2026-10-13-secuencia-hubspot.md)
+para el 16/22/29 de octubre; seis inscripciones `Programado` verificadas, parada por respuesta. No duplicarlos
+desde el heartbeat ni usar Apollo. Esta autorización es acotada y no amplía la autonomía general.
+
 ## Cada ejecución
 
 1. Leer AGENTS.md, project_context.md, Handoff.md, este contrato, REGISTRO.md y state.json. Cargar hubspot-as-a-service, greenhouse-public-private-tenders, notion-platform y documentación comercial pertinente.

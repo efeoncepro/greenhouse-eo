@@ -11,4 +11,23 @@ Aplicar cuando el operador confirma un correo enviado o pide próximos contactos
 7. Reusar el heartbeat comercial de 09:00/16:00 cuando esté activo; no crear un recordatorio competidor. Configuración activa no prueba ejecución futura. Preparar textos en Notion es distinto de guardar en Outlook; si falla un borrador, registrar intento/fallback. No activar secuencias/Prospecting Agent, enviar o cambiar CRM por autonomía recurrente.
 8. Mantener registro y estado con IDs, fuentes, nivel de evidencia, fecha próxima, paso enviado y límites. Un delta focalizado no renueva el corte de todo el pipeline. Guardar datos individuales en CRM/Notion, no exportar correos o cuerpos originales al repo. Skills contienen criterios; expedientes contienen hechos.
 
-Caso y evidencia: `docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md`.
+Preparación de primeros contactos personalizados y envío con firma gráfica: sección de prospección de
+`docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md`. Incluye selección/contexto del brochure,
+Outlook web, conservación de la firma instalada y readback de adjuntos/EMAIL; no amplía permisos de envío.
+
+Casos y evidencia: `docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md` y
+`docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md`.
+
+## Secuencias autorizadas explícitamente
+
+Preferencia confirmada 13/10: **HubSpot, no Apollo**. El mandato puede autorizar un lote finito sin
+ampliar el heartbeat general. Caso: `docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md`.
+Preparar cada paso con un aporte contextual distinto y un brochure explicado; usar Insertar → Documentos
+para generar enlaces nativos. Verificar correo conectado, firma global del usuario y una sola firma.
+Configurar días laborables, zona horaria del destinatario, retrasos y **Enviar más tarde** para el primer paso.
+Automatizar: respuesta a cualquier correo → desinscribir el contacto; reunión desactivada si el mandato
+exige seguir hasta respuesta. Mantener protecciones nativas de bajas/rebotes. Tras iniciar, leer de nuevo
+`Programado`, contacto, fecha y reglas guardadas. Inscripción no es envío ni prueba de entrega. El registro
+de secuencias es nativo CRM: no inferir CCO ni declarar una firma renderizada si sólo se verificó su HTML.
+No duplicar con correos manuales ni retomar borradores Apollo detenidos. El siguiente lote requiere su
+propio alcance autorizado; la preferencia de plataforma se conserva.

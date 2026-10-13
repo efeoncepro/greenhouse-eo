@@ -2,6 +2,8 @@
 
 - [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
 
+- [Outreach personalizado del 13/10/2026](follow-up-agent/runs/2026-10-13-outreach-personalizado.md): seis correos enviados por Outlook web con firma gráfica, brochure contextual y actividades HubSpot `SENT`; Rafael excluido. Referencia para próximos primeros contactos y su verificación.
+
 > **Naming AEO vigente:** **Efeonce AEO** es la capacidad comercial; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Índice operativo de ventas de Efeonce. Esta carpeta conecta las metas aprobadas, el forecast y los negocios
