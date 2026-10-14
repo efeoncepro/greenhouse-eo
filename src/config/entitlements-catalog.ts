@@ -2354,6 +2354,11 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)
   // mismo PR. `publish/author/review/manage/retry` → acción `execute` (la intención vive
   // en la key); `read`/`submissions.read` → `read`.
+  // TASK-2036 — separately governed advertising measurement configuration.
+  { key: 'growth.measurement.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.measurement.author', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.measurement.publish', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.measurement.disable', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'growth.forms.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'growth.forms.author', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'growth.forms.review', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },

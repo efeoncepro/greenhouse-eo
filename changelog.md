@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-Meta Lead14/10: Server7, atribución consentida persistente, external_id SHA256 y request IP/UA; [prueba Server/website](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md). Backend/renderers en preparación de release completo.
+Meta Lead14/10: Server7, atribución consentida persistente, external_id SHA256 y request IP/UA; [prueba Server/website](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md). Backend/renderers y configuración por políticas en preparación de release completo; [checkpoint TASK-2035](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
 
 Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independientes y partners gris. [QA y reversión](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 

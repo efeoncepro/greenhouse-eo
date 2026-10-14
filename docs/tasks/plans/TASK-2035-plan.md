@@ -5,8 +5,8 @@
 Goal confirmado por el operador14/10/2026: **limitar ahora a configuración escalable y CAPI**.
 Un único release final completo develop→main. No ejecutar los slices CRO, abandono, newsletter,
 CRM/outcomes del paraguas; siguen pendientes. No nuevo servicio, proyecto, cron ni gasto.
-Checkpoint de este plan: **pendiente de aprobación humana**, conforme TASK_PROCESS §Phase3
-(P1/Effort Alto). No código de la configuración se ha escrito. La corrección CAPI previa fue
+Checkpoint de este plan: **aprobado por el operador14/10/2026** mediante «Apruebo el plan; ejecuta».
+La ejecución sigue el alcance acotado y el orden documentado. La corrección CAPI previa fue
 encargada y autorizada por separado; commit ba9b8c9cc, backend aún sin release.
 
 ## Discovery summary
@@ -161,7 +161,7 @@ Resueltas por propuesta del plan: persistencia en el dominio Growth, revisión i
 caché autorizante, bearer server-to-server v2, revocación de cola al envío, independencia de
 contacto/analytics/ads, seed explícito y nuevo acceso fino. La agenda usa binding discovery
 verificado; no se inventa un calendario efeonce-discovery-30 inexistente.
-Pendiente sólo aprobación de este plan y registro de sus unidades. No decisión de newsletter,
+Plan aprobado; unidades2036/2037 registradas para ejecutar. No decisión de newsletter,
 ventanas de abandono o lifecycle CRM: quedaron fuera del goal actual.
 
 ## Preflight read-only 2026-10-14
@@ -171,4 +171,4 @@ membresía greenhouse_runtime y sin greenhouse_migrator. No DDL, seed ni write e
 La migración usará el perfil migrator canónico separado, nunca privilegios nuevos del runtime.
 Schema de Forms/Meetings/measurement inspeccionado por metadata. El binding discovery real
 continúa siendo la única agenda activa; no se cambia sólo para hacer pasar una fixture.
-Task2035 movida a in-progress por la toma autorizada; checkpoint humano del plan sigue pendiente.
+Task2035 movida a in-progress por la toma autorizada; checkpoint humano aprobado después de ese preflight.

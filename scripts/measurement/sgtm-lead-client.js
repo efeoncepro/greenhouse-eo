@@ -60,7 +60,7 @@ return; }
 
 const allowed = ['schema_version','event_name','event_id','event_time','action_source','page_location',
   'meta_ads_consent','backend_verified','x-fb-ud-em','x-fb-ud-ph','x-fb-ud-fn','x-fb-ud-ln','x-fb-ud-external_id',
-  'ip_override','user_agent','x-fb-ck-fbp','x-fb-ck-fbc','custom_properties','test_event_code'];
+  'ip_override','user_agent','x-fb-ck-fbp','x-fb-ck-fbc','custom_properties','test_event_code','measurement_policy'];
 
 for (const key in event) {
   if (allowed.indexOf(key) < 0) { respond(400, 'not_fired', 'unexpected_field');
@@ -68,7 +68,7 @@ for (const key in event) {
 return; }
 }
 
-if (event.schema_version !== 1 || event.event_name !== 'generate_lead' ||
+if (event.schema_version !== 2 || event.event_name !== 'generate_lead' ||
     event.action_source !== 'website' || event.meta_ads_consent !== 'granted' ||
     event.backend_verified !== '1' ||
     !matches(event.event_id, '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-8][a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$') ||
@@ -150,22 +150,38 @@ return;
   }
 }
 
-const forms = ['efeonce-aeo-diagnostic','efeonce-seo-diagnostic','efeonce-desarrollo-web-cotizacion',
-  'efeonce-lead-gen-web','efeonce-social-audit','ai-visibility-grader'];
+const proof = event.measurement_policy;
+const uuidPattern = '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-8][a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$';
+const proofKeys = ['policy_id','revision_id','revision','source_kind','source_key','source_version','surface_id','purpose'];
 
-if (!properties.surface_id || (properties.lead_source === 'growth_form' ?
-    forms.indexOf(properties.form_slug) < 0 || properties.scheduler_key !== undefined :
-    properties.lead_source !== 'meeting_booking' || properties.scheduler_key !== 'efeonce-discovery-30' ||
-    properties.surface_id !== 'fhsf-efeonce-lead-gen-web' || properties.form_slug !== undefined)) {
-  respond(400, 'not_fired', 'commercial_scope');
+if (!proof || getType(proof) !== 'object') { respond(400, 'not_fired', 'policy_proof'); 
 
+return; }
+
+for (const key in proof) {
+  if (proofKeys.indexOf(key) < 0) { respond(400, 'not_fired', 'policy_proof'); 
+
+return; }
+}
+
+if (!matches(proof.policy_id, uuidPattern) || !matches(proof.revision_id, uuidPattern) ||
+    getType(proof.revision) !== 'number' || proof.revision < 1 || proof.revision % 1 !== 0 ||
+    proof.purpose !== 'commercial_lead' || proof.surface_id !== properties.surface_id || !properties.surface_id ||
+    (proof.source_kind === 'form_submission' ?
+      properties.lead_source !== 'growth_form' || !properties.form_slug || properties.scheduler_key !== undefined ||
+      !matches(proof.source_key, uuidPattern) || !matches(proof.source_version, '^(fver-[A-Za-z0-9_-]{1,140}|[a-fA-F0-9-]{36})$') :
+      proof.source_kind !== 'meeting_booking' || properties.lead_source !== 'meeting_booking' ||
+      proof.source_key !== properties.scheduler_key || !matches(proof.source_key, '^[A-Za-z0-9_-]{1,120}$') ||
+      !matches(proof.source_version, '^[a-f0-9]{64}$') || properties.form_slug !== undefined)) {
+  respond(400, 'not_fired', 'policy_scope');
+  
 return;
 }
 
 const modeledEvent = {};
 
 for (const key in event) {
-  if (key !== 'schema_version') modeledEvent[key] = event[key];
+  if (key !== 'schema_version' && key !== 'measurement_policy') modeledEvent[key] = event[key];
 }
 
 // Trust the authenticated Client, not a browser event carrying a similarly named flag.

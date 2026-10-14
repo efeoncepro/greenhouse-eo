@@ -8160,6 +8160,64 @@ export interface GreenhouseGrowthLeadPiiRevealAudit {
   user_agent: string | null;
 }
 
+export interface GreenhouseGrowthMeasurementConversion {
+  consent_snapshot_json: Json;
+  created_at: Generated<Timestamp>;
+  encrypted_payload_json: Json | null;
+  event_id: string;
+  occurred_at: Timestamp;
+  policy_revision_id: string | null;
+  source_id: string;
+  source_kind: string;
+}
+
+export interface GreenhouseGrowthMeasurementDelivery {
+  attempts: Generated<number>;
+  destination: string;
+  event_id: string;
+  http_status: number | null;
+  lease_token: string | null;
+  lease_until: Timestamp | null;
+  next_attempt_at: Generated<Timestamp>;
+  safe_error_class: string | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthMeasurementPolicy {
+  created_at: Generated<Timestamp>;
+  policy_id: Generated<string>;
+  published_revision_id: string | null;
+  source_key: string;
+  source_kind: string;
+  surface_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthMeasurementPolicyAudit {
+  action: string;
+  actor_id: string;
+  audit_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  idempotency_key: string;
+  policy_id: string;
+  request_fingerprint: string;
+  result_json: Json;
+  revision_id: string | null;
+}
+
+export interface GreenhouseGrowthMeasurementPolicyRevision {
+  config_json: Json;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  policy_id: string;
+  published_at: Timestamp | null;
+  reviewed_at: Timestamp | null;
+  revision: number;
+  revision_id: Generated<string>;
+  state: Generated<string>;
+}
+
 export interface GreenhouseGrowthMeetingBookingExecution {
   attribution_json: Generated<Json>;
   booking_fingerprint: string;
@@ -14473,6 +14531,11 @@ export interface DB {
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
   "greenhouse_growth.lead_pii_reveal_audit": GreenhouseGrowthLeadPiiRevealAudit;
+  "greenhouse_growth.measurement_conversion": GreenhouseGrowthMeasurementConversion;
+  "greenhouse_growth.measurement_delivery": GreenhouseGrowthMeasurementDelivery;
+  "greenhouse_growth.measurement_policy": GreenhouseGrowthMeasurementPolicy;
+  "greenhouse_growth.measurement_policy_audit": GreenhouseGrowthMeasurementPolicyAudit;
+  "greenhouse_growth.measurement_policy_revision": GreenhouseGrowthMeasurementPolicyRevision;
   "greenhouse_growth.meeting_booking_execution": GreenhouseGrowthMeetingBookingExecution;
   "greenhouse_growth.meeting_rate_limit_bucket": GreenhouseGrowthMeetingRateLimitBucket;
   "greenhouse_growth.meeting_runtime_rollup": GreenhouseGrowthMeetingRuntimeRollup;

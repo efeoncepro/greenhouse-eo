@@ -3,12 +3,9 @@ import 'server-only'
 import { createHash, randomUUID } from 'node:crypto'
 import { isIP } from 'node:net'
 
-import { publicMeasurementContextSchema, type MatchingContact, type MeasurementScope } from './contracts'
+import { measurementPolicyConfigSchema, type MeasurementPolicyRevision } from './policy-contract'
 
-const COMMERCIAL_FORMS = new Set([
-  'efeonce-aeo-diagnostic', 'efeonce-seo-diagnostic', 'efeonce-desarrollo-web-cotizacion',
-  'efeonce-lead-gen-web', 'efeonce-social-audit', 'ai-visibility-grader',
-])
+import { publicMeasurementContextSchema, type MatchingContact, type MeasurementScope } from './contracts'
 
 const HOSTS = new Set(['efeoncepro.com', 'think.efeoncepro.com'])
 const sha256 = (value: string) => createHash('sha256').update(value, 'utf8').digest('hex')
@@ -76,6 +73,7 @@ export const safeMeasurementUrl = (origin: string | null, pageUri?: string | nul
 export const buildMeasurementPayloads = (input: {
   scope: MeasurementScope
   contact: MatchingContact
+  policy?: MeasurementPolicyRevision
   measurementContext: unknown
   ip?: string | null
   userAgent?: string | null
@@ -92,8 +90,13 @@ export const buildMeasurementPayloads = (input: {
   if (Math.abs(now.getTime() - Date.parse(consent.capturedAt)) > 10 * 60_000) return null
   const scope = input.scope
 
-  if (scope.sourceKind === 'form_submission' && (!scope.formSlug || !COMMERCIAL_FORMS.has(scope.formSlug))) return null
-  if (scope.sourceKind === 'meeting_booking' && (scope.schedulerKey !== 'efeonce-discovery-30' || scope.surfaceId !== 'fhsf-efeonce-lead-gen-web')) return null
+  const policy = input.policy
+  const config = measurementPolicyConfigSchema.safeParse(policy?.config)
+
+  if (!policy || !config.success || policy.state !== 'published' || policy.publishedRevisionId !== policy.revisionId ||
+      policy.scope.sourceKind !== scope.sourceKind || policy.scope.sourceKey !== scope.sourceKey ||
+      policy.scope.surfaceId !== scope.surfaceId || policy.config.sourceVersion !== scope.sourceVersion ||
+      !policy.config.origins.some(origin => origin === scope.origin)) return null
   const pageLocation = safeMeasurementUrl(scope.origin, scope.pageUri)
 
   if (!pageLocation || !scope.surfaceId) return null
@@ -113,7 +116,12 @@ export const buildMeasurementPayloads = (input: {
   }
 
   const meta = {
-    schema_version: 1,
+    schema_version: 2,
+    measurement_policy: {
+      policy_id: policy.policyId, revision_id: policy.revisionId, revision: policy.revision,
+      source_kind: scope.sourceKind, source_key: policy.scope.sourceKey, source_version: policy.config.sourceVersion,
+      surface_id: scope.surfaceId, purpose: 'commercial_lead',
+    },
     event_name: 'generate_lead', event_id: eventId,
     event_time: Math.floor(now.getTime() / 1000),
     action_source: 'website', page_location: pageLocation,
@@ -127,7 +135,7 @@ export const buildMeasurementPayloads = (input: {
     custom_properties: JSON.stringify(classification),
   }
 
-  const google = consent.analytics && consent.clientId ? {
+  const google = policy.config.destinations.includes('google_upd') && consent.analytics && consent.clientId ? {
     client_id: consent.clientId,
     user_data: matches.google,
     consent: { ad_user_data: 'GRANTED', ad_personalization: 'GRANTED' },

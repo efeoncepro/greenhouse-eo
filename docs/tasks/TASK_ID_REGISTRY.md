@@ -25,7 +25,9 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `TASK-2035` | `in-progress` | Medición Growth: goal acotado a configuración escalable y CAPI; plan pendiente de aprobación, resto del paraguas sin iniciar | `docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md` |
+| `TASK-2037` | `in-progress` | Growth measurement configuration operator panel; consumer de TASK-2036 | `docs/tasks/in-progress/TASK-2037-growth-measurement-configuration-panel.md` |
+| `TASK-2036` | `in-progress` | Growth measurement policy foundation and authenticated scope | `docs/tasks/in-progress/TASK-2036-growth-measurement-policy-foundation.md` |
+| `TASK-2035` | `in-progress` | Medición Growth: goal acotado a configuración escalable y CAPI; plan aprobado, foundation/UI en ejecución; resto del paraguas sin iniciar | `docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md` |
 | `TASK-2034` | `in-progress` | Lead matching Meta CAPI y Google UPD/audiencias; rollout activo, acceptance comercial pendiente; auditoría documental integral | `docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md` |
 | `TASK-2033` | `in-progress` | Efeonce Insights: alcance de contenido por organización (medir sólo lo que Efeonce trabaja) | `docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md` |
 | `TASK-2032` | `to-do` | Product reference prices computed by Pricing V3 | `docs/tasks/to-do/TASK-2032-product-reference-prices-from-pricing-v3.md` |
@@ -2632,3 +2634,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro 2026-10-13: TASK-2034 reservada para matching de Leads Meta CAPI y Google UPD/audiencias (pedido explícito del operador). Implementación en `in-progress/`; siguiente ID libre TASK-2035.
 
 > Registro 2026-10-14: TASK-2035 reservada por pedido explícito de reunir TODO el pendiente de medición, no sólo subscribe. Barrido por dominio/superficie conserva TASK-1359/1509/1510/1802/1866/1885/2034 como dueñas; nueva umbrella para policy/config, CRO/audiencias, suscripción, calidad y cierre cross-runtime. Registro documental, sin implementación ni rollout. Siguiente ID libre TASK-2036.
+
+> Registro14/10: planTASK-2035 aprobado para configuración/CAPI; TASK-2036 foundation y TASK-2037 consumerUI. Siguiente ID libre TASK-2038.

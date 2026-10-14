@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Plan: goal confirmado14/10, corrida limitada a configuracion escalable Forms/Meetings y CAPI; plan P1 pendiente de aprobacion. Sin codigo/migracion/release de esta ampliacion; CRO/newsletter/CRM pendientes.`
+- Status real: `Plan: goal confirmado14/10, corrida limitada a configuracion escalable Forms/Meetings y CAPI; plan P1 aprobado; unidades2036/2037 en ejecucion. Sin codigo/migracion/release de esta ampliacion; CRO/newsletter/CRM pendientes.`
 - Rank: `Now`
 - Domain: `data|growth|crm`
 - Blocked by: `none`
@@ -51,8 +51,8 @@ El registro no implementa la propuesta ni autoriza un publish, envío, campaña 
 
 El operador confirmó «Limitar ahora a configuración escalable y CAPI». Se ejecutarán slices0/1
 más verificación y release aplicables; el resto del alcance integral permanece en este paraguas
-sin iniciarse. [Plan concreto](../plans/TASK-2035-plan.md), commit29b47e574: checkpoint P1 pendiente.
-No interpretar el goal como aprobación del plan todavía; TASK_PROCESS §Phase3 exige esa decisión.
+sin iniciarse. [Plan concreto](../plans/TASK-2035-plan.md), commit29b47e574: checkpoint P1 aprobado por «Apruebo el plan; ejecuta».
+El operador aprobó explícitamente el plan, cumpliendo TASK_PROCESS §Phase3.
 La reparación CAPI previa pertenece a TASK-2034 y está en ba9b8c9cc, sin release Greenhouse.
 
 ## Goal

@@ -1,6 +1,6 @@
 # Propuesta — configuración de medición por formulario y calendario
 
-- Status: **Proposed; goal de configuración escalable y CAPI confirmado por el operador14/10. Plan P1 pendiente de aprobación; no implementada ni Accepted como ADR.**
+- Status: **Proposed; goal de configuración escalable y CAPI confirmado por el operador14/10. Plan P1 aprobado; decisión formalizada en GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md; implementación en curso.**
 - Fecha: 2026-10-13, conversación posterior a PR254.
 - Owner propuesto: Growth Forms / Meetings / Measurement.
 - Scope: elegibilidad y matching; sin nueva infraestructura ni cambio de sender.

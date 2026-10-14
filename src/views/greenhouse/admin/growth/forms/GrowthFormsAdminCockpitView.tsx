@@ -50,6 +50,8 @@ import type {
   GrowthFormsHealthState,
 } from '@/lib/growth/forms/readers'
 
+import MeasurementPolicyPanel from './MeasurementPolicyPanel'
+
 type SidecarMode = 'inspector' | 'composer' | 'evidence'
 
 type DecisionAction = 'openEvidence' | 'dispatch' | 'review' | 'smoke' | 'monitor'
@@ -1658,6 +1660,8 @@ const GrowthFormsAdminCockpitView = ({ data, canRevealPii }: { data: GrowthForms
           <GreenhouseChip kind='metric' size='small' variant='label' tone={selectedForm.deadLetterCount > 0 ? 'error' : 'success'} label={`${selectedForm.retryQueueCount} ${GH_GROWTH_FORMS.units.retry}`} />
         </Stack>
       </Box>
+
+      <MeasurementPolicyPanel />
 
       <DeliveryPathPanel steps={selectedDeliveryPath} />
 

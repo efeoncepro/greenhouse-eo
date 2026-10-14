@@ -7,6 +7,10 @@ import { GoogleAuth } from 'google-auth-library'
 import { buildMeasurementPayloads } from '../../src/lib/growth/measurement/payload'
 import { readVisitorMeasurementRequest } from '../../src/lib/growth/measurement/visitor-request'
 
+import { loadGreenhouseToolEnv,applyGreenhousePostgresProfile } from '../lib/load-greenhouse-tool-env'
+
+loadGreenhouseToolEnv();applyGreenhousePostgresProfile('ops')
+
 const origin = 'https://efeonce-gtm-tagging-183008134038.us-central1.run.app'
 
 async function main() {
@@ -37,16 +41,26 @@ async function main() {
   // RFC 5737 reserved IP and an explicitly synthetic agent, never a worker IP/agent fallback.
   const visitor = readVisitorMeasurementRequest(new Headers({ 'x-forwarded-for': '198.51.100.9, 192.0.2.2', 'user-agent': 'Efeonce synthetic visitor browser / Meta Test Events' }))
 
+  const {listMeasurementPolicies}=await import('../../src/lib/growth/measurement/policy-store')
+  const {closeGreenhousePostgres}=await import('../../src/lib/db')
+  const policies=await listMeasurementPolicies()
+  const form=policies.find(p=>p.state==='published'&&p.scope.surfaceId==='fhsf-ai-visibility-grader')
+  const meeting=policies.find(p=>p.state==='published'&&p.scope.sourceKind==='meeting_booking'&&p.scope.sourceKey==='discovery')
+
+  if(!form||!meeting) throw Error('published_test_scopes_required')
+
   const scopes = [
-    { sourceKind: 'form_submission' as const, sourceId: 'synthetic-test-only', origin: 'https://efeoncepro.com', pageUri: '/aeo-2/', surfaceId: 'fhsf-aeo', formSlug: 'efeonce-aeo-diagnostic' },
-    { sourceKind: 'meeting_booking' as const, sourceId: 'synthetic-test-only', origin: 'https://think.efeoncepro.com', pageUri: '/web-agentica/', surfaceId: 'fhsf-efeonce-lead-gen-web', schedulerKey: 'efeonce-discovery-30' },
+    { ...form.scope, sourceVersion:form.config.sourceVersion,sourceId:'synthetic-test-only',origin:'https://think.efeoncepro.com',pageUri:'/web-agentica/',formSlug:'ai-visibility-grader',policy:form },
+    { ...meeting.scope,sourceVersion:meeting.config.sourceVersion,sourceId:'synthetic-test-only',origin:'https://efeoncepro.com',pageUri:'/contacto/',schedulerKey:'discovery',policy:meeting },
   ]
+
+  await closeGreenhousePostgres()
 
   const receipts = []
 
   for (const scope of scopes) {
     const eventId = randomUUID()
-    const built = buildMeasurementPayloads({ scope, contact: { email: 'synthetic.lead@example.com', phone: '+12025550148', firstName: 'Synthetic', lastName: 'Fixture' }, measurementContext, ...visitor, now, eventId })
+    const built = buildMeasurementPayloads({ scope, policy:scope.policy, contact: { email: 'synthetic.lead@example.com', phone: '+12025550148', firstName: 'Synthetic', lastName: 'Fixture' }, measurementContext, ...visitor, now, eventId })
 
     if (!built || built.google) throw Error('test_projection_invalid')
     const payload = { ...built.meta, test_event_code: testCode }

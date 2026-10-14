@@ -4,6 +4,7 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 import type { MeasurementDestination } from './contracts'
 import { decryptMeasurementPayload } from './crypto'
+import { measurementPolicyAllowsDelivery } from './policy-store'
 import { claimMeasurementDeliveries, expireMeasurementDeliveries, finishMeasurementDelivery } from './store'
 
 const TAGGING_ORIGIN = 'https://efeonce-gtm-tagging-183008134038.us-central1.run.app'
@@ -80,21 +81,33 @@ export const dispatchMeasurementConversions = async (limit = 50, env: NodeJS.Pro
     if (!row) break
     let result
 
-    try {
-      const payloads = decryptMeasurementPayload(row.encrypted_payload_json, key, row.event_id) as { meta: Record<string, unknown>; google: Record<string, unknown> | null }
-      const payload = row.destination === 'meta' ? payloads.meta : payloads.google
+    let authorized: boolean
 
-      if (!payload) throw new Error('measurement_projection_missing')
-      result = await sendMeasurementPayload(row.destination, payload, secrets.get(row.destination)!)
-    } catch {
-      result = { success: false, httpStatus: null, retryable: false, errorClass: 'measurement_payload_invalid' }
+    try { authorized = await measurementPolicyAllowsDelivery(row.policy_revision_id,row.destination) }
+    catch {
+      result = {success:false,httpStatus:null,retryable:true,errorClass:'measurement_policy_unavailable'}
+      authorized = false
     }
 
-    const finalized = await finishMeasurementDelivery(row, result)
+    if (!authorized && !result) result = {success:false,httpStatus:null,retryable:false,errorClass:'measurement_policy_revoked'}
+
+    if (authorized) {
+      try {
+        const payloads = decryptMeasurementPayload(row.encrypted_payload_json, key, row.event_id) as {meta:Record<string,unknown>|null;google:Record<string,unknown>|null}
+        const payload = row.destination === 'meta' ? payloads.meta : payloads.google
+
+        if (!payload) throw new Error('measurement_projection_missing')
+        result = await sendMeasurementPayload(row.destination,payload,secrets.get(row.destination)!)
+      } catch {
+        result = {success:false,httpStatus:null,retryable:false,errorClass:'measurement_payload_invalid'}
+      }
+    }
+
+    const finalized = await finishMeasurementDelivery(row, result!)
 
     summary.processed++
     if (!finalized) summary.staleFinalizations++
-    else if (result.success) summary.httpAccepted++
+    else if (result!.success) summary.httpAccepted++
     else summary.failed++
   }
 

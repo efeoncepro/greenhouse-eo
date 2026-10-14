@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/lib/secrets/secret-manager', () => ({ resolveSecret: vi.fn() }))
+vi.mock('../policy-store', () => ({measurementPolicyAllowsDelivery:vi.fn()}))
 vi.mock('../store', () => ({ claimMeasurementDeliveries: vi.fn(), expireMeasurementDeliveries: vi.fn(), finishMeasurementDelivery: vi.fn() }))
 
 import { sendMeasurementPayload, dispatchMeasurementConversions, dispatchMeasurementConversionsSafely } from '../dispatch'
 import { resolveSecret } from '@/lib/secrets/secret-manager'
-import { claimMeasurementDeliveries, expireMeasurementDeliveries } from '../store'
+import { claimMeasurementDeliveries, expireMeasurementDeliveries, finishMeasurementDelivery } from '../store'
+import { measurementPolicyAllowsDelivery } from '../policy-store'
 
 describe('destination acknowledgements', () => {
   it('does not accept successful ingress HTTP if the Meta tag did not run', async () => {
@@ -87,5 +89,23 @@ return {value:'fixture',source:'env'} as Awaited<ReturnType<typeof resolveSecret
   expect(expireMeasurementDeliveries).toHaveBeenCalledOnce()
   expect(result).toMatchObject({skipped:'measurement_disabled'})
   expect(resolveSecret).not.toHaveBeenCalled()
+ })
+})
+
+describe('policy revocation immediately before delivery',()=>{
+ beforeEach(()=>vi.resetAllMocks())
+ const row={event_id:'a879b155-a143-40bd-9b15-731c2b62d173',policy_revision_id:'a879b155-a143-40bd-9b15-731c2b62d174',destination:'meta' as const,attempts:1,lease_token:'fixture',occurred_at:new Date(),encrypted_payload_json:{v:1 as const,iv:'fixture',tag:'fixture',ciphertext:'fixture'}}
+
+ it.each([false,'unavailable'])('blocks HTTP for policy %s and records the correct retry posture',async state=>{
+  vi.mocked(resolveSecret).mockResolvedValue({value:'ab'.repeat(32),source:'env'} as Awaited<ReturnType<typeof resolveSecret>>)
+  vi.mocked(claimMeasurementDeliveries).mockResolvedValueOnce([row]).mockResolvedValue([])
+  if(state==='unavailable') vi.mocked(measurementPolicyAllowsDelivery).mockRejectedValue(Error('private-db-error'))
+  else vi.mocked(measurementPolicyAllowsDelivery).mockResolvedValue(false)
+  const fetcher=vi.spyOn(globalThis,'fetch')
+
+  await dispatchMeasurementConversions(1,{NODE_ENV:'test',GROWTH_MEASUREMENT_META_ENABLED:'true'})
+  expect(fetcher).not.toHaveBeenCalled()
+  expect(finishMeasurementDelivery).toHaveBeenCalledWith(row,expect.objectContaining({success:false,retryable:state==='unavailable',errorClass:state==='unavailable'?'measurement_policy_unavailable':'measurement_policy_revoked'}))
+  fetcher.mockRestore()
  })
 })

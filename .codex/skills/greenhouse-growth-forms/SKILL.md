@@ -631,3 +631,8 @@ pnpm release:watchdog --json                                      # worker GIT_S
 - AEO landing: `docs/documentation/public-site/aeo-landing-elementor.md`
 - Compose with: `greenhouse-postgres`, `greenhouse-backend`, `greenhouse-cron-sync-ops`,
   `hubspot-greenhouse-bridge`, `efeonce-public-site-wordpress`, `greenhouse-ux` (+ product-design).
+
+
+### Published measurement configuration — TASK-2035 checkpoint14/10
+
+For scalable conversion matching use the [policy ADR](../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) and [operator manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). Code in develop resolves stable form_key + opaque published fver-* identity or active meeting binding fingerprint, surface/origin, typed mapping and independent destinations from immutable reviewed/published policy data. Never add a form slug/scheduler to a runtime list or let public telemetry authorize advertising. New source/version activation is a governed data command, not a redeploy; new behavior/host/provider may require code. Source acceptance and fresh consent/GPC remain mandatory; enqueue and dispatcher revalidate publication. Disabling blocks pending sends, not HTTP already started. API/UI permission is internal read/author/publish/disable; browser never picks authority. Seven equivalence policies seeded and metadata-only lifecycle proof passed; panel lifecycle, CI, GTM v2 production cutover and final release remain pending at this checkpoint. Follow live runtime ledger rather than treating this checkpoint as a deployed result.

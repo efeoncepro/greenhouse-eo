@@ -12,7 +12,7 @@ function run(overrides = {}) {
   const state = {claimed: false, ran: false};
 
   const body = {
-    schema_version: 1, event_name: 'generate_lead', event_id: 'a879b155-a143-40bd-9b15-731c2b62d173',
+    schema_version: 2, measurement_policy: {policy_id:'a879b155-a143-40bd-9b15-731c2b62d173',revision_id:'a879b155-a143-40bd-9b15-731c2b62d174',revision:1,source_kind:'form_submission',source_key:'a879b155-a143-40bd-9b15-731c2b62d175',source_version:'a879b155-a143-40bd-9b15-731c2b62d176',surface_id:'fhsf-aeo',purpose:'commercial_lead'}, event_name: 'generate_lead', event_id: 'a879b155-a143-40bd-9b15-731c2b62d173',
     event_time: Math.floor(Date.now()/1000), action_source: 'website', page_location: 'https://efeoncepro.com/aeo-2/',
     meta_ads_consent: 'granted', backend_verified: '1', 'x-fb-ud-em': '12'.repeat(32),
     custom_properties: JSON.stringify({lead_source: 'growth_form', form_slug: 'efeonce-aeo-diagnostic', surface_id: 'fhsf-aeo'}),
@@ -60,7 +60,7 @@ for (const [name, overrides] of [
   ['URL query', {body: {page_location: 'https://efeoncepro.com/?email=qa@example.com'}}],
   ['wrong host', {body: {page_location: 'https://other.example.com/'}}],
   ['missing event ID', {body: {event_id: undefined}}], ['stale timestamp', {body: {event_time: Math.floor(Date.now()/1000)-86401}}],
-  ['unknown commercial form', {body: {custom_properties: JSON.stringify({lead_source:'growth_form', form_slug:'careers', surface_id:'fhsf-aeo'})}}],
+  ['unsupported proof', {body: {measurement_policy:undefined}}],
   ['wrong properties shape', {body: {custom_properties: {lead_source:'growth_form'}}}],
 ]) test(name+' cannot trigger Meta', () => {const state=run(overrides);
 
@@ -91,3 +91,10 @@ for (const [name, body] of [
   assert.equal(state.ran, false);
   assert.ok(state.status >= 400);
 });
+
+test('new compatible form slug uses the same authenticated scope contract without a template edit', () => {
+  const state=run({body:{custom_properties:JSON.stringify({lead_source:'growth_form',form_slug:'new-commercial-form',surface_id:'fhsf-aeo'})}});
+  assert.equal(state.status,200);
+  assert.equal(state.event.measurement_policy,undefined);
+});
+test('old v1 payload cannot bypass the policy proof',()=>{assert.equal(run({body:{schema_version:1}}).status,400);});

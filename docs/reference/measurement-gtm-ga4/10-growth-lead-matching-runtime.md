@@ -282,3 +282,7 @@ Consulta de sólo agregados al ledger últimos7d:0 conversiones al corte; hay Le
 en Test Events, así que los14 reportados no prueban por sí solos una regresión del backend.
 El canary anterior omitía IP/UA: el nuevo usa contexto explícito de request de fixture.
 Logs sólo clases/contadores; Sentry elimina body/headers/cookies/env/user de submit/book.
+
+## TASK-2035 configuration checkpoint — 14/10
+
+Published policy data replaces fixed source lists in develop: [ADR](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md), [operator manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md), [evidence](../../audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md). Seven initial policies seeded, new source by data verified, schema2 Client Preview only. UI first-fold/CI/release pending; live remains7. Commercial traffic/EMQ not inferred from Test Events.

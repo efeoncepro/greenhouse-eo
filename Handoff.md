@@ -8,10 +8,10 @@
 
 [Corrección y pruebas](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md): Server7 sólo template30,
 website/IP/UA/fbp/fbc/external_id/em/ph/fn/ln recibidos en Test Events ambos hosts; código temporal por petición,
-sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Goal acotado a configuración escalable/CAPI, [plan P1 pendiente](docs/tasks/plans/TASK-2035-plan.md); un solo release final.
+sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Plan acotado aprobado: [TASK-2035](docs/tasks/plans/TASK-2035-plan.md). Foundation/migración/seed7 y alta por datos probados; panel/CI/release pendientes. [Evidencia](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
 Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user submit/book. Primera conversión real pendiente.
 
-[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: corrida14/10 limitada a configuración escalable/CAPI, plan P1 pendiente; CRO, abandono, newsletter y CRM permanecen sin iniciar. Umbrella sobre dueñas existentes, sin release de esta ampliación.
+[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: corrida14/10 aprobada, TASK-2036/2037 en ejecución; CRO, abandono, newsletter y CRM permanecen sin iniciar. Umbrella sobre dueñas existentes, sin release de esta ampliación.
 
 Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
@@ -34,7 +34,7 @@ auditada no bloqueante, sin afirmar solución. Dossier incluye rollback, digests
 Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo proyecto/cron para matching.
 
 Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
-ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md): alcance integrado a **TASK-2035**, sin implementar. Commit documental, sin publicación/release adicional.
+ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md): alcance integrado a **TASK-2035**, foundation implementada/seed aplicado; panel y release pendientes.
 
 El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
 WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
