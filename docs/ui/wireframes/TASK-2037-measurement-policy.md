@@ -33,6 +33,8 @@ field options; no arbitrary JSON. Policy content/publication logic remains serve
 
 ## GVC Scenario Plan
 
+Scenario file: `scripts/frontend/scenarios/growth-measurement-policy.scenario.ts`
+
 Quality profile: premium
 
 Capture desktop 1440 and mobile 390, inspect images, axe/focus/keyboard, reduced-motion and

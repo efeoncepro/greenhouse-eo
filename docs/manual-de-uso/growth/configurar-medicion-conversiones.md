@@ -3,8 +3,9 @@
 Estado14/10/2026: TASK-2036 implementada en develop, migración y seed aplicados. Panel TASK-2037
 con lifecycle implementado y12 pruebas UI/red PASS; QA remota y release pendientes. GTM8
 es compatible v1/v2 temporalmente; el corte final estricto v2 queda pendiente del release.
-Alta controlada real mediante UI y readback API probada; revisión visual final pendiente tras
-corregir contraste de acciones secundarias con tokens nativos.
+Alta controlada real mediante UI y readback API probada; GVC premium1440/390 PASS. Revisión final de estados pendiente tras corregir contraste del
+feedback con tokens nativos. El harness distingue estados simulados de presentación y
+comandos reales sobre una fixture controlada.
 Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 
 ## Alta compatible por datos
@@ -70,4 +71,4 @@ incluye events. El código de prueba nunca queda fijo en producción.
 - verify-policy-lifecycle.ts --apply: fixture de configuración sin embed key ni tráfico; publica y desactiva política, archiva form y surface al terminar con readback independiente previo al recibo de éxito. No crea contactos/submissions/bookings ni envía a proveedores.
 - policy-ui-fixture.ts prepare/cleanup --apply: exige MEASUREMENT_FIXTURE_RECEIPT; crea una fuente controlada sin embed key y archiva fuente/surface/desactiva política con readback al terminar. Reutiliza el recibo existente, no genera fixtures duplicadas.
 - verify-policy-ui.ts --apply: staging únicamente, escribe desde la UI sólo sobre la fixture declarada; captura lifecycle real y estados de presentación aislados en el navegador. No envía formularios ni bookings.
-- verify-lead-context.ts: exige META_TEST_EVENT_CODE real y opcional META_TEST_PREVIEW_HEADER_FILE privado. Resuelve las políticas publicadas y prueba sólo Meta Test Events. META_TEST_POLICY_ID permite seleccionar una política publicada de prueba para verificar un alta por datos sin volver a publicar GTM. Nunca volcar sus payloads, headers o credenciales.
+- verify-lead-context.ts: exige META_TEST_EVENT_CODE real y opcional META_TEST_PREVIEW_HEADER_FILE privado. Resuelve las políticas publicadas y su mapping mediante preparación canónica y cifrado efímero de prueba; no persiste cola. Prueba sólo Meta Test Events. Un único key efímero por proceso respeta la caché del resolver de secretos. META_TEST_POLICY_ID permite seleccionar una política publicada de prueba para verificar un alta por datos sin volver a publicar GTM. Nunca volcar sus payloads, headers o credenciales.

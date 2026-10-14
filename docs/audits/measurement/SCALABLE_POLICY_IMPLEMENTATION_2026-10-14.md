@@ -132,3 +132,33 @@ new policy contract; main web convergence remains required. Operational read sho
 measurement conversions/deliveries in the preceding3 hours; no lost commercial event was
 observed. Recheck queue and runtime before strict Client cutover; do not silently upgrade
 legacy receipts to a different policy or consent.
+
+## Functional GVC and real mapped projection — 14:14Z
+
+GVC premium2e49a6db4 passes desktop1440/mobile390,4 frames, focus/reduced motion, axe,
+layout, runtime and enterprise rubric; images inspected and dossier generated at
+.captures/2026-10-14T14-12-42_growth-measurement-policy. Final state-loop testing found
+native warning Alert text contrast1.58:1 in conflict state; corrected scoped feedback text
+to text.primary. Full state-loop repeat against the next exact staging remains pending.
+UI harness now waits for the select menu to close before frames and targets visible panel
+copies when the native sidecar changes mode. Earlier transitional frames are not final QA.
+
+The first controlled source was independently cleaned13:56:42Z. A replacement controlled
+source73299b79-5044-44ff-b1be-47faedfae53c was configured with businessEmail/phone/firstName/lastName,
+Meta only; actual UI publication/readback policy2b9ae007-713b-416c-a7ba-28afd17cbaac, revision2
+9346726c-4408-49e3-89a1-d8fd94238542. Helper now exercises canonical policy/source/mapping
+preparation and encryption before Test Events, not a manually supplied contact projection.
+It uses one ephemeral test encryption key per process (the secret resolver caches by env
+presence/ref; replacing the ephemeral value per scope caused the initial harness-only decrypt
+failure, now fixed without changing production secret resolution). No queue/CRM rows are created.
+
+Full mapped canary14:13:56Z eventee614f8d-90d5-4b52-b052-9f8460c2452b: live8 HTTP200,
+replay200, denied/raw-identity400; all9 mapped fields present, website and original occurrence.
+Independent Meta UI receipt still required. Baseline full preparation14:08:49Z also passed
+both existing hosts (6d86ecb9...Think;881162d0...discovery). Think's policy has no phone mapping,
+so it correctly supplies8 fields, not an invented phone; discovery supplies9. These are isolated
+Test Events, never commercial delivery or EMQ evidence. Earlier b0305574 direct-builder canary
+proved generalized Client ingress, not mapping enforcement; the canonical preparation supersedes
+that limit. Final strict workspace11 compiles with only template30 changed; canonical committed
+source digest0c42c4e93a6e79fb291f5aa7bb353b6486b9a572146b719df2b6e78fe9eba1d7 (post-formatting).
+No publication until web/worker convergence, queue check and final Preview/live acceptance.

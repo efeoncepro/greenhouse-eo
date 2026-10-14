@@ -1,7 +1,7 @@
 # Task Index
 
 - `TASK-2036` — [Policy/API de medición](in-progress/TASK-2036-growth-measurement-policy-foundation.md), in-progress; DB/policy y Test Events v2 verificados, corrección CI remota.
-- `TASK-2037` — [Panel de medición](in-progress/TASK-2037-growth-measurement-configuration-panel.md), in-progress; first fold staging aceptado, lifecycle y12 pruebas PASS; QA/release pendientes.
+- `TASK-2037` — [Panel de medición](in-progress/TASK-2037-growth-measurement-configuration-panel.md), in-progress; lifecycle y alta UI real probados; GVC premium PASS, estados finales/CI/release pendientes.
 
 - `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI, [plan P1 aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2038`.
 

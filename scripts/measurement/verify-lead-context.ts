@@ -1,10 +1,10 @@
 /** Isolated Meta Test Events canary. Never creates a CRM contact or ordinary dataset event. */
-import { randomUUID } from 'node:crypto'
+import { randomBytes, randomUUID } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 
 import { GoogleAuth } from 'google-auth-library'
 
-import { buildMeasurementPayloads } from '../../src/lib/growth/measurement/payload'
+import type { buildMeasurementPayloads } from '../../src/lib/growth/measurement/payload'
 import { readVisitorMeasurementRequest } from '../../src/lib/growth/measurement/visitor-request'
 
 import { loadGreenhouseToolEnv,applyGreenhousePostgresProfile } from '../lib/load-greenhouse-tool-env'
@@ -12,6 +12,8 @@ import { loadGreenhouseToolEnv,applyGreenhousePostgresProfile } from '../lib/loa
 loadGreenhouseToolEnv();applyGreenhousePostgresProfile('ops')
 
 const origin = 'https://efeonce-gtm-tagging-183008134038.us-central1.run.app'
+
+let stage='init'
 
 async function main() {
   const testCode = process.env.META_TEST_EVENT_CODE
@@ -42,7 +44,6 @@ async function main() {
   const visitor = readVisitorMeasurementRequest(new Headers({ 'x-forwarded-for': '198.51.100.9, 192.0.2.2', 'user-agent': 'Efeonce synthetic visitor browser / Meta Test Events' }))
 
   const {listMeasurementPolicies}=await import('../../src/lib/growth/measurement/policy-store')
-  const {closeGreenhousePostgres}=await import('../../src/lib/db')
   const policies=await listMeasurementPolicies()
   const form=policies.find(p=>p.state==='published'&&p.scope.surfaceId==='fhsf-ai-visibility-grader')
   const meeting=policies.find(p=>p.state==='published'&&p.scope.sourceKind==='meeting_booking'&&p.scope.sourceKey==='discovery')
@@ -69,15 +70,29 @@ async function main() {
       ...(policy.scope.sourceKind==='form_submission'?{formSlug:source.formSlug!}:{schedulerKey:policy.scope.sourceKey}),policy}]
   }
 
-  await closeGreenhousePostgres()
-
   const receipts = []
+  const testKey=randomBytes(32).toString('hex')
 
   for (const scope of scopes) {
     const eventId = randomUUID()
-    const built = buildMeasurementPayloads({ scope, policy:scope.policy, contact: { email: 'synthetic.lead@example.com', phone: '+12025550148', firstName: 'Synthetic', lastName: 'Fixture' }, measurementContext, ...visitor, now, eventId })
+    const contact:Record<string,string>={email:'synthetic.lead@example.com',phone:'+12025550148',firstName:'Synthetic',lastName:'Fixture'}
+    const fields=Object.fromEntries(Object.entries(scope.policy.config.mapping).map(([target,key])=>[key,contact[target]]))
+    const {prepareMeasurementConversion}=await import('../../src/lib/growth/measurement/prepare')
+    const {decryptMeasurementPayload}=await import('../../src/lib/growth/measurement/crypto')
+    // Ephemeral test encryption key: exercise the real policy/mapping path without persisting a queue item.
 
-    if (!built || built.google) throw Error('test_projection_invalid')
+    stage='policy-projection'
+
+    const prepared=await prepareMeasurementConversion({scope,fields,measurementContext,...visitor,now,eventId},
+      {...process.env,GROWTH_MEASUREMENT_CAPTURE_ENABLED:'true',GROWTH_MEASUREMENT_PAYLOAD_KEY_SECRET_REF:undefined,GROWTH_MEASUREMENT_PAYLOAD_KEY:testKey})
+
+    if(!prepared || prepared.policyRevisionId!==scope.policy.revisionId) throw Error('policy_projection_required')
+    if(prepared.eventId!==eventId) throw Error('occurrence_id_mismatch')
+    stage='decrypt-projection'
+    const built=decryptMeasurementPayload(prepared.encryptedPayload,testKey,eventId) as NonNullable<ReturnType<typeof buildMeasurementPayloads>>
+
+    stage='verify-projection'
+    if (!built?.meta || built.google) throw Error('test_projection_invalid')
     const payload = { ...built.meta, test_event_code: testCode }
     const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(preview ? { 'X-Gtm-Server-Preview': preview } : {}) }
 
@@ -88,6 +103,7 @@ async function main() {
       return { status: response.status, metaTagStatus: result.meta_tag_status }
     }
 
+    stage='send-test-only'
     const first = await send(payload)
 
     if (first.status !== 200 || first.metaTagStatus !== 'success') throw Error('meta_test_delivery_failed_' + first.status)
@@ -100,7 +116,8 @@ async function main() {
     if (denied.status !== 400 || rawIdentity.status !== 400) throw Error('negative_gate_failed')
     receipts.push({ eventId, sourceKind: scope.sourceKind, host: scope.origin, eventSourceUrl: payload.page_location,
       actionSource: payload.action_source, eventTimeSeconds: Number.isInteger(payload.event_time),
-      suppliedFields: ['client_ip_address', 'client_user_agent', 'fbp', 'fbc', 'external_id', 'em', 'ph', 'fn', 'ln'],
+      suppliedFields: Object.entries({client_ip_address:'ip_override',client_user_agent:'user_agent',fbp:'x-fb-ck-fbp',fbc:'x-fb-ck-fbc',external_id:'x-fb-ud-external_id',em:'x-fb-ud-em',ph:'x-fb-ud-ph',fn:'x-fb-ud-fn',ln:'x-fb-ud-ln'}).filter(([,key])=>key in payload).map(([key])=>key),
+      policyProjectionVerified:true,
       first, replay, deniedStatus: denied.status, rawIdentityStatus: rawIdentity.status, testEventsOnly: true, preview: Boolean(preview),
     })
   }
@@ -111,4 +128,6 @@ async function main() {
   console.log(JSON.stringify(receipt))
 }
 
-main().catch(() => { console.error('meta_test_validation_failed_no_sensitive_payload_logged'); process.exitCode = 1 })
+main().finally(async()=>{const {closeGreenhousePostgres}=await import('../../src/lib/db');
+
+await closeGreenhousePostgres()}).catch((error) => { console.error('meta_test_validation_failed_no_sensitive_payload_logged',{stage,failureType:error instanceof Error?error.name:'unknown',authTagMismatch:error instanceof Error&&error.message.includes('authenticate'),missingFunction:error instanceof Error&&error.message.includes('not a function'),code:error instanceof Error&&/^[a-z_0-9]{1,80}$/.test(error.message)?error.message:'failure'}); process.exitCode = 1 })

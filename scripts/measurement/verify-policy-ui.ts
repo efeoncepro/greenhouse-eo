@@ -56,11 +56,16 @@ return}
     await route.fallback()
   })
   const selector='[data-capture="measurement-policy-panel"]'
-  const panel=page.locator(selector)
+  const panel=page.locator(selector+':visible')
 
   const mark=async(state:string)=>{
     stage='capture-'+state
+    await page.getByRole('listbox').waitFor({state:'hidden',timeout:5000})
     await panel.scrollIntoViewIfNeeded()
+    // Leave the fixed app header above the clipped section; evaluate reads only DOM geometry.
+    const top=await panel.evaluate(element=>element.getBoundingClientRect().top)
+
+    if(top<100) await page.evaluate(()=>window.scrollBy(0,-100))
     const framePath=resolve(outputDir,state+'.png')
 
     await panel.screenshot({path:framePath})
@@ -84,14 +89,31 @@ return response.json()}) as Promise<MeasurementCatalog>
     const initial=await readCatalog()
     const source=initial.sources.find(value=>value.scope.sourceKey===fixture.sourceKey&&value.scope.surfaceId===fixture.surfaceId)
 
-    assert(source?.name==='TEST — Measurement UI proof' && !fixturePolicy(initial).length,'new_fixture_only')
+    assert(source?.name==='TEST — Measurement UI proof','controlled_fixture_only')
+    const previous=fixturePolicy(initial)
+    const expectedRevision=Math.max(0,...previous.map(policy=>policy.revision))+1
+
+    if(previous.length) assert(process.argv.includes('--revise-fixture'),'explicit_fixture_revision_required')
     stage='select-source'
     await panel.getByRole('combobox',{name:C.source}).click()
     await page.getByRole('option',{name:/TEST — Measurement UI proof/}).click()
-    await mark('01-empty')
+    await mark(previous.length?'01-current':'01-empty')
+    if(previous.length) await panel.getByRole('button',{name:C.edit,exact:true}).click()
+
+    if(!previous.length) {
     await panel.getByRole('combobox',{name:C.email,exact:true}).click()
     await page.getByRole('option',{name:'businessEmail',exact:true}).click()
-    await panel.getByRole('switch',{name:C.meta,exact:true}).check()
+
+    for(const target of ['phone','firstName','lastName'] as const) {
+      assert(source.fields.some(field=>field.key===target))
+      await panel.getByRole('combobox',{name:C[target],exact:true}).click()
+      await page.getByRole('option',{name:target,exact:true}).click()
+    }
+
+    }
+
+    stage='enable-meta'
+    if(!(await panel.getByRole('switch',{name:C.meta,exact:true}).isChecked())) await panel.getByRole('switch',{name:C.meta,exact:true}).check()
     assert(!(await panel.getByRole('switch',{name:C.google_upd,exact:true}).isChecked()))
     stage='save-draft'
     await panel.getByRole('button',{name:C.save,exact:true}).click()
@@ -106,13 +128,17 @@ return response.json()}) as Promise<MeasurementCatalog>
     await mark('03-review')
     stage='publish'
     await panel.getByRole('button',{name:C.publish,exact:true}).click()
-    await panel.getByText(C.activeRevision(1),{exact:true}).waitFor({timeout:30000})
+    await panel.getByText(C.activeRevision(expectedRevision),{exact:true}).waitFor({timeout:30000})
     const published=fixturePolicy(await readCatalog()).find(policy=>policy.state==='published')
 
     assert(published?.revisionId===published?.publishedRevisionId && published?.config.mapping.email==='businessEmail')
     assert.deepEqual(published.config.destinations,['meta'])
     await mark('04-published')
     await page.setViewportSize({width:390,height:844})
+    await page.reload({waitUntil:'domcontentloaded'})
+    await panel.getByRole('combobox',{name:C.source}).waitFor({timeout:60000})
+    await panel.getByRole('combobox',{name:C.source}).click()
+    await page.getByRole('option',{name:/TEST — Measurement UI proof/}).click()
     await mark('05-mobile-published')
     await page.emulateMedia({reducedMotion:'reduce'})
     await mark('06-reduced-motion')
@@ -157,9 +183,10 @@ return response.json()}) as Promise<MeasurementCatalog>
     await showCatalog(presentationCatalog,403)
     await panel.getByText(C.denied,{exact:true}).waitFor({timeout:30000})
     await mark('12-denied-presentation')
-    writeFileSync(resolve(outputDir,'receipt.json'),JSON.stringify({checkedAt:new Date().toISOString(),stagingUrl:envConfig.baseUrl,sourceKey:fixture.sourceKey,policyId:published.policyId,revisionId:published.revisionId,commands,frames,blockedWrites,commercialSubmissions:0,bookings:0,providerRequests:0,newSourceConfiguredThroughUIWithoutCodeOrGtmChange:true},null,2))
+    writeFileSync(resolve(outputDir,'receipt.json'),JSON.stringify({checkedAt:new Date().toISOString(),stagingUrl:envConfig.baseUrl,sourceKey:fixture.sourceKey,policyId:published.policyId,revisionId:published.revisionId,commands,frames,blockedWrites,commercialSubmissions:0,bookings:0,providerRequests:0,newSourceConfiguredThroughUIWithoutCodeOrGtmChange:previous.length===0,revisionConfiguredThroughUIWithoutCodeOrGtmChange:true},null,2))
     console.log(JSON.stringify({ok:true,policyId:published.policyId,sourceKey:fixture.sourceKey,commands,frames:frames.length,providerRequests:0,commercialSubmissions:0}))
-  } finally {await session.stopTracing(null);await session.finalizeRecording();await session.browser.close()}
+  } catch(error) {await page.screenshot({path:resolve(outputDir,'failure-context.png'),fullPage:false}).catch(()=>{});throw error}
+  finally {await session.stopTracing(null);await session.finalizeRecording();await session.browser.close()}
 }
 
-main().catch(()=>{console.error('policy_ui_verification_failed_no_sensitive_payload_logged',{stage});process.exitCode=1})
+main().catch((error)=>{console.error('policy_ui_verification_failed_no_sensitive_payload_logged',{stage,operation:error instanceof Error&&/^[a-zA-Z.]+: Timeout/.test(error.message)?error.message.split('\n')[0]:'',kind:error instanceof Error&&error.message.includes('strict mode violation')?'ambiguous_locator':error instanceof Error&&error.message.includes('Timeout')?'timeout':'quality_or_assertion'});process.exitCode=1})

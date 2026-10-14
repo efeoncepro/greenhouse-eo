@@ -1,14 +1,17 @@
 # Runtime de consentimiento y matching de Leads
 
 Código promovido en PR254, main `d692ab51dc486a0585b7950f95bb627197e6f2c6`.
-Últimos readbacks externos: 2026-10-14 UTC (Server7 y Test Events); [dossier de release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Últimos readbacks externos: 2026-10-14 UTC (Server8 compatible temporal y Test Events); [dossier de release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 **Matching activado; primera conversión comercial consentida post-activación sin observar.**
 Este documento describe lo construido; su actualización no certifica tráfico posterior.
 
 [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
 [consentimiento/hosts](09-hubspot-consent.md), [recuperación e inventario histórico](08-meta-conversions-api-server-side.md).
 La [configuración escalable](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
-está **propuesta, pendiente de GO y sin implementar**. Hoy hay listas fijas en backend y Client sGTM.
+fue **aprobada e implementada en develop (PR255)**: DB/seed, API y panel con lifecycle real
+probado. Web producción aún sirve main PR254; Ops compartido00776-g9g ya sirve policy v2
+(bef1e2184). Server8 acepta v1 previo y v2 durante esta transición. Falta completar CI,
+QA de estados y release completo antes del Client estricto. [Estado/evidencia](../../audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
 
 ## 1. Componentes y autoridad
 
@@ -20,7 +23,7 @@ está **propuesta, pendiente de GO y sin implementar**. Hoy hay listas fijas en 
 | Contexto publicitario | src/growth-measurement-context/context.ts; consentimiento/identificadores permitidos |
 | Matching/cola | src/lib/growth/measurement/* y proyección greenhouse_growth, sin segunda verdad de negocio |
 | Entrega | Ops existente, /growth/forms/dispatch, cadencia existente2min; no cron/servicio nuevo |
-| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live7 |
+| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live8 temporal v1/v2 |
 | GA4 | Propiedad486264460, stream10593675149, G-KYPPY57M14; GTM Web NGHPGRLZ live5 |
 
 ```mermaid
@@ -35,6 +38,8 @@ flowchart LR
   R --> M["Client backend sGTM → Meta Lead"]
   R --> G["Google MP user_data sin events"]
   A --> E["Espejo browser generate_lead → GA4"]
+  A --> O["Outbox comercial → HubSpot Forms secure-submit"]
+  O --> C["CRM: contacto y propiedades, readback independiente"]
 ```
 
 El último espejo requiere que el browser procese la confirmación. El dataLayer no es prueba
@@ -285,4 +290,4 @@ Logs sólo clases/contadores; Sentry elimina body/headers/cookies/env/user de su
 
 ## TASK-2035 configuration checkpoint — 14/10
 
-Published policy data replaces fixed source lists in develop: [ADR](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md), [operator manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md), [evidence](../../audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md). Seven initial policies seeded, new source by data verified, schema2 Client Preview only. UI first-fold/CI/release pending; live remains7. Commercial traffic/EMQ not inferred from Test Events.
+Published policy data replaces fixed source lists in develop: [ADR](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md), [operator manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md), [evidence](../../audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md). Seven initial policies seeded, new source by data verified, schema2 Client compilado; live8 compatible temporal y workspace11 estricto sin publicar. UI lifecycle por datos y GVC premium1440/390 PASS; corrección de contraste de feedback/CI/release pendientes. Commercial traffic/EMQ not inferred from Test Events.
