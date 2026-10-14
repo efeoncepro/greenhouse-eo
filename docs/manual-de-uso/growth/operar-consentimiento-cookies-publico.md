@@ -126,3 +126,14 @@ y publicar sólo campos permitidos. No confiar en `max_output_tokens` como redac
 repetir el valor en comandos, documentos, registros o artefactos de evidencia. No ejecutar una nueva
 llamada sólo para reproducir la exposición. La rotación es una operación separada que requiere su
 alcance autorizado y readback, no una consecuencia automática de actualizar este manual.
+
+## Matching de visitante y pruebas aisladas (14/10/2026)
+
+El bridge autorizado ahora conserva atribución publicitaria después del grant; detalle de cookies,
+revocación y contexto en [runtime10](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+Para comprobar entrega, verificar el código real vigente en Meta Probar eventos y pasarlo sólo
+en META_TEST_EVENT_CODE temporal al ejecutar scripts/measurement/verify-lead-context.ts con
+el shim server-only. META_TEST_PREVIEW_HEADER_FILE es opcional para el draft; sin él prueba
+el Client publicado. META_TEST_RECEIPT_FILE guarda sólo metadatos/estados, nunca user_data.
+No publicar testEventCode en el tag ni ejecutar el canary histórico sin este gate.
+No confundir los fixtures recibidos con formularios aceptados de clientes ni con mejora de EMQ.

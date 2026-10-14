@@ -270,3 +270,12 @@ publicada vs funnel pendiente. La [política configurable](../../architecture/GR
 permanece Proposed, pendiente de GO, sin schema/API/UI/template/release nuevo. No se abre
 una task de implementación por esta documentación. StatusParcial conserva acceptance
 real comercial pendiente; no tildarlo por una auditoría documental.
+
+### Checkpoint 2026-10-14 — contexto de visitante
+
+[Corrección y evidencia](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
+Server7 publicado, sólo template30; nueve campos matching + website recibidos por Test Events
+ambos hosts, código temporal por request. Bridge WP421eaa3 / Think PR14, external_id SHA256,
+normalización y helper IP/UA de POST preparados para release completo develop→main.
+63 Vitest +25 Client +8 attribution +16 bridge PASS. Primera aceptación comercial sigue
+pendiente: ledger últimos7d sin conversiones al corte; no usar fixtures para cerrar ese criterio.

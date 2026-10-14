@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { describe, expect, it } from 'vitest'
 
 import { buildMatchingData, buildMeasurementPayloads, safeMeasurementUrl } from '../payload'
@@ -41,6 +43,26 @@ describe('destination-specific Lead matching', () => {
   it('never guesses a country or splits a full name', () => {
     expect(buildMatchingData({ phone: '2025550148' }).hasIdentity).toBe(false)
     expect(buildMatchingData({ email: 'qa@example.com' }).meta).not.toHaveProperty('x-fb-ud-ln')
+  })
+  it('keeps external contact identity stable across submissions and normalizes Unicode punctuation', () => {
+    const hash = (s: string) => createHash('sha256').update(s).digest('hex')
+    const matching = buildMatchingData({ email: ' QA .Meta+Lead@Example.com ', lastName: ' O’Neill—Smith! ' })
+
+    expect(matching.meta['x-fb-ud-external_id']).toBe(hash('qa.meta+lead@example.com'))
+    expect(matching.meta['x-fb-ud-external_id']).toBe(matching.meta['x-fb-ud-em'])
+    expect(matching.meta['x-fb-ud-ln']).toBe(hash('oneillsmith'))
+  })
+  it('forwards original visitor context without hashing IP, UA or cookie identifiers', () => {
+    const cookies = { fbp: 'fb.1.1791921600000.1234', fbc: 'fb.1.1791921600000.actual-click' }
+    const payload = buildMeasurementPayloads({ ...input, measurementContext: { ...context, ...cookies } })!
+
+    expect(payload.meta.ip_override).toBe(input.ip)
+    expect(payload.meta.user_agent).toBe(input.userAgent)
+    expect(payload.meta['x-fb-ck-fbp']).toBe(cookies.fbp)
+    expect(payload.meta['x-fb-ck-fbc']).toBe(cookies.fbc)
+    expect(payload.meta.action_source).toBe('website')
+    expect(payload.meta.event_time).toBe(Math.floor(now.getTime() / 1000))
+    expect(payload.meta.event_id).toBe(input.eventId)
   })
   it('produces a clean URL, explicit classification and Google user-data-only', () => {
     const payload = buildMeasurementPayloads(input)!

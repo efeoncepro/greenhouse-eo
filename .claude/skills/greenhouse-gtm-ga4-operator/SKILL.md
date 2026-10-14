@@ -124,6 +124,18 @@ excluir el campo. Validar variables y luego payload positivo Test Events; no igu
 6. Workspaces aislados por contenedor; presentar diff/QA/rollback antes de publicar.
    Documentación no autoriza provisionar cloud/DNS/IAM, rotar secretos ni enviar canaries.
 
+## Contexto Lead — corrección 14/10/2026
+
+Cargar [auditoría](../../../docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md) y runtime10.
+Server7: sólo template30 cambia; no editar tags ajenos ni fijar testEventCode. Visitor-request
+captura XFF/IP real y UA en POST Forms/Meetings, snapshot cifrado; nunca worker IP/UA.
+Bridge conserva _fbp/_fbc y landing fbclid sólo tras ads grant (cookies90d + session fallback);
+revocación/GPC limpia, sin IDs en GA4/dataLayer. external_id = SHA256 del email normalizado,
+fallback teléfono internacional, nunca submissionId. Meta pasa los nueve campos sin rehash
+adicional; action_source website, URL real limpia, tiempo UNIX/UUID estable.
+verify-lead-context.ts requiere META_TEST_EVENT_CODE real temporal por request; Preview y live
+Test Events procesados Server/website ambos hosts. No asumir EMQ ni primera conversión real.
+
 ## Canonical coordinates (Efeonce)
 
 | Recurso | Valor |

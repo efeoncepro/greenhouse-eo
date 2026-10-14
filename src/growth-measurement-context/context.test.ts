@@ -20,5 +20,18 @@ describe('new visitor consent context',()=>{
   expect(context.advertisement).toBe(false);expect(context.fbp).toBeUndefined();expect(context.fbc).toBeUndefined()
  })
  it('reads only an actual GA cookie after analytics consent',()=>expect(readPublicMeasurementContext(visitor())?.clientId).toBe('123.456'))
+ it('reads the consented bridge fallback at submit after cookies are blocked',()=>{
+  const win=visitor('granted','denied') as Window & {efeonceReadMetaAttribution?:()=>{fbp:string;fbc:string}}
+
+  win.document.cookie=''
+  win.efeonceReadMetaAttribution=()=>({fbp:'fb.1.1791921600000.1234',fbc:'fb.1.1791921600000.landing-click'})
+  expect(readPublicMeasurementContext(win)).toMatchObject({fbp:'fb.1.1791921600000.1234',fbc:'fb.1.1791921600000.landing-click'})
+ })
+ it('never invokes attribution storage when advertising is denied',()=>{
+  const win=visitor('denied','granted') as Window & {efeonceReadMetaAttribution?:()=>never}
+
+  win.efeonceReadMetaAttribution=()=>{throw Error('must not access attribution')}
+  expect(readPublicMeasurementContext(win)?.advertisement).toBe(false)
+ })
  it('excludes noncanonical hosts',()=>expect(readPublicMeasurementContext(visitor('granted','granted',false,'greenhouse.efeoncepro.com'))).toBeUndefined())
 })

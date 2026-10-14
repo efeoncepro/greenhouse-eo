@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { readVisitorMeasurementRequest } from '@/lib/growth/measurement/visitor-request'
+
 import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { bookMeeting } from '@/lib/growth/meetings/command'
 import { isNativeMeetingSchedulerEnabled } from '@/lib/growth/meetings/flags'
@@ -20,9 +22,6 @@ const statusByCode = {
   booking_rejected: 422,
   provider_degraded: 503,
 } as const
-
-const clientIp = (request: Request): string | null =>
-  request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
 
 export const OPTIONS = (request: Request) => publicFormsOptionsResponse(request, METHODS)
 
@@ -57,8 +56,8 @@ export async function POST(request: Request) {
       { ...body, idempotencyKey },
       {
         origin: request.headers.get('origin'),
-        ip: clientIp(request),
-        userAgent: request.headers.get('user-agent'),
+        ip: readVisitorMeasurementRequest(request.headers).ip,
+        userAgent: readVisitorMeasurementRequest(request.headers).userAgent,
         requestGlobalPrivacyControl: request.headers.get('sec-gpc')?.trim() === '1',
       },
     )

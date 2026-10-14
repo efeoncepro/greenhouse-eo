@@ -1,5 +1,9 @@
 # ADR — Meta CAPI mediante el contenedor GTM Server de Efeonce
 
+Delta14/10: [corrección de contexto Lead](../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
+Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
+Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
+
 > **Readout vigente de implementación (13/10/2026):** Server6/Web5, matching activo,
 > PR254/main d692ab51dc48 y manifest released. Primera conversión comercial consentida
 > post-activación sin observar. [Contrato construido](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)

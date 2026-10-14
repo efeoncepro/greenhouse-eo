@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-14 — Meta Lead: contexto del visitante
+
+[Corrección y pruebas](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md): Server7 sólo template30,
+website/IP/UA/fbp/fbc/external_id/em/ph/fn/ln recibidos en Test Events ambos hosts; código temporal por petición,
+sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop, release completo pendiente al corte.
+Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user submit/book. Primera conversión real pendiente.
+
+
 ## 2026-10-14 — Footer público: composición compacta
 
 [Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.

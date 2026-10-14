@@ -67,3 +67,27 @@ for (const [name, overrides] of [
  assert.equal(state.ran, false); assert.ok(state.status>=400);});
 test('tag missing is never acknowledged', () => {assert.equal(run({tags: []}).status, 502);});
 for (const status of ['failure', 'exception', 'timeout']) test('Meta '+status+' is retryable', () => {assert.equal(run({tags:[{id:'6',status}]}).status, 502);});
+
+test('retains visitor context, stable hash and temporary test code for the Meta template', () => {
+  const fields = {
+    ip_override: '198.51.100.9', user_agent: 'Fixture visitor browser',
+    'x-fb-ck-fbp': 'fb.1.1791972000000.123456789',
+    'x-fb-ck-fbc': 'fb.1.1791972000000.fixtureclick',
+    'x-fb-ud-external_id': '34'.repeat(32), test_event_code: 'TEST12345',
+  };
+  const state = run({body: fields});
+
+  assert.equal(state.status, 200);
+  for (const [key, value] of Object.entries(fields)) assert.equal(state.event[key], value);
+  assert.equal(state.event.action_source, 'website');
+});
+for (const [name, body] of [
+  ['raw external identity', {'x-fb-ud-external_id': 'fixture@example.com'}],
+  ['placeholder test code', {test_event_code: 'TEST_____'}],
+  ['invalid test code', {test_event_code: 'other123'}],
+]) test(name+' cannot reach Meta', () => {
+  const state = run({body});
+
+  assert.equal(state.ran, false);
+  assert.ok(state.status >= 400);
+});

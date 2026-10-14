@@ -1,4 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
+
+Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
+Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
+Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
 > **Version:** 1.0
 > **Creado:** 2026-07-07 por Claude
 > **Ultima actualizacion:** 2026-10-14

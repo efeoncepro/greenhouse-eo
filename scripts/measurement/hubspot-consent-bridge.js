@@ -9,6 +9,63 @@
   w._hsp = w._hsp || [];
   w.clarity = w.clarity || function () { (w.clarity.q = w.clarity.q || []).push(arguments); };
   var sent = { analytics: false, meta: false };
+  // Persist attribution only after the authoritative advertising grant, before navigation loses fbclid.
+  // Same first-party cookie domain covers the public site and Think; no identifiers enter dataLayer.
+  var attributionKey = 'efeonce.meta-attribution.v1';
+  var attributionMemory = {};
+  var landingClick = '';
+  var landingClickAt = Date.now();
+  try { landingClick = new w.URL(w.location.href).searchParams.get('fbclid') || ''; } catch (_) {}
+  function readCookie(name) {
+    try {
+      var part = (d.cookie || '').split(';').map(function (s) { return s.trim(); }).find(function (s) { return s.indexOf(name + '=') === 0; });
+      return part ? decodeURIComponent(part.slice(name.length + 1)) : '';
+    } catch (_) { return ''; }
+  }
+  function writeAttributionCookie(name, value, maxAge) {
+    try { d.cookie = name + '=' + encodeURIComponent(value) + '; Path=/; Domain=efeoncepro.com; Max-Age=' + maxAge + '; SameSite=Lax; Secure'; } catch (_) {}
+  }
+  function validAttribution(value, click) {
+    return typeof value === 'string' && (click ? /^fb\.\d+\.\d{13}\.[A-Za-z0-9._~-]{1,512}$/ : /^fb\.\d+\.\d{13}\.\d{1,20}$/).test(value) &&
+      Date.now() - Number(value.split('.')[2]) < 7776000000 && Number(value.split('.')[2]) <= Date.now() + 300000;
+  }
+  function clearAttribution() {
+    attributionMemory = {};
+    try { w.sessionStorage.removeItem(attributionKey); } catch (_) {}
+    ['_fbp', '_fbc'].forEach(function (name) {
+      writeAttributionCookie(name, '', 0);
+      try { d.cookie = name + '=; Path=/; Max-Age=0; SameSite=Lax; Secure'; } catch (_) {}
+    });
+  }
+  w.efeonceReadMetaAttribution = function () {
+    if (d.documentElement.getAttribute('data-efeonce-ads-consent') !== 'granted' || w.navigator.globalPrivacyControl === true) return {};
+    var stored = {};
+    try { stored = JSON.parse(w.sessionStorage.getItem(attributionKey) || '{}') || {}; } catch (_) {}
+    var fbp = readCookie('_fbp') || stored.fbp || attributionMemory.fbp;
+    var fbc = readCookie('_fbc') || stored.fbc || attributionMemory.fbc;
+    if (!validAttribution(fbp, false)) {
+      fbp = '';
+      try {
+        var random = w.crypto.getRandomValues(new Uint32Array(2));
+        fbp = 'fb.1.' + Date.now() + '.' + String(random[0]) + String(random[1]);
+      } catch (_) {}
+    }
+    if (!validAttribution(fbc, true)) fbc = '';
+    var click = landingClick;
+    var clickAt = landingClickAt;
+    try {
+      var currentClick = new w.URL(w.location.href).searchParams.get('fbclid') || '';
+      if (currentClick && currentClick !== click) { click = currentClick; clickAt = Date.now(); }
+    } catch (_) {}
+    if (/^[A-Za-z0-9._~-]{1,512}$/.test(click) && (!fbc || fbc.split('.').slice(3).join('.') !== click)) {
+      fbc = 'fb.1.' + clickAt + '.' + click;
+    }
+    attributionMemory = {};
+    if (fbp) { attributionMemory.fbp = fbp; writeAttributionCookie('_fbp', fbp, 7776000); }
+    if (fbc) { attributionMemory.fbc = fbc; writeAttributionCookie('_fbc', fbc, 7776000); }
+    try { w.sessionStorage.setItem(attributionKey, JSON.stringify(attributionMemory)); } catch (_) {}
+    return attributionMemory;
+  };
   var meetingIds = Object.create(null);
   // GTM uses its own event counter only as a local cache key; it never leaves the page.
   // The ID sent to CAPI is an independent UUID, not a receipt or business/provider ID.
@@ -58,6 +115,8 @@
     var analyticsState = analytics ? 'granted' : 'denied';
     var fields = { meta_ads_consent: adsState, analytics_consent: analyticsState };
     reflect(adsState, analyticsState);
+    if (ads) w.efeonceReadMetaAttribution();
+    else if (categories.advertisement === false || w.navigator.globalPrivacyControl === true) clearAttribution();
     w.gtag('consent', 'update', {
       ad_storage: adsState, ad_user_data: adsState, ad_personalization: adsState,
       analytics_storage: analyticsState,

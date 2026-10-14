@@ -1,5 +1,9 @@
 # Tracking Plan — Registro de Forms & CTAs (SoT de la capa de medición)
 
+Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
+Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
+Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
+
 > **Registro vivo y OBLIGATORIO.** Todo form o CTA público de Efeonce se registra aquí con su estado de tagging.
 >
 > - **SoT de definiciones de form:** la base de datos (`greenhouse_growth.form_definition`) — no este archivo.

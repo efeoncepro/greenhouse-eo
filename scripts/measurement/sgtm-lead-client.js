@@ -59,8 +59,8 @@ if (!event || getType(event) !== 'object') { respond(400, 'not_fired', 'schema')
 return; }
 
 const allowed = ['schema_version','event_name','event_id','event_time','action_source','page_location',
-  'meta_ads_consent','backend_verified','x-fb-ud-em','x-fb-ud-ph','x-fb-ud-fn','x-fb-ud-ln',
-  'ip_override','user_agent','x-fb-ck-fbp','x-fb-ck-fbc','custom_properties'];
+  'meta_ads_consent','backend_verified','x-fb-ud-em','x-fb-ud-ph','x-fb-ud-fn','x-fb-ud-ln','x-fb-ud-external_id',
+  'ip_override','user_agent','x-fb-ck-fbp','x-fb-ck-fbc','custom_properties','test_event_code'];
 
 for (const key in event) {
   if (allowed.indexOf(key) < 0) { respond(400, 'not_fired', 'unexpected_field');
@@ -80,7 +80,14 @@ if (event.schema_version !== 1 || event.event_name !== 'generate_lead' ||
 return;
 }
 
-const hashes = ['x-fb-ud-em','x-fb-ud-ph','x-fb-ud-fn','x-fb-ud-ln'];
+const hashes = ['x-fb-ud-em','x-fb-ud-ph','x-fb-ud-fn','x-fb-ud-ln','x-fb-ud-external_id'];
+
+// Authenticated, per-request Test Events only. No code is fixed in production configuration.
+if (event.test_event_code !== undefined && !matches(event.test_event_code, '^TEST[0-9]{1,20}$')) {
+  respond(400, 'not_fired', 'test_event_code');
+
+return;
+}
 
 for (let i = 0; i < hashes.length; i++) {
   const value = event[hashes[i]];

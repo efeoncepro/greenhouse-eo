@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { readVisitorMeasurementRequest } from '@/lib/growth/measurement/visitor-request'
+
 import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { type PublicSubmitInput, type PublicSubmitOutcome } from '@/lib/growth/forms/contracts'
 import { submitForm } from '@/lib/growth/forms/commands'
@@ -33,9 +35,6 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
   disabled: 404,
   error: 503,
 }
-
-const getClientIp = (request: Request): string | null =>
-  request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
 
 const publicSubmitReasonClass = (outcome: PublicSubmitOutcome, reason?: string): string => {
   if (outcome === 'captcha_failed') return reason ?? 'captcha_failed'
@@ -138,8 +137,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
   try {
     const result = await submitForm(input, {
       origin: request.headers.get('origin'),
-      ip: getClientIp(request),
-      userAgent: request.headers.get('user-agent'),
+      ...readVisitorMeasurementRequest(request.headers),
       requestGlobalPrivacyControl: request.headers.get('sec-gpc')?.trim() === '1',
       captchaToken: typeof body.captchaToken === 'string' ? body.captchaToken : null,
       requestId: null,

@@ -15,7 +15,7 @@ const sha256 = (value: string) => createHash('sha256').update(value, 'utf8').dig
 const text = (value: unknown): string => typeof value === 'string' ? value.trim() : ''
 
 const email = (value: unknown): string | undefined => {
-  const normalized = text(value).toLowerCase()
+  const normalized = text(value).toLowerCase().replace(/\s/g, '')
 
   return normalized.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized) ? normalized : undefined
 }
@@ -28,7 +28,7 @@ const phone = (value: unknown): string | undefined => {
 
 const metaName = (value: unknown): string | undefined => {
   // Meta capi-param-builder string normalization; plain hex, without its appendix.
-  const normalized = text(value).toLowerCase().replace(/[\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, '')
+  const normalized = text(value).normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\p{Z}\s]/gu, '')
 
   return normalized && normalized.length <= 160 ? normalized : undefined
 }
@@ -46,6 +46,8 @@ export const buildMatchingData = (contact: MatchingContact) => {
       ...(ph ? { 'x-fb-ud-ph': sha256(ph.slice(1)) } : {}),
       ...(fn ? { 'x-fb-ud-fn': sha256(fn) } : {}),
       ...(ln ? { 'x-fb-ud-ln': sha256(ln) } : {}),
+      // A contact email is available before asynchronous CRM delivery; never use a submission ID.
+      ...(em || ph ? { 'x-fb-ud-external_id': sha256(em || ph!.slice(1)) } : {}),
     },
     google: {
       ...(googleEmail ? { sha256_email_address: [sha256(googleEmail)] } : {}),

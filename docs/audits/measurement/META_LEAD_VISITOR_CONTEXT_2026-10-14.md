@@ -1,0 +1,75 @@
+# Meta Lead — contexto del visitante, 14 de octubre de 2026
+
+## Alcance y diagnóstico
+
+Autorización: corregir end-to-end el matching del píxel708931297255942 sin cambiar tags ajenos,
+respetando consentimiento y sin pruebas ordinarias al dataset. ADR existente:
+[Meta mediante GTM Server](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
+No hay nuevo proyecto, servicio, cron, secreto ni dependencia.
+
+El backend publicado ya tomaba IP/UA y website; el canary anterior omitía IP/UA. Consulta PG
+últimos7d al corte:0 measurement_conversion. Test Events muestra varios Leads anteriores de
+servidor. No se atribuyen los14 casos reportados a conversiones comerciales sin conciliación.
+Defectos confirmados: external_id ausente; fbclid sin persistencia entre páginas y _fbp no
+creado en la ruta sólo CAPI. El tag oficial sí soportaba los nueve campos.
+
+## Cambios
+
+- payload.ts: email lowercase/sin whitespace; nombres NFKC/lowercase/sin signos/espacios;
+  external_id SHA256(email normalizado), fallback teléfono internacional; em/ph/fn/ln preservados.
+- visitor-request.ts + POST Forms/Meetings: snapshot de primer XFF/IP real válido y UA original,
+  formatos IPv4/v6/puerto, sin hash ni fallback del worker. Proyección cifrada/retry existentes.
+- bridge + context.ts: landing fbclid en memoria; _fbp first-party y _fbc de clic real sólo tras
+  ads grant. Cookies compartidas90d, sessionStorage consentido de fallback; GPC/revoke limpia.
+- sGTM customTemplate30: external_id SHA256 permitido y test_event_code autenticado por petición.
+  Server7 publicado12:06:32Z, comparación semántica contra6: sólo template30 diferente.
+  Meta tag6/Pixel, GA4 tag18, todos los activadores, variables, Clients y transforms intactos.
+- Sentry scrub: submit/book sin body, headers, cookies, env, query ni user. Logs de medición
+  conservan sólo clases/contadores. No se registran contactos, IP, identificadores ni secretos.
+- Herramienta verify-lead-context.ts exige código real temporal en env; prepare-preview-canary
+  ya no escribe códigos en el tag. Entrada legacy delega al verificador seguro.
+
+## Validación externa
+
+Código real obtenido y verificado en la UI Meta Probar eventos; se suministró sólo en env de
+la ejecución y en top-level test_event_code de cada petición. No se fija ni reproduce aquí.
+Preview workspace9 compilado y diff congelado. HTTP saliente a Meta v25: Lead, website,
+event_source_url https://efeoncepro.com/aeo-2/, event_time entero UNIX y los nueve campos de
+user_data; 200/events_received1. La UI muestra sólo el dominio en su resumen de URL.
+
+| Prueba | efeoncepro.com formulario | Think reserva |
+| --- | --- | --- |
+| Preview Test Events | 6c979cdd-e25c-4dae-9697-46017844c143 | c553b759-0689-418d-8d56-617bc5d07d54 |
+| Server7 live, Test Events | 25564838-25da-4fbc-8214-80e0cb44388e | 7f4e4062-3488-470b-ac11-da793b3daa74 |
+| Meta UI | Procesado / Servidor / website | Procesado / Servidor / website |
+| Matching recibido | IP, UA, fbp, fbc, external_id, em, ph, fn, ln | mismos nueve campos |
+| Replay mismo UUID | HTTP200, ID conservado | HTTP200, ID conservado |
+| Negativos | denied y external_id crudo →400 | denied y external_id crudo →400 |
+
+Datos de prueba sintéticos: email example.com, teléfono reservado, IP RFC5737 y UA explícito.
+No se crean submissions, bookings ni contactos CRM. No se envía UPD Google en el canary.
+El replay en Test Events no certifica por sí solo deduplicación en reportes de producción.
+No existe emisor Pixel Lead de navegador: un único sender backend; browser futuro requerirá
+Lead/eventID compartido. El espejo GA4 sigue siendo una sola conversión.
+
+## Hosts, release y rollback
+
+WordPress: bridge publicado con guardas de hashes, PHP idéntico y backup remoto
+/tmp/efeonce-consent-before-20261014-120656.tar. Runtime commit421eaa3.
+Think: PR14 mergeado43806bd30237; Preview Vercel verde antes de merge. Bridge SHA256 común:
+4bbd77b35fdb60b128712bf4e00d64dd37815f0d93f5434868d559264f71b28a.
+
+Backend/renderers: cambio preparado en develop, promoción completa develop→main pendiente
+al escribir esta entrada. No afirmar desplegado sólo por el canary directo sGTM.
+Rollback sGTM: versión6. Bridge: snapshot exacto anterior; Think revert del PR14. Backend:
+release previo main d692ab51dc48. Captura/entrega pueden desactivarse por sus flags existentes,
+sin tocar la aceptación comercial ni reactivar triggers legacy12/17.
+
+Pruebas locales al corte:63 Vitest (measurement/context/Meetings/Sentry),25 Client,8 atribución
+y16 bridge. CI del release, readback de hosts y estado final se añaden al cerrar.
+
+## Límites
+
+Primera conversión comercial consentida real sigue sin observar; TASK-2034 permanece parcial.
+La EMQ se vuelve a medir después con tráfico real; no se promete puntaje ni serving.
+No se amplió la allowlist ni se implementó la configuración/CRO de TASK-2035.

@@ -1,7 +1,7 @@
 # Runtime de consentimiento y matching de Leads
 
 Código promovido en PR254, main `d692ab51dc486a0585b7950f95bb627197e6f2c6`.
-Últimos readbacks externos: 2026-10-13 UTC; [dossier de release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Últimos readbacks externos: 2026-10-14 UTC (Server7 y Test Events); [dossier de release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 **Matching activado; primera conversión comercial consentida post-activación sin observar.**
 Este documento describe lo construido; su actualización no certifica tráfico posterior.
 
@@ -20,7 +20,7 @@ está **propuesta, pendiente de GO y sin implementar**. Hoy hay listas fijas en 
 | Contexto publicitario | src/growth-measurement-context/context.ts; consentimiento/identificadores permitidos |
 | Matching/cola | src/lib/growth/measurement/* y proyección greenhouse_growth, sin segunda verdad de negocio |
 | Entrega | Ops existente, /growth/forms/dispatch, cadencia existente2min; no cron/servicio nuevo |
-| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live6 |
+| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live7 |
 | GA4 | Propiedad486264460, stream10593675149, G-KYPPY57M14; GTM Web NGHPGRLZ live5 |
 
 ```mermaid
@@ -67,11 +67,17 @@ absoluta de capturedAt≤10min y veta Sec-GPC:1 aunque el body diga false.
 Procesamiento y comunicaciones no conceden publicidad. Missing/malformed/stale/denied
 omite matching sin rechazar el formulario/reserva por ese motivo.
 
-client_id se extrae de _ga sólo con analytics; _fbp/_fbc sólo con ads. fbc puede construirse
-con fbclid real de la URL, nunca inventar un clic. Sin cookies reales se omiten esos campos;
-el endpoint run.app no lee cookies cross-domain. Retiro de consentimiento afecta nuevos
-eventos, no cancela HTTP enviado ni borra por sí mismo datos recibidos por plataformas.
-No se construyó un proceso nuevo de borrado global/backfill.
+client_id se extrae de _ga sólo con analytics. Después del grant publicitario, el bridge
+lee _fbp/_fbc del visitante; conserva los valores existentes válidos y crea _fbp first-party
+con timestamp + aleatoriedad criptográfica cuando no existe. Captura fbclid al cargar la
+landing sólo en memoria; tras el grant construye _fbc = fb.1.<timestamp_ms_landing>.<fbclid>.
+Cookies Secure/SameSite=Lax/Path=/, dominio efeoncepro.com, 90 días; sessionStorage consentido
+como fallback de navegación por host, memoria si ambos almacenamientos fallan. Un clic real
+nuevo reemplaza _fbc; sin clic nunca se inventa. Revocación explícita/GPC limpia atribución.
+El renderer consulta efeonceReadMetaAttribution() al enviar, siempre después del gate ads/GPC.
+Ni cookies ni hashes entran en dataLayer/GA4 ordinario. El endpoint run.app no lee cookies
+cross-domain: recibe el snapshot permitido desde el POST. Retirar consentimiento afecta
+nuevos eventos; no cancela HTTP enviado ni borra automáticamente datos de plataformas.
 
 ## 3. Cobertura y límites actuales
 
@@ -104,11 +110,12 @@ de nuevo. El ledger Meetings conserva HMAC, no contactos recuperables.
 
 | Dato | Meta | Google UPD |
 | --- | --- | --- |
-| Email válido | trim/lowercase, SHA256hex64; conserva puntos Gmail | normalización separada, elimina puntos locales Gmail/Googlemail; sha256_email_address[] |
+| Email válido | lowercase/sin whitespace, SHA256hex64; conserva puntos Gmail | normalización separada, elimina puntos locales Gmail/Googlemail; sha256_email_address[] |
 | Teléfono válido | E.164 internacional explícito, SHA256 sin + | SHA256 con +, sha256_phone_number[] |
-| Nombre/apellido separados | lowercase/normalización de caracteres, hashes fn/ln si existen | no enviados en esta implementación |
-| IP/UA originales válidos | ip_override/user_agent, sin sustituir por worker | no incluidos |
-| Contexto | fbp/fbc reales consentidos | client_id real obligatorio para UPD |
+| Nombre/apellido separados | NFKC/lowercase/sin espacios, puntuación ni símbolos Unicode; SHA256 fn/ln si existen | no enviados en esta implementación |
+| IP/UA originales válidos | visitor-request.ts lee primer XFF válido (normaliza IPv4/v6/puerto), fallback x-real-ip y UA del POST; ip_override/user_agent sin hash ni sustitución por worker | no incluidos |
+| external_id | SHA256hex del email normalizado, fallback teléfono internacional sin +; estable por contacto y sin usar IDs de submission | no incluido |
+| Contexto | fbp/fbc consentidos del visitante | client_id real obligatorio para UPD |
 
 No adivinar país/apellido/identidad. Se exige email o teléfono válido; nombres solos no bastan.
 Hashes son datos sensibles derivados, no una afirmación de anonimato. No reutilizar HMAC
@@ -215,8 +222,8 @@ read-only ni tienen dry-run. Inspeccionar estado/código/autorización antes de 
 | hubspot-consent-bridge.js | Fuente browser; copias WP/Think byte-idénticas, sin editar a mano |
 | deploy-wordpress-consent.php | Escribe/activa2archivos WP; ZIP/manifest/prestatehash/backup/cache; scope live propio |
 | build-sgtm-lead-draft.ts | Muta draft, guard base live5; hoy live6, no rerun como diagnóstico. templates.list usa template |
-| prepare-preview-canary.ts | Muta TestEvents code de draft workspace8; --clear lo retira, no es publish |
-| send-preview-canary.ts | Fixtures/replay/negativos a Preview con TestEvents real; no positivos live ordinarios |
+| prepare-preview-canary.ts | Compila workspace explícito META_TEST_WORKSPACE_ID; nunca muta testEventCode del tag |
+| verify-lead-context.ts / send-preview-canary.ts | META_TEST_EVENT_CODE real obligatorio y temporal por petición; Preview header opcional; fixture reservado, ambos hosts, replay y negativos; sin CRM ni GA4 |
 | configure-google-lead-audiences.ts | Crea dimensiones/audiencias/readback; sin dry-run implícito ni campañas |
 | provision-matching-secrets.ts | Secretos/MPsecret/grants/readback; no diagnóstico ni rotador automático |
 | read-release-state.ts | Reader de precondiciones del batch |
@@ -256,3 +263,22 @@ La ruta compacta de project_context conserva aquí sus destinos anteriores:
 [arquitectura embed](../../architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md),
 [Forms](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md).
 No cambia la autoridad de esos contratos ni la taxonomía/futuro del TrackingEngine.
+
+## Corrección verificada 2026-10-14
+
+[Auditoría y estados de entrega](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md).
+Server7 sólo modifica customTemplate30; tags/Client31/activadores/transformaciones/GA4 idénticos
+al live6. Template oficial Meta pin convierte generate_lead→Lead, page_location→event_source_url,
+ip_override/user_agent→client_ip_address/client_user_agent y pasa external_id/fbp/fbc sin rehash.
+action_source website y event_time entero UNIX confirmados en el HTTP saliente Preview; Meta
+respondió200/events_received1. La UI resume URL por dominio: no confundir ese resumen con la
+URL completa, que conserva /aeo-2/ en el payload. Test Events procesó Server/website y nueve
+claves de user_data en ambos hosts, Preview y live, sin código fijo en producción.
+
+No hay Pixel Lead web activo; no se añade un segundo sender para deduplicar. Retries usan
+el mismo event_id; si se agrega Pixel más adelante, Lead/eventID debe compartir ese UUID.
+La prueba sintética acredita transporte/mapeo, no aceptación comercial real ni mejora de EMQ.
+Consulta de sólo agregados al ledger últimos7d:0 conversiones al corte; hay Leads anteriores
+en Test Events, así que los14 reportados no prueban por sí solos una regresión del backend.
+El canary anterior omitía IP/UA: el nuevo usa contexto explícito de request de fixture.
+Logs sólo clases/contadores; Sentry elimina body/headers/cookies/env/user de submit/book.
