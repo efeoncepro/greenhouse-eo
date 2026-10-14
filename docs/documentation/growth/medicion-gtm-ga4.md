@@ -13,14 +13,14 @@ Mide qué pasa en los sitios públicos de Efeonce (`efeoncepro.com` + `think.efe
 ## Cómo funciona (simple)
 
 - Cada sitio carga **Google Tag Manager** (el contenedor `GTM-NGHPGRLZ`).
-- GTM enciende **Google Analytics 4** automáticamente: páginas vistas, sesiones, scroll, clicks salientes, etc. No hay que configurar métrica por métrica.
+- Con consentimiento de analítica, GTM enciende **Google Analytics 4** automáticamente: páginas vistas, sesiones, scroll, clicks salientes, etc. No hay que configurar métrica por métrica.
 - Cuando alguien **completa un formulario válido** (cualquier Growth Form), se registra una **conversión `generate_lead`**, con un dato `form_slug` que dice **cuál** formulario fue (AEO, grader, redes sociales…).
 - Un **formulario nuevo queda medido solo**, sin trabajo extra — se distingue por su nombre. Lo mismo un **host nuevo** del ecosistema: nace con el tag de medición (es un mandato).
 
 ## Qué NO mide
 
 - Formularios que **no son del motor de Greenhouse** (HubSpot nativo, Contact Form 7) — esos son otro sistema.
-- Si el visitante **rechaza las cookies de analítica**, el evento igual se envía pero Google lo modela en agregado (no aparece como fila individual en reportes).
+- Si el visitante **rechaza las cookies de analítica**, el forwarding del servidor bloquea GA4. Sin consentimiento publicitario tampoco se entrega matching ni eventos a Meta.
 
 ## Quién lo opera
 
@@ -41,31 +41,25 @@ en navegador, se correlacionan ambos eventos para contar una sola conversión.
 Consentimiento denegado o desconocido bloquea el envío Meta. GA4 y el snapshot web no
 comprueban entrega a Meta; se exige recepción con origen Server y lectura posterior.
 
-Estado: GTM servidor live 5/web live 5 publicados; consentimiento HubSpot por categorías
- y transporte activos en ambos hosts. Positivos PageView/Lead procesados como Server en Meta
-Test Events; navegación real completó tags Meta/GA4. [Manual](../../manual-de-uso/growth/operar-meta-capi-servidor.md)
+Estado 2026-10-13: **GTM Server6/Web5 y matching activos**, tras release completo PR254.
+HubSpot muestra el banner en la primera visita, con preferencias en el pie legal; publicidad
+requiere aceptación explícita. [Manual](../../manual-de-uso/growth/operar-meta-capi-servidor.md)
 y [consentimiento](../../reference/measurement-gtm-ga4/09-hubspot-consent.md).
 
-La recuperación reusa el evento GA4 de los formularios: se produce tras aceptación real
-y se transporta al servidor GTM para convertirlo en Lead de Meta. No requiere otro evento
-de submit ni un emisor backend nuevo. [Estado actual](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md):
-publicación y transporte verificados. La siguiente conversión comercial y replay real
-quedan por observar; no se crearon formularios ni reservas de prueba.
+El evento GA4 de aceptación conserva una sola conversión generate_lead. Para Meta, el backend
+prepara email/nombre/teléfono validados en hash compatible y clasificadores comerciales sólo
+cuando el formulario fue aceptado o la reunión confirmada, con publicidad consentida. Los
+envía por la cola cifrada al GTM Server existente. El anterior envío Meta de Lead basado en
+GA4 fue retirado para no duplicar. PageView sigue en el transporte consentido existente.
 
-Para remarketing de leads queda pendiente el enriquecimiento: email/teléfono y nombres
-disponibles en hash compatible con Meta, junto con el origen comercial del Lead. Se deben
-preparar desde el backend con consentimiento publicitario y enviarse sólo al servidor GTM,
-sin pasar por Google Analytics ni dataLayer. La recuperación de transporte no incluyó esos
-campos. El [contrato de ampliación](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#41-lead-utilizable-para-remarketing--requisito-confirmado-2026-10-13)
-está definido; implementación y configuración de audiencias siguen pendientes.
+GA4 correcto486264460 tiene UPD/ack y siete audiencias90d (AEO, SEO, web, contacto, social,
+reuniones y comerciales), con link Ads9531478329 y personalización activos. Google recibe
+hashes por user_data MP top-level sin eventos adicionales, sólo con client_id real y ambos
+consentimientos analytics+ads. Los hashes no entran en parámetros ordinarios ni dataLayer.
+No se añaden otro proyecto, servicio o cron para matching.
 
-
-## Matching de Leads — estado 2026-10-13
-
-GA4 correcto486264460 ya tiene UPD/ack activados y siete audiencias comerciales90d
-creadas/releídas, incluido scheduler confirmado. Link Ads existente conservado.
-Implementación local de consentimiento publicitario en POST, hashing por proveedor y cola
-cifrada probada; Meta Preview/Test Events mostró datos de coincidencia desde ambos hosts.
-**La automatización de matching real todavía no está desplegada.** Release acotado, SQL,
-refs y cutover pendientes. Contrato: [08 §4.2](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13).
-No enviar hashes en parámetros GA4: UPD usa user_data top-level MP sin events adicionales.
+La SQL está aplicada y captura/Meta/Google/retención están habilitados permanentemente;
+canaries de cola, acceso, credenciales y Meta Test Events pasaron. **La primera conversión
+comercial real con enriquecimiento después de activar queda por observar**, al igual que
+volumen/calidad de coincidencia y elegibilidad de audiencias. No se fabrican contactos o
+reservas para probar. [Evidencia y rollback](../../audits/releases/2026-10-13-full-develop-matching-release.md).

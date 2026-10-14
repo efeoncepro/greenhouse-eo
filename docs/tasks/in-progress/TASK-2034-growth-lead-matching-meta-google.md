@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Implementacion`
+- Status real: `Parcial: released PR254/main d692ab51dc48; SQL, GTM6/5 y cuatro flags activos/verificados. Pendiente primera conversión comercial consentida post-flip y su recepción provider.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -31,10 +31,12 @@ Audiencias por formulario/reunión, con vínculo Ads y settings verificados.
 
 ## Why This Task Exists
 
-La recuperación live 5/5 sólo transporta PageView/Lead sin email/teléfono. GA4 está vinculado a
-Google Ads 9531478329 con personalización; al inicio UPD estaba desactivado y faltaban audiencias.
-UPD/ack y siete audiencias 90 d ya activados/releídos; rolloutbackend aún pendiente.
-El operador autorizó implementación el 2026-10-13: «Bien, hagamoslo además GA4… Google Ads».
+La recuperación histórica5/5 transportaba PageView/Lead sin matching de contacto. El operador
+pidió enriquecimiento para Meta/Google y autorizó todo develop→main. Release completo PR254
+(main d692ab51dc486a0585b7950f95bb627197e6f2c6) y orquestador38483437158 success;
+manifest released. GA4 UPD/ack, siete audiencias90d, SQL, secretos, GTM Server6/Web5 y flags
+ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin observar.
+[Estado verificable y recibos](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 
 ## Goal
 
@@ -67,10 +69,11 @@ El operador autorizó implementación el 2026-10-13: «Bien, hagamoslo además G
 
 ## Current Repo State
 
-- Existing consent bridge supplies separate ads/analytics states; only opt-in categories grant ads.
-- Meetings ledger keeps HMAC, not recoverable contact; build matching at confirmation.
-- Matching backend and native Google UPD contract under implementation, flags default OFF.
-- Unrelated shared WIP preserved. No production capture/dispatch flip yet.
+- Consentimiento granular ads/analytics, sin inferir publicidad del procesamiento; veto GPC.
+- Matching backend, renderer y worker released; SQL aplicada y capture/meta/google/retención ON.
+- GTM Server6 retira legacyLead12/17; PageView11 y GA4 mirror permanecen, Client GA4 exclusivo.
+- Ops00775-fnh100%, Vercel dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias canónico.
+- WIP ajeno preservado; cierre documental en develop para próximo release.
 
 ## Modular Placement Contract
 
@@ -112,8 +115,8 @@ El operador autorizó implementación el 2026-10-13: «Bien, hagamoslo además G
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive`; SQL parked in pending-migrations until release precondition.
-- Default state: capture/meta/google flags OFF.
+- Migration posture: `additive`; canonical 20261013233429748 applied post-release 2026-10-13 23:34:44.561947Z; parked removed.
+- Default state: flags OFF in source; explicitly ON in Production, durable config and served readback recorded.
 - Backfill: none; no inferred historic advertising consent.
 - Rollback: flags OFF; restore prior GTM live version and browser Lead ownership together.
 - External coordination: AES key, ingress token, MP secret, UPD policy/UI, renderer+worker release.
@@ -140,13 +143,14 @@ El operador autorizó implementación el 2026-10-13: «Bien, hagamoslo además G
 
 - [x] Public POST carries granular consent/context, never treats processing consent as ads consent.
 - [x] Backend builds Meta and Google normalized hashes separately; no PII custom GA4 params.
-- [ ] Atomic durable capture + destination-specific retry, no second GA4 generate_lead.
+- [x] Atomic durable capture + destination-specific retry, no second GA4 generate_lead. SQL role-runtime canary + template6 Client GA4 boundary verified.
 - [x] Meta custom Client validates authentication, schema, commerce, identity and consent.
 - [x] Google UPD property/settings, MP secret and Ads linkage verified before activation.
 - [x] Commercial audiences created/read back separately from matching delivery.
-- [ ] Meta Test Events Server shows matching keys and classifiers; positive/negative/replay checks.
-- [ ] Source/worker/renderer released, parked migration applied, flags and live delivery verified.
-- [ ] Docs, mirrored skills, audit/handoff, rollback and scope checks complete.
+- [x] Meta Test Events Server shows matching keys/classifiers; positives, six negatives and stable-ID replay verified (not attribution dedupe).
+- [x] Source/worker/renderer released, migration applied, scoped secrets and four flags verified live.
+- [ ] First accepted commercial form/confirmed booking with ads consent post-flip: source→ledger→destination ack→provider reception; not exercised, no synthetic business records.
+- [x] Docs, mirrored skills, audit/handoff and rollback synchronized; closure gates recorded in release dossier.
 
 <!-- ZONE 2 — Plan Mode -->
 
@@ -155,24 +159,41 @@ El operador autorizó implementación el 2026-10-13: «Bien, hagamoslo además G
 1. Implement destination payloads, context capture, encrypted queue and existing worker drain.
 2. Build sGTM Client/workspace, Test Events and Google audience/settings draft.
 3. Validate and release owned source; apply migration and configure scoped secrets.
-4. Activate source capture, switch Meta ownership, enable Google only after policy/settings.
+4. Switch Meta ownership, enable worker destinations/retention after settings, then capture + Vercel redeploy last.
 5. Verify readbacks and close with actual runtime status.
 
 ## Verification
 
-- Started 2026-10-13: Google Admin readbacks confirm link and current dimensions/audiences.
-- 71 tests/10files PASS + 21 Client tests PASS; TypeScript/ESLint, portable Forms/Meetings builds y worker bundle PASS.
-- Google API+UI: UPD/ack habilitados, autocolección OFF, Ads link existente, siete audiencias 90 d y dimensiones lead_source/scheduler_key releídas.
-- Tres secretos scoped/versión 1 preparados en efeonce-group; refs aún no en runtimes. No nuevo servicio/proyecto/cron.
-- GTMworkspace 8 PreviewcompiledPASS; MetaTestEventsProcessedServer em/ph/fn/ln y clasificadores para amboshosts. FixtureIDs e407fecc-5d9e-4cb7-948d-0151d1d5fc57/ec437ec1-5429-4b00-98b9-b2b6e07e1af5. Seis negativosHTTP400/401; replaymismoIDHTTP 200, sin afirmar dedupeattribution.
-- Recibos .captures/meta-capi-diagnostic-2026-10-13/{google-lead-audiences-receipt,matching-secrets-receipt,matching-preview-canary}.json; capturas ga4-lead-audiences-created.png y meta-lead-matching-processed.png.
-- Migración parked sin aplicar; live 5/5 conservado y drafttestcode retirado. Captura/send prod ausentes/defaultOFF.
-- Release completo develop→main autorizado el13/10; sin checkout alternativo. Build local completo PASS; suite global interrumpida por saturación. CI y override formal del batch pendientes.
+- Local: 71 tests10files +21Client tests, tipos/lint, portable Forms/Meetings y worker bundle PASS.
+- CI candidato38475587661/build y staging smoke38476441021 success. Main CI38479348660:
+  20.100 PASS/616 skipped/0 failed; Deep38479348739 y smoke38480495445 success.
+- Orquestador38483437158 success, manifest d692ab51dc48-571eef31-2bd1-43b4-b8c8-6da07041a71d
+  released. Auth health success, Azure no_diff. Watchdog final ok6/6, drift/data_missing0, Teamsfalse.
+- SQL20261013233429748 aplicada23:34:44Z; ocho DML app. Canary rol greenhouse_app pasa
+  SAVEPOINT/idempotencia/claims paralelos/leaseCAS/retries/retención48h y elimina fixtures.
+- Server6/Web5, cutover23:38:57Z, frozen artifact verified, tag6 sólo[11,33]; legacy12/17 retirados.
+  ForwardingGA4 restringido a ClientGA4. Negativos live401/400/400 sin disparar Meta.
+- Meta Preview/Test Events Processed/Server em/ph/fn/ln + clasificadores ambos hosts,
+  IDs db9788fc-85d8-4315-8033-2ac2eb2ad06a/bc3e69f5-8573-46ce-828b-a2450dd3e694.
+  Replay conservaID/tiempo; no atribución deduplicada demostrada.
+- GA4 correcto486264460/G-KYPPY57M14, UPD/ack activos, automáticaOFF, Ads9531478329 y
+  personalización existentes. Siete audiencias90d y dimensioneslead_source/scheduler_key releídas.
+- Ops00775-fnh100% con Meta/Google/retención true y GitHub repo vars persistentes. Canary200
+  dentro del worker resuelve tres secretos versión1, unavailableDestinations=[]/processed0.
+- Vercel capturetrue exacto, payloadref1, credencial real service_account_key del portalSA;
+  redeploy dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY y alias canónico. Bundles con contexto.
+- Sin TTL en secretos ni condición temporal IAM tagging. No infraestructura/cron nueva.
+- Falta primera conversión comercial consentida y recepción provider post-flip; no se crean
+  submissions/bookings/CRM/quotes/pagos para probar. Incidente mindicador separado sigue abierto.
+- Dossier y lista de recibos saneados: docs/audits/releases/2026-10-13-full-develop-matching-release.md.
 
 ## Progress Log
 
-- 2026-10-13: authorized implementation; code under shared checkout, unrelated WIP preserved.
-- 2026-10-13: auditoría corrigió isolationForms/destinations, vetoSec-GPC y leases/CAS. ProviderGoogle activo, MetaTestEventsPASS. Pending: decisión de integración/releaseacotado, SQL/runtime flags y validaciónlive real.
+- 2026-10-13: autorización de implementación, Google settings/audiencias y pruebas locales/Preview.
+- 2026-10-13: full develop→main PR254; corregido heapCI6→8GiB sin quitar gates. No repetir
+  build/suite local. API cero pasos/UI Startingjob resultaron metadatos incompletos, no inactividad.
+- 2026-10-13: released, SQL aplicada, canary cola real, GTM6 cutover, worker ON y capture/redeploy
+  último. Rollout operativo completo; Status Parcial por primera conversión consentida no ejercitada.
 
 ## Risks & Open Questions
 
@@ -186,8 +207,10 @@ Acceptance evidence + Status real current, runtime and rollout gates passed, doc
 
 ## Handoff
 
-Current implementation owner Codex. Production flags ausentes/defaultOFF hasta release.
-Necesita decisión operador sobre integración acotada debido al contrato sharedworkspace; no publicar380 archivos ajenos.
+Owner Codex. Matching activo y permanente; no volver a ejecutar rollout por snapshots históricos.
+El operador exigió todo develop comprometido, ya promovido como PR254. Preservar WIP ajeno.
+Observar siguiente fuente real consentida y correlacionar ledger/ack/provider sin fabricar negocio;
+con esa evidencia completar el acceptance restante. No afirmar calidad/serving por Test Events.
 
 <!-- ZONE 3 — Execution Spec -->
 
@@ -210,7 +233,7 @@ Source/payload contracts live in `src/lib/growth/measurement`; explicit advertis
 
 ## Rollout Plan & Risk Matrix
 
-Ordering: source/worker → parked migration/secrets → Client preview → context smoke → sender cutover → flags.
+Ordering: source/worker → parked migration/secrets → Client preview → context smoke → sender cutover → worker destinations/retention ON → source capture/redeploy last.
 
 | Risk | System | Mitigation | Signal |
 |---|---|---|---|
@@ -224,13 +247,14 @@ Flags: GROWTH_MEASUREMENT_CAPTURE_ENABLED, GROWTH_MEASUREMENT_META_ENABLED, GROW
 ## Closing Protocol
 
 - [ ] Runtime acceptance and current Status real recorded.
-- [ ] Task index, audit/handoff, changelog and mirrored skills synchronized.
-- [ ] Scope/type/context and meaningful QA checks passed.
+- [x] Task index, audit/handoff, changelog and mirrored skills synchronized.
+- [x] Scope/type/context and meaningful QA checks passed; task lint/mirrors/context strict and CI evidence in release dossier.
 
 
-### Delta de release completo autorizado — 2026-10-13
+### Cierre de rollout — 2026-10-13
 
-Sin worktree ni rama adicional. Tres flags worker usan GitHub repo vars y env del workflow,
-con fallbackfalse en deploy.sh; refs pinned declaradas. Se activan vars + revisión servida
-juntos tras SQL y cutover; retención permanece activa durante rollback. Build completo
-local pasó. No repetir build/suite completos en el equipo: CI remoto del SHA candidato.
+Release completo autorizado y ejecutado; capturar sólo aceptación/confirmación. GitHub repo vars
+worker son el SoT durable; flags runtime y Vercel exactos releídos. Rollback captura/sendersOFF,
+retenciónON, GTM5 sólo tras detener backend, no rotar key48h. Tipo generado omitido con
+MIGRATE_SKIP_TYPES permitido: contrato PG explícito ya compilado, futura proyección gobernada.
+La migración catalog de TASK-1905 también aplicada, sin marcar esa task completa ni ampliarMCP.

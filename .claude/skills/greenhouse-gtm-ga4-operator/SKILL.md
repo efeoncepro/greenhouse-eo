@@ -28,7 +28,7 @@ ADR `GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md`. Para Efeonce, CAPI se oper
 **GTM Server**, separado de Pixel/web; no proponer Pixel web como solución completa.
 Meta admite backend directo y Gateway, pero no son la ruta elegida. Inventariar primero:
 API 2026-10-13 confirmó `Efeonce Server` `GTM-K2X4ZTTK`, cuenta `6068297031`, container
-`191286361`, live 3, Client GA4 y tag CAPI para `708931297255942`; entrega actual pendiente.
+`191286361`, inicialmente live3; recuperación live5 posterior, con Client GA4 y tag CAPI para `708931297255942`. Estado de matching más abajo/auditoría; no operar con el snapshot inicial.
 Releer `usageContext`, endpoints, Clients, template/SHA/permisos, versiones y fuentes.
 
 1. Recuperar el server existente antes de crear otro. Metadata/URL/token no prueban funcionamiento.
@@ -37,14 +37,13 @@ Releer `usageContext`, endpoints, Clients, template/SHA/permisos, versiones y fu
    always-on no es una tarifa fija ni una factura. min=0 no garantiza gratis y free tier se
    comparte por billing. Ante cuota de vinculación, evaluar el proyecto canónico existente
    antes de solicitar cuota o crear otro proyecto, con capacidad/costo explícitos.
-2. PageView requiere navegación consentida. Para recuperar Lead, reusar
-   `gh_form_submission_accepted → generate_lead → GA4 Client sGTM → Meta Lead`: accepted
-   se emite tras aceptación backend. No exigir otro emisor backend ni usar `gh_form_submitted`.
-   No enviar postulaciones, clics ni errores; un sender outbox futuro es otro carril con dedupe.
-   Reuniones: `gh_meeting_booking_confirmed → generate_lead` (`lead_source=meeting_booking`)
-   → CAPI Lead con filtro propio por scheduler/surface. Cargar `greenhouse-growth-meetings`: sólo
-   confirmación elegible, nunca apertura/intento/replay; UUID opaco renderer o fallback sender
-   Crypto memoizado por evento GTM. No exige release GH; nunca receipt/IDs internos. Futuro backend necesita identidad compartida.
+2. PageView requiere navegación consentida. Para matching TASK-2034, Lead nace en backend
+   sólo tras aceptar formulario comercial o confirmar reserva elegible. No usar submit intentado,
+   clics, errores o postulaciones. El espejo `gh_form_submission_accepted` /
+   `gh_meeting_booking_confirmed → generate_lead` conserva una sola conversión GA4.
+   La recuperación inicial llevaba ese espejo a Meta; retirar sus triggers12/17 al activar
+   el ingreso backend, nunca mantener ambos senders con IDs independientes. Cargar las skills
+   Forms/Meetings; proyección cifrada e identidad durable pertenecen al contrato08 §4.2.
 3. CAPI tag y token sólo servidor. No ampliar dataLayer/GA4 con PII; usar ingress separado,
    allowlists por destino, gate Meta explícito (denegado/desconocido bloquea) y exports redactados.
 4. Identidad/tiempo estables por ocurrencia/retry; Pixel complementario comparte nombre/ID.
@@ -62,15 +61,23 @@ Backend captura sólo aceptación/confirmación, veto adicional Sec-GPC, snapsho
 UUID/tiempo durables y unique source. Worker comparte cadence Forms con fallo de medición
 aislado; destinos independientes, lease CAS y retención48h. Al cutover retirar los triggers
 Meta Lead browser12/17 antes de habilitar backend; PageView11/GA4 mirror continúan.
-2026-10-13: código local probado y draftworkspace8 Preview/Test Events Server muestran
-em/ph/fn/ln + clasificadores; **todavía sin deploy**. GA4 486264460 UPD/ack activos, automática
-OFF y siete audiencias90d releídas, Ads link9531478329 ya activo. Secretos scoped preparados.
+Publicar Client/retiro legacy →destinos y retención worker ON →captura/redeploy Vercel última.
+Forwarding GA4 restringido a `Client Name = GA4`: el Client backend no reenvía otro generate_lead.
+Verificar versión congelada antes de publicar; recibo tras create_version permite recuperación
+sin recrear workspace/versión a ciegas.
+2026-10-13: release completo PR254/main d692ab51dc48, manifest released, matching activo.
+Server live6/Web live5; captura Vercel true tras redeploy READY, Meta/Google/retención
+true en Ops00775-fnh y GitHub repo vars. SQL aplicada y tres refs pinned versión1 resueltas
+dentro del worker real; canary200 sin salida comercial. Preview/Test Events Server mostró
+em/ph/fn/ln + clasificadores; primera conversión comercial consentida post-flip sin observar.
+GA4 486264460 UPD/ack activos, automática OFF, siete audiencias90d y Ads link9531478329.
+[Dossier y rollback](../../../docs/audits/releases/2026-10-13-full-develop-matching-release.md).
 No asumir serving, matching efectivo ni atribución deduplicada por Processed. Google Signals
 no es prerrequisito de UPD. Respetar la restricción shared workspace antes del release.
 
 Verificado 2026-10-13: hosting del mismo `GTM-K2X4ZTTK` recuperado en `efeonce-group`,
 tagging + preview min 0/max 1, 1CPU/512MiB, instance-based; `/healthy` 200 y Preview funcional.
-GTM Web live **5**/Server live **5** publicados con autorización; HubSpot categoría opt-in y
+GTM Web live **5**/Server live **6** publicados con autorización; HubSpot categoría opt-in y
 routing WP/Think activos. Test Events Server procesados y PageView real completó ambos destinos.
 Próximas conversiones comerciales/replay pendientes. Ver estado/URLs en la auditoría.
 Cargar `09-hubspot-consent.md`: API banner `_hsp`, boolean categories, nunca legacy `allowed`

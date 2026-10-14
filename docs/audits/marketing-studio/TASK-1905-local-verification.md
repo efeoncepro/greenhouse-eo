@@ -4,6 +4,11 @@
 
 **Fecha:** 2026-10-04. **Alcance:** código compartido local, tests unitarios y PostgreSQL local. **Estado:** implementación local verificada: check global Studio, suite PostgreSQL completa y build aprobados; Greenhouse typecheck aprobado con heap de 12 GB. Commits locales Studio `5036d94` y Greenhouse `7d5dc100f`; sin push, CI, deploy ni canary remoto. Documentación compartida permanece en el worktree para preservar WIP ajeno.
 
+**Actualización Greenhouse 2026-10-13:** PR254/main d692ab51dc48 released; capability/CLI
+promovidas y SQL canónica20261013233455807 aplicada23:35:02Z, registry releído, parked retirado.
+[Recibo](../releases/2026-10-13-full-develop-matching-release.md). Las referencias al parked y
+al no-release abajo son históricas; no ejecutar de nuevo ni ampliar grants MCP por este cambio.
+
 ## Evidencia ejecutada
 
 | Superficie | Resultado observado |

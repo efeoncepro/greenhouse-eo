@@ -1,6 +1,6 @@
 # Diagnosticar y recuperar Meta CAPI por GTM Server
 
-> Manual de operador · 2026-10-13. GTM Server 5/Web 5 publicados; consentimiento y transporte activos.
+> Manual de operador · 2026-10-13. GTM Server6/Web5, matching activado; primera conversión comercial consentida post-flip sin observar.
 
 1. Leer el [runbook](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md)
    y la [decisión](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
@@ -28,26 +28,25 @@ No demuestran entrega servidor a Meta. Pixel browser es complementario si se dec
 compartir nombre e ID con CAPI y verificar deduplicación. No fabricar conversiones reales
 para probar ni confundir recepción con atribución o resultados comerciales.
 
-Diagnóstico vigente: [2026-10-13](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
-Hosting del mismo contenedor recuperado en `efeonce-group`, min 0/max 1 por servicio;
-GTM server live 5/web live 5 publicados con autorización. HubSpot categorías y routing activo
-WP/Think; [contrato de consentimiento](../../reference/measurement-gtm-ga4/09-hubspot-consent.md).
-Test Events procesó PageView/Lead Server; navegación real de ambos hosts completó tags.
-Próximas conversiones/replay de negocio aún sin observar. Renderer local preparado, sin release;
-el sender usa UUID fallback compatible y no requiere otro evento/backend. Incidente QA previo
-registrado en auditoría; nunca contar un Lead sintético como conversión comercial.
+Estado vigente: [release completo y matching](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Hosting del mismo contenedor en efeonce-group, min0/max1; Server6/Web5, sin Test Events code.
+Client backend31/trigger33 es el emisor Meta Lead; legacy12/17 retirados. PageView11 y mirror
+GA4 continúan. HubSpot categorías/routing activos WP/Think. [Consentimiento](../../reference/measurement-gtm-ga4/09-hubspot-consent.md).
+SQL aplicada, refs pinned y tres flags worker true (Ops00775-fnh100% + GitHub repo vars),
+captura Vercel true exacta tras redeploy READY. Canary worker200 resuelve secretos reales;
+cola/leaseCAS/retención probados con rol runtime. Preview/Test Events Processed/Server mostró
+em/ph/fn/ln y clasificadores; negativos live no disparan Meta. Primera conversión comercial
+real consentida post-flip todavía sin observar. No crear negocios de prueba ni afirmar serving.
+GA4 UPD/ack y siete audiencias90d activos; conservar link Ads. Nunca hashes en parámetros
+ordinarios/dataLayer: user_data MP top-level sin events adicionales.
 
-Matching de remarketing: implementación local y Preview/Test Events PASS en
-[TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md), pendiente de deploy.
-[08 §4.2](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13)
-es el contrato vigente. GA4 UPD/ack y siete audiencias90d ya activados; conservar el link Ads.
-No poner hashes en parámetros GA4 ni dataLayer: usar user_data MP top-level sin events.
-
-Para activar: publicar source/worker/renderer mediante release acotado; aplicar SQL parked
-post-release, configurar tres refs pinned de Secret Manager y verificar resolución con la
-identidad real del runtime. Activar captura, publicar ingreso sGTM sin test code y retirar
-triggers Meta Lead12/17 en la misma versión antes de prender backend Meta. Google UPD sólo
-con client_id real y consentimiento analytics+ads. Mantener PageView11 y mirror GA4.
+Secuencia aplicada; para un futuro rollout, releer primero el estado: publicar source/worker/renderer mediante release gobernado con el alcance
+autorizado (operador13/10: todo develop→main); aplicar SQL parked post-release y configurar
+tres refs pinned de Secret Manager. Publicar ingreso sGTM sin test code y retirar triggers
+Meta Lead12/17 en la misma versión; luego destinos/retención worker ON y verificar resolución
+con su identidad real. Activar captura y redeploy Vercel al final. Google UPD sólo con client_id
+real y consentimiento analytics+ads. Mantener PageView11 y mirror GA4; forwarding GA4 exige
+Client Name=GA4 y excluye el Client backend. Validar la versión congelada antes del publish.
 Verificar registros de negocio, cola/HTTP y recepción provider por separado. Durante rollback:
 senders/capture OFF, retención ON, no borrar key/ciphertext; restaurar sender anterior sólo
 tras deshabilitar backend. No crear otra infraestructura ni promover trabajo ajeno por inferencia.

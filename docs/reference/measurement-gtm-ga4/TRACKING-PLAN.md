@@ -105,30 +105,32 @@ Al refrescar: agregar forms nuevos con tagging `⏳ pendiente`, no borrar filas 
 
 ## Meta CAPI / servidor — 2026-10-13
 
-Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md) y
-[recuperación verificada](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md),
+[recuperación histórica](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md) y
+[release/matching actual](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 
 | Destino | Evento | Origen requerido | Estado | Evidencia pendiente |
 | --- | --- | --- | --- | --- |
-| Pixel/dataset `708931297255942` vía `GTM-K2X4ZTTK` Server | `PageView` | Navegación consentida de ambos hosts | Server live 5/Web live 5; HubSpot/routing activo ambos hosts; Server Processed Test Events y tags reales Completada | Observar volumen/recepción ordinaria y calidad de coincidencia |
-| Mismo destino/servidor | `Lead` formulario | `gh_form_submission_accepted → generate_lead` tras aceptación comercial backend | Web live 5/server live 5, accepted/UUID/ads gates; Lead Test Events Server Processed | Próxima conversión comercial real y reconciliación ledger |
-| Mismo destino/servidor | `Lead` reunión | `gh_meeting_booking_confirmed → generate_lead`, `lead_source=meeting_booking`; confirmación elegible fresca | Web live 5 tag 60/trigger 59; server live 5 trigger 17; UUID sender fallback, Lead Test Events Server Processed | Próxima reserva elegible/replay reales; renderer enhancement local sin release |
+| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server6/Web5; transporte previo conservado, Test Events Server y tags reales verificados | Volumen/calidad ordinaria |
+| Mismo destino/servidor | Lead formulario | Aceptación backend comercial + snapshot ads consentido | Client31/trigger33 autenticado, cola cifrada/worker ON; legacyMeta12 retirado | Primera aceptación comercial consentida post-flip: fuente→ledger→provider |
+| Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida post-flip y replay real |
 
-Tagging/preview en `efeonce-group`: min 0/max 1 por servicio, 1CPU/512MiB, instance-based,
-`/healthy` 200/ok; contenedor existente asociado. Draft forwarding GA4 excluye datos Meta.
-Seis negativos Preview bloquean Meta y GA4 (marcador interno sólo para GA4). Un Lead sintético
-previo llegó a Meta por gate `.+` que aceptó missing; corregido a UUID anclado y retesteado.
-No cuenta como conversión real ni certifica producción. Versiones live web 4/server 3 sin cambiar.
-Inventario/borrador no constituye rollout ni elegibilidad de todos los Growth Forms.
-
+Tagging/preview mismo efeonce-group, min0/max1, 1CPU/512MiB, instance-based. Sin proyecto,
+servicio o cron nuevo para matching. GTM6 publicado sin Test Events code; tag6 sólo[11,33],
+PageView11 preservado. ForwardingGA4 exige Client Name=GA4, excluye Client backend.
+Incidente histórico: Lead QA sin Test Events pasó por regex .+; gate UUID corregido,
+no fue submission/reserva ni cuenta como conversión real. No repetir positivos fuera de Test Events.
 
 ## Delta 2026-10-13 — matching de Leads
 
-[TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md): Meta
-recibió fixtures enriquecidas en Preview/Test Events Server; sin cutover productivo todavía.
-Google propiedad 486264460: UPD/ack y siete audiencias 90 d activos, dimensiones lead_source y
-scheduler_key añadidas. Lead browser generate_lead continúa como única conversión GA4;
-backend Google enviará sólo user_data dedicado con client_id real, consentimiento analytics+ads.
-PII/hash excluidos de parámetros ordinarios/dataLayer. Metadata comercial Meta se construye
-en custom_properties JSON string. Sender único MetaLead después del release, retirando
-triggers browser12/17. PageView 11 se conserva. [Estado/evidencia](../../audits/measurement/META_LEAD_MATCHING_2026-10-13.md).
+[TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) Parcial:
+rollout completo operativo, primera conversión comercial consentida no ejercitada.
+Meta fixtures enriquecidas Processed/Server em/ph/fn/ln y clasificadores, seis negativos y replay
+ID estable; live negativos auth/consent/rawidentity no disparan Meta. No demuestra atribución deduplicada.
+Google486264460 UPD/ack, siete audiencias90d y dimensioneslead_source/scheduler_key activos;
+Ads9531478329 personalización existente. Lead browser generate_lead conserva una sola conversión
+GA4; Google backend envía sólo user_data dedicado, con client_id real + analytics/ads.
+PII/hash excluidos de parámetros ordinarios/dataLayer; Meta custom_properties JSON string.
+SQL post-release aplicada; Meta/Google/retención true en Ops00775-fnh y repo vars;
+captura Vercel true tras deploymentREADY/alias. Canary worker200 resuelve tres secretos.
+[Estado y recibos](../../audits/measurement/META_LEAD_MATCHING_2026-10-13.md).

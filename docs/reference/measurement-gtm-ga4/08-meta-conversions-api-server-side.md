@@ -1,6 +1,6 @@
 # Meta Conversions API mediante GTM Server
 
-> Canon operativo de CAPI/sGTM. Baseline publicado Server 5/Web 5; enriquecimiento en TASK-2034, rollout pendiente.
+> Canon operativo de CAPI/sGTM. Server6/Web5; matching TASK-2034 activado tras release completo PR254. Primera conversión comercial consentida post-flip todavía sin observar.
 > Dirección elegida por el operador: [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
 > Estado vigente 2026-10-13: hosting existente recuperado en efeonce-group; consentimiento y transporte activos. §2 conserva el inventario inicial anterior al rollout.
 > [Diagnóstico y pendientes actuales](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
@@ -21,7 +21,7 @@ Fuentes Meta: [template oficial](https://github.com/facebookincubator/Conversion
 
 ## 2. Inventario observado, sin secretos
 
-Baseline publicado y asociación actual, leídos por GTM API v2 el 2026-10-13:
+Inventario inicial13/10, anterior a la recuperaciónlive5 y al matching de §4.2. Es historia de diagnóstico; releer el estado live antes de operar:
 
 | Recurso | Evidencia observada | Alcance de la prueba |
 | --- | --- | --- |
@@ -45,52 +45,43 @@ La API distingue el tipo por `usageContext`; el nombre o ID público no basta.
 
 ## 3. Ruta y verdad de negocio
 
+Ruta de matching después del cutover de TASK-2034 (estado de rollout en §4.2):
+
 ```text
-Navegación consentida de ambos hosts → endpoint sGTM → Client → PageView → tag CAPI → Meta
-Backend acepta → gh_form_submission_accepted → GA4 generate_lead → sGTM Client → Meta CAPI Lead
-Reserva confirmada → gh_meeting_booking_confirmed → generate_lead (meeting_booking) → sGTM → Meta Lead
-Pixel navegador opcional → Meta, con el mismo nombre e ID para deduplicación
+Navegación consentida → sGTM Client GA4 → Meta PageView
+Backend acepta formulario / confirma reserva → cola cifrada → worker → Client autenticado → Meta Lead
+Espejo browser aceptado/confirmado → GA4 generate_lead → sGTM Client GA4 → forwarding GA4
+Cola + client_id real + consentimiento ads/analytics → MP user_data sin events → Google UPD
 ```
 
-El **server container necesita solicitudes entrantes**. Publicarlo no captura visitas ni
-formularios por sí solo. Un Client debe reclamar y convertir el protocolo de la solicitud
-en Event Data; un POST JSON arbitrario a Cloud Run no garantiza procesamiento.
-`server_container_url` cambia el transporte del Google tag, no el tipo del contenedor.
+El contenedor Server necesita solicitudes entrantes; publicarlo no captura visitas ni
+formularios. Un Client reclama y convierte el protocolo en Event Data. Un POST arbitrario
+no prueba procesamiento; `server_container_url` cambia transporte, no el tipo de contenedor.
 Ver [ingreso a sGTM](https://developers.google.com/tag-platform/tag-manager/server-side/send-data).
 
-- **PageView:** señal de navegación real; una ocurrencia por vista, hostname permitido y
-  URL saneada. Medición de PageView con origen browser encaminada por sGTM sigue dependiendo
-  de que esa señal salga del navegador.
-- **Lead:** aceptación real de un formulario comercial en `greenhouse_growth.form_submission`
-  y evento `growth.forms.submission_accepted`. Esa es la verdad de negocio. La recuperación
-  usa su espejo `gh_form_submission_accepted → generate_lead` como transporte al GA4 Client
-  de sGTM (aclaración del operador 2026-10-13); no exige un emisor backend nuevo. Un clic,
-  `gh_form_submitted` o agradecimiento no es prueba de aceptación. El origen browser sigue
-  sujeto a pérdida de señal; un futuro sender outbox es una evolución separada.
-- `gh_form_submission_accepted` es el espejo browser. El renderer ya lleva
-  `correlation_id=result.submissionId`; es un **candidato** de correlación, no un contrato
-  CAPI implementado. Definir una identidad opaca estable por aceptación y compartirla con
-  el carril browser si se usa Pixel. No ampliar allowlists ni exponer IDs internos por defecto.
-- Filtrar por formulario/surface y finalidad comercial; excluir postulaciones, errores,
-  spam/rechazos y eventos de interacción. El tag GA4 genérico existente no decide elegibilidad Meta.
-- **Reunión agendada:** reutilizar `gh_meeting_booking_confirmed → generate_lead` con
-  `lead_source=meeting_booking`, con filtro CAPI propio por scheduler/surface. El ledger
-  de reuniones y su receipt elegible son la verdad; apertura, selección de horario, intento,
-  error y replay no son otra conversión. No reenviar además el custom confirmado a GA4
-  ni contar la misma reserva como dos Leads en Meta. El embed HubSpot legacy no acredita
-  confirmación. Identidad CAPI de reunión preparada localmente, renderer aún sin release:
-  UUID v4 opaco sólo en confirmación elegible, conservado durante retry del push. No expone
-  receipt/IDs internos ni define identidad durable compartida con un sender backend futuro;
-  no usar receipt, idempotency/correlation keys ni provider IDs como sustituto. Ver
-  [skill dueña](../../../.codex/skills/greenhouse-growth-meetings/SKILL.md).
-- Elegir un único dueño de envío por evento. No enviar el mismo Lead desde browser→sGTM y
-  backend→sGTM sin un contrato de deduplicación/replay. No crear un sender backend directo
-  a Meta en paralelo a la ruta sGTM elegida.
+- **PageView:** navegación real consentida, una ocurrencia por vista, hostname permitido y
+  URL saneada. Sigue dependiendo de que esa señal salga del navegador.
+- **Lead formulario:** aceptación en `greenhouse_growth.form_submission` y evento
+  `growth.forms.submission_accepted`. La proyección de matching usa la transacción del source;
+  un clic, submit intentado o agradecimiento no acreditan aceptación.
+- **Reunión:** confirmación elegible del proveedor/ledger, con allowlist scheduler/surface.
+  Apertura, selección, intento, error y replay no son conversiones nuevas. Preparar matching
+  antes de descartar contacto del ledger HMAC; guardar sólo material cifrado48h en la proyección.
+- **GA4:** conserva un solo espejo `gh_form_submission_accepted` o
+  `gh_meeting_booking_confirmed → generate_lead`. La etiqueta de forwarding exige
+  `Client Name=GA4`, por lo que el Client backend no envía una segunda conversión. Google UPD
+  vincula user_data al client_id existente sin otro event. No usar receipt/provider IDs como
+  user_id ni incluir hashes/contactos en dimensiones o dataLayer.
+- **Identidad Meta:** UUID/timestamp durable por source_kind/source_id y destino. No exponer
+  IDs internos ni reutilizar HMAC de negocio. La recuperación inicial usaba el espejo GA4
+  como transporte Meta; se retiran sus triggers Lead12/17 al activar el backend. No mantener
+  dos emisores independientes. Si se introduce Pixel complementario, necesita identidad
+  compartida/dedupe y autorización propia.
+- Excluir postulaciones, rechazos, spam y eventos de interacción; analítica no concede
+  consentimiento publicitario. Consultar las skills dueñas de Forms/Meetings.
 
-El template oficial soporta eventos de GA4 Client (`page_view→PageView`,
-`generate_lead→Lead`). Un ingreso backend propio requiere protocolo/client compatible,
-autenticación/validación y límites; la mención upstream de un CAPI Client beta no demuestra
-que esté instalado ni disponible. Cargar invariantes de integrations/outbox antes de implementar.
+El template oficial normaliza `page_view→PageView` y `generate_lead→Lead`. El ingreso backend
+propio exige Client compatible, autenticación, validación, allowlists y límites; ver §4.2.
 
 ## 4. Contrato mínimo y tratamiento de datos
 
@@ -131,11 +122,11 @@ validar contrato vigente y template **instalado** antes de ejecutar. Fuentes ver
 ### 4.1. Lead utilizable para remarketing — requisito confirmado 2026-10-13
 
 El operador requiere coincidencia de personas y segmentación comercial, además de recepción
-de eventos. **Estado: implementación local probada y Preview/Test Events PASS; todavía no desplegada.**
-La recuperación actual no cierra este requisito. Readback de las versiones live 5/5 y de la
-plantilla instalada confirma que no se pasan contactos desde Forms/Meetings. En la prueba de
-visitante nuevo Meta mostró sólo IP/User-Agent. La plantilla puede leer `fbp`/`fbc` recibidos,
-pero el endpoint `run.app` no implica acceso a cookies de los hosts públicos.
+de eventos. **Estado: desplegado y activado, Server6/Web5, source y worker con flags ON.**
+La primera conversión comercial consentida con matching post-flip sigue sin observarse.
+La recuperación histórica5/5 sólo transportaba IP/User-Agent. Ahora el backend prepara
+contactos validados y contexto consentido; `fbp`/`fbc` sólo si reales y disponibles.
+El endpoint run.app no implica acceso a cookies de los hosts públicos.
 
 | Información | Contrato de la ampliación |
 | --- | --- |
@@ -152,7 +143,7 @@ El mapper construye `custom_properties` como JSON string: el template pin usa `.
 momento/ID de la misma ocurrencia. `external_id` queda fuera hasta definir identidad estable
 y autorizada; `event_id` identifica una conversión, no una persona.
 
-**Flujo implementado localmente, pendiente de release, en el mismo GTM Server:**
+**Flujo publicado y activado en el mismo GTM Server:**
 
 1. Adjuntar al POST público de Forms/Meetings un contexto separado de publicidad con estado
    granular HubSpot/GPC y versión/fuente de consentimiento. El runtime publicado anterior sólo recibe
@@ -264,13 +255,15 @@ son móviles: reverificar al implementar y contrastar con el SHA instalado.
 
 ## Estado vigente — cierre autorizado 2026-10-13
 
-Server live 5/Web live 5 publicados, HubSpot categorías y routing WP/Think activos.
+Server live6/Web live5, matching activado tras PR254/main d692ab51dc48 y SQL post-release.
+[Readbacks, runtime y límites](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+HubSpot categorías y routing WP/Think activos.
 [Consentimiento y distribución del bridge](09-hubspot-consent.md) gobiernan adquisición,
 PV por destino, UUID sender compatible y retiro. Positivos Server procesados en Test Events,
 10 negativos sin salidas y PageView real completó tags Meta/GA4 desde ambos hosts.
 El SDK usa `evnid` para event_id; Client GA4 normaliza. No duplicar un parámetro por un
-falso negativo al buscar sólo ep.event_id. Renderer local enhancement sin release GH;
-el sender fallback evita esa dependencia. Próximos leads comerciales/replay sin observar.
+falso negativo al buscar sólo ep.event_id. Renderers con contexto publicados en Production;
+la primera aceptación/reserva comercial consentida tras matching sigue sin observarse.
 Evidencia/rollback en auditoría; estado previo descrito arriba es histórico, no el bloqueo actual.
 
 
@@ -304,11 +297,21 @@ server-side; sólo `/efeonce/lead-enrichment`, schema/campos/hashes/consent/alca
 Client HTTP 200 sólo con tag 6 status success, no se infiere Processed de ese ack.
 Preview/Test Events mostró em/ph/fn/ln + clasificadores de ambos hosts; seis negativos bloqueados.
 Replay conserva ID/tiempo; Test Events muestra cada recepción y no demuestra dedupe de atribución.
-Draft sin test code al cerrar; **live 5/5 conservado**, triggers Meta Lead 12/17 aún activos.
+Publicado **Server6/Web5**, sin test code; triggers Meta Lead12/17 retirados en la misma versión.
+Versión congelada verificada antes del publish23:38:57Z. Negativos live400/401 sin disparar Meta.
 
-Rollout requerido: release source/worker/renderer →migración parked →refs pinned →capture →
-publicar Client y quitar triggers Meta Lead 12/17 atómicamente→activar Meta/Google→readbacklive.
+Orden aplicado (repetir sólo con readback actual, nunca por snapshot): release source/worker/renderer →migración post-release →refs pinned →
+publicar Client y quitar triggers Meta Lead 12/17 atómicamente→activar destinos/retención del
+worker→activar captura y redeploy Vercel→readbacklive. Captura se habilita última.
+El forwarding GA4 exige `Client Name = GA4`; el Client autenticado de Lead queda fuera,
+aunque su event_name sea generate_lead. Conservar esa frontera al crear la versión.
+Validar el artefacto congelado (Meta, Client/template y forwarding GA4) antes de publicar;
+si falla tras create_version, recuperar esa versión/recibo, nunca repetir ciegamente el builder.
 Nunca activar backend Meta mientras exista el emisor Lead browser con otroID. PageView 11 y
 GA4 mirror continúan. Flags defaultOFF; retention ON permanece durante rollback. No rotar
 payloadkey antes de expirar ciphertext48 h. Secretos versión 1 en proyecto efeonce-group; sólo
-portal SA tiene grant por secreto. Todavía no configurados en runtimes.
+portal SA tiene grant por secreto. Refs configuradas y resueltas en Ops00775-fnh, canary200
+unavailableDestinations=[]; Meta/Google/retención true allí y en GitHub repo vars. Captura
+Vercel true exacta y dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias canónico. SQL
+20261013233429748 aplicada, claims/leaseCAS/retención probados con rol greenhouse_app.
+No se ejercitó negocio real post-flip ni se acredita serving/calidad por fixtures Test Events.

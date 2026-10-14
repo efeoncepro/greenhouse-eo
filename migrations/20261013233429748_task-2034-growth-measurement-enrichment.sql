@@ -36,3 +36,8 @@ DO $$ BEGIN
   END IF;
 END $$;
 -- Rollback: flags off; preserve receipts. Do not drop matching material automatically.
+
+-- Down Migration
+DO $$ BEGIN
+  RAISE EXCEPTION 'Forward-only measurement projection: disable capture/senders, retain receipts and retention; use a reviewed forward migration';
+END $$;

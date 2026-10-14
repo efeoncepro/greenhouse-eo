@@ -12,21 +12,23 @@
 - [ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
   [contrato HubSpot](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md) y
   [auditoría](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server en
-  `efeonce-group`, min 0/max 1; **server live 5/web live 5**, Meta v25 y forwarding GA4.
+  `efeonce-group`, min 0/max 1; **server live6/web live5**, Meta v25 y forwarding GA4.
 - Banner español opt-in/GPC y routing activos WP/Think. PageView por destino, default denied,
   URL limpia, UUID sender compatible, Lead accepted form/confirmed meeting; sin nuevo sender.
 - Meta Test Events Processed/Server y diez negativos sin salidas; navegación real ambos hosts
   completó Meta/GA4. Lead QA accidental previo documentado y gate UUID corregido.
-- 16 tests bridge y 30 renderer PASS; renderer local sin release GH. Think promovido y WP
+- 16 tests bridge y 30 renderer PASS; renderer con contexto released PR254. Think promovido y WP
   plugin scoped 1.0.3 con preferencias inline junto a enlaces legales, sin franja adicional. Próximos leads/replay reales pendientes.
-  Docs/skills espejo actualizados; sin commit/push, proyecto o suscripción nueva.
-- Requisito de remarketing registrado en [08 §4.1](docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#41-lead-utilizable-para-remarketing--requisito-confirmado-2026-10-13):
-  contacto en hash compatible, clasificadores y consentimiento por ingreso backend exclusivo.
-  Readback live 5/5 conserva transporte anterior; [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) agrega matching local probado, sin deploy.
-- GA4 UPD/ack y siete audiencias 90d activos/releídos; secretos scoped preparados. Meta Preview/Test Events
-  Processed/Server con em/ph/fn/ln y clasificadores, seis negativos bloqueados. 71 tests + 21 Client tests,
-  tipos/lint y builds PASS. Release acotado, SQL y flags pendientes por restricción del checkout compartido;
-  [evidencia y siguiente paso](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md).
+  Recuperación previa documentada; matching posterior abajo. Sin nuevo proyecto/suscripción.
+- [Matching](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md) activado tras
+  [release completo PR254](docs/audits/releases/2026-10-13-full-develop-matching-release.md):
+  main d692ab51dc48, orquestador38483437158/manifest released, CI20.100 PASS y build/Deep/smoke.
+  SQL aplicada, GTM6 retira legacyLead12/17, GA4 Client boundary preservada. Ops00775-fnh
+  y GitHub vars Meta/Google/retención true; captura Vercel true + redeploy READY/alias.
+- GA4 UPD/ack y siete audiencias90d, secretos pinned/identidad real resueltos dentro del worker;
+  Test Events em/ph/fn/ln, negativos live y cola/leaseCAS/retención PASS. Watchdog ok6/6 drift0.
+  Primera conversión comercial consentida post-flip sin observar; TASK-2034 parcial, sin datos
+  sintéticos de negocio. Incidente mindicador separado sigue abierto, excepción auditada.
 
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 

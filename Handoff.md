@@ -2,24 +2,21 @@
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
-[ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md), [consentimiento](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md)
-y [evidencia](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server, hosting
-`efeonce-group`, tagging/preview min 0/max 1; GTM **server live 5 / web live 5**.
-HubSpot español opt-in por categorías/GPC activo en ambos sitios, default denied;
-WP routing activo + plugin 1.0.3; Think `dpl_AH8YdErwaGg6haELFGzdk3DuddRX` promovido.
-Preferencias inline en pie legal de ambos hosts, sin franja extra; QA desktop/móvil PASS.
-Meta Test Events Processed/Server: PageView ambos hosts + Lead accepted form/confirmed meeting;
-10 negativos sin salidas. PageView real ambos hosts completó Meta/GA4 con versión live.
-Primera visita sin elección HubSpot: banner automático; sólo publicidad produjo PageView
-Procesado/Servidor de ambos hosts, UUID correlacionado navegador→Meta y GA4 bloqueado.
-UUID sender fallback compatible evita exigir release GH; renderer local 30 tests sin release.
-Incidente previo: Lead sintético fuera de Test Events por regex `.+`, corregido a UUID.
-No bookings/submissions/CRM creados. Preview cerrado; QA de preferencias desktop/mobile.
-Remarketing: [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) implementado localmente: consentimiento granular en POST, hashes Meta/Google separados, cola cifrada y retries por destino; 71 tests + 21 Client tests, tipos/lint y builds PASS.
-GA4 correcto 486264460: UPD/ack activos, siete audiencias 90d creadas/releídas, Ads link existente; tres secretos version1 con grant scoped, refs aún no configuradas. Preview workspace8 + Meta Test Events Processed/Server muestran em/ph/fn/ln y clasificadores en ambos hosts; seis negativos bloqueados, replay conserva ID (no prueba atribución deduplicada).
-Migración parked/flags/cutover/release pendientes. Live 5/5 conservado, test code draft retirado. El operador ordenó release completo develop→main el 13/10, rechazando el checkout acotado. Se mantiene el checkout compartido; revisión/preflight del batch completo en curso. [Auditoría y paquete](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md). No publicar un batch amplio por inferencia.
-Próximos leads comerciales/replay y calidad de coincidencia aún sin verificar. Docs/skills espejo
-actualizados; sin commit/push. Rollback y límites de costo en auditoría; no nuevo proyecto/suscripción.
+[Release completo y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md): PR254,
+main d692ab51dc48, orquestador38483437158 success y manifest released; CI/Deep/build/smoke PASS.
+GTM Server6/Web5, mismo hosting efeonce-group min0/max1. HubSpot categorías/GPC y banner
+primera visita WP/Think; preferencias inline en pie legal, sin franja extra. PageView consentido activo.
+Matching [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md): SQL aplicada,
+Client backend autenticado único Meta Lead, legacy12/17 retirados y espejo GA4 preservado.
+Ops00775-fnh100%: Meta/Google/retención true, GitHub repo vars persistentes y secretos versión1
+resueltos en canary200. Vercel captura true, dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias.
+GA4 correcto486264460: UPD/ack, siete audiencias90d y linkAds9531478329. Meta Test Events
+Processed/Server em/ph/fn/ln y clasificadores; cola/leaseCAS/retención y negativos live PASS.
+Watchdog ok6/6 drift0. Primera aceptación/reserva comercial consentida post-flip sin observar;
+no submissions/bookings/CRM sintéticos ni promesa de calidad/serving. Status task Parcial por esa prueba.
+Incidente separado mindicador TLS/timeout sigue abierto, Sentry7790958718/7790964540; excepción
+auditada no bloqueante, sin afirmar solución. Dossier incluye rollback, digests y límites.
+Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo proyecto/cron para matching.
 
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 

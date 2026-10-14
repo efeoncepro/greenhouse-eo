@@ -733,6 +733,14 @@ borre en silencio — **también ordena el flip por construcción**: el flag se 
 su código se despliega, nunca antes. Eso resolvió una precondición real ese día (`TASK-1792` no estaba
 en `main`; viajaba en la misma promoción).
 
+### CI metadata and build heap — verified 2026-10-13
+
+Zero job steps or a Starting job UI is not evidence that CI has not executed: PR #254
+published passing test artifacts while those views were incomplete. Inspect artifacts and
+completed logs before cancelling/retrying. Its build then exhausted a 6 GiB override;
+CI now inherits the canonical 8 GiB from `scripts/run-next-build.mjs`, with every gate intact.
+Require the new candidate build to pass; a successful develop push can skip the build.
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:

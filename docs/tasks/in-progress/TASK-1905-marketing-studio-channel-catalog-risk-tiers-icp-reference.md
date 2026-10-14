@@ -120,7 +120,7 @@ abajo. API-first, dependencias funcionales y controles de acceso existentes sigu
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-049`
-- Status real: `Studio desplegado 2026-10-04: main 74073de, Vercel Ready, API 1.6.0 / 59 tools, catálogo v1 publicado con 52 canales en staging y producción; migraciones y worker promovidos, canary API verde. Backfill sólo dry-run (134 registros unmapped, owner efeonce_operations). Greenhouse capability sin release; federación T1 espera TASK-2003, ICP real TASK-1906/1892. CLI API-only Greenhouse local: pnpm studio, 18 tests/lint, discovery/lectura/dry-run reales; sin release GH ni carga aplicada productiva. Task sigue in-progress.`
+- Status real: `Studio desplegado 2026-10-04: main 74073de, Vercel Ready, API 1.6.0 / 59 tools, catálogo v1 publicado con 52 canales en staging y producción; migraciones y worker promovidos, canary API verde. Backfill sólo dry-run (134 registros unmapped, owner efeonce_operations). Greenhouse capability released en PR254/main d692ab51dc48; SQL canónica 20261013233455807 aplicada 2026-10-13 23:35:02Z y registry releído; federación T1 espera TASK-2003, ICP real TASK-1906/1892. CLI API-only Greenhouse local: pnpm studio, 18 tests/lint, discovery/lectura/dry-run reales; CLI incluida en release GH; sin carga aplicada productiva ni ampliación grants MCP. Task sigue in-progress.`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -713,9 +713,11 @@ La clasificación inicial `UI impact: none` se corrige a `copy` al conectar la s
 `marketing_studio.catalog.manage` existe en código (`src/config/entitlements-catalog.ts`) y grants efectivos
 calculados (`src/lib/entitlements/runtime.ts`): acciones `create`/`update`, sólo `efeonce_admin` y
 `efeonce_operations`. Coverage de 33 tests PASS; account/designer, acciones delete/all y roles no efectivos no
-conceden acceso. Esto acredita implementación local en Greenhouse, no registro/grant efectivo en producción.
-El SQL está en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
-el operador de release debe recrearlo con `pnpm migrate:create`, aplicar y verificar el registry y canje.
+conceden acceso. Las pruebas locales acreditaban implementación; el registro productivo se verificó posteriormente abajo. No equivalen a canje delegado T1.
+Actualización 2026-10-13: capability y CLI Greenhouse promovidas en PR254/main d692ab51dc48;
+`migrations/20261013233455807_task-1905-marketing-studio-catalog-capability.sql` aplicada23:35:02Z,
+registry releído y parked retirado. No acredita nuevo canje delegado T1 ni amplía grants MCP.
+[Dossier Greenhouse](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 No hubo release Greenhouse en el release Studio ni al entregar la CLI HTTP. Un bearer de servicio no gobierna
 el catálogo: el canary productivo devuelve 403. TASK-2003 resuelve el carril delegado T1 en paralelo; no es
 prerrequisito de toda TASK-1905. ICP real sigue desactivado y depende de TASK-1906/TASK-1892.
@@ -728,8 +730,8 @@ prerrequisito de toda TASK-1905. ICP real sigue desactivado y depende de TASK-19
 - Studio `pnpm check` y `pnpm build`: PASS. API 1.6.0 / 59 tools; 15 operaciones añadidas.
 - DB: diez migraciones en cluster local nuevo; inmutabilidad, concurrencia, restricciones de arrays,
   warn/enforce/off, audiencias, derechos y revalidación verificadas; suite completa 34 archivos / 216 pruebas, cero skips.
-- Greenhouse: capability/coverage 33 tests PASS; SQL guardado en
-  `pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending` para reactivar al release.
+- Greenhouse: capability/coverage 33 tests PASS; SQL aplicada post-release13/10 como
+  `migrations/20261013233455807_task-1905-marketing-studio-catalog-capability.sql`, registry releído.
 - Atención: captura local real desktop 1440/mobile 390, sin overflow/errores y CTA correcto.
 - Manual MCP/appliesTo y planificación actualizados: 34 tests PASS; 27 referencias coinciden con el manifiesto local. Flags documentados y cierre documental focal sin advertencias.
 - Release posterior autorizado: Studio push main 74073de, Vercel/worker Ready, seed/migraciones en ambas bases; [canary API productivo](../../audits/marketing-studio/TASK-1905-release-2026-10-04.md). Backfill apply y sesión MCP delegada pendientes.
