@@ -23,7 +23,8 @@ For **event naming / taxonomy / the gh_ house style** → `docs/reference/measur
 
 ## Meta CAPI / sGTM — cargar antes de proponer o ejecutar
 
-Canon: `docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md` +
+Canon: `docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md` (implementación vigente),
+`09-hubspot-consent.md`, `08-meta-conversions-api-server-side.md` +
 ADR `GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md`. Para Efeonce, CAPI se opera por
 **GTM Server**, separado de Pixel/web; no proponer Pixel web como solución completa.
 Meta admite backend directo y Gateway, pero no son la ruta elegida. Inventariar primero:
@@ -43,7 +44,8 @@ Releer `usageContext`, endpoints, Clients, template/SHA/permisos, versiones y fu
    `gh_meeting_booking_confirmed → generate_lead` conserva una sola conversión GA4.
    La recuperación inicial llevaba ese espejo a Meta; retirar sus triggers12/17 al activar
    el ingreso backend, nunca mantener ambos senders con IDs independientes. Cargar las skills
-   Forms/Meetings; proyección cifrada e identidad durable pertenecen al contrato08 §4.2.
+   Forms/Meetings; proyección cifrada e identidad durable pertenecen al contrato10. Los
+   triggers12/17 ya están retirados desde Server6: no reactivarlos como fallback.
 3. CAPI tag y token sólo servidor. No ampliar dataLayer/GA4 con PII; usar ingress separado,
    allowlists por destino, gate Meta explícito (denegado/desconocido bloquea) y exports redactados.
 4. Identidad/tiempo estables por ocurrencia/retry; Pixel complementario comparte nombre/ID.
@@ -72,6 +74,13 @@ dentro del worker real; canary200 sin salida comercial. Preview/Test Events Serv
 em/ph/fn/ln + clasificadores; primera conversión comercial consentida post-flip sin observar.
 GA4 486264460 UPD/ack activos, automática OFF, siete audiencias90d y Ads link9531478329.
 [Dossier y rollback](../../../docs/audits/releases/2026-10-13-full-develop-matching-release.md).
+**Alta de fuentes hoy:** backend `payload.ts` y Client `sgtm-lead-client.js` contienen listas
+fijas de seis formularios y un scheduler/surface. GA4 genérico no equivale a matching autorizado.
+Cambiar alcance hoy implica código/release y publicar Client sGTM; no prometer un toggle
+existente. La configuración administrable está en
+`docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md`: propuesta
+pendiente de GO, no implementada ni autorizada por el encargo de documentación.
+
 No asumir serving, matching efectivo ni atribución deduplicada por Processed. Google Signals
 no es prerrequisito de UPD. Respetar la restricción shared workspace antes del release.
 

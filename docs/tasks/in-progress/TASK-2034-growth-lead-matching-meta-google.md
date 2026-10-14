@@ -258,3 +258,15 @@ worker son el SoT durable; flags runtime y Vercel exactos releídos. Rollback ca
 retenciónON, GTM5 sólo tras detener backend, no rotar key48h. Tipo generado omitido con
 MIGRATE_SKIP_TYPES permitido: contrato PG explícito ya compilado, futura proyección gobernada.
 La migración catalog de TASK-1905 también aplicada, sin marcar esa task completa ni ampliarMCP.
+
+
+### Auditoría documental integral previa al GO de escalabilidad
+
+Tres subagentes contrastaron código, skills, cronología, release y recibos locales; sin
+nuevas mutaciones externas. [Inventario completo](../../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md)
+y [contrato runtime10](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+Corregidos ADR/Tracking, Forms/Meetings, referencias/skills y distinción GA4 confirmación
+publicada vs funnel pendiente. La [política configurable](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
+permanece Proposed, pendiente de GO, sin schema/API/UI/template/release nuevo. No se abre
+una task de implementación por esta documentación. StatusParcial conserva acceptance
+real comercial pendiente; no tildarlo por una auditoría documental.

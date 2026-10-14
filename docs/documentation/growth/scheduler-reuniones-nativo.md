@@ -21,6 +21,28 @@ El CTA permanece compacto. En desktop abre un diálogo bounded y en móvil una s
 - Abrir la agenda no cuenta como conversión. Sólo un recibo confirmado server-side habilita la conversión de meeting.
 - Si el bundle o la disponibilidad fallan antes de reservar, la experiencia ofrece `Reintentar` y navegación mensual sin salir del scheduler. Un booking ambiguo no habilita un segundo intento inmediato.
 
+## Medición y matching publicitario
+
+La reserva confirmada produce el espejo GA4 `generate_lead` con `lead_source=meeting_booking`.
+Abrir el calendario, seleccionar horario, fallar o repetir una confirmación no crea otra conversión.
+
+TASK-2034 agregó un carril backend para Meta y Google: después de la confirmación válida se guarda
+una proyección cifrada, con UUID independiente de la reserva y su recibo privado. El worker la
+entrega a Meta por GTM Server y, si corresponde, a Google como datos de usuario sin otro evento GA4.
+Sólo se prepara con consentimiento publicitario vigente y sin GPC; Google requiere además analítica
+consentida y un identificador GA4 real. Los datos de contacto y hashes no van al dataLayer.
+
+La cobertura de matching es **sólo** `efeonce-discovery-30` sobre
+`fhsf-efeonce-lead-gen-web`, en `efeoncepro.com` o `think.efeoncepro.com`.
+Una agenda o surface nueva puede funcionar para reservas sin estar autorizada para matching.
+La elegibilidad sigue fija en backend y Client sGTM; administrarla sin release es propuesta
+pendiente de GO, no una opción disponible en el cockpit.
+
+El matching no bloquea el booking si falla; reintenta como máximo 5 veces/24 h y elimina el
+material cifrado a 48 h. La confirmación de transporte no acredita audiencia publicitaria utilizable.
+[Contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) ·
+[activación y primera conversión real aún por observar](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+
 ## Estados y adaptación
 
 El mismo controlador proyecta recetas `guided`, `split` o `command` según la caja disponible. Cambiar tamaño o cerrar/reabrir no crea otro booking intent ni repite pasos del funnel.

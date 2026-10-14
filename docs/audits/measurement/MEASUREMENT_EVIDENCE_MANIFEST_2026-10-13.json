@@ -1,0 +1,101 @@
+{
+  "scope": "Fingerprints only, no receipt payloads or secrets. Local evidence from the prior authorized rollout, not live revalidation by documentation update.",
+  "releaseSha": "d692ab51dc486a0585b7950f95bb627197e6f2c6",
+  "files": [
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/backend-lead-cutover-receipt.json",
+      "bytes": 544,
+      "sha256": "45885c18548bb64e8bf4271d02c46691196b7775fb94139f218f8ed4d8b594d5"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/live-ingress-negative-canary.json",
+      "bytes": 650,
+      "sha256": "ba2de7a8484d1acc239690737c06d6308604c24385221924af916225c13a2aab"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/measurement-queue-live-canary.json",
+      "bytes": 438,
+      "sha256": "7563d7f6b6f2f4dcbd74838d7e898ee1a63e76c537910cfd84160c719963e44a"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/postrelease-schema-readback.json",
+      "bytes": 2114,
+      "sha256": "3135078891ec942675f26d98394aef981942c9e7494e2584afe19788f6c204dd"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/worker-matching-contract-canary.json",
+      "bytes": 1072,
+      "sha256": "6dfb97493d3d75a60ed5f1b1713d79ed5bc5896b1d0eb37701d7a08b0b78c23e"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/measurement-repo-vars-readback.json",
+      "bytes": 187,
+      "sha256": "b68165c883a339caff35790ca72ebab883f0910c8f0a9af45aa33980d1aeb380"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/vercel-capture-configuration-readback.json",
+      "bytes": 264,
+      "sha256": "e149d7065d59f5a1b5c3eba55a3cb19cd44e7a823e51c2b5d099a3c1c539c1ff"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/vercel-credential-identity-readback.json",
+      "bytes": 327,
+      "sha256": "a7a784a9ba4b142db343da7d18e16a6825dd18ffaf54531fa3a9e27ada99216a"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/production-capture-ready.json",
+      "bytes": 270,
+      "sha256": "f00c7dbf930ba643b577504fc73e4ffc49af6424d1f2e51918595e3fff23ef6a"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/production-renderer-readback.json",
+      "bytes": 814,
+      "sha256": "95766acbb9a96ff3b9b291260d7156aba7ab272a51b76a6cf7073b46a22559ef"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/permanent-configuration-readback.json",
+      "bytes": 548,
+      "sha256": "945f1502b21d72372bab731e2c533549ac53d9c7ccbdcfefc8958635ed4bcc58"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/final-matching-worker-runtime.json",
+      "bytes": 4187,
+      "sha256": "a34a9d02ff3e9cafd8fcde8abba23d83f6be991ce5fd506dbf7413f54f86bd82"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/release-watchdog-final.json",
+      "bytes": 2620,
+      "sha256": "016df5a1c08b7decabf05adfb4c7a3fceb0417b8cb2fcbaf4628bff181422cf2"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/released-manifest-readback.json",
+      "bytes": 287,
+      "sha256": "39625d81ab077f15bfa5ec7c7a00c06639c5c9e7c8cd40e31b367586eb349f31"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/google-lead-audiences-receipt.json",
+      "bytes": 19054,
+      "sha256": "bd63c8c6621adcbadc32dd886c597caa11b9873bb35777f24dfcd9c1cebbac16"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/matching-secret-bindings-readback.json",
+      "bytes": 782,
+      "sha256": "3a8a80e5dfd0115a44b6f7ca75c0d5d0e0a27c2fbe3ee607cd6dd8120b77eb22"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/meta-matching-latest-processed.png",
+      "bytes": 135956,
+      "sha256": "499b82c029a07b90ec6eaae307b9438815a4308656ca098b33c1b890a923a59c"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/meta-matching-latest-processed.txt",
+      "bytes": 13361,
+      "sha256": "9e7a5fd1398b9dc1cfb7bad2daaa6578a1762d84dc9d144c7971946a72a971c6"
+    },
+    {
+      "file": ".captures/meta-capi-diagnostic-2026-10-13/economic-indicator-freshness-readback.json",
+      "bytes": 795,
+      "sha256": "25f0734621af5684e378dd4a73b336c43bcc6615d2b313d72247cb50b3f6aec5"
+    }
+  ]
+}

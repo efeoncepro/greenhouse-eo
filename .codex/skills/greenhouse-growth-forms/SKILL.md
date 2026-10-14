@@ -60,6 +60,41 @@ React con mensajes explícitos; no introduce React ni ese control en el web comp
 
 ---
 
+## Matching publicitario — TASK-2034 (release 2026-10-13)
+
+Antes de tocar captura, identidad o destinos publicitarios, cargar el contrato completo
+`docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md` y la skill
+`greenhouse-gtm-ga4-operator`. Es un carril separado de la entrega HubSpot del formulario.
+
+- `src/growth-measurement-context/context.ts` lee categorías HubSpot resueltas y GPC al enviar;
+  `measurementContext` va sólo al POST gobernado. La casilla de consentimiento del formulario
+  no autoriza publicidad. Ausencia, antigüedad >10 min, publicidad denegada o GPC bloquean matching.
+- `submitForm` prepara matching con **campos ya normalizados** `email`, `phone`, `firstName`,
+  `lastName`. No inferir mappings desde labels ni fabricar apellidos o identidades GA4.
+- La aceptación guarda submission + consentimiento + outbox; la proyección cifrada se inserta en
+  esa misma transacción mediante SAVEPOINT aislado. Si falla medición, se conserva la aceptación.
+  No confundir esta captura opcional con entrega publicitaria garantizada.
+- `measurement_conversion` / `measurement_delivery` en `greenhouse_growth` son los ledgers de
+  matching. UUID externo independiente, único por `(source_kind, source_id)`; se conserva en retries.
+  El ops-worker existente drena ambos destinos: Meta vía Client autenticado sGTM; Google UPD vía
+  Measurement Protocol **sin events**. GA4 conserva un solo `generate_lead` browser-reported.
+- `GROWTH_MEASUREMENT_CAPTURE_ENABLED` gobierna Vercel; `GROWTH_MEASUREMENT_META_ENABLED`,
+  `GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED` y `GROWTH_MEASUREMENT_RETENTION_ENABLED` gobiernan worker.
+  Verificar cada runtime y la persistencia de repo vars; no extrapolar desde flags Forms/HubSpot.
+- Cobertura fija actual: `efeonce-aeo-diagnostic`, `efeonce-seo-diagnostic`,
+  `efeonce-desarrollo-web-cotizacion`, `efeonce-lead-gen-web`, `efeonce-social-audit`,
+  `ai-visibility-grader`, sólo en origins HTTPS `efeoncepro.com` / `think.efeoncepro.com` con surface.
+  La allowlist existe en `measurement/payload.ts` **y** `scripts/measurement/sgtm-lead-client.js`.
+  Publicar un formulario o registrar su tagging GA4 **no lo incorpora automáticamente al matching**.
+- AES-256-GCM, reintentos máximos 5 en 24 h y purga de material cifrado a 48 h; no incluir PII,
+  hashes, cookies publicitarias ni payloads en dataLayer, logs o dimensiones GA4 ordinarias.
+- UI/configuración publicada por formulario para autorizar matching: **propuesta, sin GO y no
+  implementada**. Hoy ampliar cobertura requiere código/release y publicación sGTM gobernados.
+  No prometer alta por configuración ni inferir audiencia elegible por habilitar el transporte.
+
+Pruebas controladas y activación no sustituyen observar el primer Lead comercial real consentido;
+consultar el [readback del release](../../../docs/audits/releases/2026-10-13-full-develop-matching-release.md).
+
 ## Mental model — end to end
 
 ```

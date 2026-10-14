@@ -30,6 +30,9 @@
   Primera conversión comercial consentida post-flip sin observar; TASK-2034 parcial, sin datos
   sintéticos de negocio. Incidente mindicador separado sigue abierto, excepción auditada.
 
+- Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+  ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
+
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 
 - [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,

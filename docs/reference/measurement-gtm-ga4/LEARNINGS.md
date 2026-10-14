@@ -4,6 +4,40 @@
 
 ---
 
+## 2026-10-13 — recuperación, consentimiento y matching backend
+
+[Contrato vigente completo](10-growth-lead-matching-runtime.md), [consentimiento](09-hubspot-consent.md)
+y [release completo](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Server6/Web5 publicados, primera conversión comercial consentida post-flip aún no observada.
+
+- **GTM Server es una ejecución alojada:** recuperar el contenedor existente y el proyecto
+  canónico antes de crear proyectos; inspeccionar billing/min/max/CPU/RAM. min0 no equivale
+  a gratis y una referencia always-on no es una factura real. Matching comparte worker/cron existentes.
+- **Dos fuentes, dos identidades:** PageView nace de navegación consentida; Lead de aceptación
+  o reserva backend. El UUID browser del antiguo sender no sustituye el UUID durable de la cola.
+  Retirar los triggers Meta12/17 en el mismo publish que habilita Client31; no sumar senders.
+- **Consentimiento granular:** `_hsp` categories boolean, GPC veto, defaults inline denied.
+  Permiso de procesamiento del formulario no concede ads. Form/meeting POST añade contexto
+  opcional estricto; ausencia/edad/GPC omiten matching y preservan la acción comercial.
+- **GA4 mantiene un mirror:** forwarding server restringido a Client Name=GA4; el Client
+  backend `generate_lead` no se reenvía. Google MP entrega user_data top-level **sin events**,
+  con client_id real + analytics/ads. UPD habilitado no prueba audiencia utilizable ni serving.
+- **Templates GTM no son JavaScript estándar:** sandbox sin RegExp literals; usar String.match.
+  Meta pin espera custom_properties como JSON string y hashes64hex sin appendixSDK.
+  Normalización Meta/Google difiere en teléfono (+E.164 Google) y puntos Gmail.
+- **Recepción no es atribución:** Meta callback success/HTTP2xx se guarda como http_accepted,
+  Processed se comprueba por separado. Retry conserva event_id/tiempo; replay en Test Events
+  no prueba deduplicación de atribución. No fabricar bookings/submissions/CRM para comprobarlo.
+- **Publicar artefacto verificado:** create_version consume workspace. Congelar/verificar
+  Client/template/tag/forwarding antes de publish y recuperar recibo si hay fallo; no recrear
+  a ciegas. Orden: SQL+refs → Client y retiro legacy → worker destinos/retención → captura
+  Vercel última con redeploy y alias READY. Repo vars y revisión live se mantienen juntas.
+- **Rollback conserva limpieza:** captura/senders OFF, retención ON, key/ciphertext48h, SQL
+  aditivo. El cifrado no reemplaza consentimiento y los hashes no dejan de ser datos personales.
+- **Escalabilidad todavía pendiente:** backend y Client sGTM enumeran seis forms y un binding
+  de calendario. Publicar otro formulario no habilita matching automáticamente; configuración
+  administrable es [propuesta pendiente de GO](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md).
+
 ## 2026-08-20 — CTA anidado en una tarjeta enlazada: `Click URL` vacío no significa que no exista destino
 
 **Qué:** en el sitio cliente Berel, el CTA visible `Conoce más` no tiene una sola forma DOM. En las tarjetas de

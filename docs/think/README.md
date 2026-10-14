@@ -112,3 +112,13 @@ Los patrones Think se pueden reutilizar dentro de Think o en otras experiencias
 publicas satelite. Para llevarlos al portal Greenhouse hay que traducirlos a la
 plataforma UI privada: primitives, tokens, `CompositionShell`, density contracts,
 GVC y contratos de task UI cuando aplique.
+
+
+## Consentimiento y matching compartidos
+
+[Contrato HubSpot/host](../reference/measurement-gtm-ga4/09-hubspot-consent.md) y
+[runtime implementado](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+son el canon de banner automático, preferencias inline, PageView consentido y contexto portable.
+Host distribuye el bridge común y embebe Forms/Meetings; no replica lógica de matching ni secretos.
+Matching released no autoautoriza un formulario/host nuevo; conserva el scope publicado.
+La política administrable sigue propuesta sin GO. No activar tracking en rutas privadas/tokenizadas.

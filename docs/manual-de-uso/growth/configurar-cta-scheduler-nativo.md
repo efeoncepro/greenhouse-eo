@@ -21,6 +21,26 @@
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
 11. En un host ancho, revisa que “Conversemos” no corte letras, que el carril no muestre aros recortados y que la marca monocroma de Teams aparezca sin fondo morado. Repite a 820 px y 390 px verificando `scrollWidth === clientWidth`.
 
+## Comprobar medición y matching
+
+El binding y la publicación del CTA habilitan la experiencia de reserva, no el matching por sí solos.
+La autorización actual de matching es fija: `efeonce-discovery-30` +
+`fhsf-efeonce-lead-gen-web` en los origins públicos Efeonce/Think.
+La surface de ejemplo `efeonce-public-site` de este manual no amplía ese alcance.
+No hay opción de configuración sin release: la propuesta está sin GO y no implementada.
+
+Después de una reserva real autorizada y confirmada, distinguir tres evidencias: receipt/ledger
+server-side, mirror GA4 `generate_lead`, y entrega backend a Meta/Google.
+El renderer toma categorías HubSpot/GPC al POST; sin publicidad explícita no hay matching, y
+Google UPD exige también analítica e identificador GA4 real. La casilla para reservar no equivale a
+consentimiento publicitario. El UUID de medición es independiente del recibo privado.
+
+Meta Lead sale por el Client autenticado de GTM Server; el antiguo sender Lead basado en GA4 está
+retirado. Google UPD no agrega eventos ni otra conversión. Nunca crear reservas ficticias ni repetir
+booking para probar transporte. Las pruebas controladas de TASK-2034 y sus límites están en el
+[release](../../audits/releases/2026-10-13-full-develop-matching-release.md); el procedimiento completo,
+reintentos/retención y rollback en el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+
 ## Degradación y rollback
 
 - Si no carga la agenda nativa, usa **Reintentar** y revisa bundle/CSP/origin binding si el problema persiste.

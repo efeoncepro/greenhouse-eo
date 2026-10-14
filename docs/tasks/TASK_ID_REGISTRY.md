@@ -25,7 +25,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `TASK-2034` | `in-progress` | Lead matching Meta CAPI y Google UPD/audiencias | `docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md` |
+| `TASK-2034` | `in-progress` | Lead matching Meta CAPI y Google UPD/audiencias; rollout activo, acceptance comercial pendiente; auditoría documental integral | `docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md` |
 | `TASK-2033` | `in-progress` | Efeonce Insights: alcance de contenido por organización (medir sólo lo que Efeonce trabaja) | `docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md` |
 | `TASK-2032` | `to-do` | Product reference prices computed by Pricing V3 | `docs/tasks/to-do/TASK-2032-product-reference-prices-from-pricing-v3.md` |
 | `TASK-2031` | `to-do` | Quoter V3 product identity: SKU binding, composite services and line versus custom items | `docs/tasks/to-do/TASK-2031-quoter-v3-product-identity.md` |

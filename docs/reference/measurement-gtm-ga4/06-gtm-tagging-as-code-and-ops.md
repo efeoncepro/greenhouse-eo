@@ -120,8 +120,12 @@ Event in dataLayer but tag didn't fire → almost always the **trigger's event n
 
 **Canon Meta CAPI:** [runbook 08](08-meta-conversions-api-server-side.md) y
 [ADR servidor](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
-El inventario read-only del 2026-10-13 confirma `Efeonce Server` (`GTM-K2X4ZTTK`),
-`usageContext=server`, versión live 3 y tag Meta CAPI; entrega actual no verificada.
+El inventario inicial del 2026-10-13 encontró `Efeonce Server` (`GTM-K2X4ZTTK`),
+`usageContext=server`, entonces live3. Tras recuperación y cutover, el estado publicado es
+**Server6/Web5**: PageView consentido por GA4 Client y Lead sólo por Client backend autenticado.
+[Contrato vigente](10-growth-lead-matching-runtime.md) y [release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Test Events Server y controles de cola/credenciales pasaron; primera conversión comercial
+consentida post-activación aún no observada. No inferirla de configuración o HTTP2xx.
 `GTM-NGHPGRLZ` es web; su snapshot/GA4 smoke no certifican el servidor.
 
 - Recuperar/inventariar el existente antes de crear otro. Verificar hosting, URL, Client,

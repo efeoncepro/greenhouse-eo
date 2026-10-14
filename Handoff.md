@@ -18,6 +18,11 @@ Incidente separado mindicador TLS/timeout sigue abierto, Sentry7790958718/779096
 auditada no bloqueante, sin afirmar solución. Dossier incluye rollback, digests y límites.
 Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo proyecto/cron para matching.
 
+Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
+
+Fuentes desplegadas previas versionadas localmente: WP `cf7f10d1c` (plugin2archivos), Think `63e9fa7c7` (layout/home/bridge3archivos); sin push/deploy.
+
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 
 El operador presentó la oferta el 13/10 a las 08:56 (estado «Enviada», leído en el portal sin tocar campos): un servicio, MXN 64.000 netos, tres archivos

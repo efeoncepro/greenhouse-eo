@@ -2,7 +2,9 @@
 
 > Decisión del operador 2026-10-13: «Ok, hazlo» sobre la recomendación de HubSpot.
 > Autoriza configurar/publicar el banner y conectar sus categorías con la medición.
-> Estado de despliegue y QA: [auditoría](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+> Estado vigente: Server6/Web5, contexto backend publicado y matching activado.
+> [Runtime](10-growth-lead-matching-runtime.md) · [release y QA](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+> La [auditoría de recuperación](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md) es cronología histórica.
 
 ## Fuente y contrato
 
@@ -57,23 +59,23 @@ no cancela HTTP ya enviado. Estos controles técnicos no afirman cumplimiento le
   Meta PageView exige publicidad granted, host permitido, meta_capi_page_view 1 y UUID.
   El SDK GA4 usa el parámetro nativo `evnid`; Client GA4 lo normaliza a `event_id`.
   Inspeccionar ambas formas antes de diagnosticar un ID ausente.
-  Form/meeting Lead conservan sus propios gates comerciales/UUID, sin depender del marker PV.
+  Lead Forms/Meetings nace ahora en backend: consentimiento snapshot + fuente elegible +
+  identidad durable. No depende del marker PV ni del UUID browser para enviar Meta.
 - Transformaciones por destino excluyen los campos de control; Meta recibe URL sin query/
   fragment ni referrer. Los atributos HTML de QA reflejan estados, sin guardar PII/cookies.
 
-## Identidad de reunión compatible con el renderer vigente
+## Identidad de navegación y espejo de reuniones
 
-PageView usa un UUID v4 por ocurrencia del mismo generador Crypto, memoizado por evento GTM,
-para conservar identidad en reintentos. El tag GA4 de confirmación usa `JS - meeting conversion event_id`: primero UUID opaco válido
-emitido por el renderer, si existe; si falta, el bridge genera UUID v4 con Crypto y lo memoiza
-por `gtm.uniqueEventId`, usado **sólo como llave local**, nunca transmitido. La variable sólo
-opera en `gh_meeting_booking_confirmed`; el dominio conserva receipt/eligibilidad/replay.
+PageView usa UUID v4 por ocurrencia, memoizado por evento GTM, para conservar identidad
+en reintentos. El tag GA4 de confirmación de reunión conserva `JS - meeting conversion event_id`:
+prefiere el UUID opaco válido del renderer; como compatibilidad, usa Crypto memoizado por
+`gtm.uniqueEventId` (llave local, nunca transmitida). El dominio conserva receipt/eligibilidad/replay.
 
-No requiere liberar Greenhouse para recuperar esta identidad del sender. El renderer UUID
-preparado localmente es compatible y puede liberarse después: no genera un segundo sender.
-Sin Crypto/counter válido, ID vacío y CAPI fail-closed; UX y GA4 conservan el comportamiento.
-No es identidad durable del ledger ni compartida con un sender outbox futuro. Ese carril
-requiere una decisión explícita de identidad/dedupe antes de coexistir.
+Ese UUID browser correspondía al sender Meta de recuperación inicial. **Desde Server6 los
+triggers Meta Lead12/17 están retirados:** el espejo browser sólo alimenta GA4; el Lead de Meta
+usa el UUID durable de la cola backend. No reactivar el sender anterior como fallback, ni
+confundir un fallo Crypto del espejo con un veto a una conversión backend válida.
+No transmitir receipt o IDs internos como identidad publicitaria. [Contrato completo](10-growth-lead-matching-runtime.md).
 
 ## QA y publicación
 
@@ -85,12 +87,16 @@ Verificar hashes de ambas distribuciones; API compile no sustituye Preview ni le
 Positivos CAPI sólo con código **real** de Test Events, obtenido del dataset correcto en
 Events Manager, y código activo sólo en el draft. Excluir probes internos de GA4.
 Comprobar PageView y Lead **Server** de ambos hosts, URL limpia, ID UUID y negativos.
-Retirar código de prueba y releer antes de publicar server→web; luego activar routing WP,
+La recuperación inicial publicó server→web y después activó routing WP. Para matching actual,
+seguir el cutover del contrato10: retirar legacy y publicar Client → worker destinos/retención →
+captura Vercel última. Retirar código de prueba y releer artefacto congelado antes de publicar;
 verificar versiones/consentimiento/tráfico real y cerrar Preview para evitar consumo continuo.
 No crear bookings/submissions/CRM ni confundir un Lead sintético Test Events con negocio real.
 
-Rollback: versiones GTM anteriores; desactivar routing WP y/o plugin scoped, restaurar backup;
-Vercel rollback al deployment previo verificado. No desplegar todo el repo WP con drift ajeno.
+Rollback matching: captura y ambos senders OFF en configuración durable/live; retención ON.
+Restaurar Server5 sólo después de detener backend Meta; preservar key/ciphertext48h y SQL aditivo.
+Para revertir además la recuperación inicial: desactivar routing/plugin scoped WP, restaurar backup
+y deployment Think previo verificado. No desplegar todo el repo WP con drift ajeno.
 
 ## Fuentes oficiales verificadas 2026-10-13
 
@@ -115,4 +121,5 @@ cuando su finalidad está consentida. Backend valida tipos/antigüedad y aplica 
 si Sec-GPC:1, aunque el body diga false. Consentimiento de procesamiento/comunicaciones
 nunca concede publicidad. Unknown/denied omite matching sin rechazar formulario/reserva.
 Snapshot sin cookies en ledger; proyección de hashes/cookies/contexto cifrada con retención48 h.
-Código local probado, pendiente de release. [Contrato](08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13).
+Publicado y activado tras PR254/main d692ab51dc48; primera aceptación/reserva comercial
+consentida post-activación todavía sin observar. Detalle de schemas, tiempos y gates en [runtime](10-growth-lead-matching-runtime.md). [Contrato](08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13).

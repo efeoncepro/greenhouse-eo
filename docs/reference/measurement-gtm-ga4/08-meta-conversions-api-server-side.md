@@ -3,7 +3,8 @@
 > Canon operativo de CAPI/sGTM. Server6/Web5; matching TASK-2034 activado tras release completo PR254. Primera conversión comercial consentida post-flip todavía sin observar.
 > Dirección elegida por el operador: [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
 > Estado vigente 2026-10-13: hosting existente recuperado en efeonce-group; consentimiento y transporte activos. §2 conserva el inventario inicial anterior al rollout.
-> [Diagnóstico y pendientes actuales](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+> [Implementación vigente completa](10-growth-lead-matching-runtime.md) · [release y evidencia](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+> [Diagnóstico y recuperación histórica](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
 
 ## 1. Separar Pixel, CAPI y contenedores
 
@@ -146,7 +147,7 @@ y autorizada; `event_id` identifica una conversión, no una persona.
 **Flujo publicado y activado en el mismo GTM Server:**
 
 1. Adjuntar al POST público de Forms/Meetings un contexto separado de publicidad con estado
-   granular HubSpot/GPC y versión/fuente de consentimiento. El runtime publicado anterior sólo recibe
+   granular HubSpot/GPC y versión/fuente de consentimiento. Antes del release, el runtime sólo recibía
    `consent`/`consentCheckboxes`; Meetings, procesamiento y comunicaciones. Ninguno concede
    publicidad por inferencia. Legacy/sin señal publicitaria = unknown = sin enriquecimiento.
 2. Después de aceptación/confirmación real, construir en Greenhouse la proyección mínima
@@ -226,7 +227,10 @@ demuestra salud. [Hosting](https://developers.google.com/tag-platform/tag-manage
 HTTP 200, tag disparado, `/healthy`, GA4 realtime y snapshot web no certifican entrega CAPI.
 Recepción no demuestra atribución publicitaria, match quality ni efectividad comercial.
 
-## 7. Operación actual (delta 2026-10-13)
+## 7. Diagnóstico previo a publicación (histórico 2026-10-13)
+
+Este apartado conserva el punto previo de la investigación. No es el inventario servido:
+consultar [estado vigente](#estado-vigente--cierre-autorizado-2026-10-13) y [runtime](10-growth-lead-matching-runtime.md).
 
 [Auditoría](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): hosting del contenedor
 existente recuperado en `efeonce-group`; tagging/preview min 0/max 1, 1CPU/512MiB,
@@ -268,6 +272,11 @@ Evidencia/rollback en auditoría; estado previo descrito arriba es histórico, n
 
 
 ### 4.2. Implementación de matching y Google UPD — 2026-10-13
+
+Detalle implementado y frontera con la propuesta de configuración: [runtime](10-growth-lead-matching-runtime.md).
+Las listas de formularios y scheduler/surface siguen fijas tanto en backend como en Client sGTM;
+la [configuración administrable](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
+es una propuesta pendiente de GO, sin implementación ni publicación autorizadas.
 
 Dueño: [TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md).
 `src/lib/growth/measurement` prepara proyecciones desde Forms aceptados/Meetings confirmados.

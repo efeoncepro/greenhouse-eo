@@ -50,3 +50,69 @@ Client Name=GA4 y excluye el Client backend. Validar la versión congelada antes
 Verificar registros de negocio, cola/HTTP y recepción provider por separado. Durante rollback:
 senders/capture OFF, retención ON, no borrar key/ciphertext; restaurar sender anterior sólo
 tras deshabilitar backend. No crear otra infraestructura ni promover trabajo ajeno por inferencia.
+
+
+## Comprobar el estado sin crear una conversión
+
+Consultar primero el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+y el [dossier con recibos](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Releer por separado configuración durable, revisión servida y ejecución; un flag en GitHub,
+una ref de secreto o una credencial local no demuestra su resolución dentro del worker.
+
+- Captura: valor exacto `true` en Vercel Production **y redeploy READY con alias canónico**.
+  El renderer público actualizado prueba distribución de código; no aceptación de un Lead.
+- Destinos: tres repo vars measurement true, sin overrides Production; comparar con los tres
+  valores de la revisión Ops que recibe tráfico. Mantener defaults OFF para instalaciones nuevas.
+- Secretos: refs payload-key/ingress-token/ga4-api-secret pinned a versión1, grants por secreto.
+  El canary real del worker devolvió unavailableDestinations=[]; nunca imprimir credenciales,
+  CONTAINER_CONFIG ni exportar tags con el token Meta.
+- SQL: revisar las dos migraciones y permisos del dossier. `pgmigrations.run_on` es timestamp
+  sin zona UTC: usar lectura textual para no desplazar la hora. No recrear las parked aplicadas.
+- Salud: release released, readiness/health y watchdog sin drift son controles distintos de
+  recepción de Meta. Revisión con SHA anterior puede ser válida sólo con change-gate y
+  equivalencia runtime documentados, nunca sólo porque el servicio está Ready.
+
+Para cerrar el acceptance pendiente, correlacionar la próxima aceptación/reserva consentida
+real con source, measurement_conversion/delivery, ID/tiempo estable, resultado HTTP y
+recepción provider. No crear submissions, bookings ni contactos comerciales de prueba para
+fabricar esa evidencia. Un ack no certifica atribución ni audiencia elegible.
+
+## Hosting, costo y permanencia
+
+Mismo contenedor, dos servicios existentes del hosting recuperado en `efeonce-group` /
+us-central1: tagging y preview, cada uno 1vCPU/512MiB, instance-based, min0/max1.
+El matching reutiliza Ops y su cadence Forms: no añade proyecto, servicio ni cron propio.
+Cerrar Preview al terminar QA; min0 no garantiza gasto cero y max1 limita capacidad, no
+el gasto total. Costos, free tier compartido y escenarios fechados están en el
+[dossier](../../audits/releases/2026-10-13-full-develop-matching-release.md#hosting-costo-y-permanencia).
+No hay factura histórica verificada ni tope monetario creado por esos límites.
+
+Flags y secretos se dejaron sin vencimiento configurado; invoker tagging sin condición
+horaria. Esto no convierte la vigencia del token Meta en perpetua: no se verificó su TTL.
+La sesión OAuth de la herramienta y su duración no controlan la vida del despliegue.
+
+
+## Lectura operacional de cola sin contactos
+
+Usar el acceso PostgreSQL canónico con perfil autorizado; estas consultas son sólo lectura
+sobre recibos y no sustituyen una comprobación provider. No seleccionar encrypted_payload_json,
+contactos, cookies o secretos para diagnosticar estados.
+
+```sql
+SELECT destination, state, COUNT(*) AS deliveries,
+       MAX(attempts) AS max_attempts, MIN(updated_at) AS oldest_updated_at
+FROM greenhouse_growth.measurement_delivery
+GROUP BY destination, state
+ORDER BY destination, state;
+
+SELECT COUNT(*) FILTER (WHERE encrypted_payload_json IS NOT NULL) AS encrypted_material,
+       COUNT(*) FILTER (WHERE encrypted_payload_json IS NOT NULL
+         AND occurred_at < CURRENT_TIMESTAMP - INTERVAL '48 hours') AS pending_retention
+FROM greenhouse_growth.measurement_conversion;
+```
+
+Conteo cero no certifica un fallo ni una entrega; puede no haber fuentes elegibles consentidas.
+queued/sending requiere revisar cadencia/lease/flags; dead_letter requiere safe_error_class y
+ventana/intentosedad; http_accepted es ack, no atribución. Los comandos de provisioning,
+audiencias y Preview son mutantes: no ejecutarlos como una lectura ni recrear secretos/IDs
+para corregir un diagnóstico. No se añadió cockpit/API de gestión de esta cola.

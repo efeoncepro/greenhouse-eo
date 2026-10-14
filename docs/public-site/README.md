@@ -143,3 +143,13 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   consecuencias, enlaces a ADR/EPIC/TASK, y reglas duras si aplica.
 - Al aceptar/cambiar un PDR, actualizar el índice de arriba y, si toca el orden
   de ejecución, `PRODUCT_ROADMAP.md`.
+
+
+## Consentimiento y matching compartidos
+
+[Contrato HubSpot/host](../reference/measurement-gtm-ga4/09-hubspot-consent.md) y
+[runtime implementado](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+son el canon de banner automático, preferencias inline, PageView consentido y contexto portable.
+Host distribuye el bridge común y embebe Forms/Meetings; no replica lógica de matching ni secretos.
+Matching released no autoautoriza un formulario/host nuevo; conserva el scope publicado.
+La política administrable sigue propuesta sin GO. No activar tracking en rutas privadas/tokenizadas.

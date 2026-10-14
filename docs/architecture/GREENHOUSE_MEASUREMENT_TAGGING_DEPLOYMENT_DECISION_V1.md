@@ -77,3 +77,14 @@ añade la dirección servidor elegida por el operador y [runbook 08](../referenc
 El snapshot/drift implementado sólo cubre `GTM-NGHPGRLZ` web; no demuestra sGTM/CAPI.
 Server requiere inventario, Clients/templates, ingress y readback Meta propios, con exports
 redactados porque los tags pueden contener tokens. Provisión/publicación fueron autorizadas posteriormente; estado vivo en la auditoría CAPI.
+
+
+## Readout posterior de implementación — 2026-10-13
+
+PR254/main d692ab51dc48 released, Server6/Web5; backend único MetaLead y GoogleUPD dedicado
+sin events. [Contrato implementado10](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+Las tres capas permanecen separadas: publicar formulario, habilitar matching y configurar
+provider/audiencias. Hoy matching tiene listas en código backend+Client; requiere release y
+publishGTM para ampliarlas. [Propuesta configurable](GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
+pendiente de GO, no cambia esta regla por estar documentada. Snapshotweb antiguo etiquetado;
+no constituye una nueva verificación de paridad live ni de entrega CAPI.

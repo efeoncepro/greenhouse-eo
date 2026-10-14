@@ -46,6 +46,12 @@ y skill `greenhouse-gtm-ga4-operator`: Lead backend comercial aceptado, gate de 
 identidad estable, readback Server en Meta y dedupe si se usa Pixel complementario.
 Configuración/tag disparado no prueba recepción, atribución ni match quality; no publicar
 ni provisionar desde una recomendación de paid media.
+[Contrato de matching](../../../../docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md):
+Meta recibe Lead único de backend; Google recibe user_data MP dedicado sin events, mientras
+GA4 conserva generate_lead browser. Consentimiento por finalidad, GPC y elegibilidad fuente
+son gates distintos. CAPI no crea audiencias Meta/Customer Match ni campañas automáticamente;
+Google UPD y siete audiencias configuradas no acreditan volumen/elegibilidad/serving.
+Primera conversión comercial consentida post-activación sigue pendiente de observar.
 
 ## 4. Signal loss post-cookie (los tres pilares)
 

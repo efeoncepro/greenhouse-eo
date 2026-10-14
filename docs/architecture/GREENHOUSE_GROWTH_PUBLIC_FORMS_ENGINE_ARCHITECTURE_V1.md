@@ -752,6 +752,38 @@ Event payloads must not include raw field values, email, phone, document names, 
 
 Client-side GTM events are behavioral analytics. The authoritative conversion ledger remains Greenhouse server-side: `received`, `accepted`, `delivered`, `failed`, `dead_letter` and `qualified_handoff` come from the submission and destination-attempt records, not from the browser alone.
 
+### 15.2 Matching publicitario backend — TASK-2034, 2026-10-13
+
+El [contrato runtime completo](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+complementa esta arquitectura; la [evidencia del release](../audits/releases/2026-10-13-full-develop-matching-release.md)
+separa activación de recepción de una conversión comercial real. No modifica el contrato HubSpot.
+
+Los renderers de Forms y Meetings adjuntan `measurementContext` al POST gobernado, sin enviarlo a
+telemetry. Se lee del puente de categorías HubSpot en el momento del envío: versión de política,
+timestamp, categorías, GPC y cookies reales permitidas. El backend exige publicidad consentida,
+GPC falso y contexto vigente (10 min); `Sec-GPC: 1` también bloquea. Google UPD exige además
+analítica consentida e identificador GA4 real. El consentimiento para procesar un formulario
+no reemplaza publicidad. No se inventan cookies, apellidos ni IDs GA4.
+
+`submitForm` prepara los hashes con `normalizedFields.email/phone/firstName/lastName` y cifra la
+proyección AES-256-GCM. `persistAcceptedSubmission` inserta la conversión y sus destinos junto a la
+aceptación, con un SAVEPOINT que permite omitir medición ante un fallo sin romper el commit de
+negocio. `(source_kind, source_id)` evita otra conversión; el UUID externo es independiente del PK.
+El worker existente procesa `meta` y `google_upd`: máximo 5 intentos/24 h, lease/CAS y eliminación
+del payload cifrado a 48 h. Recibo HTTP no equivale a procesamiento o audiencia utilizable.
+
+Cobertura actual fija en backend **y** Client sGTM: `efeonce-aeo-diagnostic`,
+`efeonce-seo-diagnostic`, `efeonce-desarrollo-web-cotizacion`, `efeonce-lead-gen-web`,
+`efeonce-social-audit`, `ai-visibility-grader`; origins HTTPS `efeoncepro.com` y
+`think.efeoncepro.com`, surface obligatoria y URL pública saneada sin query/fragment.
+No son elegibles automáticamente todas las Forms. Las definiciones, versiones y bindings son
+configurables, pero **la autorización de matching por formulario aún no lo es**.
+La propuesta para administrarla/publicarla sin release está sin GO y no implementada.
+
+Meta recibe Lead por ingreso autenticado al contenedor Server; el sender Lead derivado del mirror
+GA4 está retirado. Google recibe datos de usuario por MP **sin events**; conserva un solo
+`generate_lead` desde el navegador. PII/hash permanecen fuera de dataLayer y parámetros GA4 ordinarios.
+
 ## 16. Progressive profiling
 
 The engine may support progressive profiling, but only under explicit privacy rules.

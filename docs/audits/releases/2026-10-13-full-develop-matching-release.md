@@ -78,6 +78,36 @@ Credencial Production `service_account_key`, principal greenhouse-portal@efeonce
 refs pinned versión1. Secretos sin TTL/expireTime, IAM tagging sin condición temporal.
 La configuración es permanente; las sesiones OAuth de las herramientas tienen su ciclo propio.
 
+## Hosting, costo y permanencia
+
+Se recuperó el mismo contenedor `GTM-K2X4ZTTK` en el proyecto canónico **efeonce-group**,
+región us-central1; no se creó otro proyecto ni se solicitó cuota Google. Tagging
+`efeonce-gtm-tagging-00001-4qp` y preview `efeonce-gtm-preview-00001-vf2`:
+1vCPU/512MiB, concurrencia80, timeout60s, instance-based, CPU sin throttling ni startup
+boost, min servicio/revisión0 y max servicio/revisión1. Imagen oficial fijada:
+`gcr.io/cloud-tagging-10302018/gtm-cloud-image@sha256:490cd41aad58406d44853ddc6f2be58c5d9a1d13bc75c8f92fee076891d6ed74`.
+SA `efeonce-gtm-runtime@efeonce-group.iam.gserviceaccount.com`, sin roles de datos del proyecto.
+Readback de recuperación: `cloud-run-rehost-receipt.json`; asociación y salud verificadas.
+El matching reutiliza Ops y su cadence Forms; no añade otro servicio/cron de procesamiento.
+
+**Costo de referencia verificado el13/10, no factura ni tarifa plana:** escenario30d
+si una instancia de1vCPU/0.5GiB permanece siempre encendida: **USD49,25 bruto**; dos,
+USD98,50. Excluye free tier, red, logs, impuestos y otros servicios. Tarifas de ese snapshot:
+USD0,000018/vCPU-s y USD0,000002/GiB-s de us-central1 instance-based.
+[Fuente oficial consultada](https://cloud.google.com/run/pricing), recibo
+`gtm-cost-and-rollback.json`. Free tier compartido por cuenta:240.000vCPU-s/450.000GiB-s,
+no restarlo por servicio ni asumirlo disponible. Min0 permite escalar a cero; no garantiza
+costo cero. Max1 por servicio limita capacidad y no es un tope monetario. Preview debe
+cerrarse tras QA; no se verificó factura histórica ni costo efectivo mensual del nuevo uso.
+La [cronología de costo y reautorización](../measurement/META_CAPI_RECOVERY_2026-10-13.md)
+preserva el primer intento revertido y la comparación con la infraestructura original.
+
+Permanencia verificada en `permanent-configuration-readback.json`: tres secretos sin
+TTL/expireTime, invoker tagging sin condición horaria, repo vars/captura durables.
+GoogleAuth/Cloud Run renuevan sus access tokens de runtime; la sesión OAuth de herramientas
+no impone una hora de vida al servicio. **No se verificó TTL/renovación del token Meta**;
+configuración permanente no equivale a credencial de proveedor perpetua.
+
 ## Matching y límites de evidencia
 
 [Contrato](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13).

@@ -1,5 +1,13 @@
 # ADR — Meta CAPI mediante el contenedor GTM Server de Efeonce
 
+> **Readout vigente de implementación (13/10/2026):** Server6/Web5, matching activo,
+> PR254/main d692ab51dc48 y manifest released. Primera conversión comercial consentida
+> post-activación sin observar. [Contrato construido](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+> y [release/recibos](../audits/releases/2026-10-13-full-develop-matching-release.md).
+> La metadata inicial y los deltas previos se conservan como cronología de la decisión;
+> sus estados «pendiente» describen ese checkpoint. El cierre autorizado al final actualiza
+> la implementación; la dirección GTM Server continúa Accepted.
+
 - Status: Accepted.
 - Decision boundary: dirección del carril servidor; implementación/recuperación pendiente.
 - Date: 2026-10-13.
@@ -141,3 +149,30 @@ el override formal de batch y demás gates de release siguen siendo obligatorios
 Persistencia de rollout del worker: GitHub repo vars de los tres switches → env del workflow
 → deploy.sh, replicando AUTH_SERVER_GC_ENABLED; defaultOFF hasta SQL/cutover. Cambiar
 repo vars y env servido juntos, también al apagar; retentionON durante rollback.
+
+
+## Cierre de implementación autorizado — 2026-10-13
+
+Este cierre implementa la dirección Accepted bajo las autorizaciones posteriores del operador
+para consentimiento, hosting con límites, matching/Google y release íntegro develop→main.
+No vuelve retroactivamente autorizadas las acciones de los checkpoints anteriores.
+PR254/main d692ab51dc48, manifest released; Server6/Web5, SQL aplicada, cuatro flagsON y
+secretos verificados dentro del worker. [Evidencia y rollback](../audits/releases/2026-10-13-full-develop-matching-release.md).
+
+El emisor actual Meta Lead es exclusivamente backend: aceptación/confirmación persistida,
+snapshot granular/GPC, proyección cifrada, UUID/tiempo durables, retries por destino y Client
+sGTM autenticado31/trigger33. Retirados los emisoresMeta12/17 basados en GA4. Esto sustituye
+el transporte Lead de recuperación inicial descrito arriba; PageView11 y espejoGA4 continúan.
+Forwarding sólo ClientGA4, sin segunda conversión; GoogleUPD dedicado user_data sin events.
+No PII/hash en parámetros ordinarios/dataLayer. [Contrato completo](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+
+Se preserva elegibilidad explícita, hoy seis slugs y una pareja scheduler/surface enumerados
+**en backend y Client sGTM**. Publicar otro formulario no autoriza matching automáticamente.
+[Configuración escalable](GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) es
+Proposed, pendiente de GO, sin schema/API/UI/Client/release implementado por documentarla.
+
+GoogleUPD/ack y siete audiencias90d activos no prueban serving/calidad. Test Events Processed
+con hashes y canaries de cola/credenciales no sustituyen primera fuente comercial consentida
+post-flip ni dedupe de atribución; TASK2034 queda parcial por esa aceptación restante.
+Rollbackmatching: capture/sendersOFF durable+live, retentionON, Server5 sólo tras backendOFF,
+conservar key48h/SQL/recibos. Config persistente no afirma tokenMeta perpetuo ni costo cero.

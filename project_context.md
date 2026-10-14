@@ -244,7 +244,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo componer Globe con Wave para producir experiencias launch-ready | `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md` + skills gemelas `greenhouse-globe` |
 | Cómo se administran créditos y capabilities de los usuarios de Globe (y por qué la llave de aprobación nunca sale de su runtime) | `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015) + `TASK-1566` + `.claude/rules/globe-administration.md` |
 | Cómo razona, documenta y se autoevalúa el arquitecto Codex | skill `software-architect-2026` + `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md` + `evals/software-architect-2026/` |
-| Cómo opera el scheduler nativo, su booking/medición y la plataforma portable Forms/CTAs/Meetings | `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md` + `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md` + `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md` + skill `greenhouse-growth-meetings` |
+| Forms/CTAs/Meetings, consentimiento y matching | `docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md` + skills `greenhouse-growth-forms`, `greenhouse-growth-meetings`, `greenhouse-gtm-ga4-operator` |
 | Qué significa para producto/negocio | `docs/context/00_INDEX.md` + docs funcionales |
 | Cómo lo opera una persona/agente | `docs/manual-de-uso/**` y runbook aplicable |
 
