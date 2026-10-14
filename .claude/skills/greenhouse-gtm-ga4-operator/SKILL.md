@@ -104,6 +104,15 @@ persistencia nueva. Canon `scripts/measurement/hubspot-consent-ui.*` + builder; 
 distribuyen assets idénticos y sólo en rutas con medición. No reemplazar los hijos que administra
 el renderer nativo ni llamar `setHubSpotConsent` para este diseño. Revalidar selectores, categorías,
 reapertura, retiro, GPC y a11y al tocarlo; [rollout](../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+Procedimiento de UI: [manual operativo](../../../docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md).
+`node scripts/measurement/verify-hubspot-consent-ui.mjs --inject-local` revisa antes de publicar;
+`--live` consume assets publicados. Ambos interceptan `/g/collect` con 204: prueban UI/gates,
+no entrega Meta Server ni GA4. El PASS visual no cierra la primera conversión comercial pendiente.
+Conservar rutas Think `analytics=false` sin tracking/banner/UI; no usar el prototipo como CMP.
+Revalidar GPC por separado: el proveedor puede resolver denegación y omitir el aviso nativo.
+Builder genera ambos consumidores con tokens/fonts/licencias y hashes; no editar distribuciones.
+El manual reúne procedencia, QA, publicación acotada, rollback y la incidencia CLI cuya renovación
+sigue pendiente. No ejecutar Vercel ni rotar credenciales por un cierre documental.
 Gates: **no usar regex `.+` para validar event_id**: acepta missing/`undefined` como string.
 Exigir UUID anclado y probar ausente + literal `undefined`; una prueba sintética alcanzó Meta
 antes de corregirlo. Positivos sólo con `test_event_code` real verificado; nunca un código inventado.

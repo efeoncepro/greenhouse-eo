@@ -21,6 +21,40 @@ Al cambiarlo, revalidar selectores nativos, categorías, GPC, a11y y bridge. Nun
 Dirección, alternativas, estados y evidencia: [dossier de privacidad](../../../../docs/ui/visual-directions/EFEONCE_COOKIE_PRIVACY_2026-10-13.md).
 Estado: publicado en ambos hosts y verificado en escritorio/móvil; [readback y rollback](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 
+### Producción y mantenimiento de esta aplicación
+
+Corte publicado: WP `8d6ff95` (`eo-measurement-consent` 1.1.0) y Think `f7d8f36`, verificado el
+2026-10-14 UTC / 13 de octubre en Chile. La aprobación alcanza esta aplicación pública; no convierte
+el adapter en un componente portable de AXIS ni migra otra UI de producto.
+
+- **Fidelidad:** CSS generado desde `efeonceGraphicLine`, geometry, motion, typography, elevation,
+  button y forms; el builder exige primitives 0.6.6/tokens 0.6.1. Las fuentes Bricolage variable y
+  Poppins 400/500 son WOFF2 locales con licencias. No editar CSS/fonts distribuidos a mano: el canon
+  en Greenhouse genera ambos consumidores y su manifest de hashes.
+- **Compatibilidad:** el JS atiende sólo los dos hosts públicos, espera el DOM tardío con
+  `MutationObserver` y añade hermanos de presentación; no reemplaza hijos administrados por HubSpot.
+  Conserva controles, handlers, detalles/accordions y enlace de política real. Ajusta etiquetas ARIA y
+  retira `aria-pressed` inválido del checkbox sin cambiar `checked`. Las preferencias conservan también
+  «Aceptar todas» nativo; el layout del prototipo no es un reemplazo literal del renderer productivo.
+- **Fallback y límite:** la UI nativa sigue siendo la autoridad y el estado abierto/cerrado lo conserva
+  HubSpot. Esto no garantiza compatibilidad ante cambios de sus IDs/clases: no hay un fallback
+  productivo nuevo ni persistencia propia que los sustituya. Si cambia el proveedor, revalidar y,
+  si hace falta, retirar/revertir sólo el adapter mediante el procedimiento del rollout.
+- **QA de referencia:** ambos hosts × 1440/390 desde assets públicos, sin inyección; aviso automático,
+  publicidad sin analítica, recarga, reapertura y retiro, axe WCAG A/AA sin violaciones. Con GPC activo,
+  HubSpot resuelve categorías denegadas y no monta el aviso opt-in: es una excepción verificada al
+  estado inicial, no permiso implícito. CSS conserva `prefers-reduced-motion`.
+- **Qué no prueba:** la regresión intercepta el transporte de medición para no contaminar destinos;
+  no acredita un nuevo PageView/Lead recibido por Meta Server, ni una conversión comercial real.
+  Think `analytics=false` continúa sin cargar medición ni este adapter.
+
+Para cambiar copy, proporción o estados, revisar primero
+`scripts/measurement/hubspot-consent-ui.js` y `hubspot-consent-ui.template.css`; comprobar procedencia
+antes de ejecutar `node scripts/measurement/build-hubspot-consent-ui.mjs` (escribe en ambos repos
+hermanos). La regresión `node scripts/measurement/verify-hubspot-consent-ui.mjs --inject-local`
+permite revisar antes de publicar; `--live` verifica los assets publicados. Mantener aprobaciones,
+distribución y readback como pasos distintos, con el scope de cada host explícito.
+
 > Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.

@@ -249,6 +249,17 @@ producción desde el 2026-10-12.
 
 ## Analytics / GA4 (medición)
 
+### Consentimiento público y aislamiento de Think — adopción 2026-10-13
+
+El contrato vigente está en [consentimiento HubSpot](../../../docs/reference/measurement-gtm-ga4/09-hubspot-consent.md)
+y el [manual operativo de cookies](../../../docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md);
+para medición, prevalecen sobre el resumen histórico siguiente. `BaseLayout.astro` carga UI La órbita,
+bridge, HubSpot y GTM sólo con `analytics=true`. Con `analytics=false`, informes privados y previews
+permanecen sin scripts de medición/banner/UI. La ruta `/preview/cookies` demuestra diseño con estado
+efímero; no gobierna preferencias. Producción viste controles nativos y HubSpot conserva elección,
+categorías, persistencia y `showBanner`; no convertir el prototipo en CMP ni habilitar tracking desde él.
+La adopción de presentación no cambia el contrato de eventos o matching.
+
 efeonce-think mide con la **misma propiedad GA4** que efeoncepro.com (funnel unificado; subdominio = mismo stream, `486264460`). El snippet **GTM (`GTM-NGHPGRLZ`)** vive en `BaseLayout.astro`: `<script is:inline>` con el loader en `<head>` (`is:inline` SÍ — evita que Astro bundlee el snippet) + `<noscript>` **SIN** `is:inline` (esa directiva es solo para `<script>`/`<style>`; en `<noscript>` Astro 7 estricto puede colarla como atributo raro — flag de Copilot, fix PR #11). El `page_view` lo dispara un GA4 Config gateado por hostname DENTRO del container (no en el sitio Astro); los `<greenhouse-form>` ya emiten `gh_form_*` → conversiones medidas por construcción.
 
 - **SIEMPRE** que se sume un host/sitio nuevo del ecosistema → hereda/instala el tag GA4 (mandato Tracking Engine §19.2/§19.5). Contrato + patrón + gotchas: `greenhouse-eo/docs/reference/measurement-gtm-ga4/` + skill `greenhouse-gtm-ga4-operator`.

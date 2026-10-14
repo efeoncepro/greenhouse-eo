@@ -4,6 +4,7 @@
 
 Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
+Auditoría documental 14/10 con tres subagentes: [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills al día.
 
 [Release completo y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md): PR254,
 main d692ab51dc48, orquestador38483437158 success y manifest released; CI/Deep/build/smoke PASS.
@@ -24,7 +25,9 @@ Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo p
 Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
 ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
 
-Fuentes desplegadas previas versionadas localmente: WP `cf7f10d1c` (plugin2archivos), Think `63e9fa7c7` (layout/home/bridge3archivos); sin push/deploy.
+El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
+WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
+Panel/categorías/GPC verificados; QA intercepta transporte y no prueba nuevas recepciones Meta. Renovación de credencial CLI expuesta sigue pendiente en el dossier.
 
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 

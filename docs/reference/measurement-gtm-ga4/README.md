@@ -45,7 +45,9 @@ antes de afirmar drift cero; el estado publicado6/5 se respalda en el dossier de
 > Frescura: GA4/GTM cambian cada trimestre (consent mode, features de reporting, límites). Antes de afirmar un límite exacto o una regla volátil, reverificar contra la doc oficial citada en cada archivo.
 
 Consentimiento HubSpot y sender publicado: [09-hubspot-consent.md](09-hubspot-consent.md);
-estado vigente **Server6/Web5**, backend único de Lead y Google UPD en [contrato de runtime](10-growth-lead-matching-runtime.md).
+lectura funcional del [panel de cookies](../../documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante)
+y [manual de operación](../../manual-de-uso/growth/operar-consentimiento-cookies-publico.md).
+Estado vigente **Server6/Web5**, backend único de Lead y Google UPD en [contrato de runtime](10-growth-lead-matching-runtime.md).
 La [recuperación inicial](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md) conserva la cronología 5/5;
 el [release completo y activación](../../audits/releases/2026-10-13-full-develop-matching-release.md) acredita
 la configuración activa. Primera conversión comercial consentida post-activación todavía sin observar.

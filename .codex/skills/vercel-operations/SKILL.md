@@ -60,12 +60,38 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
 - Keep AXIS package credentials scoped to the build system and Secret Manager. Never expose the token
   through a Vercel runtime variable, image, artifact, deployment log, or client bundle.
 
-Canonical AXIS pointers: [shared UI platform ADR](../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
-and [private package consumption runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+Canonical AXIS pointers: [shared UI platform ADR](../../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
+and [private package consumption runbook](../../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 - Do not repoint shared aliases like `pre-greenhouse` to a branch preview until that preview has passed a minimal auth smoke:
   - `vercel curl /api/auth/session --deployment <url>`
   - expected without session: `200 {}` or another non-500 response
 - When reporting results, always include the exact branch, project, environment, deployment URL, domain alias, and whether protection/auth blocked validation.
+
+## Salida de la CLI y credencial del wrapper
+
+Incidencia verificada en el despliegue público de consentimiento del 13/10/2026: el wrapper local
+inyectó una credencial en `argv` y `vercel ls --yes` la reprodujo en la sugerencia de paginación.
+No repetir la llamada para reproducirlo, ni inspeccionar/imprimir secretos para documentarlo.
+Renovación/revocación sigue pendiente; el cierre documental no la autoriza ni la da por realizada.
+Evidencia saneada y alcance: [rollout de consentimiento](../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+
+Antes de cualquier comando de las secciones siguientes en este entorno:
+
+- Capturar **stdout y stderr antes de mostrar** el resultado, incluido exit code, en un canal local
+  controlado. No devolver la salida cruda de un wrapper autenticado a la conversación.
+- Sanear argumentos de credencial y sugerencias completas de siguiente página; preferir extraer sólo
+  campos permitidos (estado, ID de deployment, alias, commit). No asumir que logs, errores o texto de
+  ayuda son seguros. La redacción debe ocurrir antes de cualquier impresión o adjunto.
+- `max_output_tokens` sólo trunca: no es un filtro de secretos. No colocar tokens explícitos en
+  comandos, copiar recomendaciones de paginación sin revisión ni habilitar trazas de shell.
+- Si no se puede garantizar salida saneada, usar el MCP/provider autorizado u otra lectura segura;
+  no ejecutar la CLI a ciegas. Capturar la salida reduce la exposición en conversación, pero no elimina
+  el riesgo de un token en `argv`; no afirmar que la incidencia quedó resuelta por filtrar texto.
+- Tratar renovación/revocación como operación separada, con alcance y verificación de
+  `greenhouse-secret-hygiene`. Una petición docs-only no concede ese cambio ni permite leer el valor.
+
+Esta skill ya existe sólo en el bundle Codex local. Este aprendizaje no crea un bundle Claude ni
+cambia el contrato de los productos o la autorización necesaria para publicar.
 
 ## Workflow
 

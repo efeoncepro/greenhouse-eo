@@ -11,6 +11,7 @@
 
 - Diseño de consentimiento La órbita autorizado y adoptado mediante adapter de presentación sobre HubSpot;
   [rollout WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md). Categorías y persistencia nativas, sin cambios de matching.
+- Auditoría documental 14/10 con tres subagentes: contrato/recibo, capa [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual operativo](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills; límites de QA y pendiente de seguridad explícitos.
 
 - [ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
   [contrato HubSpot](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md) y

@@ -18,10 +18,12 @@ automatizaciones CRM, píxeles web de HubSpot Ads ni otras integraciones por inf
 ni usar `allowed`: también puede ser true sin banner o en modo sólo notificación.
 Sólo boolean true concede cada categoría; desconocido/faltante/denegado bloquea.
 GPC true fuerza publicidad denegada. No crear cookies ni persistir preferencias propias:
-El banner aparece automáticamente cuando falta una elección HubSpot; el control legal
-sólo reabre preferencias después. La verificación de primera visita debe observar el banner
+El banner aparece automáticamente cuando falta una elección HubSpot y la política requiere
+opt-in. Con GPC, el proveedor puede resolver la elección a denied sin mostrar aviso; ese caso
+se verificó en ambos hosts y no equivale a aceptación. El control legal permite reabrirlo después. La verificación de primera visita debe observar el banner
 antes de tocar ese control, aceptar sólo publicidad y correlacionar UUID navegador→Meta.
-HubSpot conserva la elección; `showBanner` permite cambiarla desde «Preferencias de cookies»,
+HubSpot conserva la elección; `showBanner` permite cambiarla desde «Preferencias de cookies»
+(puede abrir primero el aviso, seguido de «Personalizar preferencias»),
 un control de texto integrado con los enlaces legales del pie. No crear una franja/botón
 destacado independiente debajo del contenido. En Think home, el pie legal queda dentro
 del hero existente, sin prolongar su altura ni introducir otro fondo.
@@ -46,10 +48,17 @@ el banner ni se crea persistencia propia. Botones, checkboxes, categorías y han
 siendo HubSpot. El listener/default/bridge anteriores no cambian. Los nodos de presentación
 se agregan como hermanos, sin reemplazar los textos que administra el renderer del proveedor.
 Las etiquetas pintadas y ARIA se adaptan; el estado accesible usa el `checked` nativo.
+El copy del adapter es presentación local: no modifica textos ni políticas guardadas en HubSpot.
+La elección se lee del listener nativo; nunca de un toggle visual, de la existencia del banner
+o del estado efímero del prototipo. `gh_privacy_consent_updated` identifica
+`consent_source=hubspot_categories`; el contexto de conversión conserva esa fuente y su versión
+de política propia, sin reemplazarlas por la versión del diseño.
 
 Canon: `scripts/measurement/hubspot-consent-ui.js`, `hubspot-consent-ui.template.css` y
 `build-hubspot-consent-ui.mjs`; distribuciones byte-idénticas en `consent-ui/` de los dos hosts.
-WP plugin 1.1.0 y BaseLayout Think cargan assets con hash, sólo en superficies con medición.
+WP plugin 1.1.0 carga assets en el frontend del host canónico; BaseLayout Think los carga
+sólo con `analytics=true`. Ambos usan hash en URL. El flag de routing WP gobierna transporte,
+no habilita/deshabilita esta presentación.
 `analytics=false` sigue excluyendo banner, bridge, UI y trackers.
 [Publicación, pruebas y rollback](../../audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 
@@ -61,7 +70,8 @@ WP plugin 1.1.0 y BaseLayout Think cargan assets con hash, sólo en superficies 
 - WordPress: recuperación inicial con plugin nuevo y release de sólo dos archivos, hashes/prestate/backup, cache de
   plugins invalidada antes de activar. Header antes de Site Kit/GTM; HubSpot loader existente.
   Opción `eo_measurement_server_routing=enabled` coordina routing y `send_page_view=false`.
-  Plugin 1.0.3: preferencias inline en el pie Ohio; sin bloque visual después del footer.
+  Plugin 1.0.3 introdujo preferencias inline en el pie Ohio; 1.1.0 conserva ese montaje
+  y suma la presentación La órbita, sin bloque visual después del footer.
 - Think: BaseLayout instala default/bridge/loader HubSpot antes de GTM; `analytics=false`
   no incluye ninguno ni el botón, conservando informes con credenciales sin tracking.
 - `gh_privacy_consent_updated` actualiza preferencias; no es una conversión.

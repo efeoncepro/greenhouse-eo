@@ -1,11 +1,17 @@
 # Registro de decisiones y versiones
 
-### 2026-10-13 — Privacidad pública: dirección solicitada, diseño candidato
+### 2026-10-13 — Privacidad pública: propuesta, aprobación y adopción publicada
 
 Decisión posterior del operador: «Vamos, ponla». Autoriza adopción en ambos sitios.
 Publicado sobre controles HubSpot, sin CMP ni persistencia nueva; publicidad-only, retiro,
 reapertura y a11y verificados en ambos hosts × escritorio/móvil. Think `f7d8f36` / WP `8d6ff95`.
 [Rollout y límites](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+Readback del 2026-10-14 UTC / 13 de octubre Chile: WP plugin 1.1.0 y Think Production Ready;
+CSS/JS/fuentes/licencias idénticos en ambos hosts. QA nativa preserva elección al recargar y GPC
+resuelve analítica/publicidad denegadas sin aviso opt-in. El PASS visual/consentimiento no es un nuevo
+recibo Meta Server: las pruebas interceptaron el transporte y no crearon leads ni reservas.
+El adapter es presentación específica para estos dos consumidores, con dependencia de selectores
+HubSpot; no se canoniza una CMP propia, un contrato AXIS nuevo ni permisos adicionales de medición.
 El párrafo siguiente conserva el estado de la primera propuesta.
 
 «Quiero algo mucho más moderno, premium y elegante que vaya mucho con la efeonce-graphic-line»
@@ -50,6 +56,7 @@ solo en memoria y no escribe consentimiento real. Dirección y QA en
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-13 | Privacidad pública: tras pedir una experiencia moderna/premium/elegante afín a La órbita, el operador autoriza «Vamos, ponla». Se adopta papel/navy, Bricolage/Poppins, aviso compacto y preferencias responsive en WordPress/Think. El footer conserva el enlace legal discreto; HubSpot conserva consentimiento y persistencia. Aplicación publicada y verificada; no habilita la propuesta escalable de medición ni migra otros productos. [Aplicación y mantenimiento](applications.md#producción-y-mantenimiento-de-esta-aplicación). |
 | 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |
 | 2026-10-10 | Deck **Marketing de Contenidos** aprobado (brochure de 57 láminas, línea Brand, ruta corta de 21; «Me encantó todo, queda aprobado»). Deja cuatro cosas en el canon: el patrón **franjas de foto** en seis y tres franjas, con tres excepciones sólo para él (una esfera por franja, foto de cine recortada, degradado bajo el título); la lámina a mano **«Producción con IA»** con la foto `CT24` en el índice de cine; **«Día a día»** con una interfaz de Marketing Studio **construida, no capturada**, como uso de `content-day-tools`; y la lámina de equipo **«Expertos multidisciplinarios»** con «+85 expertos más en Latam» («Personas reales» deja de ser el titular preferido). No se envía a un prospecto hasta cerrar sus pendientes (compromisos de servicio, «+85» sin fuente, logos de terceros). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y deltas 2026-10-10 (a–e); catálogo: `deck-recipes/README.md`. |
 | 2026-10-09 | Deck **Servicios web y digitales** aprobado (brochure de 29 láminas, línea Engine; «este deck está listo»). Fija que una pieza de línea lleva el **fondo Efeonce `#001A33`** y sólo el acento de la línea (`#091951` es de piezas de producto), una variante de `decision-case` sin foto del caso y la lámina «Dónde construimos». Pendientes antes de enviarlo: cifras de los casos Aguas Andinas (marcadores) y Berel. Norma: §4.6, «Deck Servicios web». |
