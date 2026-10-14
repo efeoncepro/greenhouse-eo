@@ -64,7 +64,7 @@ export const resolveMeasurementSource = async (scope: MeasurementPolicyScope): P
   if (allowed.length && !allowed.includes(definition.slug)) reasons.push('surface_out_of_scope')
   if (!origins.length) reasons.push('origin_out_of_scope')
 
-  return { scope, name: definition.name, sourceVersion: version?.form_version_id ?? '', origins,
+  return { scope, name: definition.name, formSlug: definition.slug, sourceVersion: version?.form_version_id ?? '', origins,
     fields: matchingFieldCatalog(version?.field_schema_json, version?.validation_schema_json), blockingReasons: reasons }
 }
 

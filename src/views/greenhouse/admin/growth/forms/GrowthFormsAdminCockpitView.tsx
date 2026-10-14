@@ -1661,7 +1661,7 @@ const GrowthFormsAdminCockpitView = ({ data, canRevealPii }: { data: GrowthForms
         </Stack>
       </Box>
 
-      <MeasurementPolicyPanel />
+      <MeasurementPolicyPanel preferredFormSlug={selectedForm.slug} />
 
       <DeliveryPathPanel steps={selectedDeliveryPath} />
 

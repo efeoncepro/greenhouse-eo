@@ -100,3 +100,13 @@ Status is aria-live polite, error feedback uses Alert and retains focus/input. K
 source, destinations, typed field mapping and the next action in DOM order. Disabled controls
 have adjacent reasons. Reduced-motion retains identical meaning; desktop/mobile checks include
 visible focus and overflow measurements. Section marker: measurement-policy-panel.
+
+## First-fold review — 2026-10-14
+
+ACCEPT FIRST FOLD for composition: staging fa654bd97, screenshots
+.captures/2026-10-14T13-32-16_growth-measurement-policy/{01-desktop,02-mobile}/frames/01-measurement-policy-first-fold.png
+were inspected. The existing inspector, readable labels/status and vertical mapping fit desktop
+and390px without overlap or horizontal overflow. Axe, runtime and enterprise rubric passed.
+Keyboard gate found a missing ring on the focused select; fixed in db0159c3e using the native
+primary token. This is visual composition acceptance, not final functional/accessibility acceptance;
+repeat GVC after wiring the full lifecycle. No local application server/build is required.

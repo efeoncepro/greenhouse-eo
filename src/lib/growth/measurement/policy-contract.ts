@@ -33,7 +33,7 @@ export interface MeasurementPolicyRevision {
   scope: MeasurementPolicyScope; config: MeasurementPolicyConfig; publishedRevisionId: string|null
 }
 export interface MeasurementPolicySource {
-  scope: MeasurementPolicyScope; name: string; sourceVersion: string; origins: string[]
+  scope: MeasurementPolicyScope; name: string; formSlug?: string; sourceVersion: string; origins: string[]
   fields: { key: string; type: 'email'|'tel'|'text'; derived?: boolean }[]
   blockingReasons: string[]
 }

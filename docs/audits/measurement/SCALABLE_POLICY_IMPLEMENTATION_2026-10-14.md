@@ -75,3 +75,29 @@ with source and surface archived. Node tests35/35 pass; no provider/business eve
 The final verifier includes cleanup readback in its receipt. Global CI/build must still pass.
 
 Final verifier receipt13:21:30Z: policy8e14f7cc-c1e8-4266-bf69-579dbdbbddf2, source04e72c92-90c3-493d-9507-e03c39cd0093; every lifecycle assertion and independent source/surface cleanup readback passed, process exit0. The success receipt is now emitted after cleanup.
+
+## Transitional Client and functional panel checkpoint — 13:45Z
+
+Server GTM version8 published13:31:42Z, only custom template30. Source digest
+3b24fe3b4712667f87efe71cc20388bf471e8170a64bf53d2e4f5dbe4a30bfad; all other entities
+match version7. The temporary compatibility branch accepts the exact existing v1 scope and
+policy-authorized v2. Preview sandbox31/31 plus three Meta Processed/Server receipts verified
+both branches. Final strict schema2 publication remains required after web/worker convergence
+and old queue disposition; version8 is a transition, not goal completion.
+
+Staging fa654bd97 READY, authenticated catalog200 (13 sources,7 published policies,10 revisions;
+read/author/publish/disable permitted). Desktop/mobile composition inspected and ACCEPT FIRST
+FOLD recorded in the wireframe. Runtime/axe/layout/enterprise checks passed; only focus ring
+failed and was corrected in db0159c3e. Remote lint/typecheck for fa654 passed; its CI was
+superseded by the next develop push while tests ran, not a complete green CI result.
+
+The panel now wires immutable draft/review/publish/disable to Product API, separates published
+head from working revision, retains edits on409/reload, asks before leaving dirty source, and
+keeps the exact command/key across uncertain POST retries. A known write receipt retries GET
+readback only. No success is shown before readback; permissions and typed source blockers
+control actions. New sources default destinations OFF. Compatible source selection follows the
+cockpit's selected form by display-only formSlug metadata; stable source identity is unchanged.
+Twelve focused UI/network tests passed under a512MiB cap, including full lifecycle, unknown
+outcome replay, readback conflict, read-only/disable confirmation and dirty-source handling.
+Full current CI, rendered functional state QA, data-only UI proof and production release remain
+pending. No local dev server, full tsc or build was started.

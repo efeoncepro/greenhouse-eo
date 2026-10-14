@@ -20,7 +20,7 @@
 - Flow: `docs/ui/flows/TASK-2037-measurement-policy-flow.md`
 - Motion: `docs/ui/motion/TASK-2037-measurement-policy-motion.md`
 - Backend impact: `none`
-- Status real: `First fold implementado y readiness PASS; captura local inválida por reinicios/memoria; revisión en staging pendiente antes de lifecycle completo`
+- Status real: `First fold staging aceptado; lifecycle/API, recuperación y permisos implementados;12 pruebas UI/red PASS; QA funcional remota y release pendientes`
 - Rank: `Now`
 - Domain: `data|growth`
 - Blocked by: `TASK-2036`
