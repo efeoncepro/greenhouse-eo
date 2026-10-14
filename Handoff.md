@@ -1,5 +1,9 @@
 # Handoff
 
+## 2026-10-14 — Footer público: Explora Efeonce y partners
+
+[Publicado y verificado](docs/audits/public-site/2026-10-14-footer-explore-partners.md): navegación propia y nueve logotipos de las firmas en gris, responsive. Widgets Ohio; snapshot/rollback durable, hermanos preservados. Home + servicio × 1440/390 PASS; sin cambios de tracking ni Think.
+
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
 [TASK-2035](docs/tasks/to-do/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), to-do: TODO el pendiente acordado (config/API/UI, CRO, abandono/retargeting, newsletter, calidad HubSpot y release/evidencia). Umbrella sobre dueñas existentes; registro14/10, sin implementación/publicación.

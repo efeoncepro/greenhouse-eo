@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "mode": "apply",
+  "home": "https://efeoncepro.com",
+  "frontId": 251731,
+  "expectedSidebarsHash": "51f442f7a1da51b8023645614dfd6558a5b832f945baabd0b702672c23b2125e",
+  "expectedWidgets": {
+    "34": "3958a4c1ffcad4f8c8d0ac95873426d9fe985df691bbcdbbd17294cc5e100f19",
+    "45": "85018d5888289cb1b4c445b4cd07c3e5aff34d59bf37fe3090ad19c57681d28c"
+  },
+  "navigation": "<!-- wp:html -->\n<nav class=\"eo-footer-explore\" aria-labelledby=\"eo-footer-explore-title\"><h2 id=\"eo-footer-explore-title\">Explora Efeonce</h2><ul><li><a href=\"https://efeoncepro.com/#servicios\">Servicios</a></li><li><a href=\"https://efeoncepro.com/#metodo\">Cómo trabajamos</a></li><li><a href=\"https://efeoncepro.com/portafolio/\">Casos de éxito</a></li><li><a href=\"https://efeoncepro.com/blog/\">Blog</a></li></ul></nav>\n<!-- /wp:html -->",
+  "partners": "<!-- wp:html -->\n<style>/* La orbita: color values from axis-tokens efeonceGraphicLine.color; source adapter footer-refresh-v1. */\n#colophon:has([data-eo-footer-partners=\"v1\"])>.page-container>.widgets{display:grid;margin-inline:0;grid-template-columns:1fr 1fr 1.45fr;gap:40px 56px}\n#colophon:has([data-eo-footer-partners=\"v1\"])>.page-container>.widgets>.widgets-column{float:none;width:auto;max-width:100%;padding-inline:0;min-width:0}\n#colophon:has([data-eo-footer-partners=\"v1\"])>.page-container>.widgets>.widgets-column:last-child{grid-column:1/-1}\n#colophon .eo-footer-explore,#colophon .eo-footer-partners{--eo-ft-paper:#f7f8f6;--eo-ft-accent:#36c8bf;font-family:EfeonceConsentText,Poppins,Inter,sans-serif}\n#colophon .eo-footer-explore h2,#colophon .eo-footer-partners h2{font-family:EfeonceConsentDisplay,'Bricolage Grotesque',sans-serif;color:var(--eo-ft-paper);font-size:20px;font-weight:600;line-height:1.3;letter-spacing:-.02em;margin:0 0 20px}\n#colophon .eo-footer-explore ul{padding:0;margin:0;list-style:none}\n#colophon .eo-footer-explore li{margin:0;padding:0}\n#colophon .eo-footer-explore a{display:inline-flex;align-items:center;min-height:40px;padding:4px 0;color:var(--eo-ft-paper);font-size:14px;line-height:1.65;text-decoration:none;background-image:none;opacity:.8}\n#colophon .eo-footer-explore a:hover{color:var(--eo-ft-accent);opacity:1}\n#colophon .eo-footer-explore a:focus-visible,#colophon .eo-footer-partners a:focus-visible{outline:2px solid var(--eo-ft-accent);outline-offset:6px;border-radius:3px}\n#colophon .eo-footer-partners{width:100%;border-top:1px solid color-mix(in srgb,var(--eo-ft-paper) 16%,transparent);padding-top:28px;margin:0}\n#colophon .eo-footer-partners h2{font-size:16px;font-weight:500;color:var(--eo-ft-paper);opacity:.7;margin:0 0 24px}\n#colophon .eo-footer-partner-list{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:24px;align-items:center;list-style:none;padding:0;margin:0}\n#colophon .eo-footer-partner-list>li{display:flex;align-items:center;justify-content:center;min-width:0;min-height:48px;margin:0;padding:0}\n#colophon .eo-footer-partner-list img{display:block;max-width:100%;height:auto;object-fit:contain;filter:grayscale(1);opacity:1;margin:0}\n@media(max-width:1100px){#colophon .eo-footer-partner-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}}\n@media(max-width:900px){#colophon:has([data-eo-footer-partners=\"v1\"])>.page-container>.widgets{grid-template-columns:1fr 1fr;gap:32px}#colophon:has([data-eo-footer-partners=\"v1\"])>.page-container>.widgets>.widgets-column:nth-child(3){grid-column:1/-1}}\n@media(max-width:540px){#colophon:has([data-eo-footer-partners=\"v1\"])>.page-container>.widgets{grid-template-columns:1fr;gap:32px}#colophon .eo-footer-partner-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 16px}}\n</style><section class=\"eo-footer-partners\" data-eo-footer-partners=\"v1\" aria-labelledby=\"eo-footer-partners-title\"><h2 id=\"eo-footer-partners-title\">Nuestros partners</h2><ul class=\"eo-footer-partner-list\"><li><img src=\"{{hubspot}}\" width=\"204\" height=\"57\" style=\"width:92px\" alt=\"HubSpot\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{salesforce}}\" width=\"90\" height=\"63\" style=\"width:41px\" alt=\"Salesforce\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{adobe}}\" width=\"177\" height=\"39\" style=\"width:80px\" alt=\"Adobe\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{microsoft}}\" width=\"219\" height=\"48\" style=\"width:99px\" alt=\"Microsoft\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{aws}}\" width=\"120\" height=\"72\" style=\"width:54px\" alt=\"AWS\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{googlecloud}}\" width=\"240\" height=\"39\" style=\"width:108px\" alt=\"Google Cloud\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{claude}}\" width=\"240\" height=\"51\" style=\"width:108px\" alt=\"Claude\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{openai}}\" width=\"231\" height=\"63\" style=\"width:104px\" alt=\"OpenAI\" loading=\"lazy\" decoding=\"async\"></li><li><img src=\"{{byteplus}}\" width=\"240\" height=\"45\" style=\"width:108px\" alt=\"BytePlus\" loading=\"lazy\" decoding=\"async\"></li></ul></section>\n<!-- /wp:html -->",
+  "assets": [
+    {
+      "key": "hubspot",
+      "file": "hubspot-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/hubspot-navy.png",
+      "sha256": "b613863b5f495a15262f2349368d65c778aeedf82cd0bd861d9517336cc8475c",
+      "name": "HubSpot",
+      "w": 68,
+      "h": 19
+    },
+    {
+      "key": "salesforce",
+      "file": "salesforce-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/salesforce-navy.png",
+      "sha256": "f7f7a07b2744f3dd20129542e6978b17bc51c624cdc65d5bd55039a6590cf708",
+      "name": "Salesforce",
+      "w": 30,
+      "h": 21
+    },
+    {
+      "key": "adobe",
+      "file": "adobe-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/adobe-navy.png",
+      "sha256": "e1c198a399d861b1dd215997a25eda52f82536f0c76bf5016f89dde2998955ef",
+      "name": "Adobe",
+      "w": 59,
+      "h": 13
+    },
+    {
+      "key": "microsoft",
+      "file": "microsoft-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/microsoft-navy.png",
+      "sha256": "c7c008976724692328d211cd119f307da04c141c1e27b07340e674ed91339db2",
+      "name": "Microsoft",
+      "w": 73,
+      "h": 16
+    },
+    {
+      "key": "aws",
+      "file": "aws-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/aws-navy.png",
+      "sha256": "f73509183edb285c02ab335d0e5c2e140df7ee08d0c81c6000dccc913a43c995",
+      "name": "AWS",
+      "w": 40,
+      "h": 24
+    },
+    {
+      "key": "googlecloud",
+      "file": "googlecloud-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/googlecloud-navy.png",
+      "sha256": "59e33c760f64c6cda4f736d8f414a2334b9557a5002bfbbcb7c31c219442056f",
+      "name": "Google Cloud",
+      "w": 80,
+      "h": 13
+    },
+    {
+      "key": "claude",
+      "file": "claude-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/claude-navy.png",
+      "sha256": "50d015127f41d57d15e088d24c1391ef08f9349a58d7db4ddb8bbf6d284dcad9",
+      "name": "Claude",
+      "w": 80,
+      "h": 17
+    },
+    {
+      "key": "openai",
+      "file": "openai-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/openai-navy.png",
+      "sha256": "940a51053b15298f1040dd57f3ff8a78f5e639c8fd692a4c0f586ad94980db01",
+      "name": "OpenAI",
+      "w": 77,
+      "h": 21
+    },
+    {
+      "key": "byteplus",
+      "file": "byteplus-mono.png",
+      "source": "ai-generations/2026-09-26_firma-partners/logos/mono/byteplus-navy.png",
+      "sha256": "cb1f73c61766713d2098c6d9d44107a02f655db047a56ea77249b43b053d1027",
+      "name": "BytePlus",
+      "w": 80,
+      "h": 15
+    }
+  ],
+  "brandColors": {
+    "dark": "#001a33",
+    "teal": "#36c8bf",
+    "halo": "#72ded8",
+    "navy": "#023c70",
+    "tealDark": "#0e8c82",
+    "paper": "#f7f8f6",
+    "productInk": "#091951"
+  },
+  "partnerEvidence": {
+    "source": "Firmas corporativas v3.1 aprobadas 2026-09-26, equipo 2026-09-29; operador solicita mismos partners y gris 2026-10-14",
+    "sourceHTML": "ai-generations/2026-09-29_avatares-equipo/firmas/entregables/firma-julio-reyes/firma-fondo-navy.html",
+    "usage": "Logotipos existentes de firma; no tiers ni insignias de programa inventados"
+  }
+}

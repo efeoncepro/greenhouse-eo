@@ -1617,3 +1617,12 @@ Radio/medidas comunes, loader orbital y flecha opcional. Fuente y ejemplos: [lab
 Verificado contra: axis-design-system@1bccb3f — 2026-10-04; adopción de productos separada.
 
 Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+### Footer WordPress: franja de partners — 2026-10-14
+
+Aplicación publicada en `efeoncepro.com`: nueve logos monocromos de la firma v3.1, con
+`grayscale(1)`, pesos ópticos heredados, nueve columnas desktop/cinco tablet/tres móvil.
+HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus. El operador
+rechazó la variante de dos badges a color, nunca publicada. Se adapta la composición al footer
+nativo Ohio; no cambia la firma ni los recursos AXIS, no implica tier o programa adicional.
+[Rollout, recursos y rollback](../../../../docs/audits/public-site/2026-10-14-footer-explore-partners.md).

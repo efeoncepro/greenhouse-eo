@@ -901,3 +901,12 @@ El bundle WordPress exige procedencia/hash del paquete instalado y continúa sin
 Ohio pertenece al adapter. Imagen azul y aviso WebKit ResizeObserver permanecen abiertos; pruebas de
 callbacks en memoria no certifican persistencia, dispositivos físicos, AT ni proveedor de streaming.
 | 2026-10-12 | **Plate `HW1` reemplazado por `HW1-mismo-trabajo-sin-lanyard.png`** (operador: «el lanyard está encima del brazo y mal montado»). Borrado con `pnpm ai:inpaint erase`, resto de la foto idéntico; repuntado en catálogo, ejemplos, referencias, brochure 360 y canvas Agencia Creativa (v1). Mismo día: las tres láminas diseñadas de Revenue (`decision-provider-fit`, `content-service-lanes`, `method-agent-supervisor`) rechazadas en el 360 por la luz magenta del escenario («no sirve de acento sino de luz»); el arreglo es TASK-2012 Slice 3 (tokens AXIS), pendiente del visto bueno del operador. |
+
+### 2026-10-14 — Partners del footer: gris y conjunto de firmas
+
+«Explora Efeonce me gusta. Y sobre los partners sí, dale» autoriza los dos bloques. Corrección:
+«Se ven horribles los partners, prefiero que estén en escala de grises [...] mira nuestras firmas
+corporativas». Se reutilizan los nueve logos monocromos aprobados de la firma v3.1; fila común
+responsive, sin tarjetas/badges saturados. Publicado y verificado Home + servicio × 1440/390.
+[Recibo](../../../../docs/audits/public-site/2026-10-14-footer-explore-partners.md); no cambia
+la firma de correo, tiers ni programas del registro de partnerships.

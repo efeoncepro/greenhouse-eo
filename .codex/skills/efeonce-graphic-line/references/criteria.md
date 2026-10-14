@@ -1079,3 +1079,11 @@ en 400 y una única idea principal en 700, sin cambiar copy, tamaño o color den
 Ejemplo: «Cuando le preguntan a la IA,» introduce; «¿aparece tu marca?» concentra el énfasis.
 En agenda, «Una conversación.» introduce y «Tu próximo paso.» toma el peso. No se extrapola
 esta aplicación aprobada a titulares arbitrarios ni se infiere énfasis por palabras clave.
+
+### Partners del footer público — 2026-10-14
+
+El operador rechazó los dos badges a color porque saturan el footer. Pide escala de grises y
+el conjunto de nueve partners de las firmas corporativas. Para esta superficie: logotipos
+monocromos con peso óptico equilibrado, sin tarjetas ni cambio a color al hover; fila en desktop
+y cuadrícula en móvil. Recuperar recursos aprobados, nunca regenerar ni inventar insignias/tier.
+No extrapolar esta decisión del footer a todas las aplicaciones de terceros.

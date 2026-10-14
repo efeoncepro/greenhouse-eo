@@ -7,6 +7,8 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+Footer 14/10: «Explora Efeonce» y nueve partners en gris publicados. [QA y reversión](docs/audits/public-site/2026-10-14-footer-explore-partners.md).
+
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
 - Diseño de consentimiento La órbita autorizado y adoptado mediante adapter de presentación sobre HubSpot;

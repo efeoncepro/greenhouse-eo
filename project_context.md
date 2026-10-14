@@ -147,7 +147,8 @@ Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVE
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
-Este último sigue propuesto: Ohio padre es live y Theme Builder no está probado. `Index eligible` no prueba indexación.
+Misceláneas propuestas; Ohio live, Theme Builder sin probar. Elegibilidad ≠ indexación.
+Footer: [estado](docs/audits/public-site/2026-10-14-footer-explore-partners.md).
 
 ### Lectura mínima obligatoria
 
