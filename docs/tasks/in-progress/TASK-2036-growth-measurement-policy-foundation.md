@@ -250,3 +250,12 @@ Ninguna bloqueante: decisiones del plan aprobadas14/10; los detalles quedan en A
 - verify-policy-lifecycle.ts: nueva fuente businessEmail por datos, draft/review/publish/disable, conflicto CAS, replay/idempotency reuse, client denial, immutable trigger, auditoría4. Fixture archivada/surface inactiva; cero envíos, contactos, queue items o requests a proveedores.
 - Vitest medición74 y Client27 PASS. Snapshot tipos regenerado. Typecheck previo incremental pasó antes de las últimas adiciones; la repetición completa local alcanzó4GiB. Verificación final en CI, sin build completo local.
 - GTM workspace10 Preview: sólo template30 cambia sobre live7. Dos canaries Test Events v2 con ACK200/success; negativos400. Aún sin publicación del contrato v2 ni release Greenhouse.
+
+
+### Agent-first acceptance addendum14/10
+
+- [x] Versioned discovery + fresh read-only validation + shared HTTP client/CLI;18 targeted tests
+  PASS (authority, typed mapping, CAS/state, safe schema errors, exact-origin session and durable
+  known-receipt recovery). No SQL or browser required for operational commands.
+- [ ] Remote HTTP CLI lifecycle/readback on the controlled source, with current candidate CI.
+- [ ] Full develop→main release and production contract verification remain pending.

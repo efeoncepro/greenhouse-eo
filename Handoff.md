@@ -8,7 +8,7 @@
 
 [Corrección y pruebas](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md): Server7 sólo template30,
 website/IP/UA/fbp/fbc/external_id/em/ph/fn/ln recibidos en Test Events ambos hosts; código temporal por petición,
-sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Plan acotado aprobado: [TASK-2035](docs/tasks/plans/TASK-2035-plan.md). Foundation/seed7 y Test Events v2 probados; GTM8 compatible temporal. Panel lifecycle12 pruebas y boundary Forms→CRM13 PASS; Alta UI real y GVC premium PASS; feedback corregido, estados/CI/release pendientes. Hook local omitido con aprobación; sin build/tsc local. [Evidencia](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
+sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Plan acotado aprobado: [TASK-2035](docs/tasks/plans/TASK-2035-plan.md). Foundation/seed7 y Test Events v2 probados; GTM8 compatible temporal. Panel lifecycle12 pruebas y boundary Forms→CRM13 PASS; UI/GVC12 estados PASS; CLI agent-first y24 pruebas PASS; HTTP/CI/release pendientes. Hook local omitido con aprobación; sin build/tsc local. [Evidencia](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
 Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user submit/book. Primera conversión real pendiente.
 
 [TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: corrida14/10 aprobada, TASK-2036/2037 en ejecución; CRO, abandono, newsletter y CRM permanecen sin iniciar. Umbrella sobre dueñas existentes, sin release de esta ampliación.

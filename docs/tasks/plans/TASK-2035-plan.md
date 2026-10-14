@@ -172,3 +172,20 @@ La migración usará el perfil migrator canónico separado, nunca privilegios nu
 Schema de Forms/Meetings/measurement inspeccionado por metadata. El binding discovery real
 continúa siendo la única agenda activa; no se cambia sólo para hacer pasar una fixture.
 Task2035 movida a in-progress por la toma autorizada; checkpoint humano aprobado después de ese preflight.
+
+## Operator addendum14/10 — agents as first-class clients
+
+The operator requested agent-first operation while preserving the approved configuration/CAPI scope.
+Deliver a versioned discoverable contract and fresh read-only preflight through the existing Product
+API, plus `pnpm growth:measurement discover|validate|apply|verify`. The CLI uses the canonical
+user-bound agent-session ceremony and the same HTTP client/commands/readback as the cockpit;
+no browser, SQL, hardcoded actor/role, new issuer, gateway exposure or OAuth scope is required.
+Mutations remain explicit, capability-gated, CAS/idempotent and audited. Persist the request and
+known receipt privately before readback, allowing recovery without accidental duplicate writes.
+An `--apply` flag records execution intent, never replaces operator authorization. Existing Nexa
+propose/confirm semantics remain mandatory for any future conversational adapter; this release
+provides its shared governed primitives, not a claim of registered Nexa/MCP tools.
+Acceptance: discover real sources/typed fields/heads/permissions; reject stale heads, incompatible
+mapping and client authority without writes; complete the controlled metadata lifecycle using
+HTTP only and independently verify it. Growth Forms acceptance, HubSpot Forms/CRM mappings and
+consent remain separate authorities. No new release is needed for compatible source configuration.

@@ -72,3 +72,42 @@ incluye events. El código de prueba nunca queda fijo en producción.
 - policy-ui-fixture.ts prepare/cleanup --apply: exige MEASUREMENT_FIXTURE_RECEIPT; crea una fuente controlada sin embed key y archiva fuente/surface/desactiva política con readback al terminar. Reutiliza el recibo existente, no genera fixtures duplicadas.
 - verify-policy-ui.ts --apply: staging únicamente, escribe desde la UI sólo sobre la fixture declarada; captura lifecycle real y estados de presentación aislados en el navegador. No envía formularios ni bookings.
 - verify-lead-context.ts: exige META_TEST_EVENT_CODE real y opcional META_TEST_PREVIEW_HEADER_FILE privado. Resuelve las políticas publicadas y su mapping mediante preparación canónica y cifrado efímero de prueba; no persiste cola. Prueba sólo Meta Test Events. Un único key efímero por proceso respeta la caché del resolver de secretos. META_TEST_POLICY_ID permite seleccionar una política publicada de prueba para verificar un alta por datos sin volver a publicar GTM. Nunca volcar sus payloads, headers o credenciales.
+
+## Operar como agente sin abrir el panel
+
+Contrato efectivo: `GET /api/admin/growth/measurement` devuelve `contract.version`, operaciones,
+permisos, fuentes/campos tipados y revisiones. No usar slugs ni inferir permisos por rol local.
+La CLI consume HTTP y el mismo cliente del panel; no accede a SQL ni fabrica autoridad.
+
+1. Obtener una sesión ligada al operador mediante el procedimiento canónico
+   `scripts/playwright-auth-setup.mjs` (modo API no abre navegador). Conservar su storage state
+   ignorado dentro de `.auth/`, con permiso0600; secretos por entorno, nunca argumentos/logs.
+   Configurar `GROWTH_MEASUREMENT_BASE_URL` al origen HTTPS correcto y
+   `GROWTH_MEASUREMENT_STORAGE_STATE` a ese archivo. La sesión debe corresponder exactamente
+   al host, estar vigente y tener las capabilities internas. No exportar cookies al gateway.
+2. `pnpm growth:measurement discover`: JSON con fuentes, versiones, campos, políticas, cabeza
+   publicada y permisos efectivos. `--help` describe comandos, entorno y códigos de salida sin auth.
+3. Crear un archivo JSON de comando con **nombres de campos**, nunca datos de contactos.
+   Para draft: `action`, `scope` descubierto, `config` (`purpose:commercial_lead`, `sourceVersion`,
+   `origins`, `destinations`, `mapping`), `expectedPublishedRevisionId` actual (o null) y un UUID
+   `idempotencyKey`. Destinos vacíos por defecto; escoger cada destino expresamente.
+   Para review/publish/disable: `action`, `policyId`, `revisionId`, cabeza esperada y UUID propio.
+4. `pnpm growth:measurement validate comando.json`: preflight fresco, **sin escrituras**.
+   Devuelve blockers, conflicto de cabeza/estado o rutas/códigos de schema; no eco de valores.
+   Presentar impacto al operador y respetar la autorización existente antes de ejecutar.
+5. `pnpm growth:measurement apply comando.json --apply --receipt .auth/recibo.json`:
+   escritura explícita, auditada e idempotente; éxito sólo tras GET independiente. El archivo0600
+   se reserva antes del POST y conserva comando/origen/recibo conocido antes del GET.
+6. Revisar/publicar con comandos y claves distintos para cada transición. No saltar review.
+   `pnpm growth:measurement verify .auth/recibo.json` sólo lee y confirma el estado y cabeza.
+   Desactivar usa el mismo contrato; no cambia la aceptación comercial ni el mapping de HubSpot.
+
+Ante timeout/outcome desconocido, repetir **el mismo comando y recibo**, no generar otro UUID.
+Si existe recibo conocido, la CLI repite sólo GET. Un409 obliga a redescubrir estado y explicar el
+conflicto; no sobrescribir otra publicación ni reciclar una clave con otro contenido. Validar no
+reserva el estado: puede cambiar antes de aplicar. Salidas:0 éxito,2 inválido,3 conflicto,4 denegado,
+5 indisponibilidad en validación,6 resultado posiblemente desconocido. Nunca interpretar una
+validación verde o un ACK como publicación/recepción de Meta; cada destino requiere su evidencia.
+La CLI no envía formularios, reuniones, contactos CRM ni pruebas a proveedores. No hay nuevas
+tools MCP/Nexa registradas por esta entrega; el contrato compartido permite adaptarlas con su
+gobernanza propia, sin duplicar lógica.

@@ -63,7 +63,16 @@ backend authority. This uses the existing trust boundary, not a new signing secr
 ## Access and API parity
 
 Fine read/author/publish/disable capabilities, explicit internal role grants, client denial and
-shared canonical commands. Product API is the programmatic path. No automatic MCP/gateway
+shared canonical commands. Product API is the programmatic path. Its GET includes the versioned
+`growth-measurement-policy.v1` operation metadata, effective permissions, source/typed-field
+catalog and revision heads. POST `{dryRun:true,command}` validates fresh authority/state/mapping
+without creating a draft, audit entry or conversion. Validation is advisory; execution revalidates
+under lock. `pnpm growth:measurement` is a first-class HTTP consumer, with discover/validate/apply/
+verify and structured JSON. The shared HTTP client checkpoints a known receipt before GET;
+unknown outcomes reuse the exact request/key, known receipts retry only independent readback.
+Authentication uses the existing user-bound agent-session (private0600 storage state), never an
+actor/role passed in JSON. Explicit execution requires existing operator authorization; CLI flags
+do not grant it. No browser or database access is required to operate configuration. No automatic MCP/gateway
 expansion or broader OAuth access. Operator UI offers typed field options and validation reasons,
 not JSON editing or its own rules. No new navigation destination.
 

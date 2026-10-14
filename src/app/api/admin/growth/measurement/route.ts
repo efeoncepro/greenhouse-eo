@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
-import { executeMeasurementPolicyCommand, readMeasurementPolicyCatalog } from '@/lib/growth/measurement/policy-command'
+import { executeMeasurementPolicyCommand, previewMeasurementPolicyCommand, readMeasurementPolicyCatalog } from '@/lib/growth/measurement/policy-command'
+import { measurementPolicyPreviewSchema } from '@/lib/growth/measurement/policy-contract'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic='force-dynamic'
@@ -28,7 +29,8 @@ export async function POST(request: Request) {
   let body: unknown
 
   try { body=JSON.parse(text) } catch { return NextResponse.json({ok:false,error:'invalid_input',blockingReasons:[]},{status:400}) }
-  const result=await executeMeasurementPolicyCommand(tenant,body)
+  const preview=measurementPolicyPreviewSchema.safeParse(body)
+  const result=preview.success?await previewMeasurementPolicyCommand(tenant,preview.data.command):await executeMeasurementPolicyCommand(tenant,body)
   const status=result.ok?200:result.error==='forbidden'?403:result.error==='not_found'?404:result.error==='conflict'?409:result.error==='policy_unavailable'?503:422
 
   return NextResponse.json(result,{status})

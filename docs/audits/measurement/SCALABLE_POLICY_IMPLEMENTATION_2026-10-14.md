@@ -162,3 +162,23 @@ proved generalized Client ingress, not mapping enforcement; the canonical prepar
 that limit. Final strict workspace11 compiles with only template30 changed; canonical committed
 source digest0c42c4e93a6e79fb291f5aa7bb353b6486b9a572146b719df2b6e78fe9eba1d7 (post-formatting).
 No publication until web/worker convergence, queue check and final Preview/live acceptance.
+
+
+##14:34Z — final UI state loop and agent-first addendum
+
+Actual af0 staging UI run passed12 frames, zero findings/overflow, scoped draft/review/publish and
+independent head readback; no commercial submissions/bookings/provider calls. Revision3 is
+`9e194c45-be7d-482e-8e74-174d680bcfdd`. Presentation-only adverse states are explicitly mocked;
+see versioned TASK-2037 review/scorecard. The native warning feedback contrast fix is verified.
+The14:17Z canonical preparation canary `817af943-737b-4ff9-bff6-dff104c86ba4` was independently
+expanded in Meta Test Events: Processed, Server, website and all9 expected user_data keys.
+Evidence `policy-configured-active-ui-meta.png`/`policy-configured-active-ui-meta-ui.txt` under
+`.captures/meta-lead-fix-2026-10-14/`; no real CRM/contact/event-quality claim.
+
+Operator requested first-class agents. Added versioned HTTP discovery, fresh read-only preflight
+and `pnpm growth:measurement discover|validate|apply|verify`, sharing the cockpit HTTP client,
+canonical command authority and independent readback. Private durable receipts prevent duplicate
+writes after known outcomes.24 targeted agent/network/panel tests pass with512MiB cap. No new
+issuer, OAuth scope, gateway tool, infrastructure or SQL-based operator shortcut. Remote CLI
+lifecycle/current CI and full release remain pending; shared staging/prod worker transition and
+strict Client final cutover still require their existing checks.

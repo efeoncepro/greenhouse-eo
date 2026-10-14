@@ -169,3 +169,16 @@ page backups, current availability and one-off smoke evidence in tasks, ledgers,
 ### Published measurement configuration — TASK-2035 checkpoint14/10
 
 For scalable conversion matching use the [policy ADR](../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) and [operator manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). Code in develop resolves stable form_key + opaque published fver-* identity or active meeting binding fingerprint, surface/origin, typed mapping and independent destinations from immutable reviewed/published policy data. Never add a form slug/scheduler to a runtime list or let public telemetry authorize advertising. New source/version activation is a governed data command, not a redeploy; new behavior/host/provider may require code. Source acceptance and fresh consent/GPC remain mandatory; enqueue and dispatcher revalidate publication. Disabling blocks pending sends, not HTTP already started. API/UI permission is internal read/author/publish/disable; browser never picks authority. The contextual panel uses immutable draft→review→publish, separate disable, dirty-source confirmation and independent server readback. Preserve the same body/idempotency key after an unknown POST outcome; after a known receipt retry GET only. A409 reload retains unsaved values and refreshes CAS authority. Forms delivery through HubSpot Forms→CRM retains its separate destination fieldMapping, consent and commercial outbox; matching configuration never replaces it or gates commercial acceptance. Verify each destination independently. For current CI/GTM transition/production status follow the live runtime ledger; code/tests or Meta Test Events never prove real CRM delivery.
+
+
+### Agent-first measurement operation
+
+Use `pnpm growth:measurement --help` then `discover → validate → apply → verify` from the
+[manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). This is an HTTP
+client of the same governed Product API as the panel, not a SQL/admin-role shortcut. Discovery
+returns the versioned contract, effective permissions, source version/fields and current heads.
+Validate is read-only; apply requires existing operator authorization, explicit intent and a
+private receipt. Keep the exact command/key on unknown outcome; a known receipt retries GET only.
+A409 requires fresh discovery, never blind overwrite. No contact values belong in configuration,
+receipts or logs. Preserve the separate Growth Forms→HubSpot Forms→CRM delivery and consented
+measurement projection. Do not claim MCP/Nexa tool exposure or provider success from CLI success.

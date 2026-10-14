@@ -62,3 +62,22 @@ export const measurementPolicyProofSchema = z.object({
 }).strict()
 export type MeasurementPolicyProof = z.infer<typeof measurementPolicyProofSchema>
 export interface MeasurementPolicyResult { ok: boolean; policy?: MeasurementPolicyRevision; blockingReasons: string[]; error?: 'invalid_input'|'forbidden'|'not_found'|'conflict'|'policy_unavailable' }
+
+/** Discoverable metadata: same commands for operators, CLI and governed action consumers. */
+export const MEASUREMENT_POLICY_AGENT_CONTRACT = {
+  version: 'growth-measurement-policy.v1',
+  endpoint: '/api/admin/growth/measurement',
+  authentication: 'user-bound agent-session or portal session; internal capability checks',
+  operations: ['discover', 'validate', 'draft', 'review', 'publish', 'disable', 'verify'],
+  lifecycle: ['draft', 'review', 'publish'],
+  mutationRequired: ['action', 'expectedPublishedRevisionId', 'idempotencyKey'],
+  draftRequired: ['scope', 'config'],
+  transitionRequired: ['policyId', 'revisionId'],
+  destinations: ['meta', 'google_upd'],
+  defaults: { destinations: [] },
+  retry: 'Reuse the exact command and idempotencyKey after an unknown outcome; after a receipt retry readback only.',
+  concurrency: 'expectedPublishedRevisionId must equal the current published head, including null.',
+  authority: 'Source version, typed fields, surface, origin and consent remain server-owned. Validation does not publish.',
+} as const
+
+export const measurementPolicyPreviewSchema = z.object({dryRun: z.literal(true), command: z.unknown()}).strict()

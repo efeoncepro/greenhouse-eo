@@ -1,0 +1,95 @@
+{
+  "taskId": "TASK-2037",
+  "scenario": "Growth Forms contextual measurement policy inspector",
+  "reviewedAt": "2026-10-14",
+  "reviewer": "Codex \u2014 actual staging frames and interaction readback",
+  "uiRigor": "ui-premium",
+  "directionMode": "source-led",
+  "wireframe": "docs/ui/wireframes/TASK-2037-measurement-policy.md",
+  "evidence": {
+    "desktop": ".captures/meta-lead-fix-2026-10-14/policy-ui-live/04-published.png",
+    "mobile": ".captures/meta-lead-fix-2026-10-14/policy-ui-live/05-mobile-published.png",
+    "captures": ".captures/meta-lead-fix-2026-10-14/policy-ui-live/",
+    "dossier": "docs/ui/reviews/TASK-2037-measurement-policy-2026-10-14.md",
+    "functional": "Real scoped draft/review/publish plus independent GET; remaining adverse-state presentations are explicitly isolated browser mocks. No business/provider submissions."
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "Published head, working revision and one next action have distinct positions.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Native contextual inspector fits desktop sidecar and390px viewport.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Labeled fields and clear mapping/origin/destination groups retain native cadence.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "density": {
+      "score": 4.3,
+      "rationale": "Four matching fields remain visible; narrow inspector is intentionally vertical.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames",
+      "nextAction": "Monitor long-source operational use; evaluate a wider inspector only if observed scrolling impairs configuration."
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "One inspector surface, no nested decorative cards.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "Reuses the Forms cockpit and native controls without adding navigation or a parallel shell.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "Restrained native hierarchy, clear publication status and one primary command.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "typography": {
+      "score": 4.5,
+      "rationale": "Native type hierarchy and concise contextual helper; long source label remains available below.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "color": {
+      "score": 4.5,
+      "rationale": "Neutral content, primary focus/action and readable warning/error feedback; contrast repaired and rechecked.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "iconography": {
+      "score": 4.4,
+      "rationale": "Native semantic select/feedback controls; no decorative icons.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames",
+      "nextAction": "Keep native semantic controls; reassess additional icons only if an observed action needs disambiguation."
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "Desktop and390px states have zero horizontal overflow; actions stack.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "motion": {
+      "score": 4.4,
+      "rationale": "Focus and pending feedback are causal; reduced-motion reaches the same state.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames",
+      "nextAction": "Retain restrained native feedback; assess animation changes only with an interaction problem and reduced-motion parity."
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Matches approved contextual-inspector wireframe, lifecycle and native Vuexy primitives.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "Source/version authority, immutable revisions, consented destinations and conflict recovery are domain-specific.",
+      "evidence": "GVC first-fold dossier and12-state receipt14:34Z; reviewed actual desktop/mobile/conflict frames"
+    }
+  },
+  "average": 4.507,
+  "floor": 4.3,
+  "threshold": "average >=4.5; floor >=4; hierarchy/surfaceEconomy/visualImpact/fidelity/genericTemplateResistance >=4.5",
+  "verdict": "pass"
+}

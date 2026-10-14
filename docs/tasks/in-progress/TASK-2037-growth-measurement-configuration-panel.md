@@ -20,7 +20,7 @@
 - Flow: `docs/ui/flows/TASK-2037-measurement-policy-flow.md`
 - Motion: `docs/ui/motion/TASK-2037-measurement-policy-motion.md`
 - Backend impact: `none`
-- Status real: `Lifecycle/API y alta real UI verificados;12 pruebas PASS; GVC premium1440/390 PASS; feedback de conflicto corregido, repeat de estados/CI/release pendientes`
+- Status real: `Lifecycle/API y alta real UI verificados;12 pruebas PASS; GVC premium1440/390 PASS; 12 estados/scorecard PASS; HTTP agent-first/CI/release pendientes`
 - Rank: `Now`
 - Domain: `data|growth`
 - Blocked by: `TASK-2036`
