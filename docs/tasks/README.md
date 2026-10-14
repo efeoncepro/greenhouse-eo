@@ -1,6 +1,6 @@
 # Task Index
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](to-do/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), to-do; umbrella de TODO el alcance acordado: policy/API/UI, embudo, audiencias, newsletter, calidad HubSpot y release/verificación. Sin implementación; siguiente ID disponible: `TASK-2036`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI, [plan P1 pendiente de aprobación](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2036`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress; release completo PR254 y matching activos, GA4 UPD/siete audiencias y SQL/flags verificados; falta primera conversión comercial consentida post-flip; [auditoría documental integral](../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), configuración escalable y pendientes ampliados coordinados por `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.

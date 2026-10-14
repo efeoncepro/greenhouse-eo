@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -20,8 +20,8 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Diseno: alcance integral acordado y backlog registrado; sin implementacion, migracion ni publicacion de esta ampliacion`
-- Rank: `Next`
+- Status real: `Plan: goal confirmado14/10, corrida limitada a configuracion escalable Forms/Meetings y CAPI; plan P1 pendiente de aprobacion. Sin codigo/migracion/release de esta ampliacion; CRO/newsletter/CRM pendientes.`
+- Rank: `Now`
 - Domain: `data|growth|crm`
 - Blocked by: `none`
 - Branch: `develop; checkout compartido, sin worktrees`
@@ -46,6 +46,14 @@ Esta es una task paraguas de coordinación, no una implementación híbrida mono
 UI/Backend impact describen el artefacto directo documental; el resultado incluye backend y UI,
 que deberán tener unidades dependientes con sus addenda y ownership antes de ejecutar código.
 El registro no implementa la propuesta ni autoriza un publish, envío, campaña o nuevo gasto.
+
+## Corrida autorizada 2026-10-14
+
+El operador confirmó «Limitar ahora a configuración escalable y CAPI». Se ejecutarán slices0/1
+más verificación y release aplicables; el resto del alcance integral permanece en este paraguas
+sin iniciarse. [Plan concreto](../plans/TASK-2035-plan.md), commit29b47e574: checkpoint P1 pendiente.
+No interpretar el goal como aprobación del plan todavía; TASK_PROCESS §Phase3 exige esa decisión.
+La reparación CAPI previa pertenece a TASK-2034 y está en ba9b8c9cc, sin release Greenhouse.
 
 ## Goal
 
@@ -124,7 +132,7 @@ cross-runtime; ésta lo coordina. El barrido fue por dominio y superficie, no s�
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md`
+- `docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md`
 - `docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md` — brief/decisiones del programa hasta su formalización.
 - `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`, `Handoff.md` — sólo filas/punteros de este programa.
 
@@ -380,6 +388,8 @@ de IAM. No usar la automatización para pedir a otros agentes/usuarios una autor
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [x] Alcance de la corrida confirmado por el operador14/10: configuración escalable y CAPI; goal activo y plan registrado, resto del paraguas pendiente.
 
 - [ ] Existe mapa exhaustivo de gaps, unidades dueñas y dependencias; no se duplican TASK-1359/1509/1510/1802/1885/1866/2034 ni se ocultan pendientes sin dueño.
 - [ ] Foundation backend-data y consumer ui-ux quedan separados en unidades ejecutables; perfiles/addenda/ownership y wireframe/flow/GVC están presentes antes de código UI.

@@ -4,7 +4,7 @@
 
 [Corrección y pruebas](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md): Server7 sólo template30,
 website/IP/UA/fbp/fbc/external_id/em/ph/fn/ln recibidos en Test Events ambos hosts; código temporal por petición,
-sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop, release completo pendiente al corte.
+sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Goal acotado a configuración escalable/CAPI, [plan P1 pendiente](docs/tasks/plans/TASK-2035-plan.md); un solo release final.
 Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user submit/book. Primera conversión real pendiente.
 
 
@@ -14,7 +14,7 @@ Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user subm
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
-[TASK-2035](docs/tasks/to-do/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), to-do: TODO el pendiente acordado (config/API/UI, CRO, abandono/retargeting, newsletter, calidad HubSpot y release/evidencia). Umbrella sobre dueñas existentes; registro14/10, sin implementación/publicación.
+[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), to-do: TODO el pendiente acordado (config/API/UI, CRO, abandono/retargeting, newsletter, calidad HubSpot y release/evidencia). Umbrella sobre dueñas existentes; registro14/10, sin implementación/publicación.
 
 Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.

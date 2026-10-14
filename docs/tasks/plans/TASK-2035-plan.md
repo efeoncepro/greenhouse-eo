@@ -163,3 +163,12 @@ contacto/analytics/ads, seed explícito y nuevo acceso fino. La agenda usa bindi
 verificado; no se inventa un calendario efeonce-discovery-30 inexistente.
 Pendiente sólo aprobación de este plan y registro de sus unidades. No decisión de newsletter,
 ventanas de abandono o lifecycle CRM: quedaron fuera del goal actual.
+
+## Preflight read-only 2026-10-14
+
+pg:doctor PASS: CLI/ADC alineadas a efeonce-group, conexión runtime greenhouse_app con
+membresía greenhouse_runtime y sin greenhouse_migrator. No DDL, seed ni write ejecutados.
+La migración usará el perfil migrator canónico separado, nunca privilegios nuevos del runtime.
+Schema de Forms/Meetings/measurement inspeccionado por metadata. El binding discovery real
+continúa siendo la única agenda activa; no se cambia sólo para hacer pasar una fixture.
+Task2035 movida a in-progress por la toma autorizada; checkpoint humano del plan sigue pendiente.
