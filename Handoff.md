@@ -2,6 +2,9 @@
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
+Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
+
 [Release completo y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md): PR254,
 main d692ab51dc48, orquestador38483437158 success y manifest released; CI/Deep/build/smoke PASS.
 GTM Server6/Web5, mismo hosting efeonce-group min0/max1. HubSpot categorías/GPC y banner

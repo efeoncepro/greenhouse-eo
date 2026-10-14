@@ -1,5 +1,21 @@
 # Registro de decisiones y versiones
 
+### 2026-10-13 — Privacidad pública: dirección solicitada, diseño candidato
+
+Decisión posterior del operador: «Vamos, ponla». Autoriza adopción en ambos sitios.
+Publicado sobre controles HubSpot, sin CMP ni persistencia nueva; publicidad-only, retiro,
+reapertura y a11y verificados en ambos hosts × escritorio/móvil. Think `f7d8f36` / WP `8d6ff95`.
+[Rollout y límites](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+El párrafo siguiente conserva el estado de la primera propuesta.
+
+«Quiero algo mucho más moderno, premium y elegante que vaya mucho con la efeonce-graphic-line»
+autoriza diseñar el aviso y panel de preferencias. Se preparó una propuesta navegable local en Think:
+«Tu visita. Tus reglas.» / «Elige qué compartes.», papel/navy, Bricolage/Poppins y controles publicados
+AXIS. Sin anillo decorativo ni franja adicional de footer. No equivale a aprobación de esta composición,
+publicación, sustitución de HubSpot o nuevos permisos de tracking. La demostración conserva elecciones
+solo en memoria y no escribe consentimiento real. Dirección y QA en
+[el dossier](../../../../docs/ui/visual-directions/EFEONCE_COOKIE_PRIVACY_2026-10-13.md).
+
 > Delta mate uniforme verificado contra: petición y aprobación del operador, AXIS `de34866` y catálogo live
 > de 134 entradas — 2026-10-12; comparación local, sin publicación de paquetes ni incorporación al catálogo.
 

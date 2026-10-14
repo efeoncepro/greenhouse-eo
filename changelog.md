@@ -9,6 +9,9 @@
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
+- Diseño de consentimiento La órbita autorizado y adoptado mediante adapter de presentación sobre HubSpot;
+  [rollout WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md). Categorías y persistencia nativas, sin cambios de matching.
+
 - [ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
   [contrato HubSpot](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md) y
   [auditoría](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server en

@@ -1,5 +1,26 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
+## Privacidad pública: aviso y preferencias de cookies (adoptada, 2026-10-13)
+
+El operador pidió una experiencia más moderna, premium y elegante afín a esta línea y autorizó «Vamos, ponla». Dirección:
+papel/navy, Bricolage editorial/Poppins funcional, aviso flotante compacto y preferencias en diálogo
+con divisores e interruptores AXIS. La órbita no es obligatoria: aquí no mide ni rodea un dato, por lo
+que se omite el anillo. Acento solo en geometría/punto, nunca en texto pequeño.
+
+Se conserva el enlace discreto «Preferencias de cookies» en el footer legal. El aviso inicial aparece
+automáticamente; el enlace sirve para revisar la elección posteriormente. No incorporar otra franja
+permanente. En móvil, la tarjeta respeta márgenes y el diálogo se transforma en panel inferior desplazable.
+
+Prototipo nativo Astro en Think `/preview/cookies`, sin medición ni persistencia; botones, cerrar y switches
+de primitives 0.6.6, proyección generada de tokens 0.6.1. No es un contrato AXIS publicado ni una CMP nueva.
+La fuente de consentimiento continúa siendo HubSpot. Producción usa un adapter CSS/ARIA sobre sus
+controles nativos; no persiste preferencias propias ni usa la demo para escribir categorías.
+Canon: `scripts/measurement/hubspot-consent-ui.*` y builder; distribuciones idénticas WP/Think.
+Al cambiarlo, revalidar selectores nativos, categorías, GPC, a11y y bridge. Nunca conectar `gtag` o CAPI a la demo.
+
+Dirección, alternativas, estados y evidencia: [dossier de privacidad](../../../../docs/ui/visual-directions/EFEONCE_COOKIE_PRIVACY_2026-10-13.md).
+Estado: publicado en ambos hosts y verificado en escritorio/móvil; [readback y rollback](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+
 > Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.

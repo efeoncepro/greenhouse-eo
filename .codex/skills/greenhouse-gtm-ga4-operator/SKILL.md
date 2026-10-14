@@ -99,6 +99,11 @@ ausente por buscar sólo ep.event_id. Retirar Test Events code antes del publish
 SoT bridge `scripts/measurement/hubspot-consent-bridge.js`; WP/Think copias byte-idénticas.
 Preferencias de cookies = control de texto integrado al pie legal; nunca franja/CTA
 independiente debajo del sitio. Probar acceso móvil sin superposición del CTA de reuniones.
+Presentación La órbita autorizada 13/10: adapter CSS/JS sobre controles HubSpot, sin CMP ni
+persistencia nueva. Canon `scripts/measurement/hubspot-consent-ui.*` + builder; ambos hosts
+distribuyen assets idénticos y sólo en rutas con medición. No reemplazar los hijos que administra
+el renderer nativo ni llamar `setHubSpotConsent` para este diseño. Revalidar selectores, categorías,
+reapertura, retiro, GPC y a11y al tocarlo; [rollout](../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 Gates: **no usar regex `.+` para validar event_id**: acepta missing/`undefined` como string.
 Exigir UUID anclado y probar ausente + literal `undefined`; una prueba sintética alcanzó Meta
 antes de corregirlo. Positivos sólo con `test_event_code` real verificado; nunca un código inventado.

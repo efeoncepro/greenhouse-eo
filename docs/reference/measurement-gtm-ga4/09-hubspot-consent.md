@@ -38,10 +38,27 @@ no cancela HTTP ya enviado. Estos controles técnicos no afirman cumplimiento le
 
 ## Adquisición, PageView y sender
 
+### Presentación La órbita — autorizada 2026-10-13
+
+«Vamos, ponla» autoriza adoptar la propuesta visual en ambos hosts. Se viste la UI nativa de
+HubSpot con CSS/JS scoped y fuentes locales; no se usa `setHubSpotConsent`, no se deshabilita
+el banner ni se crea persistencia propia. Botones, checkboxes, categorías y handlers siguen
+siendo HubSpot. El listener/default/bridge anteriores no cambian. Los nodos de presentación
+se agregan como hermanos, sin reemplazar los textos que administra el renderer del proveedor.
+Las etiquetas pintadas y ARIA se adaptan; el estado accesible usa el `checked` nativo.
+
+Canon: `scripts/measurement/hubspot-consent-ui.js`, `hubspot-consent-ui.template.css` y
+`build-hubspot-consent-ui.mjs`; distribuciones byte-idénticas en `consent-ui/` de los dos hosts.
+WP plugin 1.1.0 y BaseLayout Think cargan assets con hash, sólo en superficies con medición.
+`analytics=false` sigue excluyendo banner, bridge, UI y trackers.
+[Publicación, pruebas y rollback](../../audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+
+### Transporte existente
+
 - SoT del bridge: `scripts/measurement/hubspot-consent-bridge.js` en Greenhouse.
   Distribuciones byte-identical: plugin WP `eo-measurement-consent/assets/consent-bridge.v1.js`
   y Think `public/measurement/consent-bridge.v1.js`. No editar copias a mano.
-- WordPress: plugin nuevo y release de sólo dos archivos, hashes/prestate/backup, cache de
+- WordPress: recuperación inicial con plugin nuevo y release de sólo dos archivos, hashes/prestate/backup, cache de
   plugins invalidada antes de activar. Header antes de Site Kit/GTM; HubSpot loader existente.
   Opción `eo_measurement_server_routing=enabled` coordina routing y `send_page_view=false`.
   Plugin 1.0.3: preferencias inline en el pie Ohio; sin bloque visual después del footer.

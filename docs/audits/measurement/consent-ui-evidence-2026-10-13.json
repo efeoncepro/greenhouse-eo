@@ -1,0 +1,220 @@
+{
+  "date": "2026-10-14",
+  "scope": "Native HubSpot presentation, four public host/viewport combinations",
+  "deployment": {
+    "thinkCommit": "f7d8f36f3040b270711f6961b0163919ddcbf2a3",
+    "thinkDeployment": "dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5",
+    "wpCommit": "8d6ff95",
+    "wpVersion": "1.1.0"
+  },
+  "nativeUi": {
+    "injected": false,
+    "status": "PASS",
+    "results": [
+      {
+        "host": "think.efeoncepro.com",
+        "viewport": "desktop",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-tracking-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      },
+      {
+        "host": "think.efeoncepro.com",
+        "viewport": "mobile",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-tracking-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      },
+      {
+        "host": "efeoncepro.com",
+        "viewport": "desktop",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-tracking-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      },
+      {
+        "host": "efeoncepro.com",
+        "viewport": "mobile",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-tracking-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      }
+    ]
+  },
+  "publicAssets": {
+    "status": "PASS",
+    "results": [
+      {
+        "host": "efeoncepro.com",
+        "files": [
+          {
+            "file": "consent-ui.v1.css",
+            "status": 200,
+            "sha256": "6f39d85ac719fc2bdbc1becdbc06aa792af219c1195211e7511f222dfa5cbec8"
+          },
+          {
+            "file": "consent-ui.v1.js",
+            "status": 200,
+            "sha256": "63b246da2480f07249c40c920f4c6c842cbefb81cfcd14243cebd793af8ff2f9"
+          },
+          {
+            "file": "bricolage-latin.woff2",
+            "status": 200,
+            "sha256": "a97804dc9fbe5fc972a08018c5eda4dab7ef2346f64c57e61419d05e6de4ea1c"
+          },
+          {
+            "file": "poppins-400-latin.woff2",
+            "status": 200,
+            "sha256": "7d93459d86585bfcdbb7e0376056226adb25821ee54b96236fe2123e9560929f"
+          },
+          {
+            "file": "poppins-500-latin.woff2",
+            "status": 200,
+            "sha256": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446"
+          },
+          {
+            "file": "LICENSE-bricolage",
+            "status": 200,
+            "sha256": "923f4ddf0fd39f9b7794ab0df7332f3d95dc43e8ad7ec2289d6d9e8491177f51"
+          },
+          {
+            "file": "LICENSE-poppins",
+            "status": 200,
+            "sha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+          }
+        ]
+      },
+      {
+        "host": "think.efeoncepro.com",
+        "files": [
+          {
+            "file": "consent-ui.v1.css",
+            "status": 200,
+            "sha256": "6f39d85ac719fc2bdbc1becdbc06aa792af219c1195211e7511f222dfa5cbec8"
+          },
+          {
+            "file": "consent-ui.v1.js",
+            "status": 200,
+            "sha256": "63b246da2480f07249c40c920f4c6c842cbefb81cfcd14243cebd793af8ff2f9"
+          },
+          {
+            "file": "bricolage-latin.woff2",
+            "status": 200,
+            "sha256": "a97804dc9fbe5fc972a08018c5eda4dab7ef2346f64c57e61419d05e6de4ea1c"
+          },
+          {
+            "file": "poppins-400-latin.woff2",
+            "status": 200,
+            "sha256": "7d93459d86585bfcdbb7e0376056226adb25821ee54b96236fe2123e9560929f"
+          },
+          {
+            "file": "poppins-500-latin.woff2",
+            "status": 200,
+            "sha256": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446"
+          },
+          {
+            "file": "LICENSE-bricolage",
+            "status": 200,
+            "sha256": "923f4ddf0fd39f9b7794ab0df7332f3d95dc43e8ad7ec2289d6d9e8491177f51"
+          },
+          {
+            "file": "LICENSE-poppins",
+            "status": 200,
+            "sha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+          }
+        ]
+      }
+    ]
+  },
+  "bridgeTests": {
+    "passed": 16
+  },
+  "privatePreview": {
+    "status": 200,
+    "measurementScripts": 0
+  },
+  "gpc": [
+    {
+      "host": "efeoncepro.com",
+      "gpc": true,
+      "status": "PASS",
+      "state": {
+        "ads": "denied",
+        "decision": [
+          {
+            "ads": "denied",
+            "analytics": "denied"
+          }
+        ],
+        "banner": false
+      }
+    },
+    {
+      "host": "think.efeoncepro.com",
+      "gpc": true,
+      "status": "PASS",
+      "state": {
+        "ads": "denied",
+        "decision": [
+          {
+            "ads": "denied",
+            "analytics": "denied"
+          }
+        ],
+        "banner": false
+      }
+    }
+  ]
+}
