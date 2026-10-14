@@ -27,7 +27,7 @@ ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado
 
 El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
 WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
-Panel/categorías/GPC verificados; QA intercepta transporte y no prueba nuevas recepciones Meta. Renovación de credencial CLI expuesta sigue pendiente en el dossier.
+Panel/categorías/GPC verificados; QA intercepta transporte y no prueba nuevas recepciones Meta. [Rotación CLI 14/10](docs/audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json): anterior revocada/403; nueva CLI/proyectos200, dos fuentes0600 y GitHub actualizados, wrappers retirados; vence14/10/2027. Sin nuevo workflow/deploy.
 
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 

@@ -58,10 +58,22 @@ anterior fue un payload acotado; no demuestra que el resto de su repositorio sea
 
 ## Pendientes y límites
 
-La renovación/revocación de la credencial que imprimió la CLI sigue pendiente; las medidas de salida
-saneada no equivalen a revocación. No se leyó ni reprodujo su valor para este cierre.
+Al corte documental la renovación/revocación estaba pendiente. En una operación posterior autorizada
+el 14/10 se completó y verificó: [recibo de rotación](VERCEL_CREDENTIAL_ROTATION_2026-10-14.json).
+Las medidas de salida saneada por sí solas no equivalen a revocación.
 La primera conversión comercial enriquecida sigue sin un nuevo recibo en este encargo; no se cierra
 por inferencia. La configuración escalable de fuentes sigue siendo propuesta sin GO.
 
 AGENTS/CLAUDE y la arquitectura de consentimiento se comprobaron sin nuevo ADR o regla global:
 no cambia la autoridad, esquema, transporte ni autorización. El runtime ya publicado no se modificó.
+
+## Operación posterior: rotación autorizada de Vercel
+
+El 14/10 se aplicó y verificó la rotación del [recibo saneado](VERCEL_CREDENTIAL_ROTATION_2026-10-14.json).
+La postura cloud y la skill de higiene existentes gobiernan esta sustitución; conserva el alcance de
+usuario anterior, sin nuevo proveedor, política de acceso o ADR. `project_context.md` revisado sin
+cambio: mantiene el router vigente. Vercel Operations sigue siendo una skill exclusivamente Codex,
+sin contraparte Claude preexistente; no se crea un bundle por las advertencias heurísticas del checker.
+No se añade una skill nueva ni se cambia lógica del reader: sólo se corrige su comentario obsoleto
+sobre el wrapper retirado. El secreto GitHub se escribió y su metadata se releyó; no se ejecutó CI
+ni se desplegó producción como prueba. Las copias históricas del token revocado no se borraron.

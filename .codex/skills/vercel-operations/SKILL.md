@@ -72,7 +72,11 @@ and [private package consumption runbook](../../../docs/operations/AXIS_PRIVATE_
 Incidencia verificada en el despliegue público de consentimiento del 13/10/2026: el wrapper local
 inyectó una credencial en `argv` y `vercel ls --yes` la reprodujo en la sugerencia de paginación.
 No repetir la llamada para reproducirlo, ni inspeccionar/imprimir secretos para documentarlo.
-Renovación/revocación sigue pendiente; el cierre documental no la autoriza ni la da por realizada.
+Rotación autorizada y verificada el 14/10/2026: token anterior revocado (403), reemplazo vigente
+hasta el 14/10/2027; CLI, dos fuentes locales y secreto GitHub de greenhouse-eo actualizados.
+[Recibo saneado](../../../docs/audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json). Wrappers retirados de `.zshenv`/`.zshrc`: usar
+la CLI con su archivo privado `auth.json`, sin pasar secretos mediante `--token`.
+El secreto GitHub fue escrito y su metadata releída; no se disparó un workflow para probarlo.
 Evidencia saneada y alcance: [rollout de consentimiento](../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 
 Antes de cualquier comando de las secciones siguientes en este entorno:

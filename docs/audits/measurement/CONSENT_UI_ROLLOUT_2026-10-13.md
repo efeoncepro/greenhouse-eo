@@ -144,7 +144,9 @@ proveedor, revalidar y ajustar el adapter. Una nueva preferencia/función o CMP 
 contrato; no reutilizar el estado efímero del prototipo como consentimiento productivo.
 
 Incidencia de herramienta: `vercel ls` incluyó una credencial CLI en la sugerencia de paginación.
-No se reproduce ni se almacena aquí; salidas posteriores filtradas. Renovación/revocación pendiente.
+No se reproduce ni se almacena aquí; salidas posteriores filtradas. La rotación autorizada el
+14/10 quedó verificada: anterior403/metadata404, reemplazo200 y CLI válida; dos fuentes locales,
+CLI y secreto GitHub actualizados, wrappers retirados. [Recibo saneado](VERCEL_CREDENTIAL_ROTATION_2026-10-14.json).
 
 ## Fuentes oficiales consultadas
 

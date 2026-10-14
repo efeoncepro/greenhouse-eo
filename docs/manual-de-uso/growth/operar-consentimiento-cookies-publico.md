@@ -108,11 +108,15 @@ anterior documentado o revert del commit UI y redeploy. Confirmar otra vez versi
 categorías/persistencia y rutas privadas. No revertir matching, bridge ni GTM por una regresión de estilo.
 IDs concretos de rollback y backup viven en la auditoría, no se inventan ni se infieren del árbol local.
 
-## Incidencia de credencial Vercel: pendiente
+## Incidencia de credencial Vercel: rotación verificada
 
 En el rollout, el wrapper local añadió una credencial a `argv`; `vercel ls --yes` la reprodujo en una
-sugerencia de siguiente página. La credencial no se reproduce aquí. Renovación/revocación continúa
-pendiente: este cierre documental no la ejecuta ni acredita contención completa.
+sugerencia de siguiente página. La credencial no se reproduce aquí. El operador autorizó la rotación
+el 14/10: anterior revocada y rechazada403; nueva credencial validada por CLI/API, fuentes locales
+con0600 y secreto GitHub greenhouse-eo actualizados. Los wrappers fueron retirados; la CLI utiliza
+su `auth.json` privado sin `--token`. Vencimiento: 14/10/2027.
+[Recibo saneado](../../audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json).
+La metadata del secreto GitHub se releyó; no se lanzó un workflow ni un deploy como prueba.
 
 Antes de volver a operar esa CLI, aplicar el aprendizaje de su
 [skill local Vercel](../../../.codex/skills/vercel-operations/SKILL.md#salida-de-la-cli-y-credencial-del-wrapper)
