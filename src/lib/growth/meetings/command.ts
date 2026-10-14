@@ -290,10 +290,10 @@ export const bookMeeting = async (
 
     const measurement = await prepareMeasurementConversion({
       scope: {
-        sourceKind: 'meeting_booking', sourceId: claim.executionId, origin: context.origin,
+        sourceKind: 'meeting_booking', sourceId: claim.executionId, sourceKey: input.schedulerKey, origin: context.origin,
         pageUri: input.attribution?.pagePath, surfaceId: input.surfaceId, schedulerKey: input.schedulerKey,
       },
-      contact: input.contact, measurementContext: input.measurementContext,
+      fields: {...input.contact}, measurementContext: input.measurementContext,
       ip: context.ip, userAgent: context.userAgent,
       requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
     }, env)

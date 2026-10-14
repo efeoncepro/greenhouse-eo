@@ -20,12 +20,24 @@ export const enqueueMeasurementConversion = async (
   await client.query('SAVEPOINT measurement_enqueue')
 
   try {
+    // Lock the publication pointer through enqueue: a concurrent disable wins before capture,
+    // or waits until this accepted occurrence is persisted; dispatch checks again before HTTP.
+    const authorized = await client.query(
+      `SELECT p.policy_id FROM greenhouse_growth.measurement_policy p
+       JOIN greenhouse_growth.measurement_policy_revision r ON r.revision_id=p.published_revision_id
+       WHERE r.revision_id=$1 AND r.state='published' FOR SHARE OF p`, [prepared.policyRevisionId],
+    )
+
+    if (!authorized.rows.length) { await client.query('RELEASE SAVEPOINT measurement_enqueue');
+
+return }
+
     const result = await client.query<{ event_id: string }>(
       `INSERT INTO greenhouse_growth.measurement_conversion
-         (event_id, source_kind, source_id, occurred_at, consent_snapshot_json, encrypted_payload_json)
-       VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
+         (event_id, source_kind, source_id, occurred_at, consent_snapshot_json, encrypted_payload_json, policy_revision_id)
+       VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7::uuid)
        ON CONFLICT (source_kind, source_id) DO NOTHING RETURNING event_id`,
-      [prepared.eventId, sourceKind, sourceId, prepared.occurredAt, JSON.stringify(prepared.consent), JSON.stringify(prepared.encryptedPayload)],
+      [prepared.eventId, sourceKind, sourceId, prepared.occurredAt, JSON.stringify(prepared.consent), JSON.stringify(prepared.encryptedPayload), prepared.policyRevisionId],
     )
 
     if (result.rows[0]) {
@@ -47,6 +59,7 @@ export const enqueueMeasurementConversion = async (
 }
 
 export interface ClaimedMeasurementDelivery {
+  policy_revision_id: string | null
   event_id: string
   destination: MeasurementDestination
   attempts: number
@@ -80,7 +93,7 @@ export const claimMeasurementDeliveries = async (destinations: MeasurementDestin
       RETURNING d.*
     )
     SELECT d.event_id, d.destination, d.attempts, d.lease_token,
-           c.occurred_at, c.encrypted_payload_json
+           c.occurred_at, c.encrypted_payload_json, c.policy_revision_id
     FROM claimed d JOIN greenhouse_growth.measurement_conversion c USING (event_id)
   `.execute(db)
 

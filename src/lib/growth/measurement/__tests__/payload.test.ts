@@ -1,4 +1,8 @@
+import { createHash } from 'node:crypto'
+
 import { describe, expect, it } from 'vitest'
+
+import { policyFixture, sourceKey, sourceVersion } from './policy-fixture'
 
 import { buildMatchingData, buildMeasurementPayloads, safeMeasurementUrl } from '../payload'
 
@@ -11,7 +15,8 @@ const context = {
 } as const
 
 const input = {
-  scope: { sourceKind: 'form_submission', sourceId: 'fixture', origin: 'https://efeoncepro.com',
+  policy: policyFixture(),
+  scope: { sourceKind: 'form_submission', sourceId: 'fixture', sourceKey, sourceVersion, origin: 'https://efeoncepro.com',
     pageUri: 'https://efeoncepro.com/aeo-2/?email=private@example.com#secret',
     surfaceId: 'fhsf-aeo', formSlug: 'efeonce-aeo-diagnostic' } as const,
   contact: { email: ' QA.Meta+Lead@Example.com ', phone: '+1 (202) 555-0148', firstName: 'José María', lastName: "O’Neill" },
@@ -42,6 +47,26 @@ describe('destination-specific Lead matching', () => {
     expect(buildMatchingData({ phone: '2025550148' }).hasIdentity).toBe(false)
     expect(buildMatchingData({ email: 'qa@example.com' }).meta).not.toHaveProperty('x-fb-ud-ln')
   })
+  it('keeps external contact identity stable across submissions and normalizes Unicode punctuation', () => {
+    const hash = (s: string) => createHash('sha256').update(s).digest('hex')
+    const matching = buildMatchingData({ email: ' QA .Meta+Lead@Example.com ', lastName: ' O’Neill—Smith! ' })
+
+    expect(matching.meta['x-fb-ud-external_id']).toBe(hash('qa.meta+lead@example.com'))
+    expect(matching.meta['x-fb-ud-external_id']).toBe(matching.meta['x-fb-ud-em'])
+    expect(matching.meta['x-fb-ud-ln']).toBe(hash('oneillsmith'))
+  })
+  it('forwards original visitor context without hashing IP, UA or cookie identifiers', () => {
+    const cookies = { fbp: 'fb.1.1791921600000.1234', fbc: 'fb.1.1791921600000.actual-click' }
+    const payload = buildMeasurementPayloads({ ...input, measurementContext: { ...context, ...cookies } })!
+
+    expect(payload.meta.ip_override).toBe(input.ip)
+    expect(payload.meta.user_agent).toBe(input.userAgent)
+    expect(payload.meta['x-fb-ck-fbp']).toBe(cookies.fbp)
+    expect(payload.meta['x-fb-ck-fbc']).toBe(cookies.fbc)
+    expect(payload.meta.action_source).toBe('website')
+    expect(payload.meta.event_time).toBe(Math.floor(now.getTime() / 1000))
+    expect(payload.meta.event_id).toBe(input.eventId)
+  })
   it('produces a clean URL, explicit classification and Google user-data-only', () => {
     const payload = buildMeasurementPayloads(input)!
 
@@ -65,17 +90,22 @@ describe('destination-specific Lead matching', () => {
   it('missing client_id keeps Meta but does not invent a Google visitor', () => {
     expect(buildMeasurementPayloads({ ...input, measurementContext: { ...context, clientId: undefined } })?.google).toBeNull()
   })
-  it('excludes hiring and unknown forms and unknown meeting surfaces', () => {
-    expect(buildMeasurementPayloads({ ...input, scope: { ...input.scope, formSlug: 'careers' } })).toBeNull()
-    expect(buildMeasurementPayloads({ ...input, scope: { ...input.scope, sourceKind: 'meeting_booking', schedulerKey: 'efeonce-discovery-30' } })).toBeNull()
+  it('requires an active published scope instead of a hardcoded slug', () => {
+    expect(buildMeasurementPayloads({...input,policy:undefined})).toBeNull()
+    expect(buildMeasurementPayloads({...input,policy:policyFixture({state:'disabled'})})).toBeNull()
+    expect(buildMeasurementPayloads({...input,scope:{...input.scope,sourceKey:'another-source'}})).toBeNull()
+    expect(buildMeasurementPayloads({...input,scope:{...input.scope,formSlug:'new-commercial-form'}})).not.toBeNull()
   })
   it('confirmed scheduler uses booking classification only', () => {
-    const payload = buildMeasurementPayloads({ ...input, scope: {
-      sourceKind: 'meeting_booking', sourceId: 'fixture-booking', origin: 'https://think.efeoncepro.com',
-      pageUri: '/web-agentica/', surfaceId: 'fhsf-efeonce-lead-gen-web', schedulerKey: 'efeonce-discovery-30',
+    const meetingScope={sourceKind:'meeting_booking' as const,sourceKey:'discovery',surfaceId:'fhsf-efeonce-lead-gen-web'}
+    const policy=policyFixture({scope:meetingScope,config:{...input.policy.config,sourceVersion:'ab'.repeat(32),origins:['https://think.efeoncepro.com']}})
+
+    const payload = buildMeasurementPayloads({ ...input, policy, scope: {
+      ...meetingScope, sourceVersion:policy.config.sourceVersion, sourceKind: 'meeting_booking', sourceId: 'fixture-booking', origin: 'https://think.efeoncepro.com',
+      pageUri: '/web-agentica/', surfaceId: 'fhsf-efeonce-lead-gen-web', schedulerKey: 'discovery',
     } })!
 
-    expect(JSON.parse(payload.meta.custom_properties)).toEqual({ lead_source: 'meeting_booking', surface_id: 'fhsf-efeonce-lead-gen-web', scheduler_key: 'efeonce-discovery-30' })
+    expect(JSON.parse(payload.meta.custom_properties)).toEqual({ lead_source: 'meeting_booking', surface_id: 'fhsf-efeonce-lead-gen-web', scheduler_key: 'discovery' })
   })
   it.each([
     ['https://other.example.com', '/'], ['http://efeoncepro.com', '/'],

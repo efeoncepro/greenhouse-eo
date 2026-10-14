@@ -543,13 +543,10 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
 
   const measurement = await prepareMeasurementConversion({
     scope: {
-      sourceKind: 'form_submission', sourceId: version.form_id, origin: context.origin,
+      sourceKind: 'form_submission', sourceId: version.form_id, sourceKey: definition.form_key, sourceVersion: version.form_version_id, origin: context.origin,
       pageUri: input.pageUri, surfaceId, formSlug: input.formSlug,
     },
-    contact: {
-      email: normalizedFields.email, phone: normalizedFields.phone,
-      firstName: normalizedFields.firstName, lastName: normalizedFields.lastName,
-    },
+    fields: normalizedFields,
     measurementContext: input.measurementContext, ip: context.ip, userAgent: context.userAgent,
     requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
   })

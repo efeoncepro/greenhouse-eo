@@ -1,0 +1,375 @@
+{
+  "date": "2026-10-14",
+  "source": "Fresh normal public URLs, no injected footer markup/styles",
+  "cases": [
+    {
+      "slug": "home",
+      "width": 1440,
+      "url": "https://efeoncepro.com/",
+      "height": 531.09375,
+      "scroll": 1440,
+      "grid": "306.961px 190.023px 409.281px 277.734px",
+      "nav": "Explora",
+      "partners": 9,
+      "allImages": true,
+      "forms": 1,
+      "emailLabel": "Correo electrónico",
+      "emailRequired": "true",
+      "consentRequired": true,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "social": [
+        {
+          "url": "https://www.facebook.com/efeonce.cl/",
+          "label": "Facebook"
+        },
+        {
+          "url": "https://www.instagram.com/efeoncepro/",
+          "label": "Instagram"
+        },
+        {
+          "url": "https://linkedin.com/company/efeoncecl",
+          "label": "LinkedIn"
+        },
+        {
+          "url": "https://www.youtube.com/@efeoncelatam",
+          "label": "YouTube"
+        }
+      ],
+      "legal": "© 2026 Efeonce Group SpA.\nPrivacidad y cookies | Preferencias de cookies",
+      "legalUrls": [
+        "https://efeoncepro.com/politica-de-privacidad"
+      ],
+      "preferences": 1,
+      "chromeHidden": true,
+      "button": [
+        {
+          "width": 106,
+          "height": 46,
+          "color": "rgb(0, 26, 51)",
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "slug": "home",
+      "width": 390,
+      "url": "https://efeoncepro.com/",
+      "height": 1134.53125,
+      "scroll": 390,
+      "grid": "163px 163px",
+      "nav": "Explora",
+      "partners": 9,
+      "allImages": true,
+      "forms": 1,
+      "emailLabel": "Correo electrónico",
+      "emailRequired": "true",
+      "consentRequired": true,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "social": [
+        {
+          "url": "https://www.facebook.com/efeonce.cl/",
+          "label": "Facebook"
+        },
+        {
+          "url": "https://www.instagram.com/efeoncepro/",
+          "label": "Instagram"
+        },
+        {
+          "url": "https://linkedin.com/company/efeoncecl",
+          "label": "LinkedIn"
+        },
+        {
+          "url": "https://www.youtube.com/@efeoncelatam",
+          "label": "YouTube"
+        }
+      ],
+      "legal": "© 2026 Efeonce Group SpA.\nPrivacidad y cookies | Preferencias de cookies",
+      "legalUrls": [
+        "https://efeoncepro.com/politica-de-privacidad"
+      ],
+      "preferences": 1,
+      "chromeHidden": true,
+      "button": [
+        {
+          "width": 106,
+          "height": 46,
+          "color": "rgb(0, 26, 51)",
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "slug": "service",
+      "width": 1440,
+      "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+      "height": 531.09375,
+      "scroll": 1440,
+      "grid": "292.852px 181.297px 390.477px 264.969px",
+      "nav": "Explora",
+      "partners": 9,
+      "allImages": true,
+      "forms": 1,
+      "emailLabel": "Correo electrónico",
+      "emailRequired": "true",
+      "consentRequired": true,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "social": [
+        {
+          "url": "https://www.facebook.com/efeonce.cl/",
+          "label": "Facebook"
+        },
+        {
+          "url": "https://www.instagram.com/efeoncepro/",
+          "label": "Instagram"
+        },
+        {
+          "url": "https://linkedin.com/company/efeoncecl",
+          "label": "LinkedIn"
+        },
+        {
+          "url": "https://www.youtube.com/@efeoncelatam",
+          "label": "YouTube"
+        }
+      ],
+      "legal": "© 2026 Efeonce Group SpA.\nPrivacidad y cookies | Preferencias de cookies",
+      "legalUrls": [
+        "https://efeoncepro.com/politica-de-privacidad"
+      ],
+      "preferences": 1,
+      "chromeHidden": true,
+      "button": [
+        {
+          "width": 106,
+          "height": 46,
+          "color": "rgb(0, 26, 51)",
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "slug": "service",
+      "width": 390,
+      "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+      "height": 1134.53125,
+      "scroll": 390,
+      "grid": "163px 163px",
+      "nav": "Explora",
+      "partners": 9,
+      "allImages": true,
+      "forms": 1,
+      "emailLabel": "Correo electrónico",
+      "emailRequired": "true",
+      "consentRequired": true,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "social": [
+        {
+          "url": "https://www.facebook.com/efeonce.cl/",
+          "label": "Facebook"
+        },
+        {
+          "url": "https://www.instagram.com/efeoncepro/",
+          "label": "Instagram"
+        },
+        {
+          "url": "https://linkedin.com/company/efeoncecl",
+          "label": "LinkedIn"
+        },
+        {
+          "url": "https://www.youtube.com/@efeoncelatam",
+          "label": "YouTube"
+        }
+      ],
+      "legal": "© 2026 Efeonce Group SpA.\nPrivacidad y cookies | Preferencias de cookies",
+      "legalUrls": [
+        "https://efeoncepro.com/politica-de-privacidad"
+      ],
+      "preferences": 1,
+      "chromeHidden": true,
+      "button": [
+        {
+          "width": 106,
+          "height": 46,
+          "color": "rgb(0, 26, 51)",
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "slug": "wide",
+      "width": 1920,
+      "url": "https://efeoncepro.com/",
+      "height": 531.09375,
+      "scroll": 1920,
+      "grid": "306.961px 190.023px 409.281px 277.734px",
+      "nav": "Explora",
+      "partners": 9,
+      "allImages": true,
+      "forms": 1,
+      "emailLabel": "Correo electrónico",
+      "emailRequired": "true",
+      "consentRequired": true,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "social": [
+        {
+          "url": "https://www.facebook.com/efeonce.cl/",
+          "label": "Facebook"
+        },
+        {
+          "url": "https://www.instagram.com/efeoncepro/",
+          "label": "Instagram"
+        },
+        {
+          "url": "https://linkedin.com/company/efeoncecl",
+          "label": "LinkedIn"
+        },
+        {
+          "url": "https://www.youtube.com/@efeoncelatam",
+          "label": "YouTube"
+        }
+      ],
+      "legal": "© 2026 Efeonce Group SpA.\nPrivacidad y cookies | Preferencias de cookies",
+      "legalUrls": [
+        "https://efeoncepro.com/politica-de-privacidad"
+      ],
+      "preferences": 1,
+      "chromeHidden": true,
+      "button": [
+        {
+          "width": 106,
+          "height": 46,
+          "color": "rgb(0, 26, 51)",
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "slug": "tablet",
+      "width": 768,
+      "url": "https://efeoncepro.com/",
+      "height": 887.0703125,
+      "scroll": 768,
+      "grid": "340px 340px",
+      "nav": "Explora",
+      "partners": 9,
+      "allImages": true,
+      "forms": 1,
+      "emailLabel": "Correo electrónico",
+      "emailRequired": "true",
+      "consentRequired": true,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "social": [
+        {
+          "url": "https://www.facebook.com/efeonce.cl/",
+          "label": "Facebook"
+        },
+        {
+          "url": "https://www.instagram.com/efeoncepro/",
+          "label": "Instagram"
+        },
+        {
+          "url": "https://linkedin.com/company/efeoncecl",
+          "label": "LinkedIn"
+        },
+        {
+          "url": "https://www.youtube.com/@efeoncelatam",
+          "label": "YouTube"
+        }
+      ],
+      "legal": "© 2026 Efeonce Group SpA.\nPrivacidad y cookies | Preferencias de cookies",
+      "legalUrls": [
+        "https://efeoncepro.com/politica-de-privacidad"
+      ],
+      "preferences": 1,
+      "chromeHidden": true,
+      "button": [
+        {
+          "width": 106,
+          "height": 46,
+          "color": "rgb(0, 26, 51)",
+          "transform": "none"
+        }
+      ]
+    }
+  ],
+  "interaction": {
+    "axe": {
+      "violations": [],
+      "passes": 30,
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    "focus": {
+      "text": "Suscribirme",
+      "outline": "rgb(54, 200, 191) solid 2px"
+    },
+    "afterTop": {
+      "scroll": 11837.5,
+      "chrome": [
+        {
+          "inert": false
+        },
+        {
+          "inert": false
+        }
+      ]
+    }
+  },
+  "manualContrast": 10.1566,
+  "cookiePreferencesPanelOpened": true,
+  "termsLinkRemovedAfter404": true,
+  "topReachedAfterSmoothAnimation": true,
+  "finalInteraction": {
+  "reducedMotionTop": 0,
+  "axe": {
+    "violations": [],
+    "passes": 30,
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "targets": [
+          [
+            ".eo-footer-top > span[aria-hidden=\"true\"]"
+          ]
+        ]
+      }
+    ]
+  }
+}
+}

@@ -1,0 +1,87 @@
+{
+  "snapshotOption": "eo_footer_refresh_20261014_v1",
+  "state": "applied",
+  "checks": {
+    "ohio_widget_logo-1": true,
+    "block-17": true,
+    "ohio_widget_socialbar_subscribe-3": true,
+    "ohio_widget_subscribe-2": true,
+    "block-32": true,
+    "block-31": true,
+    "block-14": true,
+    "sidebar:wp_inactive_widgets": true,
+    "sidebar:wc_shop": true,
+    "sidebar:ohio-sidebar-blog": true,
+    "sidebar:ohio-sidebar-page": true,
+    "sidebar:ohio-sidebar-footer-1": true,
+    "sidebar:ohio-sidebar-footer-2": true,
+    "sidebar:ohio-sidebar-footer-3": true,
+    "sidebar:array_version": true,
+    "front": true,
+    "template": true,
+    "owned:34": true,
+    "owned:45": true,
+    "sidebar4": true
+  },
+  "allChecksPass": true,
+  "ownedHashes": {
+    "34": "8d0f9f097631d099874c93228c16a97b199909b917349ee5a6bd04a2b052bf2b",
+    "45": "10affd5faf89d1e17e641dea402e74e3a62c270439f69c4b83a4e01db2af8565"
+  },
+  "media": [
+    {
+      "id": 251950,
+      "key": "hubspot",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/hubspot-mono.png",
+      "sha256": "b613863b5f495a15262f2349368d65c778aeedf82cd0bd861d9517336cc8475c"
+    },
+    {
+      "id": 251951,
+      "key": "salesforce",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/salesforce-mono.png",
+      "sha256": "f7f7a07b2744f3dd20129542e6978b17bc51c624cdc65d5bd55039a6590cf708"
+    },
+    {
+      "id": 251952,
+      "key": "adobe",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/adobe-mono.png",
+      "sha256": "e1c198a399d861b1dd215997a25eda52f82536f0c76bf5016f89dde2998955ef"
+    },
+    {
+      "id": 251953,
+      "key": "microsoft",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/microsoft-mono.png",
+      "sha256": "c7c008976724692328d211cd119f307da04c141c1e27b07340e674ed91339db2"
+    },
+    {
+      "id": 251954,
+      "key": "aws",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/aws-mono.png",
+      "sha256": "f73509183edb285c02ab335d0e5c2e140df7ee08d0c81c6000dccc913a43c995"
+    },
+    {
+      "id": 251955,
+      "key": "googlecloud",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/googlecloud-mono.png",
+      "sha256": "59e33c760f64c6cda4f736d8f414a2334b9557a5002bfbbcb7c31c219442056f"
+    },
+    {
+      "id": 251956,
+      "key": "claude",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/claude-mono.png",
+      "sha256": "50d015127f41d57d15e088d24c1391ef08f9349a58d7db4ddb8bbf6d284dcad9"
+    },
+    {
+      "id": 251957,
+      "key": "openai",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/openai-mono.png",
+      "sha256": "940a51053b15298f1040dd57f3ff8a78f5e639c8fd692a4c0f586ad94980db01"
+    },
+    {
+      "id": 251958,
+      "key": "byteplus",
+      "url": "https://efeoncepro.com/wp-content/uploads/2026/10/byteplus-mono.png",
+      "sha256": "cb1f73c61766713d2098c6d9d44107a02f655db047a56ea77249b43b053d1027"
+    }
+  ]
+}

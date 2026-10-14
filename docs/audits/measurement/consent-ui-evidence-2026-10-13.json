@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 2,
+  "date": "2026-10-14",
+  "scope": "Native HubSpot presentation, four public host/viewport combinations",
+  "deployment": {
+    "thinkCommit": "f7d8f36f3040b270711f6961b0163919ddcbf2a3",
+    "thinkDeployment": "dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5",
+    "wpCommit": "8d6ff95081dc3ec07b7580d979c86102a9666518",
+    "wpVersion": "1.1.0",
+    "thinkPrestateDeployment": "dpl_AH8YdErwaGg6haELFGzdk3DuddRX"
+  },
+  "nativeUi": {
+    "injected": false,
+    "status": "PASS",
+    "results": [
+      {
+        "host": "think.efeoncepro.com",
+        "viewport": "desktop",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-consented-transport-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      },
+      {
+        "host": "think.efeoncepro.com",
+        "viewport": "mobile",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-consented-transport-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      },
+      {
+        "host": "efeoncepro.com",
+        "viewport": "desktop",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-consented-transport-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      },
+      {
+        "host": "efeoncepro.com",
+        "viewport": "mobile",
+        "status": "PASS",
+        "consentAuthority": "HubSpot",
+        "checks": [
+          "automatic-banner",
+          "branded-title",
+          "contained-banner",
+          "default-denied",
+          "no-consented-transport-before-choice",
+          "ads-only",
+          "analytics-remains-denied",
+          "legal-footer-reopen",
+          "native-choice-preserved",
+          "revoke",
+          "HubSpot-cookie-present"
+        ],
+        "pageErrors": []
+      }
+    ],
+    "verificationScope": {
+      "browser": "Chromium",
+      "reducedMotion": "reduce",
+      "viewports": {
+        "desktop": {
+          "width": 1440,
+          "height": 1000
+        },
+        "mobile": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "transportIntercepted": "/g/collect fulfilled with 204",
+      "beforeChoiceAssertion": "Every observed /g/collect request has gcs G100, meta consent not granted, and Meta PageView marker not 1; the set may be empty",
+      "accessibility": "axe tags wcag2a/wcag2aa/wcag21a/wcag21aa/wcag22aa, subtree #hs-banner-parent in banner and preferences states",
+      "notProven": [
+        "Absence of all network requests or cookies",
+        "New CAPI receipt or real business conversion",
+        "Full-site accessibility certification",
+        "Keyboard matrix or all category/button combinations by this verifier"
+      ]
+    }
+  },
+  "publicAssets": {
+    "status": "PASS",
+    "results": [
+      {
+        "host": "efeoncepro.com",
+        "files": [
+          {
+            "file": "consent-ui.v1.css",
+            "status": 200,
+            "sha256": "6f39d85ac719fc2bdbc1becdbc06aa792af219c1195211e7511f222dfa5cbec8"
+          },
+          {
+            "file": "consent-ui.v1.js",
+            "status": 200,
+            "sha256": "63b246da2480f07249c40c920f4c6c842cbefb81cfcd14243cebd793af8ff2f9"
+          },
+          {
+            "file": "bricolage-latin.woff2",
+            "status": 200,
+            "sha256": "a97804dc9fbe5fc972a08018c5eda4dab7ef2346f64c57e61419d05e6de4ea1c"
+          },
+          {
+            "file": "poppins-400-latin.woff2",
+            "status": 200,
+            "sha256": "7d93459d86585bfcdbb7e0376056226adb25821ee54b96236fe2123e9560929f"
+          },
+          {
+            "file": "poppins-500-latin.woff2",
+            "status": 200,
+            "sha256": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446"
+          },
+          {
+            "file": "LICENSE-bricolage",
+            "status": 200,
+            "sha256": "923f4ddf0fd39f9b7794ab0df7332f3d95dc43e8ad7ec2289d6d9e8491177f51"
+          },
+          {
+            "file": "LICENSE-poppins",
+            "status": 200,
+            "sha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+          }
+        ]
+      },
+      {
+        "host": "think.efeoncepro.com",
+        "files": [
+          {
+            "file": "consent-ui.v1.css",
+            "status": 200,
+            "sha256": "6f39d85ac719fc2bdbc1becdbc06aa792af219c1195211e7511f222dfa5cbec8"
+          },
+          {
+            "file": "consent-ui.v1.js",
+            "status": 200,
+            "sha256": "63b246da2480f07249c40c920f4c6c842cbefb81cfcd14243cebd793af8ff2f9"
+          },
+          {
+            "file": "bricolage-latin.woff2",
+            "status": 200,
+            "sha256": "a97804dc9fbe5fc972a08018c5eda4dab7ef2346f64c57e61419d05e6de4ea1c"
+          },
+          {
+            "file": "poppins-400-latin.woff2",
+            "status": 200,
+            "sha256": "7d93459d86585bfcdbb7e0376056226adb25821ee54b96236fe2123e9560929f"
+          },
+          {
+            "file": "poppins-500-latin.woff2",
+            "status": 200,
+            "sha256": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446"
+          },
+          {
+            "file": "LICENSE-bricolage",
+            "status": 200,
+            "sha256": "923f4ddf0fd39f9b7794ab0df7332f3d95dc43e8ad7ec2289d6d9e8491177f51"
+          },
+          {
+            "file": "LICENSE-poppins",
+            "status": 200,
+            "sha256": "5c4a92c8f8ce0ab211f4c72889d82383c9644546115d9ba39a4f2d5b8f37014b"
+          }
+        ]
+      }
+    ]
+  },
+  "bridgeTests": {
+    "passed": 16
+  },
+  "gpc": [
+    {
+      "host": "efeoncepro.com",
+      "gpc": true,
+      "status": "PASS",
+      "state": {
+        "ads": "denied",
+        "decision": [
+          {
+            "ads": "denied",
+            "analytics": "denied"
+          }
+        ],
+        "banner": false
+      }
+    },
+    {
+      "host": "think.efeoncepro.com",
+      "gpc": true,
+      "status": "PASS",
+      "state": {
+        "ads": "denied",
+        "decision": [
+          {
+            "ads": "denied",
+            "analytics": "denied"
+          }
+        ],
+        "banner": false
+      }
+    }
+  ],
+  "observedLocalDate": "2026-10-13",
+  "localTimeZone": "America/Santiago",
+  "documentationReviewDate": "2026-10-14",
+  "reviewMode": "Stored rollout receipts and local code inspection; no new live execution or publication",
+  "consentContract": {
+    "authority": "HubSpot native category preferences and persistence",
+    "listener": "_hsp.addPrivacyConsentListener",
+    "consentSource": "hubspot_categories",
+    "presentationWritesConsent": false,
+    "presentationOwnsPersistence": false,
+    "reopen": "_hsp.showBanner; may require Personalizar preferencias before category dialog",
+    "gpc": "Provider may resolve denied without mounting the opt-in banner; bridge independently vetoes ads when navigator.globalPrivacyControl is true"
+  },
+  "analyticsDisabledPreview": {
+    "status": 200,
+    "measurementScripts": 0,
+    "route": "/preview/cookies",
+    "publiclyReachable": true,
+    "meaning": "Public design preview with analytics=false; does not prove access control or every private report route"
+  },
+  "provenance": {
+    "localArtifacts": [
+      {
+        "path": ".captures/cookie-rollout/live/result.json",
+        "sha256": "748be4830a6e0eaffc696d7d4434b12634135673e598a950a74753e4827fab8b"
+      },
+      {
+        "path": ".captures/cookie-rollout/live-assets.json",
+        "sha256": "21513780ddefa54507571d09d3fab1d06d3a8787aff7017291d5b529476e7218"
+      },
+      {
+        "path": ".captures/cookie-rollout/live-gpc.json",
+        "sha256": "47a9dd34f1282e9920cf758cff083c2c3e83aa2dfdecbd3c68be41552b978308"
+      },
+      {
+        "path": ".captures/cookie-rollout/verify-native-ui.mjs",
+        "sha256": "9e3ab0e108016cbd650efdb4700fd09535f29a0543fc5401284b2c41e2879f02"
+      },
+      {
+        "path": "scripts/measurement/hubspot-consent-ui.js",
+        "sha256": "80a36cad0de104e6ffe0863b592406ae6dc1bbad8507c49b3387ef9af0af66f1"
+      },
+      {
+        "path": "scripts/measurement/hubspot-consent-ui.template.css",
+        "sha256": "46c5be10a836305d8ef98d46427bef74f73de0d14f93ad3a6a237d0e9137e383"
+      },
+      {
+        "path": "scripts/measurement/build-hubspot-consent-ui.mjs",
+        "sha256": "cef67a2b7d8562e0acac8603cd35e8e849bad416ff73a9deca814a1495d9f599"
+      },
+      {
+        "path": "scripts/measurement/verify-hubspot-consent-ui.mjs",
+        "sha256": "bd472ed3f99941c01d06aab86e60f9fc43a15be7684909ab6b15b73baa212500"
+      },
+      {
+        "path": "scripts/measurement/hubspot-consent-bridge.js",
+        "sha256": "15026e5d27ed54a8188a67b100f812ef5d33129bb15f7eb365054cac6f4f0d3a"
+      }
+    ],
+    "historicalEvidenceDirectory": ".captures/cookie-rollout/live/",
+    "currentVerifierOutputDirectory": ".captures/cookie-ui-live/",
+    "evidenceAvailability": "Local captures are ignored, not portable repo fixtures; this sanitized JSON preserves their summarized results and hashes",
+    "assetManifestPath": "../efeonce-think/public/measurement/consent-ui/manifest.json",
+    "assetManifestSha256": "ef36f19f3919770300583bd1995fd8392590ce395b765c3ce4f0b1d0589213cd",
+    "canonicalJavaScriptSha256": "80a36cad0de104e6ffe0863b592406ae6dc1bbad8507c49b3387ef9af0af66f1",
+    "publishedJavaScriptSha256": "63b246da2480f07249c40c920f4c6c842cbefb81cfcd14243cebd793af8ff2f9",
+    "sourceDistributionEquivalence": "Acorn AST equal after omitting start/end/loc/range on documentation review; raw bytes differ after source formatting",
+    "rebuildEffect": "Builder raw-copies canonical JS, so rebuilt JS digest differs from the published snapshot; no redistribution performed during documentation review"
+  },
+  "toolIncident": {
+    "tool": "Vercel CLI pagination output",
+    "credentialValueRecordedHere": false,
+    "remediationStatus": "Revocation or renewal pending at rollout; not attempted or verified by documentation review"
+  }
+}

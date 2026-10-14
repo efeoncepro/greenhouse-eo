@@ -44,8 +44,9 @@ export const readPublicMeasurementContext = (
   }
 
   if (context.advertisement) {
-    const fbp = cookie('_fbp')
-    const fbc = cookie('_fbc')
+    const attribution = (win as Window & { efeonceReadMetaAttribution?: () => { fbp?: string; fbc?: string } }).efeonceReadMetaAttribution?.()
+    const fbp = attribution?.fbp || cookie('_fbp')
+    const fbc = attribution?.fbc || cookie('_fbc')
     const fbclid = new URL(win.location.href).searchParams.get('fbclid')
 
     if (fbp && /^fb\.\d+\.\d{13}\.\d{1,20}$/.test(fbp)) context.fbp = fbp

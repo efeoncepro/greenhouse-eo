@@ -1,12 +1,40 @@
 # Meta CAPI — recuperación y publicación · 2026-10-13
 
-> Estado actual: GTM Server live **5**, Web live **5**; HubSpot consent por categorías
-> publicado y routing activo en WordPress y Think. Positivos Server procesados en Meta Test Events;
-> navegación real de ambos hosts completó tags Meta/GA4. Próximos leads comerciales/replay sin observar.
-> Los deltas inferiores preservan la secuencia histórica; el último delta gobierna el estado actual.
-> Canon: [runbook](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md).
+> **Estado vigente al cierre del 13/10 Chile:** GTM Server **6** / Web **5**; matching
+> Meta y Google activado después del release completo PR254/main `d692ab51dc48`.
+> [Release, runtime, SQL, configuración y rollback vigentes](../releases/2026-10-13-full-develop-matching-release.md).
+> [Contrato de operación de matching](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
 
-## Requisito vigente: coincidencia y remarketing de Lead
+## Estado vigente y límite de cierre
+
+HubSpot categorías/GPC y routing WP/Think permanecen activos. Server6 añade el Client backend
+31/trigger33 autenticado y retira los emisores Meta Lead12/17; PageView11 y el mirror GA4
+continúan. El forwarding GA4 exige Client Name=GA4 y excluye ese Client backend.
+SQL post-release aplicada; Ops00775-fnh sirve Meta/Google/retención true, persistidos también
+en GitHub repo vars. Los tres secretos pinned versión1 se resolvieron en el worker real,
+canary200 sin negocio ni egress provider. Captura Vercel true exacta, redeploy
+`dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT` READY y alias canónico confirmado. GA4 UPD/ack,
+siete audiencias90d y vínculo Ads releídos. No se afirma renovación/TTL del token Meta.
+
+Preview/Test Events confirmó matching em/ph/fn/ln y clasificadores; controles SQL y negativos
+live pasaron. **Primera aceptación/reserva comercial real consentida posterior a la activación
+sin observar**: no atribuir entrega comercial, match quality, dedupe de atribución ni serving
+por esos controles. TASK-2034 permanece parcial. Incidencia separada mindicador TLS/timeout
+abierta, documentada en el dossier de release; no afecta el estado de este cutover.
+
+Rollback de matching vigente: captura y ambos senders OFF en configuración durable y runtime;
+retención ON. Restaurar Server5 sólo después de detener backend Meta; conservar SQL,
+recibos y key/ciphertext vigente48h. El rollback de recuperación Server3/Web4 que aparece
+más abajo es histórico y tiene otro alcance; no aplicarlo automáticamente al matching.
+
+## Cronología preservada — estados anteriores al cierre
+
+Los apartados siguientes son evidencia secuencial del diagnóstico, borradores, provisión,
+reversiones y recuperación5/5. Sus expresiones «vigente», «pendiente», «sin release» y sus
+versiones describen **ese momento**, no el estado actual resumido arriba. No se borran los
+intentos, el evento QA accidental ni las decisiones/costos que cambiaron el curso.
+
+## Requisito inicial: coincidencia y remarketing de Lead
 
 Readback posterior a las pruebas de visitante nuevo: GTM Web/Server live 5/5, etiqueta
 Meta v25 con enriquecimiento/cookie extension deshabilitados. Forms tag 12 usa
@@ -315,7 +343,7 @@ Evidencia saneada: `original-tagging-scaling.png`, `original-preview-scaling.png
 y `gtm-cost-and-rollback.json` en capturas. El operador detuvo hosting hasta
 entender y acordar costo; ninguna nueva provisión autorizada tras esa parada.
 
-## Delta vigente — hosting reautorizado, recuperado y QA funcional
+## Hosting reautorizado, recuperado y QA funcional — hito histórico
 
 El operador autorizó avanzar después de contrastar los límites originales. Este delta
 supersede el estado detenido/revertido anterior, sin borrar sus acciones ni evidencia.

@@ -60,6 +60,41 @@ React con mensajes explícitos; no introduce React ni ese control en el web comp
 
 ---
 
+## Matching publicitario — TASK-2034 (release 2026-10-13)
+
+Antes de tocar captura, identidad o destinos publicitarios, cargar el contrato completo
+`docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md` y la skill
+`greenhouse-gtm-ga4-operator`. Es un carril separado de la entrega HubSpot del formulario.
+
+- `src/growth-measurement-context/context.ts` lee categorías HubSpot resueltas y GPC al enviar;
+  `measurementContext` va sólo al POST gobernado. La casilla de consentimiento del formulario
+  no autoriza publicidad. Ausencia, antigüedad >10 min, publicidad denegada o GPC bloquean matching.
+- `submitForm` prepara matching con **campos ya normalizados** `email`, `phone`, `firstName`,
+  `lastName`. No inferir mappings desde labels ni fabricar apellidos o identidades GA4.
+- La aceptación guarda submission + consentimiento + outbox; la proyección cifrada se inserta en
+  esa misma transacción mediante SAVEPOINT aislado. Si falla medición, se conserva la aceptación.
+  No confundir esta captura opcional con entrega publicitaria garantizada.
+- `measurement_conversion` / `measurement_delivery` en `greenhouse_growth` son los ledgers de
+  matching. UUID externo independiente, único por `(source_kind, source_id)`; se conserva en retries.
+  El ops-worker existente drena ambos destinos: Meta vía Client autenticado sGTM; Google UPD vía
+  Measurement Protocol **sin events**. GA4 conserva un solo `generate_lead` browser-reported.
+- `GROWTH_MEASUREMENT_CAPTURE_ENABLED` gobierna Vercel; `GROWTH_MEASUREMENT_META_ENABLED`,
+  `GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED` y `GROWTH_MEASUREMENT_RETENTION_ENABLED` gobiernan worker.
+  Verificar cada runtime y la persistencia de repo vars; no extrapolar desde flags Forms/HubSpot.
+- Cobertura fija actual: `efeonce-aeo-diagnostic`, `efeonce-seo-diagnostic`,
+  `efeonce-desarrollo-web-cotizacion`, `efeonce-lead-gen-web`, `efeonce-social-audit`,
+  `ai-visibility-grader`, sólo en origins HTTPS `efeoncepro.com` / `think.efeoncepro.com` con surface.
+  La allowlist existe en `measurement/payload.ts` **y** `scripts/measurement/sgtm-lead-client.js`.
+  Publicar un formulario o registrar su tagging GA4 **no lo incorpora automáticamente al matching**.
+- AES-256-GCM, reintentos máximos 5 en 24 h y purga de material cifrado a 48 h; no incluir PII,
+  hashes, cookies publicitarias ni payloads en dataLayer, logs o dimensiones GA4 ordinarias.
+- UI/configuración publicada por formulario para autorizar matching: **propuesta, sin GO y no
+  implementada**. Hoy ampliar cobertura requiere código/release y publicación sGTM gobernados.
+  No prometer alta por configuración ni inferir audiencia elegible por habilitar el transporte.
+
+Pruebas controladas y activación no sustituyen observar el primer Lead comercial real consentido;
+consultar el [readback del release](../../../docs/audits/releases/2026-10-13-full-develop-matching-release.md).
+
 ## Mental model — end to end
 
 ```
@@ -596,3 +631,21 @@ pnpm release:watchdog --json                                      # worker GIT_S
 - AEO landing: `docs/documentation/public-site/aeo-landing-elementor.md`
 - Compose with: `greenhouse-postgres`, `greenhouse-backend`, `greenhouse-cron-sync-ops`,
   `hubspot-greenhouse-bridge`, `efeonce-public-site-wordpress`, `greenhouse-ux` (+ product-design).
+
+
+### Published measurement configuration — TASK-2035 checkpoint14/10
+
+For scalable conversion matching use the [policy ADR](../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) and [operator manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). Code in develop resolves stable form_key + opaque published fver-* identity or active meeting binding fingerprint, surface/origin, typed mapping and independent destinations from immutable reviewed/published policy data. Never add a form slug/scheduler to a runtime list or let public telemetry authorize advertising. New source/version activation is a governed data command, not a redeploy; new behavior/host/provider may require code. Source acceptance and fresh consent/GPC remain mandatory; enqueue and dispatcher revalidate publication. Disabling blocks pending sends, not HTTP already started. API/UI permission is internal read/author/publish/disable; browser never picks authority. The contextual panel uses immutable draft→review→publish, separate disable, dirty-source confirmation and independent server readback. Preserve the same body/idempotency key after an unknown POST outcome; after a known receipt retry GET only. A409 reload retains unsaved values and refreshes CAS authority. Forms delivery through HubSpot Forms→CRM retains its separate destination fieldMapping, consent and commercial outbox; matching configuration never replaces it or gates commercial acceptance. Verify each destination independently. For current CI/GTM transition/production status follow the live runtime ledger; code/tests or Meta Test Events never prove real CRM delivery.
+
+
+### Agent-first measurement operation
+
+Use `pnpm growth:measurement --help` then `discover → validate → apply → verify` from the
+[manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). This is an HTTP
+client of the same governed Product API as the panel, not a SQL/admin-role shortcut. Discovery
+returns the versioned contract, effective permissions, source version/fields and current heads.
+Validate is read-only; apply requires existing operator authorization, explicit intent and a
+private receipt. Keep the exact command/key on unknown outcome; a known receipt retries GET only.
+A409 requires fresh discovery, never blind overwrite. No contact values belong in configuration,
+receipts or logs. Preserve the separate Growth Forms→HubSpot Forms→CRM delivery and consented
+measurement projection. Do not claim MCP/Nexa tool exposure or provider success from CLI success.

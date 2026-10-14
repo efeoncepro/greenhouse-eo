@@ -30,6 +30,8 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[Footer completo: Explora, newsletter, empleo y partners](../audits/public-site/2026-10-14-footer-composition-v2.md)** — cuatro columnas, nueve partners de las firmas en gris, QA responsive, accesibilidad y rollback.
+
 - **Reproductor AXIS — adapter preparado, sin activación:** bloque `eo-axis-video` en
   `efeonce-public-site-runtime/wp-content/plugins/eo-axis-video/`. La prueba del snapshot del artículo
   `251941` no modificó el artículo público. [Estado y límites](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md#reproductor-publicado--estado-verificado-2026-10-07)
@@ -143,3 +145,13 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   consecuencias, enlaces a ADR/EPIC/TASK, y reglas duras si aplica.
 - Al aceptar/cambiar un PDR, actualizar el índice de arriba y, si toca el orden
   de ejecución, `PRODUCT_ROADMAP.md`.
+
+
+## Consentimiento y matching compartidos
+
+[Contrato HubSpot/host](../reference/measurement-gtm-ga4/09-hubspot-consent.md) y
+[runtime implementado](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+son el canon de banner automático, preferencias inline, PageView consentido y contexto portable.
+Host distribuye el bridge común y embebe Forms/Meetings; no replica lógica de matching ni secretos.
+Matching released no autoautoriza un formulario/host nuevo; conserva el scope publicado.
+La política administrable sigue propuesta sin GO. No activar tracking en rutas privadas/tokenizadas.

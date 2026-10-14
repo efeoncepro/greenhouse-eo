@@ -1,0 +1,334 @@
+{
+  "verifiedAt": "2026-10-14",
+  "source": "Fresh public normal-URL Playwright navigations; no DOM injection",
+  "checks": [
+    {
+      "slug": "home",
+      "width": 1440,
+      "url": "https://efeoncepro.com/",
+      "scroll": 1440,
+      "nav": [
+        {
+          "text": "Servicios",
+          "url": "https://efeoncepro.com/#servicios"
+        },
+        {
+          "text": "Cómo trabajamos",
+          "url": "https://efeoncepro.com/#metodo"
+        },
+        {
+          "text": "Casos de éxito",
+          "url": "https://efeoncepro.com/portafolio/"
+        },
+        {
+          "text": "Blog",
+          "url": "https://efeoncepro.com/blog/"
+        }
+      ],
+      "partners": [
+        {
+          "name": "HubSpot",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Salesforce",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Adobe",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Microsoft",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "AWS",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Google Cloud",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Claude",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "OpenAI",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "BytePlus",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        }
+      ],
+      "columns": "116.617px 116.625px 116.617px 116.625px 116.617px 116.625px 116.617px 116.625px 116.625px",
+      "forms": 1,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "preferences": 1,
+      "demoLinks": 0
+    },
+    {
+      "slug": "home",
+      "width": 390,
+      "url": "https://efeoncepro.com/",
+      "scroll": 390,
+      "nav": [
+        {
+          "text": "Servicios",
+          "url": "https://efeoncepro.com/#servicios"
+        },
+        {
+          "text": "Cómo trabajamos",
+          "url": "https://efeoncepro.com/#metodo"
+        },
+        {
+          "text": "Casos de éxito",
+          "url": "https://efeoncepro.com/portafolio/"
+        },
+        {
+          "text": "Blog",
+          "url": "https://efeoncepro.com/blog/"
+        }
+      ],
+      "partners": [
+        {
+          "name": "HubSpot",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Salesforce",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Adobe",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Microsoft",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "AWS",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Google Cloud",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Claude",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "OpenAI",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "BytePlus",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        }
+      ],
+      "columns": "108.664px 108.664px 108.664px",
+      "forms": 1,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "preferences": 1,
+      "demoLinks": 0
+    },
+    {
+      "slug": "service",
+      "width": 1440,
+      "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+      "scroll": 1440,
+      "nav": [
+        {
+          "text": "Servicios",
+          "url": "https://efeoncepro.com/#servicios"
+        },
+        {
+          "text": "Cómo trabajamos",
+          "url": "https://efeoncepro.com/#metodo"
+        },
+        {
+          "text": "Casos de éxito",
+          "url": "https://efeoncepro.com/portafolio/"
+        },
+        {
+          "text": "Blog",
+          "url": "https://efeoncepro.com/blog/"
+        }
+      ],
+      "partners": [
+        {
+          "name": "HubSpot",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Salesforce",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Adobe",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Microsoft",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "AWS",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Google Cloud",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Claude",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "OpenAI",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "BytePlus",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        }
+      ],
+      "columns": "116.617px 116.625px 116.617px 116.625px 116.617px 116.625px 116.617px 116.625px 116.625px",
+      "forms": 1,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "preferences": 1,
+      "demoLinks": 0
+    },
+    {
+      "slug": "service",
+      "width": 390,
+      "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+      "scroll": 390,
+      "nav": [
+        {
+          "text": "Servicios",
+          "url": "https://efeoncepro.com/#servicios"
+        },
+        {
+          "text": "Cómo trabajamos",
+          "url": "https://efeoncepro.com/#metodo"
+        },
+        {
+          "text": "Casos de éxito",
+          "url": "https://efeoncepro.com/portafolio/"
+        },
+        {
+          "text": "Blog",
+          "url": "https://efeoncepro.com/blog/"
+        }
+      ],
+      "partners": [
+        {
+          "name": "HubSpot",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Salesforce",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Adobe",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Microsoft",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "AWS",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Google Cloud",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "Claude",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "OpenAI",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        },
+        {
+          "name": "BytePlus",
+          "loaded": true,
+          "filter": "grayscale(1)"
+        }
+      ],
+      "columns": "108.664px 108.664px 108.664px",
+      "forms": 1,
+      "careers": [
+        {
+          "url": "https://greenhouse.efeoncepro.com/public/careers",
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      ],
+      "preferences": 1,
+      "demoLinks": 0
+    }
+  ]
+}

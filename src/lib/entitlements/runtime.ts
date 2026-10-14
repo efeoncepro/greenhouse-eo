@@ -512,6 +512,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-2036: advertising policy writes require fine grants, never a public/client context.
+  if (subject.tenantType === 'efeonce_internal' &&
+      (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS))) {
+    addEntitlement(entries, {module:'growth',capability:'growth.measurement.read',action:'read',scope:'tenant',source:'role'})
+
+    for (const capability of ['growth.measurement.author','growth.measurement.publish','growth.measurement.disable'] as const) {
+      addEntitlement(entries, {module:'growth',capability,action:'execute',scope:'tenant',source:'role'})
+    }
+  }
+
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
   // públicos (author/review/publish/destinations/surfaces/submissions/retry). V1
   // internal-only: route_group internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪

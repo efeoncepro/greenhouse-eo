@@ -1,5 +1,60 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
+## Privacidad pública: aviso y preferencias de cookies (adoptada, 2026-10-13)
+
+El operador pidió una experiencia más moderna, premium y elegante afín a esta línea y autorizó «Vamos, ponla». Dirección:
+papel/navy, Bricolage editorial/Poppins funcional, aviso flotante compacto y preferencias en diálogo
+con divisores e interruptores AXIS. La órbita no es obligatoria: aquí no mide ni rodea un dato, por lo
+que se omite el anillo. Acento solo en geometría/punto, nunca en texto pequeño.
+
+Se conserva el enlace discreto «Preferencias de cookies» en el footer legal. El aviso inicial aparece
+automáticamente; el enlace sirve para revisar la elección posteriormente. No incorporar otra franja
+permanente. En móvil, la tarjeta respeta márgenes y el diálogo se transforma en panel inferior desplazable.
+
+Prototipo nativo Astro en Think `/preview/cookies`, sin medición ni persistencia; botones, cerrar y switches
+de primitives 0.6.6, proyección generada de tokens 0.6.1. No es un contrato AXIS publicado ni una CMP nueva.
+La fuente de consentimiento continúa siendo HubSpot. Producción usa un adapter CSS/ARIA sobre sus
+controles nativos; no persiste preferencias propias ni usa la demo para escribir categorías.
+Canon: `scripts/measurement/hubspot-consent-ui.*` y builder; distribuciones idénticas WP/Think.
+Al cambiarlo, revalidar selectores nativos, categorías, GPC, a11y y bridge. Nunca conectar `gtag` o CAPI a la demo.
+
+Dirección, alternativas, estados y evidencia: [dossier de privacidad](../../../../docs/ui/visual-directions/EFEONCE_COOKIE_PRIVACY_2026-10-13.md).
+Estado: publicado en ambos hosts y verificado en escritorio/móvil; [readback y rollback](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+
+### Producción y mantenimiento de esta aplicación
+
+Corte publicado: WP `8d6ff95` (`eo-measurement-consent` 1.1.0) y Think `f7d8f36`, verificado el
+2026-10-14 UTC / 13 de octubre en Chile. La aprobación alcanza esta aplicación pública; no convierte
+el adapter en un componente portable de AXIS ni migra otra UI de producto.
+
+- **Fidelidad:** CSS generado desde `efeonceGraphicLine`, geometry, motion, typography, elevation,
+  button y forms; el builder exige primitives 0.6.6/tokens 0.6.1. Las fuentes Bricolage variable y
+  Poppins 400/500 son WOFF2 locales con licencias. No editar CSS/fonts distribuidos a mano: el canon
+  en Greenhouse genera ambos consumidores y su manifest de hashes.
+- **Compatibilidad:** el JS atiende sólo los dos hosts públicos, espera el DOM tardío con
+  `MutationObserver` y añade hermanos de presentación; no reemplaza hijos administrados por HubSpot.
+  Conserva controles, handlers, detalles/accordions y enlace de política real. Ajusta etiquetas ARIA y
+  retira `aria-pressed` inválido del checkbox sin cambiar `checked`. Las preferencias conservan también
+  «Aceptar todas» nativo; el layout del prototipo no es un reemplazo literal del renderer productivo.
+- **Fallback y límite:** la UI nativa sigue siendo la autoridad y el estado abierto/cerrado lo conserva
+  HubSpot. Esto no garantiza compatibilidad ante cambios de sus IDs/clases: no hay un fallback
+  productivo nuevo ni persistencia propia que los sustituya. Si cambia el proveedor, revalidar y,
+  si hace falta, retirar/revertir sólo el adapter mediante el procedimiento del rollout.
+- **QA de referencia:** ambos hosts × 1440/390 desde assets públicos, sin inyección; aviso automático,
+  publicidad sin analítica, recarga, reapertura y retiro, axe WCAG A/AA sin violaciones. Con GPC activo,
+  HubSpot resuelve categorías denegadas y no monta el aviso opt-in: es una excepción verificada al
+  estado inicial, no permiso implícito. CSS conserva `prefers-reduced-motion`.
+- **Qué no prueba:** la regresión intercepta el transporte de medición para no contaminar destinos;
+  no acredita un nuevo PageView/Lead recibido por Meta Server, ni una conversión comercial real.
+  Think `analytics=false` continúa sin cargar medición ni este adapter.
+
+Para cambiar copy, proporción o estados, revisar primero
+`scripts/measurement/hubspot-consent-ui.js` y `hubspot-consent-ui.template.css`; comprobar procedencia
+antes de ejecutar `node scripts/measurement/build-hubspot-consent-ui.mjs` (escribe en ambos repos
+hermanos). La regresión `node scripts/measurement/verify-hubspot-consent-ui.mjs --inject-local`
+permite revisar antes de publicar; `--live` verifica los assets publicados. Mantener aprobaciones,
+distribución y readback como pasos distintos, con el scope de cada host explícito.
+
 > Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta marca Rooms (A13) verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
@@ -1562,3 +1617,20 @@ Radio/medidas comunes, loader orbital y flecha opcional. Fuente y ejemplos: [lab
 Verificado contra: axis-design-system@1bccb3f — 2026-10-04; adopción de productos separada.
 
 Evidencia de distribución de botones: [auditoría](../../../../docs/audits/2026-10-04-axis-buttons-release.md).
+
+### Footer WordPress: franja de partners — 2026-10-14
+
+Aplicación publicada en `efeoncepro.com`: nueve logos monocromos de la firma v3.1, con
+`grayscale(1)`, pesos ópticos heredados, nueve columnas desktop/cinco tablet/tres móvil.
+HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus. El operador
+rechazó la variante de dos badges a color, nunca publicada. Se adapta la composición al footer
+nativo Ohio; no cambia la firma ni los recursos AXIS, no implica tier o programa adicional.
+[Rollout, recursos y rollback](../../../../docs/audits/public-site/2026-10-14-footer-explore-partners.md).
+
+### Footer WordPress V2 — composición integral, 2026-10-14
+
+Sustituye la primera aplicación del mismo día: marca · «Explora» · newsletter · empleo,
+Bricolage/Poppins y container acotado; nueve logos gris, Salesforce ajustado. Altura1440:851→531px.
+Móvil combina marca/navegación y apila newsletter/empleo; partners3columnas. Controles flotantes
+inert sólo al intersectar footer, top discreto y legal español. Preserva CF7/consentimiento/delivery;
+no acredita recepción. [Estado y reversión](../../../../docs/audits/public-site/2026-10-14-footer-composition-v2.md).

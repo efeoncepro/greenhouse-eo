@@ -107,19 +107,34 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 - Extend `MEETING_GTM_EVENTS`, `MEETING_STEPS`, `MEETING_TELEMETRY_PAYLOAD_KEYS`, the renderer mirror,
   parity tests and Tracking Plan together.
 - Preserve server-confirmed ledger truth; GA4 remains a browser-reported mirror to reconcile.
-- Meta CAPI via sGTM: reuse the confirmed `generate_lead` with `lead_source=meeting_booking`
-  and a separate scheduler/surface eligibility filter. Load the canonical runbook
-  `docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md`. Meeting CAPI
-  identity uses an opaque browser UUID only on a fresh eligible confirmation. The sender
-  prefers a valid renderer UUID and otherwise uses the consent bridge Crypto UUID cached by
-  the local GTM event counter (never transmitted). Load `09-hubspot-consent.md`. Sender live
-  2026-10-13; local renderer enhancement remains unreleased and is not a recovery dependency.
-  Never repurpose the private receipt or internal IDs.
-  Preserve the UUID across a failed dataLayer push and suppress repeat emission of the same effect.
-  Interaction/replay/disabled telemetry emit no conversion UUID. Entropy failure keeps UX/GA4
-  working without an ID and makes the strict server UUID gate block CAPI. This single browser
-  sender does not define a durable backend identity; an outbox sender needs a shared-ID decision.
-  No CAPI conversion from opening the scheduler, selecting a slot, attempts, errors or replays.
+- **TASK-2034, release 2026-10-13:** Meta Lead matching now originates in the backend after a
+  successful provider booking and the guarded `provider_dispatched → succeeded` transition.
+  `finalizeMeetingExecution` borrows one transaction for confirmation and optional encrypted
+  `measurement_conversion` / delivery rows; SAVEPOINT failure cannot undo commercial success.
+  Never create a second booking, backfill contacts or derive external identity from the receipt.
+- Both portable renderers read `measurementContext` at POST time through
+  `src/growth-measurement-context/context.ts`: resolved HubSpot categories, GPC and permitted real
+  cookie identifiers only. Processing/communication consent is not advertising consent. Backend
+  rejects unknown/denied advertising, GPC and context older than 10 minutes for matching.
+- Only `efeonce-discovery-30` on `fhsf-efeonce-lead-gen-web`, from HTTPS `efeoncepro.com` or
+  `think.efeoncepro.com`, is currently eligible. A new active meeting binding does **not** authorize
+  advertising matching. These fixed checks exist in `measurement/payload.ts` and the sGTM Client
+  `scripts/measurement/sgtm-lead-client.js`; configuration-driven enrollment remains a proposal,
+  not implemented and without GO.
+- Contact normalization/hash happens server-side using available email, international phone and
+  separated first/last names. The durable backend UUID and event time are retained through retries.
+  Meta ingress is authenticated and independently gated; the legacy GA4-derived Meta Lead sender
+  is retired. The browser nonce can remain as safe telemetry but no longer owns Meta delivery.
+- Google receives dedicated UPD only with analytics + advertising consent and a real GA4 client ID;
+  UPD contains **no events**. The one browser `generate_lead` remains the GA4 conversion mirror.
+  Restrict server GA4 forwarding to Client Name=GA4 to exclude the custom backend ingress.
+- The existing ops-worker drains matching independently of meeting UX and HubSpot form delivery;
+  up to 5 attempts/24 h, leases/CAS and 48 h encrypted-payload purge. Never treat HTTP acceptance,
+  Test Events or an enabled audience as proof of real conversion processing or ads eligibility.
+- Load the full current contract `docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md`
+  and `08-meta-conversions-api-server-side.md` before changing flags, capture, identity or destinations.
+  Runtime/evidence: `docs/audits/releases/2026-10-13-full-develop-matching-release.md`. The first real
+  commercial consented conversion after activation remains unobserved in that release evidence.
 
 ## Verification minimum
 
@@ -149,3 +164,21 @@ Update both `.codex` and `.claude` copies in the same change set when changing t
 boundary, state machine, native-only recovery, renderer recipes, CTA action, telemetry, flags, bindings or
 rollout gates. Update the architecture or PDR first when the durable decision changes; keep release IDs,
 page backups, current availability and one-off smoke evidence in tasks, ledgers, handoff or landing references.
+
+
+### Published measurement configuration — TASK-2035 checkpoint14/10
+
+For scalable conversion matching use the [policy ADR](../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) and [operator manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). Code in develop resolves stable form_key + opaque published fver-* identity or active meeting binding fingerprint, surface/origin, typed mapping and independent destinations from immutable reviewed/published policy data. Never add a form slug/scheduler to a runtime list or let public telemetry authorize advertising. New source/version activation is a governed data command, not a redeploy; new behavior/host/provider may require code. Source acceptance and fresh consent/GPC remain mandatory; enqueue and dispatcher revalidate publication. Disabling blocks pending sends, not HTTP already started. API/UI permission is internal read/author/publish/disable; browser never picks authority. The contextual panel uses immutable draft→review→publish, separate disable, dirty-source confirmation and independent server readback. Preserve the same body/idempotency key after an unknown POST outcome; after a known receipt retry GET only. A409 reload retains unsaved values and refreshes CAS authority. Forms delivery through HubSpot Forms→CRM retains its separate destination fieldMapping, consent and commercial outbox; matching configuration never replaces it or gates commercial acceptance. Verify each destination independently. For current CI/GTM transition/production status follow the live runtime ledger; code/tests or Meta Test Events never prove real CRM delivery.
+
+
+### Agent-first measurement operation
+
+Use `pnpm growth:measurement --help` then `discover → validate → apply → verify` from the
+[manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). This is an HTTP
+client of the same governed Product API as the panel, not a SQL/admin-role shortcut. Discovery
+returns the versioned contract, effective permissions, source version/fields and current heads.
+Validate is read-only; apply requires existing operator authorization, explicit intent and a
+private receipt. Keep the exact command/key on unknown outcome; a known receipt retries GET only.
+A409 requires fresh discovery, never blind overwrite. No contact values belong in configuration,
+receipts or logs. Preserve the separate Growth Forms→HubSpot Forms→CRM delivery and consented
+measurement projection. Do not claim MCP/Nexa tool exposure or provider success from CLI success.

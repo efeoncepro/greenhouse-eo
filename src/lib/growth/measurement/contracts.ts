@@ -18,6 +18,8 @@ export type MeasurementDestination = 'meta' | 'google_upd'
 export interface MeasurementScope {
   sourceKind: MeasurementSourceKind
   sourceId: string
+  sourceKey?: string
+  sourceVersion?: string
   origin: string | null
   pageUri?: string | null
   surfaceId: string | null
@@ -26,6 +28,7 @@ export interface MeasurementScope {
 }
 export interface MatchingContact { email?: unknown; phone?: unknown; firstName?: unknown; lastName?: unknown }
 export interface PreparedMeasurement {
+  policyRevisionId: string
   eventId: string
   occurredAt: string
   consent: MeasurementConsentSnapshot

@@ -2,11 +2,14 @@
 paths:
   - "src/lib/growth/gtm/**"
   - "src/lib/growth/ga4/**"
+  - "src/lib/growth/measurement/**"
+  - "src/growth-measurement-context/**"
+  - "scripts/measurement/**"
 ---
 
 # Medición / tagging GTM + GA4 — invariantes (auto-load por path)
 
-Al tocar `src/lib/growth/{gtm,ga4}/**` (eventos `gh_*`, tags/triggers/variables, custom dimensions, key events), cargá la **skill `greenhouse-gtm-ga4-operator`** + el reference canónico **`docs/reference/measurement-gtm-ga4/`** (README + `01`-`08` + `TRACKING-PLAN.md` + `LEARNINGS.md`). Naming/estrategia: `growth-marketing-cro`.
+Al tocar `src/lib/growth/{gtm,ga4,measurement}/**`, `src/growth-measurement-context/**` o `scripts/measurement/**` (eventos `gh_*`, tags/triggers/variables, custom dimensions, key events), cargá la **skill `greenhouse-gtm-ga4-operator`** + el reference canónico **`docs/reference/measurement-gtm-ga4/`** (README + `01`-`10` + `TRACKING-PLAN.md` + `LEARNINGS.md`). Naming/estrategia: `growth-marketing-cro`.
 
 Reglas duras (detalle en la skill + doc `04`/`05`):
 
@@ -20,3 +23,11 @@ Reglas duras (detalle en la skill + doc `04`/`05`):
 
 - **Meta CAPI:** cargar docs `08` y `09` (HubSpot categorías/evnid) + ADR `GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md`. Recuperar Server existente antes de crear otro; Pixel web no instala CAPI. Lead sale de aceptación comercial persistida a ingreso validado sGTM, no de clic/submit frontend.
 - **Servidor:** consentimiento Meta explícito, token sólo servidor, sin PII/hash en eventos GA4 ordinarios/dataLayer (Google UPD dedicado es la excepción gobernada, 08 §4.2), exports redactados, nombre/ID estables y readback Server/dedupe en Meta. Snapshot web y GA4 smoke no certifican CAPI; server publish requiere preview + aprobación.
+
+- **Matching vigente:** canon `10-growth-lead-matching-runtime.md`; Meta Lead backend único,
+  Client31 autenticado y forwarding restringido a GA4 Client. Google user_data MP sin events
+  no duplica generate_lead. No reactivar triggers12/17 retirados como fallback.
+- **Alta de fuentes:** listas comerciales fijas en backend y Client sGTM; GA4 genérico no
+  autoriza matching. Configuración administrable es propuesta pendiente de GO, no existente.
+- **Evidencia:** http_accepted/Processed no prueban atribución, match quality o serving; primera
+  conversión real consentida post-flip sigue pendiente. No crear negocio/CRM sintético para QA.

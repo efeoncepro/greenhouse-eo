@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.7 — 2026-10-09 (Claude, destinos HubSpot por registro)
+> **Version:** 1.8 — 2026-10-13 (Codex, matching backend TASK-2034)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -33,6 +33,32 @@ Para revisar o modificar su configuración:
 7. Separa ese smoke sin envío de un envío controlado aceptado, su ledger y la observación GA4.
    El rollout del 2026-08-31 no realizó estos últimos; la fila de
    [TRACKING-PLAN.md](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md) sigue pendiente.
+
+## Verificar matching publicitario de un formulario
+
+Leer el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+antes de modificar captura, campos, consentimiento o destinos publicitarios. La entrega HubSpot
+puede estar activa aunque matching no aplique, y viceversa; los flags de Forms no sustituyen los
+cuatro `GROWTH_MEASUREMENT_*` del contrato.
+
+1. Verificar elegibilidad actual: `efeonce-aeo-diagnostic`, `efeonce-seo-diagnostic`,
+   `efeonce-desarrollo-web-cotizacion`, `efeonce-lead-gen-web`, `efeonce-social-audit` o
+   `ai-visibility-grader`, con surface y origin público autorizados. Crear una Form o marcarla
+   como tagged en GA4 no agrega autorización de matching. La lista existe en backend y Client sGTM.
+2. Verificar el renderer servido en el host real y la elección de categorías. El POST lleva
+   `measurementContext` fresco, publicidad explícita y GPC falso. No copiar cookies o contacto a
+   docs/capturas; el checkbox de la solicitud no prueba consentimiento publicitario.
+3. Para una conversión comercial real ya autorizada, comprobar aceptación y correlacionar sus
+   recibos `measurement_conversion` / `measurement_delivery` por la identidad durable del backend,
+   sin revelar el payload. El scope de prueba no autoriza crear un Lead o contacto ficticio en CRM.
+4. Separar estado de cola, acuse del tag Meta/HTTP y procesamiento en la plataforma. Google UPD
+   complementa un solo mirror GA4, sin `events` adicionales. Falta de client ID real omite Google UPD.
+5. Aplicar rollback con el orden del contrato: detener captura/envío y preservar retención; no
+   borrar las tablas ni rotar la clave mientras haya material cifrado pendiente.
+
+No existe aún configuración de matching publicable por formulario. Esa propuesta está sin GO;
+hoy ampliar cobertura requiere release de código y publicación gobernada de GTM Server.
+[Estado y evidencia del release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 
 ## Usar el cockpit visual
 

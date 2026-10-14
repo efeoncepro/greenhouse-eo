@@ -684,8 +684,8 @@ Flag explícito web/worker `STUDIO_CHANNEL_VALIDATION_MODE=warn`;
 `off` desactiva validación y `enforce` exige publicación/backfill revisado y un release observado en warn.
 `STUDIO_CUSTOMER_MODEL_ENABLED=false` explícito en web/worker. Activarlo no provisiona un consumer real; depende de TASK-1906/1892.
 Federación de writes T1 depende de TASK-2003. Gateway quedó intacto en rama ajena `feat/task-1921-brand-render`.
-SQL de capability Greenhouse parqueado en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
-owner operador release: recrear timestamp, aplicar staging y readback. Dry-run productivo: 134 registros unmapped; cinco aliases
+El SQL Greenhouse que estaba parqueado se aplicó posteriormente el13/10: migración canónica
+20261013233455807 y registry releídos; detalle en el delta siguiente. Dry-run productivo: 134 registros unmapped; cinco aliases
 pendientes de revisión por efeonce_operations (detalle y conteos en el dossier). No se aplicó backfill ni se
 activó enforce. El canary API pasó. Federación/canary de las nuevas lecturas MCP pendientes; las escrituras T1 requieren TASK-2003. No se bloquea desarrollo ni operación API/CLI/UI por TASK-1899. Greenhouse y gateway no se publicaron.
 
@@ -696,9 +696,11 @@ activó enforce. El canary API pasó. Federación/canary de las nuevas lecturas 
 `marketing_studio.catalog.manage` existe en código (`src/config/entitlements-catalog.ts`) y grants efectivos
 calculados (`src/lib/entitlements/runtime.ts`): acciones `create`/`update`, sólo `efeonce_admin` y
 `efeonce_operations`. Coverage de 33 tests PASS; account/designer, acciones delete/all y roles no efectivos no
-conceden acceso. Esto acredita implementación local en Greenhouse, no registro/grant efectivo en producción.
-El SQL está en `docs/tasks/pending-migrations/TASK-1905-marketing-studio-catalog-capability.sql.pending`;
-el operador de release debe recrearlo con `pnpm migrate:create`, aplicar y verificar el registry y canje.
+conceden acceso. Las pruebas locales acreditaban implementación; el registro productivo se verificó posteriormente abajo. No equivalen a canje delegado T1.
+Actualización 2026-10-13: capability y CLI Greenhouse promovidas en PR254/main d692ab51dc48;
+`migrations/20261013233455807_task-1905-marketing-studio-catalog-capability.sql` aplicada23:35:02Z,
+registry releído y parked retirado. No acredita nuevo canje delegado T1 ni amplía grants MCP.
+[Dossier Greenhouse](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 No hubo release Greenhouse en el release Studio ni al entregar la CLI HTTP. Un bearer de servicio no gobierna
 el catálogo: el canary productivo devuelve 403. TASK-2003 resuelve el carril delegado T1 en paralelo; no es
 prerrequisito de toda TASK-1905. ICP real sigue desactivado y depende de TASK-1906/TASK-1892.

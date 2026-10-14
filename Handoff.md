@@ -1,25 +1,44 @@
 # Handoff
 
+## 2026-10-14 — Footer público: composición compacta
+
+[Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
+
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
-[ADR](docs/architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md), [consentimiento](docs/reference/measurement-gtm-ga4/09-hubspot-consent.md)
-y [evidencia](docs/audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): mismo GTM Server, hosting
-`efeonce-group`, tagging/preview min 0/max 1; GTM **server live 5 / web live 5**.
-HubSpot español opt-in por categorías/GPC activo en ambos sitios, default denied;
-WP routing activo + plugin 1.0.3; Think `dpl_AH8YdErwaGg6haELFGzdk3DuddRX` promovido.
-Preferencias inline en pie legal de ambos hosts, sin franja extra; QA desktop/móvil PASS.
-Meta Test Events Processed/Server: PageView ambos hosts + Lead accepted form/confirmed meeting;
-10 negativos sin salidas. PageView real ambos hosts completó Meta/GA4 con versión live.
-Primera visita sin elección HubSpot: banner automático; sólo publicidad produjo PageView
-Procesado/Servidor de ambos hosts, UUID correlacionado navegador→Meta y GA4 bloqueado.
-UUID sender fallback compatible evita exigir release GH; renderer local 30 tests sin release.
-Incidente previo: Lead sintético fuera de Test Events por regex `.+`, corregido a UUID.
-No bookings/submissions/CRM creados. Preview cerrado; QA de preferencias desktop/mobile.
-Remarketing: [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) implementado localmente: consentimiento granular en POST, hashes Meta/Google separados, cola cifrada y retries por destino; 71 tests + 21 Client tests, tipos/lint y builds PASS.
-GA4 correcto 486264460: UPD/ack activos, siete audiencias 90d creadas/releídas, Ads link existente; tres secretos version1 con grant scoped, refs aún no configuradas. Preview workspace8 + Meta Test Events Processed/Server muestran em/ph/fn/ln y clasificadores en ambos hosts; seis negativos bloqueados, replay conserva ID (no prueba atribución deduplicada).
-Migración parked/flags/cutover/release pendientes. Live 5/5 conservado, test code draft retirado. El operador ordenó release completo develop→main el 13/10, rechazando el checkout acotado. Se mantiene el checkout compartido; revisión/preflight del batch completo en curso. [Auditoría y paquete](docs/audits/measurement/META_LEAD_MATCHING_2026-10-13.md). No publicar un batch amplio por inferencia.
-Próximos leads comerciales/replay y calidad de coincidencia aún sin verificar. Docs/skills espejo
-actualizados; sin commit/push. Rollback y límites de costo en auditoría; no nuevo proyecto/suscripción.
+[Corrección y pruebas](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md): Server7 sólo template30,
+website/IP/UA/fbp/fbc/external_id/em/ph/fn/ln recibidos en Test Events ambos hosts; código temporal por petición,
+sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Plan acotado aprobado: [TASK-2035](docs/tasks/plans/TASK-2035-plan.md). Foundation/seed7 y Test Events v2 probados; GTM8 compatible temporal. Panel lifecycle12 pruebas y boundary Forms→CRM13 PASS; UI/GVC12 estados PASS; CLI agent-first y24 pruebas PASS; HTTP/CI/release pendientes. Hook local omitido con aprobación; sin build/tsc local. [Evidencia](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
+Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user submit/book. Primera conversión real pendiente.
+
+[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: corrida14/10 aprobada, TASK-2036/2037 en ejecución; CRO, abandono, newsletter y CRM permanecen sin iniciar. Umbrella sobre dueñas existentes, sin release de esta ampliación.
+
+Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
+Auditoría documental 14/10 con tres subagentes: [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills al día.
+
+[Release completo y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md): PR254,
+main d692ab51dc48, orquestador38483437158 success y manifest released; CI/Deep/build/smoke PASS.
+GTM Server6/Web5, mismo hosting efeonce-group min0/max1. HubSpot categorías/GPC y banner
+primera visita WP/Think; preferencias inline en pie legal, sin franja extra. PageView consentido activo.
+Matching [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md): SQL aplicada,
+Client backend autenticado único Meta Lead, legacy12/17 retirados y espejo GA4 preservado.
+Ops00775-fnh100%: Meta/Google/retención true, GitHub repo vars persistentes y secretos versión1
+resueltos en canary200. Vercel captura true, dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias.
+GA4 correcto486264460: UPD/ack, siete audiencias90d y linkAds9531478329. Meta Test Events
+Processed/Server em/ph/fn/ln y clasificadores; cola/leaseCAS/retención y negativos live PASS.
+Watchdog ok6/6 drift0. Primera aceptación/reserva comercial consentida post-flip sin observar;
+no submissions/bookings/CRM sintéticos ni promesa de calidad/serving. Status task Parcial por esa prueba.
+Incidente separado mindicador TLS/timeout sigue abierto, Sentry7790958718/7790964540; excepción
+auditada no bloqueante, sin afirmar solución. Dossier incluye rollback, digests y límites.
+Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo proyecto/cron para matching.
+
+Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md): alcance integrado a **TASK-2035**, foundation implementada/seed aplicado; panel y release pendientes.
+
+El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
+WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
+Panel/categorías/GPC verificados; QA intercepta transporte y no prueba nuevas recepciones Meta. [Rotación CLI 14/10](docs/audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json): anterior revocada/403; nueva CLI/proyectos200, dos fuentes0600 y GitHub actualizados, wrappers retirados; vence14/10/2027. Sin nuevo workflow/deploy.
 
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 

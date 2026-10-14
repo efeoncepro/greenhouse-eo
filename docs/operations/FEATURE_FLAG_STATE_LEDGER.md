@@ -181,16 +181,19 @@ no reutilizar esas notas históricas como estado actual.
 
 ## Delta 2026-10-13 — matching de Lead (TASK-2034)
 
-Production leído mediante env pull: cuatro flags **ausentes**, por tanto OFF por default.
-Código lector todavía no en main; no activar hasta release, SQL y runtime secrets verificados.
-Staging no inspeccionado en esta fase. Secrets version1 ya existen, refs no configuradas.
+Main d692ab51dc48 released por orquestador38483437158. SQL post-release aplicada.
+Production releído: cuatro flags **ON**, valores exactos true; configuración permanente.
+Refs pinned versión1; canary dentro del worker confirma resolución de los tres secretos.
+Staging Vercel no activado por inferencia; Ops es compartido. [Readbacks y límites](../audits/releases/2026-10-13-full-develop-matching-release.md).
 
-| Flag | Dueño | Production | Rollout requerido |
+| Flag | Dueño | Production | Configuración durable y rollback |
 | --- | --- | --- | --- |
-| `GROWTH_MEASUREMENT_CAPTURE_ENABLED` | TASK-2034 | ausente/OFF default | source + renderer, SQL + payload key; captura tras aceptación/confirmación |
-| `GROWTH_MEASUREMENT_META_ENABLED` | TASK-2034 | ausente/OFF default | worker + ingress token + Client; retirar triggers Meta Lead12/17 antes de envío |
-| `GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED` | TASK-2034 | ausente/OFF default | worker + API secret; UPD/ack y Ads link ya verificados; no duplicar evento GA4 |
-| `GROWTH_MEASUREMENT_RETENTION_ENABLED` | TASK-2034 | ausente/OFF default | worker + SQL; mantener ON durante rollback para borrar ciphertext48h |
+| `GROWTH_MEASUREMENT_CAPTURE_ENABLED` | TASK-2034 | **ON** Vercel, dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY | Captura última, tras SQL/cutover/worker; apagar y redeploy para rollback |
+| `GROWTH_MEASUREMENT_META_ENABLED` | TASK-2034 | **ON** Ops00775-fnh100% | GitHub repo var true, sin override Production; sGTM6 retira Lead12/17 |
+| `GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED` | TASK-2034 | **ON** Ops00775-fnh100% | GitHub repo var true; UPD/ack/link verificados, sin otro evento GA4 |
+| `GROWTH_MEASUREMENT_RETENTION_ENABLED` | TASK-2034 | **ON** Ops00775-fnh100% | GitHub repo var true; mantener ON en rollback para borrar ciphertext48h |
+
+No equivale a entrega de una conversión comercial real post-flip; pendiente observarla.
 
 [Contrato](../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13).
 

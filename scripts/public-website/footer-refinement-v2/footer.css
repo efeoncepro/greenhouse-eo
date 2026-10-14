@@ -1,0 +1,70 @@
+/* Efeonce footer adapter: La orbita typography, paper and teal from AXIS. */
+#colophon:has([data-eo-footer-partners="v2"]){--eo-ft-paper:#f7f8f6;--eo-ft-accent:#36c8bf;--eo-ft-ink:#001a33;--eo-ft-text:color-mix(in srgb,var(--eo-ft-paper) 76%,transparent);font-family:EfeonceConsentText,Poppins,sans-serif;color:var(--eo-ft-text)}
+#colophon:has([data-eo-footer-partners="v2"])>.page-container,#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright>.page-container{width:100%;max-width:1328px;padding-inline:24px;margin-inline:auto}
+#colophon:has([data-eo-footer-partners="v2"])>.page-container>.widgets{display:grid;grid-template-columns:1.05fr .65fr 1.4fr .95fr;gap:32px;margin:0;padding:56px 0 28px;align-items:start}
+#colophon:has([data-eo-footer-partners="v2"]) .widgets>.widgets-column{float:none;min-width:0;width:auto;max-width:100%;padding:0}
+#colophon:has([data-eo-footer-partners="v2"]) .widgets>.widgets-column>ul{margin:0;padding:0;list-style:none}
+#colophon:has([data-eo-footer-partners="v2"]) .widgets>.widgets-column>ul>.widget{display:block;padding:0;margin:0;min-width:0}
+#colophon:has([data-eo-footer-partners="v2"]) .widgets>.widgets-column:last-child,#colophon:has([data-eo-footer-partners="v2"]) .widgets>.widgets-column:last-child>ul{display:contents}
+#colophon:has([data-eo-footer-partners="v2"]) #block-31{grid-column:4;grid-row:1}
+#colophon:has([data-eo-footer-partners="v2"]) #block-34{grid-column:1/-1;grid-row:2;width:100%;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) h2,#colophon:has([data-eo-footer-partners="v2"]) h3.widget-title{font-family:EfeonceConsentDisplay,'Bricolage Grotesque',sans-serif;font-size:17px;line-height:1.3;letter-spacing:-.02em;font-weight:600;color:var(--eo-ft-paper);margin:0 0 20px}
+#colophon:has([data-eo-footer-partners="v2"]) p{font-family:inherit;font-size:13px;line-height:1.75;color:var(--eo-ft-text);margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .branding .logo img{width:160px;max-width:100%;height:auto}
+#colophon:has([data-eo-footer-partners="v2"]) #block-17{margin-top:24px}
+#colophon:has([data-eo-footer-partners="v2"]) #block-17 strong{display:block;font-size:12px;font-weight:500;margin-bottom:4px;color:var(--eo-ft-paper)}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_socialbar_subscribe-3{margin-top:16px}
+#colophon:has([data-eo-footer-partners="v2"]) .social-networks{display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .social-networks a.network{display:inline-flex;align-items:center;justify-content:center;width:30px;height:32px;min-width:30px;margin:0;color:var(--eo-ft-text);background:none}
+#colophon:has([data-eo-footer-partners="v2"]) .social-networks a.network:hover{color:var(--eo-ft-paper)}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-explore ul{list-style:none;margin:0;padding:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-explore li{margin:0;padding:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-explore a,#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-careers a{display:inline-flex;align-items:center;gap:8px;min-height:36px;font-size:13px;line-height:1.6;font-family:inherit;color:var(--eo-ft-text);text-decoration:none;background-image:none;padding:4px 0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-careers p{margin-bottom:12px;max-width:25ch}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-careers a{color:var(--eo-ft-paper);border-bottom:1px solid color-mix(in srgb,var(--eo-ft-paper) 35%,transparent)}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-explore a:hover,#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-careers a:hover{color:var(--eo-ft-accent)}
+#colophon:has([data-eo-footer-partners="v2"]) :is(a,button,input):focus-visible{outline:2px solid var(--eo-ft-accent);outline-offset:4px}
+#colophon:has([data-eo-footer-partners="v2"]) .subscribe-widget{margin:0;padding:0;width:100%}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup{margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-row{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-email-label{display:block;flex:1;min-width:0;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-email-label .wpcf7-form-control-wrap{display:block;width:100%;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup input[type=email]{display:block;width:100%;min-width:0;height:46px;min-height:46px;padding:0 12px;border:1px solid color-mix(in srgb,var(--eo-ft-paper) 22%,transparent);background:color-mix(in srgb,var(--eo-ft-paper) 5%,transparent);border-radius:9px;color:var(--eo-ft-paper);font:400 12px EfeonceConsentText,Poppins,sans-serif;margin:0;box-shadow:none}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup input[type=email]::placeholder{color:var(--eo-ft-text);opacity:1}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-row :is(button,input[type=submit]){position:static;flex:0 0 auto;width:auto;min-width:106px;height:46px;min-height:46px;margin:0;padding:0 14px;border:1px solid var(--eo-ft-paper);border-radius:9px;background:var(--eo-ft-paper);color:var(--eo-ft-ink);font:500 12px EfeonceConsentText,Poppins,sans-serif;box-shadow:none}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-row :is(button,input[type=submit]):hover{background:var(--eo-ft-accent);border-color:var(--eo-ft-accent)}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-row br{display:none}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup .wpcf7-spinner{position:absolute;right:0;bottom:-28px;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-row{position:relative}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-consent{font-size:11px;line-height:1.7;color:var(--eo-ft-text)}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-consent .wpcf7-list-item{display:block;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-consent label{display:flex;align-items:flex-start;gap:8px;font:inherit;color:inherit;margin:0;cursor:pointer}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-signup-consent input[type=checkbox]{position:relative;flex:0 0 15px;width:15px;min-width:15px;height:15px;margin:2px 0 0;accent-color:var(--eo-ft-accent)}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partners{width:100%;margin:0;padding-top:24px;border-top:1px solid color-mix(in srgb,var(--eo-ft-paper) 14%,transparent)}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partner-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partners h2{font-family:inherit;font-size:12px;font-weight:400;letter-spacing:0;color:var(--eo-ft-text);margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-top{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0;color:var(--eo-ft-text);font-size:11px;background:none;text-decoration:none}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partner-list{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));align-items:center;gap:24px;list-style:none;margin:0;padding:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partner-list>li{display:flex;align-items:center;justify-content:center;min-width:0;min-height:48px;padding:0;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partner-list img{display:block;max-width:100%;height:auto;object-fit:contain;filter:grayscale(1);opacity:1;margin:0}
+#colophon:has([data-eo-footer-partners="v2"])>.page-container:has(>.vc_row.holder){display:none}
+#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright{margin:0;padding:0;border:0;font-size:11px;font-family:inherit}
+#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright .vc_row{margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright .vc_col-md-12{padding:0}
+#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright .holder{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px 24px;border-top:1px solid color-mix(in srgb,var(--eo-ft-paper) 14%,transparent);padding:18px 0 22px;font-size:11px;line-height:1.8;min-height:0}
+#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright .holder>:is(.-left,.-right){margin:0;padding:0;font-size:inherit;line-height:inherit;color:var(--eo-ft-text)}
+#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright a,#colophon:has([data-eo-footer-partners="v2"]) .efeonce-cookie-preferences{font:inherit;color:var(--eo-ft-text);background-image:none;min-height:24px}
+body.eo-footer-in-view>.social-bar,body.eo-footer-in-view>.color-switcher{visibility:hidden;opacity:0;pointer-events:none}
+@media(max-width:1100px){#colophon:has([data-eo-footer-partners="v2"])>.page-container>.widgets{grid-template-columns:1fr 1fr;gap:28px 40px}#colophon:has([data-eo-footer-partners="v2"]) #block-31{grid-column:2;grid-row:2}#colophon:has([data-eo-footer-partners="v2"]) #block-34{grid-row:3}#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partner-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px 24px}}
+@media(max-width:600px){#colophon:has([data-eo-footer-partners="v2"])>.page-container,#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright>.page-container{padding-inline:20px}#colophon:has([data-eo-footer-partners="v2"])>.page-container>.widgets{gap:28px 24px;padding:36px 0 20px}#colophon:has([data-eo-footer-partners="v2"]) .widgets>.widgets-column:nth-child(3){grid-column:1/-1;grid-row:2}#colophon:has([data-eo-footer-partners="v2"]) #block-31{grid-column:1/-1;grid-row:3}#colophon:has([data-eo-footer-partners="v2"]) #block-34{grid-row:4}#colophon:has([data-eo-footer-partners="v2"]) .branding .logo img{width:145px}#colophon:has([data-eo-footer-partners="v2"]) h2,#colophon:has([data-eo-footer-partners="v2"]) h3.widget-title{font-size:16px;margin-bottom:16px}#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-explore a{font-size:12px;min-height:34px}#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partners h2{font-size:12px;margin:0}#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-partner-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 16px}#colophon:has([data-eo-footer-partners="v2"]) .eo-footer-careers p{max-width:none}#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright .holder{justify-content:flex-start;gap:8px}#colophon:has([data-eo-footer-partners="v2"]) .site-footer-copyright .holder>.-right{max-width:100%;font-size:10px}}
+/* Owned overrides for legacy Ohio/Home newsletter declarations, including its submit transform. */
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 h3.widget-title{color:var(--eo-ft-paper)!important}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 .eo-footer-signup-row>p{display:flex;align-items:center;gap:8px;width:100%;margin:0}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 .eo-footer-signup input[type=email]{padding:0 12px!important;background:color-mix(in srgb,var(--eo-ft-paper) 5%,transparent)!important;border:1px solid color-mix(in srgb,var(--eo-ft-paper) 22%,transparent)!important;color:var(--eo-ft-paper)!important}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 .eo-footer-signup-row :is(button,input[type=submit]){transform:none!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;position:static!important;margin:0!important;min-width:106px;min-height:46px;padding:0 14px!important;background:var(--eo-ft-paper)!important;border:1px solid var(--eo-ft-paper)!important;color:var(--eo-ft-ink)!important;box-shadow:none!important}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 .eo-footer-signup-row :is(button,input[type=submit]):hover{background:var(--eo-ft-accent)!important;border-color:var(--eo-ft-accent)!important}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 .eo-footer-signup-consent :is(p,span,label){font-family:inherit;font-size:11px!important;line-height:1.7!important;color:var(--eo-ft-text)!important}
+#colophon:has([data-eo-footer-partners="v2"]) #ohio_widget_subscribe-2 :is(button,input):focus-visible{outline:2px solid var(--eo-ft-accent)!important;outline-offset:4px}
+#colophon:has([data-eo-footer-partners="v2"]) #block-17 strong+br{display:none}
+body.eo-footer-in-view .elements-bar .social-bar,body.eo-footer-in-view .elements-bar .color-switcher{visibility:hidden;opacity:0;pointer-events:none}
+@media(max-width:600px){#colophon:has([data-eo-footer-partners="v2"]){padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}}

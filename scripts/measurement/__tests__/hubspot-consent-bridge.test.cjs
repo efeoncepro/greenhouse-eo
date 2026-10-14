@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 
 const source=fs.readFileSync('scripts/measurement/hubspot-consent-bridge.js','utf8');
 
-function setup({enabled=true,gpc=false,host='efeoncepro.com'}={}){const attributes={},handlers={};const window={location:{hostname:host},navigator:{globalPrivacyControl:gpc},crypto:require('node:crypto').webcrypto,efeonceConsentMeasurementEnabled:enabled};const document={documentElement:{setAttribute:(k,v)=>attributes[k]=v},addEventListener:(k,v)=>handlers[k]=v};const ctx={window,document};
+function setup({enabled=true,gpc=false,host='efeoncepro.com'}={}){const attributes={},handlers={};const window={location:{hostname:host},navigator:{globalPrivacyControl:gpc},crypto:require('node:crypto').webcrypto,efeonceConsentMeasurementEnabled:enabled};const document={documentElement:{setAttribute:(k,v)=>attributes[k]=v,getAttribute:k=>attributes[k]},addEventListener:(k,v)=>handlers[k]=v};const ctx={window,document};
 
 vm.runInNewContext(source,ctx);
 

@@ -14,10 +14,9 @@ const noop = () => {}
 
 export async function getVercelCliToken({ log = noop } = {}) {
   // 1) VERCEL_TOKEN del entorno (o de .env.local) — la fuente CANÓNICA en las máquinas
-  //    del equipo: el propio CLI se invoca como `vercel --token "$VERCEL_TOKEN"` (función
-  //    de shell), así que el auth.json del CLI puede quedar con un access token OAuth
-  //    expirado (el CLI refresca en memoria y NUNCA persiste — 403 invalidToken detectado
-  //    2026-07-18 durante el rollout TASK-1340). El env var es un token personal estable.
+  //    del equipo para readers API. La CLI lee su auth.json privado, sin --token ni
+  //    wrappers de shell (rotación 2026-10-14). Se prioriza el env explícito porque
+  //    otras máquinas pueden conservar un access token OAuth expirado en auth.json.
   if (process.env.VERCEL_TOKEN) return process.env.VERCEL_TOKEN
 
   try {

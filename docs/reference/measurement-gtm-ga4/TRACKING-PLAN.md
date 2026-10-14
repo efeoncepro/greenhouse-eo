@@ -1,5 +1,9 @@
 # Tracking Plan — Registro de Forms & CTAs (SoT de la capa de medición)
 
+Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
+Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
+Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
+
 > **Registro vivo y OBLIGATORIO.** Todo form o CTA público de Efeonce se registra aquí con su estado de tagging.
 >
 > - **SoT de definiciones de form:** la base de datos (`greenhouse_growth.form_definition`) — no este archivo.
@@ -79,11 +83,11 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 
 | Surface id                                        | Kind                     | Página / ubicación                                                               | Emite dataLayer                                     | Evento GTM → GA4                                                                                                                | Key event                      | Tagging                                            | Notas                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fhsf-efeonce-lead-gen-web` + binding `discovery` | native_meeting_scheduler | `/agenda/` piloto público `noindex`; otros placements por host aún no promovidos | ✅ renderer y funnel live; conversión no ejercitada | `gh_meeting_step_reached` → custom homónimo; `gh_meeting_booking_confirmed` → `generate_lead` con `lead_source=meeting_booking` | sólo `generate_lead` existente | ⏳ workspace 6 previewado; sin versión/publicación | El custom `gh_meeting_booking_confirmed` NO se reenvía a GA4. Piloto native-only liberado en `fbe8a9c76a74` (run `29854833210`): cero enlaces/copy HubSpot y recuperación por navegación mensual/`Reintentar`. Ledger `server_confirmed` es SoT; GA es mirror browser-reported. Pendientes: booking controlado/replay, evidencia live `/g/collect`, confirmación humana y publish. |
+| `fhsf-efeonce-lead-gen-web` + binding `discovery` | native_meeting_scheduler | `/agenda/` piloto público `noindex`; otros placements por host aún no promovidos | ✅ renderer emite funnel; conversión GA4 real no ejercitada | `gh_meeting_step_reached` → custom homónimo; `gh_meeting_booking_confirmed` → `generate_lead` con `lead_source=meeting_booking` | sólo `generate_lead` existente | GA4 confirmación publicada Web5; funnel workspace6 pendiente | El custom `gh_meeting_booking_confirmed` NO se reenvía a GA4. Piloto native-only liberado en `fbe8a9c76a74` (run `29854833210`): cero enlaces/copy HubSpot y recuperación por navegación mensual/`Reintentar`. Ledger `server_confirmed` es SoT; GA es mirror browser-reported. Tag60/trigger59 de confirmación se publicaron en Web5 durante recuperación; workspace6 ajeno preservado. Pendientes: booking consentido/replay y evidencia live `/g/collect` de conversión. El funnel no se afirma publicado. |
 
 Allowlist funnel: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`, `presentation_variant` y `activation_mode`. Las dos últimas describen contexto de exposición (`launcher|guided|split|command` e `inline|dialog|full_screen|page`), no pasos del funnel. Se prohíben PII, valores de campos, slot/timestamp/timezone exactos, receipt, idempotency/correlation/provider IDs, Teams URL, raw UTMs/referrer/query y provider body/error. `stage` no existe: sería redundante y podría contradecir `meeting_step`.
 
-GTM pendiente: workspace 6 basado en versión publicada; reusa DLV `surface_id`/`placement` y contiene DLVs `meeting_step`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`, `presentation_variant` y `activation_mode`, más 2 triggers y 2 tags dedicados. GA4: registrar esas 8 dimensiones event-scoped; no crear otro key event ni usar `transaction_id`. Publish sólo tras preview, evidencia `/g/collect`, confirmación humana y snapshot.
+GTM funnel pendiente: workspace6 histórico permanece separado y no se publicó con la recuperación. La confirmación sí quedó publicada como tag60/trigger59 Web5, conservada tras cutover Server6. Workspace6 reusa DLV `surface_id`/`placement` y contiene DLVs `meeting_step`, `scheduler_key`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`, `presentation_variant` y `activation_mode`, más 2 triggers y 2 tags dedicados. GA4: verificar registro de esas dimensiones antes de cerrar el funnel; `scheduler_key` sí fue registrada en matching2026-10-13, sin inferir las otras siete; no crear otro key event ni usar `transaction_id`. Publish sólo tras preview, evidencia `/g/collect`, confirmación humana y snapshot.
 
 ---
 
@@ -105,30 +109,32 @@ Al refrescar: agregar forms nuevos con tagging `⏳ pendiente`, no borrar filas 
 
 ## Meta CAPI / servidor — 2026-10-13
 
-Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md) y
-[recuperación verificada](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md),
+[recuperación histórica](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md) y
+[release/matching actual](../../audits/releases/2026-10-13-full-develop-matching-release.md).
 
 | Destino | Evento | Origen requerido | Estado | Evidencia pendiente |
 | --- | --- | --- | --- | --- |
-| Pixel/dataset `708931297255942` vía `GTM-K2X4ZTTK` Server | `PageView` | Navegación consentida de ambos hosts | Server live 5/Web live 5; HubSpot/routing activo ambos hosts; Server Processed Test Events y tags reales Completada | Observar volumen/recepción ordinaria y calidad de coincidencia |
-| Mismo destino/servidor | `Lead` formulario | `gh_form_submission_accepted → generate_lead` tras aceptación comercial backend | Web live 5/server live 5, accepted/UUID/ads gates; Lead Test Events Server Processed | Próxima conversión comercial real y reconciliación ledger |
-| Mismo destino/servidor | `Lead` reunión | `gh_meeting_booking_confirmed → generate_lead`, `lead_source=meeting_booking`; confirmación elegible fresca | Web live 5 tag 60/trigger 59; server live 5 trigger 17; UUID sender fallback, Lead Test Events Server Processed | Próxima reserva elegible/replay reales; renderer enhancement local sin release |
+| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server6/Web5; transporte previo conservado, Test Events Server y tags reales verificados | Volumen/calidad ordinaria |
+| Mismo destino/servidor | Lead formulario | Aceptación backend comercial + snapshot ads consentido | Client31/trigger33 autenticado, cola cifrada/worker ON; legacyMeta12 retirado | Primera aceptación comercial consentida post-flip: fuente→ledger→provider |
+| Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida post-flip y replay real |
 
-Tagging/preview en `efeonce-group`: min 0/max 1 por servicio, 1CPU/512MiB, instance-based,
-`/healthy` 200/ok; contenedor existente asociado. Draft forwarding GA4 excluye datos Meta.
-Seis negativos Preview bloquean Meta y GA4 (marcador interno sólo para GA4). Un Lead sintético
-previo llegó a Meta por gate `.+` que aceptó missing; corregido a UUID anclado y retesteado.
-No cuenta como conversión real ni certifica producción. Versiones live web 4/server 3 sin cambiar.
-Inventario/borrador no constituye rollout ni elegibilidad de todos los Growth Forms.
-
+Tagging/preview mismo efeonce-group, min0/max1, 1CPU/512MiB, instance-based. Sin proyecto,
+servicio o cron nuevo para matching. GTM6 publicado sin Test Events code; tag6 sólo[11,33],
+PageView11 preservado. ForwardingGA4 exige Client Name=GA4, excluye Client backend.
+Incidente histórico: Lead QA sin Test Events pasó por regex .+; gate UUID corregido,
+no fue submission/reserva ni cuenta como conversión real. No repetir positivos fuera de Test Events.
 
 ## Delta 2026-10-13 — matching de Leads
 
-[TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md): Meta
-recibió fixtures enriquecidas en Preview/Test Events Server; sin cutover productivo todavía.
-Google propiedad 486264460: UPD/ack y siete audiencias 90 d activos, dimensiones lead_source y
-scheduler_key añadidas. Lead browser generate_lead continúa como única conversión GA4;
-backend Google enviará sólo user_data dedicado con client_id real, consentimiento analytics+ads.
-PII/hash excluidos de parámetros ordinarios/dataLayer. Metadata comercial Meta se construye
-en custom_properties JSON string. Sender único MetaLead después del release, retirando
-triggers browser12/17. PageView 11 se conserva. [Estado/evidencia](../../audits/measurement/META_LEAD_MATCHING_2026-10-13.md).
+[TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md) Parcial:
+rollout completo operativo, primera conversión comercial consentida no ejercitada.
+Meta fixtures enriquecidas Processed/Server em/ph/fn/ln y clasificadores, seis negativos y replay
+ID estable; live negativos auth/consent/rawidentity no disparan Meta. No demuestra atribución deduplicada.
+Google486264460 UPD/ack, siete audiencias90d y dimensioneslead_source/scheduler_key activos;
+Ads9531478329 personalización existente. Lead browser generate_lead conserva una sola conversión
+GA4; Google backend envía sólo user_data dedicado, con client_id real + analytics/ads.
+PII/hash excluidos de parámetros ordinarios/dataLayer; Meta custom_properties JSON string.
+SQL post-release aplicada; Meta/Google/retención true en Ops00775-fnh y repo vars;
+captura Vercel true tras deploymentREADY/alias. Canary worker200 resuelve tres secretos.
+[Estado y recibos](../../audits/measurement/META_LEAD_MATCHING_2026-10-13.md).

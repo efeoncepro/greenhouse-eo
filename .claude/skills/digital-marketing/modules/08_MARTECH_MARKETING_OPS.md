@@ -59,6 +59,16 @@ medición y la verdad de atribución**. No dupliques el modelo de atribución ac
 - Base legal para PII/first-party (GDPR; en Chile **Ley 21.719**, ver overlay). Consentimiento,
   minimización, retención acotada. Privacy-first **es** measurement-first (converge con growth 07).
 
+## Matching Efeonce: operación y frontera de configuración
+
+Cargar [contrato vigente](../../../../docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+y skill `greenhouse-gtm-ga4-operator` antes de ampliar destinos o fuentes. Aceptar formulario
+no concede publicidad: snapshot HubSpot y GPC se comprueban en backend. Cola cifrada,
+retención48h, flags durables/live coordinados y receipt por destino son parte de la operación.
+Hoy la elegibilidad comercial está fija en backend y Client sGTM; publicar un form no la
+modifica. La [configuración administrable](../../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
+es propuesta sin GO ni implementación. No simular un control ya existente en el producto.
+
 ## Checklist de salida
 
 - [ ] Taxonomía UTM definida, documentada y con owner; alineada al tracking plan de growth.

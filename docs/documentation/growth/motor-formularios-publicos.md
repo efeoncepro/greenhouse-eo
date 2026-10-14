@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-08-31 por Codex (TASK-1799 — Content Marketing)
+> **Ultima actualizacion:** 2026-10-13 por Codex (TASK-2034 — matching publicitario)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -18,6 +18,28 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 - **Recibir lo que la gente envia** de forma segura: valida los datos, exige consentimiento, frena spam/abuso (honeypot + captcha + limite por persona/IP) y guarda evidencia del consentimiento aunque la entrega falle.
 - **Entregar el lead** a su destino (HubSpot, email, etc.) de forma confiable: si el destino esta caido, el lead NO se pierde — se reintenta aparte, nunca bloquea la aceptacion.
 - **Operar todo por API gobernada** (no solo desde una pantalla): la misma capacidad la pueden usar la UI admin, Nexa, un script o una integracion.
+
+## Matching Meta y Google después de un envío aceptado
+
+Desde el release del 2026-10-13, seis formularios comerciales permiten enriquecer la medición con
+los datos de contacto disponibles: AEO, SEO, cotización web, Lead Gen web, auditoría social y
+AI Visibility Grader. Se exige autorización publicitaria del visitante; Google requiere además
+analítica e identificador GA4 real. La casilla para procesar la solicitud no reemplaza estos permisos.
+GPC y una elección desconocida o denegada bloquean el matching.
+
+Greenhouse acepta el envío, prepara los datos normalizados como hashes y guarda una proyección
+cifrada para entregarla después. Meta recibe un Lead por GTM Server. Google recibe datos de usuario
+por su canal dedicado, manteniendo una sola conversión GA4. Si falla medición, el formulario sigue
+funcionando; los reintentos de publicidad son independientes de la entrega HubSpot.
+
+**Crear/publicar otro formulario no activa automáticamente este matching.** La autorización de
+esos seis formularios está fija en código y en GTM Server. Hacerla administrable por formulario
+es una propuesta pendiente de GO, aún no implementada; no hay un selector disponible en el cockpit.
+La instrumentación GA4 genérica y la autorización publicitaria son controles distintos.
+
+[Contrato técnico y alcance exacto](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
+· [activación y límites de evidencia](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+Las pruebas controladas no sustituyen verificar la primera conversión comercial real consentida.
 
 ## Como funciona (flujo)
 

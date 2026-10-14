@@ -1,5 +1,27 @@
 # Registro de decisiones y versiones
 
+### 2026-10-13 — Privacidad pública: propuesta, aprobación y adopción publicada
+
+Decisión posterior del operador: «Vamos, ponla». Autoriza adopción en ambos sitios.
+Publicado sobre controles HubSpot, sin CMP ni persistencia nueva; publicidad-only, retiro,
+reapertura y a11y verificados en ambos hosts × escritorio/móvil. Think `f7d8f36` / WP `8d6ff95`.
+[Rollout y límites](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
+Readback del 2026-10-14 UTC / 13 de octubre Chile: WP plugin 1.1.0 y Think Production Ready;
+CSS/JS/fuentes/licencias idénticos en ambos hosts. QA nativa preserva elección al recargar y GPC
+resuelve analítica/publicidad denegadas sin aviso opt-in. El PASS visual/consentimiento no es un nuevo
+recibo Meta Server: las pruebas interceptaron el transporte y no crearon leads ni reservas.
+El adapter es presentación específica para estos dos consumidores, con dependencia de selectores
+HubSpot; no se canoniza una CMP propia, un contrato AXIS nuevo ni permisos adicionales de medición.
+El párrafo siguiente conserva el estado de la primera propuesta.
+
+«Quiero algo mucho más moderno, premium y elegante que vaya mucho con la efeonce-graphic-line»
+autoriza diseñar el aviso y panel de preferencias. Se preparó una propuesta navegable local en Think:
+«Tu visita. Tus reglas.» / «Elige qué compartes.», papel/navy, Bricolage/Poppins y controles publicados
+AXIS. Sin anillo decorativo ni franja adicional de footer. No equivale a aprobación de esta composición,
+publicación, sustitución de HubSpot o nuevos permisos de tracking. La demostración conserva elecciones
+solo en memoria y no escribe consentimiento real. Dirección y QA en
+[el dossier](../../../../docs/ui/visual-directions/EFEONCE_COOKIE_PRIVACY_2026-10-13.md).
+
 > Delta mate uniforme verificado contra: petición y aprobación del operador, AXIS `de34866` y catálogo live
 > de 134 entradas — 2026-10-12; comparación local, sin publicación de paquetes ni incorporación al catálogo.
 
@@ -34,6 +56,7 @@
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-13 | Privacidad pública: tras pedir una experiencia moderna/premium/elegante afín a La órbita, el operador autoriza «Vamos, ponla». Se adopta papel/navy, Bricolage/Poppins, aviso compacto y preferencias responsive en WordPress/Think. El footer conserva el enlace legal discreto; HubSpot conserva consentimiento y persistencia. Aplicación publicada y verificada; no habilita la propuesta escalable de medición ni migra otros productos. [Aplicación y mantenimiento](applications.md#producción-y-mantenimiento-de-esta-aplicación). |
 | 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |
 | 2026-10-10 | Deck **Marketing de Contenidos** aprobado (brochure de 57 láminas, línea Brand, ruta corta de 21; «Me encantó todo, queda aprobado»). Deja cuatro cosas en el canon: el patrón **franjas de foto** en seis y tres franjas, con tres excepciones sólo para él (una esfera por franja, foto de cine recortada, degradado bajo el título); la lámina a mano **«Producción con IA»** con la foto `CT24` en el índice de cine; **«Día a día»** con una interfaz de Marketing Studio **construida, no capturada**, como uso de `content-day-tools`; y la lámina de equipo **«Expertos multidisciplinarios»** con «+85 expertos más en Latam» («Personas reales» deja de ser el titular preferido). No se envía a un prospecto hasta cerrar sus pendientes (compromisos de servicio, «+85» sin fuente, logos de terceros). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y deltas 2026-10-10 (a–e); catálogo: `deck-recipes/README.md`. |
 | 2026-10-09 | Deck **Servicios web y digitales** aprobado (brochure de 29 láminas, línea Engine; «este deck está listo»). Fija que una pieza de línea lleva el **fondo Efeonce `#001A33`** y sólo el acento de la línea (`#091951` es de piezas de producto), una variante de `decision-case` sin foto del caso y la lámina «Dónde construimos». Pendientes antes de enviarlo: cifras de los casos Aguas Andinas (marcadores) y Berel. Norma: §4.6, «Deck Servicios web». |
@@ -878,3 +901,20 @@ El bundle WordPress exige procedencia/hash del paquete instalado y continúa sin
 Ohio pertenece al adapter. Imagen azul y aviso WebKit ResizeObserver permanecen abiertos; pruebas de
 callbacks en memoria no certifican persistencia, dispositivos físicos, AT ni proveedor de streaming.
 | 2026-10-12 | **Plate `HW1` reemplazado por `HW1-mismo-trabajo-sin-lanyard.png`** (operador: «el lanyard está encima del brazo y mal montado»). Borrado con `pnpm ai:inpaint erase`, resto de la foto idéntico; repuntado en catálogo, ejemplos, referencias, brochure 360 y canvas Agencia Creativa (v1). Mismo día: las tres láminas diseñadas de Revenue (`decision-provider-fit`, `content-service-lanes`, `method-agent-supervisor`) rechazadas en el 360 por la luz magenta del escenario («no sirve de acento sino de luz»); el arreglo es TASK-2012 Slice 3 (tokens AXIS), pendiente del visto bueno del operador. |
+
+### 2026-10-14 — Partners del footer: gris y conjunto de firmas
+
+«Explora Efeonce me gusta. Y sobre los partners sí, dale» autoriza los dos bloques. Corrección:
+«Se ven horribles los partners, prefiero que estén en escala de grises [...] mira nuestras firmas
+corporativas». Se reutilizan los nueve logos monocromos aprobados de la firma v3.1; fila común
+responsive, sin tarjetas/badges saturados. Publicado y verificado Home + servicio × 1440/390.
+[Recibo](../../../../docs/audits/public-site/2026-10-14-footer-explore-partners.md); no cambia
+la firma de correo, tiers ni programas del registro de partnerships.
+
+### 2026-10-14 — Footer completo: «A ver hazlo todo»
+
+El operador rechaza redundancia de «Explora Efeonce» al lado del logo y aprueba rediseñar el conjunto.
+Publicado «Explora», cuatro columnas, newsletter/empleo separados, partners gris compactos,
+legales discretos y controles flotantes ocultos sólo al ver footer. 531px desktop, QA6casos y axe
+sin violaciones. [Recibo](../../../../docs/audits/public-site/2026-10-14-footer-composition-v2.md).
+La variante anterior se conserva como historial; no se cambia la firma de correo ni tiers.

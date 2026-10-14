@@ -24,7 +24,8 @@ interface ScrubbableSpan {
 
 export interface ScrubbableSentryEvent {
   transaction?: string
-  request?: { url?: string; query_string?: unknown }
+  request?: { url?: string; query_string?: unknown; data?: unknown; headers?: unknown; cookies?: unknown; env?: unknown }
+  user?: unknown
   breadcrumbs?: ScrubbableBreadcrumb[]
   spans?: ScrubbableSpan[]
 }
@@ -42,6 +43,23 @@ const scrubData = (data: Record<string, unknown> | undefined): void => {
 }
 
 export const scrubSentryServerEvent = <T extends ScrubbableSentryEvent>(event: T): T => {
+  // Public conversion requests carry contacts and visitor identifiers. Sentry's
+  // sendDefaultPii=false is not a contract to retain their request bodies/headers.
+  const route = event.request?.url || event.transaction || ''
+
+  if (/\/api\/public\/growth\/(?:forms\/[^/?\s]+\/submit|meetings\/book)(?:[/?\s]|$)/.test(route)) {
+    if (event.request) {
+      delete event.request.data
+      delete event.request.headers
+      delete event.request.cookies
+      delete event.request.env
+      delete event.request.query_string
+      if (event.request.url) event.request.url = event.request.url.split(/[?#]/)[0]
+    }
+
+    delete event.user
+  }
+
   if (typeof event.transaction === 'string') event.transaction = redactSensitive(event.transaction)
 
   if (event.request) {

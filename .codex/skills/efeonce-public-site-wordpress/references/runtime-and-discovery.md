@@ -25,13 +25,52 @@ Use this reference for public-site inventory, bridge inspection, runtime repo bi
   Redes Sociales wall assets v1 under `assets/img/social/wall/v1/`; full note
   `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
+## Measurement consent presentation — published 2026-10-13 Chile
+
+The dated consent rollout adds `eo-measurement-consent` **1.1.0** to the governed runtime inventory
+above; runtime repo `main` commit `8d6ff95`. It distributes the HubSpot consent bridge and the scoped
+La órbita presentation adapter. Its legal-footer button invokes native `showBanner`; it does not add
+a permanent footer strip or replace the Ohio footer template. The existing measurement server-routing
+option remains enabled; presentation changes do not grant advertising consent.
+
+- Canonical UI sources live in Greenhouse under `scripts/measurement/hubspot-consent-ui.js`,
+  `hubspot-consent-ui.template.css` and `build-hubspot-consent-ui.mjs`; generated distributions live
+  in the plugin `assets/consent-ui/` and Think `public/measurement/consent-ui/`. Builder checks installed
+  AXIS primitives 0.6.6/tokens 0.6.1, writes both repositories, and includes local fonts/licenses and
+  a digest manifest. Do not patch generated distributions independently.
+- The plugin is public-host scoped, loads hashed CSS/JS in the head before the HubSpot loader, and
+  leaves native consent controls/handlers, categories, cookies, GPC and persistence with HubSpot.
+  Presentation copy/ARIA is added without replacing the provider's managed child nodes. No CAPI token,
+  CMP preference storage, policy registry or new tracking eligibility is implemented by the host UI.
+- Deployment was a **closed nine-file payload**, with prestate/bridge hash guards, backup outside the
+  webroot, assets before atomic PHP replacement and cache invalidation. A repo push does not prove
+  the whole repo was deployed. Other plugin/theme WIP was excluded; do not infer current full-repo
+  release safety from this scoped delivery or the historical green drift snapshot below.
+- Live readback used both hosts at 1440/390 without injecting adapter code: initial banner, selective
+  advertising with analytics denied, native reopening, reload persistence, withdrawal and axe WCAG
+  A/AA passed. With GPC, the provider resolved both categories denied and skipped the opt-in banner.
+  Transport was intercepted in the repeated UI regression; those results do not prove new Meta
+  Server delivery or a commercial Lead. Think `analytics=false` remained isolated.
+- Compatibility depends on native HubSpot IDs/classes. `MutationObserver` handles delayed mounting,
+  not arbitrary provider schema changes. On a visual regression, inspect the provider DOM, native
+  handlers and source CSS/JS, then use the scoped rollback; do not replace consent with prototype
+  state or revert server matching/GTM as a presentation fix.
+
+Evidence, exact hashes/deployments, scoped rollback and repeatable regression:
+[Consent UI rollout](../../../../docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md) and
+[versioned receipt](../../../../docs/audits/measurement/consent-ui-evidence-2026-10-13.json).
+Before another rollout, refresh SSH/WP-CLI preflight and live drift. For the consent contract and
+changes to tracking, load `greenhouse-gtm-ga4-operator` plus
+`docs/reference/measurement-gtm-ga4/09-hubspot-consent.md`; this host reference is not that contract.
+
 ## Global Footer Widget Facts
 
 Use this when the user asks to inspect or update the public-site footer. Do not
 mutate the footer during discovery.
 
 - Canonical audit and rollout evidence:
-  `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`.
+  `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`; refresh inicial
+  `docs/audits/public-site/2026-10-14-footer-explore-partners.md` y composición vigente V2 arriba.
 - The visible footer is `footer#colophon.site-footer.clb__dark_section`,
   rendered by the Ohio child theme plus WordPress sidebars/widgets. The current
   visible footer is not rendered from the headless `eoh_site_settings_footer_*`
@@ -40,9 +79,21 @@ mutate the footer during discovery.
   `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/themes/ohio-child/parts/elements/footer.php`.
   It counts active sidebars `ohio-sidebar-footer-1..4` and renders each through
   `dynamic_sidebar(...)`.
-- Careers footer entry lives in `ohio-sidebar-footer-3`:
-  `ohio_widget_subscribe-2`, `block-32 | Unete a nuestro equipo`,
-  `block-31 | ¿Te interesa trabajar con nosotros?`.
+- Estado V2 publicado 2026-10-14: **Explora** (`block-45`), evitando repetir Efeonce junto al logo.
+  Cuatro columnas (marca, navegación, newsletter, empleo); partners en fila compartida inferior.
+  Sidebar3 sólo `ohio_widget_subscribe-2`; sidebar4 `block-31` + `block-34`; `block-32` preservado,
+  sin asignación. Wrapper de sidebar4 usa `display:contents`; marcador `data-eo-footer-partners="v2"`.
+  Nueve logos de firmas en gris permanente, Salesforce58px: HubSpot, Salesforce, Adobe, Microsoft,
+  AWS, Google Cloud, Claude, OpenAI y BytePlus. No regresar a los badges de color rechazados.
+  CF7 242255 conserva required/names/consentimiento y delivery; markup/label/autocomplete cambian.
+  CSS/JS/rollback: `scripts/public-website/footer-refinement-v2/README.md`; snapshot durable
+  no autoload `eo_footer_refinement_20261014_v2`. La V1 queda como historia, no writer vigente.
+  Instagram corregido, Spotify sin destino retirado, cuatro redes con nombres accesibles.
+  Chrome de `.elements-bar` se oculta/inert sólo al intersectar footer y se restaura al salir.
+  Legales: privacidad + preferencias nativas HubSpot; términos404 retirado porque no hay página
+  publicada. No inventar texto legal ni reincorporar enlace sin contenido aprobado.
+  Auditoría actual `docs/audits/public-site/2026-10-14-footer-composition-v2.md`.
+  No modifica Think, AXIS ni tiers/estados contractuales del registry.
 - Current Careers contract: footer recruiting is Careers-only. `block-31`
   renders one CTA, `Ver vacantes y postular`, pointing to
   `https://greenhouse.efeoncepro.com/public/careers` with `target="_blank"` and
@@ -61,10 +112,8 @@ mutate the footer during discovery.
   verify Home plus at least one service landing in desktop `1440` and mobile
   `390`, assert one Careers link, expected target/rel, no stale email copy, and
   `scrollWidth === clientWidth`.
-- Adjacent footer debt remains intentionally separate unless scoped: demo
-  Resources links, malformed Instagram URL, placeholder social `#`, missing
-  social accessible labels, newsletter/legal mixed-language copy, and
-  inconsistent link targets.
+- Newsletter delivery/integración no se acredita por este rediseño: la configuración permanece
+  idéntica y no se enviaron formularios. Página de términos pendiente de contenido aprobado.
 
 ## Miscellaneous Surface Facts
 

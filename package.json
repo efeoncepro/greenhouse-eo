@@ -14,6 +14,7 @@
     ]
   },
   "scripts": {
+    "growth:measurement": "tsx scripts/measurement/policy-cli.ts",
     "studio": "node scripts/marketing-studio/cli.mjs",
     "studio:test": "node --test scripts/marketing-studio/*.test.mjs",
     "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm mcp:manifest:check && pnpm mcp:skills:check && pnpm dataforseo:version:check && pnpm vercel:reachability-gate && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",

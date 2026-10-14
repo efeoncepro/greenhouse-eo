@@ -1,87 +1,65 @@
 # Lead matching Meta y Google — 2026-10-13
 
-## Resultado y límites
+## Resultado
 
-El operador autorizó implementar/activar matching de formularios aceptados y reuniones
-confirmadas para remarketing. Código preparado y probado en el checkout compartido;
-**todavía sin release, SQL aplicada ni flags activados**. GTM Server/Web live 5/5 conserva
-la medición anterior. El ingreso backend permanece en workspace 8, con test code retirado.
+**Released y activado** mediante release completo develop→main PR254, main d692ab51dc48,
+manifest released y orquestador38483437158 success. [Dossier de release y recibos](../releases/2026-10-13-full-develop-matching-release.md).
+GTM Server live6/Web live5; captura Vercel y Meta/Google/retención Ops activos de forma persistente.
+La primera aceptación/reserva comercial consentida post-activación queda sin observar;
+TASK-2034 conserva Status real Parcial. No se confunde preparación con entrega provider real.
 
-### Cambios externos realizados y releídos
+## Configuración y cadena
 
-- GA4 correcto, cuenta 252968286/propiedad 486264460/stream 10593675149, `G-KYPPY57M14`,
-  usuario `jreyes@efeoncepro.com`. UPD y reconocimiento general activados tras autorización;
-  colección automática OFF. Link Ads 9531478329/personalización ya activos, conservados.
-- Siete audiencias 90 d: AEO, SEO, proyectos web, contacto, social, reuniones confirmadas y
-  Leads comerciales. Reglas unen los clasificadores al mismo `generate_lead`. Dos dimensiones
-  nuevas: `lead_source` y `scheduler_key`. Cuatro audiencias anteriores conservadas.
-- MP secret `properties/486264460/dataStreams/10593675149/measurementProtocolSecrets/16122785915`.
-  Tres secretos GCP versión 1: `greenhouse-measurement-payload-key`,
-  `greenhouse-measurement-ingress-token`, `greenhouse-measurement-ga4-api-secret`.
-  Grant por secreto a `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`; valores
-  verificados en memoria, nunca impresos. Refs aún no configuradas en runtimes.
-- GTM workspace 8, template 30/Client 31/variable 32/trigger 33 compilados. Draft añade ingreso
-  autenticado y conserva triggers Lead 12/17 hasta el cutover. No publicado.
-- Meta Test Events recibió fixtures de formulario y reunión como **Procesado / Servidor**,
-  con correo/nombre/apellido/teléfono y clasificadores comerciales. UUIDs:
-  `e407fecc-5d9e-4cb7-948d-0151d1d5fc57`, `ec437ec1-5429-4b00-98b9-b2b6e07e1af5`.
-  Seis negativos (credencial falsa, denied, email sin hash por host) bloqueados400/401.
-  Replay de otros dos UUIDs conserva ID/tiempo y devuelve200; Test Events muestra cada
-  recepción. No se afirma dedupe de atribución ni volumen/calidad de coincidencia real.
+- GA4 cuenta252968286/propiedad486264460/stream10593675149, G-KYPPY57M14,
+  jreyes@efeoncepro.com. UPD y reconocimiento aceptados tras autorización; automática OFF,
+  Signals OFF (no prerrequisito UPD). Ads link10593794382/customer9531478329, personalización activa.
+- Siete audiencias90d creadas/releídas: AEO, SEO, web, contacto, social, reuniones y comerciales.
+  Clasificadores del mismo generate_lead; nuevas dimensiones lead_source y scheduler_key.
+- MP secret16122785915 y secretos scoped GCP payload-key/ingress-token/ga4-api-secret versión1;
+  grant por secreto al portal SA, refs pinned. Resolución efectiva verificada dentro del worker,
+  no sólo mediante lectura local. Vercel real usa service_account_key del mismo principal.
+- Source Forms aceptado/Meetings confirmado prepara hashes Meta/Google diferentes y toma
+  contexto publicitario granular con veto Sec-GPC. Unknown/denied/stale/GPC omite medición,
+  nunca rechaza el negocio ni infiere publicidad del consentimiento de procesamiento.
+- SAVEPOINT/proyección AES-GCM/AAD y unique source; UUID/tiempo durables, destinos independientes,
+  cinco intentos24h, claims SKIP LOCKED/lease/CAS, ciphertext eliminado48h. Worker Forms ya existente.
+- Meta recibe sólo el ingreso backend autenticado del GTM Server existente. Client31/template30/
+  trigger33; tag6 sólo [11,33], legacyLead12/17 retirados. Sin Test Events code al publicar.
+  GA4 forwarding requiere Client Name=GA4, preserva espejo y excluye backend; Google UPD
+  utiliza user_data MP top-level sin events ni otro generate_lead, con client_id real + ads/analytics.
+  Nunca PII/hash en dataLayer, parámetros ordinarios, dimensiones o URLs.
 
-No se crearon submissions, bookings, contactos CRM, campañas, gasto publicitario ni otro
-proyecto/servicio/cron. No se enviaron contactos reales ni datos históricos.
+## Verificación
 
-## Implementación y verificación local
+- 71 tests10archivos +21Client tests PASS, tipos/lint y bundles Forms/Meetings/worker PASS.
+  CI remoto main20.100 PASS/616 skipped/0 failed y build/Deep/smoke success; no repetir build/suite
+  local que saturó el equipo. CI fallaba por heap6GiB; corrección hereda8GiB canónicos sin omitir gates.
+  API cero pasos y UI Starting job eran incompletas, no prueba de inactividad del runner.
+- Meta Preview/Test Events **Procesado/Servidor** con em/ph/fn/ln y clasificadores ambos hosts:
+  db9788fc-85d8-4315-8033-2ac2eb2ad06a, bc3e69f5-8573-46ce-828b-a2450dd3e694.
+  Seis negativos400/401; replay conserva ID/tiempo, sin afirmar dedupe de atribución.
+- SQL post-release aplicada23:34/23:35Z; ocho permisos app y capability catalog verificados.
+  Canary con rol real greenhouse_app prueba SAVEPOINT/idempotencia/claims paralelos/leaseCAS/
+  retención y elimina fixtures de medición. Sin escritura de negocios ni salida provider.
+- Versión6 congelada verificada antes de publicar23:38:57Z; tres negativos live prueban gates
+  auth/consentimiento/identidad cruda sin disparar Meta. Web5 sin cambio.
+- Worker00775-fnh100% con tres flags true y canary200 que resuelve tres secretos reales;
+  processed0/unavailableDestinations[]. GitHub repo vars persistentes, sin override Production.
+- Captura true exacta en Vercel; deployment dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY,
+  alias canónico confirmado. Bundles portables tienen measurementContext/consentimiento,
+  cache must-revalidate. Watchdog ok6/6 sin drift ni mensajes Teams.
 
-- Consentimiento publicitario granular opcional y veto `Sec-GPC`; unknown/denied/stale/GPC
-  omite medición sin bloquear el negocio. Contactos sólo desde datos validados de la aceptación.
-- Hashes Meta y Google separados, sin HMAC interno; Google MP `user_data` top-level sin
-  events ni otro generate_lead. Nunca PII/hash en dataLayer o dimensiones GA4.
-- Proyección AES-GCM, AAD por UUID, unique source y filas de delivery por destino.
-  SAVEPOINT aísla instrumentación dentro de la transacción comercial. Retries estables,
-  cinco intentos/24 h, lease/CAS y expiración que conserva una entrega con lease vigente.
-  Ciphertext se elimina a48 h; retención funciona con ambos senders deshabilitados.
-- Worker Forms existente, cadence 2 min: error de medición no altera su respuesta; secreto
-  Google no disponible no detiene Meta ni viceversa.
-- 71 tests/10 archivos y21 tests de Client PASS, TypeScript/ESLint PASS. Builds portables
-  Forms/Meetings y bundle del ops-worker PASS. No se ejecutó una release production ni
-  concurrencia SQL live; esas pruebas siguen pendientes junto al rollout.
+## Límites, pendiente y rollback
 
-Evidencia privada saneada en `.captures/meta-capi-diagnostic-2026-10-13/`:
-`google-lead-audiences-receipt.json`, `matching-secrets-receipt.json`,
-`matching-preview-canary.json`, `meta-lead-matching-processed.png/txt`,
-`ga4-user-provided-data-enabled.png`, `ga4-lead-audiences-created.png`.
-El parche reviewable `lead-matching-owned-source.patch` comprende26 rutas propias;
-`lead-matching-owned-source-paths.txt` enumera su alcance. No cambia índice ni crea árbol Git.
+No se crearon submissions, bookings, CRM, quotes, pagos, campañas ni backfill de contactos.
+Test Events y controles de cola/credenciales no prueban la primera conversión comercial real
+post-flip ni tamaño/elegibilidad de audiencias, calidad o rendimiento. Ese es el único acceptance
+runtime de matching todavía abierto; registrar fuente consentida→ledger→ack→recepción provider
+cuando ocurra, sin fabricar negocio. Incidente económico mindicador separado sigue abierto,
+con excepción y Sentry detallados en el dossier; no se afirma arreglado.
 
-## Integración y siguiente paso autorizado
-
-El operador rechazó la excepción de checkout y ordenó **todo develop→main** el13/10.
-Se conserva el checkout compartido y se prepara un commit sólo de medición; el release
-incluye íntegra la rama develop existente, sin incorporar WIP ajeno no committeado.
-Main previo:7182af769e71bc1ad978aa8a3459337f77c20ce6. Auditoría del batch observa cinco SQL
-netas ya aplicadas, seis capabilities quoter presentes y ninguna release activa. La key
-marketing_studio.catalog.manage continúa pendiente de SQL parked postrelease.
-
-El preflight clasifica Finance/Auth/Cloud y requiere autorización formal del override de
-batch; la orden de publicar todo no permite desactivar los demás gates. Build local completo
-PASS; suite general interrumpida por saturación y timeouts al ejecutarse simultáneamente.
-No quedan procesos de esos comandos. CI remoto validará el árbol exacto antes del merge.
-
-Persistencia del worker: tres GitHub repo vars → env workflow → deploy.sh, defaultOFF,
-replicando AUTH_SERVER_GC_ENABLED. Configurar vars y runtime juntos tras SQL/cutover;
-rollback apaga senders y mantiene retención. Tres secret refs pinned version1 declaradas.
-
-Tras release: aplicar migración parked con timestamp post-release, configurar refs pinned,
-verificar secretos en runtime, habilitar captura y retención, publicar Client sin test code y
-retirar triggers Meta Lead 12/17 en la misma versión antes de activar Meta backend. Activar
-Google sólo con client_id real + analytics/ads consent; conservar PageView 11/GA4 mirror.
-Verificar ledger, respuestaHTTP y provider por separado. Audiencias recién creadas no
-acreditan tamaño/elegibilidad/serving ni resultado de campañas.
-
-Rollback: senders/capture OFF, retención ON, conservar key y receipts; restaurar sender
-anterior sólo después de detener backend. No rotar key mientras exista ciphertext vigente.
-Canon [08 §4.2](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13),
+Rollback: captura y senders OFF en configuración durable y revisión live, retención ON;
+restaurar GTM5 sólo tras detener backend; no borrar key/ciphertext vigente48h, mantener SQL y recibos.
+No otro proyecto/servicio/cron. Canon [08 §4.2](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#42-implementación-de-matching-y-google-upd--2026-10-13),
 [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md) y
 [TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md).

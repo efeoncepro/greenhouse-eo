@@ -46,6 +46,11 @@ Convenciones canónicas:
   [runbook canónico](../../../../docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md)
   + skill `greenhouse-gtm-ga4-operator`; Lead procede del backend tras aceptación comercial,
   consentimiento y dedupe. Pixel web y GA4 no certifican entrega CAPI.
+  Implementación Efeonce vigente: [contrato10](../../../../docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md),
+  backend único de Lead → Client autenticado GTM Server; navegador conserva mirror GA4.
+  Google matching usa user_data MP dedicado sin otro evento y requiere analytics+ads/client_id real.
+  La habilitación de formulario está fija en backend+Client; configuración sin release es
+  [propuesta pendiente de GO](../../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md).
 - **Warehouse-native:** métricas calculadas en el warehouse = una sola fuente de verdad
   (evita el "las métricas del tool no cuadran con negocio"). Habilita experimentación
   warehouse-native (Eppo/GrowthBook, `04`).

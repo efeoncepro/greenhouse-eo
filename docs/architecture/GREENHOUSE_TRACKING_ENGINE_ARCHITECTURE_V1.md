@@ -447,15 +447,21 @@ Elegir 1 opción, documentarla, y recién ahí construir tags. Mientras esto sig
 
 Todos a la **misma propiedad GA4 `486264460`** (funnel unificado). **Al sumar un host nuevo (mandato §19.2):** (1) instalar el snippet `GTM-NGHPGRLZ` en ese host; (2) si el host NO tiene otra fuente de page_view, agregar un GA4 Config gateado por hostname en el container (workspace → preview → confirmación → publish); (3) agregar la fila aquí; (4) verificar con Playwright (`/g/collect en=page_view tid=G-KYPPY57M14`, sin doble conteo). Patrón + gotchas (incl. cross-repo vía rama+PR; en Astro `is:inline` va SOLO en `<script>`, NUNCA en `<noscript>`): `docs/reference/measurement-gtm-ga4/LEARNINGS.md`.
 
-### 19.6 Meta CAPI: contenedor Server separado (2026-10-13)
+### 19.6 Meta CAPI y matching de servidor (estado de release 2026-10-13)
 
-Dirección elegida por el operador: [ADR CAPI por sGTM](GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md);
-contrato/pasos/evidencia en [runbook 08](../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md).
-GTM `GTM-NGHPGRLZ` web live **5**, `Efeonce Server` `GTM-K2X4ZTTK` server live **5**
-(cuenta `6068297031`, container `191286361`), tag CAPI para `708931297255942`.
-Recuperado el existente en `efeonce-group`; [consentimiento HubSpot](../reference/measurement-gtm-ga4/09-hubspot-consent.md)
-y routing activos en WordPress/Think. PageView explícito consentido por destino, UUID;
-Lead reutiliza accepted form/confirmed meeting del dominio mediante generate_lead hacia Client
-GA4 servidor. Sin nuevo outbox/sender. Recepción Server Test Events y PageView real verificados;
-próximas conversiones/replay comerciales aún por observar. Pixel web opcional no reemplaza
-CAPI; si se usa dual, comparte nombre/ID y prueba dedupe. Snapshot/smoke web no prueban Meta.
+Dirección [ADR CAPI por sGTM](GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
+contrato implementado [10](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md),
+consentimiento [09](../reference/measurement-gtm-ga4/09-hubspot-consent.md) y
+[evidencia](../audits/releases/2026-10-13-full-develop-matching-release.md).
+WebGTM-NGHPGRLZ live5 y ServerGTM-K2X4ZTTK live6; mismo hosting efeonce-group y dataset708931297255942.
+PageView explícito consentido permanece. Lead backend toma aceptaciónForms/confirmaciónMeeting,
+encola proyección cifrada transaccional y entrega por Client autenticado31/trigger33. LegacyMeta12/17
+retirados: no otro Lead desde ClientGA4. El mirror generate_lead conserva una sola conversiónGA4;
+UPDGoogle entrega user_data dedicado sin events, con client_id real y ads+analytics consentidos.
+Este matching no implementa todo el futuro TrackingEngine descrito en secciones anteriores.
+Allowlist fija en backend y Client: seis Forms y una pareja scheduler/surface. No autoalta por
+publicar otra fuente. Propuesta configurable sin GO: [documento](GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md).
+Source/worker/renderers released, SQL/flags/secrets activos; TestEventsServer y canariesPASS.
+Primera conversión comercial real consentida post-activación, calidad/serving/dedupe atribución
+sin observar. Snapshot/smoke web no prueban CAPI; Pixel complementario requiere identidad/dedupe
+propios y no sustituye el servidor. No nuevos proyectos/cron/servicio para este matching.
