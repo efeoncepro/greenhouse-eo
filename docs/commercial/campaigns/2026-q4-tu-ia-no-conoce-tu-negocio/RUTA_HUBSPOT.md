@@ -21,7 +21,7 @@ detiene esa columna, no el carril completo.
 | Gate | Estado al 2026-09-22 | Qué habilita | Qué bloquea |
 |---|---|---|---|
 | **Destino** | **sólo el caso ANAM** sirve; el pillar `200` redirige a un artículo de 2024; otras cuatro `404` | Orgánico completo; pauta al caso ANAM y a `/agenda/` | Pauta a pillar, precios, agentes, `cuando-no-usar` y `vs-salesforce` |
-| **Partner** | ✅ **resuelto 2026-10-14**: Gold Solutions Partner, autorizado por el operador (readback del directorio 2026-10-06) | Cifras atribuidas; nombrar HubSpot y declarar Gold Solutions Partner con la insignia oficial, también en pauta | Sprocket 3D en escena hasta confirmar la aprobación escrita de HubSpot (CDR-004, Delta 2026-10-14) |
+| **Partner** | ✅ **resuelto 2026-10-14**: Gold Solutions Partner, autorizado por el operador (readback del directorio 2026-10-06) | Cifras atribuidas; nombrar HubSpot y declarar Gold Solutions Partner con la insignia oficial, también en pauta | — (sprocket 3D aprobado por HubSpot, declarado 2026-10-14; siempre desde el kit) |
 | **Prueba** | un caso publicado (ANAM Customer Agent) | Los dos dolores de capítulo 4 con prueba real | Cualquier otro dolor con caso de cliente; el resto va con método y límite |
 
 **Lectura corta:** hoy se produce y se publica orgánico en los siete dolores; se pauta poco y sólo al caso ANAM o
@@ -154,7 +154,7 @@ se suma como pipeline. La propiedad de campaña por capítulo en HubSpot requier
 ## 6. Dependencias antes de ejecutar
 
 1. ~~Revalidar el estado de partnership HubSpot~~ — **resuelto 2026-10-14** (Gold Solutions Partner, autorizado).
-   Queda como rutina confirmar el perfil del directorio antes de cada vuelo, y abierta la aprobación del sprocket 3D.
+   Queda como rutina confirmar el perfil del directorio antes de cada vuelo. Sprocket 3D aprobado.
 2. **Construir el pillar y desbloquear `/precios/`**. Hoy el carril no tiene página que reparta: `/servicios/hubspot/`
    redirige a un artículo de 2024 y `/servicios-contratar-hubspot/` sigue viva sin su 301.
 3. **Decidir el hueco de Revenue Lifecycle** (CDR-004 §10.1).

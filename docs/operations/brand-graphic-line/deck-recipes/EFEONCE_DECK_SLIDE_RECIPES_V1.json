@@ -14867,9 +14867,9 @@
             "question": "¿Qué hacen en HubSpot?",
             "answer": "Todo el ciclo"
           },
-          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Seis carriles de la oferta HubSpot con su Hub e íconos oficiales (hubspot-icon-*), cuatro fases; sin mascota. En el canvas, el sprocket 3D de HubSpot está superpuesto sobre la plataforma: uso interno hasta la aprobación escrita de HubSpot, fuera del PDF.",
+          "fit": "Cabe en los slots medidos de la receta (eyebrow, pregunta, respuesta y bajada, medidos contra maxChars el 2026-10-06). El resto del contenido está en el intent (renderSource) y lo midió el compositor al componer. Seis carriles de la oferta HubSpot con su Hub e íconos oficiales (hubspot-icon-*), cuatro fases; sin mascota. En el canvas, el sprocket 3D de HubSpot está superpuesto sobre la plataforma: autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14).",
           "conditions": [
-            "Sprocket 3D de HubSpot: uso interno hasta la aprobación escrita de HubSpot; está en el canvas, nunca en el PDF ni en una pieza que salga de Efeonce."
+            "Sprocket 3D de HubSpot: autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14); siempre desde el kit, sin modificar ni generar el logo."
           ]
         }
       ]

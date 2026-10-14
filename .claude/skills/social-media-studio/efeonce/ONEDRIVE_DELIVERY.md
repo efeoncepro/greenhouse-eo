@@ -51,7 +51,7 @@ antes de reutilizarla; incluye rutas y particularidades Unicode verificadas. Ide
 disco: `pnpm ai-gen:pull ai-generations/2026-09-20_identidad-julio-nexa`). El banco
 OneDrive de poses guía actuación/cuerpo, no identidad facial.
 
-**Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, logo de uso interno hasta aprobación) con subcarpetas por familia y versión
+**Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, autorizado para piezas externas desde el 2026-10-14) con subcarpetas por familia y versión
 (p. ej. `Clawd (Claude)/`, `Codex (OpenAI)/` y `Gigi (Google Gemini)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y
 `Poses 3D con accesorios/v01/`, cada pose en fondo de estudio y transparente). Método reutilizable:
 [`mascot-3d-pose-library.md`](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md); evidencia en

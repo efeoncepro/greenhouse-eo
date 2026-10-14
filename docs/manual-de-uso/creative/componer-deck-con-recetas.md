@@ -291,7 +291,7 @@ Antes de enviarlo:
   hacia una persona y 23 fuentes) están en el caso publicado.
 - **Insignia Gold:** es un claim con readback `hubspot-partner-readback-2026-10-06`. Repite la lectura antes de un envío
   externo fuera de su vigencia (registro de partnerships).
-- **Sprocket 3D de HubSpot:** uso interno hasta la aprobación escrita de HubSpot. Está en el canvas, nunca en el PDF.
+- **Sprocket 3D de HubSpot:** autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14). Se usa desde el kit, sin modificar ni generar el logo.
 - **Sin mascotas ni personajes de HubSpot.** Logos de clientes sólo con su autorización (TASK-1937).
 
 **Límites prácticos que dejó esta corrida** (el compositor no recorta: si te pasas, la lámina no sale o se monta):
@@ -933,8 +933,8 @@ Ejemplos en `ai-generations/2026-10-07_pibank-propuesta/`: `ciclo-v13/transplant
   autorización.
 - **No generes con IA el logo de un cliente dentro de una foto de caso:** se compone desde el archivo oficial.
 - **No inventes oficinas** en `content-markets`: los países salen de `EFEONCE_OPERATING_MARKETS`.
-- **No uses el brochure HubSpot con prospectos** mientras falte la autorización de ANAM para sus dos cifras, ni pongas el
-  sprocket 3D de HubSpot en una pieza que salga de Efeonce.
+- **No uses el brochure HubSpot con prospectos** mientras falte la autorización de ANAM para sus dos cifras, ni generes ni
+  modifiques el sprocket de HubSpot: va siempre desde el kit.
 - **No compongas `decision-case` ni `content-clients` en la línea de un deck oscuro:** van como láminas de Efeonce, en
   claro y en la línea `growth`.
 - **No pongas campañas reales en una interfaz de brochure** (ni propias ni de clientes): las interfaces de Creative

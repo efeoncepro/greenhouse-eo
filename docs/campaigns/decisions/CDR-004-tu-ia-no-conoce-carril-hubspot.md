@@ -295,7 +295,7 @@ como «HubSpot no sirve»; eso sigue siendo regla.
 - **Rutina, no bloqueo:** antes de cada vuelo, confirmar que el perfil del Solutions Directory sigue diciendo Gold.
 - **Sigue vigente:** claims prohibidos y cifras atribuidas de §6, isotipo y badge nunca generados, ANAM y Salesforce
   fuera de la pauta, destinos de §7.
-- **Abierto:** el sprocket 3D como placement en escena requiere, según las guías de partner de HubSpot, aprobación
-  escrita (registro de partnerships: «uso interno hasta aprobación escrita»). Pendiente que el operador confirme si
-  su autorización la incluye; mientras tanto la vía para pautar es la insignia.
+- **Sprocket 3D:** el operador confirmó el 2026-10-14 que existe la aprobación escrita de HubSpot que piden sus
+  guías de partner. El placement en escena queda habilitado para orgánico y pauta, desde el kit, sin modificar ni
+  generar el logo (registro de partnerships actualizado).
 - **Brief:** OneDrive `CMP-002_tu-ia-no-conoce-tu-negocio-hubspot/BRIEF.md`, Delta 2026-10-14.
