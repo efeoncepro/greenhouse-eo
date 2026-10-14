@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -20,10 +20,10 @@
 - Flow: `docs/ui/flows/TASK-2037-measurement-policy-flow.md`
 - Motion: `docs/ui/motion/TASK-2037-measurement-policy-motion.md`
 - Backend impact: `none`
-- Status real: `Lifecycle/API y alta real UI verificados;12 pruebas PASS; GVC premium1440/390 PASS; 12 estados/scorecard PASS; HTTP agent-first/CI/release pendientes`
+- Status real: `Publicado main9690efad, orquestador38591329633/manifest released; Server9 y watchdog6/6/drift0; API/CLI/UI y alta por datos verificados; tráfico real fuera de este cierre`
 - Rank: `Now`
 - Domain: `data|growth`
-- Blocked by: `TASK-2036`
+- Blocked by: `none`
 - Branch: `develop; checkout compartido, sin worktrees`
 
 ## Summary
@@ -231,9 +231,9 @@ GTM/Meta/hosts existentes con autorización de esta corrida; sin nuevas credenci
 ## Acceptance Criteria
 
 - [x] Wireframe/flow/dirección/mapping/readiness pasan antes de JSX; UI ready sólo entonces yes — task/ui-readiness gate0 errores antes de implementar el first fold.
-- [ ] Primitive reuse y copy canónico, sin lógica de autorización en UI.
-- [ ] Loading/empty/error/denied/conflict y lifecycle cubiertos, reduced-motion equivalente.
-- [ ] GVC premium desktop/390 revisado, sin overflow/overlaps; API real y release verificados.
+- [x] Primitive reuse y copy canónico, sin lógica de autorización en UI — inspector nativo, GH_GROWTH_MEASUREMENT y shared HTTP client; mismas capabilities server/CLI.
+- [x] Loading/empty/error/denied/conflict y lifecycle cubiertos, reduced-motion equivalente —24 pruebas UI/agentes/red,12 estados y GVC final1440/390; mocks de presentación explícitos.
+- [x] GVC premium desktop/390 revisado, sin overflow/overlaps; API real y release verificados — scorecard4.51/floor4.3, captura14:46Z y release9690efad.
 
 ## Verification
 
@@ -241,9 +241,9 @@ Tests/lint focales, CI completo y gates de policy/DB o UI según perfil. Task li
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta/índices reflejan runtime real y evidencias por criterio.
-- [ ] Docs/skills espejos/handoff/changelog sincronizados; WIP ajeno intacto.
-- [ ] Un release completo y recibos; no cerrar por fixture la primera conversión real.
+- [x] Lifecycle/carpeta/índices reflejan runtime real y evidencias por criterio — cierre publicado14/10; registry/README sincronizados.
+- [x] Docs/skills espejos/handoff/changelog sincronizados; WIP ajeno preservado mediante staging explícito/parcial.
+- [x] Un release completo y recibos — PR255/orch38591329633; TASK-2034 conserva tráfico comercial/EMQ pendiente.
 
 ## Follow-ups
 
@@ -260,3 +260,8 @@ select tipados, copy central y primitivas nativas. Ninguna captura local acredit
 compilación lenta, reinicios por límite de memoria y assets404/reset. La captura con Times/overlay
 fue rechazada; no se bajó el estándar. Se valida la composición en staging y después se conectan
 mutaciones completas. Sin release de producción por este checkpoint.
+
+
+### Cierre publicado14/10
+
+[release y evidencia](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md). El cierre cubre configuración/CAPI y cliente agente; ningún fixture demuestra conversión comercial real ni EMQ.

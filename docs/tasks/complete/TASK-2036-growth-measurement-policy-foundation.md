@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Implementación/API/worker y migración aplicados; seed7 y prueba lifecycle por datos verificados; CI y release pendientes`
+- Status real: `Publicado main9690efad, orquestador38591329633/manifest released; Server9 y watchdog6/6/drift0; API/CLI/UI y alta por datos verificados; tráfico real fuera de este cierre`
 - Rank: `Now`
 - Domain: `data|growth`
 - Blocked by: `none`
@@ -221,9 +221,9 @@ GTM/Meta/hosts existentes con autorización de esta corrida; sin nuevas credenci
 ## Acceptance Criteria
 
 - [x] Plan aprobado y ownership separados, sin duplicar tasks existentes — aprobación14/10; TASK-2036 foundation/TASK-2037 consumer y registro verificados.
-- [ ] Alta compatible demostrada por datos sin nuevo build/redeploy/publish GTM.
-- [ ] Consentimiento/GPC/revocación, identidad, scopes y matching preservados.
-- [ ] API/UI/worker/Client y versión desplegada verificados con Test Events aislados.
+- [x] Alta compatible demostrada por datos sin nuevo build/redeploy/publish GTM — fuente nueva15:56Z, CLI producción y Meta Test Eventc7dd1839; snapshots main/deployment/Server9 idénticos.
+- [x] Consentimiento/GPC/revocación, identidad, scopes y matching preservados —74 pruebas foundation más contratos/bridge; negativos live400, frontera Forms/CRM13 PASS.
+- [x] API/UI/worker/Client y versión desplegada verificados con Test Events aislados — release9690efad, Server9, Meta UI ambos hosts, health200 y watchdog6/6.
 
 ## Verification
 
@@ -231,9 +231,9 @@ Tests/lint focales, CI completo y gates de policy/DB o UI según perfil. Task li
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta/índices reflejan runtime real y evidencias por criterio.
-- [ ] Docs/skills espejos/handoff/changelog sincronizados; WIP ajeno intacto.
-- [ ] Un release completo y recibos; no cerrar por fixture la primera conversión real.
+- [x] Lifecycle/carpeta/índices reflejan runtime real y evidencias por criterio — cierre publicado14/10; registry/README sincronizados.
+- [x] Docs/skills espejos/handoff/changelog sincronizados; WIP ajeno preservado mediante staging explícito/parcial.
+- [x] Un release completo y recibos — PR255/orch38591329633; TASK-2034 conserva tráfico comercial/EMQ pendiente.
 
 ## Follow-ups
 
@@ -257,5 +257,10 @@ Ninguna bloqueante: decisiones del plan aprobadas14/10; los detalles quedan en A
 - [x] Versioned discovery + fresh read-only validation + shared HTTP client/CLI;18 targeted tests
   PASS (authority, typed mapping, CAS/state, safe schema errors, exact-origin session and durable
   known-receipt recovery). No SQL or browser required for operational commands.
-- [ ] Remote HTTP CLI lifecycle/readback on the controlled source, with current candidate CI.
-- [ ] Full develop→main release and production contract verification remain pending.
+- [x] Remote HTTP CLI lifecycle/readback on controlled sources — staging17 calls and production14 calls plus disable/readback; CI exact627/969 green.
+- [x] Full develop→main release and production contract verified — PR255, manifest released and native HTTP contract canary; see final release audit.
+
+
+### Cierre publicado14/10
+
+[release y evidencia](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md). El cierre cubre configuración/CAPI y cliente agente; ningún fixture demuestra conversión comercial real ni EMQ.

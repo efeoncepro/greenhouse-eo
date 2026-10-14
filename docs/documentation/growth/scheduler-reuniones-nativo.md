@@ -32,11 +32,11 @@ entrega a Meta por GTM Server y, si corresponde, a Google como datos de usuario 
 Sólo se prepara con consentimiento publicitario vigente y sin GPC; Google requiere además analítica
 consentida y un identificador GA4 real. Los datos de contacto y hashes no van al dataLayer.
 
-La cobertura de matching es **sólo** `efeonce-discovery-30` sobre
-`fhsf-efeonce-lead-gen-web`, en `efeoncepro.com` o `think.efeoncepro.com`.
-Una agenda o surface nueva puede funcionar para reservas sin estar autorizada para matching.
-La elegibilidad sigue fija en backend y Client sGTM; administrarla sin release es propuesta
-pendiente de GO, no una opción disponible en el cockpit.
+La cobertura la autoriza una policy publicada sobre el binding activo, no una constante.
+El seed equivalente usa `discovery`/`fhsf-efeonce-lead-gen-web`, en los dos hosts Efeonce.
+Una agenda/surface nueva puede reservar sin estar habilitada para publicidad: se configura
+mapping/destinos por datos y se publica desde el panel o la CLI de agentes, sin otro release
+para una fuente compatible. El fingerprint detecta cambios del binding. [Manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
 
 El matching no bloquea el booking si falla; reintenta como máximo 5 veces/24 h y elimina el
 material cifrado a 48 h. La confirmación de transporte no acredita audiencia publicitaria utilizable.

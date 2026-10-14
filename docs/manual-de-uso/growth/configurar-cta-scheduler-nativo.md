@@ -10,7 +10,7 @@
 
 1. En el cockpit de Growth CTA, selecciona **Abrir agenda nativa**.
 2. Ingresa la **Surface de reuniones**; por ejemplo, `efeonce-public-site`.
-3. Ingresa el **Scheduler key**; por ejemplo, `efeonce-discovery-30`.
+3. Ingresa el **Scheduler key**; por ejemplo, `discovery` si el catálogo/binding vigente confirma esa key.
 4. Ajusta el copy del launcher. No prometas una descarga, formulario o navegación si la acción abre la agenda.
 5. Publica una versión nueva del CTA y asígnala sólo a una surface autorizada.
 6. Verifica que el launcher no cambie de tamaño al abrir: desktop debe usar diálogo y móvil full-screen.
@@ -24,10 +24,11 @@
 ## Comprobar medición y matching
 
 El binding y la publicación del CTA habilitan la experiencia de reserva, no el matching por sí solos.
-La autorización actual de matching es fija: `efeonce-discovery-30` +
-`fhsf-efeonce-lead-gen-web` en los origins públicos Efeonce/Think.
-La surface de ejemplo `efeonce-public-site` de este manual no amplía ese alcance.
-No hay opción de configuración sin release: la propuesta está sin GO y no implementada.
+La autorización de matching es una policy publicada ligada al binding activo; el seed usa
+`discovery`/`fhsf-efeonce-lead-gen-web`. La surface de ejemplo `efeonce-public-site` no amplía
+ese alcance por sí sola. Para una agenda/surface nueva compatible, usar [configuración por
+API/panel/CLI](configurar-medicion-conversiones.md): mapping tipado, destinos explícitos,
+review/publish y lectura de confirmación. No cambiar una lista en código o GTM.
 
 Después de una reserva real autorizada y confirmada, distinguir tres evidencias: receipt/ledger
 server-side, mirror GA4 `generate_lead`, y entrega backend a Meta/Google.

@@ -1,6 +1,6 @@
 # Diagnosticar y recuperar Meta CAPI por GTM Server
 
-> Manual de operador · 2026-10-13. GTM Server6/Web5, matching activado; primera conversión comercial consentida post-flip sin observar.
+> Manual de operador · actualizado14/10. GTM Server9/Web5, matching por políticas activado; primera conversión comercial consentida/EMQ sin observar.
 
 1. Leer el [runbook](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md)
    y la [decisión](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
@@ -29,7 +29,7 @@ compartir nombre e ID con CAPI y verificar deduplicación. No fabricar conversio
 para probar ni confundir recepción con atribución o resultados comerciales.
 
 Estado vigente: [release completo y matching](../../audits/releases/2026-10-13-full-develop-matching-release.md).
-Hosting del mismo contenedor en efeonce-group, min0/max1; Server6/Web5, sin Test Events code.
+Hosting del mismo contenedor en efeonce-group, min0/max1; Server9/Web5, sin Test Events code fijo.
 Client backend31/trigger33 es el emisor Meta Lead; legacy12/17 retirados. PageView11 y mirror
 GA4 continúan. HubSpot categorías/routing activos WP/Think. [Consentimiento](../../reference/measurement-gtm-ga4/09-hubspot-consent.md).
 SQL aplicada, refs pinned y tres flags worker true (Ops00775-fnh100% + GitHub repo vars),
@@ -116,3 +116,6 @@ queued/sending requiere revisar cadencia/lease/flags; dead_letter requiere safe_
 ventana/intentosedad; http_accepted es ack, no atribución. Los comandos de provisioning,
 audiencias y Preview son mutantes: no ejecutarlos como una lectura ni recrear secretos/IDs
 para corregir un diagnóstico. No se añadió cockpit/API de gestión de esta cola.
+
+
+Configuración de fuentes y cliente agente: [manual compartido](configurar-medicion-conversiones.md). Estado/rollback/recibos actuales: [release14/10](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md). Los pasos de activación13/10 son antecedente; no volver a provisionar ni aplicar sus guards de versión antiguos contra Server9.

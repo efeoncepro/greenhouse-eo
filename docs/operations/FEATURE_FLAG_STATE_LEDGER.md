@@ -179,6 +179,13 @@ no reutilizar esas notas históricas como estado actual.
 > **Delta 2026-06-22 (TASK-1210, release develop→main `3a39c68ba`, sign-off CEO):** los 8 flags MXN+CLF — `FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_CORE_CLF_INDEXED_ENABLED`, `FINANCE_CLF_INCOME_PROJECTION_ENABLED`, `FINANCE_CLF_OBLIGATIONS_ENABLED`, `FINANCE_CLF_REPORTING_ENABLED` — pasaron a **ON en producción**: Vercel prod (agregados + redeploy `greenhouse-midjr78bo`) + ops-worker Cloud Run (persistente via `services/ops-worker/deploy.sh`, `:-true`). Los `*_BACKFILL_APPLY_ENABLED` (gates de script) siguen OFF. Verdad live: `vercel env ls` + `gcloud run services describe ops-worker`.
 > **Doc relacionado:** [GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md](../architecture/GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md) (los flags PG declarativos — mecanismo distinto, ver abajo)
 
+## Readback14/10 — configuración escalable y CAPI
+
+PR255/main9690efad released (orquestador38591329633). Capture Production **ON** releída15:22Z,
+deploymentdpl_843eUPPMzYQdBgxt9ELX3WD5w9oQ READY. Meta/UPD/retención y HubSpot Forms secure-submit
+**ON** en ops-worker-00778-d74,100%,627ea6a8d con árbol completo idéntico a main. Repo vars/refs
+existentes preservadas; no flags nuevos. Server9 estricto, sólo template30. [Release y límites](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md). No equivale a tráfico comercial ni EMQ.
+
 ## Delta 2026-10-13 — matching de Lead (TASK-2034)
 
 Main d692ab51dc48 released por orquestador38483437158. SQL post-release aplicada.

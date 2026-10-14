@@ -77,3 +77,27 @@ y16 bridge. CI del release, readback de hosts y estado final se añaden al cerra
 Primera conversión comercial consentida real sigue sin observar; TASK-2034 permanece parcial.
 La EMQ se vuelve a medir después con tráfico real; no se promete puntaje ni serving.
 No se amplió la allowlist ni se implementó la configuración/CRO de TASK-2035.
+
+
+## Cierre runtime14/10 —16:07Z
+
+[Release completo y evidencia final](../releases/2026-10-14-scalable-measurement-agent-first-release.md):
+PR255/main9690efad; CI/Deep/smoke/Production READY; orquestador38591329633 success y manifest
+9690efad0c1b-b80fdb2e-e48e-4d1b-9724-3dd3286b1baa released. Dos gates aprobados, health200,
+watchdog ok/6 runtimes/drift0. Ops/auth/artifact conservan627ea6a8d con árbol completo idéntico
+al target; no reconstruir por etiqueta. Server9 publicado15:55:12Z, sólo customTemplate30,
+sha0c42c4e…; schema1 live400 y controles de consentimiento/identidad cruda400.
+
+CLI agent-first probada en staging y producción. Una fuente nueva posterior al contrato inicial
+se creó15:56:40Z y configuró por HTTP; policyc885a92e-e8bb-4bbb-8414-77efa7c83016, revision1.
+Meta Test Eventc7dd1839-98ad-4890-b905-c1d4baa65863: Processed/Server/website y nueve claves.
+Think43b16ffe-45cd-43c6-815d-a3077bb8e3db: ocho claves (sin teléfono no mapeado); agenda
+a5934334-8ac5-4c92-8a5d-810ad0ca22f2: nueve. UI expandida verificada y capturada; código real
+sólo temporal por petición. Una sesión de escucha inactiva exigió reactivar Web antes de la
+confirmación UI; los ACK anteriores no se presentaron como esa confirmación.
+
+Snapshots antes/después de la nueva alta: mismo main9690efad, deploymentdpl_843eUPPMzYQdBgxt9ELX3WD5w9oQ,
+Server9 y fingerprint/template/tags; cero cambios de código/build/redeploy/publicación por el alta.
+Disable por CLI/readback; Form/surface archivadas y HTTP posterior13 fuentes/siete políticas.
+Cero submissions/bookings/contactos CRM o canaries GA4. Configuración de medición nunca reemplaza
+el destino HubSpot Forms/CRM. Tráfico comercial/EMQ y el resto de TASK-2035 continúan pendientes.

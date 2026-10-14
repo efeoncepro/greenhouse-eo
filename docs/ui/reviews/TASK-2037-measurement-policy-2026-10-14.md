@@ -19,11 +19,20 @@ real corresponding command boundaries. No submissions, bookings or provider call
 Receipt: `.captures/meta-lead-fix-2026-10-14/policy-ui-live/receipt.json`; zero findings and overflow
 in all12 states. Functional/unit coverage is separate from visual scoring. Follow the runtime
 ledger for cleanup, final CI, production and strict sGTM cutover; this review does not prove them.
-The later agent-first addition reuses this client and panel; rerun the relevant network/contract
-checks on its final staging candidate. No visible layout is changed by that addition.
+The later agent-first addition reuses this client and panel; the relevant network/contract
+checks passed on its final staging candidate. No visible layout is changed by that addition.
 
 Local quality scorecard gate passes (average4.51/floor4.3). The visual contract-only gate passes;
 the full local gate walker hits a pre-existing dangling dependency symlink under an unrelated
 ignored `.captures/cotizacion-pibank-checkout-aislado-2026-10-08/` directory. It is preserved.
 The referenced premium manifest/dossier and all12-frame quality results were read directly;
 no gate was weakened and no unrelated capture tree was modified.
+
+## Final verification
+
+Final source `627ea6a8d92bf49dfbcc639725b5ea0841637cfb` premium capture at14:46Z:
+`.captures/2026-10-14T14-46-00_growth-measurement-policy/`. Both desktop and mobile images
+were opened and reviewed; focus/reduced-motion, axe/layout/runtime/enterprise checks passed.
+24 targeted shared-client/agent/network checks passed. Production contract and a fresh-source
+CLI lifecycle were independently verified after release.
+[Final release evidence](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).

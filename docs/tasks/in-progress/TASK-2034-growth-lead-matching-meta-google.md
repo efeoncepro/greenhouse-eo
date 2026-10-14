@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: released PR254/main d692ab51dc48; SQL, GTM6/5 y cuatro flags activos/verificados. Pendiente primera conversión comercial consentida post-flip y su recepción provider.`
+- Status real: `Parcial: corrección CAPI y configuración/agentes publicadas PR255/main9690efad, Server9; flags/hosts y Test Events verificados. Pendiente primera conversión comercial consentida y mejora EMQ con tráfico real.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -279,3 +279,10 @@ ambos hosts, código temporal por request. Bridge WP421eaa3 / Think PR14, extern
 normalización y helper IP/UA de POST preparados para release completo develop→main.
 63 Vitest +25 Client +8 attribution +16 bridge PASS. Primera aceptación comercial sigue
 pendiente: ledger últimos7d sin conversiones al corte; no usar fixtures para cerrar ese criterio.
+
+## Verificación del 14/10/2026
+
+PR255 completa la corrección de contexto del visitante y la configuración administrable por
+API/CLI/panel; Server9 estricto, ambos hosts y fuente nueva sin redeploy verificados.
+[Release y recibos](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+La recepción en Test Events no cierra el acceptance comercial ni demuestra evolución de EMQ.

@@ -1,8 +1,10 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 
 Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
-Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
-Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
+Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; operación de
+políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)
+y [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md). Meta Test Events
+Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión comercial.
 > **Version:** 1.0
 > **Creado:** 2026-07-07 por Claude
 > **Ultima actualizacion:** 2026-10-14
@@ -89,7 +91,7 @@ en navegador, se correlacionan ambos eventos para contar una sola conversión.
 Consentimiento denegado o desconocido bloquea el envío Meta. GA4 y el snapshot web no
 comprueban entrega a Meta; se exige recepción con origen Server y lectura posterior.
 
-Estado 2026-10-13: **GTM Server6/Web5 y matching activos**, tras release completo PR254.
+Estado14/10: **GTM Server9/Web5 y matching por políticas activos**, tras release completo PR255/main9690efad.
 HubSpot muestra el banner en la primera visita, con preferencias en el pie legal; publicidad
 requiere aceptación explícita. [Manual](../../manual-de-uso/growth/operar-meta-capi-servidor.md)
 y [consentimiento](../../reference/measurement-gtm-ga4/09-hubspot-consent.md).

@@ -4,20 +4,23 @@
 
 [Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
 
-## 2026-10-13 — Meta CAPI y consentimiento publicados
+## 2026-10-14 — Medición escalable, CAPI y agentes publicados
 
-[Corrección y pruebas](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md): Server7 sólo template30,
-website/IP/UA/fbp/fbc/external_id/em/ph/fn/ln recibidos en Test Events ambos hosts; código temporal por petición,
-sin tag fijo. WP bridge421eaa3 y Think PR14; backend/renderers en develop. Plan acotado aprobado: [TASK-2035](docs/tasks/plans/TASK-2035-plan.md). Foundation/seed7 y Test Events v2 probados; GTM8 compatible temporal. Panel lifecycle12 pruebas y boundary Forms→CRM13 PASS; UI/GVC12 estados PASS; CLI agent-first y24 pruebas PASS; HTTP/CI/release pendientes. Hook local omitido con aprobación; sin build/tsc local. [Evidencia](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
-Consentimiento/GPC, cifrado y GA4 preservados; Sentry sin body/headers/user submit/book. Primera conversión real pendiente.
+[Release completo](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md): PR255/main9690efad,
+orquestador38591329633 success, manifest released; health200 y watchdog6/6/drift0. SQL/seed7,
+API/panel/CLI agent-first y Server9 estricto (sólo template30) publicados. Nueva fuente por datos
+recibida Meta Server/website/nueve claves sin otro build/redeploy/GTM; fixture archivada y
+HTTP13 fuentes/siete policies. GVC1440/390 y12 estados PASS. Bridge WP/Think4bbd77… idéntico.
+Primera conversión comercial/EMQ siguen pendientes; consentimiento, GA4 y CRM preservados.
+Hook pesado omitido con autorización; sin build/tsc local. [Manual](docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
 
-[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: corrida14/10 aprobada, TASK-2036/2037 en ejecución; CRO, abandono, newsletter y CRM permanecen sin iniciar. Umbrella sobre dueñas existentes, sin release de esta ampliación.
+[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: configuración/CAPI/cliente agente completados en TASK-2036/2037; CRO, abandono, newsletter y CRM permanecen sin iniciar, con dueñas existentes.
 
 Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
 Auditoría documental 14/10 con tres subagentes: [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills al día.
 
-[Release completo y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md): PR254,
+Antecedente13/10: [release y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md), PR254,
 main d692ab51dc48, orquestador38483437158 success y manifest released; CI/Deep/build/smoke PASS.
 GTM Server6/Web5, mismo hosting efeonce-group min0/max1. HubSpot categorías/GPC y banner
 primera visita WP/Think; preferencias inline en pie legal, sin franja extra. PageView consentido activo.

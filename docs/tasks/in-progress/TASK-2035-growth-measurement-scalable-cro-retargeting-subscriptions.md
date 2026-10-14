@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Plan: goal confirmado14/10, corrida limitada a configuracion escalable Forms/Meetings y CAPI; plan P1 aprobado; unidades2036/2037 en ejecucion. Sin codigo/migracion/release de esta ampliacion; CRO/newsletter/CRM pendientes.`
+- Status real: `Corrida acotada configuración/CAPI/agent-first publicada14/10: TASK-2036/2037 completas, PR255/main9690efad, Server9, watchdog6/6; CRO/abandono/newsletter/CRM y tráfico real permanecen pendientes.`
 - Rank: `Now`
 - Domain: `data|growth|crm`
 - Blocked by: `none`
@@ -35,7 +35,7 @@ matching y runtimes existentes; reúne dependencias y evidencia sin duplicar tas
 
 ## Why This Task Exists
 
-El matching actual usa seis slugs fijos en backend y Client sGTM, un scheduler/surface fijo y
+El matching previo al contrato publicado14/10 usaba seis slugs fijos en backend y Client sGTM, un scheduler/surface fijo y
 cuatro nombres de contacto. Forms ya se publica desde datos, pero habilitar matching todavía
 requiere código y publicación GTM. La telemetría de inicio/intento/error existe parcialmente sin
 cableado completo; los pasos, agenda y blog tienen dueños previos. El mapping genérico accepted
@@ -391,14 +391,14 @@ de IAM. No usar la automatización para pedir a otros agentes/usuarios una autor
 
 - [x] Alcance de la corrida confirmado por el operador14/10: configuración escalable y CAPI; goal activo y plan registrado, resto del paraguas pendiente.
 
-- [ ] Existe mapa exhaustivo de gaps, unidades dueñas y dependencias; no se duplican TASK-1359/1509/1510/1802/1885/1866/2034 ni se ocultan pendientes sin dueño.
-- [ ] Foundation backend-data y consumer ui-ux quedan separados en unidades ejecutables; perfiles/addenda/ownership y wireframe/flow/GVC están presentes antes de código UI.
-- [ ] ADR/amendment define SSOT, policy/schema, envelope, compatibilidad, revocación/cache/cola, acceso/idempotencia/auditoría y errores sanitizados antes de implementar.
-- [ ] API y UI editan/validan/publican/desactivan la misma política con capability/scope efectivo y Full API Parity; casos de tenant/surface ajeno rechazan.
-- [ ] Una nueva fuente autorizada se habilita sólo publicando datos y mapping; evidencia muestra cero cambios de código/redeploy/publish GTM por esa alta compatible.
-- [ ] form_key estable sobrevive rename; versión/surface/origin o campos incompatibles impiden matching sin romper aceptación de negocio.
-- [ ] Seed mantiene exactamente seis Forms y pareja Meetings autorizados; fuentes nuevas/destinos OFF y fallos desconocidos cerrados, sin ampliar hosts/clientes.
-- [ ] No quedan dos allowlists por slug ni browser con autoridad publicitaria; sGTM rechaza envelope/versión/scope/consentimiento inválidos y distingue microevento de hecho backend.
+- [x] Existe mapa exhaustivo de gaps, unidades dueñas y dependencias; no se duplican TASK-1359/1509/1510/1802/1885/1866/2034 ni se ocultan pendientes sin dueño. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] Foundation backend-data y consumer ui-ux quedan separados en unidades ejecutables; perfiles/addenda/ownership y wireframe/flow/GVC están presentes antes de código UI. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] ADR/amendment define SSOT, policy/schema, envelope, compatibilidad, revocación/cache/cola, acceso/idempotencia/auditoría y errores sanitizados antes de implementar. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] API y UI editan/validan/publican/desactivan la misma política con capability/scope efectivo y Full API Parity; casos de tenant/surface ajeno rechazan. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] Una nueva fuente autorizada se habilita sólo publicando datos y mapping; evidencia muestra cero cambios de código/redeploy/publish GTM por esa alta compatible. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] form_key estable sobrevive rename; versión/surface/origin o campos incompatibles impiden matching sin romper aceptación de negocio. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] Seed mantiene exactamente seis Forms y pareja Meetings autorizados; fuentes nuevas/destinos OFF y fallos desconocidos cerrados, sin ampliar hosts/clientes. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
+- [x] No quedan dos allowlists por slug ni browser con autoridad publicitaria; sGTM rechaza envelope/versión/scope/consentimiento inválidos y distingue microevento de hecho backend. — evidencia TASK-2036/2037 y release9690efad (ver auditoría final).
 - [ ] Exposición real, readiness/fallo de carga, inicio, intento, errores/captcha/rechazo, aceptación y éxito quedan observables sin doble conteo ni valores de campos.
 - [ ] TASK-1359 entrega pasos y errores por clave; agenda distingue falta de disponibilidad, conflicto, timeout y booking confirmado, con tagging verificado.
 - [ ] CTA visto/clic/apertura y postconversión/download/acceso/informe usan señales existentes; clic/redirect no se reporta como consumo efectivo.
@@ -451,3 +451,8 @@ citadas y adjuntar sus deltas/criterios antes de tomar superficies compartidas. 
 - Ventanas 7/14/30 días, regla de exclusión/reingreso y objetivos por campaña: validar con volumen elegible; campaña no incluida en este registro.
 - Definición comercial de calificado/convertido y correlación permitida a largo plazo: decide el operador con reglas HubSpot y privacidad, sin inferir desde una etapa ambigua.
 - Nombres Meta nuevos y campos admitidos/objetivos: verificar documentación primaria y Preview antes de publicar; son propuestas en este brief.
+
+
+### Cierre de la corrida acotada14/10
+
+[release y evidencia](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md). Sólo los criterios de configuración/CAPI/cliente agente se completan. El resto de la umbrella conserva sus checkboxes abiertos y dueñas existentes.

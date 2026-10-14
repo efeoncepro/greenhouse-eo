@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-Meta Lead14/10: Server7, atribución consentida persistente, external_id SHA256 y request IP/UA; [prueba Server/website](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md). Backend/renderers y panel lifecycle por políticas preparados;12 pruebas UI/red y13 Forms/CRM PASS, GTM8 compatible temporal, UI/GVC12 estados PASS y CLI agent-first24 pruebas PASS; HTTP/CI/release pendientes; [checkpoint TASK-2035](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
+Medición14/10: todo develop publicado en main9690efad (PR255/orquestador38591329633), Server9 estricto y watchdog6/6/drift0. API/panel/CLI para agentes comparten políticas y comandos; alta nueva por datos recibida en Meta Test Events con nueve claves sin otro build/redeploy/GTM. Consentimiento y Forms→HubSpot Forms→CRM preservados; fixtures archivados. [Release y límites](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); tráfico comercial/EMQ y resto de TASK-2035 pendientes.
 
 Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independientes y partners gris. [QA y reversión](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 

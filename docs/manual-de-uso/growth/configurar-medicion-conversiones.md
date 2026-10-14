@@ -1,11 +1,11 @@
 # Configurar medición de conversiones
 
-Estado14/10/2026: TASK-2036 implementada en develop, migración y seed aplicados. Panel TASK-2037
-con lifecycle implementado y12 pruebas UI/red PASS; QA remota y release pendientes. GTM8
-es compatible v1/v2 temporalmente; el corte final estricto v2 queda pendiente del release.
-Alta controlada real mediante UI y readback API probada; GVC premium1440/390 PASS. Revisión final de estados pendiente tras corregir contraste del
-feedback con tokens nativos. El harness distingue estados simulados de presentación y
-comandos reales sobre una fixture controlada.
+Estado14/10/2026: TASK-2036/2037 publicadas en main9690efad, PR255 y orquestador38591329633
+success; manifest released, Server9 estricto, watchdog6/6/drift0. API/panel/CLI comparten el
+contrato. GVC1440/390 y12 estados PASS. Alta de fuente nueva por datos en producción y recepción
+Meta Test Events verificadas sin otro código/build/redeploy/publish GTM; fixture archivada y
+readback13 fuentes/siete políticas. [Recibos y límites](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+No se afirma conversión comercial real ni mejora EMQ a partir de fixtures.
 Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 
 ## Alta compatible por datos
@@ -85,21 +85,21 @@ La CLI consume HTTP y el mismo cliente del panel; no accede a SQL ni fabrica aut
    Configurar `GROWTH_MEASUREMENT_BASE_URL` al origen HTTPS correcto y
    `GROWTH_MEASUREMENT_STORAGE_STATE` a ese archivo. La sesión debe corresponder exactamente
    al host, estar vigente y tener las capabilities internas. No exportar cookies al gateway.
-2. `pnpm growth:measurement discover`: JSON con fuentes, versiones, campos, políticas, cabeza
+2. `pnpm --silent growth:measurement discover`: JSON con fuentes, versiones, campos, políticas, cabeza
    publicada y permisos efectivos. `--help` describe comandos, entorno y códigos de salida sin auth.
 3. Crear un archivo JSON de comando con **nombres de campos**, nunca datos de contactos.
    Para draft: `action`, `scope` descubierto, `config` (`purpose:commercial_lead`, `sourceVersion`,
    `origins`, `destinations`, `mapping`), `expectedPublishedRevisionId` actual (o null) y un UUID
    `idempotencyKey`. Destinos vacíos por defecto; escoger cada destino expresamente.
    Para review/publish/disable: `action`, `policyId`, `revisionId`, cabeza esperada y UUID propio.
-4. `pnpm growth:measurement validate comando.json`: preflight fresco, **sin escrituras**.
+4. `pnpm --silent growth:measurement validate comando.json`: preflight fresco, **sin escrituras**.
    Devuelve blockers, conflicto de cabeza/estado o rutas/códigos de schema; no eco de valores.
    Presentar impacto al operador y respetar la autorización existente antes de ejecutar.
-5. `pnpm growth:measurement apply comando.json --apply --receipt .auth/recibo.json`:
+5. `pnpm --silent growth:measurement apply comando.json --apply --receipt .auth/recibo.json`:
    escritura explícita, auditada e idempotente; éxito sólo tras GET independiente. El archivo0600
    se reserva antes del POST y conserva comando/origen/recibo conocido antes del GET.
 6. Revisar/publicar con comandos y claves distintos para cada transición. No saltar review.
-   `pnpm growth:measurement verify .auth/recibo.json` sólo lee y confirma el estado y cabeza.
+   `pnpm --silent growth:measurement verify .auth/recibo.json` sólo lee y confirma el estado y cabeza.
    Desactivar usa el mismo contrato; no cambia la aceptación comercial ni el mapping de HubSpot.
 
 Ante timeout/outcome desconocido, repetir **el mismo comando y recibo**, no generar otro UUID.
@@ -111,3 +111,5 @@ validación verde o un ACK como publicación/recepción de Meta; cada destino re
 La CLI no envía formularios, reuniones, contactos CRM ni pruebas a proveedores. No hay nuevas
 tools MCP/Nexa registradas por esta entrega; el contrato compartido permite adaptarlas con su
 gobernanza propia, sin duplicar lógica.
+
+Para consumir stdout como JSON, usar `pnpm --silent growth:measurement …`; `pnpm exec tsx scripts/measurement/policy-cli.ts …` también evita banners del runner.

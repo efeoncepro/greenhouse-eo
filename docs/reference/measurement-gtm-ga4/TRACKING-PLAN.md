@@ -1,8 +1,10 @@
 # Tracking Plan — Registro de Forms & CTAs (SoT de la capa de medición)
 
 Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
-Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
-Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
+Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; operación de
+políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)
+y [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md). Meta Test Events
+Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión comercial.
 
 > **Registro vivo y OBLIGATORIO.** Todo form o CTA público de Efeonce se registra aquí con su estado de tagging.
 >
@@ -111,11 +113,11 @@ Al refrescar: agregar forms nuevos con tagging `⏳ pendiente`, no borrar filas 
 
 Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md),
 [recuperación histórica](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md) y
-[release/matching actual](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+[release/matching actual](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 
 | Destino | Evento | Origen requerido | Estado | Evidencia pendiente |
 | --- | --- | --- | --- | --- |
-| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server6/Web5; transporte previo conservado, Test Events Server y tags reales verificados | Volumen/calidad ordinaria |
+| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server9/Web5; transporte previo conservado, Test Events Server y tags reales verificados | Volumen/calidad ordinaria |
 | Mismo destino/servidor | Lead formulario | Aceptación backend comercial + snapshot ads consentido | Client31/trigger33 autenticado, cola cifrada/worker ON; legacyMeta12 retirado | Primera aceptación comercial consentida post-flip: fuente→ledger→provider |
 | Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida post-flip y replay real |
 
@@ -138,3 +140,13 @@ PII/hash excluidos de parámetros ordinarios/dataLayer; Meta custom_properties J
 SQL post-release aplicada; Meta/Google/retención true en Ops00775-fnh y repo vars;
 captura Vercel true tras deploymentREADY/alias. Canary worker200 resuelve tres secretos.
 [Estado y recibos](../../audits/measurement/META_LEAD_MATCHING_2026-10-13.md).
+
+
+## Configuración por datos y fixtures14/10
+
+La elegibilidad Meta/UPD vive en políticas publicadas, no en una lista de slugs/agenda del Client.
+Alta comercial compatible mediante API/panel/CLI, revisión y readback; nuevo host/contrato puede
+requerir código. No activar automáticamente todas las fuentes ni convertir subscribe en Lead.
+Fixtures metadata-only del programa TASK-2036/2037 están archivadas/sin embed keys; no son nuevas
+superficies de captación comercial. Inventario/IDs/recibos y la prueba de fuente nueva posterior
+al contrato inicial en el release enlazado. Catálogo activo final13 fuentes/siete policies.
