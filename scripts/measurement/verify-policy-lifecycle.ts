@@ -14,13 +14,14 @@ async function main() {
   if(!process.argv.includes('--apply')) throw Error('explicit_apply_required')
   const {getDb,closeGreenhousePostgres}=await import('../../src/lib/db')
   const {authorDraftForm,publishForm,archiveForm,createHostSurface,setHostSurfaceStatusCommand}=await import('../../src/lib/growth/forms/commands')
-  const {getPublishedVersionBySlug}=await import('../../src/lib/growth/forms/store')
+  const {getPublishedVersionBySlug,getFormDefinitionById,getHostSurfaceById}=await import('../../src/lib/growth/forms/store')
   const {resolveMeasurementSource}=await import('../../src/lib/growth/measurement/policy-source')
   const {executeMeasurementPolicyCommand}=await import('../../src/lib/growth/measurement/policy-command')
   const {resolvePublishedMeasurementPolicy,measurementPolicyAllowsDelivery}=await import('../../src/lib/growth/measurement/policy-store')
   const {buildMeasurementPayloads}=await import('../../src/lib/growth/measurement/payload')
   const actor={userId:'operator-approved:TASK-2035:verification',tenantType:'efeonce_internal' as const,roleCodes:['efeonce_admin'],primaryRoleCode:'efeonce_admin',routeGroups:['internal'],authorizedViews:[]}
   let fixture:{formId:string;formVersionId:string}|undefined, surfaceId:string|undefined, published:{policyId:string;revisionId:string}|undefined
+  let receipt: Record<string,unknown>|undefined
 
   try {
     const db=await getDb(),original=await getPublishedVersionBySlug('efeonce-lead-gen-web')
@@ -91,16 +92,29 @@ async function main() {
     const audit=await sql<{n:string}>`SELECT count(*)::text AS n FROM greenhouse_growth.measurement_policy_audit WHERE policy_id=${ids.policyId}::uuid`.execute(db)
 
     assert.equal(audit.rows[0].n,'4')
-    console.log(JSON.stringify({checkedAt:new Date().toISOString(),sourceKey:formKey,sourceVersion:source.sourceVersion,policyId:ids.policyId,
+    receipt={checkedAt:new Date().toISOString(),sourceKey:formKey,sourceVersion:source.sourceVersion,policyId:ids.policyId,
       proof:{newSourceWithoutCodeChange:true,typedCustomEmail:true,idempotency:true,keyReuseConflict:true,clientDenied:true,publishRequiresReview:true,
       publishedReadback:true,independentDestinations:true,website:true,staleRevisionConflict:true,immutable:true,disabledBlocksDelivery:true,auditActions:4},
-      providerRequests:0,commercialSubmissions:0,cleanup:'policy disabled; fixture archived and surface inactive'}))
+      providerRequests:0,commercialSubmissions:0}
   } finally {
-    if(published) await executeMeasurementPolicyCommand(actor,{action:'disable',...published,expectedPublishedRevisionId:published.revisionId,idempotencyKey:randomUUID()})
-    if(fixture) await archiveForm(fixture.formVersionId,fixture.formId)
-    if(surfaceId) await setHostSurfaceStatusCommand(surfaceId,'inactive')
-    await closeGreenhousePostgres()
+    stage='cleanup'
+
+    try {
+      if(published) assert((await executeMeasurementPolicyCommand(actor,{action:'disable',...published,expectedPublishedRevisionId:published.revisionId,idempotencyKey:randomUUID()})).ok)
+
+      if(fixture) {
+        await archiveForm(fixture.formVersionId,fixture.formId)
+        assert.equal((await getFormDefinitionById(fixture.formId))?.status,'archived')
+      }
+
+      if(surfaceId) {
+        await setHostSurfaceStatusCommand(surfaceId,'archived')
+        assert.equal((await getHostSurfaceById(surfaceId))?.status,'archived')
+      }
+    } finally { await closeGreenhousePostgres() }
   }
+
+  console.log(JSON.stringify({...receipt,cleanup:'policy disabled; fixture and surface archived',independentCleanupReadback:true}))
 }
 
 main().catch((e)=>{console.error('measurement_policy_verification_failed_no_sensitive_payload_logged',{stage,code:typeof e.code==='string'?e.code:'assertion'});process.exitCode=1})

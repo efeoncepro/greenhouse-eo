@@ -230,7 +230,7 @@ GTM/Meta/hosts existentes con autorización de esta corrida; sin nuevas credenci
 
 ## Acceptance Criteria
 
-- [ ] Wireframe/flow/dirección/mapping/readiness pasan antes de JSX; UI ready sólo entonces yes.
+- [x] Wireframe/flow/dirección/mapping/readiness pasan antes de JSX; UI ready sólo entonces yes — task/ui-readiness gate0 errores antes de implementar el first fold.
 - [ ] Primitive reuse y copy canónico, sin lógica de autorización en UI.
 - [ ] Loading/empty/error/denied/conflict y lifecycle cubiertos, reduced-motion equivalente.
 - [ ] GVC premium desktop/390 revisado, sin overflow/overlaps; API real y release verificados.

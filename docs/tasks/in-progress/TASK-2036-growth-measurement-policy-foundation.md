@@ -220,7 +220,7 @@ GTM/Meta/hosts existentes con autorización de esta corrida; sin nuevas credenci
 
 ## Acceptance Criteria
 
-- [ ] Plan aprobado y ownership separados, sin duplicar tasks existentes.
+- [x] Plan aprobado y ownership separados, sin duplicar tasks existentes — aprobación14/10; TASK-2036 foundation/TASK-2037 consumer y registro verificados.
 - [ ] Alta compatible demostrada por datos sin nuevo build/redeploy/publish GTM.
 - [ ] Consentimiento/GPC/revocación, identidad, scopes y matching preservados.
 - [ ] API/UI/worker/Client y versión desplegada verificados con Test Events aislados.

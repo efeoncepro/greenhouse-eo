@@ -25,8 +25,8 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `TASK-2037` | `in-progress` | Growth measurement configuration operator panel; consumer de TASK-2036 | `docs/tasks/in-progress/TASK-2037-growth-measurement-configuration-panel.md` |
-| `TASK-2036` | `in-progress` | Growth measurement policy foundation and authenticated scope | `docs/tasks/in-progress/TASK-2036-growth-measurement-policy-foundation.md` |
+| `TASK-2037` | `in-progress` | Growth measurement configuration operator panel; readiness PASS y first fold staging pendiente | `docs/tasks/in-progress/TASK-2037-growth-measurement-configuration-panel.md` |
+| `TASK-2036` | `in-progress` | Growth measurement policy foundation; DB/Preview verificados, CI remoto en corrección | `docs/tasks/in-progress/TASK-2036-growth-measurement-policy-foundation.md` |
 | `TASK-2035` | `in-progress` | Medición Growth: goal acotado a configuración escalable y CAPI; plan aprobado, foundation/UI en ejecución; resto del paraguas sin iniciar | `docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md` |
 | `TASK-2034` | `in-progress` | Lead matching Meta CAPI y Google UPD/audiencias; rollout activo, acceptance comercial pendiente; auditoría documental integral | `docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md` |
 | `TASK-2033` | `in-progress` | Efeonce Insights: alcance de contenido por organización (medir sólo lo que Efeonce trabaja) | `docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md` |

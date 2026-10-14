@@ -75,6 +75,7 @@ test('retains visitor context, stable hash and temporary test code for the Meta 
     'x-fb-ck-fbc': 'fb.1.1791972000000.fixtureclick',
     'x-fb-ud-external_id': '34'.repeat(32), test_event_code: 'TEST12345',
   };
+
   const state = run({body: fields});
 
   assert.equal(state.status, 200);
@@ -94,6 +95,7 @@ for (const [name, body] of [
 
 test('new compatible form slug uses the same authenticated scope contract without a template edit', () => {
   const state=run({body:{custom_properties:JSON.stringify({lead_source:'growth_form',form_slug:'new-commercial-form',surface_id:'fhsf-aeo'})}});
+
   assert.equal(state.status,200);
   assert.equal(state.event.measurement_policy,undefined);
 });
