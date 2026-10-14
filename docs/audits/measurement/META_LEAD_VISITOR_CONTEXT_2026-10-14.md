@@ -59,8 +59,12 @@ WordPress: bridge publicado con guardas de hashes, PHP idéntico y backup remoto
 Think: PR14 mergeado43806bd30237; Preview Vercel verde antes de merge. Bridge SHA256 común:
 4bbd77b35fdb60b128712bf4e00d64dd37815f0d93f5434868d559264f71b28a.
 
-Backend/renderers: cambio preparado en develop, promoción completa develop→main pendiente
-al escribir esta entrada. No afirmar desplegado sólo por el canary directo sGTM.
+Backend/renderers: commit ba9b8c9cc en develop, sin push/release de Greenhouse al corte.
+El operador pidió consolidarlo con configuración escalable; goal acotado confirmado y
+[plan de TASK-2035](../../tasks/plans/TASK-2035-plan.md) pendiente del checkpoint P1.
+No afirmar backend desplegado sólo por el canary directo sGTM.
+QA nativo live WP/Think1440/390:4 superficies PASS, banner automático/default denied,
+ads-only, preferencias/reapertura, revocación, sin nuevas PageViews a destinos (interceptadas).
 Rollback sGTM: versión6. Bridge: snapshot exacto anterior; Think revert del PR14. Backend:
 release previo main d692ab51dc48. Captura/entrega pueden desactivarse por sus flags existentes,
 sin tocar la aceptación comercial ni reactivar triggers legacy12/17.
