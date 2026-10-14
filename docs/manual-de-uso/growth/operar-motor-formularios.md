@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.8 — 2026-10-13 (Codex, matching backend TASK-2034)
+> **Version:** 1.9 — 2026-10-14 (Codex, configuración por políticas y agentes)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -41,24 +41,34 @@ antes de modificar captura, campos, consentimiento o destinos publicitarios. La 
 puede estar activa aunque matching no aplique, y viceversa; los flags de Forms no sustituyen los
 cuatro `GROWTH_MEASUREMENT_*` del contrato.
 
-1. Verificar elegibilidad actual: `efeonce-aeo-diagnostic`, `efeonce-seo-diagnostic`,
-   `efeonce-desarrollo-web-cotizacion`, `efeonce-lead-gen-web`, `efeonce-social-audit` o
-   `ai-visibility-grader`, con surface y origin público autorizados. Crear una Form o marcarla
-   como tagged en GA4 no agrega autorización de matching. La lista existe en backend y Client sGTM.
-2. Verificar el renderer servido en el host real y la elección de categorías. El POST lleva
-   `measurementContext` fresco, publicidad explícita y GPC falso. No copiar cookies o contacto a
-   docs/capturas; el checkbox de la solicitud no prueba consentimiento publicitario.
-3. Para una conversión comercial real ya autorizada, comprobar aceptación y correlacionar sus
-   recibos `measurement_conversion` / `measurement_delivery` por la identidad durable del backend,
-   sin revelar el payload. El scope de prueba no autoriza crear un Lead o contacto ficticio en CRM.
-4. Separar estado de cola, acuse del tag Meta/HTTP y procesamiento en la plataforma. Google UPD
-   complementa un solo mirror GA4, sin `events` adicionales. Falta de client ID real omite Google UPD.
-5. Aplicar rollback con el orden del contrato: detener captura/envío y preservar retención; no
-   borrar las tablas ni rotar la clave mientras haya material cifrado pendiente.
+1. Ejecutar `pnpm --silent growth:measurement discover` con sesión interna vigente y permisos.
+   Resolver el `form_key`, versión publicada, surface, origen y campos tipados desde el catálogo;
+   revisar `blockingReasons`. Una Form publicada o una fila tagged en GA4 no autoriza matching.
+2. Seguir [Configurar medición de conversiones](configurar-medicion-conversiones.md): validar sin
+   escritura, crear borrador, revisar, publicar y leer el resultado efectivo. Panel y agente usan
+   el mismo contrato, CAS, idempotencia y auditoría. Una fuente compatible nueva o una versión
+   nueva se configura por datos, sin redeploy ni publicación GTM; no editar una lista en código.
+3. Verificar por separado el destino HubSpot Forms, sus propiedades y `fieldMapping`. La política
+   de medición no configura CRM ni demuestra su entrega. La aceptación y el outbox comercial se
+   mantienen aunque publicidad esté denegada o falle la proyección publicitaria.
+4. Verificar renderer servido y categorías en el host real. El POST lleva `measurementContext`
+   fresco, publicidad explícita y GPC falso. IP/UA se capturan en la petición original, no en el
+   worker. No copiar contacto, cookies o payload a docs/logs/capturas; la casilla de la solicitud
+   no prueba consentimiento publicitario. Sólo una aceptación válida habilita Lead.
+5. Para una conversión comercial real ya autorizada, correlacionar aceptación, recibos de
+   `measurement_conversion`/`measurement_delivery`, ID/tiempo estable y recepción provider sin
+   revelar payload. No crear leads o contactos CRM ficticios para demostrar esta cadena.
+6. Para probar sólo transporte/matching, usar un código real temporal de Meta Test Events según
+   el [manual CAPI](operar-meta-capi-servidor.md). Separar cola, HTTP/tag y recepción independiente
+   Processed/Server/website. Google UPD complementa un solo espejo GA4, sin `events` adicionales;
+   sin client ID real o sin analytics+ads se omite Google UPD.
+7. Desactivar una política por el mismo contrato detiene entregas pendientes tras revalidación;
+   un HTTP ya iniciado no puede retirarse. Para rollback de runtime, aplicar el orden del contrato:
+   detener captura/envío y preservar retención; no borrar tablas ni rotar claves con material pendiente.
 
-No existe aún configuración de matching publicable por formulario. Esa propuesta está sin GO;
-hoy ampliar cobertura requiere release de código y publicación gobernada de GTM Server.
-[Estado y evidencia del release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+La prueba de alta nueva por CLI llegó a Meta Test Events sin código/build/redeploy/GTM adicional;
+la fixture quedó desactivada y archivada. [Estado y límites del release](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+La primera conversión comercial real y evolución de EMQ continúan pendientes de tráfico real.
 
 ## Usar el cockpit visual
 

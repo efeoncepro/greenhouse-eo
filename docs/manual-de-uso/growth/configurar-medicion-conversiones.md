@@ -1,11 +1,11 @@
 # Configurar medición de conversiones
 
-Estado14/10/2026: TASK-2036/2037 publicadas en main9690efad, PR255 y orquestador38591329633
-success; manifest released, Server9 estricto, watchdog6/6/drift0. API/panel/CLI comparten el
-contrato. GVC1440/390 y12 estados PASS. Alta de fuente nueva por datos en producción y recepción
-Meta Test Events verificadas sin otro código/build/redeploy/publish GTM; fixture archivada y
-readback13 fuentes/siete políticas. [Recibos y límites](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
-No se afirma conversión comercial real ni mejora EMQ a partir de fixtures.
+Estado al 14/10/2026: **publicado en producción** mediante PR #255, main `9690efad`, orquestador
+`38591329633` y GTM Server 9 estricto. API, panel y CLI comparten el contrato. Se verificó una
+fuente creada después del release: alta y publicación por datos → Meta Test Events sin otro
+código/build/redeploy/publish GTM. La fixture quedó desactivada y archivada; no hubo registros
+comerciales sintéticos. [Recibos y límites](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+No se afirma conversión comercial real, mejora de EMQ ni elegibilidad de audiencias desde fixtures.
 Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 
 ## Alta compatible por datos
@@ -42,9 +42,11 @@ comercial real permanece separado cuando no se ha observado.
 
 ## Product API y permisos
 
+[Referencia HTTP y DTOs](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md).
+
 GET /api/admin/growth/measurement devuelve sources, policies y permissions; POST acepta draft,
 review, publish o disable. El actor sale de la sesión interna canónica. Capacidades separadas:
-growth.measurement.read/author/publish/disable; sólo admin/operations internos. Un cliente o
+growth.measurement.read/author/publish/disable; sólo identidades internas autorizadas de administración/operaciones. Un cliente o
 una ruta interna por sí solos no autorizan cambios. Contrato estricto en policy-contract.ts.
 No se amplía MCP/OAuth. No introducir contactos, IP, secretos, valores libres ni JavaScript.
 
@@ -81,7 +83,10 @@ La CLI consume HTTP y el mismo cliente del panel; no accede a SQL ni fabrica aut
 
 1. Obtener una sesión ligada al operador mediante el procedimiento canónico
    `scripts/playwright-auth-setup.mjs` (modo API no abre navegador). Conservar su storage state
-   ignorado dentro de `.auth/`, con permiso0600; secretos por entorno, nunca argumentos/logs.
+   ignorado dentro de `.auth/`, con permiso `0600`; secretos por entorno, nunca argumentos/logs.
+   Ejecutar el helper con `umask 077` o aplicar `chmod 600` al archivo: la CLI rechaza permisos
+   de grupo/otros. `AGENT_AUTH_BASE_URL` y `AGENT_AUTH_STORAGE_PATH` deben apuntar al mismo
+   host y archivo que las variables de medición; el default localhost del helper no sirve aquí.
    Configurar `GROWTH_MEASUREMENT_BASE_URL` al origen HTTPS correcto y
    `GROWTH_MEASUREMENT_STORAGE_STATE` a ese archivo. La sesión debe corresponder exactamente
    al host, estar vigente y tener las capabilities internas. No exportar cookies al gateway.
@@ -113,3 +118,97 @@ tools MCP/Nexa registradas por esta entrega; el contrato compartido permite adap
 gobernanza propia, sin duplicar lógica.
 
 Para consumir stdout como JSON, usar `pnpm --silent growth:measurement …`; `pnpm exec tsx scripts/measurement/policy-cli.ts …` también evita banners del runner.
+
+## Ejemplo de contrato para un agente
+
+Primero, con la identidad y secreto ya cargados por el mecanismo autorizado (sin imprimirlos),
+generar la sesión y descubrir. Estos comandos no publican políticas:
+
+```bash
+umask 077
+export AGENT_AUTH_MODE="api"
+export AGENT_AUTH_BASE_URL="https://greenhouse.efeoncepro.com"
+export AGENT_AUTH_STORAGE_PATH=".auth/measurement-storage.json"
+node scripts/playwright-auth-setup.mjs
+chmod 600 .auth/measurement-storage.json
+export GROWTH_MEASUREMENT_BASE_URL="https://greenhouse.efeoncepro.com"
+export GROWTH_MEASUREMENT_STORAGE_STATE=".auth/measurement-storage.json"
+pnpm --silent growth:measurement discover > .auth/measurement-catalog.json
+```
+
+Requisitos: `AGENT_AUTH_EMAIL` y `AGENT_AUTH_SECRET` ya presentes para el modo API. No usar una
+identidad distinta a la autorizada. La CLI envía sólo la cookie de sesión vigente para el host
+exacto, por HTTPS, a esta ruta; rechaza redirects. El bypass de Vercel es opcional para staging,
+no sustituye la sesión ni las capabilities. La salida del setup es operacional; stdout JSON puro
+corresponde a los comandos `growth:measurement`, no al helper de autenticación.
+
+Crear `draft.json` con esta forma, **reemplazando todos los marcadores por metadata de discovery**;
+no es un archivo listo para ejecutar. Cada campo de mapping debe existir con el tipo compatible:
+`email` → email, `phone` → tel E.164, nombres → text declarado o derivado por namePolicy.
+No inventar `phone` si la fuente no lo ofrece. El nombre del campo puede ser `businessEmail`;
+el valor de la persona nunca aparece en este JSON.
+
+```json
+{
+  "action": "draft",
+  "scope": {
+    "sourceKind": "form_submission",
+    "sourceKey": "<form_key UUID descubierto>",
+    "surfaceId": "<surface descubierta>"
+  },
+  "config": {
+    "purpose": "commercial_lead",
+    "sourceVersion": "<versión publicada descubierta>",
+    "origins": ["https://efeoncepro.com"],
+    "destinations": ["meta"],
+    "mapping": {"email": "<campo email descubierto>"}
+  },
+  "expectedPublishedRevisionId": null,
+  "idempotencyKey": "<UUID nuevo para este borrador>"
+}
+```
+
+El origen debe estar en la fuente; `null` sólo si no existe cabeza publicada. Destinos permitidos:
+`meta`, `google_upd`, ambos o ninguno; no hay destino GA4 de conversión en esta política. Para
+Meetings se usa `sourceKind:meeting_booking`, el scheduler key como sourceKey y el fingerprint
+sourceVersion del catálogo, con su surface real. No usar el ejemplo Forms para fabricar su versión.
+
+```bash
+pnpm --silent growth:measurement validate draft.json
+pnpm --silent growth:measurement apply draft.json --apply --receipt .auth/draft-receipt.json
+pnpm --silent growth:measurement verify .auth/draft-receipt.json
+```
+
+Con los IDs devueltos, cada transición usa su propio archivo y UUID. La forma es:
+
+```json
+{
+  "action": "review",
+  "policyId": "<policyId del borrador>",
+  "revisionId": "<revisionId del borrador>",
+  "expectedPublishedRevisionId": "<cabeza publicada actual; usar null si no existe>",
+  "idempotencyKey": "<UUID nuevo para la revisión>"
+}
+```
+
+Validar/aplicar/verificar `review.json`; después hacer lo mismo para `publish.json` con
+`action:publish`, IDs revisados, cabeza actual y otra clave. Para `disable.json`, usar
+`action:disable`, la revisión publicada y su cabeza actual. En los tres casos se repite la
+forma de comando anterior con un **archivo de recibo distinto por intención**. No reemplazar
+por el string `"null"`: debe ser JSON `null`. Conservar los recibos privados para recuperar
+reintentos y auditoría; no guardarlos en git. Un recibo antiguo puede verificar conflicto si
+la revisión ya avanzó; descubrir el estado actual antes de concluir que falló el write.
+
+Para un consumidor HTTP propio, discovery es GET y ejecución POST a la misma ruta;
+la validación usa POST `{"dryRun":true,"command":{...}}`. Este wrapper lo añade la CLI:
+no envolver el archivo `draft.json` ni usar `dryRun:true` como comando de apply. POST valida
+el esquema cerrado y limita el cuerpo a 16 KiB. El permiso efectivo de cada acción procede del
+servidor; ninguna opción CLI ni campo actor/role amplía autoridad.
+
+## Alcance que sigue pendiente
+
+Las políticas comerciales no implementan eventos CRO, abandono, Subscribe del blog ni resultados
+CRM; esos ítems permanecen en TASK-2035. El envío o matching tampoco marca por sí solo un evento
+como clave en GA4: revisar propiedad/evento y evidencia en TRACKING-PLAN. La primera aceptación
+comercial consentida, su conciliación con cada proveedor y la evolución de calidad requieren
+tráfico real. La prueba aislada de Meta no certifica Google Ads, atribución ni audiencias utilizables.

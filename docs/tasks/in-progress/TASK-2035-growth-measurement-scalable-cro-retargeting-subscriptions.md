@@ -36,8 +36,8 @@ matching y runtimes existentes; reúne dependencias y evidencia sin duplicar tas
 ## Why This Task Exists
 
 El matching previo al contrato publicado14/10 usaba seis slugs fijos en backend y Client sGTM, un scheduler/surface fijo y
-cuatro nombres de contacto. Forms ya se publica desde datos, pero habilitar matching todavía
-requiere código y publicación GTM. La telemetría de inicio/intento/error existe parcialmente sin
+cuatro nombres de contacto. Al registrar este paraguas, habilitar matching aún
+requería código y publicación GTM; ese gap quedó resuelto en TASK-2036/2037. La telemetría de inicio/intento/error existe parcialmente sin
 cableado completo; los pasos, agenda y blog tienen dueños previos. El mapping genérico accepted
 → generate_lead tampoco distingue una suscripción editorial de una consulta comercial.
 El operador pidió registrar **todo** lo pendiente de esta conversación, no sólo subscribe.
@@ -49,11 +49,12 @@ El registro no implementa la propuesta ni autoriza un publish, envío, campaña 
 
 ## Corrida autorizada 2026-10-14
 
-El operador confirmó «Limitar ahora a configuración escalable y CAPI». Se ejecutarán slices0/1
+El operador confirmó «Limitar ahora a configuración escalable y CAPI». Se completaron slices0/1
 más verificación y release aplicables; el resto del alcance integral permanece en este paraguas
 sin iniciarse. [Plan concreto](../plans/TASK-2035-plan.md), commit29b47e574: checkpoint P1 aprobado por «Apruebo el plan; ejecuta».
 El operador aprobó explícitamente el plan, cumpliendo TASK_PROCESS §Phase3.
-La reparación CAPI previa pertenece a TASK-2034 y está en ba9b8c9cc, sin release Greenhouse.
+La reparación CAPI pertenece a TASK-2034; ba9b8c9cc y la ampliación policy/agentes quedaron
+incluidas en PR255/main9690efad, Server9. Ver el cierre publicado y sus límites.
 
 ## Goal
 

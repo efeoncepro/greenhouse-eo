@@ -23,13 +23,12 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 | [07-ga4-admin-api-ops.md](07-ga4-admin-api-ops.md) | Operador. GA4 Admin API: measurement ID, custom dimensions, key events, MP secrets, blueprint lead-gen. |
 | [09-hubspot-consent.md](09-hubspot-consent.md) | Banner HubSpot, bridge, categorías, PageView por destino, UUID sender, rollout/rollback WP–Think. |
 | [08-meta-conversions-api-server-side.md](08-meta-conversions-api-server-side.md) | Canon Meta CAPI por GTM **Server**: inventario live, ingreso web/backend, consentimiento, dedupe, secretos y verificación Meta; separado del Pixel web. |
-
 | [10-growth-lead-matching-runtime.md](10-growth-lead-matching-runtime.md) | Implementación vigente de matching: fuentes, consentimiento, normalización, proyección cifrada, cola, Client sGTM, Google UPD, operación y límites. |
 
 El `container-snapshot.json` versionado conserva la captura anterior `TASK-1340 greenhouse_cta_* events`;
 no incluye los cambios de consentimiento/Web5. No usarlo como prueba de paridad live ni
 sobrescribirlo desde exports sin sanear. Refrescarlo por el carril gobernado y revisar el diff
-antes de afirmar drift cero; el estado publicado6/5 se respalda en el dossier de release.
+antes de afirmar drift cero; el estado Server9/Web5 se respalda en el [cierre14/10](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 
 ## Regla de una línea
 
@@ -47,7 +46,11 @@ antes de afirmar drift cero; el estado publicado6/5 se respalda en el dossier de
 Consentimiento HubSpot y sender publicado: [09-hubspot-consent.md](09-hubspot-consent.md);
 lectura funcional del [panel de cookies](../../documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante)
 y [manual de operación](../../manual-de-uso/growth/operar-consentimiento-cookies-publico.md).
-Estado vigente **Server6/Web5**, backend único de Lead y Google UPD en [contrato de runtime](10-growth-lead-matching-runtime.md).
-La [recuperación inicial](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md) conserva la cronología 5/5;
-el [release completo y activación](../../audits/releases/2026-10-13-full-develop-matching-release.md) acredita
-la configuración activa. Primera conversión comercial consentida post-activación todavía sin observar.
+Estado verificado **14/10: Server9/Web5**, backend único de Lead, contexto original del visitante,
+Google UPD y políticas administrables por API/panel/CLI en [contrato de runtime](10-growth-lead-matching-runtime.md).
+La [referencia API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md) define discovery,
+dry-run, comandos, permisos y recuperación; el [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md)
+explica su operación. Alta compatible por datos comprobada sin código/redeploy/publicación GTM.
+[Release completo y Test Events](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md);
+primera conversión comercial consentida y mejora EMQ siguen sin observarse. Los expedientes13/10
+conservan la recuperación y el matching iniciales, sin sustituir este contrato vigente.

@@ -31,6 +31,16 @@ consentimiento y destino del lead viven en Greenhouse.
 > primario semantico de cada superficie; no es teal por definicion. En Influencer es Core Blue.
 > AEO solo agrega guards extra por ser una landing publica critica.
 
+## Configuración comercial y medición son pasos distintos
+
+Incrustar un formulario publicado no habilita automáticamente Meta/Google matching. En los dos
+hosts Efeonce aprobados, usar la [política administrable por API, CLI o panel](configurar-medicion-conversiones.md)
+para esa versión/surface, con campos tipados y destinos explícitos. Las altas compatibles no
+requieren otra publicación de código o GTM. Un nuevo host, evento, proveedor o tipo de campo
+puede requerir cambios gobernados. Conservar en el host el bridge de consentimiento canónico;
+no leer contacto ni construir CAPI desde Elementor/Astro o dataLayer. GA4, publicidad y entrega
+a HubSpot se verifican por separado. La elección publicitaria no condiciona el envío del formulario.
+
 ## Vista previa interna (antes de tocar un sitio)
 
 Greenhouse → **Design System → Growth Forms renderer**

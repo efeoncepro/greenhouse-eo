@@ -112,9 +112,11 @@ El tagging GA4 y la autorización publicitaria son contratos distintos. [Procedi
 
 ## 4. Aceptación, datos e identidad
 
-Forms toma normalizedFields.email/phone/firstName/lastName después de guards comerciales;
-encola junto con la submission aceptada. Meetings prepara desde input.contact después de
-respuesta provider, antes de descartar contacto recuperable. Finalización CAS
+Forms entrega sus normalizedFields después de guards comerciales; la política publicada resuelve
+qué claves tipadas corresponden a email/phone/firstName/lastName (por ejemplo businessEmail→email).
+No se exigen nombres de campo fijos. Encola junto con la submission aceptada. Meetings prepara
+desde input.contact con su mapping autorizado después de respuesta provider, antes de descartar
+contacto recuperable. Finalización CAS
 provider_dispatched→succeeded y enqueue comparten transacción. Replay confirmado no encola
 de nuevo. El ledger Meetings conserva HMAC, no contactos recuperables.
 
@@ -199,7 +201,7 @@ SignalsOFF. Link10593794382 a customer9531478329, personalización activa.
 lead_source/scheduler_key nuevas dimensiones; form_slug/form_kind/surface_id existentes.
 Siete audiencias90d, filtros ligados al mismo generate_lead: AEO(2slugs), SEO, proyectosweb,
 contacto(efeonce-lead-gen-web), redes, reuniones(scheduler+surface) y comerciales. «Contacto»
-no es un séptimo slug fuera de allowlist. Comerciales usa OR entre seis form_slug o
+no agrega una séptima fuente al seed inicial. Comerciales usa OR entre seis form_slug o
 lead_source=meeting_booking; esa rama no exige scheduler/surface como sí Reuniones. Son
 filtros del espejo browserGA4, no autorización backend ni prueba de asociaciónUPD.
 Cuatro audiencias previas conservadas. No campañas/

@@ -90,6 +90,17 @@ capture/destinations/policies and restores compatible revisions; preserves ledge
 re-enables legacy browser Lead triggers. Test Events requires a real temporary per-request code;
 provider Processed is distinct from a real commercial acceptance and from EMQ improvement.
 
+## Production closure — 2026-10-14
+
+TASK-2036/2037 delivered in full develop→main PR255, main9690efad; Server9 accepts only
+schema2. A source created after release was configured by the actual production HTTP CLI and
+received as Processed/Server/website in Meta Test Events without code/redeploy/GTM publication.
+The policy was disabled and fixture archived with independent readback. This proves compatible
+configuration enablement, not a real commercial acceptance or EMQ improvement.
+[API contract](../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md),
+[operating manual](../manual-de-uso/growth/configurar-medicion-conversiones.md) and
+[release evidence/limits](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+
 ## Alternatives
 
 Fixed slugs and env lists repeat releases and duplicate authority. Browser analytics_policy_json

@@ -1,5 +1,7 @@
 # Task Index
 
+Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md); estados publicados y límites comerciales conservados.
+
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 

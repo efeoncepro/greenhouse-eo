@@ -79,12 +79,12 @@ Server requiere inventario, Clients/templates, ingress y readback Meta propios, 
 redactados porque los tags pueden contener tokens. Provisión/publicación fueron autorizadas posteriormente; estado vivo en la auditoría CAPI.
 
 
-## Readout posterior de implementación — 2026-10-13
+## Estado de implementación — 2026-10-14
 
-PR254/main d692ab51dc48 released, Server6/Web5; backend único MetaLead y GoogleUPD dedicado
-sin events. [Contrato implementado10](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
-Las tres capas permanecen separadas: publicar formulario, habilitar matching y configurar
-provider/audiencias. Hoy matching tiene listas en código backend+Client; requiere release y
-publishGTM para ampliarlas. [Propuesta configurable](GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
-pendiente de GO, no cambia esta regla por estar documentada. Snapshotweb antiguo etiquetado;
-no constituye una nueva verificación de paridad live ni de entrega CAPI.
+PR255/main9690efad released, Server9/Web5; backend único Meta Lead y Google UPD sin events.
+[Contrato implementado](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+Publicar formulario, habilitar matching y configurar proveedores/audiencias siguen separados.
+Matching usa [políticas publicadas](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md): alta
+compatible por API/panel/CLI sin release/redeploy/publish GTM, verificada con fuente nueva y
+Meta Test Events después del release. Nuevo contrato/host/destino requiere su cambio gobernado.
+El snapshot web histórico no acredita paridad server; [recibos independientes](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).

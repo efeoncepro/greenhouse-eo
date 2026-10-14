@@ -107,7 +107,7 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 - Extend `MEETING_GTM_EVENTS`, `MEETING_STEPS`, `MEETING_TELEMETRY_PAYLOAD_KEYS`, the renderer mirror,
   parity tests and Tracking Plan together.
 - Preserve server-confirmed ledger truth; GA4 remains a browser-reported mirror to reconcile.
-- **TASK-2034, release 2026-10-13:** Meta Lead matching now originates in the backend after a
+- **Published backend matching:** Meta Lead matching originates in the backend after a
   successful provider booking and the guarded `provider_dispatched → succeeded` transition.
   `finalizeMeetingExecution` borrows one transaction for confirmation and optional encrypted
   `measurement_conversion` / delivery rows; SAVEPOINT failure cannot undo commercial success.
@@ -116,11 +116,18 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
   `src/growth-measurement-context/context.ts`: resolved HubSpot categories, GPC and permitted real
   cookie identifiers only. Processing/communication consent is not advertising consent. Backend
   rejects unknown/denied advertising, GPC and context older than 10 minutes for matching.
-- Only `efeonce-discovery-30` on `fhsf-efeonce-lead-gen-web`, from HTTPS `efeoncepro.com` or
-  `think.efeoncepro.com`, is currently eligible. A new active meeting binding does **not** authorize
-  advertising matching. These fixed checks exist in `measurement/payload.ts` and the sGTM Client
-  `scripts/measurement/sgtm-lead-client.js`; configuration-driven enrollment remains a proposal,
-  not implemented and without GO.
+- Eligibility comes from a reviewed/published measurement policy for the **active meeting
+  binding fingerprint**, scheduler/surface and approved origin. Initial seed uses the actual
+  `discovery` / `fhsf-efeonce-lead-gen-web` binding. Never revive `efeonce-discovery-30` as a
+  matching constant or add schedulers to a sender list. A newly active binding alone does not
+  authorize advertising; discover, validate and publish its compatible policy data.
+- The original booking POST supplies visitor XFF/x-real-ip and User-Agent through
+  `visitor-request.ts`. Reuse that encrypted snapshot, never worker IP/UA. Consented `_fbp`/`_fbc`
+  remain raw; landing fbclid persists only after ads grant and clears on revoke/GPC. Meta
+  contact fields use provider normalization/SHA-256 hex; external_id is normalized email hash
+  (international-phone fallback), not executionId/receipt. Do not invent absent contact fields.
+- Authenticated sGTM ingress requires schema 2 plus closed policy proof and strips proof before
+  the Meta tag. Keep `website`, safe real page URL, occurrence UNIX seconds and durable UUID.
 - Contact normalization/hash happens server-side using available email, international phone and
   separated first/last names. The durable backend UUID and event time are retained through retries.
   Meta ingress is authenticated and independently gated; the legacy GA4-derived Meta Lead sender
@@ -133,16 +140,21 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
   Test Events or an enabled audience as proof of real conversion processing or ads eligibility.
 - Load the full current contract `docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md`
   and `08-meta-conversions-api-server-side.md` before changing flags, capture, identity or destinations.
-  Runtime/evidence: `docs/audits/releases/2026-10-13-full-develop-matching-release.md`. The first real
-  commercial consented conversion after activation remains unobserved in that release evidence.
+  Runtime/evidence:
+  [published release](../../../docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+  Server 9 strict v2 and both hosts were independently confirmed in Meta Test Events; compatible
+  new-source enrollment was proven without redeploy/GTM publish. Real commercial conversion,
+  CRM reconciliation and EMQ remain separate pending evidence.
 
-## Verification minimum
+## Verification proportional to the change
+
+Use focal domain/renderer tests and the canonical CI/release gates. Documentation-only closure
+needs link/mirror/context checks, not a local application build. After resource pressure, keep
+local checks bounded and run mandatory full build/type/lint gates in CI; never claim a skipped
+local check passed. Load `greenhouse-production-release` for promotion and hooks/CI exceptions.
 
 ```bash
-pnpm vitest run src/lib/growth/meetings src/growth-meeting-renderer src/growth-cta-renderer
-pnpm lint
-pnpm tsc --noEmit
-pnpm build
+NODE_OPTIONS=--max-old-space-size=512 pnpm vitest run src/lib/growth/meetings --maxWorkers=1
 ```
 
 For host verification, assert the current bundle loaded, the calendar remains present for an empty month,
@@ -165,20 +177,49 @@ boundary, state machine, native-only recovery, renderer recipes, CTA action, tel
 rollout gates. Update the architecture or PDR first when the durable decision changes; keep release IDs,
 page backups, current availability and one-off smoke evidence in tasks, ledgers, handoff or landing references.
 
+## Published policies: agents and panel share one contract
 
-### Published measurement configuration — TASK-2035 checkpoint14/10
+Use the [policy ADR](../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md)
+and [operator manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
+The policy binds stable source/version, surface, origin, typed mapping and independent destinations.
+Destinations default OFF. Commercial purpose excludes subscribe/application/survey and high-risk
+sources; new forms of those kinds are not automatically eligible. Only the two approved HTTPS
+hosts are supported. A compatible source/version is enabled by reviewed policy data; a new
+behavior, field type, provider, event or host may require code and governed publication.
 
-For scalable conversion matching use the [policy ADR](../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) and [operator manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). The canonical contract resolves stable form_key + opaque published fver-* identity or active meeting binding fingerprint, surface/origin, typed mapping and independent destinations from immutable reviewed/published policy data. Never add a form slug/scheduler to a runtime list or let public telemetry authorize advertising. New source/version activation is a governed data command, not a redeploy; new behavior/host/provider may require code. Source acceptance and fresh consent/GPC remain mandatory; enqueue and dispatcher revalidate publication. Disabling blocks pending sends, not HTTP already started. API/UI permission is internal read/author/publish/disable; browser never picks authority. The contextual panel uses immutable draft→review→publish, separate disable, dirty-source confirmation and independent server readback. Preserve the same body/idempotency key after an unknown POST outcome; after a known receipt retry GET only. A409 reload retains unsaved values and refreshes CAS authority. Forms delivery through HubSpot Forms→CRM retains its separate destination fieldMapping, consent and commercial outbox; matching configuration never replaces it or gates commercial acceptance. Verify each destination independently. For current CI/GTM transition/production status follow the live runtime ledger; code/tests or Meta Test Events never prove real CRM delivery.
+### Agent operating loop
 
+1. Use the canonical user-bound agent-session from `scripts/playwright-auth-setup.mjs` and a
+   private `0600` ignored storage state. Set `GROWTH_MEASUREMENT_BASE_URL` to the exact HTTPS origin
+   and `GROWTH_MEASUREMENT_STORAGE_STATE` to that file. Session expiry/denial requires refreshing
+   canonical auth; never mint actor/role in JSON or copy cookies to another host/gateway. The
+   CLI restricts cookies to that host/session and rejects redirects. Secrets stay out of arguments/logs.
+2. Run `pnpm --silent growth:measurement --help`, then `discover`. Structured JSON includes
+   `growth-measurement-policy.v1`, effective read/author/publish/disable capabilities, typed
+   source fields/versions, blockers and current heads. Client users are denied; a local role
+   label or an internal URL does not grant authority.
+3. Build a metadata-only command from discovery; no contact values, IP, hashes or JavaScript.
+   `validate comando.json` POSTs `{dryRun:true,command}` without draft/audit/conversion writes.
+   Validation does not reserve state or publish; execution revalidates fresh server authority.
+4. Within existing operator authorization, execute
+   `apply comando.json --apply --receipt .auth/recibo.json`. Use one UUID per intended command and the discovered current
+   `expectedPublishedRevisionId` (including null). Draft→review→publish uses distinct commands
+   and keys; disable is separate. Publication is immutable: edits create a new revision.
+5. `verify .auth/recibo.json` performs independent GET. Receipt `0600` is reserved before POST and
+   the known write receipt is checkpointed before GET. Unknown outcome: retry the exact body,
+   key and receipt; known receipt: retry GET only. A409 requires discovery and deliberate new
+   authority, never overwrite or key reuse with changed content. The panel shares this client,
+   retains unsaved values on conflict/reload and requires readback before success.
 
-### Agent-first measurement operation
+All four operations use `pnpm --silent growth:measurement …` (or
+`pnpm exec tsx scripts/measurement/policy-cli.ts …`) for clean JSON. Exit 0 is success, 2 invalid, 3 conflict,
+4 denied, 5 unavailable during validation, 6 potentially unknown outcome. Keep private receipts
+for recovery; never print arbitrary provider errors or credentials.
 
-Use `pnpm --silent growth:measurement --help` then `discover → validate → apply → verify` from the
-[manual](../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md). This is an HTTP
-client of the same governed Product API as the panel, not a SQL/admin-role shortcut. Discovery
-returns the versioned contract, effective permissions, source version/fields and current heads.
-Validate is read-only; apply requires existing operator authorization, explicit intent and a
-private receipt. Keep the exact command/key on unknown outcome; a known receipt retries GET only.
-A409 requires fresh discovery, never blind overwrite. No contact values belong in configuration,
-receipts or logs. Preserve the separate Growth Forms→HubSpot Forms→CRM delivery and consented
-measurement projection. Do not claim MCP/Nexa tool exposure or provider success from CLI success.
+Operational policy commands need no SQL or browser. They do not create forms, submit/book,
+configure HubSpot mappings, write CRM contacts or send provider tests. New source provisioning
+still uses its canonical Forms/Meetings commands. Growth Forms→HubSpot Forms→CRM and the
+consented measurement projection retain separate mappings, outboxes and evidence. No MCP/Nexa
+registration, issuer/OAuth scope expansion or new infrastructure was introduced by this CLI.
+Provider delivery and real commercial outcomes require their own readback; CLI success is not
+that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.

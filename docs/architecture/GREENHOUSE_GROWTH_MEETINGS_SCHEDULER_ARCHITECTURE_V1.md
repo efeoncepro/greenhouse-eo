@@ -112,14 +112,16 @@ El secret HMAC es obligatorio en producción. Los buckets de rate limit se consu
   Matching exige publicidad explícita, GPC falso (incluido `Sec-GPC`) y snapshot ≤10 min.
   Google UPD requiere además analítica consentida + client ID GA4 real y no envía `events`.
   El mirror browser `generate_lead` sigue siendo la única conversión GA4.
-- Elegibilidad fija actual: scheduler `efeonce-discovery-30` + surface `fhsf-efeonce-lead-gen-web`,
-  origins HTTPS `efeoncepro.com` / `think.efeoncepro.com`. Un nuevo binding no autoriza matching;
-  la lista está tanto en backend como en Client sGTM. Administración por configuración es propuesta
-  sin GO, no implementada. [Contrato completo](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+- Elegibilidad por [policy publicada](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md):
+  scheduler_key + surface + fingerprint del binding activo y origen aprobado. El seed inicial
+  usa `discovery` / `fhsf-efeonce-lead-gen-web`, comprobado en el catálogo, no el identificador
+  antiguo `efeonce-discovery-30`. Un binding nuevo o modificado requiere revisar/publicar
+  su policy; no hay lista fija en backend/Client. API/panel/CLI comparten autoridad y permiten
+  altas compatibles por datos sin redeploy/publish GTM. [Contrato y recibos](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
 - Email/teléfono y nombres disponibles se normalizan/hash server-side. La proyección cifrada se
   guarda en `measurement_conversion`/`measurement_delivery`; el worker existente entrega hasta
   5 intentos/24 h, con lease/CAS, y purga el material cifrado a 48 h. No copiar recibos privados,
-  IDs provider ni contactos a telemetry. [Readback y límites](../audits/releases/2026-10-13-full-develop-matching-release.md).
+  IDs provider ni contactos a telemetry. [Readback y límites](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 - `stage` se rechaza porque duplica `meeting_step` y permite pares contradictorios.
 - Parámetros allowlisted: `meeting_step`, `scheduler_key`, `surface_id`, `placement`, `availability_state`, `days_ahead_bucket`, `time_of_day_bucket`, `error_category`, `presentation_variant` y `activation_mode`; `renderer_version` y `contract_version` se validan en el renderer pero no requieren dimensión.
 - Nunca se envían PII, slot/timestamp/timezone exactos, receipt, idempotency/correlation/provider IDs, Teams URL, UTMs crudos ni provider errors.

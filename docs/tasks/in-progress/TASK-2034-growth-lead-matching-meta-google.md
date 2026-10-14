@@ -69,6 +69,8 @@ ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin 
 
 ## Current Repo State
 
+Snapshot de intake histórico. Para el estado vigente, usar Status real y el cierre14/10.
+
 - Consentimiento granular ads/analytics, sin inferir publicidad del procesamiento; veto GPC.
 - Matching backend, renderer y worker released; SQL aplicada y capture/meta/google/retención ON.
 - GTM Server6 retira legacyLead12/17; PageView11 y GA4 mirror permanecen, Client GA4 exclusivo.

@@ -27,7 +27,11 @@ Reglas duras (detalle en la skill + doc `04`/`05`):
 - **Matching vigente:** canon `10-growth-lead-matching-runtime.md`; Meta Lead backend único,
   Client31 autenticado y forwarding restringido a GA4 Client. Google user_data MP sin events
   no duplica generate_lead. No reactivar triggers12/17 retirados como fallback.
-- **Alta de fuentes:** listas comerciales fijas en backend y Client sGTM; GA4 genérico no
-  autoriza matching. Configuración administrable es propuesta pendiente de GO, no existente.
+- **Alta de fuentes:** policy server-only publicada por fuente/versión/surface/origen y mapping
+  tipado; GA4 genérico no autoriza matching. API/panel/CLI comparten contrato, permisos y
+  comandos. Usar `pnpm --silent growth:measurement discover|validate|apply|verify`; alta
+  compatible por datos, sin release/publish GTM. Cambio de contrato/host/destino requiere su
+  cambio gobernado. Canon: `GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md` + manual. No
+  reintroducir listas de slugs ni editar SQL; validar y verificar cada mutación con recibo.
 - **Evidencia:** http_accepted/Processed no prueban atribución, match quality o serving; primera
   conversión real consentida post-flip sigue pendiente. No crear negocio/CRM sintético para QA.

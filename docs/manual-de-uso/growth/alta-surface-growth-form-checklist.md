@@ -1,7 +1,7 @@
 # Alta de una surface Growth Form (checklist end-to-end)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.2 — 2026-08-10 (Claude, TASK-1388 — Growth vive como seccion del dominio Comercial)
+> **Version:** 1.3 — 2026-10-14 (Codex, distinguir alta comercial y política publicitaria)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Contrato runtime:** [docs/architecture/growth-public-forms-runtime-contract.md](../../architecture/growth-public-forms-runtime-contract.md)
 > **Runbook hermano:** [Operar el Motor de Formularios de Growth](operar-motor-formularios.md) · [Incrustar el formulario (WordPress/Astro)](incrustar-formulario-wordpress-astro.md)
@@ -43,6 +43,23 @@ Regla: si tu form es Tier 1, **no deberías escribir código**. Si te encuentras
 
 7. Crear la fila de **`form_destination`** con el adapter reusable (`hubspot_forms_secure_submit`): `formGuid`, `portalId`, `fieldMapping`, `consentText`, `retry_policy`. El browser nunca ve este mapping.
 
+### C.1. Configurar medición si la fuente comercial debe participar
+
+El destino HubSpot Forms y su mapping comercial son distintos del matching publicitario.
+Con el formulario/versión y surface publicados, ejecutar discovery y configurar una política
+según [el manual API/CLI/panel](configurar-medicion-conversiones.md). Elegir campos tipados y
+cada destino explícitamente, validar, revisar, publicar y verificar. No heredar publicidad por
+publicar el form ni por marcar GA4 tagged. La nueva versión debe revalidarse en la política.
+
+La configuración actual admite fuentes comerciales compatibles en `efeoncepro.com` y
+`think.efeoncepro.com`. **Autorizar CORS de otro host para Forms no lo habilita en medición**:
+un origen publicitario adicional requiere su cambio gobernado. Subscribe/application/survey y
+fuentes de alto riesgo siguen excluidos. No convertir una suscripción en Lead comercial.
+
+Denegar publicidad no impide el envío ni el outbox CRM. Verificar aparte GA4 y Meta; un envío
+aceptado o un contacto en HubSpot no acredita recepción publicitaria. Para pruebas de CAPI usar
+Meta Test Events temporal, sin crear contactos/reservas ficticios ni pruebas ordinarias al dataset.
+
 ### D. Turnstile — agregar el hostname del host ⚠️
 
 8. En el panel de Cloudflare Turnstile, abrir el widget cuyo **Site Key** sea el del render contract y **agregar el hostname del host nuevo** (ej. `think.efeoncepro.com`) al Hostname Management. **Guardar.**
@@ -57,7 +74,8 @@ Regla: si tu form es Tier 1, **no deberías escribir código**. Si te encuentras
 ### F. Smoke end-to-end en la surface real (gate de cierre) ✅
 
 10. **Desde un browser real** (no automation — Turnstile bloquea headless), en la URL pública del host:
-    - Completar y enviar el form.
+    - Con alcance comercial autorizado, completar y enviar el form. No fabricar contactos o
+      reservas para probar únicamente transporte publicitario.
     - Confirmar el success behavior real (mensaje/redirect/asset).
     - Verificar la entrega: la submission aparece en el cockpit y el lead llega a HubSpot (o el destino declarado).
 11. **Verificación de transporte** (server-to-server, complementa el browser):

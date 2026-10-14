@@ -61,6 +61,9 @@ Reemplazar listas por datos publicados sin ampliar autoridad browser ni romper m
 
 ## Current Repo State
 
+El bloque Already exists/Gap conserva el snapshot de intake previo a implementar. El estado
+vigente es Status real y el cierre publicado; no reejecutar estos gaps históricos.
+
 ### Already exists
 
 Forms/Meetings, medición cifrada, dispatcher y cockpit publicados; CAPI corregida en develop.

@@ -154,4 +154,8 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 son el canon de banner automático, preferencias inline, PageView consentido y contexto portable.
 Host distribuye el bridge común y embebe Forms/Meetings; no replica lógica de matching ni secretos.
 Matching released no autoautoriza un formulario/host nuevo; conserva el scope publicado.
-La política administrable sigue propuesta sin GO. No activar tracking en rutas privadas/tokenizadas.
+La [policy administrable](../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md)
+está publicada: configura fuente/versión/surface/origen y campos por API/panel/CLI. Alta
+compatible sin redeploy/GTM; nuevos hosts/contratos requieren revisión gobernada.
+[Manual para agentes](../manual-de-uso/growth/configurar-medicion-conversiones.md). No activar
+tracking en rutas privadas/tokenizadas ni copiar la configuración server-only al host.

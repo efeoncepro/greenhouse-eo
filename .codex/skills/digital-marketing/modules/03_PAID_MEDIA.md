@@ -51,7 +51,12 @@ Meta recibe Lead único de backend; Google recibe user_data MP dedicado sin even
 GA4 conserva generate_lead browser. Consentimiento por finalidad, GPC y elegibilidad fuente
 son gates distintos. CAPI no crea audiencias Meta/Customer Match ni campañas automáticamente;
 Google UPD y siete audiencias configuradas no acreditan volumen/elegibilidad/serving.
-Primera conversión comercial consentida post-activación sigue pendiente de observar.
+La configuración de fuentes se opera por políticas versionadas desde API/panel/CLI, no listas
+en código: [manual](../../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
+Publicar una policy compatible no requiere otro release/GTM; no crea campañas ni audiencias.
+IP/UA y cookies consentidas corresponden al visitante; hashes de contacto sólo por el canal
+dedicado. Test Events fue verificado en ambos hosts y una fuente nueva sin redeploy.
+Primera conversión comercial consentida y evolución de calidad requieren tráfico real.
 
 ## 4. Signal loss post-cookie (los tres pilares)
 

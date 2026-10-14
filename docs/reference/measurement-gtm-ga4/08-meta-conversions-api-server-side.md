@@ -1,10 +1,13 @@
 # Meta Conversions API mediante GTM Server
 
-> Canon operativo de CAPI/sGTM. Server6/Web5; matching TASK-2034 activado tras release completo PR254. Primera conversión comercial consentida post-flip todavía sin observar.
-> Dirección elegida por el operador: [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
-> Estado vigente 2026-10-13: hosting existente recuperado en efeonce-group; consentimiento y transporte activos. §2 conserva el inventario inicial anterior al rollout.
-> [Implementación vigente completa](10-growth-lead-matching-runtime.md) · [release y evidencia](../../audits/releases/2026-10-13-full-develop-matching-release.md).
-> [Diagnóstico y recuperación histórica](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+> Canon operativo de CAPI/sGTM. **Readout14/10: Server9/Web5**, PR255/main9690efad publicado,
+> Lead backend único, contexto visitante y políticas versionadas. Primera conversión comercial
+> consentida y mejora EMQ aún no observadas; Test Events es evidencia controlada separada.
+> Dirección: [ADR Meta](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md) y
+> [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
+> [Runtime vigente](10-growth-lead-matching-runtime.md) · [release y pruebas](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md) ·
+> [API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md) · [manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
+> Inventarios/checkpoints13/10 siguientes conservan el antecedente; sus versiones/listas no son instrucciones live.
 
 ## 1. Separar Pixel, CAPI y contenedores
 
@@ -65,7 +68,8 @@ Ver [ingreso a sGTM](https://developers.google.com/tag-platform/tag-manager/serv
 - **Lead formulario:** aceptación en `greenhouse_growth.form_submission` y evento
   `growth.forms.submission_accepted`. La proyección de matching usa la transacción del source;
   un clic, submit intentado o agradecimiento no acreditan aceptación.
-- **Reunión:** confirmación elegible del proveedor/ledger, con allowlist scheduler/surface.
+- **Reunión:** confirmación elegible del proveedor/ledger, con policy publicada sobre binding activo,
+  fingerprint, scheduler/surface y origen.
   Apertura, selección, intento, error y replay no son conversiones nuevas. Preparar matching
   antes de descartar contacto del ledger HMAC; guardar sólo material cifrado48h en la proyección.
 - **GA4:** conserva un solo espejo `gh_form_submission_accepted` o
@@ -123,7 +127,7 @@ validar contrato vigente y template **instalado** antes de ejecutar. Fuentes ver
 ### 4.1. Lead utilizable para remarketing — requisito confirmado 2026-10-13
 
 El operador requiere coincidencia de personas y segmentación comercial, además de recepción
-de eventos. **Estado: desplegado y activado, Server6/Web5, source y worker con flags ON.**
+de eventos. **Estado14/10: desplegado y activado, Server9/Web5, source y worker con flags ON.**
 La primera conversión comercial consentida con matching post-flip sigue sin observarse.
 La recuperación histórica5/5 sólo transportaba IP/User-Agent. Ahora el backend prepara
 contactos validados y contexto consentido; `fbp`/`fbc` sólo si reales y disponibles.
@@ -141,8 +145,9 @@ El endpoint run.app no implica acceso a cookies de los hosts públicos.
 `form_slug`/`lead_source` presentes en Event Data no se copian automáticamente a Meta: la
 plantilla oficial instalada sólo añade propiedades arbitrarias desde `custom_properties`.
 El mapper construye `custom_properties` como JSON string: el template pin usa `.indexOf()` antes del control de tipo; un objeto produce error. Conservar `Lead`, URL limpia y
-momento/ID de la misma ocurrencia. `external_id` queda fuera hasta definir identidad estable
-y autorizada; `event_id` identifica una conversión, no una persona.
+momento/ID de la misma ocurrencia. `external_id` es SHA256hex del email normalizado o, si falta,
+teléfono internacional sin `+`; identidad estable del contacto. `event_id` identifica una conversión,
+no una persona. IP/UA se capturan en el POST original; el worker nunca los sustituye por los propios.
 
 **Flujo publicado y activado en el mismo GTM Server:**
 
@@ -155,7 +160,7 @@ y autorizada; `event_id` identifica una conversión, no una persona.
    contacto: su ledger HMAC no conserva email/nombre recuperables. Capturar snapshot e ID
    durable para retries mediante contrato transaccional propio, sin PII cruda en outbox/logs.
 3. Entregar esa proyección por ingreso autenticado exclusivo de servidor a sGTM, con Client
-   y allowlists propios. No pasar contactos ni hashes por eventos GA4 ordinarios, dimensiones, dataLayer o URLs. Google UPD usa su contrato dedicado descrito abajo.
+   y prueba de policy publicada/schema2 propios. No pasar contactos ni hashes por eventos GA4 ordinarios, dimensiones, dataLayer o URLs. Google UPD usa su contrato dedicado descrito abajo.
    Mantener el token de Meta exclusivamente en la etiqueta del servidor existente.
 4. Elegir un solo emisor Meta de Lead al hacer el cutover. El espejo GA4 de aceptación puede
    continuar, pero no debe emitir otro Lead CAPI independiente. El nonce browser de reuniones
@@ -184,7 +189,7 @@ y [plantilla instalada](https://github.com/facebookincubator/ConversionsAPI-Tag-
    trigger → tag → POST a Meta → respuesta. Encontrar el primer eslabón que falla; revisar
    filtros `always`, token/dataset y permisos sin imprimir credenciales.
 4. Determinar fuentes actuales de ambos hosts y backend. Diseñar PageView consentido y
-   Lead anclado al espejo de aceptación real, con consentimiento, validación, dedupe y
+   Lead anclado a aceptación/confirmación backend persistida, con consentimiento, validación, dedupe y
    fallo de medición independiente del éxito del submit. Crear cambios en workspaces aislados
    basados en la versión live correcta de **cada** contenedor; no publicar WIP ajeno.
 5. Revisar template instalado y mapping; construir/previewar ingress y tags. No inventar shapes
@@ -230,7 +235,7 @@ Recepción no demuestra atribución publicitaria, match quality ni efectividad c
 ## 7. Diagnóstico previo a publicación (histórico 2026-10-13)
 
 Este apartado conserva el punto previo de la investigación. No es el inventario servido:
-consultar [estado vigente](#estado-vigente--cierre-autorizado-2026-10-13) y [runtime](10-growth-lead-matching-runtime.md).
+consultar [cierre histórico](#estado-histórico--cierre-autorizado-2026-10-13) y [runtime](10-growth-lead-matching-runtime.md).
 
 [Auditoría](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): hosting del contenedor
 existente recuperado en `efeonce-group`; tagging/preview min 0/max 1, 1CPU/512MiB,
@@ -257,7 +262,7 @@ verificable procede de README/código oficial, no de tutoriales de terceros. Las
 son móviles: reverificar al implementar y contrastar con el SHA instalado.
 
 
-## Estado vigente — cierre autorizado 2026-10-13
+## Estado histórico — cierre autorizado 2026-10-13
 
 Server live6/Web live5, matching activado tras PR254/main d692ab51dc48 y SQL post-release.
 [Readbacks, runtime y límites](../../audits/releases/2026-10-13-full-develop-matching-release.md).
@@ -271,12 +276,16 @@ la primera aceptación/reserva comercial consentida tras matching sigue sin obse
 Evidencia/rollback en auditoría; estado previo descrito arriba es histórico, no el bloqueo actual.
 
 
-### 4.2. Implementación de matching y Google UPD — 2026-10-13
+### 4.2. Implementación inicial de matching y Google UPD — 2026-10-13 (histórico)
+
+El corte13/10 siguiente conserva las listas/Server6 iniciales; fue ampliado14/10 por
+[políticas Accepted](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md),
+schema2 estricto y Server9. Operar únicamente con el [runtime vigente](10-growth-lead-matching-runtime.md).
 
 Detalle implementado y frontera con la propuesta de configuración: [runtime](10-growth-lead-matching-runtime.md).
-Las listas de formularios y scheduler/surface siguen fijas tanto en backend como en Client sGTM;
+Al corte13/10, las listas de formularios y scheduler/surface seguían fijas en backend y Client sGTM;
 la [configuración administrable](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
-es una propuesta pendiente de GO, sin implementación ni publicación autorizadas.
+era una propuesta pendiente de GO, sin implementación ni publicación autorizadas en ese checkpoint.
 
 Dueño: [TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md).
 `src/lib/growth/measurement` prepara proyecciones desde Forms aceptados/Meetings confirmados.
@@ -324,3 +333,25 @@ unavailableDestinations=[]; Meta/Google/retención true allí y en GitHub repo v
 Vercel true exacta y dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias canónico. SQL
 20261013233429748 aplicada, claims/leaseCAS/retención probados con rol greenhouse_app.
 No se ejercitó negocio real post-flip ni se acredita serving/calidad por fixtures Test Events.
+
+
+## Estado vigente — configuración escalable y contexto visitante 2026-10-14
+
+Política publicada por identidad estable de Form/versión/surface/origen o binding/fingerprint
+Meeting. Mapping sobre campos tipados, destinos independientes y defaultOFF; nueva fuente
+compatible mediante datos, sin editar template ni redeploy. No habilita todo el catálogo ni
+nuevos hosts/finalidades. [API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md)
+y CLI son clientes del mismo command/reader del panel; sesión interna, capacidades separadas,
+dry-run sin writes, CAS/idempotencia/recibos. No tools MCP nuevas ni SQL de configuración.
+
+Client31/template30 exige envelope autenticado schema2/proof cerrado, consentimiento website,
+UUID/tiempo/scope coherentes y contacto hash válido; retira proof antes de Meta. Legacy schema1
+rechazado400. Pixel708931297255942/tags6/18/Web5 sin cambios; publishServer9 sólo customTemplate30.
+El worker revalida policy/destino antes de HTTP; revocación/supersesión bloquea pendientes sin
+alterar aceptación ni outbox HubSpot Forms/CRM. Un HTTP iniciado no puede retirarse.
+
+Meta Test Events final verificó ambos hosts y fuente nueva creada tras el release, con
+Processed/Server/website y todas las claves disponibles (sin inventar teléfono Think). Código
+temporal por petición, no tag fijo, sin pruebas ordinarias. Fuente/policy de QA archivada/desactivada
+con readback; aplicación y GTM idénticos durante el alta. [Expediente de release](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+No prueba mejora EMQ, audiencia utilizable ni aceptación comercial real; continúan pendientes.

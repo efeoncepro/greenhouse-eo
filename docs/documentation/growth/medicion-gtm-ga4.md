@@ -5,7 +5,7 @@ Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; o
 políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)
 y [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md). Meta Test Events
 Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión comercial.
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-07 por Claude
 > **Ultima actualizacion:** 2026-10-14
 > **Documentacion tecnica:** [docs/reference/measurement-gtm-ga4/](../../reference/measurement-gtm-ga4/) · [Tracking Engine §19](../../architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md) · ADR [GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1](../../architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md)
@@ -20,8 +20,31 @@ Mide qué pasa en los sitios públicos de Efeonce (`efeoncepro.com` + `think.efe
 
 - Cada sitio carga **Google Tag Manager** (el contenedor `GTM-NGHPGRLZ`).
 - Con consentimiento de analítica, GTM enciende **Google Analytics 4** automáticamente: páginas vistas, sesiones, scroll, clicks salientes, etc. No hay que configurar métrica por métrica.
-- Cuando alguien **completa un formulario válido** (cualquier Growth Form), se registra una **conversión `generate_lead`**, con un dato `form_slug` que dice **cuál** formulario fue (AEO, grader, redes sociales…).
+- Cuando el backend **acepta un formulario válido** y el transporte analítico tiene consentimiento, el espejo existente envía `generate_lead`, con `form_slug` para identificar el formulario. Un clic o intento fallido no es esa conversión. Una reserva confirmada usa el mismo evento GA4 con `lead_source=meeting_booking`; abrir la agenda no cuenta como conversión.
 - Un formulario nuevo compatible puede aprovechar el evento genérico de GA4 en un host instalado y autorizado; hay que verificarlo. **Eso no habilita matching Meta/Google automáticamente**: las fuentes elegibles siguen siendo explícitas. Un host nuevo requiere instalar, configurar y verificar su medición.
+
+## Configuración escalable y operación por agentes
+
+Las políticas publicadas definen fuente, versión, surface/origen, campos tipados y destinos
+independientes. El panel de Forms y `pnpm --silent growth:measurement` consumen la misma API y
+permisos. Los agentes pueden descubrir, validar sin escribir, crear borrador, revisar, publicar,
+desactivar y verificar con recibos y protección frente a conflictos; no necesitan SQL ni abrir
+el panel. No se añadieron herramientas MCP/Nexa ni nuevos permisos OAuth en este release.
+
+Una fuente comercial compatible nueva se configura por datos sin otro release o publicación
+GTM. Cambiar la versión del formulario o binding exige revisar su política. Los dos hosts
+Efeonce son un límite deliberado; otros orígenes, proveedores, eventos o tipos nuevos pueden
+requerir cambios gobernados. Las suscripciones no se convierten automáticamente en Lead.
+
+Growth Forms acepta y guarda la solicitud; HubSpot Forms conserva su mapping comercial y entrega
+asíncrona a CRM. Medición es una proyección separada y consentida. Desactivar publicidad o fallar
+matching no bloquea ese flujo comercial. Un recibo Meta y un contacto HubSpot prueban destinos
+distintos. El alta y Test Events de una fuente posterior al release se verificaron; mejorar EMQ,
+conciliar tráfico comercial real o habilitar una audiencia utilizable requieren evidencia aparte.
+
+[Operación paso a paso](../../manual-de-uso/growth/configurar-medicion-conversiones.md) ·
+[release y evidencia](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+CRO, abandono, suscripciones y resultados CRM permanecen en el alcance pendiente de TASK-2035.
 
 ## Cookies y preferencias del visitante
 
@@ -112,4 +135,4 @@ La SQL está aplicada y captura/Meta/Google/retención están habilitados perman
 canaries de cola, acceso, credenciales y Meta Test Events pasaron. **La primera conversión
 comercial real con enriquecimiento después de activar queda por observar**, al igual que
 volumen/calidad de coincidencia y elegibilidad de audiencias. No se fabrican contactos o
-reservas para probar. [Evidencia y rollback](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+reservas para probar. [Evidencia vigente y rollback](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).

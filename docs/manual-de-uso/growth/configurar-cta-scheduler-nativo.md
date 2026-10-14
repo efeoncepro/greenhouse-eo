@@ -16,7 +16,7 @@
 6. Verifica que el launcher no cambie de tamaño al abrir: desktop debe usar diálogo y móvil full-screen.
 7. Selecciona fecha y horario, cierra y vuelve a abrir. La misma selección debe permanecer.
 8. Verifica `greenhouse_cta_clicked`/`greenhouse_cta_action_started` y el funnel `gh_meeting_step_reached` sin PII. No debe existir conversión por abrir.
-9. Completa una reserva controlada y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
+9. Con alcance comercial autorizado, completa una reserva y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
    rango horario, zona y Teams, y no volver a ofrecer selección ni otra acción de booking.
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
 11. En un host ancho, revisa que “Conversemos” no corte letras, que el carril no muestre aros recortados y que la marca monocroma de Teams aparezca sin fondo morado. Repite a 820 px y 390 px verificando `scrollWidth === clientWidth`.
@@ -38,8 +38,9 @@ consentimiento publicitario. El UUID de medición es independiente del recibo pr
 
 Meta Lead sale por el Client autenticado de GTM Server; el antiguo sender Lead basado en GA4 está
 retirado. Google UPD no agrega eventos ni otra conversión. Nunca crear reservas ficticias ni repetir
-booking para probar transporte. Las pruebas controladas de TASK-2034 y sus límites están en el
-[release](../../audits/releases/2026-10-13-full-develop-matching-release.md); el procedimiento completo,
+booking para probar transporte. Usar Meta Test Events efímero para esa prueba aislada, siguiendo el
+[manual CAPI](operar-meta-capi-servidor.md). Las pruebas controladas y sus límites están en el
+[release vigente](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); el procedimiento completo,
 reintentos/retención y rollback en el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
 
 ## Degradación y rollback

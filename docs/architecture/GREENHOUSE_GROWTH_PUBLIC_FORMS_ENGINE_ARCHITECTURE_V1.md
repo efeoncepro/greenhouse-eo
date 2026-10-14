@@ -752,10 +752,10 @@ Event payloads must not include raw field values, email, phone, document names, 
 
 Client-side GTM events are behavioral analytics. The authoritative conversion ledger remains Greenhouse server-side: `received`, `accepted`, `delivered`, `failed`, `dead_letter` and `qualified_handoff` come from the submission and destination-attempt records, not from the browser alone.
 
-### 15.2 Matching publicitario backend — TASK-2034, 2026-10-13
+### 15.2 Matching publicitario backend — contrato publicado 2026-10-14
 
 El [contrato runtime completo](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
-complementa esta arquitectura; la [evidencia del release](../audits/releases/2026-10-13-full-develop-matching-release.md)
+complementa esta arquitectura; la [evidencia del release](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)
 separa activación de recepción de una conversión comercial real. No modifica el contrato HubSpot.
 
 Los renderers de Forms y Meetings adjuntan `measurementContext` al POST gobernado, sin enviarlo a
@@ -765,20 +765,24 @@ GPC falso y contexto vigente (10 min); `Sec-GPC: 1` también bloquea. Google UPD
 analítica consentida e identificador GA4 real. El consentimiento para procesar un formulario
 no reemplaza publicidad. No se inventan cookies, apellidos ni IDs GA4.
 
-`submitForm` prepara los hashes con `normalizedFields.email/phone/firstName/lastName` y cifra la
-proyección AES-256-GCM. `persistAcceptedSubmission` inserta la conversión y sus destinos junto a la
+`submitForm` resuelve la policy publicada y su mapping tipado sobre los campos normalizados
+de la versión fuente; no presupone keys email/phone/firstName/lastName. Sólo usa nombres
+derivados si la fuente declara namePolicy. Prepara hashes y cifra la proyección AES-256-GCM. `persistAcceptedSubmission` inserta la conversión y sus destinos junto a la
 aceptación, con un SAVEPOINT que permite omitir medición ante un fallo sin romper el commit de
 negocio. `(source_kind, source_id)` evita otra conversión; el UUID externo es independiente del PK.
 El worker existente procesa `meta` y `google_upd`: máximo 5 intentos/24 h, lease/CAS y eliminación
 del payload cifrado a 48 h. Recibo HTTP no equivale a procesamiento o audiencia utilizable.
 
-Cobertura actual fija en backend **y** Client sGTM: `efeonce-aeo-diagnostic`,
-`efeonce-seo-diagnostic`, `efeonce-desarrollo-web-cotizacion`, `efeonce-lead-gen-web`,
-`efeonce-social-audit`, `ai-visibility-grader`; origins HTTPS `efeoncepro.com` y
-`think.efeoncepro.com`, surface obligatoria y URL pública saneada sin query/fragment.
-No son elegibles automáticamente todas las Forms. Las definiciones, versiones y bindings son
-configurables, pero **la autorización de matching por formulario aún no lo es**.
-La propuesta para administrarla/publicarla sin release está sin GO y no implementada.
+La autorización de matching se administra con [políticas](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md)
+por form_key estable, versión publicada, surface y origen HTTPS aprobado (`efeoncepro.com` o
+`think.efeoncepro.com`). No hay listas de slugs en backend/Client ni alta automática por
+publicar un Form: se revisa y publica su policy, destinos OFF por defecto. Cambiar versión exige
+revisar configuración; un alta compatible se hace por datos sin redeploy/publish GTM.
+API/panel/CLI comparten permisos, comandos, revisión esperada, idempotencia y auditoría;
+[manual operativo](../manual-de-uso/growth/configurar-medicion-conversiones.md). El worker
+revalida la revisión/destino antes de enviar y no reautoriza colas revocadas. La URL se sanea
+sin query/fragment; IP/UA vienen del request visitante, nunca del worker. La policy de matching
+no modifica el mapping HubSpot Forms ni el outbox comercial.
 
 Meta recibe Lead por ingreso autenticado al contenedor Server; el sender Lead derivado del mirror
 GA4 está retirado. Google recibe datos de usuario por MP **sin events**; conserva un solo

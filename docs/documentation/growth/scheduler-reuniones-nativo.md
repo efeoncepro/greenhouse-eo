@@ -41,7 +41,9 @@ para una fuente compatible. El fingerprint detecta cambios del binding. [Manual]
 El matching no bloquea el booking si falla; reintenta como máximo 5 veces/24 h y elimina el
 material cifrado a 48 h. La confirmación de transporte no acredita audiencia publicitaria utilizable.
 [Contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) ·
-[activación y primera conversión real aún por observar](../../audits/releases/2026-10-13-full-develop-matching-release.md).
+[release vigente y límites de Test Events](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+La primera reserva comercial consentida y su conciliación con cada proveedor siguen pendientes
+de observar; las pruebas aisladas no crean bookings ni contactos comerciales.
 
 ## Estados y adaptación
 

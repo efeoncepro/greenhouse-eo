@@ -1,16 +1,13 @@
 # ADR — Meta CAPI mediante el contenedor GTM Server de Efeonce
 
-Delta14/10: [corrección de contexto Lead](../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
-Server7, IP/UA original, atribución consentida persistente y external_id SHA256; Test Events
-Server/website con nueve campos. Estado de backend/hosts y límites en el expediente.
-
-> **Readout vigente de implementación (13/10/2026):** Server6/Web5, matching activo,
-> PR254/main d692ab51dc48 y manifest released. Primera conversión comercial consentida
-> post-activación sin observar. [Contrato construido](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
-> y [release/recibos](../audits/releases/2026-10-13-full-develop-matching-release.md).
-> La metadata inicial y los deltas previos se conservan como cronología de la decisión;
-> sus estados «pendiente» describen ese checkpoint. El cierre autorizado al final actualiza
-> la implementación; la dirección GTM Server continúa Accepted.
+Readout vigente **14/10/2026**: PR255/main9690efad publicado; **Server9/Web5**, Lead backend
+único, contexto original del visitante y políticas versionadas administrables por API/panel/CLI.
+[Contrato vigente](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md),
+[ADR de políticas Accepted](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) y
+[release/prueba de alta sin redeploy](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+Primera conversión comercial consentida y mejora EMQ siguen pendientes de tráfico real.
+La metadata inicial y deltas13/10 siguientes conservan la cronología de esta decisión;
+sus listas fijas, pendientes y versiones no son instrucciones de operación vigentes.
 
 - Status: Accepted.
 - Decision boundary: dirección del carril servidor; implementación/recuperación pendiente.
@@ -180,3 +177,29 @@ con hashes y canaries de cola/credenciales no sustituyen primera fuente comercia
 post-flip ni dedupe de atribución; TASK2034 queda parcial por esa aceptación restante.
 Rollbackmatching: capture/sendersOFF durable+live, retentionON, Server5 sólo tras backendOFF,
 conservar key48h/SQL/recibos. Config persistente no afirma tokenMeta perpetuo ni costo cero.
+
+
+## Cierre complementario autorizado — 2026-10-14
+
+Se conserva GTM Server existente, hosting/proyecto y pixel708931297255942. Sólo customTemplate30
+cambió en el publish Server9; tag Meta6, GA4tag18, Client31/trigger33 y Web5 permanecieron.
+El envelope autenticado schema2 añade prueba cerrada de policy/revisión/source-version/surface;
+se valida y retira antes del tag. Schema1 se rechaza. Ya no existen listas de slugs en backend/Client:
+manda la policy publicada y versionada del [ADR Accepted](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
+
+IP/UA provienen del POST del visitante; fbp/fbc consentidos y fbclid de landing persistido tras grant,
+sin hash. Email/teléfono/nombres/external_id estable normalizados y SHA256hex. Website, URL real
+segura, tiempo UNIX y UUID durable conservados. Matching sigue separado de aceptación/HubSpot
+Forms/CRM; GA4 conserva un espejo y Google UPD user_data sin events. Sin nuevos servicios/gasto.
+
+API/CLI comparten commands/autoridad con el panel: discovery tipado versionado, dry-run fresco
+sin escritura, lifecycle inmutable, CAS/idempotencia/auditoría y recibos con GET independiente.
+La alta de fuente compatible posterior al release llegó a Meta Test Events sin cambiar código,
+deployment ni GTM; policy desactivada y fixture archivada. Los tres canaries finales mostraron
+Processed/Server/website (ocho claves Think sin teléfono mapeado, nueve agenda/fuente nueva).
+No se enviaron pruebas ordinarias ni se fija test_event_code. [Recibos y límites](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+
+El rollback actual debe mantener compatibilidad con schema2: desactivar captura/destinos/policies,
+conservar SQL/recibos/ciphertext/key48h y retención. Server5/6 y los builders basados en esos
+snapshots sólo son antecedentes; no restaurarlos bajo productores nuevos activos. Las fuentes
+comerciales reales/EMQ siguen pendientes, sin cerrar artificialmente TASK-2034 ni el resto de TASK-2035.

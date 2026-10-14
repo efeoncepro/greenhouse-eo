@@ -95,5 +95,9 @@ runtimes destino y lectura provider proporcional.
 | Habilitar todos los Forms | Rompe finalidad/alcance comercial; rechazada |
 | Policy versionada por dominio | Propuesta recomendada; reutiliza ciclo actual, implementación inicial coordinada |
 
-Reabrir si cambia dueño/contrato de extracción de Growth. No supersede ADR MetaCAPI Accepted
-ni se presenta como capacidad disponible hoy. La ejecución se gobierna por TASK-2035 y sus unidades/checkpoints; planificación iniciada en [plan](../tasks/plans/TASK-2035-plan.md), implementación pendiente de su aprobación.
+Reabrir si cambia dueño/contrato de extracción de Growth. Esta propuesta histórica no supersede
+el ADR MetaCAPI Accepted. La configuración escalable descrita se implementó bajo el
+[ADR de políticas Accepted](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) y las unidades
+TASK-2036/2037 del [plan aprobado](../tasks/plans/TASK-2035-plan.md). [Cierre14/10](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md): alta por datos vía CLI productiva y Meta Test Events sin redeploy/publishGTM,
+fixture archivada. El resto de TASK-2035 (CRO, abandono, suscripciones, outcomes CRM) permanece fuera
+del alcance publicado; la implementación y evidencia actuales se consultan en esos canones.
