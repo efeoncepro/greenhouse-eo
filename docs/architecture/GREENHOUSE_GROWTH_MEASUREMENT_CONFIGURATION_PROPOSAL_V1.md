@@ -1,14 +1,17 @@
 # Propuesta — configuración de medición por formulario y calendario
 
-- Status: **Proposed; pendiente de GO del operador. No implementada ni Accepted.**
+- Status: **Proposed; alcance incorporado a TASK-2035 por el operador el 14/10/2026. No implementada ni Accepted como ADR.**
 - Fecha: 2026-10-13, conversación posterior a PR254.
 - Owner propuesto: Growth Forms / Meetings / Measurement.
 - Scope: elegibilidad y matching; sin nueva infraestructura ni cambio de sender.
 - Base: [runtime construido](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
 
-La petición actual autoriza documentar, auditar y hacer commit. No autoriza implementar
-esta propuesta, crear schema/API/UI, modificar ClientGTM, flags, secretos, audiencias ni
-hacer otro release. Este documento es la propuesta revisable previa al GO.
+La petición del 14/10 autoriza registrar el alcance integral en
+[TASK-2035](../tasks/to-do/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md),
+incluyendo CRO, audiencias, suscripciones y calidad HubSpot, además de esta configuración.
+Este documento conserva la propuesta técnica base: ubicación/schema, envelope y planes de
+ejecución aún requieren sus decisiones/checkpoints. El registro no crea schema/API/UI ni
+publica ClientGTM, flags, secretos, audiencias o un release.
 
 ## Problema confirmado
 
@@ -93,4 +96,4 @@ runtimes destino y lectura provider proporcional.
 | Policy versionada por dominio | Propuesta recomendada; reutiliza ciclo actual, implementación inicial coordinada |
 
 Reabrir si cambia dueño/contrato de extracción de Growth. No supersede ADR MetaCAPI Accepted
-ni se presenta como capacidad disponible hoy. La ejecución queda pendiente de GO.
+ni se presenta como capacidad disponible hoy. La ejecución se gobierna por TASK-2035 y sus unidades/checkpoints; no está iniciada.

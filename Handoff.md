@@ -2,6 +2,8 @@
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
+[TASK-2035](docs/tasks/to-do/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), to-do: TODO el pendiente acordado (config/API/UI, CRO, abandono/retargeting, newsletter, calidad HubSpot y release/evidencia). Umbrella sobre dueñas existentes; registro14/10, sin implementación/publicación.
+
 Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
 Auditoría documental 14/10 con tres subagentes: [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills al día.
@@ -23,7 +25,7 @@ auditada no bloqueante, sin afirmar solución. Dossier incluye rollback, digests
 Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo proyecto/cron para matching.
 
 Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
-ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
+ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md): alcance integrado a **TASK-2035**, sin implementar. Commit documental, sin publicación/release adicional.
 
 El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
 WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
