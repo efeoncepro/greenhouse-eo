@@ -114,6 +114,9 @@ Antes de declarar que una pieza llena un vacío, **medirlo**. Saturación no es 
 
 ### 6. Gates de claim de partner
 
+> ✅ **Delta 2026-10-14:** el gate de partner y la regla del badge de esta sección quedan **superados** por decisión
+> del operador (Gold Solutions Partner, autorizado). Ver el Delta al final; el resto de la sección sigue vigente.
+
 - **Ninguna pieza externa declara tier, nivel, badge ni categoría de partner HubSpot** hasta revalidar el estado
   contractual. El registro dice «declarado por el CEO, no revalidado»; una declaración interna no es un derecho de uso
   de marca. Revalidar tier, portal, certificaciones y derechos es prerrequisito de cualquier pieza provider-specific
@@ -278,3 +281,21 @@ como «HubSpot no sirve»; eso sigue siendo regla.
   de partner.**
 - Pendientes bloqueantes, en orden de impacto: revalidar el estado de partnership · desbloquear `/precios/` ·
   decidir el hueco de Revenue Lifecycle · autorizar o archivar el caso ANAM RevOps.
+
+## Delta 2026-10-14 — gate de partner resuelto
+
+**Decide:** el operador (Julio Reyes): «somos partners y estamos autorizados».
+
+- **Estado:** Efeonce es **HubSpot Gold Solutions Partner**, leído en el perfil público del Solutions Directory el
+  2026-10-06 ([registro de partnerships](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)). La fila «tier no
+  revalidado» del estado verificado al 2026-09-22 queda como historia.
+- **Se levanta:** el primer gate de §6 y la regla «el badge no se usa hasta revalidar el tier». Las piezas pagadas
+  pueden nombrar HubSpot, declarar la relación de partner y usar la insignia oficial Gold desde
+  `@efeoncepro/axis-brand-assets`. Sale de la lista de pendientes bloqueantes; el primero pasa a ser `/precios/`.
+- **Rutina, no bloqueo:** antes de cada vuelo, confirmar que el perfil del Solutions Directory sigue diciendo Gold.
+- **Sigue vigente:** claims prohibidos y cifras atribuidas de §6, isotipo y badge nunca generados, ANAM y Salesforce
+  fuera de la pauta, destinos de §7.
+- **Abierto:** el sprocket 3D como placement en escena requiere, según las guías de partner de HubSpot, aprobación
+  escrita (registro de partnerships: «uso interno hasta aprobación escrita»). Pendiente que el operador confirme si
+  su autorización la incluye; mientras tanto la vía para pautar es la insignia.
+- **Brief:** OneDrive `CMP-002_tu-ia-no-conoce-tu-negocio-hubspot/BRIEF.md`, Delta 2026-10-14.
