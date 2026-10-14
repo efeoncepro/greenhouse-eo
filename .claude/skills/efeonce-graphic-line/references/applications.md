@@ -1626,3 +1626,11 @@ HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y ByteP
 rechazó la variante de dos badges a color, nunca publicada. Se adapta la composición al footer
 nativo Ohio; no cambia la firma ni los recursos AXIS, no implica tier o programa adicional.
 [Rollout, recursos y rollback](../../../../docs/audits/public-site/2026-10-14-footer-explore-partners.md).
+
+### Footer WordPress V2 — composición integral, 2026-10-14
+
+Sustituye la primera aplicación del mismo día: marca · «Explora» · newsletter · empleo,
+Bricolage/Poppins y container acotado; nueve logos gris, Salesforce ajustado. Altura1440:851→531px.
+Móvil combina marca/navegación y apila newsletter/empleo; partners3columnas. Controles flotantes
+inert sólo al intersectar footer, top discreto y legal español. Preserva CF7/consentimiento/delivery;
+no acredita recepción. [Estado y reversión](../../../../docs/audits/public-site/2026-10-14-footer-composition-v2.md).

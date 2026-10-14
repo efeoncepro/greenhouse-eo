@@ -1,0 +1,25 @@
+{
+  "state": "applied",
+  "snapshotOption": "eo_footer_refinement_20261014_v2",
+  "checks": {
+    "sidebars_widgets": true,
+    "widget_block": true,
+    "widget_ohio_widget_subscribe": true,
+    "widget_ohio_widget_socialbar_subscribe": true,
+    "options_global_footer_copyright_left": true,
+    "options_global_footer_copyright_right": true,
+    "options_global_footer_copyright_alignment": true,
+    "form": true,
+    "form_delivery_properties": true,
+    "home": true,
+    "template": true
+  },
+  "allChecksPass": true,
+  "formId": 242255,
+  "formDeliveryHash": "e6159b85ab96e98addf3e8c1cfa4a9c42d3319676aa5ddfac8b10734e4ba5d88",
+  "blockHashes": {
+    "31": "068c9f65b212fbc878d503bd4e86cfff5d0ffc953af0f1057201d66b5f45dd00",
+    "34": "483b232a9ddcfcc94e28087fdd791d0181032c4c14379b7e57a342e821008a29",
+    "45": "db76ab1e4f12b39c156189ec860c701b262f40f6af711a76de01d643382f3bcf"
+  }
+}

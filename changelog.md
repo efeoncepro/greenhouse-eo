@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-Footer 14/10: «Explora Efeonce» y nueve partners en gris publicados. [QA y reversión](docs/audits/public-site/2026-10-14-footer-explore-partners.md).
+Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independientes y partners gris. [QA y reversión](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 

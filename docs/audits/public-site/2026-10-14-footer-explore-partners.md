@@ -1,6 +1,6 @@
 # Footer público — Explora Efeonce y partners monocromos
 
-**Estado: publicado y verificado el 14/10/2026.** El operador aprobó «Explora Efeonce» y publicar la franja de partners. Luego rechazó la propuesta de dos badges de colores: pidió escala de grises y tomar las firmas corporativas como referencia. La variante de dos badges nunca se publicó.
+**Versión inicial publicada el 14/10/2026, sustituida después por la [composición integral V2](2026-10-14-footer-composition-v2.md).** El operador aprobó «Explora Efeonce» y publicar la franja de partners. Luego rechazó la propuesta de dos badges de colores: pidió escala de grises y tomar las firmas corporativas como referencia. La variante de dos badges nunca se publicó.
 
 ## Resultado y autoridad
 

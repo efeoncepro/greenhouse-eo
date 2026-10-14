@@ -69,8 +69,8 @@ Use this when the user asks to inspect or update the public-site footer. Do not
 mutate the footer during discovery.
 
 - Canonical audit and rollout evidence:
-  `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`; refresh publicado
-  `docs/audits/public-site/2026-10-14-footer-explore-partners.md`.
+  `docs/audits/public-site/2026-07-09-footer-careers-entry-readiness.md`; refresh inicial
+  `docs/audits/public-site/2026-10-14-footer-explore-partners.md` y composición vigente V2 arriba.
 - The visible footer is `footer#colophon.site-footer.clb__dark_section`,
   rendered by the Ohio child theme plus WordPress sidebars/widgets. The current
   visible footer is not rendered from the headless `eoh_site_settings_footer_*`
@@ -79,18 +79,21 @@ mutate the footer during discovery.
   `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/themes/ohio-child/parts/elements/footer.php`.
   It counts active sidebars `ohio-sidebar-footer-1..4` and renders each through
   `dynamic_sidebar(...)`.
-- Refresh 2026-10-14: `block-45` = **Explora Efeonce**, links absolutos Home `#servicios`,
-  Home `#metodo`, `/portafolio/`, `/blog/`. `block-34` = partners de las firmas corporativas:
-  HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus.
-  PNG monocromos existentes, CSS `grayscale(1)` permanente; nunca volver a los dos badges
-  de colores rechazados. Layout acotado por `data-eo-footer-partners="v1"`: tres columnas +
-  fila común, logos en 9/5/3 columnas. Sidebar4 sólo `block-34`; instancia `block-14` preservada.
-  Writer/recursos/rollback: `scripts/public-website/footer-refresh-v1/README.md`;
-  snapshot durable no autoload `eo_footer_refresh_20261014_v1`. Primero redescubrir hashes.
-  Esta aplicación no modifica Think, AXIS ni tiers/estados contractuales del registry.
-- Careers footer entry lives in `ohio-sidebar-footer-3`:
-  `ohio_widget_subscribe-2`, `block-32 | Unete a nuestro equipo`,
-  `block-31 | ¿Te interesa trabajar con nosotros?`.
+- Estado V2 publicado 2026-10-14: **Explora** (`block-45`), evitando repetir Efeonce junto al logo.
+  Cuatro columnas (marca, navegación, newsletter, empleo); partners en fila compartida inferior.
+  Sidebar3 sólo `ohio_widget_subscribe-2`; sidebar4 `block-31` + `block-34`; `block-32` preservado,
+  sin asignación. Wrapper de sidebar4 usa `display:contents`; marcador `data-eo-footer-partners="v2"`.
+  Nueve logos de firmas en gris permanente, Salesforce58px: HubSpot, Salesforce, Adobe, Microsoft,
+  AWS, Google Cloud, Claude, OpenAI y BytePlus. No regresar a los badges de color rechazados.
+  CF7 242255 conserva required/names/consentimiento y delivery; markup/label/autocomplete cambian.
+  CSS/JS/rollback: `scripts/public-website/footer-refinement-v2/README.md`; snapshot durable
+  no autoload `eo_footer_refinement_20261014_v2`. La V1 queda como historia, no writer vigente.
+  Instagram corregido, Spotify sin destino retirado, cuatro redes con nombres accesibles.
+  Chrome de `.elements-bar` se oculta/inert sólo al intersectar footer y se restaura al salir.
+  Legales: privacidad + preferencias nativas HubSpot; términos404 retirado porque no hay página
+  publicada. No inventar texto legal ni reincorporar enlace sin contenido aprobado.
+  Auditoría actual `docs/audits/public-site/2026-10-14-footer-composition-v2.md`.
+  No modifica Think, AXIS ni tiers/estados contractuales del registry.
 - Current Careers contract: footer recruiting is Careers-only. `block-31`
   renders one CTA, `Ver vacantes y postular`, pointing to
   `https://greenhouse.efeoncepro.com/public/careers` with `target="_blank"` and
@@ -109,10 +112,8 @@ mutate the footer during discovery.
   verify Home plus at least one service landing in desktop `1440` and mobile
   `390`, assert one Careers link, expected target/rel, no stale email copy, and
   `scrollWidth === clientWidth`.
-- Adjacent footer debt remains intentionally separate unless scoped: malformed
-  Instagram URL, placeholder social `#`, missing
-  social accessible labels, newsletter/legal mixed-language copy, and
-  inconsistent link targets.
+- Newsletter delivery/integración no se acredita por este rediseño: la configuración permanece
+  idéntica y no se enviaron formularios. Página de términos pendiente de contenido aprobado.
 
 ## Miscellaneous Surface Facts
 

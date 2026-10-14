@@ -30,7 +30,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
-- **[Footer publicado: Explora Efeonce + nueve partners en gris](../audits/public-site/2026-10-14-footer-explore-partners.md)** — widgets nativos Ohio, firmas corporativas como fuente, QA Home/servicio escritorio/móvil y rollback.
+- **[Footer completo: Explora, newsletter, empleo y partners](../audits/public-site/2026-10-14-footer-composition-v2.md)** — cuatro columnas, nueve partners de las firmas en gris, QA responsive, accesibilidad y rollback.
 
 - **Reproductor AXIS — adapter preparado, sin activación:** bloque `eo-axis-video` en
   `efeonce-public-site-runtime/wp-content/plugins/eo-axis-video/`. La prueba del snapshot del artículo

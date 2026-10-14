@@ -910,3 +910,11 @@ corporativas». Se reutilizan los nueve logos monocromos aprobados de la firma v
 responsive, sin tarjetas/badges saturados. Publicado y verificado Home + servicio × 1440/390.
 [Recibo](../../../../docs/audits/public-site/2026-10-14-footer-explore-partners.md); no cambia
 la firma de correo, tiers ni programas del registro de partnerships.
+
+### 2026-10-14 — Footer completo: «A ver hazlo todo»
+
+El operador rechaza redundancia de «Explora Efeonce» al lado del logo y aprueba rediseñar el conjunto.
+Publicado «Explora», cuatro columnas, newsletter/empleo separados, partners gris compactos,
+legales discretos y controles flotantes ocultos sólo al ver footer. 531px desktop, QA6casos y axe
+sin violaciones. [Recibo](../../../../docs/audits/public-site/2026-10-14-footer-composition-v2.md).
+La variante anterior se conserva como historial; no se cambia la firma de correo ni tiers.

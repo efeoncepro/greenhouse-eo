@@ -1,8 +1,8 @@
 # Handoff
 
-## 2026-10-14 — Footer público: Explora Efeonce y partners
+## 2026-10-14 — Footer público: composición compacta
 
-[Publicado y verificado](docs/audits/public-site/2026-10-14-footer-explore-partners.md): navegación propia y nueve logotipos de las firmas en gris, responsive. Widgets Ohio; snapshot/rollback durable, hermanos preservados. Home + servicio × 1440/390 PASS; sin cambios de tracking ni Think.
+[Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
 
 ## 2026-10-13 — Meta CAPI y consentimiento publicados
 
