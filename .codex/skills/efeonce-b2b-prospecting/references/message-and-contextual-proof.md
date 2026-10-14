@@ -34,6 +34,34 @@ No automatizar scraping, invitaciones o DMs por defecto ni simular un hilo o un 
 el operador envía desde su perfil (respuesta a una publicación pública, alguien que conoce) sí puede proponerse:
 preparar borrador y motivo tras leer el contexto original; lo envía él y respeta HOLD y negativas como el correo.
 
+### Correo comercial robusto de Julio
+
+Preferencia aprobada por Julio el **14-10-2026**, tras revisar un correo de presentación a una
+aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura como referencia:
+
+1. **Contexto concreto:** saludo personal y motivo vinculado a la señal real del destinatario.
+2. **Encaje de Efeonce:** presentación breve, enlace institucional y capacidad que responde al pedido.
+3. **Aportes concretos:** desarrollar sólo los servicios pertinentes; agruparlos en bloques breves si
+   facilita comparar cómo ayudaríamos. Tres bloques funcionaron en el ejemplo, no son una cuota.
+4. **Enfoque sectorial:** explicar qué cuidaríamos en ese contexto y qué validaríamos con su equipo,
+   sin atribuir problemas desconocidos, experiencia sectorial o resultados no comprobados.
+5. **Forma de trabajo:** responsable de coordinación, brief, validaciones, entregables, revisiones y
+   seguimiento. Proponer una entrada puntual y posible continuidad según la demanda, sin inventar
+   capacidad, presupuesto, plazos ni compromisos.
+6. **Brochure contextualizado:** explicar qué encontrará y por qué sirve para evaluar a Efeonce;
+   compartir la versión pertinente sólo tras comprobar contenido, evidencia y permiso de uso.
+7. **Invitación natural:** pregunta útil sobre prioridades o criterios; enlace de reunión verificado
+   y respuesta por correo como alternativas de la misma conversación.
+8. **Cierre e identidad:** despedida cordial, firma oficial y CCO según la
+   [política Outlook](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
+   Si el pedido exige firma gráfica, comprobar su render y no sustituirla por texto.
+
+Voz personal de Julio: cercana, profesional, específica y con párrafos cortos; suficiente detalle para
+defender la propuesta, sin catálogo completo ni fórmulas copiadas entre cuentas. La preferencia es por
+la **estructura y profundidad**, no por un número fijo de palabras ni por alargar todos los primeros
+contactos. Adaptar extensión a señal, relación y pedido; en seguimientos, conservar el aporte nuevo
+en vez de repetir toda la presentación. Esta preferencia no autoriza envíos futuros.
+
 ## Graduar la prueba contextual Efeonce
 
 Elegir la incertidumbre del comprador que se quiere resolver. En frío, una lectura/ejemplo útil; con fit,

@@ -44,6 +44,7 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 
+- 14/10: Prospección Codex/Claude incorpora la [estructura de correo robusto aprobada por Julio](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio): contexto, encaje, aportes, enfoque sectorial, forma de trabajo, brochure explicado e invitación; profundidad adaptable, firma por la vía pedida y permiso de envío separado.
 - [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
   empatía, motivo para elegir Efeonce, brochure explicado y firma instalada en Outlook web; Enviados,
   adjuntos y EMAIL de HubSpot comprobados por separado. Criterio enlazado desde las skills espejo de HubSpot.

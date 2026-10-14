@@ -53,7 +53,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Descubrir o verificar entidad, fit y señales | [account-research-and-signals](references/account-research-and-signals.md) + Customer Model |
 | Encontrar objetivo, adyacentes y rutas de acceso | [buying-group-and-access](references/buying-group-and-access.md) |
 | Conseguir y evaluar datos accionables | [contact-quality-and-enrichment](references/contact-quality-and-enrichment.md) |
-| Preparar acercamiento o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) + Copywriting/práctica |
+| Preparar acercamiento, correo robusto de Julio o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) ([estructura preferida](references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio)) + Copywriting/práctica |
 | Preparar discovery, criterios o prueba por oferta/función | [discovery-and-proof](references/discovery-and-proof.md) + Commercial/práctica |
 | Dimensionar cartera, preventa y seguimiento | [capacity-and-economics](references/capacity-and-economics.md) + Pricing/Finance |
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |

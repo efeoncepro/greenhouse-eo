@@ -1,5 +1,9 @@
 # Handoff
 
+## 2026-10-14 — Preferencia de correos comerciales robustos
+
+Julio aprobó la [estructura en Prospección](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio); referencia y routing espejados Codex/Claude, extensión adaptable por cuenta. Actualización documental local, sin nueva autorización de envío.
+
 ## 2026-10-14 — Footer público: composición compacta
 
 [Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
