@@ -17,6 +17,26 @@ Una versión nueva del formulario requiere revisar/publicar configuración, sin 
 de código, evento, proveedor, campo de un tipo nuevo u origen fuera de los dos aprobados requiere
 su cambio gobernado. Subscribe/application/survey y fuentes de alto riesgo quedan excluidas.
 
+## Relación Growth Forms / Forms / Medición / CRM
+
+En el flujo actual, Growth Forms posee la definición, validación, normalización, consentimiento
+y aceptación. La entrega comercial usa el destino HubSpot Forms (secure-submit), que alimenta
+CRM. Desde la misma aceptación se prepara, por separado, la medición publicitaria consentida.
+
+| Capa | Configuración que le pertenece | Evidencia que confirma su resultado |
+| --- | --- | --- |
+| Growth Forms | Versión publicada, campos, surface y aceptación | Submission aceptada y consentimiento guardado |
+| HubSpot Forms | Destino, portal/formulario y fieldMapping hacia propiedades CRM | Attempt de entrega y respuesta del proveedor |
+| Medición | Matching tipado, sitios y destinos Meta/Google | Revisión publicada, recibo y entrega publicitaria |
+| CRM | Contacto y propiedades tras la entrega comercial | Readback independiente del contacto en HubSpot |
+
+El mapping de matching no sustituye el fieldMapping de HubSpot Forms. Un alta completa revisa
+ambos y la existencia de las propiedades/formulario destino. Desactivar medición, denegar
+publicidad o fallar el enqueue publicitario conserva la aceptación, su consentimiento y el
+outbox comercial. Una respuesta de Meta no prueba entrega a CRM; un contacto en CRM no prueba
+medición. La prueba controlada no crea contactos comerciales ficticios; el readback de tráfico
+comercial real permanece separado cuando no se ha observado.
+
 ## Product API y permisos
 
 GET /api/admin/growth/measurement devuelve sources, policies y permissions; POST acepta draft,
@@ -46,4 +66,6 @@ incluye events. El código de prueba nunca queda fijo en producción.
 
 - seed-policy.ts: dry-run por defecto, --apply con MEASUREMENT_POLICY_ACTOR_ID explícito. Sólo equivalencia inicial de seis Forms y discovery; futuras altas no requieren editar este seed.
 - verify-policy-lifecycle.ts --apply: fixture de configuración sin embed key ni tráfico; publica y desactiva política, archiva form y surface al terminar con readback independiente previo al recibo de éxito. No crea contactos/submissions/bookings ni envía a proveedores.
-- verify-lead-context.ts: exige META_TEST_EVENT_CODE real y opcional META_TEST_PREVIEW_HEADER_FILE privado. Resuelve las políticas publicadas y prueba sólo Meta Test Events. Nunca volcar sus payloads, headers o credenciales.
+- policy-ui-fixture.ts prepare/cleanup --apply: exige MEASUREMENT_FIXTURE_RECEIPT; crea una fuente controlada sin embed key y archiva fuente/surface/desactiva política con readback al terminar. Reutiliza el recibo existente, no genera fixtures duplicadas.
+- verify-policy-ui.ts --apply: staging únicamente, escribe desde la UI sólo sobre la fixture declarada; captura lifecycle real y estados de presentación aislados en el navegador. No envía formularios ni bookings.
+- verify-lead-context.ts: exige META_TEST_EVENT_CODE real y opcional META_TEST_PREVIEW_HEADER_FILE privado. Resuelve las políticas publicadas y prueba sólo Meta Test Events. META_TEST_POLICY_ID permite seleccionar una política publicada de prueba para verificar un alta por datos sin volver a publicar GTM. Nunca volcar sus payloads, headers o credenciales.

@@ -49,10 +49,25 @@ async function main() {
 
   if(!form||!meeting) throw Error('published_test_scopes_required')
 
-  const scopes = [
+  let scopes: Array<Parameters<typeof buildMeasurementPayloads>[0]['scope'] & { policy: typeof form }> = [
     { ...form.scope, sourceVersion:form.config.sourceVersion,sourceId:'synthetic-test-only',origin:'https://think.efeoncepro.com',pageUri:'/web-agentica/',formSlug:'ai-visibility-grader',policy:form },
     { ...meeting.scope,sourceVersion:meeting.config.sourceVersion,sourceId:'synthetic-test-only',origin:'https://efeoncepro.com',pageUri:'/contacto/',schedulerKey:'discovery',policy:meeting },
   ]
+
+  const isolatedPolicyId=process.env.META_TEST_POLICY_ID
+
+  if(isolatedPolicyId) {
+    if(!/^[a-f0-9-]{36}$/i.test(isolatedPolicyId)) throw Error('invalid_test_policy_id')
+    const policy=policies.find(value=>value.policyId===isolatedPolicyId&&value.state==='published'&&value.publishedRevisionId===value.revisionId)
+
+    if(!policy) throw Error('published_test_policy_required')
+    const {resolveMeasurementSource}=await import('../../src/lib/growth/measurement/policy-source')
+    const source=await resolveMeasurementSource(policy.scope)
+
+    if(!source || source.blockingReasons.length || !policy.config.destinations.includes('meta')) throw Error('compatible_test_source_required')
+    scopes=[{...policy.scope,sourceVersion:policy.config.sourceVersion,sourceId:'synthetic-test-only',origin:policy.config.origins[0],pageUri:'/measurement-proof/',
+      ...(policy.scope.sourceKind==='form_submission'?{formSlug:source.formSlug!}:{schedulerKey:policy.scope.sourceKey}),policy}]
+  }
 
   await closeGreenhousePostgres()
 

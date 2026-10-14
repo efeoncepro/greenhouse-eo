@@ -40,6 +40,16 @@ Meetings uses the actual active binding (currently discovery/fhsf-efeonce-lead-g
 stale efeonce-discovery-30 matching constant. Its authority fingerprint changes when scope does.
 Only the two currently approved HTTPS hosts are eligible. Destinations default OFF.
 
+## Growth Forms / Forms / Measurement / CRM boundary
+
+Growth Forms owns normalized acceptance and its consent/outbox. The existing destination maps
+those fields to HubSpot Forms secure-submit and then CRM properties. Measurement is a separate
+consented projection of that acceptance, with a different typed matching map and delivery ledger.
+Policy publication does not configure or replace the HubSpot form/property mapping. Advertising
+denial/revocation/unavailability cannot gate commercial acceptance or its CRM outbox. Independent
+readback is required for each destination; a Meta receipt never proves CRM contact delivery.
+This release preserves that integration; future CRM outcome/event extensions remain out of scope.
+
 ## Authenticated server envelope v2
 
 Keep the existing bearer secret and server Client boundary. schema_version2 adds a closed

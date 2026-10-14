@@ -101,3 +101,15 @@ Twelve focused UI/network tests passed under a512MiB cap, including full lifecyc
 outcome replay, readback conflict, read-only/disable confirmation and dirty-source handling.
 Full current CI, rendered functional state QA, data-only UI proof and production release remain
 pending. No local dev server, full tsc or build was started.
+
+## Growth Forms / Forms / Medición / CRM — operator steering
+
+The operator emphasized the complete chain. Verified current flow: canonical Growth Forms
+acceptance/normalized fields/consent and outbox → asynchronous HubSpot Forms secure-submit →
+CRM; a separate measurement projection pins its own policy. Matching mapping never replaces
+form_destination.fieldMapping. Added three boundary tests plus the ten existing HubSpot adapter
+tests:13/13 pass. Advertising denial, revoked policy and measurement DB failure retain accepted
+submission/consent/commercial outbox and the mapped CRM fields. These are isolated tests, not
+new real submissions or CRM contact delivery evidence. The architecture/manual now state this
+boundary and separate per-destination readbacks. Scope remains configuration+CAPI; no new CRM
+outcome/CRO/subscription work or automatic synthetic contacts.
