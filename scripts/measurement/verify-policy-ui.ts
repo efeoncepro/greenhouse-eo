@@ -12,6 +12,8 @@ import type { MeasurementPolicyRevision } from '../../src/lib/growth/measurement
 import type { MeasurementCatalog } from '../../src/views/greenhouse/admin/growth/forms/measurement-policy-client'
 import { GH_GROWTH_MEASUREMENT as C } from '../../src/lib/copy/growth-measurement'
 
+let stage='init'
+
 async function main() {
   assert(process.argv.includes('--apply') && process.env.MEASUREMENT_FIXTURE_RECEIPT, 'explicit_fixture_apply_required')
   const fixture=JSON.parse(readFileSync(process.env.MEASUREMENT_FIXTURE_RECEIPT,'utf8')) as {sourceKey:string;surfaceId:string;slug:string}
@@ -57,6 +59,7 @@ return}
   const panel=page.locator(selector)
 
   const mark=async(state:string)=>{
+    stage='capture-'+state
     await panel.scrollIntoViewIfNeeded()
     const framePath=resolve(outputDir,state+'.png')
 
@@ -75,12 +78,14 @@ if(!response.ok)throw Error('catalog_unavailable');
 return response.json()}) as Promise<MeasurementCatalog>
 
   try {
+    stage='navigate'
     await page.goto(envConfig.baseUrl+'/admin/growth/forms',{waitUntil:'domcontentloaded'})
     await panel.getByRole('combobox',{name:C.source}).waitFor({timeout:60000})
     const initial=await readCatalog()
     const source=initial.sources.find(value=>value.scope.sourceKey===fixture.sourceKey&&value.scope.surfaceId===fixture.surfaceId)
 
     assert(source?.name==='TEST — Measurement UI proof' && !fixturePolicy(initial).length,'new_fixture_only')
+    stage='select-source'
     await panel.getByRole('combobox',{name:C.source}).click()
     await page.getByRole('option',{name:/TEST — Measurement UI proof/}).click()
     await mark('01-empty')
@@ -88,15 +93,18 @@ return response.json()}) as Promise<MeasurementCatalog>
     await page.getByRole('option',{name:'businessEmail',exact:true}).click()
     await panel.getByRole('switch',{name:C.meta,exact:true}).check()
     assert(!(await panel.getByRole('switch',{name:C.google_upd,exact:true}).isChecked()))
+    stage='save-draft'
     await panel.getByRole('button',{name:C.save,exact:true}).click()
     await panel.getByRole('button',{name:C.review,exact:true}).waitFor({timeout:30000})
     const draft=fixturePolicy(await readCatalog())[0]
 
     assert(draft?.state==='draft');allowedPolicies.add(draft.policyId)
     await mark('02-draft')
+    stage='review'
     await panel.getByRole('button',{name:C.review,exact:true}).click()
     await panel.getByRole('button',{name:C.publish,exact:true}).waitFor({timeout:30000})
     await mark('03-review')
+    stage='publish'
     await panel.getByRole('button',{name:C.publish,exact:true}).click()
     await panel.getByText(C.activeRevision(1),{exact:true}).waitFor({timeout:30000})
     const published=fixturePolicy(await readCatalog()).find(policy=>policy.state==='published')
@@ -154,4 +162,4 @@ return response.json()}) as Promise<MeasurementCatalog>
   } finally {await session.stopTracing(null);await session.finalizeRecording();await session.browser.close()}
 }
 
-main().catch(()=>{console.error('policy_ui_verification_failed_no_sensitive_payload_logged');process.exitCode=1})
+main().catch(()=>{console.error('policy_ui_verification_failed_no_sensitive_payload_logged',{stage});process.exitCode=1})

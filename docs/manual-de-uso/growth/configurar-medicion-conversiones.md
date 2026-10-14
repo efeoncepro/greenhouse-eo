@@ -3,6 +3,8 @@
 Estado14/10/2026: TASK-2036 implementada en develop, migración y seed aplicados. Panel TASK-2037
 con lifecycle implementado y12 pruebas UI/red PASS; QA remota y release pendientes. GTM8
 es compatible v1/v2 temporalmente; el corte final estricto v2 queda pendiente del release.
+Alta controlada real mediante UI y readback API probada; revisión visual final pendiente tras
+corregir contraste de acciones secundarias con tokens nativos.
 Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 
 ## Alta compatible por datos

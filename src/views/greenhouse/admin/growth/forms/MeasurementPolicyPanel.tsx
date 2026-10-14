@@ -39,6 +39,7 @@ export default function MeasurementPolicyPanel({ preferredFormSlug, initialCatal
     <Box component='section' data-surface-recipe='settings-flow' aria-labelledby='measurement-policy-heading'
       data-capture='measurement-policy-panel' data-state={!catalog ? issue ? 'error' : 'loading' : 'ready'}
       sx={{ p:2, borderTop:1, borderColor:'divider', minWidth:0,
+        '& .MuiButton-text, & .MuiButton-outlined': {color:'text.primary'},
         '& .MuiSelect-select:focus-visible': { outline:theme=>`2px solid ${theme.palette.primary.main}`, outlineOffset:2 },
         '& .MuiSwitch-root:focus-within, & .MuiCheckbox-root:focus-within': { outline:theme=>`2px solid ${theme.palette.primary.main}`, outlineOffset:2 },
       }}>

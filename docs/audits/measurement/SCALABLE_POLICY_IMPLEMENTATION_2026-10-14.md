@@ -113,3 +113,22 @@ submission/consent/commercial outbox and the mapped CRM fields. These are isolat
 new real submissions or CRM contact delivery evidence. The architecture/manual now state this
 boundary and separate per-destination readbacks. Scope remains configuration+CAPI; no new CRM
 outcome/CRO/subscription work or automatic synthetic contacts.
+
+## First real UI lifecycle — 13:54Z checkpoint
+
+Staging402cb65bd READY. Controlled source822e8c41-ebc0-4bb1-a0ea-f855284a186a was
+created without embed key/submission and configured through actual panel POST commands
+(draft→review→publish). Independent authenticated GET confirmed policy237e3d22-e9ad-4c06-826e-35eb58c300a7,
+revision b81d3030-40d2-4cd5-a51d-0d1ca9bce88c, custom businessEmail mapping and Meta-only.
+No code or GTM publication occurred between fixture creation and UI publication.
+The capture gate correctly rejected a4.12:1 primary-text hover contrast in the published
+state (04-published.axe.json). Fixed non-primary action text with native text.primary tokens;
+no quality gate was lowered. Functional publication is proven; full rendered acceptance is
+not yet claimed. Browser closed automatically, no local Next/build/tsc process.
+
+Shared Ops readback:00776-g9g100%, SHA bef1e2184; Forms HubSpot secure-submit and three
+measurement delivery/retention flags true. This shared staging worker is already on the
+new policy contract; main web convergence remains required. Operational read showed no
+measurement conversions/deliveries in the preceding3 hours; no lost commercial event was
+observed. Recheck queue and runtime before strict Client cutover; do not silently upgrade
+legacy receipts to a different policy or consent.
