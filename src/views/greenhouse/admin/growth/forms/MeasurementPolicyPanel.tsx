@@ -41,7 +41,7 @@ export default function MeasurementPolicyPanel({initialCatalog}:{initialCatalog?
   const source=catalog?.sources.find(s=>scopeKey(s.scope)===selected)
   const revision=catalog?.policies.find(p=>scopeKey(p.scope)===selected&&p.state==='published')
 
-  return <Box component='section' data-surface-recipe='settings-flow' aria-labelledby='measurement-policy-heading' data-capture='measurement-policy-panel' data-state={error?'error':catalog?'ready':'loading'} sx={{p:2,borderTop:1,borderColor:'divider',minWidth:0}}>
+  return <Box component='section' data-surface-recipe='settings-flow' aria-labelledby='measurement-policy-heading' data-capture='measurement-policy-panel' data-state={error?'error':catalog?'ready':'loading'} sx={{p:2,borderTop:1,borderColor:'divider',minWidth:0,'& .MuiSelect-select:focus-visible':{outline:theme=>`2px solid ${theme.palette.primary.main}`,outlineOffset:2}}}>
     <Stack spacing={2}>
       <Box><Typography id='measurement-policy-heading' variant='subtitle1' color='text.primary'>{C.title}</Typography><Typography variant='body2' color='text.secondary'>{C.description}</Typography></Box>
       {error?<Alert severity='error'>{error}</Alert>:!catalog?<Typography role='status'>{C.loading}</Typography>:<>
