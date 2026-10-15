@@ -18,6 +18,9 @@
 .gh-creativa :is(img,video)[style*="height: 100%"]{height:100%}
 .gh-creativa :is(a,button,summary):focus-visible{outline:2px solid currentColor;outline-offset:3px}
 
+/* Decorative labels live in data-label so they never become heading text. */
+.gh-creativa [data-label]::after{content:attr(data-label)}
+
 /* Tabs: one pressed state per group, panels switch without layout jumps. */
 .gh-creativa [data-gh-tabs="rutas"] [data-gh-tab][aria-pressed="true"]{border:2px solid #ff6500 !important;background:#ff6500 !important;color:#001a33 !important;font-weight:600 !important}
 .gh-creativa [data-gh-tabs="formatos"] [data-gh-tab][aria-pressed="true"]{border:2px solid #023c70 !important;background:#023c70 !important;color:#ffffff !important;font-weight:600 !important}

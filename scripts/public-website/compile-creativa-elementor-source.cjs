@@ -63,6 +63,13 @@ $('header').first().remove()
 const hero = heroWrap.children('section').first()
 hero.attr('style', 'background: #001a33; color: #ffffff')
 heroWrap.replaceWith(hero)
+// The art-direction cursor tag is decoration inside the H1: keep it visible via CSS, out of the heading text.
+hero.find('h1 .eo-cur > span').each((_, el) => {
+  $(el).attr('data-label', $(el).text().trim())
+  $(el).empty()
+})
+// The hero photo is the LCP element: load it eagerly with high priority.
+hero.find('img.eo-hero-img').attr('fetchpriority', 'high').attr('loading', 'eager')
 
 // 03 Rutas: tabs + panels rendered statically; JS switches them.
 {
@@ -230,9 +237,9 @@ function compileFragment(html, module) {
 
     if (node.attr('href') && el.tagName === 'a') node.attr('href', field('url', 'Destino · ' + excerpt(node.text()), { url: node.attr('href') }))
 
-    for (const a of ['aria-label', 'placeholder', 'title']) {
+    for (const a of ['aria-label', 'placeholder', 'title', 'data-label']) {
       if (!node.attr(a) || el.tagName === 'video' || q(el).closest('svg').length || node.attr(a).includes('%%')) continue
-      node.attr(a, field('text', 'Nombre accesible · ' + excerpt(node.attr(a)), node.attr(a)))
+      node.attr(a, field('text', (a === 'data-label' ? 'Etiqueta decorativa · ' : 'Nombre accesible · ') + excerpt(node.attr(a)), node.attr(a)))
     }
   })
 
@@ -364,10 +371,31 @@ for (const [key, title, scheme] of MODULES) {
     Object.assign(extraDefaults, { form_key: 'e913d958-2ad7-48a5-8015-dbff53eca4a3', form_surface: 'fhsf-efeonce-creative-diagnostic', form_fallback: 'Este formulario necesita JavaScript. Puedes escribirnos a hola@efeoncepro.com o agendar en efeoncepro.com/agenda.' })
   }
 
+  let structuredData
+
+  if (key === 'preguntas') {
+    // One truth, two interfaces: FAQPage is built at render time from the same rows the visitor reads.
+    structuredData = { faq: { repeaters: repeaters.filter(r => r.key.startsWith('faq_')).map(r => r.key), question: 'f001_pregunta', answer: 'f002_descripcion' }, service: true }
+    extra.push(
+      { key: 'schema_service_name', type: 'text', label: 'Datos estructurados · nombre del servicio' },
+      { key: 'schema_service_type', type: 'text', label: 'Datos estructurados · tipo de servicio' },
+      { key: 'schema_service_description', type: 'textarea', label: 'Datos estructurados · descripción del servicio' },
+      { key: 'schema_audience', type: 'text', label: 'Datos estructurados · audiencia' },
+      { key: 'schema_area_served', type: 'text', label: 'Datos estructurados · países (separados por coma)' },
+    )
+    Object.assign(extraDefaults, {
+      schema_service_name: 'Agencia creativa',
+      schema_service_type: 'Squad creativo, sistemas de marca, campañas, contenido y social, audiovisual y producción con IA',
+      schema_service_description: 'Personas, tecnología y procesos probados que se suman a tu equipo de marketing para producir más y llegar antes al mercado, sin que tu marca pierda consistencia.',
+      schema_audience: 'Equipos de marketing',
+      schema_area_served: 'Chile, Estados Unidos, Colombia, México, Perú',
+    })
+  }
+
   const definition = {
     schema: 'creativaModule.v1', module: key, title, scheme,
     fields: [...compiled.fields, ...extra], defaults: { ...compiled.defaults, ...extraDefaults },
-    repeaters, sourceSha256,
+    repeaters, ...(structuredData ? { structuredData } : {}), sourceSha256,
   }
 
   emit('includes/creativa/templates/' + key + '.html', compiled.template)
