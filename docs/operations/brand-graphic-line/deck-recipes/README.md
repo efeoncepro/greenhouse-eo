@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.20
+> **Versión:** 1.21
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-10 por Claude (1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-15 por Claude (1.21: el caso Sky canónico para todos los decks, uso aprobado de `decision-case`. Antes, 2026-10-10, 1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -452,6 +452,21 @@ Fuente: `ai-generations/2026-10-09_deck-contenidos/deck/` (`LEEME.md`, con el or
   día» la 40 y «Expertos multidisciplinarios» la 45. Las secciones de arriba citan los números que tenían al aprobarse.
 - **No se envía a un prospecto** hasta cerrar los pendientes de la norma: compromisos de servicio sin contrastar, «+85»
   sin fuente, datos de muestra sin rótulo en «Día a día» y logos de terceros sin verificar.
+
+## El caso Sky canónico (aprobado el 2026-10-15)
+
+El operador fijó una sola lámina del caso Sky para todos los decks: «Esa es la canónica para los deck, ok?» (canvas del
+brochure Agencia de Marketing 360°, 2026-10-15). Es un **uso aprobado de `decision-case`** (`approvedUses`), tema
+claro, línea `growth`: «¿Lo han hecho a escala? Sí, con Sky.», cuatro cifras del caso publicado (+2.000 piezas
+aprobadas · 39 campañas · 88 % entregas a tiempo · −25 % tiempo de producción) y el cursor «Contenido» sobre −25 %.
+
+- **Compone con:** `pnpm brand:compose -- --intent ai-generations/2026-10-09_deck-contenidos/intents/C12-caso-sky.json --out <carpeta> --artifact-id <id>`.
+  Foto: `ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png`.
+- **Reemplaza** a la lámina A12 del brochure Agencia Creativa (foto `SK1`, el ala por la ventana; el operador: «Esta
+  imagen que tiene esta lámina no refleja nada») y a la versión con `L1-mesa-de-luz` como foto del caso. Quedan como
+  historia; `L1-mesa-de-luz` sigue siendo plate de ejemplo de `contact-sheet`.
+- **Condiciones:** el avión es un montaje del PNG oficial de Sky sobre un cielo generado (revisar restricciones de la
+  librea antes de enviar a un prospecto) y el logo de Sky depende de la autorización de logos de clientes (TASK-1937).
 
 ## Anatomía de una receta (campos del JSON)
 

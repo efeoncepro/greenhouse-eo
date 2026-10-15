@@ -9294,6 +9294,53 @@
             "−57 % de carga comercial y +32 % de ventas en 7 meses los entregó el operador y no están en el artículo aprobado por ANAM: pendiente la autorización de ANAM antes de usar el brochure con prospectos. 5 rutas hacia una persona y 23 fuentes sí están en el caso publicado (efeoncepro.com, julio de 2026).",
             "Logo de ANAM sólo con su autorización de uso (TASK-1937)."
           ]
+        },
+        {
+          "approvedAt": "2026-10-15",
+          "approvedBy": "operador, 2026-10-15, en el canvas del brochure Agencia de Marketing 360° (https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3), sobre la lámina del caso Sky: «Esta lámina la tenemos con el avión de Sky el que es. Esta imagen que tiene esta lámina no refleja nada» y, con la lámina cambiada, «Esa es la canónica para los deck, ok?». Relatado por la sesión que arma el brochure.",
+          "deck": "Caso Sky canónico para todos los decks (nace en Marketing de Contenidos, línea growth)",
+          "line": "growth",
+          "slide": "C12-caso-sky · Marketing de Contenidos 5 · brochure 360 31",
+          "board": "canvas Deck Marketing de Contenidos y canvas Brochure Efeonce (versión 27)",
+          "document": "brochure · proposal",
+          "referenceSource": "ai-generations/2026-10-09_deck-contenidos/out/C12-caso-sky/01-deck-decision-case.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-09_deck-contenidos/intents/C12-caso-sky.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-09_deck-contenidos/intents/C12-caso-sky.json"
+          },
+          "content": {
+            "eyebrow": "Caso · 12 meses",
+            "question": "¿Lo han hecho a escala?",
+            "answer": "Sí, con Sky",
+            "clientLogo": {
+              "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+              "alt": "Sky Airline"
+            },
+            "stats": [
+              "+2.000 piezas aprobadas",
+              "39 campañas",
+              "88 % entregas a tiempo",
+              "−25 % tiempo de producción"
+            ],
+            "source": "caso publicado de Sky Airlines, métricas de entrega de 12 meses",
+            "selectedStat": 4
+          },
+          "photo": {
+            "register": "documental",
+            "plate": "ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png",
+            "alt": "Un Airbus A320neo de Sky asciende sobre un mar de nubes, con el cielo azul del amanecer"
+          },
+          "selection": {
+            "target": "object",
+            "label": "Contenido",
+            "participantKind": "department"
+          },
+          "fit": "Compuesta con la receta tal cual, tema claro, línea growth (la receta es sólo clara). La respuesta «Sí, con Sky» mide 11 de 11. Es la lámina canónica del caso Sky para TODOS los decks: un deck que muestre el caso Sky usa esta lámina y no otra foto. Reemplaza a A12 del brochure Agencia Creativa (foto SK1, el ala por la ventana) y a la versión con L1-mesa-de-luz del creativo v1, que quedan como historia.",
+          "conditions": [
+            "El avión es un montaje del PNG oficial de Sky (Airbus A320neo con su librea) sobre un cielo generado. Revisar las restricciones de uso de la librea de Sky antes de enviar a un prospecto (pendiente del LEEME del deck de Marketing de Contenidos).",
+            "El logo de Sky va con la autorización de uso de logos de clientes (TASK-1937).",
+            "Las cifras salen del caso publicado de Sky Airlines (12 meses de entrega); si el caso se actualiza, se actualizan aquí."
+          ]
         }
       ]
     },
