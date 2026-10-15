@@ -12,8 +12,10 @@
 de Efeonce. Desde el 2026-10-15 muestra el diseño aprobado por el operador, construido con 15 módulos
 propios de Elementor. El header y el footer son los mismos del resto del sitio.
 
-La página `/agencia-creativa-v2/` sigue existiendo como satélite, sin cambios y sin redirección. No es la
-landing vigente.
+La página `/agencia-creativa-v2/` es otra landing con otra intención: «producción creativa a escala» (cómo
+escalamos la producción, qué medimos, cómo lo medimos y qué logra la marca). Desde el 2026-10-15 está hecha con
+los mismos módulos editables de Elementor: nueve propios (`escala-*`) más el diagnóstico y el cierre, que comparte
+con esta página. Cambiar un módulo compartido cambia las dos landings. No hay redirección entre ellas; se enlazan.
 
 > Detalle técnico: identidad de la página, hashes y snapshot en el
 > [contrato técnico](../../architecture/public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md#identidad-y-estado-vigente).

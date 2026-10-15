@@ -18,8 +18,12 @@ Para editar el contenido de [`/agencia-creativa/`](https://efeoncepro.com/agenci
   [audit del rollout](../../audits/public-site/2026-10-15-agencia-creativa-elementor-rollout.md).
 - El checkout es compartido: corre `git status --short` en Greenhouse y en `efeonce-public-site-runtime`.
 - Para cualquier carril WP-CLI, corre primero `pnpm public-website:ssh-check`.
-- Confirma qué estás editando: `249582` es la landing vigente; `251279` (`/agencia-creativa-v2/`) es un
-  satélite que no se toca como parte de esta landing.
+- Confirma qué estás editando: `249582` es `/agencia-creativa/`; `251279` es `/agencia-creativa-v2/`
+  («producción creativa a escala»), con sus módulos `escala-*`. `diagnostico` y `cierre` son compartidos:
+  editarlos en Elementor afecta las dos páginas. La v2 se publica con `publish-creative-v2-page.php` y
+  `creativa-source/page-custom-v2.css`; antes de republicar, actualiza el hash previo que exige el script.
+- Al verificar, haz scroll real hasta cada sección: Elementor no pinta los fondos de un contenedor hasta que
+  entra en pantalla, así que una captura de página completa hecha deprisa muestra velos y pantallas vacías.
 
 ## Editar textos, imágenes y colecciones en Elementor
 

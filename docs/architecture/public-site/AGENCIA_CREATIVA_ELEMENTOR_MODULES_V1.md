@@ -228,3 +228,31 @@ chrome global sin cambios.
 - Widget v2 (`class-eo-creative-landing-module-widget.php`, desplegado con `build-creative-v2-widget-package.cjs` + `deploy-creative-v2-widget.php`, backup `/tmp/eo-creative-v2-widget-before-20261015-163953.tar`): H1 «Creatividad a escala que puedes ver operar.», fila índice «Producción creativa a escala», Service «Producción creativa a escala» con `mainEntityOfPage` al `@id` real de Yoast (antes `#webpage`, inexistente), y enlace desde su FAQ hacia /agencia-creativa/.
 - Enlace recíproco: el módulo `formatos` de /agencia-creativa/ suma «Mira cómo producimos a escala →» hacia la v2 (fuente `Main.dc.html` recompilada).
 - Verificado en HTML público: títulos distintos, OG nuevas servidas, grafos sin referencias colgando en ambas, enlaces cruzados, scrollWidth = viewport a 1440 y 390.
+
+## Delta 2026-10-15 — /agencia-creativa-v2/ reconstruida con el mismo sistema de módulos
+
+- **Qué cambió:** la v2 (página `251279`) dejó el widget `greenhouse_creative_landing_module` y ahora son 11 widgets
+  `creativaModule.v1`, compilados desde el canvas aprobado «Creatividad a escala» (`creativa-source/Escala.dc.html`):
+  `escala-hero`, `escala-problema`, `escala-motor`, `escala-cadena`, `escala-metricas`, `escala-logros`, `escala-studio`,
+  `escala-campana`, `diagnostico` y `cierre` (compartidos con /agencia-creativa/) y `escala-faq`.
+- **Mensaje:** cómo se escala la producción (un sistema, no más gente), qué se mide (FTR, RpA, OTD, CT, TTM), cómo se mide
+  (registro de cada pieza en Creative Studio) y el resultado: menos tiempo de producción, Time-to-Market más corto, la marca
+  intacta, con IA. Se conservan las animaciones del hero (lienzo) y del motor «Cómo trabajamos contigo»; el spot de
+  producción con IA es un loop recortado (sin el contador ficticio ni la tarjeta Globe) y el video anterior se mantiene.
+- **Código:** el compilador arma ambas landings (`LANDINGS`); las claves de módulo admiten guion y el widget se registra
+  como `greenhouse_creativa_escala_*`; el CSS de la v2 es el subconjunto del canvas tras el marcador `/* ---- v2`, añadido al
+  CSS generado. El allowlist del deploy acepta schemas con guion.
+- **Publicación:** `publish-creative-v2-page.php` + custom CSS `creativa-source/page-custom-v2.css`. Snapshot
+  `_gh_creative_v2_before_20261015_182612`; hash previo `84804acc…`, nuevo `83124650…`; thumbnail `249740` restaurado
+  (Elementor lo borra al guardar); Home y 249582 sin cambios; chrome global sin cambios. Paquete de plugin con backup
+  `/tmp/eo-creativa-widgets-before-20261015-182327.tar` en Kinsta.
+- **Verificado en vivo (1440 y 390):** 200, 11 widgets en orden, 0 tokens `%%…%%` sin resolver, `scrollWidth = clientWidth`,
+  un `h1`, los dos videos reproduciéndose, logo de Sky, formulario montado, JSON-LD Service «Producción creativa a escala» +
+  FAQPage 6/6, sin errores de consola.
+- **Trampa de QA:** Elementor «lazy load background images» aplica `background-image:none !important` a todo contenedor
+  sin `e-lazyloaded`. Una captura fullPage rápida muestra el muro de logros sin velo y las pantallas de Creative Studio
+  vacías; con scroll real hasta cada sección el velo y las imágenes cargan. Verificar así antes de reportar un fallo.
+- **Rollback:** restaurar el snapshot con `Document::save` (elementos + settings + metas) y purgar. El widget legacy sigue
+  registrado.
+- **Pendiente:** el cargador `class-eo-widgets-loader.php` está desplegado con las 24 clases, pero no está commiteado en el
+  repo runtime porque el archivo contiene WIP de otras sesiones; quien commitee ese archivo debe conservar la entrada creativa.
