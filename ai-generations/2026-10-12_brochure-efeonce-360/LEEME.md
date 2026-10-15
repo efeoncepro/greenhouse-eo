@@ -1,7 +1,7 @@
-# Brochure «Agencia de Marketing 360°» · 2026-10-12 (v7, 2026-10-15)
+# Brochure «Agencia de Marketing 360°» · 2026-10-12 (v8, 2026-10-15)
 
-Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 25). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v7.pdf`
-(copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v7/` (39, numeradas en el orden del recorrido).
+Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 26). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v8.pdf`
+(copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v8/` (39, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
 
@@ -65,7 +65,7 @@ el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): �
 - Zoho en «El que encaje»: confirmar si va en un brochure de grupo (recomendación de la sesión HubSpot: sacarlo).
 - «Partner oficial de» (29): readback de insignia pendiente para Adobe, AWS, Microsoft y Salesforce en EFEONCE_PARTNERSHIP_REGISTRY_V1.
 - Cifras sin fuente en la lámina: «+90 empresas» (28) y «+85 expertos más en Latam» (27). Cifras de Sky (caso, clientes y «Talento adentro» no): autorización de Sky para prospectos sin confirmar.
-- Acentos dentro de un tramo: 03 y 04 (teal, acto 1 en growth: bien); 22 y 23 llevan la marca azul de producto Insights dentro del tramo Growth (teal); revisar con la sesión de la línea gráfica.
+- Acentos dentro de un tramo: 03 y 04 (teal, acto 1 en growth); 22 y 23 recompuestas a mano en teal de Growth y fondo #001a33 (v8, regla registrada por la sesión de la línea gráfica el 2026-10-15: lo que viene de otra línea se recompone en el acento del tramo); 10 «Cuatro piezas» conserva el azul de Engine y pasa a fondo #001a33. Fuente: `render-src/native/` del deck SEO, recoloreadas y horneadas con su `shot.cjs`.
 - «Ya no» y «Ordenado» nombran a HubSpot en la bajada: válidas sólo dentro del tramo Revenue (están ahí).
 - Karo aparece en la portada Brand (CR4) y en «Talento adentro» (SA1): dos tomas con la misma persona; el peer creativo pide máximo una de sus tres láminas con Karo (se tomó sólo A19).
 - Portadas Voice (15) y Brand (11): plates aprobados antes de la regla «el acento es puntuación, no luz»; no se regeneraron.
