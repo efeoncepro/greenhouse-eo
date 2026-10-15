@@ -29,6 +29,21 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ## Cuándo invocar
 
 - Descubrir/filtrar oportunidades de compra pública o privada (radar comercial).
+  Cargar la [guía de primera entrada y alertas tempranas](../../../docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md):
+  interés/credenciales/inscripción/visita antes del cierre final; señal primaria con acción útil al operador
+  sin esperar el RFP completo, sin certificar elegibilidad ni enviar automáticamente. Separar descubrimiento
+  amplio y vigilancia de conocidos, público/privado por Chile/Colombia/México/Perú y nonprofit aparte;
+  LATAM primero y Palm Desert condicionado. Solape mínimo de 72 horas ampliable por indexación tardía
+  acreditada; prechequear identidad canónica/URL y bloqueos sin avanzar marcadores si falla.
+  Registrar publicación, disponibilidad pública, detección, validación, aviso y margen útil por separado;
+  menos de cinco días hábiles a la primera puerta muestra «detección tardía». No usar alta CRM como detección.
+  No prometer exhaustividad ni modificar frecuencia, suscripciones o permisos por actualizar esta guía.
+  [Socopur 2027](../../../docs/commercial/tenders/socopur-agencia-marketing-digital-2027/README.md):
+  entrada tardía cerrada por respuesta 15/10 16:54:36 UTC; sin inferir adjudicación o invitación futura.
+  Corrección directa de Julio, 15/10/2026 17:51 UTC: detección **06/10/2026**, sin hora/zona; interés
+  cerrado **05/10**: un día calendario después, no 24 horas exactas. Radar horario y alta CRM del 10/10
+  son posteriores y no explican la tardanza del día 6; publicación, disponibilidad/indexación inicial,
+  primer aviso exacto y causa sin acreditar. Mantener los cortes anteriores como históricos.
 - Calificar una solicitud pública de proveedor y preparar su abordaje según fecha, estado y rol →
   `prospect-intent-segmentation.md`; la operación de cohortes/segmentos pertenece a `hubspot-as-a-service`.
 - Decidir si Efeonce participa: screening + **bid/no-bid con margen sobre loaded cost**.

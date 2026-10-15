@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "layout": "line",
+  "voice": {
+    "eyebrow": "Brochure · Agencia de medios",
+    "question": "¿Dónde invierto?",
+    "answer": [
+      "Donde rinde"
+    ]
+  },
+  "body": "**Cinco** frentes, una sola responsabilidad:\nEstrategia · Compra · Creatividad\nMedición · Gestión de inversión",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png",
+    "alt": "Una líder de medios de Efeonce con la chaqueta sostiene una esfera de luz naranja de la que salen haces hacia muchas pantallas"
+  },
+  "column": {
+    "topPx": 300
+  }
+}

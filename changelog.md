@@ -65,6 +65,14 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
   ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
 
+## 2026-10-13 — Radar comercial con registro por corrida
+
+- Automatización existente convertida a tarea nueva diaria en greenhouse-eo, conservando 09:00 Santiago.
+- [Contrato y ledger](docs/commercial/prospecting-agent/README.md): búsquedas saneadas en repo, datos privados separados,
+  cinco líneas × cuatro mercados; nuevas convocatorias para postular dentro de la misma semana calendario.
+- INTURSA y Alfin registradas bajo autorización; cuatro contactos verificados vía Apollo. Históricos tratados como
+  prospección futura. No Deals, notas ni envíos nuevos. Próxima ejecución programada todavía no observada.
+
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 
 - 15/10: [Socopur](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md), seguimiento puntual autorizado a Katherine con firma gráfica/PDF y EMAIL `118603198768` SENT asociado. Dossier y registros conciliados; Prospecting/HubSpot Codex-Claude precisan decisión por historial de cuenta, aporte nuevo y verificación de reply/adjunto/CRM. Sin admisión, secuencia o nuevo permiso futuro.
@@ -82,6 +90,7 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - [Módulo de secuencias en Prospecting](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md),
   routing, cadencia/mensaje/respuesta/entregabilidad, template, manual y adapter HubSpot espejados.
   Fixtures v9 P51–P55 cubren plataforma, autorización, programación, personalización y evidencia; sin nueva ejecución externa.
+- [Política de seguimiento a largo plazo](docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) aprobada: proveedor vigente, revisión interna a seis meses sin hito, nutrición con permiso y reactivación autorizada. Skills espejo/fixtures v11 y seguimiento existentes actualizados; tareas comerciales en HubSpot por corrección de Julio. Fabrimetal: TASK 118419088700 para 13/04/2027 09:00 Chile, duplicado Notion Cancelado y nota CRM conciliada, sin envío.
 
 ## 2026-10-12 — Propuesta de campaña creativa: playbook y skills
 
@@ -563,14 +572,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
   el plate y Sunburst por instrucción borran limpio (Flare con máscara y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
   `expand` usa Flux Fill por defecto (Flare reencuadra, Sunburst copia el relleno en espejo). Herramienta out-of-band.
 - Slice 2 (`foto:expandir` sobre el núcleo) pasa a TASK-1925; BFL FLUX Tools (Outpainting, Erase) queda como follow-up.
-
-## 2026-10-02 — Login V4 premium y novedades del login (TASK-1963, TASK-1964)
-
-- Novedades del login gobernadas: tabla `greenhouse_core.login_announcements` (migración aplicada en la instancia
-  compartida), reader `listActiveLoginAnnouncements` (hasta 3 publicadas y vigentes por prioridad), `GET
-  /api/public/login-announcements` y API admin con `login_announcements.manage`. Vigentes: Engine, Brand y Growth.
-- `/login` pasa al V4 premium en develop/staging: formulario sobre papel con Efeonce como marca principal, escenario con
-  fotos producidas, lente reconstruida al canon de AXIS y anclada al sujeto, voz con anillo y esfera, transición «La
-  lente te lleva adentro» y mejoras de contraste en avisos y alertas. No está en producción; `pnpm test` completo pendiente.
-- Canon de foto y skills: la referencia de cara del equipo pasa al avatar con la bomber; personajes de casting con retrato ancla (piel v3) antes de la escena; casebook cine (fallas 14–20, `LG1`/`LG2e` como recetas), registro cine (excepción del login), guía de modelos, regla `brand-photography` y `efeonce-graphic-line` (lecciones, ledger, aplicación §A12) actualizados.
-- Docs: [funcional](docs/documentation/identity/novedades-del-login.md) y [manual](docs/manual-de-uso/identity/administrar-novedades-del-login.md).

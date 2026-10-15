@@ -48,9 +48,26 @@ Julio aprobó la [estructura en Prospección](.codex/skills/efeonce-b2b-prospect
 
 [Socopur 15/10](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md): reply autorizado sólo a Katherine 07:13 Chile; firma gráfica/PDF y EMAIL `118603198768` SENT asociado verificados. Esperar respuesta sobre admisión; sin próximo envío. Método y registros actualizados, WIP ajeno preservado.
 
+**Actualización posterior, 16:54:36 UTC:** [Katherine confirmó cierre](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md)
+para nuevas postulaciones/propuestas de este período; resuelve la espera anterior. Credenciales guardadas
+sin fecha/invitación ni adjudicación inferidas. [Guía del radar](docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md)
+y skills espejo actualizados: primera puerta, señales tempranas, solape72h y tiempos separados;
+[verificación](docs/audits/commercial/2026-10-15-socopur-radar-docs-skills.md). Sólo docs del proyecto,
+sin CRM/envíos/código ni cambios de automatización. Adopción real y causa de tardanza sin verificar.
+Skill personal: dos playbooks de acción/frescura actualizados por aprobación puntual del entorno;
+SKILL.md intacto, sin cambio de permisos persistentes o automatización. Bloqueo de escritura resuelto.
+Corrección directa de Julio 15/10 17:51 UTC: detección 06/10/2026 sin hora/zona, un día calendario tras
+cierre de interés 05/10, no 24 horas exactas. Radar horario/CRM del 10/10 posteriores, sin explicar esa tardanza.
+
 ## 2026-10-14 — Footer público: composición compacta
 
 [Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
+
+## 2026-10-14 — LicitaLAB: radar público y conciliación CRM
+
+[Expediente del corte](docs/commercial/tenders/licitalab-actualizacion-2026-10-14/README.md): 1.142 códigos únicos revisados por perfil y keywords; 72 candidatas con lectura dirigida. Catorce bajas administrativas de plazo verificadas en HubSpot, dos prórrogas y UTEM preservada. 30 Deals nuevos y 3 RFI en Company + nota, con doble readback; cada alta conserva calificación/GO pendientes. Índices CRM y seguimiento local conciliados; historia y WIP ajeno preservados. No envío ni postulación.
+
+[Paquetes y pendientes](docs/commercial/tenders/licitalab-actualizacion-2026-10-14/PREPARACION-SUBDERE-TARAPACA.md): bases81/56p leídas, técnica/económica y anexos borradores en OneDrive canónico. Repo sólo trazabilidad liviana; sin binarios ni snapshots pesados. SUBDERE14.994MIVA candidato; Tarapacá cuatro unitarios/CPT5.355M, bolsa6.204Msin mínimos. Equipo, idoneidad, costo completo y subcontratación pendientes; sin GO, firmas ni envío.
 
 ## 2026-10-14 — Medición escalable, CAPI y agentes publicados
 
@@ -90,6 +107,21 @@ ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado
 El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
 WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
 Panel/categorías/GPC verificados; QA intercepta transporte y no prueba nuevas recepciones Meta. [Rotación CLI 14/10](docs/audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json): anterior revocada/403; nueva CLI/proyectos200, dos fuentes0600 y GitHub actualizados, wrappers retirados; vence14/10/2027. Sin nuevo workflow/deploy.
+
+## 2026-10-13 — Fabrimetal: continuidad de largo plazo
+
+[Política aprobada](docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) y [caso](docs/commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md): proveedor vigente,
+comunicaciones detenidas y TASK HubSpot **118419088700**, **13/04/2027 09:00 Chile**, asignada a Julio/releída; duplicado Notion Cancelado.
+Nutrición por email pendiente de permiso; recontacto requiere razón nueva y autorización. Skills espejo y
+seguimiento conservan la cola futura aunque cambie el mes. Acuse puntual 13/10 enviado y EMAIL SENT verificado; cadencia detenida.
+
+## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
+
+[Contrato y registro](docs/commercial/prospecting-agent/README.md): mismo scheduler convertido a cron ACTIVE,
+09:00 Santiago, tarea nueva por corrida en greenhouse-eo y consultas saneadas en repo. Nuevas convocatorias
+para postular sólo de la semana calendario; cinco líneas × cuatro mercados. Históricos para credenciales.
+INTURSA/Alfin: altas autorizadas de dos empresas y cuatro contactos; detalles privados y [reporte](docs/commercial/prospecting-agent/runs/2026-10-13-privadas.md).
+Primera corrida futura aún no observada. Sin nuevos envíos ni Deals; no commit automático.
 
 ## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
 
@@ -258,23 +290,3 @@ Actualización posterior aprobada: módulo HubSpot con familias de captura, plan
 [Ampliación operativa de prospección](docs/audits/commercial/2026-10-11-prospecting-operational-modules-update.md): cuatro mejoras aprobadas e incorporadas a skills/espejos: adapter HubSpot con changeset/readback y roles por iniciativa, capacidad/costo por owner/período, discovery/proof por oferta/función y aprendizaje/vigencia. Fixtures v4 preservan 26 casos y añaden cuatro; revisión/validación del alcance registrada en auditoría. Método sin nuevo software/API de gráfico, activación beta, schema, gastos, CRM, envíos ni scheduler.
 
 [Recorridos y entregabilidad](docs/audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md): cinco módulos aprobados y repartidos entre tres subagentes; señal→acción, entradas por situación, cadencia, respuestas y preparación de entrega. Plantillas/routing Commercial y fixtures v5 (40, 30 previos conservados) incorporados. Verificación y límites en auditoría; ningún piloto ni acción externa iniciados.
-
-## 2026-10-11 — Contactos conocidos de banca y retail
-
-Contrato vigente de [prospección B2B](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#gate-previo-al-alta-correo-y-contactos-adyacentes): objetivo + 2–3 adicionales como base ampliable por roles/riesgos; no dar de alta contactos sin correo corporativo individual verificado. Docs y skills Codex/Claude actualizadas; los registros sin correo descritos abajo son históricos. Sin migración ni cambios live por esta actualización.
-
-[Bancos Chile](docs/commercial/prospects/bancos-chile-2026-10/README.md): 22 Contact adicionales (18 nuevos, cuatro reutilizados) de 11 bancos; 20 con correo, Arturo/Isabel sin correo. ACTIVE **188** reúne esos 20 y ocho conocidos de BCI/BICE/Itaú: **28 personas de 14 bancos**, definición ACTIVE y conjunto completo verificados. Focos SEO/web de Luisa/Carolina/Rafael/Natalia en notas, sin fit forzado. Antes de contacto: validación conflictiva de Andrés/María Beatriz, vigencia de Cristian y campos pendientes. Sin envíos ni Deals nuevos.
-
-[BCI, BICE, Cencosud e Itaú](docs/commercial/prospects/contactos-conocidos-banca-retail-2026-10/README.md): 12 contactos en HubSpot (10 nuevos, 2 reutilizados), cinco Company existentes, focos por persona y segmentos 180–187 verificados para este intake. Luisa: SEO de sitios públicos; Pamela/Felipe del Sante: creativo. Owner Julio; sin outreach ni nuevos Deals.
-
-Antes de contactar: resolver validación contradictoria del correo de Andrés, correo histórico de Pablo (Primary Mercado Libre) y roles/permanencia de Cencosud. Correos/evidencia en CRM y expediente local indicado en el dossier. Apollo consumió seis créditos autorizados; nuevas revelaciones requieren su propio alcance aprobado.
-
-
-
-## 2026-10-09 — CRM y Talent Assurance
-
-[Ads✓](docs/README.md)
-
-[CRM](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md): aprobado; pendiente.
-
-**Pibank:** [v13 enviada 09-10](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md).

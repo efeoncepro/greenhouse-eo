@@ -1,0 +1,12 @@
+{
+ "id": "R3-contenido",
+ "formato": "4:5",
+ "impacto": true,
+ "palanca": "instrumento",
+ "instrumento": "the rear monitor of a cinema camera rigged on a gimbal",
+ "escena": "SCENE (documentary, a real photograph during a content shoot in a small, dark studio set in Santiago): we look over the shoulder of the camera operator, who is entirely out of frame except for a blurred edge of a sleeve, straight into the bright rear monitor of a compact cinema camera on a gimbal. Inside the monitor, razor sharp: the take itself, a vertical 9:16 frame of a fictitious cold-brew coffee can sweating on a slab of dark stone, caught at the instant a hand closes around it and lifts it a few millimetres off the stone, side light, with the framing guides of the monitor overlaid as thin white lines. Beyond the monitor, out of focus, the real set: the same stone slab and can under one small softbox, a matte black flag, a coiled cable, and an LED tube glowing cool blue at the back of the set. ONE tiny point on the monitor, the record indicator, glows vivid orange (#FF6500), the only warm accent in the frame. The monitor's own glow lights the gimbal handles and the operator's out-of-focus sleeve. Camera about sixty centimetres behind the monitor, 50mm f/1.8, the monitor frame filling the centre of the picture. Current-generation equipment only, nothing vintage. Real sensor grain, genuine depth of field. No readable text, no brand names, no logos of any brand on the can, the camera or the monitor.",
+ "lecho": {
+  "objeto": "the dark out-of-focus rubber grip of the gimbal handle crossing the bottom of the frame, outside the monitor's glow",
+  "tono": "DARK near black"
+ }
+}

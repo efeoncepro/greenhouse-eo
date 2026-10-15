@@ -60,6 +60,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Seleccionar intensidad/inversión y coordinar ABM/ABS | [abm-and-abs](references/abm-and-abs.md) + Digital Marketing/Commercial según fase |
 | Clasificar relación, demanda, proceso y modo | [motions-and-relationship](references/motions-and-relationship.md) |
 | Descubrir o verificar entidad, fit y señales | [account-research-and-signals](references/account-research-and-signals.md) + Customer Model |
+| Radar de convocatorias, primera entrada y alertas tempranas | [guía compartida del radar](../../../docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) + Tenders; descubrimiento amplio y vigilancia de conocidos separados |
 | Encontrar objetivo, adyacentes y rutas de acceso | [buying-group-and-access](references/buying-group-and-access.md) |
 | Conseguir y evaluar datos accionables | [contact-quality-and-enrichment](references/contact-quality-and-enrichment.md) |
 | Preparar acercamiento, correo robusto de Julio o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) ([estructura preferida](references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio)) + Copywriting/práctica |
@@ -74,6 +75,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Coordinar personas, canales, pasos y pausas de una cuenta | [account-cadence](references/account-cadence.md) |
 | Programar seguimientos personalizados por email | [hubspot-follow-up-sequences](references/hubspot-follow-up-sequences.md) + HubSpot; preferencia de Julio: HubSpot, no Apollo |
 | Clasificar respuesta y preparar revisión o handoff | [response-handling](references/response-handling.md) + Commercial |
+| Conservar cuentas con proveedor actual y definir revisión/nutrición | [política de largo plazo](../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) + [response-handling](references/response-handling.md); TASK comercial en HubSpot, revisión distinta de recontacto |
 | Comprobar preparación de entrega antes de envío autorizado | [deliverability-operations](references/deliverability-operations.md) + owner del canal |
 | Diseñar un piloto o revisar resultados | [experiments-and-learning](references/experiments-and-learning.md) |
 | Verificar sustento técnico/mercado o incorporar Sales | [sources](references/sources.md) |
@@ -154,6 +156,21 @@ paso con responsable. Si sólo hubo investigación, no afirmes registro, contact
 Fuentes y cobertura deben indicar conjunto, consultas, fecha, límites y campos aportados.
 
 El radar `hubspot-saas-prospecting` conserva HSP, matriz, reporte diario, scheduler y datos locales privados.
+Para convocatorias aplicar la [guía de primera entrada](../../../docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md):
+priorizar interés, credenciales, inscripción o visita además del cierre final; avisar señales tempranas
+documentadas con acción útil al operador sin esperar el RFP ni certificar elegibilidad. Mantener carriles
+públicos/privados independientes por Chile, Colombia, México y Perú, nonprofit aparte, LATAM primero y
+Palm Desert condicionado. Solape de lectura mínimo de 72 horas, ampliado ante indexación tardía acreditada;
+prechequear identidad canónica y URL contra bloqueos, sin reintentos equivalentes ni avance de marcadores
+si falla. Registrar publicación, disponibilidad pública, detección, validación, aviso y margen útil
+por separado; alta CRM no es primera detección. Menos de cinco días hábiles hasta la primera puerta
+muestra «detección tardía». Socopur 2027 quedó cerrado para entrada tardía por respuesta del 15/10
+16:54:36 UTC; conservar credenciales no promete fecha/invitación ni prueba adjudicación. Guía documental,
+sin cambiar frecuencia, permisos, suscripciones o automatizaciones ni prometer exhaustividad.
+Corrección directa de Julio, 15/10/2026 17:51 UTC: Socopur se detectó el **06/10/2026**, sin hora/zona
+acreditadas, un día calendario después del cierre de interés del **05/10**; no son 24 horas exactas.
+Radar horario y alta CRM del 10/10 son posteriores y no explican la tardanza del día 6. Publicación,
+disponibilidad/indexación inicial, primer aviso exacto y causa siguen sin acreditar; conservar cortes históricos.
 Vive en la instalación personal de Codex: en una sesión donde no esté cargado, dilo y entrega la cuenta con
 este método, sin simular sus IDs ni su reporte. No migres su historial ni crees automatizaciones como efecto
 de usar el núcleo compartido.

@@ -13,7 +13,10 @@ Autorización: solicitud explícita del operador de alertas, borradores, tareas 
 
 Este agente de Codex revisa el trabajo comercial existente. Complementa el radar diario de prospección HubSpot; no lo sustituye ni duplica. No depende de créditos de Breeze. El scheduler vive en la app Codex, no en producción Greenhouse.
 
-HubSpot es la fuente de objetos y etapas comerciales; Notion de tareas; Outlook de comunicaciones. Las bases, ficha y anuncios vigentes del comprador gobiernan plazos y admisibilidad. Markdown guarda evidencia observada, decisiones y continuidad, no es un CRM alternativo.
+HubSpot es la fuente de objetos, etapas y **tareas comerciales**; Notion de trabajo operativo y
+entregables; Outlook de comunicaciones. Revisiones de cuenta, follow-ups, llamadas y próximos pasos
+comerciales nuevos se crean/reutilizan como TASK de HubSpot. Los históricos Notion se conservan, sin
+migración masiva ni duplicados por defecto. Las bases, ficha y anuncios vigentes del comprador gobiernan plazos y admisibilidad. Markdown guarda evidencia observada, decisiones y continuidad, no es un CRM alternativo.
 
 ## Seguimiento de correos manuales
 
@@ -26,15 +29,26 @@ excluido por Julio. Mandato posterior: [18 seguimientos programados en HubSpot](
 para el 16/22/29 de octubre; seis inscripciones `Programado` verificadas, parada por respuesta. No duplicarlos
 desde el heartbeat ni usar Apollo. Esta autorización es acotada y no amplía la autonomía general.
 
+## Seguimiento de largo plazo
+
+Aplicar la [política aceptada](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md): conservar cuenta con encaje,
+proveedor/motivo y restricciones; seis meses de revisión interna para proveedor recién contratado sin hito.
+Recuperar las TASK de HubSpot abiertas de largo plazo por ID/clave de `state.json.actions`, aunque no haya lead/correo
+reciente o termine el proyecto de origen. No crear otra por cambiar de mes. Mantenerlas como espera futura
+hasta la ventana de siete días, salvo señal pertinente; sin alertas reiteradas, borrador ni envío automático.
+Al vencer, decidir continuidad con evidencia actual; nutrición por email requiere permiso verificable y
+mandato, y recontacto nueva autorización dentro de las restricciones. [Fabrimetal](runs/2026-10-13-fabrimetal-respuesta-parada.md)
+es el primer caso con revisión interna 13/04/2027; comunicaciones siguen detenidas.
+
 ## Cada ejecución
 
-1. Leer AGENTS.md, project_context.md, Handoff.md, este contrato, REGISTRO.md y state.json. Cargar hubspot-as-a-service, greenhouse-public-private-tenders, notion-platform y documentación comercial pertinente.
-2. Confirmar fecha/hora America/Santiago, portal HubSpot 48713323, identidad y mailbox Outlook jreyes@efeoncepro.com. Leer todos los pipelines; paginar hasta agotar todos los negocios abiertos. Revisar también investigación reciente sin Deal, leads y compromisos de los últimos 14 días; incluir propuestas cerradas solo si dejan un compromiso pendiente verificado.
+1. Leer AGENTS.md, project_context.md, Handoff.md, este contrato, REGISTRO.md y state.json. Cargar hubspot-as-a-service, greenhouse-public-private-tenders y documentación comercial pertinente; notion-platform si hay trabajo operativo, entregables o históricos Notion que consultar.
+2. Confirmar fecha/hora America/Santiago, portal HubSpot 48713323, identidad y mailbox Outlook jreyes@efeoncepro.com. Leer todos los pipelines; paginar hasta agotar todos los negocios abiertos. Recuperar además todas las revisiones internas futuras abiertas del ledger por ID/clave, independientemente del mes/proyecto de origen. Revisar también investigación reciente sin Deal, leads y compromisos de los últimos 14 días; incluir propuestas cerradas solo si dejan un compromiso pendiente verificado.
 3. Cruzar descripción, hs_next_step, fecha_de_cierre_de_licitacion, notes_next_activity_date y cambios recientes. closedate es forecast, nunca deadline de oferta. Leer las notas/hilos/documentos que cambien la decisión. Buscar Outlook desde el último corte exitoso con 48h de solapamiento; primera recuperación usa 14 días. Paginar y declarar cobertura parcial cuando proceda.
 4. Buscar respuestas, enviados, borradores y tareas previas antes de proponer un envío. Leer el último mensaje real completo; resumen IA no prevalece sobre respuesta directa del comprador. Respetar rechazos, opt-outs, NO-BID, HOLD y límites de propuesta.
 5. Revalidar cambios de fechas en LicitaLAB/Mercado Público/Wherex o correos oficiales. Mantener fecha original, zona, fuente y observación. Si hay conflicto, alertar y pedir validación con margen conservador; nunca inventar UTC. Un cierre vencido no prueba pérdida ni postulación.
 6. Priorizar: plazo vencido con acción sin conciliar; cierre/compromiso antes de la siguiente revisión; <=24h; <=72h; <=7d; después preparación. Anticipar lunes y fin de semana en el corte del viernes. Si el plazo cae a las 09:00, resolver el día hábil anterior. La fecha interna recomendada se etiqueta distinta del plazo del cliente. La cadencia es lunes–viernes; no se omiten festivos automáticamente.
-7. Crear o actualizar tareas necesarias en el teamspace Efeonce Comercial, data source 2a539c2f-efe7-8177-a02d-000b4e8604c0, tras fetch de schema. Responsable Julio 98be6859-4b84-4dee-a8f2-5546d770c44b. Proyecto octubre 3f339c2f-efe7-816a-b5b2-d29551199c43; al cambiar mes, descubrir/reusar el proyecto comercial vigente antes de crear el mensual equivalente. Incluir objetivo, DoD, contexto, fuentes, deadline externo, fecha interna, bloqueo y siguiente paso.
+7. Crear/reutilizar **TASK comerciales en HubSpot portal 48713323**, tras verificar identidad, permiso TASK read/write, enums y owner (Julio 75788512, revalidar). Incluir objetivo, criterios de revisión, contexto/fuentes, fecha del equipo vs deadline externo, bloqueo y siguiente paso; asociar registros Contact/Company/Deal existentes pertinentes. Buscar duplicados y leer contenido/estado/fecha/owner/asociaciones después. Notion data source 2a539c2f-efe7-8177-a02d-000b4e8604c0 conserva trabajo operativo/entregables y tareas históricas; no crear allí duplicado de la tarea comercial ni migrar otros históricos en lote.
 8. Aplicar la [política de firma oficial completa y CCO HubSpot](../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) a borradores de Julio: CCO `48713323@bcc.hubspot.com`; usar firma completa en texto para conector o firma gráfica oficial para Outlook UI; un borrador sin firma sigue incompleto. No amplía la autorización del agente. Preparar borradores personalizados cuando haya contexto suficiente. Reutilizar hilo original y destinatarios verificados. No inventar adjuntos, reuniones, credenciales, experiencia, precios, garantía de resultados ni autoridad de compra. Si Outlook permite guardar, crear borrador y leerlo de vuelta; si devuelve 403, registrar el texto en la tarea/Markdown, sin reintentos repetidos ni escalación de permisos. No sobrescribir borradores humanos; conservarlos y sugerir ajustes en la tarea.
 9. Verificar cada escritura por lectura independiente y registrar resultado/ID. No cerrar tareas por haber creado un archivo: requiere evidencia de la DoD. Si hay respuesta pero falta acción, cambiar la recomendación sin dar el trabajo por terminado. No modificar campos humanos ajenos al seguimiento.
 10. Actualizar REGISTRO.md y state.json, añadir una entrada fechada de ejecución con cobertura, cambios, IDs, borradores, alertas y bloqueos. Preservar historia; archivarla con enlace si crece. En checkout compartido, releer antes de editar y preservar cambios ajenos.
@@ -46,7 +60,7 @@ Clave estable: followup:<deal-id o código licitación o cuenta>:<acción-semán
 
 Tras timeout/resultado incierto de una escritura, buscar y leer antes de reintentar. Registrar proposed, attempted, created, verified, blocked o unknown de forma honesta. No duplicar alertas como hallazgos nuevos; un riesgo crítico abierto puede repetirse con su ID y estado.
 
-Autorizado de forma recurrente: lectura, investigación, tareas comerciales, borradores sin envío, documentación local. Prohibido sin nuevo mandato: enviar/programar emails, mensajes externos, secuencias/Prospecting Agent, presentar ofertas, cambiar CRM/etapas/segmentos, crear Deals, compras/créditos, cambios de permisos, borrados y commits/push.
+Autorizado de forma recurrente: lectura, investigación, crear/actualizar TASK comerciales en HubSpot y asociarlas a registros existentes verificados, borradores sin envío y documentación local. Prohibido sin nuevo mandato: enviar/programar emails, mensajes externos, secuencias/Prospecting Agent, presentar ofertas, cambiar otros objetos CRM/etapas/segmentos, crear Contact/Company/Lead/Deal, compras/créditos, permisos, borrados y commits/push. La TASK no crea autoridad de contacto; sólo se marca completada con evidencia de su resultado.
 
 Criterio del operador sobre postulaciones por plataforma (08/10/2026): en licitaciones por plataforma en general —Wherex, Mercado Público y oportunidades consultadas mediante LicitaLAB conectado con Mercado Público—, no exigir conversación o respuesta previa del comprador como condición automática para preparar la oferta. Buscar contacto del proceso/canal de preguntas disponible; si no existe, registrar esa limitación y trabajar con bases y supuestos acordados. No repetir aclaraciones imposibles como bloqueos. Facturación/soporte no son interlocutores del proceso. [Detalle y búsqueda UTEM](../EFEONCE_DATOS_PARA_LICITACIONES.md#operación-por-plataforma-y-contacto-previo--criterio-de-julio-08102026).
 

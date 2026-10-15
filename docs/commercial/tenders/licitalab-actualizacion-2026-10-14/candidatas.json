@@ -1,0 +1,4969 @@
+{
+  "date": "2026-10-14",
+  "timezone": "America/Santiago",
+  "nature": "public_opportunity",
+  "registration": "Deals explícitamente autorizados; precio y GO no aprobados",
+  "records": [
+    {
+      "code": "5504-368-COT26",
+      "buyer": "UNIVERSIDAD DE CHILE",
+      "buyer_tax_number": "60.910.000-1",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T14:11:00.000Z",
+      "deadline_local": "15-10-2026 11:11",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Agencia EPEC/FCEI: estrategia, Meta Ads, diseño y HTML, más 21 reels durante 7 meses.",
+      "fit": "alto",
+      "risks": [
+        "Fee máximo CLP 2.450.000 IVA por siete meses; pauta mínima 4.400.000; experiencia en universidades públicas y postgrados. Resolver tributación de pauta y fecha de informe contradictoria.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "requerimiento publicidad Postgrado (1)-firmado (1)-firmado.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "requerimiento publicidad Postgrado (1)-firmado (1)-firmado.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "requerimiento publicidad Postgrado (1)-firmado (1)-firmado.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/5504-368-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "existing_workspace": "docs/commercial/tenders/uchile-fcei-agencia-2026/REQUISITOS.md",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "31779716469",
+        "note_id": "118499981197",
+        "deal_id": "65963504256",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "5586-157-LE26",
+      "buyer": "UNIVERSIDAD DE LA FRONTERA",
+      "buyer_tax_number": "87.912.900-1",
+      "budget": 9700000,
+      "currency": "CLP",
+      "deadline": "2026-10-16T18:00:00.000Z",
+      "deadline_local": "16-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "UFRO salud mental: identidad visual, plantillas digitales y reels, dossier, impresos y merchandising.",
+      "fit": "alto mixto",
+      "risks": [
+        "Veinte días corridos y cuatro visitas presenciales. Impresión y merchandising incluidos requieren proveedor y costeo. Subcontratación permitida.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ANEXOS SEC 4205.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 33,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 36,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 3,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/5586-157-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59085575939",
+        "note_id": "118504352558",
+        "deal_id": "65972505911",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1422259-10-LE26",
+      "buyer": "CORPORACION REGIONAL DE DESARROLLO DE LA REGION DE TARAPACA",
+      "buyer_tax_number": "65.042.904-4",
+      "budget": 20960141,
+      "currency": "CLP",
+      "deadline": "2026-10-20T18:00:00.000Z",
+      "deadline_local": "20-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Tarapacá: adjudicación independiente por línea; priorizar línea 2 de RRSS y videos corporativos.",
+      "fit": "alto por línea 2",
+      "risks": [
+        "Línea 2 CLP 6.204.000 IVA; línea 1 CLP 14.756.141 IVA. Bolsa total no equivale a fee. Cantidades, canales y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 52,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 24,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.2 ANEXO TECNICO DE OFERTA - LINEA 1 DIARIO Y RADIO.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.1 ANEXO ADMINISTRATIVO - LIC PLAN DE MEDIOS 1422259-10-LE26.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.6 ANEXO ADMINISTRATIVO - EN CASO DE OFERTAR COMO UTP.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 54,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 49,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 50,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 23,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 6,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1422259-10-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "budget_source": "Suma de bolsas líneas 1 y 2, RESOL 42/2026 p 5, impuestos incluidos",
+      "selected_line": "2 RRSS/videos corporativos",
+      "selected_line_budget": 6204000,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59204234842",
+        "note_id": "118503738627",
+        "deal_id": "65958079532",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1412-27-COT26",
+      "buyer": "Comité SEP",
+      "buyer_tax_number": "61.933.600-3",
+      "budget": 600000,
+      "currency": "CLP",
+      "deadline": "2026-10-19T18:00:00.000Z",
+      "deadline_local": "19-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SEP/CORFO: portada, lomo, contraportada y 50–65 páginas de 2 capítulos; integrar 282 páginas existentes; PDF de imprenta y digital interactivo.",
+      "fit": "alto diseño editorial",
+      "risks": [
+        "CLP 600.000 impuestos incluidos; quince días hábiles. Título, experiencia respaldada, anexos y cronograma. Carga alta respecto del ticket.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo N° 1 Diseño libro.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Declaración Jurada Pacto de Integridad.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 3,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1412-27-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59203151532",
+        "note_id": "118495485586",
+        "deal_id": "65965670767",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "2307-486-COT26",
+      "buyer": "I MUNICIPALIDAD DE OSORNO",
+      "buyer_tax_number": "69.210.100-6",
+      "budget": 600000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T13:00:00.000Z",
+      "deadline_local": "15-10-2026 10:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Osorno Ovejería: edición de 10 cápsulas educativas con subtítulos, Full HD,16:9, intro/outro, gráficos y B-roll; insumos grabados octubre-noviembre.",
+      "fit": "alto edición audiovisual",
+      "risks": [
+        "CLP 600.000. Confirmar duración de cápsulas, insumos y revisiones; edición en noviembre y entrega un mes después. No asumir rodaje incluido.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "EETT servicio de edición audiovisual Ovejeria.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/2307-486-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59202377804",
+        "note_id": "118495336770",
+        "deal_id": "65977310220",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "3030-442-COT26",
+      "buyer": "ILUSTRE MUNICIPALIDAD DE RETIRO",
+      "buyer_tax_number": "69.130.800-6",
+      "budget": 2000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T15:30:00.000Z",
+      "deadline_local": "14-10-2026 12:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Retiro/CESFAM: VPS, hosting, correo institucional, web y servicios complementarios con arquitectura cloud distribuida.",
+      "fit": "alto infraestructura condicionado",
+      "risks": [
+        "Arquitectura multi-nodo desacoplada excluyente; solución monolítica prohibida. Aislamiento y límites CPU/RAM/IOPS. No afirmar cumplimiento ni que se pide Google Cloud por marca.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "339.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/3030-442-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59194210991",
+        "note_id": "118515365974",
+        "deal_id": "65965976665",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1439282-6-COT26",
+      "buyer": "FUNDACION CHILENA DEL PACIFICO",
+      "buyer_tax_number": "72.695.900-5",
+      "budget": 900,
+      "currency": "USD",
+      "deadline": "2026-10-14T18:00:00.000Z",
+      "deadline_local": "14-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Fundación Chilena del Pacífico: memoria 2026 digital interactiva con índice, enlaces y material multimedia.",
+      "fit": "alto diseño",
+      "risks": [
+        "USD 900. Más de diez años de diseño similar como requisito, pero matriz evalúa menos de diez: contradicción. CVs, portafolio y entregas a tres/seis días; ajustes pendientes de costeo.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1439282-6-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59188595240",
+        "note_id": "118512033434",
+        "deal_id": "65952374446",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1421874-18-LE26",
+      "buyer": "FUNDACION CENTRO CULTURAL DE LO PRADO",
+      "buyer_tax_number": "65.081.269-7",
+      "budget": 8534917,
+      "currency": "CLP",
+      "deadline": "2026-10-19T19:05:00.000Z",
+      "deadline_local": "19-10-2026 16:05",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Lo Prado A! Puro Diseño: cuatro líneas independientes; Diseño Gráfico y Community Manager es el fit principal.",
+      "fit": "alto por línea 2",
+      "risks": [
+        "Global CLP 8.534.917 IVA; línea 2 CLP 2.997.503 IVA. No comprometer las otras tres líneas por inferencia. Verificar títulos, CV, experiencia y fechas.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 29,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 40,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 41,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO 5 Y 6.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO 4.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 49,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 13,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 47,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 4,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1421874-18-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "selected_line": "2 Diseño Gráfico y CommunityManager",
+      "selected_line_budget": 2997503,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59202063283",
+        "note_id": "118503415832",
+        "deal_id": "65959325258",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "584105-39-LE26",
+      "buyer": "SUBSECRETARIA DE ENERGIA",
+      "buyer_tax_number": "61.979.830-9",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-19T18:01:00.000Z",
+      "deadline_local": "19-10-2026 15:01",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Energía: estrategia y ejecución de plan de medios incluyendo digital, redes y programática, indicadores e informes.",
+      "fit": "alto medios",
+      "risks": [
+        "Al menos 90% neto a medios y 40% a medios locales. Producción, transmisión y tributación. Presupuesto máximo no recuperado; canal, caja, margen y referencias pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ANEXOS EDITABLES.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento de Compras 00349-2026 aprobado.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 23,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 30,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 29,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 17,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 39,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 37,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 4,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/584105-39-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59198702877",
+        "note_id": "118489636510",
+        "deal_id": "65970960505",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "2078-47-LE26",
+      "buyer": "SUBSECRETARIA DE SALUD PUBLICA",
+      "buyer_tax_number": "61.601.000-K",
+      "budget": 10600000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T13:05:00.000Z",
+      "deadline_local": "15-10-2026 10:05",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SEREMI Salud Biobío: difusión multimedial con radio/TV y una línea de agencia para Instagram institucional.",
+      "fit": "alto por líneas",
+      "risks": [
+        "CLP 10.600.000 global no es fee. Línea de agencia: utilidad máxima 20%. Validar presupuesto por línea, localidad, inventario y cotizaciones.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 15,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXOS  (1).doc",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/2078-47-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "32340888618",
+        "note_id": "118494719064",
+        "deal_id": "65952222732",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "797305-59-COT26",
+      "buyer": "SUPERINTENDENCIA DE INSOLVENCIA Y REEMPRENDIMIENTO",
+      "buyer_tax_number": "61.005.000-K",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T18:00:00.000Z",
+      "deadline_local": "15-10-2026 15:00",
+      "status": "Cancelada",
+      "is_closed": false,
+      "summary": "Superir: diseño instruccional, desarrollo e implementación de dos cursos autoinstruccionales; gráficos, cápsulas, materiales y archivos editables.",
+      "fit": "alto e-learning",
+      "risks": [
+        "CLP 7.000.000 global. Aclarar contenidos, duración, LMS/SCORM, relatores aportados, producción, hitos y costos. Proceso distinto de 797305-60.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/797305-59-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59190452507",
+        "note_id": "118513991212",
+        "deal_id": "65961796615",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1088172-25-COT26",
+      "buyer": "SERVICIO NACIONAL PARA LA PREVENCION Y REHABILITACION DEL CONSUMO DE DROGAS Y ALCOHOL",
+      "buyer_tax_number": "61.980.170-9",
+      "budget": 3000000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T15:00:00.000Z",
+      "deadline_local": "15-10-2026 12:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SENDA Los Lagos: tres diseños gráficos, dos videos de hasta un minuto y frases con emisión radial para Más Comunidad, Más Prevención.",
+      "fit": "alto mixto",
+      "risks": [
+        "CLP 3.000.000 comparte medios y creatividad; radios específicas y seis meses octubre-marzo. Proveedor/canal, costos, financiamiento y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Requerimiento con solicitud para frases radiales y gráficas.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1088172-25-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59196072522",
+        "note_id": "118521509769",
+        "deal_id": "65967348002",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "2817-68-L126",
+      "buyer": "I MUNICIPALIDAD DE SAN FERNANDO",
+      "buyer_tax_number": "69.090.100-5",
+      "budget": 5300000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T20:00:00.000Z",
+      "deadline_local": "15-10-2026 17:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "San Fernando: línea 1 de capacitación presencial en redes sociales, dos módulos de 2,5 horas; otras líneas son presentación de productos y textiles.",
+      "fit": "alto por línea 1",
+      "risks": [
+        "Línea 1 CLP 2.000.000 IVA. No asumir todas las líneas. Logística, relator, formación y público pendientes; ejecución hasta 15 de diciembre.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXOS.doc",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP. PRESENTANDO MIS PRODUCTOS.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP. TALLER MANEJO REDES SOCIALES.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP.PROF.OFICIO TEXTILES.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP. TALLER MANEJO REDES SOCIALES.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 6,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/2817-68-L126",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "budget_source": "Suma 3 líneas BASES ADMINISTRATIVAS.pdf p 11 IVA incluido",
+      "selected_line": "1 Taller manejo redes sociales",
+      "selected_line_budget": 2000000,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59199011361",
+        "note_id": "118521904479",
+        "deal_id": "65950525803",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "3603-37-LE26",
+      "buyer": "I MUNICIPALIDAD DE MULCHEN",
+      "buyer_tax_number": "69.170.500-5",
+      "budget": 30000000,
+      "currency": "CLP",
+      "deadline": "2026-10-19T18:30:00.000Z",
+      "deadline_local": "19-10-2026 15:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Mulchén Vive Biobío: línea 2 de comercialización y marketing turístico, incluyendo marketing digital, contenidos e IA; talleres y espacios de promoción.",
+      "fit": "alto por línea 2",
+      "risks": [
+        "CLP 30.000.000 global no equivale al presupuesto de línea 2. Logística, merchandising, catering, equipo y experiencia requieren costeo.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ANEXO 5 PROPUESTA TECNICA.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Informe Secplan-314.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCIýN-50001726.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Informe Secplan-314.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Informe Secplan-314.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCIýN-50001726.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 20,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 17,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 15,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/3603-37-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59203151624",
+        "note_id": "118514923642",
+        "deal_id": "65962112843",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "4514-10-COT26",
+      "buyer": "SERVICIO NACIONAL DE CAPACITACION Y EMPLEO",
+      "buyer_tax_number": "61.531.000-K",
+      "budget": 3060000,
+      "currency": "CLP",
+      "deadline": "2026-10-16T15:00:00.000Z",
+      "deadline_local": "16-10-2026 12:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SENCE Tarapacá: tres videos HD de RRSS y proyección con gráfica y guion aportados, más maestro de ceremonia 22/10 de 10 a 13 en Alto Hospicio.",
+      "fit": "alto audiovisual mixto",
+      "risks": [
+        "CLP 3.060.000. Presentador presencial y logística, exhibición y producción acotada. Capacidad, costos y plazos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "solicitud compra produccion dialogos.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "solicitud compra produccion dialogos.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/4514-10-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59088367247",
+        "note_id": "118509713271",
+        "deal_id": "65961647917",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "5586-155-LE26",
+      "buyer": "UNIVERSIDAD DE LA FRONTERA",
+      "buyer_tax_number": "87.912.900-1",
+      "budget": 60000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T13:00:00.000Z",
+      "deadline_local": "14-10-2026 10:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "UFRO Admisión 2027: gestión de publicidad digital Meta, TikTok, YouTube, Google Display, Demand Gen y Search hasta 28/01/2027.",
+      "fit": "alto medios digital",
+      "risks": [
+        "Cierre hoy 14/10 a 10:00. Total CLP 60.000.000 IVA; pauta mínima 49.000.000 y fee máximo 15%. Acreditar referencias/resultados, tributación, caja y costo.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 33,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 37,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 36,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 35,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/5586-155-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "budget_source": "R.I N°782 SEC 3718...pdf p 34, IVA incluido",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59085575939",
+        "note_id": "118490227121",
+        "deal_id": "65959633824",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1111089-21-LE26",
+      "buyer": "Comisión Nacional de Investigación Científica y Tecnológicas - CONICYT",
+      "buyer_tax_number": "60.915.000-9",
+      "budget": 8500000,
+      "currency": "CLP",
+      "deadline": "2026-10-19T18:00:00.000Z",
+      "deadline_local": "19-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "ANID: monitoreo diario de prensa y redes sobre ciencia y tecnología, con registros y reportes.",
+      "fit": "medio inteligencia medios",
+      "risks": [
+        "Total CLP 8.500.000 impuestos incluidos. Entregas 7:30 de lunes a viernes,8:00 fines de semana; registros regionales hasta 24 h, excepciones 4 h. Plataforma, cobertura, duración y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ANEXOS  1111089-21-LE26  MONITOREO DE PRENSA PUBLICAR.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 15,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1111089-21-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "budget_source": "Resolucion N°8480 del 07-10-2026...pdf p 4, impuestos incluidos",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "53965641129",
+        "note_id": "118510169431",
+        "deal_id": "65954207631",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1219102-6-LE26",
+      "buyer": "Defensoría del Contribuyente",
+      "buyer_tax_number": "62.000.930-K",
+      "budget": 25200000,
+      "currency": "CLP",
+      "deadline": "2026-10-19T18:30:00.000Z",
+      "deadline_local": "19-10-2026 15:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Monitoreo, análisis estratégico e inteligencia de medios, plataformas digitales y redes durante 36 meses.",
+      "fit": "medio inteligencia medios",
+      "risks": [
+        "CLP 25.200.000 global para 36 meses. Plataforma 24/7/365, búsqueda, descarga, transcripciones, dashboard y reportes. Proveedor, capacidad y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ANEXOS.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 241-Pregunta-Foro-1219102-6-LE26.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 47,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 58,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 62,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 241-Pregunta-Foro-1219102-6-LE26.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 59,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 241-Pregunta-Foro-1219102-6-LE26.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 3,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1219102-6-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59194211077",
+        "note_id": "118492263992",
+        "deal_id": "65958396505",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1591-19-LP26",
+      "buyer": "SERVICIO NACIONAL DE TURISMO",
+      "buyer_tax_number": "60.704.000-1",
+      "budget": 160000000,
+      "currency": "CLP",
+      "deadline": "2026-10-29T18:00:00.000Z",
+      "deadline_local": "29-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERNATUR Gira de Estudio: campaña estratégica y creativa, KV y piezas digitales, evento y activación, más medios.",
+      "fit": "alto campaña integral",
+      "risks": [
+        "CLP 160.000.000 global. Activación/producción requieren capacidad o proveedor. Referencias, caja, distribución fee/pauta y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Anexos editables 1591-19-LP26.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 35,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 52,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 75,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 72,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 71,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 70,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 68,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 63,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 4,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1591-19-LP26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "31640422315",
+        "note_id": "118506616350",
+        "deal_id": "65950672537",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "2380-2193-COT26",
+      "buyer": "I MUNICIPALIDAD DE COPIAPO",
+      "buyer_tax_number": "69.030.200-4",
+      "budget": 450000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T13:30:00.000Z",
+      "deadline_local": "14-10-2026 10:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Copiapó: banner web, hasta 10 notas por mes, publicaciones en redes con diseño y difusión digital.",
+      "fit": "medio digital condicionado",
+      "risks": [
+        "CLP 450.000. RAG sólo devolvió informativo administrativo; evidencia técnica incompleta. Medio, período, cantidad y costo no acreditados.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "INFORMATIVO COMPRA AGIL.PDF",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/2380-2193-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59203459684",
+        "note_id": "118491777635",
+        "deal_id": "65959943707",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "4085-482-COT26",
+      "buyer": "I MUNICIPALIDAD DE LONGAVI",
+      "buyer_tax_number": "69.130.600-3",
+      "budget": 4500000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T13:40:00.000Z",
+      "deadline_local": "14-10-2026 10:40",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Longaví plan de medios línea 1: seis meses de cobertura, dos entrevistas por mes, dos historias por semana en cada plataforma y dos notas audiovisuales por mes.",
+      "fit": "medio contenido/difusión",
+      "risks": [
+        "CLP 4.500.000 global o 750.000 IVA al mes. Producción propia, cobertura local, perfil del medio, volumen y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/4085-482-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59182400294",
+        "note_id": "118507060487",
+        "deal_id": "65972660649",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "4085-483-COT26",
+      "buyer": "I MUNICIPALIDAD DE LONGAVI",
+      "buyer_tax_number": "69.130.600-3",
+      "budget": 1500000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T14:00:00.000Z",
+      "deadline_local": "14-10-2026 11:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Longaví plan de medios línea 2: seis meses de cobertura, dos entrevistas por mes, dos historias por semana en cada plataforma y dos notas audiovisuales por mes.",
+      "fit": "medio contenido/difusión",
+      "risks": [
+        "CLP 1.500.000 global o 250.000 IVA al mes. Ticket versus carga, canal y producción local pendientes; distinta de 4085-482.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/4085-483-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59182400294",
+        "note_id": "118517070761",
+        "deal_id": "65955911722",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1469-268-L126",
+      "buyer": "UNIVERSIDAD DE TALCA",
+      "buyer_tax_number": "70.885.500-6",
+      "budget": 3570000,
+      "currency": "CLP",
+      "deadline": "2026-10-20T18:00:00.000Z",
+      "deadline_local": "20-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "U. de Talca: plataforma informativa digital nacional, banner en portada, veinte contenidos y cuatro entrevistas.",
+      "fit": "medio medios digitales",
+      "risks": [
+        "CLP 3.570.000 IVA. Inventario y canal nacional, referencias y margen pendientes. Referencia radial contradice objeto digital: aclarar.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada_288KB.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada_288KB.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "AnexoCaracteristicasTécnicas_20261009144754.825_X.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "AnexoOfertaEconómica_20261009144650.715_X.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "AnexoExperiencia_20261009144715.427_X.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 7,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1469-268-L126",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "31776227440",
+        "note_id": "118516623263",
+        "deal_id": "65962270021",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "895072-124-COT26",
+      "buyer": "SUBSECRETARIA DE EDUCACION PARVULARIA",
+      "buyer_tax_number": "61.980.540-2",
+      "budget": 3000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T12:00:00.000Z",
+      "deadline_local": "14-10-2026 09:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Educación Parvularia: planificación, administración, optimización y seguimiento de Todos al Jardín, octubre-noviembre, con medios locales y radio.",
+      "fit": "alto medios condicionado",
+      "risks": [
+        "Cierre hoy a 09:00. CLP 3.000.000 impuestos incluye medios y honorarios. Inventario, producción, caja, fee y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/895072-124-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59186428030",
+        "note_id": "118517691753",
+        "deal_id": "65953310343",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1750-75-COT26",
+      "buyer": "DIRECCION NACIONAL DEL SERVICIO CIVIL",
+      "buyer_tax_number": "65.290.590-0",
+      "budget": 3500000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T20:00:00.000Z",
+      "deadline_local": "15-10-2026 17:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Servicio Civil: renovación de Zoom Workplace para diez anfitriones,300 participantes y dos plugins de subtitulado/traducción por doce meses.",
+      "fit": "sin fit desarrollo web",
+      "risks": [
+        "Licencia Zoom específica fuera del alcance; medio de pago internacional del proveedor. Aplicaciones web en el título no acredita desarrollo o infraestructura web.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Términos de Referencia.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Términos de Referencia.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Términos de Referencia.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1750-75-COT26",
+      "disposition": "exclude",
+      "crm_object": null,
+      "commercial_status": "exclude"
+    },
+    {
+      "code": "2346-1-LP26",
+      "buyer": "I MUNICIPALIDAD DE PUNTA ARENAS",
+      "buyer_tax_number": "69.250.200-0",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-27T18:00:00.000Z",
+      "deadline_local": "27-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIO DE AVISAJE MEDIOS DE COMUNICACIÓN ESCRITO. SERVICIOS DE AVISAJE EN REVISTA IMPRESA Y DIGITAL ESPECIALIZADA EN NOTICIAS, CRÓNICAS, HISTORIAS Y PERSONAJES DE ANTAÑO, QUE INCLUYA EN SUS CONTENIDOS PRINCIPALMENTE TEMÁTICAS COMUNALES Y REGIONALES DEL ÁREA, CON DISTRIBUCIÓN COMUNAL, COMO MÍNIMO.; SERVICIOS DE AVISAJE EN REVISTA DIGITAL (CM/CL) ESPECIALIZADA EN TEMAS DE MASCOTAS Y TENENCIA RESPONSABLE, QUE INCLUYA EN SUS CONTENIDOS PRINCIPALMENTE TEMÁTICAS COMUNALES Y REGIONALES DEL ÁREA, CON DISTRIBUCIÓN COMUNAL, COMO MÍNIMO.",
+      "fit": "condicional medios local",
+      "risks": [
+        "Contrato 48 meses por líneas; medios locales, inventario, proveedor, garantía por línea, bolsa y comisión pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "2801.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXOS.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 13,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 26,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "2801.pdf",
+          "page": 23,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/2346-1-LP26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "2827-98-LE26",
+      "buyer": "I MUNICIPALIDAD DE CONSTITUCION",
+      "buyer_tax_number": "69.120.100-7",
+      "budget": 29000000,
+      "currency": "CLP",
+      "deadline": "2026-10-20T19:00:00.000Z",
+      "deadline_local": "20-10-2026 16:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIO AGENCIA DE PUBLICIDAD RADIAL Y ESCRITA. SERVICIO DE PUBLICIDAD TANTO RADIAL COMO ESCRITA.SE ADJUNTAN ARCHIVOS.",
+      "fit": "condicional radio/prensa",
+      "risks": [
+        "CLP 29.000.000 incluye honorarios y medios durante diez meses. Estudios, entrevistas y enlaces locales; inventario, costos y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "bases generales.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "bases generales.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "bases generales.pdf",
+          "page": 15,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "bases generales.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bae.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "bases generales.pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bae.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Contratación de Agencia de difusión.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bae.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bae.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Contratación de Agencia de difusión.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Contratación de Agencia de difusión.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Contratación de Agencia de difusión.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 6,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/2827-98-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1404452-67-COT26",
+      "buyer": "ASOCIACION DE MUNICIPALIDADES PARQUE CORDILLERA",
+      "buyer_tax_number": "65.060.484-9",
+      "budget": 735000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T08:47:06.087Z",
+      "deadline_local": "15-10-2026 05:47",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "“SERVICIO DE PUBLICIDAD RADIAL PARA EL FOMENTO DE LA VISITACIÓN DE LA RED DE PARQUES PARQUE CORDILLERA” por un mes o 30 días. “SERVICIO DE PUBLICIDAD RADIAL PARA EL FOMENTO DE LA VISITACIÓN DE LA RED DE PARQUES PARQUE CORDILLERA” por un mes o 30 días. Debe adjuntar cotización detallada según lo solicitado en requerimiento adjunto. El oferente debe contar con giro asociado a la naturaleza de la compra.",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 735.000. Cierre 15/10 a 05:47. Canal de Santiago, respaldos de emisión, giro y costo pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "COMPRA AGIL Publicidad Radial en fomento de visitaciónde la red d.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1404452-67-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1498473-8-COT26",
+      "buyer": "I MUNICIPALIDAD DE QUINCHAO",
+      "buyer_tax_number": "69.230.900-6",
+      "budget": 3000000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T11:00:00.000Z",
+      "deadline_local": "15-10-2026 08:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "DIFUSION DE ACTIVIDADES MUNICIPALES DIARIAS. CONTRATACION SERVICIO DE DIFUSION DE ACTIVIDADES MUNICIPALES DIARIAS, ENTREVISTAS Y TRANSMISION DE 2 PROGRAMAS SEMANALES DE MEDIA HORA, DESDE OCTUBRE A DICIEMBRE 2026, EN RADIO DE COBERTURA PROVINCIAL Y ESTUDIO EN ACHAO. ADJUNTAR RESOLUCION SUBTEL. REVISAR HOJA ANEXA CON DETALLES DEL REQUERIMIENTO Y CRITERIOS DE EVALUACION.",
+      "fit": "condicional radio/digital",
+      "risks": [
+        "CLP 3.000.000 en ficha versus 6.000.000 en anexo; referencia a redes sociales contradictoria. SUBTEL obligatorio, estudio en Achao y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "solicitud de pedido 1029 - programas radiales.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "solicitud de pedido 1029 - programas radiales.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1498473-8-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "4922-423-COT26",
+      "buyer": "I MUNICIPALIDAD DE FUTRONO",
+      "buyer_tax_number": "69.200.700-K",
+      "budget": 150000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T17:30:00.000Z",
+      "deadline_local": "14-10-2026 14:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIOS DE PUBLICIDAD EN MEDIOS ELECTRÓNICOS CULTURA . SERVICIOS DE PUBLICIDAD EN MEDIOS ELECTRÓNICOS.",
+      "fit": "sin evidencia suficiente",
+      "risks": [
+        "CLP 150.000. RAG en indexing; alcance, canal y período no acreditados.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [],
+      "documents_total": 0,
+      "rag_status": "indexing",
+      "source_url": "https://app.licitalab.cl/search/agile/4922-423-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "812799-61-LE26",
+      "buyer": "I MUNICIPALIDAD DE MEJILLONES",
+      "buyer_tax_number": "69.020.400-2",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-23T16:30:00.000Z",
+      "deadline_local": "23-10-2026 13:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIO DE DISEÑO PRODUCCIÓN E IMPRESIÓN DE MATERIAL GRÁFICO Y PROMOCIONAL PARA LA IV CUMBRE REGIONAL DE TURISMO Y EL VIII FORO DEL CORREDOR BIOCEÁNICO DE CAPRICORNIO MEJILLONES 2026. Servicio de diseño, producción e impresion de material grafico y promocional, especificaciones de acuerdo a lo detallado en bases de licitación.",
+      "fit": "mixto diseño+físico",
+      "risks": [
+        "Diseño y suministro físico mixtos: requiere proveedor back-to-back. Ficha 0 no prueba presupuesto cero; cantidades y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 26,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 30,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 20,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 24,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexos -Grafica Cumbre.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases Diseño Impresion - ID 812799-61-LE26.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 4,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/812799-61-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1208106-38-COT26",
+      "buyer": "SERVICIO NACIONAL DE PROTECCIÓN ESPECIALIZADA A LA NIÑEZ Y ADOLESCENCI",
+      "buyer_tax_number": "62.000.890-7",
+      "budget": 300000,
+      "currency": "CLP",
+      "deadline": "2026-10-16T17:00:00.000Z",
+      "deadline_local": "16-10-2026 14:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Adquisición de Mensajes Radiales para difusión de programa Familia de Acogida y programa Solicitantes Adopción. Mensaje radial; a)\tAdquisición de Mensaje radial con cobertura y difusión en las 12 comunas de la región de los Rios, (requisito obligatorio). b)\t5 frases diarias- 25\" a 30\" de lunes a sábado c)\tPor un periodo de 30 días d)\tdisponibilidad de comunicados en prensa y una entrevista en horario noticias segun especificaciones adjuntas.",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 300.000. Cobertura obligatoria de doce comunas, cinco frases diarias durante treinta días. Canal, respaldos y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Especificaciones Tecnicas (Mensajes radiales)..docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexos.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Memorandum 00316-2026.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 3,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1208106-38-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "2727-618-COT26",
+      "buyer": "ILUSTRE MUNICIPALIDAD DE SAN CARLOS",
+      "buyer_tax_number": "69.140.500-1",
+      "budget": 357000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T19:00:00.000Z",
+      "deadline_local": "15-10-2026 16:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "DIFUSIÓN RADIAL CONVENIO CONTINUIDAD PROGRAMA PREVENTIVO Y TRATAMIENTO APS. SERVICIO DE DIFUSIÓN RADIAL QUE CONSISTA EN 5 FRASES DIARIAS DE 30 SEGUNDOS CADA UNA, DE LUNES A SÁBADO, HASTA EL 31 DE DICIEMBRE DEL 2026. GRABACIÓN CON VOZ DEL MEDIO CONTRATADO, CON FRASES ACORDADAS CON LA REQUIRENTE Y QUE PUEDAN SER REEMPLAZADAS CADA 15 DÍAS EN HORARIO A CONVENIR. COBERTURA DE LA RADIOEMISORA DEBE SER PARA TODA LA PROVINCIA DE PUNILLA Y REGIÓN DE ÑUBLE.",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 357.000. RAG en indexing; difusión cinco frases diarias hasta 31/12 con cobertura Punilla/Ñuble. Canal y costo pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [],
+      "documents_total": 0,
+      "rag_status": "indexing",
+      "source_url": "https://app.licitalab.cl/search/agile/2727-618-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "5416-719-COT26",
+      "buyer": "UNIVERSIDAD DE LA SERENA",
+      "buyer_tax_number": "70.783.100-6",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T15:00:00.000Z",
+      "deadline_local": "14-10-2026 12:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Espacio en radio emisora local. U de La Serena, necesita el siguiente material: Espacio en radio emisora local. Se adjuntan especificaciones técnicas.",
+      "fit": "condicional radio/digital/TV",
+      "risks": [
+        "CLP 7.000.000. Trece bloques 45 minutos; FM, digital y TV. Producción del medio; canal, inventario, costos y papel de agencia pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ESPECIFICACIONES TECNICAS SC 51624.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "CLÁUSULAS PARA COMPRA ÁGIL.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "CLÁUSULAS PARA COMPRA ÁGIL.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/5416-719-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1275930-53-COT26",
+      "buyer": "Corporación Cultural Municipal de Ovalle",
+      "buyer_tax_number": "65.115.321-2",
+      "budget": 476000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T19:00:00.000Z",
+      "deadline_local": "14-10-2026 16:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": " Servicio de Difusión y Entrevistas en Radio - Proyecto \"Plan de Gestión TMO 2026” Folio N° 851673. Servicio de Difusión y Entrevistas en Radio - Proyecto \"Plan de Gestión TMO 2026” Folio N° 851673, según especificaciones técnicas adjuntas.",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 476.000. Canal local, volumen exacto, condiciones y rentabilidad pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR Radio PAOCC.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1275930-53-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "564162-150-L126",
+      "buyer": "UNIVERSIDAD DE SANTIAGO DE CHILE",
+      "buyer_tax_number": "60.911.000-7",
+      "budget": 6307000,
+      "currency": "CLP",
+      "deadline": "2026-10-20T18:00:00.000Z",
+      "deadline_local": "20-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Solicitud N°93547 - ESPACIO PUBLICITARIO RADIAL - 112/1930. ESPACIO PUBLICITARIO RADIAL",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 6.307.000 IVA. Espacio radial CIMAC; canal, inventario, cantidades, fee y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 14,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO_N°6_EXPERIENCIA_DEL_OFERENTE.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO_N°4__OFERTA_ECONÓMICA.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_564162-150-L126.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 8,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/564162-150-L126",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1208100-26-COT26",
+      "buyer": "SERVICIO NACIONAL DE PROTECCIÓN ESPECIALIZADA A LA NIÑEZ Y ADOLESCENCI",
+      "buyer_tax_number": "62.000.890-7",
+      "budget": 294000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T18:00:00.000Z",
+      "deadline_local": "15-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIO DE TRANSMISIÓN DE PROGRAMA INFORMATIVO EN RADIO FM DE PICHILEMU PARA LA DIFUSIÓN DEL ACOGIMIENTO FAMILIAR. Contratar los servicios de una radioemisora de Frecuencia Modulada (FM) con domicilio y estudio de grabación en la comuna de Pichilemu, para la trasmisión de 5 capítulos de un programa informativo orientado a sensibilizar y fortalecer la convocatoria ciudadana de Familias de Acogida.; Contratar los servicios de una radioemisora de Frecuencia Modulada (FM) con domicilio y estudio de grabación en la comuna de Pichilemu, para la trasmisión de 5 capítulos de un programa informativo orientado a sensibilizar y fortalecer la convocatoria ciudadana de Familias de Acogida.",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 294.000. Estudio y domicilio de radio FM en Pichilemu, cinco capítulos 15 minutos. Atributos excluyentes y canal pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "TDR.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo 3.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo 2.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo 1.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 4,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1208100-26-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1873-46-COT26",
+      "buyer": "SERVICIO NACIONAL DE TURISMO",
+      "buyer_tax_number": "60.704.000-1",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T14:30:00.000Z",
+      "deadline_local": "14-10-2026 11:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Campaña radial en conciencia turistica . Desarrollar e implementar una campaña regional de conciencia turística destinada a dinamizar la actividad turística de la Región del Biobío de manera previa a la temporada alta 2027, fortaleciendo el posicionamiento de destinos cercanos, hospitalarios y auténticos, contribuyendo al fomento del turismo interno, a la reactivación de la actividad turística local y a la recuperación económica y social de estos territorios.",
+      "fit": "condicional campaña radio",
+      "risks": [
+        "CLP 7.000.000. Campaña radio con creatividad, locución y redes. Canal regional, cápsulas, testimonios, fee y costo; cierre hoy 11:30.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "1.- Solicitud de Corización campaña Radial Conciencia turística f.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1.- Solicitud de Corización campaña Radial Conciencia turística f.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1.- Solicitud de Corización campaña Radial Conciencia turística f.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1.- Solicitud de Corización campaña Radial Conciencia turística f.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1.- Solicitud de Corización campaña Radial Conciencia turística f.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1.- Solicitud de Corización campaña Radial Conciencia turística f.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1873-46-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "5358-233-COT26",
+      "buyer": "UNIVERSIDAD DE TARAPACA",
+      "buyer_tax_number": "70.770.800-K",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T17:00:00.000Z",
+      "deadline_local": "14-10-2026 14:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "CONTRATACION DE SERVICIO DE PUBLICIDAD EN VIA PUBLICA MOVIL, LUNETAS EN IQUIQUE Y ALTO HOSPICIO. UTA SEDE IQUIQUE . se requiere de servicio de publicidad en vía publica móvil mediante la instalación de graficas en lunetas de buses, con cobertura en la región de Tarapacá, comunas de Iquique y alto hospicio.  LUNETAS EN IQUIQUE: 29  LUNETAS A ALTO HOSPICIO: 29",
+      "fit": "condicional OOH",
+      "risks": [
+        "CLP 7.000.000. Cincuenta y ocho lunetas físicas en buses, instalación, continuidad y reposición. Requiere inventario y proveedor back-to-back.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Anexo N°1 Esp.Tecnicas Iquique,Calama (2).docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/5358-233-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "5358-232-COT26",
+      "buyer": "UNIVERSIDAD DE TARAPACA",
+      "buyer_tax_number": "70.770.800-K",
+      "budget": 7100000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T14:00:00.000Z",
+      "deadline_local": "15-10-2026 11:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "CONTRATACION DE SERVICIO DE DIFUSION PUBLICITARIA EN MEDIO RADIAL REGIONAL, IQUIQUE UTA SEDE IQQ . servicios en programa matinal de lunes a viernes con co-auspicio programa la mañana y entrevistas semanales.",
+      "fit": "condicional radio",
+      "risks": [
+        "CLP 7.100.000 IVA. Coauspicio radial regional octubre-diciembre. Canal, referencias, inicio de actividades, bolsa y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Anexo Esp. Tecnicas Iquique (1).docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Medio Descripción de lo requerido Radio Regional (1).docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/5358-232-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "707416-52-COT26",
+      "buyer": "FUNDACION EDUCACIONAL PARA EL DESAROLLO INTEGRAL DE LA NIÑEZ",
+      "buyer_tax_number": "70.574.900-0",
+      "budget": 1061406,
+      "currency": "CLP",
+      "deadline": "2026-10-15T13:00:00.000Z",
+      "deadline_local": "15-10-2026 10:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "C-800 Adquisición de campaña comunicacional en prensa regional impresa y digital. Se requiere contratar 01 Servicio comunicacional durante octubre y noviembre de 2026, Debe incluir Dos publirreportajes o publientrevistas, uno durante octubre y otro durante noviembre de 2026. Detalles del servicio solicitado se encuentran en documento adjunto TDR N° 36",
+      "fit": "condicional prensa/digital",
+      "risks": [
+        "CLP 1.061.406. Dos publicaciones impresas y web, redacción y redes. Medio regional acreditado, inventario, costo y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "TDR N° 36 Comunicaciones.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR N° 36 Comunicaciones.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR N° 36 Comunicaciones.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR N° 36 Comunicaciones.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR N° 36 Comunicaciones.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/707416-52-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "5358-231-COT26",
+      "buyer": "UNIVERSIDAD DE TARAPACA",
+      "buyer_tax_number": "70.770.800-K",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T14:00:00.000Z",
+      "deadline_local": "14-10-2026 11:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "“SERVICIO CONTRATACIÓN DE SERVICIO DE DIFUSIÓN PUBLICITARIA EN MEDIO IMPRESO Y DIGITAL REGIONAL”. UTA SEDE IQUIQUE . SERVICIO DE CONTRATACION DIFUSION PUBLICITARIA EN MEDIO IMPRESO Y DIGITAL REGIONAL",
+      "fit": "condicional prensa/digital",
+      "risks": [
+        "CLP 7.000.000. Difusión impresa y digital regional; inventario y canal. Anexo cita ID anterior, no prueba prórroga. Nivel de servicio y costo pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Anexo1 Esp. TECNICAS 12.16.24 p.m. (1).docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/5358-231-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1469-264-L126",
+      "buyer": "UNIVERSIDAD DE TALCA",
+      "buyer_tax_number": "70.885.500-6",
+      "budget": 2500000,
+      "currency": "CLP",
+      "deadline": "2026-10-16T18:00:00.000Z",
+      "deadline_local": "16-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "AUSPICIO EN PROGRAMA RADIAL PARA DIFUSION ALTERNATIVAS ACADEMICAS DEL CAMPUS TALCA. La Universidad de Talca, requiere contratar un servicio de difusión a modo de auspicio  en medio radial con presencia en la ciudad de Talca y sus alrededores. ",
+      "fit": "condicional radio/digital",
+      "risks": [
+        "CLP 2.500.000 IVA. Auspicio radio local, diez frases, banner web y entrevista. Canal, duración y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-264-L126.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 5,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1469-264-L126",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1298357-15-L126",
+      "buyer": "CORPORACION CULTURAL MUNICIPAL DE LA COMUNA DE CHILLAN",
+      "buyer_tax_number": "65.077.305-5",
+      "budget": 3200000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T18:10:00.000Z",
+      "deadline_local": "14-10-2026 15:10",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIO PUBLICIDAD RADIAL PRENSA ESCRITA EN ÑUBLE. La Corporación Cultural Municipal de Chillán requiere mantener una difusión continua, oportuna y territorialmente pertinente de su programación artística, cultural y formativa, así como de sus actividades institucionales, durante los meses de octubre, nov",
+      "fit": "condicional radio/prensa",
+      "risks": [
+        "CLP 3.200.000. Tres meses de radio y prensa Ñuble. Inventario, plan de medios local, referencias, costo y fee pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Anexos_Licitacion_1298357-15-L126.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 22,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 36,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 27,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 37,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 35,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS Y TÉCNICAS LICITACIÓN 1298357-15-L1SERVICIO.pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 4,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1298357-15-L126",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "5531-166-COT26",
+      "buyer": "UNIVERSIDAD DE CHILE",
+      "buyer_tax_number": "60.910.000-1",
+      "budget": 7215000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T18:00:00.000Z",
+      "deadline_local": "15-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIOS AUDIOVISUALES SEMINARIO MGPP - 12 de noviembre de 2026. Contratación de servicios audiovisuales y de producción técnica para el seminario internacional del Magíster en Gestión y Políticas Públicas (MGPP), que se realizará el jueves 12 de noviembre de 2026 en la Casa Central de la Universidad de Chile, Avenida Libertador Bernardo O'Higgins 1058, Santiago.   IMPORTANTE: revisar las especificaciones técnicas adjuntas donde se detalle todos requisitos solicitados.",
+      "fit": "condicional producción evento",
+      "risks": [
+        "CLP 7.215.000. Equipamiento y operación en recinto patrimonial, LED, truss, multicámara y personal técnico. Requiere proveedor especialista back-to-back; no sólo edición.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Esp_Técnicas AudiovisualesMGPP.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/5531-166-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "4486-37-LE26",
+      "buyer": "I MUNICIPALIDAD DE NEGRETE",
+      "buyer_tax_number": "69.170.800-4",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-15T23:00:00.000Z",
+      "deadline_local": "15-10-2026 20:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SERVICIO DE CAPACITACIÓNES A EMPRENDEDORES DE L. SERVICIO DE CAPACITACIONES PARA EMPRENDEDORES DE LA COMUNA DE NEGRETE",
+      "fit": "mixto formación",
+      "risks": [
+        "Formación amplia incluye marketing digital, negocios y finanzas, más merchandising/catering y logística. Relatores, presupuesto y capacidad pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 17,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES TÉCNICAS CAPACITACIÓN.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 18,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo N° 5 oferta técnica.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS LICITACIÓN CAPACITACIÓN.pdf",
+          "page": 20,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 10,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/4486-37-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "568963-24-LE26",
+      "buyer": "COMISION DEL SISTEMA NACIONAL DE CERTIFICACION DE COMPETENCIAS LABORALES",
+      "buyer_tax_number": "61.979.610-1",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-19T18:00:00.000Z",
+      "deadline_local": "19-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "PRODUCCIÓNDE TRES JORNADAS DE TRABAJO TRIPARTITO. SERVICIO DE PRODUCCIÓN Y EJECUCIÓN DE TRES JORNADAS DE TRABAJO TRIPARTITO DEL SISTEMA NACIONAL DE CERTIFICACIÓN DE COMPETENCIAS LABORALES CON LA CIUDADANÍA Y ACTORES RELEVANTES Y VINCULADOS A CHILEVALORA",
+      "fit": "mixto eventos",
+      "risks": [
+        "Tres jornadas presenciales: logística y producción. Referencias, presupuesto y costos pendientes; alcance creativo digital no confirmado.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 27,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 30,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 36,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 29,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexos Editables.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 13,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 45,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 22,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.E.507-2026_Bases Jornadas Tripartitas de Comunicaciones 2026.pdf",
+          "page": 50,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/568963-24-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1873-47-COT26",
+      "buyer": "SERVICIO NACIONAL DE TURISMO",
+      "buyer_tax_number": "60.704.000-1",
+      "budget": 6000000,
+      "currency": "CLP",
+      "deadline": "2026-10-16T00:00:00.000Z",
+      "deadline_local": "15-10-2026 21:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "“ACTIVACIÓN Y MERCHANDISING PARTICIPACIÓN DE LA REGIÓN DEL BIOBÍO EN FERIA INTERNACIONAL VYVA 2026, SANTIAGO\". Soporte Tecnológico Autónomo para Difusión de Contenidos Audiovisuales Activación Artística-Cultural e Interacción Identitaria. Herramientas de Marketing Directo (Merchandising)",
+      "fit": "mixto activación físico",
+      "risks": [
+        "CLP 6.000.000. LED 70 pulgadas, activación artística y merchandising; operación Santiago y entrega Concepción. Proveedor, transporte, montaje y costo pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "1. Cotización Feria VyVa 2026 activación y Merchandising (1).pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/1873-47-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "4239-498-COT26",
+      "buyer": "I MUNICIPALIDAD DE CURANILAHUE",
+      "buyer_tax_number": "69.160.201-K",
+      "budget": 969900,
+      "currency": "CLP",
+      "deadline": "2026-10-14T19:12:00.000Z",
+      "deadline_local": "14-10-2026 16:12",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Servidor web de neruda776.cl:12meses,cPanel/Proxmox,soporte24/7.",
+      "fit": "condicional",
+      "risks": [
+        "Certificaciones ISO27001/9001/27017/27018/22301 a nombre del oferente y TierIII obligatorias; ticket969.900IVA. No hay evidencia de admisibilidad propia.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "TTRR SERVIDOR PABLO NERUDA.pdf",
+          "page": 2
+        },
+        {
+          "filename": "TTRR SERVIDOR PABLO NERUDA.pdf",
+          "page": 1
+        },
+        {
+          "filename": "COMPRA AGIL REQUISITOS.docx",
+          "page": null
+        },
+        {
+          "filename": "Declaración Jurada de Requisitos para Ofertar.docx",
+          "page": null
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/4239-498-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "584105-241-COT26",
+      "buyer": "SUBSECRETARIA DE ENERGIA",
+      "buyer_tax_number": "61.979.830-9",
+      "budget": 7000000,
+      "currency": "CLP",
+      "deadline": "2026-10-14T18:00:00.000Z",
+      "deadline_local": "14-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Rediseño UX/UI de intranet SharePointModern+Viva sobre estructura vigente; tres meses,diagnóstico,mockups,implementación y capacitación.",
+      "fit": "directo",
+      "risks": [
+        "CLP7M impuestos; experiencia comprobable SharePoint como puerta; pagos3hitos a30días; cierre hoy15h.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 8
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 1
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 6
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 4
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 3
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 5
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 9
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 2
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 7
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/agile/584105-241-COT26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59198702877",
+        "note_id": "118521361520",
+        "deal_id": "65969254199",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1385462-15-RFI26",
+      "buyer": "SERVICIO DE BIODIVERSIDAD Y AREAS PROTEGIDAS",
+      "buyer_tax_number": null,
+      "budget": null,
+      "currency": null,
+      "deadline": "2026-10-21T13:00:06.000Z",
+      "deadline_local": "21-10-2026 10:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "RFI SINAT: plataforma modular de trámites,usuarios,atención ciudadana,analítica,integraciones y mantención.",
+      "fit": "directo",
+      "risks": [
+        "Consulta referencial sin presupuesto ni adjudicación; nube privada aportada porSBAP; alcanceintegral ycapacidadpendientes. No afirmar CRM mayorUSD1000mensuales.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 1
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 41
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 53
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 9
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 54
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 52
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 49
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 33
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 2
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/market_query/1385462-15-RFI26",
+      "disposition": "intake",
+      "crm_object": "Company+Note",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Investigación autorizada14/10; RFI no es licitación abierta para ofertas.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59215924833",
+        "note_id": "118518150998",
+        "deal_id": null,
+        "disposition": "rfi_company_note",
+        "deal_two_readbacks": false,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1618-18-RFI26",
+      "buyer": "TESORERIA GENERAL DE LA REPUBLICA",
+      "buyer_tax_number": null,
+      "budget": null,
+      "currency": null,
+      "deadline": "2026-11-02T13:00:34.000Z",
+      "deadline_local": "02-11-2026 10:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "RFI Tesorería: modernización y migración de visualización analítica sobre DWOracle,con experiencia híbrida GoogleCloud/BigQuery.",
+      "fit": "directo",
+      "risks": [
+        "Consulta no vinculante; presupuesto no publicado,entornoOracleODI3,5–5TB; plataformas/volumen/capacidad porverificar. No es proyectoGA4 porinferencia.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 5
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 6
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 11
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 13
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 8
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 3
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 10
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 12
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 4
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 1
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/market_query/1618-18-RFI26",
+      "disposition": "intake",
+      "crm_object": "Company+Note",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Investigación autorizada14/10; RFI no es licitación abierta para ofertas.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59206556188",
+        "note_id": "118503888413",
+        "deal_id": null,
+        "disposition": "rfi_company_note",
+        "deal_two_readbacks": false,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1469-81-SC26",
+      "buyer": null,
+      "buyer_tax_number": null,
+      "budget": 10859000,
+      "currency": "$",
+      "deadline": "2026-10-14T13:20:00.000Z",
+      "deadline_local": "14-10-2026 10:20",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Solicitud pública hosting sistema de seguimiento patologías crónicas.",
+      "fit": "condicional",
+      "risks": [
+        "ModalidadSC,sinRAGcompatible(unsupported); no declara servicioGoogleCloud. Alcanceoriginal/canal ysiadmiteofertaabiertapendientes.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [],
+      "rag_status": "unsupported",
+      "source_url": "https://app.licitalab.cl/search/details/1469-81-SC26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1469-82-SC26",
+      "buyer": null,
+      "buyer_tax_number": null,
+      "budget": 10859000,
+      "currency": "$",
+      "deadline": "2026-10-15T18:08:00.000Z",
+      "deadline_local": "15-10-2026 15:08",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Otra solicitud pública hosting sistema de seguimiento patologías crónicas,ticketDLS36981.",
+      "fit": "condicional",
+      "risks": [
+        "ID distinto de1469-81; modalidadSC,RAGunsupported; verificarif hardwareoservicio,SKUyadmisiónabierta.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [],
+      "rag_status": "unsupported",
+      "source_url": "https://app.licitalab.cl/search/details/1469-82-SC26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1016414-71-COT26",
+      "buyer": "CONSEJO NACIONAL DE TELEVISION",
+      "buyer_tax_number": "60.909.000-6",
+      "budget": 3000000,
+      "currency": "CLP",
+      "deadline": "2026-10-20T19:30:00.000Z",
+      "deadline_local": "20-10-2026 16:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Asesoría tecnológica para infraestructura de fiscalización audiovisualCNTV,recepción,grabación ytransmisióndeseñales.",
+      "fit": "condicional",
+      "risks": [
+        "Ingeniería audiovisualespecializada:no confundirproduccióncreativa. Fit,referenciasycapacidadpendientes.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [],
+      "rag_status": "not_queried",
+      "source_url": "https://app.licitalab.cl/search/agile/1016414-71-COT26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "584105-29-LE26",
+      "buyer": "SUBSECRETARIA DE ENERGIA",
+      "buyer_tax_number": "61.979.830-9",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-26T18:01:00.000Z",
+      "deadline_local": "26-10-2026 15:01",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Diseño e implementación del sistema de gestión y medición de incidencia participación ciudadanaSIGMI.",
+      "fit": "condicional",
+      "risks": [
+        "Es sistemainstitucionalsectorial; noGA4/GTM. Faltarevisarprofundidadmetodología,software,equipo,presupuesto.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "ANEXOS EDITABLES.docx",
+          "page": null
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 1
+        },
+        {
+          "filename": "Requerimiento de Compras 00127-2026 (02-10).pdf",
+          "page": 2
+        },
+        {
+          "filename": "Requerimiento de Compras 00127-2026 (02-10).pdf",
+          "page": 1
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 4
+        },
+        {
+          "filename": "CDP C0311.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 25
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 40
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 3
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 35
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 20
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 48
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 46
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 21
+        },
+        {
+          "filename": "RES_ESU_0306_2026 BASES DE LICITACION.pdf",
+          "page": 38
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/584105-29-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "3553-34-LE26",
+      "buyer": "MINISTERIO DE BIENES NACIONALES",
+      "buyer_tax_number": "61.402.000-8",
+      "budget": 60000000,
+      "currency": "CLP",
+      "deadline": "2026-10-20T18:05:00.000Z",
+      "deadline_local": "20-10-2026 15:05",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Desarrollo e implementación de nuevo sistema de administración de carteraMBN.",
+      "fit": "condicional",
+      "risks": [
+        "CLP60M; desarrollosectorial/interoperabilidad; noCRMcomercialdemostrado. Admisibilidad,equipo,referenciasymargenpendientes.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 1
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 8
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 6
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 13
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 19
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 31
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 33
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 11
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 38
+        },
+        {
+          "filename": "Anexo N°3, Experiencia del Oferente.docx",
+          "page": null
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 36
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 40
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 43
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 22
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 5
+        },
+        {
+          "filename": "Bases Res. Ex.N°1717, Des. e Imp. nuevo Sistema Adm. de Cartera.pdf",
+          "page": 42
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/3553-34-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1191688-76-LE26",
+      "buyer": "I MUNICIPALIDAD DE LA COMUNA DE EL BOSQUE",
+      "buyer_tax_number": "69.255.300-4",
+      "budget": 14000000,
+      "currency": "CLP",
+      "deadline": "2026-10-15T18:00:00.000Z",
+      "deadline_local": "15-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Plataforma de reserva y pago online de campos deportivos,inscripción en talleres y comunicación con comunidad.",
+      "fit": "directo",
+      "risks": [
+        "CLP14M; ver integración de pagos,datos,soporte,admisibilidad ycapacidad; sinprecioaprobado.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "filename": "1. Solicitud de Compra 800-00578-2026 - sv.pdf",
+          "page": 1
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 1
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 1
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 14
+        },
+        {
+          "filename": "1. Solicitud de Compra 800-00578-2026 - sv.pdf",
+          "page": 2
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 2
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 12
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 9
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 16
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 26
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 20
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 27
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 6
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 25
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 18
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 19
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 23
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 22
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 19
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1191688-76-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "53947557760",
+        "note_id": "118511240716",
+        "deal_id": "65951142967",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "591-34-LE26",
+      "buyer": "FONDO NACIONAL DE SALUD",
+      "buyer_tax_number": "61.603.000-0",
+      "budget": 3000000,
+      "currency": "CLP",
+      "deadline": "2026-10-19T23:00:00.000Z",
+      "deadline_local": "19-10-2026 20:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Curso IA en ingeniería de software y analítica avanzada sobreAWS/GCP/OCI/onpremise.",
+      "fit": "condicional",
+      "risks": [
+        "Capacitación técnica,noadquisiciónservicioGCP. Relatores,experiencia ycostospendientes.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "document_evidence": [],
+      "rag_status": "not_queried",
+      "source_url": "https://app.licitalab.cl/search/details/591-34-LE26",
+      "disposition": "radar",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "3671-69-LE26",
+      "buyer": "ILUSTRE MUNICIPALIDAD DE CHILLAN VIEJO",
+      "buyer_tax_number": "69.266.500-7",
+      "budget": null,
+      "currency": "CLP",
+      "deadline": "2026-10-23T18:00:00.000Z",
+      "deadline_local": "23-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Hosting web,aplicaciones y basesdatos municipales:dosVM,40vCPU,64GBRAM,2TBSSD,2IPdedicadas;24meses.",
+      "fit": "alto condicionado",
+      "risks": [
+        "HOLD:certificaciónTIERIIIUptime(TCCF)eISO27001a nombre del oferente obligatorias,p7;patentevigente. Sin evidencia admisibilidadpropia,presupuestono informado. RAGpartial:documentospendientes.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "document_evidence": [
+        {
+          "filename": "ANEXOS EDITABLES 3671-69-LE26.docx",
+          "page": null
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 1
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 15
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 16
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 7
+        },
+        {
+          "filename": "TERMINOS DE REFERENCIA WEB HOSTING.pdf",
+          "page": 1
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 8
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 9
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 6
+        }
+      ],
+      "rag_status": "partial",
+      "source_url": "https://app.licitalab.cl/search/details/3671-69-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "identity_evidence": null,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59207505971",
+        "note_id": "118501861534",
+        "deal_id": "65966292255",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "3552-2-RFI26",
+      "buyer": "ESCUELA DE GENDARMERIA",
+      "buyer_tax_number": null,
+      "budget": null,
+      "currency": null,
+      "deadline": "2026-10-16T18:00:11.000Z",
+      "deadline_local": "16-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Consulta MercadoGendarmería:diseño/desarrollo de webs institucionales y24meses de mantención;GCPadmitido.",
+      "fit": "alto condicionado",
+      "risks": [
+        "RFI sinpresupuesto ni compromiso:5añoswebpública,3proyectosEstado,equipo8roles. SLAcrítico30minrespuesta/4hsolución. SinGO.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. Investigación RFI sin Deal ni GO."
+      ],
+      "document_evidence": [
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 19
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 23
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 2
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 15
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 24
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 22
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 4
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 18
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 16
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 20
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 13
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 7
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 14
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 3
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 21
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 8
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 12
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 10
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/market_query/3552-2-RFI26",
+      "disposition": "intake",
+      "crm_object": "Company+Note",
+      "identity_evidence": "CampoorganismoUI +fichaRAG; EscuelaGendarmeríaesunidad delorganismoGendarmeríadeChile.",
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Investigación autorizada14/10; RFI no es licitación abierta para ofertas.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59198238510",
+        "note_id": "118500283665",
+        "deal_id": null,
+        "disposition": "rfi_company_note",
+        "deal_two_readbacks": false,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "1057390-21-LR26",
+      "buyer": "SERVICIO DE SALUD ARAUCANIA NORTE",
+      "buyer_tax_number": "61.955.100-1",
+      "budget": 487000000,
+      "currency": "CLP",
+      "deadline": "2026-11-09T18:30:00.000Z",
+      "deadline_local": "09-11-2026 15:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SSAraucaníaNorte:cloudOracle,aplicativoESISSAN,enlacededicado,36meses.",
+      "fit": "alto condicionado",
+      "risks": [
+        "HOLD:capacidadOracle/ESISSAN,enlaces,experienciaSalud ygarantíaspendientes. NoGCPgenérico. Presupuesto487Mpor36mesesimpuestos,nohonorariosEfeonce.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "document_evidence": [
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 27
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 10
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 13
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 5
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 21
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 22
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 16
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 8
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 3
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 2
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 48
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 44
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 4
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 34
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 6
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 7
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 11
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 25
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 15
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/1057390-21-LR26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "identity_evidence": null,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59200673703",
+        "note_id": "118491490456",
+        "deal_id": "65953160734",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "2704-83-L126",
+      "buyer": "UNIVERSIDAD DEL BIO BIO",
+      "buyer_tax_number": "60.911.006-6",
+      "budget": 3600000,
+      "currency": "CLP",
+      "deadline": "2026-10-17T02:59:00.000Z",
+      "deadline_local": "16-10-2026 23:59",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "UBB:reporteimpacto2026,30páginas,recopilación datos,redacción,3propuestasgráficas,piezadigital yresumenejecutivo;4meses.",
+      "fit": "alto condicionado",
+      "risks": [
+        "CLP3,6M;presencialinicio/cierre;puntúaEmpresaB ydomicilioÑuble/Biobío. Pagos60%elaboración/40%diseño. Validarcostos/referencias.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "document_evidence": [
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 7
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 2
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 3
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 6
+        },
+        {
+          "filename": "ESPECIFICACIONES TÉCNICAS Y CRITERIOS DE EVALUACION.pdf",
+          "page": 1
+        },
+        {
+          "filename": "ESPECIFICACIONES TÉCNICAS Y CRITERIOS DE EVALUACION.pdf",
+          "page": 2
+        },
+        {
+          "filename": "ESPECIFICACIONES TÉCNICAS Y CRITERIOS DE EVALUACION.pdf",
+          "page": 3
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 8
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 1
+        },
+        {
+          "filename": "FORMULARIO B.docx",
+          "page": null
+        },
+        {
+          "filename": "FORMULARIO A.docx",
+          "page": null
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 5
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 9
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 4
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 12
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 10
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 13
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/2704-83-L126",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "identity_evidence": null,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59195450741",
+        "note_id": "118490875831",
+        "deal_id": "65948666534",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "761-24-LE26",
+      "buyer": "SUBSECRETARIA DE DESARROLLO REGIONAL Y ADMINISTRATIVO",
+      "buyer_tax_number": "60.515.000-4",
+      "budget": 15000000,
+      "currency": "CLP",
+      "deadline": "2026-10-23T18:00:00.000Z",
+      "deadline_local": "23-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "SUBDERE:diseño instruccional,virtualización cursosSCORM/HTML5,multimedia,UXyLMS,editables.",
+      "fit": "alto condicionado",
+      "risks": [
+        "CLP15MimpuestossegúnRes6306pp2,18;umbralpromediotécnico>50excluyente. Experiencia25%,equipo30%,propuesta30%,precio10%. No infraestructuraGCP.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "document_evidence": [
+        {
+          "filename": "ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+          "page": null
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 4
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 54
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 28
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 43
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 45
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 13
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 9
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 69
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 24
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 14
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 42
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 38
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 16
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 35
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 70
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 34
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 33
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 41
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 65
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 76
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 2
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 23
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 46
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 53
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 52
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 18
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 51
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 80
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 75
+        }
+      ],
+      "rag_status": "ok",
+      "source_url": "https://app.licitalab.cl/search/details/761-24-LE26",
+      "disposition": "intake",
+      "crm_object": "Deal",
+      "identity_evidence": null,
+      "commercial_status": "por_calificar_sin_GO",
+      "crm_registration_authority": "Julio: Para licitaciones públicas crea deals,14/10/2026.",
+      "hubspot": {
+        "portal": "48713323",
+        "company_id": "59206556228",
+        "note_id": "118515853212",
+        "deal_id": "65950672644",
+        "disposition": "created_deal",
+        "deal_two_readbacks": true,
+        "research_two_readbacks": true
+      }
+    },
+    {
+      "code": "2656-1168-COT26",
+      "buyer": "I MUNICIPALIDAD DE TOME",
+      "buyer_tax_number": "69.150.100-0",
+      "budget": 550000,
+      "currency": "CLP",
+      "published_at": "2026-10-13T11:04:22.733Z",
+      "published_at_local": "13-10-2026 08:04",
+      "deadline": "2026-10-14T12:00:00.000Z",
+      "deadline_local": "14-10-2026 09:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Tomé desarrollo rural: treinta manuales informativos y bolsas personalizadas, impresión de contenido con diseño dado por el cliente.",
+      "fit": "physical",
+      "risks": [
+        "Suministro físico; cotización con foto y totalidad obligatoria, despacho Tomé en un día hábil. No demanda de agencia digital acreditada.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "FICHA DE SOLICITUD DE COTIZACIÓN.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "FICHA DE SOLICITUD DE COTIZACIÓN.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "FORMATO N°1.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "disposition": "exclude",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/agile/2656-1168-COT26",
+      "crm_object": null,
+      "commercial_status": "exclude"
+    },
+    {
+      "code": "1485789-10-COT26",
+      "buyer": "DELEGACIÓN PRESIDENCIAL REGIONAL DE LOS RÍOS",
+      "buyer_tax_number": "61.978.950-4",
+      "budget": 883661,
+      "currency": "CLP",
+      "published_at": "2026-10-08T13:54:32.703Z",
+      "published_at_local": "08-10-2026 10:54",
+      "deadline": "2026-10-18T16:05:27.297Z",
+      "deadline_local": "18-10-2026 13:05",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Delegación Presidencial Los Ríos: poleras, chaquetas polar, capas impermeables, botas y jockeys.",
+      "fit": "physical",
+      "risks": [
+        "El título publicidad no cambia los ítems de vestuario. Suministro físico; no alta comercial creativa por este hallazgo.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ANEXO VESTUARIO.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "disposition": "exclude",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/agile/1485789-10-COT26",
+      "crm_object": null,
+      "commercial_status": "exclude"
+    },
+    {
+      "code": "2785-88-LE26",
+      "buyer": "I MUNICIPALIDAD DE SAN PEDRO DE LA PAZ",
+      "buyer_tax_number": "69.264.800-5",
+      "budget": 25200000,
+      "currency": "CLP",
+      "published_at": "2026-10-06T13:28:03.320Z",
+      "published_at_local": "06-10-2026 10:28",
+      "deadline": "2026-10-21T17:00:00.000Z",
+      "deadline_local": "21-10-2026 14:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "San Pedro de la Paz: producción e impresión de volantes, dípticos, trípticos, pendones roller y paneles araña; diseños aportados por municipio.",
+      "fit": "physical",
+      "risks": [
+        "CLP 25.200.000 global para impresión y estructuras. Experiencia evaluada en impresión por tramos. No diseño creativo contratado según fragmentos recuperados.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo N° 2 Formulario Acreditación Experiencia Licitación ID 2785.doc",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo N° 1 Formato Programa de Integridad Licitación 2785-88-LE26.doc",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases administrativas Licitación ID 2785-88-LE26 Servicio de prod.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 6,
+      "rag_status": "ok",
+      "disposition": "exclude",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/details/2785-88-LE26",
+      "crm_object": null,
+      "commercial_status": "exclude"
+    },
+    {
+      "code": "1262137-70-COT26",
+      "buyer": "CORPORACION MUNICIPAL DE CULTURA DE TILTIL",
+      "buyer_tax_number": "65.166.626-0",
+      "budget": 970000,
+      "currency": "CLP",
+      "published_at": "2026-10-09T14:36:49.330Z",
+      "published_at_local": "09-10-2026 11:36",
+      "deadline": "2026-10-14T13:30:00.000Z",
+      "deadline_local": "14-10-2026 10:30",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Til Til: impresiones, afiches, flyers, pendones, credenciales, adhesivos, chapitas y bolsas para Centro Cultural y Radio.",
+      "fit": "physical",
+      "risks": [
+        "La referencia a Radio Til Til no pide compra de espacios radiales. Entregas físicas parcializadas y despacho; CLP 970.000 IVA.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Solicitud de compra grafica octubre 2026.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "disposition": "exclude",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/agile/1262137-70-COT26",
+      "crm_object": null,
+      "commercial_status": "exclude"
+    },
+    {
+      "code": "5067-2475-COT26",
+      "buyer": "UNIVERSIDAD DE SANTIAGO DE CHILE",
+      "buyer_tax_number": "60.911.000-7",
+      "budget": 3868000,
+      "currency": "CLP",
+      "published_at": "2026-10-13T17:50:21.683Z",
+      "published_at_local": "13-10-2026 14:50",
+      "deadline": "2026-10-14T18:00:00.000Z",
+      "deadline_local": "14-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "USACH: inserción en medio nacional, papel y digital, media página color 27,9×28,9cm; contenido aportado por USACH.",
+      "fit": "conditional_media",
+      "risks": [
+        "Medio con más de 80.000 suscriptores. Canal/inventario/precio de proveedor y fee pendientes; cotización y ficha técnica excluyentes; cierre hoy 15:00.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "BASES DE POSTULACIÓN PARA COMPRA ÁGIL.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO DATOS BANCARIOS.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "disposition": "radar",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/agile/5067-2475-COT26",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "1098710-26-LP26",
+      "buyer": "SUBSECRETARIA DE CIENCIA, TECNOLOGIA, CONOCIMIENTO E INNOVACION",
+      "buyer_tax_number": "62.000.740-4",
+      "budget": 230000000,
+      "currency": "CLP",
+      "published_at": "2026-10-02T20:32:23.953Z",
+      "published_at_local": "02-10-2026 17:32",
+      "deadline": "2026-10-22T18:00:00.000Z",
+      "deadline_local": "22-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Ciencia: Congreso Nacional Explora 2026; diseño y producción integral,45 stands híbridos con pósters, tótems 55 pulgadas, contenidos y motion graphics; ejecución 4 noviembre en MIM.",
+      "fit": "conditional_event",
+      "risks": [
+        "CLP 230.000.000 global; logística integral, mobiliario, montaje/desmontaje, menores y equipos internacionales, monitores y desplazamientos. No limitarlo a diseño digital ni asumir capacidad, proveedor back-to-back, referencias o margen.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "Anexos editables (Congreso_Nacional).docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 14,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 23,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 39,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 40,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 30,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 37,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Rex 445 Aprueba bases Congreso Nacional.pdf",
+          "page": 43,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 2,
+      "rag_status": "ok",
+      "disposition": "radar",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/details/1098710-26-LP26",
+      "crm_object": null,
+      "commercial_status": "radar"
+    },
+    {
+      "code": "745463-5-LE26",
+      "buyer": "SERVICIO NACIONAL PARA LA PREVENCION Y REHABILITACION DEL CONSUMO DE D",
+      "buyer_tax_number": "61.980.170-9",
+      "budget": 20000000,
+      "currency": "CLP",
+      "published_at": "2026-10-08T18:31:44.917Z",
+      "published_at_local": "08-10-2026 15:31",
+      "deadline": "2026-10-23T20:00:00.000Z",
+      "deadline_local": "23-10-2026 17:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Academia SENDA: cuadernos, bloques croquera, bolsas, dípticos, tarjetas y lápices personalizados; insumos de diseño/color/dimensiones aportados por SENDA.",
+      "fit": "physical",
+      "risks": [
+        "CLP 20.000.000 impuestos incluidos para diseño aplicado e impresión/suministro. No agencia creativa o contenidos digitales acreditados. Carta Gantt y etapas obligatorias; no fabricar físicamente como Efeonce.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "RE_691_26.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 20,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 26,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 25,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RE_691_26.pdf",
+          "page": 29,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 7,
+      "rag_status": "ok",
+      "disposition": "exclude",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/details/745463-5-LE26",
+      "crm_object": null,
+      "commercial_status": "exclude"
+    },
+    {
+      "code": "1282238-78-COT26",
+      "buyer": "CORPORACION CULTURAL MUNICIPAL DE COYHAIQUE",
+      "buyer_tax_number": "73.921.100-K",
+      "budget": 2950000,
+      "currency": "CLP",
+      "published_at": "2026-10-09T14:49:25.870Z",
+      "published_at_local": "09-10-2026 11:49",
+      "deadline": "2026-10-16T18:00:00.000Z",
+      "deadline_local": "16-10-2026 15:00",
+      "status": "Publicada",
+      "is_closed": false,
+      "summary": "Coyhaique: diseño y ejecución Encuentro Arte, Cultura y Patrimonio del 4/12; coordinación, guion, ambientación, montaje, maestro de ceremonia y taller textil para hasta 80 personas.",
+      "fit": "conditional_event",
+      "risks": [
+        "CLP 2.950.000 impuestos incluidos; encuentro presencial con taller patrimonial, materiales y logística local. Producción creativa mixta con capacidad/proveedor/costos pendientes; no oportunidad digital calificada.",
+        "Calificación, canal, capacidad y margen pendientes. Sin GO ni presentación."
+      ],
+      "document_evidence": [
+        {
+          "file": "ESPECI~1.PDF",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ESPECI~1.PDF",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ESPECI~1.PDF",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ESPECI~1.PDF",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ESPECI~1.PDF",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ESPECI~1.PDF",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "documents_total": 1,
+      "rag_status": "ok",
+      "disposition": "radar",
+      "intake_route": "Radar local; no CRM write recomendado en este corte",
+      "source_url": "https://app.licitalab.cl/search/agile/1282238-78-COT26",
+      "crm_object": null,
+      "commercial_status": "radar"
+    }
+  ],
+  "verification": "CRM writes complete and readback verified; no GO or submission."
+}

@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "decision",
+  "recipe": "decision-next-steps",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "¿Por dónde empiezo?",
+    "answer": [
+      "Hablemos"
+    ]
+  },
+  "body": "Una conversación para ver **dónde** rinde tu inversión.",
+  "agenda": {
+    "kicker": "01 · Conversación inicial",
+    "title": "Agenda una reunión",
+    "descriptor": "45 min por videollamada · objetivos, canales actuales, inversión y medición",
+    "days": [
+      {
+        "weekday": "Lun",
+        "day": "19"
+      },
+      {
+        "weekday": "Mar",
+        "day": "20"
+      },
+      {
+        "weekday": "Mié",
+        "day": "21"
+      },
+      {
+        "weekday": "Jue",
+        "day": "22"
+      },
+      {
+        "weekday": "Vie",
+        "day": "23"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 2,
+      "time": 2
+    },
+    "summary": "Martes 20 · 11:30 · hora de Chile",
+    "cta": "Agenda una reunión"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Diagnóstico",
+      "title": "Plan de medios",
+      "desc": "Inversión, audiencias, tracking y mix: un plan de 90 días priorizado."
+    },
+    {
+      "number": "03",
+      "label": "Operación",
+      "title": "Tu campaña",
+      "desc": "Compra, optimización y reporte, con medios y fee por separado."
+    }
+  ]
+}

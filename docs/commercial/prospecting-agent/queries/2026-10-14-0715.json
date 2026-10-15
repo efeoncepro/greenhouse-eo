@@ -1,0 +1,1228 @@
+{
+  "run_id": "manual-deep-2026-10-14-0715",
+  "checked_at": "2026-10-14T07:13:30.659254-03:00",
+  "timezone": "America/Santiago",
+  "primary_window": "2026-10-12 00:00 hasta corrida",
+  "sources": "web search, buyer portals, public LinkedIn posts via normal UI",
+  "query_count_including_validation_and_ui": 172,
+  "queries": [
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"proveedores\" OR \"cotización\") (\"marketing\" OR \"sitio web\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"agencia\" (\"recomiendan\" OR \"recomendaciones\") \"octubre\" \"2026\"",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" (\"necesitamos\" OR \"buscando\") (\"rediseñar\" OR \"sitio web\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" (\"proveedor\" OR \"partner\") (\"SEO\" OR \"AEO\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"banco\" OR \"clínica\" OR \"universidad\") \"agencia\" \"licitación\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"retail\" OR \"aseguradora\") (\"SEO\" OR \"CRM\") (\"proveedor\" OR \"licitación\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"agencia\" \"subcontratar\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"agencia\" (\"buscamos partner\" OR \"partner tecnológico\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"licitaciones\" \"proveedores\" \"banco\" marketing octubre2026",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"licitaciones\" \"proveedores\" \"universidad\" agencia 2026",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"portal proveedores\" \"Cencosud\" servicios",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"Falabella\" \"licitaciones\" servicios proveedores",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:bci.cl proveedores licitaciones",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:santander.cl proveedores licitaciones",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:uc.cl proveedores licitaciones",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:duoc.cl licitaciones proveedores",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (Falabella OR Cencosud OR Ripley) (\"agencia\" OR \"SEO\" OR \"CRM\") (\"licitación\" OR \"buscamos\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (Santander OR Bci OR Itaú OR Scotiabank) (\"agencia\" OR \"rediseño\") (\"convocatoria\" OR \"licitación\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (UC OR Duoc OR UNAB OR UDD) (\"marketing\" OR \"sitio web\") \"licitación\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"RedSalud\" OR \"Bupa\" OR \"Clínica Alemana\") (\"agencia\" OR \"SEO\" OR \"CRM\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"solicitamos\" \"agencia\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"invitamos\" \"agencias\" \"2027\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"convocatoria\" \"paid media\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"selección proveedor\" (\"web\" OR \"CRM\" OR \"SEO\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"buscamos agencia\" OR \"concurso de agencias\" OR \"pitch de agencias\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"necesito recomendaciones\" OR \"recomienden\") (\"agencia\" OR \"desarrollo web\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"CRM\" OR \"HubSpot\") (\"RFP\" OR \"solicitud de propuesta\" OR \"cotización\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"SEO\" OR \"posicionamiento orgánico\") (\"buscamos\" OR \"requerimos\" OR \"convocatoria\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (Copec OR CMPC OR Arauco OR CCU) (\"agencia\" OR \"marketing\" OR \"sitio web\") (\"proveedor\" OR \"licitación\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (Entel OR WOM OR Claro OR Movistar) \"agencia\" (\"pitch\" OR \"concurso\" OR \"selección\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"agencia de medios\" OR \"plan de medios\") (\"buscamos\" OR \"cotización\" OR \"proveedor\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile (\"rebranding\" OR \"imagen corporativa\") (\"licitación\" OR \"convocatoria\" OR \"proveedor\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts Chile \"agencia creativa\" \"octubre\" \"2026\"",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts Chile \"agencia de medios\" \"octubre\" \"2026\"",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts Chile \"HubSpot\" \"proveedor\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts Chile \"rediseño\" \"cotizar\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Copec proveedores portal licitaciones registro",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "CMPC proveedores licitaciones portal",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "RedSalud proveedores licitaciones portal",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Entel Chile proveedores licitaciones portal",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" \"selección de agencia\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" \"agencias interesadas\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" \"busco agencia\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" \"buscamos proveedor\" \"web\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "\"[nombre individual redactado]\" \"agencia\" \"QuePlan\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"queplan\" \"agencia\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:codesser.cl \"2026\" \"octubre\" \"marketing\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:codesser.cl \"2026\" \"octubre\" \"web\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" \"agencia SEO\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "site:linkedin.com/posts \"Chile\" \"implementación HubSpot\" (\"buscamos\" OR \"recomiendan\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"licitación privada\" (\"diseño\" OR \"marketing\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "chile",
+      "family": "queries",
+      "q": "Chile \"solicitud de propuestas\" (\"web\" OR \"comunicaciones\" OR \"medios\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"agencia\" \"recomiendan\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"aliado\" \"marketing\" \"buscamos\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"renovación\" \"sitio web\" \"proveedor\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"implementación\" \"CRM\" \"convocatoria\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com/posts \"agencia\" \"2027\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"homologación\" \"marketing\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"SEO\" \"licitación\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"medios\" \"agencia\" \"convocatoria\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú proveedores \"marketing\" \"octubre 2026\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"banco\" \"agencia\" \"buscando\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"universidad\" \"rediseño\" \"convocatoria\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"retail\" \"agencia\" \"recomendaciones\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:profonanpe.org.pe \"convocatoria\" \"octubre\" \"2026\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:wwf.org.pe \"consultoría\" \"2026\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:planinternational.org.pe \"proveedores\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:savethechildren.org.pe \"convocatoria\" \"octubre\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"buscamos agencia\" after:2026-10-11 -jobs -empleo",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"busco recomendaciones\" \"agencia\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"partner\" \"HubSpot\" \"buscando\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"SEO\" \"buscamos\" after:2026-10-11 -jobs -empleo",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"proveedores\" \"creatividad\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"agencia SEO\" \"recomiendan\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"AEO\" \"proveedor\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"HubSpot\" \"integración\" \"licitación\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:up.edu.pe \"proveedores\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:ucal.edu.pe \"agencia\" \"convocatoria\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:continental.edu.pe \"proveedores\" \"convocatoria\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"licitación privada\" \"marketing\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"solicitud de cotización\" \"marketing\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"RFI\" \"CRM\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"propuesta técnica\" \"sitio web\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"agencia\" \"octubre 2026\" \"credenciales\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"compras\" \"agencia digital\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"selección\" \"agencia creativa\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"GEO\" \"licitación\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "Perú \"agencia de medios 2027\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"buscamos\" \"branding\" after:2026-10-11 -jobs",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"necesitamos\" \"web\" \"proveedor\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"recomienden\" \"CRM\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_queries",
+      "q": "site:pe.linkedin.com \"pauta\" \"agencia\" \"buscamos\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "site:alicorp.com.pe proveedores licitaciones marketing",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "site:viabcp.com proveedores convocatoria marketing",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "site:pucp.edu.pe proveedores licitaciones publicidad",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "site:planinternational.org.pe licitaciones proveedores",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "Perú proveedores portal Scotiabank",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "Universidad Pacífico Perú proveedores registro",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "Plan International Perú convocatorias consultorías",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "discovery_without_date",
+      "q": "Profonanpe convocatorias compras 2026",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "resolution_queries",
+      "q": "\"No hay sin suerte\" \"[nombre individual redactado]\" \"programática\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "resolution_queries",
+      "q": "\"No hay sin suerte\" LinkedIn empleados",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "resolution_queries",
+      "q": "\"Plan International\" \"Perú\" \"licitaciones\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "resolution_queries",
+      "q": "\"Save the Children\" \"Perú\" \"proveedores\" \"convocatorias\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "resolution_queries",
+      "q": "Machapro Service empleados tamaño empresa machapro.com",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "peru",
+      "family": "resolution_queries",
+      "q": "Machapro Service empresa Perú colaboradores",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia convocatoria proveedores agencia comunicaciones octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia contratación privada diseño portal sitio web octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia agencia posicionamiento SEO invitación cotizar octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia implementación automatización CRM cotización octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia selección agencia pauta digital medios 2027 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:comfama.com proveedores convocatoria marketing after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:compensar.com proveedores publicidad invitación after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:colsubsidio.com proveedores agencia convocatoria after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:bancolombia.com proveedores convocatoria marketing after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:davivienda.com proveedores marketing licitación after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:grupoexito.com.co proveedores convocatoria agencia after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:uniandes.edu.co convocatoria proveedor diseño web after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:wwf.org.co convocatorias comunicación agencia octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:plan.org.co convocatoria agencia campaña octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:fundacioncorona.org contratación web comunicaciones octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia fundación invitación propuesta agencia SEO digital octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:alianzaporlasolidaridad.org Colombia convocatoria comunicaciones octubre 2026 after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:wwf.org.co \"convocatorias\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:plan.org.co \"licitaciones\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"solicitud de cotización\" \"comunicaciones\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:linkedin.com/posts \"Colombia\" \"aliado\" \"agencia\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:linkedin.com/posts \"Bogotá\" \"recomiendan\" \"marketing\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:linkedin.com/posts \"Colombia\" \"selección\" \"2027\" \"agencias\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:linkedin.com/posts \"Medellín\" \"proveedor\" \"web\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "WWF Colombia convocatorias consultorías comunicaciones 2026",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Fundación Plan Colombia convocatorias proveedores 2026",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia proveedores Comfenalco convocatoria diseño publicidad after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia ONG firma consultora estrategia comunicación after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"agencia\" \"cotizar\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"SEO\" \"proveedor\" \"buscamos\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"HubSpot\" \"implementación\" \"buscamos\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"rediseño\" \"invitación\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:corferias.com convocatoria proveedor publicidad after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:ccb.org.co invitación agencia comunicaciones after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:profamilia.org.co convocatoria marketing after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "site:coomeva.com.co convocatoria proveedor CRM after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"buscamos agencia\" \"octubre\" \"2026\"",
+      "recency": 7,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"licitación\" \"SEO\" \"octubre\"",
+      "recency": 7,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"convocatoria\" \"rediseño web\" \"2026\"",
+      "recency": 7,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "discovery_queries",
+      "q": "Colombia \"agencia de medios\" \"convocatoria\" \"2027\"",
+      "recency": 7,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "qualification_queries",
+      "q": "UNIMINUTO corporacion universitaria minuto dios empleados 2025 informe gestión",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "colombia",
+      "family": "qualification_queries",
+      "q": "UNIMINUTO [nombre individual redactado] Digital Marketing Manager influencer marketing agencia",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México (\"selección de agencia\" OR \"recomiendan una agencia\" OR \"partner digital\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México (\"proveedores\" OR \"convocatorias\") (\"marketing\" OR \"comunicación\") (\"fundación\" OR \"asociación\") octubre 2026",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México (\"HubSpot\" OR \"CRM\") (\"integrador\" OR \"RFI\" OR \"RFP\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México (\"agencia SEO\" OR \"rediseño web\") (\"busco\" OR \"buscamos\" OR \"recomienden\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México \"licitación\" \"agencia de medios\" \"octubre\" \"2026\"",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México (\"solicitud de propuesta\" OR \"convocatoria\") (\"sitio web\" OR \"SEO\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México \"proveedores\" \"agencia\" \"2027\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México (\"RFP\" OR \"concurso\") (\"CRM\" OR \"HubSpot\" OR \"programática\") after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "HEINEKEN México empleados 2026 proveedores BTL [nombre individual redactado]",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México \"buscamos agencia\" \"octubre\" \"2026\"",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México \"buscamos\" \"agencia SEO\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "queries",
+      "q": "México \"implementación CRM\" \"proveedor\" after:2026-10-11",
+      "recency": 2,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "additional_queries",
+      "q": "site.heinekenmexico.com \"colaboradores\" \"2026\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "additional_queries",
+      "q": "site:heinekenmexico.com \"más de\" \"empleados\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "additional_queries",
+      "q": "site:cemexmexico.com proveedores portal nuevos proveedores",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "additional_queries",
+      "q": "site:grupobimbo.com proveedores registro portal",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "additional_queries",
+      "q": "site:walmex.mx proveedores servicios mercadotecnia",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "buscamos agencia",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "\"buscamos agencia\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "\"busco agencia\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "HubSpot (buscamos OR recomiendan OR proveedor OR partner)",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "\"HubSpot\" AND \"buscamos\"",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "\"SEO\" AND (\"buscamos\" OR \"busco\" OR \"licitación\")",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    },
+    {
+      "market": "mexico-and-linkedin",
+      "family": "linkedin_ui_queries",
+      "q": "\"web\" AND (\"licitación\" OR \"recomiendan\" OR \"proveedor\")",
+      "recency": null,
+      "executed_date": "2026-10-14"
+    }
+  ],
+  "additional_private_followups": "chile-followup-verifications.json and peru-sandoval-addendum.json; not included in count",
+  "new_ids": [
+    "HSP-0029",
+    "HSP-0030"
+  ],
+  "crm_writes": 0,
+  "outreach": 0,
+  "paid_enrichment": 0,
+  "limitations": [
+    "Not an exhaustive market census",
+    "Date filters are discovery aids, not publication evidence",
+    "Invited supplier procurement behind login was not inspected",
+    "Names in nominal queries redacted; full log retained privately"
+  ]
+}

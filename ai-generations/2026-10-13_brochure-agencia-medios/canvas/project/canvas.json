@@ -1,0 +1,52 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-13T12:20:00Z" },
+  "title": "Brochure Agencia de Medios Efeonce",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1920, "h": 1080, "title": "01 · Portada · ¿Dónde invierto? Donde rinde." },
+    "L02-diferencia.dc.html": { "x": 2000, "y": 0, "w": 1920, "h": 1080, "title": "02 · La diferencia · ¿Otra agencia de medios? Una operación." },
+    "L03-frentes.dc.html": { "x": 4000, "y": 0, "w": 1920, "h": 1080, "title": "03 · Oferta integral · ¿Qué hace mi agencia de medios? Todo el ciclo." },
+    "L04-performance.dc.html": { "x": 6000, "y": 0, "w": 1920, "h": 1080, "title": "04 · Performance marketing · ¿A quién le llega mi pauta? A quien importa." },
+    "L05-programatica.dc.html": { "x": 0, "y": 1440, "w": 1920, "h": 1080, "title": "05 · Programática · ¿Y fuera de search y social? También." },
+    "L06-formatos.dc.html": { "x": 2000, "y": 1440, "w": 1920, "h": 1080, "title": "06 · Programática · Formatos · ¿En qué pantallas aparezco? Donde mira." },
+    "L07-rutas.dc.html": { "x": 4000, "y": 1440, "w": 1920, "h": 1080, "title": "07 · Programática · Cómo se contrata · Por una campaña." },
+    "L08-cobro.dc.html": { "x": 6000, "y": 1440, "w": 1920, "h": 1080, "title": "08 · Cómo se cobra · ¿Cómo pago medios y agencia? Aparte." },
+    "L09-medicion.dc.html": { "x": 0, "y": 2880, "w": 1920, "h": 1080, "title": "09 · Medición · ¿Cómo sé qué funcionó? Con evidencia." },
+    "L10-siguiente.dc.html": { "x": 2000, "y": 2880, "w": 1920, "h": 1080, "title": "10 · Próximos pasos · ¿Por dónde empiezo? Hablemos." },
+    "L11-contraportada.dc.html": { "x": 4000, "y": 2880, "w": 1920, "h": 1080, "title": "11 · Contraportada · ¿Conversamos? Cuando quieras." }
+  },
+  "order": [
+    "Main.dc.html",
+    "L02-diferencia.dc.html",
+    "L03-frentes.dc.html",
+    "L04-performance.dc.html",
+    "L05-programatica.dc.html",
+    "L06-formatos.dc.html",
+    "L07-rutas.dc.html",
+    "L08-cobro.dc.html",
+    "L09-medicion.dc.html",
+    "L10-siguiente.dc.html",
+    "L11-contraportada.dc.html"
+  ],
+  "notes": {
+    "t1": { "x": 0, "y": -300, "text": "Acto 1 · La agencia de medios: portada, diferencia, oferta integral y performance", "kind": "title1", "maxW": 7920 },
+    "t2": { "x": 0, "y": 1140, "text": "Acto 2 · Publicidad programática: qué es, formatos, cómo se contrata y cómo se cobra", "kind": "title1", "maxW": 7920 },
+    "t3": { "x": 0, "y": 2580, "text": "Acto 3 · Medición y cierre", "kind": "title1", "maxW": 5920 },
+    "n1": { "x": 8200, "y": 0, "w": 560, "fill": "teal", "text": "Cómo está hecho: cada lámina es una receta aprobada del catálogo de deck, compuesta con pnpm brand:compose (línea Voice, uso brochure). Intents, plan validado y PNG en ai-generations/2026-10-13_brochure-agencia-medios/. Para cambiar un texto se edita el intent y se vuelve a componer." },
+    "n2": { "x": 8200, "y": 620, "w": 560, "fill": "orange", "text": "Pares nuevos que necesitan tu aprobación: «¿Otra agencia de medios? Una operación.», «¿Qué hace mi agencia de medios? Todo el ciclo.», «¿Y fuera de search y social? También.», «¿En qué pantallas aparezco? Donde mira.», «¿Por dónde parto con programática? Por una campaña.», «¿Cómo pago medios y agencia? Aparte.», «¿Cómo sé qué funcionó? Con evidencia.», «¿Por dónde empiezo? Hablemos.». Aprobados que se reutilizan: portada Voice, «A quien importa» y la contraportada." },
+    "n3": { "x": 8200, "y": 1440, "w": 560, "fill": "blue", "text": "Programática, según la ficha comercial aprobada el 2026-10-09: no se nombran proveedores tecnológicos, no hay precios (la propuesta muestra sólo el alcance y precio de cada cliente) y no se promete ROAS, ventas ni alcance. Los formatos no están habilitados en todos los mercados: se confirma por campaña. «Comisiones sólo si están en tu contrato» resume la política de rebates declarados; conviene que Finance y Legal la lean antes de imprimir." },
+    "n4": { "x": 8200, "y": 2200, "w": 560, "fill": "blue", "text": "Fotos: la portada usa el plate aprobado de la línea Voice (LN4) y Performance usa CT7 (paid social), que ya salió en el brochure 360 y en el deck de contenidos. No hay todavía una foto propia de programática ni de pDOOH; si quieres una lámina de cine para programática, hay que producir el plate." },
+    "n5": { "x": 8200, "y": 2880, "w": 560, "fill": "gray", "text": "Fuera de esta primera versión: creadores e influencia, PR, retail media en detalle, casos y logos de clientes (sólo con autorización archivada), equipo y mercados. La lámina de próximos pasos trae fechas de muestra." }
+  },
+  "designSystems": [
+    {
+      "title": "Efeonce — La órbita",
+      "namespace": "la-orbita",
+      "artifact": "https://claude.ai/code/artifact/0f7107f2-2ef1-460c-af82-5bf59e2f8785",
+      "version": "1791045370-2874",
+      "copiedAt": "2026-10-13T12:20:00Z"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "method",
+  "recipe": "method-waves",
+  "voice": {
+    "eyebrow": "Programática · cómo se contrata",
+    "question": "¿Por dónde parto con programática?",
+    "answer": [
+      "Por una",
+      "campaña"
+    ]
+  },
+  "body": "Tres formas de contratar según lo que necesites probar. Cada una termina con una **recomendación** para el siguiente ciclo.",
+  "steps": [
+    {
+      "kicker": "Antes de comprar",
+      "name": "Diseño de distribución",
+      "desc": "Mix, inventario, inversión y medición recomendados."
+    },
+    {
+      "kicker": "Empieza aquí",
+      "name": "Campaña acotada",
+      "desc": "Lanzamiento, evento o territorio: plan, activación, pacing y reporte reconciliado."
+    },
+    {
+      "kicker": "On-Going",
+      "name": "Operación mensual",
+      "desc": "Flights continuos con control, aprendizaje y decisiones de mix en cada período."
+    },
+    {
+      "kicker": "Cuenta integral",
+      "name": "Mix completo",
+      "desc": "Search, social y programática bajo un plan; pagas sólo la capacidad adicional."
+    }
+  ],
+  "selectedStep": 2
+}

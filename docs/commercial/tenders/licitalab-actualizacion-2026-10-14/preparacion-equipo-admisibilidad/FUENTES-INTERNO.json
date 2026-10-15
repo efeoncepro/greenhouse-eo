@@ -1,0 +1,213 @@
+{
+  "review_date": "2026-10-14",
+  "classification": "INTERNAL_RESTRICTED_NO_PUBLICATION",
+  "note": "Sólo índices y conclusiones; originales permanecen en repositorio corporativo privado. No acredita disponibilidad actual ni autoriza incluir nombres en oferta.",
+  "sources": [
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Workspace/Efeonce Group/People/Documentación/CV Wendy Burgos.pdf",
+      "sha256": "80904c6c7cc7a6722933836842c8b5b6c32ae2ef73d3351223f0f53dd153fa15",
+      "bytes": 98355,
+      "type": "cv",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Workspace/Efeonce Group/People/Documentación/CV Melkin Hernández.pdf",
+      "sha256": "ab3b0790c70c97ec0103fa75fb566eb7311e00437342e388710ce9aea2c0d74e",
+      "bytes": 1252559,
+      "type": "cv",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Workspace/Efeonce Group/People/Documentación/CV Daniela Infante.pdf",
+      "sha256": "427c0d5a6243f6147d30a5b03aede1afc3d25bd7f6cc21f099e6e4e8b6a73ac1",
+      "bytes": 366194,
+      "type": "cv",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Workspace/Efeonce Group/People/Documentación/CV Daniela Ferreira.pdf",
+      "sha256": "2855b5fb604a4cf8992be0d4149aee2619331e89eba3cda3ca2a36e114d86c76",
+      "bytes": 1117132,
+      "type": "cv",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Workspace/Efeonce Group/People/Talento/TRaffickers/Anderson Badillo CV  (3).pdf",
+      "sha256": "9b43696f565c4e197593a718b0a9707361f07e75556f7dd41826a796fdc2296b",
+      "bytes": 1363542,
+      "type": "cv",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Workspace/Efeonce Group/People/Laborales/Valentina Hoyos/CV VALENTINA HOYOS (2).pdf",
+      "sha256": "7fcdb7deb0c07be4f4758ba5de4fbdf76e4d9ba097bea65ce3e85298b7f5f13a",
+      "bytes": 56463,
+      "type": "cv",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/e-rut.pdf",
+      "sha256": "c55fad2b667abec24c57e1431a4555ff9e362e909a1d7ce0ee891185256c02d8",
+      "bytes": 61287,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/vigencia-05-01-26.pdf",
+      "sha256": "9bddc7502fede95921b7006605ffd621b7397fff924dbef46ad6922d907de8b2",
+      "bytes": 268826,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/anotaciones-05-01-26.pdf",
+      "sha256": "9382f83838e2942b3065b8fd986d2cdf71804015c6380bd83a7693b091455678",
+      "bytes": 268816,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/estatutos-05-01-26.pdf",
+      "sha256": "5d0a846af28f50ec736ce97f690c5c35df9b0211fec37eaf90ac7ff5996995aa",
+      "bytes": 758859,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/certificado (12).pdf",
+      "sha256": "10ff09e30951a414dfd007db4b97b65dc18459b87018e2ca735dac957f08c561",
+      "bytes": 30629,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/ct-08-26-efeonce.pdf",
+      "sha256": "c6ce62365be23d446118b72b1f7e65d1c59716cbd5cb3c0ccbb8dd6836c07d27",
+      "bytes": 425834,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/3542752 AL DIA.pdf",
+      "sha256": "069e53ac10a895fe2d990fd314d138604febdc538a9f0cabf56a1dee3fb2d22e",
+      "bytes": 45210,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/Referencia-Sky-FIRMA.pdf",
+      "sha256": "f9ce3b5995bdfeedda711f4858bceab38638e441685ee9380a8111b301fef78f",
+      "bytes": 121877,
+      "type": "corporate",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Gobierno de Santiago/FAC-EL_111_61923200-3.pdf",
+      "sha256": "b61fdb7acda55b7a45ab1162e4e04567edef484294d03c66705c76fa652b4463",
+      "bytes": 67320,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Gobierno de Santiago/Certificado Recibo Conforme - EFEONCE.pdf",
+      "sha256": "232bf00bb96f756ce68ea62d9730afb204f18a49cea05d19e4e732538fd7eac7",
+      "bytes": 113940,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Berel/Contrato de Prestacion de Servicios EFEONCE .pdf-firmado.pdf",
+      "sha256": "16187f21f8b409914ab0d647b828ffe201f94a76a6b93f420dc6bcd29a522d09",
+      "bytes": 2140821,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Berel/FAC-EXPE_53_PBE970101718.pdf",
+      "sha256": "eadd6d6d9ec10f653fb3095fd4a4ed1eccba02ef2ebee1746213fa124dcafaba",
+      "bytes": 64528,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/SKY/FAC-EL_56_88417000-1.pdf",
+      "sha256": "defd41a77eaaf194d5016e1ccbaf2710c1605394bd50fc0f79be76313dd63e03",
+      "bytes": 68188,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/SKY/PO_221970_0.pdf",
+      "sha256": "bc0a97f42dcf3629e14ee5921e40c0cae0db297f4019ea0ca7c08bf2b11dd8b7",
+      "bytes": 31091,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/SKY/Contrato-Sky-830c0de8-ff76-48a8-afe4-b897fb2b9eb9.pdf",
+      "sha256": "3e4ca4b363ce8ed0763477e092b4ed7c19b57b08239cace188beb10c4458b530",
+      "bytes": 899399,
+      "type": "experience",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/05. Paquete para presentar/1.8 Anexo 8 — Programa de integridad — FIRMADO.docx",
+      "sha256": "9333a1c5d178d35420157f9faab4a0ba9fd6e65dc48cc5d348cee6715baebcf2",
+      "bytes": 7703153,
+      "type": "integrity",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/05. Paquete para presentar/1.8 Anexo 8 — Programa de integridad — FIRMADO.pdf",
+      "sha256": "b5acc5f2c62de6c521548585cc7f25fec81f1cda3c297af10456159e52c0ae77",
+      "bytes": 87652,
+      "type": "integrity",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/05. Paquete para presentar/1.8 Programa de integridad Efeonce — ACTUALIZADO Y FIRMADO.docx",
+      "sha256": "41dccda608fbd911c659a9a647bfa8318e52de7239fb3a23a251a636227799ca",
+      "bytes": 240417,
+      "type": "integrity",
+      "exists_at_review": true
+    },
+    {
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/05. Paquete para presentar/1.8 Programa de integridad Efeonce — ACTUALIZADO Y FIRMADO.pdf",
+      "sha256": "6b0b4ab53d69afb18121095ffd3e28de6afe58a7eb87d0d4f6fb74192803acd5",
+      "bytes": 315496,
+      "type": "integrity",
+      "exists_at_review": true
+    }
+  ],
+  "process_base_provenance": [
+    {
+      "code": "761-24-LE26",
+      "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+      "pages": 81,
+      "verification": "original completo por agente categories; consultas RAG de apoyo locales",
+      "support_cache": ".auth/licitalab-radar-reports/additional-20261014/761-24-LE26-requirements.json",
+      "critical_refs": [
+        "pp11–12",
+        "p16 §5.4",
+        "pp36–38",
+        "p47 §22",
+        "pp77–80"
+      ]
+    },
+    {
+      "code": "1422259-10-LE26",
+      "filename": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+      "pages": 56,
+      "verification": "original completo por agente reconcile_expired; consulta RAG dirigida adicional",
+      "support_cache": ".auth/tender-team-review-20261014/tarapaca-linea2-brief-evidence.json",
+      "critical_refs": [
+        "pp8–10",
+        "pp21–24",
+        "p26",
+        "p31",
+        "p49",
+        "p54"
+      ]
+    }
+  ]
+}

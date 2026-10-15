@@ -38,6 +38,28 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
 7. Entregar action pack a Commercial/seguimiento: estado observado, owner, próximo paso/fecha, fuentes y brechas.
    Mantener HSP e historial privados en radar existente; no cambiar scheduler ni crear otro.
 
+## Radar: primera puerta y aviso temprano
+
+1. Leer la [guía compartida](../../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) y el estado del proceso.
+   Separar descubrimiento de vigilancia; registrar por país/servicio público y privado independientes,
+   nonprofit aparte. Prioridad LATAM; Palm Desert sigue condicionado.
+2. Antes de abrir, prechequear identidad canónica y URL contra bloqueos. Si falla, registrar intento y
+   brecha, conservar marcadores de éxito/cobertura/IDs y detener ese acceso; no usar rutas equivalentes.
+3. Aplicar solape mínimo de 72 horas desde el último corte exitoso, incluso al cruzar semana; ampliar
+   ante indexación tardía acreditada/interrupción. No sustituye la frecuencia vigente ni permite simular lecturas.
+4. Ordenar interés, credenciales, inscripción, visita, consultas y cierre final. Avisar al operador una
+   señal primaria documentada con una acción útil sin esperar el RFP completo; acceso/eligibilidad
+   pendientes siguen explícitos. Menos de cinco días hábiles a la primera puerta muestra detección tardía.
+5. Registrar publicación, disponibilidad pública, detección, validación y aviso separados, con fuentes/
+   precisión/zona y margen útil. No usar creación CRM como primera detección ni borrador como aviso entregado.
+   No inferir causa del retraso ni prometer exhaustividad. Una guía no es una automatización desplegada.
+
+[Socopur 2027](../../commercial/tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md):
+la respuesta del 15/10 16:54:36 UTC cerró nuevas postulaciones/propuestas de este período. No insistir,
+ampliar a colegas ni preparar oferta; credenciales guardadas no prometen invitación/fecha o adjudicación.
+El seguimiento puntual enlazado abajo es un corte histórico anterior a esa respuesta. Estos pasos no
+modifican permisos, frecuencia o suscripciones ni autorizan comunicaciones o registros CRM.
+
 ## Cuando el pedido involucra ABM / ABS
 
 Cargar [módulo account-based](../../../.codex/skills/efeonce-b2b-prospecting/references/abm-and-abs.md).
@@ -140,3 +162,14 @@ y correr cierre/contexto después de la última edición. No confundir evaluaci�
 Para medir un cambio, comparar a ciegas respuestas con y sin la skill sobre los mismos escenarios y mirar
 también la extensión: el [diferencial del 2026-10-12](../../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md)
 describe el procedimiento y sus límites.
+
+## Conservar cuentas con proveedor actual
+
+Aplicar la [política de seguimiento a largo plazo](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md).
+Detener la cadencia actual, conservar encaje/historia y fijar una revisión interna con owner/TASK única
+en HubSpot. Asociar Contact/Company y Deal pertinente, verificar readback y registrar el ID nativo.
+Notion conserva trabajo operativo/entregables; cancelar duplicado comercial después del readback.
+Con agencia recién contratada y sin hito, usar seis meses; hito del comprador y restricciones prevalecen.
+Mantener tarea en el seguimiento existente aunque cambie el mes; revisión no autoriza contacto.
+Nutrición por email requiere permiso verificable y autoridad de ejecución, distintos de presencia pública.
+Caso con tarea/readback: [Fabrimetal](../../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).

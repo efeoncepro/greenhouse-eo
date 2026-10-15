@@ -1,0 +1,33 @@
+# SUBDERE y Tarapacá ofertas para revisión
+
+Corte14-10-2026. Pedido de Julio: preparar bases completas, admisibilidad, equipo, alcance y costeo, **sin enviar**. Pesados sólo en la carpeta comercial existente de OneDrive `Alineación/4. Comercial/Licitaciones`; repo conserva registros livianos y enlaces. No carpeta nueva Tenders en OneDrive. Los expedientes siguen como borradores: no se han firmado, cargado, enviado ni aprobado.
+
+| Proceso | Bases completas leídas | Economía propuesta para revisión | Cierre postulación Chile | Decisión actual |
+| --- | --- | --- | --- | --- |
+| SUBDERE761-24-LE26 | Resolución6306/2026 PDF81p y DOCX completo | CLP12.600.000netos +2.394.000IVA =14.994.000total; presupuesto15.000.000total |23/10/2026 15:00|Preparación prioritaria condicionada a dos especialistas, experiencia pertinente y costo completo|
+| Corporación Tarapacá1422259-10-LE26 línea2 | Resolución42/2026 PDF56p por OCR y cuadros cotejados, DOCX económico completo | Cuatro unitarios con IVA; CPT3=5.355.000 para evaluación; bolsa6.204.000 sin consumo mínimo |20/10/2026 15:00|Preparar capacidad/aclaración antes de compromiso económico; importante desventaja por plus30%|
+
+## Archivos para revisar en OneDrive
+
+- [SUBDERE técnica y económica](https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/02.%20Propuesta%20en%20trabajo), [anexos sin firma](https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/03.%20Anexos%20borradores%20sin%20firma). [Índice liviano del repo](../subdere-elearning-2026/README.md).
+- [Tarapacá técnica](https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/02.%20Propuesta%20en%20trabajo), [anexos y económica](https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma). [Índice liviano del repo](../tarapaca-medios-linea2-2026/README.md).
+
+Cada expediente tiene `01. Bases y anexos originales`, `02. Propuesta en trabajo`, `03. Anexos borradores sin firma` y `04. Interno`. El costeo completo, sus hipótesis, documentos congelados y QA están en04; no se entregan al comprador. Las originales Word se conservan dentro de ZIP para mantener bytes de descarga; las copias de uso en OneDrive adquieren metadatos OOXML, con contenido cotejado sin cambios. PDFs originales idénticos por hash local y tamaño observado en nube.
+
+## Qué preparar y qué falta
+
+**SUBDERE primero:** el diseño cubre siete módulos, actividades, evaluación, SCORM/HTML5 aprobado, accesibilidad, editables, QA y transferencia. Hipótesis inicial14cápsulas más inducción/evaluación, sin límite contractual;458h de dos especialistas integrados, incluyendo continuidad. Informes10/90/160d, servicio230d, contrato250d. Pago40/30/30contra recepción; garantía5%neto (630.000). El costeo base del catálogo estima6.518.006de costo y49,21%margen propio, con contingencia12%; aún no es costo completo real. El espacio de costos adicionales antes de piso45%es519.994; overhead10%humano+prima120.000+financiación20.000lo supera por33.006. No aprobar implícitamente ese desvío ni suponer costo de especialista igual al proxy. Caja conservadora con colateral:2,66/3,56/4,45M para pagos30/60/90d después de cada informe aprobado, sin IVA libre ni overhead adicional.
+
+Conseguir dos personas distintas con CV/títulos/experiencias verificables y jefatura identificada; acreditar experiencia del oferente en virtualización/formación pertinente; elegir herramienta y fuentes/derechos institucionales, validar presupuesto y cronograma. SUBDERE permite subcontratación parcial máxima30% y excluye transferir prestaciones contratadas por idoneidad; conseguir dos proveedores externos para todo el núcleo no acredita admisibilidad. El promedio técnico debe superar50, con antecedentes reales.
+
+**Tarapacá:** estrategia editorial territorial, segmentación Meta/TikTok, crisis, reels4K1–3min, creadores locales>=15.000seguidores y hasta5corporativos60–90seg horizontal/vertical. Los cuatro precios con IVA del Anexo6 son: fee mensual2.034.900incluyendo300.000netos de pauta como hipótesis, reel999.600, colaboración630.700, corporativo1.689.800. Pedidos aislados modelados conservadoramente; no sumar sus costos como si fueran un mismo equipo ni tratar CPT3 como ingreso. Cinco corporativos a esta tarifa exceden la bolsa: no prometer máximos simultáneos. Final del contrato31/12/2026; consumo mensual real, pago30d y sin anticipo.
+
+Conseguir y costear productora/kit/desplazamiento/derechos y creador, validar referencias desde2020 y disponibilidad. La ficha dice sin subcontratación, mientras original exige autorización escrita previa; consulta preparada, no enviada. Plus evaluado30%: LED/mobiliario o alternativa web+newsletter+app, sin disponibilidad y costo validados; no comprometer gratis para llenar casilla. Sin domicilio regional acreditado ni recursos propios supuestos. El equipo asignado SKY tiene restricciones contractuales que impiden contar horas libres por inferencia.
+
+**Ambas:** personería/habilidad actual, declaraciones del proceso y difusión del programa de integridad pendientes; no extrapolar UTEM. [Ledger corporativo/equipo y briefs](preparacion-equipo-admisibilidad/README-INTERNO.md). Julio confirmó que todavía no tiene los especialistas/productora, pero puede conseguirlos. No se contactó a candidatos, productores, creadores ni compradores.
+
+## CRM y verificación
+
+Deals existentes: [SUBDERE65950672644](https://app.hubspot.com/contacts/48713323/record/0-3/65950672644), [Tarapacá65958079532](https://app.hubspot.com/contacts/48713323/record/0-3/65958079532). Esta fase no cambia montos/closedate ni atribuye GO. Las altas de hoy conservan su readback en el recibo inicial. Los presupuestos, cierre de postulación y precio propuesto son hechos separados.
+
+Archivos/URLs y readback remoto en `ARCHIVOS-ONEDRIVE.json` de cada expediente. Se verificó identidad Julio/Efeonce y la biblioteca GrowthMarketing; presencia de las carpetas y PDFs mediante conector SharePoint después de copiar y comparar hashes en disco. Sin commit, push, firma ni presentación.

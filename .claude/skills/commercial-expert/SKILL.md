@@ -1,4 +1,5 @@
 name: commercial-expert-greenhouse-overlay
+
 description: Greenhouse-specific pinned decisions that OVERRIDE the global commercial-expert skill defaults. Load this first whenever commercial-expert is invoked inside the greenhouse-eo repo. Specializes in ASaaS doctrine (Manifesto V1), Bow-tie alignment with Greenhouse runtime, 3 client_kind playbooks (Active/Self-Serve/Project), Globe clients ICP (enterprise marketing teams), 4-product positioning (servicio agencia / Kortex / Verk / Greenhouse portal), HubSpot portal 48713323 operations, Nubox billing implications, ICO health score integration.
 type: overlay
 overrides: commercial-expert

@@ -1,6 +1,8 @@
 # Pierre Fabre Chile — Agencia Integral de Medios 2027
 
-Estado al 09-10-2026, America/Santiago: proceso registrado en HubSpot y en evaluación. Sin preinscripción, credenciales enviadas ni propuesta presentada. Este expediente no acredita GO, presupuesto o adjudicación.
+Estado vigente al **15-10-2026**, America/Santiago, confirmado por Julio: **preinscripción realizada**. Julio preparará las credenciales **mañana viernes16/10/2026** para enviar; el envío sigue pendiente, sin fecha de envío fijada. No acredita propuesta final presentada, presupuesto o adjudicación.
+
+Corte histórico09/10: proceso registrado en HubSpot y en evaluación; entonces no constaban preinscripción, credenciales enviadas ni propuesta presentada.
 
 ## Enlace correcto de preinscripción
 

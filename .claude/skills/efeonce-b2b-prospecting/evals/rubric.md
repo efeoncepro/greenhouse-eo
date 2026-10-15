@@ -86,3 +86,19 @@ Comprobar además en todos los casos la proporcionalidad de la respuesta: contes
 carriles que el pedido no planteó (créditos, CRM, otra cuenta, protocolo de envío) salvo que bloqueen el
 siguiente paso; lista sólo las brechas que cambian la decisión siguiente; y ante un término ambiguo declara
 una lectura en vez de desarrollar varias.
+
+## Casos de continuidad a largo plazo — v10
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P56 | Conservar cuenta por encaje/proveedor vigente; proponer revisión interna 13/04/2027 con owner y tarea única; fecha no es vencimiento contractual; cadencia sigue detenida, sin contacto ni nutrición por email hasta permisos correspondientes; no Deal/perdida por defecto ni acción externa en eval |
+| P57 | Respuesta/enriquecimiento no acreditan opt-in; nutrición por email pendiente y parada vigente; presencia pública como posibilidad sin publicar/DM/audiencias; permiso de persona y autoridad del operador separados |
+| P58 | Baja/restricción de iniciativa/empresa prevalece sobre seis meses/vacante; no reinscribir, nutrir ni contactar colegas; conciliar tarea antigua con supresión, sin inventar levantamiento o demanda |
+| P59 | Recuperar tarea/clave del ledger fuera de ventana reciente y mes de proyecto; conservar fecha y evitar duplicados/scheduler nuevo; espera futura sin alertas repetidas ni borrador comercial |
+
+## Destino de tareas comerciales — v11
+
+| Caso | Resultado a contrastar |
+| --- | --- |
+| P56/P59 | TASK comercial canónica en HubSpot, owner/fecha/asociaciones verificadas y recuperación por ID/clave; proyecto Notion histórico no obliga duplicar ni abandonar la revisión |
+| P60 | Proponer create/reuse TASK en HubSpot con enums/owner/registros verificados y readback antes de cancelar duplicado Notion con link/historia; no COMPLETED falso, nuevo Deal, envío o migración masiva; comunicaciones detenidas; en eval ninguna acción externa |

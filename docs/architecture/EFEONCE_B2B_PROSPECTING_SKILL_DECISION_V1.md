@@ -36,8 +36,12 @@ el gate de correo individual. El trabajo reciente distingue necesidad pública, 
    capacidad y proof; Copywriting la voz; HubSpot las mutaciones/readback. La entrada Codex de Commercial es
    companion del overlay Claude, no un fork del método global. Cargar sólo la fase pertinente, sin recursión.
 6. La skill personal `hubspot-saas-prospecting` conserva nombre compatible, IDs HSP, historial, datos privados,
-   matriz, reportes, ventanas y scheduler; delega método al núcleo. No mover datos, borrar aprobaciones o crear
-   otro scheduler. El adapter local no constituye distribución a otros hosts.
+   matriz y scheduler; delega método al núcleo. Por instrucción de Julio del 13-10-2026, el scheduler existente
+   abre una tarea nueva por corrida en greenhouse-eo a las 09:00 Santiago y escribe búsquedas saneadas en
+   [el registro del radar](../commercial/prospecting-agent/README.md). Nuevas convocatorias para postular:
+   publicación verificable en la misma semana calendario y proceso abierto; históricas para credenciales
+   futuras. Cinco líneas por cuatro mercados, incluyendo medios. No mover datos privados, borrar aprobaciones
+   ni duplicar scheduler. El adapter local no constituye distribución a otros hosts.
 7. Sales es colaborador opcional por fase, descubierto mediante su índice instalado. Enrichment identifica
    contactos/datos; company research prepara acercamiento a destinatario conocido; strategy/business case/
    follow-up conservan sus propios recorridos. No copiar el plugin ni fijar versión/cache como dependencia.
@@ -189,3 +193,62 @@ se conserva visible y la decide Commercial/operador para el caso, no esta skill 
 Cambie un gate/permiso del operador, aparezca deriva de resultados Codex/Claude, un provider altere costos o
 campos, el adapter duplique cuentas/envíos, haya evidencia local de eficacia o fallen escenarios críticos.
 Pilotaje de comunicaciones, cambios económicos y schema requieren sus propias decisiones/autorizaciones.
+
+### Delta aceptado 2026-10-13 — continuidad con proveedor actual
+
+Julio aprobó «Hagamos eso, y dejémoslo como política» tras acordar conservar Fabrimetal y revisar en
+seis meses, con presencia pública, nutrición por email sólo con permiso y recontacto sujeto a razón nueva
+más autorización. La [política dueña](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) distingue revisión de envío:
+proveedor recién contratado sin hito → revisión interna a seis meses; hito/HOLD/baja prevalecen.
+Cuenta/historia se conservan sin enum, stage o Deal automático. Tarea única en seguimiento existente,
+independiente del mes/proyecto de origen; permiso de persona separado de autoridad del operador.
+Módulos/plantillas/fixtures v10 P56–P59 espejo consumen el canon; no nuevo runtime, scheduler ni
+nutrición activa. [Aplicación y evidencia](../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).
+
+### Corrección aceptada 2026-10-13 — TASK comercial en HubSpot
+
+Julio corrige el destino: «Estas tareas mejor crearlas en Hubspot, son tareas comerciales».
+La revisión y continuidad comercial se gestionan como TASK HubSpot con owner, fecha, asociaciones y
+readback; Notion conserva trabajo operativo/entregables e historia de traslado, sin duplicados activos.
+Método/plantillas/adaptador HubSpot/fixtures v11 consumen la [política](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md).
+El destino de TASK no habilita otros objetos CRM, envíos o migración masiva; la autoridad recurrente
+acotada se registra en [seguimiento](GREENHOUSE_COMMERCIAL_FOLLOWUP_AGENT_DECISION_V1.md).
+
+### Delta aceptado 2026-10-15 — primera entrada y señales tempranas del radar
+
+Julio pidió actualizar documentos y skills tras el cierre de Socopur para nuevas postulaciones/propuestas,
+confirmado por Katherine a las 16:54:36 UTC. [Cierre y evidencia aportada por el operador](../commercial/tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md).
+La [guía compartida](../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) desarrolla el método: primera puerta
+de interés/credenciales/inscripción/visita además de cierre final; aviso temprano con fuente primaria y
+acción útil sin esperar RFP completo ni certificar elegibilidad. Descubrimiento amplio y vigilancia de
+conocidos independientes, público/privado por Chile/Colombia/México/Perú, nonprofit aparte; LATAM primero
+y Palm Desert condicionado. Solape mínimo de 72 horas, ampliado ante indexación tardía acreditada;
+prechequeo de identidad canónica/URL contra bloqueos y marcadores de éxito sin avance ante falla.
+
+Publicación, disponibilidad pública, detección, validación, aviso y margen útil conservan evidencia y
+precisión independientes; CRM no sustituye detección. Menos de cinco días hábiles a la primera puerta
+se muestra como detección tardía. No se atribuye causa a frecuencia/indexación sin prueba.
+Este delta complementa la pasada semanal/48h para no perder la entrada por un filtro de frescura;
+las publicaciones anteriores siguen separadas de nuevas publicaciones verificadas de la semana.
+
+Alcance: instrucciones/documentación del proyecto y dos SKILL.md espejo; sin cambiar ownership, ICP,
+autonomía, CRM, schema, código, infraestructura, frecuencia ni suscripciones de automatizaciones.
+La instalación personal `hubspot-saas-prospecting` queda fuera de este cambio. No implica despliegue,
+propagación al scheduler ni exhaustividad; eficacia pendiente de futuras corridas y avisos observados.
+[Verificación y prueba documental](../audits/commercial/2026-10-15-socopur-radar-docs-skills.md).
+
+**Aclaración posterior del operador, mismo 15/10:** la revisión incluye la skill personal si necesita
+ajuste documental. Su SKILL.md ya remite al núcleo con precedencia; dos playbooks conservan reglas
+que requieren actualización. La ruta personal queda fuera de las raíces de escritura permitidas:
+ajuste externo bloqueado, sin ampliación de permisos ni copia instalada. [Cambios mínimos pendientes](../audits/commercial/2026-10-15-socopur-radar-docs-skills.md#revisión-ampliada-de-la-skill-personal--escritura-bloqueada).
+
+**Resolución posterior del mismo mandato:** se aplicaron únicamente los dos ajustes mediante aprobación
+puntual de escritura ofrecida por el entorno. SKILL.md, permisos persistentes, horario y suscripciones
+intactos; el bloqueo ya no está vigente. La auditoría registra hashes y alcance de la aplicación.
+
+**Corrección de cronología por Julio, 15/10/2026 17:51 UTC:** «Lo detectamos el 6 y había cerrado un día antes».
+Detección **06/10/2026**, sin hora/zona acreditadas; cierre de interés **05/10**: un día calendario después,
+no 24 horas exactas. Radar horario y alta CRM del 10/10 son posteriores y no explican la tardanza del día 6.
+Publicación, primera disponibilidad/indexación, primer aviso exacto y causa siguen sin acreditar.
+Las conclusiones previas que no tenían acreditada la fecha se conservan como cortes históricos;
+esta confirmación acredita la fecha, no un timestamp, latencia exacta o causa.

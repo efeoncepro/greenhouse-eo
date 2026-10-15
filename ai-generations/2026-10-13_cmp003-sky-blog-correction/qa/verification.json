@@ -1,0 +1,46 @@
+[
+  {
+    "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_cmp003-sky-blog-correction/sky-v18-blog-4k.mp4",
+    "sha256": "f210d01292c1edfccb1e697aa30c0922de5c015286601c9761bcd8ce3c38d19a",
+    "width": 2160,
+    "height": 3840,
+    "frames": 708,
+    "fps": 24,
+    "duration": 29.5,
+    "color": "Rec709",
+    "audioCompressedHashIdentical": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe",
+    "unchangedDecodedFramesOutsideReencodedWindow": true,
+    "reencodedWindowFrames": [
+      344,
+      603
+    ],
+    "actualNewTitleFrames": [
+      484,
+      563
+    ],
+    "fullDecodePass": true,
+    "ptsEveryFrameVerified": true
+  },
+  {
+    "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_cmp003-sky-blog-correction/sky-v18-blog-1080p.mp4",
+    "sha256": "01063f528cde3c46103282fba455f00716a15eba7d6f77073e344afa660b738b",
+    "width": 1080,
+    "height": 1920,
+    "frames": 708,
+    "fps": 24,
+    "duration": 29.5,
+    "color": "Rec709",
+    "audioCompressedHashIdentical": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe",
+    "unchangedDecodedFramesOutsideReencodedWindow": true,
+    "reencodedWindowFrames": [
+      293,
+      612
+    ],
+    "actualNewTitleFrames": [
+      484,
+      563
+    ],
+    "fullDecodePass": true,
+    "ptsEveryFrameVerified": true
+  }
+]

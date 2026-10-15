@@ -1,0 +1,143 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "d3702ed6b0fb",
+  "key": "d3702ed6b0fbdf7d683cc7b72956c0df92b3e000bd1b9e6fe0af567f5444ae27",
+  "status": "completed",
+  "createdAt": "2026-10-15T13:14:55.036Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/expand-inputs/1211fe6283e9-canvas.png",
+    "imageSha256": "4673379e923c42627cef3aa904cf779e4f9262772e2f381085c8c2f41b8eaef2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/expand/expand-inputs/1211fe6283e9-mask.png",
+    "maskSha256": "bfef6a7507f75d109e46f227429df84df084f88a0a539a934400449ce8455d18",
+    "maskConvention": "white-editable",
+    "width": 2560,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "The same golden-hour sky continues to the left: a deep clear blue at the top fading to warm amber and peach near the horizon, a few thin high wispy clouds lit from the right, and the dark silhouette of the Andes mountain range along the bottom edge continuing seamlessly. Empty sky, no aircraft, no birds, no text. Real photograph with natural grain.",
+    "providerPrompt": "The same golden-hour sky continues to the left: a deep clear blue at the top fading to warm amber and peach near the horizon, a few thin high wispy clouds lit from the right, and the dark silhouette of the Andes mountain range along the bottom edge continuing seamlessly. Empty sky, no aircraft, no birds, no text. Real photograph with natural grain. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.4234375,
+    "editable": 1049600,
+    "soft": 60416,
+    "protected": 1511424
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2560,
+      "height": 1024
+    },
+    "target": {
+      "width": 2048,
+      "height": 816
+    },
+    "aspectError": 0.003906249999999986,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.1,
+    "basis": "1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 65.656,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.07,
+        "bestError": 1.07,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1511424,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1049600,
+        "maxDelta": 255,
+        "meanDelta": 68.241,
+        "worst": {
+          "x": 658,
+          "y": 402
+        }
+      },
+      "seam": {
+        "pixels": 60416,
+        "maxDelta": 219,
+        "meanDelta": 20.739,
+        "worst": {
+          "x": 1025,
+          "y": 66
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1511424,
+        "maxDelta": 120,
+        "meanDelta": 4.425,
+        "worst": {
+          "x": 2159,
+          "y": 426
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a13fb3-b028-74a1-957c-859f6360bcf4",
+        "account": "FAL_API_KEY",
+        "seed": 1734731210
+      }
+    }
+  ],
+  "expand": {
+    "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_lp-agencia-creativa-rutas/sky/edit.png",
+    "sourceSha256": "a6bc5c76faa79e2f4856cd0e8e0556e44f6e15280b0a55a2fdd9c356390b924d",
+    "to": null,
+    "plan": {
+      "canvas": {
+        "width": 2560,
+        "height": 1024
+      },
+      "scene": {
+        "left": 1024,
+        "top": 0,
+        "width": 1536,
+        "height": 1024
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 60
+  }
+}

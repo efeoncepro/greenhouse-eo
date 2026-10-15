@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "content",
+  "recipe": "content-text",
+  "voice": {
+    "eyebrow": "Cómo se cobra",
+    "question": "¿Cómo pago medios y agencia?",
+    "answer": [
+      "Aparte"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 3
+  },
+  "body": "Ves por un lado lo que inviertes en medios y por otro nuestro fee. Sin porcentajes ocultos.",
+  "points": [
+    {
+      "name": "Fee fijo",
+      "text": "por campaña o por mes"
+    },
+    {
+      "name": "Medios al costo",
+      "text": "sin recargo sobre tu inversión"
+    },
+    {
+      "name": "Comisiones",
+      "text": "sólo si están en tu contrato"
+    }
+  ],
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  }
+}

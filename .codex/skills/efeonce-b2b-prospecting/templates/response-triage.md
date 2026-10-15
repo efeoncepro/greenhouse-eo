@@ -26,3 +26,8 @@ Continuidad: <siguiente compromiso bilateral o revisión interna, owner y fecha/
 Restricción para reactivación: <alcance, condición y evidencia; una señal no elimina una baja>.
 
 Sin respuesta, conservar resultado desconocido. Sin readback de parada, no afirmar «pausado».
+
+Para proveedor actual sin necesidad activa, aplicar la [política de largo plazo](../../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md):
+registrar revisión interna/owner/TASK de HubSpot con asociaciones y permiso de nutrición separado de
+autoridad de contacto. Notion conserva trabajo operativo/entregables, sin tarea comercial duplicada.
+Una cadencia terminada no convierte a la cuenta en perdida ni crea una suscripción.

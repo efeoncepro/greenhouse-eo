@@ -47,6 +47,17 @@ ambigua como permiso para trasladar la conversación a otra iniciativa. Mantener
 potencialmente afectado —pedirle una aclaración al comprador lo decide Commercial—, sin convertir la duda en
 una exclusión definitiva de toda la organización.
 
+## Revisión interna de largo plazo
+
+La [política](../../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) conserva la cuenta tras detener el
+acercamiento por proveedor vigente. Registrar owner, `next_internal_review_on`, permiso de nutrición
+con su fuente y condición de reactivación; `next_contact_at` sigue vacío mientras no haya contacto
+aprobado. Reutilizar tarea/clave en el seguimiento existente, aunque cambie el mes/proyecto de origen.
+La tarea comercial canónica se crea/reutiliza en **HubSpot** (TASK, owner y asociaciones verificados);
+Notion queda para trabajo operativo/entregables. Si existía duplicado, cancelarlo tras el readback de
+HubSpot y conservar trazabilidad. La revisión revalida contexto; no prepara automáticamente borrador ni envío.
+No repetir alertas antes de la ventana de siete días salvo señal observada que amerite evaluación.
+
 ## Traducir el plan al canal real
 
 Antes de enrollment o ejecución, HubSpot/owner del canal comprueban destinatario, remitente, permisos,

@@ -5,6 +5,12 @@
 Programado no significa publicado. Este registro describe el readback del 24 de septiembre; antes de modificar
 o reportar publicación efectiva, consultar Metricool de nuevo.
 
+## Corrección solicitada por SKY · 2026-10-13
+
+El operador informa que la pieza salió y que retiró la publicación de LinkedIn. No se infiere cuál cuenta ni el estado actual de las demás desde ese reporte. SKY pidió precisar el encargo: **contenido para su blog con enfoque SEO y AEO**, no «su agencia SEO/AEO». Dirección aprobada por el operador; V18 y copies corregidos se preparan para revisión **antes de volver a publicar**. Portada V4 conservada. Las fechas/IDs de abajo son el readback histórico del 24/09, no evidencia de estado actual.
+
+Paquete de revisión: [`2026-10-13_cmp003-sky-blog-correction`](../../../ai-generations/2026-10-13_cmp003-sky-blog-correction/README.md). No publicar/reprogramar automáticamente las variantes anteriores.
+
 ## Decisión y alcance
 
 El operador aprobó el video V17 y la portada V4, corrigió los copies y autorizó explícitamente programar

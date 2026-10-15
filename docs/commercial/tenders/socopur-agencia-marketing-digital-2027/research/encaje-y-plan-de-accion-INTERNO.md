@@ -1,5 +1,10 @@
 # Socopur — investigación y acción comercial — INTERNO
 
+> **Actualización 15/10/2026 16:54:36 UTC:** entrada tardía cerrada; no reciben nuevas postulaciones/
+> propuestas para este período. Las preguntas, acciones y borrador del 10/10 que siguen son historia,
+> no instrucciones vigentes de envío o preparación. Guardar credenciales no promete invitación ni fecha.
+> [Cierre confirmado y fuente](cierre-y-aprendizajes-2026-10-15-INTERNO.md); no insistir ni ampliar a colegas.
+
 **Corte:** 10-10-2026, America/Santiago. Recuperación inmediata; sin probabilidad o presupuesto estimados.
 
 ## Comprador y contexto

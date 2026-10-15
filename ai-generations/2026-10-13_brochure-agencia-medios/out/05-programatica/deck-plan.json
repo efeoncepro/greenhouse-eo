@@ -1,0 +1,65 @@
+{
+  "tenderId": "05-programatica",
+  "slides": [
+    {
+      "slideId": "deck-content-text",
+      "contentType": "deck.content-text",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 400,
+          "questionPx": "--gl-ct-question-px=48px",
+          "questionLeading": "--gl-ct-question-leading=1.2",
+          "answerLeading": "--gl-ct-answer-leading=1",
+          "answerTracking": "--gl-ct-answer-tracking=-0.05em",
+          "answerInset": "--gl-ct-answer-inset=-16px",
+          "bodyTop": 826,
+          "bodyPx": 36,
+          "bodyWidth": 860,
+          "bodyLeading": "--gl-ct-body-leading=1.35",
+          "pointsTop": "--gl-ct-points-top=872px",
+          "pointsRight": "--gl-ct-points-right=140px",
+          "pointsWidth": "--gl-ct-points-width=620px",
+          "pointPx": "--gl-ct-point-px=22px",
+          "pointGap": "--gl-ct-point-gap=8px",
+          "pointPad": "--gl-ct-point-pad=10px",
+          "pointRule": "--gl-ct-point-rule=2px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-ct-progress-2-of-5-voice"
+        },
+        "voice": {
+          "question": "¿Y fuera de search y social?",
+          "answer": "También",
+          "eyebrow": "Publicidad programática"
+        },
+        "body": "Compra programática para llegar a tu audiencia en los medios y pantallas que sí mira.",
+        "points": [
+          {
+            "name": "Inventario",
+            "text": "· abierto, privado o garantizado"
+          },
+          {
+            "name": "Audiencias",
+            "text": "· contexto, geografía y datos propios"
+          },
+          {
+            "name": "Control",
+            "text": "· marca segura y presupuesto vigilado"
+          }
+        ],
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1.6
+        }
+      },
+      "template": "ContentText"
+    }
+  ]
+}

@@ -19,7 +19,7 @@ Toda respuesta humana cambia la revisión de cuenta aunque el proveedor no cambi
 | Respuesta o evento | Decisión y próxima acción proporcional | Responsable | Revisión y parada |
 | --- | --- | --- | --- |
 | «Envíame información» | Responder la pregunta con pieza/caso verificado y acotado; si el pedido es amplio, aclarar una prioridad útil. Proponer siguiente conversación sin convertirla en acuerdo | Owner + Copywriting/práctica; Commercial si hay evaluación | Pausar seguimiento genérico de la iniciativa. Revisar recepción/contenido en fecha acordada; sin fecha, proponer ventana razonada interna |
-| «Ya tenemos agencia/proveedor/equipo» | Conservar alternativa y alcance declarados. Si deja apertura, preguntar por necesidad complementaria o criterio de revisión sin desacreditar al proveedor. Si expresa cierre, aplicar fila de rechazo | Owner; Commercial para objeción/encaje | No diagnosticar insatisfacción, sustituir oferta ni lanzar a colegas. Revisar sólo oportunidad/hito explícito o apertura permitida |
+| «Ya tenemos agencia/proveedor/equipo» | Conservar proveedor y alcance declarados, detener el acercamiento actual y conservar la cuenta con encaje en seguimiento de largo plazo. Apertura complementaria se atiende sólo en su alcance; una baja/restricción expresa prevalece | Owner; Commercial para objeción/encaje | [Política aprobada](../../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md): con proveedor recién contratado y sin hito, revisión interna a seis meses; no envío ni reinscripción. Nutrición por email sólo con permiso verificable y autoridad del operador |
 | «Habla con X» | Registrar derivación y motivo, confirmar destinatario/función y validar correo individual. Solicitar introducción cuando encaje. Distinguir nombre sugerido, presentación prometida e introducción recibida | Owner + persona que deriva; investigación si faltan datos | Suspender ruta redundante. No registrar X sin email ni atribuirle demanda/aval. Revisar al producirse la presentación o al hito acordado |
 | «Más adelante», fecha o evento concreto | Registrar hito, condición y responsable; confirmar qué seguimiento pidió y qué queda abierto. Pausar acciones incompatibles de esa iniciativa | Owner + Commercial | Próxima revisión en el hito permitido; el acuerdo no autoriza otros contactos o una frecuencia mayor |
 | «Más adelante» o «esperen hasta que confirme», sin fecha | Preservar falta de prioridad/fecha sin pedirle una fecha al comprador para presionar; si condicionó el avance a su confirmación, la revisión queda sujeta a ella. Mantener [HOLD](account-cadence.md), listar lo ya programado hacia la cuenta y proponer su pausa. Un acuse breve al mismo interlocutor lo decide Commercial; no es un paso por defecto | Owner + Commercial | Sin automatizar recordatorios comerciales recurrentes ni marcar perdido por defecto. Revisión interna documentada, no autorización para enviar |
@@ -31,6 +31,19 @@ Toda respuesta humana cambia la revisión de cuenta aunque el proveedor no cambi
 | Bounce permanente / identidad cuestionada | Si el código o motivo es de política o seguridad (5.7.x, filtro, autenticación) o falta el reporte completo, aplicar antes la [tabla de rebotes de entregabilidad](deliverability-operations.md): ese rebote no prueba que la casilla no exista. En otro caso, detener uso de esa dirección, conservar diagnóstico técnico y revalidar identidad/empleo con fuentes. No inventar variante ni asumir que todos los emails de la empresa fallan | Owner + investigación/operador de entregabilidad | Revisión con evidencia nueva; no reactivar sin resolver causa. HubSpot conserva su writer/estado; cambios vía su adapter |
 | Error transitorio / aplazamiento técnico | Conservar código y diagnóstico; suspender reintentos manuales mientras el provider/owner revisa causa y lo ya programado | Operador del canal + owner | Reintento sólo cuando proceda según diagnóstico y alcance, sin apilar envíos sobre reintentos automáticos |
 | Interés o reunión aceptada | Resolver pregunta y confirmar participantes, objetivo, fecha/zona horaria y siguiente compromiso; entregar historia/mapa/brechas a Commercial | Owner + Commercial | Reconciliar la cadencia de iniciativa. Agendada ≠ realizada; interés ≠ presupuesto/calificación; verificar evento por el canal autorizado |
+
+## Proveedor actual y seguimiento de largo plazo
+
+Aplicar la [política aprobada el 13/10/2026](../../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md).
+Conservar historia/encaje y motivo «proveedor contratado, sin necesidad actual», sin nuevo enum CRM.
+Una cadencia terminada puede dejar una revisión interna futura; distinguirla de una comunicación.
+Hito comprador prevalece; si acaba de contratar proveedor y no dio fecha, revisión interna a seis meses
+con owner y **TASK única en HubSpot**, asociada a los registros pertinentes. Notion no duplica tareas
+comerciales; conservar allí sólo trabajo operativo/entregables o historia de traslado. No suponer
+vencimiento contractual, insatisfacción ni oportunidad perdida.
+Registrar permiso de nutrición por email como confirmado/pendiente/denegado, con fuente y alcance;
+respuesta comercial no es opt-in. Presencia pública no autoriza DMs, newsletter ni audiencias nuevas.
+Baja, rechazo y HOLD conservan sus condiciones; un trigger/fecha nunca habilita eludirlas.
 
 ## Criterio de continuidad y handoff
 

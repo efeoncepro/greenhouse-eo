@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Oferta integral de medios",
+    "question": "¿Qué hace mi agencia de medios?",
+    "answer": [
+      "Todo el ciclo"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 1
+  },
+  "items": [
+    {
+      "title": "Estrategia y planificación",
+      "desc": "Audiencias, mix, presupuesto y plan de medición antes de comprar un solo espacio."
+    },
+    {
+      "title": "Creatividad para performance",
+      "desc": "Mensajes, formatos y variaciones que aprenden: qué escalar y qué detener."
+    },
+    {
+      "title": "Compra y operación",
+      "desc": "Search, social, video, retail media y programática: activación, pacing y optimización."
+    },
+    {
+      "title": "Medición y gestión de inversión",
+      "desc": "Señales de negocio, reporte reconciliado y la recomendación del siguiente ciclo."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Medios",
+    "participantKind": "department"
+  }
+}

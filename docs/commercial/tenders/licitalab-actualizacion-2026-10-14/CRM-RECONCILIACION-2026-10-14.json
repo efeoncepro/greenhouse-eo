@@ -1,0 +1,707 @@
+{
+  "portal": "48713323",
+  "lane": "Agent CLI OAuth 0.15.1 build1430",
+  "verified_at": "2026-10-14T10:45:31.737000+00:00",
+  "scope": "14 cierres administrativos públicos y 2 plazos prorrogados; empresas e historial preservados",
+  "updates": [
+    {
+      "type": "deals",
+      "id": "65678411411",
+      "code": "813-655-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/813-655-COT26",
+      "source_deadline": "2026-10-06T17:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "7000000",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "NO-BID expreso del operador para este proceso de diseño ISP. Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "7000000",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "58970137230"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65678240928",
+      "code": "813-654-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/813-654-COT26",
+      "source_deadline": "2026-10-06T17:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "7000000",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "7000000",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "58970137230"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65678397325",
+      "code": "2305-29-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/2305-29-COT26",
+      "source_deadline": "2026-10-07T18:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "2660000",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "2660000",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "58986233874"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65806293639",
+      "code": "609-107-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/609-107-COT26",
+      "source_deadline": "2026-10-08T17:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "59083043845"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65806334790",
+      "code": "918434-271-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/918434-271-COT26",
+      "source_deadline": "2026-10-12T15:30:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "31163122599"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65832763160",
+      "code": "757-429-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/757-429-COT26",
+      "source_deadline": "2026-10-13T14:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "32340888618"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65806250773",
+      "code": "2432-31-LE26",
+      "source_url": "https://app.licitalab.cl/search/details/2432-31-LE26",
+      "source_deadline": "2026-10-13T18:20:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "dealstage": "qualifiedtobuy",
+        "closed_lost_reason": null,
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "dealstage": "closedlost",
+        "closed_lost_reason": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva.",
+        "closedate": null,
+        "amount": "",
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "59106213185"
+      ],
+      "checks": {
+        "dealstage": true,
+        "closed_lost_reason": true,
+        "closedate": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937988",
+      "code": "857-61-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/857-61-COT26",
+      "source_deadline": "2026-10-09T14:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada / no presentada: Julio Reyes confirmó el 09/10/2026 que no se presentó oferta por falta de tiempo (nota 118299111982); tarea comercial cancelada y seguimiento cerrado. Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-09T14:00:00.000Z (09-10-2026 11:00 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/857-61-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "59077724081"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937909",
+      "code": "5423-170-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/5423-170-COT26",
+      "source_deadline": "2026-10-09T20:15:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-09T20:15:00.000Z (09-10-2026 17:15 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/5423-170-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "52872501650"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937991",
+      "code": "5872-54-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/5872-54-COT26",
+      "source_deadline": "2026-10-12T13:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-12T13:00:00.000Z (12-10-2026 10:00 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/5872-54-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "31779716469"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937990",
+      "code": "5709-48-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/5709-48-COT26",
+      "source_deadline": "2026-10-12T14:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-12T14:00:00.000Z (12-10-2026 11:00 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/5709-48-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "31779716469"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937910",
+      "code": "2427-1134-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/2427-1134-COT26",
+      "source_deadline": "2026-10-13T12:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-13T12:00:00.000Z (13-10-2026 09:00 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/2427-1134-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "32039105348"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937987",
+      "code": "2343-534-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/2343-534-COT26",
+      "source_deadline": "2026-10-13T14:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-13T14:00:00.000Z (13-10-2026 11:00 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/2343-534-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "59069041507"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "leads",
+      "id": "595416937985",
+      "code": "94-37-COT26",
+      "source_url": "https://app.licitalab.cl/search/agile/94-37-COT26",
+      "source_deadline": "2026-10-13T18:00:00.000Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "hs_pipeline_stage": "new-stage-id",
+        "hs_lead_disqualification_reason": null,
+        "hs_lead_disqualification_note": null,
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "after": {
+        "hs_pipeline_stage": "unqualified-stage-id",
+        "hs_lead_disqualification_reason": "BAD_TIMING",
+        "hs_lead_disqualification_note": "Expirada: cierre público vencido al 14/10/2026; sin comprobante de postulación en expediente revisado. Cierre administrativo de radar, no derrota competitiva. Plazo de presentación confirmado en LicitaLAB: 2026-10-13T18:00:00.000Z (13-10-2026 15:00 America/Santiago). Estado fuente: Cerrada. Fuente: https://app.licitalab.cl/search/agile/94-37-COT26.",
+        "hs_pipeline": "lead-pipeline-id",
+        "hubspot_owner_id": "75788512"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "32497515095"
+      ],
+      "checks": {
+        "hs_pipeline_stage": true,
+        "hs_lead_disqualification_reason": true,
+        "hs_lead_disqualification_note": true,
+        "preserved_hs_pipeline": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65832737849",
+      "code": "1108660-10-LE26",
+      "source_url": "https://app.licitalab.cl/search/details/1108660-10-LE26",
+      "source_deadline": "2026-10-19T18:30:00Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "fecha_de_cierre_de_licitacion": "2026-10-14T18:30:00Z",
+        "amount": "",
+        "closedate": null,
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "fecha_de_cierre_de_licitacion": "2026-10-19T18:30:00Z",
+        "amount": "",
+        "closedate": null,
+        "pipeline": "default",
+        "pipeline_bucket": "Core Pipeline",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "39482363678"
+      ],
+      "checks": {
+        "fecha_de_cierre_de_licitacion": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    },
+    {
+      "type": "deals",
+      "id": "65832697782",
+      "code": "1332-12-LP26",
+      "source_url": "https://app.licitalab.cl/search/details/1332-12-LP26",
+      "source_deadline": "2026-10-23T18:00:00Z",
+      "source_checked_on": "2026-10-14",
+      "before": {
+        "fecha_de_cierre_de_licitacion": "2026-10-21T18:00:00Z",
+        "amount": "",
+        "closedate": null,
+        "pipeline": "default",
+        "pipeline_bucket": "Strategic Bets",
+        "dealtype": "newbusiness"
+      },
+      "after": {
+        "fecha_de_cierre_de_licitacion": "2026-10-23T18:00:00Z",
+        "amount": "",
+        "closedate": null,
+        "pipeline": "default",
+        "pipeline_bucket": "Strategic Bets",
+        "dealtype": "newbusiness"
+      },
+      "two_readbacks": true,
+      "company_ids": [
+        "31640422315"
+      ],
+      "checks": {
+        "fecha_de_cierre_de_licitacion": true,
+        "preserved_amount": true,
+        "preserved_closedate": true,
+        "preserved_pipeline": true,
+        "preserved_pipeline_bucket": true,
+        "preserved_dealtype": true,
+        "preserved_company_associations": true
+      }
+    }
+  ],
+  "closure_notes": [
+    {
+      "id": "118514303804",
+      "lead_id": "595416937988",
+      "company_id": "59077724081",
+      "code": "857-61-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    },
+    {
+      "id": "118510486554",
+      "lead_id": "595416937909",
+      "company_id": "52872501650",
+      "code": "5423-170-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    },
+    {
+      "id": "118505690423",
+      "lead_id": "595416937991",
+      "company_id": "31779716469",
+      "code": "5872-54-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    },
+    {
+      "id": "118521903227",
+      "lead_id": "595416937990",
+      "company_id": "31779716469",
+      "code": "5709-48-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    },
+    {
+      "id": "118500127112",
+      "lead_id": "595416937910",
+      "company_id": "32039105348",
+      "code": "2427-1134-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    },
+    {
+      "id": "118511101085",
+      "lead_id": "595416937987",
+      "company_id": "59069041507",
+      "code": "2343-534-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    },
+    {
+      "id": "118501859978",
+      "lead_id": "595416937985",
+      "company_id": "32497515095",
+      "code": "94-37-COT26",
+      "readback_verified": true,
+      "two_readbacks": true,
+      "checks": {
+        "body_persisted": true,
+        "lead_associated": true,
+        "company_associated": true
+      }
+    }
+  ],
+  "all_checks_passed": true,
+  "task_review": {
+    "pending_tasks_read": 184,
+    "public_processes_checked": 14,
+    "pending_related_tasks": 0,
+    "task_changes": 0
+  }
+}

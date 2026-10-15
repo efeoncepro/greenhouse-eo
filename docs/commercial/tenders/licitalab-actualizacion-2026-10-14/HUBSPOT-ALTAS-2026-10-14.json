@@ -1,0 +1,4729 @@
+{
+  "portal": "48713323",
+  "verified_at": "2026-10-14T11:11:17.811462+00:00",
+  "object_scope": "Public tenders: Company + Deal + Note by explicit instruction; RFI: Company + Note. No new Contacts or Leads. Budget of buyer is not our offer amount; GO and economics pending.",
+  "global_dedupe": {
+    "all_leads_read": 2252,
+    "tender_leads_detected": 21,
+    "all_companies_read_before_intake": 2497
+  },
+  "records": [
+    {
+      "code": "5504-368-COT26",
+      "disposition": "created_note",
+      "buyer": "UNIVERSIDAD DE CHILE",
+      "buyer_tax_number": "60.910.000-1",
+      "source_url": "https://app.licitalab.cl/search/agile/5504-368-COT26",
+      "source_checked_at": "2026-10-14T10:54:28.691650+00:00",
+      "deadline": "2026-10-15T14:11:00.000Z",
+      "company_id": "31779716469",
+      "company_action": "reused",
+      "note_id": "118499981197",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Agencia EPEC/FCEI: estrategia, Meta Ads, diseño y HTML, más 21 reels durante 7 meses.",
+      "budget_buyer": 7000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Fee máximo CLP 2.450.000 IVA por siete meses; pauta mínima 4.400.000; experiencia en universidades públicas y postgrados. Resolver tributación de pauta y fecha de informe contradictoria.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "requerimiento publicidad Postgrado (1)-firmado (1)-firmado.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "requerimiento publicidad Postgrado (1)-firmado (1)-firmado.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "requerimiento publicidad Postgrado (1)-firmado (1)-firmado.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65963504256",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:02:52.407511+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "5586-157-LE26",
+      "disposition": "created_note",
+      "buyer": "UNIVERSIDAD DE LA FRONTERA",
+      "buyer_tax_number": "87.912.900-1",
+      "source_url": "https://app.licitalab.cl/search/details/5586-157-LE26",
+      "source_checked_at": "2026-10-14T10:54:40.012012+00:00",
+      "deadline": "2026-10-16T18:00:00.000Z",
+      "company_id": "59085575939",
+      "company_action": "reused",
+      "note_id": "118504352558",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "UFRO salud mental: identidad visual, plantillas digitales y reels, dossier, impresos y merchandising.",
+      "budget_buyer": 9700000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Veinte días corridos y cuatro visitas presenciales. Impresión y merchandising incluidos requieren proveedor y costeo. Subcontratación permitida.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "ANEXOS SEC 4205.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 33,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 36,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RI 777_SEC 4205_BASES Servicio Integral de Diseño y Producción .pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65972505911",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:03:02.339850+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1422259-10-LE26",
+      "disposition": "created_note",
+      "buyer": "CORPORACION REGIONAL DE DESARROLLO DE LA REGION DE TARAPACA",
+      "buyer_tax_number": "65.042.904-4",
+      "source_url": "https://app.licitalab.cl/search/details/1422259-10-LE26",
+      "source_checked_at": "2026-10-14T10:54:50.823254+00:00",
+      "deadline": "2026-10-20T18:00:00.000Z",
+      "company_id": "59204234842",
+      "company_action": "created",
+      "note_id": "118503738627",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Tarapacá: adjudicación independiente por línea; priorizar línea 2 de RRSS y videos corporativos.",
+      "budget_buyer": 20960141,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Línea 2 CLP 6.204.000 IVA; línea 1 CLP 14.756.141 IVA. Bolsa total no equivale a fee. Cantidades, canales y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 52,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 24,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.2 ANEXO TECNICO DE OFERTA - LINEA 1 DIARIO Y RADIO.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.1 ANEXO ADMINISTRATIVO - LIC PLAN DE MEDIOS 1422259-10-LE26.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "10.6 ANEXO ADMINISTRATIVO - EN CASO DE OFERTAR COMO UTP.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 54,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 49,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 50,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 23,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65958079532",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:03:11.301414+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1412-27-COT26",
+      "disposition": "created_note",
+      "buyer": "Comité SEP",
+      "buyer_tax_number": "61.933.600-3",
+      "source_url": "https://app.licitalab.cl/search/agile/1412-27-COT26",
+      "source_checked_at": "2026-10-14T10:55:01.629326+00:00",
+      "deadline": "2026-10-19T18:00:00.000Z",
+      "company_id": "59203151532",
+      "company_action": "created",
+      "note_id": "118495485586",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "SEP/CORFO: portada, lomo, contraportada y 50–65 páginas de 2 capítulos; integrar 282 páginas existentes; PDF de imprenta y digital interactivo.",
+      "budget_buyer": 600000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 600.000 impuestos incluidos; quince días hábiles. Título, experiencia respaldada, anexos y cronograma. Carga alta respecto del ticket.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR_Diseño libro.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Anexo N° 1 Diseño libro.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Declaración Jurada Pacto de Integridad.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65965670767",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:03:24.671465+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "2307-486-COT26",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE OSORNO",
+      "buyer_tax_number": "69.210.100-6",
+      "source_url": "https://app.licitalab.cl/search/agile/2307-486-COT26",
+      "source_checked_at": "2026-10-14T10:55:11.832033+00:00",
+      "deadline": "2026-10-15T13:00:00.000Z",
+      "company_id": "59202377804",
+      "company_action": "created",
+      "note_id": "118495336770",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Osorno Ovejería: edición de 10 cápsulas educativas con subtítulos, Full HD,16:9, intro/outro, gráficos y B-roll; insumos grabados octubre-noviembre.",
+      "budget_buyer": 600000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 600.000. Confirmar duración de cápsulas, insumos y revisiones; edición en noviembre y entrega un mes después. No asumir rodaje incluido.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "EETT servicio de edición audiovisual Ovejeria.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65977310220",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:03:33.603124+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "3030-442-COT26",
+      "disposition": "created_note",
+      "buyer": "ILUSTRE MUNICIPALIDAD DE RETIRO",
+      "buyer_tax_number": "69.130.800-6",
+      "source_url": "https://app.licitalab.cl/search/agile/3030-442-COT26",
+      "source_checked_at": "2026-10-14T10:55:22.298694+00:00",
+      "deadline": "2026-10-14T15:30:00.000Z",
+      "company_id": "59194210991",
+      "company_action": "created",
+      "note_id": "118515365974",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Retiro/CESFAM: VPS, hosting, correo institucional, web y servicios complementarios con arquitectura cloud distribuida.",
+      "budget_buyer": 2000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Arquitectura multi-nodo desacoplada excluyente; solución monolítica prohibida. Aislamiento y límites CPU/RAM/IOPS. No afirmar cumplimiento ni que se pide Google Cloud por marca.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "339.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "339.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65965976665",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:03:42.852150+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1439282-6-COT26",
+      "disposition": "created_note",
+      "buyer": "FUNDACION CHILENA DEL PACIFICO",
+      "buyer_tax_number": "72.695.900-5",
+      "source_url": "https://app.licitalab.cl/search/agile/1439282-6-COT26",
+      "source_checked_at": "2026-10-14T10:55:32.667849+00:00",
+      "deadline": "2026-10-14T18:00:00.000Z",
+      "company_id": "59188595240",
+      "company_action": "created",
+      "note_id": "118512033434",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Fundación Chilena del Pacífico: memoria 2026 digital interactiva con índice, enlaces y material multimedia.",
+      "budget_buyer": 900,
+      "currency_buyer": "USD",
+      "risks": [
+        "USD 900. Más de diez años de diseño similar como requisito, pero matriz evalúa menos de diez: contradicción. CVs, portafolio y entregas a tres/seis días; ajustes pendientes de costeo.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases de Licitación Diseño Memoria 2026.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65952374446",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:03:52.754217+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1421874-18-LE26",
+      "disposition": "created_note",
+      "buyer": "FUNDACION CENTRO CULTURAL DE LO PRADO",
+      "buyer_tax_number": "65.081.269-7",
+      "source_url": "https://app.licitalab.cl/search/details/1421874-18-LE26",
+      "source_checked_at": "2026-10-14T10:55:43.683818+00:00",
+      "deadline": "2026-10-19T19:05:00.000Z",
+      "company_id": "59202063283",
+      "company_action": "created",
+      "note_id": "118503415832",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Lo Prado A! Puro Diseño: cuatro líneas independientes; Diseño Gráfico y Community Manager es el fit principal.",
+      "budget_buyer": 8534917,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Global CLP 8.534.917 IVA; línea 2 CLP 2.997.503 IVA. No comprometer las otras tres líneas por inferencia. Verificar títulos, CV, experiencia y fechas.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 29,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 40,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 41,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO 5 Y 6.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXO 4.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 49,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 13,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX - Aprueba llamado a lic y bases festival a puro diseño (Licit.pdf",
+          "page": 47,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65959325258",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:01.155853+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "584105-39-LE26",
+      "disposition": "created_note",
+      "buyer": "SUBSECRETARIA DE ENERGIA",
+      "buyer_tax_number": "61.979.830-9",
+      "source_url": "https://app.licitalab.cl/search/details/584105-39-LE26",
+      "source_checked_at": "2026-10-14T10:55:54.324768+00:00",
+      "deadline": "2026-10-19T18:01:00.000Z",
+      "company_id": "59198702877",
+      "company_action": "created",
+      "note_id": "118489636510",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Energía: estrategia y ejecución de plan de medios incluyendo digital, redes y programática, indicadores e informes.",
+      "budget_buyer": null,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Al menos 90% neto a medios y 40% a medios locales. Producción, transmisión y tributación. Presupuesto máximo no recuperado; canal, caja, margen y referencias pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "ANEXOS EDITABLES.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 19,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento de Compras 00349-2026 aprobado.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 23,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 30,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 29,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 17,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 39,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RES_ESU_0295_2026 BASES DE LICITACION.pdf",
+          "page": 37,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65970960505",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:09.708871+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "2078-47-LE26",
+      "disposition": "created_note",
+      "buyer": "SUBSECRETARIA DE SALUD PUBLICA",
+      "buyer_tax_number": "61.601.000-K",
+      "source_url": "https://app.licitalab.cl/search/details/2078-47-LE26",
+      "source_checked_at": "2026-10-14T10:56:04.610830+00:00",
+      "deadline": "2026-10-15T13:05:00.000Z",
+      "company_id": "32340888618",
+      "company_action": "reused",
+      "note_id": "118494719064",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "SEREMI Salud Biobío: difusión multimedial con radio/TV y una línea de agencia para Instagram institucional.",
+      "budget_buyer": 10600000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 10.600.000 global no es fee. Línea de agencia: utilidad máxima 20%. Validar presupuesto por línea, localidad, inventario y cotizaciones.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 15,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXOS  (1).doc",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCION 23300 BASES.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65952222732",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:19.609153+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "797305-59-COT26",
+      "disposition": "created_note",
+      "buyer": "SUPERINTENDENCIA DE INSOLVENCIA Y REEMPRENDIMIENTO",
+      "buyer_tax_number": "61.005.000-K",
+      "source_url": "https://app.licitalab.cl/search/agile/797305-59-COT26",
+      "source_checked_at": "2026-10-14T10:56:14.830070+00:00",
+      "deadline": "2026-10-15T18:00:00.000Z",
+      "company_id": "59190452507",
+      "company_action": "created",
+      "note_id": "118513991212",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Superir: diseño instruccional, desarrollo e implementación de dos cursos autoinstruccionales; gráficos, cápsulas, materiales y archivos editables.",
+      "budget_buyer": 7000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 7.000.000 global. Aclarar contenidos, duración, LMS/SCORM, relatores aportados, producción, hitos y costos. Proceso distinto de 797305-60.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento diseño instruccional.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65961796615",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:28.153416+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1088172-25-COT26",
+      "disposition": "created_note",
+      "buyer": "SERVICIO NACIONAL PARA LA PREVENCION Y REHABILITACION DEL CONSUMO DE D",
+      "buyer_tax_number": "61.980.170-9",
+      "source_url": "https://app.licitalab.cl/search/agile/1088172-25-COT26",
+      "source_checked_at": "2026-10-14T10:56:25.373671+00:00",
+      "deadline": "2026-10-15T15:00:00.000Z",
+      "company_id": "59196072522",
+      "company_action": "created",
+      "note_id": "118521509769",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "SENDA Los Lagos: tres diseños gráficos, dos videos de hasta un minuto y frases con emisión radial para Más Comunidad, Más Prevención.",
+      "budget_buyer": 3000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 3.000.000 comparte medios y creatividad; radios específicas y seis meses octubre-marzo. Proveedor/canal, costos, financiamiento y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "Requerimiento con solicitud para frases radiales y gráficas.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65967348002",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:37.015321+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null,
+      "identity_completion": {
+        "official_company_name": "Servicio Nacional para la Prevención y Rehabilitación del Consumo de Drogas y Alcohol (SENDA)",
+        "source_url": "https://www.senda.gob.cl/quienes-somos/",
+        "verified": true
+      }
+    },
+    {
+      "code": "2817-68-L126",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE SAN FERNANDO",
+      "buyer_tax_number": "69.090.100-5",
+      "source_url": "https://app.licitalab.cl/search/details/2817-68-L126",
+      "source_checked_at": "2026-10-14T10:56:35.901819+00:00",
+      "deadline": "2026-10-15T20:00:00.000Z",
+      "company_id": "59199011361",
+      "company_action": "created",
+      "note_id": "118521904479",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "San Fernando: línea 1 de capacitación presencial en redes sociales, dos módulos de 2,5 horas; otras líneas son presentación de productos y textiles.",
+      "budget_buyer": 5300000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Línea 1 CLP 2.000.000 IVA. No asumir todas las líneas. Logística, relator, formación y público pendientes; ejecución hasta 15 de diciembre.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "ANEXOS.doc",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP. PRESENTANDO MIS PRODUCTOS.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP. TALLER MANEJO REDES SOCIALES.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP.PROF.OFICIO TEXTILES.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "EE.TT. CAP. TALLER MANEJO REDES SOCIALES.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65950525803",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:45.727508+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "3603-37-LE26",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE MULCHEN",
+      "buyer_tax_number": "69.170.500-5",
+      "source_url": "https://app.licitalab.cl/search/details/3603-37-LE26",
+      "source_checked_at": "2026-10-14T10:56:46.036586+00:00",
+      "deadline": "2026-10-19T18:30:00.000Z",
+      "company_id": "59203151624",
+      "company_action": "created",
+      "note_id": "118514923642",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Mulchén Vive Biobío: línea 2 de comercialización y marketing turístico, incluyendo marketing digital, contenidos e IA; talleres y espacios de promoción.",
+      "budget_buyer": 30000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 30.000.000 global no equivale al presupuesto de línea 2. Logística, merchandising, catering, equipo y experiencia requieren costeo.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "ANEXO 5 PROPUESTA TECNICA.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Informe Secplan-314.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCIýN-50001726.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Informe Secplan-314.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Informe Secplan-314.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "RESOLUCIýN-50001726.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 20,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "BASES ADMINISTRATIVAS DAF-52 (1).pdf",
+          "page": 17,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65962112843",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:04:54.628280+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "4514-10-COT26",
+      "disposition": "created_note",
+      "buyer": "SERVICIO NACIONAL DE CAPACITACION Y EMPLEO",
+      "buyer_tax_number": "61.531.000-K",
+      "source_url": "https://app.licitalab.cl/search/agile/4514-10-COT26",
+      "source_checked_at": "2026-10-14T10:56:56.176722+00:00",
+      "deadline": "2026-10-16T15:00:00.000Z",
+      "company_id": "59088367247",
+      "company_action": "reused",
+      "note_id": "118509713271",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": "https://sence.gob.cl/node/1080",
+      "error": null,
+      "summary": "SENCE Tarapacá: tres videos HD de RRSS y proyección con gráfica y guion aportados, más maestro de ceremonia 22/10 de 10 a 13 en Alto Hospicio.",
+      "budget_buyer": 3060000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 3.060.000. Presentador presencial y logística, exhibición y producción acotada. Capacidad, costos y plazos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "solicitud compra produccion dialogos.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "solicitud compra produccion dialogos.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Requerimiento ( Servicio de Produccion).pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65961647917",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:03.309227+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "5586-155-LE26",
+      "disposition": "created_note",
+      "buyer": "UNIVERSIDAD DE LA FRONTERA",
+      "buyer_tax_number": "87.912.900-1",
+      "source_url": "https://app.licitalab.cl/search/details/5586-155-LE26",
+      "source_checked_at": "2026-10-14T10:57:07.108770+00:00",
+      "deadline": "2026-10-14T13:00:00.000Z",
+      "company_id": "59085575939",
+      "company_action": "reused",
+      "note_id": "118490227121",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "UFRO Admisión 2027: gestión de publicidad digital Meta, TikTok, YouTube, Google Display, Demand Gen y Search hasta 28/01/2027.",
+      "budget_buyer": 60000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Cierre hoy 14/10 a 10:00. Total CLP 60.000.000 IVA; pauta mínima 49.000.000 y fee máximo 15%. Acreditar referencias/resultados, tributación, caja y costo.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 28,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 31,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 34,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 33,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 37,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 36,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 32,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 35,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "R.I N°782 SEC 3718  BASES SERVICIO DE PUBLICIDAD Y DIFUSIÓN_DIRCO.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65959633824",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:14.015715+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1111089-21-LE26",
+      "disposition": "created_note",
+      "buyer": "Comisión Nacional de Investigación Científica y Tecnológicas - CONICYT",
+      "buyer_tax_number": "60.915.000-9",
+      "source_url": "https://app.licitalab.cl/search/details/1111089-21-LE26",
+      "source_checked_at": "2026-10-14T10:57:13.026059+00:00",
+      "deadline": "2026-10-19T18:00:00.000Z",
+      "company_id": "53965641129",
+      "company_action": "reused",
+      "note_id": "118510169431",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": "https://ayuda.anid.gob.cl/hc/es/articles/4410512961044-Rendici%C3%B3n-Gastos-operacionales-Etapa-2026",
+      "error": null,
+      "summary": "ANID: monitoreo diario de prensa y redes sobre ciencia y tecnología, con registros y reportes.",
+      "budget_buyer": 8500000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Total CLP 8.500.000 impuestos incluidos. Entregas 7:30 de lunes a viernes,8:00 fines de semana; registros regionales hasta 24 h, excepciones 4 h. Plataforma, cobertura, duración y costos pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "ANEXOS  1111089-21-LE26  MONITOREO DE PRENSA PUBLICAR.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 15,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 12,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 11,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolucion N°8480 del 07-10-2026 llama a licitacion 1111089-21-LE.pdf",
+          "page": 16,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65954207631",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:23.669182+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1219102-6-LE26",
+      "disposition": "created_note",
+      "buyer": "Defensoría del Contribuyente",
+      "buyer_tax_number": "62.000.930-K",
+      "source_url": "https://app.licitalab.cl/search/details/1219102-6-LE26",
+      "source_checked_at": "2026-10-14T10:57:23.932122+00:00",
+      "deadline": "2026-10-19T18:30:00.000Z",
+      "company_id": "59194211077",
+      "company_action": "created",
+      "note_id": "118492263992",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Monitoreo, análisis estratégico e inteligencia de medios, plataformas digitales y redes durante 36 meses.",
+      "budget_buyer": 25200000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 25.200.000 global para 36 meses. Plataforma 24/7/365, búsqueda, descarga, transcripciones, dashboard y reportes. Proveedor, capacidad y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "ANEXOS.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 241-Pregunta-Foro-1219102-6-LE26.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 38,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 47,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 58,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 21,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 62,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 241-Pregunta-Foro-1219102-6-LE26.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 233 BASES-Monitoreo-de-Medios.pdf",
+          "page": 59,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REX 241-Pregunta-Foro-1219102-6-LE26.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65958396505",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:33.097951+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1591-19-LP26",
+      "disposition": "created_note",
+      "buyer": "SERVICIO NACIONAL DE TURISMO",
+      "buyer_tax_number": "60.704.000-1",
+      "source_url": "https://app.licitalab.cl/search/details/1591-19-LP26",
+      "source_checked_at": "2026-10-14T10:57:34.107144+00:00",
+      "deadline": "2026-10-29T18:00:00.000Z",
+      "company_id": "31640422315",
+      "company_action": "reused",
+      "note_id": "118506616350",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": "https://www.sernatur.cl/transparencia/",
+      "error": null,
+      "summary": "SERNATUR Gira de Estudio: campaña estratégica y creativa, KV y piezas digitales, evento y activación, más medios.",
+      "budget_buyer": 160000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 160.000.000 global. Activación/producción requieren capacidad o proveedor. Referencias, caja, distribución fee/pauta y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "Anexos editables 1591-19-LP26.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 35,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 52,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 75,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 72,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 71,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 70,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 68,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Resolución Exenta 387 Bases de Licitación 1591-19-LP26.pdf",
+          "page": 63,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65950672537",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:42.567005+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "2380-2193-COT26",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE COPIAPO",
+      "buyer_tax_number": "69.030.200-4",
+      "source_url": "https://app.licitalab.cl/search/agile/2380-2193-COT26",
+      "source_checked_at": "2026-10-14T10:57:45.920652+00:00",
+      "deadline": "2026-10-14T13:30:00.000Z",
+      "company_id": "59203459684",
+      "company_action": "created",
+      "note_id": "118491777635",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Copiapó: banner web, hasta 10 notas por mes, publicaciones en redes con diseño y difusión digital.",
+      "budget_buyer": 450000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 450.000. RAG sólo devolvió informativo administrativo; evidencia técnica incompleta. Medio, período, cantidad y costo no acreditados.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "INFORMATIVO COMPRA AGIL.PDF",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65959943707",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:51.388613+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "4085-482-COT26",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE LONGAVI",
+      "buyer_tax_number": "69.130.600-3",
+      "source_url": "https://app.licitalab.cl/search/agile/4085-482-COT26",
+      "source_checked_at": "2026-10-14T10:57:57.006317+00:00",
+      "deadline": "2026-10-14T13:40:00.000Z",
+      "company_id": "59182400294",
+      "company_action": "created",
+      "note_id": "118507060487",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Longaví plan de medios línea 1: seis meses de cobertura, dos entrevistas por mes, dos historias por semana en cada plataforma y dos notas audiovisuales por mes.",
+      "budget_buyer": 4500000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 4.500.000 global o 750.000 IVA al mes. Producción propia, cobertura local, perfil del medio, volumen y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°1.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65972660649",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:05:59.751108+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "4085-483-COT26",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE LONGAVI",
+      "buyer_tax_number": "69.130.600-3",
+      "source_url": "https://app.licitalab.cl/search/agile/4085-483-COT26",
+      "source_checked_at": "2026-10-14T10:58:07.145429+00:00",
+      "deadline": "2026-10-14T14:00:00.000Z",
+      "company_id": "59182400294",
+      "company_action": "reused",
+      "note_id": "118517070761",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Longaví plan de medios línea 2: seis meses de cobertura, dos entrevistas por mes, dos historias por semana en cada plataforma y dos notas audiovisuales por mes.",
+      "budget_buyer": 1500000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 1.500.000 global o 250.000 IVA al mes. Ticket versus carga, canal y producción local pendientes; distinta de 4085-482.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "REFERENCIAS TÉCNICAS LINEA N°2.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65955911722",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:06:08.398110+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1469-268-L126",
+      "disposition": "created_note",
+      "buyer": "UNIVERSIDAD DE TALCA",
+      "buyer_tax_number": "70.885.500-6",
+      "source_url": "https://app.licitalab.cl/search/details/1469-268-L126",
+      "source_checked_at": "2026-10-14T10:58:13.085485+00:00",
+      "deadline": "2026-10-20T18:00:00.000Z",
+      "company_id": "31776227440",
+      "company_action": "reused",
+      "note_id": "118516623263",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "U. de Talca: plataforma informativa digital nacional, banner en portada, veinte contenidos y cuatro entrevistas.",
+      "budget_buyer": 3570000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP 3.570.000 IVA. Inventario y canal nacional, referencias y margen pendientes. Referencia radial contradice objeto digital: aclarar.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada_288KB.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada_288KB.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Bases_1469-268-L126.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "AnexoCaracteristicasTécnicas_20261009144754.825_X.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "AnexoOfertaEconómica_20261009144650.715_X.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "AnexoExperiencia_20261009144715.427_X.docx",
+          "page": null,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.pdf",
+          "page": 10,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "Formato Bases Licitación Simplificada.pdf",
+          "page": 9,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65962270021",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:06:18.621547+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "895072-124-COT26",
+      "disposition": "created_note",
+      "buyer": "SUBSECRETARIA DE EDUCACION PARVULARIA",
+      "buyer_tax_number": "61.980.540-2",
+      "source_url": "https://app.licitalab.cl/search/agile/895072-124-COT26",
+      "source_checked_at": "2026-10-14T10:58:23.144334+00:00",
+      "deadline": "2026-10-14T12:00:00.000Z",
+      "company_id": "59186428030",
+      "company_action": "created",
+      "note_id": "118517691753",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Educación Parvularia: planificación, administración, optimización y seguimiento de Todos al Jardín, octubre-noviembre, con medios locales y radio.",
+      "budget_buyer": 3000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "Cierre hoy a 09:00. CLP 3.000.000 impuestos incluye medios y honorarios. Inventario, producción, caja, fee y margen pendientes.",
+        "Por calificar: verificar admisibilidad, capacidad, canal y margen. Sin GO ni autorización de presentación."
+      ],
+      "documents": [
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 1,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 4,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 5,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 6,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 7,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 2,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 3,
+          "verification": "RAG fragment; no full-original reading claimed"
+        },
+        {
+          "file": "TDR-CAMPANA-EP-SDEP-2026-VF-1.pdf",
+          "page": 8,
+          "verification": "RAG fragment; no full-original reading claimed"
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65953310343",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:06:28.239609+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "584105-241-COT26",
+      "disposition": "created_note",
+      "buyer": "SUBSECRETARIA DE ENERGIA",
+      "buyer_tax_number": "61.979.830-9",
+      "source_url": "https://app.licitalab.cl/search/agile/584105-241-COT26",
+      "source_checked_at": "2026-10-14T10:58:34.710333+00:00",
+      "deadline": "2026-10-14T18:00:00.000Z",
+      "company_id": "59198702877",
+      "company_action": "reused",
+      "note_id": "118521361520",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Rediseño UX/UI de intranet SharePointModern+Viva sobre estructura vigente; tres meses,diagnóstico,mockups,implementación y capacitación.",
+      "budget_buyer": 7000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP7M impuestos; experiencia comprobable SharePoint como puerta; pagos3hitos a30días; cierre hoy15h.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "documents": [
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 8
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 1
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 6
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 4
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 3
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 5
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 9
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 2
+        },
+        {
+          "filename": "09 10 REQ ESPECIFICO_revpms.pdf",
+          "page": 7
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65969254199",
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:06:37.153782+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "1385462-15-RFI26",
+      "disposition": "created_note",
+      "buyer": "SERVICIO DE BIODIVERSIDAD Y AREAS PROTEGIDAS",
+      "buyer_tax_number": null,
+      "source_url": "https://app.licitalab.cl/search/market_query/1385462-15-RFI26",
+      "source_checked_at": "2026-10-14T10:58:40.875230+00:00",
+      "deadline": "2026-10-21T13:00:06.000Z",
+      "company_id": "59215924833",
+      "company_action": "created",
+      "note_id": "118518150998",
+      "lead_created": false,
+      "deal_created": false,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "RFI SINAT: plataforma modular de trámites,usuarios,atención ciudadana,analítica,integraciones y mantención.",
+      "budget_buyer": null,
+      "currency_buyer": null,
+      "risks": [
+        "Consulta referencial sin presupuesto ni adjudicación; nube privada aportada porSBAP; alcanceintegral ycapacidadpendientes. No afirmar CRM mayorUSD1000mensuales.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "documents": [
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 1
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 41
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 53
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 9
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 54
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 52
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 49
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 33
+        },
+        {
+          "filename": "SBAP-PR-GCA-05_RFI_SINAT V3.pdf",
+          "page": 2
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": null,
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": null,
+      "crm_disposition": "rfi_company_note",
+      "deal_checks": null,
+      "deal_two_readbacks": false,
+      "source_checked_before_deal": null,
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": null,
+      "error_deal": null
+    },
+    {
+      "code": "1618-18-RFI26",
+      "disposition": "created_note",
+      "buyer": "TESORERIA GENERAL DE LA REPUBLICA",
+      "buyer_tax_number": null,
+      "source_url": "https://app.licitalab.cl/search/market_query/1618-18-RFI26",
+      "source_checked_at": "2026-10-14T10:58:51.932044+00:00",
+      "deadline": "2026-11-02T13:00:34.000Z",
+      "company_id": "59206556188",
+      "company_action": "created",
+      "note_id": "118503888413",
+      "lead_created": false,
+      "deal_created": false,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "RFI Tesorería: modernización y migración de visualización analítica sobre DWOracle,con experiencia híbrida GoogleCloud/BigQuery.",
+      "budget_buyer": null,
+      "currency_buyer": null,
+      "risks": [
+        "Consulta no vinculante; presupuesto no publicado,entornoOracleODI3,5–5TB; plataformas/volumen/capacidad porverificar. No es proyectoGA4 porinferencia.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "documents": [
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 5
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 6
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 11
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 13
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 8
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 3
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 10
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 12
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 4
+        },
+        {
+          "filename": "rfi-visualizacion-analitica-tgr (octubre 2026).pdf",
+          "page": 1
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": null,
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": null,
+      "crm_disposition": "rfi_company_note",
+      "deal_checks": null,
+      "deal_two_readbacks": false,
+      "source_checked_before_deal": null,
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": null,
+      "error_deal": null
+    },
+    {
+      "code": "1191688-76-LE26",
+      "disposition": "created_note",
+      "buyer": "I MUNICIPALIDAD DE LA COMUNA DE EL BOSQUE",
+      "buyer_tax_number": "69.255.300-4",
+      "source_url": "https://app.licitalab.cl/search/details/1191688-76-LE26",
+      "source_checked_at": "2026-10-14T10:59:02.327175+00:00",
+      "deadline": "2026-10-15T18:00:00.000Z",
+      "company_id": "53947557760",
+      "company_action": "reused",
+      "note_id": "118511240716",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": "https://www.municipalidadelbosque.cl/",
+      "error": null,
+      "summary": "Plataforma de reserva y pago online de campos deportivos,inscripción en talleres y comunicación con comunidad.",
+      "budget_buyer": 14000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP14M; ver integración de pagos,datos,soporte,admisibilidad ycapacidad; sinprecioaprobado.",
+        "Por calificar; sin GO, contacto, cotización ni presentación."
+      ],
+      "documents": [
+        {
+          "filename": "1. Solicitud de Compra 800-00578-2026 - sv.pdf",
+          "page": 1
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 1
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 1
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 14
+        },
+        {
+          "filename": "1. Solicitud de Compra 800-00578-2026 - sv.pdf",
+          "page": 2
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 2
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 12
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 9
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 16
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 26
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 20
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 27
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 6
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 25
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 18
+        },
+        {
+          "filename": "3. Decreto alcaldicio 03494-2026.pdf",
+          "page": 19
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 23
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 22
+        },
+        {
+          "filename": "2. Especificaciones-tecnicas-de-licitacion-reserva-y-talleres-dep.pdf",
+          "page": 19
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65951142967",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:06:45.702038+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "3671-69-LE26",
+      "disposition": "created_note",
+      "buyer": "ILUSTRE MUNICIPALIDAD DE CHILLAN VIEJO",
+      "buyer_tax_number": "69.266.500-7",
+      "source_url": "https://app.licitalab.cl/search/details/3671-69-LE26",
+      "source_checked_at": "2026-10-14T11:01:01.768427+00:00",
+      "deadline": "2026-10-23T18:00:00.000Z",
+      "company_id": "59207505971",
+      "company_action": "created",
+      "note_id": "118501861534",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "Hosting web,aplicaciones y basesdatos municipales:dosVM,40vCPU,64GBRAM,2TBSSD,2IPdedicadas;24meses.",
+      "budget_buyer": null,
+      "currency_buyer": "CLP",
+      "risks": [
+        "HOLD:certificaciónTIERIIIUptime(TCCF)eISO27001a nombre del oferente obligatorias,p7;patentevigente. Sin evidencia admisibilidadpropia,presupuestono informado. RAGpartial:documentospendientes.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "documents": [
+        {
+          "filename": "ANEXOS EDITABLES 3671-69-LE26.docx",
+          "page": null
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 1
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 15
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 16
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 7
+        },
+        {
+          "filename": "TERMINOS DE REFERENCIA WEB HOSTING.pdf",
+          "page": 1
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 8
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 9
+        },
+        {
+          "filename": "D.A N°8251 DE FECHA 06.10.2026 AP. BASES Y LLAMA A L.P ID 3671-69.pdf",
+          "page": 6
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65966292255",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:06:54.107477+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "3552-2-RFI26",
+      "disposition": "created_note",
+      "buyer": "Gendarmería de Chile",
+      "buyer_tax_number": null,
+      "source_url": "https://app.licitalab.cl/search/market_query/3552-2-RFI26",
+      "source_checked_at": "2026-10-14T11:01:12.237201+00:00",
+      "deadline": "2026-10-16T18:00:11.000Z",
+      "company_id": "59198238510",
+      "company_action": "created",
+      "note_id": "118500283665",
+      "lead_created": false,
+      "deal_created": false,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": "https://www.gendarmeria.gob.cl/director%28a%29_escuela.html",
+      "error": null,
+      "summary": "Consulta MercadoGendarmería:diseño/desarrollo de webs institucionales y24meses de mantención;GCPadmitido.",
+      "budget_buyer": null,
+      "currency_buyer": null,
+      "risks": [
+        "RFI sinpresupuesto ni compromiso:5añoswebpública,3proyectosEstado,equipo8roles. SLAcrítico30minrespuesta/4hsolución. SinGO.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "documents": [
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 19
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 23
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 2
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 15
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 24
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 22
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 4
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 18
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 16
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 20
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 13
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 7
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 14
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 3
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 21
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 8
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 12
+        },
+        {
+          "filename": "RFI WEB INSTITUCIONAL.pdf",
+          "page": 10
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": null,
+      "bucket_proposed": null,
+      "bucket_observed": null,
+      "bucket_drift": null,
+      "crm_disposition": "rfi_company_note",
+      "deal_checks": null,
+      "deal_two_readbacks": false,
+      "source_checked_before_deal": null,
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": null,
+      "error_deal": null
+    },
+    {
+      "code": "1057390-21-LR26",
+      "disposition": "created_note",
+      "buyer": "SERVICIO DE SALUD ARAUCANIA NORTE",
+      "buyer_tax_number": "61.955.100-1",
+      "source_url": "https://app.licitalab.cl/search/details/1057390-21-LR26",
+      "source_checked_at": "2026-10-14T11:01:23.931630+00:00",
+      "deadline": "2026-11-09T18:30:00.000Z",
+      "company_id": "59200673703",
+      "company_action": "created",
+      "note_id": "118491490456",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "SSAraucaníaNorte:cloudOracle,aplicativoESISSAN,enlacededicado,36meses.",
+      "budget_buyer": 487000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "HOLD:capacidadOracle/ESISSAN,enlaces,experienciaSalud ygarantíaspendientes. NoGCPgenérico. Presupuesto487Mpor36mesesimpuestos,nohonorariosEfeonce.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "documents": [
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 27
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 10
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 13
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 5
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 21
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 22
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 16
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 8
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 3
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 2
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 48
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 44
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 4
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 34
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 6
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 7
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 11
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 25
+        },
+        {
+          "filename": "RES EXENTA 3440 aprueba bases.pdf",
+          "page": 15
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65953160734",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:07:03.480942+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "2704-83-L126",
+      "disposition": "created_note",
+      "buyer": "UNIVERSIDAD DEL BIO BIO",
+      "buyer_tax_number": "60.911.006-6",
+      "source_url": "https://app.licitalab.cl/search/details/2704-83-L126",
+      "source_checked_at": "2026-10-14T11:01:34.828326+00:00",
+      "deadline": "2026-10-17T02:59:00.000Z",
+      "company_id": "59195450741",
+      "company_action": "created",
+      "note_id": "118490875831",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "UBB:reporteimpacto2026,30páginas,recopilación datos,redacción,3propuestasgráficas,piezadigital yresumenejecutivo;4meses.",
+      "budget_buyer": 3600000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP3,6M;presencialinicio/cierre;puntúaEmpresaB ydomicilioÑuble/Biobío. Pagos60%elaboración/40%diseño. Validarcostos/referencias.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "documents": [
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 7
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 2
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 3
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 6
+        },
+        {
+          "filename": "ESPECIFICACIONES TÉCNICAS Y CRITERIOS DE EVALUACION.pdf",
+          "page": 1
+        },
+        {
+          "filename": "ESPECIFICACIONES TÉCNICAS Y CRITERIOS DE EVALUACION.pdf",
+          "page": 2
+        },
+        {
+          "filename": "ESPECIFICACIONES TÉCNICAS Y CRITERIOS DE EVALUACION.pdf",
+          "page": 3
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 8
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 1
+        },
+        {
+          "filename": "FORMULARIO B.docx",
+          "page": null
+        },
+        {
+          "filename": "FORMULARIO A.docx",
+          "page": null
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 5
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 9
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 4
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 12
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 10
+        },
+        {
+          "filename": "Bases_2704-83-L126.pdf",
+          "page": 13
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65948666534",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:07:12.052202+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    },
+    {
+      "code": "761-24-LE26",
+      "disposition": "created_note",
+      "buyer": "SUBSECRETARIA DE DESARROLLO REGIONAL Y ADMINISTRATIVO",
+      "buyer_tax_number": "60.515.000-4",
+      "source_url": "https://app.licitalab.cl/search/details/761-24-LE26",
+      "source_checked_at": "2026-10-14T11:01:45.640975+00:00",
+      "deadline": "2026-10-23T18:00:00.000Z",
+      "company_id": "59206556228",
+      "company_action": "created",
+      "note_id": "118515853212",
+      "lead_created": false,
+      "deal_created": true,
+      "contact_created": false,
+      "checks": {
+        "note_body_persisted": true,
+        "company_associated": true
+      },
+      "identity_primary_source": null,
+      "error": null,
+      "summary": "SUBDERE:diseño instruccional,virtualización cursosSCORM/HTML5,multimedia,UXyLMS,editables.",
+      "budget_buyer": 15000000,
+      "currency_buyer": "CLP",
+      "risks": [
+        "CLP15MimpuestossegúnRes6306pp2,18;umbralpromediotécnico>50excluyente. Experiencia25%,equipo30%,propuesta30%,precio10%. No infraestructuraGCP.",
+        "Calificación/admisibilidad/capacidad/economía pendientes. AltaDealporinstrucciónexpresaJulio14/10,NO-GO."
+      ],
+      "documents": [
+        {
+          "filename": "ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+          "page": null
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 1
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 4
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 54
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 28
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 43
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 45
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 13
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 9
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 69
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 24
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 14
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 42
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 38
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 16
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 35
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 70
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 34
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 33
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 41
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 65
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 76
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 2
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 23
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 46
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 53
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 52
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 18
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 51
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 80
+        },
+        {
+          "filename": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+          "page": 75
+        }
+      ],
+      "two_readbacks": true,
+      "contact_authority_inferred": false,
+      "deal_id": "65950672644",
+      "bucket_proposed": "Strategic Bets",
+      "bucket_observed": "Strategic Bets",
+      "bucket_drift": false,
+      "crm_disposition": "created_deal",
+      "deal_checks": {
+        "unique_id": true,
+        "idempotency_key": true,
+        "company_primary": true,
+        "note_associated": true,
+        "ficha_de_licitacion": true,
+        "hubspot_owner_id": true,
+        "pipeline": true,
+        "dealstage": true,
+        "dealtype": true,
+        "modalidad_de_venta": true,
+        "deadline": true,
+        "amount_empty": true,
+        "closedate_empty": true,
+        "note_body_persisted": true,
+        "unique_final": true
+      },
+      "deal_two_readbacks": true,
+      "source_checked_before_deal": "2026-10-14T11:07:22.184575+00:00",
+      "amount_offer": null,
+      "closedate_commercial": null,
+      "deal_stage": "qualifiedtobuy",
+      "error_deal": null
+    }
+  ],
+  "companies": [
+    {
+      "id": "31779716469",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Universidad de Chile",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-06",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "after": {
+        "name": "Universidad de Chile",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Universidad de Chile",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59085575939",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Universidad de La Frontera",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": null,
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "salesqualifiedlead"
+      },
+      "after": {
+        "name": "Universidad de La Frontera",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "salesqualifiedlead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Universidad de La Frontera",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59204234842",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "CORPORACION REGIONAL DE DESARROLLO DE LA REGION DE TARAPACA",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "CORPORACION REGIONAL DE DESARROLLO DE LA REGION DE TARAPACA",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59203151532",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "Comité SEP",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Comité SEP",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59202377804",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "I MUNICIPALIDAD DE OSORNO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "I MUNICIPALIDAD DE OSORNO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59194210991",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "ILUSTRE MUNICIPALIDAD DE RETIRO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "ILUSTRE MUNICIPALIDAD DE RETIRO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59188595240",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "FUNDACION CHILENA DEL PACIFICO",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "FUNDACION CHILENA DEL PACIFICO",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59202063283",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "FUNDACION CENTRO CULTURAL DE LO PRADO",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "FUNDACION CENTRO CULTURAL DE LO PRADO",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59198702877",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SUBSECRETARIA DE ENERGIA",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "SUBSECRETARIA DE ENERGIA",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "32340888618",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Subsecretaria de Salud Pública",
+        "country": null,
+        "industry": "GOVERNMENT_RELATIONS",
+        "efeonce_prospecting_researched_on": null,
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "after": {
+        "name": "Subsecretaria de Salud Pública",
+        "country": "Chile",
+        "industry": "GOVERNMENT_RELATIONS",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Subsecretaria de Salud Pública",
+        "country": "Chile",
+        "industry": "GOVERNMENT_RELATIONS",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59190452507",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SUPERINTENDENCIA DE INSOLVENCIA Y REEMPRENDIMIENTO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "SUPERINTENDENCIA DE INSOLVENCIA Y REEMPRENDIMIENTO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59196072522",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SERVICIO NACIONAL PARA LA PREVENCION Y REHABILITACION DEL CONSUMO DE D",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Servicio Nacional para la Prevención y Rehabilitación del Consumo de Drogas y Alcohol (SENDA)",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "identity_completion": {
+        "source_url": "https://www.senda.gob.cl/quienes-somos/",
+        "old": "SERVICIO NACIONAL PARA LA PREVENCION Y REHABILITACION DEL CONSUMO DE D",
+        "new": "Servicio Nacional para la Prevención y Rehabilitación del Consumo de Drogas y Alcohol (SENDA)",
+        "two_readbacks": true,
+        "verified": true
+      }
+    },
+    {
+      "id": "59199011361",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "I MUNICIPALIDAD DE SAN FERNANDO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "I MUNICIPALIDAD DE SAN FERNANDO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59203151624",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "I MUNICIPALIDAD DE MULCHEN",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "I MUNICIPALIDAD DE MULCHEN",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59088367247",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Servicio Nacional de Capacitación y Empleo (SENCE)",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-06",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "after": {
+        "name": "Servicio Nacional de Capacitación y Empleo (SENCE)",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Servicio Nacional de Capacitación y Empleo (SENCE)",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "53965641129",
+      "action": "updated_research_date",
+      "before": {
+        "name": "ANID",
+        "country": "Chile",
+        "industry": "PHARMACEUTICALS",
+        "efeonce_prospecting_researched_on": null,
+        "hubspot_owner_id": null,
+        "lifecyclestage": "salesqualifiedlead"
+      },
+      "after": {
+        "name": "ANID",
+        "country": "Chile",
+        "industry": "PHARMACEUTICALS",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": null,
+        "lifecyclestage": "salesqualifiedlead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "ANID",
+        "country": "Chile",
+        "industry": "PHARMACEUTICALS",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": null,
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59194211077",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "Defensoría del Contribuyente",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Defensoría del Contribuyente",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "31640422315",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Servico Nacional de Turismo",
+        "country": "Chile",
+        "industry": "GOVERNMENT_RELATIONS",
+        "efeonce_prospecting_researched_on": "2026-10-06",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "after": {
+        "name": "Servico Nacional de Turismo",
+        "country": "Chile",
+        "industry": "GOVERNMENT_RELATIONS",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Servico Nacional de Turismo",
+        "country": "Chile",
+        "industry": "GOVERNMENT_RELATIONS",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59203459684",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "I MUNICIPALIDAD DE COPIAPO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "I MUNICIPALIDAD DE COPIAPO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59182400294",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "I MUNICIPALIDAD DE LONGAVI",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "I MUNICIPALIDAD DE LONGAVI",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "31776227440",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Universidad de Talca",
+        "country": null,
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": null,
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "after": {
+        "name": "Universidad de Talca",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Universidad de Talca",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59186428030",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SUBSECRETARIA DE EDUCACION PARVULARIA",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "SUBSECRETARIA DE EDUCACION PARVULARIA",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59215924833",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SERVICIO DE BIODIVERSIDAD Y AREAS PROTEGIDAS",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "SERVICIO DE BIODIVERSIDAD Y AREAS PROTEGIDAS",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      }
+    },
+    {
+      "id": "59206556188",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "TESORERIA GENERAL DE LA REPUBLICA",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "TESORERIA GENERAL DE LA REPUBLICA",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      }
+    },
+    {
+      "id": "53947557760",
+      "action": "updated_research_date",
+      "before": {
+        "name": "Ilustre Municipalidad de El Bosque",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": null,
+        "hubspot_owner_id": null,
+        "lifecyclestage": "salesqualifiedlead"
+      },
+      "after": {
+        "name": "Ilustre Municipalidad de El Bosque",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": null,
+        "lifecyclestage": "salesqualifiedlead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "preserved_name": true,
+        "preserved_domain": true,
+        "preserved_website": true,
+        "preserved_industry": true,
+        "preserved_hubspot_owner_id": true,
+        "preserved_lifecyclestage": true,
+        "preserved_description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Ilustre Municipalidad de El Bosque",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": null,
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59207505971",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "ILUSTRE MUNICIPALIDAD DE CHILLAN VIEJO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "ILUSTRE MUNICIPALIDAD DE CHILLAN VIEJO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59198238510",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "Gendarmería de Chile",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "Gendarmería de Chile",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      }
+    },
+    {
+      "id": "59200673703",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SERVICIO DE SALUD ARAUCANIA NORTE",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "SERVICIO DE SALUD ARAUCANIA NORTE",
+        "country": "Chile",
+        "industry": null,
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59195450741",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "UNIVERSIDAD DEL BIO BIO",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "UNIVERSIDAD DEL BIO BIO",
+        "country": "Chile",
+        "industry": "HIGHER_EDUCATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    },
+    {
+      "id": "59206556228",
+      "action": "created",
+      "before": null,
+      "after": {
+        "name": "SUBSECRETARIA DE DESARROLLO REGIONAL Y ADMINISTRATIVO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "lead"
+      },
+      "two_readbacks": true,
+      "checks": {
+        "researched_on": true,
+        "name": true,
+        "country": true,
+        "hubspot_owner_id": true,
+        "efeonce_prospecting_researched_on": true,
+        "lifecyclestage": true,
+        "description": true,
+        "industry": true,
+        "member_active187": true
+      },
+      "member_active187": true,
+      "observed_after_deal_promotion": {
+        "name": "SUBSECRETARIA DE DESARROLLO REGIONAL Y ADMINISTRATIVO",
+        "country": "Chile",
+        "industry": "GOVERNMENT_ADMINISTRATION",
+        "efeonce_prospecting_researched_on": "2026-10-14",
+        "hubspot_owner_id": "75788512",
+        "lifecyclestage": "opportunity"
+      }
+    }
+  ],
+  "counts": {
+    "created_note": 33,
+    "companies_created": 22,
+    "companies_reused": 8
+  },
+  "all_written_records_verified": true,
+  "deal_counts": {
+    "created_deal": 30,
+    "rfi_company_note": 3
+  },
+  "bucket_drift": [],
+  "all_deal_checks_passed": true,
+  "lead_inventory_after": 2252,
+  "lead_inventory_before": 2252,
+  "no_new_leads_inventory_check": true,
+  "membership_scope": "30 companies from this intake individually verified as members of ACTIVE187; not a segment-wide member count."
+}

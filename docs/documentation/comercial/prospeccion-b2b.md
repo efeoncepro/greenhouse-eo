@@ -86,6 +86,18 @@ es por lote, sin ampliar el heartbeat. [Caso del 13/10](../../commercial/follow-
 
 ## Roles y continuidad
 
+Para radar de convocatorias, la [guía de primera entrada](../../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md)
+prioriza interés/credenciales/inscripción/visita además de propuesta final. Se avisan señales tempranas
+documentadas con acción útil al operador sin esperar el RFP ni certificar elegibilidad. Descubrimiento
+amplio y vigilancia de conocidos son independientes, igual que público/privado por Chile/Colombia/México/
+Perú; nonprofit aparte, LATAM primero y Palm Desert condicionado. Solape mínimo de 72 horas ampliable
+ante indexación tardía acreditada; bloqueo canónico de identidad/URL impide reintentos y avance de marcadores.
+Publicación, disponibilidad pública, detección, validación, aviso y margen útil se registran separados;
+alta CRM no acredita detección. Menos de cinco días hábiles a la primera puerta muestra detección tardía.
+[Socopur 2027](../../commercial/tenders/socopur-agencia-marketing-digital-2027/README.md): entrada tardía
+cerrada, sin adjudicación inferida. Método documental; frecuencia, suscripciones y permisos intactos,
+sin promesa de exhaustividad o automatización desplegada.
+
 Commercial dirige avance de venta; Customer Model el ICP/grupo comprador; prácticas oferta/capacidad/proof;
 Copywriting mensajes; HubSpot CRM/dedupe/asociaciones/readback. Sales opcional apoya la fase adecuada cuando
 se encuentra instalado o se invoca; no sustituye reglas Efeonce. El radar personal conserva HSP, reporte,
@@ -105,3 +117,12 @@ evidencia real de uso y, cuando corresponde, una autorización de acción distin
 Desde el 2026-10-12 la respuesta es proporcional al pedido: contesta primero lo que se preguntó y deja la
 entrega completa para dossier o handoff. Un [diferencial ciego bajo Claude](../../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md)
 mostró que la skill evita el alta de contactos sin correo, y que antes de la corrección respondía 74 % más largo.
+
+## Seguimiento de largo plazo
+
+La [política aceptada](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) conserva cuentas con encaje y proveedor
+actual tras detener el acercamiento. Hito comprador prevalece; proveedor recién contratado sin hito deja
+revisión interna a seis meses, owner/TASK única en **HubSpot** y restricciones vigentes. Notion conserva
+trabajo operativo/entregables; no duplica las tareas comerciales. El seguimiento recupera esa
+cola aunque cambie el mes del proyecto. Revisar, nutrir con permiso y recontactar autorizado son acciones
+distintas; la respuesta no crea opt-in ni oportunidad. [Caso Fabrimetal](../../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).

@@ -1,0 +1,628 @@
+{
+  "status": "draft_for_review",
+  "repoPolicy": "lightweight_record_and_links_only",
+  "oneDriveFolder": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26",
+  "files": [
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/bases/ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/01. Bases y anexos originales/Originales Word descargados sin modificación.zip#ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+      "bytes": 47628,
+      "sha256": "9c9a15f187b3bfc8d359e8b983aaff36af87b133baeb974b69af9c7ed2e5a0ab",
+      "standaloneWordContentVerified": true,
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/bases/RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/01. Bases y anexos originales/RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+      "bytes": 1273001,
+      "sha256": "e496de7046a2ffe50f4387f30523f73cf69e45f09b9f134e2e5d957e662b171f",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/bases/extraccion-anexos-oficiales.txt",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Extracciones/extraccion-anexos-oficiales.txt",
+      "bytes": 52234,
+      "sha256": "af20a96d0a04cd4cb2a65388ca365b225bb080991a8ace80e1761492c47c0f3a",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/bases/extraccion-resolucion-6306-2026.txt",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Extracciones/extraccion-resolucion-6306-2026.txt",
+      "bytes": 414534,
+      "sha256": "e5b159a968cb3edb4cbae5d93d4b2a4ed6b5d27a2a3fb7fcfe3540a9514651f7",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/research/pricing/revision-v1.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Costeo V3/revision-v1.json",
+      "bytes": 11381,
+      "sha256": "36f905b251a28e17cc9ddf3924912cecfc84128e1fa46719cdec88a33ad3d024",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/research/pricing/resumen-v1.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Costeo V3/resumen-v1.json",
+      "bytes": 28402,
+      "sha256": "bdc4f9206ff743447c8884db059d72f68110770e5456620c8430900d1a54b916",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/research/pricing/cotizacion-congelada-v1.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Costeo V3/cotizacion-congelada-v1.json",
+      "bytes": 1645600,
+      "sha256": "d1a77f29375d18faa8096f7583a6a944f6d501ee15540df0cd77bdd01a9841cf",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/research/pricing/demanda-v1.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Costeo V3/demanda-v1.json",
+      "bytes": 29028,
+      "sha256": "86769e33ec6a7a883a42f9b35d5430eecd2fb6db12272ac6235ab8fbdb22f37b",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/datos-v1.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/datos-v1.json",
+      "bytes": 6033,
+      "sha256": "9a94ad806bbbb3f1387793b9ccd4b497ed09e157accc30584ebf3eef106e9d86",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/datos-v2.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/datos-v2.json",
+      "bytes": 5939,
+      "sha256": "4c8c8f40ef138dcc69e798f83cc993c4b44b8906c6834df6313f00bdaf8a7652",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/cotizacion.pdf",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/cotizacion.pdf",
+      "bytes": 250201,
+      "sha256": "a8167e659a9911e0f0811e083229a7f95bf4fde343cb969e3ad755d5e5c45197",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/cotizacion.html",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/cotizacion.html",
+      "bytes": 1487122,
+      "sha256": "7d25d4bc346391370354b31bdde19460ff54ed0c096fc0f2ea6303ad3b582e1a",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/manifest.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/manifest.json",
+      "bytes": 11021,
+      "sha256": "23f8313372f242075ce1abb2014d438db0c5d7740d211b19d06227124af2e2cb",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/datos.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/datos.json",
+      "bytes": 5939,
+      "sha256": "4c8c8f40ef138dcc69e798f83cc993c4b44b8906c6834df6313f00bdaf8a7652",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/qa/mobile.png",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/qa/mobile.png",
+      "bytes": 69165,
+      "sha256": "4e3dc48071512e05af5ecd6444776ab41307abc7997447a635c4ff9236564059",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/qa/pagina-5.png",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/qa/pagina-5.png",
+      "bytes": 117327,
+      "sha256": "8d672decd8564edb3faf067888a3c81f3ca7e9fb5c5f51f4800b40c747ba6531",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/qa/pagina-4.png",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/qa/pagina-4.png",
+      "bytes": 53193,
+      "sha256": "914305b46ff9aea044e78f8ba50410372754a6d9b60afb4f633277f3d53a331e",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/qa/pagina-3.png",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/qa/pagina-3.png",
+      "bytes": 75706,
+      "sha256": "a09d147d0287317a95b957d3976209f82362496f73c670e60ca20c545a9a100b",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/qa/pagina-2.png",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/qa/pagina-2.png",
+      "bytes": 121415,
+      "sha256": "cc971324dfbeaa32e61f036099dfeb699f4446690a5fc603540bce90ce14cbd4",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/subdere-elearning-2026/cotizacion/v2/qa/pagina-1.png",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/SUBDERE/1. Virtualización y diseño instruccional 761-24-LE26/04. Interno/Cotización A4 y QA/v2/qa/pagina-1.png",
+      "bytes": 103829,
+      "sha256": "973f7b72df3e698ac7b33997679b8f0e25511d43282ad673d1c4b6f75c76e8de",
+      "localReadback": true,
+      "remoteReadback": false
+    }
+  ],
+  "submitted": false,
+  "signed": false,
+  "currentLocalFiles": [
+    {
+      "path": "03. Anexos borradores sin firma/anexo-10-multimedia-BORRADOR.docx",
+      "bytes": 24061,
+      "sha256": "e172f7f4d21516e08ffcda84bc2d014a3f97ea98083822f8751e420321a6a5c1"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/SUBDERE_Anexos_administrativos_BORRADOR.pdf",
+      "bytes": 200822,
+      "sha256": "d8b3c7b1f2f9280a75ddd8b64423984d6cde48d98188fb3eb4b265b8246bbb4f"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-11-oferta-economica-BORRADOR.pdf",
+      "bytes": 61456,
+      "sha256": "a848c96942d294624e81231179a3fd040639444254cbad99cd6d667b77b904f5"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-07-oferta-tecnica-BORRADOR.docx",
+      "bytes": 27820,
+      "sha256": "d840bd710941b5563a11b58e6986c68ce4a3d80f740b9fe0f8657472e11b6fbb"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-10-instruccional-BORRADOR.docx",
+      "bytes": 24056,
+      "sha256": "437a62ebe61406d9624dc2ff9f142c3de15c4399c5de74cce5cbc77a0c18b500"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-09-experiencia-oferente-BORRADOR.docx",
+      "bytes": 23849,
+      "sha256": "446a4b4d67f1ff16fd5f456f5ac04df29019d7dfff0119e6d7e7cad2e1f0adc4"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-11-oferta-economica-BORRADOR.docx",
+      "bytes": 22861,
+      "sha256": "f46c4f5eae5f2ea2177fb2997daba318fba68f36e00e9f9c510cad14eec2fa0d"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-08-equipo-BORRADOR.docx",
+      "bytes": 22808,
+      "sha256": "0e19f12e89e2795363d16090129b4dc828f0ca3f57f3ee58789becf305a717d7"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-10-jefatura-BORRADOR.docx",
+      "bytes": 24054,
+      "sha256": "5a3c0e6532d67b48230465d3e4f49afc435cb9b7b008388f9fc008ead9511e41"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/SUBDERE_Anexos_administrativos_BORRADOR.docx",
+      "bytes": 32153,
+      "sha256": "55166e364a5ac91d0e5b18b60e02d9d3eb859595444b299aceb052cdf560cf97"
+    },
+    {
+      "path": "02. Propuesta en trabajo/Oferta económica SUBDERE BORRADOR.pdf",
+      "bytes": 250201,
+      "sha256": "a8167e659a9911e0f0811e083229a7f95bf4fde343cb969e3ad755d5e5c45197"
+    },
+    {
+      "path": "02. Propuesta en trabajo/SUBDERE_761-24-LE26_Oferta_tecnica_REVISION.pdf",
+      "bytes": 92579,
+      "sha256": "a1219c585a9a6c2d55780c26cb161635a303e40d9802cee6f664993183d831fb"
+    },
+    {
+      "path": "01. Bases y anexos originales/RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+      "bytes": 1273001,
+      "sha256": "e496de7046a2ffe50f4387f30523f73cf69e45f09b9f134e2e5d957e662b171f"
+    },
+    {
+      "path": "01. Bases y anexos originales/Originales Word descargados sin modificación.zip",
+      "bytes": 45238,
+      "sha256": "137a4691393d4095e8ae0c0750216c78ea1273e1db011960dc2e83d622f8e347"
+    },
+    {
+      "path": "01. Bases y anexos originales/ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+      "bytes": 54763,
+      "sha256": "3eaee86eaf2f2ca1885d1df6067ad1cf2472e9347b3256df4e00ac9a19adfbaa"
+    },
+    {
+      "path": "04. Interno/EQUIPO-Y-EXPERIENCIAS-INTERNO.md",
+      "bytes": 8813,
+      "sha256": "f4448ef4ddbf10e4924b0612ec0f5b1b4a4a0a0d55c5a475cd158fa69560ee03"
+    },
+    {
+      "path": "04. Interno/SUBDERE_draft_manifest_2026-10-14.json",
+      "bytes": 5178,
+      "sha256": "f7ecd9a7ae0fa8c5c88af100d0925578d74eaea9e35b994036b314bb4cefcf0d"
+    },
+    {
+      "path": "04. Interno/BRIEF-PROVEEDORES-INTERNO.md",
+      "bytes": 8448,
+      "sha256": "4f138bd78c0e9291845c13f587091767dfb0dfd4b2ba415478247ea61063f26e"
+    },
+    {
+      "path": "04. Interno/Indice repo.md",
+      "bytes": 4460,
+      "sha256": "82a59a456379e235fa2a040c7a163c082ed571920a0facaf463b6bd4c4267035"
+    },
+    {
+      "path": "04. Interno/equipo-capacidad-INTERNO.md",
+      "bytes": 6643,
+      "sha256": "1ac4a3e0b717ff28ca727d6a84fc6574d361ab0a251d7c7835756a328056a96b"
+    },
+    {
+      "path": "04. Interno/README-INTERNO.md",
+      "bytes": 2741,
+      "sha256": "e65de49fdf935b6fdd709641e28eba5bd12e5b994a8f0910a183f5576f63cb49"
+    },
+    {
+      "path": "04. Interno/SUBDERE_QA_administrativos_2026-10-14.zip",
+      "bytes": 2575952,
+      "sha256": "0c7963d99e72bb2b5f3836cb0441e107fdfaf0b204ed0821ab055ee6ded21e1b"
+    },
+    {
+      "path": "04. Interno/SUBDERE_QA_anexos_2026-10-14.zip",
+      "bytes": 4848292,
+      "sha256": "80567918eeb2cc43692b3c80b2b54f4c65d56a59617628cf48443b3e6e9829bd"
+    },
+    {
+      "path": "04. Interno/LEDGER-ADMISIBILIDAD-INTERNO.md",
+      "bytes": 9123,
+      "sha256": "f2a3a6cd49735fb5b87a86d597d145f5e6e1cffa8799fa7042a0d8cd73b00ef0"
+    },
+    {
+      "path": "04. Interno/FUENTES-INTERNO.json",
+      "bytes": 10158,
+      "sha256": "d58156dc8a01ea7417e7f16f7d4e0de367963e9fda58da60d3a14b971f06eaa8"
+    },
+    {
+      "path": "04. Interno/costeo-INTERNO.md",
+      "bytes": 7254,
+      "sha256": "aae39af0ea91bf784a26667883f0d07c213a769d121d2ae3b3433740e413da1d"
+    },
+    {
+      "path": "04. Interno/SUBDERE_QA_administrativos_2026-10-14.json",
+      "bytes": 1695,
+      "sha256": "351d84b80362bf754b2aee7b133c199a9c5c24d99edab789e4811b66ffe80821"
+    },
+    {
+      "path": "04. Interno/INSUMOS-COSTEO-V3-INTERNO.json",
+      "bytes": 7225,
+      "sha256": "dd0e0314a84e18de55e257de02ea3bf2b1a2cf9a735e0bdb3a786a90e54fb2ca"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/datos-v1.json",
+      "bytes": 6033,
+      "sha256": "9a94ad806bbbb3f1387793b9ccd4b497ed09e157accc30584ebf3eef106e9d86"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/datos-v2.json",
+      "bytes": 5939,
+      "sha256": "4c8c8f40ef138dcc69e798f83cc993c4b44b8906c6834df6313f00bdaf8a7652"
+    },
+    {
+      "path": "04. Interno/Costeo V3/revision-v1.json",
+      "bytes": 11381,
+      "sha256": "36f905b251a28e17cc9ddf3924912cecfc84128e1fa46719cdec88a33ad3d024"
+    },
+    {
+      "path": "04. Interno/Costeo V3/resumen-v1.json",
+      "bytes": 28402,
+      "sha256": "bdc4f9206ff743447c8884db059d72f68110770e5456620c8430900d1a54b916"
+    },
+    {
+      "path": "04. Interno/Costeo V3/caja-escenarios.json",
+      "bytes": 4325,
+      "sha256": "46ef8e10cf61a906f8175441b8274380ef7e20eb973a4165f538a04b52e0dbbb"
+    },
+    {
+      "path": "04. Interno/Costeo V3/cotizacion-congelada-v1.json",
+      "bytes": 1645600,
+      "sha256": "d1a77f29375d18faa8096f7583a6a944f6d501ee15540df0cd77bdd01a9841cf"
+    },
+    {
+      "path": "04. Interno/Costeo V3/demanda-v1.json",
+      "bytes": 29028,
+      "sha256": "86769e33ec6a7a883a42f9b35d5430eecd2fb6db12272ac6235ab8fbdb22f37b"
+    },
+    {
+      "path": "04. Interno/Extracciones/extraccion-anexos-oficiales.txt",
+      "bytes": 52234,
+      "sha256": "af20a96d0a04cd4cb2a65388ca365b225bb080991a8ace80e1761492c47c0f3a"
+    },
+    {
+      "path": "04. Interno/Extracciones/extraccion-resolucion-6306-2026.txt",
+      "bytes": 414534,
+      "sha256": "e5b159a968cb3edb4cbae5d93d4b2a4ed6b5d27a2a3fb7fcfe3540a9514651f7"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/cotizacion.pdf",
+      "bytes": 250201,
+      "sha256": "a8167e659a9911e0f0811e083229a7f95bf4fde343cb969e3ad755d5e5c45197"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/cotizacion.html",
+      "bytes": 1487122,
+      "sha256": "7d25d4bc346391370354b31bdde19460ff54ed0c096fc0f2ea6303ad3b582e1a"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/manifest.json",
+      "bytes": 11021,
+      "sha256": "23f8313372f242075ce1abb2014d438db0c5d7740d211b19d06227124af2e2cb"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/datos.json",
+      "bytes": 5939,
+      "sha256": "4c8c8f40ef138dcc69e798f83cc993c4b44b8906c6834df6313f00bdaf8a7652"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/qa/mobile.png",
+      "bytes": 69165,
+      "sha256": "4e3dc48071512e05af5ecd6444776ab41307abc7997447a635c4ff9236564059"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/qa/pagina-5.png",
+      "bytes": 117327,
+      "sha256": "8d672decd8564edb3faf067888a3c81f3ca7e9fb5c5f51f4800b40c747ba6531"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/qa/pagina-4.png",
+      "bytes": 53193,
+      "sha256": "914305b46ff9aea044e78f8ba50410372754a6d9b60afb4f633277f3d53a331e"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/qa/pagina-3.png",
+      "bytes": 75706,
+      "sha256": "a09d147d0287317a95b957d3976209f82362496f73c670e60ca20c545a9a100b"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/qa/pagina-2.png",
+      "bytes": 121415,
+      "sha256": "cc971324dfbeaa32e61f036099dfeb699f4446690a5fc603540bce90ce14cbd4"
+    },
+    {
+      "path": "04. Interno/Cotización A4 y QA/v2/qa/pagina-1.png",
+      "bytes": 103829,
+      "sha256": "973f7b72df3e698ac7b33997679b8f0e25511d43282ad673d1c4b6f75c76e8de"
+    }
+  ],
+  "remoteReadback": {
+    "code": "761-24-LE26",
+    "remotePresenceVerified": true,
+    "files": [
+      {
+        "name": "Oferta económica SUBDERE BORRADOR.pdf",
+        "itemId": "017EGG3WGG24HSGNZW5BAJGBNOJQ5GLER3",
+        "size": 250201,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/02.%20Propuesta%20en%20trabajo/Oferta%20econ%C3%B3mica%20SUBDERE%20BORRADOR.pdf"
+      },
+      {
+        "name": "SUBDERE_761-24-LE26_Oferta_tecnica_REVISION.pdf",
+        "itemId": "017EGG3WDYYRRFJZZ56FFI65Q3F5IBXS65",
+        "size": 92579,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/02.%20Propuesta%20en%20trabajo/SUBDERE_761-24-LE26_Oferta_tecnica_REVISION.pdf"
+      },
+      {
+        "name": "anexo-07-oferta-tecnica-BORRADOR.docx",
+        "itemId": "017EGG3WAYJSTMOZ4UEBDI33BQIJGFSGOD",
+        "size": 27820,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BC7A64C18-9467-4620-8DEC-30424C5919C3%7D&file=anexo-07-oferta-tecnica-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-08-equipo-BORRADOR.docx",
+        "itemId": "017EGG3WF5G2J4SXXMQFC3JU35C27UVX2I",
+        "size": 22808,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BC99336BD-EC5E-4581-B4D3-7D16BF4ADF48%7D&file=anexo-08-equipo-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-09-experiencia-oferente-BORRADOR.docx",
+        "itemId": "017EGG3WFM6EGJOXVEHBH3MDLBRF7UFQDT",
+        "size": 23849,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B970CF1AC-A45E-4F38-B60D-61897F42C073%7D&file=anexo-09-experiencia-oferente-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-10-instruccional-BORRADOR.docx",
+        "itemId": "017EGG3WBRZ6V2ZGQMUNH3IPTXGW7JRISQ",
+        "size": 24056,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BACABCF31-0C9A-4FA3-B43E-7735BE98A250%7D&file=anexo-10-instruccional-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-10-jefatura-BORRADOR.docx",
+        "itemId": "017EGG3WA3U2CJOIYSUBAKKSSVXPMK3MZW",
+        "size": 24054,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B9784A61B-1223-40A0-A54A-55BBD8ADB336%7D&file=anexo-10-jefatura-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-10-multimedia-BORRADOR.docx",
+        "itemId": "017EGG3WFMLIGOBRQJZBHLV3BOCAWC4CIN",
+        "size": 24061,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BE00C5AAC-09C6-4EC8-BAEC-2E102C2E090D%7D&file=anexo-10-multimedia-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-11-oferta-economica-BORRADOR.docx",
+        "itemId": "017EGG3WDXVPKZMPIMNFC2BXSNKNGAYF2H",
+        "size": 22861,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B96D5AB77-0C3D-4569-A0DE-4D534C0C1747%7D&file=anexo-11-oferta-economica-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "anexo-11-oferta-economica-BORRADOR.pdf",
+        "itemId": "017EGG3WC3WOWZXRKH4FFJTXSUTG3SHZA4",
+        "size": 61456,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/03.%20Anexos%20borradores%20sin%20firma/anexo-11-oferta-economica-BORRADOR.pdf"
+      },
+      {
+        "name": "SUBDERE_Anexos_administrativos_BORRADOR.docx",
+        "itemId": "017EGG3WAEU5P42HONIZHYNTG7KDTZW3Q2",
+        "size": 32150,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BCD5FA704-CD1D-4F46-86CC-DF50E79B6E1A%7D&file=SUBDERE_Anexos_administrativos_BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+        "itemId": "017EGG3WGWSMTB5FLAO5BL36BBCCW7HBUF",
+        "size": 54763,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B1E2693D6-6095-4277-BDF8-2110ADF38685%7D&file=ANEXOS%20-%20LICITACION%20PUBLICA%20SERVICIO%20DE%20VIRTUALIZACION.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+        "itemId": "017EGG3WHESKU6B37X4JDLY3N6K2TUBLRU",
+        "size": 1273001,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/01.%20Bases%20y%20anexos%20originales/RES.%20EX.%206306-2026%20APRUEBA%20BASES%20Y%20ANEXOS%20DE%20LICITACION.pdf"
+      }
+    ],
+    "checkedAt": "2026-10-14 12:21:54 UTC",
+    "byteIdentityClaim": "PDFs checked by source/localcopy hash and remote size; Word has changed container metadata, body XML equal, raw bytes preserved in ZIP."
+  },
+  "closureRemoteReadback": {
+    "checkedAt": "2026-10-14 12:22:58 UTC",
+    "folders": [
+      {
+        "key": "subdere",
+        "folder": "01. Bases y anexos originales",
+        "isError": false,
+        "items": [
+          {
+            "name": "ANEXOS - LICITACION PUBLICA SERVICIO DE VIRTUALIZACION.docx",
+            "itemId": "017EGG3WGWSMTB5FLAO5BL36BBCCW7HBUF",
+            "size": 54763,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B1E2693D6-6095-4277-BDF8-2110ADF38685%7D&file=ANEXOS%20-%20LICITACION%20PUBLICA%20SERVICIO%20DE%20VIRTUALIZACION.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "Originales Word descargados sin modificación.zip",
+            "itemId": "017EGG3WCEC4IWIH5PHZFZQDZCFMJF7R3Q",
+            "size": 45238,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/01.%20Bases%20y%20anexos%20originales/Originales%20Word%20descargados%20sin%20modificaci%C3%B3n.zip"
+          },
+          {
+            "name": "RES. EX. 6306-2026 APRUEBA BASES Y ANEXOS DE LICITACION.pdf",
+            "itemId": "017EGG3WHESKU6B37X4JDLY3N6K2TUBLRU",
+            "size": 1273001,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/01.%20Bases%20y%20anexos%20originales/RES.%20EX.%206306-2026%20APRUEBA%20BASES%20Y%20ANEXOS%20DE%20LICITACION.pdf"
+          }
+        ]
+      },
+      {
+        "key": "subdere",
+        "folder": "03. Anexos borradores sin firma",
+        "isError": false,
+        "items": [
+          {
+            "name": "anexo-07-oferta-tecnica-BORRADOR.docx",
+            "itemId": "017EGG3WAYJSTMOZ4UEBDI33BQIJGFSGOD",
+            "size": 27820,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BC7A64C18-9467-4620-8DEC-30424C5919C3%7D&file=anexo-07-oferta-tecnica-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-08-equipo-BORRADOR.docx",
+            "itemId": "017EGG3WF5G2J4SXXMQFC3JU35C27UVX2I",
+            "size": 22808,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BC99336BD-EC5E-4581-B4D3-7D16BF4ADF48%7D&file=anexo-08-equipo-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-09-experiencia-oferente-BORRADOR.docx",
+            "itemId": "017EGG3WFM6EGJOXVEHBH3MDLBRF7UFQDT",
+            "size": 23849,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B970CF1AC-A45E-4F38-B60D-61897F42C073%7D&file=anexo-09-experiencia-oferente-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-10-instruccional-BORRADOR.docx",
+            "itemId": "017EGG3WBRZ6V2ZGQMUNH3IPTXGW7JRISQ",
+            "size": 24056,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BACABCF31-0C9A-4FA3-B43E-7735BE98A250%7D&file=anexo-10-instruccional-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-10-jefatura-BORRADOR.docx",
+            "itemId": "017EGG3WA3U2CJOIYSUBAKKSSVXPMK3MZW",
+            "size": 24054,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B9784A61B-1223-40A0-A54A-55BBD8ADB336%7D&file=anexo-10-jefatura-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-10-multimedia-BORRADOR.docx",
+            "itemId": "017EGG3WFMLIGOBRQJZBHLV3BOCAWC4CIN",
+            "size": 24061,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BE00C5AAC-09C6-4EC8-BAEC-2E102C2E090D%7D&file=anexo-10-multimedia-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-11-oferta-economica-BORRADOR.docx",
+            "itemId": "017EGG3WDXVPKZMPIMNFC2BXSNKNGAYF2H",
+            "size": 22861,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B96D5AB77-0C3D-4569-A0DE-4D534C0C1747%7D&file=anexo-11-oferta-economica-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "anexo-11-oferta-economica-BORRADOR.pdf",
+            "itemId": "017EGG3WC3WOWZXRKH4FFJTXSUTG3SHZA4",
+            "size": 61456,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/03.%20Anexos%20borradores%20sin%20firma/anexo-11-oferta-economica-BORRADOR.pdf"
+          },
+          {
+            "name": "SUBDERE_Anexos_administrativos_BORRADOR.docx",
+            "itemId": "017EGG3WAEU5P42HONIZHYNTG7KDTZW3Q2",
+            "size": 32153,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BCD5FA704-CD1D-4F46-86CC-DF50E79B6E1A%7D&file=SUBDERE_Anexos_administrativos_BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "SUBDERE_Anexos_administrativos_BORRADOR.pdf",
+            "itemId": "017EGG3WH7DXYFFSW7Z5CLADCQCXUV54HE",
+            "size": 200822,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/03.%20Anexos%20borradores%20sin%20firma/SUBDERE_Anexos_administrativos_BORRADOR.pdf"
+          }
+        ]
+      },
+      {
+        "key": "subdere",
+        "folder": "04. Interno/Costeo V3",
+        "isError": false,
+        "items": [
+          {
+            "name": "caja-escenarios.json",
+            "itemId": "017EGG3WGAU2SBILWIHBD2O6L4REA6E5W2",
+            "size": 4325,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/04.%20Interno/Costeo%20V3/caja-escenarios.json"
+          },
+          {
+            "name": "cotizacion-congelada-v1.json",
+            "itemId": "017EGG3WE2PSMNIISV7JB2CNDODJGEBJ35",
+            "size": 1645600,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/04.%20Interno/Costeo%20V3/cotizacion-congelada-v1.json"
+          },
+          {
+            "name": "demanda-v1.json",
+            "itemId": "017EGG3WEI2AWQYZ2SSRHYEYMN2FCD7PRW",
+            "size": 29028,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/04.%20Interno/Costeo%20V3/demanda-v1.json"
+          },
+          {
+            "name": "resumen-v1.json",
+            "itemId": "017EGG3WCKM77KLDJVCZDLSE56SB5ELEEO",
+            "size": 28402,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/04.%20Interno/Costeo%20V3/resumen-v1.json"
+          },
+          {
+            "name": "revision-v1.json",
+            "itemId": "017EGG3WAR2FK4YAUUL5EIGIO6QDH7QPEV",
+            "size": 11381,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/SUBDERE/1.%20Virtualizaci%C3%B3n%20y%20dise%C3%B1o%20instruccional%20761-24-LE26/04.%20Interno/Costeo%20V3/revision-v1.json"
+          }
+        ]
+      }
+    ],
+    "allFoldersVerified": true
+  }
+}

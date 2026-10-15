@@ -1,0 +1,77 @@
+{
+  "tenderId": "09-medicion",
+  "slides": [
+    {
+      "slideId": "deck-method-staircase",
+      "contentType": "deck.method-staircase.flat",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 140,
+          "bodyTop": 590,
+          "bodyPx": 25,
+          "bodyWidth": 520,
+          "stairX0": "--gl-stair-x0=800px",
+          "stairDx": "--gl-stair-dx=60px",
+          "stairY0": "--gl-stair-y0=820px",
+          "stairDy": "--gl-stair-dy=132px",
+          "levelNamePx": "--gl-level-name-px=80px",
+          "levelTopNamePx": "--gl-level-top-name-px=92px",
+          "levelNumberPx": "--gl-level-number-px=26px",
+          "levelDescriptorPx": "--gl-level-descriptor-px=24px",
+          "notePx": "--gl-note-px=17px",
+          "noteTop": "--gl-note-top=930px",
+          "columnWidth": "--gl-column-width=780px",
+          "rowGap": "--gl-row-gap=26px",
+          "levelNumberBox": "--gl-level-number-box=40px"
+        },
+        "voice": {
+          "question": "¿Cómo sé qué funcionó?",
+          "answer": "evidencia",
+          "eyebrow": "Escalera de medición",
+          "answerLead": "Con"
+        },
+        "body": "Cada capa responde una pregunta distinta. Te decimos cuál estás comprando y cuál no.",
+        "levels": [
+          {
+            "name": "Registro",
+            "descriptor": "qué ocurrió de verdad"
+          },
+          {
+            "name": "Atribución",
+            "descriptor": "quién recibe el crédito"
+          },
+          {
+            "name": "Optimización",
+            "descriptor": "la señal del algoritmo"
+          },
+          {
+            "name": "Incremental",
+            "descriptor": "qué causó tu inversión"
+          },
+          {
+            "name": "Efectividad",
+            "descriptor": "dónde va el próximo peso"
+          }
+        ],
+        "note": "Incrementalidad y MMM exigen volumen, historial y datos.",
+        "selection": {
+          "label": "Medios",
+          "anchor": "bottom-start",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "level": 3
+        }
+      },
+      "template": "MethodStaircaseFlat"
+    }
+  ]
+}

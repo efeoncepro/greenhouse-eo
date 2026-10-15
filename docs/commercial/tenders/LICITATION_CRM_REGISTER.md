@@ -12,6 +12,22 @@ Nombre CRM vigente: **Gana \| CO \| Programática omnicanal \| GRD-1541**; sólo
 **Marca: Gana**, separada de las demás marcas del holding. [Deal 66065702426](https://app.hubspot.com/contacts/48713323/record/0-3/66065702426?utm_source=codex&utm_medium=ai_agent) creado por instrucción de Julio; [Grupo Reditos 34264439413](https://app.hubspot.com/contacts/48713323/record/0-2/34264439413?utm_source=codex&utm_medium=ai_agent) reutilizada como **Principal**, nota118603990273 asociada. Dos readbacks: default/appointmentscheduled (entrada administrativa, sin reunión/calificación completa), Strategic Bets, newbusiness, Julio75788512. Presupuesto comprador **COP30.000.000/mes**, sin amount ni closedate; duración/IVA pendientes. Cierre20/10: invitación14:00Colombia vs UI18:00sinzona, datetime por conciliar.
 Sin contacto individual identificado en bases/invitación/portal; no altas ni asociaciones de contactos históricos por inferencia. Efeonce presta y factura siempre; proveedores sólo apoyan a Efeonce. Evaluación condicionada, sin GO ni postulación. [Expediente](gana-programatica-colombia-1541-2026/README.md) y [readbacks/contactos](gana-programatica-colombia-1541-2026/research/CRM-ALTA-2026-10-15-INTERNO.md). Otros procesos y WIP preservados.
 
+## Seguimiento14/10 09h — cambios de fuente posteriores al intake
+
+Superir `797305-59-COT26` aparece **Cancelada** en la ficha actual, aunque conserve fecha15/10 e `is_closed=false`. Excluir preparación activa; Deal65961796615 permanece sin cambios en este heartbeat. No confundir con797305-60, otro proceso. Educación Parvularia `895072-124-COT26` aparece **Cerrada** a09:00 de hoy; falta conciliar comprobante/decisión, sin pérdida inferida ni cambio de Deal. [Reporte,37fichas y tareas](../follow-up-agent/runs/2026-10-14-0900.md). SUBDERE y Tarapacá línea2 tienen borradores y gates pendientes; sus consultas15/10 exigen revisión hoy. UChileFCEI conserva expediente, fee estrecho y experiencia pendiente; TASK existente ahora asociada también al Deal nuevo.
+
+## SUBDERE y Tarapacá — preparación sin envío 14-10-2026
+
+[Revisión y ofertas](licitalab-actualizacion-2026-10-14/PREPARACION-SUBDERE-TARAPACA.md). Bases completas y técnica/económica preparadas para revisión; admisibilidad, capacidades y costos reales pendientes. Pesados sólo en OneDrive Comercial/Licitaciones; repo conserva índices livianos y links. Deals65950672644/65958079532 preservados, sin nueva mutación CRM en esta fase. Sin firma, consulta ni postulación.
+
+## LicitaLAB — conciliación vigente 14-10-2026
+
+[Barrido, nuevas candidatas y estado CRM](licitalab-actualizacion-2026-10-14/README.md). El corte de hoy prevalece sobre las filas históricas de abajo: **7 Deals cerrados administrativamente por vencimiento y 7 Leads Disqualified/BAD_TIMING**, con dos lecturas; se retiran del radar activo y se conservan sus expedientes. No se atribuye derrota competitiva por ausencia de comprobante. ProChile, SANNA y UNAP ya estaban cerradas desde el 09/10; UTEM sigue presentada y en evaluación.
+
+**Prórrogas conciliadas:** FUCOA `1108660-10-LE26` cierra **19/10 15:30 Chile**; Aysén `1332-12-LP26`, **23/10 15:00 Chile**. `closedate` y montos históricos preservados. [Recibo de las 16 actualizaciones](licitalab-actualizacion-2026-10-14/CRM-RECONCILIACION-2026-10-14.json).
+
+Las nuevas licitaciones públicas se registran como **Deals por instrucción expresa de Julio del 14/10**. La creación no acredita GO, admisibilidad ni margen; presupuesto comprador y fecha de postulación se conservan separados del precio y cierre comercial. La evidencia final de altas está en el expediente del corte. Las consultas RFI se distinguen de una licitación abierta para recibir ofertas. **Resultado final: 30 Deals nuevos, 3 RFI en Company + nota, 33 notas y 30 empresas (22 nuevas, 8 reutilizadas)**. [IDs y doble readback](licitalab-actualizacion-2026-10-14/HUBSPOT-ALTAS-2026-10-14.json); sin contactos ni Leads nuevos.
+
 ## INAPI y SERNATUR Arica — alta completa de radar 10/10/2026
 
 **Decisión posterior de Julio:** Arica1330-22-COT26 descartada. Lead595750420295 Disqualified/NO_INTEREST, nota118333867172 ampliada y tarea Cancelada, con readback. [Decisión y evidencia](../follow-up-agent/runs/2026-10-10-arica-no-bid.md).
@@ -27,6 +43,20 @@ Alta autorizada por Julio, con readback propio HubSpot/Notion. **Alta inicial de
 
 ## Grupo Socopur — agencia digital 2027 — revisión completa 10-10-2026
 
+**Estado vigente documental, 15/10/2026 16:54:36 UTC: cerrado para entrada tardía.** Katherine confirmó
+fin del proceso de selección y que no reciben nuevas postulaciones/propuestas para este período.
+Credenciales conservadas para futuras oportunidades sin fecha ni invitación prometidas; sin inferir
+adjudicación. [Fuente y límites](socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md).
+No insistir ni preparar propuesta; Deal `65871170058` no consultado ni editado en este corte.
+
+**Corrección directa de Julio, 15/10/2026 17:51 UTC:** detección **06/10/2026**, sin hora/zona,
+un día calendario después del cierre de interés del **05/10**; no equivale a 24 horas exactas.
+Radar horario y alta CRM del 10/10 son posteriores y no explican la tardanza del día 6. Publicación,
+primera disponibilidad/indexación, primer aviso exacto y causa siguen sin acreditar.
+
+**Cortes históricos siguientes:** la recuperación, calendario, espera y campos CRM describen lecturas
+anteriores; la respuesta de cierre los supera para decidir acceso, sin reescribir esos readbacks.
+
 **Recuperación de ingreso tardío, HSP-0017.** [Expediente y cinco láminas](socopur-agencia-marketing-digital-2027/README.md): redes, pauta, audiovisual/diseño, SEO/web y analítica. Manifestación cerró 5/10; calendario prevé Q&A 8–13/10, preparación 14–30/10, presentaciones 2–6/11 y selección 9–13/11. Año 2026 contextual, sin hora/zona publicadas. **No hay reapertura ni ingreso tardío confirmados.** Nuevo detalle: equipo técnico/creativo exclusivo y discrepancia entre experiencia sectorial mínima (lámina) o preferida (post). Primer contacto: credencial/portafolio PDF; RFP completo pendiente.
 
 Company `59118554799`, Contact `254187252267` y nota `118330098975` existentes; nota ampliada y readback exacto verificado con autorización de Julio. **Actualización posterior autorizada:** [Deal 65871170058](https://app.hubspot.com/contacts/48713323/record/0-3/65871170058?utm_source=codex&utm_medium=ai_agent) creado, `default/qualifiedtobuy`, Strategic Bets, newbusiness, owner Julio; Company Primary, contacto y nota asociados y verificados. Sin amount; **closedate previsto 13-11-2026**, fin del período publicado de selección/comunicación, por instrucción de Julio. Lead automático `595727275161` conservado. [Auditoría y excepción de empresa duplicada por dominio](socopur-agencia-marketing-digital-2027/research/hubspot-verificacion-2026-10-10-INTERNO.md). Próximo paso: esperar respuesta de Katherine sobre admisión y bases tras el seguimiento del 15/10; Q&A ya transcurrió y no hay próximo envío programado. Presupuesto, capacidad exclusiva, admisibilidad y GO pendientes.
@@ -34,6 +64,8 @@ Company `59118554799`, Contact `254187252267` y nota `118330098975` existentes; 
 **Actualización verificada 15/10:** historial 10–13/10 contrastado y seguimiento puntual autorizado enviado sólo a Katherine a las 07:13 Chile. Firma gráfica, PDF creativo adjunto, CCO y EMAIL `118603198768` SENT asociado a Contact/Company verificados. [Readbacks y límites](socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md). Sin respuesta, admisión o bases recibidas; no cambia etapa, cierre ni GO.
 
 ## Pierre Fabre Chile — licitación agencia integral 2027 — 09-10-2026
+
+**Estado actualizado por Julio el15/10/2026:** preinscripción realizada. Julio preparará las credenciales **el viernes16/10** para enviar; envío todavía pendiente. Las menciones a «sin inscripción» del corte histórico09/10 quedan superadas. Registro documental; sin cambios HubSpot ni envíos por el agente.
 
 **Aclaración del enlace y contacto de credenciales:** [expediente con formulario completo verificado y requisitos](pierre-fabre-agencia-integral-2027/README.md). La URL copiada que termina en «…» está truncada. Contacto de credenciales `254011713292` registrado y asociado a la misma Company/Deal; fuente: apartado 10 del formulario, sin cargo ni entregabilidad inferidos. Descripción y nota CRM actualizadas; sin envío.
 

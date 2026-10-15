@@ -1,0 +1,73 @@
+{
+  "tenderId": "04-performance",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CT7-paid-social",
+          "alt": "Una creadora de Efeonce con hoodie lanza un anuncio desde su teléfono: tres haces de luz cruzan miles de pantallas apagadas y encienden sólo tres grupos"
+        },
+        "voice": {
+          "question": "¿A quién le llega mi pauta?",
+          "answer": "A quien importa",
+          "eyebrow": "Performance marketing"
+        },
+        "body": "Search, social, video y retail media operados para que los algoritmos trabajen con mejores señales, creatividad y objetivos de negocio.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:medicion-voice-dark-44",
+            "kicker": "Señal",
+            "name": "Medición base"
+          },
+          {
+            "icon": "asset-ref:icon:megafono-voice-dark-44",
+            "kicker": "Search y social",
+            "name": "Campañas"
+          },
+          {
+            "icon": "asset-ref:icon:embudo-voice-dark-44",
+            "kicker": "Commerce",
+            "name": "Retail media"
+          },
+          {
+            "icon": "asset-ref:icon:trofeo-voice-dark-44",
+            "kicker": "Aprendizaje",
+            "name": "Optimización"
+          }
+        ],
+        "note": "La inversión en medios va en una línea aparte.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}
