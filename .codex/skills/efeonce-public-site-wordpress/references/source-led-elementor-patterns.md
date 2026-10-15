@@ -40,6 +40,25 @@ and `references/landings/content-marketing.md`.
   itself can be replaced. Test that typed fields, validation and step state survive neighboring controls.
   Growth Forms owns the field contract; use `references/growth-forms-wordpress.md` for its gates.
 
+### Canvas (`.dc.html`) → static native modules
+
+Agencia Creativa (`scripts/public-website/compile-creativa-elementor-source.cjs`, source
+`scripts/public-website/creativa-source/Main.dc.html`) compiles a live canvas into schema-driven widgets.
+Expand every dynamic part of the canvas into static, editable markup; do not ship the canvas runtime:
+
+- Interactive tabs → one repeater whose row has two parts, rendered into `%%repeat_<key>__tab%%` and
+  `%%repeat_<key>__panel%%`, with `%%row_first%%` for the initial pressed state. Bounded JS switches them
+  (click + arrow keys); CSS hides non-first panels until JS marks `data-ready`.
+- Marquee duplicates: remove them from the source and let JS recreate them as `aria-hidden` loop copies
+  (see Continuous rails).
+- Live imports of other canvases (e.g. Creative Studio screens) → screenshots captured locally with
+  Playwright in the theme the canvas uses; check that theme in the capture.
+- A designed form → Growth Forms host card (`<greenhouse-form>`); the host never draws fields. Map each
+  canvas control to the renderer before publishing (`references/growth-forms-wordpress.md`).
+- An SVG data meter → a server-drawn number field, not an image of a number.
+- Repeater rows whose markup differs → explicit layout variants. Name row field labels by role
+  (what the field is in every row), never by the first row's copy.
+
 ## Native editorial revisions
 
 - For Home-specific message, comparison evidence, FAQ emphasis and copy persistence, load
@@ -75,6 +94,9 @@ and `references/landings/content-marketing.md`.
   `!important`. Inspect computed position and the winning selector in the real theme, then target only
   the affected page's owned Elementor containers. Keep inner content gutters and native chrome intact;
   clipping horizontal overflow alone does not correct a shifted section or certify responsive layout.
+- Ohio resets `ul` `list-style`; a list the source shows with disc bullets needs a module-scoped
+  `list-style` restore. Source display sizes that fit a desktop canvas can overflow phones: give
+  display type a mobile clamp and check 390 before publishing.
 - Test filled CTA normal, sustained hover, focus and reduced motion. Ohio's `-undash` opts a link out of
   `links-underline`; changing only `background-color` does not remove its animated background image.
 - A glow should fade to transparent within its own box. A tall clipped circular gradient can look like
@@ -153,11 +175,13 @@ Deploy only manifest-listed runtime files with previous/new hashes and scoped ba
 1. PHP renderer and native control-registration tests (including URL defaults and escaping).
 2. JS lifecycle tests for mount/replacement/removal, editor/reduced, filter and player cleanup.
 3. Real Elementor registration/render probe and semantic CMS readback.
+   Pre-live, run the host-swap harness from `references/landing-workflow.md` §7 on the new body; it caught
+   Ohio's gutter offset, the `ul` reset, oversized phone type and a wrong screenshot theme on Creativa.
 4. Fresh public Browser render, actual clicks/playback, sustained hover, scroll, 1280/890/390 layout,
    reduced motion, overflow and console observations; add wider rail samples when needed.
 5. Authenticated Elementor edit/save/reload remains its own gate. Server probes cannot certify that UI.
 
-Current executable anchors: runtime `tests/agency-modules.test.php`; main-repo
+Current executable anchors: runtime `tests/agency-modules.test.php` and `tests/creativa-modules.test.php`; main-repo
 `scripts/public-website/agency-elementor-lifecycle.test.cjs` and
 `scripts/public-website/verify-agency-elementor-contract.php`. Counts evolve with schema changes: verify
 the current schema, not an old audit's total. Captures with host-emulation scaling need DOM geometry and

@@ -13,6 +13,9 @@ Use this folder when a reusable public landing component, Elementor widget, host
 
 - [Content Marketing / Content Ops](CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) — trece widgets
   semánticos, captura Growth Forms y SEO sobre la página existente; incluye límites y evidencia.
+- [Agencia Creativa](AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md) — quince widgets `greenhouse_creativa_*`
+  compilados desde el canvas aprobado, carril de release con preflight y diagnóstico Growth Forms; incluye
+  incidente, rollback y pendientes.
 
 ## Shared surfaces
 

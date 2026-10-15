@@ -235,7 +235,13 @@ that root, and the base CSS declares all `--ghf-*` tokens on `greenhouse-form, .
 re-declares the base tokens and **shadows host overrides** (`appearance="bare"` + `--ghf-font` stop
 propagating to the content).
 
-- Post-`hosted` fix: a host override on `greenhouse-form { --ghf-* }` propagates — canonical recipe.
+- Post-`hosted` fix: a host override on `greenhouse-form { --ghf-* }` propagates — canonical recipe
+  **for the default style only**.
+- With a `styleVariant` (e.g. `diagnostic_premium`) the variant re-declares `--ghf-*` on the inner
+  `.ghf-root[data-ghf-style-variant]`, so overrides on `greenhouse-form`/`.ghf-scope` lose (2026-10-15,
+  `/agencia-creativa/`: live CTA teal `#36c8bf` instead of host `#0375db`). Scope under the host card:
+  `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]) { --ghf-* }`; verify the submit
+  button's computed style on the live page.
 - Against an OLD renderer bundle (before the fix reaches prod): also target the inner scope —
   `greenhouse-form, greenhouse-form .ghf-scope { --ghf-* }` (forward-compatible: harmless once fixed).
 - `color-scheme="light"` is mandatory on light bands (else OS-dark visitors see a dark form).
@@ -548,6 +554,16 @@ Three ways:
    renderer). This is the AEO pattern.
 3. **Astro** — `GrowthForm.astro` component (repo `efeonce-web`).
 
+**Canvas-designed form (Claude Design or similar):** treat it as a configuration brief, never as host
+markup. Map each control to an existing type/presentation — chips/cards → `type: 'radio'`
+(`ghf-choice-group--cards`), label icons → `presentation.icon`, country → `presentation.control:
+'country_select'` — with visual parity as acceptance. Two columns need `greenhouse-form` ≥520 px (container
+query), so the host card's width/padding decides. Measure width, radio groups and icons live before
+closing; only true gaps (pill-chip look, AXIS checkbox styling, other custom listboxes) become a renderer
+extension, flagged to the operator before publishing. Creativa's v1 used `select` and no icons by
+configuration, not by renderer limit. Host checklist: `efeonce-public-site-wordpress`
+`references/growth-forms-wordpress.md` §Canvas-designed forms.
+
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`
 in `wp-config.php`; embed key minted with `pnpm growth:forms:embed-key --surface-id <id>` (shown once).
 
@@ -606,7 +622,8 @@ nubox/grader/reliability. Verify with `pnpm release:watchdog --json` (worker GIT
 - **NUNCA** ship form behavior into a single UI/host — extract the governed contract (Full API Parity).
 - **NUNCA** log/telemeter PII; reveal is capability + reason + append-only audit.
 - **NUNCA** override `--ghf-*` tokens expecting them to reach the content without accounting for the
-  `.ghf-scope` scope (use the `hosted` fix or target `.ghf-scope`).
+  `.ghf-scope` scope (use the `hosted` fix or target `.ghf-scope`) or a `styleVariant` root that
+  re-declares them (target `.ghf-root[data-ghf-style-variant]` too).
 - **NUNCA** turn every new form launch into a full AEO TASK-1298 cutover. Use the shared renderer
   hardening and proportional gates; escalate to AEO-level pre-live evidence only for critical
   public landings, new hostile hosts, or renderer/theme regressions.

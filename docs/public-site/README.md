@@ -51,6 +51,12 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   [edición y verificación](../manual-de-uso/public-site/content-marketing.md) y
   [evidencia del corte de publicación](../audits/public-site/2026-08-31-content-marketing-publication.md).
 
+- **[Agencia Creativa vigente — Elementor](../architecture/public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md)** —
+  página `249582` en `/agencia-creativa/`, quince widgets compilados desde el canvas aprobado y el diagnóstico
+  creativo de Growth Forms; publicada el 2026-10-15. [Funcionamiento](../documentation/public-site/agencia-creativa.md),
+  [operación](../manual-de-uso/public-site/operar-agencia-creativa.md) y [evidencia del rollout](../audits/public-site/2026-10-15-agencia-creativa-elementor-rollout.md).
+  Contenido de clientes, cifra Sky, Yoast y primer envío real siguen pendientes.
+
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
   identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).

@@ -14,6 +14,9 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
    - Inspect Elementor tree: ids, `elType`, `widgetType`, classes, page settings and custom CSS.
    - Inspect Ohio metas and runtime computed styles. Do not infer brand values from Elementor kit defaults alone.
    - For visual work, observe the live page with Playwright/GVC discipline before authoring changes.
+   - If the approved source (canvas/Claude Design) contains a form, map every control to the Growth Forms
+     renderer **before** approving or implementing it, and tell the operator about any true gap before
+     publishing: `references/growth-forms-wordpress.md` §Canvas-designed forms.
 
 3. **Choose the mutation rail**
    - Elementor structure/settings: use `Document::save()`.
@@ -48,7 +51,13 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
    - For Home-like sticky editorial lanes, prefer Ohio's native `-sticky-block` pattern over Elementor Pro sticky effects:
      apply `-sticky-block` to the lane/column itself, give that lane viewport height, center the inner content, keep page wrappers `overflow:visible`, and make the lane static on mobile. Do not place sticky only on a small inner node, and do not leave an ancestor such as `.site-content` with `overflow-y:auto`; it becomes the sticky scroll container. Verify active sticky samples and the final stop with Playwright.
 
-7. **Purge and verify**
+7. **Pre-live check, then purge and verify**
+   - Before writing a new or rebuilt body live, render it inside the real Ohio page contract: take a live
+     page that already has the target contract (e.g. Home `251731`), swap its `.entry-content` for the
+     locally rendered modules (Creativa: `php tests/creativa-modules.test.php render` with
+     `EO_PLUGIN_URL=file://…`) and capture 1440/390 with Playwright. A local-only render misses theme
+     interactions; on Creativa this caught Ohio's `.e-con-full.e-parent` `left:16px` offset, Ohio's `ul`
+     reset removing intended bullets, oversized display type on phones and a screenshot in the wrong theme.
    - Purge Kinsta cache after live mutations.
    - Hard-reload or freshly navigate the real URL before the smoke. An already open tab can retain
      the previous custom-element JavaScript bundle even after the server and Kinsta cache changed;

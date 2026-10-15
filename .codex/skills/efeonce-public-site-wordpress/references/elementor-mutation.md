@@ -29,6 +29,7 @@ Capture:
 - post id, title, slug, status;
 - `_elementor_data`;
 - `_elementor_page_settings`;
+- `_elementor_controls_usage`;
 - `_thumbnail_id`;
 - `get_the_post_thumbnail_url()`;
 - `page_header_title_background_type`;
@@ -38,8 +39,9 @@ Capture:
 
 For a guarded production writer, also check the ownership marker, current `page_on_front`,
 expected status and full document hash before snapshot/save. Register the affected widgets before
-validating their control keys: Elementor can initialize registration lazily. Refuse unknown controls
-or source drift before writing. Keep a durable snapshot option and exact runtime-file manifest;
+validating their control keys: Elementor can initialize registration lazily. Then preflight every
+widget the new tree uses: build its `get_controls()` and run one render, all **before** snapshot and
+save. Refuse unknown controls, a control/render error or source drift before writing. Keep a durable snapshot option and exact runtime-file manifest;
 an old `/tmp` backup path is recovery evidence, not a guarantee that the archive still exists.
 
 ## After Save
@@ -109,6 +111,14 @@ Visual guardrails:
 - Motion must be subtle, enterprise-grade, and reduced-motion aware.
 
 ## Common Hazards
+
+- `Document::save()` is not atomic: it writes page settings **before** elements. On 2026-10-15
+  (`/agencia-creativa/`) a widget control error (repeater Media field with a string default →
+  `TypeError array_merge()` in `elementor/includes/managers/controls.php`) killed the save after the new
+  page settings (including new `custom_css`) were written over the old layout; `_thumbnail_id` was cleared
+  and `_elementor_controls_usage` dropped, while `_elementor_data` stayed untouched. Recovery restored
+  settings, controls usage and thumbnail from the pre-write snapshot. Hence the controls+render preflight
+  above, and snapshotting settings, controls usage and thumbnail, not only `_elementor_data`.
 
 - `Document::save()` can affect metas outside the edited widget on published Ohio pages. Protect `_thumbnail_id`, especially when `page_header_title_background_type=featured`.
 - A known failed guard is counting an unescaped URL directly in raw

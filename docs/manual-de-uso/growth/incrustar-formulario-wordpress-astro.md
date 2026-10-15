@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.7 — 2026-08-31 (Codex, TASK-1799 Content Marketing)
+> **Version:** 1.8 — 2026-10-15 (Claude, override de tokens con variante de estilo en Agencia Creativa)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -236,6 +236,21 @@ máximo en la pestaña **Estilo**; el resto se ajusta con CSS scoped al contened
 > no ves el cambio en el contenido (solo en el borde del host), es esto: agrega el selector
 > `.ghf-scope`. Mismo motivo aplica a `appearance="bare"`: cubre el host; el workaround lo
 > extiende al scope interno.
+
+> **Override con variante de estilo activa (caso 2026-10-15, `/agencia-creativa/`).** Cuando la
+> versión publicada declara un `styleVariant` (por ejemplo `diagnostic_premium`), la variante
+> re-declara los tokens `--ghf-*` en `.ghf-root[data-ghf-style-variant]`, así que un override sólo
+> sobre `greenhouse-form` (o `.ghf-scope`) **no gana**. En el diagnóstico creativo el botón vivo salió
+> teal `#36c8bf` en vez del azul del diseño. El selector correcto es:
+>
+> ```css
+> .mi-seccion greenhouse-form :is(.ghf-scope, .ghf-root[data-ghf-style-variant]) {
+>   --ghf-accent: …; /* token de la superficie, nunca hex inventado */
+> }
+> ```
+>
+> Con ese selector el CTA quedó `#0375db`, como el canvas aprobado. Verifica siempre el color
+> computado del botón en vivo, no sólo el borde del host.
 
 **Modo claro/oscuro — gotcha importante:** por defecto el renderer sigue el modo del SO
 del visitante (`prefers-color-scheme`). Si tu sección es una **banda clara**, un visitante

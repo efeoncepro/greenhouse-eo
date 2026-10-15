@@ -102,6 +102,30 @@ For non-AEO embeds, the widget/minimal host should be routine:
 5. For premium custom selects, open the listbox and assert `aria-expanded=true`, the top option is
    actually above following fields, selected/hover text stays dark and `scrollWidth==clientWidth`.
 6. Fix renderer/shared host adapter issues globally before adding one-off page CSS.
+7. Host token overrides with a `styleVariant` (e.g. `diagnostic_premium`): the variant re-declares
+   `--ghf-*` on the inner `.ghf-root[data-ghf-style-variant]`, so an override on `greenhouse-form` or
+   `.ghf-scope` loses (Creativa's live CTA painted the variant teal instead of the host `#0375db`).
+   Scope under the host card: `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]) { --ghf-* }`,
+   and verify the submit button's computed style on the live page.
+
+## Canvas-designed forms
+
+A form drawn in a canvas is a brief for configuring the governed renderer; the host never draws fields.
+Before approving or implementing the canvas, map each canvas control to an existing renderer type or
+`presentation` and configure it in the form version, with visual parity as the acceptance criterion:
+
+- chip/card choices → `type: 'radio'` (renders `ghf-choice-group--cards`), not `select`;
+- per-label icons → `presentation.icon` (user, mail, phone, link, linkedin, briefcase, calendar, clock,
+  message, file, globe);
+- country picker → `presentation.control: 'country_select'`;
+- two columns are adaptive (`@container (min-width: 520px)` on `greenhouse-form`): the host card's width
+  and padding decide it. Creativa measured 516 px inside a 588 px card with 36 px padding → one column;
+- privacy link text is form copy, not host markup.
+
+Measure the `greenhouse-form` width (≥520 px for two columns), radio groups and icons live before closing.
+Only true gaps (exact pill-chip look vs choice cards, AXIS checkbox styling, a custom listbox beyond
+`country_select`) become a renderer extension in its own task and renderer release; flag them to the
+operator **before** publishing, not after. Field catalog and versioning: `greenhouse-growth-forms`.
 
 ## Verification
 

@@ -14,6 +14,8 @@ Canonical visual specification:
 - Keep `appearance="bare"` and `color-scheme="light"` inside a light host card.
 - Use Poppins only for the host title; Geist for all form/control copy.
 - Use Core Blue for the public-site submit when the surrounding Efeonce landing establishes blue, not teal.
+  `diagnostic_premium` re-declares `--ghf-*` on `.ghf-root[data-ghf-style-variant]`; the host override must
+  target that root too (SKILL.md §Theming) and be checked on the live submit button's computed style.
 - Keep one caret per trigger. Country flags are vector circles with explicit optical centering, crisp outline and
   no blur; other options use semantic pictograms.
 - The caret is down when closed and rotates the same element 180 degrees around its optical center when opened;

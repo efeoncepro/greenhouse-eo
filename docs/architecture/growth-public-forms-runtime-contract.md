@@ -28,6 +28,28 @@ comunicaciones comerciales: el adapter HubSpot envía `communications: []`, así
 opcional quedaría guardada sin efecto. Un cambio de campos exige revisar también la política de
 medición, porque cada versión nueva se revalida.
 
+**Embed vivo (2026-10-15).** El módulo `greenhouse_creativa_diagnostico` de `/agencia-creativa/` incrusta
+`<greenhouse-form form-key="e913d958-…" surface="fhsf-efeonce-creative-diagnostic" locale="es-CL"
+color-scheme="light" appearance="bare">`. El renderer es dueño de campos, consentimiento y envío; el host,
+del chrome de la tarjeta y del fallback sin JS. Contrato de la landing:
+[AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md](public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md).
+Falta el primer envío humano real (Turnstile bloquea automatización) para confirmar
+`form_destination_attempt=succeeded`.
+
+**Override de tokens con variante de estilo.** `diagnostic_premium` re-declara `--ghf-*` en
+`.ghf-root[data-ghf-style-variant]`; un override sólo en `greenhouse-form` no gana (el CTA salió teal
+`#36c8bf`). El host debe apuntar a `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`.
+
+**Brecha de fidelidad frente al canvas (mayormente configuración).** La versión publicada usa `select`
+para `mainBlocker` y `startTimeline` y no declara iconos, aunque el renderer soporta `type: 'radio'` como
+tarjetas (`ghf-choice-group--cards`) y `presentation.icon`. Las dos columnas dependen de
+`@container (min-width: 520px)`; en vivo el formulario midió 516 px dentro de la tarjeta host de 588 px
+(36 px de padding). La URL de privacidad cruda es copy del formulario. Brechas reales del renderer: look
+exacto de chip/pill, checkbox AXIS `axis-choice` y listbox custom más allá de
+`presentation.control: 'country_select'`. Remediación pendiente: versión nueva con radio + iconos por
+`publish-creative-diagnostic-form.ts`, **conservando los mismos valores de opción** (el mapping HubSpot ya
+existe), más ajuste de padding/ancho de la tarjeta host, y re-verificación en vivo.
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger

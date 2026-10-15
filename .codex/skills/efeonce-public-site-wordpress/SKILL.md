@@ -55,7 +55,7 @@ Read the minimal set:
 | Post-publication sitemap, GSC observation, indexing request or Platform Properties | `references/agentic-blogpost-end-to-end.md` + `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md` |
 | Direct SVG infographics, `<picture>`, Media Library, ALT/long description, featured/OG raster | `references/content-factory-gutenberg.md` + `.codex/skills/seo-aeo/references/editorial-image-seo.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
-| Claude Design → modular Elementor, Home, brand marks, rails, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
+| Claude Design / canvas (`.dc.html`) → modular Elementor (compiler, tabs, rails, canvas forms), Home, brand marks, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
 | 404, search/no-results, category/tag/author/date archives, impossible pagination or empty taxonomy | `references/miscellaneous-surfaces.md` + `references/runtime-and-discovery.md`; add the SEO technical module when robots, canonical, schema, or indexability changes |
