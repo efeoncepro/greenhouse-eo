@@ -1,6 +1,6 @@
 # Brochure «Agencia de Marketing 360°» · 2026-10-12 (v9, 2026-10-15)
 
-Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 33). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`
+Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 34). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`
 (copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v9/` (26, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
@@ -37,7 +37,7 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 | 08 | C02 | 08 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad. |
 | 09 | S08 | 09 · Brand · Tu equipo dirige. Nosotros producimos. |
 | 10 | C03 | 10 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde. |
-| 11 | S15 | 11 · Voice · ¿A quién le llega mi pauta? Directo a quien importa. |
+| 11 | S15 | 11 · Voice · ¿A quién le llega mi pauta? A quien importa. |
 | 12 | C04 | 12 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo. |
 | 13 | R19 | 13 · Revenue · ¿Sigo llenando el CRM? Ya no. |
 | 14 | C05 | 14 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard) |
@@ -70,4 +70,5 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 - 2026-10-15 (tarde): «A tu competencia» y «En ingresos» salen del acto 1 y entran al tramo Engine después de «No estás», recompuestas en línea engine con sus recetas (`decision-ai-answer`, `decision-traffic-to-revenue`); el operador objetó que entraban sin preámbulo.
 - 2026-10-15 (tarde): «¿Otra agencia más? Un sistema.» → «¿Cuántas agencias necesito? Una sola.» y «Un sistema 360°» → «Una agencia 360°» (el operador: «Efeonce un sistema????»); intent `intents/r2/n01-diferencia.json`.
 - **Titulares de la v9: workaround TEMPORAL.** Los 9 titulares se armaron sobre el visual compuesto con un panel del color de fondo (`native-growth/titulares-v9.mjs`). Condición de retiro: cuando las recetas acepten la voz `decision` (TASK-2012, etapa 2), esas láminas se recomponen desde el compositor y el panel desaparece. El generador usa rutas absolutas de esta máquina (`/Users/jreye/...`, sharp y `file://`) y bases del scratchpad de la sesión: no es reproducible en otra máquina. Tipografía igualada a la plantilla del compositor (eyebrow 16 px #e2e2e2, respuesta Bricolage 760 con tracking −0,045 em). Las dos láminas con foto (Voice «Directo a quien importa» y Revenue «Ya no») NO llevan panel: se leía como banda sobre la foto (regla: nunca un scrim sobre foto a sangre), así que quedan con su par original.
-- Voice (11) conserva el eyebrow de su deck de origen («06 · Paid social») y el acento naranja de Brand: recomponer en línea voice cuando haya voz `decision`.
+- Voice (11): recompuesta el 2026-10-15 en línea voice (acento #f83902) con eyebrow «03 · Voice · Paid social»; intent `intents/r2/s15-paid-social-voice.json`.
+- **Densidad de pares: decisión del operador.** 13 de 26 (uno de cada dos); la regla del 2026-10-06 pone el tope en uno de cada tres (8 o 9 en 26). Opciones: aprobarla como excepción del 360, recortar los pares más débiles o esperar a TASK-2012.
