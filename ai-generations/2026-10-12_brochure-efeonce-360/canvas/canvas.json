@@ -32,7 +32,7 @@
       "title": "02 · Por qué 360° · ¿Otra agencia más? Un sistema."
     },
     "N02.dc.html": {
-      "x": 4000,
+      "x": 8000,
       "y": 0,
       "w": 1920,
       "h": 1080,
@@ -40,14 +40,14 @@
     },
     "S06.dc.html": {
       "x": 2000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Fuera del recorrido · Cinco líneas (misma foto que la portada)"
     },
     "N03.dc.html": {
       "x": 4000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 01"
@@ -67,189 +67,189 @@
       "title": "07 · Engine · SEO y AEO, un solo sistema."
     },
     "S13.dc.html": {
-      "x": 8000,
-      "y": 1440,
+      "x": 18000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "08 · Engine · Agentes que trabajan contigo."
     },
     "N04.dc.html": {
       "x": 6000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 02"
     },
     "S08.dc.html": {
-      "x": 12000,
-      "y": 1440,
+      "x": 2000,
+      "y": 2880,
       "w": 1920,
       "h": 1080,
       "title": "10 · Brand · Tu equipo dirige. Nosotros producimos."
     },
     "S09.dc.html": {
-      "x": 14000,
-      "y": 1440,
+      "x": 4000,
+      "y": 2880,
       "w": 1920,
       "h": 1080,
       "title": "11 · Brand · Seis capacidades, un solo equipo."
     },
     "S10.dc.html": {
-      "x": 16000,
-      "y": 1440,
+      "x": 6000,
+      "y": 2880,
       "w": 1920,
       "h": 1080,
       "title": "12 · Brand · Todo lo social, un solo squad."
     },
     "N05.dc.html": {
       "x": 8000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 03"
     },
     "S14.dc.html": {
       "x": 16000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Descartada · página Voice (misma foto que la portada)"
     },
     "S15.dc.html": {
-      "x": 2000,
-      "y": 2880,
+      "x": 20000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "14 · Voice · Paid social · Directo a quien importa."
     },
     "N06.dc.html": {
       "x": 10000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 04"
     },
     "S16.dc.html": {
-      "x": 6000,
-      "y": 2880,
+      "x": 4000,
+      "y": 4320,
       "w": 1920,
       "h": 1080,
       "title": "16 · Revenue · ¿HubSpot, Salesforce o Zoho? El que encaje."
     },
     "S17.dc.html": {
-      "x": 8000,
-      "y": 2880,
+      "x": 26000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "17 · Revenue · ¿Qué hacen en HubSpot? Todo el ciclo."
     },
     "S18.dc.html": {
-      "x": 10000,
-      "y": 2880,
+      "x": 28000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "18 · Revenue · Una persona."
     },
     "N07.dc.html": {
       "x": 12000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 05"
     },
     "S07.dc.html": {
       "x": 14000,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Descartada · página Growth (misma foto que la portada)"
     },
     "S22.dc.html": {
       "x": 2000,
-      "y": 4320,
+      "y": 5760,
       "w": 1920,
       "h": 1080,
       "title": "20 · Growth · ¿Cómo sé que funciona? Lo medimos."
     },
     "S21.dc.html": {
-      "x": 4000,
-      "y": 4320,
+      "x": 30000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "21 · Growth · Resultados · ¿Y el reporte? Llega solo."
     },
     "S04.dc.html": {
       "x": 0,
-      "y": 5760,
+      "y": 7200,
       "w": 1920,
       "h": 1080,
       "title": "22 · Quiénes somos · ¿Y si necesito de todo? Un solo equipo."
     },
     "S02.dc.html": {
-      "x": 2000,
-      "y": 5760,
+      "x": 22000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "23 · Personas y agentes."
     },
     "S19.dc.html": {
-      "x": 4000,
-      "y": 5760,
+      "x": 2000,
+      "y": 7200,
       "w": 1920,
       "h": 1080,
       "title": "24 · ¿Cómo trabaja mi squad? Escucha. Crea. Mide."
     },
     "S20.dc.html": {
-      "x": 6000,
-      "y": 5760,
+      "x": 4000,
+      "y": 7200,
       "w": 1920,
       "h": 1080,
       "title": "25 · Día a día · ¿Dónde veo el avance? En tu panel."
     },
     "S23.dc.html": {
-      "x": 8000,
-      "y": 5760,
+      "x": 24000,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "26 · ¿Hay alguien detrás? Personas."
     },
     "S24.dc.html": {
-      "x": 10000,
-      "y": 5760,
+      "x": 6000,
+      "y": 7200,
       "w": 1920,
       "h": 1080,
       "title": "27 · Expertos multidisciplinarios."
     },
     "S25.dc.html": {
-      "x": 0,
+      "x": 8000,
       "y": 7200,
       "w": 1920,
       "h": 1080,
       "title": "28 · ¿Con quién trabajan? +90 empresas."
     },
     "S26.dc.html": {
-      "x": 2000,
+      "x": 10000,
       "y": 7200,
       "w": 1920,
       "h": 1080,
       "title": "29 · ¿Con qué plataformas trabajan? Con las tuyas."
     },
     "S27.dc.html": {
-      "x": 6000,
-      "y": 7200,
+      "x": 0,
+      "y": 8640,
       "w": 1920,
       "h": 1080,
       "title": "31 · Caso Sky."
     },
     "S28.dc.html": {
-      "x": 8000,
-      "y": 7200,
+      "x": 2000,
+      "y": 8640,
       "w": 1920,
       "h": 1080,
       "title": "32 · Caso Berel."
     },
     "S31.dc.html": {
-      "x": 4000,
+      "x": 12000,
       "y": 7200,
       "w": 1920,
       "h": 1080,
@@ -257,35 +257,35 @@
     },
     "N08.dc.html": {
       "x": 0,
-      "y": 8640,
+      "y": 10080,
       "w": 1920,
       "h": 1080,
       "title": "33 · ¿Cómo empezamos? Contigo."
     },
     "S29.dc.html": {
       "x": 2000,
-      "y": 8640,
+      "y": 10080,
       "w": 1920,
       "h": 1080,
       "title": "34 · Compras capacidad, no horas."
     },
     "S30.dc.html": {
-      "x": 4000,
-      "y": 8640,
+      "x": 6000,
+      "y": 10080,
       "w": 1920,
       "h": 1080,
       "title": "35 · ¿Y si no funciona? Empiezas chico."
     },
     "S32.dc.html": {
-      "x": 6000,
-      "y": 8640,
+      "x": 10000,
+      "y": 10080,
       "w": 1920,
       "h": 1080,
       "title": "36 · Empecemos."
     },
     "S33.dc.html": {
-      "x": 8000,
-      "y": 8640,
+      "x": 12000,
+      "y": 10080,
       "w": 1920,
       "h": 1080,
       "title": "37 · ¿Conversamos? Cuando quieras."
@@ -300,66 +300,129 @@
     "C02.dc.html": {
       "w": 1920,
       "h": 1080,
-      "x": 10000,
-      "y": 1440,
+      "x": 0,
+      "y": 2880,
       "title": "09 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad."
     },
     "C03.dc.html": {
       "w": 1920,
       "h": 1080,
       "x": 0,
-      "y": 2880,
+      "y": 4320,
       "title": "13 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde."
     },
     "C04.dc.html": {
       "w": 1920,
       "h": 1080,
-      "x": 4000,
-      "y": 2880,
+      "x": 2000,
+      "y": 4320,
       "title": "15 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo."
     },
     "C05.dc.html": {
       "w": 1920,
       "h": 1080,
       "x": 0,
-      "y": 4320,
+      "y": 5760,
       "title": "19 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard)"
     },
     "A01.dc.html": {
       "x": 0,
-      "y": 10080,
+      "y": 11820,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa · portada con selección y cursor de Nexa"
+    },
+    "E03.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "03 · Por qué 360° · ¿A quién recomienda la IA? A tu competencia.",
+      "x": 4000,
+      "y": 0
+    },
+    "E04.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "04 · Por qué 360° · ¿Dónde termina el SEO? En ingresos.",
+      "x": 6000,
+      "y": 0
+    },
+    "E07.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "10 · Engine · ¿Qué hay dentro? Cuatro piezas.",
+      "x": 8000,
+      "y": 1440
+    },
+    "R19.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "18 · Revenue · ¿Sigo llenando el CRM? Ya no.",
+      "x": 6000,
+      "y": 4320
+    },
+    "R20.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "19 · Revenue · ¿Cómo escala mi CRM? Ordenado.",
+      "x": 8000,
+      "y": 4320
+    },
+    "G22.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "22 · Growth · ¿Cómo te llega? Como la necesites.",
+      "x": 4000,
+      "y": 5760
+    },
+    "G23.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "23 · Growth · ¿Y el PPT del comité? Ya está.",
+      "x": 6000,
+      "y": 5760
+    },
+    "B19.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "35 · Cómo se compra · Tu equipo, con talento de Efeonce adentro.",
+      "x": 4000,
+      "y": 10080
+    },
+    "C10.dc.html": {
+      "w": 1920,
+      "h": 1080,
+      "title": "37 · Cierre · ¿Pierdo el control de mi marca? Nunca.",
+      "x": 8000,
+      "y": 10080
     }
   },
   "order": [
     "Main.dc.html",
     "N01.dc.html",
+    "E03.dc.html",
+    "E04.dc.html",
     "N02.dc.html",
     "C01.dc.html",
     "S03.dc.html",
     "S11.dc.html",
     "S12.dc.html",
-    "S13.dc.html",
+    "E07.dc.html",
     "C02.dc.html",
     "S08.dc.html",
     "S09.dc.html",
     "S10.dc.html",
     "C03.dc.html",
-    "S15.dc.html",
     "C04.dc.html",
     "S16.dc.html",
-    "S17.dc.html",
-    "S18.dc.html",
+    "R19.dc.html",
+    "R20.dc.html",
     "C05.dc.html",
     "S22.dc.html",
-    "S21.dc.html",
+    "G22.dc.html",
+    "G23.dc.html",
     "S04.dc.html",
-    "S02.dc.html",
     "S19.dc.html",
     "S20.dc.html",
-    "S23.dc.html",
     "S24.dc.html",
     "S25.dc.html",
     "S26.dc.html",
@@ -368,7 +431,9 @@
     "S28.dc.html",
     "N08.dc.html",
     "S29.dc.html",
+    "B19.dc.html",
     "S30.dc.html",
+    "C10.dc.html",
     "S32.dc.html",
     "S33.dc.html",
     "A01.dc.html",
@@ -379,62 +444,69 @@
     "N06.dc.html",
     "N07.dc.html",
     "S07.dc.html",
-    "S14.dc.html"
+    "S14.dc.html",
+    "S13.dc.html",
+    "S15.dc.html",
+    "S02.dc.html",
+    "S23.dc.html",
+    "S17.dc.html",
+    "S18.dc.html",
+    "S21.dc.html"
   ],
   "notes": {
     "t1": {
       "x": 0,
       "y": -300,
-      "text": "Acto 1 · Por qué 360°: la vuelta completa en la portada, por qué un sistema y no otra agencia, cómo se crece",
+      "text": "Acto 1 · Por qué 360°: la vuelta completa, un sistema (no otra agencia), la IA ya recomienda, todo termina en ingresos, el cliente vuelve",
       "kind": "title1",
       "maxW": 5920
     },
     "t2": {
       "x": 0,
       "y": 1140,
-      "text": "Acto 2 · La vuelta, tramo a tramo · 01 Te encuentran (Engine) · 02 Te recuerdan (Brand)",
+      "text": "Acto 2 · La vuelta, tramo a tramo · 01 Te encuentran (Engine)",
       "kind": "title1",
-      "maxW": 17920
+      "maxW": 9920
     },
     "t3": {
       "x": 0,
       "y": 2580,
-      "text": "03 Le hablas a quien compra (Voice) · 04 Te compran y vuelven (Revenue)",
+      "text": "02 Te recuerdan (Brand)",
       "kind": "title1",
-      "maxW": 11920
+      "maxW": 7920
     },
     "t4": {
       "x": 0,
       "y": 4020,
-      "text": "05 Lo mides y la vuelta empieza de nuevo (Growth)",
+      "text": "03 Le hablas a quien compra (Voice) · 04 Te compran y vuelven (Revenue)",
       "kind": "title1",
-      "maxW": 5920
+      "maxW": 9920
     },
     "t5": {
       "x": 0,
       "y": 5460,
-      "text": "Acto 3 · Quién opera la vuelta: un solo equipo de personas y agentes",
+      "text": "05 Lo mides y la vuelta empieza de nuevo (Growth)",
       "kind": "title1",
-      "maxW": 11920
+      "maxW": 7920
     },
     "t6": {
       "x": 0,
       "y": 6900,
-      "text": "Acto 4 · Prueba",
+      "text": "Acto 3 · Quién opera la vuelta: un solo equipo de personas y agentes",
       "kind": "title1",
-      "maxW": 9920
+      "maxW": 13920
     },
     "t7": {
       "x": 0,
       "y": 8340,
-      "text": "Acto 5 · Cierre: contigo, cómo se compra, riesgo cubierto y el siguiente paso",
+      "text": "Acto 4 · Prueba",
       "kind": "title1",
-      "maxW": 9920
+      "maxW": 3920
     },
     "t8": {
       "x": 0,
       "y": 9780,
-      "text": "Fuera del recorrido · aperturas de papel (versión anterior) y las dos páginas descartadas",
+      "text": "Acto 5 · Cierre: contigo, cómo se compra, talento adentro, riesgo cubierto, control de marca y el siguiente paso",
       "kind": "title1",
       "maxW": 13920
     },
@@ -485,6 +557,20 @@
       "y": 4320,
       "w": 560,
       "text": "Portada Growth: el plate aprobado HW1 traía el lanyard montado sobre el antebrazo. Se borró con pnpm ai:inpaint erase (zona protegida idéntica bit a bit) y la portada se recompuso con el plate limpio HW1b. Cabe registrar HW1b como reemplazo de HW1 en el canon si lo apruebas.",
+      "fill": "blue"
+    },
+    "t9": {
+      "x": 0,
+      "y": 11520,
+      "text": "Fuera del recorrido · versiones anteriores, candidatas y las láminas retiradas el 2026-10-15 (agentes, paid social, personas y agentes, «Personas», «Todo el ciclo», «Una persona», «Llega solo»)",
+      "kind": "title1",
+      "maxW": 31920
+    },
+    "n30": {
+      "x": 18200,
+      "y": 9800,
+      "w": 560,
+      "text": "2026-10-15: se sumaron 9 láminas de los decks SEO/AEO (03, 04, 07, 22, 23), HubSpot (azul-B19, azul-B20) y Agencia Creativa (A19, A10 recompuesta en growth), a pedido del operador («ok sumalo»). Revenue quedó con una sola lámina magenta («El que encaje»). Las dos de Insights (22, 23) llevan la marca azul de producto dentro del tramo Growth.",
       "fill": "blue"
     }
   },
