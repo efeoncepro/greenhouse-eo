@@ -1,7 +1,7 @@
-# Brochure «Agencia de Marketing 360°» · 2026-10-12 (v8, 2026-10-15)
+# Brochure «Agencia de Marketing 360°» · 2026-10-12 (v9, 2026-10-15)
 
-Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 30). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v8.pdf`
-(copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v8/` (39, numeradas en el orden del recorrido).
+Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 31). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`
+(copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v9/` (26, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
 
@@ -15,56 +15,51 @@ HubSpot azul-B19 «Ya no» y azul-B20 «Ordenado» (`2026-10-06_deck-hubspot/png
 el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): «Agentes que trabajan contigo», «Paid social», «Personas y agentes»,
 «¿Hay alguien detrás? Personas.», «Todo el ciclo», «Una persona» y «Llega solo». «Menos tiempo» (creativo B3) quedó fuera: repetía las cifras de Sky.
 
-## Recorrido (39 láminas)
+**v9 (2026-10-15, «Ok, hazlo»):** el operador objetó que el brochure eran «láminas sueltas» que no se leían como secuencia. Se reescribió como un solo
+argumento: la vuelta del cliente → cada momento con otro proveedor → cinco líneas, un equipo → un tramo por momento (portada de la línea + qué
+hacemos + cómo pasa al siguiente) → quién la opera → prueba → cierre. 26 láminas, 11 pares; el resto, titulares de decisión. Como el compositor aún
+exige pregunta y respuesta (TASK-2012), los 11 titulares (V02–V18) se armaron sobre el visual ya compuesto, tapando la columna de voz con un panel del
+color de fondo y escribiendo el titular con la tipografía de la línea (Bricolage 760, Poppins 300, esfera del acento del tramo). Fuente:
+`native-growth/titulares-v9.mjs` (bases en el scratchpad de la sesión; para regenerar se usan las láminas del recorrido v8 en git). «Cinco líneas»
+(V04) es una lámina hecha a mano: la receta de carriles sólo admite íconos de producto de Salesforce o HubSpot.
+
+## Recorrido (26 láminas)
 
 | # | Tablero | Título |
 |---|---|---|
 | 01 | Main | 01 · Portada · ¿Qué gano con Efeonce? Crecimiento. |
-| 02 | N01 | 02 · Por qué 360° · ¿Cuántas agencias necesito? Una sola. |
-| 03 | N02 | 03 · La idea · ¿Mi cliente se va? Vuelve. |
-| 04 | C01 | 04 · Tramo 01 · Engine · ¿Te encuentra la IA? Ahora sí. |
-| 05 | S03 | 05 · Engine · ¿Y si la IA no me nombra? No estás. |
-| 06 | E03 | 06 · Engine · ¿A quién recomienda la IA? A tu competencia. |
-| 07 | E04 | 07 · Engine · ¿Dónde termina el SEO? En ingresos. |
-| 08 | S11 | 08 · Engine · ¿Qué construyen? Tu capa digital. |
-| 09 | S12 | 09 · Engine · SEO y AEO, un solo sistema. |
-| 10 | E07 | 10 · Engine · ¿Qué hay dentro? Cuatro piezas. |
-| 11 | C02 | 11 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad. |
-| 12 | S08 | 12 · Brand · Tu equipo dirige. Nosotros producimos. |
-| 13 | S09 | 13 · Brand · Seis capacidades, un solo equipo. |
-| 14 | S10 | 14 · Brand · Todo lo social, un solo squad. |
-| 15 | C03 | 15 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde. |
-| 16 | C04 | 16 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo. |
-| 17 | S16 | 17 · Revenue · ¿HubSpot, Salesforce o Zoho? El que encaje. |
-| 18 | R19 | 18 · Revenue · ¿Sigo llenando el CRM? Ya no. |
-| 19 | R20 | 19 · Revenue · ¿Cómo escala mi CRM? Ordenado. |
-| 20 | C05 | 20 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard) |
-| 21 | S22 | 21 · Growth · ¿Cómo sé que funciona? Lo medimos. |
-| 22 | G22 | 22 · Growth · ¿Cómo te llega? Como la necesites. |
-| 23 | G23 | 23 · Growth · ¿Y el PPT del comité? Ya está. |
-| 24 | S04 | 24 · Quiénes somos · ¿Y si necesito de todo? Un solo equipo. |
-| 25 | S19 | 25 · ¿Cómo trabaja mi squad? Escucha. Crea. Mide. |
-| 26 | S20 | 26 · Día a día · ¿Dónde veo el avance? En tu panel. |
-| 27 | S24 | 27 · Expertos multidisciplinarios. |
-| 28 | S25 | 28 · ¿Con quién trabajan? +90 empresas. |
-| 29 | S26 | 29 · ¿Con qué plataformas trabajan? Con las tuyas. |
-| 30 | S31 | 30 · Cinco países, un solo equipo. |
-| 31 | S27 | 31 · Caso Sky · ¿Lo han hecho a escala? Sí, con Sky. |
-| 32 | S28 | 32 · Caso Berel. |
-| 33 | N08 | 33 · ¿Cómo empezamos? Contigo. |
-| 34 | S29 | 34 · Compras capacidad, no horas. |
-| 35 | B19 | 35 · Cómo se compra · Tu equipo, con talento de Efeonce adentro. |
-| 36 | S30 | 36 · ¿Y si no funciona? Empiezas chico. |
-| 37 | C10 | 37 · Cierre · ¿Pierdo el control de mi marca? Nunca. |
-| 38 | S32 | 38 · Empecemos. |
-| 39 | S33 | 39 · ¿Conversamos? Cuando quieras. |
+| 02 | V02 | 02 · La idea · Tu cliente da vueltas alrededor de tu marca. |
+| 03 | V03 | 03 · Por qué 360° · Hoy, cada momento lo atiende otro proveedor. |
+| 04 | V04 | 04 · Cinco momentos, un equipo · Una vuelta, cinco líneas, un equipo. |
+| 05 | C01 | 05 · Tramo 01 · Engine · ¿Te encuentra la IA? Ahora sí. |
+| 06 | V06 | 06 · Engine · La IA ya recomienda a tu competencia. |
+| 07 | V07 | 07 · Engine · El SEO termina en ingresos, no en visitas. |
+| 08 | C02 | 08 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad. |
+| 09 | S08 | 09 · Brand · Tu equipo dirige. Nosotros producimos. |
+| 10 | C03 | 10 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde. |
+| 11 | V11 | 11 · Voice · Tu inversión llega a quien decide la compra. |
+| 12 | C04 | 12 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo. |
+| 13 | V13 | 13 · Revenue · Tu CRM se llena solo. |
+| 14 | C05 | 14 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard) |
+| 15 | V15 | 15 · Growth · Cada mes ves qué movió el negocio. |
+| 16 | V16 | 16 · Growth · La lectura te llega lista y empieza la siguiente vuelta. |
+| 17 | V17 | 17 · Quién opera la vuelta · Personas con nombre, con agentes a su lado. |
+| 18 | V18 | 18 · Tu día a día · Trabajas con nosotros en vivo. |
+| 19 | S27 | 19 · Caso Sky · ¿Lo han hecho a escala? Sí, con Sky. |
+| 20 | S28 | 20 · Caso Berel. |
+| 21 | S25 | 21 · ¿Con quién trabajan? +90 empresas. |
+| 22 | S29 | 22 · Compras capacidad, no horas. |
+| 23 | S30 | 23 · ¿Y si no funciona? Empiezas chico. |
+| 24 | C10 | 24 · Cierre · ¿Pierdo el control de mi marca? Nunca. |
+| 25 | S32 | 25 · Empecemos. |
+| 26 | S33 | 26 · ¿Conversamos? Cuando quieras. |
 
 ## Pendientes antes de enviarlo
 
-- TASK-2012 Slice 3: «El que encaje» (17) sigue con el escenario magenta; el operador lo rechazó el 2026-10-12. Las otras dos diseñadas de Revenue salieron del recorrido el 2026-10-15.
+- TASK-2012: en la v9 ya no hay láminas con escenario magenta en el recorrido. Cuando salga la voz `decision`, los 11 titulares se recomponen en el compositor en vez de sobre el visual.
 - Zoho en «El que encaje»: confirmar si va en un brochure de grupo (recomendación de la sesión HubSpot: sacarlo).
 - «Partner oficial de» (29): readback de insignia pendiente para Adobe, AWS, Microsoft y Salesforce en EFEONCE_PARTNERSHIP_REGISTRY_V1.
-- Cifras sin fuente en la lámina: «+90 empresas» (28) y «+85 expertos más en Latam» (27). Cifras de Sky (caso, clientes y «Talento adentro» no): autorización de Sky para prospectos sin confirmar.
+- Cifras sin fuente en la lámina: «+90 empresas» (21). «+85 expertos» ya no aparece (la v9 lo tapa con el titular de equipo). Cifras de Sky (caso, clientes y «Talento adentro» no): autorización de Sky para prospectos sin confirmar.
 - Acentos dentro de un tramo: 03 y 04 (teal, acto 1 en growth); 22 y 23 recompuestas a mano en teal de Growth y fondo #001a33 (v8, regla registrada por la sesión de la línea gráfica el 2026-10-15: lo que viene de otra línea se recompone en el acento del tramo); 10 «Cuatro piezas» conserva el azul de Engine y pasa a fondo #001a33. Fuente: `render-src/native/` del deck SEO; las copias recoloreadas viven en `native-growth/` (ver su LEEME) y se hornean con `shot.cjs`.
 - «Ya no» y «Ordenado» nombran a HubSpot en la bajada: válidas sólo dentro del tramo Revenue (están ahí).
 - Karo aparece en la portada Brand (CR4) y en «Talento adentro» (SA1): dos tomas con la misma persona; el peer creativo pide máximo una de sus tres láminas con Karo (se tomó sólo A19).
