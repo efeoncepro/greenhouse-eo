@@ -1,6 +1,6 @@
 # Brochure «Agencia de Marketing 360°» · 2026-10-12 (v7, 2026-10-15)
 
-Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 23). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v7.pdf`
+Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 25). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v7.pdf`
 (copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v7/` (39, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
