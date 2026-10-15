@@ -32,7 +32,7 @@
       "title": "02 · Por qué 360° · ¿Otra agencia más? Un sistema."
     },
     "N02.dc.html": {
-      "x": 8000,
+      "x": 4000,
       "y": 0,
       "w": 1920,
       "h": 1080,
@@ -53,18 +53,18 @@
       "title": "Alternativa de papel · Tramo 01"
     },
     "S11.dc.html": {
-      "x": 4000,
+      "x": 8000,
       "y": 1440,
       "w": 1920,
       "h": 1080,
-      "title": "06 · Engine · ¿Qué construyen? Tu capa digital."
+      "title": "08 · Engine · ¿Qué construyen? Tu capa digital."
     },
     "S12.dc.html": {
-      "x": 6000,
+      "x": 10000,
       "y": 1440,
       "w": 1920,
       "h": 1080,
-      "title": "07 · Engine · SEO y AEO, un solo sistema."
+      "title": "09 · Engine · SEO y AEO, un solo sistema."
     },
     "S13.dc.html": {
       "x": 18000,
@@ -85,21 +85,21 @@
       "y": 2880,
       "w": 1920,
       "h": 1080,
-      "title": "10 · Brand · Tu equipo dirige. Nosotros producimos."
+      "title": "12 · Brand · Tu equipo dirige. Nosotros producimos."
     },
     "S09.dc.html": {
       "x": 4000,
       "y": 2880,
       "w": 1920,
       "h": 1080,
-      "title": "11 · Brand · Seis capacidades, un solo equipo."
+      "title": "13 · Brand · Seis capacidades, un solo equipo."
     },
     "S10.dc.html": {
       "x": 6000,
       "y": 2880,
       "w": 1920,
       "h": 1080,
-      "title": "12 · Brand · Todo lo social, un solo squad."
+      "title": "14 · Brand · Todo lo social, un solo squad."
     },
     "N05.dc.html": {
       "x": 8000,
@@ -134,7 +134,7 @@
       "y": 4320,
       "w": 1920,
       "h": 1080,
-      "title": "16 · Revenue · ¿HubSpot, Salesforce o Zoho? El que encaje."
+      "title": "17 · Revenue · ¿HubSpot, Salesforce o Zoho? El que encaje."
     },
     "S17.dc.html": {
       "x": 26000,
@@ -169,7 +169,7 @@
       "y": 5760,
       "w": 1920,
       "h": 1080,
-      "title": "20 · Growth · ¿Cómo sé que funciona? Lo medimos."
+      "title": "21 · Growth · ¿Cómo sé que funciona? Lo medimos."
     },
     "S21.dc.html": {
       "x": 30000,
@@ -183,7 +183,7 @@
       "y": 7200,
       "w": 1920,
       "h": 1080,
-      "title": "22 · Quiénes somos · ¿Y si necesito de todo? Un solo equipo."
+      "title": "24 · Quiénes somos · ¿Y si necesito de todo? Un solo equipo."
     },
     "S02.dc.html": {
       "x": 22000,
@@ -197,14 +197,14 @@
       "y": 7200,
       "w": 1920,
       "h": 1080,
-      "title": "24 · ¿Cómo trabaja mi squad? Escucha. Crea. Mide."
+      "title": "25 · ¿Cómo trabaja mi squad? Escucha. Crea. Mide."
     },
     "S20.dc.html": {
       "x": 4000,
       "y": 7200,
       "w": 1920,
       "h": 1080,
-      "title": "25 · Día a día · ¿Dónde veo el avance? En tu panel."
+      "title": "26 · Día a día · ¿Dónde veo el avance? En tu panel."
     },
     "S23.dc.html": {
       "x": 24000,
@@ -274,21 +274,21 @@
       "y": 10080,
       "w": 1920,
       "h": 1080,
-      "title": "35 · ¿Y si no funciona? Empiezas chico."
+      "title": "36 · ¿Y si no funciona? Empiezas chico."
     },
     "S32.dc.html": {
       "x": 10000,
       "y": 10080,
       "w": 1920,
       "h": 1080,
-      "title": "36 · Empecemos."
+      "title": "38 · Empecemos."
     },
     "S33.dc.html": {
       "x": 12000,
       "y": 10080,
       "w": 1920,
       "h": 1080,
-      "title": "37 · ¿Conversamos? Cuando quieras."
+      "title": "39 · ¿Conversamos? Cuando quieras."
     },
     "C01.dc.html": {
       "w": 1920,
@@ -302,28 +302,28 @@
       "h": 1080,
       "x": 0,
       "y": 2880,
-      "title": "09 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad."
+      "title": "11 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad."
     },
     "C03.dc.html": {
       "w": 1920,
       "h": 1080,
       "x": 0,
       "y": 4320,
-      "title": "13 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde."
+      "title": "15 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde."
     },
     "C04.dc.html": {
       "w": 1920,
       "h": 1080,
       "x": 2000,
       "y": 4320,
-      "title": "15 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo."
+      "title": "16 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo."
     },
     "C05.dc.html": {
       "w": 1920,
       "h": 1080,
       "x": 0,
       "y": 5760,
-      "title": "19 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard)"
+      "title": "20 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard)"
     },
     "A01.dc.html": {
       "x": 0,
@@ -335,22 +335,22 @@
     "E03.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "03 · Por qué 360° · ¿A quién recomienda la IA? A tu competencia.",
+      "title": "06 · Engine · ¿A quién recomienda la IA? A tu competencia.",
       "x": 4000,
-      "y": 0
+      "y": 1440
     },
     "E04.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "04 · Por qué 360° · ¿Dónde termina el SEO? En ingresos.",
+      "title": "07 · Engine · ¿Dónde termina el SEO? En ingresos.",
       "x": 6000,
-      "y": 0
+      "y": 1440
     },
     "E07.dc.html": {
       "w": 1920,
       "h": 1080,
       "title": "10 · Engine · ¿Qué hay dentro? Cuatro piezas.",
-      "x": 8000,
+      "x": 12000,
       "y": 1440
     },
     "R19.dc.html": {
@@ -399,11 +399,11 @@
   "order": [
     "Main.dc.html",
     "N01.dc.html",
-    "E03.dc.html",
-    "E04.dc.html",
     "N02.dc.html",
     "C01.dc.html",
     "S03.dc.html",
+    "E03.dc.html",
+    "E04.dc.html",
     "S11.dc.html",
     "S12.dc.html",
     "E07.dc.html",
@@ -457,16 +457,16 @@
     "t1": {
       "x": 0,
       "y": -300,
-      "text": "Acto 1 · Por qué 360°: la vuelta completa, un sistema (no otra agencia), la IA ya recomienda, todo termina en ingresos, el cliente vuelve",
+      "text": "Acto 1 · Por qué 360°: la vuelta completa en la portada, un sistema (no otra agencia) y el cliente que vuelve",
       "kind": "title1",
       "maxW": 5920
     },
     "t2": {
       "x": 0,
       "y": 1140,
-      "text": "Acto 2 · La vuelta, tramo a tramo · 01 Te encuentran (Engine)",
+      "text": "Acto 2 · La vuelta, tramo a tramo · 01 Te encuentran (Engine): no estás, la IA recomienda a tu competencia, el SEO termina en ingresos",
       "kind": "title1",
-      "maxW": 9920
+      "maxW": 13920
     },
     "t3": {
       "x": 0,
@@ -570,7 +570,7 @@
       "x": 18200,
       "y": 9800,
       "w": 560,
-      "text": "2026-10-15: se sumaron 9 láminas de los decks SEO/AEO (03, 04, 07, 22, 23), HubSpot (azul-B19, azul-B20) y Agencia Creativa (A19, A10 recompuesta en growth), a pedido del operador («ok sumalo»). Revenue quedó con una sola lámina magenta («El que encaje»). Las dos de Insights (22, 23) llevan la marca azul de producto dentro del tramo Growth.",
+      "text": "2026-10-15: se sumaron 9 láminas de los decks SEO/AEO (03, 04, 07, 22, 23), HubSpot (azul-B19, azul-B20) y Agencia Creativa (A19, A10 recompuesta en growth), a pedido del operador («ok sumalo»). Revenue quedó con una sola lámina magenta («El que encaje»). Las dos de Insights (22, 23) llevan la marca azul de producto dentro del tramo Growth. 2026-10-15 (tarde): «A tu competencia» y «En ingresos» pasaron del acto 1 al tramo Engine, después de «No estás», recompuestas en línea engine (el operador: entraban sin preámbulo).",
       "fill": "blue"
     }
   },
