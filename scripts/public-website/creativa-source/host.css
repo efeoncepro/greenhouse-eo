@@ -52,3 +52,14 @@
 .gh-creativa :not(text)[style*="font-size: 168px"]{font-size:clamp(44px,14vw,168px) !important}
 .gh-creativa :not(text)[style*="font-size: 64px"]{font-size:clamp(38px,10.5vw,64px) !important}
 }
+
+/* Diagnóstico (2026-10-15): the form needs ≥520px inside the card to lay its fields in two columns (renderer
+   @container rule). Desktop gives the form column more room and keeps the plan sticky beside it; below 1200px
+   both columns stack so the form gets the full width. Shared by /agencia-creativa/ and /agencia-creativa-v2/. */
+@media (min-width:1200px){
+.gh-creativa [data-gh-module="diagnostico"]>div{display:grid !important;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);align-items:start}
+.gh-creativa [data-gh-module="diagnostico"]>div>div:first-child{position:sticky;top:120px}
+}
+@media (max-width:1199.98px){
+.gh-creativa [data-gh-module="diagnostico"]>div>div{flex-basis:100% !important}
+}

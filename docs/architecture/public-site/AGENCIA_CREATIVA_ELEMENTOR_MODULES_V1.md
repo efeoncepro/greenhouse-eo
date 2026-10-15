@@ -256,3 +256,15 @@ chrome global sin cambios.
   registrado.
 - **Pendiente:** el cargador `class-eo-widgets-loader.php` está desplegado con las 24 clases, pero no está commiteado en el
   repo runtime porque el archivo contiene WIP de otras sesiones; quien commitee ese archivo debe conservar la entrada creativa.
+
+## Delta 2026-10-15 — Formulario del diagnóstico en dos columnas
+
+- **Problema (reportado por el operador):** el card dejaba el formulario en 516 px, bajo el umbral `@container (min-width: 520px)`
+  del renderer; los 8 campos quedaban en una columna (1.668 px de alto) junto a una columna izquierda vacía por ~1.400 px.
+- **Arreglo (`creativa-source/host.css`, módulo compartido `diagnostico`):** desde 1200 px la sección es una grilla
+  `.82fr / 1.18fr` y la columna del plan queda `sticky` (top 120 px); bajo 1200 px ambas columnas se apilan. Formulario a 622 px,
+  dos columnas, 1.182 px de alto; sección de 2.190 a 1.704 px. Aplica a /agencia-creativa/ y /agencia-creativa-v2/.
+- **Despliegue:** sólo `creativa-landing.css`, backup `/tmp/eo-creativa-widgets-before-20261015-192918.tar`. Verificado en vivo en
+  ambas páginas a 1440, 1100 y 390 (`scrollWidth = clientWidth`).
+- **Pendiente fuera de este módulo:** el renderer de Growth Forms usa la URL de privacidad como texto del enlace
+  (`renderer.ts`, bloque de consentimiento); se corrige en el renderer, para todos los formularios.
