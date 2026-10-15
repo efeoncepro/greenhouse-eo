@@ -78,6 +78,20 @@ El piloto del informe es propuesta y requiere parámetros/capacidad aprobados an
 Usar sólo las plantillas del paso actual y enlazar expediente/HSP/seguimiento existente. Las cinco mejoras
 actualizan el método; la autorización para crearlas no inicia piloto, campañas, pausas, DNS ni registros CRM.
 
+## Evaluar y enviar otro correo puntual
+
+Cargar [criterio de seguimiento](../../../.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#decidir-si-vale-la-pena-otro-correo)
+y el [adapter de envío/readback](../../../.codex/skills/hubspot-as-a-service/references/manual-outreach-follow-up.md#reply-con-firma-gráfica-y-pdf-en-outlook).
+Reconstruir contactos de toda la iniciativa, respuestas y pendientes; decidir si el aporte nuevo justifica
+otro toque. Elegir un receptor y una pregunta útil, sin repetir la presentación ni rodear restricciones.
+La autorización condicional «si vale la pena, hazlo» permite ese envío si el criterio se cumple, sin crear
+una secuencia. En procesos cerrados, preguntar por evaluación no acredita reapertura o admisión.
+
+Con firma gráfica solicitada, usar la vía Outlook permitida y comprobar el render. Si corresponde PDF,
+adjuntar la versión aprobada como copia y verificar carga terminada; no convertirla en enlace público.
+Después leer mensaje, destinatarios, adjunto y EMAIL/asociaciones CRM por separado. Registrar fecha,
+aporte y decisión pendiente; esperar respuesta no programa otro envío. [Socopur: aplicación y evidencia](../../commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md).
+
 ## Programar seguimientos personalizados en HubSpot
 
 Cargar el [módulo de secuencias](../../../.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)

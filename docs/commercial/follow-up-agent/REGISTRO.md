@@ -1,5 +1,7 @@
 # Registro de seguimiento comercial
 
+**Delta focal 15/10, 07:13 Chile · Socopur:** Julio autorizó evaluar y enviar un seguimiento con firma gráfica. Se envió sólo a Katherine en el hilo existente, con PDF creativo adjunto y pregunta sobre evaluación o lista cerrada. Enviados, firma, PDF y EMAIL `118603198768` SENT asociado a Contact/Company verificados. [Historial y readbacks](../tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md). Esperar respuesta; sin admisión/bases, cambio de etapa o nuevo envío programado. No repetir presentación ni ampliar a colegas. No renueva el corte global siguiente ni la fecha histórica de la tarea comercial.
+
 **Delta focalizado 13/10 · outreach personalizado:** seis primeros correos enviados a Paula Arciniegas,
 Nicol Cueva, Fiorella Marcos, Sergio Suárez, Hernán Ugarte y Jesús Rangel. Outlook web, firma gráfica y PDF
 contextual; Enviados, adjuntos y seis actividades HubSpot `SENT` verificados. Rafael Figueroa excluido;

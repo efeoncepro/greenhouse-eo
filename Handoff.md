@@ -1,8 +1,10 @@
 # Handoff
 
-## 2026-10-14 — Preferencia de correos comerciales robustos
+## 2026-10-15 — Correos comerciales y seguimiento puntual
 
 Julio aprobó la [estructura en Prospección](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio); referencia y routing espejados Codex/Claude, extensión adaptable por cuenta. Actualización documental local, sin nueva autorización de envío.
+
+[Socopur 15/10](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md): reply autorizado sólo a Katherine 07:13 Chile; firma gráfica/PDF y EMAIL `118603198768` SENT asociado verificados. Esperar respuesta sobre admisión; sin próximo envío. Método y registros actualizados, WIP ajeno preservado.
 
 ## 2026-10-14 — Footer público: composición compacta
 

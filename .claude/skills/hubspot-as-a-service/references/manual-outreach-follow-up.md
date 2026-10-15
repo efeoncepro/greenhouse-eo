@@ -18,6 +18,21 @@ Outlook web, conservación de la firma instalada y readback de adjuntos/EMAIL; n
 Casos y evidencia: `docs/commercial/follow-up-agent/runs/2026-10-08-outreach-manual.md` y
 `docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md`.
 
+## Reply con firma gráfica y PDF en Outlook
+
+- En una respuesta al propio mensaje enviado, comprobar Para/CC/CCO tras abrir el reply: el comando de
+  respuesta no garantiza que el destinatario sea el comprador. Conservar el hilo, la firma instalada nueva
+  y el historial citado, sin duplicar firmas en el cuerpo nuevo ni incorporar otros colegas por defecto.
+- Para adjuntar un PDF desde navegador, esperar el selector de archivo antes de accionar la carga y usar
+  la ruta exacta aprobada. Si Outlook propone compartir por OneDrive o un complemento propone un enlace
+  público, mantener copia adjunta cuando ése sea el alcance autorizado. Esperar a que termine la carga.
+- Antes de enviar: destinatarios, asunto, cuerpo, firma renderizada y adjunto sin progreso pendiente.
+  Ante envío incierto, consultar Enviados antes de repetir. Después: recuperar el mensaje y metadatos del
+  PDF; verificar EMAIL nativo y asociaciones a Contact/Company. No duplicar esa actividad con una creación
+  manual. CCO no acredita ingestión inmediata; si sigue pendiente, informar ese estado por separado.
+
+Aplicación verificada y límites: `docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md`.
+
 ## Secuencias autorizadas explícitamente
 
 Preferencia confirmada 13/10: **HubSpot, no Apollo**. Método reusable dueño de Prospecting:

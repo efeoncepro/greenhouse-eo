@@ -62,6 +62,33 @@ la **estructura y profundidad**, no por un número fijo de palabras ni por alarg
 contactos. Adaptar extensión a señal, relación y pedido; en seguimientos, conservar el aporte nuevo
 en vez de repetir toda la presentación. Esta preferencia no autoriza envíos futuros.
 
+### Decidir si vale la pena otro correo
+
+Revisar enviados y respuestas de **toda la cuenta para esa iniciativa**, incluidos otros interlocutores,
+borradores y pasos programados. Contar comunicaciones reales, no sólo las del contacto elegido; una búsqueda
+sin respuesta localizada no acredita recepción ni falta de interés. Resolver HOLD, negativas y rebotes antes
+de recomendar continuidad mediante [cadencia](account-cadence.md) y [respuestas](response-handling.md).
+
+- Justificar la utilidad del siguiente toque frente al historial y al tiempo transcurrido. Tener correo o
+  permiso no basta para recomendar insistencia; si no hay aporte o decisión pendiente pertinente, esperar.
+- Elegir un interlocutor pertinente y una pregunta concreta. No contactar a varios colegas como consecuencia
+  de investigarlos ni repetir la presentación robusta del primer mensaje. «Si vale la pena, hazlo» autoriza
+  evaluar y ejecutar ese seguimiento dentro del alcance, sin pedir otra aprobación idéntica; no crea una cadencia.
+- Si el proceso cerró, reconocer el plazo y preguntar por la posibilidad de evaluación únicamente cuando
+  el contexto y el mandato lo justifiquen. Una fase de propuestas posterior no reabre la inscripción; pedir
+  bases no prueba admisión ni habilita invertir en una propuesta completa.
+- Un material nuevo puede facilitar una decisión: si antes hubo un enlace y el comprador pidió PDF, adjuntar
+  la versión aprobada y explicar su utilidad. Cambiar enlace por archivo no justifica por sí solo otro correo
+  ni certifica que se satisfacen todos los requisitos. No adjuntar un catálogo de materiales innecesarios.
+- Conservar el hilo y cerrar con una salida clara, por ejemplo confirmar si aún pueden evaluar credenciales
+  o si la lista está cerrada. No prometer capacidad, exclusividad, experiencia sectorial o resultados sin evidencia.
+
+Después del envío autorizado, registrar fecha local/zona, destinatarios efectivos, aporte nuevo y siguiente
+decisión. Firma gráfica, PDF enviado y actividad EMAIL asociada requieren sus propios readbacks; no equivalen
+a entrega, lectura, respuesta ni aceptación. Esperar respuesta no programa otro envío. El
+[caso Socopur](../../../../docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md)
+documenta una aplicación puntual; su cantidad de toques e intervalo no son una regla general.
+
 ## Graduar la prueba contextual Efeonce
 
 Elegir la incertidumbre del comprador que se quiere resolver. En frío, una lectura/ejemplo útil; con fit,

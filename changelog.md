@@ -44,6 +44,8 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 
+- 15/10: [Socopur](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md), seguimiento puntual autorizado a Katherine con firma gráfica/PDF y EMAIL `118603198768` SENT asociado. Dossier y registros conciliados; Prospecting/HubSpot Codex-Claude precisan decisión por historial de cuenta, aporte nuevo y verificación de reply/adjunto/CRM. Sin admisión, secuencia o nuevo permiso futuro.
+
 - 14/10: Prospección Codex/Claude incorpora la [estructura de correo robusto aprobada por Julio](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio): contexto, encaje, aportes, enfoque sectorial, forma de trabajo, brochure explicado e invitación; profundidad adaptable, firma por la vía pedida y permiso de envío separado.
 - [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
   empatía, motivo para elegir Efeonce, brochure explicado y firma instalada en Outlook web; Enviados,
