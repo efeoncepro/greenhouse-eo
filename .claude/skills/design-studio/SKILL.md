@@ -66,6 +66,18 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 ## 1. Cómo se usa esta skill (router)
 
+**Imagen de referencia para OmniHuman 2.0**
+
+Para un presentador o personaje animado desde **imagen + audio**, carga `motion-design-studio` y el
+[manual OmniHuman 2.0](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md). Design Studio dirige y
+aprueba la imagen de referencia: identidad, rostro/boca legibles, manos, encuadre y espacio para la composición
+final; conserva la fuente y los derechos de imagen. Para fotografía propia Efeonce sigue vigente `foto:prompt`
+y su QA; el modelo de video no reemplaza ese canon ni autoriza regenerar una identidad aprobada.
+Logo, textos y firma exactos se componen después; revisar que la animación no altere marcas presentes.
+**OmniHuman es BytePlus Vision AI**: la preferencia directa para Seedance/Seedream no extiende la API key de
+ModelArk a esta superficie. El [research fechado](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md)
+separa límites API, consola y claims comerciales; no es una ruta Globe ni una generación verificada.
+
 Para **paid media / scroll-stop / estáticos e híbridos**, carga
 [palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
 Elige una hipótesis de atención, su ejecución y control; distingue contraste perceptual de semántico.

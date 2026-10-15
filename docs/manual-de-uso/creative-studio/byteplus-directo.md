@@ -1,5 +1,9 @@
 # Usar BytePlus directo
 
+**OmniHuman 2.0 pertenece a Vision AI y no está conectado a estos comandos.** Ver su
+[manual API separado](omnihuman-2-api.md): autenticación, límites y recuperación distintos.
+El `--doctor` de esta CLI no valida acceso a Vision AI.
+
 Carril local del operador. Consume ModelArk/Seed Speech del fabricante en Johor y conserva Fal como alternativa
 explícita. No es una ruta de Globe, que permanece hibernado. [Decisión](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
 

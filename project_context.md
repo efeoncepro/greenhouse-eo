@@ -71,15 +71,14 @@ Flota de modelos de Globe: se resuelve y promueve por identidad exacta de ruta. 
 sin ruta Globe; cargar `higgsfield-provider` y su ADR antes de integrar. Estado live en
 `globe.producer.fleet.list`, mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
-amplía la allowlist global: sólo se acepta para una salida exacta esperada tras verificar sus bytes. Método transversal
-para añadir o auditar proveedores: `greenhouse-globe-model-fleet` (espejado Codex/Claude); sus route cards machine-readable viven en `docs/architecture/creative-studio/model-fleet/routes/` y nunca
-sustituyen la autoridad live del reader. ADR-023 separa evidencia del proveedor, cables de integración y disponibilidad
-de Globe. “Imagen 2 de ChatGPT” se normaliza a
+amplía la allowlist global: sólo se acepta para una salida exacta esperada tras verificar sus bytes. Proveedores: `greenhouse-globe-model-fleet` (Codex/Claude), fichas en
+`docs/architecture/creative-studio/model-fleet/routes/`. ADR-023 separa evidencia, integración y disponibilidad;
+las fichas no sustituyen al reader live. “Imagen 2 de ChatGPT” se normaliza a
 `gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. La transparencia GPT Image 2 sigue en preview y gated hasta
 canary y readback. `gpt-image-2.5` (Sunburst/Flare): provider-supported, sin ruta Globe ni Batch;
 el helper transporta 2.5. CLI `ai:image`: OpenAI,
 default `gpt-image-2`, con 2.5 seleccionable. [Matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
-BytePlus: `pnpm ai:byteplus`/`ai:layers`, sin Globe.
+BytePlus: `pnpm ai:byteplus`/`ai:layers`, sin Globe. [OmniHuman/Vision AI](docs/manual-de-uso/creative-studio/omnihuman-2-api.md): API sin CLI.
 CLI: [Nano 2.1](docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) · [Omni](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md).
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano

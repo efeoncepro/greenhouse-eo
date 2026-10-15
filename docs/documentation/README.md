@@ -20,6 +20,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [OmniHuman: aplicaciones y estado de acceso](creative-studio/omnihuman.md) — imagen + audio, flujo de producción y límites; candidato sin integración.
+
 - [Clasificación y orquestación de la producción de video con IA](creative-production/clasificacion-y-orquestacion-de-video.md) —
   cómo se clasifica una pieza (tipo, look, fidelidad, dificultad, operaciones por fase), personas usando producto
   digital, «propio primero» y el plan con compuertas de ADR-025; complemento del

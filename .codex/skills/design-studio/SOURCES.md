@@ -42,6 +42,13 @@ Fal queda para modelos no-Google allowlisted; OpenAI va directo. Para volumen By
 comparar el endpoint directo contra Fal: el directo suele ser más barato y Fal reduce fricción de integración.
 No confundir créditos de partner con precio API ni comprometer tarifas sin revalidación.
 
+**OmniHuman 2.0 (research 2026-10-15):** BytePlus **Vision AI**, con carriles AK/SK firmado o
+API key IAM en hosts distintos;
+no reutiliza la API key de ModelArk ni la clave Seed Speech y no está integrado en las CLI actuales ni en Globe.
+El [manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) concentra el contrato API;
+la [auditoría](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) separa documentación,
+consola y ejecución. La preferencia directa Seedance/Seedream de esta tabla no amplía ese soporte.
+
 ## Comparación directo vs. Fal (as-of 2026-07-26)
 
 Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuota y calculadora antes de reservar consumo.

@@ -62,6 +62,13 @@ se promueve una ruta Globe; o falta evidencia del transporte y de sus salidas re
 
 ## Evidence
 
+OmniHuman 2.0 / Vision AI fue investigado el 2026-10-15 y sigue fuera de la implementación aceptada de
+ModelArk/Seed Speech de este ADR. Dos transportes oficiales (AK/SK y API Key IAM) no amplían nuestras claves
+existentes. Modelo `Disabled` en la cuenta, sin inferencia. [Contrato y frontera](BYTEPLUS_OMNIHUMAN_2_API_CONTRACT_V1.md)
+y [manual](../../manual-de-uso/creative-studio/omnihuman-2-api.md). Una integración futura requiere su unidad
+con revisión de arquitectura, credencial, presupuesto, recuperación y canario; sin promoción Globe implícita.
+
+
 - [Imagen y layer decomposition](https://docs.byteplus.com/en/docs/ModelArk/image-generation-api)
 - [Crear tarea de video](https://docs.byteplus.com/en/docs/ModelArk/create-video-generation-task-api)
 - [Tarifas y ejemplos](https://docs.byteplus.com/en/docs/ModelArk/model-pricing)

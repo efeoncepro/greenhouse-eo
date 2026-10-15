@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.17
+> **Version:** 1.18
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-12 por Codex — v1.17: BytePlus directo por defecto para sus modelos de media, incluido Layerize; secretos, CLI y evidencia por transporte en su ADR/manual.
+> **Ultima actualizacion:** 2026-10-15 por Codex — v1.18: OmniHuman 2.0 / Vision AI investigado, separado de la CLI BytePlus y de Gemini Omni; contrato API y disponibilidad de cuenta distinguidos.
+> **Antes (v1.17):** BytePlus directo por defecto para Seedream, Layerize, Seedance y Seed Speech; secretos, CLI y evidencia por transporte en su ADR/manual.
 > **Antes (v1.16):** 2026-10-06 por Codex — v1.16: CLI Nano Banana 2.1 separada; generación real Nexa 4K/high y comparación visual acotada con NX7d Sunburst (§10.1). OpenAI conserva su default `gpt-image-2`.
 > **Antes (v1.15):** 2026-10-04 por Claude — v1.15: 🔁 **corrige una regla sobregeneralizada de Seedance.** La guía decía que Seedance rechaza personas reales y marcas en las referencias (filtro ByteDance) y recomendaba evitarlo con ese material. La evidencia es más acotada: **dos** rechazos medidos en fal el 2026-09-16, tras encolar y cobrados (`422 content_policy_violation` / `partner_validation_failed`: el isotipo de Efeonce, «potential copyright violation», y un video de barista, «likenesses of real people») [verificado 2026-09-16]; las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22]; y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]. El rechazo es un **riesgo observado en casos puntuales, no un filtro sistemático**; qué lo dispara: [sin dato]. Seedance vuelve a ser candidato con personas y marcas, presupuestando el posible rechazo cobrado (prueba corta y a baja resolución antes del final) y con Flux 3 / Wan 3.0 como alternativa si rechaza (§3, §4.3, §5.2, §5.3, §5.4, §5.6, §5.7, §6.8, §6.9, §6.12, §7.3, §7.4, §10.3).
 > **Antes (v1.14):** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
@@ -27,6 +28,14 @@
 ---
 
 ## Ruta del fabricante BytePlus
+
+**OmniHuman 2.0:** candidato para actuación de personaje desde imagen + audio aprobado; no genera la voz.
+Vision AI usa otra API y autenticación; no está en `pnpm ai:byteplus` ni tiene ruta Globe demostrada.
+Modelo `Disabled` en la cuenta al 2026-10-15. La API publica 4–300 s; la ficha de consola mostraba 120 s,
+sin canario que confirme el máximo efectivo. No confundir con Gemini Omni ni heredar controles 1.5.
+[Contrato](creative-studio/BYTEPLUS_OMNIHUMAN_2_API_CONTRACT_V1.md) ·
+[Manual API y QA](../manual-de-uso/creative-studio/omnihuman-2-api.md) ·
+[Aplicaciones](../documentation/creative-studio/omnihuman.md).
 
 Para Seedream, Layerize, Seedance y Seed Speech del contrato Johor, usa `pnpm ai:byteplus` directo por defecto;
 `pnpm ai:layers` usa BytePlus Pro. [Manual y catálogo operativo](../manual-de-uso/creative-studio/byteplus-directo.md),

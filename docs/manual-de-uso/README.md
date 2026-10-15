@@ -20,6 +20,8 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [OmniHuman 2.0 por API](creative-studio/omnihuman-2-api.md) — Vision AI, dos autenticaciones, payload, estados, errores, recuperación, costos y QA; aún sin consumidor local.
+
 - [Usar BytePlus directo](creative-studio/byteplus-directo.md) — claves separadas en Secret Manager; Seedream, Layerize, Seedance y Seed Speech con el contrato Johor, por CLI local.
 
 - [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de

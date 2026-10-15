@@ -1,18 +1,27 @@
 # changelog.md
 
-## 2026-10-15 — Convención comercial de nombres
-
-- Adoptada la [convención de negocios y leads](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
-  aprobada por Julio, con routing en skills Codex/Claude, captura CRM, licitaciones y prospección.
-- Primera aplicación: Gana66065702426; renombrado con readback. Nuevas altas autorizadas usan la regla;
-  histórico pendiente de lote. Sin schema, workflows, envíos ni migración masiva.
-
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
+
+## 2026-10-15 — OmniHuman: contrato API y routing de producción
+
+- [Manual](docs/manual-de-uso/creative-studio/omnihuman-2-api.md),
+  [funcional](docs/documentation/creative-studio/omnihuman.md) y
+  [auditoría](docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) separan Vision AI de ModelArk,
+  AK/SK de IAM Bearer, capacidad publicada de acceso efectivo y permisos de imagen/voz.
+- Skills de imagen, motion, audio, derechos y flota canalizadas al contrato; sin activación, inferencia,
+  implementación CLI o promoción Globe. API300s y ficha UI120s quedan registrados por superficie.
+
+## 2026-10-15 — Convención comercial de nombres
+
+- Adoptada la [convención de negocios y leads](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
+  aprobada por Julio, con routing en skills Codex/Claude, captura CRM, licitaciones y prospección.
+- Primera aplicación: Gana66065702426; renombrado con readback. Nuevas altas autorizadas usan la regla;
+  histórico pendiente de lote. Sin schema, workflows, envíos ni migración masiva.
 
 Medición14/10: todo develop publicado en main9690efad (PR255/orquestador38591329633), Server9 estricto y watchdog6/6/drift0. API/panel/CLI para agentes comparten políticas y comandos; alta nueva por datos recibida en Meta Test Events con nueve claves sin otro build/redeploy/GTM. Consentimiento y Forms→HubSpot Forms→CRM preservados; fixtures archivados. [Release y límites](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); [auditoría integral docs/skills](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md). Tráfico comercial/EMQ y resto de TASK-2035 pendientes.
 
@@ -558,16 +567,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
   lente te lleva adentro» y mejoras de contraste en avisos y alertas. No está en producción; `pnpm test` completo pendiente.
 - Canon de foto y skills: la referencia de cara del equipo pasa al avatar con la bomber; personajes de casting con retrato ancla (piel v3) antes de la escena; casebook cine (fallas 14–20, `LG1`/`LG2e` como recetas), registro cine (excepción del login), guía de modelos, regla `brand-photography` y `efeonce-graphic-line` (lecciones, ledger, aplicación §A12) actualizados.
 - Docs: [funcional](docs/documentation/identity/novedades-del-login.md) y [manual](docs/manual-de-uso/identity/administrar-novedades-del-login.md).
-
-## 2026-10-02 — Inpainting de imagen y video en los CLIs (TASK-1965)
-
-- Nuevos `pnpm ai:mask` (máscara canónica con fuentes, operaciones y guardas de cobertura) y `pnpm ai:inpaint image|video`:
-  recorte con contexto, generación por adaptador (OpenAI, `fal:flux-pro-fill`, Seedream edit; video `fal:flux3-edit`),
-  recomposición obligatoria y verificación del archivo en delta máximo 0, dry-run, caché por hash y manifiesto.
-- Medido: Sunburst con máscara devuelve un panel negro plano (3 de 3) → default Flare con máscara y Sunburst sin máscara
-  con corrección de color en anillo; modo boceto y referencias (como el Markup de ChatGPT). `ai:image --mask` avisa que
-  no recompone. Canario en `ai-generations/2026-10-02_task-1965-canary/`. Herramienta out-of-band: no toca runtime.
-- Cerrada el 2026-10-03: en producción con el release `fe261ca27`; siguiente paso, TASK-1973 (expandir, capas, borrar, fondo y detalle).
 
 ## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
 

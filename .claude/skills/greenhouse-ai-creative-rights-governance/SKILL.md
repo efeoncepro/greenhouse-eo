@@ -16,3 +16,10 @@ Preserve the canonical invariants: commercial clearance is bound to exact
 rights policy is immutable per asset; promotion only makes a route available and is never delivery; and no secret,
 signed URL, provider payload, prompt, client content, stack trace, or raw upstream prose may cross the safe
 evidence boundary.
+
+For **OmniHuman 2.0 / BytePlus Vision AI**, load the canonical skill's dated OmniHuman routing and the
+[API manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) with its
+[research evidence](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md).
+Apply the Vision AI Service Specific Terms and General AI Terms, dedicated likeness/voice permissions and
+asset-level clearance. Do not infer ModelArk indemnity, training consent or zero retention from partner status,
+task expiry or URL TTL; preserve provenance, disclosure and the default watermark.

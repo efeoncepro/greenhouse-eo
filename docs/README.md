@@ -55,6 +55,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Reingreso Workforce: contrato y recuperación](architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) · [Runbook](operations/runbooks/workforce-reentry-recovery.md)
 
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
+- [OmniHuman 2.0 / Vision AI](architecture/creative-studio/BYTEPLUS_OMNIHUMAN_2_API_CONTRACT_V1.md) — [aplicaciones](documentation/creative-studio/omnihuman.md), [manual API](manual-de-uso/creative-studio/omnihuman-2-api.md) y [evidencia](audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md); investigación sin integración.
 - [Efeonce Shared Product UI Platform Decision](architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
 - [Creative Studio — Business Model Decision V1](architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)
 - [Efeonce Creative Studio — Agentic Platform](architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_ARCHITECTURE_V1.md)

@@ -1039,6 +1039,12 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 
 ### BytePlus directo (2026-10-12)
 
+**OmniHuman 2.0 es Vision AI**, actuación de imagen + audio aprobado, con API/auth diferentes de ModelArk.
+No está en `pnpm ai:byteplus`; las claves actuales no prueban acceso. Para derivar una imagen aprobada a
+video, cargar `motion-design-studio` y el [manual API](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md).
+No crear un slug o ruta Globe por el anuncio; estado por superficie y fuentes en la
+[auditoría](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md).
+
 El operador autorizó el carril directo del fabricante para aprovechar el contrato de Johor.
 Para Seedream/Seedance/Seed Speech, usa BytePlus directo por defecto; Fal/Higgsfield sólo por elección explícita
 o una capacidad que el contrato directo no cubra. Los slugs y precios de Fal siguientes pertenecen a ese proveedor.

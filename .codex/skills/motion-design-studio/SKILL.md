@@ -73,6 +73,21 @@ description: >-
 
 ## 1. Cómo se usa esta skill (router)
 
+**Presentadores y personajes audio-driven: OmniHuman 2.0**
+
+Para animar una imagen con una locución o interpretación ya aprobada, usa el
+[manual OmniHuman 2.0 API](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) y compón con
+`design-studio` (imagen/identidad), `audio-studio` (master y actuación) y derechos. Es **BytePlus Vision AI**,
+separado de ModelArk/Seedance, Seed Speech y Gemini Omni: ni `pnpm ai:byteplus` ni `pnpm ai:omni` lo integran.
+Planifica la toma a partir del audio, fija actuación/cámara en el prompt opcional y conserva las referencias
+aprobadas. QA del video completo: sincronía labial, identidad, dientes/manos, expresión, silencios, continuidad
+y correspondencia con el master; un buen primer cuadro no valida una toma larga. Textos, subtítulos y firma
+exactos van en posproducción. Conserva el watermark por defecto y la evidencia de procedencia.
+Límites, estados asíncronos, cancelación y recuperación viven en el manual; la
+[auditoría](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) distingue API documentada,
+consola observada y capacidad ejecutada. Modelo desactivado en la cuenta al 2026-10-15: no se habilita ni se
+somete una generación para completar una investigación documental. Sin ruta Globe; conserva su hibernación.
+
 **Clasificar antes de producir:** toda pieza de video se clasifica primero con la
 [taxonomía de producción de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md):
 pieza, **tipo de video** (hiperrealista, cine, producto, UGC, personaje 3D, 2D, motion graphics, demo de UI,

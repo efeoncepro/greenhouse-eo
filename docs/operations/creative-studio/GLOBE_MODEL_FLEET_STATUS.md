@@ -19,6 +19,12 @@
 
 ## Los DOS carriles (la distinción que evita toda la confusión)
 
+**OmniHuman 2.0 / Vision AI, investigación 2026-10-15:** contrato de proveedor documentado, modelo
+`Disabled` en la cuenta; sin transporte en la CLI BytePlus, adapter, route card ejecutable, binding o canario
+Globe demostrado. Esta nota no cambia la disponibilidad de ninguna ruta ni despierta el producto.
+[Contrato externo](../../architecture/creative-studio/BYTEPLUS_OMNIHUMAN_2_API_CONTRACT_V1.md) ·
+[Manual](../../manual-de-uso/creative-studio/omnihuman-2-api.md).
+
 Un modelo puede estar integrado en **un carril, el otro, o ambos**. No son lo mismo, y "probado en el Lab"
 **no** implica "entregable a cliente en producción".
 
