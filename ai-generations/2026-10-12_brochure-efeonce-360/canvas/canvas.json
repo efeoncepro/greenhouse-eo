@@ -18,63 +18,63 @@
       "title": "01 · Portada · ¿Qué gano con Efeonce? Crecimiento."
     },
     "S03.dc.html": {
+      "x": 8000,
+      "y": 13360,
+      "w": 1920,
+      "h": 1080,
+      "title": "Engine · ¿Y si la IA no me nombra? No estás."
+    },
+    "N01.dc.html": {
       "x": 4000,
       "y": 13360,
       "w": 1920,
       "h": 1080,
-      "title": "05 · Engine · ¿Y si la IA no me nombra? No estás."
-    },
-    "N01.dc.html": {
-      "x": 0,
-      "y": 13360,
-      "w": 1920,
-      "h": 1080,
-      "title": "02 · Por qué 360° · ¿Cuántas agencias necesito? Una sola."
+      "title": "Por qué 360° · ¿Cuántas agencias necesito? Una sola."
     },
     "N02.dc.html": {
-      "x": 2000,
+      "x": 6000,
       "y": 13360,
       "w": 1920,
       "h": 1080,
-      "title": "03 · La idea · ¿Mi cliente se va? Vuelve."
+      "title": "La idea · ¿Mi cliente se va? Vuelve."
     },
     "S06.dc.html": {
-      "x": 2000,
+      "x": 4000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Fuera del recorrido · Cinco líneas (misma foto que la portada)"
     },
     "N03.dc.html": {
-      "x": 4000,
+      "x": 6000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 01"
     },
     "S11.dc.html": {
-      "x": 10000,
+      "x": 14000,
       "y": 13360,
       "w": 1920,
       "h": 1080,
-      "title": "08 · Engine · ¿Qué construyen? Tu capa digital."
+      "title": "Engine · ¿Qué construyen? Tu capa digital."
     },
     "S12.dc.html": {
-      "x": 12000,
+      "x": 16000,
       "y": 13360,
       "w": 1920,
       "h": 1080,
-      "title": "09 · Engine · SEO y AEO, un solo sistema."
+      "title": "Engine · SEO y AEO, un solo sistema."
     },
     "S13.dc.html": {
-      "x": 18000,
+      "x": 20000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
-      "title": "08 · Engine · Agentes que trabajan contigo."
+      "title": "Engine · Agentes que trabajan contigo."
     },
     "N04.dc.html": {
-      "x": 6000,
+      "x": 8000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
@@ -88,137 +88,137 @@
       "title": "09 · Brand · Tu equipo dirige. Nosotros producimos."
     },
     "S09.dc.html": {
-      "x": 16000,
+      "x": 20000,
       "y": 13360,
       "w": 1920,
       "h": 1080,
-      "title": "13 · Brand · Seis capacidades, un solo equipo."
+      "title": "Brand · Seis capacidades, un solo equipo."
     },
     "S10.dc.html": {
-      "x": 18000,
+      "x": 22000,
       "y": 13360,
       "w": 1920,
       "h": 1080,
-      "title": "14 · Brand · Todo lo social, un solo squad."
+      "title": "Brand · Todo lo social, un solo squad."
     },
     "N05.dc.html": {
-      "x": 8000,
+      "x": 10000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 03"
     },
     "S14.dc.html": {
-      "x": 16000,
+      "x": 18000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Descartada · página Voice (misma foto que la portada)"
     },
     "S15.dc.html": {
-      "x": 20000,
-      "y": 15760,
+      "x": 2000,
+      "y": 4320,
       "w": 1920,
       "h": 1080,
-      "title": "14 · Voice · Paid social · Directo a quien importa."
+      "title": "11 · Voice · ¿A quién le llega mi pauta? Directo a quien importa."
     },
     "N06.dc.html": {
-      "x": 10000,
+      "x": 12000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 04"
     },
     "S16.dc.html": {
-      "x": 20000,
-      "y": 13360,
+      "x": 0,
+      "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "17 · Revenue · ¿HubSpot, Salesforce o Zoho? El que encaje."
+      "title": "Revenue · ¿HubSpot, Salesforce o Zoho? El que encaje."
     },
     "S17.dc.html": {
       "x": 2000,
       "y": 16960,
       "w": 1920,
       "h": 1080,
-      "title": "17 · Revenue · ¿Qué hacen en HubSpot? Todo el ciclo."
+      "title": "Revenue · ¿Qué hacen en HubSpot? Todo el ciclo."
     },
     "S18.dc.html": {
       "x": 4000,
       "y": 16960,
       "w": 1920,
       "h": 1080,
-      "title": "18 · Revenue · Una persona."
+      "title": "Revenue · Una persona."
     },
     "N07.dc.html": {
-      "x": 12000,
+      "x": 14000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Alternativa de papel · Tramo 05"
     },
     "S07.dc.html": {
-      "x": 14000,
+      "x": 16000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
       "title": "Descartada · página Growth (misma foto que la portada)"
     },
     "S22.dc.html": {
-      "x": 2000,
+      "x": 4000,
       "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "21 · Growth · ¿Cómo sé que funciona? Lo medimos."
+      "title": "Growth · ¿Cómo sé que funciona? Lo medimos."
     },
     "S21.dc.html": {
       "x": 6000,
       "y": 16960,
       "w": 1920,
       "h": 1080,
-      "title": "21 · Growth · Resultados · ¿Y el reporte? Llega solo."
+      "title": "Growth · Resultados · ¿Y el reporte? Llega solo."
     },
     "S04.dc.html": {
-      "x": 8000,
+      "x": 10000,
       "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "24 · Quiénes somos · ¿Y si necesito de todo? Un solo equipo."
+      "title": "Quiénes somos · ¿Y si necesito de todo? Un solo equipo."
     },
     "S02.dc.html": {
       "x": 22000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
-      "title": "23 · Personas y agentes."
+      "title": "Personas y agentes."
     },
     "S19.dc.html": {
-      "x": 10000,
-      "y": 14560,
-      "w": 1920,
-      "h": 1080,
-      "title": "25 · ¿Cómo trabaja mi squad? Escucha. Crea. Mide."
-    },
-    "S20.dc.html": {
       "x": 12000,
       "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "26 · Día a día · ¿Dónde veo el avance? En tu panel."
+      "title": "¿Cómo trabaja mi squad? Escucha. Crea. Mide."
+    },
+    "S20.dc.html": {
+      "x": 14000,
+      "y": 14560,
+      "w": 1920,
+      "h": 1080,
+      "title": "Día a día · ¿Dónde veo el avance? En tu panel."
     },
     "S23.dc.html": {
       "x": 0,
       "y": 16960,
       "w": 1920,
       "h": 1080,
-      "title": "26 · ¿Hay alguien detrás? Personas."
+      "title": "¿Hay alguien detrás? Personas."
     },
     "S24.dc.html": {
-      "x": 14000,
+      "x": 16000,
       "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "27 · Expertos multidisciplinarios."
+      "title": "Expertos multidisciplinarios."
     },
     "S25.dc.html": {
       "x": 4000,
@@ -228,11 +228,11 @@
       "title": "21 · ¿Con quién trabajan? +90 empresas."
     },
     "S26.dc.html": {
-      "x": 16000,
+      "x": 18000,
       "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "29 · ¿Con qué plataformas trabajan? Con las tuyas."
+      "title": "¿Con qué plataformas trabajan? Con las tuyas."
     },
     "S27.dc.html": {
       "x": 0,
@@ -249,18 +249,18 @@
       "title": "20 · Caso Berel."
     },
     "S31.dc.html": {
-      "x": 18000,
-      "y": 14560,
-      "w": 1920,
-      "h": 1080,
-      "title": "30 · Cinco países, un solo equipo."
-    },
-    "N08.dc.html": {
       "x": 20000,
       "y": 14560,
       "w": 1920,
       "h": 1080,
-      "title": "33 · ¿Cómo empezamos? Contigo."
+      "title": "Cinco países, un solo equipo."
+    },
+    "N08.dc.html": {
+      "x": 22000,
+      "y": 14560,
+      "w": 1920,
+      "h": 1080,
+      "title": "¿Cómo empezamos? Contigo."
     },
     "S29.dc.html": {
       "x": 0,
@@ -326,7 +326,7 @@
       "title": "14 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard)"
     },
     "A01.dc.html": {
-      "x": 0,
+      "x": 2000,
       "y": 15760,
       "w": 1920,
       "h": 1080,
@@ -335,58 +335,58 @@
     "E03.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "06 · Engine · ¿A quién recomienda la IA? A tu competencia.",
-      "x": 6000,
+      "title": "Engine · ¿A quién recomienda la IA? A tu competencia.",
+      "x": 10000,
       "y": 13360
     },
     "E04.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "07 · Engine · ¿Dónde termina el SEO? En ingresos.",
-      "x": 8000,
+      "title": "Engine · ¿Dónde termina el SEO? En ingresos.",
+      "x": 12000,
       "y": 13360
     },
     "E07.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "10 · Engine · ¿Qué hay dentro? Cuatro piezas.",
-      "x": 14000,
+      "title": "Engine · ¿Qué hay dentro? Cuatro piezas.",
+      "x": 18000,
       "y": 13360
     },
     "R19.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "18 · Revenue · ¿Sigo llenando el CRM? Ya no.",
-      "x": 22000,
-      "y": 13360
+      "title": "13 · Revenue · ¿Sigo llenando el CRM? Ya no.",
+      "x": 2000,
+      "y": 5760
     },
     "R20.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "19 · Revenue · ¿Cómo escala mi CRM? Ordenado.",
-      "x": 0,
+      "title": "Revenue · ¿Cómo escala mi CRM? Ordenado.",
+      "x": 2000,
       "y": 14560
     },
     "G22.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "22 · Growth · ¿Cómo te llega? Como la necesites.",
-      "x": 4000,
+      "title": "Growth · ¿Cómo te llega? Como la necesites.",
+      "x": 6000,
       "y": 14560
     },
     "G23.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "23 · Growth · ¿Y el PPT del comité? Ya está.",
-      "x": 6000,
+      "title": "Growth · ¿Y el PPT del comité? Ya está.",
+      "x": 8000,
       "y": 14560
     },
     "B19.dc.html": {
       "w": 1920,
       "h": 1080,
-      "title": "35 · Cómo se compra · Tu equipo, con talento de Efeonce adentro.",
-      "x": 22000,
-      "y": 14560
+      "title": "Cómo se compra · Tu equipo, con talento de Efeonce adentro.",
+      "x": 0,
+      "y": 15760
     },
     "C10.dc.html": {
       "w": 1920,
@@ -433,16 +433,16 @@
     "V11.dc.html": {
       "w": 1920,
       "h": 1080,
-      "x": 2000,
-      "y": 4320,
-      "title": "11 · Voice · Tu inversión llega a quien decide la compra."
+      "x": 0,
+      "y": 13360,
+      "title": "Descartada · titular sobre foto (se leía como banda)"
     },
     "V13.dc.html": {
       "w": 1920,
       "h": 1080,
       "x": 2000,
-      "y": 5760,
-      "title": "13 · Revenue · Tu CRM se llena solo."
+      "y": 13360,
+      "title": "Descartada · titular sobre foto (se leía como banda)"
     },
     "V15.dc.html": {
       "w": 1920,
@@ -484,9 +484,9 @@
     "C02.dc.html",
     "S08.dc.html",
     "C03.dc.html",
-    "V11.dc.html",
+    "S15.dc.html",
     "C04.dc.html",
-    "V13.dc.html",
+    "R19.dc.html",
     "C05.dc.html",
     "V15.dc.html",
     "V16.dc.html",
@@ -500,6 +500,8 @@
     "C10.dc.html",
     "S32.dc.html",
     "S33.dc.html",
+    "V11.dc.html",
+    "V13.dc.html",
     "N01.dc.html",
     "N02.dc.html",
     "S03.dc.html",
@@ -511,7 +513,6 @@
     "S09.dc.html",
     "S10.dc.html",
     "S16.dc.html",
-    "R19.dc.html",
     "R20.dc.html",
     "S22.dc.html",
     "G22.dc.html",
@@ -534,7 +535,6 @@
     "S07.dc.html",
     "S14.dc.html",
     "S13.dc.html",
-    "S15.dc.html",
     "S02.dc.html",
     "S23.dc.html",
     "S17.dc.html",
@@ -672,7 +672,7 @@
       "x": 10200,
       "y": 0,
       "w": 600,
-      "text": "v9 (2026-10-15): el recorrido se reescribió como un solo argumento («Siento que estás uniendo muchas láminas sueltas…»; «Ok, hazlo»). 26 láminas, 11 pares (portada, cinco aperturas de tramo, Sky, clientes, «Empiezas chico», «Nunca», cierre); el resto son titulares de decisión. El compositor aún exige pregunta y respuesta (TASK-2012), así que los once titulares se armaron sobre el visual compuesto con la tipografía de la línea: fuente en native-growth/titulares-v9.mjs.",
+      "text": "v9 (2026-10-15): el recorrido se reescribió como un solo argumento («Siento que estás uniendo muchas láminas sueltas…»; «Ok, hazlo»). 26 láminas, 13 pares (portada, cinco aperturas de tramo, paid social, «Ya no», Sky, clientes, «Empiezas chico», «Nunca», cierre); el resto son titulares de decisión. El compositor aún exige pregunta y respuesta (TASK-2012), así que los nueve titulares se armaron sobre el visual compuesto con la tipografía de la línea: fuente en native-growth/titulares-v9.mjs. Las dos láminas con foto (Voice y Revenue) volvieron a su par original: el panel sobre la foto se leía como banda (regla: nunca un scrim sobre foto a sangre). Tipografía igualada a la plantilla (eyebrow 16 px, tracking −0,045 em). TEMPORAL: se retira cuando TASK-2012 etapa 2 dé la voz decision; entonces se recomponen en el compositor.",
       "fill": "teal"
     }
   },

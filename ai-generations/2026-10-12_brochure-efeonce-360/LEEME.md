@@ -1,6 +1,6 @@
 # Brochure «Agencia de Marketing 360°» · 2026-10-12 (v9, 2026-10-15)
 
-Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 31). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`
+Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 33). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`
 (copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v9/` (26, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
@@ -17,8 +17,8 @@ el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): �
 
 **v9 (2026-10-15, «Ok, hazlo»):** el operador objetó que el brochure eran «láminas sueltas» que no se leían como secuencia. Se reescribió como un solo
 argumento: la vuelta del cliente → cada momento con otro proveedor → cinco líneas, un equipo → un tramo por momento (portada de la línea + qué
-hacemos + cómo pasa al siguiente) → quién la opera → prueba → cierre. 26 láminas, 11 pares; el resto, titulares de decisión. Como el compositor aún
-exige pregunta y respuesta (TASK-2012), los 11 titulares (V02–V18) se armaron sobre el visual ya compuesto, tapando la columna de voz con un panel del
+hacemos + cómo pasa al siguiente) → quién la opera → prueba → cierre. 26 láminas, 13 pares; el resto, titulares de decisión. Como el compositor aún
+exige pregunta y respuesta (TASK-2012), los 9 titulares (V02–V18, sin V11 ni V13) se armaron sobre el visual ya compuesto, tapando la columna de voz con un panel del
 color de fondo y escribiendo el titular con la tipografía de la línea (Bricolage 760, Poppins 300, esfera del acento del tramo). Fuente:
 `native-growth/titulares-v9.mjs` (bases en el scratchpad de la sesión; para regenerar se usan las láminas del recorrido v8 en git). «Cinco líneas»
 (V04) es una lámina hecha a mano: la receta de carriles sólo admite íconos de producto de Salesforce o HubSpot.
@@ -37,9 +37,9 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 | 08 | C02 | 08 · Tramo 02 · Brand · ¿Quién crea mi contenido? Tu squad. |
 | 09 | S08 | 09 · Brand · Tu equipo dirige. Nosotros producimos. |
 | 10 | C03 | 10 · Tramo 03 · Voice · ¿Dónde invierto? Donde rinde. |
-| 11 | V11 | 11 · Voice · Tu inversión llega a quien decide la compra. |
+| 11 | S15 | 11 · Voice · ¿A quién le llega mi pauta? Directo a quien importa. |
 | 12 | C04 | 12 · Tramo 04 · Revenue · ¿Cuándo veo mi pipeline? En vivo. |
-| 13 | V13 | 13 · Revenue · Tu CRM se llena solo. |
+| 13 | R19 | 13 · Revenue · ¿Sigo llenando el CRM? Ya no. |
 | 14 | C05 | 14 · Tramo 05 · Growth · ¿Lo medimos? Siempre. (plate sin lanyard) |
 | 15 | V15 | 15 · Growth · Cada mes ves qué movió el negocio. |
 | 16 | V16 | 16 · Growth · La lectura te llega lista y empieza la siguiente vuelta. |
@@ -69,3 +69,5 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 - Caso Sky (31): aprobada por el operador el 2026-10-15 como la lámina CANÓNICA del caso Sky para todos los decks («Esa es la canónica para los deck»); las versiones del ala por la ventana (SK1) y de la mesa de luz quedan como historia. Registro en la norma a cargo de la sesión de la línea gráfica.
 - 2026-10-15 (tarde): «A tu competencia» y «En ingresos» salen del acto 1 y entran al tramo Engine después de «No estás», recompuestas en línea engine con sus recetas (`decision-ai-answer`, `decision-traffic-to-revenue`); el operador objetó que entraban sin preámbulo.
 - 2026-10-15 (tarde): «¿Otra agencia más? Un sistema.» → «¿Cuántas agencias necesito? Una sola.» y «Un sistema 360°» → «Una agencia 360°» (el operador: «Efeonce un sistema????»); intent `intents/r2/n01-diferencia.json`.
+- **Titulares de la v9: workaround TEMPORAL.** Los 9 titulares se armaron sobre el visual compuesto con un panel del color de fondo (`native-growth/titulares-v9.mjs`). Condición de retiro: cuando las recetas acepten la voz `decision` (TASK-2012, etapa 2), esas láminas se recomponen desde el compositor y el panel desaparece. El generador usa rutas absolutas de esta máquina (`/Users/jreye/...`, sharp y `file://`) y bases del scratchpad de la sesión: no es reproducible en otra máquina. Tipografía igualada a la plantilla del compositor (eyebrow 16 px #e2e2e2, respuesta Bricolage 760 con tracking −0,045 em). Las dos láminas con foto (Voice «Directo a quien importa» y Revenue «Ya no») NO llevan panel: se leía como banda sobre la foto (regla: nunca un scrim sobre foto a sangre), así que quedan con su par original.
+- Voice (11) conserva el eyebrow de su deck de origen («06 · Paid social») y el acento naranja de Brand: recomponer en línea voice cuando haya voz `decision`.

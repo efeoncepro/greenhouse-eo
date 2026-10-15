@@ -4,8 +4,8 @@ const ID="'Bricolage Grotesque', system-ui, sans-serif", ST="'Poppins', system-u
 const head=`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Poppins:wght@300;400;500;600&display=swap"><style>body{margin:0}b{font-weight:600}</style></head><body>`;
 const sphere=a=>`<span style="display:inline-block;width:0.2em;height:0.2em;border-radius:50%;background:${a};margin-left:0.04em"></span>`;
 const text=(c)=>`<div style="position:absolute;left:140px;top:${c.top||120}px;width:${c.W-170}px;display:flex;flex-direction:column">
-<div style="font-family:${ST};font-size:18px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#e2e2e2">${c.eyebrow}</div>
-<div style="margin-top:64px;font-family:${ID};font-size:${c.px}px;font-weight:760;letter-spacing:-0.035em;line-height:0.94;color:#fff">${c.lines.join('<br>')}${sphere(c.acc)}</div>
+<div style="font-family:${ST};font-size:16px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#e2e2e2">${c.eyebrow}</div>
+<div style="margin-top:64px;font-family:${ID};font-size:${c.px}px;font-weight:760;letter-spacing:-0.045em;line-height:0.94;color:#fff">${c.lines.join('<br>')}${sphere(c.acc)}</div>
 <div style="margin-top:44px;font-family:${ST};font-size:24px;font-weight:300;line-height:1.45;color:#fff;max-width:${Math.min(c.W-200,560)}px">${c.body}</div></div>
 <img src="${BUB}" style="position:absolute;left:135px;top:990px;width:162px;height:38px">`;
 async function bg(file){const {data,info}=await sharp(file).extract({left:20,top:300,width:60,height:480}).raw().toBuffer({resolveWithObject:true});let r=0,g=0,b=0,n=0;for(let i=0;i<data.length;i+=info.channels){r+=data[i];g+=data[i+1];b+=data[i+2];n++;}return [r/n|0,g/n|0,b/n|0];}
