@@ -1,0 +1,51 @@
+/* Host layer: what the canvas got from its own document and the WordPress theme does not give. */
+.gh-creativa{font-family:'Poppins',system-ui,sans-serif;width:100%;overflow-x:clip;-webkit-font-smoothing:antialiased;box-sizing:border-box}
+.gh-creativa *,.gh-creativa *::before,.gh-creativa *::after{box-sizing:border-box}
+.gh-creativa section{margin:0}
+/* Ohio skins headings, paragraphs, quotes, lists and buttons globally; the canvas sets what it needs inline. */
+.gh-creativa :is(h1,h2,h3,h4,h5,h6){font-family:inherit;color:inherit;text-transform:none;letter-spacing:inherit;margin:0}
+.gh-creativa :is(p,ul,ol,li,figure,figcaption,blockquote,summary,details){font-family:inherit;color:inherit;letter-spacing:inherit}
+.gh-creativa blockquote{border:0;padding:0;margin:0;font-style:normal;background:none;quotes:none}
+.gh-creativa blockquote::before,.gh-creativa blockquote::after{content:none;display:none}
+.gh-creativa :is(ul,ol){list-style:none}
+.gh-creativa ul[style*="padding-left"]{list-style:disc}
+.gh-creativa ul[style*="padding-left"] > li::marker{color:inherit}
+.gh-creativa li::before{content:none}
+.gh-creativa button{text-transform:none;letter-spacing:normal;line-height:1.2;height:auto;box-shadow:none;font-family:inherit;margin:0}
+.gh-creativa a{text-decoration-thickness:1px;box-shadow:none}
+.gh-creativa a::after,.gh-creativa a::before{content:none}
+.gh-creativa img,.gh-creativa video{max-width:100%;height:auto}
+.gh-creativa :is(img,video)[style*="height: 100%"]{height:100%}
+.gh-creativa :is(a,button,summary):focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
+/* Tabs: one pressed state per group, panels switch without layout jumps. */
+.gh-creativa [data-gh-tabs="rutas"] [data-gh-tab][aria-pressed="true"]{border:2px solid #ff6500 !important;background:#ff6500 !important;color:#001a33 !important;font-weight:600 !important}
+.gh-creativa [data-gh-tabs="formatos"] [data-gh-tab][aria-pressed="true"]{border:2px solid #023c70 !important;background:#023c70 !important;color:#ffffff !important;font-weight:600 !important}
+.gh-creativa [data-gh-tab]{transition:background 220ms,border-color 220ms,color 220ms}
+.gh-creativa [data-gh-panels]:not([data-ready]) > [data-gh-panel]:not(:first-child),
+.gh-creativa [data-gh-panel][hidden]{display:none !important}
+@keyframes gh-creativa-panel-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.gh-creativa [data-gh-panels][data-ready] > [data-gh-panel]:not([hidden]){animation:gh-creativa-panel-in 420ms cubic-bezier(0.2,0,0,1) both}
+
+/* Growth Form host card: the renderer owns the fields; the card keeps the canvas chrome. */
+.gh-creativa .gh-creativa-form-card greenhouse-form{display:block;margin-top:8px;--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#023c70;--ghf-muted:#5c5866;--ghf-accent:#0375db;--ghf-accent-contrast:#ffffff;--ghf-field-bg:#f4f6f8;--ghf-border:rgba(2,60,112,0.18);--ghf-border-strong:#0375db;--ghf-radius:12px;--ghf-focus:rgba(3,117,219,0.18)}
+.gh-creativa .gh-creativa-form-card greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]){--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#023c70;--ghf-muted:#5c5866;--ghf-accent:#0375db;--ghf-accent-contrast:#ffffff;--ghf-field-bg:#f4f6f8;--ghf-border:rgba(2,60,112,0.18);--ghf-border-strong:#0375db;--ghf-focus:rgba(3,117,219,0.18)}
+.gh-creativa .gh-creativa-form-fallback{margin:0;font-size:15px;line-height:1.5;color:#5c5866}
+
+/* Editor switch «Animaciones» off, and reduced motion, stop every loop. */
+.gh-creativa[data-motion="no"] *,.gh-creativa[data-motion="no"] *::after{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion:reduce){.gh-creativa [data-gh-panels][data-ready] > [data-gh-panel]{animation:none !important}}
+/* Display sizes scale with the viewport on phones; SVG text keeps its own units. */
+@media (max-width:760px){
+.gh-creativa .eo-cur{display:none}
+.gh-creativa :not(text)[style*="font-size: 72px"]{font-size:clamp(44px,14vw,72px) !important}
+.gh-creativa :not(text)[style*="font-size: 76px"]{font-size:clamp(44px,14vw,76px) !important}
+.gh-creativa :not(text)[style*="font-size: 88px"]{font-size:clamp(44px,14vw,88px) !important}
+.gh-creativa :not(text)[style*="font-size: 96px"]{font-size:clamp(44px,14vw,96px) !important}
+.gh-creativa :not(text)[style*="font-size: 104px"]{font-size:clamp(44px,14vw,104px) !important}
+.gh-creativa :not(text)[style*="font-size: 112px"]{font-size:clamp(44px,14vw,112px) !important}
+.gh-creativa :not(text)[style*="font-size: 124px"]{font-size:clamp(44px,14vw,124px) !important}
+.gh-creativa :not(text)[style*="font-size: 136px"]{font-size:clamp(44px,14vw,136px) !important}
+.gh-creativa :not(text)[style*="font-size: 168px"]{font-size:clamp(44px,14vw,168px) !important}
+.gh-creativa :not(text)[style*="font-size: 64px"]{font-size:clamp(38px,10.5vw,64px) !important}
+}

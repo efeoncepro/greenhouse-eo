@@ -4,7 +4,20 @@
 
 - URL: `https://efeoncepro.com/agencia-creativa/`
 - WordPress `page_id`: `249582`
-- Status: publish
+- Status: publish, indexed. `/agencia-creativa-v2/` (`251279`) stays as a satellite; no redirect.
+
+## Current body — Agencia Creativa modules (2026-10-15)
+
+- Source: the canvas approved by the operator on 2026-10-15, copied to `scripts/public-website/creativa-source/Main.dc.html` (with `assets.json`, `used-assets.json`, `host.css`, `page-custom.css`).
+- Compiler: `node scripts/public-website/compile-creativa-elementor-source.cjs` expands the canvas's dynamic parts (routes and formats as tabs + panels, Creative Studio screens as captures, the form as a Growth Forms host card, the 94 % meter as a server-drawn number) and writes `includes/creativa/{schemas,templates}` plus `assets/css/creativa-landing.css` into `eo-elementor-widgets`. Do not hand-edit generated files; edit the source or `host.css` and recompile.
+- Runtime: 15 native widgets `greenhouse_creativa_{hero,portafolio,rutas,formatos,marca,produccion,ia,equipo,studio,compra,control,prueba,diagnostico,preguntas,cierre}`, one per full-width container with `gh-creativa-section` + `clb__dark_section`/`clb__light_section`. Base `class-eo-creativa-landing-base.php`, schema `creativaModule.v1`. Every text, image, video, poster, alt, link and aria label is a native control; collections are Elementor repeaters (portfolio rows, routes, formats, pillars, capabilities, offers, FAQ groups…). No HTML widget, no control accepts HTML/CSS/JS. JS `creativa-landing.js`: tabs (click + arrows), marquee loop copy, reduced-motion video pause, Elementor editor re-init.
+- Form: `diagnostico` embeds `<greenhouse-form form-key="e913d958-2ad7-48a5-8015-dbff53eca4a3" surface="fhsf-efeonce-creative-diagnostic">` (slug `efeonce-creative-diagnostic`, style `diagnostic_premium`); the renderer owns fields, consent and submit. Host tokens override the variant on `.ghf-root[data-ghf-style-variant]` (blue `#0375db` CTA as in the canvas). Pending: first real browser submission (Turnstile blocks automation) to confirm `form_destination_attempt=succeeded`, then the TRACKING-PLAN row.
+- Ohio page contract (mirrors Home `251731` and v2): `page_header_title_visibility=0`, `page_breadcrumbs_visibility=0`, `page_add_wrapper=0`, `page_add_top_padding=0`, `page_full_width_margins_size=0px`, `page_header_logo_style=light_variant`, menu typo `{"color":"rgba(255,255,255,0.78)"}` as JSON string. Full bleed comes from the page custom CSS in `page-custom.css` (same pattern as Home, plus the strong selector that cancels Ohio's `left:16px` on `.e-con-full.e-parent`). Header and footer are Ohio's.
+- Release rail: `build-creativa-elementor-package.cjs <live baseline>` → `deploy-creativa-elementor-package.php` (contract `creativa-elementor-release.v1`, allowlist, previous-SHA drift guard, tar backup, loader last) → `publish-creativa-elementor-page.php` (content-hash guard, control + render preflight, snapshot option, `Document::save`, metas, thumbnail restore, Home/v2 hash and global-chrome checks, purge). Local test: `php tests/creativa-modules.test.php` in the runtime repo.
+- Rollback: snapshot option `_gh_creativa_before_20261015_143257` (elements, settings, metas of the previous body, hash `cdc078d2…`); restore elements + settings with `Document::save`, then the metas listed above and `_thumbnail_id=249672`. Plugin file backups: `/tmp/eo-creativa-widgets-before-*.tar` on Kinsta (temporary).
+- Lesson 2026-10-15: `Document::save` writes page settings before elements. The first attempt died on an Elementor control error (repeater media field with a string default) after writing settings and clearing `_thumbnail_id`; settings, controls usage and thumbnail were restored from the snapshot. The publisher now preflights every widget's controls and render before any write. Media/URL control defaults must always be arrays.
+- Verification 2026-10-15: live desktop 1440 and mobile 390 with `scrollWidth==clientWidth`, all 15 modules with media, tabs and arrows, loop copies, form renders from the governed contract, reduced motion stops animations and all 15 videos, one `h1`.
+- Open for the operator: Yoast title/description are still the old ones (`Agencia Creativa en LATAM`, «más de 120 marcas»); the 94 % figure, client-work permissions and some FAQ/closing claims still need validation.
 
 ## V2 — Elementor Modular Landing
 
@@ -46,7 +59,7 @@
 
 ## Featured Hero Guardrail
 
-This page uses Ohio headline background type `featured`.
+Historical: until 2026-10-15 this page used Ohio headline background type `featured`. The headline is now hidden, but keep `_thumbnail_id=249672` (Elementor drops it on save; the publisher restores it).
 
 Correct hero/featured attachment:
 
@@ -66,7 +79,7 @@ Before any `Document::save()` on this page, snapshot:
 
 Restore immediately with `set_post_thumbnail()` if drift occurs.
 
-## "Cómo trabajamos" Sticky Module
+## "Cómo trabajamos" Sticky Module (historical, replaced 2026-10-15)
 
 Section/container:
 
