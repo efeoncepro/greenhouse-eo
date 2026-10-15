@@ -284,12 +284,88 @@ const REPEAT_LABELS = {
   track_a: 'Trabajos · Fila superior', track_b: 'Trabajos · Fila inferior', routes: 'Rutas', formats: 'Formatos',
   pillars: 'Pilares del sistema', locations: 'Lugares del set', capabilities: 'Capacidades', offers: 'Formas de compra',
   commitments: 'Compromisos', talent_benefits: 'Beneficios del talento embebido', steps: 'Pasos del plan',
+  faq: 'Preguntas', stats: 'Cifras', phases: 'Etapas de la cadena', metrics: 'Métricas', wall_a: 'Muro · fila superior', wall_b: 'Muro · fila inferior', problems: 'Problemas', sparks: 'Agentes', pieces: 'Piezas de la campaña', benefits: 'Beneficios', plan: 'Etapas',
   faq_1: 'Preguntas · Grupo 1', faq_2: 'Preguntas · Grupo 2', faq_3: 'Preguntas · Grupo 3', faq_4: 'Preguntas · Grupo 4',
 }
 
-for (const [key, title, scheme] of MODULES) {
-  const root = $('section[data-gh-module="' + key + '"]').clone()
-  const q = cheerio.load($.html(root), { decodeEntities: false }, false)
+// Second landing: /agencia-creativa-v2/ (Producción creativa a escala). Its source is the canvas artboard Escala.dc.html,
+// approved 2026-10-15; it keeps the v2 «lienzo» and production-engine animations restyled to La órbita.
+const escalaSource = fs.readFileSync(path.join(__dirname, 'creativa-source/Escala.dc.html'), 'utf8')
+const $e = cheerio.load(escalaSource.slice(escalaSource.indexOf('</helmet>') + 9, escalaSource.indexOf('<script type="text/x-dc"')), { decodeEntities: false }, false)
+const ESCALA_MODULES = [
+  ['escala-hero', 'Escala · Hero · Creatividad a escala', 'dark', 'section#inicio'],
+  ['escala-problema', 'Escala · El problema', 'light', 'section#problema'],
+  ['escala-motor', 'Escala · Cómo trabajamos (motor animado)', 'dark', 'section#como-trabajamos'],
+  ['escala-cadena', 'Escala · Cómo escalamos (cadena con IA)', 'light', 'section#como-escalamos'],
+  ['escala-metricas', 'Escala · Qué medimos y cómo', 'dark', 'section#que-medimos'],
+  ['escala-logros', 'Escala · Lo que logramos (caso Sky)', 'light', 'section#escala-en-numeros'],
+  ['escala-studio', 'Escala · Creative Studio', 'dark', 'section#creative-studio'],
+  ['escala-campana', 'Escala · Una campaña en cada mercado', 'light', 'section#trabajo'],
+  ['escala-faq', 'Escala · Preguntas frecuentes', 'light', 'section#preguntas'],
+]
+
+// Diagnóstico and cierre reuse the /agencia-creativa/ widgets on the page; their canvas copies are not compiled.
+for (const [key, , , selector] of ESCALA_MODULES) {
+  const section = $e(selector)
+
+  if (section.length !== 1) throw new Error('Escala section not found: ' + selector)
+  section.attr('data-gh-module', key)
+}
+
+const markEscala = (selector, key) => $e(selector).each((_, el) => { $e(el).attr('data-gh-repeat', key) })
+
+markEscala('section#problema article.es-card', 'problems')
+markEscala('section#como-escalamos li.es-node', 'phases')
+markEscala('section#que-medimos article', 'metrics')
+markEscala('section#creative-studio ul > li', 'benefits')
+markEscala('section#trabajo figure.eo-ad:not(:has(video))', 'pieces')
+markEscala('section#preguntas details.eo-faq', 'faq')
+$e('section#escala-en-numeros .es-wall .eo-track, section#escala-en-numeros .es-wall .eo-track-rev').each((i, el) => {
+  // The canvas duplicates each wall row for the loop; the runtime JS makes that copy, so keep one set as rows.
+  const imgs = $e(el).children('img')
+
+  imgs.slice(imgs.length / 2).remove()
+  $e(el).children('img').attr('data-gh-repeat', i === 0 ? 'wall_a' : 'wall_b')
+})
+$e('dc-import').each((_, el) => {
+  const name = $e(el).attr('name')
+  const id = name === 'CS-Home' ? 'cs-home' : 'cs-campaigns'
+  const alt = name === 'CS-Home'
+    ? 'Pantalla Hoy de Creative Studio: decisiones pendientes, calendario e inventario de piezas'
+    : 'Pantalla Campañas de Creative Studio: cada campaña con su estado de creatividad, medios y lanzamiento'
+
+  $e(el).parent().replaceWith(`<img src="/_blob/${id}" alt="${alt}" style="width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block">`)
+})
+const escalaStyle = escalaSource.match(/<style>([\s\S]*?)<\/style>/)[1]
+const escalaMarker = escalaStyle.indexOf('/* ---- v2 (lienzo + motor)')
+
+if (escalaMarker < 0) throw new Error('Escala styles marker missing')
+// Only what the canvas adds on top of Main's styles: the v2 animations restyled to La órbita and the es-* components.
+const escalaCss = escalaStyle.slice(escalaStyle.indexOf('*/', escalaMarker) + 2)
+
+const LANDINGS = [
+  { dom: $, modules: MODULES, sha: sourceSha256 },
+  { dom: $e, modules: ESCALA_MODULES, sha: crypto.createHash('sha256').update(escalaSource).digest('hex') },
+]
+
+// Page-scoped Service + FAQPage per FAQ module; the FAQ part is built at render time from the visible rows.
+const SERVICE_DEFAULTS = {
+  preguntas: {
+    schema_service_name: 'Agencia creativa',
+    schema_service_type: 'Squad creativo, sistemas de marca, campañas, contenido y social, audiovisual y producción con IA',
+    schema_service_description: 'Personas, tecnología y procesos probados que se suman a tu equipo de marketing para producir más y llegar antes al mercado, sin que tu marca pierda consistencia.',
+  },
+  'escala-faq': {
+    schema_service_name: 'Producción creativa a escala',
+    schema_service_type: 'Producción creativa: contenido, formatos, audiovisual y adaptaciones con IA gobernada',
+    schema_service_description: 'Un squad creativo con IA gobernada que produce el volumen que tu marketing necesita: más piezas y formatos cada semana, con dirección de arte humana y cada entrega a la vista.',
+  },
+}
+
+for (const landing of LANDINGS) for (const [key, title, scheme] of landing.modules) {
+  const root = landing.dom('section[data-gh-module="' + key + '"]').clone()
+  if (!root.length) throw new Error('Missing section for module ' + key)
+  const q = cheerio.load(landing.dom.html(root), { decodeEntities: false }, false)
   const groups = [...new Set(q('[data-gh-repeat]').map((_, el) => q(el).attr('data-gh-repeat')).get())]
   const repeaters = []
 
@@ -373,9 +449,9 @@ for (const [key, title, scheme] of MODULES) {
 
   let structuredData
 
-  if (key === 'preguntas') {
+  if (SERVICE_DEFAULTS[key]) {
     // One truth, two interfaces: FAQPage is built at render time from the same rows the visitor reads.
-    structuredData = { faq: { repeaters: repeaters.filter(r => r.key.startsWith('faq_')).map(r => r.key), question: 'f001_pregunta', answer: 'f002_descripcion' }, service: true }
+    structuredData = { faq: { repeaters: repeaters.filter(r => r.key.startsWith('faq')).map(r => r.key), question: 'f001_pregunta', answer: 'f002_descripcion' }, service: true }
     extra.push(
       { key: 'schema_service_name', type: 'text', label: 'Datos estructurados · nombre del servicio' },
       { key: 'schema_service_type', type: 'text', label: 'Datos estructurados · tipo de servicio' },
@@ -383,19 +459,13 @@ for (const [key, title, scheme] of MODULES) {
       { key: 'schema_audience', type: 'text', label: 'Datos estructurados · audiencia' },
       { key: 'schema_area_served', type: 'text', label: 'Datos estructurados · países (separados por coma)' },
     )
-    Object.assign(extraDefaults, {
-      schema_service_name: 'Agencia creativa',
-      schema_service_type: 'Squad creativo, sistemas de marca, campañas, contenido y social, audiovisual y producción con IA',
-      schema_service_description: 'Personas, tecnología y procesos probados que se suman a tu equipo de marketing para producir más y llegar antes al mercado, sin que tu marca pierda consistencia.',
-      schema_audience: 'Equipos de marketing',
-      schema_area_served: 'Chile, Estados Unidos, Colombia, México, Perú',
-    })
+    Object.assign(extraDefaults, SERVICE_DEFAULTS[key], { schema_audience: 'Equipos de marketing', schema_area_served: 'Chile, Estados Unidos, Colombia, México, Perú' })
   }
 
   const definition = {
     schema: 'creativaModule.v1', module: key, title, scheme,
     fields: [...compiled.fields, ...extra], defaults: { ...compiled.defaults, ...extraDefaults },
-    repeaters, ...(structuredData ? { structuredData } : {}), sourceSha256,
+    repeaters, ...(structuredData ? { structuredData } : {}), sourceSha256: landing.sha,
   }
 
   emit('includes/creativa/templates/' + key + '.html', compiled.template)
@@ -404,7 +474,7 @@ for (const [key, title, scheme] of MODULES) {
 
 /* ---------- 3. Scoped stylesheet ---------- */
 
-const css = source.match(/<style>([\s\S]*?)<\/style>/)[1] + '\n' + fs.readFileSync(path.join(__dirname, 'creativa-source/host.css'), 'utf8')
+const css = source.match(/<style>([\s\S]*?)<\/style>/)[1] + '\n/* Agencia Creativa v2: lienzo + motor (v2) restyled to La órbita, and escala components */\n' + escalaCss + '\n' + fs.readFileSync(path.join(__dirname, 'creativa-source/host.css'), 'utf8')
 const ast = postcss.parse(css)
 
 ast.walkRules(rule => {
@@ -419,4 +489,4 @@ emit('assets/css/creativa-landing.css', '/* Generated by greenhouse-eo scripts/p
 
 const usedAssets = [...new Set(written.filter(f => f.startsWith('includes/creativa')).flatMap(f => [...fs.readFileSync(path.join(plugin, f), 'utf8').matchAll(/@creativa\/([\w.-]+)/g)].map(m => m[1])))]
 fs.writeFileSync(path.join(__dirname, 'creativa-source/used-assets.json'), JSON.stringify(usedAssets.sort(), null, 2) + '\n')
-console.log(JSON.stringify({ files: written.length, modules: MODULES.length, assets: usedAssets.length, sourceSha256 }, null, 2))
+console.log(JSON.stringify({ files: written.length, modules: LANDINGS.reduce((n, l) => n + l.modules.length, 0), assets: usedAssets.length, sourceSha256 }, null, 2))

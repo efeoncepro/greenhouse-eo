@@ -7,7 +7,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'creativa-elementor-release.v1' ) { WP_
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root = WP_PLUGIN_DIR . '/eo-elementor-widgets/';
-$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-creativa-landing-(base|widgets)\.php|creativa/schemas/[a-z]+\.json|creativa/templates/[a-z0-9_-]+\.html)|assets/(css/creativa-landing\.css|js/creativa-landing\.js|img/creativa/[a-z0-9-]+\.(webp|mp4|svg)))$#';
+$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-creativa-landing-(base|widgets)\.php|creativa/schemas/[a-z]+(-[a-z]+)*\.json|creativa/templates/[a-z0-9_-]+\.html)|assets/(css/creativa-landing\.css|js/creativa-landing\.js|img/creativa/[a-z0-9-]+\.(webp|mp4|svg)))$#';
 $files = array();
 foreach ( $manifest['files'] as $entry ) {
 	$path = $entry['path'];
