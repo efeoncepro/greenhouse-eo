@@ -1,5 +1,10 @@
 # Llenar propiedades comerciales de HubSpot
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 Owner: HubSpot / Commercial. Portal de esta guía: **48713323**. Diccionario observado:
 [inventario completo 2026-10-11](../../audits/commercial/hubspot-properties-2026-10-11/README.md),
 [CSV](../../audits/commercial/hubspot-properties-2026-10-11/properties.csv) y cuatro JSON originales.

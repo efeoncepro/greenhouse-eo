@@ -5,6 +5,15 @@ description: Investiga cuentas B2B para Efeonce, identifica compradores y contac
 
 # Prospección B2B Efeonce
 
+## Nombres de negocios y leads Efeonce
+
+Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
+[convención canónica](../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md), aceptada el 15/10/2026:
+Deal = marca/cuenta, país, iniciativa, referencia; Lead = marca/cuenta, país, necesidad, persona,
+separados por ` | `. La marca del alcance precede al holding; conservar Company legal y asociaciones.
+El formato no autoriza altas, calificación ni renombrados masivos. Nuevas altas autorizadas lo adoptan;
+registros existentes sólo cambian nombre dentro del mandato expreso, con antes/después y readback.
+
 Entrega una cuenta con ruta comercial defendible: evidencia, encaje, necesidad o hipótesis, personas,
 acceso y siguiente decisión. Usa el alcance pedido; una cuenta focalizada no exige rastrear todo el mercado.
 Para ABM/ABS, selecciona cuentas por fit y prioriza inversión por problema, acceso, margen y capacidad;

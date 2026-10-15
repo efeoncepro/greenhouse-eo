@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-15 — Convención de negocios y leads adoptada
+
+[Política](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md) aceptada por Julio; skills Codex/Claude,
+manuales y routers enlazados. Nuevas altas autorizadas: marca/cuenta, país, iniciativa/necesidad,
+referencia/persona. Gana66065702426 renombrado y leído live; resto del histórico pendiente de lote,
+sin cambios de schema, automatizaciones ni calificación. [Caso](docs/commercial/tenders/gana-programatica-colombia-1541-2026/README.md).
+
 ## 2026-10-15 — Correos comerciales y seguimiento puntual
 
 Julio aprobó la [estructura en Prospección](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio); referencia y routing espejados Codex/Claude, extensión adaptable por cuenta. Actualización documental local, sin nueva autorización de envío.

@@ -1,5 +1,17 @@
 # Registro operativo general de negocios CRM
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
+## Gana — programática Colombia — alta verificada 15-10-2026
+
+Nombre CRM vigente: **Gana \| CO \| Programática omnicanal \| GRD-1541**; sólo `dealname` normalizado bajo la convención aprobada, con readback del 15/10/2026.
+
+**Marca: Gana**, separada de las demás marcas del holding. [Deal 66065702426](https://app.hubspot.com/contacts/48713323/record/0-3/66065702426?utm_source=codex&utm_medium=ai_agent) creado por instrucción de Julio; [Grupo Reditos 34264439413](https://app.hubspot.com/contacts/48713323/record/0-2/34264439413?utm_source=codex&utm_medium=ai_agent) reutilizada como **Principal**, nota118603990273 asociada. Dos readbacks: default/appointmentscheduled (entrada administrativa, sin reunión/calificación completa), Strategic Bets, newbusiness, Julio75788512. Presupuesto comprador **COP30.000.000/mes**, sin amount ni closedate; duración/IVA pendientes. Cierre20/10: invitación14:00Colombia vs UI18:00sinzona, datetime por conciliar.
+Sin contacto individual identificado en bases/invitación/portal; no altas ni asociaciones de contactos históricos por inferencia. Efeonce presta y factura siempre; proveedores sólo apoyan a Efeonce. Evaluación condicionada, sin GO ni postulación. [Expediente](tenders/gana-programatica-colombia-1541-2026/README.md) y [readbacks/contactos](tenders/gana-programatica-colombia-1541-2026/research/CRM-ALTA-2026-10-15-INTERNO.md). Otros procesos y WIP preservados.
+
 ## Socopur — Agencia Digital 2027 — 10-10-2026
 
 [Deal 65871170058](https://app.hubspot.com/contacts/48713323/record/0-3/65871170058?utm_source=codex&utm_medium=ai_agent) creado por instrucción expresa de Julio, tras deduplicación por nombre y asociaciones. Dos lecturas: `default/qualifiedtobuy`, `Strategic Bets`, `newbusiness`, owner `75788512`, sin amount. **Cierre previsto actualizado por Julio: 13-11-2026**, final de la ventana de selección/comunicación 9–13/11; no adjudicación confirmada. USD es moneda predeterminada CRM, no negociación confirmada. Company `59118554799` Primary, Contact `254187252267` y Note `118330098975` asociados y releídos.

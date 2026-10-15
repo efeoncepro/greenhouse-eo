@@ -1,5 +1,10 @@
 # Prospección B2B Efeonce
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 Método compartido para transformar una cuenta, señal o lista focalizada en una ruta comercial sustentada.
 Se opera con [efeonce-b2b-prospecting](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md).
 [Decisión técnica](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md) y

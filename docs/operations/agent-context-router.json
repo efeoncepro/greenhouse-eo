@@ -697,7 +697,8 @@
         "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md",
         "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md",
         "docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md",
-        "docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md"
+        "docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md",
+        "docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md"
       ]
     },
     {

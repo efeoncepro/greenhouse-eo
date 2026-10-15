@@ -1,0 +1,18 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "gana-programatica-colombia-1541-2026",
+  "workspacePath": "docs/commercial/tenders/gana-programatica-colombia-1541-2026",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Caso de intake. Sin Proposal registrada, deck, cotizacion ni entregables."
+  ]
+}

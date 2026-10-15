@@ -1,5 +1,17 @@
 # Registro operativo CRM de licitaciones
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
+## Gana — programática Colombia — alta verificada 15-10-2026
+
+Nombre CRM vigente: **Gana \| CO \| Programática omnicanal \| GRD-1541**; sólo `dealname` normalizado bajo la convención aprobada, con readback del 15/10/2026.
+
+**Marca: Gana**, separada de las demás marcas del holding. [Deal 66065702426](https://app.hubspot.com/contacts/48713323/record/0-3/66065702426?utm_source=codex&utm_medium=ai_agent) creado por instrucción de Julio; [Grupo Reditos 34264439413](https://app.hubspot.com/contacts/48713323/record/0-2/34264439413?utm_source=codex&utm_medium=ai_agent) reutilizada como **Principal**, nota118603990273 asociada. Dos readbacks: default/appointmentscheduled (entrada administrativa, sin reunión/calificación completa), Strategic Bets, newbusiness, Julio75788512. Presupuesto comprador **COP30.000.000/mes**, sin amount ni closedate; duración/IVA pendientes. Cierre20/10: invitación14:00Colombia vs UI18:00sinzona, datetime por conciliar.
+Sin contacto individual identificado en bases/invitación/portal; no altas ni asociaciones de contactos históricos por inferencia. Efeonce presta y factura siempre; proveedores sólo apoyan a Efeonce. Evaluación condicionada, sin GO ni postulación. [Expediente](gana-programatica-colombia-1541-2026/README.md) y [readbacks/contactos](gana-programatica-colombia-1541-2026/research/CRM-ALTA-2026-10-15-INTERNO.md). Otros procesos y WIP preservados.
+
 ## INAPI y SERNATUR Arica — alta completa de radar 10/10/2026
 
 **Decisión posterior de Julio:** Arica1330-22-COT26 descartada. Lead595750420295 Disqualified/NO_INTEREST, nota118333867172 ampliada y tarea Cancelada, con readback. [Decisión y evidencia](../follow-up-agent/runs/2026-10-10-arica-no-bid.md).

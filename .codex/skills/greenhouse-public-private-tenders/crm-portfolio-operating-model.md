@@ -1,5 +1,10 @@
 # CRM y priorización de cartera de licitaciones
 
+Para nombres de Deal/Lead, aplicar la [convención canónica](../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
+El Deal de licitación usa `Marca o cuenta | País | Iniciativa | ID oficial`; marca demandante y
+Company legal se resuelven por separado. El ID oficial y la llave de idempotencia siguen siendo campos
+propios. No renombrar otros procesos del grupo ni crear un Lead sin su gate por aplicar el formato.
+
 Usa este companion para promover oportunidades públicas o privadas a HubSpot y para ordenar una cartera completa.
 No reemplaza las bases, el portal de compras, HubSpot ni la decisión humana bid/no-bid.
 

@@ -1,5 +1,10 @@
 # Operar prospección B2B con agentes
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 Canon: [skill](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md),
 [decisión](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md) y
 [funcionamiento](../../documentation/comercial/prospeccion-b2b.md).

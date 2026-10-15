@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "portal_id": 48713323,
+  "object_type": "DEAL",
+  "object_id": 66065702426,
+  "url": "https://app.hubspot.com/contacts/48713323/record/0-3/66065702426?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch",
+  "authorization": "Julio aprobó la convención y pidió documentarla y adoptarla el 15/10/2026; aplicación acotada al negocio Gana de este caso.",
+  "policy": "docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md",
+  "mutation": {
+    "field": "dealname",
+    "before": "Gana — Publicidad programática omnicanal Colombia — GRD-1541",
+    "after": "Gana | CO | Programática omnicanal | GRD-1541",
+    "hubspot_updated_at": "2026-10-15T12:41:20.299Z"
+  },
+  "readbacks": [
+    {
+      "phase": "immediate",
+      "properties": {
+        "dealname": "Gana | CO | Programática omnicanal | GRD-1541",
+        "pipeline": "default",
+        "dealstage": "appointmentscheduled",
+        "hubspot_owner_id": "75788512"
+      },
+      "updated_at": "2026-10-15T12:41:20.299Z"
+    },
+    {
+      "phase": "after_documentation_work",
+      "properties": {
+        "pipeline": "default",
+        "dealname": "Gana | CO | Programática omnicanal | GRD-1541",
+        "deal_currency_code": "COP",
+        "hubspot_owner_id": "75788512",
+        "hs_lastmodifieddate": "2026-10-15T12:41:20.299Z",
+        "pipeline_bucket": "Strategic Bets",
+        "dealstage": "appointmentscheduled",
+        "id_de_licitacion": "GRD-1541",
+        "dealtype": "newbusiness"
+      },
+      "updated_at": "2026-10-15T12:41:20.299Z"
+    }
+  ],
+  "absent_in_final_response": [
+    "amount",
+    "closedate"
+  ],
+  "limits": {
+    "historical_other_records_renamed": false,
+    "leads_created_or_renamed": false,
+    "schema_or_workflow_changed": false,
+    "associations_written": false
+  },
+  "rollback": "Releer el mismo ID y confirmar el mandato antes de restaurar exclusivamente dealname al valor anterior; no revertir otros campos."
+}
