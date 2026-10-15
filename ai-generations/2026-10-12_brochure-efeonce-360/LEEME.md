@@ -49,7 +49,7 @@ el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): �
 | 28 | S25 | 28 · ¿Con quién trabajan? +90 empresas. |
 | 29 | S26 | 29 · ¿Con qué plataformas trabajan? Con las tuyas. |
 | 30 | S31 | 30 · Cinco países, un solo equipo. |
-| 31 | S27 | 31 · Caso Sky. |
+| 31 | S27 | 31 · Caso Sky · ¿Lo han hecho a escala? Sí, con Sky. (avión de Sky, deck de contenidos C12) |
 | 32 | S28 | 32 · Caso Berel. |
 | 33 | N08 | 33 · ¿Cómo empezamos? Contigo. |
 | 34 | S29 | 34 · Compras capacidad, no horas. |
@@ -70,3 +70,4 @@ el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): �
 - Karo aparece en la portada Brand (CR4) y en «Talento adentro» (SA1): dos tomas con la misma persona; el peer creativo pide máximo una de sus tres láminas con Karo (se tomó sólo A19).
 - Portadas Voice (15) y Brand (11): plates aprobados antes de la regla «el acento es puntuación, no luz»; no se regeneraron.
 - Logos de clientes y partners sólo con autorización archivada (TASK-1937). Sprocket 3D de HubSpot: aprobado (canon 2026-10-14).
+- Caso Sky (31): desde el 2026-10-15 es la lámina del deck de contenidos con el avión de Sky (`2026-10-09_deck-contenidos/out/C12-caso-sky/`, decision-case, línea growth, aprobada el 2026-10-10). Su LEEME advierte: el avión es un montaje del PNG oficial de Sky sobre un cielo generado; revisar restricciones de uso de la librea antes de enviarlo a prospectos.
