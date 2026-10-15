@@ -53,7 +53,8 @@
 
 ## Delta 2026-10-15 — brochure «Agencia de Marketing 360°», en curso **[decisiones del operador, 2026-10-12]**
 
-Relatado por la sesión que arma el brochure (canvas «Brochure Efeonce»,
+Relatado por la sesión que arma el brochure (recorrido de 37 láminas, fuentes y pendientes en
+`ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md`; canvas «Brochure Efeonce»,
 [https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3](https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3); PDF v6 en
 OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`; commit `e1a5ba830`). **El brochure no está aprobado
 todavía:** sus pares de voz están vigentes en el canvas, no aprobados uno por uno.
@@ -65,8 +66,10 @@ todavía:** sus pares de voz están vigentes en el canvas, no aprobados uno por 
   `method-hybrid-workforce-scene` y la tabla de portadas de línea de esta norma.
 - **El escenario magenta de Revenue, rechazado como luz.** El operador: «No me gusta esa luz rosada la verdad porque no
   sirve de acento sino de luz». Confirma la regla del 2026-10-06 (el acento es puntuación) para las **láminas
-  diseñadas**, no sólo para la foto. Las tres láminas de Revenue que repetían las del brochure HubSpot no entran al
-  360. El arreglo es la etapa 3 de TASK-2012 (tokens de escenario en AXIS), pendiente del OK del operador.
+  diseñadas**, no sólo para la foto. Las tres láminas de Revenue que repiten las del brochure HubSpot (16, 17 y 18)
+  quedan **rechazadas por el operador y pendientes**: siguen en el canvas y en el PDF v6 mientras él elige entre
+  ejecutar TASK-2012 (etapa 3, tokens de escenario en AXIS), reemplazarlas por las fotos HubSpot con luz azul o
+  quitarlas.
 - **Acento por tramo en un brochure de varias líneas.** El operador pidió «una portada para cada línea de negocio
   cinematográfica y con alto impacto». En un brochure que recorre varias líneas, **cada tramo abre con la portada de su
   línea y su propio acento**; el resto del documento va en Growth, con el fondo `#001a33` en todas. Es la forma
