@@ -561,7 +561,12 @@ markup. Map each control to an existing type/presentation — chips/cards → `t
 query), so the host card's width/padding decides. Measure width, radio groups and icons live before
 closing; only true gaps (pill-chip look, AXIS checkbox styling, other custom listboxes) become a renderer
 extension, flagged to the operator before publishing. Creativa's v1 used `select` and no icons by
-configuration, not by renderer limit. Host checklist: `efeonce-public-site-wordpress`
+configuration, not by renderer limit. **Verify in the renderer that is LIVE, not only in source:** until
+`ab622e958` (2026-10-15), `type: 'radio'` rendered as cards only under `hubspot_pillar` and fell through to an
+empty text input in every other style, and label icons were text glyphs that Ohio's `[data-icon]` CSS turned into
+words. Preview a contract change on the real host by intercepting the contract (and, for a renderer change, the
+bundle) in a test browser before publishing a version. The renderer only reaches production with a Greenhouse
+release until TASK-2038 moves it to AXIS. Host checklist: `efeonce-public-site-wordpress`
 `references/growth-forms-wordpress.md` §Canvas-designed forms.
 
 Catalog selector needs `GREENHOUSE_GROWTH_CATALOG_SURFACE_ID` + `GREENHOUSE_GROWTH_CATALOG_EMBED_KEY`

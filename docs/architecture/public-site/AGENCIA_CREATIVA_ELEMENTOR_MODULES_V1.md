@@ -268,3 +268,19 @@ chrome global sin cambios.
   ambas páginas a 1440, 1100 y 390 (`scrollWidth = clientWidth`).
 - **Pendiente fuera de este módulo:** el renderer de Growth Forms usa la URL de privacidad como texto del enlace
   (`renderer.ts`, bloque de consentimiento); se corrige en el renderer, para todos los formularios.
+
+## Delta 2026-10-15 — Formulario del diagnóstico en dos pasos (aprobado; publicación en espera del renderer)
+
+- **Diseño aprobado por el operador:** canvas «Formulario.dc.html» del artifact de la landing. Paso 1 «Tu operación»
+  con opciones visibles (qué te frena en tarjetas; equipo y plazo en píldoras); paso 2 «Tus datos» con íconos; botón
+  naranja a todo el ancho; legal en una línea.
+- **Bloqueo encontrado:** el renderer sólo dibujaba `radio` como tarjetas con `hubspot_pillar`; con
+  `diagnostic_premium` salía una caja de texto vacía. Arreglo en Greenhouse `ab622e958` (también enlace de privacidad
+  legible e íconos SVG de etiqueta). Llega con la próxima publicación de Greenhouse a producción.
+- **Ya publicado (módulo `diagnostico`, compatible hacia adelante):** botón naranja a todo el ancho y legal reordenado
+  en la versión actual; las reglas de tarjetas/píldoras y el resumen oculto se activan solos con la versión nueva.
+  Backup del plugin `/tmp/eo-creativa-widgets-before-20261015-221410.tar`.
+- **Publicación pendiente:** `scripts/growth/activate-creative-diagnostic-two-step.ts --apply` (clona la versión
+  `fver-79bbb3b4…`, se niega si el renderer de producción no trae `ab622e958`), luego revincular la política
+  publicitaria con `pnpm --silent growth:measurement` y verificar en vivo las dos landings.
+- **Dirección acordada:** el renderer pasa a AXIS y se publica por el carril de EPIC-035 ([TASK-2038](../../tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md)).
