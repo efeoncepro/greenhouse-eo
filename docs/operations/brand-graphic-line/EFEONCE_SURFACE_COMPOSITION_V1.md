@@ -74,6 +74,10 @@ todavía:** sus pares de voz están vigentes en el canvas, no aprobados uno por 
   cinematográfica y con alto impacto». En un brochure que recorre varias líneas, **cada tramo abre con la portada de su
   línea y su propio acento**; el resto del documento va en Growth, con el fondo `#001a33` en todas. Es la forma
   aprobada de mezclar líneas en una pieza: el acento cambia por tramo, nunca dentro de una lámina.
+- **v7 (2026-10-15), 39 láminas.** El operador: «ok sumalo», sobre incorporar láminas de los decks de línea. Entran
+  láminas del deck SEO/AEO, de HubSpot (las de luz azul) y de Agencia Creativa; las que vienen de otra línea se
+  recomponen en el acento del tramo donde quedan. Revenue conserva una sola lámina magenta («El que encaje»), pendiente
+  de TASK-2012. Recorrido en el `LEEME.md` del brochure.
 - **Pendientes del operador para el 360:** TASK-2012; Zoho en «El que encaje»; readback de insignias para «Partner
   oficial de»; «+85 expertos» sin fuente; las portadas Voice y Brand con el acento como luz (plates anteriores a la
   regla, sin regenerar).
