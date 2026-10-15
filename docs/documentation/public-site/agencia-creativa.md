@@ -1,7 +1,7 @@
 # Landing Agencia Creativa — Módulos editables en Elementor
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-15 por Claude
 > **Ultima actualizacion:** 2026-10-15 por Claude
 > **Documentacion tecnica:** [AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md](../../architecture/public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md)
@@ -65,10 +65,26 @@ campos, el consentimiento y el envío los pone Greenhouse; la página sólo dibu
 (título, badge de 45 minutos y línea de confianza). Si el navegador no carga JavaScript o el formulario no
 está disponible, se muestra un texto alternativo en lugar de una caja vacía.
 
-Hoy el formulario se ve en una sola columna, con listas desplegables donde el diseño aprobado mostraba
-opciones visibles, sin iconos en las etiquetas y con el enlace de privacidad como dirección completa. La
-mayor parte se arregla con configuración (publicar una versión nueva del formulario y ajustar la tarjeta);
-algunos detalles visuales requieren mejoras del motor de formularios.
+En pantallas anchas (desde 1200 px) la sección pone el plan a la izquierda y el formulario a la derecha, con
+más espacio para el formulario: sus campos se acomodan en dos columnas y el plan queda fijo a su lado mientras
+la persona baja. En pantallas más angostas ambas partes se apilan y el formulario usa todo el ancho. Como el
+módulo Diagnóstico es compartido, esto rige en las dos landings.
+
+El operador aprobó un diseño nuevo del formulario en dos pasos: primero «Tu operación» (qué te frena hoy, en
+tarjetas; tamaño del equipo y plazo, en píldoras) y luego «Tus datos», con íconos en las etiquetas, el botón
+naranja a todo el ancho y el texto legal en una línea.
+
+| | Lo que ve hoy la persona | Lo que verá cuando se publique la versión en dos pasos |
+| --- | --- | --- |
+| Pasos | Un solo paso con todos los campos | Dos pasos: «Tu operación» y «Tus datos» |
+| Preguntas de operación | Listas desplegables | Tarjetas (qué te frena) y píldoras (equipo y plazo) |
+| Botón | Naranja, a todo el ancho | Igual |
+| Legal | Casilla, aviso y enlace de privacidad, en ese orden | Igual, con el enlace como texto «Política de privacidad» |
+| Enlace de privacidad | Se muestra como dirección completa | Texto legible |
+
+La publicación de la versión en dos pasos espera una mejora del motor de formularios de Greenhouse que llega
+con su próxima publicación a producción; sin ella, las tarjetas se verían como cajas vacías. Los estilos de la
+tarjeta ya están listos y se activan solos cuando la versión nueva salga.
 
 > Detalle técnico: [contrato runtime del formulario](../../architecture/growth-public-forms-runtime-contract.md#diagnóstico-creativo-agencia-creativa).
 
@@ -76,12 +92,15 @@ algunos detalles visuales requieren mejoras del motor de formularios.
 
 - **Primer envío real:** falta que una persona envíe el formulario desde un navegador para confirmar que
   el lead llega a HubSpot (la verificación anti-bots impide hacerlo con automatización).
-- **Fidelidad del formulario:** versión nueva con opciones visibles e iconos, y tarjeta con espacio para
-  dos columnas; luego, mejoras del motor para el estilo exacto de chips y del checkbox.
+- **Formulario en dos pasos:** publicar la versión aprobada cuando la mejora del motor de formularios llegue
+  a producción, volver a conectar la medición publicitaria a esa versión y revisar las dos landings en vivo.
+  Más adelante, el motor de formularios pasa al sistema de diseño AXIS
+  ([TASK-2038](../../tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md)).
 - **Validación de contenido por el operador:** la cifra de Sky (94 % en la página; el caso publicado dice
   88 %), los permisos para mostrar trabajos de clientes (Sky, Berel, GORE, Bresler, Eusari, Marca Chile,
   Pabellón) y la imagen y videos del avión Sky, y frases de preguntas y cierre como «nada más que firmar»,
   «aunque no trabajemos juntos» y «Sin compromiso».
-- **SEO:** el título y la descripción de Yoast siguen siendo los anteriores («Agencia Creativa en LATAM»,
-  «más de 120 marcas»), a la espera de decisión.
+- **SEO:** título, descripción y vistas para redes de Yoast se actualizaron el 2026-10-15 («Agencia creativa
+  que escala tu equipo de marketing | Efeonce»); falta revisar los datos estructurados en Rich Results y Search
+  Console.
 - **Prueba de edición en Elementor:** falta comprobar guardar y recargar desde la interfaz del editor.

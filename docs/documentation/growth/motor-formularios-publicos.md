@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.0
+> **Version:** 2.1
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-14 por Codex (TASK-2036/2037 — políticas y operación por agentes)
+> **Ultima actualizacion:** 2026-10-15 por Claude (opciones visibles en cualquier estilo, enlace de privacidad legible, íconos de etiqueta; TASK-2038)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -165,6 +165,19 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
   encima de las filas siguientes del grid; las opciones selected/hover mantienen texto oscuro
   legible. Si un host como Ohio vuelve a enterrar un dropdown, se corrige en
   `src/growth-forms-renderer/**` o en la capa compartida de host, no con CSS de una landing.
+- **Opciones visibles como tarjetas, en cualquier estilo (2026-10-15):** una pregunta de opción única
+  puede mostrarse como desplegable o como tarjetas visibles que la persona toca de una vez. Las tarjetas
+  ya funcionan en todos los estilos del formulario (antes sólo en uno; en el estilo premium salía una
+  caja de texto vacía). Ocupan el ancho completo y se acomodan en dos columnas cuando hay espacio.
+  Cambiar de desplegable a tarjetas no cambia lo que llega a HubSpot ni a la medición.
+- **Enlace de privacidad legible:** el aviso de consentimiento muestra «Política de privacidad» (o
+  «Privacy policy» en inglés) en vez de la dirección web completa.
+- **Íconos de etiqueta limpios en WordPress:** los íconos junto a cada etiqueta (correo, teléfono,
+  empresa…) son dibujos, no letras; así el tema del sitio ya no los convierte en palabras sueltas.
+- **Cuándo se ven estos cambios en los sitios:** el renderer llega a WordPress y Astro sólo con una
+  publicación de producción de Greenhouse. Estos tres ajustes están listos pero esperan esa publicación.
+  Para que en el futuro un cambio visual salga sin esperar a Greenhouse, el renderer se mudará al
+  sistema de diseño AXIS (`TASK-2038`).
 
 ## Cockpit operativo — TASK-1232
 

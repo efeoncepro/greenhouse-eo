@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.8 — 2026-10-15 (Claude, override de tokens con variante de estilo en Agencia Creativa)
+> **Version:** 1.9 — 2026-10-15 (Claude, opciones visibles, íconos de etiqueta, cuándo llega un cambio del renderer y previsualización por intercepción)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -112,6 +112,25 @@ Esta capa existe para que Ohio no vuelva a imponer estilos globales de
 `input/select/button` sobre el renderer. No mueve logica a WordPress: no define campos,
 validacion, destinos, mapping HubSpot, Turnstile ni microcopy contractual. El renderer y
 el render contract siguen siendo la fuente de verdad.
+
+**Íconos de etiqueta y Ohio.** El CSS global de Ohio inyecta texto en cualquier `[data-icon]`. Por eso
+el renderer dibuja los íconos de etiqueta como SVG sin ese atributo (commit `ab622e958`, pendiente de
+release). Si en una landing ves palabras sueltas junto a una etiqueta («user ID»), revisa qué bundle
+se está sirviendo antes de tocar CSS de la página.
+
+### Cuándo llega a los sitios un cambio del renderer
+
+El bundle `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` se construye en el
+`prebuild` de Greenhouse. Un cambio en `src/growth-forms-renderer/**` llega a WordPress y Astro **sólo
+con el próximo release de producción de Greenhouse**, aunque ya esté en `develop` (hasta que
+`TASK-2038` mueva el renderer a AXIS). Antes de prometer un ajuste visual en una landing, confirma que
+el bundle servido lo trae (busca en él una clase o texto propio del cambio).
+
+Para ver el resultado en la landing real antes de ese release, o antes de publicar una versión nueva
+del formulario, usa la previsualización por intercepción: un navegador Playwright que responde
+`GET /api/public/growth/forms/<formKey>` con el contrato modificado y, si cambió el renderer,
+`renderer-latest.js` con el build local de `pnpm renderer:build`. Pasos en
+[Operar el motor de formularios](operar-motor-formularios.md#cambiar-el-diseño-de-un-formulario-publicado-opciones-visibles-pasos-íconos).
 
 ### Aplicar Editorial Premium Brief
 
@@ -317,6 +336,9 @@ El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
   (asi todos los sitios quedan en la misma version).
 - **No** arregles dropdowns premium con `z-index` local de una landing: el overlay/listbox vive en
   el renderer y debe quedar reusable para todos los hosts.
+- **No** construyas tarjetas de opciones en el host ni conviertas un `select` en botones con JS de la
+  landing: declara el campo como `radio` en una versión nueva del formulario y el renderer lo dibuja
+  como tarjetas en cualquier estilo.
 - **No** restaures el bridge AEO `/aeo-2/` salvo rollback explicito del operador usando
   el backup documentado. Cualquier cambio futuro sobre AEO exige backup Elementor,
   protección del hero y `pnpm public-website:verify-aeo-live-contract`.

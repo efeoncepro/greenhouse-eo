@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.9 — 2026-10-14 (Codex, configuración por políticas y agentes)
+> **Version:** 1.10 — 2026-10-15 (Claude, opciones visibles, previsualización por intercepción y revinculación de medición)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -161,6 +161,46 @@ muestra slug/form_id/surface antes de mutar, preserva fields/validación/Turnsti
 dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-contract.ts` —
 `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
 (dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
+
+## Cambiar el diseño de un formulario publicado (opciones visibles, pasos, íconos)
+
+Un cambio de campos, tipos, pasos o íconos es una **versión nueva** del formulario: se clona la versión
+publicada, se cambia lo necesario y se publica con un script dry-run por defecto (`--apply` para publicar),
+igual que el copy. Caso de referencia: `scripts/growth/activate-creative-diagnostic-two-step.ts`.
+
+**`radio` o `select`.**
+
+- Usa `radio` cuando la pregunta tiene pocas opciones (hasta ~6) y conviene que la persona las vea todas
+  sin abrir nada: freno principal, tamaño de equipo, plazo. Se dibuja como tarjetas, a ancho completo y en
+  dos columnas cuando el formulario mide 520 px o más.
+- Usa `select` para listas largas o de referencia (país, rango, industria) o cuando el espacio es escaso.
+- Pasar de `select` a `radio` conserva los `value` de las opciones: HubSpot y la medición reciben lo mismo.
+  No cambies los valores al cambiar el tipo.
+
+**El renderer y los hosts.** Los cambios del renderer (`src/growth-forms-renderer/**`) llegan a WordPress
+y Astro **sólo con un release de producción de Greenhouse**, porque `renderer-latest.js` se construye en
+su `prebuild` (hasta que `TASK-2038` lo mueva a AXIS). Si la versión nueva depende de un cambio del
+renderer que todavía no está en producción, no la publiques: el script del caso de referencia lo
+comprueba buscando un marcador CSS en el bundle servido y se niega a aplicar.
+
+**Previsualizar en el host real sin tocar producción.** Antes de publicar una versión, mira cómo se vería
+en la landing real con un navegador de prueba Playwright que intercepta dos respuestas:
+
+1. `GET https://greenhouse.efeoncepro.com/api/public/growth/forms/<formKey>` → responde con el contrato
+   de render modificado (el que publicarías).
+2. Sólo si cambiaste el renderer: `**/growth-forms/renderer-latest.js` → responde con tu build local
+   (`pnpm renderer:build` deja `public/growth-forms/renderer-latest.js`).
+
+Abre la landing pública en ese navegador, revisa desktop y 390 px, y completa los campos sin enviar
+(bloquea también `**/submit`). Nada se publica ni llega a HubSpot. Ejemplos de `page.route` en
+`scripts/public-website/verify-contacto-country-select-preview.ts`. Así se detectó el 2026-10-15 que
+`radio` salía como caja de texto vacía en `diagnostic_premium` antes de publicar la versión.
+
+**Después de publicar, revincula la medición.** La política de medición publicitaria está atada al
+`form_version_id` exacto (`sourceVersion`); con una versión nueva, la política vieja deja de aplicar.
+Revincúlala con `pnpm --silent growth:measurement` siguiendo
+[Configurar medición de conversiones](configurar-medicion-conversiones.md) y verifica en vivo cada
+landing que incrusta el formulario.
 
 ## Activar variante premium del brief de Influencer
 

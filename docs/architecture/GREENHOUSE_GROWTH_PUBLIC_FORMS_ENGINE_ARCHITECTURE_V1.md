@@ -9,6 +9,31 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-growth-public-forms.v1` (planned)
 
+## Delta 2026-10-15 — renderer: `radio` como tarjetas en toda variante, enlace de privacidad legible e íconos SVG de etiqueta (§19)
+
+Commit `ab622e958` en `src/growth-forms-renderer/**` (tests 83/83 del renderer y 167/167 del dominio forms):
+
+- **`type: 'radio'` se dibuja siempre como radiogroup nativo de tarjetas** (`ghf-choice-group ghf-choice-group--cards`,
+  fila completa, dos columnas desde `@container (min-width: 520px)`), en cualquier `styleVariant`. Antes sólo
+  `hubspot_pillar` lo hacía; en `diagnostic_premium` y el resto caía a un input de texto vacío. Los estilos base viven
+  tokenizados (`--ghf-*`) en `styles.ts` bajo `.ghf-root:not([data-ghf-style-variant="hubspot_pillar"])`, así que pillar
+  conserva sus chips/tarjetas propias para `select`/`multiselect`. Prueba: `__tests__/choice-cards.test.ts`.
+- **El enlace de privacidad del consentimiento muestra un texto legible** (`privacyLinkLabel` en `copy.ts`:
+  «Política de privacidad» / «Privacy policy», según locale); la URL queda sólo en `href`. Antes el texto visible era la URL.
+- **Los íconos de etiqueta (`presentation.icon`) son SVG inline sin `data-icon`**, salvo `linkedin` (conserva su glifo
+  `in`). Los glifos de texto (`@`, `+`, `·`…) se convertían en palabras como «user ID» en WordPress porque el CSS de Ohio
+  inyecta texto en `[data-icon]`. Generaliza el arreglo previo de `globe`. Los íconos de control conservan `data-icon`.
+
+**Estado de rollout:** code complete en `develop`, **pendiente de un release de producción de Greenhouse**:
+`public/growth-forms/renderer-latest.js` se construye en el `prebuild` de Greenhouse, así que ningún host lo recibe antes.
+Lo espera la versión en dos pasos del diagnóstico de Agencia Creativa
+([contrato runtime](growth-public-forms-runtime-contract.md#diagnóstico-creativo-agencia-creativa)).
+
+**Dirección:** el acoplamiento renderer↔release de Greenhouse es el motivo de `TASK-2038` (hija de EPIC-035,
+decisión del operador 2026-10-15): fuente y build del renderer pasan a AXIS y se publican por el delivery plane de
+EPIC-035; Greenhouse conserva contrato de render, API pública, validación de servidor, autoridad de consentimiento,
+destinos y medición. Su Slice 1 enmienda `GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md`.
+
 ## Presentación Content Marketing — 2026-08-31
 
 La variante `content_marketing` conserva la composición `multi_step_light` y agrega encabezado,

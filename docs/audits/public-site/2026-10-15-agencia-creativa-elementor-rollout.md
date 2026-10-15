@@ -70,6 +70,9 @@ página a medio escribir; el preflight debe ocurrir antes de cualquier escritura
   Brechas reales del renderer: look exacto de chip/pill, checkbox estilo AXIS `axis-choice` y listbox custom
   más allá de `country_select`. Remediación (versión nueva con radio + iconos conservando los valores de
   opción, más ajuste de la tarjeta host) **no ejecutada**.
+  *Corrección 2026-10-15:* el renderer de producción sólo dibujaba `radio` como tarjetas con `hubspot_pillar`
+  (con `diagnostic_premium` salía una caja vacía). Los íconos de etiqueta salían como texto en WordPress y la URL
+  cruda la pintaba el renderer. Arreglado en Greenhouse `ab622e958`, pendiente de release; ver los deltas finales.
 - **Contenido sin validar por el operador:** cifra Sky 94 % (el caso publicado dice 88 %; la nota al pie
   cita «caso publicado de Sky Airline, métricas de entrega de 12 meses»); permisos de uso de trabajo de
   Sky, Berel, GORE, Bresler, Eusari, Marca Chile y Pabellón y de la imagen/videos del avión Sky; claims
@@ -122,3 +125,47 @@ página a medio escribir; el preflight debe ocurrir antes de cualquier escritura
   registrado.
 - **Pendiente:** el cargador `class-eo-widgets-loader.php` está desplegado con las 24 clases, pero no está commiteado en el
   repo runtime porque el archivo contiene WIP de otras sesiones; quien commitee ese archivo debe conservar la entrada creativa.
+
+## Delta 2026-10-15 — Diagnóstico: formulario en dos columnas y estilos del formulario en dos pasos
+
+Aplica al módulo compartido `diagnostico`, así que cubre `/agencia-creativa/` (`249582`) y `/agencia-creativa-v2/`
+(`251279`). Ambos cambios son CSS de host (`creativa-source/host.css`, compilado a
+`eo-elementor-widgets/assets/css/creativa-landing.css`); no se tocó el documento Elementor ni la versión del formulario.
+
+**1. Formulario en dos columnas (en vivo).**
+
+- **Problema:** la tarjeta dejaba el `<greenhouse-form>` en 516 px, bajo el umbral de 520 px del contenedor del
+  renderer; los 8 campos quedaban apilados (1.668 px de alto) junto a una columna izquierda vacía de ~1.400 px.
+- **Arreglo:** desde 1200 px la sección es una grilla `.82fr / 1.18fr` con la columna del plan `position: sticky;
+  top: 120px`; bajo 1200 px ambas columnas se apilan y el formulario usa todo el ancho.
+- **Resultado medido:** formulario a 622 px, dos columnas, 1.182 px de alto; sección de 2.190 a 1.704 px.
+- **Verificación:** en vivo en las dos páginas a 1440, 1100 y 390, `scrollWidth = clientWidth` (sin scroll horizontal).
+- **Evidencia:** Greenhouse `c7da93cce`; runtime `d960ab6`; backup del plugin
+  `/tmp/eo-creativa-widgets-before-20261015-192918.tar` (Kinsta, temporal).
+
+**2. Estilos del diseño en dos pasos (en vivo, compatibles hacia adelante).**
+
+- **Diseño:** canvas «Formulario.dc.html» aprobado por el operador (artifact de diseño de la landing). Paso 1 «Tu
+  operación» con opciones visibles; paso 2 «Tus datos» con íconos; acción naranja a todo el ancho; legal en una línea.
+- **Qué ya rige con la versión actual del formulario:** acción naranja a todo el ancho mediante tokens
+  (`--ghf-accent:#ff6500` sobre `.ghf-actions`, sin `!important`) y bloque legal reordenado (checkbox, aviso, enlace
+  de privacidad).
+- **Qué se activa solo al publicar la versión con `radio`:** tarjetas de opción (la seleccionada en navy), píldoras
+  para `[data-ghf-field-key="marketingTeamSize"]` y `[data-ghf-field-key="startTimeline"]`, y resumen de intake oculto.
+- **Verificación:** en vivo en las dos páginas.
+- **Evidencia:** Greenhouse `1f3a16858`; runtime `f850dbe`; backup del plugin
+  `/tmp/eo-creativa-widgets-before-20261015-221410.tar` (Kinsta, temporal).
+
+**3. Publicación de la versión en dos pasos: pendiente.**
+
+- **Bloqueo:** antes del arreglo del renderer de Greenhouse `ab622e958`, un `radio` fuera del estilo `hubspot_pillar`
+  se dibujaba como una caja de texto vacía. Ese commit también cambia el enlace de privacidad por un texto legible
+  (hoy se sigue viendo la URL completa) y pasa los íconos de etiqueta a SVG. Llega con la próxima publicación de
+  Greenhouse a producción.
+- **Activación:** `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-creative-diagnostic-two-step.ts`
+  (dry-run) y luego `--apply`. Clona la versión publicada `fver-79bbb3b4…` y se niega a publicar si el renderer de
+  producción no trae `ab622e958`.
+- **Después de publicar:** revincular la política de medición publicitaria a la versión nueva con
+  `pnpm --silent growth:measurement` y verificar en vivo las dos landings.
+- **Dirección:** el renderer de Growth Forms pasa a AXIS y se publica por el carril de entrega de EPIC-035
+  ([TASK-2038](../../tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md)).

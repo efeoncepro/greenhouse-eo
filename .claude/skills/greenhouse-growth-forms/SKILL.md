@@ -213,7 +213,14 @@ inline field errors (`role="alert"`, `aria-invalid`, `aria-describedby`), deboun
 typo-suggest with honest degradation, submit pending + anti-double-submit, success inline/redirect,
 **sanitized** server errors (never raw `reason`), honest empty/error states (`Formulario no
 disponible` / `No pudimos cargar… Reintentar`), invisible Turnstile (1px, no layout shift),
-reduced-motion, telemetry with a hard allowlist (no field values).
+reduced-motion, telemetry with a hard allowlist (no field values). Since `ab622e958` (2026-10-15,
+code complete, not yet in production): `type: 'radio'` = native radiogroup of cards in **every**
+`styleVariant` (full row, 2 columns from a 520 px container; pillar keeps its own chips); the consent
+privacy link text is the locale copy `privacyLinkLabel` (URL only in `href`); label icons are inline SVG
+without `data-icon` (except `linkedin`, glyph `in`). Contract: `growth-public-forms-runtime-contract.md`
+§«Renderer: opciones visibles…». Source and build live in Greenhouse and ship only with a Greenhouse
+production release (`prebuild` → `renderer:build`) until **TASK-2038** moves them to AXIS (EPIC-035
+delivery plane; Greenhouse keeps contract/API/server validation/consent/destinations/measurement).
 
 **What it does NOT draw** (host markup): the card chrome, any heading (`h1`–`h6`), trust/privacy/
 direct-link, and the **no-JS fallback** (the inner content of `<greenhouse-form>…</greenhouse-form>`
@@ -560,8 +567,10 @@ markup. Map each control to an existing type/presentation — chips/cards → `t
 'country_select'` — with visual parity as acceptance. Two columns need `greenhouse-form` ≥520 px (container
 query), so the host card's width/padding decides. Measure width, radio groups and icons live before
 closing; only true gaps (pill-chip look, AXIS checkbox styling, other custom listboxes) become a renderer
-extension, flagged to the operator before publishing. Creativa's v1 used `select` and no icons by
-configuration, not by renderer limit. **Verify in the renderer that is LIVE, not only in source:** until
+extension, flagged to the operator before publishing. Creativa's v1 used `select` and no icons; switching
+to `radio` needed the renderer fix below (its two-step version waits for that release:
+`scripts/growth/activate-creative-diagnostic-two-step.ts`, then rebind the measurement policy to the new
+`form_version_id` with `pnpm --silent growth:measurement`). **Verify in the renderer that is LIVE, not only in source:** until
 `ab622e958` (2026-10-15), `type: 'radio'` rendered as cards only under `hubspot_pillar` and fell through to an
 empty text input in every other style, and label icons were text glyphs that Ohio's `[data-icon]` CSS turned into
 words. Preview a contract change on the real host by intercepting the contract (and, for a renderer change, the

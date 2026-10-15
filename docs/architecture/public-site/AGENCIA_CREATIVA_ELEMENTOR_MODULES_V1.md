@@ -164,6 +164,13 @@ de opción, el estilo AXIS `axis-choice` del checkbox y un listbox custom más a
 **Remediación pendiente (no ejecutada):** publicar una versión nueva con radio + iconos mediante el
 publisher gobernado, ajustar padding/ancho de la tarjeta host en `host.css` y re-verificar en vivo.
 
+> **Corrección 2026-10-15 (mismo día):** el diagnóstico de arriba sobre-estimó lo que era configuración. En
+> producción el renderer sólo dibujaba `radio` como tarjetas con `hubspot_pillar`; con `diagnostic_premium` salía
+> una caja de texto vacía. Los íconos de etiqueta eran glifos de texto que el CSS `[data-icon]` de Ohio convertía en
+> palabras. La URL cruda la pintaba el renderer, no el copy. Las tres cosas se arreglaron en el renderer (Greenhouse
+> `ab622e958`, pendiente de release). La tarjeta host ya se resolvió (dos columnas, 622 px). El estado vigente está
+> en «Delta 2026-10-15 — Formulario del diagnóstico en dos pasos» al final de este documento.
+
 ## Mutación y rollback
 
 Guardar sólo con `Document::save()` mediante el publisher. Para revertir el rollout:
@@ -208,8 +215,9 @@ chrome global sin cambios.
   claims de FAQ/cierre («nada más que firmar», «aunque no trabajemos juntos», «Sin compromiso»).
 - Decisión sobre Yoast (título y descripción).
 - Commit del registro del loader cuando el WIP ajeno del archivo se resuelva.
-- Brecha de fidelidad del formulario: versión nueva con radio + iconos y ajuste de la tarjeta host
-  (configuración); chip/pill, checkbox AXIS y listbox custom como extensión del renderer.
+- Brecha de fidelidad del formulario: tarjeta host resuelta (dos columnas, 2026-10-15); versión en dos pasos con
+  radio + iconos preparada y a la espera del renderer `ab622e958` en producción (ver delta final). Checkbox AXIS y
+  listbox custom siguen como extensión del renderer (TASK-2038).
 - Prueba de edición + guardado + recarga desde la interfaz Elementor: no ejecutada; las pruebas del
   renderer y del publisher no la sustituyen.
 

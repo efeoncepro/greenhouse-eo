@@ -1,7 +1,7 @@
 # Operar la landing Agencia Creativa
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-15 por Claude
 > **Ultima actualizacion:** 2026-10-15 por Claude
 > **Documentacion tecnica:** [AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md](../../architecture/public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md)
@@ -22,8 +22,10 @@ Para editar el contenido de [`/agencia-creativa/`](https://efeoncepro.com/agenci
   («producción creativa a escala»), con sus módulos `escala-*`. `diagnostico` y `cierre` son compartidos:
   editarlos en Elementor afecta las dos páginas. La v2 se publica con `publish-creative-v2-page.php` y
   `creativa-source/page-custom-v2.css`; antes de republicar, actualiza el hash previo que exige el script.
-- Al verificar, haz scroll real hasta cada sección: Elementor no pinta los fondos de un contenedor hasta que
-  entra en pantalla, así que una captura de página completa hecha deprisa muestra velos y pantallas vacías.
+- Al verificar, haz scroll real hasta cada sección: con «lazy load background images», Elementor fuerza
+  `background-image:none !important` en todo contenedor que todavía no tiene la clase `e-lazyloaded`, así que
+  una captura de página completa hecha deprisa muestra velos y pantallas vacías. No es un fallo: baja hasta la
+  sección, espera a que cargue y recién ahí mide o captura.
 
 ## Editar textos, imágenes y colecciones en Elementor
 
@@ -44,7 +46,8 @@ comportamiento raro al guardar, detente y escala antes de reintentar.
 El diseño vive en la fuente aprobada `scripts/public-website/creativa-source/Main.dc.html` y en el plugin.
 Un cambio de diseño se hace así:
 
-1. Edita la fuente (y `host.css` o `page-custom.css` si corresponde).
+1. Edita la fuente (y `host.css` o `page-custom.css` si corresponde). Las reglas de `host.css` para
+   `diagnostico` y `cierre` se aplican en las dos landings: después de desplegar, verifica `249582` y `251279`.
 2. Recompila con `node scripts/public-website/compile-creativa-elementor-source.cjs`; si hay media nueva,
    prepárala con `prepare-creativa-assets.cjs`.
 3. Corre `php tests/creativa-modules.test.php` en el repo runtime.
@@ -74,6 +77,41 @@ Home y v2, reconstruye el indexable Yoast y purga.
 Después verifica: 1440 y 390 px sin overflow (`scrollWidth == clientWidth`), los 15 módulos con media, tabs
 con clic y flechas, formulario visible, reduced motion sin animaciones ni videos, un solo `h1`, y Home/v2/
 header/footer sin cambios.
+
+## Publicar el formulario del diagnóstico en dos pasos
+
+El diseño en dos pasos («Tu operación» → «Tus datos») está aprobado y sus estilos ya están en vivo en el módulo
+`diagnostico`, pero la versión nueva del formulario todavía no se publica: necesita que el renderer de Growth
+Forms con el commit `ab622e958` esté en producción (antes de ese commit, un campo `radio` fuera del estilo
+`hubspot_pillar` se dibuja como una caja de texto vacía).
+
+1. Confirma que la publicación de Greenhouse que trae `ab622e958` ya llegó a producción.
+2. Corre el dry-run desde la raíz de Greenhouse:
+
+   ```bash
+   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-creative-diagnostic-two-step.ts
+   ```
+
+   Revisa que reporte la versión publicada esperada (`fver-79bbb3b4…`) y el renderer de producción listo.
+3. Publica con el mismo comando y `--apply`. El script vuelve a medir sus guardas y **se niega** si la versión
+   publicada cambió o si el renderer de producción no trae el arreglo (`renderer_not_released`). No intentes
+   saltarte esa guarda: publicar antes deja las preguntas del paso 1 como cajas vacías en las dos landings.
+4. Revincula la política de medición publicitaria a la versión nueva (está atada a la versión exacta):
+   `pnpm --silent growth:measurement`, siguiendo el runbook
+   [`10-growth-lead-matching-runtime.md`](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+5. Purga la caché y verifica en vivo `/agencia-creativa/` y `/agencia-creativa-v2/` a 1440 y 390 px: dos
+   pasos, tarjetas en «¿Qué te frena hoy?», píldoras en tamaño del equipo y plazo (la opción elegida en navy),
+   íconos en las etiquetas, botón naranja a todo el ancho, enlace «Política de privacidad» legible y
+   `scrollWidth == clientWidth`. Haz scroll hasta la sección antes de capturar.
+
+## Previsualizar un cambio del formulario antes de publicarlo
+
+Un cambio de contrato o de renderer se puede ver sobre la página real sin tocar producción: en un navegador de
+prueba con Playwright, intercepta la respuesta de la API del contrato del formulario
+(`GET /api/public/growth/forms/{slug}`) y, si hace falta, el bundle del renderer, y sírvelos con la versión que
+quieres probar. Así compruebas el resultado en el host real (ancho de la tarjeta, CSS de Ohio, estilos de
+`host.css`) a 1440 y 390 px antes de prometer el diseño o de publicar. La interceptación sólo afecta a ese
+navegador; no publica nada.
 
 ## Rollback
 
@@ -110,17 +148,18 @@ remotos son temporales.
   [audit](../../audits/public-site/2026-10-15-agencia-creativa-elementor-rollout.md#incidente-del-primer-intento).
 - **La imagen destacada desapareció tras guardar.** Elementor borra `_thumbnail_id` al guardar; restáuralo
   a `249672`.
-- **El botón del formulario sale teal (`#36c8bf`) en vez de azul.** La variante de estilo re-declara los
-  tokens `--ghf-*` en `.ghf-root[data-ghf-style-variant]`. El override debe apuntar a
-  `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`, no sólo a `greenhouse-form`.
-- **El formulario no se parece al diseño (una columna, selects, sin iconos).** Casi todo es configuración:
-  la versión publicada usa `select` en «¿Qué te frena hoy?» y «¿Cuándo quieres partir?» y no declara
-  iconos, aunque el renderer soporta `radio` como tarjetas y `presentation.icon`. Las dos columnas se
-  activan desde 520 px de ancho de contenedor; en vivo el formulario midió 516 px dentro de la tarjeta de
-  588 px con 36 px de padding. Se corrige publicando una versión nueva con el publisher gobernado
-  (manteniendo los mismos valores de opción, por el mapping HubSpot) y ajustando padding/ancho en
-  `host.css`. El look exacto de chips, el checkbox AXIS y un listbox custom sí requieren extender el
-  renderer. Remediación pendiente.
+- **El botón del formulario sale teal (`#36c8bf`) en vez del color del host.** La variante de estilo
+  re-declara los tokens `--ghf-*` en `.ghf-root[data-ghf-style-variant]`. El override debe apuntar a
+  `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`, no sólo a `greenhouse-form`. Para la
+  acción, declara los tokens sobre `.ghf-actions` (hoy `--ghf-accent:#ff6500`, naranja) en vez de pelear con
+  `!important`.
+- **El formulario sale en una sola columna.** Las dos columnas se activan cuando el `<greenhouse-form>` mide
+  520 px o más. Desde el 2026-10-15 el host le da 622 px desde 1200 px de viewport (grilla `.82fr / 1.18fr` con
+  el plan sticky) y lo apila a todo el ancho por debajo. Si vuelve a una columna, mide el ancho del
+  `<greenhouse-form>` en vivo y revisa que no se haya pisado la regla de `diagnostico` en `host.css`.
+- **El formulario todavía tiene listas desplegables y la URL de privacidad completa.** Es la versión vigente:
+  la versión en dos pasos espera el renderer con `ab622e958` en producción (ver
+  [Publicar el formulario del diagnóstico en dos pasos](#publicar-el-formulario-del-diagnóstico-en-dos-pasos)).
 - **El formulario muestra el texto alternativo.** Revisa el `form-key` y la surface: un `form-key` inválido
   degrada al fallback.
 - **La sección se ve corrida 16 px a la izquierda.** Falta o fue pisado el selector de `page-custom.css` que

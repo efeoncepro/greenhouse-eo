@@ -114,15 +114,31 @@ A form drawn in a canvas is a brief for configuring the governed renderer; the h
 Before approving or implementing the canvas, map each canvas control to an existing renderer type or
 `presentation` and configure it in the form version, with visual parity as the acceptance criterion:
 
-- chip/card choices → `type: 'radio'` (renders `ghf-choice-group--cards`), not `select`;
+- chip/card choices → `type: 'radio'` (renders `ghf-choice-group--cards`), not `select`. **Renderer-version
+  dependent:** before Greenhouse `ab622e958`, `radio` outside `hubspot_pillar` rendered as an empty text box.
+  Check which renderer is live in production (`/growth-forms/renderer-latest.js`) and preview by interception
+  (below) before promising cards to the operator;
 - per-label icons → `presentation.icon` (user, mail, phone, link, linkedin, briefcase, calendar, clock,
   message, file, globe);
 - country picker → `presentation.control: 'country_select'`;
 - two columns are adaptive (`@container (min-width: 520px)` on `greenhouse-form`): the host card's width
-  and padding decide it. Creativa measured 516 px inside a 588 px card with 36 px padding → one column;
+  and padding decide it. Creativa measured 516 px inside a 588 px card with 36 px padding → one column, 8
+  fields stacked beside an empty column. Fix in the host layout, not the form: give the form column room
+  (Creativa 2026-10-15: grid `.82fr / 1.18fr` from 1200 px with the companion column `position: sticky`,
+  stacked full-width below → 622 px, two columns);
 - privacy link text is form copy, not host markup.
 
 Measure the `greenhouse-form` width (≥520 px for two columns), radio groups and icons live before closing.
+
+Host theming of the action: declare the tokens on `.ghf-actions` (e.g. `--ghf-accent`, `--ghf-accent-contrast`,
+`--ghf-action-shadow`) inside the host card instead of fighting the variant with `!important`. Host CSS for a
+not-yet-published version can ship ahead if it is forward-compatible (selectors that only match once the new
+field types exist), as Creativa did for its two-step version.
+
+Preview before publishing: a contract or renderer change can be seen on the live host page without touching
+production by intercepting, in a Playwright test browser, the form contract API response (and, if needed, the
+renderer bundle) and serving the candidate version. Use it to validate host width, Ohio CSS and host tokens at
+desktop and 390 before promising a design or running a publish.
 Only true gaps (exact pill-chip look vs choice cards, AXIS checkbox styling, a custom listbox beyond
 `country_select`) become a renderer extension in its own task and renderer release; flag them to the
 operator **before** publishing, not after. Field catalog and versioning: `greenhouse-growth-forms`.

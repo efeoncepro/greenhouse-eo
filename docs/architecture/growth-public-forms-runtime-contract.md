@@ -50,6 +50,45 @@ exacto de chip/pill, checkbox AXIS `axis-choice` y listbox custom más allá de
 `publish-creative-diagnostic-form.ts`, **conservando los mismos valores de opción** (el mapping HubSpot ya
 existe), más ajuste de padding/ancho de la tarjeta host, y re-verificación en vivo.
 
+**Corrección 2026-10-15 al párrafo anterior.** Dos afirmaciones no eran ciertas en el renderer servido:
+`radio` sólo salía como tarjetas bajo `hubspot_pillar` (en `diagnostic_premium` caía a un input de texto
+vacío), y la URL cruda de privacidad la dibujaba el renderer, no el copy del formulario. Ambas las corrige
+el commit `ab622e958` (ver §«Renderer: opciones visibles, enlace de privacidad e íconos de etiqueta»).
+La previsualización por intercepción en el host real (manual
+[operar-motor-formularios.md](../manual-de-uso/growth/operar-motor-formularios.md)) destapó la primera
+antes de publicar una versión.
+
+**Versión en dos pasos preparada (2026-10-15, no publicada).**
+`scripts/growth/activate-creative-diagnostic-two-step.ts` (commit `32395e5fb`; dry-run por defecto,
+`--apply` publica) clona la versión publicada esperada `fver-79bbb3b4-…` conservando destinos,
+seguridad, políticas y copy, y cambia a `composition: multi_step_light` con los pasos `operacion`
+(`mainBlocker`, `marketingTeamSize`, `startTimeline` como `radio`, **mismos valores de opción**) y
+`datos` (`firstName`, `lastName`, `email`, `phone`, `companyName`, `role`, `context`), más íconos de
+etiqueta y placeholders. Rechaza `--apply` si el bundle de producción no trae el marcador CSS
+`.ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice` o si la versión publicada o
+sus campos se movieron. Dry-run del 2026-10-15: `fieldsMatch=true`, `productionRendererReady=false`
+(espera el release de Greenhouse que lleve `ab622e958`). Después de publicar: revincular la política de
+medición (atada al `form_version_id` exacto) con `pnpm --silent growth:measurement` y verificar en vivo
+las dos landings.
+
+## Renderer: opciones visibles, enlace de privacidad e íconos de etiqueta
+
+Contrato del renderer desde el commit `ab622e958` (code complete; llega a los hosts con el próximo
+release de producción de Greenhouse, porque `renderer-latest.js` se construye en su `prebuild`).
+
+- **`type: 'radio'`** = radiogroup nativo de tarjetas (`ghf-choice-group ghf-choice-group--cards`,
+  `label.ghf-choice` con su `input type=radio`) en **cualquier** `styleVariant`. Ocupa la fila completa y
+  pasa a dos columnas con `@container (min-width: 520px)`. Estilos tokenizados `--ghf-*` bajo
+  `.ghf-root:not([data-ghf-style-variant="hubspot_pillar"])`; pillar mantiene sus chips/tarjetas para
+  `select`/`multiselect`. Cambiar `select` → `radio` no cambia los `value`, así que destinos y medición
+  reciben lo mismo; sí exige versión nueva del formulario.
+- **Enlace de privacidad del consentimiento:** el texto visible es copy de sistema `privacyLinkLabel`
+  según locale («Política de privacidad» / «Privacy policy»); `consent.privacyUrl` va sólo en `href`.
+- **Íconos de etiqueta (`presentation.icon`):** SVG inline (`renderIcon`) **sin** atributo `data-icon`,
+  para todos los íconos salvo `linkedin`, que conserva su glifo `in`. El CSS global de Ohio apunta a
+  `[data-icon]` e inyecta texto heredado; con glifos de texto salían palabras como «user ID». Los íconos
+  de control conservan `data-icon`. El host no debe reintroducir íconos por CSS sobre la etiqueta.
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger
