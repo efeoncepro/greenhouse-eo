@@ -7,6 +7,27 @@
 
 Este documento captura contratos runtime vigentes que no deben crecer como deltas dentro del monolito de arquitectura base.
 
+## Diagnóstico creativo (Agencia Creativa)
+
+Alta del 2026-10-15, autorizada por el operador. Registro de identidad; antes de operar, relee el
+contrato público y el ledger.
+
+| Identidad | Valor |
+|---|---|
+| Landing WordPress | `/agencia-creativa/`, página `249582` |
+| Slug / form key | `efeonce-creative-diagnostic` / `e913d958-2ad7-48a5-8015-dbff53eca4a3` |
+| Surface | `fhsf-efeonce-creative-diagnostic` (`https://efeoncepro.com`, `https://www.efeoncepro.com`) |
+| Versión publicada | `fver-79bbb3b4-a66e-4e23-9465-5344e6454b6d` (v2 con destino `direct`; v1 `fver-8f5ef209-c663-4345-ae24-6f7dd7285ebf` deprecada) |
+| Presentación | `styleVariant=diagnostic_premium`, `static`, success card con acción a `/agenda/` |
+| Destino | HubSpot «Lead Gen - Agencia Creativa» por `hubspot-destinations.registry.ts`; properties `gh_form_creative_{rol,freno,tamano_equipo,plazo}` |
+| Medición | Política `485f38e5-76b2-4f9d-b922-44324faaa931` publicada (rev. `cf4ae435-…`), sólo `meta`, mapping email/phone/firstName/lastName |
+
+Authoring: `scripts/growth/publish-creative-diagnostic-form.ts` (dry-run por defecto, `--apply`);
+Turnstile se copia de la versión publicada de `efeonce-seo-diagnostic`. No hay casilla de
+comunicaciones comerciales: el adapter HubSpot envía `communications: []`, así que una casilla
+opcional quedaría guardada sin efecto. Un cambio de campos exige revisar también la política de
+medición, porque cada versión nueva se revalida.
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger

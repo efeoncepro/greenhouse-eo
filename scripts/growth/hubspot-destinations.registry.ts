@@ -224,4 +224,22 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       select('primaryObjective', 'gh_form_social_objetivo', 'Objetivo Principal (Redes Sociales)', 'Objetivo principal que busca con redes sociales.'),
     ],
   },
+  {
+    formKey: 'e913d958-2ad7-48a5-8015-dbff53eca4a3',
+    slug: 'efeonce-creative-diagnostic',
+    pageUrl: 'https://efeoncepro.com/agencia-creativa/',
+    hubspotForm: { name: 'Lead Gen - Agencia Creativa' },
+    fields: [
+      FIRST_NAME,
+      LAST_NAME,
+      EMAIL,
+      PHONE,
+      existing('companyName', 'company', 'Empresa o sitio web'),
+      select('role', 'gh_form_creative_rol', 'Rol (Agencia Creativa)', 'Rol de la persona que pide el diagnóstico creativo.'),
+      select('mainBlocker', 'gh_form_creative_freno', 'Principal Freno (Agencia Creativa)', 'Qué frena hoy al equipo de marketing o marca, según la persona.'),
+      select('marketingTeamSize', 'gh_form_creative_tamano_equipo', 'Tamaño del Equipo de Marketing (Agencia Creativa)', 'Tamaño declarado del equipo de marketing.'),
+      select('startTimeline', 'gh_form_creative_plazo', 'Plazo para Partir (Agencia Creativa)', 'Cuándo quiere partir con el trabajo creativo.'),
+      existing('context', 'message', 'Contexto'),
+    ],
+  },
 ]
