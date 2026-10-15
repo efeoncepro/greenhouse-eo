@@ -63,3 +63,21 @@
 @media (max-width:1199.98px){
 .gh-creativa [data-gh-module="diagnostico"]>div>div{flex-basis:100% !important}
 }
+
+/* Diagnóstico · formulario en dos pasos (canvas «Formulario.dc.html», aprobado 2026-10-15). Cards/pills apply once the
+   form version with radio fields is published (needs the renderer from ab622e958 in production); the orange full-width
+   action, the compact legal block and the hidden intake summary apply to the current version too. */
+.gh-creativa .gh-creativa-form-card greenhouse-form label.ghf-choice:has(input:checked){border-color:#023c70;box-shadow:inset 0 0 0 1px #023c70;background:#eef3f9;color:#023c70}
+.gh-creativa .gh-creativa-form-card greenhouse-form label.ghf-choice:has(input:checked)::before{border-color:#023c70}
+.gh-creativa .gh-creativa-form-card greenhouse-form :is([data-ghf-field-key="marketingTeamSize"],[data-ghf-field-key="startTimeline"]) .ghf-choice-group{display:flex;flex-wrap:wrap;gap:8px}
+.gh-creativa .gh-creativa-form-card greenhouse-form :is([data-ghf-field-key="marketingTeamSize"],[data-ghf-field-key="startTimeline"]) label.ghf-choice{min-height:44px;padding:10px 18px;border-radius:999px;background:#fff}
+.gh-creativa .gh-creativa-form-card greenhouse-form :is([data-ghf-field-key="marketingTeamSize"],[data-ghf-field-key="startTimeline"]) label.ghf-choice::before{display:none}
+.gh-creativa .gh-creativa-form-card greenhouse-form :is([data-ghf-field-key="marketingTeamSize"],[data-ghf-field-key="startTimeline"]) label.ghf-choice:has(input:checked){background:#023c70;color:#fff;box-shadow:none}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-actions{width:100%;flex-wrap:nowrap;--ghf-accent:#ff6500;--ghf-accent-contrast:#ffffff;--ghf-action-shadow:0 12px 28px rgba(255,101,0,.28);--ghf-action-shadow-hover:0 16px 32px rgba(255,101,0,.34)}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-actions .ghf-btn:not(.ghf-btn--ghost){flex:1 1 0;width:auto;max-width:none;min-height:58px;border-radius:14px}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-actions .ghf-btn--ghost{flex:none;min-height:58px;border-radius:14px}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-intake-summary{display:none}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check){display:flex;flex-direction:row;flex-wrap:wrap;column-gap:4px;row-gap:6px}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check) > .ghf-check{order:0;flex:1 1 100%}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check) > .ghf-help{order:1;margin:0;font-size:13px}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check) > .ghf-help:last-child{order:2;padding-left:0}
