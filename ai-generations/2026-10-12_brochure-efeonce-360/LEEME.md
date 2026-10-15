@@ -1,6 +1,6 @@
 # Brochure «Agencia de Marketing 360°» · 2026-10-12 (v8, 2026-10-15)
 
-Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 28). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v8.pdf`
+Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 30). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v8.pdf`
 (copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v8/` (39, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
@@ -20,7 +20,7 @@ el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): �
 | # | Tablero | Título |
 |---|---|---|
 | 01 | Main | 01 · Portada · ¿Qué gano con Efeonce? Crecimiento. |
-| 02 | N01 | 02 · Por qué 360° · ¿Otra agencia más? Un sistema. |
+| 02 | N01 | 02 · Por qué 360° · ¿Cuántas agencias necesito? Una sola. |
 | 03 | N02 | 03 · La idea · ¿Mi cliente se va? Vuelve. |
 | 04 | C01 | 04 · Tramo 01 · Engine · ¿Te encuentra la IA? Ahora sí. |
 | 05 | S03 | 05 · Engine · ¿Y si la IA no me nombra? No estás. |
@@ -73,3 +73,4 @@ el scratchpad, receta `content-bullets`). Salieron del recorrido (parqueadas): �
 - Caso Sky (31): desde el 2026-10-15 es la lámina del deck de contenidos con el avión de Sky (`2026-10-09_deck-contenidos/out/C12-caso-sky/`, decision-case, línea growth, aprobada el 2026-10-10). Su LEEME advierte: el avión es un montaje del PNG oficial de Sky sobre un cielo generado; revisar restricciones de uso de la librea antes de enviarlo a prospectos.
 - Caso Sky (31): aprobada por el operador el 2026-10-15 como la lámina CANÓNICA del caso Sky para todos los decks («Esa es la canónica para los deck»); las versiones del ala por la ventana (SK1) y de la mesa de luz quedan como historia. Registro en la norma a cargo de la sesión de la línea gráfica.
 - 2026-10-15 (tarde): «A tu competencia» y «En ingresos» salen del acto 1 y entran al tramo Engine después de «No estás», recompuestas en línea engine con sus recetas (`decision-ai-answer`, `decision-traffic-to-revenue`); el operador objetó que entraban sin preámbulo.
+- 2026-10-15 (tarde): «¿Otra agencia más? Un sistema.» → «¿Cuántas agencias necesito? Una sola.» y «Un sistema 360°» → «Una agencia 360°» (el operador: «Efeonce un sistema????»); intent `intents/r2/n01-diferencia.json`.
