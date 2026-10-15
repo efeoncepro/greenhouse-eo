@@ -2,10 +2,11 @@
 
 Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md); estados publicados y límites comerciales conservados.
 
+- `TASK-2038` — [Renderer de Growth Forms en AXIS](to-do/TASK-2038-growth-forms-renderer-on-axis.md), to-do; `EPIC-035`. Fuente y build del renderer a AXIS, publicación por el carril de EPIC-035 sin release de Greenhouse. Siguiente ID libre `TASK-2039`.
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2038`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2039`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress; release completo PR254 y matching activos, GA4 UPD/siete audiencias y SQL/flags verificados; falta primera conversión comercial consentida post-flip; [auditoría documental integral](../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), configuración escalable y pendientes ampliados coordinados por `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.

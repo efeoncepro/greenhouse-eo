@@ -25,6 +25,14 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-10-15
+
+- La fuente del renderer de Growth Forms pasa a AXIS por decisión del operador: [TASK-2038](TASK-2038-growth-forms-renderer-on-axis.md).
+  El Slice 1 de esta task publica desde el release de AXIS en vez de `scripts/build-growth-forms-renderer.mjs`; los
+  `Files owned` `src/growth-forms-renderer/` y el build script se comparten con TASK-2038 hasta que su Slice 3 los
+  reduzca. Este corte sigue siendo dueño del loader neutral, los hosts y la ventana legacy.
+- Línea base a portar: commit `ab622e958` (radio como tarjetas en cualquier estilo, enlace de privacidad legible, íconos SVG).
+
 ## Summary
 
 Migra Growth Forms desde el mutable `greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` al runtime neutral,

@@ -56,6 +56,8 @@ No cabe en una task. Requiere estabilizar el carril actual, formalizar protocolo
 - `TASK-1516` — Meetings dual-publish, real-host soak, neutral-domain cutover y rollback.
 - `TASK-1517` — Forms independent release, WordPress/Think migration y submission/abuse/legacy verification.
 - `TASK-1518` — CTA registry/cutover, composition matrix y cierre de legacy/SLO/costos/runbooks del fleet.
+- `TASK-2038` — Renderer de Growth Forms en AXIS: la fuente del renderer de Forms pasa a AXIS y este carril publica
+  desde su release (decisión del operador 2026-10-15; enmienda el ADR V2).
 
 ## Existing Related Work
 

@@ -25,6 +25,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `TASK-2038` | `to-do` | Renderer de Growth Forms en AXIS (EPIC-035): la fuente y el build de `<greenhouse-form>` pasan a AXIS y se publican por el delivery plane de EPIC-035 sin release de Greenhouse; Greenhouse conserva contrato, API, servidor, consentimiento, destinos y medición. Decisión del operador 2026-10-15; primer slice enmienda el ADR V2 del Embed Runtime. backend-data, Backend impact integration. | `docs/tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md` |
 | `TASK-2037` | `complete` | Panel/API/CLI publicados PR255; GVC1440/390 y12 estados PASS; contrato y docs/skills auditados14/10 | `docs/tasks/complete/TASK-2037-growth-measurement-configuration-panel.md` |
 | `TASK-2036` | `complete` | Policy/API/CLI publicados PR255; fuente nueva sin redeploy y Meta Server9 verificados; docs/skills auditados14/10 | `docs/tasks/complete/TASK-2036-growth-measurement-policy-foundation.md` |
 | `TASK-2035` | `in-progress` | Medición Growth: goal acotado a configuración escalable y CAPI; configuración/CAPI/agentes publicadas PR255 y verificadas; resto del paraguas sin iniciar | `docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md` |
@@ -2636,3 +2637,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro 2026-10-14: TASK-2035 reservada por pedido explícito de reunir TODO el pendiente de medición, no sólo subscribe. Barrido por dominio/superficie conserva TASK-1359/1509/1510/1802/1866/1885/2034 como dueñas; nueva umbrella para policy/config, CRO/audiencias, suscripción, calidad y cierre cross-runtime. Registro documental, sin implementación ni rollout. Siguiente ID libre TASK-2036.
 
 > Registro14/10: planTASK-2035 aprobado para configuración/CAPI; TASK-2036 foundation y TASK-2037 consumerUI. Siguiente ID libre TASK-2038.
+
+> Registro 2026-10-15: TASK-2038 reservada (renderer de Growth Forms en AXIS, hija de EPIC-035). Barrido por dominio/superficie: TASK-1517 es dueña de la publicación del renderer, no de su fuente; recibe Delta. Siguiente ID libre TASK-2039.
