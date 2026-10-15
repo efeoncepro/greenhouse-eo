@@ -1,0 +1,1415 @@
+{
+  "manifest_version": 1,
+  "status": "prepared_not_applied",
+  "generated_on": "2026-10-15",
+  "executed_changes": 0,
+  "items": [
+    {
+      "candidate_id": "404-02",
+      "source_post_id": 2394,
+      "source_url": "https://blog.skyairline.com/mejor-vida-nocturna/",
+      "broken_destination_url": "https://blog.skyairline.com/restaurantes-tematicos-de-bogota/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/restaurantes-tematicos-de-bogota/",
+          "anchor": "restaurantes temáticos",
+          "paragraph": "Si Bogotá es tu destino, te recomendamos que en tu bitácora de viajes y de fiesta no falte la zona rosa que se encuentra al norte de la ciudad. Se trata del sector que ofrece mayor variedad de entretenimiento, aquí encontrarás tres de los principales centros comerciales, además de los mejores restaurantes temáticos ."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "devolver_contenido",
+      "dependency": [
+        "Recuperar original y aprobar guía temática actualizada con fuentes de locales"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9325,
+      "source_url": "https://blog.skyairline.com/comodoro-rivadavia/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "sur argentino",
+          "paragraph": "La ciudad cuenta con conexión aérea a través del Aeropuerto Internacional General Enrique Mosconi, además de rutas terrestres que permiten integrarla en recorridos por el sur argentino ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9185,
+      "source_url": "https://blog.skyairline.com/el-chalten/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "sur de Argentina",
+          "paragraph": "Ubicado a unos 220 kilómetros de El Calafate, El Chaltén se encuentra al sur de Argentina en la provincia de Santa Cruz, dentro del Parque Nacional Los Glaciares."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9321,
+      "source_url": "https://blog.skyairline.com/las-grutas/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "ciudades argentinas del sur",
+          "paragraph": "Para llegar puedes optar por carreteras de distintas ciudades argentinas del sur o combinar un vuelo hasta la región con un traslado terrestre."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9326,
+      "source_url": "https://blog.skyairline.com/llanada-grande/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "sur",
+          "paragraph": "Llanada Grande es una pequeña localidad cordillerana del sur chileno que pertenece a la comuna de Cochamó, en la provincia de Llanquihue, Región de Los Lagos."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9248,
+      "source_url": "https://blog.skyairline.com/neuquen/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "Sudamérica",
+          "paragraph": "Neuquén es, básicamente, el centro neurálgico de una de las regiones con mayor crecimiento de Sudamérica . Su ubicación es perfecta para conectar rutas con la cordillera de los Andes y la estepa."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 890,
+      "source_url": "https://blog.skyairline.com/paquetes-de-viaje/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/sur-argentino/",
+          "anchor": "vacaciones",
+          "paragraph": "Los paquetes de viajes son una combinación de servicios que prometen comodidad y, en muchos casos, un ahorro significativo para sus vacaciones . Pero, ¿cumplen realmente esta promesa?"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9322,
+      "source_url": "https://blog.skyairline.com/peninsula-valdes/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "Patagonia argentina",
+          "paragraph": "Este paraíso se encuentra en la provincia de Chubut, al noreste de la Patagonia argentina , sobre el océano Atlántico."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9304,
+      "source_url": "https://blog.skyairline.com/puerto-madryn/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "sur argentino",
+          "paragraph": "Fundada por colonos galeses en 1865, une su historia cultural con la valoración del entorno natural. Su ambiente abierto y áreas protegidas la convierten en un referente del ecoturismo del sur argentino para observar fauna marina."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9327,
+      "source_url": "https://blog.skyairline.com/trelew/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "sur argentino",
+          "paragraph": "Entre fósiles gigantes, tradiciones centenarias y paisajes únicos, este destino ofrece una experiencia diferente para quienes desean conocer una faceta cultural e histórica del sur argentino ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9324,
+      "source_url": "https://blog.skyairline.com/turismo-esquel/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "sur argentino",
+          "paragraph": "En esta guía descubrirás qué ver, qué hacer y cómo planificar una visita inolvidable a este rincón especial del sur argentino ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-03",
+      "source_post_id": 9328,
+      "source_url": "https://blog.skyairline.com/villa-la-angostura/",
+      "broken_destination_url": "https://blog.skyairline.com/sur-argentino/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/sur-argentino/",
+          "anchor": "al sur",
+          "paragraph": "Ubicada al sur de la provincia de Neuquén, Villa La Angostura se encuentra sobre la costa norte del Lago Nahuel Huapi, dentro de una reserva con el mismo nombre: Parque Nacional Nahuel Huapi."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-04",
+      "source_post_id": 7866,
+      "source_url": "https://blog.skyairline.com/caldera/",
+      "broken_destination_url": "https://blog.skyairline.com/desierto-florido-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/desierto-florido-de-chile/",
+          "anchor": "Desierto de Atacama",
+          "paragraph": "Una vez que aterrizas en el Aeropuerto Desierto de Atacama , tienes varias alternativas para llegar a la costa:"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/desierto-florido/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Corregir geografía con fuente oficial y aprobación editorial antes de promover destino"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-04",
+      "source_post_id": 7812,
+      "source_url": "https://blog.skyairline.com/copiapo/",
+      "broken_destination_url": "https://blog.skyairline.com/desierto-florido-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/desierto-florido-de-chile/",
+          "anchor": "el desierto se cubre de flores",
+          "paragraph": "Gracias a precipitaciones esporádicas, el desierto se cubre de flores , transformando paisajes áridos en alfombras de color."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/desierto-florido/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Corregir geografía con fuente oficial y aprobación editorial antes de promover destino"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-04",
+      "source_post_id": 2388,
+      "source_url": "https://blog.skyairline.com/curiosidades-de-chile-2/",
+      "broken_destination_url": "https://blog.skyairline.com/desierto-florido-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/desierto-florido-de-chile/",
+          "anchor": "desierto florido",
+          "paragraph": "Aquí se da un fenómeno único: si después de un largo periodo de tiempo se registran lluvias, se produce la floración de más de 200 especies de plantas que cubre el desierto de un hermoso color púrpura ¡El desierto florido es algo que tienes que admirar aunque sea una vez en la vida!"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/desierto-florido/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Corregir geografía con fuente oficial y aprobación editorial antes de promover destino"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-04",
+      "source_post_id": 2749,
+      "source_url": "https://blog.skyairline.com/norte-de-chile/",
+      "broken_destination_url": "https://blog.skyairline.com/desierto-florido-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/desierto-florido-de-chile/",
+          "anchor": "desierto florido de Chile",
+          "paragraph": "Desde San Pedro de Atacama es posible incursionar en la inmensidad del desierto de Atacama y, con un poco de suerte y planificación, observar el imponente espectáculo del desierto florido de Chile ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/desierto-florido/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Corregir geografía con fuente oficial y aprobación editorial antes de promover destino"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-05",
+      "source_post_id": 3048,
+      "source_url": "https://blog.skyairline.com/reservar-un-hotel/",
+      "broken_destination_url": "https://blog.skyairline.com/vacaciones-nav-idenas-latinoamerica/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/vacaciones-nav-idenas-latinoamerica/",
+          "anchor": "vacaciones navideñas",
+          "paragraph": "Al momento de reservar un hotel en línea, estamos propensos a dejarnos llevar por la inmediatez o lo atractivo de una oferta. Sin embargo, es importante tener en cuenta algunas recomendaciones generales para garantizar una experiencia satisfactoria: Reserva con anticipación: esto te permitirá tener más opciones disponibles y acceder a mejores precios. Aunque te parezca pronto para planificar tus vacaciones navideñas , evita dejarlo para el último momento, especialmente en temporada alta o destinos populares. Lee los términos y condiciones: antes de confirmar la reserva, lee detenidamente los términos de la oferta, políticas de cancelación, pagos adicionales y restricciones. Investiga sobre el hotel y el destino: lee opiniones de otros viajeros, revisa fotos y verifica su ubicación en relación con los lugares de interés que deseas visitar. Procura conseguir los datos más recientes para evitarte decepciones. Compara precios: utiliza diferentes plataformas de reserva en línea para comparar precios y obtener la mejor oferta posible. No te quedes con la primera opción que encuentres. Con los servicios de SKY Airline no solamente puedes conseguir los vuelos más convenientes, también ofrece una manera fácil y segura de encontrar el alojamiento ideal para tu próximo viaje."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "Decisión editorial de restaurar/retirar según vigencia e intención"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 2731,
+      "source_url": "https://blog.skyairline.com/costos-al-viajar/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "turismo gastronómico",
+          "paragraph": "Si en tu viaje piensas hacer turismo gastronómico , entonces no pueden faltar las comidas y bebidas típicas del lugar que visitarás. Cuanto más detalles conozcas sobre el tema, más precisión tendrás con los gastos de alimentación."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 1910,
+      "source_url": "https://blog.skyairline.com/ecoturismo/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "exquisiteces locales",
+          "paragraph": "Dado que ya sabes que los lugareños son la mejor opción para conocer las bellezas por descubrir o dónde encontrar las mejores exquisiteces locales , nuestra recomendación es que no dejes de escuchar todo lo que tengan que decir, porque podrías terminar con grandes historias."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 2590,
+      "source_url": "https://blog.skyairline.com/mejor-comida-peruana/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "turismo gastronómico",
+          "paragraph": "Si una de tus cosas favoritas al viajar es hacer turismo gastronómico , una parada en Qunuq Restaurant tiene que estar sí o sí en tus planes cuando vayas a Machu Picchu."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 4328,
+      "source_url": "https://blog.skyairline.com/natal-brasil/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "turismo gastronómico",
+          "paragraph": "Cuando vayas a Natal no puedes dejar de hacer turismo gastronómico . Estos son los platillos que te conectarán con los sabores de la región:"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 2904,
+      "source_url": "https://blog.skyairline.com/paseo-del-mar-de-antofagasta/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "turismo gastronómico",
+          "paragraph": "Los amantes del turismo gastronómico no pueden empezar un viaje sin antes haber investigado un poco sobre las mejores opciones gastronómicas del sitio, ¿no es así? Si eres uno de ellos, toma nota de los siguientes restaurantes en el Paseo del Mar de Antofagasta :"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 2686,
+      "source_url": "https://blog.skyairline.com/plaza-mayor-de-lima/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "turismo gastronómico",
+          "paragraph": "Al terminar el cambio de guardia, una buena opción es hacer un poco de turismo gastronómico . En los alrededores de la plaza encontrarás restaurantes con los mejores platos típicos de Lima."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 3231,
+      "source_url": "https://blog.skyairline.com/puerto-montt-que-hacer-invierno/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "turismo gastronómico",
+          "paragraph": "Durante la temporada de invierno, los restaurantes de Puerto Montt se destacan con la preparación de platos típicos locales. No hay otra ciudad para probar las recetas más deliciosas. Así que dale un sí rotundo al turismo gastronómico ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-06",
+      "source_post_id": 2062,
+      "source_url": "https://blog.skyairline.com/tomar-vino-en-mendoza/",
+      "broken_destination_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/turismo-gastronomico-2/",
+          "anchor": "Turismo gastronómico: Explora un mundo de sabores",
+          "paragraph": "Ahora que sabes esto, ¿te animas a pasar unos días en Mendoza y probar sus más exquisitos vinos? Mientras preparas tu viaje puedes seguir en nuestro blog y leer este post: Turismo gastronómico: Explora un mundo de sabores ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-07",
+      "source_post_id": 9307,
+      "source_url": "https://blog.skyairline.com/lugares-turisticos-cajamarca/",
+      "broken_destination_url": "https://blog.skyairline.com/invierno-en-peru/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/invierno-en-peru/",
+          "anchor": "invierno en Perú",
+          "paragraph": "Si planeas visitar la zona durante los meses más fríos, te recomendamos considerar las particularidades del invierno en Perú para preparar mejor tu recorrido."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/estaciones-del-ano-en-peru/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de dos anclas"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-07",
+      "source_post_id": 9308,
+      "source_url": "https://blog.skyairline.com/vuelos-a-cajamarca/",
+      "broken_destination_url": "https://blog.skyairline.com/invierno-en-peru/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/invierno-en-peru/",
+          "anchor": "clima cambia",
+          "paragraph": "El clima cambia entre el día y la noche. Lleva protector solar, lentes de sol y prendas ligeras, además de una chaqueta para después del atardecer. Vestirte en capas te permitirá adaptarte."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/estaciones-del-ano-en-peru/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de dos anclas"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 4022,
+      "source_url": "https://blog.skyairline.com/brasil-canasvieiras/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viaje-a-florianopolis/",
+          "anchor": "vacaciones en Florianópolis",
+          "paragraph": "Al organizar tus vacaciones en Florianópolis , el principal atractivo de este lugar, Canasvieiras, es una playa de 2,4 kilómetros de blanca y fina arena. Rodeada de paisajes de abundante vegetación ideal para actividades de ecoturismo , el barrio cuenta con varias agencias de turismo que ofrecen paseos a islas cercanas, a otros barrios igualmente atractivos y un recorrido marítimo que proporciona fotos increíbles en la playa de Canasvieiras en Brasil."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 8758,
+      "source_url": "https://blog.skyairline.com/canasvieiras/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "centro de Florianópolis",
+          "paragraph": "Otro punto que suma es la conexión con el centro de Florianópolis . En auto, el trayecto ronda los treinta minutos por vía rápida. En bus, la línea 210 sale con frecuencia desde el terminal de Canasvieiras y te deja en el centro en menos de una hora."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 8878,
+      "source_url": "https://blog.skyairline.com/clima-florianopolis/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "un viaje en una experiencia completa",
+          "paragraph": "El clima de Florianópolis puede guiar tu decisión, pero también el presupuesto puede influir. Encontrar ese punto medio es lo que convierte un viaje en una experiencia completa ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 2608,
+      "source_url": "https://blog.skyairline.com/donde-viajar-con-ninos/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "viaje a Floripa",
+          "paragraph": "Con más de 40 playas, en un viaje a Floripa encontrarás calas de aguas tranquilas ideales para los niños, como Jurerê o Canasvieiras."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 8085,
+      "source_url": "https://blog.skyairline.com/florianopolis-playas/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "viajes a Florianópolis",
+          "paragraph": "Es una de las playas más elegidas en los viajes a Florianópolis por jóvenes y parejas que buscan combinar descanso con vida nocturna, pues aquí encuentras beach clubs , restaurantes e incluso supermercados a pasos de la arena."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 3257,
+      "source_url": "https://blog.skyairline.com/florianopolis/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "",
+          "paragraph": "En Florianópolis casi un tercio del territorio está bajo protección oficial como unidades de conservación, lo te da una pista de cuánto valor se le da allá a lo natural."
+        },
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "Florianópolis",
+          "paragraph": "En Florianópolis casi un tercio del territorio está bajo protección oficial como unidades de conservación, lo te da una pista de cuánto valor se le da allá a lo natural."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 8925,
+      "source_url": "https://blog.skyairline.com/jurere/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "qué hacer en Florianópolis",
+          "paragraph": "Y para los que viajan con niños, hay clubes infantiles con monitores especializados. Con todo lo que ofrece, no es de sorprender que muchos viajeros elijan esta zona como su base para explorar qué hacer en Florianópolis sin alejarse del lujo."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 8082,
+      "source_url": "https://blog.skyairline.com/pasajes-a-florianopolis/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/viaje-a-florianopolis/",
+          "anchor": "viajar a Florianópolis",
+          "paragraph": "Lo bueno es que el aeropuerto está ubicado en la zona sur de la isla, lo que facilita el traslado hacia playas como Campeche, Armação o incluso el centro. Así, ¡ viajar a Florianópolis es solo el comienzo de una larga aventura!"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-08",
+      "source_post_id": 3385,
+      "source_url": "https://blog.skyairline.com/santo-antonio-de-lisboa/",
+      "broken_destination_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viaje-a-florianopolis/",
+          "anchor": "vacaciones a Florianópolis",
+          "paragraph": "Rodeado de pequeñas colinas que ofrecen un paisaje digno de una pintura y de una extensa playa que maravilla a todos con sus inigualables atardeceres, San Antonio de Lisboa ofrece las mejores vistas al ir de vacaciones a Florianópolis ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-09",
+      "source_post_id": 5316,
+      "source_url": "https://blog.skyairline.com/bailes-tipicos-del-peru/",
+      "broken_destination_url": "https://blog.skyairline.com/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+          "anchor": "sierra sur",
+          "paragraph": "Como una muestra de la integración entre las costumbres indígenas, africanas y europeas que anidan en el país, los bailes típicos del Perú manifiestan la cultura, historia y tradiciones de cada una de sus regiones: desde el baile de La Marinera en la costa, hasta la Danza de las Tijeras en la sierra sur ."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "Decidir restauración histórica contextualizada o retirar enlace conservando texto"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-09",
+      "source_post_id": 5289,
+      "source_url": "https://blog.skyairline.com/bebidas-tipicas-peru/",
+      "broken_destination_url": "https://blog.skyairline.com/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+          "anchor": "los Andes peruanos",
+          "paragraph": "El ingrediente principal de la chicha morada es el maíz morado, una variedad autóctona de los Andes peruanos , conocida tanto por su color y sabor, como por sus propiedades antioxidantes."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "Decidir restauración histórica contextualizada o retirar enlace conservando texto"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-09",
+      "source_post_id": 2913,
+      "source_url": "https://blog.skyairline.com/canon-de-shucto/",
+      "broken_destination_url": "https://blog.skyairline.com/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+          "anchor": "naturaleza andina.",
+          "paragraph": "Más allá del cañón en sí, los alrededores también ofrecen rutas de senderismo que te permiten sumergirte aún más en la naturaleza andina. Los caminos, rodeados de vegetación nativa y montañas, te brindan vistas increíbles del paisaje."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "Decidir restauración histórica contextualizada o retirar enlace conservando texto"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-10",
+      "source_post_id": 5878,
+      "source_url": "https://blog.skyairline.com/cafe-chileno-conoce-la-historia-del-cafe-en-chile-tipos-y-donde-probarlo/",
+      "broken_destination_url": "https://blog.skyairline.com/puerto-natales-3/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/puerto-natales-3/",
+          "anchor": "esta pequeña ciudad",
+          "paragraph": "Aunque Santiago lidera la tendencia del café chileno, otras ciudades también han desarrollado una fuerte cultura del café, ofreciendo lugares únicos para quienes buscan una buena taza fuera de la capital. Puerto Natales: en el extremo sur del país, esta pequeña ciudad sorprende con cafeterías de especialidad que han sido reconocidas internacionalmente, convirtiéndola en un destino imperdible para los amantes del café. Valparaíso: con su esencia artística, la ciudad puerto es hogar de varias cafeterías que combinan tradición con tendencias modernas, ofreciendo espacios acogedores con vistas privilegiadas. Concepción: el auge del café de especialidad también ha llegado a esta ciudad , donde cada vez aparecen más cafeterías que buscan resaltar la calidad de sus granos y ofrecer nuevas experiencias a los clientes. Consejos para disfrutar un buen café Los verdaderos amantes del café, saben que hay algunos aspectos que pueden hacer la diferencia en el sabor, el aroma y la experiencia en general."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/puerto-natales/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión anclas; corregir CTA 4498 literal en paralelo"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-10",
+      "source_post_id": 7600,
+      "source_url": "https://blog.skyairline.com/comida-tipica-de-argentina/",
+      "broken_destination_url": "https://blog.skyairline.com/puerto-natales-3/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/puerto-natales-3/",
+          "anchor": "Puerto Natales",
+          "paragraph": "Puerto Natales combina paisajes únicos con una cocina que rescata lo local, en restaurantes y refugios que sirven curantos , guisos de cordero y platos gourmet con centolla o calafate , siempre con productos frescos de la zona."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/puerto-natales/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión anclas; corregir CTA 4498 literal en paralelo"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-10",
+      "source_post_id": 7597,
+      "source_url": "https://blog.skyairline.com/patagonia/",
+      "broken_destination_url": "https://blog.skyairline.com/puerto-natales-3/",
+      "links_evidence": [
+        {
+          "href_before": "https://blog.skyairline.com/puerto-natales-3/",
+          "anchor": "Puerto Natales",
+          "paragraph": "Puerto Natales combina paisajes únicos con una cocina que rescata lo local, en restaurantes y refugios que sirven curantos , guisos de cordero y platos gourmet con centolla o calafate , siempre con productos frescos de la zona."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/puerto-natales/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión anclas; corregir CTA 4498 literal en paralelo"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-11",
+      "source_post_id": 5971,
+      "source_url": "https://blog.skyairline.com/auroras-australes-en-chile-cuando-y-donde-verlas/",
+      "broken_destination_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/lugares-turisticos-sur-de-chile/",
+          "anchor": "el sur de Chile.",
+          "paragraph": "La buena noticia es que, aunque este fenómeno es más común en latitudes extremas como la Antártida, aquí te contamos todo lo que necesitas saber para aumentar tus probabilidades de presenciarlo en el sur de Chile."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-11",
+      "source_post_id": 6209,
+      "source_url": "https://blog.skyairline.com/parque-hornopiren-que-ver-y-como-llegar/",
+      "broken_destination_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/lugares-turisticos-sur-de-chile/",
+          "anchor": "Sur de Chile",
+          "paragraph": "El parque alberga uno de los ecosistemas más ricos y biodiversos del Sur de Chile . Entre sus árboles destacan los majestuosos alerces, algunos con más de 3.000 años de antigüedad, que, junto a especies como coigües, tepas y mañíos, forman un paisaje verde de inigualable belleza."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-11",
+      "source_post_id": 5912,
+      "source_url": "https://blog.skyairline.com/pueblos-del-sur-de-chile-con-encanto-y-tradiciones/",
+      "broken_destination_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/lugares-turisticos-sur-de-chile/",
+          "anchor": "Chiloé es una isla",
+          "paragraph": "Famosa por su arquitectura peculiar, con iglesias de madera que son Patrimonio de la Humanidad, Chiloé es una isla ubicada en la región de Los Lagos."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-11",
+      "source_post_id": 5872,
+      "source_url": "https://blog.skyairline.com/rutas-de-los-pioneros/",
+      "broken_destination_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/lugares-turisticos-sur-de-chile/",
+          "anchor": "Sur de Chile",
+          "paragraph": "Las Rutas de Los Pioneros consisten en trayectos que atraviesan algunas de las regiones más remotas del Sur de Chile . Por lo cual, hacer una expedición es prácticamente un tributo al coraje de las personas que dibujaron sus primeros caminos en el siglo XIX entre los suelos inexplorados en esa región."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-11",
+      "source_post_id": 6054,
+      "source_url": "https://blog.skyairline.com/termas-en-la-region-de-los-lagos-aguas-termales-en-la-patagonia/",
+      "broken_destination_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/lugares-turisticos-sur-de-chile/",
+          "anchor": "Sur de Chile",
+          "paragraph": "Sin dudas, si estás planeando visitar el Sur de Chile , recomendamos que añadas estas termas a tu itinerario."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-11",
+      "source_post_id": 6121,
+      "source_url": "https://blog.skyairline.com/termas-en-puerto-montt-las-mejores-opciones-para-relajarte/",
+      "broken_destination_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/lugares-turisticos-sur-de-chile/",
+          "anchor": "viaje por el Sur de Chile",
+          "paragraph": "¡Descubre el encanto y la magia de las termas en tu próximo viaje por el Sur de Chile !"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-12",
+      "source_post_id": 1404,
+      "source_url": "https://blog.skyairline.com/actividades-al-aire-libre-en-rio-de-janeiro/",
+      "broken_destination_url": "https://blog.skyairline.com/que-hacer-en-rio-de-janeiro/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/que-hacer-en-rio-de-janeiro/",
+          "anchor": "¿Qué hacer en Río de Janeiro? ¡Descubre las mejores actividades!",
+          "paragraph": "¿Qué hacer en Río de Janeiro? ¡Descubre las mejores actividades!"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/rio-de-janeiro/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de cinco fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-12",
+      "source_post_id": 1719,
+      "source_url": "https://blog.skyairline.com/bucket-list/",
+      "broken_destination_url": "https://blog.skyairline.com/que-hacer-en-rio-de-janeiro/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/que-hacer-en-rio-de-janeiro/",
+          "anchor": "Cristo Redentor",
+          "paragraph": "Para nadie es un secreto que, unas de las metas más populares, tienen que ver con recorrer el mundo y visitar lo mejor de cada destino. En este sentido, aquí van algunas de nuestras recomendaciones: Bañarse en las paradisíacas playas de Punta Cana . Visitar el Santuario Histórico de Machu Picchu , una de las siete nuevas maravillas del mundo moderno. Conocer las maravillosas islas de Cancún . Practicar enoturismo en el Valle de Casablanca , Chile, o en Mendoza , Argentina, lugares donde se producen algunos de los mejores vinos del mundo. Esquiar en los Nevados de Chillán , Chile, o en el Cerro Castor , Argentina. ¡Y sin necesidad de ir a Europa o Norteamérica! Conocer el icónico Cristo Redentor en Río de Janeiro. Disfrutar la gastronomía fusión de Perú, considerada una de las mejores del mundo. ¡Manos a la obra! Este es el momento perfecto para empezar a armar tu bucket list , o poner en práctica todo lo que has aprendido para modificar la que ya tienes. Recuerda que el límite lo pones tú, y que la constancia es muy importante para lograr todo lo que te propongas."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/rio-de-janeiro/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de cinco fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-12",
+      "source_post_id": 2916,
+      "source_url": "https://blog.skyairline.com/cristo-de-tatanazo/",
+      "broken_destination_url": "https://blog.skyairline.com/que-hacer-en-rio-de-janeiro/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/que-hacer-en-rio-de-janeiro/",
+          "anchor": "Río de Janeiro",
+          "paragraph": "El Cristo de Tatanazo es una estatua ubicada en la meseta del Tatanazo, en el pueblo de Llocllapampa, Perú . Representa a Jesucristo con los brazos abiertos, a la manera de otras estatuas similares ubicadas en Lima (Cristo del Pacífico) y Río de Janeiro (Cristo Redentor)."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/rio-de-janeiro/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de cinco fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-12",
+      "source_post_id": 5612,
+      "source_url": "https://blog.skyairline.com/descubre-urca-en-rio-de-janeiro-el-barrio-del-pan-de-azucar/",
+      "broken_destination_url": "https://blog.skyairline.com/que-hacer-en-rio-de-janeiro/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/que-hacer-en-rio-de-janeiro/",
+          "anchor": "qué hacer en Urca, Río de Janeiro",
+          "paragraph": "Tras presentarte los encantos de un barrio pintoresco que mezcla modernidad con una potente carga histórica y cultural, te sugerimos qué hacer en Urca, Río de Janeiro , durante un día perfecto."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/rio-de-janeiro/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de cinco fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-12",
+      "source_post_id": 2614,
+      "source_url": "https://blog.skyairline.com/playa-copacabana/",
+      "broken_destination_url": "https://blog.skyairline.com/que-hacer-en-rio-de-janeiro/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/que-hacer-en-rio-de-janeiro/",
+          "anchor": "Río de Janeiro",
+          "paragraph": "Este rincón de Río de Janeiro es famoso por su extenso litoral de arena blanca y aguas cristalinas, pero también por su energía única, su historia fascinante y su vida urbana llena de encanto que cautiva todos los turistas que la visitan."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/rio-de-janeiro/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de cinco fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-13",
+      "source_post_id": 1395,
+      "source_url": "https://blog.skyairline.com/10-mil-pasos-diarios/",
+      "broken_destination_url": "https://blog.skyairline.com/viajar-con-mascota-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viajar-con-mascota-2/",
+          "anchor": "viajas con tu mascota",
+          "paragraph": "Si viajas con tu mascota , sacarla es la excusa perfecta que te permitirá cumplir con los pasos diarios necesarios para estar en forma. No lo dudes, tómate un momento del día para ir al parque con tu perro o con tu gato."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner política de mascotas valida actualidad; revisión 4 fuentes. Propuesta puntual: normas-para-viajar-en-avion→mascotas-en-cabina"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-13",
+      "source_post_id": 1473,
+      "source_url": "https://blog.skyairline.com/normas-para-viajar-en-avion/",
+      "broken_destination_url": "https://blog.skyairline.com/viajar-con-mascota-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viajar-con-mascota-2/",
+          "anchor": "mascotas en la cabina de vuelo",
+          "paragraph": "Existen normas de seguridad para viajar en avión que implican restricciones para ocupar determinados asientos, como son los ubicados en las salidas de emergencia. Conoce a continuación quiénes no pueden utilizarlos: Mujeres embarazadas. Pasajeros menores de 15 años. Personas con alguna discapacidad. Personas de la tercera edad. Pasajeros con mascotas en la cabina de vuelo . Pasajeros que requieran de una extensión para el uso del cinturón de seguridad. Pasajeros que no hable el idioma de origen de la empresa aérea ni el idioma inglés. Personas que sean acompañantes de pasajeros que requieran de su asistencia. Pasajeros que estén tomando algún tipo de medicamento que afecte las facultades exigidas. 5. Normas en el terminal de desembarque De igual manera, existen disposiciones que se deben cumplir al momento de abandonar el avión e ingresar en el control de migración de cada país. ¡Sigue leyendo!"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/mascotas-en-cabina/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner política de mascotas valida actualidad; revisión 4 fuentes. Propuesta puntual: normas-para-viajar-en-avion→mascotas-en-cabina"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-13",
+      "source_post_id": 1634,
+      "source_url": "https://blog.skyairline.com/parque-cultural-ruinas-de-huanchaca/",
+      "broken_destination_url": "https://blog.skyairline.com/viajar-con-mascota-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viajar-con-mascota-2/",
+          "anchor": "viajas con tu mascota",
+          "paragraph": "Si en tu viaje a Chile estás decidido a vivir la experiencia de conocer un poco más de Antofagasta, toma en cuenta estos consejos que te ayudarán a que tu recorrido sea más placentero: La caminata por las ruinas es al aire libre, así que viste de forma adecuada para la ocasión. Toma en cuenta que durante el año las temperaturas oscilan entre los 13 °C a 25 °C. Rara vez bajan a los 10 °C o suben a los 27 °C. Si quieres recorrer el museo programa tu visita entre martes y domingo, porque los días lunes están cerrados al público. El paseo por las ruinas es gratuito, pero para ingresar al museo debes adquirir entradas. Las personas de la tercera edad y los niños menores de seis años no pagan. Si gustas puedes hacer las reservaciones con tiempo. La galería estuvo cerrada durante la pandemia por COVID-19 y tras su reapertura se establecieron tips de seguridad para la visita del museo , por ejemplo, el uso obligatorio del tapabocas y mantener una distancia de al menos un metro entre las personas. Si viajas con tu mascota , puedes ingresar al museo porque tienen permitido el recorrido con animales. ¿Estás listo para conocer el Parque Cultural Ruinas de Huanchaca? Esperamos que este post te haya sido de utilidad y, ya que planeas viajar a Chile, te invitamos a leer este artículo Enoturismo en Chile: guía para viajeros amantes del buen vino ."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner política de mascotas valida actualidad; revisión 4 fuentes. Propuesta puntual: normas-para-viajar-en-avion→mascotas-en-cabina"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-13",
+      "source_post_id": 2062,
+      "source_url": "https://blog.skyairline.com/tomar-vino-en-mendoza/",
+      "broken_destination_url": "https://blog.skyairline.com/viajar-con-mascota-2/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viajar-con-mascota-2/",
+          "anchor": "viajar con mascotas",
+          "paragraph": "Te dejamos algunos consejos que te ayudarán a que la experiencia sea más que increíble: Realiza las reservas con unas dos semanas de anticipación. La razón es que las bodegas más importantes de la región son tan solicitadas que suelen quedarse sin disponibilidad en las mesas con bastante rapidez; Si viajarás exclusivamente para sumergirte en la viticultura de Mendoza, toma en cuenta que muchas de las bodegas ofrecen diversas actividades, además de los tradicionales recorridos; ¿Planeas viajar con mascotas y niños? Antes de reservar, cerciórate de que las vinotecas que quieres conocer tengan espacios familiares, porque no todas reciben infantes y animales; En una mañana se pueden recorrer hasta tres bodegas, así que hay que ser prudentes con la cata de bebidas o de lo contrario no llegarás a disfrutar por completo el resto de los lugares; En tus preparativos para viajar , considera programar tu viaje entre febrero y mayo, preferiblemente. En ese periodo ocurre la vendimia. Esto te da la oportunidad de probar vinos de fermentación, los granos de uva, ver la cosecha y vivir en directo cómo se elabora la bebida. Ahora que sabes esto, ¿te animas a pasar unos días en Mendoza y probar sus más exquisitos vinos? Mientras preparas tu viaje puedes seguir en nuestro blog y leer este post: Turismo gastronómico: Explora un mundo de sabores ."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner política de mascotas valida actualidad; revisión 4 fuentes. Propuesta puntual: normas-para-viajar-en-avion→mascotas-en-cabina"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-14",
+      "source_post_id": 3350,
+      "source_url": "https://blog.skyairline.com/cena-navidena-chilena/",
+      "broken_destination_url": "https://blog.skyairline.com/pase-de-movilidad-en-chile/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/pase-de-movilidad-en-chile/",
+          "anchor": "quienes visitan Chile",
+          "paragraph": "De hecho, uno de los aspectos que más llaman la atención de quienes visitan Chile en Navidad es la gran diversidad de opciones de comidas y bebidas, todo muy sabroso, atractivo a la vista y a la altura de mejores celebraciones. ¡Es una fiesta tradicional muy animada y alegre para todos los presupuestos y paladares!"
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "SKY valida retiro/vigencia; actualizar tres fuentes; 410 sólo tras decisión explícita de retiro sin sustituto"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-14",
+      "source_post_id": 1367,
+      "source_url": "https://blog.skyairline.com/vacunacion-en-latinoamerica/",
+      "broken_destination_url": "https://blog.skyairline.com/pase-de-movilidad-en-chile/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/pase-de-movilidad-en-chile/",
+          "anchor": "Pase de Movilidad",
+          "paragraph": "Los ciudadanos que han sido inmunizados con alguna de estas vacunas –exceptuando la Jannsen y la Sputnik V–, y luego de 14 días de haberse completado la pauta de vacunación, pueden solicitar un Pase de Movilidad ."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "SKY valida retiro/vigencia; actualizar tres fuentes; 410 sólo tras decisión explícita de retiro sin sustituto"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-14",
+      "source_post_id": 1146,
+      "source_url": "https://blog.skyairline.com/viajar-en-familia-durante-el-covid-19/",
+      "broken_destination_url": "https://blog.skyairline.com/pase-de-movilidad-en-chile/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/pase-de-movilidad-en-chile/",
+          "anchor": "pase de movilidad",
+          "paragraph": "En algunos países se pide a los viajeros documentos como declaraciones juradas, pase de movilidad (Chile) y tarjetas de vacunación que además de la vacuna contra el COVID-19, incluya las utilizadas para combatir enfermedades endémicas, como la fiebre amarilla."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "SKY valida retiro/vigencia; actualizar tres fuentes; 410 sólo tras decisión explícita de retiro sin sustituto"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-15",
+      "source_post_id": 3061,
+      "source_url": "https://blog.skyairline.com/aerolinea-lowcost-para-volar/",
+      "broken_destination_url": "https://blog.skyairline.com/administrar-vuelo/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/administrar-vuelo/",
+          "anchor": "flexibilidad",
+          "paragraph": "Y si deseas personalizar tu experiencia, la flexibilidad en la contratación de servicios te permite agregar opciones adicionales según tus necesidades."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/administra-tu-vuelo-sky/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida funcionalidades y condiciones vigentes"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-15",
+      "source_post_id": 4272,
+      "source_url": "https://blog.skyairline.com/sky-app/",
+      "broken_destination_url": "https://blog.skyairline.com/administrar-vuelo/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/administrar-vuelo/",
+          "anchor": "administración de tus vuelos",
+          "paragraph": "En este artículo exploraremos las características más relevantes de nuestra aplicación y sus mayores beneficios y, con ello, te mostraremos cómo puede convertirse en el mejor aliado para la administración de tus vuelos ."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/administra-tu-vuelo-sky/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Owner SKY valida funcionalidades y condiciones vigentes"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-16",
+      "source_post_id": 3290,
+      "source_url": "https://blog.skyairline.com/fiestas-patrias-en-concepcion/",
+      "broken_destination_url": "https://blog.skyairline.com/viajar-a-concepcion/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viajar-a-concepcion/",
+          "anchor": "maravillas que Concepción tiene para ofrecer",
+          "paragraph": "Te animamos a ser parte de esta magnífica celebración y a disfrutar al máximo de todas las maravillas que Concepción tiene para ofrecer durante sus celebraciones del dieciocho. ¡Únete a la fiesta de colores y sabores que te llenará de recuerdos inolvidables!"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/concepcion-2/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de dos fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-16",
+      "source_post_id": 3220,
+      "source_url": "https://blog.skyairline.com/invierno-en-concepcion/",
+      "broken_destination_url": "https://blog.skyairline.com/viajar-a-concepcion/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/viajar-a-concepcion/",
+          "anchor": "Viajar a Concepción",
+          "paragraph": "Viajar a Concepción en la temporada de invierno es una gran idea para disfrutar de la ciudad de una manera diferente. Si quieres estar cómodo con el clima, es importante que lleves en la maleta algunas prendas de vestir que te protejan del frío. Es esto lo que no se te puede olvidar:"
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/concepcion-2/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de dos fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-17",
+      "source_post_id": 6009,
+      "source_url": "https://blog.skyairline.com/caracteristicas-de-la-zona-sur-de-chile-geografia-y-biodiversidad/",
+      "broken_destination_url": "https://blog.skyairline.com/playas-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/playas-sur-de-chile/",
+          "anchor": "una costa espectacular",
+          "paragraph": "Los ríos, por su parte, descienden con fuerza desde la cordillera, formando cascadas y rápidos ideales para el ecoturismo, mientras que los fiordos y canales esculpen una costa espectacular , donde el mar se adentra en la tierra creando refugios naturales para la biodiversidad."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/playas-del-sur-de-chile-que-no-te-puedes-perder/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de dos fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-17",
+      "source_post_id": 5893,
+      "source_url": "https://blog.skyairline.com/frutas-del-sur-de-chile-variedades-y-beneficios/",
+      "broken_destination_url": "https://blog.skyairline.com/playas-sur-de-chile/",
+      "links_evidence": [
+        {
+          "href_before": "https://www.skyairline.com/blog/playas-sur-de-chile/",
+          "anchor": "paisajes impresionantes",
+          "paragraph": "Además de sus paisajes impresionantes , el sur de Chile también cuenta con una increíble variedad de frutas llenas de sabor y beneficios para la salud. Desde el maqui, conocido como un superalimento, hasta la murta y el calafate, cada una de estas frutas tiene algo especial que ofrecer."
+        }
+      ],
+      "proposed_destination_url": "https://blog.skyairline.com/playas-del-sur-de-chile-que-no-te-puedes-perder/",
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "Revisión editorial de dos fuentes"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-18",
+      "source_post_id": 4328,
+      "source_url": "https://blog.skyairline.com/natal-brasil/",
+      "broken_destination_url": "https://blog.skyairline.com/como-llegar-a-pipa-brasil/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/como-llegar-a-pipa-brasil/",
+          "anchor": "llegar hasta Pipa",
+          "paragraph": "La mejor forma de disfrutar de Natal Brasil es llegar en avión a Río de Janeiro, Brasilia o Florianópolis, luego hacer un recorrido para llegar hasta Pipa , desde aquí puedes alquilar un auto o tomar el autobús."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "devolver_contenido",
+      "dependency": [
+        "Recuperar original y validar transporte/itinerario con fuente oficial"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-19",
+      "source_post_id": 2364,
+      "source_url": "https://blog.skyairline.com/se-pueden-cambiar-los-pasajes-de-avion/",
+      "broken_destination_url": "https://blog.skyairline.com/errores-al-pasar-por-migracion/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/errores-al-pasar-por-migracion/",
+          "anchor": "viajero",
+          "paragraph": "En general, estas tarifas se calculan de la siguiente manera: Para cambiar la fecha de vuelo La aerolínea puede pedir al viajero el pago de una tarifa para cada trayecto que quiera ser cambiado. Se agregan las diferencias derivadas del precio del pasaje. Para cambiar el nombre del titular del pasaje En estos casos, podrían pedirte que pagues una tarifa por cada nombre que modifique en un pasaje. Si vuelas por tramos, en cada trayecto deberás pagar una tarifa. También por cada titular del ticket. Para modificar la ruta Se aplican tarifas a cada pasajero y por cada uno de los tramos modificados. Esto es independiente de si compraste los pasajes para un grupo, como lo harías por ejemplo, para un viaje con la familia. Las diferencias en los precios de los tickets nuevos o ya comprados se agregan a la tarifa por cambio de ruta. Factores a tener en cuenta si pides cambios en tus pasajes Existen varias condiciones que usualmente se aplican tanto en las aerolíneas low cost como en las tradicionales:"
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "retirar_hipervinculo_conservar_texto",
+      "dependency": [
+        "Revisión editorial de fuente; no 301 ni reemplazo por pasar-migracion por parecido de slug"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-20",
+      "source_post_id": 1183,
+      "source_url": "https://blog.skyairline.com/enoturismo-en-chile/",
+      "broken_destination_url": "https://blog.skyairline.com/informacion-para-viajar/",
+      "links_evidence": [
+        {
+          "href_before": "http://www.skyairline.com/blog/informacion-para-viajar/",
+          "anchor": "algunas razones para tomar tus maletas",
+          "paragraph": "Si no has vivido esta experiencia, seguramente acá encontrarás algunas razones para tomar tus maletas e iniciar un viaje con buen sabor. ¿Estás preparado para esta aventura?"
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "revision",
+      "dependency": [
+        "Revisar intención original; conservar texto y retirar enlace sólo si editorial aprueba"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    },
+    {
+      "candidate_id": "404-21",
+      "source_post_id": 3235,
+      "source_url": "https://blog.skyairline.com/puerto-natales-en-invierno/",
+      "broken_destination_url": "https://blog.skyairline.com/puerto-natales-en-invierno/blank",
+      "links_evidence": [
+        {
+          "href_before": "blank",
+          "anchor": "conocer precios, itinerarios y destinos",
+          "paragraph": "Si estás listo para descubrir este rincón de la región de Magallanes, entonces ven a conocer precios, itinerarios y destinos ."
+        }
+      ],
+      "proposed_destination_url": null,
+      "proposed_action": "corregir_enlace",
+      "dependency": [
+        "SKY debe aportar destino comercial oficial 200 aprobado; no inventarlanding"
+      ],
+      "status": "prepared_owner_decision_required",
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra"
+    }
+  ],
+  "distinct_source_posts": 68,
+  "note": "70 aristas fuente-destino; 68 artículos únicos; no cambios aplicados. Las propuestas amplias requieren validar cada ancla."
+}

@@ -112,17 +112,18 @@ ledger y Globe Producer muestra un self-view read-only de effective/funding/cap-
 Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
 `GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
 
-Growth SEO (`growth.seo`, EPIC-022) está en producción y federado, fail-closed por organización.
+Growth SEO (`growth.seo`, EPIC-022): producción y federación, fail-closed por organización.
 `enforceSeoRunEntitlement` autoriza cada run con `seo_v2`; app/ecosystem/MCP reusan readers canónicos.
 La cola append-only de TASK-1700 es la única autoridad de prioridad: sin demanda medida el score es NULL.
-CTR distingue ausencia de muestra de cero; discovery identifica keywords normalizadas. `GROWTH_SEO_ENABLED`
-gobierna Vercel y `ops-worker` conjuntamente; no flip aislado. Contratos, crons y verificación:
+CTR separa falta de muestra y cero; discovery identifica keywords normalizadas. `GROWTH_SEO_ENABLED`
+gobierna Vercel y `ops-worker`; no flip aislado. Contratos, crons y verificación:
 [arquitectura SEO](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [invariantes ops](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
 SEO: [categoría y representación](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md).
-Greenhouse posee datos/prioridad/outcomes; Marketing Studio posee flujo editorial; Insights posee informes.
+Greenhouse: datos/prioridad/outcomes; Marketing Studio: flujo editorial; Insights: informes.
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
+SKY: `sky-blog-seo` · [cuenta](docs/services/sky-blog-seo/README.md).
 
 Marketing Studio: skills `efeonce-marketing-studio` y `efeonce-campaign-planning`; el catálogo versionado
 rige canales y límites, no los aliases históricos. [Contrato](docs/documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).

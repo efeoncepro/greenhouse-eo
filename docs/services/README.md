@@ -63,6 +63,10 @@ modelo `Approved for validation`, sin precio público ni capacidad runtime nueva
 
 ## Familias disponibles
 
+Instancia de cuenta: [Servicio SEO del Blog SKY](sky-blog-seo/README.md), marco de operación,
+recovery, editorial y medición. Preparación aprobada el 15-10-2026; cantidades y metas se confirman
+con anexo/auditoría. Reutiliza Search Visibility 360 y el playbook del cliente, sin crear una línea nueva.
+
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
 - [Salesforce Practice](salesforce/README.md) — arquitectura de oferta por outcomes y lifecycle para CRM core,
   Marketing Cloud Engagement y Marketing Cloud Next, con operación, venta y coexistencia separadas.

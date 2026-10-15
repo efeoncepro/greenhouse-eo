@@ -4,6 +4,17 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "sky-blog-seo",
+      "triggers": ["servicio SEO SKY", "recuperación blog SKY", "indicador orgánico SKY", "operación SEO blog SKY"],
+      "skills": ["sky-blog-seo", "seo-aeo", "dataforseo-operator"],
+      "sources": [
+        "docs/services/sky-blog-seo/README.md",
+        "docs/services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md",
+        "docs/architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md",
+        "docs/manual-de-uso/growth/valorar-trafico-organico.md"
+      ]
+    },
+    {
       "id": "creative-workbench",
       "triggers": [
         "Creative Workbench",

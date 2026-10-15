@@ -1,5 +1,20 @@
 # Informe — DataForSEO en `greenhouse-eo` (as-of 2026-08-06, branch `develop`)
 
+## Delta 2026-10-15 — Valor orgánico con clics GSC y CPC por país
+
+El indicador `gsc_clicks_country_cpc_v1` reutiliza los snapshots de `keyword-market-data.ts` y su
+reader, que ahora expone `capturedAt` por keyword. Foundation local en
+`src/lib/growth/seo/organic-traffic-value/` y CLI `scripts/seo/organic-traffic-value.ts`.
+No crea un presupuesto, cliente DataForSEO, tracking recurrente o superficie productiva nuevos.
+Compras puntuales por CLI gobernada, preview/ceiling, consumer SEO y writer canónico existente.
+
+El dinero derivado conserva procedencia estimada de CPC; GSC conserva clics medidos y controles sin query.
+Cobertura explícita, ausencias null y CPC cero válido. No extrapolar al resto ni denominar ahorro/ROI al valor.
+No sustituye `estimated_paid_traffic_cost` del proveedor, que usa ETV y su versión metodológica.
+Método y piloto de SKY:
+[`INDICADOR_VALOR_ORGANICO_V1.md`](../../../../docs/services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md),
+[`valorar-trafico-organico.md`](../../../../docs/manual-de-uso/growth/valorar-trafico-organico.md).
+
 ## §1 Cliente canónico (API + firmas)
 
 Vive en `src/lib/ai/dataforseo.ts` (364 líneas, `import 'server-only'`). Base URL fija `https://api.dataforseo.com` (`src/lib/ai/dataforseo.ts:13`). Exports:

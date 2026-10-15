@@ -1,0 +1,33 @@
+{
+  "manifest_version": 1,
+  "status": "prepared_not_applied",
+  "generated_on": "2026-10-15",
+  "executed_changes": 0,
+  "items": [
+    {
+      "source_url": "https://blog-sky-h0gfh8acecdrdtav.eastus2-01.azurewebsites.net/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "evidence": [
+        "market/azure-live-check.json",
+        "market/azure-duplicate-comparison.json"
+      ],
+      "facts": "Home y 2 artículos 200 autocanónicos de Azure sin noindex. Similitud de texto de 2 artículos≈96%; no censo completo del host. Función real sin confirmar.",
+      "proposed_action": "Decidir configuración por función real del host; ver runbook tres ramas",
+      "dependency": [
+        "Owner infra identifica origen activo/staging/clon retirado; mapa Cloudflare/Host/SNI/caché/healthchecks antes de cambios"
+      ],
+      "owner_proposed": "SKY Azure/Cloudflare/plataforma + SEO",
+      "status": "blocked_host_role_confirmation",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    }
+  ]
+}

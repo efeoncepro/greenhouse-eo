@@ -5,6 +5,11 @@ description: Operador experto de la API DataForSEO v3 para Greenhouse — oficio
 
 # DataForSEO Operator — oficio del proveedor + contrato Greenhouse
 
+Para valorar clics orgánicos observados con CPC por país, usar la foundation local
+`src/lib/growth/seo/organic-traffic-value/` y el [manual del indicador](../../../docs/manual-de-uso/growth/valorar-trafico-organico.md).
+Reutiliza los snapshots Labs y su writer; cobertura y fechas son parte del resultado. El valor nativo con
+ETV conserva su base estimada independiente. Para la cuenta SKY cargar además `sky-blog-seo`.
+
 Skill de dos capas, inseparables:
 
 1. **Oficio de la API** — qué ofrece DataForSEO v3 hoy (as-of 2026-09-02; la respuesta contractual de ETV mejorado todavía adelanta a la documentación pública), cómo llamarla bien y cómo pagar lo mínimo por el máximo dato.

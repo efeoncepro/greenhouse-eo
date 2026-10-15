@@ -14,6 +14,10 @@
 
 Documento maestro del módulo SEO. Contrato técnico + de negocio del que derivan las tasks `TASK-1299…1310`. Complementa (no reemplaza) `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (el motor hermano).
 
+Delta 15-10-2026: [valor orgánico con clics GSC × CPC por país](GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md),
+foundation local para análisis de operador y piloto SKY. Reutiliza readers, snapshots y procedencia; no crea
+panel, tool MCP, API, job ni una nueva edición de Insights. El valor nativo con ETV conserva su metodología.
+
 ---
 
 ## 1. Tesis y bounded context

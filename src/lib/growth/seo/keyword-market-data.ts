@@ -99,6 +99,8 @@ export const SEO_SEARCH_INTENTS: readonly SeoSearchIntent[] = [
 ]
 
 export interface SeoKeywordMarketDatum {
+  /** Fecha efectiva del snapshot cuando lo devuelve el reader. El parser de proveedor no la inventa. */
+  capturedAt?: string
   normalizedKeyword: string
   keyword: string
   locationCode: string
@@ -932,6 +934,7 @@ export const readKeywordMarketData = async (input: {
     if (row.is_fresh) freshKeywords += 1
 
     byKeyword.set(row.normalized_keyword, {
+      capturedAt: captureDate,
       normalizedKeyword: row.normalized_keyword,
       keyword: row.keyword,
       locationCode: input.locationCode,

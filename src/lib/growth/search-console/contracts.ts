@@ -78,6 +78,18 @@ export interface SearchConsoleAnalyticsParams {
   range: { startDate: string; endDate: string }
   dimensions?: SearchConsoleAnalyticsDimension[]
   rowLimit?: number
+  /** Filtros aditivos para cortes comparables de medición, sin ampliar OAuth. */
+  type?: 'web' | 'image' | 'video' | 'news' | 'discover' | 'googleNews'
+  dataState?: 'final' | 'all'
+  aggregationType?: 'auto' | 'byPage' | 'byProperty'
+  dimensionFilterGroups?: Array<{
+    groupType: 'and'
+    filters: Array<{
+      dimension: SearchConsoleAnalyticsDimension
+      operator: 'equals' | 'notEquals' | 'contains' | 'notContains' | 'includingRegex' | 'excludingRegex'
+      expression: string
+    }>
+  }>
   /**
    * Offset de paginación de la Search Analytics API (TASK-1302, aditivo).
    *

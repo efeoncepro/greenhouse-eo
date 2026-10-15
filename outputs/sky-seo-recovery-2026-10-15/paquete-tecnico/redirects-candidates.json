@@ -1,0 +1,1051 @@
+{
+  "manifest_version": 1,
+  "status": "prepared_not_applied",
+  "generated_on": "2026-10-15",
+  "executed_changes": 0,
+  "items": [
+    {
+      "candidate_id": "404-01",
+      "source_url": "https://blog.skyairline.com/como-cambiar-un-vuelo-en-sky-pasos-y-condiciones/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "revision",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Archivo consultado sin capturas. Ambas URLs coexistían en GA4 en 2025; semejanza temática no prueba equivalencia.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 0,
+      "source_post_ids": [],
+      "source_post_urls": [],
+      "pre_ga4_sessions": 3433,
+      "post_ga4_sessions": 2187,
+      "pre_ga4_views": 3888,
+      "post_ga4_views": 2440,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": true,
+      "dependency": [
+        "Recuperar backup/revisión original y comparar con cambiar-vuelo-sky; owner condiciones comerciales"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-02",
+      "source_url": "https://blog.skyairline.com/restaurantes-tematicos-de-bogota/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "devolver_contenido",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Restaurantes de Bogotá vigente es guía general; no reemplaza demostrablemente intención temática.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 1,
+      "source_post_ids": [
+        2394
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/mejor-vida-nocturna/"
+      ],
+      "pre_ga4_sessions": 730,
+      "post_ga4_sessions": 500,
+      "pre_ga4_views": 742,
+      "post_ga4_views": 514,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Recuperar original y aprobar guía temática actualizada con fuentes de locales"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-03",
+      "source_url": "https://blog.skyairline.com/sur-argentino/",
+      "proposed_destination_url": "https://blog.skyairline.com/patagonia-argentina/",
+      "proposed_destination_post_id": 9076,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Anclas sur argentino/sur de Argentina y destino cubre Patagonia Andina/Austral/Atlántica, Bariloche, Calafate, Chaltén, Ushuaia, Madryn y Valdés.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 11,
+      "source_post_ids": [
+        9325,
+        9185,
+        9321,
+        9326,
+        9248,
+        890,
+        9322,
+        9304,
+        9327,
+        9324,
+        9328
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/comodoro-rivadavia/",
+        "https://blog.skyairline.com/el-chalten/",
+        "https://blog.skyairline.com/las-grutas/",
+        "https://blog.skyairline.com/llanada-grande/",
+        "https://blog.skyairline.com/neuquen/",
+        "https://blog.skyairline.com/paquetes-de-viaje/",
+        "https://blog.skyairline.com/peninsula-valdes/",
+        "https://blog.skyairline.com/puerto-madryn/",
+        "https://blog.skyairline.com/trelew/",
+        "https://blog.skyairline.com/turismo-esquel/",
+        "https://blog.skyairline.com/villa-la-angostura/"
+      ],
+      "pre_ga4_sessions": 418,
+      "post_ga4_sessions": 192,
+      "pre_ga4_views": 428,
+      "post_ga4_views": 181,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial por ancla; no se recuperó contenido original para 301"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-04",
+      "source_url": "https://blog.skyairline.com/desierto-florido-de-chile/",
+      "proposed_destination_url": "https://blog.skyairline.com/desierto-florido/",
+      "proposed_destination_post_id": 2187,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "condicionada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Intención del fenómeno coincide. Destino mezcla Atacama/Vallenar-Copiapó con San Pedro-Calama 98 km: inconsistencia geográfica interna.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 4,
+      "source_post_ids": [
+        7866,
+        7812,
+        2388,
+        2749
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/caldera/",
+        "https://blog.skyairline.com/copiapo/",
+        "https://blog.skyairline.com/curiosidades-de-chile-2/",
+        "https://blog.skyairline.com/norte-de-chile/"
+      ],
+      "pre_ga4_sessions": 412,
+      "post_ga4_sessions": 208,
+      "pre_ga4_views": 421,
+      "post_ga4_views": 227,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Corregir geografía con fuente oficial y aprobación editorial antes de promover destino"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-05",
+      "source_url": "https://blog.skyairline.com/vacaciones-nav-idenas-latinoamerica/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "revision",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "No hay reemplazo navideño latinoamericano acreditado; para-navidad es fechado 2022 y más estrecho.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 1,
+      "source_post_ids": [
+        3048
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/reservar-un-hotel/"
+      ],
+      "pre_ga4_sessions": 73,
+      "post_ga4_sessions": 9,
+      "pre_ga4_views": 75,
+      "post_ga4_views": 10,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Decisión editorial de restaurar/retirar según vigencia e intención"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-06",
+      "source_url": "https://blog.skyairline.com/turismo-gastronomico-2/",
+      "proposed_destination_url": "https://blog.skyairline.com/turismo-gastronomico/",
+      "proposed_destination_post_id": 817,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "media_por_contexto",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Turismo-gastronomico define concepto y Perú/Argentina; turistas-gastronomicos cubre más destinos deLatAm. Escoger por ancla, no una 301 global.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 8,
+      "source_post_ids": [
+        2731,
+        1910,
+        2590,
+        4328,
+        2904,
+        2686,
+        3231,
+        2062
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/costos-al-viajar/",
+        "https://blog.skyairline.com/ecoturismo/",
+        "https://blog.skyairline.com/mejor-comida-peruana/",
+        "https://blog.skyairline.com/natal-brasil/",
+        "https://blog.skyairline.com/paseo-del-mar-de-antofagasta/",
+        "https://blog.skyairline.com/plaza-mayor-de-lima/",
+        "https://blog.skyairline.com/puerto-montt-que-hacer-invierno/",
+        "https://blog.skyairline.com/tomar-vino-en-mendoza/"
+      ],
+      "pre_ga4_sessions": 9,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": 10,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisar 8 anclas: concepto→turismo-gastronomico; destinos de Latinoamérica→turistas-gastronomicos"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-07",
+      "source_url": "https://blog.skyairline.com/invierno-en-peru/",
+      "proposed_destination_url": "https://blog.skyairline.com/estaciones-del-ano-en-peru/",
+      "proposed_destination_post_id": 9470,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Guía vigente detalla invierno por costa/sierra/selva y Cajamarca, con SENAMHI; fuentes son artículos sobre Cajamarca.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 2,
+      "source_post_ids": [
+        9307,
+        9308
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/lugares-turisticos-cajamarca/",
+        "https://blog.skyairline.com/vuelos-a-cajamarca/"
+      ],
+      "pre_ga4_sessions": 8,
+      "post_ga4_sessions": 1,
+      "pre_ga4_views": 10,
+      "post_ga4_views": 1,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial de dos anclas"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-08",
+      "source_url": "https://blog.skyairline.com/viaje-a-florianopolis/",
+      "proposed_destination_url": "https://blog.skyairline.com/donde-queda-florianopolis/",
+      "proposed_destination_post_id": 2487,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "condicionada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Guía incluye ubicación y actividades; afirma vuelos SKY internos enBrasil São Paulo/Porto Alegre/Rio. No promover antes de validar rutas.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 9,
+      "source_post_ids": [
+        4022,
+        8758,
+        8878,
+        2608,
+        8085,
+        3257,
+        8925,
+        8082,
+        3385
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/brasil-canasvieiras/",
+        "https://blog.skyairline.com/canasvieiras/",
+        "https://blog.skyairline.com/clima-florianopolis/",
+        "https://blog.skyairline.com/donde-viajar-con-ninos/",
+        "https://blog.skyairline.com/florianopolis-playas/",
+        "https://blog.skyairline.com/florianopolis/",
+        "https://blog.skyairline.com/jurere/",
+        "https://blog.skyairline.com/pasajes-a-florianopolis/",
+        "https://blog.skyairline.com/santo-antonio-de-lisboa/"
+      ],
+      "pre_ga4_sessions": 4,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": 4,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Owner SKY valida/corrige afirmaciones de rutas; revisión individual de 9 anclas (algunas centro/cafés)"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-09",
+      "source_url": "https://blog.skyairline.com/dia-del-turismo-andino-conoce-los-tres-mejores-destinos-de-la-sierra-sur-del-peru/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "revision",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Noticia de evento sin equivalente actual acreditado; anclas genéricas Andes/sierra no justifican 301 aotra guía.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 3,
+      "source_post_ids": [
+        5316,
+        5289,
+        2913
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/bailes-tipicos-del-peru/",
+        "https://blog.skyairline.com/bebidas-tipicas-peru/",
+        "https://blog.skyairline.com/canon-de-shucto/"
+      ],
+      "pre_ga4_sessions": 3,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": 2,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Decidir restauración histórica contextualizada o retirar enlace conservando texto"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-10",
+      "source_url": "https://blog.skyairline.com/puerto-natales-3/",
+      "proposed_destination_url": "https://blog.skyairline.com/puerto-natales/",
+      "proposed_destination_post_id": 1814,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Guía vigente cubre ciudad, excursiones y gastronomía/cafés Costanera, coherente con anclas ciudad/comida.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 3,
+      "source_post_ids": [
+        5878,
+        7600,
+        7597
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/cafe-chileno-conoce-la-historia-del-cafe-en-chile-tipos-y-donde-probarlo/",
+        "https://blog.skyairline.com/comida-tipica-de-argentina/",
+        "https://blog.skyairline.com/patagonia/"
+      ],
+      "pre_ga4_sessions": 2,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": 2,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión anclas; corregir CTA 4498 literal en paralelo"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-11",
+      "source_url": "https://blog.skyairline.com/lugares-turisticos-sur-de-chile/",
+      "proposed_destination_url": "https://blog.skyairline.com/lugares-para-visitar-en-el-sur-de-chile-naturaleza-y-aventura/",
+      "proposed_destination_post_id": 5979,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Destino cubre Torres del Paine, Chiloé, Austral, trekking/kayak y clima; coincide con contextos naturaleza/sur Chile.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 6,
+      "source_post_ids": [
+        5971,
+        6209,
+        5912,
+        5872,
+        6054,
+        6121
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/auroras-australes-en-chile-cuando-y-donde-verlas/",
+        "https://blog.skyairline.com/parque-hornopiren-que-ver-y-como-llegar/",
+        "https://blog.skyairline.com/pueblos-del-sur-de-chile-con-encanto-y-tradiciones/",
+        "https://blog.skyairline.com/rutas-de-los-pioneros/",
+        "https://blog.skyairline.com/termas-en-la-region-de-los-lagos-aguas-termales-en-la-patagonia/",
+        "https://blog.skyairline.com/termas-en-puerto-montt-las-mejores-opciones-para-relajarte/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": 1,
+      "pre_ga4_views": null,
+      "post_ga4_views": 1,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial de seis fuentes"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-12",
+      "source_url": "https://blog.skyairline.com/que-hacer-en-rio-de-janeiro/",
+      "proposed_destination_url": "https://blog.skyairline.com/rio-de-janeiro/",
+      "proposed_destination_post_id": 3424,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Guía actual leída: playas, Cristo, Pan de Azúcar, barrios, cultura y transporte; anclas de viaje/actividades.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 5,
+      "source_post_ids": [
+        1404,
+        1719,
+        2916,
+        5612,
+        2614
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/actividades-al-aire-libre-en-rio-de-janeiro/",
+        "https://blog.skyairline.com/bucket-list/",
+        "https://blog.skyairline.com/cristo-de-tatanazo/",
+        "https://blog.skyairline.com/descubre-urca-en-rio-de-janeiro-el-barrio-del-pan-de-azucar/",
+        "https://blog.skyairline.com/playa-copacabana/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial de cinco fuentes"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-13",
+      "source_url": "https://blog.skyairline.com/viajar-con-mascota-2/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "condicionada_por_fuente",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Sólo normas-para-viajar-en-avion menciona mascotas en cabina; otras fuentes son paseo/viaje genérico y no acreditan mismo destino.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 4,
+      "source_post_ids": [
+        1395,
+        1473,
+        1634,
+        2062
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/10-mil-pasos-diarios/",
+        "https://blog.skyairline.com/normas-para-viajar-en-avion/",
+        "https://blog.skyairline.com/parque-cultural-ruinas-de-huanchaca/",
+        "https://blog.skyairline.com/tomar-vino-en-mendoza/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Owner política de mascotas valida actualidad; revisión 4 fuentes. Propuesta puntual: normas-para-viajar-en-avion→mascotas-en-cabina"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-14",
+      "source_url": "https://blog.skyairline.com/pase-de-movilidad-en-chile/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "revision",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Reglas sanitarias históricas requieren decisión de vigencia; no restaurar política obsoleta por defecto.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 3,
+      "source_post_ids": [
+        3350,
+        1367,
+        1146
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/cena-navidena-chilena/",
+        "https://blog.skyairline.com/vacunacion-en-latinoamerica/",
+        "https://blog.skyairline.com/viajar-en-familia-durante-el-covid-19/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "SKY valida retiro/vigencia; actualizar tres fuentes; 410 sólo tras decisión explícita de retiro sin sustituto"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-15",
+      "source_url": "https://blog.skyairline.com/administrar-vuelo/",
+      "proposed_destination_url": "https://blog.skyairline.com/administra-tu-vuelo-sky/",
+      "proposed_destination_post_id": 5088,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "condicionada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Cuerpo actual trata reserva, checkin, servicios, reembolso/transferencia; encaja con intención pero condiciones requieren validación.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 2,
+      "source_post_ids": [
+        3061,
+        4272
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/aerolinea-lowcost-para-volar/",
+        "https://blog.skyairline.com/sky-app/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": 1,
+      "pre_ga4_views": null,
+      "post_ga4_views": 2,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Owner SKY valida funcionalidades y condiciones vigentes"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-16",
+      "source_url": "https://blog.skyairline.com/viajar-a-concepcion/",
+      "proposed_destination_url": "https://blog.skyairline.com/concepcion-2/",
+      "proposed_destination_post_id": 8023,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Guía actual de Concepción cubre llegada, ciudad, caletas, playas y clima; encaja con viaje a ciudad.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 2,
+      "source_post_ids": [
+        3290,
+        3220
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/fiestas-patrias-en-concepcion/",
+        "https://blog.skyairline.com/invierno-en-concepcion/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial de dos fuentes"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-17",
+      "source_url": "https://blog.skyairline.com/playas-sur-de-chile/",
+      "proposed_destination_url": "https://blog.skyairline.com/playas-del-sur-de-chile-que-no-te-puedes-perder/",
+      "proposed_destination_post_id": 5906,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_enlace_contextual",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Cuerpo incluye Colún, Bahía Mansa, Cucao, Mar Brava, Caleta Cóndor y Raúl Marín; responde playas del sur.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 2,
+      "source_post_ids": [
+        6009,
+        5893
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/caracteristicas-de-la-zona-sur-de-chile-geografia-y-biodiversidad/",
+        "https://blog.skyairline.com/frutas-del-sur-de-chile-variedades-y-beneficios/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial de dos fuentes"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_editorial_validation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-18",
+      "source_url": "https://blog.skyairline.com/como-llegar-a-pipa-brasil/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "devolver_contenido",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "No se halló guía Pipa equivalente; natal-brasil es la fuente de enlace, no reemplazo del trayecto aPipa.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 1,
+      "source_post_ids": [
+        4328
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/natal-brasil/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Recuperar original y validar transporte/itinerario con fuente oficial"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-19",
+      "source_url": "https://blog.skyairline.com/errores-al-pasar-por-migracion/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_para_quitar_enlace",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Única fuente enlaza la palabra viajero en párrafo de cambios/cargos; contexto no trata migración. Propuesta: retirar hipervínculo preservando texto.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 1,
+      "source_post_ids": [
+        2364
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/se-pueden-cambiar-los-pasajes-de-avion/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisión editorial de fuente; no 301 ni reemplazo por pasar-migracion por parecido de slug"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-20",
+      "source_url": "https://blog.skyairline.com/informacion-para-viajar/",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "revision",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "no_acreditada",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "Fuente enoturismo usa ancla algunas razones para tomar tus maletas, sin intención suficiente para checklist genérico.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 1,
+      "source_post_ids": [
+        1183
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/enoturismo-en-chile/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": 14,
+      "pre_ga4_views": null,
+      "post_ga4_views": 17,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "Revisar intención original; conservar texto y retirar enlace sólo si editorial aprueba"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "candidate_id": "404-21",
+      "source_url": "https://blog.skyairline.com/puerto-natales-en-invierno/blank",
+      "proposed_destination_url": null,
+      "proposed_destination_post_id": null,
+      "proposed_action": "corregir_enlace",
+      "redirect_approved": false,
+      "redirect_destination_url": null,
+      "equivalence_confidence": "alta_error_confirmado_destino_pendiente",
+      "equivalence_scope": "Sólo corrección contextual de enlace cuando se especifica; equivalencia del artículo 404 original no acreditada.",
+      "evidence": [
+        "WP 3235 contiene href=blank y ancla conocer precios, itinerarios y destinos: CTA comercial mal formado. No es enlace editorial.",
+        "deepening/site/combined-404-destinations.json",
+        "site/wp-inventory.json",
+        "site/wp-article-corpus.json"
+      ],
+      "source_count": 1,
+      "source_post_ids": [
+        3235
+      ],
+      "source_post_urls": [
+        "https://blog.skyairline.com/puerto-natales-en-invierno/"
+      ],
+      "pre_ga4_sessions": null,
+      "post_ga4_sessions": null,
+      "pre_ga4_views": null,
+      "post_ga4_views": null,
+      "current_http_status": 404,
+      "http_evidence": "deepening/site/legacy-census.json + site/supplement-checks.json; long alias: historical-high-traffic-alias-checks.json",
+      "historical_only_probe": false,
+      "dependency": [
+        "SKY debe aportar destino comercial oficial 200 aprobado; no inventarlanding"
+      ],
+      "owner_proposed": "SKY SEO/editorial + owner comercial si aplica; implementación SKY WordPress/infra",
+      "status": "prepared_owner_decision_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    }
+  ],
+  "approved_301_count": 0,
+  "scope_note": "21 destinos 404 de la auditoría; 20 con enlaces contextuales y 1 sonda histórica. Ninguna 301 lista para aplicar."
+}

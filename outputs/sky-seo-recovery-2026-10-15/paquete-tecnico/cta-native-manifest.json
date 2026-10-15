@@ -1,0 +1,2542 @@
+{
+  "manifest_version": 1,
+  "status": "prepared_not_applied",
+  "generated_on": "2026-10-15",
+  "executed_changes": 0,
+  "items": [
+    {
+      "wp_id": 2991,
+      "source_url": "https://blog.skyairline.com/estado-de-vuelo/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "1b0b80a79d2f8092171adcc849b1f61a287461421a59e8148ce7defad1cd335a",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2700,
+      "source_url": "https://blog.skyairline.com/playas-de-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "086fa45f5656d11313a56d8340673deeca35ca9b45c2c5518e31aa9e4aab9236",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3250,
+      "source_url": "https://blog.skyairline.com/lugares-gratuitos-en-florianopolis/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "3cb208f845d45a933bf59d29540c1842b053f8945111335e9a0e6ac414002119",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2505,
+      "source_url": "https://blog.skyairline.com/mejores-playas-de-florianopolis/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "f1ae8cf3aeafd90e9245e5cd477df1a4b2aec520a0bbae96feeae299c6b89553",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1669,
+      "source_url": "https://blog.skyairline.com/cosas-gratis-en-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "3509174ae135e8780bed2d5f390f0b08c0c7fcb7c810b8815f1d1e16830b2742",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1543,
+      "source_url": "https://blog.skyairline.com/que-hacer-con-ninos-en-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "b91fc8d81c898f08b970949c2f1c9863c3ebaf1087d11e2ab28570a038618547",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 5320,
+      "source_url": "https://blog.skyairline.com/dia-del-piloto/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4955
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4955″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "9c51d40446abcba22ef4189544c99a0dbf5899fe0da32b77be49809b4f5cf0d6",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": true,
+      "historical_4955_destination": "https://skyairline-21097480.hs-sites.com/tripulante-de-cabina?utm_medium=rock-convert",
+      "historical_4955_destination_http_current": 404,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json",
+        "deepening/site/archive-curso-tripulante-cabina-20250623065554.html",
+        "recovery-plan/technical/candidate-validation.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_landing_404",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2769,
+      "source_url": "https://blog.skyairline.com/lugares-instagrameables/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "eff0ec4b0b650e632ddc2b45de6b9bb80a80065f14d45d584857d5c390b5bee6",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 5262,
+      "source_url": "https://blog.skyairline.com/fin-de-ano-en-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "a6c2dea58433bcaa9eb3c7a27270e689995453c1e3f57060b2b9ebf1e54ef597",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 5253,
+      "source_url": "https://blog.skyairline.com/curso-tripulante-cabina/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4955,
+        4955
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4955″]",
+        "[rock-convert-cta id=»4955″]"
+      ],
+      "placement_count": 2,
+      "content_sha256": "c4f3b99c8d697b07312361ef079708108cbfab59dade5e64be0e961b78bc4afe",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": true,
+      "historical_4955_destination": "https://skyairline-21097480.hs-sites.com/tripulante-de-cabina?utm_medium=rock-convert",
+      "historical_4955_destination_http_current": 404,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json",
+        "deepening/site/archive-curso-tripulante-cabina-20250623065554.html",
+        "recovery-plan/technical/candidate-validation.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_landing_404",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 5258,
+      "source_url": "https://blog.skyairline.com/tradiciones-ano-nuevo/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "b74b58c11cdc0026ee42e8d91f0175b6498e72c595393389d045ecfe9e6bb0be",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 661,
+      "source_url": "https://blog.skyairline.com/viajar-puerto-montt/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "8debabf1d8a01da6b51294c830e7c962475dcbae05137de2c5ad8a488b9c8e23",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4934,
+      "source_url": "https://blog.skyairline.com/sky-airline-reporta-sus-resultados-al-primer-semestre-del-2024/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4955
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4955″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "b2af910cdfe7ba68d45548b85047c4ef5c930c78da8bfe589531f2c71d605d03",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": true,
+      "historical_4955_destination": "https://skyairline-21097480.hs-sites.com/tripulante-de-cabina?utm_medium=rock-convert",
+      "historical_4955_destination_http_current": 404,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json",
+        "deepening/site/archive-curso-tripulante-cabina-20250623065554.html",
+        "recovery-plan/technical/candidate-validation.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_landing_404",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3207,
+      "source_url": "https://blog.skyairline.com/esquiar-en-bariloche/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "22a3635e71c64c3f579f743f467a7820a1ce65d3af73e7a5a26d56e93fdc36dc",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4266,
+      "source_url": "https://blog.skyairline.com/cuanto-dinero-llevar-miami/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "5a287b66c1efe198891b50c42d56c823b030818c221b57fdc1733fc28255091f",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4272,
+      "source_url": "https://blog.skyairline.com/sky-app/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4264
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4264″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "824da30da3471fd270711bcde91616ce54d6d2c268ce8de0500392dce8ee6de6",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1814,
+      "source_url": "https://blog.skyairline.com/puerto-natales/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "b37212c35bbac96665dbed75c7005481c45797f37026fe13120cb6790147da16",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4220,
+      "source_url": "https://blog.skyairline.com/aeropuerto-santiago/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "2bc7394b5a34dd2c78dca4df7f927fd4b783aa1ab56af60929459a69e263a74e",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4213,
+      "source_url": "https://blog.skyairline.com/chalten-trekking/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "9003110d36ad099a688960ee6b5cfe2538305cd471987d8a16d3a93fa703414b",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4334,
+      "source_url": "https://blog.skyairline.com/parque-nahuelito-en-bariloche-2/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "7e60a6a69923bafa94bd9f116e3a99c905d8826d9fd4c4c5b472afcf7d80900f",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3318,
+      "source_url": "https://blog.skyairline.com/parque-nahuelito-en-bariloche/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "4b58ab6baf7acd1f93fbedd0cbe8ebbc5ba7d645f39ca9c563d13bb974a3ed64",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4328,
+      "source_url": "https://blog.skyairline.com/natal-brasil/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4264
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4264″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "5846483b7994d119f8ff86050f97078fd920c783beed509f818c6912df99166b",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4319,
+      "source_url": "https://blog.skyairline.com/viajar-por-sudamerica/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "d7a695493038ea4b460b4e21b624454e29dd8f4a976c1818fe4e9b9025986524",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4166,
+      "source_url": "https://blog.skyairline.com/conciertos-argentina/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4469
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4469″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "dfeb024e7fe90dfa71de250cde08dad67530895042cda87b59ff2569e768473d",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4107,
+      "source_url": "https://blog.skyairline.com/trekking-latinoamerica/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "cf6271acf337dd20849009d1770c424f662a06257c3b9d65be6ebb59feb05bc8",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 4041,
+      "source_url": "https://blog.skyairline.com/como-financiar-viaje/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "d261f232b053e648838121c519d4ee2ab28e9334a8a087763a30db0dd1b915cd",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3961,
+      "source_url": "https://blog.skyairline.com/sky-recibe-el-2024-con-nuevas-rutas-en-sudamerica/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "6cec7ddb624f536a7200d6d693fa5dd70f824edeaa260b1a685a1bf1d03d29f3",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3911,
+      "source_url": "https://blog.skyairline.com/estudiar-trabajar-extranjero/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "d26201c8393d6514c8a33612a491b093093973572a6bf5615a01ccae061246ac",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3908,
+      "source_url": "https://blog.skyairline.com/como-hacer-mochila/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "ac79d2552d359bc6858b8683186973e167cc0d1a1a716c2031702b2bb3c4b59e",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3875,
+      "source_url": "https://blog.skyairline.com/como-aprender-idioma/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "3f894f6647102d9f5338e89e0a4fe98202cdb07641c999bdd86e9c3c3a43ba6f",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 791,
+      "source_url": "https://blog.skyairline.com/viajes-avion/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "a44d3664d96e9d9651c199fad9756c2865e8ef2d26c6821fdc58cebb984df395",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1922,
+      "source_url": "https://blog.skyairline.com/equipaje-de-mano-permitido/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506,
+        4469
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]",
+        "[rock-convert-cta id=»4469″]"
+      ],
+      "placement_count": 2,
+      "content_sha256": "05177bc3e1141b60d1cfcbe98aa72eaf71f05e99d37d299588439bacb6240343",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3614,
+      "source_url": "https://blog.skyairline.com/pan-azucar-uruguay/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "4d3fbe9ef07c1637c9f16ffae17a983f1ae94830e286593f5ec84526e3298f55",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3595,
+      "source_url": "https://blog.skyairline.com/turismo-brasil/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "5d7232129fea444b945bee51951e5c36487f1174eaf40c645d4693dd54387eba",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3568,
+      "source_url": "https://blog.skyairline.com/que-estudia-tripulante-cabina/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4955
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4955″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "a811f93616d417a02d04159d0db73bf16e6016ba8a4b74a571b3fa37c2b6a425",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": true,
+      "historical_4955_destination": "https://skyairline-21097480.hs-sites.com/tripulante-de-cabina?utm_medium=rock-convert",
+      "historical_4955_destination_http_current": 404,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json",
+        "deepening/site/archive-curso-tripulante-cabina-20250623065554.html",
+        "recovery-plan/technical/candidate-validation.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_landing_404",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3433,
+      "source_url": "https://blog.skyairline.com/viaje-de-tus-suenos/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "f5fb0d04554bd6fb21f00199933427a571bd770a82b95dfd4722151c0d8a130b",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3420,
+      "source_url": "https://blog.skyairline.com/viajar-solo-primera-vez/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "2fd23fd5d7cf2481d726eb1e5c3dcfdeffdfd4c7f6493ab65e44a36f4bd991d2",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 90,
+      "source_url": "https://blog.skyairline.com/low-cost/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "b4675fcff63b90fd5f8a5549299115cd16cfc18119fb2c09535f58631e21b72b",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3531,
+      "source_url": "https://blog.skyairline.com/sky-airline-operara-dos-nuevas-rutas-en-puerto-montt/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "fe53cd6a888628e8d930aa37a98b467a4c983003ce6ddbad19bc68011627171f",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3231,
+      "source_url": "https://blog.skyairline.com/puerto-montt-que-hacer-invierno/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "f120ce9ce64590aea37ad35ee3bf3c0c387bd4752f87fa859c96f38f4a95f4b2",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3183,
+      "source_url": "https://blog.skyairline.com/gastronomia-de-jauja/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "77141cb0d9ce9120d8408ee33febe5550d0c57a42018722d317de476ed863e11",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3177,
+      "source_url": "https://blog.skyairline.com/museos-en-porto-alegre/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "241a7830aa47bee57c83ada5eb418f7c4875fffbf6adfa5fe0b642e5bb4975d1",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6710,
+      "source_url": "https://blog.skyairline.com/puerto-montt-en-invierno/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "2b83470ba92c6db503fbf35fd2198aad140038f63f5b8691a68efa073a4ca046",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3075,
+      "source_url": "https://blog.skyairline.com/que-hacer-en-pucon/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "18e5fd944f2117f31ec57a9059c41b430e9686ddda78a0e85457d7231bbb7f27",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3068,
+      "source_url": "https://blog.skyairline.com/cenotes-en-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "a3d512dabb1eddc96a95fbe24a2c6136080c10a9401e2e745a01aa338d37623f",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3067,
+      "source_url": "https://blog.skyairline.com/que-hacer-en-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "f684c98e38ac9fa255f2f7e1f6aed9cdb5dcba66ca90dc9dd449f2eda9de4ad5",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 3051,
+      "source_url": "https://blog.skyairline.com/nieve-en-suramerica/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "01585679423b2aebee2dfe7b3bcf6cd41e3a33f63f908b79ca3b3108bf6b86b8",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2804,
+      "source_url": "https://blog.skyairline.com/semana-santa-en-cancun/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "7553686931adba5b498204046ce3d8c233d10ca159e05e3c58b68c8cd6858140",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2767,
+      "source_url": "https://blog.skyairline.com/viajes-en-temporada-baja/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "5f3ae24bb8083c6fcc0fbd6b5600810bfa772080b6f0746265fdd2e1f0482328",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2731,
+      "source_url": "https://blog.skyairline.com/costos-al-viajar/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "ec21a059e5fba52ab89552c49fe0194b9755927aa9aeab822ce788904e4c375b",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2713,
+      "source_url": "https://blog.skyairline.com/cambiar-divisas/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "82809a4ddfa4fe4c7baeb7e9d2c47e9ad91101b6ff04648780534408b7035342",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2661,
+      "source_url": "https://blog.skyairline.com/sky-es-reconocida-como-la-flota-mas-nueva-de-sudamerica-por-tercer-ano-consecutivo/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "b35cb9ee8826fc75bb72fa749249f80a619a471c08e00a3599f05405ac2ce189",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2602,
+      "source_url": "https://blog.skyairline.com/bariloche-en-auto/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        3947
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»3947″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "5b9a094be2a565ced9b9dad12de5675395cd0963f250ddb54ff81d9721771eae",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2573,
+      "source_url": "https://blog.skyairline.com/visa-de-turista/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "f2f605583ff3a4939a3b6f77dc4ee4fb104236c4bfeec42d61594f48729a6181",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2403,
+      "source_url": "https://blog.skyairline.com/isla-de-san-andres/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4504
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4504″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "d6892fcb25f9008389b605d80a9b0ebaf6aeb354f7654c12c229ee3b2d6bac26",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2391,
+      "source_url": "https://blog.skyairline.com/lugares-turisticos-de-latinoamerica/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "f0e996e1483f6cd8e536b93048089be385a57b33421b63beeb1b079d58a15047",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 2289,
+      "source_url": "https://blog.skyairline.com/comidas-y-bebidas-tipicas-del-18-de-septiembre/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "4e4a677a27628183c3dd1b94f077a08d6c2f3110d01f6cac1a92f71ffdb51028",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6704,
+      "source_url": "https://blog.skyairline.com/sky-aumenta-la-presencia-de-mujeres-piloto-superando-el-promedio-mundial-2/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4955
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4955″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "9c67a162686c4586666f8dad937b68bdc4e2111f6efbf57ecef79eab5970058c",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": true,
+      "historical_4955_destination": "https://skyairline-21097480.hs-sites.com/tripulante-de-cabina?utm_medium=rock-convert",
+      "historical_4955_destination_http_current": 404,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json",
+        "deepening/site/archive-curso-tripulante-cabina-20250623065554.html",
+        "recovery-plan/technical/candidate-validation.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_landing_404",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1696,
+      "source_url": "https://blog.skyairline.com/lugares-turisticos-chile/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "6a1520fe854d6255ef9dbfe331dad0ebb4a3f55cbaeb8967be729b9a219c1c35",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1620,
+      "source_url": "https://blog.skyairline.com/temporada-alta/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "660f0389e3aa098e0dcfc4a3a34aa861b496cc8eadfb26d380f36786e18c8129",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 113,
+      "source_url": "https://blog.skyairline.com/vacaciones/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "05c476cec1fedd31132c8f0c30fee6ac0d6495bd56822802f0e328ca1805e2fb",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1361,
+      "source_url": "https://blog.skyairline.com/viajar-con-poco-dinero-2/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "7a5ef944fb414fa7d10d7b220c2f5b96fda8c516a793fff806527fdc5ec46f3c",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1349,
+      "source_url": "https://blog.skyairline.com/modo-avion-durante-los-vuelos/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4955
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4955″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "5334d28ecdd29ac73d7e9c492d962258309a5dae717630f0e3d367d0e31bc4db",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": true,
+      "historical_4955_destination": "https://skyairline-21097480.hs-sites.com/tripulante-de-cabina?utm_medium=rock-convert",
+      "historical_4955_destination_http_current": 404,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json",
+        "deepening/site/archive-curso-tripulante-cabina-20250623065554.html",
+        "recovery-plan/technical/candidate-validation.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_landing_404",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1038,
+      "source_url": "https://blog.skyairline.com/eventos-deportivos-en-latinoamerica/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4498
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4498″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "dc66a80f457fdd1d103cfd72bbf352eb34c0b6295494781d604be201d0de2a43",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1032,
+      "source_url": "https://blog.skyairline.com/viajar-de-forma-regular/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4497
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4497″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "13ed56da5708258a07a254e28d7b64897de7bcd5ca6c0005e7ad145f470623ee",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 1001,
+      "source_url": "https://blog.skyairline.com/que-hacer-con-ninos-en-bogota/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4615
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4615″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "3033094dd38db04dbe6bb81a89dca7dc731d8f011845e70f2aae3cead1b4bc81",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 926,
+      "source_url": "https://blog.skyairline.com/a-donde-ir-en-balmaceda/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "4f3cb8916ece6d2f04dad800b3dfbf6a3bc2fb1b1341b7c325ee728e63bdb6ec",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 893,
+      "source_url": "https://blog.skyairline.com/que-es-el-check-in/",
+      "proposed_destination_url": null,
+      "shortcode_ids": [
+        4506
+      ],
+      "tokens_before": [
+        "[rock-convert-cta id=»4506″]"
+      ],
+      "placement_count": 1,
+      "content_sha256": "ad8155a603cc1a362a39ff12bd467f2b92423978017e96aeef57e312031d92d9",
+      "proposed_action": "Sustituir cada token confirmado por CTA nativo de WordPress tras aprobar activo y landing; conservar ubicación",
+      "historical_mapping_verified": false,
+      "historical_4955_destination": null,
+      "historical_4955_destination_http_current": null,
+      "dependency": [
+        "SKY aprueba activo/landing 200, copy, permisos, tracking y consentimiento",
+        "IDs restantes requieren recuperar definición CTA; no inferir correlación desde otros links del artículo"
+      ],
+      "evidence": [
+        "site/unrendered-shortcodes-confirmed.json",
+        "site/wp-inventory.json"
+      ],
+      "owner_proposed": "SKY marketing/HubSpot + editorial + desarrollo WordPress",
+      "status": "blocked_cta_definition_and_destination",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar render desktop/móvil; click navegacional sólo sin submit; verificar destino y medición con consentimiento."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    }
+  ],
+  "total_placements": 70,
+  "native_component": "core/group + heading/paragraph + buttons/button (o bloque nativo aprobado); no reactivar plugin antiguo"
+}

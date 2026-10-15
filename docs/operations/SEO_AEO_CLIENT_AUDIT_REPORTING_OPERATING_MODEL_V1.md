@@ -43,6 +43,36 @@ permiten comparación). Corregir una condición técnica no prueba una mejora de
 Distingue por pieza redacción, aprobación, carga CMS, publicación pública y registro del Hub. Un estado
 atrasado del Hub no acredita un retraso del cliente. Una URL actual no reconstruye su fecha de publicación.
 
+### Cobertura antes de declarar una auditoría integral
+
+Fija las superficies realmente auditadas: un blog, un prefijo, el dominio comercial y el recorrido de
+reserva/compra son alcances distintos. La solicitud de una auditoría amplia no acredita que todos hayan
+sido examinados; declara la brecha y el siguiente trabajo sin ampliar el contrato por inferencia.
+
+Mantén una matriz por frente con objetivo, evidencia y muestra efectivas, investigación pendiente,
+responsable/dependencia y criterio verificable de cierre. Considera, según el encargo:
+
+- cambios/migración e historia de medición;
+- indexación, rastreo, acciones manuales y seguridad;
+- calidad editorial, intención, arquitectura temática y enlazado;
+- competencia y resultados de búsqueda por mercado;
+- autoridad y enlaces externos;
+- experiencia móvil y rendimiento de campo/laboratorio;
+- medición vigente y recorrido hacia el resultado comercial pertinente.
+
+Adapta la matriz al alcance; un frente excluido se justifica y uno sin acceso conserva su limitación.
+Un censo HTML no acredita revisión editorial exhaustiva; una muestra de inspecciones no cierra todo el
+estado de indexación. Mencionar backlinks o competidores no completa su evaluación. Ningún porcentaje de
+completitud se infiere de contar frentes o archivos sin un universo y método definidos.
+
+Distingue el estado de **entrega del diagnóstico**, **cobertura de la investigación**, **preparación del
+lote**, **implementación verificada** y **resultado observado**. Un informe puede estar entregado con
+cobertura parcial explícita; el plan de correcciones no cierra la investigación. La falta de historia no
+impide reparar defectos actuales, y documentar un defecto no acredita que esté corregido.
+
+Caso de aplicación, sin trasladar sus cifras a otros clientes:
+[cobertura SKY, 15-10-2026](../services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md).
+
 ## 2. Evidencia y denominadores
 
 Cada cifra debe poder rastrearse a fuente, identidad, fecha, filtros, unidad, universo y limitaciones.
@@ -62,6 +92,13 @@ personales innecesarios. La fuente y el límite relevantes se explican junto a l
 Presenta las variaciones comparables; no atribuyas causalidad a un cambio sin fechas de implementación,
 ventana adecuada y evidencia. Recomendaciones antiguas sobre resultados enriquecidos o requisitos de IA
 se contrastan con documentación oficial vigente antes de mantenerlas como fallas.
+
+Controles prácticos: cortes independientes de GSC que reconcilian no validan automáticamente su cruce
+conjunto. Paginar o retirar la dimensión consulta tampoco garantiza el total: comprueba cobertura contra
+el control del mismo universo. Una fecha actual del CMS no fecha el nacimiento de la pieza. En migraciones,
+contrasta canales y cronología antes de inferir un fallo general de medición; un estado HTTP actual no
+reconstruye el de la fecha del traslado. Congela el baseline inmediatamente previo al cambio real para
+medir la intervención; conserva una referencia analítica antigua identificada como tal.
 
 ## 3. Integración de un AEO Grader existente
 
@@ -170,6 +207,8 @@ Para una entrega en Notion y Markdown:
 El informe está listo cuando su historia es trazable, las cifras conservan su alcance, la agencia responde
 por su trabajo, las dependencias están justificadas y ambas copias coinciden tras la lectura de verificación.
 El cierre documental no convierte los pendientes técnicos o metodológicos descritos en acciones ejecutadas.
+El título y estado del informe deben conservar la cobertura real de la investigación. «Integral» no se
+usa como sinónimo de PDF terminado o lote preparado cuando siguen sin comprobarse frentes materiales.
 
 ## Presentación institucional
 

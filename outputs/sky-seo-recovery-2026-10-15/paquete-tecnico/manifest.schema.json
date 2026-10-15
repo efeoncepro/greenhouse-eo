@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SKY prepared manifests v1",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "status",
+    "executed_changes",
+    "items"
+  ],
+  "properties": {
+    "manifest_version": {
+      "const": 1
+    },
+    "status": {
+      "const": "prepared_not_applied"
+    },
+    "executed_changes": {
+      "const": 0
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "proposed_action",
+          "dependency",
+          "owner_proposed",
+          "status"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "source_url"
+            ]
+          },
+          {
+            "required": [
+              "action_id"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

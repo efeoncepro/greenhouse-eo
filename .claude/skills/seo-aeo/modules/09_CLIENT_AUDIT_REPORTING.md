@@ -7,6 +7,14 @@
 
 ## 1. Reconstruir la gestión antes de recomendar
 
+Antes de llamar «integral» a una auditoría, aplicar la matriz de cobertura del modelo compartido
+(`docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md`, sección de cobertura):
+superficies, evidencia/muestra, pendientes, responsable y aceptación por frente. Censo técnico, revisión
+editorial, indexación y recorrido comercial tienen coberturas distintas. Un blog no acredita auditoría
+de todo el dominio ni de su checkout. Distinguir diagnóstico entregado, investigación parcial, lote
+preparado, implementación verificada y resultado observado. Adaptar los frentes al alcance real;
+documentar los excluidos o inaccesibles sin marcarlos comprobados.
+
 Lee las auditorías anteriores completas, no sólo sus resúmenes. Conserva los ID
 de hallazgo y registra por cada uno: evidencia anterior, evidencia actual y fecha,
 estado actual, alcance pendiente, responsable y criterio de cierre. Usa los estados
@@ -61,6 +69,12 @@ dimensiones, unidad, denominador y cobertura. Mantén las siguientes fronteras:
 - **AEO:** impresiones en búsqueda generativa, citas en respuestas y sesiones por
   referencias IA son medidas diferentes. No fabriques un total de «visibilidad»
   sumándolas, ni una tendencia mensual con un único run.
+
+Los controles independientes GSC no prueban que un cruce de dimensiones esté completo. Reconciliar el
+cruce antes de usarlo como distribución por país o denominador; paginación agotada y ausencia de query
+no bastan. Una fecha CMS mutable no prueba creación reciente. En migraciones, contrastar la composición
+de canales y las versiones fechadas; no convertir errores actuales en causa histórica automática.
+Para seguimiento, congelar baseline previo a la intervención real, separado de las referencias del informe.
 
 ## 4. Validar el Grader antes de adoptar sus conclusiones
 
