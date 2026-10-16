@@ -193,7 +193,7 @@ export class MeetingActivationController {
     dialog.innerHTML = `
       <div class="ghc-meeting-frame">
         <header class="ghc-meeting-toolbar">
-          <div>
+          <div class="ghc-meeting-titles">
             <span class="ghc-meeting-kicker"></span>
             <h2 id="${headingId}" class="ghc-meeting-heading" tabindex="-1"></h2>
           </div>

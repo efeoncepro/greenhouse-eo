@@ -12,8 +12,12 @@
  * `Escape` lo colapsa. Minor y no patch porque cambia comportamiento observable, y
  * porque `dismissed` dejó de emitirse al cerrar por teclado — un consumidor que mida
  * la tasa de rechazo verá la serie cambiar de sentido en esta versión.
+ *
+ * `1.3.1` (2026-10-16): la cabecera del scheduler nativo deja de partirse en móvil. Las reglas del
+ * diálogo usaban `font: … inherit` (inválido): el navegador las descartaba, el tema del host pintaba
+ * el título y «Cerrar agenda» quedaba aplastado en tres líneas. Patch: sólo presentación.
  */
-export const RENDERER_VERSION = '1.3.0'
+export const RENDERER_VERSION = '1.3.1'
 
 /** Debe coincidir EXACTO con `CTA_CONTRACT_VERSION` del server (parity test). */
 export const RENDERER_CONTRACT_VERSION = 'greenhouse-growth-cta-popup.v1'

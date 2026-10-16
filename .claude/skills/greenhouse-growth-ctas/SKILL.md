@@ -164,6 +164,12 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-16: bundle `1.3.1` code complete, rollout pendiente.** Corrige la cabecera del scheduler nativo en móvil
+  (shorthands `font` inválidos + botón de cierre sin `flex: none`/`nowrap`). Verificado con el bundle local servido por
+  interceptación sobre las páginas reales `/servicios-contratar-hubspot/` y `/contacto/` (390 y 820 px: botón en una
+  línea, cabecera sin overflow). Llega a los hosts cuando el release a producción publique `renderer-latest.js`.
+  Mismo día: CTA `hubspot-discovery-meeting` publicado (dock móvil de la landing HubSpot, surface propia).
+
 - **2026-07-21: quinta acción `open_meeting_scheduler` + piloto `/agenda/` RELEASED.** El Action
   Registry y el renderer ya abren la experiencia nativa `meeting_scheduler`; el piloto público
   de WordPress opera native-only, sin link ni iframe de fallback HubSpot. Pendiente para cerrar
@@ -251,6 +257,14 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   enforcement staging + smoke kill switch sin redeploy → prod gradual (ledger §Pendientes).
 
 ## Hard rules (anti-regression — arch §20 + aprendizajes de implementación)
+
+- **NUNCA** (2026-10-16, bundle `1.3.1`) mezclar `inherit` dentro del shorthand `font` (`font: 650 .84rem/1 inherit`):
+  `inherit` sólo vale como valor completo, así que el navegador **descarta la declaración entera** y el tema del host
+  pinta el texto. Pasó en el diálogo del scheduler nativo (vive en `<body>`, fuera de todo contenedor): en WordPress el
+  título tomó el `h2` de Ohio y «Cerrar agenda» se partió en tres líneas a 390 px. Usa longhands con
+  `font-family: inherit`. Guarda: `__tests__/styles-font-shorthand.test.ts`; el verificador real es el navegador
+  (jsdom no descarta shorthands inválidos), abriendo el scheduler en un host WP a 390 px.
+- **NUNCA** escribir backticks en un comentario dentro de `RENDERER_CSS`: es un template literal y el backtick lo cierra.
 
 - **NUNCA** (TASK-1431) agregar un action kind sin su entry completo: enum en `contracts.ts` +
   metadata browser-safe + entry del registry (schema+resolver) + espejo/executor del renderer
