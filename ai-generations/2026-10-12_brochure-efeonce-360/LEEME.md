@@ -240,3 +240,21 @@ El operador: «canonicemos todo, este es el brochure oficial de la agencia 360°
   `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y puntero en `docs/services/README.md`.
 - **Los PDF oficiales** son los de OneDrive. Los de esta carpeta son su copia de trabajo.
 - 2026-10-16 · Logos de clientes autorizados por el operador para este brochure («Podemos usar los logos de clientes sí»), incluidas las piezas de Sky y Berel de sus casos. Pendientes para enviarlo afuera: cifras de ANAM y plazo de Berel.
+
+## 2026-10-16 · Caso ANAM con minivan y HubSpot
+
+El operador: «ANAM usa minivan brandeadas… o algo que vaya en su objeto» y «el servicio de ANAM fue una
+implementación de HubSpot». ANAM es un laboratorio de análisis ambientales del Grupo Aguas, con muestreo en terreno.
+
+- **Escena.** Una técnica muestrea agua en un embalse al amanecer, junto a una minivan blanca con el laboratorio móvil
+  abierto (`prompt-base.txt`). La generé sin logos.
+- **Logo.** El oficial `anam-logo-02.svg` (símbolo + ANAM + «Medimos medioambiente», de OneDrive `7. Branding &
+  Diseño/04. Logos & Partnership/01. Logo Clientes/`). Se compone en el panel lateral con homografía (`homo.cjs`) y se
+  integra como vinilo con el sombreado real del panel y grano (`vinilo.cjs`).
+  - No se usó el acabado del modelo: deformaba el símbolo y lo corría de lugar.
+  - No hay foto del rotulado real de su flota (el sitio de ANAM tiene captcha). Por eso la minivan solo lleva el logo,
+    sin franjas ni rotulado inventado.
+- **HubSpot.** Una tarjeta de ticket compuesta (`card.html`): «Solicitud de muestreo · Embalse», llegó por el chat,
+  ruta Terreno y asignada a María Paz. Representa el Customer Agent y las rutas a una persona del caso.
+- El chip «HubSpot» se volvió a dibujar. Archivos en `caso-anam/`. Se rearmaron las dos versiones del PDF; los enlaces
+  se verificaron.
