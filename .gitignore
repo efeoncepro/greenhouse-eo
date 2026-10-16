@@ -163,3 +163,7 @@ scripts/foto/.componer-cta@*.regresion.mjs
 # Referencia HERMÉTICA de la regresión y mutantes de `pnpm foto:componer:cta:mutantes` (temporales)
 scripts/foto/.ref-*
 scripts/creative/layout-compiler/.ref-*
+# Credenciales sueltas de una corrida (p. ej. token de job del reel Sika) y volcados
+# de inspección de planillas (`*.xlsx.inspect.ndjson`): locales, regenerables, nunca a git.
+**/_token.txt
+*.inspect.ndjson
