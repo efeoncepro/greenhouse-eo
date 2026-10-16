@@ -13,7 +13,7 @@
     "eyebrow": "03 · Voice · Paid social",
     "question": "¿A quién le llega mi pauta?",
     "answer": [
-      "A quien importa"
+      "A tu cliente"
     ]
   },
   "body": "Pauta en redes para que el mejor contenido llegue a la audiencia correcta, con el presupuesto medido.",
@@ -45,5 +45,11 @@
     "subject": "person",
     "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT7-paid-social.png",
     "alt": "Una creadora de Efeonce con hoodie lanza un anuncio desde su teléfono: tres haces de luz cruzan miles de pantallas apagadas y encienden sólo tres grupos"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role",
+    "anchor": "bottom-end"
   }
 }
