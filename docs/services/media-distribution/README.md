@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce
 > **Producto de la línea:** Reach (producto de la línea Voice; Reach ya no existe como línea, operador 2026-10-16)
 > **Estado:** `Approved for validation`
-> **Última actualización:** 2026-10-16 (tramo Voice del brochure oficial «Agencia de Marketing 360°») · 2026-10-12 (oferta integral de medios; reunión y ruta DSP acompañada) · 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social)
+> **Última actualización:** 2026-10-16 (material comercial vigente: brochure y landing «Agencia de Medios», reglas de claims; tramo Voice del brochure oficial «Agencia de Marketing 360°») · 2026-10-12 (oferta integral de medios; reunión y ruta DSP acompañada) · 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social)
 
 ## Propósito
 
@@ -17,16 +17,61 @@ habilitar esta capacidad con sistemas, método, datos y operación. Reach tampoc
 distribución que Efeonce puede ofrecer.
 
 **Delta 2026-10-16 (operador): «Reach ya no existe, existe la línea Voice; Reach es el producto de la línea Voice».**
-El material comercial vigente de la línea es el brochure «Agencia de Medios» (línea Voice) y el tramo Voice del
-brochure oficial «Agencia de Marketing 360°». El brochure de Reach 2026 queda como referencia histórica de alcance.
 
 Este catálogo se basó originalmente en el brochure comercial de Reach 2026 (`Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`),
-revisado el 2026-07-26. Ese brochure es una referencia histórica de alcance; esta ficha es el contrato documental vigente y
-no autoriza por sí sola pricing público, claims, checkout ni venta self-serve.
+revisado el 2026-07-26. Ese brochure queda como referencia histórica de alcance; esta ficha es el contrato documental
+vigente y no autoriza por sí sola pricing público, claims, checkout ni venta self-serve.
 
-Desde el 2026-10-16, la línea aparece en el tramo **Voice** («llegas a quien compra») del brochure oficial «Agencia de
-Marketing 360°» (OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`), sin caso propio. Ese brochure presenta la agencia completa; esta
-ficha sigue siendo el contrato de alcance.
+## Material comercial vigente
+
+Desde el 2026-10-16 la línea Voice tiene dos piezas propias aprobadas por el operador: el brochure y la landing
+«Agencia de Medios». Son el material por defecto para cualquier conversación de medios (planificación, compra,
+programática, performance por plataforma, pantallas y medición). Ninguna reemplaza esta ficha: alcance, estados y
+precio siguen aquí y en los [modelos de negocio](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+
+| Pieza | Dónde vive | Cuándo usarla |
+|---|---|---|
+| **Brochure «Agencia de Medios»** (65 láminas, sistema La órbita, línea Voice) | OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Medios/Efeonce-Brochure-Agencia-de-Medios.pdf` (versión del 2026-10-16: 12 232 318 bytes, sha256 `c4697c7ac40275fc9eba…`). Canvas: <https://claude.ai/code/artifact/d32a798b-3bb2-493f-85dc-8c46366ee077>. Fuente y recorrido: `ai-generations/2026-10-13_brochure-agencia-medios/LEEME.md` | Para entregar o presentar en una conversación de medios con una cuenta o un prospecto |
+| **Landing «Agencia de Medios»** (pública e indexable desde el 2026-10-16) | <https://efeoncepro.com/servicios/agencia-de-medios/>, en el menú Soluciones → Crecimiento Multicanal | Como enlace en prospección, firma y seguimiento; es además la entrada de leads de medios |
+| **Tramo Voice** del brochure oficial «Agencia de Marketing 360°» («llegas a quien compra», sin caso propio) | OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/` | Cuando la conversación es la agencia completa y no sólo medios |
+
+**Qué cuenta la landing.** Abre con «¿Dónde invierto? Donde rinde» y recorre canales, Efeonce en números, la
+diferencia (comparativo con Efeonce), el ciclo completo (planificar, crear, comprar, medir), un
+selector Commerce/B2B, performance por plataforma (Google, Meta, TikTok, LinkedIn, formatos, DCO y tecnología de compra
+y verificación), pantallas, medición (señal por GTM, atribución, tablero Efeonce Insights, incrementalidad), squad, cómo
+cobramos, método por etapas, partners, 11 preguntas frecuentes y la agenda con formulario. Su frase clave es «agencia
+de medios», con «compra de medios» y «planificación de medios» como secundarias. «Performance marketing» queda fuera del
+title, H1 y slug a propósito: en Chile «agencia de performance marketing» es otra búsqueda (top 10 sin dominios en
+común con «agencia de medios» y 16 veces su volumen) y tiene su propia landing pendiente
+([TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md), `/servicios/performance-marketing/` sin
+publicar; la página legacy `/servicio-gestion-campanas-publicitarias/` sigue en el menú). Operación del sitio:
+skill `efeonce-public-site-wordpress`, landing `agencia-de-medios`.
+
+**Entrada de leads.** El formulario Growth Forms `efeonce-media-diagnostic` («diagnóstico de medios») de la landing
+entrega a HubSpot como «Lead Gen - Agencia de Medios», con modelo de venta, canales e inversión mensual
+(`gh_form_medios_modelo_venta`, `gh_form_medios_canales`, `gh_form_medios_inversion_mensual`). Falta el primer envío
+real desde navegador para confirmar la entrega en HubSpot y `generate_lead` en GA4; la casilla de novedades se guarda
+en Greenhouse pero todavía no crea suscripción en HubSpot.
+
+### Reglas de claims de medios
+
+Valen para el brochure, la landing, decks, propuestas y cualquier pieza nueva de la línea:
+
+- **Rebates y comisiones son margen de Efeonce.** Decisión del operador (2026-10-16): «la comisión o rebate es nuestra,
+  es parte de la ganancia». Nunca prometer declararlos ni traspasarlos al cliente. Lo que sí se promete es «Tus cuentas:
+  siempre a tu nombre» (la lámina 62 del brochure, «Cómo se cobra», se corrigió con esa regla). El fee sigue
+  sosteniendo costo y margen sin ese ingreso.
+- **Tecnología no es alianza.** Basis, DV360, The Trade Desk, IAS y DoubleVerify son tecnología de compra y
+  verificación que Efeonce opera; nunca se presentan como alianza, partnership ni certificación. Partners acreditados en
+  la landing: HubSpot (Gold) y Salesforce. Basis, DV360 y The Trade Desk no van en las descripciones para redes sociales
+  mientras falte el inventario por mercado.
+- **Casos.** No hay caso Sky de medios (con Sky no se ha hecho medios). Eusari existe como resultado de medios, pero
+  no se publica por ahora.
+- **Cobertura.** «+120 empresas en 4 países» es el proof point de clientes; la operación cubre cinco países (Chile,
+  Colombia, Perú, México y Estados Unidos). No fundir las dos cifras.
+- **Antes de enviar el brochure afuera** siguen abiertas: la cifra de Bresler contra su caso, la autorización de logos
+  de clientes ([TASK-1937](../../tasks/to-do/TASK-1937-third-party-brand-usage-authorization-library.md)), el readback de HubSpot Gold, el inventario de Basis por mercado y el alcance de DCO e
+  incrementalidad con Performance.
 
 ## Resultado que se vende
 

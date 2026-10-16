@@ -3,7 +3,7 @@
 > **Estado:** `hypothesis_only` — bandas internas de validación; no son tarifario público ni autorización de venta
 > **Owner:** Strategy + Commercial + Finance + Media & Distribution
 > **Versión:** V1 · 2026-09-10 · **Revisión:** después del primer piloto de cada motion
-> **Último delta:** 2026-10-10 — paid social en el deck «Marketing de Contenidos» (§13); sin cambio de bandas ni de veredicto
+> **Último delta:** 2026-10-16 — rebates/comisiones como margen de Efeonce; sin cambio de bandas · 2026-10-10 — paid social en el deck «Marketing de Contenidos» (§13); sin cambio de bandas ni de veredicto
 > **Moneda de referencia:** USD; cotizar en moneda del contrato con snapshot FX aprobado (referencia de cálculo:
 > USD 1 = CLP 925,97, dólar observado 2026-09-10)
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
@@ -133,8 +133,9 @@ escala: 12% hasta USD 30 mil · 9% sobre el tramo 30–100 mil · 6% sobre el ex
 - **Real Audiences:** oferta temporal de comisión 10% hasta 2026-12-31; inversión en plataforma como base declarada,
   definición contractual y liquidación pendientes. Su crédito a 30 días sin anticipo también primera campaña no está
   aprobado. **Basis:** deck y modalidades recibidos; costos, mínimos, entidad y crédito por negociar.
-- **Rebates/comisiones:** no reemplazan el fee ni sostienen el margen base. Se trasladan al cliente o se declaran
-  como remuneración Efeonce en propuesta/contrato; nunca retención oculta. Finance valida liquidación y tributos.
+- **Rebates/comisiones:** no reemplazan el fee ni sostienen el margen base. Desde el 2026-10-16 son margen de Efeonce
+  por decisión del operador: no se promete declararlos ni traspasarlos al cliente (sustituye la regla anterior de
+  trasladarlos o declararlos). Finance valida liquidación y tributos.
 - **Autogestión:** gate por proveedor, con dos campañas managed o acompañadas auditadas, capacitación específica, trader con backup,
   permisos, soporte y costo de seat comprobados. La restricción histórica de otro DSP sólo por carencias de Real
   Audiences queda reemplazada por la [decisión dual](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).

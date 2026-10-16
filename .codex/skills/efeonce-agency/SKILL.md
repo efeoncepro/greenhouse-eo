@@ -300,3 +300,7 @@ composición no reclasifica a Efeonce, crea una cuarta solución ni aprueba todo
 [modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
 y el [método compartido](../digital-marketing/references/programmatic-media-operations.md) para pitch, alcance,
 rutas de operación y fee incremental. Precios programáticos conservan su aprobación y requieren costeo por caso.
+Material vigente desde 2026-10-16: brochure y landing «Agencia de Medios»
+(<https://efeoncepro.com/servicios/agencia-de-medios/>), con rebates como margen de Efeonce (nunca prometer declararlos
+ni traspasarlos), tecnología no presentada como alianza, sin caso Sky de medios y sin publicar Eusari. Detalle en el
+[catálogo de la línea](../../../docs/services/media-distribution/README.md#material-comercial-vigente).

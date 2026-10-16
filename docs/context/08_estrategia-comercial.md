@@ -170,6 +170,11 @@ Efeonce. En expansión de cuenta, calificar el problema de mix/inversión y pres
 conjuntos; fee adicional sólo por capacidad incremental a lo contratado, con medios/externos separados. Formación
 y acceso DSP acompañados se evalúan sin inferir licencia, crédito ni autonomía. Canon de composición y estados:
 [modelo de Media & Distribution §1.1](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+El material vigente es el brochure «Agencia de Medios» y la landing <https://efeoncepro.com/servicios/agencia-de-medios/>
+(2026-10-16). Al venderlo: la comisión o rebate del proveedor es margen de Efeonce y nunca se promete declararla ni
+traspasarla; Basis, DV360, The Trade Desk, IAS y DoubleVerify son tecnología, no alianzas; no hay caso Sky de medios y
+Eusari no se publica por ahora; «+120 empresas en 4 países» no se funde con los cinco países de operación.
+[Detalle](../services/media-distribution/README.md#material-comercial-vigente).
 
 ## Material comercial oficial de la agencia (2026-10-16)
 
@@ -178,7 +183,7 @@ Cuando una cuenta o un prospecto pregunta «¿qué hace Efeonce?», el material 
 entregar y versión corta de 26 para presentar en reunión, en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Presenta las cinco
 líneas como una sola vuelta del cliente y cierra cada tramo con su prueba cuando la hay: Berel (Engine), Sky (Brand) y
 ANAM (Revenue). En expansión de cuenta sirve para mostrar la línea siguiente sin armar un deck nuevo. Los brochures por
-línea (Agencia Creativa, Marketing de Contenidos, HubSpot, Salesforce, SEO/AEO, servicios web) siguen vigentes para
+línea (Agencia Creativa, Agencia de Medios, Marketing de Contenidos, HubSpot, Salesforce, SEO/AEO, servicios web) siguen vigentes para
 conversaciones de una sola línea.
 
 Los logos de clientes quedaron autorizados por el operador para este brochure (2026-10-16), incluidas las piezas de

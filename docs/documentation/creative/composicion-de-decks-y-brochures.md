@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.0
+> **Version:** 3.1
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-10-16 por Claude (3.0: el brochure oficial «Agencia de Marketing 360°» aprobado el 2026-10-16 — dos versiones, el hilo, la navegación con enlaces y qué revisar antes de enviarlo. Antes, 2026-10-09, 2.9: el brochure de servicios web y digitales aprobado el 2026-10-09 — qué cubre, que sus láminas se armaron a mano en el lienzo de diseño y las reglas que dejó: el fondo de una pieza firmada por Efeonce, los casos de éxito siempre con la misma lámina, el logo donde se nombra una marca, nada de marcadores «[N]» y el español primero; pendientes antes de enviarlo. Antes, 2026-09-30, 2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, logos de clientes que esperan autorización y los datos del deck tal cual por decisión del operador, que asume la responsabilidad (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-10-16 por Claude (3.1: el brochure «Agencia de Medios» y su landing pública, aprobados el 2026-10-16 — qué cubre, las reglas de logotipos de terceros, rebates y tecnología, y qué revisar antes de enviarlo. Antes, 3.0: 3.0: el brochure oficial «Agencia de Marketing 360°» aprobado el 2026-10-16 — dos versiones, el hilo, la navegación con enlaces y qué revisar antes de enviarlo. Antes, 2026-10-09, 2.9: el brochure de servicios web y digitales aprobado el 2026-10-09 — qué cubre, que sus láminas se armaron a mano en el lienzo de diseño y las reglas que dejó: el fondo de una pieza firmada por Efeonce, los casos de éxito siempre con la misma lámina, el logo donde se nombra una marca, nada de marcadores «[N]» y el español primero; pendientes antes de enviarlo. Antes, 2026-09-30, 2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, logos de clientes que esperan autorización y los datos del deck tal cual por decisión del operador, que asume la responsabilidad (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -192,6 +192,33 @@ de sus casos. **Antes de enviarlo a un prospecto** quedan por revisar las cifras
 > Detalle técnico: [norma, delta 2026-10-16 (b)](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
 > [manual, «El brochure oficial Agencia de Marketing 360°»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
 > fuente y `LEEME.md` en `ai-generations/2026-10-12_brochure-efeonce-360/`.
+
+## El brochure «Agencia de Medios» y su landing
+
+El 2026-10-16 el operador aprobó el brochure **«Agencia de Medios»** de la línea Voice: 65 láminas que cuentan cómo
+Efeonce planifica, crea, compra y mide medios pagados (search, social, video, TV conectada, audio, pantallas en la
+calle y retail media). Es el que se manda cuando alguien pregunta por medios o pauta.
+
+**Cómo se lee.** Portada, índice con enlaces y seis capítulos: *El cambio*, *Plataformas*, *Creatividad*,
+*Programática*, *Medición* y *Trabajar juntos*, con glosario al cierre. Las piezas de ejemplo usan dos marcas
+ficticias, Nórtica (consumo) y Andara (B2B), porque no hay un caso de medios publicable.
+
+**Tiene landing propia.** La misma historia vive en https://efeoncepro.com/servicios/agencia-de-medios/, publicada el
+2026-10-16 y en el menú bajo Soluciones → Crecimiento Multicanal. La landing no incrusta láminas: cada idea se
+recompuso para web (mockups nativos por plataforma, pantallas con video, tablero de medición) y termina en un
+formulario de diagnóstico propio.
+
+**Reglas que dejó:** un logotipo de otra marca (Hulu, ESPN, Forbes…) va siempre con su logotipo oficial, nunca escrito
+con la tipografía de Efeonce; nunca se promete declarar ni traspasar rebates o comisiones de medios, porque son parte
+del margen; Basis, DV360, The Trade Desk, IAS y DoubleVerify se nombran como tecnología que operamos, no como alianzas.
+
+**Antes de enviarlo afuera:** revisar la cifra de Bresler, la autorización de logos de clientes, el inventario de
+Basis por mercado y no mezclar «cinco países de operación» con «+120 empresas en 4 países».
+
+> Detalle técnico: [norma, deltas del 2026-10-16](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
+> [manual, «El brochure Agencia de Medios»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
+> [PDR-025 de la landing](../../public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) ·
+> fuente y `LEEME.md` en `ai-generations/2026-10-13_brochure-agencia-medios/`.
 
 ## El brochure de servicios web y digitales
 

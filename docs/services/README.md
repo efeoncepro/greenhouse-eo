@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-10-09
+> **Última actualización:** 2026-10-16
 
 ## Propósito
 
@@ -27,6 +27,11 @@ El foco comercial transversal —beachheads, ofertas de entrada, expansión y pr
 completo de 84 láminas y corto de 26), en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`.
 Presenta las cinco líneas y es el documento por defecto cuando se pregunta qué hace Efeonce; no reemplaza las fichas de
 esta carpeta ni define alcance o precio. Detalle: [composición de decks y brochures](../documentation/creative/composicion-de-decks-y-brochures.md).
+
+**Material comercial de medios (línea Voice):** el brochure «Agencia de Medios» (65 láminas) y la landing pública
+<https://efeoncepro.com/servicios/agencia-de-medios/>, ambos del 2026-10-16, con el formulario `efeonce-media-diagnostic`
+como entrada de leads. Rutas y reglas de claims (rebates como margen de Efeonce, tecnología no es alianza, casos y
+cobertura): [Media & Distribution](media-distribution/README.md#material-comercial-vigente).
 
 ## Fronteras
 

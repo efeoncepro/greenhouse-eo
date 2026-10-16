@@ -57,6 +57,13 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   [operación](../manual-de-uso/public-site/operar-agencia-creativa.md) y [evidencia del rollout](../audits/public-site/2026-10-15-agencia-creativa-elementor-rollout.md).
   Contenido de clientes, cifra Sky, Yoast y primer envío real siguen pendientes.
 
+- **[Agencia de Medios vigente — Elementor](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md)** —
+  página `251981` en `/servicios/agencia-de-medios/`, dieciséis widgets compilados desde el canvas aprobado y el
+  diagnóstico de medios de Growth Forms; publicada e indexable el 2026-10-16, en el menú bajo Soluciones →
+  Crecimiento Multicanal. [SEO/AEO aplicado](AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md); operación en la skill
+  `efeonce-public-site-wordpress` (`references/landings/agencia-de-medios.md`). Primer envío real, suscripción de
+  novedades, Rich Results y Search Console siguen pendientes.
+
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
   identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).
@@ -96,8 +103,10 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-019 — Taxonomía editorial canónica del blog WordPress](decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md)
 - [PDR-020 — Canales propios de Efeonce: un motor editorial, cinco roles de canal](decisions/PDR-020-canales-propios-sistema-editorial.md)
 - [PDR-021 — Landing Trade Marketing & BTL](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md) — posición en el medio entre plataformas que detectan y agencias que ejecutan; término cabeza `trade marketing`, no el modificador `agencia de`. Brief: [Channel & Commerce Landing SEO/AEO Brief V1](CHANNEL_COMMERCE_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1860`.
+- [PDR-022 — Landing Performance Marketing](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) — spoke de demand capture en `/servicios/performance-marketing/` (working slug, sin publicar) que retira con 301 la legacy `/servicio-gestion-campanas-publicitarias/`; convive con PDR-025 sin compartir términos de cabecera. Brief: [Performance Landing SEO/AEO Brief V1](PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1865`.
 - [PDR-023 — Landing ASO](decisions/PDR-023-landing-aso-posicionamiento.md) — tercera superficie del grupo `Visibilidad` junto a SEO y AEO; página de expansión y citabilidad en español, no de captura (`aso` es ambiguo y `app store optimization` casi no se busca en español); publicación por fases atada a la extensión Search & App Visibility. Brief: [ASO Landing SEO/AEO Brief V1](ASO_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1862`.
 - [PDR-024 — AXIS en el sitio público: composición agéntica](decisions/PDR-024-axis-en-el-sitio-publico-composicion-agentica.md) — el sitio consume AXIS como versión fija incluida en `eo-elementor-widgets` y encolada sólo donde se usa (los packages son privados: nada de registry ni `-latest`); los agentes componen intents validados y el SVG se sirve en el HTML del servidor; AXIS es capa gráfica y de valores, nunca de texto ni de layout. Brecha previa: `tokens.css` no emite rampas, superficies ni tipografía. Ejecución: task por crear.
+- [PDR-025 — Landing Agencia de Medios](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) — «agencia de medios» como categoría y frase clave, separada de Performance (sin dominios comunes en el top 10 chileno; «performance marketing» fuera de title, H1 y slug); slug `/servicios/agencia-de-medios/`; claims permitidos y prohibidos (tecnología ≠ alianza, sin promesa de rebates, sin caso Sky). Publicada el 2026-10-16. Brief: [Agencia de Medios Landing SEO/AEO Brief V1](AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md).
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.

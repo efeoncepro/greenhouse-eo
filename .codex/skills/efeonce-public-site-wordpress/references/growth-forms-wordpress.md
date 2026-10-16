@@ -118,6 +118,8 @@ Before approving or implementing the canvas, map each canvas control to an exist
   dependent:** before Greenhouse `ab622e958`, `radio` outside `hubspot_pillar` rendered as an empty text box.
   Check which renderer is live in production (`/growth-forms/renderer-latest.js`) and preview by interception
   (below) before promising cards to the operator;
+- multi-select chips: in production only the `hubspot_pillar` variant draws a multiple selection as chips
+  (case `efeonce-media-diagnostic`, Agencia de Medios 2026-10-16); other variants need a renderer release first;
 - per-label icons → `presentation.icon` (user, mail, phone, link, linkedin, briefcase, calendar, clock,
   message, file, globe);
 - country picker → `presentation.control: 'country_select'`;

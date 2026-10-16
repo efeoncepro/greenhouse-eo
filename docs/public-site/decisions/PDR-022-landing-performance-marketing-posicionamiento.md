@@ -11,6 +11,24 @@
 > `greenhouse-growth-forms`, `greenhouse-growth-ctas`, `greenhouse-growth-meetings`, `digital-marketing`,
 > `greenhouse-ai-design-studio`.
 
+## Delta 2026-10-16 — convivencia con la landing de Agencia de Medios
+
+La landing de Agencia de Medios ([PDR-025](PDR-025-landing-agencia-de-medios-posicionamiento.md)) está publicada e
+indexable desde el 2026-10-16 en `/servicios/agencia-de-medios/`, en el menú junto al ítem «Performance Marketing &
+Paid Ads». Semrush (2026-10-16) muestra que en Chile «agencia de medios» y «agencia de performance marketing» no
+comparten dominios en el top 10 y que performance tiene 16 veces más volumen: son dos intenciones y caben dos páginas.
+Reglas para esta landing:
+
+- no usa «agencia de medios», «compra de medios», «planificación de medios» ni «plan de medios» en title, H1 ni slug;
+- «publicidad programática» es secundaria de Medios: Performance conserva programmatic como canal en su sección de
+  canales y enlaza a la sección de Medios en vez de competir por el término;
+- al publicarse, las dos páginas se enlazan por función (Performance → Medios para planificación, compra y
+  programática; Medios → Performance para la operación de campañas);
+- las primeras semanas tras publicar, revisar en Search Console si alguna query aparece servida por ambas URLs.
+
+Nada de lo anterior cambia el slug, el 301 de la legacy ni el resto de esta decisión. Ejecución:
+[TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md).
+
 ## Delta 2026-09-11 — existe una página legacy de Performance
 
 Al crear la task apareció una página que este PDR no consideraba: `242862`, `/servicio-gestion-campanas-publicitarias/`,

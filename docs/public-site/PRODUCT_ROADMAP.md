@@ -37,6 +37,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
 | AI Visibility Grader (lead magnet) | Motor robusto (eje AEO); hub en `think.efeoncepro.com` | Gancho compartido | EPIC-020 · grader architecture |
 | Programa SEO (Search Visibility 360) | Planificado (ADR Accepted, tasks fundacionales) | Motor de datos SEO | EPIC-022 |
 | Migración a Astro runtime | Dirección aceptada, sin cutover | Rail frontend objetivo | ADR Astro runtime strategy |
+| `/servicios/agencia-de-medios/` (Agencia de Medios) | Live e indexable desde 2026-10-16 (página `251981`, en el menú) | Spoke de demanda de la oferta de medios | [PDR-025](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) · skill `efeonce-public-site-wordpress` |
 
 ## Now
 
@@ -162,6 +163,17 @@ capability dentro del sistema, no presentarse como agencia suelta.
  Ver
  [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) y
  `docs/tasks/to-do/TASK-1865-landing-performance-marketing.md`.
+ Delta 2026-10-16: la landing de Agencia de Medios (PDR-025) ya está publicada; Performance no usa «agencia de medios»,
+ «compra de medios» ni «planificación de medios» en title, H1 ni slug, y al publicarse ambas se enlazan por función.
+
+- **PDR-025 — Landing "Agencia de Medios"** (Accepted; **publicada e indexable el 2026-10-16**): página `251981` en
+ `/servicios/agencia-de-medios/`, en el menú bajo Soluciones → Crecimiento Multicanal. «Agencia de medios» es la
+ categoría y la frase clave (≈400/mes sumando mercados, KD 0–39); en Chile no compite con «agencia de performance
+ marketing», que queda fuera de su title, H1 y slug. Dieciséis widgets source-led desde el canvas aprobado (línea Voice,
+ pieza hermana del brochure «Agencia de Medios») y formulario `efeonce-media-diagnostic`. Pendientes: primer envío real,
+ suscripción de novedades, Rich Results y Search Console. Ver
+ [PDR-025](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) y
+ [brief SEO/AEO](AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md).
 
 - **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos; **§IA refinada por PDR-010**
  — el pitch vive en la Home, no en `/agencia`) + **TASK-1358** (`complete` 2026-09-11: Home publicada, cerrada por decisión del operador):

@@ -9,6 +9,18 @@
 > **Evidencia:** [investigación de términos por país 2026-09-11](../audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md)
 > y [market update 2026-09-10](../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md)
 
+## Delta 2026-10-16 — Agencia de Medios ya está publicada
+
+`/servicios/agencia-de-medios/` está live e indexable desde el 2026-10-16 ([PDR-025](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md),
+[brief](AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md)). Para no canibalizar:
+
+- este brief no toma «agencia de medios», «compra de medios», «planificación de medios» ni «plan de medios» como
+  objetivo; Medios no toma «performance marketing», «publicidad digital» ni «pauta digital»;
+- el H3 de Programmatic se mantiene como canal, pero «publicidad programática» es secundaria de Medios: la sección
+  enlaza a Medios;
+- §10 lista el enlace cruzado Performance ↔ Medios por función, que se activa al publicar;
+- tras publicar, revisar en Search Console las queries servidas por ambas URLs.
+
 ## 1. Demanda por país
 
 Una sola página en español para Chile, Perú, México y Colombia; Estados Unidos va aparte (ver §8). Ningún término
@@ -133,6 +145,8 @@ queda una sola URL indexable.
 | SEO y AEO | Esta landing | Performance marketing |
 | HubSpot (B2B) | `#como-trabajamos` | Marketing B2B con pauta conectada a tu CRM |
 | Esta landing, R8 | SEO, AEO, Influencer Marketing, HubSpot | Por función, no "clic aquí" |
+| Esta landing, H3 Programmatic | Agencia de Medios (`/servicios/agencia-de-medios/`) | Planificación y compra de medios |
+| Agencia de Medios | Esta landing, al publicar | Operación de campañas de performance |
 
 ## 11. Seguimiento AEO
 

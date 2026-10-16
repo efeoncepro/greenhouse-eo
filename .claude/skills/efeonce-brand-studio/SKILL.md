@@ -363,6 +363,11 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
     es el documento por defecto para «¿qué hace Efeonce?». Armado, rutas y pendientes en `deck-studio`; el método de
     los casos con piezas reales del cliente (componer lo exacto, el modelo sólo termina, logo como vinilo compuesto),
     en `design-studio` → `references/efeonce-photographic-language.md` §«Caso de cliente con piezas reales».
+  - **Brochure «Agencia de Medios»** (aprobado 2026-10-16): 65 láminas en la línea Voice; armado y pendientes en
+    `deck-studio`. Dos reglas de marca que salen de él: **el logotipo de un tercero nunca se escribe con la tipografía de
+    Efeonce** (va su logotipo oficial) y **ninguna pieza promete declarar ni traspasar rebates o comisiones de medios**.
+    De él salió la landing pública «Agencia de Medios», recompuesta para web sin incrustar láminas
+    (`EFEONCE_SURFACE_COMPOSITION_V1.md`, delta 2026-10-16 (c)).
   - **Publicidad 9:16 y 4:5: en prueba** (`ai-generations/2026-09-27_ads-cine/`), **no aprobada ni autorizada para
     pauta**. La receta de anuncio cine no existe en AXIS: el script de esa tanda fue de sesión, y en producción la capa
     va por `pnpm foto:componer` / `foto:componer:cta`.

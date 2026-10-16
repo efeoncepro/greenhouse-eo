@@ -1,5 +1,19 @@
 # TASK-1865 — Landing pública Performance Marketing (Performance & Commerce Distribution)
 
+## Delta 2026-10-16 — Agencia de Medios publicada: convivencia y no canibalización
+
+- `/servicios/agencia-de-medios/` (página `251981`) está live e indexable desde el 2026-10-16, en el menú bajo
+  Soluciones → Crecimiento Multicanal junto a «Performance Marketing & Paid Ads». Decisión:
+  [PDR-025](../../public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md); brief:
+  [Agencia de Medios SEO/AEO](../../public-site/AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md).
+- Semrush 2026-10-16: en Chile «agencia de medios» y «agencia de performance marketing» no comparten dominios en el
+  top 10; no hay conflicto de términos. Esta landing no usa «agencia de medios», «compra de medios», «planificación de
+  medios» ni «plan de medios» en title, H1 ni slug; el H3 de Programmatic se queda como canal y enlaza a Medios.
+- Al publicar: sumar el enlace cruzado por función Performance ↔ Medios y revisar en Search Console las queries servidas
+  por ambas URLs. Slug, 301 de la legacy y alcance de la task no cambian. Detalle en el delta 2026-10-16 de PDR-022.
+- Cautela heredada de Medios: el alcance de DCO e incrementalidad entre ambas ofertas sigue abierto.
+  — por la publicación de la landing de Agencia de Medios (2026-10-16)
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

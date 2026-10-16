@@ -1,6 +1,6 @@
 # Cómo ofrecer y preparar una campaña programática
 
-> **Fecha:** 2026-10-12 · **Owner:** Commercial + Media & Distribution
+> **Fecha:** 2026-10-12 · **Actualizado:** 2026-10-16 (material comercial y rebates) · **Owner:** Commercial + Media & Distribution
 > **Modelo canónico:** [publicidad programática](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md)
 > **Alcance:** preparación comercial y handoff; no implementa una integración DSP en Greenhouse
 > **Estado comercial:** servicio, valores base y condiciones estándar aprobados por el operador el 2026-10-09
@@ -11,6 +11,13 @@ En la cartera actual, identificar lanzamiento, expansión territorial, cobertura
 fragmentados. Presentar el servicio con la marca Efeonce y hablar del objetivo del cliente, sin nombrar los
 proveedores tecnológicos en el pitch o la propuesta comercial estándar. Utilizar la
 [ficha comercial](../../services/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md) y su texto de presentación.
+
+Para mostrarlo, usar el material vigente desde el 2026-10-16: el brochure «Agencia de Medios» (OneDrive
+`Alineación/4. Comercial/Brochures/2026/Agencia de Medios/`) y la landing
+<https://efeoncepro.com/servicios/agencia-de-medios/>. Si el prospecto llega por el formulario de la landing
+(`efeonce-media-diagnostic`), su lead entra a HubSpot como «Lead Gen - Agencia de Medios» con modelo de venta, canales
+e inversión mensual: partir la calificación desde esas respuestas. Antes de reutilizar una frase, revisar las
+[reglas de claims](../../services/media-distribution/README.md#reglas-de-claims-de-medios).
 
 En una oportunidad integral, partir por el problema de inversión/mix de la cuenta y componer estrategia,
 compra/operación, creatividad, medición y gestión bajo Efeonce. Usar el
@@ -51,7 +58,9 @@ Si se usan ambos, separar presupuesto/inventario y declarar límites de reach/fr
 Costear el trabajo propio y el costo externo con el
 [Pricing Integrity Pack](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md).
 Revisar fee incremental si ya hay retainer. Finance valida margen, impuestos y exposición de caja; Legal valida
-SOW, datos y contrato. No utilizar el rebate futuro para rescatar un fee insuficiente.
+SOW, datos y contrato. No utilizar el rebate futuro para rescatar un fee insuficiente. La comisión o rebate del
+proveedor es margen de Efeonce (decisión del operador, 2026-10-16): no prometer en la propuesta ni en la reunión
+declararla o traspasarla al cliente.
 
 Comparar managed externo y operación directa acompañada con el mismo brief/RACI: registrar costo externo y
 dedicación propia, incluida formación, QA, backup y análisis. Un menor cargo externo no demuestra menor costo total.
@@ -84,6 +93,9 @@ Campaña focal nueva: honorarios de USD 1.250 al inicio si setup está aceptado 
 contra cierre; medios USD 5.000 y externos aparte. Mensual focal/ampliada/regional con setup nuevo: honorarios
 iniciales USD 2.000 / 3.250 / 5.000; siguientes meses sin setup USD 1.500 / 2.500 / 4.000. Propuesta válida por
 15 días corridos o vigencia externa/FX anterior. Margen mínimo/objetivo 45%/55%, sin descuento automático ni markup.
+
+No presentar Basis, DV360, The Trade Desk, IAS ni DoubleVerify como alianzas: son tecnología que Efeonce opera. No
+citar un caso Sky de medios (no existe) ni el resultado de Eusari (no se publica por ahora).
 
 La identificación del proveedor queda en el expediente interno de ejecución. Si el contrato o los permisos de
 datos requieren identificar terceros, hacerlo en la documentación correspondiente, sin convertirlo en el pitch.

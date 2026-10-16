@@ -1,5 +1,17 @@
 # Handoff
 
+## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
+
+Live en https://efeoncepro.com/servicios/agencia-de-medios/ (página `251981`, menú `251987`, OG `251986`), verificada a
+1440/390 sin overflow; widgets `greenhouse_medios_*` (repo del sitio `25135f7`, `874cf48`; respaldos
+`/tmp/eo-medios-widgets-before-*` en Kinsta). Formulario `efeonce-media-diagnostic` (`hubspot_pillar`, direct, commit
+`e7ae991f1`). Brochure con PDF vigente `c4697c7a…` en OneDrive. Rebates = margen de Efeonce, aplicado también a modelos
+y packs de medios. [Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/agencia-de-medios.md) ·
+[PDR-025](docs/public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) ·
+[LEEME](ai-generations/2026-10-13_brochure-agencia-medios/LEEME.md).
+Pendiente: envío real del form (HubSpot + GA4 `generate_lead`), casilla de novedades sin suscripción HubSpot, Rich
+Results/GSC, confirmar la regla «programática secundaria de Medios» (PDR-025/022). Commits locales, sin push.
+
 ## 2026-10-16 — GTM: drift con mecanismo (web + servidor) y auditoría brand-visibility
 
 `pnpm gtm:snapshot` versiona los dos containers (web `GTM-NGHPGRLZ` y servidor `GTM-K2X4ZTTK`, nuevo
@@ -255,19 +267,3 @@ emita esa edición:** las visitas orgánicas de GA4 al contenido caen 51,9 % por
 Google Discover; el informe lo imprime sin explicarlo.
 Pendiente: release a `main`, revisar y emitir la edición de septiembre, tool MCP de lectura (Slice 6) y un render desde
 producción con los logos nuevos. `CLAUDE.md governance` está rojo por 37 tokens desde antes de este trabajo.
-
-## 2026-10-12 — Arquitectura: desacople de Greenhouse por dominios de producto (decisión, nada ejecutado)
-
-El operador aprobó [a dónde va cada dominio y en qué orden](docs/architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md):
-el Design System Lab, los catálogos de marca, `brand-surfaces` y el motor del compositor van a
-AXIS (`artifact-worker` se queda y consume el paquete); Growth y Search Visibility 360 van enteros a Marketing
-Studio; Insights pasa a dominio propio y sale último; Commercial queda diferido con su API aquí; Hiring se queda. **Knowledge
-se queda en Greenhouse** por decisión del operador, aun con poco uso (4 llamadas de personas en 4 meses; el resto es
-el QA nocturno).
-Lo ejecuta [`EPIC-054`](docs/epics/to-do/EPIC-054-greenhouse-product-domain-decoupling.md), diez unidades D01–D10 sin task registrada.
-Enmienda la cláusula «un repositorio» del ADR de build units. **Sólo documentos**: no hay tasks, repositorios ni
-código movido, y el trabajo nuevo sigue naciendo donde vive hoy su dominio. Para quien toque esos dominios: un
-dominio se mueve con su API y sus procesos asíncronos o no se mueve, y no se agregan lecturas SQL cruzadas (Insights
-ya tiene 32 hacia `greenhouse_growth` que hay que retirar antes de su corte). Sin decidir: ledger de migraciones de un
-schema con otro dueño, hospedaje de Insights, interfaz del cotizador (portal o Rooms). Verificado: `pnpm epic:lint`,
-`pnpm task:lint --task TASK-1382`, `pnpm docs:context-check:strict`. No se corrió ningún build. Local, sin push.

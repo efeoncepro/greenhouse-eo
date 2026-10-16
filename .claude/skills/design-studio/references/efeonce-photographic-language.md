@@ -1101,6 +1101,13 @@ por su distribución; en una activación, una lata gigante de aluminio «es irre
 truss, sol LED); una tarjeta de UI blanca y plana «se ve muy 1995» → **panel de vidrio oscuro** con desenfoque de fondo
 y estado vivo. Usar logos y piezas de un cliente exige su autorización (TASK-1937).
 
+**El mismo método en pantallas** (brochure y landing «Agencia de Medios», 2026-10-16;
+`ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/`): el anuncio de una marca de ejemplo ficticia
+(Nórtica) se compone por homografía sobre la pantalla detectada, el modelo sólo termina, y **si el acabado reescribe el
+logo se repone el aviso exacto encima** (pasó: «NÁRTIKA»). Una pantalla fuera de foco se desenfoca dentro de su
+máscara; el inpainting dejaba rectángulos más claros. Para darle aire a un sujeto en un hero web,
+`pnpm foto:expandir` con `--reponer no` (el hero de la landing: escala 0,72, `--fundido 120`).
+
 ## Paid media como consumidor: atención sin cambiar el lenguaje (2026-09-21)
 
 Para convertir los registros A/B/C en anuncios, cargar

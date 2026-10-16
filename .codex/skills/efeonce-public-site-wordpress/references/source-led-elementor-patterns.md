@@ -5,7 +5,8 @@ lessons, not a live-state ledger. Architecture: `docs/architecture/public-site/A
 primitive ownership: `docs/architecture/public-site/PRIMITIVES.md`. Dated Home evidence, hashes and rollback
 belong in `references/landings/home-claude-design-preview.md` and the linked audit.
 Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
-and `references/landings/content-marketing.md`.
+and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
+`references/landings/agencia-de-medios.md`.
 
 ## Source fidelity without losing editability
 
@@ -43,18 +44,33 @@ and `references/landings/content-marketing.md`.
 ### Canvas (`.dc.html`) → static native modules
 
 Agencia Creativa (`scripts/public-website/compile-creativa-elementor-source.cjs`, source
-`scripts/public-website/creativa-source/Main.dc.html`) compiles a live canvas into schema-driven widgets.
-Expand every dynamic part of the canvas into static, editable markup; do not ship the canvas runtime:
+`scripts/public-website/creativa-source/Main.dc.html`) compiles a live canvas into schema-driven widgets;
+Agencia de Medios (`compile-medios-elementor-source.cjs`, source `medios-source/Main.dc.html`) is the second
+compiler built on the same pattern. Expand every dynamic part of the canvas into static, editable markup; do
+not ship the canvas runtime:
 
 - Interactive tabs → one repeater whose row has two parts, rendered into `%%repeat_<key>__tab%%` and
   `%%repeat_<key>__panel%%`, with `%%row_first%%` for the initial pressed state. Bounded JS switches them
   (click + arrow keys); CSS hides non-first panels until JS marks `data-ready`.
+- Selectors written as conditional branches (`sc-if` on a state variable, e.g. Medios' Commerce/B2B and
+  platform pickers) are tabs too: one panel per branch, state carried by `aria-pressed` on the buttons. Do
+  not hand-write the pressed look: generate the on/off CSS from the styles the canvas itself applies to the
+  selected and unselected button, keyed on `[aria-pressed="true"|"false"]`, so the compiled page keeps the
+  canvas' exact selection treatment.
 - Marquee duplicates: remove them from the source and let JS recreate them as `aria-hidden` loop copies
   (see Continuous rails).
 - Live imports of other canvases (e.g. Creative Studio screens) → screenshots captured locally with
   Playwright in the theme the canvas uses; check that theme in the capture.
 - A designed form → Growth Forms host card (`<greenhouse-form>`); the host never draws fields. Map each
-  canvas control to the renderer before publishing (`references/growth-forms-wordpress.md`).
+  canvas control to the renderer before publishing (`references/growth-forms-wordpress.md`). The renderer
+  paints for a light background (`color-scheme="light"`): if the canvas drew the form card on a dark
+  section, make the card paper (Medios: `#f7f8f6`, with its own title and the trust line under the form)
+  instead of forcing dark tokens into the renderer.
+- Images inside an SVG (`<image href>`, e.g. isotypes placed in a diagram) are not found by the regular
+  `<img>`/background asset pass. Map them explicitly to the uploaded asset base (Medios: `%%asset_base%%`)
+  and check that each one paints on the live page.
+- Decorative glyphs marked `aria-hidden` (bullets, dots, arrows drawn as text) are markup, not copy: keep
+  them out of the editable controls so the editor exposes only real text.
 - An SVG data meter → a server-drawn number field, not an image of a number.
 - Repeater rows whose markup differs → explicit layout variants. Name row field labels by role
   (what the field is in every row), never by the first row's copy.
@@ -104,7 +120,13 @@ Expand every dynamic part of the canvas into static, editable markup; do not shi
 - Size a hero mark relative to its orbit/core, keep the same parallax depth, and inspect containment
   at the intermediate width where the graphic shrinks. Desktop-only success is insufficient.
 - A sticky FAQ's help/CTA belongs inside its aside. Stack at the appropriate tablet breakpoint and
-  disable sticky in short viewports; check after scroll, not only at section entry.
+  disable sticky in short viewports; check after scroll, not only at section entry. A two-column section
+  whose title column sits beside a long list (FAQ, diagnostic beside its form) reads best with that title
+  column `position: sticky` from 1000 px and stacked below; Medios applies it to both.
+- A page created with `wp_insert_post` (not cloned in the editor) inherits Ohio's blog defaults, including
+  the sidebar. Copy every `page_*` / `_page_*` meta from a published landing with the right chrome (Medios
+  copied 164 from Agencia Creativa `249582`), snapshot the previous values first, then verify header,
+  footer and full width live.
 - Reuse a CTA composition with a scoped modifier for a compact destination CTA. Remove superseded
   repeater/data controls when intentionally retiring cards; hide optional notices with a native select
   when the operator asks to hide rather than delete. Preserve a recoverable content snapshot.
@@ -171,6 +193,10 @@ Expand every dynamic part of the canvas into static, editable markup; do not shi
 
 Use `references/elementor-mutation.md` for identity/hash/snapshot/Document::save/metas/readback/cache.
 Deploy only manifest-listed runtime files with previous/new hashes and scoped backups, not unrelated WIP.
+Keep "create" and "change" as different scripts. A new-page publisher only creates and refuses when the slug
+already exists (Medios: `publish-medios-elementor-page.php`); changing that page's body later needs a
+republisher that reads the current content hash, refuses if it differs from the expected one, and snapshots
+before saving. Never rerun a creator to update a live page.
 
 1. PHP renderer and native control-registration tests (including URL defaults and escaping).
 2. JS lifecycle tests for mount/replacement/removal, editor/reduced, filter and player cleanup.

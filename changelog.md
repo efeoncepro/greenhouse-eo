@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
+
+- Landing pública [`/servicios/agencia-de-medios/`](https://efeoncepro.com/servicios/agencia-de-medios/) (página
+  `251981`, menú Soluciones → Crecimiento Multicanal): 16 widgets compilados del canvas, header/footer de Ohio, SEO con
+  frase clave «agencia de medios» (Semrush), OG propia y formulario `efeonce-media-diagnostic` con destino HubSpot.
+- Brochure «Agencia de Medios» (65 láminas, PDF `c4697c7a…`) con logotipos oficiales de terceros y sin promesa de
+  rebates. Canon: [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (deltas 2026-10-16),
+  [PDR-025](docs/public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) y
+  [material comercial de medios](docs/services/media-distribution/README.md).
+
 ## 2026-10-16 — GTM: drift vigilado en web y servidor
 
 - `pnpm gtm:snapshot` versiona también el container servidor (sGTM/Meta CAPI) y tapa secretos con huella sha256;
@@ -547,16 +557,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - TASK-1938: mismo motor y snapshot; seis páginas Engine con órbita, logos oficiales y cierres de cliente/prospecto, en ES/EN/PT-BR. Texto largo conserva contenido con continuación; fuentes registradas de forma aditiva. Las RRSS oficiales se muestran completas a su escala y el eslogan mantiene sus tres pesos.
 - [Dossier](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md): diez PDFs auditados, 24 comparaciones color/gris, 108 pruebas focales, TypeScript y build PASS. Fallo de metadata Manzanitas corregido en un commit separado; siete tests y sincronización PASS. Code complete local; rollout, revisión del adjunto real y paridad web/print pendientes. Sin push ni envío real.
-
-## 2026-10-03 — Elenco 2D de Efeonce canonizado
-
-- [Canon](docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md): Tomás, Camila, Renata y Mateo, ficticios y
-  dibujados, representan al grupo de compra del cliente y supervisan a los Sparks; estilo «vector con volumen» con
-  sello Efeonce (línea de luz azul + objeto azul).
-- Hojas de giro y expresiones en `ai-generations/_identidad-elenco-2d/`, selladas en el lock (catálogo `ELENCO_2D`,
-  rol `ilustracion-2d`, 560 assets) y publicadas en el canon. GPT Image 2.5 Sunburst, ≈ USD 0,78.
-- Primer uso: spot animado Sparks × Efeonce AEO aprobado (49,6 s). Método transversal de video y workflow del spot 2D
-  documentados: [método](docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md),
-  [retrospectiva](docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md),
-  [funcional](docs/documentation/creative/spot-animado-2d.md), [manual](docs/manual-de-uso/creative/producir-spot-animado.md);
-  `motion-design-studio`, `audio-studio`, guía de modelos, SPARKS_V1 e identidad sonora al día.

@@ -1,6 +1,6 @@
 # Publicidad programática de Efeonce — modelo de negocio completo
 
-> **Versión:** V1.5 · 2026-10-12 · composición integral de medios y evaluación de operación directa acompañada; tarifario aprobado sin cambio
+> **Versión:** V1.5 · 2026-10-12 · composición integral de medios y evaluación de operación directa acompañada; tarifario aprobado sin cambio · delta 2026-10-16: rebates como margen de Efeonce (§10.1) y material comercial vigente (§1)
 > **Estado:** `Commercially approved` — aprobación del operador para la oferta, valores base y política de cobro
 > **Alcance de aprobación:** venta del servicio Efeonce; contratación externa, costo real, capacidad y autorización de compra se verifican por campaña
 > **Audiencia:** documento interno de trabajo; la presentación comercial utiliza únicamente la marca Efeonce
@@ -23,7 +23,8 @@ los dos proveedores seleccionados. Sus nombres no se incorporan al pitch ni a la
 
 La oferta se vende **por campaña o como operación mensual**, con un fee explícito de Efeonce separado de la
 inversión en medios y los costos externos. Creatividad, instrumentación y estudios se agregan con alcance propio
-cuando sean necesarios. Un rebate o comisión puede complementar los ingresos, pero no debe sostener el margen base.
+cuando sean necesarios. Un rebate o comisión del proveedor es margen de Efeonce (decisión del operador, 2026-10-16) y
+puede complementar los ingresos, pero no debe sostener el margen base.
 
 La dirección está aceptada y los mínimos internos están registrados. Este modelo no acredita contratos con
 proveedores, cotizaciones aprobadas por cliente, clientes comprometidos ni experiencia de campañas ejecutadas.
@@ -42,6 +43,11 @@ Conecta planificación, compra/operación, creatividad, medición y gestión de 
 La reunión de proveedor añade una ruta a evaluar: equipo Efeonce operando el DSP con entrenamiento y acompañamiento.
 La [evidencia del 12-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) registra la reunión,
 demo y condiciones pendientes; no acredita acceso, precio externo, crédito ni campañas activas.
+
+**Material comercial vigente 2026-10-16:** el brochure y la landing pública «Agencia de Medios» presentan esta capacidad
+dentro de la oferta integral. Nombran Basis, DV360, The Trade Desk, IAS y DoubleVerify sólo como tecnología que Efeonce
+opera, nunca como alianza; la propuesta comercial estándar sigue sin nombrar proveedores. Rutas y reglas de claims:
+[catálogo de la línea](../../services/media-distribution/README.md#material-comercial-vigente).
 
 ## 2. Qué problema resolvemos y por qué nos contratarían
 
@@ -358,13 +364,16 @@ vez salvo nueva implementación material. No duplicar creatividad, estudios o re
 ```text
 Ingreso propio base = diseño/setup + fee de campaña o fee mensual + extensiones propias contratadas
 Presupuesto externo = inversión neta de medios + tecnología/datos/trading/verificación/estudios
-Ingreso adicional eventual = comisión/rebate contratado y declarado, según política pactada
+Ingreso adicional eventual = comisión/rebate del proveedor, margen de Efeonce fuera del caso base
 Total al cliente = líneas propias + líneas externas contratadas + impuestos aplicables
 ```
 
 El ingreso principal aprobado es el fee por trabajo y responsabilidad de Efeonce. Un porcentaje de medios sólo
 se evalúa como componente híbrido con piso y justificación; no como única métrica ni como markup oculto del CPM.
-Los rebates se trasladan al cliente o se declaran como remuneración Efeonce; no se retienen en silencio.
+**Rebates y comisiones (decisión del operador, 2026-10-16):** «la comisión o rebate es nuestra, es parte de la
+ganancia». Ni el material comercial ni la propuesta prometen declararlos o traspasarlos al cliente; sustituye la regla
+anterior de trasladarlos o declararlos. Siguen fuera del margen base y no se anticipan como ingreso; Finance valida
+liquidación y tributos.
 
 ### 10.2 Unidad de costo y precio
 
@@ -467,8 +476,8 @@ Sin cambios al setup, el presupuesto focal inicial pasaría a USD 7.500 más ext
 
 La operación cobra por alcance/capacidad, no por vender horas ni por prometer resultados causales. Evaluar el servicio
 con **margen sobre honorarios, costo de servir, cobro efectivo y exposición de caja**. Medios administrados y remanentes
-se concilian por cliente/período; no financian otras campañas. Beneficios externos contratados se trasladan o se
-declaran/pactan como remuneración: jamás se anticipan como ingreso base ni se retienen en silencio.
+se concilian por cliente/período; no financian otras campañas. Comisiones o rebates del proveedor son margen de
+Efeonce (§10.1): no se prometen declarar ni traspasar, y jamás se anticipan como ingreso base.
 
 El detalle de fórmula, calendario, circuitos de caja, ejemplos y cambios de alcance vive en el
 [modelo económico del Pricing Integrity Pack §3](PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#3-estructura-de-una-propuesta).

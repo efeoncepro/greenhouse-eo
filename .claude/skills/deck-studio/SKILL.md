@@ -328,6 +328,33 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   - **Antes de enviarlo afuera:** cifras de ANAM (las entregó el operador; ANAM no las publicó) y el «12 meses» del caso
     Berel (cuenta ganada en mayo de 2026). Logos y piezas de clientes autorizados para este brochure (operador,
     2026-10-16); biblioteca formal: TASK-1937. Caso BICECORP retirado; Voice y Growth no tienen caso.
+- **Brochure «Agencia de Medios» (aprobado 2026-10-16).** El collateral de la línea Voice (Media & Distribution):
+  **65 láminas** — portada, índice y seis capítulos (El cambio · Plataformas · Creatividad · Programática · Medición ·
+  Trabajar juntos) más glosario. **PDF vigente** en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de
+  Medios/Efeonce-Brochure-Agencia-de-Medios.pdf` (12,2 MB, sha256 `c4697c7a…`). **Canvas** (privado):
+  <https://claude.ai/code/artifact/d32a798b-3bb2-493f-85dc-8c46366ee077>. Fuente, scripts y pendientes:
+  `ai-generations/2026-10-13_brochure-agencia-medios/` (`LEEME.md`). Norma: delta 2026-10-16 de
+  `EFEONCE_SURFACE_COMPOSITION_V1.md`. **Patrones medidos en esta corrida:**
+  - **Mixto:** portada y láminas de voz con foto por receta (`pnpm brand:compose`); el resto nativo
+    (`native/formatos.mjs`); medición e insights traídos del 360 y recoloreados a Voice. Índice HTML vivo en la lámina
+    2 con 15 destinos internos (`pdf/build-pdf.mjs`); `outline: true` de Playwright no generó marcadores.
+  - **Titulares afirmativos, no preguntas forzadas** («esta dinámica de preguntas y respuestas se vuelve muy absurda y
+    forzada», operador): se quedan sólo las preguntas que nacen de la duda real del cliente («¿Y la tele?
+    Conectada.»).
+  - **Pantallas con anuncios de una marca de ejemplo ficticia** (Nórtica, Andara): composición por homografía, acabado
+    del modelo y **reponer el aviso exacto** encima (el acabado escribió «NÁRTIKA»); pantallas fuera de foco se
+    desenfocan dentro de su máscara, no con inpainting.
+  - **Logotipos de terceros, los oficiales** (Hulu, ESPN, Forbes, Peacock, DIRECTV en blanco monocromo,
+    `logos/terceros/`): un logotipo de tercero nunca se escribe con la tipografía de Efeonce. Basis, DV360, The Trade
+    Desk, IAS y DoubleVerify son tecnología que operamos, no partners; las plataformas de anuncios tampoco.
+  - **Cómo se cobra, sin rebates:** nunca prometer declarar ni traspasar rebates o comisiones de medios («la comisión
+    o rebate es nuestra, es parte de la ganancia», operador); el dato que queda es «Tus cuentas: siempre a tu nombre».
+  - **De brochure a landing:** la landing pública <https://efeoncepro.com/servicios/agencia-de-medios/> salió de este
+    brochure **recompuesta para web, sin incrustar láminas** (delta 2026-10-16 (c) de la misma norma); la ejecución en
+    el sitio es de `efeonce-public-site-wordpress`.
+  - **Antes de enviarlo afuera:** cifra de Bresler contra su caso publicado, autorización de logos de clientes
+    (TASK-1937), readback de HubSpot Gold, inventario de Basis por mercado, alcance de DCO e incrementalidad con
+    Performance, y no mezclar «cinco países de operación» con el proof point «120+ empresas en 4 países».
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`
