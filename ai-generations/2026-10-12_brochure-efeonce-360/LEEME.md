@@ -133,3 +133,4 @@ BICECORP, ANAM y partners son los mismos de los brochures ya publicados; la auto
 
 - 2026-10-16 · V17: «Personas con nombre, con agentes a su lado» no se entendía (todas las personas tienen nombre). Ahora dice «Sabes quién hace qué.»: cada persona del squad tiene un rol claro y una sola te habla, tu Account Manager (`e-V17b.json`).
 - 2026-10-16 · V17 suma la cifra «+89 profesionales expertos en distintas áreas, en LATAM» bajo el texto (pedido del operador, `e-V17c.json`).
+- 2026-10-16 · PTN suma la tarjeta BytePlus (columna 3, debajo de Adobe; logo oficial de `public/images/logos/partners/byteplus.png` pasado a blanco como las demás). El chip «Agentes de IA» se movió para no tocarla (`e-PTNb.json`).
