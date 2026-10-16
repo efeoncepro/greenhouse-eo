@@ -162,3 +162,4 @@ El copy sale del catálogo `docs/services/channel-commerce/` y del ADR de la lí
 Fuente: `native-growth/channel-commerce.mjs`. Los enlaces de V04 se verificaron y van a las páginas 6, 21, 38, 53 y
 63.
 - 2026-10-16 · D08 «Aparte» se reemplazó por la versión vigente de la sesión de Agencia de Medios: «¿Cómo pago medios y fee? Por separado.» (L08-cobro, blob 9f8a17d1…), con el antetítulo de Voice (`e-D08.json`).
+- 2026-10-16 · CC3 (BTL) rehecha con más impacto («Muchísimo más impacto visual acá»): mosaico a sangre de nueve fotos de activación de BRÍO, una por servicio, generadas en lote con `gpt-image-2.5-sunburst` high 1024² sobre las referencias de BRÍO (≈ USD 0,47). Fotos y prompts en `channel-commerce/btl/`.
