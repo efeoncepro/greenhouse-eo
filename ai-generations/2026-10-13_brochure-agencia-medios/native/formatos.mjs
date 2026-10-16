@@ -730,7 +730,7 @@ const AXA = 'file:///Users/jreye/Documents/greenhouse-eo/node_modules/@efeoncepr
 }
 
 
-// CB · Cómo se cobra (política aprobada 2026-10-09: fee propio y medios/costos externos separados; rebates siempre declarados por escrito)
+// CB · Cómo se cobra (fee propio y medios separados). Sin promesas sobre rebates: el operador, 2026-10-16, «la comisión o rebate es nuestra, es parte de la ganancia».
 {
   let inner = voice({ eyebrow: 'Trabajar juntos · Cómo se cobra', question: '¿Cómo pago medios y fee?', answer: ['Por', 'separado'], body: 'Tu inversión va a las plataformas al costo, con su factura a la vista. Nuestro fee es fijo y va aparte: no sube porque inviertas <b>más</b>.' });
   // dos carriles desde tu presupuesto
@@ -749,9 +749,7 @@ const AXA = 'file:///Users/jreye/Documents/greenhouse-eo/node_modules/@efeoncepr
   inner += `<div style="position:absolute;left:1350px;top:${y0 + 316}px;width:480px"><div style="font-family:${ST};font-size:14px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:${MUTE}">02 · Nuestro fee</div>
 <div style="margin-top:12px;font-family:${ID};font-size:44px;font-weight:760;letter-spacing:-0.03em;line-height:1;color:#fff">Fijo y aparte</div>
 <div style="margin-top:12px;font-family:${ST};font-size:17px;line-height:1.4;color:${SOFT}">Por campaña o por mes, según el alcance que acordamos. No es un porcentaje de tu inversión.</div></div>`;
-  // regla rebates
-  inner += `<div style="position:absolute;left:880px;top:740px;width:980px;height:80px;border-radius:20px;border:1.5px dashed rgba(255,255,255,0.4);display:flex;align-items:center;gap:16px;padding:0 24px;box-sizing:border-box"><span style="flex:none;width:30px;height:30px">${icon('contrato', 30)}</span><span style="font-family:${ST};font-size:18px;color:#fff"><b>Sin comisiones ocultas.</b> <span style="color:${SOFT}">Si un proveedor paga una comisión o un rebate, te lo declaramos por escrito en la propuesta y en el contrato.</span></span></div>`;
-  inner += facts([['finanzas', 'Medios', 'Al costo, con factura del proveedor'], ['contrato', 'Fee', 'Fijo, por campaña o por mes'], ['seguridad', 'Rebates', 'Siempre declarados por escrito']], 140, 860, 230);
+  inner += facts([['finanzas', 'Medios', 'Al costo, con factura del proveedor'], ['contrato', 'Fee', 'Fijo, por campaña o por mes'], ['seguridad', 'Tus cuentas', 'Siempre a tu nombre']], 140, 860, 230);
   slides['CB-cobro'] = page(inner, 1360, 470);
 }
 
