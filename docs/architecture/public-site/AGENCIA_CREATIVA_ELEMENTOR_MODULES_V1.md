@@ -292,3 +292,27 @@ chrome global sin cambios.
   `fver-79bbb3b4…`, se niega si el renderer de producción no trae `ab622e958`), luego revincular la política
   publicitaria con `pnpm --silent growth:measurement` y verificar en vivo las dos landings.
 - **Dirección acordada:** el renderer pasa a AXIS y se publica por el carril de EPIC-035 ([TASK-2038](../../tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md)).
+
+## Delta 2026-10-16 — Caso Sky como una sola historia (módulo `prueba`)
+
+- **Pedido del operador (comentarios en el canvas):** la sección se sentía desconectada (banda del avión, tarjeta
+  flotante, cita gigante, fila de videos y logos sueltos). Se rehízo en el canvas y se publicó:
+  - **Titular:** pregunta y respuesta como el resto de la página: logo de Sky + «Caso · 12 meses», «¿Y esto
+    funciona? Pregúntale a Sky●» y una bajada.
+  - **Grilla de prueba en dos columnas:**
+    - Tarjeta del caso: foto en franja propia arriba (63 % del ancho, sin texto encima), el medidor del 94 %
+      editable y tres cifras (+2.000, 39, 5).
+    - Mosaico de los cuatro videos de campaña.
+  - **Testimonios:** Adriana Contreras y Constanza Rojas (texto y foto literales de experiencia.efeoncepro.com),
+    en Bricolage 300 con la frase clave en 700, porque Bricolage 600 en texto largo pesa.
+  - **Cierre:** «Sky no es la única» con la franja de logos.
+- **Avión:** cuadro de 12,7 s del máster aprobado del video del anuncio SEO
+  (`ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/sky-v17-restored-4k.mp4`, A320neo a
+  contraluz sobre nubes); el logo se comparó al 100 % con el render oficial V07. Descartados: la foto anterior (el
+  avión quedaba fuera de cuadro en la tarjeta vertical), un compuesto con el V07 oficial (al operador no le
+  convenció) y el V10 ampliado del portafolio (trae marca de agua de Let's Enhance). Renders oficiales recortados:
+  OneDrive › Sky - Efeonce - General/SKY Campañas/00_Assets/11_Avion-PNG.
+- **Publicación:** sin republicar el documento: ningún widget tenía valores guardados, así que basta recompilar y
+  desplegar el plugin. Backups `/tmp/eo-creativa-widgets-before-20261016-101813.tar` y `…-102106.tar`. Verificado
+  en vivo a 1440, 900 y 390: sin scroll horizontal, 4/4 videos reproduciéndose, foto cargada, 0 tokens sin
+  resolver, 0 errores de consola. El 94 % sigue pendiente de validación (el caso publicado dice 88 %).
