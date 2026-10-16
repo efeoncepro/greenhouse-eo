@@ -85,6 +85,9 @@ collateral vigente es el brochure aprobado el 2026-10-06 (§ «Collateral comerc
   ventas en 7 meses (y cómo termina la frase): sin ella el brochure **no se usa con prospectos**; 5 rutas hacia una
   persona y 23 fuentes sí están en el caso publicado; (2) aprobación escrita del sprocket; (3) lámina de equipo
   HubSpot (nombres, cargos, certificaciones, fotos); (4) plazo estándar de implementación.
+- **Brochure oficial de la agencia** (aprobado 2026-10-16, «Agencia de Marketing 360°», skill `deck-studio`): su tramo
+  Revenue cierra con el caso ANAM como prueba de implementación HubSpot (Customer Agent, rutas hacia una persona). Sus
+  cifras de ANAM tienen el mismo pendiente de autorización antes de enviarlo afuera.
 
 ---
 

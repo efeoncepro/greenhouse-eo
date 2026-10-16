@@ -1077,6 +1077,30 @@ isotipo, nave o mascotas— carga el [contrato de selección de referencias](../
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
 corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
 
+### Caso de cliente con piezas reales: generar, componer, terminar, reponer **[brochure 360°, 2026-10-16]**
+
+Método aprobado en los casos Berel, Sky y ANAM del brochure oficial «Agencia de Marketing 360°»
+(`ai-generations/2026-10-12_brochure-efeonce-360/`, carpetas `caso-berel/`, `caso-sky/`, `caso-anam/`). Es la regla
+de arriba aplicada a material de un cliente:
+
+1. **Escena.** `gpt-image-2.5-sunburst` high genera la escena con la **referencia oficial del producto** (cubeta Berel
+   Insignia 19 L; A320 de Sky) o, si la marca va en un objeto, **sin logos** (ANAM).
+2. **Componer.** Las piezas reales del cliente (portadas y stories del blog, piezas de campaña) se ponen
+   determinísticas encima: borde, sombra, rotación y profundidad (lejos chicas y nítidas, cerca grandes y desenfocadas).
+3. **Terminar.** El modelo sólo integra luz y material.
+4. **Reponer.** El acabado deforma textos y precios: se vuelve a poner el contenido exacto de cada pieza nítida,
+   buscando el desplazamiento del modelo y corrigiendo sólo la media de color.
+5. **Logo sobre un objeto** (minivan de ANAM): el SVG oficial se compone por homografía y se integra como **vinilo**
+   con el sombreado real del panel y grano. **Nunca** se le pasa al acabado del modelo: deformó el símbolo y lo corrió.
+   Sin foto del rotulado real de la flota, sólo el logo, sin franjas inventadas.
+
+En la lámina, **lo clave cae en la mitad visible**, a la derecha de la curva del panel de papel: genera la escena con
+el sujeto u objeto clave **fuera del cuarto izquierdo**. Correcciones del operador que valen como regla: «muchísimo más
+punch, cinematográfico» (contraluz, destello, bruma, profundidad, toma baja); una estela ordenada de piezas se rechazó
+por su distribución; en una activación, una lata gigante de aluminio «es irreal» → producción creíble (contenedores,
+truss, sol LED); una tarjeta de UI blanca y plana «se ve muy 1995» → **panel de vidrio oscuro** con desenfoque de fondo
+y estado vivo. Usar logos y piezas de un cliente exige su autorización (TASK-1937).
+
 ## Paid media como consumidor: atención sin cambiar el lenguaje (2026-09-21)
 
 Para convertir los registros A/B/C en anuncios, cargar

@@ -50,6 +50,9 @@ aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura
    capacidad, presupuesto, plazos ni compromisos.
 6. **Brochure contextualizado:** explicar qué encontrará y por qué sirve para evaluar a Efeonce;
    compartir la versión pertinente sólo tras comprobar contenido, evidencia y permiso de uso.
+   Para presentar la agencia completa, el oficial es «Agencia de Marketing 360°» (aprobado 2026-10-16):
+   completo de 84 láminas o corto de 26, en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de
+   Marketing 360/`. Antes de enviarlo afuera siguen pendientes las cifras de ANAM y el «12 meses» de Berel.
 7. **Invitación natural:** pregunta útil sobre prioridades o criterios; enlace de reunión verificado
    y respuesta por correo como alternativas de la misma conversación.
 8. **Cierre e identidad:** despedida cordial, firma oficial y CCO según la

@@ -153,6 +153,10 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
 `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
 
 - El modelo entrega **sólo el medio limpio**; texto, logo, CTA y legal se componen con AXIS, nunca se generan.
+- **Piezas reales o logo de un cliente dentro de la escena** (brochure 360°, 2026-10-16): se componen determinísticas,
+  el modelo sólo termina luz y material, y después se **repone** el contenido exacto; el logo sobre un objeto va como
+  vinilo compuesto, nunca terminado por el modelo; una tarjeta de UI va en vidrio oscuro, no blanca plana. Método:
+  `design-studio` → `references/efeonce-photographic-language.md` §«Caso de cliente con piezas reales».
 - Plate cotidiano → GPT Image 2.5 Flare; edición precisa, máscara o master final → 2.5 Sunburst
   (`pnpm ai:image --model gpt-image-2.5-sunburst`); material/atmósfera → Seedream 5 Pro; divergencia barata →
   Seedream 5 Lite (`pnpm ai:fal`).

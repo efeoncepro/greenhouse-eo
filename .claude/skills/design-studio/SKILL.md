@@ -441,6 +441,10 @@ barra, trampas y comandos en la referencia (§Registros); canon vigente:
 calmo para la columna de texto, 85 mm, lecho oscuro y la luz de acento de la línea; en la contraportada con foto, el
 sujeto de espaldas caminando hacia la órbita. Receta y ficha de ejemplo
 (`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`) en la referencia, §Cine.
+**Caso de cliente en una lámina con sus piezas reales** (brochure 360°, 2026-10-16): escena con la referencia oficial del
+producto → piezas reales compuestas → acabado del modelo → reponer el contenido exacto; un logo sobre un objeto va como
+vinilo compuesto, nunca terminado por el modelo; sujeto clave fuera del cuarto izquierdo; tarjetas de UI en vidrio
+oscuro, no blancas planas. Método: referencia, §«Caso de cliente con piezas reales».
 **Al reemplazar el plate de una pieza aprobada** (operador, 2026-09-28, caso `CR4` de Creative Services): se conserva el
 **concepto de impacto** y se cambia la toma (gesto, forma del fenómeno, disposición); la receta de portada fija
 geometría, no concepto, y un validador que pasa no valida el concepto. La forma de la órbita cambia el significado

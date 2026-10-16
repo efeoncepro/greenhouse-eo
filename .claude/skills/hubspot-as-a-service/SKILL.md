@@ -61,6 +61,10 @@ Sell credits as advice on **how many** the client needs, never as "don't buy". B
 ANAM must authorize the −57 % commercial-load and +32 % sales figures (see the ANAM authorization control below);
 the 3D sprocket stays internal until HubSpot approves it in writing. Open items and commercial use:
 `hubspot-solutions-partner` § «Collateral comercial vigente».
+The official agency-wide brochure «Agencia de Marketing 360°» (approved 2026-10-16; `deck-studio`) closes its
+Revenue section with the ANAM case as HubSpot implementation proof: Customer Agent and routes to a person, shown as a
+«Solicitud de muestreo» ticket routed Chat → Agente IA → Ruta Terreno. Its ANAM figures came from the operator and are
+not published by ANAM: they stay pending before the brochure goes out.
 
 ## Manual outreach continuity
 
