@@ -23,6 +23,13 @@ Use this reference for any Efeonce public landing page on WordPress/Ohio/Element
    - Page-scoped visual CSS: prefer `_elementor_page_settings.custom_css` when the fix belongs to the page.
    - Runtime plugin/widget code: work in `efeoncepro/efeonce-public-site-runtime` and deploy through the governed rail.
    - Emergency file edits on Kinsta require backup, cache purge, verification, and backport.
+   - **Replacing an image or audio that a widget renders from the plugin folder:** the rendered URL must carry
+     `?ver=filemtime` (helper `versioned_plugin_asset_url` in the Contacto widgets). Plugin assets ship with a
+     one-year `max-age`; a fixed URL keeps serving the old file to every returning visitor even after the CDN
+     refreshes (caso `/contacto/` 2026-10-16: «sigue la foto mala»). Purging Kinsta does not clear browsers.
+   - **Replacing a media-library image (OG/social):** sideload a NEW attachment with a new filename and repoint
+     the Yoast metas; never overwrite the file in place (CDN and social scrapers cache by URL). Snapshot the metas
+     first and leave featured-image metas as they were unless the user asks (Contacto keeps `_thumbnail_id` empty).
 
 4. **Protect unrelated surfaces**
    - Do not touch Home unless explicitly requested.

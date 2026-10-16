@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-16 — Contacto: Nexa canónica, voz y medición
+
+Live en `/contacto/` y verificado en navegador/CDN: hero con rostro canónico de Nexa, voz Lucía es-MX (26 s), OG
+adjunto `251980` (v3), widget con `?ver=filemtime` en hero y audio. Backups en `/tmp/eo-contacto-widgets-before-*`
+del servidor; snapshot OG `_gh_contacto_before_og_rotation_20261016_163140`. Política medición `89e531d8`
+(Meta + Google UPD) publicada; recibos en `.auth/contacto-measurement/`. [Detalle](.claude/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
+Pendiente: envío real del form → GA4 DebugView + Meta Processed; key del MCP local ElevenLabs (tiene el ID, no `sk_`);
+saldo fal `FAL_API_KEY_B`; `contact-landing.js` local sin desplegar no es de esta sesión. Commits locales, sin push.
+
 ## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°» aprobado
 
 Aprobado y canonizado: «este es el brochure oficial de la agencia 360° con todos nuestros servicios». Completo 84
@@ -261,15 +270,3 @@ del worker**. Pendiente: (1) el operador recupera hoy las 3 keywords de Berel co
 ops-seo-rank-capture` (el clasificador bloqueó al agente); (2) mirar `failed=0` en el regrade del 13-oct 08:00 — encolará
 5 corridas `full` de Sky; (3) cerrar ambas issues tras el deploy. Verificado: typecheck, lint, 1.257 tests de
 ai-visibility/seo/worker, predicado SQL contra PG real. No se corrió `pnpm test` completo ni `pnpm build`.
-
-## 2026-10-12 — AXIS: dependientes del pin `axis-brand-assets` 0.4.25 regenerados
-
-`596bfab90` subió el pin de 0.4.15 a 0.4.25 sin regenerar y dejó tres tests rojos en `pnpm test`. Corregido en
-`7877dfe89` y el commit siguiente: tokens de Manzanitas, `INSIGHT_CHANNEL_IDS` de 19 a 22 (Facebook, Threads, X, con
-isotipo en los dos catálogos) y los cuatro lockups del PDF del AI Visibility Report re-sellados (terminación
-concéntrica del anillo: **cambio visible en un PDF en producción**, sale con el próximo release). `channelForDomain`
-lleva facebook.com a `facebook` y suma los dominios de Threads y X. Think tiene los tres isotipos en producción
-(`236d549`). El mapeo por dominio sólo marca filas de tabla del PDF y el deck: el modelo web no lo usa, así que no hay
-orden obligado entre Think y el release de Greenhouse (`develop` lleva 283 commits sin push desde el 2026-10-05). Verificado: suites de Insights, Composer,
-config y PDF; gate visual de Insights 37 frames a 0 px; export real del PDF (10); lint y typecheck. No se corrió
-`pnpm test` completo ni `pnpm build`. Lección y comandos en las skills `axis-design-system` y `efeonce-insights`.

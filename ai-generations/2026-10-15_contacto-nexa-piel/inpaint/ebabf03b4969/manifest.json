@@ -1,0 +1,186 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "ebabf03b4969",
+  "key": "ebabf03b49690402348596e694415d036382e3f89ca2630877dbd0884f7ceb16",
+  "status": "completed",
+  "createdAt": "2026-10-15T23:29:30.613Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/base.png",
+    "imageSha256": "67710b45af03979ca35c9ae727b00132ca36ba26ebe27457cdb1951bf7602aab",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/mask-piel.png",
+    "maskSha256": "8aa24c2855f59397d60cfb345c4f81db47485a5ec8b85404ed0b803e8ffbb4e9",
+    "maskConvention": "white-editable",
+    "width": 1672,
+    "height": 1055,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 2,
+    "prompt": "Retouch only the skin of the same woman: keep her exact identity, face shape, features, eyes, eyebrows, lashes, lips, smile, expression, head angle, hand pose, earrings and lighting exactly as they are. Replace the cracked, crinkled, reptile-like over-sharpened texture on her forehead, cheeks, nose, chin, neck and hand with natural, healthy human skin as shot on a full-frame camera with an 85mm lens: fine real pores, subtle natural freckles, soft even tone, gentle specular highlight on the forehead and cheekbones, no cracks, no crosshatch, no wrinkled-paper pattern, no plastic airbrushed look. Photorealistic editorial portrait, same cool blue studio light, same color grade.",
+    "providerPrompt": "Retouch only the skin of the same woman: keep her exact identity, face shape, features, eyes, eyebrows, lashes, lips, smile, expression, head angle, hand pose, earrings and lighting exactly as they are. Replace the cracked, crinkled, reptile-like over-sharpened texture on her forehead, cheeks, nose, chin, neck and hand with natural, healthy human skin as shot on a full-frame camera with an 85mm lens: fine real pores, subtle natural freckles, soft even tone, gentle specular highlight on the forehead and cheekbones, no cracks, no crosshatch, no wrinkled-paper pattern, no plastic airbrushed look. Photorealistic editorial portrait, same cool blue studio light, same color grade."
+  },
+  "mask": {
+    "touchedFraction": 0.05063947028277285,
+    "editable": 67888,
+    "soft": 21438,
+    "protected": 1674634
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1672,
+      "height": 1055
+    },
+    "target": {
+      "width": 1680,
+      "height": 1056
+    },
+    "aspectError": 0.0038185511171293083,
+    "reason": "la zona con contexto ocupa 36 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.2,
+    "basis": "2 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 35.222,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.62,
+        "bestError": 1.62,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 255,
+        "meanDelta": 42.049,
+        "worst": {
+          "x": 1088,
+          "y": 360
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 235,
+        "meanDelta": 13.603,
+        "worst": {
+          "x": 1170,
+          "y": 429
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 212,
+        "meanDelta": 3.466,
+        "worst": {
+          "x": 1652,
+          "y": 463
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a141e7-8e6a-7792-850e-4885eabfca65",
+        "account": "FAL_API_KEY",
+        "seed": 1343937562
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 35.792,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.62,
+        "bestError": 1.62,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 255,
+        "meanDelta": 42.929,
+        "worst": {
+          "x": 1160,
+          "y": 454
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 238,
+        "meanDelta": 13.191,
+        "worst": {
+          "x": 1171,
+          "y": 440
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 212,
+        "meanDelta": 3.466,
+        "worst": {
+          "x": 1652,
+          "y": 463
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "fal-ai/flux-pro/v1/fill",
+      "usage": null,
+      "meta": {
+        "requestId": "01a141e7-eb88-7782-988e-83909c3be802",
+        "account": "FAL_API_KEY",
+        "seed": 1843904011
+      }
+    }
+  ]
+}

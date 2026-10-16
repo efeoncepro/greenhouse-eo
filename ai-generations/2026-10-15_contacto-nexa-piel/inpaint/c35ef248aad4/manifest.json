@@ -1,0 +1,227 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "c35ef248aad4",
+  "key": "c35ef248aad4794dac3272fb95d4fb740adbcda8c410b23c4302edab15f251d4",
+  "status": "completed",
+  "createdAt": "2026-10-16T16:28:20.552Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/contacto-nexa-hero-piel-v2.png",
+    "imageSha256": "069507bb9a07ae391ac359a3e5494929708fce02e349157dd3088cb92066ffeb",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/mask-piel.png",
+    "maskSha256": "8aa24c2855f59397d60cfb345c4f81db47485a5ec8b85404ed0b803e8ffbb4e9",
+    "maskConvention": "white-editable",
+    "width": 1672,
+    "height": 1055,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png",
+        "sha256": "e2ffe732d00d5301dff0762781c9520aff342eb7ea4dd13abfd948b228f6a15c"
+      },
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png",
+        "sha256": "0ab381b2da1175c1f71ca1ac1f31ab5b14649f3e21d28d592eb97c12434564a2"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Identity replacement in image 1 only: the woman in image 1 becomes the exact same woman shown in image 3 (frontal) and image 4 (three-quarter view). Copy her face precisely from images 3 and 4: her bone structure, oval face, dark brown almond eyes with winged eyeliner, thick dark brows, nose, full lips with soft pink color, warm olive skin with natural freckles across nose and cheeks, the small mole on her right cheek, real pores and fine natural texture. Keep everything else from image 1 exactly: her head angle turned slightly to her left, her gaze straight into the camera, her soft closed-lip smile, her chin resting on her closed fist, the long dark wavy hair, the small gold hoop earrings, the royal blue hoodie, and the same cool blue studio light and color grade falling on her face. Photorealistic editorial portrait shot on a full-frame camera with an 85mm lens.\n Only the area marked in magenta in image 2 changes; keep the exact framing, crop, composition and every pixel outside that area.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 4 is a reference of the object or element to bring into image 1; match its look, shape and material.\nIdentity replacement in image 1 only: the woman in image 1 becomes the exact same woman shown in image 3 (frontal) and image 4 (three-quarter view). Copy her face precisely from images 3 and 4: her bone structure, oval face, dark brown almond eyes with winged eyeliner, thick dark brows, nose, full lips with soft pink color, warm olive skin with natural freckles across nose and cheeks, the small mole on her right cheek, real pores and fine natural texture. Keep everything else from image 1 exactly: her head angle turned slightly to her left, her gaze straight into the camera, her soft closed-lip smile, her chin resting on her closed fist, the long dark wavy hair, the small gold hoop earrings, the royal blue hoodie, and the same cool blue studio light and color grade falling on her face. Photorealistic editorial portrait shot on a full-frame camera with an 85mm lens.\n Only the area marked in magenta in image 2 changes; keep the exact framing, crop, composition and every pixel outside that area.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05063947028277285,
+    "editable": 67888,
+    "soft": 21438,
+    "protected": 1674634
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1672,
+      "height": 1055
+    },
+    "target": {
+      "width": 1680,
+      "height": 1056
+    },
+    "aspectError": 0.0038185511171293083,
+    "reason": "la zona con contexto ocupa 36 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0816,
+    "basis": "2 × salida 1680x1056 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 24.125,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.91,
+        "bestError": 1.91,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -2.82,
+        -3.72,
+        -2.88
+      ],
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 255,
+        "meanDelta": 28.441,
+        "worst": {
+          "x": 1162,
+          "y": 423
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 217,
+        "meanDelta": 10.456,
+        "worst": {
+          "x": 1170,
+          "y": 415
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 253,
+        "meanDelta": 3.545,
+        "worst": {
+          "x": 948,
+          "y": 468
+        }
+      },
+      "outputUsd": 0.0408,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 6492,
+        "input_tokens_details": {
+          "image_tokens": 6048,
+          "text_tokens": 444
+        },
+        "output_tokens": 1359,
+        "output_tokens_details": {
+          "image_tokens": 1359,
+          "text_tokens": 0
+        },
+        "total_tokens": 7851
+      },
+      "meta": {
+        "size": "1680x1056",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 20.715,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.73,
+        "bestError": 1.73,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -2.89,
+        -2.82,
+        -1.15
+      ],
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 251,
+        "meanDelta": 24.505,
+        "worst": {
+          "x": 1160,
+          "y": 424
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 220,
+        "meanDelta": 8.712,
+        "worst": {
+          "x": 1170,
+          "y": 415
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 203,
+        "meanDelta": 3.81,
+        "worst": {
+          "x": 945,
+          "y": 470
+        }
+      },
+      "outputUsd": 0.0408,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 6492,
+        "input_tokens_details": {
+          "image_tokens": 6048,
+          "text_tokens": 444
+        },
+        "output_tokens": 1359,
+        "output_tokens_details": {
+          "image_tokens": 1359,
+          "text_tokens": 0
+        },
+        "total_tokens": 7851
+      },
+      "meta": {
+        "size": "1680x1056",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

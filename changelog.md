@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-16 — Contacto: Nexa canónica, voz mexicana y medición Meta
+
+- Hero de `/contacto/` con el rostro canónico de Nexa (inpaint Sunburst + anclas), voz «Escucha a Nexa» nueva
+  (ElevenLabs Lucía es-MX, −16 LUFS), OG v3 en adjunto nuevo y cache-busting `?ver=filemtime` en hero/audio del widget.
+- Política Meta + Google UPD publicada para `efeonce-contacto`; GA4 `generate_lead` verificado. Bible de Nexa: voz
+  mexicana por decisión del operador. [Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
+
 ## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°»
 
 - Aprobado como brochure oficial de la agencia: versión completa (84 láminas) y corta (26), con índice linkeable,
@@ -557,10 +564,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 - [ADR-025 aceptada](docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md): plan
   declarativo por toma, ejecutores y compuertas; ningún video generativo con referencias sin aprobar.
 - EPIC-051 con TASK-1979…1989 (runner TASK-1989); capas funcional y manual; sin runtime ni gasto.
-
-## 2026-10-03 — Decisiones de marca convertidas en capacidad de ejecución escalable
-
-- [Dirección estratégica aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md): hacer operables, automatizables y escalables
-  decisiones creativas para acelerar salida al mercado preservando calidad, consistencia e identidad; recorrido
-  completo o tramo delimitado. Visión, modelo corporativo, oferta, método y skills/routing enlazados; validación
-  económica/comercial permanece por oferta. Cambio documental local, sin alterar runtime ni publicar.

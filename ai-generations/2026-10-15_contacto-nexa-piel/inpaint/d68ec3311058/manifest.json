@@ -1,0 +1,210 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "d68ec3311058",
+  "key": "d68ec331105827ff54004765295edbdd5f1478b47ba5c958e55dcad94224be11",
+  "status": "completed",
+  "createdAt": "2026-10-15T23:28:27.221Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/base.png",
+    "imageSha256": "67710b45af03979ca35c9ae727b00132ca36ba26ebe27457cdb1951bf7602aab",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/mask-piel.png",
+    "maskSha256": "8aa24c2855f59397d60cfb345c4f81db47485a5ec8b85404ed0b803e8ffbb4e9",
+    "maskConvention": "white-editable",
+    "width": 1672,
+    "height": 1055,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Retouch only the skin of the same woman: keep her exact identity, face shape, features, eyes, eyebrows, lashes, lips, smile, expression, head angle, hand pose, earrings and lighting exactly as they are. Replace the cracked, crinkled, reptile-like over-sharpened texture on her forehead, cheeks, nose, chin, neck and hand with natural, healthy human skin as shot on a full-frame camera with an 85mm lens: fine real pores, subtle natural freckles, soft even tone, gentle specular highlight on the forehead and cheekbones, no cracks, no crosshatch, no wrinkled-paper pattern, no plastic airbrushed look. Photorealistic editorial portrait, same cool blue studio light, same color grade.",
+    "providerPrompt": "Retouch only the skin of the same woman: keep her exact identity, face shape, features, eyes, eyebrows, lashes, lips, smile, expression, head angle, hand pose, earrings and lighting exactly as they are. Replace the cracked, crinkled, reptile-like over-sharpened texture on her forehead, cheeks, nose, chin, neck and hand with natural, healthy human skin as shot on a full-frame camera with an 85mm lens: fine real pores, subtle natural freckles, soft even tone, gentle specular highlight on the forehead and cheekbones, no cracks, no crosshatch, no wrinkled-paper pattern, no plastic airbrushed look. Photorealistic editorial portrait, same cool blue studio light, same color grade."
+  },
+  "mask": {
+    "touchedFraction": 0.05063947028277285,
+    "editable": 67888,
+    "soft": 21438,
+    "protected": 1674634
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 712,
+      "top": 0,
+      "width": 723,
+      "height": 890
+    },
+    "target": {
+      "width": 1728,
+      "height": 2128
+    },
+    "aspectError": 0.0004057428214732239,
+    "reason": "la zona con contexto ocupa 36.3 % de la imagen: se genera recortada a 1728x2128"
+  },
+  "estimate": {
+    "usd": 0.1594,
+    "basis": "2 × salida 1728x2128 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 127.08,
+      "suspectFlatPanel": true,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.72,
+        "bestError": 2.72,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 255,
+        "meanDelta": 164.638,
+        "worst": {
+          "x": 1088,
+          "y": 360
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 186,
+        "meanDelta": 8.146,
+        "worst": {
+          "x": 1189,
+          "y": 511
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 182,
+        "meanDelta": 2.802,
+        "worst": {
+          "x": 854,
+          "y": 488
+        }
+      },
+      "outputUsd": 0.0797,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1704,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 199
+        },
+        "output_tokens": 2657,
+        "output_tokens_details": {
+          "image_tokens": 2657,
+          "text_tokens": 0
+        },
+        "total_tokens": 4361
+      },
+      "meta": {
+        "size": "1728x2128",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 129.887,
+      "suspectFlatPanel": true,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.86,
+        "bestError": 2.86,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 255,
+        "meanDelta": 168.879,
+        "worst": {
+          "x": 1088,
+          "y": 360
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 85,
+        "meanDelta": 6.411,
+        "worst": {
+          "x": 1176,
+          "y": 422
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 199,
+        "meanDelta": 2.738,
+        "worst": {
+          "x": 854,
+          "y": 488
+        }
+      },
+      "outputUsd": 0.0797,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1704,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 199
+        },
+        "output_tokens": 2657,
+        "output_tokens_details": {
+          "image_tokens": 2657,
+          "text_tokens": 0
+        },
+        "total_tokens": 4361
+      },
+      "meta": {
+        "size": "1728x2128",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}
