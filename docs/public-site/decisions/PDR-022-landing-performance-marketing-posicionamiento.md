@@ -20,7 +20,7 @@ comparten dominios en el top 10 y que performance tiene 16 veces más volumen: s
 Reglas para esta landing:
 
 - no usa «agencia de medios», «compra de medios», «planificación de medios» ni «plan de medios» en title, H1 ni slug;
-- «publicidad programática» es secundaria de Medios: Performance conserva programmatic como canal en su sección de
+- «publicidad programática» es secundaria de Medios (confirmado por el operador el 2026-10-16): Performance conserva programmatic como canal en su sección de
   canales y enlaza a la sección de Medios en vez de competir por el término;
 - al publicarse, las dos páginas se enlazan por función (Performance → Medios para planificación, compra y
   programática; Medios → Performance para la operación de campañas);

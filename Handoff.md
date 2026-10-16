@@ -10,7 +10,8 @@ y packs de medios. [Landing](.claude/skills/efeonce-public-site-wordpress/refere
 [PDR-025](docs/public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) ·
 [LEEME](ai-generations/2026-10-13_brochure-agencia-medios/LEEME.md).
 Pendiente: envío real del form (HubSpot + GA4 `generate_lead`), casilla de novedades sin suscripción HubSpot, Rich
-Results/GSC, confirmar la regla «programática secundaria de Medios» (PDR-025/022). Commits locales, sin push.
+Results/GSC. Operador 2026-10-16: rebates nunca al cliente (regla vigente en todo); «programática secundaria de
+Medios» confirmada (PDR-025/022). Commits locales, sin push.
 
 ## 2026-10-16 — GTM: drift con mecanismo (web + servidor) y auditoría brand-visibility
 

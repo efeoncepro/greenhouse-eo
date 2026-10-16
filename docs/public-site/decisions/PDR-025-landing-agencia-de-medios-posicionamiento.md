@@ -97,7 +97,7 @@ Las creatividades de ejemplo usan una marca ficticia, «Nórtica»; ninguna piez
 |---|---|---|
 | agencia de medios · compra de medios · planificación de medios · plan de medios | Agencia de Medios | No lo usa en title, H1 ni slug |
 | agencia de performance marketing · publicidad digital · pauta digital | Performance (PDR-022) | No lo usa en title, H1 ni slug |
-| publicidad programática | Agencia de Medios (secundaria) | Performance la conserva como canal dentro de su sección de canales y enlaza a Medios |
+| publicidad programática | Agencia de Medios (secundaria; confirmado por el operador el 2026-10-16) | Performance la conserva como canal dentro de su sección de canales y enlaza a Medios |
 
 - Cada página enlaza a la otra por función cuando ambas estén publicadas; hoy Performance no existe y Medios no le
   enlaza.
