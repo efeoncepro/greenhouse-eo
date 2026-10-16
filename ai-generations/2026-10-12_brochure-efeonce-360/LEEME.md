@@ -259,3 +259,13 @@ implementación de HubSpot». ANAM es un laboratorio de análisis ambientales de
 - El chip «HubSpot» se volvió a dibujar. Archivos en `caso-anam/`. Se rearmaron las dos versiones del PDF; los enlaces
   se verificaron.
 - 2026-10-16 · ANAM con más cine, a pedido del operador («Dale más impacto cinematográfico… a la card, se ve todo muy 1995»). Toma baja en contraluz: la técnica levanta la muestra contra el sol y la minivan queda a la derecha, con el logo oficial como vinilo desenfocado (`prompt-cine.txt`, `vinilo2.cjs` con REF=150 y BLUR=1.1). La tarjeta pasó a panel de vidrio oscuro con desenfoque de fondo, sprocket 3D, «En vivo» y la ruta Chat → Agente IA → Ruta Terreno, asignada a María Paz (`slide.html`).
+
+## 2026-10-16 · VERSIÓN FINAL APROBADA
+
+El operador aprobó la versión final y pidió los PDF en la carpeta oficial. Los PDF finales están en OneDrive
+`Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`:
+
+- Completo: 84 láminas.
+- Corto: 26 láminas.
+
+Sus hashes están en el commit de cierre.

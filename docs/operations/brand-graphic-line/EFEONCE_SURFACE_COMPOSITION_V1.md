@@ -69,8 +69,12 @@ la agencia completa con las cinco líneas y es el documento por defecto cuando u
 - **Navegación.** La lámina 4 (la órbita) enlaza cada esfera a la portada de su línea, y la 5 («Todo el recorrido») es
   un índice con número de página donde cada fila es un enlace interno del PDF. `armar-indice.mjs` renderiza el índice
   con las páginas reales y `build-pdf.mjs` pone los enlaces; se verifican después de cada armado.
-- **Composición generativa con piezas reales** (casos Berel y Sky, activaciones BTL de la marca ficticia BRÍO): el
-  modelo genera la escena con el producto o el avión oficial como referencia, las piezas reales se componen
+- **Versión final aprobada el 2026-10-16** (el operador: «Perfecto, aprobado… canonicemos y entrégame en la carpeta los PDF
+  finales»), con los tres casos cinematográficos: Berel (cubeta Insignia con contenidos del blog), Sky (A320 en
+  contraluz con piezas de campaña) y ANAM (muestreo en embalse, minivan con el logo oficial y panel de HubSpot).
+- **Composición generativa con piezas reales** (casos Berel, Sky y ANAM, activaciones BTL de la marca ficticia BRÍO): el
+  modelo genera la escena con el producto o el avión oficial como referencia (en ANAM, sin logos, y el logo oficial va
+  compuesto como vinilo con el sombreado del panel, porque el acabado del modelo lo deformaba), las piezas reales se componen
   determinísticas encima, el modelo da el acabado de luz y **el contenido exacto de cada pieza se repone al final**
   (el acabado deforma textos y precios). Scripts en `caso-berel/` y `caso-sky/`.
 - **Channel & Commerce dentro de Brand**, con el copy del catálogo `docs/services/channel-commerce/` en estado
