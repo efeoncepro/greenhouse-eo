@@ -59,8 +59,10 @@ const fill = (html, prefix, row) => html.replace(new RegExp('\\{\\{' + prefix + 
 
 // 01 Hero: drop the canvas header (the theme header is canonical) and lift the dark wrapper.
 const heroWrap = $('header').first().parent()
+
 $('header').first().remove()
 const hero = heroWrap.children('section').first()
+
 hero.attr('style', 'background: #001a33; color: #ffffff')
 heroWrap.replaceWith(hero)
 // The art-direction cursor tag is decoration inside the H1: keep it visible via CSS, out of the heading text.
@@ -84,6 +86,7 @@ hero.find('img.eo-hero-img').attr('fetchpriority', 'high').attr('loading', 'eage
   group.html(ROUTES.map(r => fill(tabTpl, 'item', { ...r, tabStyle: off, pressed: 'false' })
     .replace(/ onClick="[^"]*"/, '').replace('<button', '<button data-gh-tab data-gh-repeat="routes" data-gh-part="tab"')).join('\n'))
   const panels = $('<div data-gh-panels="rutas"></div>')
+
   panels.html(ROUTES.map(r => fill(panelTpl, 'cur', r).replace(/^<div/, '<div data-gh-panel data-gh-repeat="routes" data-gh-part="panel"')).join('\n'))
   panel.replaceWith(panels)
 }
@@ -108,6 +111,7 @@ hero.find('img.eo-hero-img').attr('fetchpriority', 'high').attr('loading', 'eage
 $('dc-import').each((_, el) => {
   const name = $(el).attr('name')
   const id = name === 'CS-Home' ? 'cs-home' : 'cs-campaigns'
+
   const alt = name === 'CS-Home'
     ? 'Pantalla Hoy de Creative Studio: decisiones pendientes, calendario e inventario de piezas'
     : 'Pantalla Campañas de Creative Studio: cada campaña con su estado de creatividad, medios y lanzamiento'
@@ -124,6 +128,7 @@ $('dc-import').each((_, el) => {
   grid.replaceWith('<gh-growth-form></gh-growth-form>')
   form.find('*').addBack().each((_, el) => { for (const a of ['onClick', 'onclick']) $(el).removeAttr(a) })
   const host = $('<div></div>')
+
   host.attr('class', 'eo-brief gh-creativa-form-card')
   host.attr('style', form.attr('style'))
   host.attr('role', 'region')
@@ -160,6 +165,7 @@ $('section#preguntas details.eo-faq').each((_, el) => {
 
 // Assign module identities in document order.
 const sections = $('section')
+
 if (sections.length !== MODULES.length) throw new Error(`Expected ${MODULES.length} sections, found ${sections.length}`)
 sections.each((i, el) => { $(el).attr('data-gh-module', MODULES[i][0]) })
 
@@ -172,6 +178,7 @@ const excerpt = value => value.replace(/\s+/g, ' ').trim().slice(0, 48)
 const textLabel = (q, node, value) => {
   const tag = node.parent.tagName
   const heading = q(node.parent).closest('h1,h2,h3,h4').get(0)
+
   const kind = heading
     ? { h1: 'Título principal', h2: 'Título', h3: 'Subtítulo', h4: 'Subtítulo' }[heading.tagName]
     : ({ p: 'Descripción', a: 'Botón', button: 'Botón', summary: 'Pregunta', figcaption: 'Pie', blockquote: 'Testimonio', li: 'Ítem', strong: 'Destacado' }[tag] || 'Texto')
@@ -271,6 +278,7 @@ function compileFragment(html, module) {
 }
 
 const written = []
+
 const emit = (file, value) => {
   const target = path.join(plugin, file)
 
@@ -280,6 +288,7 @@ const emit = (file, value) => {
 }
 
 const titleFor = (q, el, i) => excerpt(q(el).find('h3,h4,summary,figcaption,strong').first().text() || q(el).attr('alt') || q(el).text()).slice(0, 40) || 'Elemento ' + (i + 1)
+
 const REPEAT_LABELS = {
   track_a: 'Trabajos · Fila superior', track_b: 'Trabajos · Fila inferior', routes: 'Rutas', formats: 'Formatos',
   pillars: 'Pilares del sistema', locations: 'Lugares del set', capabilities: 'Capacidades', offers: 'Formas de compra',
@@ -292,6 +301,7 @@ const REPEAT_LABELS = {
 // approved 2026-10-15; it keeps the v2 «lienzo» and production-engine animations restyled to La órbita.
 const escalaSource = fs.readFileSync(path.join(__dirname, 'creativa-source/Escala.dc.html'), 'utf8')
 const $e = cheerio.load(escalaSource.slice(escalaSource.indexOf('</helmet>') + 9, escalaSource.indexOf('<script type="text/x-dc"')), { decodeEntities: false }, false)
+
 const ESCALA_MODULES = [
   ['escala-hero', 'Escala · Hero · Creatividad a escala', 'dark', 'section#inicio'],
   ['escala-problema', 'Escala · El problema', 'light', 'section#problema'],
@@ -330,6 +340,7 @@ $e('section#escala-en-numeros .es-wall .eo-track, section#escala-en-numeros .es-
 $e('dc-import').each((_, el) => {
   const name = $e(el).attr('name')
   const id = name === 'CS-Home' ? 'cs-home' : 'cs-campaigns'
+
   const alt = name === 'CS-Home'
     ? 'Pantalla Hoy de Creative Studio: decisiones pendientes, calendario e inventario de piezas'
     : 'Pantalla Campañas de Creative Studio: cada campaña con su estado de creatividad, medios y lanzamiento'
@@ -364,6 +375,7 @@ const SERVICE_DEFAULTS = {
 
 for (const landing of LANDINGS) for (const [key, title, scheme] of landing.modules) {
   const root = landing.dom('section[data-gh-module="' + key + '"]').clone()
+
   if (!root.length) throw new Error('Missing section for module ' + key)
   const q = cheerio.load(landing.dom.html(root), { decodeEntities: false }, false)
   const groups = [...new Set(q('[data-gh-repeat]').map((_, el) => q(el).attr('data-gh-repeat')).get())]
@@ -388,6 +400,7 @@ for (const landing of LANDINGS) for (const [key, title, scheme] of landing.modul
 
         return `<gh-part data-part="${p}">${q.html(el)}</gh-part>`
       }).join('')
+
       const compiled = compileFragment(html, key)
       const split = cheerio.load(compiled.template, { decodeEntities: false }, false)
       const byName = Object.fromEntries(parts.map(p => [p, split('gh-part[data-part="' + p + '"]').html()]))
@@ -398,6 +411,7 @@ for (const landing of LANDINGS) for (const [key, title, scheme] of landing.modul
         variant = 'layout_' + seen.size
         seen.set(signature, variant)
         variants[variant] = { label: titleFor(q, byPart[parts[0]].get(i), i), templates: {} }
+
         for (const p of parts) {
           const file = `${key}--${group}-${variant}${parts.length > 1 ? '-' + p : ''}.html`
 
@@ -418,6 +432,7 @@ for (const landing of LANDINGS) for (const [key, title, scheme] of landing.modul
     if (Object.keys(variants).length === 1) Object.values(variants)[0].label = 'Estándar'
     // Row fields are shared by every row: name them by role, never by the first row's copy.
     const kinds = {}
+
     const rowFields = [...fields.values()].map(f => {
       const kind = f.label.split(' · ')[0]
 
@@ -488,5 +503,6 @@ ast.walkRules(rule => {
 emit('assets/css/creativa-landing.css', '/* Generated by greenhouse-eo scripts/public-website/compile-creativa-elementor-source.cjs. Do not edit by hand. */\n' + ast.toString())
 
 const usedAssets = [...new Set(written.filter(f => f.startsWith('includes/creativa')).flatMap(f => [...fs.readFileSync(path.join(plugin, f), 'utf8').matchAll(/@creativa\/([\w.-]+)/g)].map(m => m[1])))]
+
 fs.writeFileSync(path.join(__dirname, 'creativa-source/used-assets.json'), JSON.stringify(usedAssets.sort(), null, 2) + '\n')
 console.log(JSON.stringify({ files: written.length, modules: LANDINGS.reduce((n, l) => n + l.modules.length, 0), assets: usedAssets.length, sourceSha256 }, null, 2))
