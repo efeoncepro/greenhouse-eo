@@ -15,7 +15,7 @@ export const cta = (px, label = 'Ver modelo') => `<span style="display:inline-bl
 export const slash = (x, y, w, h, o = 1) => `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${VOLT};opacity:${o};transform:skewX(-24deg)"></div>`;
 
 // anuncio completo en una caja; variantes según proporción
-export const nortAd = (w, h, { img = HERO, pos = 'center', kind = 'auto', lines, label, sizeTag = '', lock = true, hs = 1 } = {}) => {
+export const nortAd = (w, h, { img = HERO, pos = 'center', kind = 'auto', lines, label, sizeTag = '', lock = true, hs = 1, slashTop = 0.38 } = {}) => {
   const k = kind !== 'auto' ? kind : (w / h > 4 ? 'row' : w / h > 1.3 ? 'wide' : 'tall');
   let inner = '';
   if (k === 'row') {
@@ -35,7 +35,7 @@ ${label !== null ? `<div style="position:absolute;right:${Math.round(u * 0.08)}p
   } else {
     const u = w;
     inner = `<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,12,0.55),rgba(5,8,12,0) 30%,rgba(5,8,12,0) 45%,rgba(5,8,12,0.92) 82%)"></div>
-${slash(Math.round(w * 0.7), Math.round(h * 0.38), Math.round(u * 0.07), Math.round(h * 0.3), 0.95)}
+${slash(Math.round(w * 0.7), Math.round(h * slashTop), Math.round(u * 0.07), Math.round(h * 0.3), 0.95)}
 ${lock ? `<div style="position:absolute;left:${Math.round(u * 0.08)}px;top:${Math.round(u * 0.08)}px">${lockup(Math.round(u * 0.09))}</div>` : ''}
 <div style="position:absolute;left:${Math.round(u * 0.08)}px;right:${Math.round(u * 0.06)}px;bottom:${Math.round(u * 0.08)}px">${headline(Math.round(u * 0.17), lines)}${label !== null ? `<div style="margin-top:${Math.round(u * 0.06)}px">${cta(Math.round(u * 0.06), label || 'Ver modelo')}</div>` : ''}</div>`;
   }
