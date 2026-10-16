@@ -316,7 +316,8 @@ const ast = postcss.parse(css)
 ast.walkRules(rule => {
   for (let p = rule.parent; p; p = p.parent) if (p.type === 'atrule' && /keyframes/.test(p.name)) return
   rule.selectors = rule.selectors.map(s => {
-    s = s.replace(/:root|\bhtml\b|\bbody\b/g, '.gh-hsv2')
+    // Only element selectors: a class such as .panel-body must keep its name.
+    s = s.replace(/:root|(^|[\s>+~,(])(html|body)(?=$|[\s>+~.:#[,)])/g, (m, pre) => (m === ':root' ? '' : pre) + '.gh-hsv2')
 
     return s.startsWith('.gh-hsv2') ? s : '.gh-hsv2 ' + s
   })

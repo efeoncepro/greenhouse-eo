@@ -32,3 +32,6 @@
 /* Editor switch «Animaciones» off stops every loop; reduced motion is handled by the canvas styles. */
 .gh-hsv2[data-motion="no"] *,.gh-hsv2[data-motion="no"] *::after{animation:none !important;transition:none !important}
 @media (prefers-reduced-motion:reduce){.gh-hsv2 [data-gh-panels][data-ready] > [data-gh-panel]{animation:none !important}}
+
+/* Ohio animates a background underline on every link hover (.links-underline); cards and buttons here are links. */
+.gh-hsv2 a:hover,.gh-hsv2 a.-dashed{animation:none !important;background-image:none !important}

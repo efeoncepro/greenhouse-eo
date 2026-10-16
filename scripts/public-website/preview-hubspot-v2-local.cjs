@@ -33,11 +33,13 @@ for (const m of order) {
   let html = fill(m + '.html', d.fields, d.defaults)
 
   html = html.replace('%%growth_form%%', '<div style="height:520px;border:2px dashed #8e1b82;border-radius:16px;display:grid;place-items:center;color:#8e1b82">Growth Form efeonce-hubspot-scope</div>')
+
   for (const g of d.repeaters) {
     const rows = g.defaults.map((row, i) => fill(g.variants[row._layout].templates.item, g.fields, { ...g.defaults[0], ...row }, { '%%row_first%%': i === 0 ? 'true' : 'false' }).replace('data-gh-open="true"', 'open data-gh-open="true"')).join('')
 
     html = html.replace('%%repeat_' + g.key + '%%', rows)
   }
+
   if (/%%[a-z0-9_]+%%/.test(html)) throw new Error('Unfilled token in ' + m + ': ' + html.match(/%%[a-z0-9_]+%%/)[0])
   out += `<div class="gh-hsv2 gh-hsv2-module gh-hsv2-module--${m}" data-motion="yes">${html}</div>\n`
 }
@@ -46,6 +48,7 @@ const page = `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta n
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap">
 <link rel="stylesheet" href="file://${path.join(plugin, 'assets/css/hubspot-v2-landing.css')}">
 <style>body{margin:0;background:#001a33}</style></head><body>${out}</body></html>`
+
 const target = path.resolve('tmp/hubspot-v2-preview/index.html')
 
 fs.mkdirSync(path.dirname(target), { recursive: true })
