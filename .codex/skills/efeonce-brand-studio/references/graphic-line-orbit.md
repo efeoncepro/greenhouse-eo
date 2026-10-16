@@ -31,7 +31,7 @@ Efeonce. Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen
 o isotipo pequeño dentro de su superficie—, nunca como firma; junto a Efeonce van en su lockup de familia
 («efeonce | producto», ruta H3, 2026-10-09) y el endoso «by efeonce» quedó **retirado**. Kortex y Verk, fuera por ahora. **La palabra del eslogan es de la línea de servicio** (operador, 2026-09-26):
 servicios creativos → «Empower your **Brand**» (producto Globe); web, infraestructura, SEO y medición → «Empower your
-**Engine**» (Wave); medios y distribución → «**Voice**» (Reach, por confirmar); Efeonce → «**Growth**», con **Greenhouse** como su
+**Engine**» (Wave); medios y distribución → «**Voice**» (línea Voice; Reach es su producto, confirmado por el operador 2026-10-16); Efeonce → «**Growth**», con **Greenhouse** como su
 producto (la plataforma que controla todas las líneas; su UI sigue con `DESIGN.md`). RevOps y CRM: pendiente;
 Growth Strategy → «Growth» (inferido). Los tokens `family` de AXIS aún cuelgan la palabra del producto (deuda). Uso de acentos de
 producto en piezas de Efeonce: pendiente (recomendación: no).

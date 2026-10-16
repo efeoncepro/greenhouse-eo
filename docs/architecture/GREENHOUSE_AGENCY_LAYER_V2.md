@@ -1309,7 +1309,7 @@ Señales de oportunidad de growth:
 
 → Recommendation: "Space Acme tiene alta satisfacción (OTD 94%, feedback
    response 2h) pero solo contrata Creative Hub. Oportunidad de upsell:
-   Social Media Management (línea Reach). Account Lead notificado."
+   Social Media Management (línea Voice). Account Lead notificado."
 ```
 
 ### 11.7 Nexa Actionable — AI que ejecuta, no solo responde

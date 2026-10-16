@@ -1,8 +1,8 @@
 # Media & Distribution — catálogo de servicios
 
-> **Línea de negocio:** Media & Distribution (Medios y Distribución)
+> **Línea de negocio:** Voice (Media & Distribution, Medios y Distribución)
 > **Marca contractual:** Efeonce
-> **Product brand habilitadora:** Reach, cuando aporte tecnología, método o diferenciación
+> **Producto de la línea:** Reach (producto de la línea Voice; Reach ya no existe como línea, operador 2026-10-16)
 > **Estado:** `Approved for validation`
 > **Última actualización:** 2026-10-16 (tramo Voice del brochure oficial «Agencia de Marketing 360°») · 2026-10-12 (oferta integral de medios; reunión y ruta DSP acompañada) · 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social)
 
@@ -16,8 +16,12 @@ El cliente contrata a Efeonce. **Reach no es la agencia ni la línea de negocio:
 habilitar esta capacidad con sistemas, método, datos y operación. Reach tampoco representa por sí solo toda la
 distribución que Efeonce puede ofrecer.
 
-Este catálogo se basa en el brochure comercial de Reach 2026 (`Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`),
-revisado el 2026-07-26. El brochure es una referencia de alcance; esta ficha es el contrato documental vigente y
+**Delta 2026-10-16 (operador): «Reach ya no existe, existe la línea Voice; Reach es el producto de la línea Voice».**
+El material comercial vigente de la línea es el brochure «Agencia de Medios» (línea Voice) y el tramo Voice del
+brochure oficial «Agencia de Marketing 360°». El brochure de Reach 2026 queda como referencia histórica de alcance.
+
+Este catálogo se basó originalmente en el brochure comercial de Reach 2026 (`Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`),
+revisado el 2026-07-26. Ese brochure es una referencia histórica de alcance; esta ficha es el contrato documental vigente y
 no autoriza por sí sola pricing público, claims, checkout ni venta self-serve.
 
 Desde el 2026-10-16, la línea aparece en el tramo **Voice** («llegas a quien compra») del brochure oficial «Agencia de
