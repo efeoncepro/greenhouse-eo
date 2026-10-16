@@ -18,7 +18,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const piezas = [
   ['fmt-9x16', 540, 960, { lines: ['CORRE', 'DE NOCHE'], img: HERO, pos: '37% 50%' }],
   ['fmt-4x5', 640, 800, { lines: ['CORRE', 'DE NOCHE'], img: HERO, pos: '37% 50%' }],
-  ['fmt-1x1', 720, 720, { lines: ['CORRE', 'DE NOCHE'], img: HERO, pos: '35% 50%' }],
+  ['fmt-1x1', 720, 720, { lines: ['CORRE', 'DE NOCHE'], img: HERO, kind: 'wide', pos: '70% 50%', hs: 0.7 }],
   ['fmt-16x9', 960, 540, { lines: ['CORRE', 'DE NOCHE'], kind: 'wide', img: HERO }],
   ['dg-191x1', 764, 400, { lines: ['HOY LLUEVE', 'CORRE IGUAL'], img: SHOE, kind: 'wide' }],
   ...[[['CORRE', 'DE NOCHE'], HERO], [['HOY LLUEVE', 'CORRE IGUAL'], SHOE], [['MÁS', 'LIVIANA'], SHOE], [['TU PRIMER', '10K'], HERO], [['VUELVE', 'A CORRER'], HERO],
