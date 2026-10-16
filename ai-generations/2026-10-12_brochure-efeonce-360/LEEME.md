@@ -5,7 +5,7 @@ Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 35). 
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
 Plate de la portada Growth: `growth-plate/` (HW1 sin lanyard; canon en `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png`).
 
-**Estado: vigente en el canvas, NO aprobado por el operador.** Línea del documento: Growth; cada tramo abre con la portada de su línea y su
+**Estado (2026-10-16): APROBADO como brochure oficial de la agencia.** Versión completa de 84 láminas y corta de 26; los PDF finales están en OneDrive (ver la sección «VERSIÓN FINAL APROBADA» al final). Lo que sigue es la bitácora histórica desde la v9; el estado de la v9 (no aprobada) quedó superado. Línea del documento: Growth; cada tramo abre con la portada de su línea y su
 acento (decisión del operador); fondo `#001a33` en todas.
 
 **v7 (2026-10-15, «ok sumalo»):** se sumaron 9 láminas de los decks de línea, consultadas con las sesiones de cada deck: SEO/AEO 03 «A tu

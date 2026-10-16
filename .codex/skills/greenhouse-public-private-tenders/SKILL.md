@@ -267,6 +267,9 @@ Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (
 alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
 enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
 No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.
+Para presentar la agencia completa, el brochure oficial es «Agencia de Marketing 360°» (aprobado 2026-10-16; skill
+`deck-studio`); su lámina del caso ANAM es la prueba visual de una implementación HubSpot. Sus cifras de ANAM y el
+«12 meses» de Berel siguen pendientes antes de entregarlo afuera.
 
 ## Costeo reproducible de una demanda con Cotizador V3
 
