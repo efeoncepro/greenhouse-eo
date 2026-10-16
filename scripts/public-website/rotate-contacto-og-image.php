@@ -3,12 +3,20 @@
  * Guarded rotation of the Contacto Open Graph image to a NEW attachment (new URL, so CDN and social
  * caches cannot serve the previous image). Source: the plugin asset, which must match the expected hash.
  * Rollback: restore the meta stored in the printed snapshot option; the previous attachment is untouched.
+ *
+ * Input (--input-file): JSON {"contract":"contacto-og.vN","sha256":"<hash del OG aprobado>","fileName":"efeonce-contacto-og-1200x630-vN.png"}
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
+if ( count( $args ?? array() ) !== 1 ) { WP_CLI::error( 'Expected one JSON input file.' ); }
+$input = json_decode( file_get_contents( $args[0] ), true );
+$contract = (string) ( $input['contract'] ?? '' );
+$expected_sha256 = (string) ( $input['sha256'] ?? '' );
+$file_name = (string) ( $input['fileName'] ?? '' );
+if ( ! preg_match( '/^contacto-og\.v\d+$/', $contract ) || ! preg_match( '/^[a-f0-9]{64}$/', $expected_sha256 ) || ! preg_match( '/^efeonce-contacto-og-1200x630-v\d+\.png$/', $file_name ) ) {
+	WP_CLI::error( 'Invalid rotation input.' );
+}
 
 $id = 20729;
-$contract = 'contacto-og.v2';
-$expected_sha256 = 'c0c382256f1030f0b9af38e08647f60fbb9c1adfc6936b431f3f111f99550ecf';
 if ( ! current_user_can( 'edit_post', $id ) || 'publish' !== get_post_status( $id ) || 'contacto' !== get_post_field( 'post_name', $id ) ) {
 	WP_CLI::error( 'Contacto identity or capability check failed.' );
 }
@@ -44,10 +52,10 @@ $existing = get_posts( array(
 if ( $existing ) {
 	$attachment = (int) $existing[0]->ID;
 } else {
-	$temp = wp_tempnam( 'contacto-og-1200x630-v2.png' );
+	$temp = wp_tempnam( $file_name );
 	if ( ! copy( $asset, $temp ) ) { WP_CLI::error( 'Unable to stage social image. Snapshot: ' . $snapshot ); }
 	$attachment = media_handle_sideload(
-		array( 'name' => 'efeonce-contacto-og-1200x630-v2.png', 'tmp_name' => $temp ),
+		array( 'name' => $file_name, 'tmp_name' => $temp ),
 		$id,
 		'Contacto Efeonce: conversemos'
 	);
