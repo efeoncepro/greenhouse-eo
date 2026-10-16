@@ -79,8 +79,9 @@ la agencia completa con las cinco líneas y es el documento por defecto cuando u
   Creativa, Contenidos, Agencia de Medios, HubSpot, Salesforce) con su antetítulo pasado al del tramo. No se componen
   solas; las candidatas a receta quedan para TASK-2013 y siguientes.
 
-**Antes de enviarlo afuera:** logos de clientes (Berel, Sky, ANAM y el muro de +90 empresas) y piezas de campaña de Sky
-y Berel según su autorización (TASK-1937); cifras de ANAM entregadas por el operador y no publicadas por ANAM; Berel
+**Logos de clientes autorizados para este brochure** (el operador, 2026-10-16: «Podemos usar los logos de clientes sí»):
+los de Berel, Sky, ANAM y el muro de +90 empresas, junto con las piezas de campaña de Sky y Berel de sus casos. Queda
+por registrar en la biblioteca de autorizaciones cuando exista (TASK-1937). **Antes de enviarlo afuera:** cifras de ANAM entregadas por el operador y no publicadas por ANAM; Berel
 dice «12 meses» con la cuenta ganada en mayo de 2026; readback de HubSpot Gold y partners declarados según el registro
 de partnerships; Voice y Growth no cierran con caso propio; «Cada mes sabes qué recibes» viene del brochure de
 contenidos y todavía habla de listening y creadores.

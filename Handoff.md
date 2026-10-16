@@ -6,8 +6,8 @@ Aprobado y canonizado: «este es el brochure oficial de la agencia 360° con tod
 láminas y corto 26, ambos con índice linkeable (órbita → portadas; lámina 5 → secciones) verificado. OneDrive
 `4. Comercial/Brochures/2026/Agencia de Marketing 360/`; canvas https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3;
 fuente y scripts en [LEEME](ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md). Registrado en la norma
-(delta 2026-10-16 b), funcional, manual y `docs/services/README.md`. Antes de enviarlo afuera: autorización de logos
-y piezas de Sky/Berel (TASK-1937), cifras ANAM, plazo Berel. Commits locales, sin push.
+(delta 2026-10-16 b), funcional, manual y `docs/services/README.md`. Logos de clientes autorizados por el operador
+(2026-10-16). Antes de enviarlo afuera: cifras ANAM y plazo Berel. Commits locales, sin push.
 
 ## 2026-10-16 — Fabricio: seguimiento web programado
 

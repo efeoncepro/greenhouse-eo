@@ -239,3 +239,4 @@ El operador: «canonicemos todo, este es el brochure oficial de la agencia 360°
   `docs/documentation/creative/composicion-de-decks-y-brochures.md`, procedimiento en
   `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y puntero en `docs/services/README.md`.
 - **Los PDF oficiales** son los de OneDrive. Los de esta carpeta son su copia de trabajo.
+- 2026-10-16 · Logos de clientes autorizados por el operador para este brochure («Podemos usar los logos de clientes sí»), incluidas las piezas de Sky y Berel de sus casos. Pendientes para enviarlo afuera: cifras de ANAM y plazo de Berel.

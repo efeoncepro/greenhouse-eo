@@ -186,8 +186,8 @@ sirve para presentar en una reunión. Las dos salen de las mismas láminas.
 **Se navega con enlaces.** En el PDF, la lámina de la órbita lleva a la portada de cada línea, y la lámina siguiente
 es un índice donde cada sección es un enlace a su página.
 
-**Antes de enviarlo a un prospecto:** hay que revisar la autorización de los logos de clientes y de las piezas de Sky
-y Berel que aparecen en sus casos, las cifras de ANAM y el plazo del caso Berel.
+**Logos de clientes:** autorizados por el operador el 2026-10-16 para este brochure, incluidas las piezas de Sky y Berel
+de sus casos. **Antes de enviarlo a un prospecto** quedan por revisar las cifras de ANAM y el plazo del caso Berel.
 
 > Detalle técnico: [norma, delta 2026-10-16 (b)](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
 > [manual, «El brochure oficial Agencia de Marketing 360°»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·

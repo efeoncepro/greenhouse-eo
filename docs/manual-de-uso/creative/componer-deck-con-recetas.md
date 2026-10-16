@@ -856,7 +856,8 @@ https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3. Los PDF están en OneDrive
 
 **Qué no hacer:** no edites las láminas sin dejar la nota en el `LEEME.md`; no cambies una pieza real de un cliente
 (caso Berel o Sky) sin reponer su contenido exacto después del acabado del modelo; no envíes el brochure afuera sin
-revisar los pendientes del delta 2026-10-16 (b) de la norma (logos, piezas de cliente y cifras).
+revisar los pendientes del delta 2026-10-16 (b) de la norma (cifras de ANAM y plazo de Berel; los logos de clientes ya
+están autorizados).
 
 ## Cambiar la foto, el copy o la sección de una lámina
 
