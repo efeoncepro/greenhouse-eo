@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-16 — Fabricio: seguimiento web programado
+
+[Caso y límites](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md): un envío inicial
+Outlook SENT y tres pasos HubSpot Programado, secuencia `316561523`, 21/28 de octubre y 4 de noviembre a las 10:00 México.
+Parada por respuesta a cualquier correo verificada; sin duplicar desde el heartbeat ni contactar puentes.
+Brochure de 27 páginas identificado y firma oficial configurada; preview integrado sin render, entrega futura pendiente.
+Método y adapter espejados Codex/Claude, registro focal actualizado; no renueva corte global ni permisos.
+
 ## 2026-10-15 — SKY: servicio SEO, skill y valor orgánico
 
 [Entrega y evidencia](docs/audits/growth/2026-10-15-sky-seo-service-and-organic-value.md):
@@ -268,25 +276,3 @@ espejos y destinos locales correctos, revisión semántica y gates proporcionale
 sin scoring/runtime, precio, programa de cliente o publicación. Primera parte capturada por commit
 concurrente `4fa5e6ce4`; cierre restante de este alcance separado. Siguiente aplicación: delimitar una
 categoría/cuenta y registrar baseline, pruebas y brechas; liderazgo/eficacia aún requieren evidencia.
-
-## 2026-10-11 — Diseño de skill de prospección B2B
-
-[Inventario HubSpot](docs/audits/commercial/hubspot-properties-2026-10-11/README.md): tres subagentes,
-1.126 definiciones activas de Contact/Company/Deal/Lead verificadas por CLI; CSV/JSON completos y
-[captura por fase](docs/manual-de-uso/hubspot/llenar-propiedades-comerciales.md) enlazados desde skills
-Codex/Claude. Catálogos MCP y un readback mínimo Lead conciliados. Pendiente: reglas UI/formulario/etapa
-(navegador sin sesión) y permiso efectivo de Lead write. Sin cambios CRM, schema, acceso, créditos o envío.
-Actualización posterior aprobada: módulo HubSpot con familias de captura, plan por objeto/fase
-(completar/conservar/pendiente/sistema) y plantillas changeset/action-pack sincronizadas Codex/Claude.
-
-[Prospección B2B](.codex/skills/efeonce-b2b-prospecting/SKILL.md): método Codex/Claude implementado, revisión Sales y 12 escenarios offline aceptados. Adapter personal conserva HSP/radar y Commercial Codex resuelve routing. [Decisión](docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md), [discovery](docs/audits/commercial/2026-10-11-prospecting-skill-discovery.md) y [verificación](docs/audits/commercial/2026-10-11-prospecting-skill-implementation.md). Sin nuevos schedulers, créditos, CRM ni envíos. Eficacia comercial y discrepancia económica pendientes de evidencia/decisión del caso.
-
-[Buying group](docs/audits/commercial/2026-10-11-buying-group-coverage-research.md): tres subagentes y revisión crítica completados; cobertura por roles/fase y 2–3 adicionales como base, ampliable según brechas. Evolución aprobada e implementada: núcleo, espejos, plantillas y canon CRM sincronizados; personas, roles y autoridad/correo/acceso separados. [Verificación](docs/audits/commercial/2026-10-11-buying-group-skill-update.md); 22 escenarios offline aceptados; validaciones mecánicas aprobadas. Sin acciones externas.
-
-[ABM y ABS](docs/audits/commercial/2026-10-11-abm-abs-research.md): investigación y tres revisiones completadas; método incorporado por aprobación del operador a skill/espejos, templates y owners. Selección/inversión por cuenta, mapas por iniciativa, coordinación marketing–ventas, consenso, medición y costo total. [Verificación](docs/audits/commercial/2026-10-11-abm-abs-skill-update.md). Piloto, capacidad/presupuesto y oferta cliente pendientes de decisión; sin acciones externas.
-
-[HubSpot ABM / Buying Groups API–CLI](docs/audits/commercial/2026-10-11-hubspot-abm-buying-groups-api-cli.md): investigación posterior al commit local `293d3f4cd`, sin cambios SaaS. Agent CLI `hubspot` 0.15.1 y MCP contrastados en portal 48713323: checkbox objetivo, tiers ICP y roles verificables; escritura documentada, no ejecutada. Buying Groups expone metadata pero rechaza list/search con 400; no contrato público de CRUD del gráfico encontrado. Beta/layout y roles por iniciativa pendientes de verificación/modelado; no confundir `hs_is_target_account` con el campo oculto `hs_target_account`.
-
-[Ampliación operativa de prospección](docs/audits/commercial/2026-10-11-prospecting-operational-modules-update.md): cuatro mejoras aprobadas e incorporadas a skills/espejos: adapter HubSpot con changeset/readback y roles por iniciativa, capacidad/costo por owner/período, discovery/proof por oferta/función y aprendizaje/vigencia. Fixtures v4 preservan 26 casos y añaden cuatro; revisión/validación del alcance registrada en auditoría. Método sin nuevo software/API de gráfico, activación beta, schema, gastos, CRM, envíos ni scheduler.
-
-[Recorridos y entregabilidad](docs/audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md): cinco módulos aprobados y repartidos entre tres subagentes; señal→acción, entradas por situación, cadencia, respuestas y preparación de entrega. Plantillas/routing Commercial y fixtures v5 (40, 30 previos conservados) incorporados. Verificación y límites en auditoría; ningún piloto ni acción externa iniciados.

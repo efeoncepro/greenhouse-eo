@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-16 — Seguimiento web y evidencia reutilizable
+
+- [Fabricio / Toyota del Bajío](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md):
+  envío inicial verificado y tres seguimientos HubSpot Programado con salida por respuesta a cualquier correo.
+- Prospección y adapter HubSpot Codex/Claude precisan versión de brochure, cuerpo/calendario de inscripción,
+  límites de firma y conciliación BCC_TO_CRM. Manual, funcional y registro actualizados; sin nuevas acciones externas.
+
 ## 2026-10-15 — SKY: cobertura de auditoría y skills SEO
 
 - [Matriz de siete frentes abiertos](docs/services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md),
@@ -562,13 +569,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
   sellado que falta o está viejo; `pnpm foto:rostro` mide la proporción del rostro.
 - Nexa: la expresión va detrás del ancla frontal (la pose sale de la escena), ancla v2 con la proporción del canon y 25
   expresiones casi de frente aprobadas. Exploración archivada (> 1,3 GB liberados).
-
-## 2026-10-03 — Técnicas de edición sobre el pipeline de inpainting (TASK-1973)
-
-- Nuevo `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen: capas con nombre, máscara por elemento y clean plate
-  = base + las demás capas; la base se cobra como una capa) y `pnpm ai:inpaint erase|move|place|background|expand` +
-  `--zone-resolution`. `place` incorpora un elemento de una foto en otra y el modelo sólo hace el acabado.
-- Canario real (≈ USD 0,90): la sombra proyectada se mide contra el plate y nunca se toma la de un vecino; borrar con
-  el plate y Sunburst por instrucción borran limpio (Flare con máscara y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
-  `expand` usa Flux Fill por defecto (Flare reencuadra, Sunburst copia el relleno en espejo). Herramienta out-of-band.
-- Slice 2 (`foto:expandir` sobre el núcleo) pasa a TASK-1925; BFL FLUX Tools (Outpainting, Erase) queda como follow-up.

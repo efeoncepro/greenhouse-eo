@@ -40,6 +40,9 @@ Al vencer, decidir continuidad con evidencia actual; nutrición por email requie
 mandato, y recontacto nueva autorización dentro de las restricciones. [Fabrimetal](runs/2026-10-13-fabrimetal-respuesta-parada.md)
 es el primer caso con revisión interna 13/04/2027; comunicaciones siguen detenidas.
 
+Caso autorizado separado del 16/10: [Fabricio / web](runs/2026-10-16-fabricio-web-hubspot.md), tres
+seguimientos programados en HubSpot. Conservar la secuencia nativa; no duplicarla desde este agente.
+
 ## Cada ejecución
 
 1. Leer AGENTS.md, project_context.md, Handoff.md, este contrato, REGISTRO.md y state.json. Cargar hubspot-as-a-service, greenhouse-public-private-tenders y documentación comercial pertinente; notion-platform si hay trabajo operativo, entregables o históricos Notion que consultar.

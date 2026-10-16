@@ -20,6 +20,11 @@ un routing Codex ausente para Commercial. El operador exige datos accionables y 
 adicionales; el [canon CRM](GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md) ya establece
 el gate de correo individual. El trabajo reciente distingue necesidad pública, relación, compra y ejecución.
 
+Evidencia operativa posterior: [web y secuencia del 16/10/2026](../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
+Aplica el mandato finito y los owners vigentes; la conciliación de un Contact creado por BCC_TO_CRM no
+amplía la admisión de nuevos contactos. El método cargable conserva versión de material, personalización
+final y límites de render/readback; sin nueva autoridad, API ni scheduler.
+
 ## Decision
 
 1. Crear `efeonce-b2b-prospecting` como núcleo compartido y discoverable. Unidad de salida: cuenta con

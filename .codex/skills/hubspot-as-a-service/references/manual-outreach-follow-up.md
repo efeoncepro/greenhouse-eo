@@ -40,4 +40,9 @@ Preferencia confirmada 13/10: **HubSpot, no Apollo**. Método reusable dueño de
 HubSpot ejecuta dentro del lote autorizado: mailbox/firma, documentos nativos, fechas de todos los pasos,
 Enviar más tarde, reglas de respuesta y lectura independiente de Programado. No duplicar desde el heartbeat,
 no inferir CCO ni delivery/rendering. El siguiente lote necesita su propio alcance; conservar la plataforma.
-Caso y límites: `docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md`.
+Casos y límites: `docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md` y
+[web del 16/10](../../../../docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
+Comprobar ID/versión del documento y cuerpo final de inscripción; una personalización puede diferir de la
+plantilla y fijar horas dentro de la ventana. Firma HTML configurada y render de preview son pruebas distintas.
+Un 403 de secuencias con OAuth de usuario limita ese endpoint: usar el carril UI autorizado, sin escalar
+permisos, inventar soporte de escritura CLI ni cambiar de plataforma.

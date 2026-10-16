@@ -3857,6 +3857,34 @@
       }
     ]
   },
+  "authorized_hubspot_sequence_fabricio_2026_10_16": {
+    "authorization": "Direct Julio: personalized Fabricio followups in HubSpot with web brochure, graphic signature and stop on reply",
+    "observed_at": "2026-10-16T10:06:08.653Z",
+    "portal_id": 48713323,
+    "status": "scheduled_readback_confirmed",
+    "total_future_messages": 3,
+    "company_id": 59377569090,
+    "contact_id": 255507604345,
+    "sequence_id": "316561523",
+    "sequence_url": "https://app.hubspot.com/sequences/48713323/sequence/316561523/enrollments",
+    "dates_local": [
+      "2026-10-21",
+      "2026-10-28",
+      "2026-11-04"
+    ],
+    "send_time_local": "10:00",
+    "time_zone": "Mexico/General",
+    "time_zone_offset": "UTC-06:00",
+    "stop_on_any_email_reply": true,
+    "stop_on_meeting": false,
+    "brochure_document_id": "357294133",
+    "brochure_pages": 27,
+    "signature_evidence": "Official Julio default HTML configured; embedded preview not rendered; delivery future",
+    "email_quality": "publicly attributed, not technically verified; enrollment is not validation",
+    "heartbeat_autonomy_changed": false,
+    "next_steps": "Native HubSpot sequence owns pending sends. Do not duplicate manually, contact bridges or automatically reenroll. Handle reply in its thread and verify pending cancellation.",
+    "evidence": "runs/2026-10-16-fabricio-web-hubspot.md"
+  },
   "authorized_hubspot_sequence_batch_2026_10_13": {
     "authorization": "Direct Julio: three followups per person; HubSpot only, not Apollo; stop on reply",
     "observed_at": "2026-10-13T11:18:46.752106+00:00",

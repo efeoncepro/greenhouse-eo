@@ -83,6 +83,9 @@ convierte el plan en pasos personalizados, brochures con contexto, firma predete
 laboral local. Para Julio se conserva HubSpot, no Apollo. Comprobar respuesta a cualquier correo, inicio
 futuro y estado Programado por persona; no confundir inscripción, envío, entrega o eficacia. La autorización
 es por lote, sin ampliar el heartbeat. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+La versión del documento compartido y el cuerpo/calendario personalizados de inscripción se conservan
+como evidencia separada de la plantilla y ventana generales. Firma configurada, preview renderizado y
+firma entregada no son equivalentes. [Caso web del 16/10](../../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
 
 ## Roles y continuidad
 

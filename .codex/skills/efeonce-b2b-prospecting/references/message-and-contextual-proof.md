@@ -100,6 +100,11 @@ Verificar claims, permiso de uso, mercado y estado del artefacto. Brochure aprob
 logos o resultados pendientes. Simulación, meta, piloto y resultado observado van separados con sus fechas.
 No prometer incremento de venta en Channel & Commerce ni disponibilidad por naturaleza comercial del producto.
 La práctica elige material y valida su evidencia; Commercial compone el caso y Pricing decide economics.
+Contrastar el PDF concreto con su LEEME/canon antes de adjuntar o insertarlo: aprobado no significa que
+cada lámina pueda presentarse como resultado. Si dentro del alcance autorizado se usa una copia sin
+láminas pendientes, preservar el original, motivo/páginas/checksum y verificar el resto; no reescribir
+casos ni declarar corregida la edición maestra. Para secuencias, conservar la misma versión identificada
+en Documentos; el procedimiento está en [seguimientos HubSpot](hubspot-follow-up-sequences.md).
 
 Canon: [venta con demostración contextual](../../../../docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md).
 Para preguntas/criterios y material por oferta o función, cargar [discovery y proof](discovery-and-proof.md).

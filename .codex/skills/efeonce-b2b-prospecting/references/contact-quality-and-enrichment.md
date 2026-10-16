@@ -23,6 +23,10 @@ personal o resultado sin dirección no cumple el gate individual. No presentar u
 comprador como certificado SMTP ni exigir una única marca de verificación.
 Si la atribución o calidad quedan contradictorias, mantén el carril pendiente y propone el menor chequeo útil.
 No crear el contacto para “completar después”. Puede avanzarse con otros elegibles y explicar la cobertura.
+Una dirección publicada exacta puede respaldar atribución sin acreditar calidad técnica; conservar ambas
+etiquetas. Si el operador autoriza un envío puntual con esa incertidumbre, registrar el alcance sin
+convertirlo en excepción general de admisión. Un Contact generado por BCC_TO_CRM o un lifecycle automático
+se concilia después, sin duplicarlo: su existencia no verifica la casilla ni prueba calificación comercial.
 
 ## Descubrir antes de enriquecer
 

@@ -128,7 +128,12 @@ Verificar mailbox/firma, días laborables y zona local, respuesta a cualquier co
 si el mandato exige seguir hasta respuesta. Seleccionar **Enviar más tarde**, comprobar las fechas de todos
 los pasos e iniciar dentro del permiso. «Procesando» no es cierre: releer contacto, Programado y fecha.
 No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respondió. El logging nativo CRM
-se distingue del CCO de Outlook. [Caso real y límites](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+se distingue del CCO de Outlook. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+
+Verificar versión/ID del brochure en Documentos, además del nombre; si se usa una copia acotada autorizada,
+conservar original y manifiesto privado. Leer cuerpo y calendario finales de la inscripción, porque pueden
+diferir de la plantilla y de la ventana general. Una firma HTML configurada no prueba render en un preview
+blob vacío ni entrega futura. [Aplicación web del 16/10 y límites](../../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
 
 ## Problemas frecuentes
 
