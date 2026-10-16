@@ -211,3 +211,20 @@ usando material real de OneDrive. El método: generar, componer lo determinísti
 
 Costo ≈ USD 0,12. Los archivos intermedios quedan en `caso-berel/`. Se rearmaron las dos versiones del PDF; los
 enlaces se verificaron.
+
+## 2026-10-16 · Caso Sky cinematográfico
+
+El operador pidió para el caso Sky lo mismo que se hizo con Berel, «con mucho punch visual, cinematográfico». La
+primera versión era una estela ordenada de piezas detrás del avión; el operador la rechazó porque la distribución no
+se veía bien. Así se rehízo:
+
+1. **Base.** El A320 de Sky grande y en contraluz al atardecer, con rayos de sol y destello de lente
+   (`prompt-cine.txt`). La referencia es el avión de la lámina original.
+2. **Composición.** 18 piezas reales de SKY Campañas en OneDrive (2025 y Always ON; lista en `index.txt`) puestas en
+   profundidad: lejos chicas y nítidas, cerca grandes y desenfocadas (`comp-cine.mjs`).
+3. **Acabado.** El modelo integra la luz (`prompt-acabado-cine.txt`).
+4. **Reposición.** `reponer-cine.cjs` vuelve a poner el contenido exacto de las piezas nítidas.
+5. **Montaje.** La foto va a la derecha del panel y el chip «Contenido» se volvió a dibujar encima.
+
+Costo ≈ USD 0,30 en total con la exploración. Archivos en `caso-sky/`. Solo cambia la versión larga (Sky no está en
+la corta); los enlaces se verificaron.
