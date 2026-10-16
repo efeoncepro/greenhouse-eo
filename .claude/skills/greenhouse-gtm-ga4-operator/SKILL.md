@@ -109,6 +109,9 @@ ausente por buscar sólo ep.event_id. Retirar Test Events code antes del publish
 SoT bridge `scripts/measurement/hubspot-consent-bridge.js`; WP/Think copias byte-idénticas.
 Preferencias de cookies = control de texto integrado al pie legal; nunca franja/CTA
 independiente debajo del sitio. Probar acceso móvil sin superposición del CTA de reuniones.
+En Think (desde 2026-10-16) el botón `[data-efeonce-cookie-settings]` se monta SOLO en un host declarado
+`[data-efeonce-legal-links]` o junto al enlace de privacidad del footer; ya no se pega al último `<footer>`.
+Página nueva con footer en Think = declarar su fila legal; sin host declarado no hay botón (el banner sí aparece).
 Presentación La órbita autorizada 13/10: adapter CSS/JS sobre controles HubSpot, sin CMP ni
 persistencia nueva. Canon `scripts/measurement/hubspot-consent-ui.*` + builder; ambos hosts
 distribuyen assets idénticos y sólo en rutas con medición. No reemplazar los hijos que administra
@@ -185,6 +188,24 @@ Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
 6. **Verificar** que LLEGA a GA4: verification tiers del doc `06 §3` + **LEARNINGS §7b (consent granted + lag del Data API)**. La prueba dura es el `/g/collect`, la confirmación es el evento en realtime.
 7. **Cerrar**: registrar la fila en `TRACKING-PLAN.md` + anotar cualquier gotcha nuevo en `LEARNINGS.md`.
 
+### Auditar la medición de un form ya publicado (dos carriles distintos)
+
+Un form comercial se mide por dos caminos que se auditan por separado; uno sano no prueba el otro:
+
+1. **GA4 (navegador → GTM web → servidor de tagging):** `gh_form_submission_accepted` → `generate_lead` en el
+   container web; el forwarding al servidor exige consentimiento de analítica. Se audita con Preview/`/g/collect`
+   y realtime, como cualquier evento GA4.
+2. **Meta:** el **PageView** sí sale del navegador por server-side (el `event_id` viaja como `evnid` en el hit gtag).
+   El **Lead NO sale del navegador**: lo envía el backend Greenhouse por el client «Efeonce backend Lead ingress»
+   sólo con consentimiento de publicidad y con una política publicada para ese origen y destinos. Se audita con
+   `growth:measurement discover` (política/destinos) + Test Events Server, no con el dataLayer.
+3. **Evidencia real:** contar envíos y conversiones registradas antes de afirmar que el Lead funciona de punta a punta.
+
+Caso verificado 2026-10-16 — `think.efeoncepro.com/brand-visibility` (`ai-visibility-grader`): GA4 `generate_lead`
+vía GTM OK; Meta PageView server-side verificado; política Lead publicada (origen think, destinos `meta` +
+`google_upd`). Sólo 3 envíos históricos (último 2026-07-05) y cero conversiones registradas en ningún form a esa fecha:
+**el Lead de punta a punta sigue sin probarse con un envío real**. No reportarlo como verificado.
+
 Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dataLayer → Preview → `/g/collect` → DebugView → realtime; el primer eslabón que rompe nombra la falla).
 
 ### Fallback DOM para CTA anidado (cuando no existe `dataLayer`)
@@ -209,6 +230,8 @@ enlazada”.
 - **NUNCA publicar a `GTM-NGHPGRLZ` sin (a) preview/Tag Assistant, (b) confirmación humana explícita en el turno.** Construir en el **workspace** es seguro (no toca el sitio); `create_version` + `publish` es la ÚNICA mutación live y requiere OK. Si lo opera un agente, es `propose → confirm → execute` (el humano confirma antes del publish).
 - **NUNCA hand-writear el bloque `gaawe` de memoria a ciegas.** Usar las plantillas verificadas de `docs/reference/measurement-gtm-ga4/05-gtm-api-v2-tag-shapes.md`; la API valida al crear en el workspace (un shape malo falla en el `POST`, no en producción) — crear, hacer `GET` de vuelta, confirmar shape.
 - **NUNCA taggear el contenedor equivocado.** Para la web, `GTM-NGHPGRLZ` (218104216); `GTM-NS3RNNCD` es un duplicado huérfano. Para CAPI, elegir el contenedor `usageContext=server` del inventario; no aplicar coordenadas web al carril servidor. Publicar server también requiere preview y aprobación explícita; provisioning cloud/secrets son mutaciones separadas.
+- **NUNCA un token/secreto literal en un parámetro GTM** (web o servidor). El snapshot lo tapa en git, pero queda visible para quien lea el container. Pendiente conocido: token Meta CAPI del tag servidor (ver «Drift de los dos containers»).
+- **SIEMPRE tras un publish** (script o UI): `pnpm gtm:snapshot` + commitear los dos JSON con el cambio.
 - **SIEMPRE registrar en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`** el estado de tagging del form/CTA (obligación espejada en la skill `greenhouse-growth-forms`).
 - **NUNCA PII ni valores crudos** en parámetros de eventos (allowlist `src/lib/growth/forms/contracts.ts`); registrar un parámetro como custom dimension en GA4 para poder reportarlo.
 - **Preferir el evento recomendado GA4** cuando existe (submit de lead → `generate_lead`, hereda key events/predictivos); custom `gh_` solo cuando no hay equivalente (regla en `docs/reference/measurement-gtm-ga4/04`).
@@ -234,9 +257,35 @@ enlazada”.
 
 Estrategia de deployment: **build agéntico primario + capa delgada** (ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1` — NO IaC declarativo; GTM no mergea). Comandos:
 
-- **`pnpm gtm:snapshot`** — exporta el config live de los DOS containers (web `container-snapshot.json` + servidor `server-container-snapshot.json`, en `docs/reference/measurement-gtm-ga4/`) con secretos tapados por huella sha256. **Correr tras cada publish** y commitear (el publish por script ya lo hace). `pnpm gtm:snapshot --check` = drift live vs commiteado, exit 1; lo corre a diario `.github/workflows/gtm-drift.yml`.
+- **`pnpm gtm:snapshot`** — exporta el config live de los DOS containers (web `container-snapshot.json` + servidor `server-container-snapshot.json`, en `docs/reference/measurement-gtm-ga4/`) con secretos tapados por huella sha256. **Correr tras cada publish** y commitear (el publish por script ya lo hace). `pnpm gtm:snapshot --check` = drift live vs commiteado, exit 1; lo corre a diario `.github/workflows/gtm-drift.yml`. Detalle abajo.
 - **`pnpm measurement:smoke`** — verifica EN VIVO que la medición funciona en los hosts/eventos clave (Playwright `/g/collect`: page_view en efeoncepro.com + think, generate_lead en submit). Atrapa regresiones (Site Kit, drift, consent).
 - **`pnpm growth:forms-tracking-audit`** — forms published+active de la DB vs `TRACKING-PLAN.md`; lista los live sin fila (drift del registro).
+
+### Drift de los dos containers (verificado 2026-10-16)
+
+- **Qué versiona:** web `GTM-NGHPGRLZ` → `container-snapshot.json`; servidor `GTM-K2X4ZTTK` (sGTM, Meta CAPI) →
+  `server-container-snapshot.json` (antes el servidor nunca se había versionado). Incluye tags, triggers,
+  variables, clients, transformations y huella sha256 del código de cada plantilla.
+- **Secretos tapados antes de escribir:** un parámetro con nombre sensible (token/secret/password/apiKey/
+  accessKey/credential/privateKey) o con valor con forma de credencial (`EAA…`, `sk-…`, `AIza…`, `ya29.…`) queda
+  `[redacted sha256:<12 hex>]`. Una rotación se ve como drift sin exponer el valor; `{{variable}}` se conserva.
+  Lógica pura + tests en `scripts/gtm/snapshot-lib.ts`.
+- **`--check`:** compara ambos containers live contra lo commiteado; exit 1 con resumen `+`/`−`/`~` por colección.
+- **`gtm-drift.yml`:** diario 12:00 UTC + disparo manual; **la falla es la alerta**. Autentica por WIF directa como
+  `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com` (`GTM_SNAPSHOT_DIRECT_AUTH=1`, scope
+  `tagmanager.readonly`; `roles/iam.workloadIdentityUser` del repo concedido 2026-10-16). Corre desde `main`: se
+  activa con el próximo release y al 2026-10-16 todavía no había corrido; no afirmar que vigila hasta ver su primera corrida.
+- **Regla post-publish:** tras CUALQUIER publish —por script o en la UI de GTM, web o servidor— correr
+  `pnpm gtm:snapshot` y commitear ambos JSON junto con el cambio. `scripts/gtm/build-cta-events-workspace.ts --publish`
+  ya reescribe los snapshots: commitearlos en el mismo commit.
+- **Si `gtm-drift` falla:** decidir si el cambio live fue intencional → regenerar con `pnpm gtm:snapshot` y commitear;
+  si no lo fue → revertir en GTM (versión anterior) con el flujo gobernado. Nunca "arreglar" el JSON a mano.
+
+**Pendiente (decisión del operador: no se hace aún):** el token de Meta CAPI sigue **literal** en el tag del container
+servidor. En git queda tapado, pero cualquiera con lectura del container en GTM lo ve. Propuesta no implementada: rotarlo
+en Meta Business Manager → Secret Manager → variable «Firestore Lookup» del sGTM leída sólo por la SA del Cloud Run de
+tagging; después, que el chequeo falle si un parámetro trae un valor con forma de token. Hasta entonces:
+**NUNCA pegar un token o secreto literal en un parámetro GTM nuevo** (web o servidor), ni copiar su valor a docs, chat o logs.
 
 Escalar a pipeline declarativo SOLO si: tags custom no-genéricos explotan / humanos click-opsean el container / N containers de clientes (ADR §"Cuándo revisitar").
 

@@ -115,7 +115,7 @@ El plan no elige en silencio: lo lista en «Decisiones abiertas».
 
 | Capa | Qué | Estado verificado | Fuente |
 |---|---|---|---|
-| Web | GA4 `G-KYPPY57M14` + GTM `GTM-K2X4ZTTK` | existen en el sitio | media plan CMP-001, 2026-09-22 |
+| Web | GA4 `G-KYPPY57M14` + GTM web `GTM-NGHPGRLZ`; `GTM-K2X4ZTTK` es el container **servidor** (sGTM, Meta CAPI), no el del sitio | existen; ambos containers versionados en `docs/reference/measurement-gtm-ga4/*container-snapshot.json` | media plan CMP-001, 2026-09-22 (citaba `GTM-K2X4ZTTK` como web; corregido 2026-10-16) |
 | Formulario | `gh_form_submitted` = **intento**; `generate_lead` sólo con mapping existente verificado | IDs de conversión de las cuentas pendientes | `MANIFIESTO-PAUTA.json` `operating_rules.conversion` |
 | CRM | conversión calificada = contacto en `opportunity` (CMP-001, fijado por el operador 2026-09-22) | en cada campaña la fija quien opera el pipeline | registro de campañas §6b |
 | Puente | `utm_campaign` → contacto → deal en HubSpot | **no resuelto**: prerrequisito `TASK-1886` (to-do al 2026-09-26) | media plan CMP-001 §4 |

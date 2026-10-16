@@ -311,3 +311,19 @@ comparten lectura, validación, comandos, permisos, CAS/idempotencia y readback.
 estados PASS. Nueva fuente por datos después del contrato inicial, procesada en Meta con nueve
 claves sin código/build/redeploy/GTM; fixture desactivada/archivada y auditoría conservada.
 No hay nueva exposición MCP/OAuth. Tráfico comercial y EMQ siguen sin inferirse de Test Events.
+
+## Auditoría de solo lectura — form de think.efeoncepro.com/brand-visibility (2026-10-16)
+
+Form `ai-visibility-grader` (`form_kind=diagnostic_intake`, surface `fhsf-ai-visibility-grader`).
+Verificado en navegador: emite `gh_form_viewed` en producción.
+
+| Carril | Estado observado |
+| --- | --- |
+| GA4 | GTM web dispara `generate_lead` en `gh_form_submission_accepted` con form_slug/form_kind/surface_id/event_id; pasa por el servidor de tagging y el forwarding GA4 exige consentimiento de analítica. |
+| Meta PageView | Server-side verificado: hit con `meta_capi_page_view=1` y `event_id` viajando como `evnid`; el pixel `708931297255942` recibe eventos server de think.efeoncepro.com. |
+| Meta Lead | No sale del navegador: lo envía el backend (client «Efeonce backend Lead ingress», backend_verified) con consentimiento de publicidad. La política del form está publicada (origen `https://think.efeoncepro.com`, destinos meta + google_upd). |
+
+El form suma 3 envíos en total, el último el 2026-07-05, y a la fecha no hay ninguna fila en
+`greenhouse_growth.measurement_conversion` para ningún form. **La cadena Lead de punta a punta de
+este form no está probada con un envío real**; la configuración publicada no lo sustituye.
+

@@ -1,6 +1,6 @@
 # Diagnosticar y recuperar Meta CAPI por GTM Server
 
-> Manual de operador · actualizado 14/10/2026. GTM Server 9/Web 5, matching por políticas activado; primera conversión comercial consentida/EMQ sin observar.
+> Manual de operador · Ultima actualizacion 2026-10-16 por Claude. GTM Server 9/Web 5, matching por políticas activado; primera conversión comercial consentida/EMQ sin observar. Snapshot de ambos contenedores y chequeo diario `gtm-drift` agregados el 16/10.
 
 1. Leer el [runbook](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md)
    y la [decisión](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
@@ -23,10 +23,50 @@
 8. Retirar test code, verificar versiones y recepción live posterior en Meta; registrar
    estado y evidencia en [tracking plan](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md).
 
-`pnpm gtm:snapshot --check` y `pnpm measurement:smoke` son controles **web/GA4**.
-No demuestran entrega servidor a Meta. Pixel browser es complementario si se decide dual;
+`pnpm gtm:snapshot --check` compara la configuración live de **ambos** contenedores contra el
+repo (desde el 16/10); `pnpm measurement:smoke` comprueba GA4. Ninguno demuestra entrega servidor a Meta. Pixel browser es complementario si se decide dual;
 compartir nombre e ID con CAPI y verificar deduplicación. No fabricar conversiones reales
 para probar ni confundir recepción con atribución o resultados comerciales.
+
+## Si falla el chequeo diario gtm-drift
+
+`.github/workflows/gtm-drift.yml` corre `pnpm gtm:snapshot --check` todos los días a las 12:00 UTC
+(y a mano con `workflow_dispatch`). Falla cuando la configuración live de `GTM-NGHPGRLZ` (web) o
+`GTM-K2X4ZTTK` (servidor) difiere de `container-snapshot.json` / `server-container-snapshot.json`.
+La falla **es** la alerta; no hay otro aviso. Los workflows programados corren desde `main`: se activa
+con el release que incluya los commits `e791942ea` y `5d28dda76` (al 16/10 todavía no había corrido).
+
+1. Abrir el run fallido y leer el resumen por colección: `+` alta, `-` baja, `~` cambio, separado por
+   container (tags, triggers, variables, clients, transformations, builtInVariables, templates).
+2. Reproducir local en solo lectura: `pnpm gtm:snapshot --check` (usa ADC + impersonación de
+   `greenhouse-gtm-publisher`). Si falla por autenticación, renovar ADC; no es drift.
+3. Clasificar el cambio:
+   - **Publicación gobernada que no reescribió el snapshot** (por ejemplo, un publish hecho fuera de
+     `scripts/gtm/build-cta-events-workspace.ts --publish`, que sí lo reescribe): confirmar con quien
+     publicó, correr `pnpm gtm:snapshot` (sin `--check`), revisar el diff y commitearlo.
+   - **Cambio de huella `[redacted sha256:…]`**: significa que se rotó o editó un secreto
+     (`apiAccessToken` del tag Meta o `tokenDigest` del client de ingreso). Confirmar que la rotación
+     fue autorizada y que Meta/ingreso siguen recibiendo antes de aceptar la huella nueva.
+   - **Cambio manual no esperado** (click-ops en la UI de GTM): no aceptarlo commiteando el snapshot.
+     Identificar autor y versión en GTM, decidir con el owner si se revierte (publicando la versión
+     anterior por el flujo gobernado) o se adopta; recién entonces refrescar el snapshot.
+4. Nunca editar los JSON a mano ni copiar un export sin sanear: el script tapa los secretos antes de
+   escribir. Un `--check` verde sólo dice que la configuración coincide; no prueba recepción en Meta.
+
+Autenticación del job: WIF directo como `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com`
+con `GTM_SNAPSHOT_DIRECT_AUTH=1` y scope `tagmanager.readonly`; permiso
+`roles/iam.workloadIdentityUser` concedido el 16/10 al principalSet del repositorio
+`efeoncepro/greenhouse-eo` en el pool `github-actions`. Esa SA también puede publicar en GTM aunque el job
+sólo pida lectura; la alternativa de mínimo privilegio (SA dedicada de sólo lectura) no está implementada.
+
+### Pendiente: token Meta literal en el tag servidor
+
+El token de Meta sigue como valor literal en el tag CAPI del contenedor servidor, visible para quien
+tenga lectura del contenedor en GTM; en git queda tapado. El operador decidió resolverlo más adelante.
+Propuesta no implementada: rotar el token en Meta Business Manager, guardarlo en Secret Manager,
+entregarlo al sGTM mediante una variable «Firestore Lookup» que sólo lea la cuenta de servicio del
+Cloud Run de tagging y luego hacer fallar el chequeo si un parámetro trae un valor con forma de token.
+No ejecutar la rotación sin autorización explícita. [Detalle](../../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#token-meta-literal-en-el-tag-servidor--pendiente-2026-10-16).
 
 ## Estado publicado y recuperación
 

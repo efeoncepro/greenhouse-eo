@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-10-16 — drift de GTM con mecanismo, no con promesa
+
+[Snapshot y drift](README.md#snapshot-y-drift-de-los-dos-containers) ·
+[token Meta pendiente](08-meta-conversions-api-server-side.md#token-meta-literal-en-el-tag-servidor--pendiente-2026-10-16).
+
+- **Una regla sin ejecutor es una regla apagada.** El ADR de tagging exigía «SIEMPRE correr el
+  snapshot tras tocar el container», pero `pnpm gtm:snapshot --check` no corría en CI ni en cron y
+  sólo miraba el container web. El container servidor (sGTM, Meta CAPI) nunca se había versionado.
+  Ahora el snapshot cubre ambos y `.github/workflows/gtm-drift.yml` lo corre a diario y falla si
+  hay drift: la falla es la alerta.
+- **Tapar antes de escribir, no después.** Secretos por nombre de parámetro o por forma de valor
+  se guardan como huella `[redacted sha256:<12 hex>]`; una rotación aparece como drift sin que el
+  valor llegue a git. Las referencias `{{variable}}` no se tapan.
+- **Un workflow programado vive en `main`.** Commitear `gtm-drift.yml` en `develop` no lo activa:
+  el chequeo corre recién después del release que lo lleve a `main`. Al 16/10 no había corrido.
+- **El permiso del job es más amplio que lo que pide.** El job pide sólo `tagmanager.readonly`,
+  pero la SA que impersona (WIF, `roles/iam.workloadIdentityUser` concedido al repo) también puede
+  publicar. Alternativa de mínimo privilegio estricto, no implementada: SA dedicada de sólo lectura.
+- **Montar un control junto al «último footer» rompe la grilla.** En Think, «Preferencias de
+  cookies» quedaba suelto abajo a la izquierda; ahora sólo se monta en un host declarado
+  (`[data-efeonce-legal-links]`) o junto al enlace de privacidad, y una página sin host no lo
+  muestra (el banner sigue apareciendo). [Detalle](09-hubspot-consent.md).
+
 ## 2026-10-14 — políticas publicadas y agentes como consumidores de primera clase
 
 [Contrato vigente](10-growth-lead-matching-runtime.md), [API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md)

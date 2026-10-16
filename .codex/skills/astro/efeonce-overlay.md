@@ -174,6 +174,38 @@ mostrando su capa de máquina acoplada. Primer caso: SKY (licitación Wherex 202
 `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`. Skills: `seo-aeo-practice` (dueña
 del oficio) · `greenhouse-public-private-tenders` (consumer) · `commercial-expert` (la vende).
 
+## Página suelta de video de muestra (2026-10-12)
+
+Segundo uso de `/muestras/<slug>-<token>`: una página para **ver un video de muestra de una propuesta** con el
+reproductor canónico de AXIS. Se llega por el enlace o el QR del documento. **No es una Radiografía:** es un archivo
+estático `src/pages/muestras/<slug>-<token>.astro`, al lado de la ruta dinámica `muestras/[slug]/[...step].astro`; no
+pasa por la colección `aeoXray`, no tiene payload ni entra a `verify:aeo-xray`. Primer caso: reel 9:16 de 25 s (Sika
+Mexicana, Wherex N.º 1164), `https://think.efeoncepro.com/muestras/sika-posible-dde148ea051c`, Think `9a36dac`, en
+producción desde el 2026-10-12.
+
+- **Receta de la página:** `export const prerender = true` · `BaseLayout` con `noindex` y `analytics={false}` (sin
+  GTM; con `analytics` en `false` el layout emite además `referrer: no-referrer`) · `AxisVideoPlayer`
+  (`@/components/AxisVideoPlayer.astro`) con un `VideoPlayerModel`. El modelo (Cinema embedded, 9:16, línea, VTT,
+  póster) y su criterio: skill `efeonce-graphic-line` →
+  [video-player.md](../efeonce-graphic-line/references/video-player.md#página-suelta-de-muestra-en-think-2026-10-12).
+- **Medios en `public/muestras/<slug>-<token>/`**, con la misma clave de la ruta: `reel.mp4`, `poster.webp`,
+  `reel.es.vtt`, el logo de quien firma y la firma de la campaña. La regla de `astro:assets` de arriba es de la
+  Radiografía; esta página sirve todo desde `public/` y no se le midió PageSpeed.
+- **Comentario de cabecera obligatorio:** qué es la página, para qué proceso y **cómo se retira**. El del caso dice:
+  borrar la página y su carpeta de `public/`, redeploy y readback.
+- **El token es discreción, no seguridad.** El MP4 queda público por su URL directa, igual que una muestra empaquetada
+  de X-Ray: es un enlace de distribución, no un permiso revocable. Se retira borrando y redesplegando.
+- **Colores de la campaña del cliente: constantes locales comentadas** en el frontmatter («no son tokens de Efeonce»),
+  pasadas al CSS como propiedades de la página. No se agregan a la copia de tokens AXIS. «NEVER hardcode brand HEX»
+  sigue valiendo para lo de Efeonce. Deriva observada en el caso: su `<style>` trae además grises literales para texto
+  y fondo; no hay decisión que lo avale, no lo copies como patrón.
+- **Despliegue:** Think despliega solo al empujar a `main` (Vercel); el push va con autorización del operador. **Antes
+  de empujar, `git log origin/main..HEAD`:** el push del 12/10 llevó también un commit ajeno (`cf78762`, de otra sesión)
+  que estaba sin empujar.
+- **Readback hecho (2026-10-12):** página 200 con `noindex, nofollow` · MP4 con rangos (206) · VTT y póster 200 ·
+  reproducción en navegador a tamaño de teléfono. **No verificado:** escanear el QR con un teléfono real.
+- El QR (`qrcode`, nivel M) y el enlace clicable viven en el deck y en el anexo de la propuesta, no en Think.
+
 ## Primitives
 
 - **`MaturityLadder`** (TASK-1325) — self-contained primitive + adapter pattern.
@@ -227,6 +259,16 @@ permanecen sin scripts de medición/banner/UI. La ruta `/preview/cookies` demues
 efímero; no gobierna preferencias. Producción viste controles nativos y HubSpot conserva elección,
 categorías, persistencia y `showBanner`; no convertir el prototipo en CMP ni habilitar tracking desde él.
 La adopción de presentación no cambia el contrato de eventos o matching.
+
+**Footers y «Preferencias de cookies» (publicado 2026-10-16, main `425a1de`).** `BaseLayout.astro` inyecta el botón
+`[data-efeonce-cookie-settings]` sólo con `analytics=true`, y lo monta **sólo** en un host declarado
+`[data-efeonce-legal-links]` o junto al enlace de privacidad del footer; ya no se pega al último `<footer>` (quedaba
+fuera de la grilla, abajo a la izquierda). El separador «·» se omite si el host es flex/grid con gap ≥ 16px. Los
+informes AEO (`/brand-visibility` y `/brand-visibility/r/[token]`) usan la fila base `.report-footer-base` (aviso a la
+izquierda; `nav.report-footer-legal` con Privacidad + Preferencias de cookies a la derecha; estilos en
+`src/styles/global.css`), reutilizable en footers nuevos. El clic llama `_hsp.push(['showBanner'])` (consent-bridge).
+- **SIEMPRE** que una página nueva de Think tenga footer, declarar su fila legal con `data-efeonce-legal-links`. Sin
+  host declarado no hay botón (el banner sí aparece), y eso deja al visitante sin forma de reabrir sus preferencias.
 
 efeonce-think mide con la **misma propiedad GA4** que efeoncepro.com (funnel unificado; subdominio = mismo stream, `486264460`). El snippet **GTM (`GTM-NGHPGRLZ`)** vive en `BaseLayout.astro`: `<script is:inline>` con el loader en `<head>` (`is:inline` SÍ — evita que Astro bundlee el snippet) + `<noscript>` **SIN** `is:inline` (esa directiva es solo para `<script>`/`<style>`; en `<noscript>` Astro 7 estricto puede colarla como atributo raro — flag de Copilot, fix PR #11). El `page_view` lo dispara un GA4 Config gateado por hostname DENTRO del container (no en el sitio Astro); los `<greenhouse-form>` ya emiten `gh_form_*` → conversiones medidas por construcción.
 

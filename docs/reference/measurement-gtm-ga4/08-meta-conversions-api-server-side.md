@@ -42,8 +42,9 @@ diagnóstico aportado por el operador; no se releyó Meta en esta auditoría. No
 el token esté vencido ni que la ausencia de transporte web sea la única causa: puede haber
 otras fuentes, scripts del host o un sender backend fuera de ese contenedor.
 
-`pnpm gtm:snapshot --check` compara **solamente el contenedor web** (ruta fija en
-`scripts/gtm/snapshot.ts`). Tampoco `pnpm measurement:smoke` certifica CAPI: comprueba GA4.
+Al 13/10 `pnpm gtm:snapshot --check` comparaba sólo el contenedor web. Desde el 16/10 versiona
+y compara **los dos** (`server-container-snapshot.json` para `GTM-K2X4ZTTK`, secretos tapados);
+detecta cambios de configuración, no entrega a Meta. Tampoco `pnpm measurement:smoke` certifica CAPI: comprueba GA4.
 La API distingue el tipo por `usageContext`; el nombre o ID público no basta.
 [Container API de Google](https://developers.google.com/tag-platform/tag-manager/api/reference/rest/v2/accounts.containers).
 
@@ -118,8 +119,8 @@ validar contrato vigente y template **instalado** antes de ejecutar. Fuentes ver
 - Hashing, server-side, dominio propio, `opt_out` y Limited Data Use no sustituyen autorización.
   Evitar texto libre, datos sensibles, cookies arbitrarias y querystrings con PII.
 - Token sólo servidor. No registrar valores ni serializar exports completos de tags/templates:
-  el tag existente tiene `apiAccessToken`. Un snapshot servidor debe redactar secretos antes
-  de persistir. No rotar ni reemplazar el token porque exista un parámetro no vacío.
+  el tag existente tiene `apiAccessToken`. El snapshot servidor (16/10) lo guarda como
+  `[redacted sha256:<12 hex>]` antes de escribir a disco. No rotar ni reemplazar el token porque exista un parámetro no vacío.
 - Registrar publisher, repositorio, SHA, permisos, Graph API y opciones de enriquecimiento/cookies.
   La gallery distribuye templates, no certifica su behavior. No actualizar SHA ni activar
   cookie extension/user enrichment automáticamente.
@@ -194,7 +195,7 @@ y [plantilla instalada](https://github.com/facebookincubator/ConversionsAPI-Tag-
    basados en la versión live correcta de **cada** contenedor; no publicar WIP ajeno.
 5. Revisar template instalado y mapping; construir/previewar ingress y tags. No inventar shapes
    server desde plantillas `gaawe` web. Los readers tipados actuales de Greenhouse no cubren
-   automáticamente Clients/templates ni snapshot servidor; registrar esa limitación.
+   automáticamente Clients/templates; el snapshot servidor existe desde el 16/10 (huella del código de templates, no el código).
 6. Ejecutar canary con `test_event_code`, evidencia saneada de request y respuesta
    (`events_received`, `messages`, `fbtrace_id`), y Test Events con origen **Server**.
    No usar datos de clientes para un canary ni activar entregas HubSpot/CRM inadvertidas.
@@ -229,7 +230,7 @@ demuestra salud. [Hosting](https://developers.google.com/tag-platform/tag-manage
 | Datos | Nada de token, PII o payload crudo en logs/artefactos; campos Meta no llegan a GA4 |
 | Cierre productivo | Versiones publicadas correctas, sin test code, readback live separado del canary |
 
-HTTP 200, tag disparado, `/healthy`, GA4 realtime y snapshot web no certifican entrega CAPI.
+HTTP 200, tag disparado, `/healthy`, GA4 realtime y los snapshots web/servidor no certifican entrega CAPI.
 Recepción no demuestra atribución publicitaria, match quality ni efectividad comercial.
 
 ## 7. Diagnóstico previo a publicación (histórico 2026-10-13)
@@ -355,3 +356,22 @@ Processed/Server/website y todas las claves disponibles (sin inventar teléfono 
 temporal por petición, no tag fijo, sin pruebas ordinarias. Fuente/policy de QA archivada/desactivada
 con readback; aplicación y GTM idénticos durante el alta. [Expediente de release](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 No prueba mejora EMQ, audiencia utilizable ni aceptación comercial real; continúan pendientes.
+
+## Token Meta literal en el tag servidor — pendiente 2026-10-16
+
+El snapshot servidor versiona `GTM-K2X4ZTTK` con los secretos tapados: `apiAccessToken` del tag
+Meta CAPI y `tokenDigest` del client «Efeonce backend Lead ingress» quedan en git sólo como
+huella `[redacted sha256:<12 hex>]`. Una rotación cambia la huella y el chequeo diario
+`gtm-drift.yml` la reporta como drift ([detalle](README.md#snapshot-y-drift-de-los-dos-containers)).
+
+**Pendiente decidido por el operador (no ejecutar sin su autorización):** el token de Meta sigue
+como valor literal en el tag del container servidor, visible para cualquiera con lectura del
+container en GTM. En git está tapado; en GTM no. Solución propuesta, no implementada:
+
+1. Rotar el token en Meta Business Manager.
+2. Guardarlo en Secret Manager y entregarlo al sGTM mediante una variable «Firestore Lookup»
+   que sólo pueda leer la cuenta de servicio del Cloud Run de tagging.
+3. Añadir al chequeo de snapshot un fallo cuando un parámetro traiga un valor con forma de token.
+
+Hasta entonces: no exportar el tag completo, no copiar el valor y no tratar la huella como
+prueba de vigencia del token.

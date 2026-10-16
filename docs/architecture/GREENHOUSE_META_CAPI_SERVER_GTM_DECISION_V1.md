@@ -62,7 +62,7 @@ saltar consentimiento. Operación, costo, observabilidad y privacidad deben revi
   Preview y aprobación antes de publicar cualquiera de los contenedores; provisión,
   IAM/DNS/secrets y envío de canaries requieren alcance autorizado propio.
 - Configuración publicada no equivale a operación verificada. `gtm:snapshot --check`
-  sólo verifica web, no CAPI. No se crearon recursos ni se publicaron cambios.
+  compara configuración (web y, desde el 16/10, servidor), no entrega CAPI. No se crearon recursos ni se publicaron cambios.
 
 ## Revisit When
 
@@ -203,3 +203,18 @@ El rollback actual debe mantener compatibilidad con schema2: desactivar captura/
 conservar SQL/recibos/ciphertext/key48h y retención. Server5/6 y los builders basados en esos
 snapshots sólo son antecedentes; no restaurarlos bajo productores nuevos activos. Las fuentes
 comerciales reales/EMQ siguen pendientes, sin cerrar artificialmente TASK-2034 ni el resto de TASK-2035.
+
+## Delta 2026-10-16 — contenedor servidor versionado; token literal pendiente
+
+`pnpm gtm:snapshot` versiona ahora también `GTM-K2X4ZTTK` en
+`docs/reference/measurement-gtm-ga4/server-container-snapshot.json`, con secretos tapados antes de
+escribir a disco (`apiAccessToken` del tag Meta y `tokenDigest` del Client de ingreso backend quedan
+como huella `[redacted sha256:…]`). `.github/workflows/gtm-drift.yml` compara a diario ambos
+contenedores y falla con drift; se activa al llegar a `main` (commits `e791942ea`, `5d28dda76`).
+No cambia la decisión ni publica nada: es control de configuración, no prueba de entrega a Meta.
+
+Riesgo abierto, aceptado por el operador para resolver después: el token Meta sigue literal en el
+tag servidor y es visible con lectura del contenedor en GTM. Dirección propuesta, no implementada:
+rotación en Meta, Secret Manager + variable Firestore Lookup leída sólo por la SA del Cloud Run de
+tagging, y fallo del chequeo ante valores con forma de token.
+[Detalle](../reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md#token-meta-literal-en-el-tag-servidor--pendiente-2026-10-16).

@@ -5,9 +5,9 @@ Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; o
 políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)
 y [manual de agentes](../../manual-de-uso/growth/configurar-medicion-conversiones.md). Meta Test Events
 Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión comercial.
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-07-07 por Claude
-> **Ultima actualizacion:** 2026-10-14
+> **Ultima actualizacion:** 2026-10-16 por Claude
 > **Documentacion tecnica:** [docs/reference/measurement-gtm-ga4/](../../reference/measurement-gtm-ga4/) · [Tracking Engine §19](../../architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md) · ADR [GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1](../../architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md)
 
 # Medición del sitio público (GTM + GA4)
@@ -58,6 +58,12 @@ tiene que repetirse en cada página. «Preferencias de cookies», junto a los en
 footer, permite revisarla después; según el estado de HubSpot, puede reabrir el panel o primero
 el aviso con «Personalizar preferencias». No hay una franja permanente adicional bajo el sitio.
 
+En Think, desde el 16/10 ese texto aparece sólo donde el footer reserva un lugar para los enlaces
+legales (en los informes AEO, a la derecha de la fila inferior, junto a «Privacidad»). Antes se
+pegaba al final de cualquier footer y quedaba desalineado. Las páginas cuyo footer no reserva ese
+lugar (por ejemplo, algunas pantallas de estado o muestras) no muestran el texto, pero el aviso
+de cookies sí aparece cuando falta una elección.
+
 | Elección | Qué permite |
 | --- | --- |
 | Esenciales | Seguridad y funciones básicas; no se desactivan desde este panel. |
@@ -90,6 +96,23 @@ calidad de coincidencia o audiencias utilizables.
 [Contrato técnico](../../reference/measurement-gtm-ga4/09-hubspot-consent.md) ·
 [Despliegue, evidencia y rollback](../../audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
 
+## Control de cambios de los contenedores GTM
+
+Efeonce tiene dos contenedores: el **web** (`GTM-NGHPGRLZ`, el que carga en los sitios) y el
+**servidor** (`GTM-K2X4ZTTK`, el que envía a Meta y reenvía a GA4). Desde el 16/10 una copia de la
+configuración de ambos vive en el repositorio. Las claves y tokens nunca se copian: se reemplazan
+por una huella, así un cambio de credencial se nota sin que el valor quede guardado.
+
+Un chequeo diario compara lo publicado en GTM con esa copia. Si alguien cambió un contenedor
+fuera del flujo gobernado, el chequeo falla y avisa. Ese chequeo se activa cuando el cambio llegue
+a producción (al 16/10 todavía no había corrido); ese día ambos contenedores coincidían con la copia.
+
+Que el chequeo pase sólo dice que la configuración no cambió. No prueba que los eventos lleguen a
+GA4 o a Meta. Pendiente: el token de Meta sigue escrito dentro del contenedor servidor, visible
+para quien tenga lectura en GTM; el operador decidió moverlo a un almacén de secretos más adelante.
+[Qué hacer si falla](../../manual-de-uso/growth/operar-meta-capi-servidor.md#si-falla-el-chequeo-diario-gtm-drift) ·
+[detalle técnico](../../reference/measurement-gtm-ga4/README.md#snapshot-y-drift-de-los-dos-containers).
+
 ## Qué NO mide
 
 - Formularios que **no son del motor de Greenhouse** (HubSpot nativo, Contact Form 7) — esos son otro sistema.
@@ -111,8 +134,8 @@ sólo una etiqueta al contenedor web.
 PageView refleja navegación consentida. Lead debe corresponder a un formulario comercial
 aceptado por el servidor: quedan fuera clics, errores y postulaciones. Si también hay Pixel
 en navegador, se correlacionan ambos eventos para contar una sola conversión.
-Consentimiento denegado o desconocido bloquea el envío Meta. GA4 y el snapshot web no
-comprueban entrega a Meta; se exige recepción con origen Server y lectura posterior.
+Consentimiento denegado o desconocido bloquea el envío Meta. GA4 y los snapshots de los
+contenedores no comprueban entrega a Meta; se exige recepción con origen Server y lectura posterior.
 
 Estado14/10: **GTM Server9/Web5 y matching por políticas activos**, tras release completo PR255/main9690efad.
 HubSpot muestra el banner en la primera visita, con preferencias en el pie legal; publicidad

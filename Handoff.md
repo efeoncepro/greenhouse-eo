@@ -1,5 +1,18 @@
 # Handoff
 
+## 2026-10-16 — GTM: drift con mecanismo (web + servidor) y auditoría brand-visibility
+
+`pnpm gtm:snapshot` versiona los dos containers (web `GTM-NGHPGRLZ` y servidor `GTM-K2X4ZTTK`, nuevo
+`server-container-snapshot.json`) con secretos tapados como huella; `--check` falla con resumen por colección.
+Workflow nuevo `gtm-drift.yml` diario 12:00 UTC (tooling), WIF directo a `greenhouse-gtm-publisher` con scope
+readonly; `roles/iam.workloadIdentityUser` concedido al repo. Commits `e791942ea` y `5d28dda76` en develop, sin push.
+Ambos containers sin drift al 16/10. Think: «Preferencias de cookies» sólo en host legal declarado (main `425a1de`).
+[Snapshot y drift](docs/reference/measurement-gtm-ga4/README.md#snapshot-y-drift-de-los-dos-containers) ·
+[qué hacer si falla](docs/manual-de-uso/growth/operar-meta-capi-servidor.md#si-falla-el-chequeo-diario-gtm-drift).
+Pendiente: release a `main` para activar el cron (aún no ha corrido en GitHub); token Meta literal en el tag
+servidor (decisión del operador: Secret Manager + Firestore Lookup después); form `ai-visibility-grader`
+de think/brand-visibility sin envío real que pruebe la cadena Lead (0 filas en `measurement_conversion`).
+
 ## 2026-10-16 — Contacto: Nexa canónica, voz y medición
 
 Live en `/contacto/` y verificado en navegador/CDN: hero con rostro canónico de Nexa, voz Lucía es-MX (26 s), OG
@@ -258,15 +271,3 @@ dominio se mueve con su API y sus procesos asíncronos o no se mueve, y no se ag
 ya tiene 32 hacia `greenhouse_growth` que hay que retirar antes de su corte). Sin decidir: ledger de migraciones de un
 schema con otro dueño, hospedaje de Insights, interfaz del cotizador (portal o Rooms). Verificado: `pnpm epic:lint`,
 `pnpm task:lint --task TASK-1382`, `pnpm docs:context-check:strict`. No se corrió ningún build. Local, sin push.
-
-## 2026-10-12 — Growth: dos errores de Sentry del ops-worker (ISSUE-181 / ISSUE-182)
-
-Regrade AEO: Sky tenía 6 mercados secundarios con cadencia y sin declarar en el contrato; fallaba a diario desde el
-3-oct. **Aplicado en producción**: `aeo_markets_included` de Sky = AR, BR, CL, CO, PE, US, UY (assignment
-`cpma-9755492d…`, command gobernado desde el árbol local). Código local sin push: predicado único
-`markets/contract-coverage.ts`, `assignAeoTier({ marketsIncluded })`, CLI `pnpm growth:aeo-contracted-markets`.
-Captura de rankings: job nuevo `ops-seo-rank-capture-retry` (07:00) y aviso de parciales, ambos **sólo tras el deploy
-del worker**. Pendiente: (1) el operador recupera hoy las 3 keywords de Berel con `gcloud scheduler jobs run
-ops-seo-rank-capture` (el clasificador bloqueó al agente); (2) mirar `failed=0` en el regrade del 13-oct 08:00 — encolará
-5 corridas `full` de Sky; (3) cerrar ambas issues tras el deploy. Verificado: typecheck, lint, 1.257 tests de
-ai-visibility/seo/worker, predicado SQL contra PG real. No se corrió `pnpm test` completo ni `pnpm build`.
