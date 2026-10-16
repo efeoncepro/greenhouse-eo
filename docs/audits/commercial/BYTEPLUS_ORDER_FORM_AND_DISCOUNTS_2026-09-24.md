@@ -6,6 +6,10 @@
 
 **Estado de la relación:** Partnership activo, confirmado por el operador el 2026-09-24.
 
+**Delta 2026-10-16:** el operador declara el Order Form **firmado** y confirma que la designación pública es
+**«partner»**. La copia firmada no se ha contrastado aún contra esta matriz; hasta hacerlo, la matriz sigue
+reflejando la copia sin firmar del 2026-09-24.
+
 **Fuente revisada:** `CT20260924149968.pdf`, recibido en `/Users/jreye/Downloads/CT20260924149968.pdf`.
 
 ## Estado del acuerdo y de las tarifas
@@ -97,8 +101,8 @@ pay-as-you-go y región Johor; el método de liquidación varía entre hora y ti
 
 **Máximo:** 60% para las dos unidades de Dreamina-Seedance-2.0-mini.
 
-**Tarifario activo:** pendiente de confirmar firma bilateral/fecha efectiva o readback de tarifas aplicadas en BytePlus
-Account. No sustituir esta matriz si llega la copia firmada: comparar cambios y añadir nueva versión con evidencia.
+**Tarifario activo:** firma declarada por el operador el 2026-10-16; falta contrastar la copia firmada (fecha efectiva y
+tarifas) o hacer readback de tarifas aplicadas en BytePlus Account. No sustituir esta matriz si llega la copia firmada: comparar cambios y añadir nueva versión con evidencia.
 
 ## Comparación preliminar de costo por uso: BytePlus vs. Fal
 
