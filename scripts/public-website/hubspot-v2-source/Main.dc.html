@@ -170,6 +170,31 @@ details[open] .plus{transform:rotate(45deg)}
  .agent-side{display:none}
  .tap{display:inline-block;padding:12px 0;margin:-12px 0}
 }
+/* Mobile dock: two exits always at hand between the hero and the form. Hidden on wider screens. */
+.mdock{display:none}
+@media (max-width:760px){
+ .mdock{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;gap:8px;padding:8px;border-radius:999px;background:rgba(0,26,51,.84);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+ .mdock-slot{flex:1 1 0;min-width:0;display:flex}
+ .mdock-slot:not(:has(.ghc-primary,.mdock-meet)){display:none}
+ .mdock-form,.mdock-meet{flex:1 1 0;min-width:0;min-height:48px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border-radius:999px;font-size:15px;font-weight:600;line-height:1.1;text-decoration:none;white-space:nowrap;box-sizing:border-box}
+ .mdock-form{color:#ffffff;border:1.5px solid rgba(255,255,255,.5)}
+ .mdock-form:hover,.mdock-form:focus-visible{color:#ffffff;border-color:#ffffff}
+ .mdock-meet{color:#001a33;background:#ffffff}
+ .mdock greenhouse-cta{display:flex;flex:1 1 0;min-width:0;--gh-cta-reserve:48px}
+ .mdock greenhouse-cta .ghc-card{display:flex!important;gap:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important}
+ .mdock greenhouse-cta :is(.ghc-content,.ghc-dismiss){display:none!important}
+ .mdock greenhouse-cta .ghc-actions{margin:0!important;padding:0!important;width:100%}
+ .mdock greenhouse-cta .ghc-primary{width:100%;min-height:48px;margin:0;padding:0 14px;border:0;border-radius:999px;font-family:'Poppins',sans-serif;font-size:15px;font-weight:600;line-height:1.1;white-space:nowrap;text-decoration:none!important;color:#001a33!important;background:#ffffff!important;box-shadow:none!important}
+ .mdock greenhouse-cta .ghc-primary:hover{background:#fbe3f6!important}
+ @supports not (animation-timeline: view()){.mdock{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+}
+@supports (animation-timeline: view()){
+ .hero{view-timeline-name:--gh-hero}
+ #agenda{view-timeline-name:--gh-agenda}
+ @keyframes mdock-in{from{translate:0 160%;visibility:hidden}}
+ @keyframes mdock-out{to{opacity:0;visibility:hidden}}
+ .mdock{animation:mdock-in linear both,mdock-out linear both;animation-timeline:--gh-hero,--gh-agenda;animation-range:exit 40% exit 85%,entry 5% entry 35%}
+}
 </style>
 </helmet>
 <div style="background: #001a33; color: #ffffff; font-family: Poppins, sans-serif; overflow-x: clip">
@@ -750,6 +775,10 @@ details[open] .plus{transform:rotate(45deg)}
 </div>
 </form>
 </div>
+<nav class="mdock" aria-label="Acciones rápidas">
+<div class="mdock-slot"><gh-meeting-cta></gh-meeting-cta></div>
+<a class="mdock-form" href="#agenda-form">Ir al formulario</a>
+</nav>
 </section>
 
 <!-- El footer canónico del sitio va aquí (lo pone WordPress). -->

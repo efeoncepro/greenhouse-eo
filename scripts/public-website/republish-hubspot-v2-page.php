@@ -2,7 +2,9 @@
 /**
  * Replaces the body of /servicios-contratar-hubspot/ (page 244079) with the HubSpot v2 modules (design of 2026-10-16).
  * Inputs: page-scoped custom CSS template (hubspot-v2-source/page-custom.css, __ID__ = page id) and the Growth Form JSON
- * { "formKey", "surface" } (hubspot-v2-source/form.json). Header and footer stay Ohio's.
+ * { "formKey", "surface" } (hubspot-v2-source/form.json). Optional third input: the meeting CTA surface JSON
+ * { "surfaceId", "embedKey" } written 0600 by scripts/growth/publish-hubspot-meeting-cta.ts (mobile dock); the key is
+ * public by design once embedded, but it never enters the repository. Header and footer stay Ohio's.
  *
  * Before writing it stores one rollback option with the previous Elementor tree, document settings, every page_* /
  * _page_* meta and the featured image; then preflights every widget, saves through Document::save(), copies the Ohio
@@ -11,7 +13,7 @@
  * Rollback: restore `_elementor_data` + settings via Document::save() and the metas from the printed snapshot option.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
-if ( count( $args ?? array() ) !== 2 ) { WP_CLI::error( 'Expected: <page-custom.css> <form.json>.' ); }
+if ( ! in_array( count( $args ?? array() ), array( 2, 3 ), true ) ) { WP_CLI::error( 'Expected: <page-custom.css> <form.json> [meeting-cta.json].' ); }
 $id = 244079; $ohio_source = 251981;
 if ( get_post_field( 'post_name', $id ) !== 'servicios-contratar-hubspot' || get_post_status( $id ) !== 'publish' ) { WP_CLI::error( 'Page identity drift.' ); }
 if ( get_post_field( 'post_name', $ohio_source ) !== 'agencia-de-medios' ) { WP_CLI::error( 'Ohio source identity drift.' ); }
@@ -19,6 +21,12 @@ $form         = json_decode( (string) file_get_contents( $args[1] ), true );
 $form_key     = (string) ( $form['formKey'] ?? '' );
 $form_surface = (string) ( $form['surface'] ?? '' );
 if ( ! preg_match( '/^[0-9a-f-]{36}$/', $form_key ) || ! preg_match( '/^fhsf-[a-z0-9-]+$/', $form_surface ) ) { WP_CLI::error( 'Invalid form key or surface.' ); }
+$meeting = array();
+if ( isset( $args[2] ) ) {
+	$cta = json_decode( (string) file_get_contents( $args[2] ), true );
+	if ( ! preg_match( '/^csur-[0-9a-f-]{36}$/', (string) ( $cta['surfaceId'] ?? '' ) ) || ! preg_match( '/^ghek_[A-Za-z0-9_-]{20,}$/', (string) ( $cta['embedKey'] ?? '' ) ) ) { WP_CLI::error( 'Invalid meeting CTA surface input.' ); }
+	$meeting = array( 'meeting_surface' => $cta['surfaceId'], 'meeting_embed_key' => $cta['embedKey'] );
+}
 $template = trim( (string) file_get_contents( $args[0] ) );
 if ( false === strpos( $template, '__ID__' ) || preg_match( '/<\/?(script|style)/i', $template ) ) { WP_CLI::error( 'Unexpected custom CSS input.' ); }
 
@@ -37,7 +45,7 @@ foreach ( array_keys( $modules ) as $module ) {
 	if ( ! isset( $widgets[ 'greenhouse_hubspot_v2_' . $module ] ) ) { WP_CLI::error( 'Widget absent: greenhouse_hubspot_v2_' . $module ); }
 	try {
 		$widgets[ 'greenhouse_hubspot_v2_' . $module ]->get_controls();
-		$probe = EO_Hubspot_V2_Landing_Base_Widget::render_module( $module, array( 'form_key' => $form_key, 'form_surface' => $form_surface ), 'preflight' );
+		$probe = EO_Hubspot_V2_Landing_Base_Widget::render_module( $module, array( 'form_key' => $form_key, 'form_surface' => $form_surface ) + $meeting, 'preflight' );
 		if ( '' === $probe || preg_match( '/%%[^%\s]+%%/', $probe ) ) { WP_CLI::error( 'Render preflight failed: ' . $module ); }
 	} catch ( \Throwable $e ) {
 		WP_CLI::error( 'Control preflight failed for ' . $module . ': ' . $e->getMessage() );
@@ -66,7 +74,7 @@ $zero     = array( 'unit' => 'px', 'top' => '0', 'right' => '0', 'bottom' => '0'
 $elements = array();
 foreach ( $modules as $module => $title ) {
 	$widget_settings = array( '_title' => $title, '_margin' => $zero, '_padding' => $zero );
-	if ( 'agenda' === $module ) { $widget_settings += array( 'form_key' => $form_key, 'form_surface' => $form_surface ); }
+	if ( 'agenda' === $module ) { $widget_settings += array( 'form_key' => $form_key, 'form_surface' => $form_surface ) + $meeting; }
 	$elements[] = array(
 		'id' => substr( md5( 'hsv2-section-' . $module ), 0, 7 ), 'elType' => 'container', 'isInner' => false,
 		'settings' => array(

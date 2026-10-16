@@ -35,3 +35,5 @@
 
 /* Ohio animates a background underline on every link hover (.links-underline); cards and buttons here are links. */
 .gh-hsv2 a:hover,.gh-hsv2 a.-dashed{animation:none !important;background-image:none !important}
+/* The dock's «Ir al formulario» lands on the form card, not on the photo that opens the agenda section. */
+.gh-hsv2 #agenda-form{scroll-margin-top:16px}

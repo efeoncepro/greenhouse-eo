@@ -1,0 +1,12 @@
+/* Page layer: rules that must reach outside the landing (body, Ohio chrome). Appended verbatim after scoping;
+   every rule is page-scoped through :has(.gh-hsv2 …) so no other page is touched. */
+/* Mobile dock: the hero timeline lives in another module, so its name is scoped on body. While the dock shows,
+   Ohio's bottom bar (mode switch) steps aside; it comes back from the form on. Page-scoped through :has(). */
+@supports (animation-timeline: view()){
+ body:has(.gh-hsv2 .mdock){timeline-scope:--gh-hero,--gh-agenda}
+ @media (max-width:760px){
+  body:has(.gh-hsv2 .mdock) .elements-bar.left{animation:gh-hsv2-bar-out linear forwards,gh-hsv2-bar-in linear forwards;animation-timeline:--gh-hero,--gh-agenda;animation-range:exit 40% exit 85%,entry 5% entry 35%}
+ }
+ @keyframes gh-hsv2-bar-out{to{opacity:0;visibility:hidden}}
+ @keyframes gh-hsv2-bar-in{from{opacity:0;visibility:hidden}to{opacity:1;visibility:visible}}
+}

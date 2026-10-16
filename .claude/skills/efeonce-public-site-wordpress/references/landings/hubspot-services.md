@@ -1,5 +1,14 @@
 # Landing: HubSpot Services
 
+> **Delta 2026-10-16 (tarde) — dock móvil.** Bajo 760 px, `244079` muestra un dock fijo con «Agendar reunión» y «Ir al
+> formulario» (`#agenda-form`). Aparece al salir del hero y se oculta al entrar a `#agenda` (scroll-driven, `timeline-scope`
+> en `body` vía `hubspot-v2-source/page.css`, la capa que se agrega SIN scoping); mientras se ve, la `.elements-bar.left` de
+> Ohio se aparta y vuelve desde el formulario. «Agendar reunión» es el CTA gobernado `hubspot-discovery-meeting`
+> (`open_meeting_scheduler`, scheduler nativo, `cta-location=hubspot_mobile_dock`) con surface propia; publicador
+> `scripts/growth/publish-hubspot-meeting-cta.ts` (key 0600 en `.auth/hubspot-v2-meeting-cta-surface.json`, que
+> `republish-hubspot-v2-page.php` recibe como tercer input; nunca al repo). Sin surface/key el dock cae a `/agenda/`.
+> El token de plantilla es `meeting_launcher`: un token con el mismo nombre que un campo lo reemplaza el valor del campo.
+
 > **Delta 2026-10-16 — v2 publicada (rediseño por los 4 resultados de HubSpot).** El cuerpo de `244079` ya no son los
 > 11 widgets `greenhouse_hubspot_*`: son **14 widgets `greenhouse_hubspot_v2_*`** (hero, marquesina, numeros, punto,
 > diferencia, resultados, riesgo, agentes, metodo, seguridad, caso, partner, preguntas, agenda) compilados desde el canvas
