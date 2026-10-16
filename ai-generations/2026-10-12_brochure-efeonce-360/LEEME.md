@@ -191,3 +191,4 @@ Fuente: `native-growth/channel-commerce.mjs`. Los enlaces de V04 se verificaron 
 - Enlaces verificados en las dos versiones. Larga: V04 → 7/22/39/54/64; IDX → 6/7/22/36/39/54/64/72/79/82.
   Corta: V04 → 7/10/13/15/18; IDX → 6/7/10/12/13/15/18/20/22/23.
 - Ambos PDF están en OneDrive (Brochures/2026/Agencia de Marketing 360).
+- 2026-10-16 · Se sacó el caso BICECORP a pedido del operador (queda fuera del recorrido en el canvas, sin borrar). Larga: 84 láminas, Engine cierra con Berel. Corta: el caso Berel ocupa su lugar y sigue en 25. Índices re-renderizados y enlaces verificados (larga IDX → 6/7/21/35/38/53/63/71/78/81; corta sin cambios de página).
