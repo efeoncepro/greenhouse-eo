@@ -7,6 +7,42 @@
 
 Este documento captura contratos runtime vigentes que no deben crecer como deltas dentro del monolito de arquitectura base.
 
+## Diagnóstico de medios (Agencia de Medios)
+
+Alta del 2026-10-16, autorizada por el operador («crear uno dedicado» con su propio formulario HubSpot).
+Registro de identidad; antes de operar, relee el contrato público.
+
+| Identidad | Valor |
+|---|---|
+| Landing | `https://efeoncepro.com/servicios/agencia-de-medios/` (embed a cargo del operador) |
+| Slug / form key | `efeonce-media-diagnostic` / `d784b9e2-f6e4-4e24-b059-f164fc82f734` |
+| Surface | `fhsf-efeonce-media-diagnostic` (`https://efeoncepro.com`, `https://www.efeoncepro.com`) |
+| Versión publicada | `fver-d448c02d-9fda-4612-9ba8-5bebd4a5139f` (v2 con destino `direct`; v1 `fver-fc49b604-243f-45b6-9489-d879123394d3` deprecada) |
+| Presentación | `styleVariant=hubspot_pillar`, `static`, success card con acción a `/agenda/` |
+| Destino | HubSpot «Lead Gen - Agencia de Medios» por `hubspot-destinations.registry.ts`; properties `gh_form_medios_{modelo_venta,canales,inversion_mensual}` + estándar (`jobtitle`, `country`, `message`) |
+| Medición | Sin política publicitaria publicada |
+
+Authoring: `scripts/growth/publish-media-diagnostic-form.ts` (dry-run por defecto, `--apply`); Turnstile
+se copia de la versión publicada de `efeonce-creative-diagnostic`. Smoke secure-submit del 2026-10-16:
+completo 200 y mínimo 200 con el contacto marcado `greenhouse-smoke+forms-20261016@efeonce.org`.
+
+**Por qué `hubspot_pillar` y no `diagnostic_premium`.** El diseño pide «Dónde pautas hoy» como chips de
+selección múltiple. El renderer sólo dibuja `multiselect` como chips bajo `hubspot_pillar`; en
+`diagnostic_premium` cae a un `<select multiple>` nativo (verificado contra el bundle de producción). En
+pillar, «¿Cómo vendes?» e «Inversión mensual» (diseño: listas desplegables) se ven como chips de
+selección única; «País» usa `country_select`. Los `value` son estables, así que cambiar variante o control
+más adelante no toca HubSpot ni la medición.
+
+**Consentimiento.** El motor exige un consentimiento de procesamiento obligatorio para aceptar el envío
+(`contact_permission`). La casilla opcional `marketing_updates` (novedades) queda en el snapshot de
+consentimiento de Greenhouse, pero el adapter HubSpot envía `communications: []`: **no crea suscripción en
+HubSpot**. Para que el opt-in llegue a HubSpot hace falta mapearlo a un `subscriptionTypeId` en el adapter.
+
+**Pendientes.** Embed en la landing (el host dibuja el título «Agenda tu diagnóstico», la tarjeta oscura y el
+fallback sin JS; con variante de estilo, el override de tokens apunta a
+`greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`), primer envío humano real y política
+de medición si el operador la quiere.
+
 ## Diagnóstico creativo (Agencia Creativa)
 
 Alta del 2026-10-15, autorizada por el operador. Registro de identidad; antes de operar, relee el

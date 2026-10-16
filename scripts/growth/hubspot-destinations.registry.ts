@@ -242,4 +242,23 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       existing('context', 'message', 'Contexto'),
     ],
   },
+  {
+    formKey: 'd784b9e2-f6e4-4e24-b059-f164fc82f734',
+    slug: 'efeonce-media-diagnostic',
+    pageUrl: 'https://efeoncepro.com/servicios/agencia-de-medios/',
+    hubspotForm: { name: 'Lead Gen - Agencia de Medios' },
+    fields: [
+      FIRST_NAME,
+      LAST_NAME,
+      EMAIL,
+      PHONE,
+      COMPANY,
+      existing('jobTitle', 'jobtitle', 'Cargo'),
+      existing('country', 'country', 'País'),
+      select('salesModel', 'gh_form_medios_modelo_venta', 'Cómo Vende (Agencia de Medios)', 'Cómo vende la empresa: online o en tiendas, a empresas o ambas.'),
+      text('mediaChannels', 'gh_form_medios_canales', 'Dónde Pauta Hoy (Agencia de Medios)', 'Canales donde la empresa pauta hoy (selección múltiple, separados por coma).'),
+      select('monthlyMediaBudget', 'gh_form_medios_inversion_mensual', 'Inversión Mensual en Medios (Agencia de Medios)', 'Rango de inversión mensual en medios declarado, en USD.'),
+      existing('context', 'message', 'Qué quiere resolver'),
+    ],
+  },
 ]
