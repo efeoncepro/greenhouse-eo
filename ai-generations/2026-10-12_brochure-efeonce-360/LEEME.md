@@ -101,3 +101,32 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 - 2026-10-16 · Logo Efeonce Web Experience 360 (candidato, no sellado en AXIS): misma regla de la familia Marketing/Creative Studio y Factory («la órbita vive en la O»), aquí en el «0» de 360, con esfera en el acento Engine #0375db; isotipo = W dentro de la órbita. Generador `scripts/brand/build-web-experience-logos.mjs`; 24 SVG en `logos-web-experience-360/`. Para canonizarlo: copiar a packages/brand-assets y sellar (mismo flujo que Creative Studio).
 - 2026-10-16 · Voice suma cinco láminas del brochure Agencia de Medios (índice en `2026-10-13_brochure-agencia-medios/INDICE-LAMINAS.md`): «Todo el ciclo» (03), «Las justas» (04), «Donde mira» (22), «Aparte» (43) y «Con evidencia» (45). En 22 y 43 se usaron las versiones sin persona: las vigentes llevan a Isabella y Voice ya tiene a Karo (el peer pide no mezclarlas). Cuidados del peer: ninguna aprobada formalmente; marcas de ejemplo Nórtica/Andara; cifras con fecha a reconfirmar. `renumerar-desde-canvas.cjs` regenera la numeración desde el canvas. Brochure: 65 láminas.
 - 2026-10-16 · Voice suma performance y programática de la Agencia de Medios (renders finales de su canvas): Google «La señal», Meta «La pieza», «Tu venta» (señal por plataforma), DOOH «En tu ruta», DOOH dinámico «Al instante», creatividad dinámica «Variantes» y «Así» (campaña completa). Marcas de ejemplo Nórtica. Cifras con fecha a reconfirmar al enviar (Meta 2026, AI Max feb-2027). Brochure: 72 láminas.
+
+## 2026-10-16 · Narrativa con hilo conductor (81 láminas)
+
+El operador pidió ordenar toda la narrativa, sumar la experiencia del cliente, el equipo, los casos, los clientes y
+los partners, y que cada lámina siga el hilo de la anterior. El recorrido quedó en seis actos:
+
+1. **Tu problema y quiénes somos:** Main → V02 → V03 → **QSM** «Un solo equipo» (deck SEO/AEO) → V04.
+2. **La vuelta en cinco líneas.** Cada línea cierra con su prueba: Engine con Berel (S28) y **BIC** (BICECORP, deck
+   SEO/AEO); Brand con Sky (S27); Revenue con **ANM** (ANAM, brochure HubSpot). Voice y Growth no tienen caso propio
+   todavía.
+3. **Cómo lo vives:** **EQP** «Este equipo» → V17 → **CTG** «Contigo» → **PV1** «Movimiento», 90 días → V18 →
+   **MES** «Cada mes sabes qué recibes» → C10 «Nunca».
+4. **La prueba:** S25 «+90 empresas» → **PTN** partners → **PAI** cinco países.
+5. **Cómo empiezas:** S29 → S30 → S32 → S33.
+
+Ediciones sobre los PDF publicados: `native-growth/narrativa/editar-lamina.mjs` + un `e-*.json` por lámina. La
+herramienta borra con interpolación vertical, o con relleno plano (`"f"`) sobre el cielo estrellado, y vuelve a
+poner el texto en Poppins y Bricolage.
+
+- EQP: la pregunta pasó a «¿Quién opera tu vuelta?» y el texto amplía el equipo a toda la agencia.
+- PV1: la tarjeta de las semanas 5–8 pasó de «Diseño y construcción» a «Producción y campañas».
+- PTN: «tu web» pasó a «tu marca».
+- Antetítulos: «Cómo lo vives · …» y «La prueba · …».
+
+Trampa: macOS no distingue mayúsculas en los nombres. Un recorte `out/ptn.jpg` pisó `out/PTN.jpg`; nunca nombres un
+recorte igual a una lámina.
+
+Los enlaces de V04 se verificaron: van a las páginas 6, 21, 35, 50 y 60, las cinco portadas de línea. Los logos de
+BICECORP, ANAM y partners son los mismos de los brochures ya publicados; la autorización de uso sigue a TASK-1937.
