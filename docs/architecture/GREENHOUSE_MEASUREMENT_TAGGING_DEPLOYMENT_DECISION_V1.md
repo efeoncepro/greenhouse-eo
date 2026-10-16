@@ -88,3 +88,25 @@ Matching usa [políticas publicadas](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISI
 compatible por API/panel/CLI sin release/redeploy/publish GTM, verificada con fuente nueva y
 Meta Test Events después del release. Nuevo contrato/host/destino requiere su cambio gobernado.
 El snapshot web histórico no acredita paridad server; [recibos independientes](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+
+## Delta 2026-10-16 — drift con mecanismo, en ambos containers
+
+La regla «SIEMPRE correr el snapshot» no tenía mecanismo: nada ejecutaba `--check` y el
+container servidor nunca se había versionado. Desde hoy:
+
+- `pnpm gtm:snapshot` versiona **web `GTM-NGHPGRLZ` y servidor `GTM-K2X4ZTTK`**
+  (`container-snapshot.json` + `server-container-snapshot.json`), incluidos clients,
+  transformations y la huella del código de cada plantilla.
+- Los secretos se **tapan antes de tocar el disco**: un parámetro con nombre sensible
+  (`token`, `secret`, `apiKey`…) o con forma de credencial (`EAA…`, `sk-…`) se guarda como
+  `[redacted sha256:<12>]`. La rotación cambia la huella y se ve como drift; el valor nunca.
+  Una referencia `{{variable}}` se conserva.
+- [`gtm-drift.yml`](../../.github/workflows/gtm-drift.yml) corre `--check` a diario y **falla**
+  si cualquiera de los dos difiere del snapshot commiteado. Se autentica por WIF directamente
+  como `greenhouse-gtm-publisher` (scope `tagmanager.readonly`); requiere
+  `roles/iam.workloadIdentityUser` del repo sobre ese SA.
+- `build-cta-events-workspace.ts --publish` reescribe los snapshots tras publicar.
+- Lógica pura y tests: `scripts/gtm/snapshot-lib.ts`.
+
+Pendiente fuera de este delta: sacar el token de Meta CAPI del parámetro literal del tag
+(hoy sólo queda tapado en git, sigue visible para quien lea el container en GTM).

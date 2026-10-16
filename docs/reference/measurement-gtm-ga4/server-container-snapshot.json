@@ -1,0 +1,1153 @@
+{
+  "name": "TASK2035 strict policy v2 after web/worker convergence",
+  "tags": [
+    {
+      "name": "FB_CONVERSIONS_API-708931297255942-Server-Tag",
+      "type": "cvt_NCN6S",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "pixelId",
+          "value": "708931297255942"
+        },
+        {
+          "type": "template",
+          "key": "apiAccessToken",
+          "value": "[redacted sha256:3bfb325c7d87]"
+        },
+        {
+          "type": "boolean",
+          "key": "enableEventEnhancement",
+          "value": "false"
+        },
+        {
+          "type": "boolean",
+          "key": "extendCookies",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "actionSource",
+          "value": "website"
+        }
+      ],
+      "firingTriggerId": [
+        "11",
+        "33"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "GA4 - server forwarding",
+      "type": "sgtmgaaw",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "redactVisitorIp",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "epToIncludeDropdown",
+          "value": "all"
+        },
+        {
+          "type": "boolean",
+          "key": "isMeasurementIdMandatory",
+          "value": "true"
+        },
+        {
+          "type": "list",
+          "key": "epToExclude",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "meta_ads_consent"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "measurement_probe"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "user_data"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "em"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "ph"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "fn"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "ln"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "fbp"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "fbc"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "external_id"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "conversionReceipt"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "conversion_receipt"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "analytics_consent"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "meta_only"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "fieldName",
+                  "value": "meta_capi_page_view"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "upToIncludeDropdown",
+          "value": "all"
+        },
+        {
+          "type": "template",
+          "key": "measurementId",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "20"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "name": "FB_CONVERSIONS_API-708931297255942-Server-Trigger",
+      "type": "always",
+      "filter": [
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": ".+"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GA4 forwarding - canonical hosts - no internal QA",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Client Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "GA4"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - measurement_probe}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "internal_qa"
+            },
+            {
+              "type": "boolean",
+              "key": "negate",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - meta_only}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "1"
+            },
+            {
+              "type": "boolean",
+              "key": "negate",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - native GA4 consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^G1[01]1$"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meta CAPI - Lead - accepted commercial forms",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - meta_ads_consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "granted"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "generate_lead"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - form_slug}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^(efeonce-aeo-diagnostic|efeonce-seo-diagnostic|efeonce-desarrollo-web-cotizacion|efeonce-lead-gen-web|efeonce-social-audit|ai-visibility-grader)$"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - event_id}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meta CAPI - Lead - authenticated backend",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Client Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "Efeonce backend Lead ingress"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - backend_verified}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - meta_ads_consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "granted"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "generate_lead"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - event_id}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meta CAPI - Lead - confirmed meeting bookings",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - meta_ads_consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "granted"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "generate_lead"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - lead_source}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "meeting_booking"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - scheduler_key}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "efeonce-discovery-30"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - surface_id}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "fhsf-efeonce-lead-gen-web"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - event_id}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meta CAPI - PageView - consent and hosts",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - meta_ads_consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "granted"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "page_view"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - meta_capi_page_view}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - event_id}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "name": "ED - analytics_consent",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "analytics_consent"
+        }
+      ]
+    },
+    {
+      "name": "ED - backend_verified",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "backend_verified"
+        }
+      ]
+    },
+    {
+      "name": "ED - event_id",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "event_id"
+        }
+      ]
+    },
+    {
+      "name": "ED - form_slug",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "form_slug"
+        }
+      ]
+    },
+    {
+      "name": "ED - lead_source",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "lead_source"
+        }
+      ]
+    },
+    {
+      "name": "ED - measurement_probe",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "measurement_probe"
+        }
+      ]
+    },
+    {
+      "name": "ED - meta_ads_consent",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "meta_ads_consent"
+        }
+      ]
+    },
+    {
+      "name": "ED - meta_capi_page_view",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "meta_capi_page_view"
+        }
+      ]
+    },
+    {
+      "name": "ED - meta_only",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "meta_only"
+        }
+      ]
+    },
+    {
+      "name": "ED - native GA4 consent",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "x-ga-gcs"
+        }
+      ]
+    },
+    {
+      "name": "ED - page_location",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "page_location"
+        }
+      ]
+    },
+    {
+      "name": "ED - scheduler_key",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "scheduler_key"
+        }
+      ]
+    },
+    {
+      "name": "ED - surface_id",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "surface_id"
+        }
+      ]
+    },
+    {
+      "name": "Meta - safe page URL",
+      "type": "remm",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "true"
+        },
+        {
+          "type": "template",
+          "key": "input",
+          "value": "{{ED - page_location}}"
+        },
+        {
+          "type": "boolean",
+          "key": "fullMatch",
+          "value": "true"
+        },
+        {
+          "type": "boolean",
+          "key": "replaceAfterMatch",
+          "value": "true"
+        },
+        {
+          "type": "template",
+          "key": "defaultValue"
+        },
+        {
+          "type": "boolean",
+          "key": "ignoreCase",
+          "value": "true"
+        },
+        {
+          "type": "list",
+          "key": "map",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "key",
+                  "value": "^(https://(?:efeoncepro\\.com|think\\.efeoncepro\\.com)/[^?#\\s]*)(?:[?#].*)?$"
+                },
+                {
+                  "type": "template",
+                  "key": "value",
+                  "value": "$1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "name": "Efeonce backend Lead ingress",
+      "type": "cvt_191286361_30",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "metaTagId",
+          "value": "6"
+        },
+        {
+          "type": "template",
+          "key": "tokenDigest",
+          "value": "[redacted sha256:d18b4b84b5cd]"
+        }
+      ],
+      "priority": 100
+    },
+    {
+      "name": "GA4",
+      "type": "gaaw_client",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "activateDefaultPaths",
+          "value": "true"
+        },
+        {
+          "type": "template",
+          "key": "cookieManagement",
+          "value": "server"
+        },
+        {
+          "type": "template",
+          "key": "cookieName",
+          "value": "FPID"
+        },
+        {
+          "type": "template",
+          "key": "cookieDomain",
+          "value": "auto"
+        },
+        {
+          "type": "template",
+          "key": "cookiePath",
+          "value": "/"
+        },
+        {
+          "type": "template",
+          "key": "cookieMaxAgeInSec",
+          "value": "63072000"
+        }
+      ]
+    }
+  ],
+  "transformations": [
+    {
+      "name": "Meta only - clean page URL",
+      "type": "tf_augment_event",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "matchingConditionsEnabled",
+          "value": "false"
+        },
+        {
+          "type": "boolean",
+          "key": "allTagsExcept",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "booleanExpressionString"
+        },
+        {
+          "type": "list",
+          "key": "augmentEventTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "paramName",
+                  "value": "page_location"
+                },
+                {
+                  "type": "template",
+                  "key": "paramValue",
+                  "value": "{{Meta - safe page URL}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "key": "affectedTags",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "tagReference",
+                  "key": "tagReference",
+                  "value": "FB_CONVERSIONS_API-708931297255942-Server-Tag",
+                  "isWeakReference": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "key": "affectedTagTypes"
+        }
+      ]
+    },
+    {
+      "name": "Meta only - exclude referrer and control fields",
+      "type": "tf_exclude_params",
+      "parameter": [
+        {
+          "type": "list",
+          "key": "excludedParamsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "excludedParams",
+                  "value": "page_referrer"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "excludedParams",
+                  "value": "measurement_probe"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "excludedParams",
+                  "value": "meta_ads_consent"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "excludedParams",
+                  "value": "analytics_consent"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "excludedParams",
+                  "value": "meta_only"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "excludedParams",
+                  "value": "meta_capi_page_view"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "boolean",
+          "key": "matchingConditionsEnabled",
+          "value": "false"
+        },
+        {
+          "type": "boolean",
+          "key": "allTagsExcept",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "booleanExpressionString"
+        },
+        {
+          "type": "list",
+          "key": "affectedTags",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "tagReference",
+                  "key": "tagReference",
+                  "value": "FB_CONVERSIONS_API-708931297255942-Server-Tag",
+                  "isWeakReference": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "key": "affectedTagTypes"
+        }
+      ]
+    }
+  ],
+  "customTemplates": [
+    {
+      "name": "Conversions API Tag",
+      "galleryReference": {
+        "host": "github.com",
+        "owner": "facebookincubator",
+        "repository": "ConversionsAPI-Tag-for-GoogleTagManager",
+        "version": "a575edb31aa447469b855c3006ed9991dad711cf",
+        "signature": "3e8ee0e2e9d9914f8c4cfa90d59ae1f4a3188baf79bbcffd4c7b934387c2c164",
+        "galleryTemplateId": "NCN6S"
+      },
+      "templateDataSha256": "e40d49da1812b20e0a632fd54496b37c1b90d76fe0f11273186cea8e30d2751f"
+    },
+    {
+      "name": "Efeonce backend Lead ingress",
+      "templateDataSha256": "a7d187947245ef48427105b74373a5e5ed69c973e36cb2d5db33fc1dea633043"
+    }
+  ],
+  "builtInVariables": [
+    "clientName",
+    "eventName"
+  ]
+}

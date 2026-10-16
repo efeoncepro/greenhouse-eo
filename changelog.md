@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-16 — GTM: drift vigilado en web y servidor
+
+- `pnpm gtm:snapshot` versiona también el container servidor (sGTM/Meta CAPI) y tapa secretos con huella sha256;
+  `gtm-drift.yml` compara a diario ambos containers live contra git y falla ante drift. El publish por script
+  reescribe los snapshots. [ADR, delta 2026-10-16](docs/architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md).
+
 ## 2026-10-16 — Contacto: Nexa canónica, voz mexicana y medición Meta
 
 - Hero de `/contacto/` con el rostro canónico de Nexa (inpaint Sunburst + anclas), voz «Escucha a Nexa» nueva
@@ -554,13 +560,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
   [retrospectiva](docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md),
   [funcional](docs/documentation/creative/spot-animado-2d.md), [manual](docs/manual-de-uso/creative/producir-spot-animado.md);
   `motion-design-studio`, `audio-studio`, guía de modelos, SPARKS_V1 e identidad sonora al día.
-
-## 2026-10-03 — Video con IA: taxonomía, producto e interfaces y pipelines por plan (EPIC-051)
-
-- [Taxonomía de video](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) por fase, tipo, look,
-  dificultad y fidelidad, neutral de motor y con «propio primero, proveedor como puente»; [anexo de producto e
-  interfaces con personas](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md); matriz operación × motor
-  y presupuestos por toma en la guía (§4.3, §7.4).
-- [ADR-025 aceptada](docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md): plan
-  declarativo por toma, ejecutores y compuertas; ningún video generativo con referencias sin aprobar.
-- EPIC-051 con TASK-1979…1989 (runner TASK-1989); capas funcional y manual; sin runtime ni gasto.

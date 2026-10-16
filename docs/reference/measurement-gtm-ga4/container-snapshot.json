@@ -2243,6 +2243,9 @@
       ]
     }
   ],
+  "clients": [],
+  "transformations": [],
+  "customTemplates": [],
   "builtInVariables": [
     "event",
     "pageHostname",

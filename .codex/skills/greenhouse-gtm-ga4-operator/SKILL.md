@@ -234,7 +234,7 @@ enlazada”.
 
 Estrategia de deployment: **build agéntico primario + capa delgada** (ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1` — NO IaC declarativo; GTM no mergea). Comandos:
 
-- **`pnpm gtm:snapshot`** — exporta el config live del container a `docs/reference/measurement-gtm-ga4/container-snapshot.json` (diff revisable en git). **Correr tras cada publish** para que git refleje el live. `pnpm gtm:snapshot --check` = detección de drift (live vs snapshot commiteado), exit 1 (CI).
+- **`pnpm gtm:snapshot`** — exporta el config live de los DOS containers (web `container-snapshot.json` + servidor `server-container-snapshot.json`, en `docs/reference/measurement-gtm-ga4/`) con secretos tapados por huella sha256. **Correr tras cada publish** y commitear (el publish por script ya lo hace). `pnpm gtm:snapshot --check` = drift live vs commiteado, exit 1; lo corre a diario `.github/workflows/gtm-drift.yml`.
 - **`pnpm measurement:smoke`** — verifica EN VIVO que la medición funciona en los hosts/eventos clave (Playwright `/g/collect`: page_view en efeoncepro.com + think, generate_lead en submit). Atrapa regresiones (Site Kit, drift, consent).
 - **`pnpm growth:forms-tracking-audit`** — forms published+active de la DB vs `TRACKING-PLAN.md`; lista los live sin fila (drift del registro).
 
