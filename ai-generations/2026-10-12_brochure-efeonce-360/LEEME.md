@@ -134,3 +134,30 @@ BICECORP, ANAM y partners son los mismos de los brochures ya publicados; la auto
 - 2026-10-16 · V17: «Personas con nombre, con agentes a su lado» no se entendía (todas las personas tienen nombre). Ahora dice «Sabes quién hace qué.»: cada persona del squad tiene un rol claro y una sola te habla, tu Account Manager (`e-V17b.json`).
 - 2026-10-16 · V17 suma la cifra «+89 profesionales expertos en distintas áreas, en LATAM» bajo el texto (pedido del operador, `e-V17c.json`).
 - 2026-10-16 · PTN suma la tarjeta BytePlus (columna 3, debajo de Adobe; logo oficial de `public/images/logos/partners/byteplus.png` pasado a blanco como las demás). El chip «Agentes de IA» se movió para no tocarla (`e-PTNb.json`).
+
+## 2026-10-16 · Brand suma Channel & Commerce (84 láminas)
+
+El operador pidió una sección de trade marketing (línea Channel & Commerce) dentro de Brand, con una lámina épica de
+activaciones de marca. Va después del caso Sky, como «fuera de la pantalla», y antes de Voice:
+
+- **CC1 «¿Y fuera de la pantalla? Te viven.»**
+  - Muestra una activación nocturna de BRÍO en una plaza de Santiago: lata gigante iluminada, barra de sampling y
+    público con el teléfono en alto.
+  - BRÍO es la marca ficticia de la landing de Agencia Creativa y de la lámina «Creatividad a escala».
+  - La foto se generó con `gpt-image-2.5-sunburst` high a 2560×1440, editando sobre dos imágenes de BRÍO como
+    referencia (≈ USD 0,06). Archivos: `channel-commerce/brio-activacion-plaza.png` y su `.prompt.txt`.
+  - Las latas chicas de la barra no se leen al 100 %: es un texto ilegible por su tamaño. La lámina declara que
+    BRÍO es una marca ficticia.
+- **CC2 «¿Qué pasa en tu góndola? Lo sabes.»** Seis servicios de trade marketing y el diferencial «La góndola y lo
+  digital, leídos juntos».
+- **CC3 «¿Y las activaciones? Medidas.»** Los nueve servicios BTL y tres diferencias: la medición va primero, la
+  activación alimenta tu dato de canal y cada activación deja contenido.
+
+El copy sale del catálogo `docs/services/channel-commerce/` y del ADR de la línea. La línea está en estado
+`Proposed`:
+
+- No hay promesa de venta, cobertura ni precio.
+- La producción física la ejecutan proveedores; Efeonce opera y responde.
+
+Fuente: `native-growth/channel-commerce.mjs`. Los enlaces de V04 se verificaron y van a las páginas 6, 21, 38, 53 y
+63.
