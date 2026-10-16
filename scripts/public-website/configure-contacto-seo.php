@@ -44,7 +44,7 @@ require_once ABSPATH . 'wp-admin/includes/image.php';
 $attachment = 0;
 $existing = get_posts( array(
 	'post_type' => 'attachment', 'post_status' => 'inherit', 'posts_per_page' => 1,
-	'meta_key' => '_eo_contact_og_contract', 'meta_value' => 'contacto-og.v1',
+	'meta_key' => '_eo_contact_og_contract', 'meta_value' => 'contacto-og.v2',
 ) );
 if ( $existing ) {
 	$attachment = (int) $existing[0]->ID;
@@ -57,7 +57,7 @@ if ( $existing ) {
 		'Contacto Efeonce: conversemos'
 	);
 	if ( is_wp_error( $attachment ) ) { WP_CLI::error( 'Media import failed. Snapshot: ' . $snapshot ); }
-	update_post_meta( $attachment, '_eo_contact_og_contract', 'contacto-og.v1' );
+	update_post_meta( $attachment, '_eo_contact_og_contract', 'contacto-og.v2' );
 }
 
 update_post_meta( $attachment, '_wp_attachment_image_alt', 'Nexa acompaña la página de contacto de Efeonce.' );
@@ -83,7 +83,6 @@ $meta = array(
 	'_yoast_wpseo_opengraph-image-id' => (string) $attachment,
 	'_yoast_wpseo_twitter-image' => $image_url,
 	'_yoast_wpseo_twitter-image-id' => (string) $attachment,
-	'_thumbnail_id' => (string) $attachment,
 );
 foreach ( $meta as $key => $value ) { update_post_meta( $id, $key, $value ); }
 
