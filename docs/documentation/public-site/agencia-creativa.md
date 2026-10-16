@@ -96,10 +96,10 @@ tarjeta ya están listos y se activan solos cuando la versión nueva salga.
   a producción, volver a conectar la medición publicitaria a esa versión y revisar las dos landings en vivo.
   Más adelante, el motor de formularios pasa al sistema de diseño AXIS
   ([TASK-2038](../../tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md)).
-- **Validación de contenido por el operador:** la cifra de Sky (94 % en la página; el caso publicado dice
-  88 %), los permisos para mostrar trabajos de clientes (Sky, Berel, GORE, Bresler, Eusari, Marca Chile,
-  Pabellón) y la imagen y videos del avión Sky, y frases de preguntas y cierre como «nada más que firmar»,
-  «aunque no trabajemos juntos» y «Sin compromiso».
+- **Contenido validado por el operador (2026-10-16):** se mantiene el 94 % de entregas a tiempo de Sky
+  (el caso publicado dice 88 %; si aparece la fuente del 94 %, corregir el pie «Cifras: caso publicado…»),
+  hay permiso para mostrar el trabajo de todos los clientes que aparecen, y se aprueban «aunque no trabajemos
+  juntos», «Sin compromiso» y «semanas de rodaje y postproducción». Las rondas dicen «de dos a tres» en todo el sitio.
 - **SEO:** título, descripción y vistas para redes de Yoast se actualizaron el 2026-10-15 («Agencia creativa
   que escala tu equipo de marketing | Efeonce»); falta revisar los datos estructurados en Rich Results y Search
   Console.
