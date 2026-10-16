@@ -494,5 +494,6 @@ del schema y `og:site_name`); tagline «Agencia de Inbound y Loop Marketing» si
 Yoast lo volvía a escapar en el schema); `og:locale` = `es_LA` por el mu-plugin versionado
 `wp-content/mu-plugins/efeonce-og-locale.php` (el idioma de WordPress sigue en `es_ES`). Script:
 `scripts/public-website/set-site-identity-seo.php`, snapshot `_gh_site_identity_seo_before_20261016_193457`.
-El tagline conserva el posicionamiento viejo: cambiarlo es decisión del operador.
+Tagline actualizado el mismo día por decisión del operador a «Agencia de marketing 360°» (alineado al brochure
+oficial; `scripts/public-website/set-site-tagline.php`, snapshot `_gh_site_tagline_before_20261016_194309`).
 
