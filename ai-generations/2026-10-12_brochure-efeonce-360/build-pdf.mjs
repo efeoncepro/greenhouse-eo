@@ -1,14 +1,16 @@
 // Arma el PDF v9 desde laminas-v9/ (orden por nombre) y agrega los enlaces internos.
-// Uso (desde la raíz del repo): node ai-generations/2026-10-12_brochure-efeonce-360/build-pdf.mjs
+// Uso (desde la raíz del repo): node ai-generations/2026-10-12_brochure-efeonce-360/build-pdf.mjs [dirLaminas] [salida.pdf]
 import fs from 'node:fs';
 import { PDFDocument, PDFName, PDFArray, PDFNumber } from 'pdf-lib';
 const D = 'ai-generations/2026-10-12_brochure-efeonce-360/';
-const files = fs.readdirSync(D + 'laminas-v9').filter(f => f.endsWith('.jpg')).sort();
+const LAM = process.argv[2] || D + 'laminas-v9';
+const OUT = process.argv[3] || D + 'Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf';
+const files = fs.readdirSync(LAM).filter(f => f.endsWith('.jpg')).sort();
 const code = f => f.split('-')[1];
 const pdf = await PDFDocument.create();
 const pages = [];
 for (const f of files) {
-  const img = await pdf.embedJpg(fs.readFileSync(D + 'laminas-v9/' + f));
+  const img = await pdf.embedJpg(fs.readFileSync(LAM + '/' + f));
   const p = pdf.addPage([1920, 1080]);
   p.drawImage(img, { x: 0, y: 0, width: 1920, height: 1080 });
   pages.push(p);
@@ -21,6 +23,9 @@ const LINKS = { V04: [
   { to: 'C04', box: [1040, 780, 1330, 970] }, // Revenue
   { to: 'C05', box: [540, 620, 820, 720] }    // Growth
 ] };
+// Lámina índice (IDX): cada fila lleva a su sección; armar-indice.mjs deja en .indice.json los destinos en orden.
+if (fs.existsSync(LAM + '/.indice.json')) LINKS.IDX = JSON.parse(fs.readFileSync(LAM + '/.indice.json', 'utf8'))
+  .map((to, i) => ({ to, box: [820, 176 + i * 80, 1780, 176 + i * 80 + 68] }));
 for (const [from, links] of Object.entries(LINKS)) {
   const i = files.findIndex(f => code(f) === from);
   if (i < 0) throw new Error('No encuentro ' + from);
@@ -38,5 +43,5 @@ for (const [from, links] of Object.entries(LINKS)) {
   pages[i].node.set(PDFName.of('Annots'), pdf.context.obj(annots));
 }
 pdf.setTitle('Efeonce — Agencia de Marketing 360°');
-fs.writeFileSync(D + 'Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf', await pdf.save());
+fs.writeFileSync(OUT, await pdf.save());
 console.log(files.length, 'páginas · enlaces en', Object.keys(LINKS).join(', '));

@@ -164,3 +164,30 @@ Fuente: `native-growth/channel-commerce.mjs`. Los enlaces de V04 se verificaron 
 - 2026-10-16 · D08 «Aparte» se reemplazó por la versión vigente de la sesión de Agencia de Medios: «¿Cómo pago medios y fee? Por separado.» (L08-cobro, blob 9f8a17d1…), con el antetítulo de Voice (`e-D08.json`).
 - 2026-10-16 · CC3 (BTL) rehecha con más impacto («Muchísimo más impacto visual acá»): mosaico a sangre de nueve fotos de activación de BRÍO, una por servicio, generadas en lote con `gpt-image-2.5-sunburst` high 1024² sobre las referencias de BRÍO (≈ USD 0,47). Fotos y prompts en `channel-commerce/btl/`.
 - 2026-10-16 · CC1: la lata gigante de aluminio se leía irreal («recrear una lata gigante en aluminio… es como irreal»). Ahora la activación está construida como una producción de verdad: bar en dos contenedores marítimos pintados de azul, un sol de LED de cuatro metros montado en truss, refrigeradores con latas, luces de evento y bruma. El texto bajó al piso de la plaza para no tapar a la gente. La v1 queda como `channel-commerce/brio-activacion-plaza-v1-lata-gigante.png`.
+
+## 2026-10-16 · Índice y versión corta
+
+- **CC2 (trade marketing) con más impacto.** Ahora es una foto de una góndola de BRÍO que alguien audita con el
+  teléfono. Encima lleva selecciones al estilo AXIS: «Ejecución OK», «Quiebre de stock · Prioridad 1» y «Frenteo
+  incompleto · Prioridad 2», más la lista priorizada del ciclo. Los seis servicios quedan como lista. La foto es
+  `channel-commerce/brio-gondola-auditoria.png` y su prompt; costó ≈ USD 0,06.
+- **Índice.** La lámina 04 (la órbita) queda como estaba, a pedido del operador: «la 4 me gustaba», y sus esferas
+  siguen enlazando a las cinco portadas. Después va **IDX «Todo el recorrido»**, un índice con número de página
+  donde cada fila enlaza a su sección en el PDF.
+  - `armar-indice.mjs <dirLaminas>` renderiza el índice con las páginas reales y deja `.indice.json`.
+  - `build-pdf.mjs [dirLaminas] [salida.pdf]` agrega los enlaces de V04 y de IDX.
+- **Versión larga:** 85 láminas, `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`.
+- **Versión corta:** 25 láminas, `Efeonce-Brochure-Agencia-de-Marketing-360-Corto.pdf`, armada con
+  `armar-corto.cjs`. Sigue el mismo hilo, con una o dos pruebas por línea:
+  - Intro: Main, V02, V03, V04, IDX y QSM.
+  - Engine: C01, V06 y BIC.
+  - Brand: C02, K13 y CC1.
+  - Voice: C03 y D03.
+  - Revenue: C04, R19 y ANM.
+  - Growth: C05 e INSG.
+  - Cómo lo vives: V17 y V18.
+  - La prueba: S25.
+  - Cómo empiezas: S30, S32 y S33.
+- Enlaces verificados en las dos versiones. Larga: V04 → 7/22/39/54/64; IDX → 6/7/22/36/39/54/64/72/79/82.
+  Corta: V04 → 7/10/13/15/18; IDX → 6/7/10/12/13/15/18/20/22/23.
+- Ambos PDF están en OneDrive (Brochures/2026/Agencia de Marketing 360).

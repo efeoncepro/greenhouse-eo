@@ -20,24 +20,29 @@ const card = (n, t, d) => `<div style="box-sizing:border-box;padding:26px 28px;b
 <div style="font-family:${ID};font-size:22px;font-weight:300;color:${ACC}">${n}</div>
 <div style="margin-top:10px;font-family:${ID};font-size:28px;font-weight:740;letter-spacing:-0.02em;line-height:1.05;color:#fff">${t}</div>
 <div style="margin-top:10px;font-family:${ST};font-size:17px;font-weight:300;line-height:1.4;color:#cfe0f3">${d}</div></div>`;
+const sel = (x, y, w, h, t, sub, c, up = false) => `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;box-sizing:border-box;border:2px dashed ${c};border-radius:4px;box-shadow:0 0 0 1px rgba(0,26,51,0.35)">${[[-6, -6], [w - 6, -6], [-6, h - 6], [w - 6, h - 6]].map(([a, b]) => `<span style="position:absolute;left:${a - 1}px;top:${b - 1}px;width:10px;height:10px;background:#fff;border:1px solid #001a33"></span>`).join('')}<div style="position:absolute;left:-2px;top:${up ? -46 : h + 10}px;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;background:${c === '#ffffff' ? '#ffffff' : c};color:${c === '#ffffff' ? '#001a33' : '#fff'};font-family:${ST};font-size:15px;font-weight:600">${t}<span style="font-weight:400;opacity:0.85">· ${sub}</span></div></div>`;
 const BTL = [['b1-sala.png', 'Activaciones en sala'], ['b2-impulso.png', 'Promotoría e impulso'], ['b3-exhibicion.png', 'Visual merchandising'], ['b4-roadshow.png', 'Roadshow y tour de marca'], ['b5-street.png', 'Street marketing y sampling'], ['b6-popup.png', 'Pop-up y espacios efímeros'], ['b7-patrocinio.png', 'Activación de patrocinios'], ['b8-feria.png', 'Ferias y exposiciones'], ['b9-canal.png', 'Encuentros de canal']];
 const pages = {
   CC1: `<div style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#001a33"><img src="file://${FOTO}" style="position:absolute;inset:0;width:1920px;height:1080px;object-fit:cover">
 <div style="position:absolute;left:140px;top:112px;width:760px">${eb('02 · Te recuerdan · Channel &amp; Commerce')}${q('¿Y fuera de la pantalla?')}${title('Te viven', 168)}</div>
 <div style="position:absolute;left:140px;top:740px;width:420px">${body('Activaciones, pop-ups, roadshows y sampling que ponen tu marca en la mano de la gente, medidos desde antes de abrir.', 420).replace('margin-top:36px;', '')}</div>
 <div style="position:absolute;left:320px;top:1000px;font-family:${ST};font-size:13px;font-weight:300;color:rgba(255,255,255,0.7)">BRÍO es una marca ficticia.</div>${bub}</div>`,
-  CC2: `<div style="position:relative;width:1920px;height:1080px;overflow:hidden;${stage}">
-<div style="position:absolute;left:140px;top:112px;width:640px">${eb('02 · Te recuerdan · Trade marketing')}${q('¿Qué pasa en tu góndola?')}${title('Lo sabes', 120)}${body('Gobernamos tu inversión en el canal: qué se ejecuta en cada punto de venta, cuánto cuesta y dónde poner el próximo peso.', 540)}
-<div style="margin-top:40px;padding-top:26px;border-top:1px solid rgba(255,255,255,0.18);font-family:${ST};font-size:20px;font-weight:300;line-height:1.45;color:#fff;max-width:540px">Un solo responsable: operamos, validamos cada dato y <b>respondemos también por los proveedores</b>.</div></div>
-<div style="position:absolute;left:860px;top:180px;width:920px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
-${card('01', 'Diagnóstico de canal', 'Qué está roto y en qué orden intervenir.')}
-${card('02', 'Cobertura auditada', 'El estado de cada punto de venta y qué arreglar primero, cada ciclo.')}
-${card('03', 'Tienda perfecta', 'Qué significa «bien ejecutado» en cada canal, antes de medir.')}
-${card('04', 'Promociones medidas', 'Si la promoción vendió de más o se comió tu margen.')}
-${card('05', 'Anaquel digital y IA', 'Cómo se ve tu producto en cada ficha y si la IA lo recomienda.')}
-${card('06', 'Retail media', 'Tu inversión en las cadenas, leída junto a la góndola.')}
+  CC2: `<div style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#001a33">
+<img src="file://${path.resolve(HERE, '../channel-commerce/brio-gondola-auditoria.png')}" style="position:absolute;left:760px;top:-4px;width:1160px;height:1088px;object-fit:cover">
+${sel(1289, 419, 185, 174, 'Quiebre de stock', 'Prioridad 1', ACC)}
+${sel(1364, 732, 238, 178, 'Frenteo incompleto', 'Prioridad 2', ACC, true)}
+${sel(979, 83, 668, 268, 'Ejecución OK', 'Cumple el estándar', '#ffffff')}
+<div style="position:absolute;left:1622px;top:884px;width:276px;box-sizing:border-box;padding:18px 20px;border-radius:14px;background:rgba(0,26,51,0.92);border:1px solid rgba(160,200,255,0.25);box-shadow:0 24px 48px rgba(0,8,20,0.5)">
+<div style="font-family:${ST};font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#9fb6cf">Lista priorizada · este ciclo</div>
+${[['1', 'Reponer el quiebre', ACC], ['2', 'Completar el frenteo', ACC], ['3', 'Mantener la exhibición', '#9fb6cf']].map(([n, t, c]) => `<div style="margin-top:10px;display:flex;align-items:center;gap:12px;font-family:${ST};font-size:16px;color:#fff"><span style="width:24px;height:24px;border-radius:50%;background:${c};color:#001a33;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center">${n}</span>${t}</div>`).join('')}
 </div>
-<div style="position:absolute;left:860px;top:808px;width:920px;display:flex;align-items:center;gap:16px;font-family:${ID};font-size:30px;font-weight:740;letter-spacing:-0.02em;color:#fff"><span style="width:12px;height:12px;border-radius:50%;background:${ACC}"></span>La góndola y lo digital, leídos juntos.</div>${bub}</div>`,
+<div style="position:absolute;left:0;top:0;width:760px;height:1080px;background:radial-gradient(ellipse 620px 520px at 300px 540px, rgba(255,101,0,0.10), rgba(0,26,51,0) 75%)"></div>
+<div style="position:absolute;left:140px;top:112px;width:580px">${eb('02 · Te recuerdan · Trade marketing')}${q('¿Qué pasa en tu góndola?')}${title('Lo sabes', 132)}${body('Cada ciclo ves el estado de cada punto de venta y qué arreglar primero. Gobernamos tu inversión en el canal y respondemos también por los proveedores.', 560)}
+<div style="margin-top:36px;display:grid;grid-template-columns:1fr 1fr;column-gap:24px;row-gap:12px">
+${['Diagnóstico de canal', 'Cobertura auditada', 'Tienda perfecta', 'Promociones medidas', 'Anaquel digital y IA', 'Retail media'].map((t, i) => `<div style="display:flex;align-items:baseline;gap:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.14)"><span style="font-family:${ID};font-size:16px;font-weight:300;color:${ACC}">${String(i + 1).padStart(2, '0')}</span><span style="font-family:${ID};font-size:21px;font-weight:700;letter-spacing:-0.01em;color:#fff">${t}</span></div>`).join('')}
+</div>
+<div style="margin-top:34px;display:flex;align-items:center;gap:14px;font-family:${ID};font-size:28px;font-weight:740;letter-spacing:-0.02em;color:#fff"><span style="width:12px;height:12px;border-radius:50%;background:${ACC}"></span>La góndola y lo digital, leídos juntos.</div></div>
+<div style="position:absolute;left:320px;top:1000px;font-family:${ST};font-size:13px;font-weight:300;color:rgba(255,255,255,0.7)">BRÍO es una marca ficticia. Ejemplo ilustrativo.</div>${bub}</div>`,
   CC3: `<div style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#001a33">
 <div style="position:absolute;left:800px;top:0;width:1120px;height:1080px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px">
 ${BTL.map(([f, t], i) => `<div style="position:relative;overflow:hidden"><img src="file://${path.resolve(HERE, '../channel-commerce/btl/' + f)}" style="width:100%;height:100%;object-fit:cover;display:block"><div style="position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;background:rgba(0,26,51,0.86)"><span style="font-family:${ID};font-size:16px;font-weight:300;color:${ACC}">${String(i + 1).padStart(2, '0')}</span><span style="font-family:${ID};font-size:19px;font-weight:700;letter-spacing:-0.01em;color:#fff">${t}</span></div></div>`).join('')}
