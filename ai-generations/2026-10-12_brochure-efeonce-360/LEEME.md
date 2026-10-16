@@ -192,3 +192,22 @@ Fuente: `native-growth/channel-commerce.mjs`. Los enlaces de V04 se verificaron 
   Corta: V04 → 7/10/13/15/18; IDX → 6/7/10/12/13/15/18/20/22/23.
 - Ambos PDF están en OneDrive (Brochures/2026/Agencia de Marketing 360).
 - 2026-10-16 · Se sacó el caso BICECORP a pedido del operador (queda fuera del recorrido en el canvas, sin borrar). Larga: 84 láminas, Engine cierra con Berel. Corta: el caso Berel ocupa su lugar y sigue en 25. Índices re-renderizados y enlaces verificados (larga IDX → 6/7/21/35/38/53/63/71/78/81; corta sin cambios de página).
+
+## 2026-10-16 · Caso Berel con la cubeta épica
+
+El operador pidió reemplazar la foto del caso Berel por una cubeta abierta de la que salen los contenidos del blog,
+usando material real de OneDrive. El método: generar, componer lo determinístico y que el modelo dé el acabado.
+
+1. **Base.** `gpt-image-2.5-sunburst` high a 1536×1344 genera la cubeta Insignia abierta, con cintas de pintura en la
+   paleta de Berel. La referencia es el producto oficial `INSIGNIA 19L_WEB.png` de
+   `Squad Berel/Workspace Oficial/02_Recursos/03_Producto PNG/` (`prompt-base.txt`).
+2. **Composición.** `comp.mjs` pone encima las piezas reales del blog de octubre (`04_Entregables/05. Articulos
+   Octubre/`): tres portadas y dos stories, con borde y sombra.
+3. **Acabado.** El modelo integra luz, brillo y gotas (`prompt-acabado.txt`).
+4. **Reposición.** `reponer.cjs` vuelve a poner el contenido exacto de cada pieza: busca el desplazamiento del modelo
+   (≤ 4 px) y corrige sólo la media de color.
+5. **Montaje.** `montar.cjs` reemplaza sólo la foto a la derecha de la curva del panel. El chip «Búsqueda» se volvió a
+   dibujar encima.
+
+Costo ≈ USD 0,12. Los archivos intermedios quedan en `caso-berel/`. Se rearmaron las dos versiones del PDF; los
+enlaces se verificaron.
