@@ -11,7 +11,8 @@ y packs de medios. [Landing](.claude/skills/efeonce-public-site-wordpress/refere
 [LEEME](ai-generations/2026-10-13_brochure-agencia-medios/LEEME.md).
 Pendiente: envío real del form (HubSpot + GA4 `generate_lead`), casilla de novedades sin suscripción HubSpot, Rich
 Results/GSC. Operador 2026-10-16: rebates nunca al cliente (regla vigente en todo); «programática secundaria de
-Medios» confirmada (PDR-025/022). Commits locales, sin push.
+Medios» confirmada (PDR-025/022). Schema: cinco países + catálogo + `about`; sitio: Yoast «Efeonce», `og:locale`
+`es_LA` (mu-plugin). Commits locales, sin push.
 
 ## 2026-10-16 — GTM: drift con mecanismo (web + servidor) y auditoría brand-visibility
 

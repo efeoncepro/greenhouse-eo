@@ -486,3 +486,13 @@ Pipe secrets through stdin. Do not pass secrets as command args or write them to
 - When using WP-CLI remotely, prefer the wrapper:
   `pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12`.
 - Use `wp kinsta cache purge --all` after live WordPress mutations.
+
+## Identidad SEO del sitio (2026-10-16)
+
+Decisión del operador: Yoast `website_name` = «Efeonce» y `alternate_website_name` = «Efeonce Group» (nodo `WebSite`
+del schema y `og:site_name`); tagline «Agencia de Inbound y Loop Marketing» sin «&» (WordPress lo guarda escapado y
+Yoast lo volvía a escapar en el schema); `og:locale` = `es_LA` por el mu-plugin versionado
+`wp-content/mu-plugins/efeonce-og-locale.php` (el idioma de WordPress sigue en `es_ES`). Script:
+`scripts/public-website/set-site-identity-seo.php`, snapshot `_gh_site_identity_seo_before_20261016_193457`.
+El tagline conserva el posicionamiento viejo: cambiarlo es decisión del operador.
+
