@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Performance · Anuncios en IA",
+    "question": "¿Y los anuncios en ChatGPT?",
+    "answer": [
+      "Preparados"
+    ]
+  },
+  "body": "Donde ChatGPT ya tiene anuncios, como México y Brasil, los operamos; en Chile dejamos listas tus intenciones, landings y medición.",
+  "steps": [
+    {
+      "glyph": "ia",
+      "kicker": "México y Brasil",
+      "name": "Campañas"
+    },
+    {
+      "glyph": "busqueda",
+      "kicker": "Chile",
+      "name": "Intenciones"
+    },
+    {
+      "glyph": "web",
+      "kicker": "Destino",
+      "name": "Landings"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "En tu sitio",
+      "name": "Medición"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT15-ejecutivos-sesion.png",
+    "alt": "Una persona de Efeonce con hoodie sostiene una tarjeta de luz con una respuesta mientras una ejecutiva la mira por sobre su hombro"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "El anuncio va bajo la respuesta, rotulado como patrocinado."
+}

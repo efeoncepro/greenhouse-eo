@@ -1,12 +1,90 @@
-{"document":"brochure","line":"voice","slides":[
-{"recipeId":"cover-brochure-line-voice","plateRef":"ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png"},
-{"recipeId":"decision-difference"},
-{"recipeId":"content-bullets"},
-{"recipeId":"proposal-cinematic-creative","plateRef":"ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT7-paid-social.png","purpose":"performance marketing, layout service con línea voice (no hay receta proposal-cinematic de Voice en el catálogo)"},
-{"recipeId":"content-text"},
-{"recipeId":"content-bullets"},
-{"recipeId":"method-waves"},
-{"recipeId":"content-text"},
-{"recipeId":"method-staircase-flat"},
-{"recipeId":"decision-next-steps"},
-{"recipeId":"close-brochure-orbit"}]}
+{
+ "document": "brochure",
+ "line": "voice",
+ "slides": [
+  {
+   "recipeId": "cover-brochure-line-voice",
+   "plateRef": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png"
+  },
+  {
+   "recipeId": "decision-difference"
+  },
+  {
+   "recipeId": "method-surround-cycle",
+   "purpose": "L03 hecha a mano (órbita de los cinco frentes), patrón de la V04 del brochure 360"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT20-social-search.png",
+   "purpose": "Search · layout service en línea Voice (no hay variante cine de Voice en el catálogo)"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT7-paid-social.png",
+   "purpose": "Social · layout service en línea Voice (no hay variante cine de Voice en el catálogo)"
+  },
+  {
+   "recipeId": "decision-traffic-to-revenue"
+  },
+  {
+   "recipeId": "decision-provider-fit"
+  },
+  {
+   "recipeId": "decision-ai-market"
+  },
+  {
+   "recipeId": "method-surround-cycle"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT15-ejecutivos-sesion.png",
+   "purpose": "Anuncios en IA · layout service en línea Voice (no hay variante cine de Voice en el catálogo)"
+  },
+  {
+   "recipeId": "method-waves"
+  },
+  {
+   "recipeId": "content-text"
+  },
+  {
+   "recipeId": "content-bullets"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT24-ia-universo.png",
+   "purpose": "pDOOH · layout service en línea Voice (no hay variante cine de Voice en el catálogo)"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT9b-voz-ejecutiva.png",
+   "purpose": "Audiencias · layout service en línea Voice (no hay variante cine de Voice en el catálogo)"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT10-social-sistema.png",
+   "purpose": "Cómo se compra · layout service en línea Voice (no hay variante cine de Voice en el catálogo)"
+  },
+  {
+   "recipeId": "decision-provider-fit",
+   "purpose": "G4 hecha a mano (muro de inventario con lente)"
+  },
+  {
+   "recipeId": "content-measure-formulas"
+  },
+  {
+   "recipeId": "method-waves"
+  },
+  {
+   "recipeId": "content-text"
+  },
+  {
+   "recipeId": "method-staircase-flat"
+  },
+  {
+   "recipeId": "decision-next-steps"
+  },
+  {
+   "recipeId": "close-brochure-orbit"
+  }
+ ]
+}

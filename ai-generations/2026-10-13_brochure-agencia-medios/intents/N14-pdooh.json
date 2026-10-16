@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Programática · pDOOH",
+    "question": "¿Mi marca en la calle?",
+    "answer": [
+      "A la vista"
+    ]
+  },
+  "body": "Pantallas digitales de exterior e interior compradas por ubicación, horario y audiencia, con prueba de emisión en cada plan.",
+  "steps": [
+    {
+      "glyph": "ubicacion",
+      "kicker": "Dónde",
+      "name": "Ubicaciones"
+    },
+    {
+      "glyph": "reloj",
+      "kicker": "Cuándo",
+      "name": "Horarios"
+    },
+    {
+      "glyph": "objetivo",
+      "kicker": "A quién",
+      "name": "Audiencia"
+    },
+    {
+      "glyph": "checklist",
+      "kicker": "Evidencia",
+      "name": "Prueba de emisión"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG2-pantallas-de-la-calle.png",
+    "alt": "Isabella en una pasarela sobre una avenida de noche, mientras las pantallas digitales de la calle se encienden una tras otra"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Una reproducción no es una persona única ni una visita."
+}

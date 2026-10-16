@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Measurement &amp; Analytics</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#cfe4fa}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: #001a33; color: #ffffff; font-family: 'Poppins', system-ui, sans-serif;">
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0;">
+    <defs>
+      <radialGradient id="stageM" cx="1300" cy="560" r="900" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#3d86d8" stop-opacity="0.28"></stop>
+        <stop offset="0.35" stop-color="#3d86d8" stop-opacity="0.10"></stop>
+        <stop offset="1" stop-color="#3d86d8" stop-opacity="0"></stop>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#stageM)"></rect>
+    <defs><linearGradient id="floorX" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"></stop><stop offset="1" stop-color="#000814" stop-opacity="0.55"></stop></linearGradient></defs>
+    <rect x="0" y="778" width="1920" height="302" fill="url(#floorX)"></rect>
+  </svg>
+  <div style="position: absolute; left: 760px; top: 120px; width: 1100px; height: 760px; transform: perspective(2400px) rotateY(-12deg) rotateX(6deg); transform-origin: 20% 50%; border-radius: 20px; background: rgba(0, 26, 51, 0.92); border: 1px solid rgba(166, 205, 245, 0.32); box-sizing: border-box; padding: 28px 30px; display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 700;">Performance · sitio y campañas</div>
+      <div style="margin-left: auto; padding: 6px 12px; border-radius: 9999px; border: 1px solid rgba(166, 205, 245, 0.32); font-size: 13px; color: #cfe4fa;">Últimos 90 días</div>
+      <div style="padding: 6px 12px; border-radius: 9999px; background: rgba(3, 117, 219, 0.22); font-size: 13px; font-weight: 600;">Datos de muestra</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;">
+      <div style="padding: 16px 18px; border-radius: 14px; background: rgba(207, 228, 250, 0.06); border: 1px solid rgba(207, 228, 250, 0.14);">
+        <div style="font-size: 13px; color: #cfe4fa;">Sesiones calificadas</div>
+        <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 40px; font-weight: 700; margin-top: 4px;">18.420</div>
+      </div>
+      <div style="position: relative; padding: 16px 18px; border-radius: 14px; background: #f7f8f6; color: #023c70;">
+        <div style="font-size: 13px; font-weight: 600;">Conversiones a lead</div>
+        <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 40px; font-weight: 700; margin-top: 4px;">1.268</div>
+        <div aria-hidden="true" style="position: absolute; inset: -9px; border: 2px dashed #a6cdf5;"></div>
+        <span aria-hidden="true" style="position: absolute; left: -15px; top: -15px; width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; right: -15px; top: -15px; width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; left: -15px; bottom: -15px; width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; right: -15px; bottom: -15px; width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; left: calc(50% - 6px); top: -15px; width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; left: calc(50% - 6px); bottom: -15px; width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; left: -15px; top: calc(50% - 6px); width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+        <span aria-hidden="true" style="position: absolute; right: -15px; top: calc(50% - 6px); width: 12px; height: 12px; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      </div>
+      <div style="padding: 16px 18px; border-radius: 14px; background: rgba(207, 228, 250, 0.06); border: 1px solid rgba(207, 228, 250, 0.14);">
+        <div style="font-size: 13px; color: #cfe4fa;">Costo por lead</div>
+        <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 40px; font-weight: 700; margin-top: 4px;">US$ 14</div>
+      </div>
+      <div style="padding: 16px 18px; border-radius: 14px; background: rgba(207, 228, 250, 0.06); border: 1px solid rgba(207, 228, 250, 0.14);">
+        <div style="font-size: 13px; color: #cfe4fa;">Eventos validados</div>
+        <div style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 40px; font-weight: 700; margin-top: 4px;">98 %</div>
+      </div>
+    </div>
+    <div style="flex: 1; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; min-height: 0;">
+      <div style="border-radius: 14px; background: rgba(207, 228, 250, 0.05); border: 1px solid rgba(207, 228, 250, 0.14); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 14px; font-weight: 600;">Leads por semana · por canal</div>
+        <svg viewBox="0 0 600 300" style="width: 100%; flex: 1;" aria-hidden="true">
+          <g stroke="rgba(207,228,250,0.12)" stroke-width="1"><line x1="0" y1="60" x2="600" y2="60"></line><line x1="0" y1="130" x2="600" y2="130"></line><line x1="0" y1="200" x2="600" y2="200"></line><line x1="0" y1="270" x2="600" y2="270"></line></g><g font-family="Poppins, system-ui, sans-serif" font-size="13" fill="#cfe4fa" fill-opacity="0.75"><text x="0" y="54">150</text><text x="0" y="124">100</text><text x="0" y="194">50</text><text x="0" y="264">0</text><text x="40" y="294">Sem 1</text><text x="190" y="294">Sem 4</text><text x="340" y="294">Sem 8</text><text x="530" y="294">Sem 12</text></g>
+          <path d="M 0 250 C 60 240, 100 230, 150 210 S 250 190, 300 160 S 400 120, 450 95 S 550 60, 600 40 L 600 270 L 0 270 Z" fill="#3d86d8" fill-opacity="0.18"></path>
+          <path d="M 0 250 C 60 240, 100 230, 150 210 S 250 190, 300 160 S 400 120, 450 95 S 550 60, 600 40" fill="none" stroke="#3d86d8" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M 0 262 C 80 258, 150 252, 220 244 S 360 230, 430 222 S 540 212, 600 206" fill="none" stroke="#a6cdf5" stroke-opacity="0.7" stroke-width="3" stroke-dasharray="8 8"></path>
+        </svg>
+        <div style="display: flex; gap: 22px; font-size: 13px; color: #cfe4fa;"><span>— Este trimestre</span><span>- - Trimestre anterior</span></div>
+      </div>
+      <div style="border-radius: 14px; background: rgba(207, 228, 250, 0.05); border: 1px solid rgba(207, 228, 250, 0.14); padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-size: 14px; font-weight: 600;">Atribución del lead</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+          <div><div style="display: flex; justify-content: space-between;"><span>Search pagado</span><span>41 %</span></div><div style="height: 10px; border-radius: 6px; background: rgba(207,228,250,0.12); margin-top: 6px;"><div style="width: 62%; height: 10px; border-radius: 6px; background: #3d86d8;"></div></div></div>
+          <div><div style="display: flex; justify-content: space-between;"><span>Social pagado</span><span>25 %</span></div><div style="height: 10px; border-radius: 6px; background: rgba(207,228,250,0.12); margin-top: 6px;"><div style="width: 38%; height: 10px; border-radius: 6px; background: #3d86d8; opacity: 0.75;"></div></div></div>
+          <div><div style="display: flex; justify-content: space-between;"><span>Programática</span><span>20 %</span></div><div style="height: 10px; border-radius: 6px; background: rgba(207,228,250,0.12); margin-top: 6px;"><div style="width: 30%; height: 10px; border-radius: 6px; background: #a6cdf5; opacity: 0.7;"></div></div></div>
+          <div><div style="display: flex; justify-content: space-between;"><span>Directo y orgánico</span><span>14 %</span></div><div style="height: 10px; border-radius: 6px; background: rgba(207,228,250,0.12); margin-top: 6px;"><div style="width: 21%; height: 10px; border-radius: 6px; background: #a6cdf5; opacity: 0.5;"></div></div></div>
+        </div>
+        <div style="margin-top: auto; padding: 10px 12px; border-radius: 10px; background: rgba(3,117,219,0.16); font-size: 13px;">GA4 + GTM · capa de datos validada</div>
+      </div>
+    </div>
+  </div>
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0;">
+    <g transform="translate(1230 288) scale(2)"><path d="M 0 0 L 32 13 L 19 18 L 14 33 Z" fill="#5d50ff"></path></g>
+  </svg>
+  <div style="position: absolute; left: 1300px; top: 340px; padding: 8px 18px; border-radius: 12px; background: #5d50ff; font-size: 24px; font-weight: 700;">Cliente</div>
+  <div style="position: absolute; left: 140px; top: 112px; font-size: 18px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff;">Performance · Measurement &amp; Analytics</div>
+  <div style="position: absolute; left: 136px; top: 170px; width: 600px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 112px; font-weight: 760; letter-spacing: -0.04em; line-height: 0.9; font-variation-settings: 'opsz' 96;">Un número en el que confiar<span aria-hidden="true" style="display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.04em; border-radius: 9999px; background: {{accent}};"></span></div>
+  <div style="position: absolute; left: 140px; top: 600px; width: 540px; display: flex; flex-direction: column;">
+    <div style="border-top: 1px solid rgba(207, 228, 250, 0.22); padding: 9px 0; display: grid; grid-template-columns: 52px minmax(0,1fr); font-size: 20px;"><span style="font-weight: 300; color: #cfe4fa;">01</span><span style="font-weight: 600;">Auditoría de medición<span style="display: block; margin-top: 2px; font-size: 14px; font-weight: 400; letter-spacing: 0.02em; color: #cfe4fa;">Measurement Audit</span></span></div>
+    <div style="border-top: 1px solid rgba(207, 228, 250, 0.22); padding: 9px 0; display: grid; grid-template-columns: 52px minmax(0,1fr); font-size: 20px;"><span style="font-weight: 300; color: #cfe4fa;">02</span><span style="font-weight: 600;">Datos en orden para medir<span style="display: block; margin-top: 2px; font-size: 14px; font-weight: 400; letter-spacing: 0.02em; color: #cfe4fa;">Tagging &amp; Data Layer</span></span></div>
+    <div style="border-top: 1px solid rgba(207, 228, 250, 0.22); padding: 9px 0; display: grid; grid-template-columns: 52px minmax(0,1fr); font-size: 20px;"><span style="font-weight: 300; color: #cfe4fa;">03</span><span style="font-weight: 600;">Implementación de GA4 y GTM<span style="display: block; margin-top: 2px; font-size: 14px; font-weight: 400; letter-spacing: 0.02em; color: #cfe4fa;">GTM / GA4 Implementation</span></span></div>
+    <div style="border-top: 1px solid rgba(207, 228, 250, 0.22); padding: 9px 0; display: grid; grid-template-columns: 52px minmax(0,1fr); font-size: 20px;"><span style="font-weight: 300; color: #cfe4fa;">04</span><span style="font-weight: 600;">Tableros y atribución<span style="display: block; margin-top: 2px; font-size: 14px; font-weight: 400; letter-spacing: 0.02em; color: #cfe4fa;">Dashboard &amp; Attribution</span></span></div>
+    <div style="border-top: 1px solid rgba(207, 228, 250, 0.22); border-bottom: 1px solid rgba(207, 228, 250, 0.22); padding: 9px 0; display: grid; grid-template-columns: 52px minmax(0,1fr); font-size: 20px;"><span style="font-weight: 300; color: #cfe4fa;">05</span><span style="font-weight: 600;">Análisis mensual de resultados<span style="display: block; margin-top: 2px; font-size: 14px; font-weight: 400; letter-spacing: 0.02em; color: #cfe4fa;">Analytics Operations</span></span></div>
+  </div>
+  <div style="position: absolute; left: 1060px; top: 960px; font-size: 14px; color: #cfe4fa;">Maqueta ilustrativa · datos de muestra</div>
+  <img src="file:///Users/jreye/Documents/greenhouse-eo/node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" style="position: absolute; left: 140px; bottom: 52px; width: 162px; height: 38px;">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#f83902","options":["#0375db","#36c8bf","#ff6500","#f83902"]},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#f83902' };
+  }
+}
+</script>
+</body>
+</html>

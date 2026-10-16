@@ -422,7 +422,7 @@
               "id": "voice",
               "questionId": "question",
               "answerId": "answer",
-              "answerText": "A quien importa"
+              "answerText": "A tu cliente"
             },
             {
               "kind": "url-bubble",
@@ -448,7 +448,7 @@
               "targetId": "answer",
               "anchor": "top-end",
               "label": "Cliente",
-              "participantKind": "department"
+              "participantKind": "role"
             }
           ]
         },
@@ -540,7 +540,7 @@
     "eyebrow": "Performance marketing",
     "question": "¿A quién le llega mi pauta?",
     "answer": [
-      "A quien importa"
+      "A tu cliente"
     ],
     "answerSphere": "closes-last-line",
     "body": "Search, social, video y retail media operados para que los algoritmos trabajen con mejores señales, creatividad y objetivos de negocio.",

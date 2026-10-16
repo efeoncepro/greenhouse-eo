@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Cómo se cobra",
+    "question": "¿Cómo pago medios y fee?",
+    "answer": [
+      "Aparte"
+    ]
+  },
+  "body": "Ves por un lado lo que inviertes en medios y por otro nuestro fee: sin porcentajes ocultos ni comisiones fuera de tu contrato.",
+  "steps": [
+    {
+      "glyph": "finanzas",
+      "kicker": "Fee fijo",
+      "name": "Por campaña o mes"
+    },
+    {
+      "glyph": "medios",
+      "kicker": "Medios",
+      "name": "Al costo"
+    },
+    {
+      "glyph": "contrato",
+      "kicker": "Comisiones",
+      "name": "Sólo si se pactan"
+    },
+    {
+      "glyph": "informe",
+      "kicker": "Reporte",
+      "name": "Gasto conciliado"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG6-aparte.png",
+    "alt": "Isabella separa con la punta de los dedos dos cubos de vidrio sobre una mesa: uno lleno de luz, el otro con un solo punto naranja"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Impuestos y costos externos se detallan en cada propuesta."
+}

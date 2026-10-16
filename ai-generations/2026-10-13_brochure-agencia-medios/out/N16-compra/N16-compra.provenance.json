@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "6038c7424a239b103edfb85389b95e7290aca0a3bf6ea40bcb286800126c2376",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:PG4-la-puja-que-rinde",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG4-la-puja-que-rinde.png",
+      "sha256": "cb477e351b5f793ce547e181e332b089a30c0fe16d9188c5f091a5812e4863cf"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

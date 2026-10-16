@@ -33,7 +33,7 @@
         },
         "voice": {
           "question": "¿A quién le llega mi pauta?",
-          "answer": "A quien importa",
+          "answer": "A tu cliente",
           "eyebrow": "Performance marketing"
         },
         "body": "Search, social, video y retail media operados para que los algoritmos trabajen con mejores señales, creatividad y objetivos de negocio.",
@@ -63,7 +63,7 @@
         "selection": {
           "label": "Cliente",
           "anchor": "top-end",
-          "participantKind": "department",
+          "participantKind": "role",
           "scale": 1.2
         }
       },

@@ -1,44 +1,651 @@
 {
   "v": 3,
-  "createdOnFiles": { "v": 1, "at": "2026-10-13T12:20:00Z" },
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-13T12:20:00Z"
+  },
   "title": "Brochure Agencia de Medios Efeonce",
-  "launch": { "view": "canvas" },
+  "launch": {
+    "view": "canvas"
+  },
   "pages": [],
   "boards": {
-    "Main.dc.html": { "x": 0, "y": 0, "w": 1920, "h": 1080, "title": "01 · Portada · ¿Dónde invierto? Donde rinde." },
-    "L02-diferencia.dc.html": { "x": 2000, "y": 0, "w": 1920, "h": 1080, "title": "02 · La diferencia · ¿Otra agencia de medios? Una operación." },
-    "L03-frentes.dc.html": { "x": 4000, "y": 0, "w": 1920, "h": 1080, "title": "03 · Oferta integral · ¿Qué hace mi agencia de medios? Todo el ciclo." },
-    "L04-performance.dc.html": { "x": 6000, "y": 0, "w": 1920, "h": 1080, "title": "04 · Performance marketing · ¿A quién le llega mi pauta? A quien importa." },
-    "L05-programatica.dc.html": { "x": 0, "y": 1440, "w": 1920, "h": 1080, "title": "05 · Programática · ¿Y fuera de search y social? También." },
-    "L06-formatos.dc.html": { "x": 2000, "y": 1440, "w": 1920, "h": 1080, "title": "06 · Programática · Formatos · ¿En qué pantallas aparezco? Donde mira." },
-    "L07-rutas.dc.html": { "x": 4000, "y": 1440, "w": 1920, "h": 1080, "title": "07 · Programática · Cómo se contrata · Por una campaña." },
-    "L08-cobro.dc.html": { "x": 6000, "y": 1440, "w": 1920, "h": 1080, "title": "08 · Cómo se cobra · ¿Cómo pago medios y agencia? Aparte." },
-    "L09-medicion.dc.html": { "x": 0, "y": 2880, "w": 1920, "h": 1080, "title": "09 · Medición · ¿Cómo sé qué funcionó? Con evidencia." },
-    "L10-siguiente.dc.html": { "x": 2000, "y": 2880, "w": 1920, "h": 1080, "title": "10 · Próximos pasos · ¿Por dónde empiezo? Hablemos." },
-    "L11-contraportada.dc.html": { "x": 4000, "y": 2880, "w": 1920, "h": 1080, "title": "11 · Contraportada · ¿Conversamos? Cuando quieras." }
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "01 · Portada · ¿Dónde invierto? Donde rinde."
+    },
+    "IX-indice.dc.html": {
+      "x": 2000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "02 · Índice · Lo que vas a ver."
+    },
+    "L02-diferencia.dc.html": {
+      "x": 4000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "03 · La diferencia · ¿Otra agencia de medios? Una operación."
+    },
+    "L03-frentes.dc.html": {
+      "x": 6000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "04 · Oferta integral · ¿Qué hace mi agencia de medios? Todo el ciclo."
+    },
+    "R0-recorrido.dc.html": {
+      "x": 0,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "05 · El recorrido · ¿Qué vamos a ver? Seis preguntas."
+    },
+    "R1-capitulo.dc.html": {
+      "x": 0,
+      "y": 2840,
+      "w": 1920,
+      "h": 1080,
+      "title": "06 · Capítulo 01 · El cambio · ¿Qué cambió en la pauta? Las reglas."
+    },
+    "P5-ahora.dc.html": {
+      "x": 2000,
+      "y": 2840,
+      "w": 1920,
+      "h": 1080,
+      "title": "07 · 2026 · ¿Por qué revisar mi pauta ahora? Cambió."
+    },
+    "P3-senal.dc.html": {
+      "x": 4000,
+      "y": 2840,
+      "w": 1920,
+      "h": 1080,
+      "title": "08 · Señal · ¿Dónde termina mi pauta? En ventas."
+    },
+    "P4-motions.dc.html": {
+      "x": 6000,
+      "y": 2840,
+      "w": 1920,
+      "h": 1080,
+      "title": "09 · Cómo operamos · ¿Qué optimiza mi pauta? Lo que vendes."
+    },
+    "R2-capitulo.dc.html": {
+      "x": 0,
+      "y": 4480,
+      "w": 1920,
+      "h": 1080,
+      "title": "10 · Capítulo 02 · Plataformas · ¿Dónde está mi cliente? Donde compra."
+    },
+    "QA-plataformas.dc.html": {
+      "x": 2000,
+      "y": 4480,
+      "w": 1920,
+      "h": 1080,
+      "title": "11 · Plataformas · ¿En qué plataformas pauto? Las justas."
+    },
+    "P1-search.dc.html": {
+      "x": 4000,
+      "y": 4480,
+      "w": 1920,
+      "h": 1080,
+      "title": "12 · Search · ¿Aparezco cuando me buscan? Ahí mismo."
+    },
+    "QB-google.dc.html": {
+      "x": 6000,
+      "y": 4480,
+      "w": 1920,
+      "h": 1080,
+      "title": "13 · Google · ¿Y en Google, qué cambia? La señal."
+    },
+    "L04-performance.dc.html": {
+      "x": 0,
+      "y": 5680,
+      "w": 1920,
+      "h": 1080,
+      "title": "14 · Social · ¿A quién le llega mi pauta? A tu cliente."
+    },
+    "QC-meta.dc.html": {
+      "x": 2000,
+      "y": 5680,
+      "w": 1920,
+      "h": 1080,
+      "title": "15 · Meta · ¿Qué mueve a Meta hoy? La pieza."
+    },
+    "QD-tiktok.dc.html": {
+      "x": 4000,
+      "y": 5680,
+      "w": 1920,
+      "h": 1080,
+      "title": "16 · TikTok · Hecho para TikTok."
+    },
+    "QE-linkedin.dc.html": {
+      "x": 6000,
+      "y": 5680,
+      "w": 1920,
+      "h": 1080,
+      "title": "17 · LinkedIn · Directo al comité."
+    },
+    "QF-selectivos.dc.html": {
+      "x": 0,
+      "y": 6880,
+      "w": 1920,
+      "h": 1080,
+      "title": "18 · Microsoft y X · Microsoft y X, cuando suman."
+    },
+    "P7-ia.dc.html": {
+      "x": 2000,
+      "y": 6880,
+      "w": 1920,
+      "h": 1080,
+      "title": "19 · Anuncios en IA · ¿Y los anuncios en ChatGPT? Preparados."
+    },
+    "R3-capitulo.dc.html": {
+      "x": 0,
+      "y": 8520,
+      "w": 1920,
+      "h": 1080,
+      "title": "20 · Capítulo 03 · Creatividad · ¿Qué le muestro? Lo que rinde."
+    },
+    "QG-formatos.dc.html": {
+      "x": 2000,
+      "y": 8520,
+      "w": 1920,
+      "h": 1080,
+      "title": "21 · Creatividad por plataforma · ¿Una pieza sirve para todo? Se adapta."
+    },
+    "P8-organico.dc.html": {
+      "x": 4000,
+      "y": 8520,
+      "w": 1920,
+      "h": 1080,
+      "title": "22 · Social · ¿Qué pieza pauto? Probado."
+    },
+    "FL-dco.dc.html": {
+      "x": 6000,
+      "y": 8520,
+      "w": 1920,
+      "h": 1080,
+      "title": "23 · Creatividad dinámica · Una pieza, mil versiones."
+    },
+    "R4-capitulo.dc.html": {
+      "x": 0,
+      "y": 10160,
+      "w": 1920,
+      "h": 1080,
+      "title": "24 · Capítulo 04 · Programática · ¿Hasta dónde llego? A todas."
+    },
+    "L05-programatica.dc.html": {
+      "x": 2000,
+      "y": 10160,
+      "w": 1920,
+      "h": 1080,
+      "title": "25 · Programática · ¿Y fuera de search y social? También."
+    },
+    "CN-canales.dc.html": {
+      "x": 4000,
+      "y": 10160,
+      "w": 1920,
+      "h": 1080,
+      "title": "26 · Canales · Los medios que conoces."
+    },
+    "L06-formatos.dc.html": {
+      "x": 6000,
+      "y": 10160,
+      "w": 1920,
+      "h": 1080,
+      "title": "27 · Formatos · ¿En qué pantallas aparezco? Donde mira."
+    },
+    "FA-mapa.dc.html": {
+      "x": 0,
+      "y": 11360,
+      "w": 1920,
+      "h": 1080,
+      "title": "28 · Mapa de formatos · ¿Qué formato uso? Según tu objetivo."
+    },
+    "FB-display.dc.html": {
+      "x": 2000,
+      "y": 11360,
+      "w": 1920,
+      "h": 1080,
+      "title": "29 · Display y rich media · Donde tu cliente lee."
+    },
+    "FC-native.dc.html": {
+      "x": 4000,
+      "y": 11360,
+      "w": 1920,
+      "h": 1080,
+      "title": "30 · Native · Anuncios que se leen."
+    },
+    "FD-video.dc.html": {
+      "x": 6000,
+      "y": 11360,
+      "w": 1920,
+      "h": 1080,
+      "title": "31 · Video online · ¿Dónde se ve mi video? Dentro y fuera."
+    },
+    "FE-ctv.dc.html": {
+      "x": 0,
+      "y": 12560,
+      "w": 1920,
+      "h": 1080,
+      "title": "32 · TV conectada · ¿Y la tele? Conectada."
+    },
+    "FF-audio.dc.html": {
+      "x": 2000,
+      "y": 12560,
+      "w": 1920,
+      "h": 1080,
+      "title": "33 · Audio digital · ¿Y en audio? Al oído."
+    },
+    "G1-pdooh.dc.html": {
+      "x": 4000,
+      "y": 12560,
+      "w": 1920,
+      "h": 1080,
+      "title": "34 · pDOOH · ¿Mi marca en la calle? A la vista."
+    },
+    "FJ-dooh-circuitos.dc.html": {
+      "x": 6000,
+      "y": 12560,
+      "w": 1920,
+      "h": 1080,
+      "title": "35 · DOOH · ¿Qué pantallas de la calle? En tu ruta."
+    },
+    "FK-dooh-dinamico.dc.html": {
+      "x": 0,
+      "y": 13760,
+      "w": 1920,
+      "h": 1080,
+      "title": "36 · DOOH dinámico · ¿Cambia según el momento? Al instante."
+    },
+    "FG-ingame.dc.html": {
+      "x": 2000,
+      "y": 13760,
+      "w": 1920,
+      "h": 1080,
+      "title": "37 · In-game · Tu marca, en el juego."
+    },
+    "FO-retail.dc.html": {
+      "x": 4000,
+      "y": 13760,
+      "w": 1920,
+      "h": 1080,
+      "title": "38 · Retail media · Donde se compra."
+    },
+    "G2-audiencias.dc.html": {
+      "x": 6000,
+      "y": 13760,
+      "w": 1920,
+      "h": 1080,
+      "title": "39 · Audiencias · ¿A quién le muestro? A quien sí."
+    },
+    "G3-compra.dc.html": {
+      "x": 0,
+      "y": 14960,
+      "w": 1920,
+      "h": 1080,
+      "title": "40 · Cómo se compra · ¿Subasta o reserva? La que rinde."
+    },
+    "T-tecnologia.dc.html": {
+      "x": 2000,
+      "y": 14960,
+      "w": 1920,
+      "h": 1080,
+      "title": "41 · Tecnología · Tecnología de primer nivel."
+    },
+    "G4-calidad.dc.html": {
+      "x": 4000,
+      "y": 14960,
+      "w": 1920,
+      "h": 1080,
+      "title": "42 · Calidad y seguridad · ¿Quién cuida dónde aparezco? Nosotros."
+    },
+    "FN-recorrido.dc.html": {
+      "x": 6000,
+      "y": 14960,
+      "w": 1920,
+      "h": 1080,
+      "title": "43 · Una campaña completa · Una campaña, cinco pantallas."
+    },
+    "R5-capitulo.dc.html": {
+      "x": 0,
+      "y": 16600,
+      "w": 1920,
+      "h": 1080,
+      "title": "44 · Capítulo 05 · Medición · ¿Cómo sé si funcionó? Medido."
+    },
+    "QH-senal.dc.html": {
+      "x": 2000,
+      "y": 16600,
+      "w": 1920,
+      "h": 1080,
+      "title": "45 · Señal por plataforma · ¿Qué le mandan a cada una? Tu venta."
+    },
+    "M-medicion.dc.html": {
+      "x": 4000,
+      "y": 16600,
+      "w": 1920,
+      "h": 1080,
+      "title": "46 · Medición · ¿Confío en mis números? Si se miden bien."
+    },
+    "M-measurement.dc.html": {
+      "x": 6000,
+      "y": 16600,
+      "w": 1920,
+      "h": 1080,
+      "title": "47 · Measurement & Analytics · Un número en el que confiar."
+    },
+    "AT-atribucion.dc.html": {
+      "x": 0,
+      "y": 17800,
+      "w": 1920,
+      "h": 1080,
+      "title": "48 · Atribución · ¿Le creo a cada plataforma? A tu CRM."
+    },
+    "G5-medicion.dc.html": {
+      "x": 2000,
+      "y": 17800,
+      "w": 1920,
+      "h": 1080,
+      "title": "49 · Medición por formato · ¿Qué me reportan? Lo que pasó."
+    },
+    "FM-incremental.dc.html": {
+      "x": 4000,
+      "y": 17800,
+      "w": 1920,
+      "h": 1080,
+      "title": "50 · Medición incremental · ¿La campaña sumó de verdad? Lo probamos."
+    },
+    "L09-medicion.dc.html": {
+      "x": 6000,
+      "y": 17800,
+      "w": 1920,
+      "h": 1080,
+      "title": "51 · Medición · ¿Cómo sé qué funcionó? Con evidencia."
+    },
+    "M-insights-graficos.dc.html": {
+      "x": 0,
+      "y": 19000,
+      "w": 1920,
+      "h": 1080,
+      "title": "52 · Reportes · ¿Y si no entiendo los datos? Cada dato, su gráfico."
+    },
+    "M-insights-comite.dc.html": {
+      "x": 2000,
+      "y": 19000,
+      "w": 1920,
+      "h": 1080,
+      "title": "53 · Reportes · ¿Y el PPT del comité? Ya está."
+    },
+    "R6-capitulo.dc.html": {
+      "x": 0,
+      "y": 20640,
+      "w": 1920,
+      "h": 1080,
+      "title": "54 · Capítulo 06 · Trabajar juntos · ¿Cómo es trabajar con ustedes? En vivo."
+    },
+    "X2-equipo.dc.html": {
+      "x": 2000,
+      "y": 20640,
+      "w": 1920,
+      "h": 1080,
+      "title": "55 · Equipo · ¿Quién opera mi pauta? Un squad."
+    },
+    "TC-cuentas.dc.html": {
+      "x": 4000,
+      "y": 20640,
+      "w": 1920,
+      "h": 1080,
+      "title": "56 · Tus cuentas · ¿De quién son las cuentas? Tuyas."
+    },
+    "X4-clientes.dc.html": {
+      "x": 6000,
+      "y": 20640,
+      "w": 1920,
+      "h": 1080,
+      "title": "57 · Clientes · Crecemos con líderes."
+    },
+    "X5-partners.dc.html": {
+      "x": 0,
+      "y": 21840,
+      "w": 1920,
+      "h": 1080,
+      "title": "58 · Partners · Partners oficiales."
+    },
+    "X6-mercados.dc.html": {
+      "x": 2000,
+      "y": 21840,
+      "w": 1920,
+      "h": 1080,
+      "title": "59 · Mercados · Cinco países, un solo equipo."
+    },
+    "P6-etapas.dc.html": {
+      "x": 4000,
+      "y": 21840,
+      "w": 1920,
+      "h": 1080,
+      "title": "60 · Cómo empiezas · ¿Cuánto me comprometo de entrada? Por etapas."
+    },
+    "L07-rutas.dc.html": {
+      "x": 6000,
+      "y": 21840,
+      "w": 1920,
+      "h": 1080,
+      "title": "61 · Cómo se contrata · ¿Por dónde parto con programática? Por una campaña."
+    },
+    "L08-cobro.dc.html": {
+      "x": 0,
+      "y": 23040,
+      "w": 1920,
+      "h": 1080,
+      "title": "62 · Cómo se cobra · ¿Cómo pago medios y fee? Por separado."
+    },
+    "L10-siguiente.dc.html": {
+      "x": 2000,
+      "y": 23040,
+      "w": 1920,
+      "h": 1080,
+      "title": "63 · Próximos pasos · ¿Por dónde empiezo? Hablemos."
+    },
+    "L11-contraportada.dc.html": {
+      "x": 0,
+      "y": 24680,
+      "w": 1920,
+      "h": 1080,
+      "title": "64 · Contraportada · ¿Conversamos? Cuando quieras."
+    },
+    "FH-glosario.dc.html": {
+      "x": 2000,
+      "y": 24680,
+      "w": 1920,
+      "h": 1080,
+      "title": "65 · Glosario · Las siglas, en simple."
+    }
   },
   "order": [
     "Main.dc.html",
+    "IX-indice.dc.html",
     "L02-diferencia.dc.html",
     "L03-frentes.dc.html",
+    "R0-recorrido.dc.html",
+    "R1-capitulo.dc.html",
+    "P5-ahora.dc.html",
+    "P3-senal.dc.html",
+    "P4-motions.dc.html",
+    "R2-capitulo.dc.html",
+    "QA-plataformas.dc.html",
+    "P1-search.dc.html",
+    "QB-google.dc.html",
     "L04-performance.dc.html",
+    "QC-meta.dc.html",
+    "QD-tiktok.dc.html",
+    "QE-linkedin.dc.html",
+    "QF-selectivos.dc.html",
+    "P7-ia.dc.html",
+    "R3-capitulo.dc.html",
+    "QG-formatos.dc.html",
+    "P8-organico.dc.html",
+    "FL-dco.dc.html",
+    "R4-capitulo.dc.html",
     "L05-programatica.dc.html",
+    "CN-canales.dc.html",
     "L06-formatos.dc.html",
+    "FA-mapa.dc.html",
+    "FB-display.dc.html",
+    "FC-native.dc.html",
+    "FD-video.dc.html",
+    "FE-ctv.dc.html",
+    "FF-audio.dc.html",
+    "G1-pdooh.dc.html",
+    "FJ-dooh-circuitos.dc.html",
+    "FK-dooh-dinamico.dc.html",
+    "FG-ingame.dc.html",
+    "FO-retail.dc.html",
+    "G2-audiencias.dc.html",
+    "G3-compra.dc.html",
+    "T-tecnologia.dc.html",
+    "G4-calidad.dc.html",
+    "FN-recorrido.dc.html",
+    "R5-capitulo.dc.html",
+    "QH-senal.dc.html",
+    "M-medicion.dc.html",
+    "M-measurement.dc.html",
+    "AT-atribucion.dc.html",
+    "G5-medicion.dc.html",
+    "FM-incremental.dc.html",
+    "L09-medicion.dc.html",
+    "M-insights-graficos.dc.html",
+    "M-insights-comite.dc.html",
+    "R6-capitulo.dc.html",
+    "X2-equipo.dc.html",
+    "TC-cuentas.dc.html",
+    "X4-clientes.dc.html",
+    "X5-partners.dc.html",
+    "X6-mercados.dc.html",
+    "P6-etapas.dc.html",
     "L07-rutas.dc.html",
     "L08-cobro.dc.html",
-    "L09-medicion.dc.html",
     "L10-siguiente.dc.html",
-    "L11-contraportada.dc.html"
+    "L11-contraportada.dc.html",
+    "FH-glosario.dc.html"
   ],
   "notes": {
-    "t1": { "x": 0, "y": -300, "text": "Acto 1 · La agencia de medios: portada, diferencia, oferta integral y performance", "kind": "title1", "maxW": 7920 },
-    "t2": { "x": 0, "y": 1140, "text": "Acto 2 · Publicidad programática: qué es, formatos, cómo se contrata y cómo se cobra", "kind": "title1", "maxW": 7920 },
-    "t3": { "x": 0, "y": 2580, "text": "Acto 3 · Medición y cierre", "kind": "title1", "maxW": 5920 },
-    "n1": { "x": 8200, "y": 0, "w": 560, "fill": "teal", "text": "Cómo está hecho: cada lámina es una receta aprobada del catálogo de deck, compuesta con pnpm brand:compose (línea Voice, uso brochure). Intents, plan validado y PNG en ai-generations/2026-10-13_brochure-agencia-medios/. Para cambiar un texto se edita el intent y se vuelve a componer." },
-    "n2": { "x": 8200, "y": 620, "w": 560, "fill": "orange", "text": "Pares nuevos que necesitan tu aprobación: «¿Otra agencia de medios? Una operación.», «¿Qué hace mi agencia de medios? Todo el ciclo.», «¿Y fuera de search y social? También.», «¿En qué pantallas aparezco? Donde mira.», «¿Por dónde parto con programática? Por una campaña.», «¿Cómo pago medios y agencia? Aparte.», «¿Cómo sé qué funcionó? Con evidencia.», «¿Por dónde empiezo? Hablemos.». Aprobados que se reutilizan: portada Voice, «A quien importa» y la contraportada." },
-    "n3": { "x": 8200, "y": 1440, "w": 560, "fill": "blue", "text": "Programática, según la ficha comercial aprobada el 2026-10-09: no se nombran proveedores tecnológicos, no hay precios (la propuesta muestra sólo el alcance y precio de cada cliente) y no se promete ROAS, ventas ni alcance. Los formatos no están habilitados en todos los mercados: se confirma por campaña. «Comisiones sólo si están en tu contrato» resume la política de rebates declarados; conviene que Finance y Legal la lean antes de imprimir." },
-    "n4": { "x": 8200, "y": 2200, "w": 560, "fill": "blue", "text": "Fotos: la portada usa el plate aprobado de la línea Voice (LN4) y Performance usa CT7 (paid social), que ya salió en el brochure 360 y en el deck de contenidos. No hay todavía una foto propia de programática ni de pDOOH; si quieres una lámina de cine para programática, hay que producir el plate." },
-    "n5": { "x": 8200, "y": 2880, "w": 560, "fill": "gray", "text": "Fuera de esta primera versión: creadores e influencia, PR, retail media en detalle, casos y logos de clientes (sólo con autorización archivada), equipo y mercados. La lámina de próximos pasos trae fechas de muestra." }
+    "t1": {
+      "x": 0,
+      "y": -300,
+      "text": "Apertura · La agencia y el recorrido",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t2": {
+      "x": 0,
+      "y": 2540,
+      "text": "Capítulo 01 · El cambio",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t3": {
+      "x": 0,
+      "y": 4180,
+      "text": "Capítulo 02 · Plataformas",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t4": {
+      "x": 0,
+      "y": 8220,
+      "text": "Capítulo 03 · Creatividad",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t5": {
+      "x": 0,
+      "y": 9860,
+      "text": "Capítulo 04 · Programática",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t6": {
+      "x": 0,
+      "y": 16300,
+      "text": "Capítulo 05 · Medición",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t7": {
+      "x": 0,
+      "y": 20340,
+      "text": "Capítulo 06 · Trabajar juntos",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "t8": {
+      "x": 0,
+      "y": 24380,
+      "text": "Cierre y anexo",
+      "kind": "title1",
+      "maxW": 7920
+    },
+    "n1": {
+      "x": 8200,
+      "y": 0,
+      "w": 560,
+      "fill": "teal",
+      "text": "Cómo está hecho: casi todas las láminas son recetas aprobadas del catálogo de deck, compuestas con pnpm brand:compose (línea Voice, uso brochure). Hechas a mano, con el mismo lenguaje que la V04 del brochure 360: la Oferta integral (órbita de los cinco frentes), Calidad y seguridad, Probado (rehecha el 2026-10-16: la versión recoloreada mezclaba naranja oscuro con restos de teal), las de Performance por plataforma y las de formatos, DOOH, retail, creatividad dinámica, medición incremental, campaña completa y glosario. Señal y 2026 vienen de recetas del deck SEO/AEO que traen fijo el acento Growth: se recolorearon al naranja Voice (regla del 2026-10-15). Todo en ai-generations/2026-10-13_brochure-agencia-medios/."
+    },
+    "n2": {
+      "x": 8200,
+      "y": 4480,
+      "w": 560,
+      "fill": "orange",
+      "text": "Pares nuevos para tu aprobación: «¿Aparezco cuando me buscan? Ahí mismo.», «¿Dónde termina mi pauta? En ventas.», «¿Qué optimiza mi pauta? Lo que vendes.», «¿Por qué revisar mi pauta ahora? Cambió.», «¿Qué contenido pauto? Probado.», «¿Y los anuncios en ChatGPT? Preparados.», «¿Cuánto me comprometo de entrada? Por etapas.», «¿Mi marca en la calle? A la vista.», «¿A quién le muestro? A quien sí.», «¿Subasta o reserva? La que rinde.», «¿Quién cuida dónde aparezco? Nosotros.», «¿Qué me reportan de cada formato? Lo que pasó.», «¿Qué formato uso? Según tu objetivo.», «¿Dónde se ve un banner? Donde lees.», «¿Un anuncio que se lee? Native.», «¿Dónde se ve mi video? Dentro y fuera.», «¿Y la tele del living? Conectada.», «¿Y quien sólo escucha? Lo oye.», «¿Mi marca dentro de un juego? En juego.», «¿Y todas estas siglas? Aquí van.», «¿Qué pantallas de la calle? En tu ruta.», «¿Cambia según el momento? Al instante.», «¿Y dónde compran? Al comprar.», «¿Una pieza para cada uno? Variantes.», «¿La campaña sumó de verdad? Lo probamos.», «¿Cómo se ve todo junto? Así.», «¿En qué plataformas pauto? Las justas.», «¿Y en Google, qué cambia? La señal.», «¿Qué mueve a Meta hoy? La pieza.», «¿Sirve TikTok para mi marca? Hecho ahí.», «¿Cómo llego al comité? Por cuenta.», «¿Y Microsoft o X? Si suman.», «¿Una pieza sirve para todo? Se adapta.», «¿Qué le mandan a cada una? Tu venta.», además de los del primer envío."
+    },
+    "n3": {
+      "x": 8200,
+      "y": 2840,
+      "w": 560,
+      "fill": "blue",
+      "text": "Revisar antes de imprimir: la lámina 2026 cita la Ley 21.719 (rige el 1-12-2026) como flujos de datos listos para revisión legal, no como asesoría; los datos de Meta y Google son de la ficha de Performance (2026-09-10). Probado («lo orgánico prueba, la pauta escala») figura en la ficha como método por validar. Anuncios en IA dice que hay anuncios en ChatGPT en México y Brasil y no en Chile (ficha, 2026-09-10): reconfirmar a la fecha de envío. Performance por plataforma (2026-10-16): estados core/selectivo/a pedido según la ficha de Performance (2026-09-10); TikTok sólo con producción nativa; X sólo a pedido con verificación de terceros; AI Max reemplaza en febrero de 2027. «Andara» (LinkedIn) es una marca B2B de ejemplo inventada, como Nórtica; los nombres del formulario son ficticios. Las interfaces de Feed, Stories, Reels, video vertical y feed profesional son genéricas, no copian el diseño de ninguna plataforma; los isotipos son los oficiales de AXIS. «¿Le creo a cada plataforma? A tu CRM.» usa cifras ilustrativas (270 contra 150 ventas, US$ 15.000) y lo dice al pie."
+    },
+    "n4": {
+      "x": 8200,
+      "y": 10160,
+      "w": 560,
+      "fill": "blue",
+      "text": "Programática según la ficha aprobada el 2026-10-09: no se nombran proveedores tecnológicos, no hay precios y no se promete ROAS, ventas ni alcance. Los formatos y audiencias se confirman por campaña y mercado. «Comisiones sólo si están en tu contrato» (Cómo se cobra) conviene que la lean Finance y Legal. Las láminas de formatos, DOOH, retail y la campaña completa muestran anuncios de «Nórtica», una marca de ejemplo inventada para la narrativa: no es un cliente ni existe; se rotula como ejemplo en cada lámina. Tiene identidad propia para que los anuncios se vean reales: símbolo N con punta al norte, condensada itálica y lima eléctrico como color de firma (sólo dentro de sus anuncios; el naranja sigue siendo de Efeonce). Creatividad dinámica y Medición incremental no estaban en la ficha del 2026-10-09: se sumaron por decisión del 2026-10-16; confirmar alcance con Performance. Retail media requiere acceso a venta y catálogo (ficha de Performance). El gráfico de Medición incremental es ilustrativo, sin datos reales. Tecnología (2026-10-16, a pedido del operador): nombra Basis, Display & Video 360, IAS y DoubleVerify aunque la ficha de programática (2026-10-09) pide no nombrar proveedores en material para clientes; se rotula como tecnología con la que se opera, no como alianza (sin acuerdo firmado no se comunica como partnership). DV360 no figura en las fichas: confirmar. IAS y DoubleVerify figuran como verificación por definir. Faltan logos oficiales de Basis, DV360, IAS y DoubleVerify (hoy fichas de texto). Canales (2026-10-16): medios e inventario tomados de basis.com (All Channel Activation e Integrations, consultado el 2026-10-16); son de Basis, mayormente de EE.UU.: confirmar disponibilidad en cada mercado de LATAM. Logos monocromos de simple-icons/AXIS; Hulu, ESPN, Forbes, Peacock y DIRECTV van en texto por falta de logo oficial en la biblioteca. Registro de partnerships: Basis «sin claim de partnership», por eso dice «nuestra tecnología de compra» y «no son alianzas de Efeonce»."
+    },
+    "n5": {
+      "x": 8200,
+      "y": 11360,
+      "w": 560,
+      "fill": "blue",
+      "text": "Fotos de los actos 2 y 3 (2026-10-16): ocho fotos de cine nuevas con Isabella, la persona del elenco para Voice (PG1 a PG8; la de TV conectada se amplió y lleva el spot de ejemplo compuesto en la pantalla y terminado por el modelo (sólo vidrio, marco y luz; ai:inpaint verificó la zona protegida bit a bit); en ai-generations/2026-10-13_brochure-agencia-medios/fotos/), producidas con foto:prompt + cine-reviewer + foto:generar: luz fría de Efeonce con un solo punto naranja por foto. Resto: portada LN4; Search CT20; Social CT7; Anuncios en IA CT15. La etiqueta «Cliente» se revisó en cada lámina: no tapa ninguna cara. Las escenas de la calle, la tienda, el juego, los teléfonos, el bus y el laptop son fotos generadas con los anuncios de ejemplo compuestos en perspectiva y terminados por el modelo (sólo luz y material); donde el modelo alteró el logotipo se repuso el anuncio exacto. En Meta, el reflejo de los teléfonos en la mesa se generó espejando el contenido real de cada pantalla."
+    },
+    "n6": {
+      "x": 8200,
+      "y": 20640,
+      "w": 560,
+      "fill": "gray",
+      "text": "Fuera de esta versión: creadores e influencia, PR, retail media en detalle, casos y logos de clientes (sólo con autorización archivada), equipo y mercados. La lámina de próximos pasos trae fechas de muestra. Medición y reportes (Si se miden bien; Un número en el que confiar, del deck web; Cada dato, su gráfico; Ya está) vienen del brochure 360 de EO Group, recompuestos en Voice y con métricas de performance de ejemplo."
+    },
+    "n7": {
+      "x": 8200,
+      "y": 21840,
+      "w": 560,
+      "fill": "orange",
+      "text": "Trabajar juntos (2026-10-16), revisar antes de enviar: (1) Casos (lámina retirada del capítulo 06 el 2026-10-16 a pedido del operador; queda el contenido por si vuelve): Sky está autorizado por el operador para nombrarse; el caso Travel Sale (MET-1530, marzo 2026) es creatividad para el equipo de Performance de Sky, no gestión de pauta. Bresler «+180 % ventas digitales» sale del caso publicado sin período: confirmar fuente y autorización. No hay casos de pauta con cifras documentados. (2) Clientes: logos del catálogo; la autorización archivada de cada logo sigue pendiente (TASK-1937); la cifra «+120 empresas» es el proof point del context pack (09_marca-agencia: «120+ empresas en 4 países»); «+90» no tiene fuente y no se usa. (3) Partners: HubSpot Gold (readback 2026-10-06, repetir antes de enviar) y Salesforce Partner (autorizado 2026-09-29); Adobe, AWS, Microsoft AI Cloud, Claude, OpenAI y BytePlus declarados por el operador (tier e insignias pendientes de readback); Google Cloud va como «registrado», no como claim pleno; Google, Meta, TikTok, LinkedIn, Microsoft Ads, X, Basis y Real Audiences NO son partnerships: van como «plataformas donde operamos». (4) Equipo: roles, sin nombres; nadie del roster tiene hoy rol de medios y el elenco ficticio nunca se muestra como equipo. (5) La lámina «Lo que vives» se retiró el 2026-10-16 a pedido del operador. (6) Tecnología: DV360 y The Trade Desk confirmados por el operador el 2026-10-16. El avión de la lámina de casos es el montaje del PNG oficial de Sky sobre un cielo generado (deck de contenidos C12): revisar las restricciones de uso de la librea antes de enviar a prospectos."
+    },
+    "n8": {
+      "x": 8200,
+      "y": 1200,
+      "w": 560,
+      "fill": "teal",
+      "text": "Hilo conductor (2026-10-16): seis preguntas en el orden en que se las hace un comprador de medios. «El recorrido» las muestra en una órbita; cada capítulo abre con la misma órbita con su estación encendida, lo recorrido en naranja y lo que viene tenue. 01 El cambio (por qué revisar ahora) → 02 Plataformas (dónde está tu cliente) → 03 Creatividad (qué le muestras) → 04 Programática (hasta dónde llegas) → 05 Medición (cómo sabes que funcionó) → 06 Trabajar juntos (cómo es, quiénes, con quién, cómo empezar). El glosario queda como anexo después de la contraportada. Índice (lámina 02): en el PDF cada capítulo y acceso directo es un vínculo a su página."
+    }
   },
   "designSystems": [
     {

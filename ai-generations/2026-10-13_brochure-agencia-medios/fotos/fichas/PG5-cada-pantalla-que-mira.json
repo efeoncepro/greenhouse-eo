@@ -1,0 +1,43 @@
+{
+  "id": "PG5-cada-pantalla-que-mira",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark modern home at night with a huge window over the city): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 77 % of the frame width and her shoulder nearest the left never further left than 62 %; between the left edge of the frame and her body there is a wide band of empty darkness. She is lifting a smartphone in her hand to chest height at the exact moment the screens of the house light up together; the phone's screen faces her, away from the camera, we see only the cool light it throws on her face. Her head stays almost frontal and her eyes look down at the phone, a warm smile. Behind her, all inside the right 55 % of the frame and progressively farther, the same campaign glows as a flat field of cool light on an open laptop on a table about one meter behind, a large connected TV on the wall four meters behind, and through the window a giant digital screen on a far building. Only the phone is sharp; the laptop, the TV and the far screen are progressively softer and out of focus, never linked by lines. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows on the giant screen of the far building, through the window, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no beams, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "the cool glow of the phone screen in her hand",
+    "tamano": "a phone screen, about 15 cm",
+    "lado": "below and to the camera-right of her face",
+    "distancia": "about 35 cm from her face"
+  },
+  "fondo": "the far city through the window melted into cold round bokeh",
+  "fenomeno": {
+    "que": "the same campaign glows on a phone, a laptop, a TV and a city screen at four depths",
+    "esServicio": "Formatos: display, video, TV conectada y pantallas, una sola campaña"
+  },
+  "lecho": {
+    "objeto": "the dark matte back of a sofa close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

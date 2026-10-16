@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Programática · Audiencias",
+    "question": "¿A quién le muestro?",
+    "answer": [
+      "A quien sí"
+    ]
+  },
+  "body": "Ubicación, horario, contexto, datos propios y retargeting: cada campaña combina las señales que de verdad describen a quien te compra.",
+  "steps": [
+    {
+      "glyph": "ubicacion",
+      "kicker": "Geográfica",
+      "name": "Ciudad o radio"
+    },
+    {
+      "glyph": "contenido",
+      "kicker": "Contextual",
+      "name": "Temas afines"
+    },
+    {
+      "glyph": "base-de-datos",
+      "kicker": "Datos propios",
+      "name": "Con permiso"
+    },
+    {
+      "glyph": "republicar",
+      "kicker": "Retargeting",
+      "name": "Volver a impactar"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG3-a-quien-si.png",
+    "alt": "Isabella frente a una multitud a oscuras de la que un haz de luz elige sólo a tres personas"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Cada señal se confirma por campaña, según inventario y mercado."
+}

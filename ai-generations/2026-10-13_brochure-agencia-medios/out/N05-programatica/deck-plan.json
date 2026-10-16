@@ -1,0 +1,73 @@
+{
+  "tenderId": "N05-programatica",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 311,
+          "answerPx": 176,
+          "bodyTop": 538,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:PG1-una-compra-todas-las-pantallas",
+          "alt": "Isabella, especialista de medios de Efeonce, en una azotea de noche: de un nudo de luz sobre su palma sale un haz que se reparte en cuatro pantallas de la ciudad"
+        },
+        "voice": {
+          "question": "¿Y fuera de search y social?",
+          "answer": "También",
+          "eyebrow": "Publicidad programática"
+        },
+        "body": "Compra programática para llegar a tu audiencia en los medios y pantallas que sí mira: sitios, streaming, audio y la calle.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:web-voice-dark-44",
+            "kicker": "Sitios y apps",
+            "name": "Display y native"
+          },
+          {
+            "icon": "asset-ref:icon:multimedia-voice-dark-44",
+            "kicker": "Streaming",
+            "name": "Video y CTV"
+          },
+          {
+            "icon": "asset-ref:icon:medios-voice-dark-44",
+            "kicker": "Podcasts y radio",
+            "name": "Audio digital"
+          },
+          {
+            "icon": "asset-ref:icon:ubicacion-voice-dark-44",
+            "kicker": "En la calle",
+            "name": "pDOOH"
+          }
+        ],
+        "note": "Cada formato se confirma por campaña y mercado.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

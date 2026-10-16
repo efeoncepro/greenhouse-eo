@@ -1,0 +1,73 @@
+{
+  "tenderId": "N20-cobro",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 311,
+          "answerPx": 176,
+          "bodyTop": 538,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:PG6-aparte",
+          "alt": "Isabella separa con la punta de los dedos dos cubos de vidrio sobre una mesa: uno lleno de luz, el otro con un solo punto naranja"
+        },
+        "voice": {
+          "question": "¿Cómo pago medios y fee?",
+          "answer": "Aparte",
+          "eyebrow": "Cómo se cobra"
+        },
+        "body": "Ves por un lado lo que inviertes en medios y por otro nuestro fee: sin porcentajes ocultos ni comisiones fuera de tu contrato.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:finanzas-voice-dark-44",
+            "kicker": "Fee fijo",
+            "name": "Por campaña o mes"
+          },
+          {
+            "icon": "asset-ref:icon:medios-voice-dark-44",
+            "kicker": "Medios",
+            "name": "Al costo"
+          },
+          {
+            "icon": "asset-ref:icon:contrato-voice-dark-44",
+            "kicker": "Comisiones",
+            "name": "Sólo si se pactan"
+          },
+          {
+            "icon": "asset-ref:icon:informe-voice-dark-44",
+            "kicker": "Reporte",
+            "name": "Gasto conciliado"
+          }
+        ],
+        "note": "Impuestos y costos externos se detallan en cada propuesta.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

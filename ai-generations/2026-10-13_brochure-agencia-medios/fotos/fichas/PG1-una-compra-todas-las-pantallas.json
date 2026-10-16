@@ -1,0 +1,43 @@
+{
+  "id": "PG1-una-compra-todas-las-pantallas",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark rooftop above a Latin American city at night): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 80 % of the frame width, her whole body and both arms inside the right 40 % of the frame, her shoulder nearest the left never further left than 64 %, the knot of light above her palm at about 70 % of the frame width; between the left edge of the frame and her body there is a wide band of empty darkness. She looks straight into the lens with a bright, confident smile, her left hand open at chest height on the camera-right side of her body, her other arm relaxed at her side, at the exact moment a compact knot of cool white light hovering above that palm releases ONE fine cool white-blue beam. A few meters behind her the beam splits into exactly FOUR fine beams, all behind her and inside the right 55 % of the frame: ONE ends on a smartphone in an anonymous hand on a balcony about 15 m away on the right, ONE on a connected TV through a dark window farther behind her right shoulder, ONE on a bus-stop screen in the street far below at the bottom right, ONE on a giant billboard on a far building, high on the right. All four screens are far, small and soft out of focus; only the origin of the beam is sharp. Haze catches the beams. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows at the very core of the knot of light above her palm, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no beams, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "a compact knot of cool white light above her open left palm",
+    "tamano": "about 10 cm across",
+    "lado": "below and to the camera-right of her face, at chest height",
+    "distancia": "about 35 cm from her face"
+  },
+  "fondo": "the far city lights and windows melted into cold round bokeh",
+  "fenomeno": {
+    "que": "one cool beam from her palm splits and reaches four different screens across the city",
+    "esServicio": "Programática: una compra lleva tu marca a cada pantalla que mira tu audiencia"
+  },
+  "lecho": {
+    "objeto": "the dark matte concrete parapet edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Performance · Search",
+    "question": "¿Aparezco cuando me buscan?",
+    "answer": [
+      "Ahí mismo"
+    ]
+  },
+  "body": "Search, Performance Max, Demand Gen y YouTube conectados a tu señal de negocio: apareces cuando te buscan y pagas por lo que vende.",
+  "steps": [
+    {
+      "glyph": "buscador",
+      "kicker": "Google y Microsoft",
+      "name": "Search"
+    },
+    {
+      "glyph": "multimedia",
+      "kicker": "YouTube",
+      "name": "Video"
+    },
+    {
+      "glyph": "seguridad",
+      "kicker": "Tu marca",
+      "name": "Exclusiones"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "Tu negocio",
+      "name": "Señal de venta"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT20-social-search.png",
+    "alt": "Una persona de Efeonce con hoodie junto a una barra de búsqueda de luz azul de la que caen resultados"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "La inversión en medios va en una línea aparte."
+}

@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "method",
+  "recipe": "method-surround-cycle",
+  "voice": {
+    "eyebrow": "Performance · Social",
+    "question": "¿Qué pieza pauto?",
+    "answer": [
+      "Probado"
+    ]
+  },
+  "body": "Lo orgánico prueba y la pauta escala: publicamos versiones, leemos cuál retiene y ponemos **presupuesto** en las que ganan.",
+  "startLabel": "Empieza aquí",
+  "stations": [
+    {
+      "icon": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/publicar.png",
+      "title": "Publicar",
+      "description": "Varias versiones de cada idea en orgánico, con ganchos distintos."
+    },
+    {
+      "icon": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/leer.png",
+      "title": "Leer",
+      "description": "Cuál retiene de verdad: tiempo de vista, guardados y comentarios."
+    },
+    {
+      "icon": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/pautar.png",
+      "title": "Pautar",
+      "description": "Presupuesto a las piezas elegidas, con la razón registrada."
+    },
+    {
+      "icon": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/aprender.png",
+      "title": "Aprender",
+      "description": "Lo que la pauta enseña vuelve al calendario editorial."
+    }
+  ],
+  "core": {
+    "title": "Tu contenido",
+    "caption": "mejora en cada vuelta"
+  }
+}

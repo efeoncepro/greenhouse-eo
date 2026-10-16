@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Programática · Compra",
+    "question": "¿Subasta o reserva?",
+    "answer": [
+      "La que rinde"
+    ]
+  },
+  "body": "Subasta abierta, mercados privados o compra garantizada: entre miles de pujas por segundo, elegimos la que rinde por objetivo y costo.",
+  "steps": [
+    {
+      "glyph": "medios",
+      "kicker": "RTB",
+      "name": "Subasta abierta"
+    },
+    {
+      "glyph": "seguridad",
+      "kicker": "PMP",
+      "name": "Mercado privado"
+    },
+    {
+      "glyph": "contrato",
+      "kicker": "PG",
+      "name": "Garantizada"
+    },
+    {
+      "glyph": "reloj",
+      "kicker": "Control",
+      "name": "Pronóstico y pacing"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG4-la-puja-que-rinde.png",
+    "alt": "Isabella sostiene en la palma una sola baldosa de vidrio encendida, tomada de un muro de miles de pujas"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Precio y entrega asegurados sólo en acuerdos garantizados."
+}

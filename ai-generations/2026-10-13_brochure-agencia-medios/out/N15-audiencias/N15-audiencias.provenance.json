@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "dfcc053779a0d84a79884c07ad79d2767baf3490261d3f451d32ee66d09ab33b",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:PG3-a-quien-si",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG3-a-quien-si.png",
+      "sha256": "74d50e1a36bea0711c848578fe1418ae7974d9fd1328034214e17bc2444b4ff5"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "4c2be7812988",
+  "key": "4c2be781298859e08a5644467ddb345aaed5d7a23e492b8a032a236e59243522",
+  "status": "completed",
+  "createdAt": "2026-10-16T11:42:27.117Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/bus-comp.png",
+    "imageSha256": "74d5700aa9c597d2209de709807dead9bf0bb118c76d7ba88f3ad6b02b35bddb",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/bus-mask.png",
+    "maskSha256": "b6a055fd6a2889a1a0babcaa46b10000493212bd8c19e0fcc10ed40f0aeb83fb",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Night bus, over-the-shoulder shot. The smartphone screen already shows a FINISHED vertical video advertisement for a fictional running brand. Keep the screen content exactly as it is; do not redraw, retype or restyle anything on it. Only add the physical finish of a real phone screen photographed at night: emitted light under glass with a faint reflection of the bus window, and the screen's light gently illuminating the hand and fingers holding the phone. Same depth of field, focus and grain as the rest. Nothing else changes.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nNight bus, over-the-shoulder shot. The smartphone screen already shows a FINISHED vertical video advertisement for a fictional running brand. Keep the screen content exactly as it is; do not redraw, retype or restyle anything on it. Only add the physical finish of a real phone screen photographed at night: emitted light under glass with a faint reflection of the bus window, and the screen's light gently illuminating the hand and fingers holding the phone. Same depth of field, focus and grain as the rest. Nothing else changes.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.07476806640625,
+    "editable": 117600,
+    "soft": 0,
+    "protected": 1455264
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 37 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0412,
+    "basis": "1 × salida 1536x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 16.295,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.31,
+        "bestError": 1.31,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.3,
+        -0.78,
+        -1.23
+      ],
+      "protected": {
+        "pixels": 1455264,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 117600,
+        "maxDelta": 238,
+        "meanDelta": 16.295,
+        "worst": {
+          "x": 906,
+          "y": 431
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1455264,
+        "maxDelta": 46,
+        "meanDelta": 2.044,
+        "worst": {
+          "x": 711,
+          "y": 250
+        }
+      },
+      "outputUsd": 0.0412,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3327,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 255
+        },
+        "output_tokens": 1372,
+        "output_tokens_details": {
+          "image_tokens": 1372,
+          "text_tokens": 0
+        },
+        "total_tokens": 4699
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

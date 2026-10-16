@@ -1,0 +1,43 @@
+{
+  "id": "PG6-aparte",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a long boardroom on a high floor at night, the table running about 6 m into depth, a glass wall over the night city far behind): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 77 % of the frame width and her shoulder nearest the left never further left than 62 %; between the left edge of the frame and her body there is a wide band of empty darkness. She stands behind the far end of the matte black table. On the table in front of her stand TWO clear glass cubes a hand's width apart, never touching: the larger cube at about 62 % of the frame width, never further left than 58 %, filled with swirling cool white-blue (#0375DB) light particles, the media investment; the smaller cube at about 86 %. With the fingertips of her left hand she slides the smaller cube toward the right edge, caught at the exact moment the two cubes separate; her other arm rests relaxed on the table, the whole arm visible; her eyes look down at the two cubes, an open, honest smile. The cubes stand at the far end of the table near her; the near half of the table is matte and stays in darkness, no reflections of the cubes on it. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows inside the smaller cube, the fee, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no beams, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "the glowing larger glass cube of cool light on the table",
+    "tamano": "a cube about 20 cm per side",
+    "lado": "below and to the camera-left of her face",
+    "distancia": "about 45 cm from her face"
+  },
+  "fondo": "the night city beyond the glass wall melted into cold round bokeh",
+  "fenomeno": {
+    "que": "two separate glass cubes: one full of cool light, the other with a single tiny orange point",
+    "esServicio": "Medios al costo y fee aparte: ves cada peso por separado"
+  },
+  "lecho": {
+    "objeto": "the dark matte near edge of the meeting table close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

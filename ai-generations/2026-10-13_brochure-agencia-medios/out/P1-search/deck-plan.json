@@ -1,0 +1,73 @@
+{
+  "tenderId": "P1-search",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 315,
+          "answerPx": 155,
+          "bodyTop": 515,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CT20-social-search",
+          "alt": "Una persona de Efeonce con hoodie junto a una barra de búsqueda de luz azul de la que caen resultados"
+        },
+        "voice": {
+          "question": "¿Aparezco cuando me buscan?",
+          "answer": "Ahí mismo",
+          "eyebrow": "Performance · Search"
+        },
+        "body": "Search, Performance Max, Demand Gen y YouTube conectados a tu señal de negocio: apareces cuando te buscan y pagas por lo que vende.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:buscador-voice-dark-44",
+            "kicker": "Google y Microsoft",
+            "name": "Search"
+          },
+          {
+            "icon": "asset-ref:icon:multimedia-voice-dark-44",
+            "kicker": "YouTube",
+            "name": "Video"
+          },
+          {
+            "icon": "asset-ref:icon:seguridad-voice-dark-44",
+            "kicker": "Tu marca",
+            "name": "Exclusiones"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-voice-dark-44",
+            "kicker": "Tu negocio",
+            "name": "Señal de venta"
+          }
+        ],
+        "note": "La inversión en medios va en una línea aparte.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

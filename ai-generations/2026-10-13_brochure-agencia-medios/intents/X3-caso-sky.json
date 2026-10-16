@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "light",
+  "use": "brochure",
+  "line": "voice",
+  "role": "decision",
+  "recipe": "decision-case",
+  "voice": {
+    "eyebrow": "Caso · Travel Sale 2026",
+    "question": "¿Lo han hecho antes?",
+    "answer": [
+      "Sí, con Sky"
+    ]
+  },
+  "figures": [
+    {
+      "value": "10 min",
+      "label": "para cambiar precios en 27 piezas",
+      "source": "caso documentado Travel Sale de Sky Airline, marzo de 2026"
+    },
+    {
+      "value": "5",
+      "label": "mercados en la misma campaña",
+      "source": "caso documentado Travel Sale de Sky Airline, marzo de 2026"
+    },
+    {
+      "value": "178",
+      "label": "piezas, 66 de Efeonce",
+      "source": "caso documentado Travel Sale de Sky Airline, marzo de 2026"
+    },
+    {
+      "value": "−25 %",
+      "label": "tiempo total de campaña",
+      "source": "caso documentado Travel Sale de Sky Airline, marzo de 2026"
+    }
+  ],
+  "clientLogo": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+    "alt": "Sky Airline"
+  },
+  "selected": 1,
+  "photo": {
+    "register": "documental",
+    "subject": "object",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png",
+    "alt": "Un Airbus A320neo de Sky asciende sobre un mar de nubes, con el cielo azul del amanecer"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Performance",
+    "participantKind": "department"
+  }
+}

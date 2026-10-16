@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "content",
+  "recipe": "content-measure-formulas",
+  "voice": {
+    "eyebrow": "Programática · Medición",
+    "question": "¿Qué me reportan de cada formato?",
+    "answer": [
+      "Lo que",
+      "pasó"
+    ]
+  },
+  "body": "Cada formato con su unidad, su fuente y su **límite**: una reproducción en una pantalla no es un clic ni una persona.",
+  "note": "Sin cifras de promesa: cada unidad se define en el plan de la campaña",
+  "metrics": [
+    {
+      "glyph": "medicion",
+      "name": "Entrega digital",
+      "formula": "Impresiones, gasto y visibilidad donde se puede medir",
+      "source": "Reportes de la compra",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "ubicacion",
+      "name": "Exposición pDOOH",
+      "formula": "Pantallas, horarios y prueba de emisión",
+      "source": "Dueño de la pantalla",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "swipe",
+      "name": "Respuesta",
+      "formula": "Clics e interacciones donde el formato lo permite",
+      "source": "Compra · GA4",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "embudo",
+      "name": "Conversión",
+      "formula": "Eventos con UTMs, píxel o CRM, sin duplicar",
+      "source": "Tu sitio · tu CRM",
+      "owner": "Tu equipo y Efeonce"
+    },
+    {
+      "glyph": "informe",
+      "name": "Brand lift",
+      "formula": "Estudio de recordación o consideración, si se contrata",
+      "source": "Estudio acordado",
+      "owner": "Efeonce"
+    }
+  ]
+}

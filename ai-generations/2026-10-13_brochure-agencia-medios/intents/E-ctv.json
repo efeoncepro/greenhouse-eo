@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Programática · TV conectada",
+    "question": "¿Y la tele?",
+    "answer": [
+      "Conectada"
+    ]
+  },
+  "body": "Tu spot en las apps de streaming del televisor, comprado por hogar, horario y audiencia, sin pagar la tanda completa.",
+  "steps": [
+    {
+      "glyph": "multimedia",
+      "kicker": "Pantalla",
+      "name": "Smart TV"
+    },
+    {
+      "glyph": "objetivo",
+      "kicker": "Compra",
+      "name": "Por audiencia"
+    },
+    {
+      "glyph": "reloj",
+      "kicker": "Formato",
+      "name": "15 o 30 s"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "Se mide",
+      "name": "Video completado"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG7f-tv-conectada.png",
+    "alt": "Isabella con control remoto en un living de noche; detrás, la familia ve en la TV conectada un spot de una marca de ejemplo"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Marca de ejemplo. Inventario y apps se confirman por mercado."
+}

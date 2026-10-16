@@ -10,13 +10,13 @@
   "recipe": "cover-brochure",
   "layout": "line",
   "voice": {
-    "eyebrow": "Brochure · Agencia de medios",
+    "eyebrow": "Agencia de medios",
     "question": "¿Dónde invierto?",
     "answer": [
       "Donde rinde"
     ]
   },
-  "body": "**Cinco** frentes, una sola responsabilidad:\nEstrategia · Compra · Creatividad\nMedición · Gestión de inversión",
+  "body": "**Una** operación para toda tu inversión:\nSearch · Social · Video · TV conectada · DOOH\nMedida de punta a punta, en cinco países",
   "photo": {
     "register": "cine",
     "subject": "person",
