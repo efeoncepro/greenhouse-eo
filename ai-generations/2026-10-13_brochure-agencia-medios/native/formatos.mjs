@@ -757,21 +757,22 @@ const AXA = 'file:///Users/jreye/Documents/greenhouse-eo/node_modules/@efeoncepr
 
 
 // CN · Canales (como «All systems for any advertising» de basis.com, consultado 2026-10-16: medios en Direct Automation, búsqueda y social,
-// e inventory partners de basis.com/technology/integrations). Logos monocromos: simple-icons y AXIS; sin logo disponible → nombre en texto.
+// e inventory partners de basis.com/technology/integrations). Logos monocromos: simple-icons, AXIS y logotipos oficiales de Wikimedia Commons en logos/terceros/ (Hulu 2018, ESPN, Forbes, Peacock 2026, DIRECTV 2025; 2026-10-16).
 {
   let inner = statement({ eyebrow: 'Programática · Canales', lines: ['Los medios', 'que conoces'], body: 'Con la tecnología con la que compramos llegas a medios, plataformas de streaming, audio y redes que tu cliente usa todos los días, en una sola <b>campaña</b>.' });
   const SI = (n) => `file:///Users/jreye/Documents/greenhouse-eo/node_modules/simple-icons/icons/${n}.svg`;
   const mono = 'filter:brightness(0) invert(1);opacity:0.9';
   const T = [
-    ['txt', 'hulu'], ['si', 'cnn', 'CNN'], ['si', 'twitch', 'Twitch'], ['txt', 'ESPN'], ['si', 'spotify', 'Spotify'],
-    ['si', 'newyorktimes', 'The New York Times'], ['txt', 'Forbes'], ['txt', 'Peacock'], ['si', 'tubi', 'Tubi'], ['txt', 'DIRECTV'],
+    ['lg', 'hulu', 44], ['si', 'cnn', 'CNN'], ['si', 'twitch', 'Twitch'], ['lg', 'espn', 34], ['si', 'spotify', 'Spotify'],
+    ['si', 'newyorktimes', 'The New York Times'], ['lg', 'forbes', 40], ['lg', 'peacock', 38], ['si', 'tubi', 'Tubi'], ['lg', 'directv', 30],
     ['si', 'youtube', 'YouTube'], ['ax', 'instagram-isotype-negative', 'Instagram'], ['ax', 'linkedin-isotype-negative', 'LinkedIn'], ['ax', 'meta-isotype-negative', 'Facebook'], ['ax', 'google-isotype', 'Google']];
   const cw = 196, ch = 130, gx = 880, gy = 150, gap = 0;
   inner += `<div style="position:absolute;left:${gx - 30}px;top:${gy - 30}px;width:${5 * cw + 60}px;height:${3 * ch + 60}px;border-radius:30px;background:radial-gradient(ellipse at 50% 50%,rgba(61,134,216,0.28),rgba(0,26,51,0) 70%)"></div>`;
   T.forEach(([k, a, b], i) => {
     const x = gx + (i % 5) * cw, y = gy + Math.floor(i / 5) * ch;
     let mark = '';
-    if (k === 'txt') mark = `<span style="font-family:${ID};font-size:${a.length > 6 ? 34 : 44}px;font-weight:760;letter-spacing:-0.02em;color:#fff;opacity:0.9">${a}</span>`;
+    if (k === 'lg') mark = `<img src="file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/logos/terceros/${a}.svg" style="height:${b}px;max-width:150px;object-fit:contain;${mono}">`;
+    else if (k === 'txt') mark = `<span style="font-family:${ID};font-size:${a.length > 6 ? 34 : 44}px;font-weight:760;letter-spacing:-0.02em;color:#fff;opacity:0.9">${a}</span>`;
     else if (k === 'si') mark = `<div style="display:flex;align-items:center;gap:10px"><img src="${SI(a)}" style="height:${a === 'cnn' || a === 'tubi' ? 52 : 40}px;${mono}">${a === 'cnn' || a === 'tubi' ? '' : a === 'newyorktimes' ? `<span style="font-family:${ID};font-size:18px;font-weight:760;line-height:1.05;color:#fff;opacity:0.9">The New<br>York Times</span>` : `<span style="font-family:${ID};font-size:26px;font-weight:760;color:#fff;opacity:0.9">${b}</span>`}</div>`;
     else mark = `<div style="display:flex;align-items:center;gap:10px"><img src="${PLAT}/${a}.svg" style="height:36px;${mono}"><span style="font-family:${ID};font-size:24px;font-weight:760;color:#fff;opacity:0.9">${b}</span></div>`;
     inner += `<div style="position:absolute;left:${x}px;top:${y}px;width:${cw}px;height:${ch}px;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,${i % 5 === 4 ? 0 : 0.1});border-bottom:1px solid rgba(255,255,255,${i >= 10 ? 0 : 0.1})">${mark}</div>`;
