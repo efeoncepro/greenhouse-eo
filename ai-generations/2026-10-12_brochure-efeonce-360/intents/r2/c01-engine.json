@@ -11,12 +11,12 @@
   "line": "engine",
   "voice": {
     "eyebrow": "01 · Te encuentran · Engine",
-    "question": "¿Te encuentra la IA?",
+    "question": "¿Te encuentran y te eligen?",
     "answer": [
       "Ahora sí"
     ]
   },
-  "body": "**Cinco** capacidades:\nSearch Visibility · Web Experience · Medición\nSistemas de agentes · Automatización",
+  "body": "**Seis** familias de servicio:\nSearch Visibility 360 · Web Experience 360\nProduct Design 360 · Medición\nSistemas de agentes · Automatización",
   "photo": {
     "register": "cine",
     "subject": "person",
