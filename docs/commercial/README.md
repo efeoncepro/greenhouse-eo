@@ -5,6 +5,7 @@ aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas aut
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
 no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
 
+- Brochure oficial para presentar la agencia completa: «Agencia de Marketing 360°» (aprobado 2026-10-16; 84 láminas y corto de 26) en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Antes de enviarlo afuera: cifras de ANAM y «12 meses» de Berel. [Detalle](../documentation/creative/composicion-de-decks-y-brochures.md#el-brochure-oficial-agencia-de-marketing-360).
 - [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
 
 - [Outreach personalizado del 13/10/2026](follow-up-agent/runs/2026-10-13-outreach-personalizado.md): seis correos enviados por Outlook web con firma gráfica, brochure contextual y actividades HubSpot `SENT`; Rafael excluido. Referencia para próximos primeros contactos y su verificación.

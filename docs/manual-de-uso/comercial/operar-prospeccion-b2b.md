@@ -130,6 +130,8 @@ los pasos e iniciar dentro del permiso. «Procesando» no es cierre: releer cont
 No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respondió. El logging nativo CRM
 se distingue del CCO de Outlook. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
 
+Brochure por defecto para presentar Efeonce completa: el oficial «Agencia de Marketing 360°» (2026-10-16);
+el de una línea, sólo si la señal es de esa línea. Sus pendientes (cifras ANAM, «12 meses» Berel) se revisan antes de enviarlo.
 Verificar versión/ID del brochure en Documentos, además del nombre; si se usa una copia acotada autorizada,
 conservar original y manifiesto privado. Leer cuerpo y calendario finales de la inscripción, porque pueden
 diferir de la plantilla y de la ventana general. Una firma HTML configurada no prueba render en un preview

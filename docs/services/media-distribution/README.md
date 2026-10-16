@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce
 > **Product brand habilitadora:** Reach, cuando aporte tecnología, método o diferenciación
 > **Estado:** `Approved for validation`
-> **Última actualización:** 2026-10-12 (oferta integral de medios; reunión y ruta DSP acompañada) · 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social)
+> **Última actualización:** 2026-10-16 (tramo Voice del brochure oficial «Agencia de Marketing 360°») · 2026-10-12 (oferta integral de medios; reunión y ruta DSP acompañada) · 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social)
 
 ## Propósito
 
@@ -19,6 +19,10 @@ distribución que Efeonce puede ofrecer.
 Este catálogo se basa en el brochure comercial de Reach 2026 (`Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`),
 revisado el 2026-07-26. El brochure es una referencia de alcance; esta ficha es el contrato documental vigente y
 no autoriza por sí sola pricing público, claims, checkout ni venta self-serve.
+
+Desde el 2026-10-16, la línea aparece en el tramo **Voice** («llegas a quien compra») del brochure oficial «Agencia de
+Marketing 360°» (OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`), sin caso propio. Ese brochure presenta la agencia completa; esta
+ficha sigue siendo el contrato de alcance.
 
 ## Resultado que se vende
 

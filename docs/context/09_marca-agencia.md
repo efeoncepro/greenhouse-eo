@@ -346,6 +346,13 @@ Desde el 2026-09-27 (D24) hay una tercera capa, **Plastilina en volumen**: cada 
 inflada (PNG con alfa), sólo para momentos protagonistas —portada, key visual, escenario, merch—, uno por pieza y
 nunca en UI, listas ni decks ([manual §14.1](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)).
 
+**Brochure oficial de la agencia (2026-10-16):** el brochure «Agencia de Marketing 360°» es la presentación canónica
+de la masterbrand: habla siempre Efeonce y recorre las cinco líneas (Engine, Brand con Channel & Commerce, Voice,
+Revenue y Growth) como un solo equipo alrededor de la vuelta del cliente. La lámina de la órbita de cinco líneas sirve
+de índice con enlaces a cada línea. El «360°» del título se sostiene con su mecanismo en las láminas (equipo, primeros
+90 días, día a día en vivo, casos, partners), no como frase suelta. [Catálogo de servicios](../services/README.md) ·
+[norma de composición, delta 2026-10-16 (b)](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+
 ## Identidad en informes
 
 Todos los informes de Efeonce aplican el [estándar de marca y entrega](../operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md): pie institucional, URL bubble oficial, contacto, logos de Efeonce y del cliente cuando corresponda, tipografías de marca y gráficos con evidencia. Los valores se resuelven desde sus fuentes canónicas, sin duplicarlos en este contexto.

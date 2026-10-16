@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.21
+> **Versión:** 1.22
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-15 por Claude (1.21: el caso Sky canónico para todos los decks, uso aprobado de `decision-case`. Antes, 2026-10-10, 1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-16 por Claude (1.22: el brochure oficial «Agencia de Marketing 360°» aprobado por el operador — 84 láminas y corta de 26, armadas en el canvas, sin recetas nuevas; logos de clientes autorizados para ese brochure. Antes, 2026-10-15, 1.21: el caso Sky canónico para todos los decks, uso aprobado de `decision-case`. Antes, 2026-10-10, 1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -467,6 +467,31 @@ aprobadas · 39 campañas · 88 % entregas a tiempo · −25 % tiempo de producc
   historia; `L1-mesa-de-luz` sigue siendo plate de ejemplo de `contact-sheet`.
 - **Condiciones:** el avión es un montaje del PNG oficial de Sky sobre un cielo generado (revisar restricciones de la
   librea antes de enviar a un prospecto) y el logo de Sky depende de la autorización de logos de clientes (TASK-1937).
+  En el brochure oficial «Agencia de Marketing 360°» ya está autorizado (operador, 2026-10-16).
+
+## El brochure oficial «Agencia de Marketing 360°» (aprobado el 2026-10-16)
+
+El brochure oficial de Efeonce: la agencia completa con sus cinco líneas, **84 láminas** y una versión corta de **26**
+para presentar, aprobado por el operador el 2026-10-16 («este es el brochure oficial de la agencia 360° con todos
+nuestros servicios»). Canvas «Brochure Efeonce»:
+[https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3](https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3). PDF en
+OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Fuente:
+`ai-generations/2026-10-12_brochure-efeonce-360/` (`LEEME.md`, con el recorrido y cada cambio).
+
+- **Mixto, armado en el canvas:** láminas compuestas con recetas existentes (por ejemplo `decision-ai-answer`,
+  `decision-traffic-to-revenue`, `content-bullets`) y láminas a mano (la órbita de cinco líneas, el índice, los casos
+  Berel, Sky y ANAM compuestos con piezas reales, las tres de Channel & Commerce). No promueve recetas nuevas; las
+  láminas a mano son candidatas sin promover.
+- **Workaround temporal:** los nueve titulares de la v9 se dibujaron sobre la lámina compuesta con un panel del fondo
+  exacto (`native-growth/titulares-v9.mjs`). Se retira cuando las recetas acepten la voz `decision` (TASK-2012, etapa
+  2) y esas láminas se recompongan desde el compositor.
+- **Navegación con enlaces:** la lámina 04 (la órbita de cinco líneas) enlaza cada esfera a la portada de su línea y la
+  05 es un índice con número de página, cada fila un enlace del PDF (`armar-indice.mjs` + `build-pdf.mjs`). Patrón
+  reutilizable para cualquier brochure largo.
+- **Logos de clientes:** autorizados por el operador para este brochure (2026-10-16), incluidas las piezas de Sky y
+  Berel; biblioteca formal en TASK-1937. **Antes de enviarlo afuera:** cifras de ANAM y el «12 meses» del caso Berel.
+- Recorrido, reglas y pendientes: [norma, delta 2026-10-16 (b)](../EFEONCE_SURFACE_COMPOSITION_V1.md) · oficio de
+  la composición con piezas reales: [casebook cine](../../brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#brochure-agencia-de-marketing-360-2026-10-16--lo-que-aprendimos).
 
 ## Anatomía de una receta (campos del JSON)
 

@@ -171,6 +171,13 @@ uso, adaptaciones incluidas, dependencias del cliente, derechos y change order.
 
 ## Collateral comercial
 
+- **Brochure oficial «Agencia de Marketing 360°»** (84 láminas y versión corta de 26; aprobado por el operador el
+  2026-10-16): presenta la agencia completa. La línea aparece en el tramo **Brand** («te recuerdan»), que cierra con el
+  caso Sky (piezas reales de SKY Campañas compuestas sobre el A320) y suma Channel & Commerce. Usarlo cuando la
+  conversación es por Efeonce entera; los brochures de esta sección, cuando es por la línea. Los logos y las piezas de
+  Sky y Berel están autorizados por el operador **para ese brochure**; esa autorización no cubre por sí sola las
+  cifras ni el testimonio del caso SKY en los brochures de abajo. Detalle:
+  [catálogo de servicios](../README.md).
 - **Brochure «Agencia Creativa»** (27 láminas, 16:9; aprobado por el operador el 2026-10-06,
   [TASK-2013](../../tasks/to-do/TASK-2013-agencia-creativa-brochure-slide-recipe-candidates.md)): el collateral
   vigente de la línea, bajo el paraguas de Agencia Creativa (PDR-004): «Tu equipo dirige. Nosotros producimos a

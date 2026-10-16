@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.6 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-06 por Codex (1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.7 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-16 por Claude (1.7: fallas 44 a 49 del brochure oficial «Agencia de Marketing 360°» — composición generativa con piezas reales del cliente, reponer su contenido exacto, el logo de cliente como vinilo, el punch cinematográfico, la producción creíble, la interfaz de vidrio y la mitad visible de la lámina. Antes, 2026-10-06, por Codex, 1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -92,7 +92,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»; 44–49 en «Brochure Agencia de Marketing 360°»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -400,3 +400,38 @@ Antonio son del elenco ficticio (`EFEONCE_BRAND_CAST_V1.md`). `RG1b` de esta cor
 **Pendientes del brochure que este casebook no resuelve:** la confirmación del caso de las personas del cliente
 (falla 40), el bloque IDENTITY de Julio (falla 38), el campo `mirada` en el compilador (falla 37), y la burbuja
 efeoncepro.com, que sobre fotos casi negras deja ver su recuadro navy (lámina 19 y otras; sin corregir).
+
+## Brochure Agencia de Marketing 360° (2026-10-16) — lo que aprendimos
+
+Las láminas de caso del brochure oficial (Berel, Sky y ANAM) y las de Channel & Commerce, aprobadas por el operador el
+2026-10-16. No son fotos del registro cine con ficha: son **composiciones generativas que llevan piezas reales del
+cliente**, con el mismo criterio de luz y profundidad. Fuente y cada paso en
+`ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md` (`caso-berel/`, `caso-sky/`, `caso-anam/`,
+`channel-commerce/`).
+
+**El método, en cinco pasos.**
+
+1. **Escena.** El modelo (`gpt-image-2.5-sunburst` high) genera la escena con el producto u objeto oficial del
+   cliente como referencia (la cubeta Berel Insignia 19 L; el A320 de Sky) o una escena sin logos (ANAM).
+2. **Piezas reales encima, determinísticas.** Portadas y stories del blog Berel, piezas de SKY Campañas: borde,
+   sombra, rotación y profundidad (lejos chicas y nítidas, cerca grandes y desenfocadas).
+3. **Acabado.** El modelo da luz y material al conjunto.
+4. **Reponer el contenido exacto** de cada pieza nítida, porque el acabado deforma textos y precios: se busca el
+   desplazamiento y se corrige sólo la media de color.
+5. **Logo de cliente en un objeto** (minivan ANAM): el SVG oficial se compone por homografía y se aplica como vinilo
+   con el sombreado real del panel y grano, **sin** pasar por el acabado del modelo.
+
+**Seis fallas nuevas, con su corrección.**
+
+| # | Síntoma | Causa medida | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 44 | **Textos y precios de las piezas reales salen deformados** | El acabado del modelo reinterpreta la tipografía de lo que se le compuso encima (variante de la falla 41) | Reponer el contenido exacto de cada pieza nítida después del acabado: alinear por desplazamiento y corregir sólo la media de color | piezas Berel y Sky | ojo al 100 % sobre cada pieza nítida |
+| 45 | **El logo del cliente sale deformado y corrido** sobre el objeto | El acabado del modelo deformó el símbolo de ANAM y lo desplazó | Logo oficial SVG por homografía, integrado como vinilo con el sombreado real del panel y grano; el modelo no toca el logo. Sin foto del rotulado real de la flota, **sólo el logo**, sin franjas inventadas | minivan ANAM (`homo.cjs`, `vinilo.cjs`, `vinilo2.cjs`) | ojo al 100 % sobre el logo |
+| 46 | **La lámina no tiene punch** (operador: «muchísimo más punch, cinematográfico») | Escena frontal y pareja, sin profundidad | Contraluz, destello, bruma, profundidad y toma baja. Una estela de piezas **ordenada** se rechazó («por cómo queda distribuida no se ve bien»): la distribución es por profundidad, no por grilla | Berel, Sky, ANAM | ojo del operador |
+| 47 | **La producción se ve irreal** (operador: una lata gigante de aluminio en una activación «es irreal») | El modelo escala el producto a escultura | Producción creíble de una activación real: contenedores, truss, sol LED | CC1, BRÍO | ojo del operador |
+| 48 | **La tarjeta de interfaz se ve vieja** (operador: «se ve muy 1995») | Tarjeta blanca plana sobre la foto | Panel de vidrio oscuro con desenfoque de fondo, sprocket 3D, estado «En vivo» y la ruta de pasos (Chat → Agente IA → Ruta Terreno) | caso ANAM | ojo del operador |
+| 49 | **Las piezas quedan bajo el panel de papel** de la lámina | La escena pone el objeto clave en el cuarto izquierdo, donde la curva del panel lo tapa (pariente de las fallas 32 y 36) | Generar la escena con el sujeto u objeto clave fuera del cuarto izquierdo, para que las piezas caigan en la mitad **visible**, a la derecha de la curva | Berel, Sky | superponer la lámina antes del acabado |
+
+**Pendientes que este casebook no resuelve:** las cifras de ANAM (entregadas por el operador, no publicadas por ANAM) y
+el «12 meses» del caso Berel, antes de enviar el brochure afuera. Los logos de clientes están autorizados para este
+brochure (operador, 2026-10-16); la biblioteca formal es TASK-1937.

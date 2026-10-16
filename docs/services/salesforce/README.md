@@ -52,6 +52,11 @@ deletes productivos sin confirmación humana proporcional al riesgo.
 Cada propuesta separa licencia, referral/co-sell, eventual reventa, implementación, migración/integración, managed
 operations, consumo de datos/IA/mensajes e IP propia. Un precio público no es una cotización contractual.
 
+**Collateral para la agencia completa (2026-10-16):** cuando la conversación no es sólo Salesforce, se usa el brochure
+oficial «Agencia de Marketing 360°» (OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`),
+que presenta Revenue dentro de las cinco líneas. El deck de la práctica Salesforce sigue siendo el collateral de esta
+carpeta; el brochure 360 no cambia sus gates de partnership.
+
 ## Ofertas de entrada y expansión
 
 La arquitectura comercial completa —promesa, customer model, fases comprables, carriles de solución, delivery,

@@ -69,6 +69,11 @@ conserva las dos vías aprobadas y la autorización específica de cada envío.
   experiencia autorizada. Evitar elogios genéricos, catálogo completo, promesas de resultados y experiencia
   sectorial/regulatoria no acreditada. Respetar el trabajo que ya realiza el equipo interno.
 - Elegir la versión pertinente del brochure y explicar en el cuerpo qué encontrará y por qué se comparte.
+  Para presentar Efeonce completa, el pertinente es el brochure oficial «Agencia de Marketing 360°» (aprobado
+  el 2026-10-16; versión corta de 26 láminas para conversar, completa de 84 para leer), en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`; si la necesidad es de una sola línea,
+  el brochure de esa línea. Antes de enviar el 360 afuera, revisar sus dos pendientes: cifras de ANAM y el
+  «12 meses» del caso Berel.
   Un enlace sin contexto no cumple. La presencia en OneDrive/HubSpot no valida cifras, casos, derechos o
   compromisos pendientes: revisar el contenido y sus fuentes antes de usarlo. Si el enlace de Documents
   fue creado para otro destinatario, generar uno propio o adjuntar el PDF; no reciclar su atribución.
