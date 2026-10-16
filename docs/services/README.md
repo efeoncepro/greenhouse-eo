@@ -23,6 +23,11 @@ Esta categoría complementa las tres capas documentales obligatorias:
 
 El foco comercial transversal —beachheads, ofertas de entrada, expansión y proof— vive en [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`](../strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md). Las fichas de servicio mantienen el alcance y la accountability; no deben convertirse en un catálogo de adquisición sin buyer, trigger y motion.
 
+**Material comercial oficial de la agencia completa:** el brochure «Agencia de Marketing 360°» (aprobado 2026-10-16;
+completo de 84 láminas y corto de 26), en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`.
+Presenta las cinco líneas y es el documento por defecto cuando se pregunta qué hace Efeonce; no reemplaza las fichas de
+esta carpeta ni define alcance o precio. Detalle: [composición de decks y brochures](../documentation/creative/composicion-de-decks-y-brochures.md).
+
 ## Fronteras
 
 - No es un tarifario. Precios, descuentos y condiciones comerciales pertenecen a propuestas y contratos.

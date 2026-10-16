@@ -3,7 +3,7 @@
 const fs = require('fs'), path = require('path');
 const CORTO = ['Main', 'V02', 'V03', 'V04', 'IDX', 'QSM',
   'C01', 'V06', 'S28',            // Engine: portada, la IA ya recomienda a tu competencia, caso Berel
-  'C02', 'K13', 'CC1',            // Brand: portada, seis capacidades, activación (Channel & Commerce)
+  'C02', 'K13', 'S27', 'CC1',     // Brand: portada, seis capacidades, caso Sky, activación (Channel & Commerce)
   'C03', 'D03',                   // Voice: portada, todo el ciclo
   'C04', 'R19', 'ANM',            // Revenue: portada, el CRM se llena solo, caso ANAM
   'C05', 'INSG',                  // Growth: portada, cada dato su gráfico

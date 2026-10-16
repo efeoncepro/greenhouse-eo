@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°»
+
+- Aprobado como brochure oficial de la agencia: versión completa (84 láminas) y corta (26), con índice linkeable,
+  Channel & Commerce dentro de Brand y casos Berel y Sky compuestos con piezas reales. Registrado en la
+  [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md), la documentación funcional y el manual.
+
 ## 2026-10-16 — Seguimiento web y evidencia reutilizable
 
 - [Fabricio / Toyota del Bajío](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md):
@@ -558,14 +564,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
   decisiones creativas para acelerar salida al mercado preservando calidad, consistencia e identidad; recorrido
   completo o tramo delimitado. Visión, modelo corporativo, oferta, método y skills/routing enlazados; validación
   económica/comercial permanece por oferta. Cambio documental local, sin alterar runtime ni publicar.
-
-## 2026-10-03 — Elenco de marca, vistas puestas elegidas por el comando y Nexa con expresiones reales
-
-- Elenco ficticio en `ELENCO` (Hum, Karo, Sophia, Isabella, Antonio) con su biblia; grupos de 3 a 5 entre elenco, Nexa
-  y Julio (sin elenco obligatorio). Julio: 37 con canas prematuras en su bloque.
-- `foto:prompt` elige la vista puesta por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión, e imprime
-  las alternativas; 126 vistas puestas nuevas en bomber, softshell, polo, hoodie y gorra; el macro viaja con la prenda.
-- `foto:isotipo` compone por detrás de los oclusores, con pliegues y escorzo; `canon-sync` baja del canon GCP lo
-  sellado que falta o está viejo; `pnpm foto:rostro` mide la proporción del rostro.
-- Nexa: la expresión va detrás del ancla frontal (la pose sale de la escena), ancla v2 con la proporción del canon y 25
-  expresiones casi de frente aprobadas. Exploración archivada (> 1,3 GB liberados).

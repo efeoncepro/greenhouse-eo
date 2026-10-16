@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.9
+> **Version:** 3.0
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-10-09 por Claude (2.9: el brochure de servicios web y digitales aprobado el 2026-10-09 — qué cubre, que sus láminas se armaron a mano en el lienzo de diseño y las reglas que dejó: el fondo de una pieza firmada por Efeonce, los casos de éxito siempre con la misma lámina, el logo donde se nombra una marca, nada de marcadores «[N]» y el español primero; pendientes antes de enviarlo. Antes, 2026-09-30, 2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, logos de clientes que esperan autorización y los datos del deck tal cual por decisión del operador, que asume la responsabilidad (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-10-16 por Claude (3.0: el brochure oficial «Agencia de Marketing 360°» aprobado el 2026-10-16 — dos versiones, el hilo, la navegación con enlaces y qué revisar antes de enviarlo. Antes, 2026-10-09, 2.9: el brochure de servicios web y digitales aprobado el 2026-10-09 — qué cubre, que sus láminas se armaron a mano en el lienzo de diseño y las reglas que dejó: el fondo de una pieza firmada por Efeonce, los casos de éxito siempre con la misma lámina, el logo donde se nombra una marca, nada de marcadores «[N]» y el español primero; pendientes antes de enviarlo. Antes, 2026-09-30, 2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, logos de clientes que esperan autorización y los datos del deck tal cual por decisión del operador, que asume la responsabilidad (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -163,6 +163,35 @@ la edición mensual (Efeonce Insights). Se entrega de tres formas: **completo** 
 > [catálogo de recetas](../../operations/brand-graphic-line/deck-recipes/README.md) ·
 > [manual, «El deck SEO/AEO»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
 > [TASK-1949](../../tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md).
+
+## El brochure oficial «Agencia de Marketing 360°»
+
+El 2026-10-16 el operador lo aprobó como **el brochure oficial de Efeonce**: presenta la agencia completa, con todos
+los servicios de las cinco líneas. Es el que se manda cuando alguien pregunta «¿qué hace Efeonce?».
+
+**Dos versiones.** La completa tiene 84 láminas y sirve para leer o para entregar como documento. La corta tiene 26 y
+sirve para presentar en una reunión. Las dos salen de las mismas láminas.
+
+**Cómo se lee.** Sigue un solo hilo, donde cada lámina responde la pregunta que deja la anterior:
+
+1. **Tu problema y quiénes somos:** tu cliente da vueltas, hoy cada momento lo atiende un proveedor distinto y
+   Efeonce es un solo equipo.
+2. **La vuelta en cinco líneas:** Engine (te encuentran), Brand (te recuerdan, con Channel & Commerce: trade marketing
+   y activaciones), Voice (llegas a quien compra), Revenue (te compran) y Growth (lo mides). Cada línea abre con su
+   portada y, cuando hay caso, cierra con él: Berel, Sky y ANAM.
+3. **Cómo lo vives:** el equipo, cómo empezamos, los primeros 90 días, el día a día y el control de tu marca.
+4. **La prueba:** clientes, partners y los cinco países donde operamos.
+5. **Cómo empiezas:** compras capacidad, empiezas chico y el siguiente paso.
+
+**Se navega con enlaces.** En el PDF, la lámina de la órbita lleva a la portada de cada línea, y la lámina siguiente
+es un índice donde cada sección es un enlace a su página.
+
+**Antes de enviarlo a un prospecto:** hay que revisar la autorización de los logos de clientes y de las piezas de Sky
+y Berel que aparecen en sus casos, las cifras de ANAM y el plazo del caso Berel.
+
+> Detalle técnico: [norma, delta 2026-10-16 (b)](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
+> [manual, «El brochure oficial Agencia de Marketing 360°»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
+> fuente y `LEEME.md` en `ai-generations/2026-10-12_brochure-efeonce-360/`.
 
 ## El brochure de servicios web y digitales
 

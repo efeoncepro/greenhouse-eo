@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°» aprobado
+
+Aprobado y canonizado: «este es el brochure oficial de la agencia 360° con todos nuestros servicios». Completo 84
+láminas y corto 26, ambos con índice linkeable (órbita → portadas; lámina 5 → secciones) verificado. OneDrive
+`4. Comercial/Brochures/2026/Agencia de Marketing 360/`; canvas https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3;
+fuente y scripts en [LEEME](ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md). Registrado en la norma
+(delta 2026-10-16 b), funcional, manual y `docs/services/README.md`. Antes de enviarlo afuera: autorización de logos
+y piezas de Sky/Berel (TASK-1937), cifras ANAM, plazo Berel. Commits locales, sin push.
+
 ## 2026-10-16 — Fabricio: seguimiento web programado
 
 [Caso y límites](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md): un envío inicial
@@ -264,15 +273,3 @@ lleva facebook.com a `facebook` y suma los dominios de Threads y X. Think tiene 
 orden obligado entre Think y el release de Greenhouse (`develop` lleva 283 commits sin push desde el 2026-10-05). Verificado: suites de Insights, Composer,
 config y PDF; gate visual de Insights 37 frames a 0 px; export real del PDF (10); lint y typecheck. No se corrió
 `pnpm test` completo ni `pnpm build`. Lección y comandos en las skills `axis-design-system` y `efeonce-insights`.
-
-## 2026-10-12 — SEO/AEO: categoría y representación de marca
-
-[Método aceptado](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md): aspirar a referencia
-para categoría/comprador/situación con pruebas y representación fiel; conservar non-brand y separar
-presencia/cita/recomendación de consideración y negocio. ADR/index, manual/plan, contexto, modelo SV360,
-caso de negocio y cuatro skills Codex/Claude alineados. Oferta, briefs, QBR/retención y mensajes corrigen
-promesas históricas de citación/recovery paid. [Verificación](docs/audits/seo/2026-10-12-category-leadership-docs-skills.md):
-espejos y destinos locales correctos, revisión semántica y gates proporcionales. Método documental;
-sin scoring/runtime, precio, programa de cliente o publicación. Primera parte capturada por commit
-concurrente `4fa5e6ce4`; cierre restante de este alcance separado. Siguiente aplicación: delimitar una
-categoría/cuenta y registrar baseline, pruebas y brechas; liderazgo/eficacia aún requieren evidencia.

@@ -228,3 +228,14 @@ se veía bien. Así se rehízo:
 
 Costo ≈ USD 0,30 en total con la exploración. Archivos en `caso-sky/`. Solo cambia la versión larga (Sky no está en
 la corta); los enlaces se verificaron.
+
+## 2026-10-16 · APROBADO — brochure oficial de la agencia
+
+El operador: «canonicemos todo, este es el brochure oficial de la agencia 360° con todos nuestros servicios».
+
+- **Versión completa:** 84 láminas.
+- **Versión corta:** 26 láminas. Se sumó el caso Sky después de «Seis capacidades».
+- **Dónde está registrado:** delta 2026-10-16 (b) de `EFEONCE_SURFACE_COMPOSITION_V1.md`, sección en
+  `docs/documentation/creative/composicion-de-decks-y-brochures.md`, procedimiento en
+  `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y puntero en `docs/services/README.md`.
+- **Los PDF oficiales** son los de OneDrive. Los de esta carpeta son su copia de trabajo.

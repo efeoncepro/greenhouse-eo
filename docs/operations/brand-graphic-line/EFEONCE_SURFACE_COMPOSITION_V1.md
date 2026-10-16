@@ -51,6 +51,40 @@
 > [documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) ·
 > [recetas por lámina del deck](./deck-recipes/README.md)
 
+## Delta 2026-10-16 (b) — el brochure «Agencia de Marketing 360°», aprobado y oficial **[decisión del operador, 2026-10-16]**
+
+El operador: «canonicemos todo, este es el brochure oficial de la agencia 360° con todos nuestros servicios». Reemplaza
+al delta 2026-10-15 de abajo, que lo daba como «no aprobado todavía». **Es el brochure oficial de Efeonce**: presenta
+la agencia completa con las cinco líneas y es el documento por defecto cuando un prospecto pide «qué hace Efeonce».
+
+- **Dos versiones, una fuente.** Completa: **84 láminas** (`Efeonce-Brochure-Agencia-de-Marketing-360.pdf`). Corta:
+  **26 láminas** para presentar en una reunión (`Efeonce-Brochure-Agencia-de-Marketing-360-Corto.pdf`). Las dos están
+  en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`; canvas «Brochure Efeonce»,
+  [https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3](https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3); fuente,
+  scripts, recorrido y pendientes en `ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md`.
+- **El hilo.** Cada lámina responde la pregunta que deja la anterior: tu problema y quiénes somos → la vuelta en cinco
+  líneas (Engine, Brand con Channel & Commerce, Voice, Revenue, Growth; cada tramo abre con su portada cine y las que
+  tienen caso cierran con él: Berel, Sky, ANAM) → cómo lo vives → la prueba (clientes, partners, cinco países) → cómo
+  empiezas.
+- **Navegación.** La lámina 4 (la órbita) enlaza cada esfera a la portada de su línea, y la 5 («Todo el recorrido») es
+  un índice con número de página donde cada fila es un enlace interno del PDF. `armar-indice.mjs` renderiza el índice
+  con las páginas reales y `build-pdf.mjs` pone los enlaces; se verifican después de cada armado.
+- **Composición generativa con piezas reales** (casos Berel y Sky, activaciones BTL de la marca ficticia BRÍO): el
+  modelo genera la escena con el producto o el avión oficial como referencia, las piezas reales se componen
+  determinísticas encima, el modelo da el acabado de luz y **el contenido exacto de cada pieza se repone al final**
+  (el acabado deforma textos y precios). Scripts en `caso-berel/` y `caso-sky/`.
+- **Channel & Commerce dentro de Brand**, con el copy del catálogo `docs/services/channel-commerce/` en estado
+  `Proposed`: sin promesa de venta, cobertura ni precio; la producción física la ejecutan proveedores.
+- **Láminas propias.** Muchas se rehicieron a mano o se trajeron de los brochures por línea (Web, SEO/AEO, Agencia
+  Creativa, Contenidos, Agencia de Medios, HubSpot, Salesforce) con su antetítulo pasado al del tramo. No se componen
+  solas; las candidatas a receta quedan para TASK-2013 y siguientes.
+
+**Antes de enviarlo afuera:** logos de clientes (Berel, Sky, ANAM y el muro de +90 empresas) y piezas de campaña de Sky
+y Berel según su autorización (TASK-1937); cifras de ANAM entregadas por el operador y no publicadas por ANAM; Berel
+dice «12 meses» con la cuenta ganada en mayo de 2026; readback de HubSpot Gold y partners declarados según el registro
+de partnerships; Voice y Growth no cierran con caso propio; «Cada mes sabes qué recibes» viene del brochure de
+contenidos y todavía habla de listening y creadores.
+
 ## Delta 2026-10-16 — el brochure «Agencia de Medios», aprobado **[decisión del operador, 2026-10-16]**
 
 El operador: «Bien. estamos Ok, recuerda que necesito una lámina de indice que linkee a las secciones claves y dame el
@@ -92,8 +126,7 @@ incrementalidad, pendiente de confirmar con Performance; y no mezclar los dos n�
 Relatado por la sesión que arma el brochure (recorrido de 37 láminas, fuentes y pendientes en
 `ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md`; canvas «Brochure Efeonce»,
 [https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3](https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3); PDF v6 en
-OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`; commit `e1a5ba830`). **El brochure no está aprobado
-todavía:** sus pares de voz están vigentes en el canvas, no aprobados uno por uno.
+OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`; commit `e1a5ba830`). **Aprobado el 2026-10-16:** ver el delta (b) de esa fecha, arriba.
 
 - **HW1 sin lanyard.** El operador: «el lanyard está encima del brazo y mal montado, está muy mala» y «Corrige donde
   aparezca HW1 y ajusta sus pdf». El plate vigente es
