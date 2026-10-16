@@ -104,7 +104,8 @@ container servidor nunca se había versionado. Desde hoy:
 - [`gtm-drift.yml`](../../.github/workflows/gtm-drift.yml) corre `--check` a diario y **falla**
   si cualquiera de los dos difiere del snapshot commiteado. Se autentica por WIF directamente
   como `greenhouse-gtm-publisher` (scope `tagmanager.readonly`); requiere
-  `roles/iam.workloadIdentityUser` del repo sobre ese SA.
+  `roles/iam.workloadIdentityUser` del repo sobre ese SA (concedido 2026-10-16). Los
+  workflows programados corren desde `main`: el chequeo se activa con el release que lo incluya.
 - `build-cta-events-workspace.ts --publish` reescribe los snapshots tras publicar.
 - Lógica pura y tests: `scripts/gtm/snapshot-lib.ts`.
 
