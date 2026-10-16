@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Implementación de HubSpot CRM y agentes de IA | Efeonce</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,800;0,900;1,300;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0;background:#001a33}
+a{color:#ffffff}a:hover{color:#f6c8ee}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.eyebrow{font-family:Poppins,sans-serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#9fb6cc;margin:0}
+.chip{display:inline-flex;align-items:center;gap:10px;width:max-content;max-width:100%;box-sizing:border-box;padding:9px 16px;border:1.5px solid rgba(255,255,255,.38);border-radius:999px;font-size:13px;line-height:1.1;color:#ffffff}
+.h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:760;letter-spacing:-.045em;line-height:.95;font-size:clamp(52px,7.4vw,124px);color:#ffffff;margin:0}
+.lead{font-family:Poppins,sans-serif;font-weight:300;font-size:clamp(17px,1.35vw,20px);line-height:1.6;color:#cfe4fa;margin:0}
+.acc{color:#e86bd0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.navlinks{display:flex;gap:30px;align-items:center}
+.words>span{display:inline-block}
+.vs-row{display:grid;grid-template-columns:minmax(0,1fr) 170px minmax(0,1.25fr)}
+.agents{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
+.flow{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:64px;align-items:center}
+.case{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:center}
+.hs-track{display:flex;flex-direction:column;gap:28px;padding:0 40px}
+.panel{position:relative;width:100%;min-height:760px;border-radius:36px;overflow:hidden;background:#021f3d;border:1px solid rgba(255,255,255,.1);box-sizing:border-box;flex:none}
+.panel-media{position:absolute;top:0;right:0;bottom:0;width:64%;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 34%);mask-image:linear-gradient(90deg,transparent 0%,#000 34%)}
+.panel-media img{width:100%;height:100%;object-fit:cover;display:block}
+.panel-body{position:relative;width:52%;padding:56px 0 52px 56px;box-sizing:border-box;display:flex;flex-direction:column;gap:22px;min-height:760px}
+.num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:150px;line-height:.8;letter-spacing:-.06em;color:rgba(255,255,255,.16);margin:0}
+.ptitle{font-family:'Bricolage Grotesque',sans-serif;font-weight:760;letter-spacing:-.045em;line-height:.92;font-size:clamp(52px,5.6vw,92px);margin:0;color:#ffffff}
+.ticks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.ticks li{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.5;color:#e6edf3}
+.ticks svg{flex:none;margin-top:3px}
+.stat{font-family:'Bricolage Grotesque',sans-serif;font-weight:760;letter-spacing:-.05em;line-height:.9;font-size:clamp(56px,5vw,84px);color:#e86bd0;margin:0}
+.btn{text-decoration:none;font-size:16px;font-weight:600;color:#001a33;background:#ffffff;padding:16px 28px;border-radius:999px;min-height:54px;box-sizing:border-box;display:inline-flex;align-items:center;gap:10px;box-shadow:0 0 0 5px rgba(232,107,208,.38),0 20px 60px rgba(232,107,208,.32)}
+.btn:hover{color:#001a33;background:#fbe3f6}
+.ghost{text-decoration:none;font-size:16px;font-weight:500;color:#ffffff;padding:16px 26px;border-radius:999px;border:1.5px solid rgba(255,255,255,.5);min-height:54px;box-sizing:border-box;display:inline-flex;align-items:center}
+.card{background:#ffffff;color:#023c70;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.row3{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:center;padding:7px 0;border-top:1px solid #e7ebee;font-size:12px}
+.row3 b{font-size:10px;letter-spacing:.1em;font-weight:600;color:#4a5868}
+.fld{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500;color:#cfe4fa}
+.fld input,.fld select,.fld textarea{font:inherit;font-size:16px;font-weight:400;color:#ffffff;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.28);border-radius:14px;padding:14px 16px;min-height:52px;box-sizing:border-box;width:100%}
+.fld select option{color:#001a33}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.opt{position:relative;display:flex}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt>span{flex:1;display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 14px;border-radius:16px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04);font-size:15px;font-weight:500;line-height:1.3;color:#ffffff;cursor:pointer;box-sizing:border-box;transition:border-color .2s,background .2s}
+.opts-4 .opt>span{min-height:48px;justify-content:center;text-align:center;font-size:14px}
+.opt>span:hover{border-color:rgba(255,255,255,.55)}
+.opt input:checked+span{border-color:#e86bd0;background:rgba(232,107,208,.12);box-shadow:0 0 0 1px #e86bd0 inset}
+.opt input:focus-visible+span{outline:2px solid #ffffff;outline-offset:2px}
+.legend{padding:0;margin:0 0 10px;font-size:14px;font-weight:600;color:#ffffff}
+fieldset{margin:0;padding:0;border:0;min-width:0}
+@media (max-width:640px){.opts,.opts-4{grid-template-columns:minmax(0,1fr)}}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid #ffffff;outline-offset:2px;border-color:#ffffff}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+details[open] .plus{transform:rotate(45deg)}
+.bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:20px}
+.span4{grid-column:span 4}.span2{grid-column:span 2}
+.tile{position:relative;border-radius:28px;overflow:hidden;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);min-height:460px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;padding:36px}
+.tile-photo{position:absolute;top:0;right:0;bottom:0;width:70%;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 38%);mask-image:linear-gradient(90deg,transparent 0%,#000 38%)}
+.tile-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.tile-h{font-family:'Bricolage Grotesque',sans-serif;font-weight:760;letter-spacing:-.04em;line-height:.95;font-size:clamp(40px,3.6vw,60px);margin:0;color:#ffffff}
+.point{display:flex;flex-direction:column;gap:14px;padding:30px;border-radius:24px;background:rgba(255,255,255,.035);border:1.5px solid rgba(255,255,255,.16);text-decoration:none;color:#ffffff;min-height:300px;box-sizing:border-box}
+.point:hover{border-color:#e86bd0;background:rgba(232,107,208,.06);color:#ffffff}
+.secgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:center}
+
+@keyframes up{from{opacity:0;transform:translateY(46px)}}
+@keyframes kb{from{transform:scale(1.16)}}
+@keyframes breathe{0%,100%{box-shadow:0 0 30px rgba(232,107,208,.45)}50%{box-shadow:0 0 70px rgba(232,107,208,.85),0 0 0 10px rgba(232,107,208,.08)}}
+@keyframes marquee{to{transform:translateX(-50%)}}
+@keyframes cue{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(10px);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,107,208,.55)}50%{box-shadow:0 0 0 10px rgba(232,107,208,0)}}
+.in{animation:up 1.2s cubic-bezier(.05,.7,.1,1) both}
+.d1{animation-delay:.15s}.d2{animation-delay:.3s}.d3{animation-delay:.45s}.d4{animation-delay:.6s}.d5{animation-delay:.8s}
+.kb{animation:kb 3.2s cubic-bezier(.2,0,0,1) both}
+.sphere{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:#e86bd0;margin-left:.05em;animation:breathe 3.6s ease-in-out infinite}
+.marquee{display:flex;width:max-content;animation:marquee 40s linear infinite}
+.cue{animation:cue 2.2s ease-in-out infinite}
+.float{animation:float 6s ease-in-out infinite}
+.float2{animation:float 7s ease-in-out -2s infinite}
+.float3{animation:float 6.5s ease-in-out -4s infinite}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+@supports (animation-timeline: view()){
+ @keyframes rv{from{opacity:0;transform:translateY(80px)}}
+ @keyframes rvl{from{opacity:0;transform:translateX(-90px)}}
+ @keyframes rvr{from{opacity:0;transform:translateX(90px)}}
+ @keyframes clip{from{clip-path:inset(22% 16% 22% 16% round 40px);transform:scale(1.22)}}
+ @keyframes strike{from{background-size:0% 2px}}
+ @keyframes lift{from{opacity:0;transform:translateY(160px)}}
+ @keyframes pop{from{opacity:0;transform:scale(.6)}}
+ @keyframes para{to{transform:translateY(18%)}}
+ @keyframes hs{to{transform:translateX(calc(-100% + 100vw))}}
+ @keyframes fill{from{width:0%}}
+ @keyframes count{from{--n:0}}
+ @keyframes draw{from{stroke-dashoffset:1}}
+ @keyframes zoomout{from{transform:scale(1.25)}}
+ .rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 85%}
+ .rvl{animation:rvl linear both;animation-timeline:view();animation-range:entry 5% cover 40%}
+ .rvr{animation:rvr linear both;animation-timeline:view();animation-range:entry 5% cover 40%}
+ .clip{animation:clip linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+ .strike{animation:strike linear both;animation-timeline:view();animation-range:entry 60% cover 55%}
+ .pop{animation:pop linear both;animation-timeline:view();animation-range:entry 20% cover 45%}
+ .words>span{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 80%}
+ .words>span:nth-child(2){animation-range:entry 8% entry 88%}
+ .words>span:nth-child(3){animation-range:entry 16% entry 96%}
+ .words>span:nth-child(4){animation-range:entry 24% cover 52%}
+ .words>span:nth-child(5){animation-range:entry 32% cover 56%}
+ .words>span:nth-child(6){animation-range:entry 40% cover 60%}
+ .st>*{animation:lift linear both;animation-timeline:view();animation-range:entry 0% cover 35%}
+ .st>*:nth-child(2){animation-range:entry 10% cover 40%}
+ .st>*:nth-child(3){animation-range:entry 20% cover 45%}
+ .st>*:nth-child(4){animation-range:entry 30% cover 50%}
+ .para{animation:para linear both;animation-timeline:scroll(root);animation-range:0px 900px}
+ .count{animation:count linear both;animation-timeline:view();animation-range:entry 10% cover 45%}
+ .draw{stroke-dasharray:1;animation:draw cubic-bezier(.2,0,0,1) both;animation-timeline:view();animation-range:entry 30% cover 55%}
+ .pipe{animation:fill linear both;animation-timeline:view();animation-range:entry 60% cover 55%}
+ .hs{view-timeline-name:--hs;height:calc(min(100vh,900px) + 3400px)}
+ .hs-pin{position:sticky;top:0;height:min(100vh,900px);overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+ .hs-track{flex-direction:row;width:max-content;padding:0 40px;animation:hs linear both;animation-timeline:--hs;animation-range:contain 0% contain 100%}
+ .hs-track .panel{width:min(1200px,88vw);min-height:min(78vh,760px)}
+ .hs-track .panel-body{min-height:min(78vh,760px)}
+ .hs-bar{animation:fill linear both;animation-timeline:--hs;animation-range:contain 0% contain 100%}
+ .panel-media img{animation:zoomout linear both;animation-timeline:--hs;animation-range:contain 0% contain 100%}
+}
+@property --n{syntax:'<integer>';inherits:false;initial-value:0}
+.count{counter-reset:n var(--n)}
+.count::after{content:counter(n)}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important}.hs{height:auto!important}.hs-pin{position:static!important;height:auto!important}.hs-track{flex-direction:column!important;width:auto!important;transform:none!important}.hs-track .panel{width:100%!important}}
+@media (max-width:1000px){
+ .navlinks{display:none}
+ .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .g3,.agents,.flow,.case,.g2,.secgrid{grid-template-columns:minmax(0,1fr)}
+ .bento{grid-template-columns:minmax(0,1fr)}.span4,.span2{grid-column:auto}
+ .tile-photo{position:relative;width:100%;height:260px;margin:-36px -36px 20px;width:calc(100% + 72px);-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+ .vs-row{grid-template-columns:minmax(0,1fr) 120px minmax(0,1.2fr)}
+ .sticky-col{position:static!important}
+}
+@media (max-width:800px){
+ .hero{height:auto!important;padding-top:0!important}
+ .hero-media{position:relative!important;width:100%!important;height:58vh!important;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%)!important;mask-image:linear-gradient(180deg,#000 70%,transparent 100%)!important}
+ .hero-copy{margin-top:-80px}
+ .panel-media{position:relative;width:100%;height:320px;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+ .panel-body{width:100%;padding:0 24px 32px;min-height:0!important}
+ .num{font-size:96px}
+ .hs-track .panel{width:86vw!important}
+}
+@media (max-width:640px){
+ .wrap{padding:0 16px}
+ .hs-track{padding:0 16px}
+ .g4,.g2{grid-template-columns:minmax(0,1fr)}
+ .vs-row{grid-template-columns:minmax(0,1fr)}
+ .vs-t{justify-content:flex-start!important;padding:18px 0 8px}
+ .vs-l,.vs-r{border-radius:18px!important;border:1px solid rgba(255,255,255,0.14)!important}
+ .vs-r{border:2px solid #e86bd0!important;margin-top:8px}
+}
+</style>
+</helmet>
+<div style="background: #001a33; color: #ffffff; font-family: Poppins, sans-serif; overflow-x: clip">
+
+<!-- El header canónico del sitio va aquí (lo pone WordPress). -->
+
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-h1" style="position: relative; height: max(840px, min(100vh, 1000px)); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end">
+<div class="para hero-media" style="position: absolute; top: 0; right: 0; bottom: 0; width: 70%; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%); mask-image: linear-gradient(90deg, transparent 0%, #000 30%)">
+<img class="kb" src="/_blob/ff8f67c857500ad77e2accfc648d78e4" fetchpriority="high" alt="Una líder de RevOps de Efeonce dirige con la mano un moño de luz que conecta a los agentes de IA" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 40%">
+</div>
+<div class="wrap hero-copy" style="position: relative; width: 100%; padding-bottom: 96px">
+<div style="max-width: 720px; display: flex; flex-direction: column; gap: 20px">
+<p class="eyebrow chip in d1"><img src="/_blob/a14f8656a2c21e0f2416d57d15d41f06" alt="" style="width: 16px; height: 16px">HubSpot Solutions Partner</p>
+<sc-if value="{{ pairContext }}" hint-placeholder-val="{{ true }}">
+<div>
+<p class="in d2" style="margin: 0; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); line-height: 1.2; color: #ffffff">¿Mi IA conoce mi negocio?</p>
+<p class="in d3" style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(88px, 12.5vw, 200px); color: #ffffff">Ahora sí<span class="sphere" aria-hidden="true"></span></p>
+</div>
+</sc-if>
+<sc-if value="{{ pairMore }}" hint-placeholder-val="{{ false }}">
+<div>
+<p class="in d2" style="margin: 0; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); line-height: 1.2; color: #ffffff">¿Mi HubSpot puede hacer más?</p>
+<p class="in d3" style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(88px, 12.5vw, 200px); color: #ffffff">Mucho más<span class="sphere" aria-hidden="true"></span></p>
+</div>
+</sc-if>
+<sc-if value="{{ pairFriday }}" hint-placeholder-val="{{ false }}">
+<div>
+<p class="in d2" style="margin: 0; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); line-height: 1.2; color: #ffffff">¿Y el reporte del viernes?</p>
+<p class="in d3" style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(88px, 12.5vw, 200px); color: #ffffff">Ya lo viste<span class="sphere" aria-hidden="true"></span></p>
+</div>
+</sc-if>
+<h1 id="hero-h1" class="in d4" style="margin: 6px 0 0; font-weight: 400; font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; color: #dbe5ee; max-width: 600px">Implementamos y operamos HubSpot, la <i>Agentic Customer Platform</i>: sus agentes rinden lo que sabe tu negocio, y nosotros hacemos que lo sepa.</h1>
+<p class="in d4" style="margin: 0; font-size: clamp(16px, 1.3vw, 19px); font-weight: 300; line-height: 1.5; color: #cfe4fa; max-width: 560px">Para generar demanda, cerrar negocios, superar las expectativas de tus clientes y acelerar el crecimiento. Lo tengas o lo estés evaluando.</p>
+<div class="in d5" style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px">
+<a href="#agenda" class="btn">Agendar reunión de alcance</a>
+<a href="#punto" class="ghost">¿En qué punto estás?</a>
+</div>
+</div>
+</div>
+<div class="cue" aria-hidden="true" style="position: absolute; left: 50%; bottom: 26px; margin-left: -11px; width: 22px; height: 36px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.6); box-sizing: border-box"></div>
+</section>
+
+<!-- MARQUESINA -->
+<section aria-label="Los cuatro resultados" style="padding: 34px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); overflow: hidden">
+<div class="marquee" aria-hidden="true" style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.04em; font-size: clamp(56px, 7vw, 108px); line-height: 1; white-space: nowrap">
+<span style="padding: 0 34px">Genera demanda</span><span style="padding: 0 34px; color: rgba(255,255,255,0.24)">Cierra negocios</span><span style="padding: 0 34px">Supera expectativas</span><span style="padding: 0 34px; color: #e86bd0">Acelera el crecimiento</span>
+<span style="padding: 0 34px">Genera demanda</span><span style="padding: 0 34px; color: rgba(255,255,255,0.24)">Cierra negocios</span><span style="padding: 0 34px">Supera expectativas</span><span style="padding: 0 34px; color: #e86bd0">Acelera el crecimiento</span>
+</div>
+</section>
+
+<!-- NÚMEROS + CLIENTES -->
+<section aria-label="Efeonce en números" style="padding: 110px 0 70px">
+<div class="wrap g4 st" style="gap: 32px">
+<div style="border-top: 2px solid #e86bd0; padding-top: 22px"><p aria-label="Más de 90" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9">+<span class="count" style="--n: 90"></span></p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">empresas han trabajado con Efeonce</p></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 22px"><p aria-label="6" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9"><span class="count" style="--n: 6"></span></p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">productos de HubSpot sobre un mismo CRM: los implementamos todos</p></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 22px"><p aria-label="Menos 56 por ciento" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9">−<span class="count" style="--n: 56"></span>%</p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">de carga del equipo de atención de ANAM, con Customer Agent</p></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 22px"><p aria-label="Más de 10" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9">+<span class="count" style="--n: 10"></span></p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">años en Latinoamérica</p></div>
+</div>
+<div class="wrap rv" style="margin-top: 80px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 40px; opacity: 0.9">
+<img src="/_blob/08267ace1d9d8bfe87685a809358b200" loading="lazy" alt="Sky Airline" style="height: 34px; filter: brightness(0) invert(1)">
+<img src="/_blob/0effa0a2ce5dc11a054ccc9bd1bbcfc4" loading="lazy" alt="Berel" style="height: 44px; filter: brightness(0) invert(1)">
+<img src="/_blob/c5edb60806dd595ae81230afb8f01424" loading="lazy" alt="Bresler" style="height: 30px; filter: brightness(0) invert(1)">
+<img src="/_blob/59c550cd6987421c18782ac874c1fd77" loading="lazy" alt="Carozzi" style="height: 26px; filter: brightness(0) invert(1)">
+<img src="/_blob/0a69be732536f73f3a0e110613316082" loading="lazy" alt="Aguas Andinas" style="height: 34px">
+<img src="/_blob/f0ed789bd4fca5f5c5387518063ef4e6" loading="lazy" alt="ANAM" style="height: 28px">
+<img src="/_blob/d3a213fb2c4dd4d999e294de7bfabb58" loading="lazy" alt="Marca Chile" style="height: 40px; filter: brightness(0) invert(1)">
+</div>
+<p class="wrap rv" style="margin-top: 36px; font-size: 15px; font-weight: 300; color: #cfe4fa">Bresler: <b style="font-weight: 600; color: #ffffff">+180 % de ventas digitales</b> · caso publicado</p>
+</section>
+
+<!-- EN QUÉ PUNTO ESTÁS -->
+<section id="punto" aria-labelledby="punto-h" style="padding: 130px 0 40px">
+<div class="wrap">
+<p class="eyebrow chip rv">Para empezar</p>
+<h2 id="punto-h" class="h2 words" style="margin-top: 22px; max-width: 1150px"><span>¿En</span> <span>qué</span> <span>punto</span> <span class="acc">estás?</span></h2>
+<p class="lead rv" style="margin-top: 26px; max-width: 620px">La reunión de alcance es la misma. Lo que cambia es qué revisamos.</p>
+<div class="g3 st" style="gap: 20px; margin-top: 60px">
+<a href="#agenda" class="point"><span class="eyebrow">01 · Lo estás evaluando</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(26px, 2.2vw, 34px); letter-spacing: -0.025em; line-height: 1.1">«¿HubSpot, Salesforce o Zoho?»</span><span style="font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Te decimos cuál encaja con tu operación, cuánto cuesta el primer año y con qué condiciones. Aunque no sea HubSpot.</span><span style="margin-top: auto; font-weight: 600; font-size: 15px">Hablar de mi caso →</span></a>
+<a href="#agenda" class="point"><span class="eyebrow">02 · Lo tienes y no rinde</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(26px, 2.2vw, 34px); letter-spacing: -0.025em; line-height: 1.1">«Tenemos HubSpot y seguimos en planillas.»</span><span style="font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Ordenamos datos, dueños y automatizaciones para que el CRM vuelva a ser la fuente que todos usan. Sin reemplazar tus sistemas por defecto.</span><span style="margin-top: auto; font-weight: 600; font-size: 15px">Hablar de mi caso →</span></a>
+<a href="#agenda" class="point"><span class="eyebrow">03 · Funciona y quieres más</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: clamp(26px, 2.2vw, 34px); letter-spacing: -0.025em; line-height: 1.1">«Lo usamos para marketing. ¿Y para cerrar?»</span><span style="font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Sumamos el siguiente resultado, en orden: sin Hubs que nadie usa ni agentes sobre datos que no están listos.</span><span style="margin-top: auto; font-weight: 600; font-size: 15px">Hablar de mi caso →</span></a>
+</div>
+</div>
+</section>
+
+<!-- LA DIFERENCIA -->
+<section aria-labelledby="dif-h" style="padding: 140px 0">
+<div class="wrap">
+<p class="eyebrow chip rv">La diferencia</p>
+<h2 id="dif-h" class="h2 words" style="margin-top: 22px; max-width: 1150px"><span>No</span> <span>te</span> <span>dejamos</span> <span>un</span> <span>portal.</span> <span class="acc">Te dejamos una operación</span></h2>
+<p class="lead rv" style="margin-top: 30px; max-width: 660px">Lo difícil de HubSpot no es activarlo. Es elegir bien, que los datos cuadren, que tu equipo lo use y que los agentes sepan cuándo pasarle el caso a una persona.</p>
+<div role="table" aria-label="Un partner que configura y se va frente a Efeonce" style="margin-top: 80px">
+<div role="row" class="vs-row">
+<div role="columnheader" class="vs-l" style="padding: 26px 30px 18px; border-radius: 22px 22px 0 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-bottom: 0; display: flex; align-items: center; min-height: 92px; box-sizing: border-box"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #8fa6bd">Un partner que configura y se va</span></div>
+<div role="columnheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; color: #6f89a2">vs</span></div>
+<div role="columnheader" class="vs-r" style="padding: 26px 30px 18px; border-radius: 26px 26px 0 0; background: linear-gradient(90deg, rgba(232,107,208,0.18), rgba(232,107,208,0.06)); border: 2px solid #e86bd0; border-bottom: 0; box-shadow: 0 -20px 80px rgba(232,107,208,0.2); display: flex; align-items: center; gap: 16px; min-height: 92px; box-sizing: border-box"><img src="/_blob/4fd21b6af046ad0819dd278a7557490d" alt="Efeonce" style="height: 36px; width: auto"><span style="font-size: 15px; color: #f2d7ee">se queda contigo</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) no-repeat 0 55% / 100% 2px">Te vende la plataforma que representa</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Plataforma</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(232,107,208,0.10), rgba(232,107,208,0.04)); border-left: 2px solid #e86bd0; border-right: 2px solid #e86bd0; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.15">Te decimos cuál encaja, aunque no sea HubSpot</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) no-repeat 0 55% / 100% 2px">Licencias de más, «por si acaso»</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Licencias</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(232,107,208,0.10), rgba(232,107,208,0.04)); border-left: 2px solid #e86bd0; border-right: 2px solid #e86bd0; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.15">Por rol, con los créditos de IA estimados</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) no-repeat 0 55% / 100% 2px">Activa todos los agentes de una vez</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">IA</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(232,107,208,0.10), rgba(232,107,208,0.04)); border-left: 2px solid #e86bd0; border-right: 2px solid #e86bd0; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.15">Con su ficha y una persona a cargo de cada uno</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) no-repeat 0 55% / 100% 2px">Migra y espera que todo cuadre</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Datos</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(232,107,208,0.10), rgba(232,107,208,0.04)); border-left: 2px solid #e86bd0; border-right: 2px solid #e86bd0; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.15">Reconciliados registro por registro</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 26px 30px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12); border-radius: 0 0 22px 22px; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) no-repeat 0 55% / 100% 2px">Configura el portal y se va</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Después</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 26px 30px 30px; background: linear-gradient(90deg, rgba(232,107,208,0.10), rgba(232,107,208,0.04)); border-left: 2px solid #e86bd0; border-right: 2px solid #e86bd0; border-bottom: 2px solid #e86bd0; border-radius: 0 0 26px 26px; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.15">Lo operamos contigo, mes a mes</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- LOS 4 RESULTADOS -->
+<section id="resultados" aria-labelledby="res-h" style="padding: 40px 0 80px; background: radial-gradient(ellipse 70% 40% at 70% 10%, #0a3157 0%, #001a33 70%)">
+<div class="wrap" style="padding-bottom: 60px">
+<p class="eyebrow chip rv">Qué implementamos</p>
+<h2 id="res-h" class="h2 words" style="margin-top: 22px; max-width: 1150px"><span>Cuatro</span> <span>resultados.</span> <span class="acc">Una plataforma que conoce tu negocio</span></h2>
+<p class="lead rv" style="margin-top: 30px; max-width: 700px">HubSpot ya no se presenta como un CRM: es una plataforma donde tu equipo y los agentes de IA trabajan con el mismo contexto. Se organiza en tres capas, y en cada una hay trabajo nuestro.</p>
+<ol class="g3 st" style="list-style: none; margin: 56px 0 0; padding: 0; gap: 20px">
+<li style="padding: 26px; border-radius: 22px; background: rgba(255,255,255,0.035); border: 1.5px solid rgba(255,255,255,0.16); display: flex; flex-direction: column; gap: 10px"><span class="eyebrow" style="font-size: 11px">Capa 1 · Contexto</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.025em; line-height: 1.1">Smart CRM</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Tus datos, tu conocimiento y la forma en que tu equipo decide. <b style="font-weight: 600; color: #ffffff">Nosotros:</b> datos en orden, integraciones y base de conocimiento.</span></li>
+<li style="padding: 26px; border-radius: 22px; background: rgba(255,255,255,0.035); border: 1.5px solid rgba(255,255,255,0.16); display: flex; flex-direction: column; gap: 10px"><span class="eyebrow" style="font-size: 11px">Capa 2 · Acción</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.025em; line-height: 1.1">Hubs, workspaces y agentes</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Donde se hace el trabajo. <b style="font-weight: 600; color: #ffffff">Nosotros:</b> los implementamos por resultado, abajo.</span></li>
+<li style="padding: 26px; border-radius: 22px; background: rgba(232,107,208,0.07); border: 1.5px solid #e86bd0; display: flex; flex-direction: column; gap: 10px"><span class="eyebrow" style="font-size: 11px">Capa 3 · Coordinación</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.025em; line-height: 1.1">Personas y agentes</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Qué hace el agente solo y qué decide una persona. <b style="font-weight: 600; color: #ffffff">Nosotros:</b> la diseñamos con tu equipo y la operamos.</span></li>
+</ol>
+</div>
+<div class="hs">
+<div class="hs-pin">
+<div class="hs-track">
+
+<article id="demanda" class="panel">
+<div class="panel-media"><img src="/_blob/126224d84a0518452e23d9eeb0c82f39" loading="lazy" alt="Un estratega de Efeonce ordena las páginas de un sitio mientras los agentes trabajan a su alrededor" style="object-position: 70% 30%"></div>
+<div class="panel-body">
+<p class="num" aria-hidden="true">01</p>
+<h3 class="ptitle">Genera <span class="acc">demanda</span></h3>
+<p style="margin: 0; font-size: 21px; font-weight: 300; font-style: italic; color: #cfe4fa">«Nadie nos encuentra, ni en Google ni en ChatGPT.»</p>
+<ul class="ticks">
+<li><img src="/_blob/f175341388207cada575f252ab3c4920" alt="" style="width: 24px; height: 24px; flex: none"><span><b style="font-weight: 600">Marketing Hub:</b> campañas, segmentos, automatización y atribución.</span></li>
+<li><img src="/_blob/8293a3d0a03ee9ee98db082d3d3b7c6f" alt="" style="width: 24px; height: 24px; flex: none"><span><b style="font-weight: 600">Content Hub y AEO:</b> que la IA te encuentre y te recomiende.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Agentes de contenido:</b> con la voz de tu marca.</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px"><span class="eyebrow" style="font-size: 11px">Recibes</span><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em; line-height: 1.1">Una campaña conectada al CRM, de punta a punta.</p><p style="margin: 4px 0 0; font-size: 12px; color: #9fb6cc">Dato de HubSpot: +14 % de alcance de marketing, en promedio, con el agente de contenido.</p></div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center"><span class="chip"><img src="/_blob/f175341388207cada575f252ab3c4920" alt="" style="width: 18px; height: 18px">Marketing Hub, desde Starter</span><span class="chip">6–8 semanas</span><a href="#agenda" class="btn" style="padding: 13px 22px; min-height: 48px; font-size: 15px">Empezar por aquí</a></div>
+</div>
+</article>
+
+<article id="negocios" class="panel">
+<div class="panel-media"><img src="/_blob/16b12bd28b474f508703ca03a9201f2d" loading="lazy" alt="Nexa junto a un registro de cliente que se llena solo con una llamada, un correo y una reunión" style="object-position: 62% 40%"></div>
+<div class="panel-body">
+<p class="num" aria-hidden="true">02</p>
+<h3 class="ptitle">Cierra <span class="acc">negocios</span></h3>
+<p style="margin: 0; font-size: 21px; font-weight: 300; font-style: italic; color: #cfe4fa">«No sé cuánto pipeline tengo de verdad. Y cotizo en Word.»</p>
+<ul class="ticks">
+<li><img src="/_blob/aa08eefd3126edbce42e3965f9bb648c" alt="" style="width: 24px; height: 24px; flex: none"><span><b style="font-weight: 600">Sales Hub y Sales Workspace:</b> el pipeline a la vista, el día del vendedor en un lugar.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Agente de prospección:</b> contacta cuando la cuenta está lista.</span></li>
+<li><img src="/_blob/51dbbc4b7c8a2f8a565e57fdc1d35593" alt="" style="width: 24px; height: 24px; flex: none"><span><b style="font-weight: 600">Revenue Hub:</b> de la cotización al contrato y al cobro.</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px"><span class="eyebrow" style="font-size: 11px">Recibes</span><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em; line-height: 1.1">Un pipeline con etapas, dueños y pronóstico que tu equipo usa.</p><p style="margin: 4px 0 0; font-size: 12px; color: #9fb6cc">Dato de HubSpot: +65 % de leads de ventas al mes, en promedio, con el agente de prospección.</p></div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center"><span class="chip"><img src="/_blob/aa08eefd3126edbce42e3965f9bb648c" alt="" style="width: 18px; height: 18px">Sales Hub, desde Starter</span><span class="chip">4–6 semanas</span><a href="#agenda" class="btn" style="padding: 13px 22px; min-height: 48px; font-size: 15px">Empezar por aquí</a></div>
+</div>
+</article>
+
+<article id="clientes" class="panel">
+<div class="panel-media" style="width: 46%"><img src="/_blob/a3a4cf42dc332b6bb91a6f551e350cdf" loading="lazy" alt="Una consultora de Efeonce presenta una curva de resultados a un equipo" style="object-position: 50% 30%"></div>
+<div class="panel-body">
+<p class="num" aria-hidden="true">03</p>
+<h3 class="ptitle">Supera las <span class="acc">expectativas</span> de tus clientes</h3>
+<p style="margin: 0; font-size: 21px; font-weight: 300; font-style: italic; color: #cfe4fa">«Mi postventa es invisible.»</p>
+<ul class="ticks">
+<li><img src="/_blob/c32392a8fff0ee26705f8031fd3b30b2" alt="" style="width: 24px; height: 24px; flex: none"><span><b style="font-weight: 600">Service Hub y Help Desk:</b> tickets, SLA y conocimiento.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Customer Agent:</b> responde 24/7 y deriva a una persona cuando corresponde.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Customer Success Workspace:</b> salud, renovación y expansión.</span></li>
+</ul>
+<div style="display: flex; align-items: flex-end; gap: 16px; margin-top: auto"><p class="stat">−56%</p><p style="margin: 0 0 8px; font-size: 13px; line-height: 1.45; color: #cfe4fa; max-width: 240px">de carga en el equipo de atención de ANAM. Lo hicimos nosotros. <a href="#caso">Ver el caso</a></p></div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center"><span class="chip"><img src="/_blob/c32392a8fff0ee26705f8031fd3b30b2" alt="" style="width: 18px; height: 18px">Service Hub, desde Pro</span><span class="chip">6–8 semanas</span><a href="#agenda" class="btn" style="padding: 13px 22px; min-height: 48px; font-size: 15px">Empezar por aquí</a></div>
+</div>
+</article>
+
+<article id="crecimiento" class="panel">
+<div class="panel-media"><img src="/_blob/182e15442f653061b8d5df99cd459ef3" loading="lazy" alt="Antonio ordena con la mano una red de datos en capas de luz" style="object-position: 64% 35%"></div>
+<div class="panel-body">
+<p class="num" aria-hidden="true">04</p>
+<h3 class="ptitle">Acelera el <span class="acc">crecimiento</span></h3>
+<p style="margin: 0; font-size: 21px; font-weight: 300; font-style: italic; color: #cfe4fa">«Mis datos están en cinco sistemas.»</p>
+<ul class="ticks">
+<li><img src="/_blob/ab466bbe032aabfbc22a447b6774a883" alt="" style="width: 24px; height: 24px; flex: none"><span><b style="font-weight: 600">Smart CRM y Data Hub:</b> un registro del cliente, con dueño por dato.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Integraciones y agente de datos:</b> a quién priorizar y por qué.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Tu CRM, conversando:</b> desde Claude o ChatGPT.</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px"><span class="eyebrow" style="font-size: 11px">Recibes</span><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em; line-height: 1.1">Un diccionario de datos, integraciones documentadas y paneles en los que confías.</p><p style="margin: 4px 0 0; font-size: 12px; color: #9fb6cc">Dato de HubSpot: 10 veces más rápido al investigar prospectos con el agente de datos.</p></div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center"><span class="chip"><img src="/_blob/ab466bbe032aabfbc22a447b6774a883" alt="" style="width: 18px; height: 18px">Data Hub, desde Starter</span><span class="chip">4–8 semanas</span><a href="#agenda" class="btn" style="padding: 13px 22px; min-height: 48px; font-size: 15px">Empezar por aquí</a></div>
+</div>
+</article>
+
+</div>
+<div class="wrap" style="width: 100%; margin-top: 28px; display: flex; align-items: center; gap: 18px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #9fb6cc">01</span>
+<div style="flex: 1; height: 2px; background: rgba(255,255,255,0.14); border-radius: 2px; overflow: hidden"><div class="hs-bar" style="height: 2px; width: 100%; background: #e86bd0"></div></div>
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #9fb6cc">04</span>
+</div>
+<p class="wrap" style="width: 100%; margin: 14px auto 0; font-size: 12px; color: #9fb6cc">Plazos para equipos medianos. En la reunión de alcance te damos el tuyo.</p>
+</div>
+</div>
+</section>
+
+<!-- SIN RIESGO -->
+<section id="riesgo" aria-labelledby="riesgo-h" style="padding: 150px 0 120px">
+<div class="wrap">
+<p class="eyebrow chip rv">Cómo te sacamos el riesgo</p>
+<h2 id="riesgo-h" class="h2 words" style="margin-top: 22px; max-width: 1150px"><span>Te</span> <span>quitamos</span> <span>el</span> <span>riesgo</span> <span class="acc">antes de que compres</span></h2>
+<div class="bento" style="margin-top: 70px">
+<article class="tile span4 rvl">
+<div class="tile-photo"><img src="/_blob/f51ea6970fa56c85e2b2ba2f540781bc" loading="lazy" alt="Nexa junto a una grilla de doce licencias de luz, tres de ellas apagadas porque nadie las usa" style="object-position: 60% 40%"></div>
+<div style="position: relative; max-width: 380px; display: flex; flex-direction: column; gap: 14px">
+<span class="eyebrow">Licencias justas</span>
+<p class="tile-h">Nunca <span class="acc">de más</span></p>
+<p style="margin: 0; font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Licencias por rol, el plan que tu operación necesita y los créditos de IA estimados antes de comprar. Revisamos el uso antes de cada renovación.</p>
+</div>
+</article>
+<article class="tile span2 rvr" style="justify-content: space-between">
+<span class="eyebrow">La plataforma</span>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<p class="tile-h">El que <span class="acc">encaje</span></p>
+<p style="margin: 0; font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">No vendemos una plataforma: vendemos la decisión, con evidencia de tu operación.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><span class="chip" style="border-color: #e86bd0">HubSpot</span><span class="chip">Salesforce</span><span class="chip">Zoho</span><span class="chip">Híbrida</span></div>
+</div>
+</article>
+<article class="tile span2 rvl" style="justify-content: space-between">
+<span class="eyebrow">Sin amarras</span>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<p class="tile-h">Te llevas <span class="acc">todo</span></p>
+<p style="margin: 0; font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Tus datos son tuyos: entran a HubSpot con orden y salen igual de completos.</p>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.45; color: #e6edf3">
+<li><b style="font-weight: 600">Exportación completa,</b> cuando quieras.</li>
+<li><b style="font-weight: 600">API estable:</b> versiones que HubSpot sostiene 18 meses.</li>
+<li><b style="font-weight: 600">Hasta 90 días</b> para restaurar lo borrado.</li>
+</ul>
+</div>
+</article>
+<article class="tile span4 rvr">
+<div class="tile-photo"><img src="/_blob/53bafff20ac46bc0dc898fc8b4d5106f" loading="lazy" alt="Un líder de RevOps de Efeonce extiende la mano con un cubo de luz que contiene una base de datos completa" style="object-position: 60% 40%"></div>
+<div style="position: relative; max-width: 380px; display: flex; flex-direction: column; gap: 14px">
+<span class="eyebrow">Datos y arquitectura</span>
+<p class="tile-h">Primero, <span class="acc">ordenado</span></p>
+<p style="margin: 0; font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Antes de automatizar o sumar agentes, ponemos tus datos en orden y el CRM sobre una base que crece.</p>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.45; color: #e6edf3">
+<li><b style="font-weight: 600">Datos en orden:</b> duplicados fuera, propiedades con dueño y una sola fuente de verdad.</li>
+<li><b style="font-weight: 600">Modelo que escala:</b> objetos, asociaciones y pipelines pensados para crecer.</li>
+<li><b style="font-weight: 600">Integración gobernada:</b> cada sync con su dirección, su dueño y su registro de errores.</li>
+</ul>
+</div>
+</article>
+</div>
+</div>
+</section>
+
+<!-- AGENTES -->
+<section id="agentes" aria-labelledby="ag-h" style="padding: 150px 0; background: radial-gradient(ellipse 70% 60% at 75% 50%, #0a3157 0%, #001a33 70%)">
+<div class="wrap agents">
+<div style="display: flex; flex-direction: column; gap: 26px">
+<p class="eyebrow chip rv">Capa 3 · Coordinación</p>
+<h2 id="ag-h" class="h2 words" style="font-size: clamp(52px, 6vw, 100px)"><span>Cada</span> <span>agente</span> <span>responde</span> <span>a</span> <span class="acc">una persona</span></h2>
+<p class="lead rv">HubSpot la llama coordinación: decidir qué hace el agente y qué aprueba una persona. La diseñamos con tu equipo. Cada agente nace con su ficha: qué lee, qué propone, qué ejecuta y quién lo aprueba.</p>
+<div class="st" style="display: flex; flex-direction: column; gap: 14px">
+<div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.18); display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap"><b style="font-weight: 600; font-size: 17px">¿Workflow o agente?</b><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 26px; letter-spacing: -0.03em; color: #e86bd0">Según la tarea</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; font-size: 13px; line-height: 1.35">
+<span style="padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05)"><b style="font-weight: 600; display: block">Workflow</b><span style="color: #cfe4fa">regla fija, mismo resultado</span></span>
+<span style="padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05)"><b style="font-weight: 600; display: block">Agente sugiere</b><span style="color: #cfe4fa">una persona decide</span></span>
+<span style="padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05)"><b style="font-weight: 600; display: block">Con aprobación</b><span style="color: #cfe4fa">actúa tras tu visto bueno</span></span>
+</div>
+</div>
+<div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.18); display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap"><b style="font-weight: 600; font-size: 17px">¿Cuántos créditos necesito?</b><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 26px; letter-spacing: -0.03em; color: #e86bd0">A medida</span></div>
+<span style="font-size: 14px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Las acciones de IA de HubSpot usan créditos. Estimamos cuántos necesitas según tus flujos y tu volumen, y revisamos el consumo cada mes.</span>
+</div>
+</div>
+</div>
+<figure style="margin: 0; position: relative; min-height: 600px" aria-label="Ejemplo ilustrativo de fichas de agentes con una supervisora a cargo">
+<svg viewBox="0 0 700 600" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<ellipse cx="350" cy="520" rx="300" ry="46" fill="none" stroke="#e86bd0" stroke-opacity="0.5" stroke-width="1.5"></ellipse>
+<ellipse cx="350" cy="520" rx="300" ry="46" fill="none" stroke="#ffffff" stroke-opacity="0.1" stroke-width="10"></ellipse>
+<path class="draw" pathLength="1" d="M350 130 C 350 190, 140 190, 140 250" fill="none" stroke="#e86bd0" stroke-opacity="0.7" stroke-width="1.5"></path>
+<path class="draw" pathLength="1" d="M350 130 L 350 220" fill="none" stroke="#e86bd0" stroke-opacity="0.7" stroke-width="1.5"></path>
+<path class="draw" pathLength="1" d="M350 130 C 350 190, 560 190, 560 250" fill="none" stroke="#e86bd0" stroke-opacity="0.7" stroke-width="1.5"></path>
+</svg>
+<div class="float" style="position: absolute; left: 50%; top: 20px; margin-left: -160px; width: 320px; box-sizing: border-box; padding: 16px 18px; border-radius: 18px; background: rgba(4,33,63,0.9); border: 1.5px solid rgba(255,255,255,0.22); display: flex; gap: 14px; align-items: center; box-shadow: 0 30px 80px rgba(0,0,0,.5)">
+<img src="/_blob/84fda03a1b755ab9370a48d13c3bfb7e" alt="Nexa" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid #e86bd0; flex: none">
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: #9fb6cc">PERSONA RESPONSABLE</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.02em">Supervisora de servicio</span><span style="font-size: 12px; color: #cfe4fa">Aprueba, corrige y detiene</span></span>
+</div>
+<div class="card float2 rvl" style="position: absolute; left: 0; top: 240px; width: 230px; padding: 16px">
+<div style="display: flex; gap: 8px; align-items: center"><img src="/_blob/a14f8656a2c21e0f2416d57d15d41f06" alt="" style="width: 18px; height: 18px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: #4a5868">AGENTE</span></div>
+<p style="margin: 6px 0 2px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Prospección</p>
+<p style="margin: 0 0 8px; font-size: 12px; color: #4a5868">Investiga cuentas y sugiere el siguiente paso.</p>
+<div class="row3"><b>LEE</b><span>Contactos y actividad</span></div>
+<div class="row3"><b>PROPONE</b><span>Siguiente paso</span></div>
+<div class="row3"><b>EJECUTA</b><span>Sólo tareas</span></div>
+<div class="row3"><b>NUNCA</b><span>Envía sin revisión</span></div>
+</div>
+<div class="card float pop" style="position: absolute; left: 50%; top: 210px; margin-left: -125px; width: 250px; padding: 18px; z-index: 2">
+<div style="display: flex; gap: 8px; align-items: center"><img src="/_blob/a14f8656a2c21e0f2416d57d15d41f06" alt="" style="width: 18px; height: 18px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: #4a5868">AGENTE</span></div>
+<p style="margin: 6px 0 2px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700">Tickets</p>
+<p style="margin: 0 0 8px; font-size: 12px; color: #4a5868">Clasifica y responde con tu base de conocimiento.</p>
+<div class="row3"><b>LEE</b><span>Historial y conocimiento</span></div>
+<div class="row3"><b>PROPONE</b><span>Respuesta al cliente</span></div>
+<div class="row3"><b>EJECUTA</b><span>Enruta dentro del SLA</span></div>
+<div class="row3"><b>APRUEBA</b><span>La supervisora</span></div>
+<div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px; border-radius: 12px; background: #f3f5f7; border: 1px dashed #8e1b82"><span style="font-size: 11px; line-height: 1.3">Respuesta propuesta al ticket #4821</span><span class="pulse" style="font-size: 12px; font-weight: 600; color: #ffffff; background: #023c70; padding: 7px 12px; border-radius: 999px">Aprobar</span></div>
+</div>
+<div class="card float3 rvr" style="position: absolute; right: 0; top: 240px; width: 230px; padding: 16px">
+<div style="display: flex; gap: 8px; align-items: center"><img src="/_blob/a14f8656a2c21e0f2416d57d15d41f06" alt="" style="width: 18px; height: 18px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: #4a5868">AGENTE</span></div>
+<p style="margin: 6px 0 2px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700">Campañas</p>
+<p style="margin: 0 0 8px; font-size: 12px; color: #4a5868">Prepara variantes para audiencias con consentimiento.</p>
+<div class="row3"><b>LEE</b><span>Segmentos</span></div>
+<div class="row3"><b>PROPONE</b><span>Variantes y audiencia</span></div>
+<div class="row3"><b>EJECUTA</b><span>Nada sin aprobación</span></div>
+</div>
+<div style="position: absolute; left: 58%; top: 470px; display: flex; align-items: flex-start; gap: 4px; z-index: 3" aria-hidden="true">
+<svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 2l7 19 2.6-7.6L20 11z" fill="#e86bd0" stroke="#001a33" stroke-width="1.2"></path></svg>
+<span style="margin-top: 14px; font-size: 13px; font-weight: 600; color: #001a33; background: #e86bd0; padding: 6px 12px; border-radius: 999px">Supervisora</span>
+</div>
+<figcaption style="position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: 12px; color: #9fb6cc">Ejemplo ilustrativo · cada ficha se define con tu equipo</figcaption>
+</figure>
+</div>
+</section>
+
+<!-- CÓMO TRABAJAMOS -->
+<section id="metodo" aria-labelledby="met-h" style="padding: 150px 0 140px">
+<div class="wrap">
+<div class="flow">
+<div style="display: flex; flex-direction: column; gap: 26px">
+<p class="eyebrow chip rv">Cómo trabajamos</p>
+<h2 id="met-h" class="h2 words" style="font-size: clamp(52px, 6vw, 100px)"><span>Nada</span> <span>llega</span> <span>a</span> <span>producción</span> <span class="acc">sin tu</span> <span class="acc">aprobación</span></h2>
+<p class="lead rv">Lo probamos en un sandbox de HubSpot y te lo mostramos en un video corto. Tú decides cuándo sale.</p>
+</div>
+<figure class="rvr" style="margin: 0; position: relative; padding: 24px 0">
+<div class="card" style="padding: 22px; position: relative">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: #4a5868">RELEASE 14 · SERVICE HUB</span><img src="/_blob/a14f8656a2c21e0f2416d57d15d41f06" alt="HubSpot" style="width: 22px; height: 22px"></div>
+<p style="margin: 6px 0 18px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em">Enrutamiento de tickets por prioridad</p>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; text-align: center; font-size: 12px; font-weight: 500">
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 26px; height: 26px; border-radius: 50%; background: #023c70; color: #ffffff; display: grid; place-items: center; font-size: 13px">✓</span>Sandbox</span>
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 26px; height: 26px; border-radius: 50%; background: #023c70; color: #ffffff; display: grid; place-items: center; font-size: 13px">✓</span>Pruebas</span>
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span class="pulse" style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #8e1b82; box-sizing: border-box"></span>Tu aprobación</span>
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; color: #8a96a3"><span style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #d3d9de; box-sizing: border-box"></span>Producción</span>
+</div>
+<div style="margin-top: 18px; height: 170px; border-radius: 14px; background: linear-gradient(135deg, #0a3157, #001a33); display: grid; place-items: center; position: relative">
+<span style="width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,0.92); display: grid; place-items: center"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="#001a33"></path></svg></span>
+<span style="position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: #ffffff">3:12</span>
+</div>
+<div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap"><span style="font-size: 13px">Qué cambió en tu Help Desk, en 3 minutos</span><span style="font-size: 13px; font-weight: 600; color: #ffffff; background: #8e1b82; padding: 10px 16px; border-radius: 999px">Aprobar release</span></div>
+</div>
+<div class="float" style="position: absolute; right: 40px; bottom: -6px; display: flex; align-items: flex-start; gap: 4px" aria-hidden="true">
+<svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 2l7 19 2.6-7.6L20 11z" fill="#e86bd0" stroke="#001a33" stroke-width="1.2"></path></svg>
+<span style="margin-top: 14px; font-size: 13px; font-weight: 600; color: #001a33; background: #e86bd0; padding: 6px 12px; border-radius: 999px">Tú</span>
+</div>
+</figure>
+</div>
+
+<ol class="g4 st" style="list-style: none; margin: 110px 0 0; padding: 0; gap: 28px">
+<li style="display: flex; flex-direction: column; gap: 12px"><div style="height: 2px; background: rgba(255,255,255,0.14)"><div class="pipe" style="height: 2px; width: 100%; background: #e86bd0"></div></div><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 760; letter-spacing: -0.04em; line-height: 1">01</span><span style="font-size: 20px; font-weight: 600">Reunión de alcance</span><span class="chip" style="font-size: 12px; padding: 6px 12px">Sin costo · 1 hora</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Elegimos juntos el resultado por el que conviene empezar.</span></li>
+<li style="display: flex; flex-direction: column; gap: 12px"><div style="height: 2px; background: rgba(255,255,255,0.14)"><div class="pipe" style="height: 2px; width: 100%; background: #e86bd0"></div></div><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 760; letter-spacing: -0.04em; line-height: 1">02</span><span style="font-size: 20px; font-weight: 600">Blueprint</span><span class="chip" style="font-size: 12px; padding: 6px 12px">Opcional · 2–3 semanas</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Estado actual, solución, fases y riesgos. Sirve aunque implemente otro.</span></li>
+<li style="display: flex; flex-direction: column; gap: 12px"><div style="height: 2px; background: rgba(255,255,255,0.14)"><div class="pipe" style="height: 2px; width: 100%; background: #e86bd0"></div></div><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 760; letter-spacing: -0.04em; line-height: 1">03</span><span style="font-size: 20px; font-weight: 600">Implementación por fases</span><span class="chip" style="font-size: 12px; padding: 6px 12px">4–8 semanas por fase</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Empezamos chico, con algo funcionando en los primeros 30 días, y escalamos con lo que funciona. Si migras, reconciliamos registro por registro.</span></li>
+<li style="display: flex; flex-direction: column; gap: 12px"><div style="height: 2px; background: rgba(255,255,255,0.14)"><div class="pipe" style="height: 2px; width: 100%; background: #e86bd0"></div></div><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 56px; font-weight: 760; letter-spacing: -0.04em; line-height: 1">04</span><span style="font-size: 20px; font-weight: 600">Operación continua</span><span class="chip" style="font-size: 12px; padding: 6px 12px">Mensual</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Releases, adopción de tu equipo y métricas con fórmula, fuente y dueño.</span></li>
+</ol>
+</div>
+</section>
+
+<!-- SEGURIDAD Y LEY 21.719 -->
+<section id="seguridad" aria-labelledby="seg-h" style="padding: 150px 0; border-top: 1px solid rgba(255,255,255,0.1); background: radial-gradient(ellipse 60% 60% at 80% 50%, #0a3157 0%, #001a33 70%)">
+<div class="wrap secgrid">
+<div style="display: flex; flex-direction: column; gap: 24px">
+<p class="eyebrow chip rv">Seguridad y privacidad</p>
+<h2 id="seg-h" class="h2 words" style="font-size: clamp(52px, 6vw, 100px)"><span>Tus</span> <span>datos,</span> <span class="acc">bajo tu control</span></h2>
+<p class="lead rv">Cada mercado donde vendes tiene su ley de datos personales. Configuramos HubSpot según la que te aplica, para que sepas quién ve qué, qué aceptó cada contacto y dónde están tus datos.</p>
+<div class="rv" style="display: flex; flex-wrap: wrap; gap: 8px">
+<span class="chip">Chile · Ley 21.719, desde el 1-12-2026</span>
+<span class="chip">Colombia · Ley 1581</span>
+<span class="chip">Perú · Ley 29733</span>
+<span class="chip">México · LFPDPPP 2025</span>
+<span class="chip">EE. UU. · CCPA/CPRA y leyes estatales</span>
+</div>
+<ul class="ticks st" style="gap: 16px">
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Consentimiento:</b> antes de cada envío, el workflow revisa si puedes contactar a esa persona.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Acceso:</b> SSO y SCIM en Pro y Enterprise, y doble factor en los planes pagos.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">IA:</b> el uso de tus datos para entrenar viene activado y se apaga en la configuración. Lo decides tú.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Residencia:</b> tus datos quedan en una región de HubSpot (EE. UU. Este u Oeste, Canadá, Fráncfort o Australia), con las garantías de su contrato de tratamiento de datos.</span></li>
+<li><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span><b style="font-weight: 600">Controles:</b> HubSpot cuenta con SOC 2 Tipo II y SOC 3. Nosotros dejamos sus controles encendidos y documentados antes del go-live.</span></li>
+</ul>
+<p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9fb6cc">Fuentes: textos oficiales de cada ley; centro de ayuda de HubSpot. Orientación técnica, no asesoría legal.</p>
+</div>
+<figure class="clip" style="margin: 0; border-radius: 32px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12)">
+<img src="/_blob/788af39f8f3c40817808b148ed0f00eb" loading="lazy" alt="Mapa del mundo en puntos de luz con arcos hacia las regiones de datos de HubSpot en Canadá, Estados Unidos, Europa y Australia" style="width: 100%; height: auto; display: block; object-fit: cover">
+</figure>
+</div>
+</section>
+
+<!-- CASO ANAM -->
+<section id="caso" aria-labelledby="caso-h" style="padding: 150px 0; border-top: 1px solid rgba(255,255,255,0.1); background: radial-gradient(ellipse 55% 55% at 25% 60%, #0a3157 0%, #001a33 72%)">
+<div class="wrap">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px"><img src="/_blob/f0ed789bd4fca5f5c5387518063ef4e6" alt="ANAM" style="height: 40px"><span class="eyebrow chip">Caso · Customer Agent de HubSpot</span></div>
+<p class="rv" style="margin: 34px 0 0; font-weight: 300; font-size: clamp(26px, 2.6vw, 38px); color: #ffffff">¿Qué ganó su equipo de atención?</p>
+<h2 id="caso-h" class="h2 words" style="margin-top: 4px"><span class="acc">Tiempo</span></h2>
+<div class="secgrid" style="margin-top: 60px; gap: 72px">
+<svg class="pop" viewBox="0 0 360 360" width="100%" style="max-width: 540px; justify-self: center" role="img" aria-label="Medida: 56 por ciento menos carga de trabajo en el equipo de atención de ANAM">
+<defs>
+<radialGradient id="halo" cx="128.5" cy="310.2" r="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e86bd0" stop-opacity="0.13"></stop><stop offset="0.6" stop-color="#e86bd0" stop-opacity="0.03"></stop><stop offset="1" stop-color="#e86bd0" stop-opacity="0"></stop></radialGradient>
+<linearGradient id="trail" x1="246.6" y1="303.1" x2="128.5" y2="310.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e86bd0" stop-opacity="0"></stop><stop offset="1" stop-color="#e86bd0" stop-opacity="1"></stop></linearGradient>
+</defs>
+<circle cx="180" cy="180" r="140" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1"></circle>
+<line x1="180" y1="32" x2="180" y2="48" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5"></line>
+<path class="draw" pathLength="1" d="M180 40 A140 140 0 1 1 128.5 310.2" fill="none" stroke="#e86bd0" stroke-opacity="0.6" stroke-width="1.6" stroke-linecap="round"></path>
+<path d="M246.6 303.1 A140 140 0 0 1 128.5 310.2" fill="none" stroke="url(#trail)" stroke-width="2.2" stroke-linecap="round"></path>
+<circle cx="128.5" cy="310.2" r="44" fill="url(#halo)"></circle>
+<circle cx="128.5" cy="310.2" r="6" fill="#e86bd0"></circle>
+<text x="180" y="190" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="760" font-size="84" letter-spacing="-3" fill="#ffffff">−56%</text>
+<text x="180" y="226" text-anchor="middle" font-family="Poppins, sans-serif" font-size="13" fill="#ffffff" fill-opacity="0.78">de carga del equipo de atención</text>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 34px">
+<p class="lead rv">ANAM incorporó Customer Agent de HubSpot a su atención. Construimos y mantenemos lo que el agente sabe, y definimos qué resuelve solo y cuándo le pasa el caso a una persona.</p>
+<div class="rv" style="display: flex; flex-direction: column; gap: 18px">
+<span class="eyebrow" style="font-size: 11px">Carga de trabajo del equipo de atención</span>
+<div style="display: grid; grid-template-columns: 90px minmax(0, 1fr) 64px; gap: 14px; align-items: center"><span style="font-size: 14px; color: #cfe4fa">Antes</span><div style="height: 14px; border-radius: 8px; background: rgba(255,255,255,0.08)"><div class="pipe" style="height: 14px; width: 100%; border-radius: 8px; background: rgba(255,255,255,0.4)"></div></div><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px; text-align: right">100%</span></div>
+<div style="display: grid; grid-template-columns: 90px minmax(0, 1fr) 64px; gap: 14px; align-items: center"><span style="font-size: 14px; color: #cfe4fa">Después</span><div style="height: 14px; border-radius: 8px; background: rgba(255,255,255,0.08)"><div class="pipe" style="height: 14px; width: 44%; border-radius: 8px; background: #e86bd0; box-shadow: 0 0 24px rgba(232,107,208,0.5)"></div></div><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px; text-align: right; color: #e86bd0">44%</span></div>
+</div>
+<div style="display: flex; align-items: baseline; gap: 16px; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 22px"><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: 72px; line-height: 0.9">−76%</p><p style="margin: 0; font-size: 15px; font-weight: 300; color: #cfe4fa">en el mes con mayor reducción</p></div>
+</div>
+</div>
+<div class="g3 st" style="gap: 28px; margin-top: 90px">
+<div style="border-top: 2px solid #e86bd0; padding-top: 20px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 40px; letter-spacing: -0.04em; line-height: 1">01</span><span style="font-size: 18px; font-weight: 600">Lo que el agente sabe: 23 fuentes</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Una base de conocimiento versionada, con responsables que la mantienen al día.</span></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 20px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 40px; letter-spacing: -0.04em; line-height: 1">02</span><span style="font-size: 18px; font-weight: 600">5 rutas hacia una persona</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Criterios claros para resolver con IA o derivar al equipo de atención.</span></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 20px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 40px; letter-spacing: -0.04em; line-height: 1">03</span><span style="font-size: 18px; font-weight: 600">Documentado antes de salir</span><span style="font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Cada responsabilidad y paso de derivación, por escrito antes de la puesta en marcha.</span></div>
+</div>
+<div style="margin-top: 56px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px">
+<p style="margin: 0; max-width: 640px; font-size: 12px; line-height: 1.5; color: #9fb6cc">Reducción promedio en los meses medidos en producción, frente a la carga previa del mismo equipo. El desempeño depende del alcance de cada operación.</p>
+<a href="https://efeoncepro.com/hubspot/ia-atencion-cliente-caso-anam/" class="ghost">Ver el caso completo</a>
+</div>
+</div>
+</section>
+
+<!-- PARTNER -->
+<section aria-label="Partner oficial" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); background: radial-gradient(ellipse 60% 80% at 50% 50%, #0a3157 0%, #001a33 75%)">
+<div class="wrap" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px 48px">
+<img class="float rvl" src="/_blob/e03b3aca528c4dd496cde3f82591d6e7" alt="Sprocket 3D de HubSpot" style="width: clamp(140px, 16vw, 220px); height: auto">
+<div class="rv" style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 12px">
+<span class="eyebrow">Partner oficial</span>
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(36px, 4vw, 64px); font-weight: 760; letter-spacing: -0.04em; line-height: 0.95">Gold Solutions Partner <span class="acc">de HubSpot</span></span>
+<span style="font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Te acompañamos en la elección de licencias, la implementación y la operación de tu portal.</span>
+<a href="https://ecosystem.hubspot.com/es/marketplace/solutions/efeoncepro" style="font-size: 15px; font-weight: 600">Ver Efeonce en el directorio de HubSpot →</a>
+</div>
+<img class="pop" src="/_blob/f161b64a28408c7c13e4759595485f52" alt="HubSpot Solutions Partner Program, nivel Gold" style="width: clamp(150px, 15vw, 210px); height: auto">
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" aria-labelledby="faq-h" style="padding: 150px 0 130px">
+<div class="wrap g2" style="gap: 64px; align-items: start">
+<div class="sticky-col" style="position: sticky; top: 48px; display: flex; flex-direction: column; gap: 22px">
+<p class="eyebrow chip rv">Respuestas</p>
+<h2 id="faq-h" class="h2 words" style="font-size: clamp(52px, 6vw, 96px)"><span>Lo</span> <span>que</span> <span>nos</span> <span class="acc">preguntan</span></h2>
+<p class="lead rv">Antes de firmar, casi siempre.</p>
+</div>
+<div class="st" style="display: flex; flex-direction: column">
+<details style="border-top: 1px solid rgba(255,255,255,0.18); padding: 26px 0"><summary style="display: flex; justify-content: space-between; gap: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 650; font-size: 26px; letter-spacing: -0.02em">¿Qué es HubSpot hoy?<span class="plus" aria-hidden="true" style="font-weight: 300; transition: transform 200ms">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">HubSpot se presenta como una Agentic Customer Platform: un Smart CRM que reúne los datos y el contexto de tus clientes, con Hubs de marketing, ventas, servicio, contenido, datos y revenue, y agentes de IA que trabajan con tu equipo sobre ese mismo contexto.</p></details>
+<details style="border-top: 1px solid rgba(255,255,255,0.18); padding: 26px 0"><summary style="display: flex; justify-content: space-between; gap: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 650; font-size: 26px; letter-spacing: -0.02em">¿Qué hace un partner de HubSpot?<span class="plus" aria-hidden="true" style="font-weight: 300; transition: transform 200ms">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Te ayuda a elegir los Hubs y licencias que necesitas, implementa y migra tu portal, capacita a tu equipo y lo opera contigo. Efeonce es Solutions Partner Gold de HubSpot.</p></details>
+<details style="border-top: 1px solid rgba(255,255,255,0.18); padding: 26px 0"><summary style="display: flex; justify-content: space-between; gap: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 650; font-size: 26px; letter-spacing: -0.02em">¿Cuánto demora en verse un resultado?<span class="plus" aria-hidden="true" style="font-weight: 300; transition: transform 200ms">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Depende del resultado y del punto de partida: para equipos medianos, cada paquete de entrada toma entre 4 y 8 semanas, con algo funcionando en los primeros 30 días. Con más usuarios o más integraciones, el plazo crece. En la reunión de alcance te damos el tuyo.</p></details>
+<details style="border-top: 1px solid rgba(255,255,255,0.18); padding: 26px 0"><summary style="display: flex; justify-content: space-between; gap: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 650; font-size: 26px; letter-spacing: -0.02em">¿Quién es dueño del portal y de los datos?<span class="plus" aria-hidden="true" style="font-weight: 300; transition: transform 200ms">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Tu empresa. Trabajamos con los permisos que nos des y documentamos cada cambio.</p></details>
+<details style="border-top: 1px solid rgba(255,255,255,0.18); padding: 26px 0"><summary style="display: flex; justify-content: space-between; gap: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 650; font-size: 26px; letter-spacing: -0.02em">¿Tenemos que reemplazar nuestros sistemas?<span class="plus" aria-hidden="true" style="font-weight: 300; transition: transform 200ms">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">No por defecto. Conectamos HubSpot con lo que ya usas y documentamos cada integración: en qué dirección va el dato, quién es su dueño y dónde se registran los errores.</p></details>
+<details style="border-top: 1px solid rgba(255,255,255,0.18); border-bottom: 1px solid rgba(255,255,255,0.18); padding: 26px 0"><summary style="display: flex; justify-content: space-between; gap: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 650; font-size: 26px; letter-spacing: -0.02em">¿Cómo evitan romper un CRM en producción?<span class="plus" aria-hidden="true" style="font-weight: 300; transition: transform 200ms">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Revisamos con acceso de lectura, probamos cada cambio en un sandbox y tu equipo lo aprueba antes de salir.</p></details>
+</div>
+</div>
+</section>
+
+<!-- AGENDA -->
+<section id="agenda" aria-labelledby="cta-h">
+<div style="position: relative; height: max(640px, min(86vh, 820px)); overflow: hidden; display: flex; align-items: center">
+<div style="position: absolute; top: 0; right: 0; bottom: 0; width: 72%; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%); mask-image: linear-gradient(90deg, transparent 0%, #000 30%)">
+<img class="clip" src="/_blob/6774604f3120afe7a6d8038494fd519f" loading="lazy" alt="Un líder de RevOps de Efeonce sostiene en la palma una esfera de luz que protege los datos de una persona" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 35%">
+</div>
+<div class="wrap" style="position: relative; width: 100%">
+<div style="max-width: 560px; display: flex; flex-direction: column; gap: 18px">
+<p class="rv" style="margin: 0; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); color: #ffffff">¿Conversamos?</p>
+<h2 id="cta-h" class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(76px, 9.5vw, 160px); color: #ffffff">Cuando quieras<span class="sphere" aria-hidden="true"></span></h2>
+<p class="lead rv" style="color: #e6edf3; max-width: 440px">Una hora sin costo con un especialista en HubSpot.</p>
+</div>
+</div>
+</div>
+<div class="wrap g2" style="gap: 56px; padding-top: 90px; padding-bottom: 150px; align-items: start">
+<div class="sticky-col" style="display: flex; flex-direction: column; gap: 22px; position: sticky; top: 48px">
+<p class="eyebrow chip rv">Evaluación sin costo</p>
+<p class="rv" style="margin: 0; font-weight: 300; font-size: clamp(24px, 2.2vw, 32px); color: #ffffff">¿Qué recibo primero?</p>
+<p class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(56px, 6vw, 96px); font-weight: 760; letter-spacing: -0.045em; line-height: 0.9; color: #e86bd0">Evidencia</p>
+<p class="lead rv" style="max-width: 520px">Una decisión sobre tu plataforma, no una recomendación por defecto.</p>
+<ul class="st" style="list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-width: 520px">
+<li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">El veredicto.</b> <span style="color: #cfe4fa; font-weight: 300">Si HubSpot es tu plataforma, y con qué condición.</span></li>
+<li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">El freno.</b> <span style="color: #cfe4fa; font-weight: 300">Lo que hoy frena tu operación.</span></li>
+<li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">El plan.</b> <span style="color: #cfe4fa; font-weight: 300">Por fases, con su primer valor y las licencias y créditos que necesitas.</span></li>
+</ul>
+</div>
+<form class="rvr" aria-labelledby="form-h" style="padding: 36px 34px; border-radius: 28px; background: rgba(0,26,51,0.92); border: 1.5px solid rgba(255,255,255,0.24); box-shadow: 0 40px 100px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 18px">
+<div style="display: {{formDisplay}}; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><p id="form-h" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 750; letter-spacing: -0.025em">{{stepTitle}}</p><span style="font-size: 13px; font-weight: 600; color: #9fb6cc">Paso {{stepNum}} de 2</span></div>
+<div style="height: 4px; border-radius: 4px; background: rgba(255,255,255,0.12)"><div style="height: 4px; border-radius: 4px; width: {{stepPct}}; background: #e86bd0; transition: width 400ms cubic-bezier(.2,0,0,1)"></div></div>
+</div>
+
+<div style="display: {{step1}}; flex-direction: column; gap: 22px">
+<fieldset><legend class="legend">¿Por qué resultado quieres empezar?</legend>
+<div class="opts">
+<label class="opt"><input type="radio" name="resultado" value="demanda"><span><img src="/_blob/f175341388207cada575f252ab3c4920" alt="" style="width: 24px; height: 24px">Genera demanda</span></label>
+<label class="opt"><input type="radio" name="resultado" value="negocios"><span><img src="/_blob/aa08eefd3126edbce42e3965f9bb648c" alt="" style="width: 24px; height: 24px">Cierra negocios</span></label>
+<label class="opt"><input type="radio" name="resultado" value="clientes"><span><img src="/_blob/c32392a8fff0ee26705f8031fd3b30b2" alt="" style="width: 24px; height: 24px">Supera las expectativas de tus clientes</span></label>
+<label class="opt"><input type="radio" name="resultado" value="crecimiento"><span><img src="/_blob/ab466bbe032aabfbc22a447b6774a883" alt="" style="width: 24px; height: 24px">Acelera el crecimiento</span></label>
+</div>
+<label class="opt" style="margin-top: 10px"><input type="radio" name="resultado" value="no-se"><span style="justify-content: center; min-height: 48px; font-weight: 400; color: #cfe4fa">Todavía no lo sé: quiero que lo veamos juntos</span></label>
+</fieldset>
+<fieldset><legend class="legend">¿Dónde están hoy con HubSpot?</legend>
+<div class="opts">
+<label class="opt"><input type="radio" name="hubspot" value="usa"><span>Ya lo usamos</span></label>
+<label class="opt"><input type="radio" name="hubspot" value="evalua"><span>Lo estamos evaluando</span></label>
+<label class="opt"><input type="radio" name="hubspot" value="otro-crm"><span>Usamos otro CRM</span></label>
+<label class="opt"><input type="radio" name="hubspot" value="sin-crm"><span>Aún no tenemos CRM</span></label>
+</div>
+</fieldset>
+<fieldset><legend class="legend">¿Cuántas personas lo usarán?</legend>
+<div class="opts-4">
+<label class="opt"><input type="radio" name="usuarios" value="1-10"><span>1 a 10</span></label>
+<label class="opt"><input type="radio" name="usuarios" value="11-50"><span>11 a 50</span></label>
+<label class="opt"><input type="radio" name="usuarios" value="51-200"><span>51 a 200</span></label>
+<label class="opt"><input type="radio" name="usuarios" value="200+"><span>Más de 200</span></label>
+</div>
+</fieldset>
+<button type="button" class="btn" onClick="{{goStep2}}" style="border: 0; align-self: flex-start">Continuar</button>
+</div>
+
+<div style="display: {{step2}}; flex-direction: column; gap: 16px">
+<div class="g2" style="gap: 16px">
+<label class="fld"><span>Nombre y apellido<span aria-hidden="true" style="color: #e86bd0"> *</span></span><input type="text" name="nombre" autocomplete="name" required=""></label>
+<label class="fld"><span>Correo de trabajo<span aria-hidden="true" style="color: #e86bd0"> *</span></span><input type="email" name="email" autocomplete="email" inputmode="email" required=""></label>
+<label class="fld"><span>Empresa<span aria-hidden="true" style="color: #e86bd0"> *</span></span><input type="text" name="empresa" autocomplete="organization" required=""></label>
+<label class="fld"><span>País<span aria-hidden="true" style="color: #e86bd0"> *</span></span><select name="pais" required=""><option value="">Elige un país</option><option>Chile</option><option>Colombia</option><option>México</option><option>Perú</option><option>Estados Unidos</option><option>Otro país</option></select></label>
+</div>
+<label class="fld"><span>Cargo <span style="font-weight: 400; color: #9fb6cc">(opcional)</span></span><input type="text" name="cargo" autocomplete="organization-title"></label>
+<label class="fld"><span>¿Algo que debamos saber? <span style="font-weight: 400; color: #9fb6cc">(opcional)</span></span><textarea name="mensaje" rows="3" style="resize: vertical; min-height: 88px" placeholder="Por ejemplo: queremos migrar desde Zoho, o nuestro equipo no usa el CRM."></textarea></label>
+<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.45; color: #cfe4fa; cursor: pointer"><input type="checkbox" name="novedades" value="si" style="width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: #e86bd0"><span>Quiero recibir novedades de Efeonce. Puedes darte de baja cuando quieras.</span></label>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+<button type="button" onClick="{{goStep1}}" style="background: transparent; border: 1.5px solid rgba(255,255,255,0.4); color: #ffffff; border-radius: 999px; padding: 15px 22px; font-size: 15px; font-weight: 500; min-height: 52px">Atrás</button>
+<button type="button" class="btn" onClick="{{send}}" style="border: 0">Agendar mi reunión</button>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03); font-size: 13px; color: #cfe4fa">
+<span>✓ Sin costo, 1 hora</span><span>✓ Sin presentación de ventas</span><span>✓ Si HubSpot no te sirve, te lo decimos</span>
+</div>
+<p style="margin: 0; font-size: 12px; color: #9fb6cc">Usamos tus datos sólo para revisar y responder esta solicitud.</p>
+</div>
+
+<div role="status" style="display: {{doneDisplay}}; flex-direction: column; gap: 18px">
+<span style="width: 56px; height: 56px; border-radius: 50%; border: 1.5px solid #e86bd0; display: grid; place-items: center"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#e86bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 750; letter-spacing: -0.03em; line-height: 1.05">Recibimos tu solicitud</p>
+<p style="margin: 0; font-size: 16px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Elige ahora el horario de tu reunión de alcance. Si prefieres, te escribimos en un día hábil.</p>
+<ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; color: #e6edf3">
+<li>Eliges el horario.</li>
+<li>Te llega la invitación con un enlace de Teams.</li>
+<li>Llegas con tu caso: nosotros ya revisamos lo que nos contaste.</li>
+</ol>
+<a href="#" class="btn" style="align-self: flex-start">Elegir mi horario</a>
+</div>
+</form>
+</div>
+</section>
+
+<!-- El footer canónico del sitio va aquí (lo pone WordPress). -->
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"hero":{"editor":"enum","options":["Ahora sí","Mucho más","Ya lo viste"],"default":"Ahora sí","section":"Hero"},"$preview":{"width":1440,"height":17200}}'>
+class Component extends DCLogic {
+renderVals() {
+const hero = this.props.hero ?? 'Ahora sí';
+const step = (this.state && this.state.step) || 1;
+const done = step === 3;
+return {
+formDisplay: done ? 'none' : 'flex',
+doneDisplay: done ? 'flex' : 'none',
+step1: step === 1 ? 'flex' : 'none',
+step2: step === 2 ? 'flex' : 'none',
+stepNum: step === 2 ? 2 : 1,
+stepPct: step === 2 ? '100%' : '50%',
+stepTitle: step === 2 ? '¿Con quién hablamos?' : 'Tu punto de partida',
+goStep1: () => this.setState({ step: 1 }),
+goStep2: () => this.setState({ step: 2 }),
+send: () => this.setState({ step: 3 }),
+pairContext: hero === 'Ahora sí', pairMore: hero === 'Mucho más', pairFriday: hero === 'Ya lo viste' };
+}
+}
+</script>
+</body>
+</html>

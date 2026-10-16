@@ -1,5 +1,29 @@
 # Landing: HubSpot Services
 
+> **Delta 2026-10-16 — v2 publicada (rediseño por los 4 resultados de HubSpot).** El cuerpo de `244079` ya no son los
+> 11 widgets `greenhouse_hubspot_*`: son **14 widgets `greenhouse_hubspot_v2_*`** (hero, marquesina, numeros, punto,
+> diferencia, resultados, riesgo, agentes, metodo, seguridad, caso, partner, preguntas, agenda) compilados desde el canvas
+> Design `https://claude.ai/artifact/K5kub2AHMQzB1sAwACe9X9` (copia en `scripts/public-website/hubspot-v2-source/Main.dc.html`,
+> con dos FAQ SEO extra). Pipeline: `prepare-hubspot-v2-assets.cjs` → `compile-hubspot-v2-elementor-source.cjs` →
+> `build-hubspot-v2-elementor-package.cjs <baseline>` → `deploy-hubspot-v2-elementor-package.php` (contrato
+> `hubspot-v2-elementor-release.v1`) → `republish-hubspot-v2-page.php` (snapshot `_gh_hubspot_v2_before_20261016_214609`:
+> árbol, settings, metas Ohio y thumbnail anteriores; hash previo `cc9710c8…`, nuevo `52308ef5…`; metas Ohio copiadas de
+> `251981`) → `configure-hubspot-v2-seo.php` (snapshot `_gh_hubspot_v2_seo_before_20261016_214622`; OG/thumbnail
+> attachment `251991`; title «Partner HubSpot: implementación de CRM y agentes de IA | Efeonce», focus «partner hubspot»,
+> Semrush CL/MX/CO 2026-10-16). Preview local sin WordPress: `preview-hubspot-v2-local.cjs`. Runtime commit en
+> `efeonce-public-site-runtime` (feat(hubspot): v2 landing modules…, sin push). Formulario: el mismo Growth Form
+> gobernado `efeonce-hubspot-scope` (`bb220383-…`, surface `fhsf-efeonce-hubspot-scope`, multipaso, HubSpot `direct`)
+> en tarjeta de papel; el diseño de dos pasos del canvas queda como brief para una versión futura del formulario.
+> Schema: el widget `preguntas` emite Service `#service` (cinco países, catálogo sin precios) + FAQPage (6);
+> `includes/hubspot-v2/seo.php` agrega `about → #service` y el adaptador v1 (`includes/hubspot/seo.php`) no agrega su
+> Service mientras el FAQ v2 esté en la página. Rollback del cuerpo: `Document::save()` con el árbol y settings del
+> snapshot + metas; plugin backup `/tmp/eo-hubspot-v2-widgets-before-20261016-214459.tar` (temporal). Verificado live
+> 1440/390 sin desborde, 14 módulos, un H1, canonical, OG, Service+FAQPage únicos, formulario paso 1 de 3.
+> Decisiones del operador (2026-10-16): fotos cine aprobadas en esta web; leyes de datos por mercado (5 países), nunca
+> sólo Chile; sin fotos de Julio (plate HS6b rechazado); cifras ANAM públicas sólo de atención (−56 %, −76 %, 5 rutas,
+> 23 fuentes); sin montos. **Todo lo que sigue sobre los 11 widgets v1 es historia** (siguen instalados como rollback).
+
+
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-hubspot-scope` v4 entrega en `direct` al formulario HubSpot «Lead Gen - Servicios HubSpot» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
 
 ## Identity and owners
