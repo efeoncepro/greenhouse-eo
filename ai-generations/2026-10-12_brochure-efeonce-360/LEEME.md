@@ -76,3 +76,10 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 - Lámina 04 (2026-10-16, «Dale muchísimo más impacto visual»): la lista se reemplazó por la órbita de La órbita con las cinco líneas como esferas alrededor de «Tu cliente» (hecha a mano, `native-growth/orbita-cinco-lineas-v04.mjs`, acento teal de Growth).
 - Lámina 04 con el acento de cada línea en su esfera y su etiqueta (2026-10-16, a pregunta del operador): Engine #0375db, Brand #ff6500, Voice #f83902, Revenue #e86bd0 (el de HubSpot, igual que su portada de tramo) y Growth #36c8bf; la órbita sigue en el teal de Growth. Es la segunda lámina con cinco acentos, después de la portada: excepción a «un acento por lámina» que el operador debe confirmar.
 - Portadas de tramo (2026-10-16, a pedido del operador): el rótulo «0N · momento · línea» va dentro de una ficha delineada de 2 px en el acento de su línea, sin relleno (`native-growth/chip-tramos.mjs`, dibujada sobre la portada compuesta). Sólo en las cinco aperturas de tramo; los rótulos de las láminas interiores siguen como texto. Al recomponer las portadas desde el compositor, la ficha debe pasar a la receta o volver a dibujarse.
+
+## 2026-10-16 · Brand con tres láminas de Agencia Creativa
+
+- A pedido del operador, Brand suma tres láminas del brochure de Agencia Creativa (`2026-10-06_brochure-creativo/build-canvas-v7.py`): 13 «Seis capacidades, un solo equipo» (`A04-capacidades`), 8 «La aplica cualquiera. Sale igual.» (`B5-sistema`) y 5 «Una campaña. 50 piezas. Una sola marca.» (`B2-formatos`).
+- Se tomaron del PDF de OneDrive a 1920×1080. Su rótulo original se borró por interpolación vertical y se puso «02 · Te recuerdan · Brand» en 16 px #e2e2e2, igual que el resto del 360. Archivos: `laminas-v9/10-K13`, `11-K08` y `12-K05`.
+- El brochure queda en 29 láminas. `build-pdf.mjs` arma el PDF y busca las portadas por código, así que los enlaces de la lámina 04 siguen apuntando bien (5, 8, 13, 15 y 17).
+- Pendiente de decisión: la 5 lleva a Karo, que ya está en la portada Brand, en «Tu equipo dirige» y en Voice, y además repite la cifra de Sky (+2.000 piezas).
