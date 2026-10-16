@@ -52,6 +52,23 @@ a{color:#ffffff}a:hover{color:#ffd9cc}
 .fld{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500;color:#cfe4fa}
 .fld input,.fld select,.fld textarea{font:inherit;font-size:16px;font-weight:400;color:#ffffff;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.28);border-radius:14px;padding:14px 16px;min-height:52px;box-sizing:border-box;width:100%}
 .fld select option{color:#001a33}
+.fld select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:46px;background-image:linear-gradient(45deg,transparent 50%,#ffffff 50%),linear-gradient(135deg,#ffffff 50%,transparent 50%);background-position:calc(100% - 24px) 52%,calc(100% - 18px) 52%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+.fld select:hover{border-color:rgba(255,255,255,.55)}
+@supports (appearance: base-select){
+ .fld select,.fld select::picker(select){appearance:base-select}
+ .fld select{display:flex;align-items:center;background-image:none;padding-right:16px}
+ .fld select::picker-icon{content:"";width:8px;height:8px;margin:0 4px 4px auto;border-right:2px solid #ffffff;border-bottom:2px solid #ffffff;transform:rotate(45deg);transition:transform .25s cubic-bezier(.2,0,0,1)}
+ .fld select:open::picker-icon{transform:translateY(4px) rotate(225deg)}
+ .fld select:open{border-color:#ffffff;box-shadow:0 0 0 4px rgba(248,57,2,.25)}
+ .fld select::picker(select){margin-top:8px;padding:8px;border-radius:18px;border:1.5px solid rgba(255,255,255,.22);background:linear-gradient(160deg,#0b3460,#04213f);color:#ffffff;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.2);opacity:1;transform:translateY(0);transition:opacity .2s ease,transform .25s cubic-bezier(.05,.7,.1,1),display .25s allow-discrete,overlay .25s allow-discrete}
+ @starting-style{.fld select:open::picker(select){opacity:0;transform:translateY(-8px)}}
+ .fld select option{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 14px;border-radius:12px;font-size:15px;font-weight:500;color:#ffffff;background:transparent;cursor:pointer}
+ .fld select option:hover,.fld select option:focus-visible{background:rgba(255,255,255,.09);outline:none}
+ .fld select option:checked{background:rgba(248,57,2,.14);font-weight:600}
+ .fld select option::checkmark{order:2;margin-left:auto;color:#f83902;font-weight:700}
+ .fld select option[value=""]{color:#9fb6cc;font-weight:400}
+ .fld select selectedcontent{font-size:16px}
+}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid #ffffff;outline-offset:2px;border-color:#ffffff}
 summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
 button{font:inherit;cursor:pointer}
@@ -131,6 +148,7 @@ button{font:inherit;cursor:pointer}
 .count::after{content:counter(n)}
 
 @media (max-width:1000px){
+ .sticky-col{position:static!important}
  .g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}
  .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
  .split,.case,.orbgrid{grid-template-columns:minmax(0,1fr);gap:28px}
@@ -142,6 +160,19 @@ button{font:inherit;cursor:pointer}
  .g5{grid-template-columns:repeat(2,minmax(0,1fr))}
  .hs-panel{width:84vw!important}
  .mbar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:20}
+ .hero{height:auto!important;display:block!important}
+ .hero .hero-media{position:relative!important;height:440px}
+ .hero .hero-media img{object-position:72% 30%!important}
+ .hero .wrap{padding-top:28px!important;padding-bottom:56px!important}
+ .vs-t{order:-1}
+ .gmock{grid-template-columns:minmax(0,1fr)!important}
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .kpis p:last-child{font-size:30px!important}
+ .stairs li{min-height:0!important}
+ .formcard{padding:24px 18px!important}
+ .hs-pin{padding-top:72px!important;padding-bottom:40px!important}
+ .hs-panel{min-height:0!important}
+ .cue{display:none}
 }
 @media (prefers-reduced-motion: reduce){
  *,*::before,*::after{animation:none!important}
@@ -153,8 +184,8 @@ button{font:inherit;cursor:pointer}
 <div style="background: #001a33; color: #ffffff; font-family: Poppins, sans-serif; overflow-x: clip">
 
 
-<section aria-labelledby="hero-h1" style="position: relative; height: max(820px, min(100vh, 1000px)); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end">
-<div class="para" style="position: absolute; inset: 0">
+<section class="hero" aria-labelledby="hero-h1" style="position: relative; height: max(820px, min(100vh, 1000px)); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end">
+<div class="para hero-media" style="position: absolute; inset: 0">
 <img class="kb" src="/_blob/cbddb709495738246434c4e0561372df" fetchpriority="high" alt="Isabella, de Efeonce, sostiene una esfera de luz naranja de la que salen líneas hacia muchas pantallas" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 66% 40%">
 </div>
 <div class="wrap" style="position: relative; width: 100%; padding-bottom: 92px">
@@ -352,7 +383,7 @@ button{font:inherit;cursor:pointer}
 <p style="margin: 0; font-size: 17px; font-weight: 300; line-height: 1.6; color: #cfe4fa; max-width: 520px">Search, Performance Max, Demand Gen y YouTube aprenden de lo que les mandamos: conversiones con valor, exclusiones de marca y listas desde tu CRM. Cuando la búsqueda migre a AI Max en 2027, llegamos con los controles puestos.</p>
 <div class="g3" style="gap: 18px; margin-top: 8px"><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Le mandamos</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Conversiones con valor y listas del CRM</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Controlamos</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Exclusiones de marca y de búsqueda</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Febrero 2027</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Búsqueda migra a AI Max</p></div></div>
 </div>
-<div class="pop-in" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px">
+<div class="pop-in gmock" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px">
 <div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 16px">Search</p><div style="height: 40px; border-radius: 20px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22); display: flex; align-items: center; padding: 0 16px; font-size: 14px; color: #cfe4fa">zapatillas para correr de noche</div><div style="margin-top: 12px; padding: 14px; border-radius: 12px; outline: 2.5px solid #f83902; outline-offset: 2px; background: rgba(255,255,255,0.04)"><p style="margin: 0; font-size: 12px; color: #cfe4fa"><b style="color: #ffffff">Patrocinado</b> · nortica.ejemplo</p><p style="margin: 6px 0 0; font-size: 18px; font-weight: 600; line-height: 1.25; color: #9fd0ff">Zapatillas de running · Suela lima reflectante</p><p style="margin: 6px 0 0; font-size: 13px; line-height: 1.4; color: #d9e3ec">Corre de noche con más visibilidad. Envío a todo el país.</p></div></div>
 <div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 16px">Shopping · PMax</p><div style="border-radius: 12px; overflow: hidden; outline: 2.5px solid #f83902; outline-offset: 2px; background: rgba(255,255,255,0.05)"><img src="/_blob/84530393cafa9f1abd55ff9fa780d45f" alt="Zapatilla de la marca de ejemplo" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block"><div style="padding: 10px 12px"><p style="margin: 0; font-size: 13px; font-weight: 600">Nórtica Night Run</p><p style="margin: 2px 0 0; font-size: 15px; font-weight: 700">$ 89.990</p><p style="margin: 2px 0 0; font-size: 11px; color: #9fb6cc">PATROCINADO</p></div></div></div>
 <div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/0ce829ad4df7bc161695097040ce9a48" alt="" style="height: 16px">YouTube</p><div style="position: relative; border-radius: 12px; overflow: hidden; outline: 2.5px solid #f83902; outline-offset: 2px"><img src="/_blob/44def11fa156850c3801735c2f9aa59e" alt="Anuncio en video de la marca de ejemplo" style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block"><span style="position: absolute; left: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,0.65)">Anuncio · 0:06</span><span style="position: absolute; right: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.5)">Omitir ›</span></div></div>
@@ -541,10 +572,10 @@ button{font:inherit;cursor:pointer}
 
 <div class="rv" style="margin-top: 120px; border-radius: 32px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)); padding: 34px 34px 30px; box-shadow: 0 60px 140px rgba(0,0,0,0.5)">
 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
-<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/a8d85947f6b28058b897dd7df1f93123" alt="Efeonce" style="height: 22px"><span class="eyebrow" style="font-size: 12px">03 · Tu tablero, cada semana</span></div>
+<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/d87664017eda36864cc70babede08980" alt="Efeonce Insights" style="height: 26px; width: auto"><span class="eyebrow" style="font-size: 12px">03 · Tu tablero, cada semana</span></div>
 <div style="display: flex; align-items: center; gap: 12px"><img src="/_blob/b33672d9f8ec537d2e2729cf6bb05256" alt="Google Analytics" style="height: 22px"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="HubSpot" style="height: 22px"><img src="/_blob/a98f7cff868281c750398184592bd4db" alt="Salesforce" style="height: 20px"><span style="font-size: 12px; color: #9fb6cc">Datos de muestra</span></div>
 </div>
-<div class="g4 st" style="gap: 14px; margin-top: 26px"><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Inversión del mes</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">US$ 15.000</p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Ventas en tu CRM</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff"><span class="count" style="--n: 150"></span></p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Costo por venta real</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">US$ 100</p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Ventas contadas dos veces</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #f83902"><span class="count" style="--n: 120"></span></p></div></div>
+<div class="g4 st kpis" style="gap: 14px; margin-top: 26px"><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Inversión del mes</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">US$ 15.000</p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Ventas en tu CRM</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff"><span class="count" style="--n: 150"></span></p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Costo por venta real</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">US$ 100</p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Ventas contadas dos veces</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #f83902"><span class="count" style="--n: 120"></span></p></div></div>
 <div class="dash" style="margin-top: 18px">
 <div style="padding: 22px 24px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)">
 <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap"><p style="margin: 0; font-size: 14px; color: #ffffff; font-weight: 500">Ventas por semana · con campaña y zona de control</p><p style="margin: 0; font-size: 12px; color: #9fb6cc"><span style="color: #f83902">━</span> Con campaña &#160; <span style="color: #6f89a2">┅</span> Control</p></div>
@@ -638,7 +669,7 @@ button{font:inherit;cursor:pointer}
 <p class="eyebrow chip rv">Cómo empezamos</p>
 <h2 id="met-h" class="h2 words" style="margin-top: 22px"><span>Por</span> <span style="color: #f83902">etapas,</span> <span>con</span> <span>evidencia</span></h2>
 <p class="lead rv" style="margin-top: 30px; max-width: 600px">Una escalera: cada etapa deja evidencia para decidir la siguiente, sin amarrarte a ciegas.</p>
-<ol class="g4 st" style="list-style: none; margin: 80px 0 0; padding: 0; gap: 20px; align-items: end">
+<ol class="g4 st stairs" style="list-style: none; margin: 80px 0 0; padding: 0; gap: 20px; align-items: end">
 <li style="padding: 30px 26px; border-radius: 22px; border: 2px solid #f83902; background: rgba(248,57,2,0.08); min-height: 240px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff">Empieza aquí</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Diagnóstico</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Inversión, cuentas, señal y creatividad; plan de 90 días en 2 a 4 semanas.</span></li>
 <li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.22); min-height: 290px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">8 a 12 semanas</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Activation Sprint</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Señal remediada, cuentas ordenadas, primera matriz creativa y línea base.</span></li>
 <li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.22); min-height: 340px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">Mínimo 3 meses</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Managed Performance</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Operación mensual, testing, reporte ejecutivo y gobierno trimestral.</span></li>
@@ -694,8 +725,8 @@ button{font:inherit;cursor:pointer}
 </div>
 </div>
 </div>
-<div class="wrap g2" style="gap: 56px; padding-top: 90px; padding-bottom: 240px; align-items: start; position: relative">
-<div style="display: flex; flex-direction: column; gap: 22px">
+<div class="wrap g2" style="gap: 56px; padding-top: 90px; padding-bottom: 150px; align-items: start; position: relative">
+<div class="sticky-col" style="display: flex; flex-direction: column; gap: 22px; position: sticky; top: 48px; align-self: start">
 <p class="eyebrow chip rv">El diagnóstico</p>
 <p class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(36px, 3.6vw, 56px); font-weight: 760; letter-spacing: -0.035em; line-height: 1">Tu pauta, revisada <span style="color: #f83902">a fondo</span></p>
 <ul class="st" style="list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-width: 520px">
@@ -704,7 +735,7 @@ button{font:inherit;cursor:pointer}
 <li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">Lo que necesitamos de ti:</b> <span style="color: #cfe4fa; font-weight: 300">acceso de lectura a tus cuentas y una reunión de inicio.</span></li>
 </ul>
 </div>
-<div class="rvr" style="padding: 36px 34px; border-radius: 28px; background: rgba(0,26,51,0.92); border: 1.5px solid rgba(255,255,255,0.24); box-shadow: 0 40px 100px rgba(0,0,0,0.5)">
+<div class="rvr formcard" style="padding: 36px 34px; border-radius: 28px; background: rgba(0,26,51,0.92); border: 1.5px solid rgba(255,255,255,0.24); box-shadow: 0 40px 100px rgba(0,0,0,0.5)">
 <sc-if value="{{notSent}}" hint-placeholder-val="{{true}}">
 <form aria-labelledby="form-h" onSubmit="{{submitForm}}" style="display: flex; flex-direction: column; gap: 18px">
 <div><p id="form-h" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.025em">Agenda tu diagnóstico</p><p style="margin: 6px 0 0; font-size: 14px; color: #cfe4fa">Los campos con <span style="color: #f83902">*</span> son obligatorios.</p></div>
@@ -722,6 +753,11 @@ button{font:inherit;cursor:pointer}
 <label class="fld"><span>Inversión mensual en medios<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><select name="inversion"><option value="">Elige un rango</option><option>Menos de USD 3.000</option><option>USD 3.000 a 10.000</option><option>USD 10.000 a 50.000</option><option>Más de USD 50.000</option><option>Por definir</option></select></label>
 <label class="fld"><span>¿Qué quieres resolver?<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><textarea name="mensaje" rows="3" style="resize: vertical; min-height: 96px" placeholder="Por ejemplo: no sabemos qué canal trae ventas, o queremos sumar programática."></textarea></label>
 <label class="chk-line"><input type="checkbox" name="novedades" value="si"><span>Quiero recibir novedades y contenidos de Efeonce. Puedes darte de baja cuando quieras.</span></label>
+<div aria-label="Por qué confiar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.03)">
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="" style="height: 20px">HubSpot Solutions Partner Gold</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600"><img src="/_blob/a98f7cff868281c750398184592bd4db" alt="" style="height: 18px">Salesforce Partner</span>
+<span style="font-size: 13px; font-weight: 600"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 760">+120</span> empresas en 4 países</span>
+</div>
 <button type="submit" style="min-height: 56px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 17px; font-weight: 600; box-shadow: 0 0 0 5px rgba(248,57,2,0.4)">Enviar y coordinar la reunión</button>
 <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9fb6cc">Usamos tus datos sólo para responder esta solicitud. Más detalle en la <a href="#privacidad" style="color: #ffffff">política de privacidad</a>.</p>
 <p style="margin: 0; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.14); font-size: 14px; color: #cfe4fa">¿Prefieres elegir el horario tú? <a href="#agendar" style="color: #ffffff; font-weight: 600">Agenda directo en el calendario</a></p>
@@ -737,7 +773,6 @@ button{font:inherit;cursor:pointer}
 </div>
 </sc-if>
 </div>
-<img src="/_blob/a8d85947f6b28058b897dd7df1f93123" loading="lazy" alt="Efeonce" style="position: absolute; left: 50%; bottom: 70px; transform: translateX(-50%); width: 170px">
 </div>
 </section>
 
