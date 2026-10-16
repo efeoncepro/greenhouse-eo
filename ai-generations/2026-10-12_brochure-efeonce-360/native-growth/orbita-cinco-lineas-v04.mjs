@@ -2,7 +2,7 @@ import fs from 'node:fs';
 const S=process.argv[2];const ID="'Bricolage Grotesque', system-ui, sans-serif", ST="'Poppins', system-ui, sans-serif";
 const BUB='file:///Users/jreye/Documents/greenhouse-eo/node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-dark.svg';
 const cx=1230,cy=590,rx=470,ry=235;
-const items=[['01','Te encuentran','Engine','#0375db'],['02','Te recuerdan','Brand','#ff6500'],['03','Le hablas a quien compra','Voice','#f83902'],['04','Te compran','Revenue','#e86bd0'],['05','Lo mides','Growth','#36c8bf']];
+const items=[['01','Te encuentran','Engine','#0375db'],['02','Te recuerdan','Brand','#ff6500'],['03','Llegas a quien compra','Voice','#f83902'],['04','Te compran','Revenue','#e86bd0'],['05','Lo mides','Growth','#36c8bf']];
 let grads='';
 const ang=[-90,-18,54,126,198];
 let spheres='',labels='';
