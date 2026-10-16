@@ -7,7 +7,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'medios-elementor-release.v1' ) { WP_CL
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root = WP_PLUGIN_DIR . '/eo-elementor-widgets/';
-$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-medios-landing-(base|widgets)\.php|medios/schemas/[a-z]+(-[a-z]+)*\.json|medios/templates/[a-z0-9_-]+\.html)|assets/(css/medios-landing\.css|js/medios-landing\.js|img/medios/[a-z0-9-]+\.(webp|mp4|svg)))$#';
+$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-medios-landing-(base|widgets)\.php|medios/seo\.php|medios/schemas/[a-z]+(-[a-z]+)*\.json|medios/templates/[a-z0-9_-]+\.html)|assets/(css/medios-landing\.css|js/medios-landing\.js|img/medios/[a-z0-9-]+\.(webp|mp4|svg)))$#';
 $files = array();
 foreach ( $manifest['files'] as $entry ) {
 	$path = $entry['path'];

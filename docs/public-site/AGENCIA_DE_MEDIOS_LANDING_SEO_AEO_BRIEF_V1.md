@@ -67,9 +67,12 @@ Basis, DV360 y The Trade Desk quedan fuera de las descripciones sociales hasta t
 ## 5. Schema
 
 - Yoast emite `WebPage`, `WebSite` y `Organization`; no se duplican.
+- El `WebPage` de Yoast declara `about → #service` (filtro acotado `includes/medios/seo.php`, sólo en esta página).
 - El widget de FAQ (`greenhouse_medios_preguntas`) emite, desde las filas visibles:
-  - `Service` `#service` con `provider` `https://efeoncepro.com/#organization` y `areaServed` Chile, Colombia, México
-    y Perú; sin `offers` ni precios.
+  - `Service` `#service` con `provider` `https://efeoncepro.com/#organization`, `areaServed` con los cinco países que
+    nombra la FAQ (Chile, Colombia, Perú, México y Estados Unidos) y `hasOfferCatalog` con los 8 componentes que la
+    página muestra (planificación, compra en search y social, programática, TV conectada y audio, DOOH, retail media,
+    creatividad para performance, medición); sin precios ni `AggregateRating`. Ajuste del 2026-10-16.
   - `FAQPage` `#faq` con las 11 preguntas, con las respuestas exactas del HTML.
 - Una pregunta nueva en el FAQ entra al schema sin otro paso; no editar el JSON-LD a mano.
 

@@ -33,7 +33,9 @@
 - SEO (`configure-medios-seo.php`, snapshot `_gh_medios_seo_before_20261016_183347`): title «Agencia de medios:
   planificación y compra | Efeonce», focus keyphrase «agencia de medios», OG/Twitter with image attachment `251986`
   (also `_thumbnail_id`). The `preguntas` module emits Service `#service` (provider `https://efeoncepro.com/#organization`,
-  areaServed CL/CO/MX/PE) + FAQPage `#faq` (11). Research: Semrush 2026-10-16 (no conflict with «agencia de performance
+  areaServed los cinco países de la FAQ, `hasOfferCatalog` sin precios con los 8 componentes visibles, editables en el
+  campo «componentes del servicio») + FAQPage `#faq` (11). `includes/medios/seo.php` agrega `about → #service` al
+  WebPage de Yoast sólo en `251981` y sólo mientras el widget `greenhouse_medios_preguntas` esté en la página (2026-10-16). Research: Semrush 2026-10-16 (no conflict with «agencia de performance
   marketing» in Chile; keep that term out of title/H1/slug).
 - Ohio: `wp_insert_post` pages get the blog sidebar. All 164 `page_*`/`_page_*` metas were copied from `249582`
   (`fix-medios-ohio-layout.php`, snapshot `_gh_medios_ohio_layout_before_20261016_183214`).

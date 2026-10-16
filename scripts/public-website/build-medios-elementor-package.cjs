@@ -17,6 +17,7 @@ const relativeFiles = [
   'includes/class-eo-widgets-loader.php',
   'includes/widgets/class-eo-medios-landing-base.php',
   'includes/widgets/class-eo-medios-landing-widgets.php',
+  'includes/medios/seo.php',
   ...list('includes/medios/schemas'),
   ...list('includes/medios/templates'),
   'assets/css/medios-landing.css',

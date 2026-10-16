@@ -280,7 +280,19 @@ const SERVICE_DEFAULTS = {
   schema_service_type: 'Planificación, compra y medición de medios pagados',
   schema_service_description: 'Planificamos, compramos, optimizamos y medimos tu inversión publicitaria en search, social, video, TV conectada, audio, DOOH y retail media, conectada a tus ventas y a tu CRM.',
   schema_audience: 'Equipos de marketing',
-  schema_area_served: 'Chile, Colombia, México, Perú',
+  // Same five countries the visible FAQ names (operator, 2026-10-16).
+  schema_area_served: 'Chile, Colombia, Perú, México, Estados Unidos',
+  // One component per line, only what the page itself shows; becomes Service.hasOfferCatalog (no prices).
+  schema_service_catalog: [
+    'Planificación de medios',
+    'Compra en search y social: Google, Meta, TikTok y LinkedIn',
+    'Compra programática',
+    'TV conectada y audio',
+    'Pantallas digitales en la calle (DOOH)',
+    'Retail media',
+    'Creatividad para performance',
+    'Medición, atribución e incrementalidad',
+  ].join('\n'),
 }
 
 for (const [key, title, scheme] of MODULES) {
@@ -362,6 +374,7 @@ for (const [key, title, scheme] of MODULES) {
       { key: 'schema_service_description', type: 'textarea', label: 'Datos estructurados · descripción del servicio' },
       { key: 'schema_audience', type: 'text', label: 'Datos estructurados · audiencia' },
       { key: 'schema_area_served', type: 'text', label: 'Datos estructurados · países (separados por coma)' },
+      { key: 'schema_service_catalog', type: 'textarea', label: 'Datos estructurados · componentes del servicio (uno por línea)' },
     )
     Object.assign(extraDefaults, SERVICE_DEFAULTS)
   }
