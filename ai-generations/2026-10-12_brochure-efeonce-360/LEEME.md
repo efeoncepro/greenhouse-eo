@@ -132,3 +132,4 @@ Los enlaces de V04 se verificaron: van a las páginas 6, 21, 35, 50 y 60, las ci
 BICECORP, ANAM y partners son los mismos de los brochures ya publicados; la autorización de uso sigue a TASK-1937.
 
 - 2026-10-16 · V17: «Personas con nombre, con agentes a su lado» no se entendía (todas las personas tienen nombre). Ahora dice «Sabes quién hace qué.»: cada persona del squad tiene un rol claro y una sola te habla, tu Account Manager (`e-V17b.json`).
+- 2026-10-16 · V17 suma la cifra «+89 profesionales expertos en distintas áreas, en LATAM» bajo el texto (pedido del operador, `e-V17c.json`).
