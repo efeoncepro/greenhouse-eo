@@ -2,15 +2,16 @@ import fs from 'node:fs';
 const S=process.argv[2];const ID="'Bricolage Grotesque', system-ui, sans-serif", ST="'Poppins', system-ui, sans-serif";
 const BUB='file:///Users/jreye/Documents/greenhouse-eo/node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-dark.svg';
 const cx=1230,cy=590,rx=470,ry=235;
-const items=[['01','Te encuentran','Engine'],['02','Te recuerdan','Brand'],['03','Le hablas a quien compra','Voice'],['04','Te compran','Revenue'],['05','Lo mides','Growth']];
+const items=[['01','Te encuentran','Engine','#0375db'],['02','Te recuerdan','Brand','#ff6500'],['03','Le hablas a quien compra','Voice','#f83902'],['04','Te compran','Revenue','#e86bd0'],['05','Lo mides','Growth','#36c8bf']];
+let grads='';
 const ang=[-90,-18,54,126,198];
 let spheres='',labels='';
-items.forEach(([n,m,l],i)=>{const a=ang[i]*Math.PI/180;const x=cx+rx*Math.cos(a),y=cy+ry*Math.sin(a);const depth=(Math.sin(a)+1)/2;const r=20+depth*16;
- spheres+=`<circle cx="${x}" cy="${y}" r="${r*2.6}" fill="url(#glow)" opacity="${0.55+depth*0.35}"/><circle cx="${x}" cy="${y}" r="${r}" fill="url(#sph)"/>`;
+items.forEach(([n,m,l,c],i)=>{grads+=`<radialGradient id="sph${i}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.3" stop-color="${c}" stop-opacity="0.85"/><stop offset="1" stop-color="${c}"/></radialGradient><radialGradient id="glow${i}"><stop offset="0" stop-color="${c}" stop-opacity="0.75"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`;const a=ang[i]*Math.PI/180;const x=cx+rx*Math.cos(a),y=cy+ry*Math.sin(a);const depth=(Math.sin(a)+1)/2;const r=20+depth*16;
+ spheres+=`<circle cx="${x}" cy="${y}" r="${r*2.6}" fill="url(#glow${i})" opacity="${0.55+depth*0.35}"/><circle cx="${x}" cy="${y}" r="${r}" fill="url(#sph${i})"/>`;
  const dx=Math.cos(a),dy=Math.sin(a);const w=260;let left,top,anchor='center';
  if(dy>0.5){left=x-w/2;top=y+r+22;}else{left=x-w/2;top=y-r-(m.length>16?118:92);}
  labels+=`<div style="position:absolute;left:${left}px;top:${top}px;width:${w}px;text-align:${anchor};font-family:${ID}">
-<div style="font-family:${ST};font-size:15px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#72ded8">${n} · ${l}</div>
+<div style="font-family:${ST};font-size:15px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:${c}">${n} · ${l}</div>
 <div style="margin-top:6px;font-size:${m.length>16?28:34}px;font-weight:740;letter-spacing:-0.02em;line-height:1.05;color:#fff">${m}</div></div>`;});
 const html=`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Poppins:wght@300;400;500;600&display=swap"><style>body{margin:0}b{font-weight:600}</style></head><body>
 <div style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#001a33">
@@ -22,7 +23,7 @@ const html=`<!doctype html><html><head><meta charset="utf-8"><link rel="styleshe
 <radialGradient id="sph" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#9ff1ea"/><stop offset="1" stop-color="#1f9e94"/></radialGradient>
 <radialGradient id="glow"><stop offset="0" stop-color="#72ded8" stop-opacity="0.8"/><stop offset="1" stop-color="#72ded8" stop-opacity="0"/></radialGradient>
 <radialGradient id="core" cx="${cx}" cy="${cy}" r="230" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#72ded8" stop-opacity="0.28"/><stop offset="1" stop-color="#72ded8" stop-opacity="0"/></radialGradient>
-<filter id="blur"><feGaussianBlur stdDeviation="9"/></filter><filter id="blur2"><feGaussianBlur stdDeviation="22"/></filter>
+${grads}<filter id="blur"><feGaussianBlur stdDeviation="9"/></filter><filter id="blur2"><feGaussianBlur stdDeviation="22"/></filter>
 </defs>
 <rect width="1920" height="1080" fill="url(#halo)"/><rect y="778" width="1920" height="302" fill="url(#floor)"/>
 <ellipse cx="${cx}" cy="${cy+395}" rx="${rx*0.9}" ry="48" fill="none" stroke="#72ded8" stroke-opacity="0.18" stroke-width="2"/>
