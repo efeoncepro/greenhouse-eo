@@ -29,7 +29,7 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 |---|---|---|
 | 01 | Main | 01 · Portada · ¿Qué gano con Efeonce? Crecimiento. |
 | 02 | V02 | 02 · La idea · Tu cliente da vueltas alrededor de tu marca. |
-| 03 | V03 | 03 · Por qué 360° · Hoy, cada momento lo atiende otro proveedor. |
+| 03 | V03 | 03 · Por qué 360° · Hoy, cada momento lo atiende un proveedor diferente. |
 | 04 | V04 | 04 · Cinco momentos, un equipo · Una vuelta, cinco líneas, un equipo. |
 | 05 | C01 | 05 · Tramo 01 · Engine · ¿Te encuentra la IA? Ahora sí. |
 | 06 | V06 | 06 · Engine · La IA ya recomienda a tu competencia. |
