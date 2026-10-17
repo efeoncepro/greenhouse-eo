@@ -57,6 +57,7 @@ Las tablas de este documento son puntos de partida y ejemplos, nunca la única o
 | 5. Física | Escalas por distancia al lente, recorrido del objeto, causa y efecto | Sección de física en la biblia | Tamaños calculados, no a ojo (§E) |
 | 6. Cámaras | Emplazamientos, alturas, lentes, ángulos y movimientos por plano | Plan de cámaras | Todos del mismo lado de la línea; cada movimiento tiene función (§J) |
 | 7. Storyboard | Una lámina por plano con el componente de video aplicado | Storyboard en el canvas | Cada lámina declara eje, voz, componente y transición (§C, §F) |
+| 7b. Fichas de toma | Una ficha por plano: cuadro inicial y final, motor y modo, acción tiempo a tiempo, cámara, referencias por personaje, sonido, continuidad, intocables, plan B, dificultad, formato y costo | Lista de tomas como **datos** (`TOMAS.json`) y storyboard canónico generado desde ella | Ninguna toma con cara visible sin su personaje en la biblioteca del motor; cada toma tiene cuadro inicial (§F.6) |
 | 8. Auditoría | Revisar la **secuencia completa** contra la biblia, idealmente con dos revisores independientes (planta y física) | Lista de quiebres y bloqueo único | Ningún quiebre abierto en el clímax (§F.3) |
 | 9. Plan de sonido y efectos | Audio, VFX y SFX por plano | Planes en la biblia o el paquete | Cada efecto con técnica decidida; cada SFX con causa visible (§K–§M) |
 | 10. Planos finales | Generar o editar cada plano contra la biblia; reponer caras; revisar texto | `planos/final/` + prompts y costos | Revisión al 100 % de caras, texto y lado de cada objeto (§H) |
@@ -194,6 +195,22 @@ o corregido se revisa contra ella **antes** de mostrarlo.
    si no queda claro a qué plano se refiere, se dice qué se interpretó y el hilo queda abierto.
 5. **Una corrección local se valida en la secuencia**: el plano corregido se pone junto al anterior y el siguiente
    antes de publicarlo.
+
+6. **Ficha de toma (paso 7b)**: el storyboard canónico no es sólo guion visual; es la hoja de producción. Cada plano
+   lleva su cuadro **inicial** (de dónde parte el video; si el cuadro clave es el clímax, se genera aparte) y, cuando
+   empalma con el siguiente, su cuadro **final**; el motor y el modo; los segundos generados y el tramo que se usa
+   (los motores generan desde 4 s y los planos duran 0,5 a 2,5 s); la acción tiempo a tiempo en la grilla musical; la
+   cámara; las referencias de cada personaje en el motor; sonido; continuidad; intocables; plan B; dificultad; costo y
+   estado. Los datos viven en un archivo de tomas (`TOMAS.json`) y el storyboard se genera desde él, para que no haya
+   dos versiones. Plantilla: `motion-design-studio/templates/shot-sheet.md`. Ejemplo: storyboard v4 de la fuente.
+7. **Restricción del motor que decide la ruta** (verificada en BytePlus, 2026-10-16): Seedance rechaza toda imagen de
+   entrada con un rostro realista que no venga de su biblioteca de retratos. Los planos con personas generados en otra
+   herramienta **no sirven como primer cuadro**: en esas tomas la ruta es por referencias (cada personaje como
+   `asset://`) y la escena se describe o se pasa sin rostros. Por eso **cada persona con cara visible tiene que estar
+   en la biblioteca antes de producir**, y el reparto se decide pensando en eso (en la fuente, Paula quedó fuera y bloqueó
+   8 de 18 tomas). Sin caras (paisajes, gente de espaldas, una mano), el plano aprobado sí puede ser primer cuadro.
+8. **Formatos antes de generar**: se decide en qué formatos se entrega y de cuál se derivan los demás. En la fuente
+   se recomendó generar en 9:16 y recortar el 4:5; el 16:9 es otra generación.
 
 ## G. Pantallas, interfaces y producto en pantalla
 
