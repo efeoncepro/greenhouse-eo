@@ -140,7 +140,11 @@ a ninguna persona real. En orden:
 4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje (la primera vez
    se firma la carta de compromiso). Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
    expresión (300–6000 px, proporción 0,4–2,5, menos de 30 MB). Estados: `Processing` → `Active` o `Failed`.
-5. **Usarlos** cuando estén `Active`, como referencia, nombrándolos «Image 1» en el prompt (nunca el id):
+5. **Activar el Asset Service** de la cuenta (una vez), en la consola de ModelArk → Open Management, región
+   ap-southeast-1. Sin eso, toda request con `asset://` falla con `InvalidParameter` en `content[n].image_url.url`
+   («Your account has not activated the Asset Service»), aunque los archivos ya estén subidos (medido el 2026-10-17).
+   La CLI lo explica así desde ese día. Lo activa el operador.
+6. **Usarlos** cuando estén `Active`, como referencia, nombrándolos «Image 1» en el prompt (nunca el id):
    `pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> ...`. Como primer cuadro
    (`--image` sin `--references`) no está documentado: probar con un borrador antes de planificar con él. Anotar
    grupo, asset id(s) y estado en el ledger.

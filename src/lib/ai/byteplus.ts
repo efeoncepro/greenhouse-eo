@@ -18,11 +18,18 @@ export interface BytePlusImageResponse {
   model?: string
   usage?: Record<string, number>
 }
+/** Causas reconocidas en mensajes del proveedor; el mensaje crudo nunca se expone (puede traer referencias o URLs). */
+export type BytePlusErrorCause = 'asset_service_not_activated'
+
 export class BytePlusError extends Error {
-  constructor(readonly status: number, readonly code: string, readonly requestId: string | null) {
-    super(`BytePlus HTTP ${status} (${code}); requestId=${requestId ?? 'sin dato'}`)
+  constructor(readonly status: number, readonly code: string, readonly requestId: string | null,
+    readonly param: string | null = null, readonly cause_: BytePlusErrorCause | null = null) {
+    super(`BytePlus HTTP ${status} (${code}${param ? ` en ${param}` : ''}); requestId=${requestId ?? 'sin dato'}`)
   }
 }
+
+export const classifyBytePlusErrorMessage = (message: unknown): BytePlusErrorCause | null =>
+  typeof message === 'string' && /not activated the Asset Service/i.test(message) ? 'asset_service_not_activated' : null
 
 export const bytePlusHeaders = async (lane: BytePlusLane, resource?: string, requestId: string = randomUUID()): Promise<Record<string, string>> => {
   const envVarName = lane === 'ark' ? 'BYTEPLUS_API_KEY' : 'BYTEPLUS_SPEECH_API_KEY'
@@ -56,15 +63,17 @@ export const bytePlusRequest = async <T>(lane: BytePlusLane, path: string, optio
 
   const requestId = response.headers.get('x-request-id') ?? response.headers.get('x-tt-logid')
   const statusCode = response.headers.get('x-api-status-code')
-  let data: T & { error?: { code?: string } }
+  let data: T & { error?: { code?: string; param?: string; message?: string } }
 
-  try { data = await response.json() as T & { error?: { code?: string } } }
+  try { data = await response.json() as T & { error?: { code?: string; param?: string; message?: string } } }
   catch { throw new BytePlusError(response.status, 'invalid_json_response', requestId) }
 
   if (!response.ok || (data.error && !(data as { status?: string }).status)) {
     const safeCode = String(data.error?.code ?? 'provider_error').replace(/[^a-zA-Z0-9_.-]/g, '').slice(0,100)
 
-    throw new BytePlusError(response.status, safeCode, requestId)
+    const safeParam = typeof data.error?.param === 'string' ? data.error.param.replace(/[^a-zA-Z0-9_.[\]-]/g, '').slice(0,100) || null : null
+
+    throw new BytePlusError(response.status, safeCode, requestId, safeParam, classifyBytePlusErrorMessage(data.error?.message))
   }
 
   return { data, requestId, statusCode }

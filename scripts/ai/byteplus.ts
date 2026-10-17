@@ -105,6 +105,10 @@ const imageInput = bytePlusImageInput
 
 /** Traduce rechazos accionables del fabricante; el resto conserva el código seguro de BytePlusError. */
 export const explainBytePlusError = (error: unknown): unknown => {
+  if (error instanceof BytePlusError && error.cause_ === 'asset_service_not_activated') {
+    return new Error(`${error.message}. La cuenta no tiene activado el Asset Service: los asset:// no se pueden usar hasta activarlo en la consola de ModelArk (Open Management, región ap-southeast-1). Lo activa el operador; ver el ledger de retratos.`)
+  }
+
   if (error instanceof BytePlusError && /PrivacyInformation/i.test(error.code)) {
     return new Error(`${error.message}. Seedance 2.x no acepta rostros humanos reales como entrada. Vías oficiales: una salida original de Seedream 5 o Seedance 2.x de esta misma cuenta (menos de 30 días, sin editar ni recomprimir), un personaje de la biblioteca digital (asset://) o un retrato autorizado. Ver el manual de BytePlus directo.`)
   }

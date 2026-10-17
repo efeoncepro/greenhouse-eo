@@ -13,7 +13,7 @@ import { BYTEPLUS_MODELS, buildBytePlusDraftFinalRequest, bytePlusDraftExpiry, b
 import { bytePlusRequest, generateBytePlusImages, getBytePlusVideo } from './byteplus'
 import { collectBytePlusTts } from './byteplus-speech'
 import { decodeBytePlusAsr, encodeBytePlusAsr, encodeBytePlusInterpretation } from './byteplus-speech-stream'
-import { BytePlusError } from './byteplus'
+import { BytePlusError, classifyBytePlusErrorMessage } from './byteplus'
 import { bytePlusImageInput, explainBytePlusError, mainBytePlus } from '../../../scripts/ai/byteplus'
 
 beforeEach(()=>vi.unstubAllGlobals())
@@ -177,6 +177,16 @@ describe('BytePlus contratos de transporte y costo',()=>{
 
     expect((privacy as Error).message).toMatch(/rostros humanos reales.*Seedream 5.*asset:\/\//)
     expect(explainBytePlusError(other)).toBe(other)
+  })
+  it('reconoce el Asset Service sin activar sin exponer el mensaje crudo del proveedor',()=>{
+    expect(classifyBytePlusErrorMessage('The parameter `content[1].image_url.url` is not valid: Your account has not activated the Asset Service. You may activate it at https://x')).toBe('asset_service_not_activated')
+    expect(classifyBytePlusErrorMessage('otra cosa')).toBeNull()
+    const err=new BytePlusError(400,'InvalidParameter','req-3','content[1].image_url.url','asset_service_not_activated')
+    const explained=explainBytePlusError(err) as Error
+
+    expect(err.message).toContain('content[1].image_url.url')
+    expect(explained.message).toMatch(/Asset Service/)
+    expect(explained.message).not.toContain('https://')
   })
   it('ensambla TTS NDJSON con fragmentos y exige evento terminal',async()=>{
     const bytes=new TextEncoder().encode('{"code":0,"data":"aG9sYQ=="}\n{"code":20000000,"data":null}')
