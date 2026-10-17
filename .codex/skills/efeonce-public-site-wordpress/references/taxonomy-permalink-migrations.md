@@ -179,14 +179,21 @@ Still test both real HTTP variants. The no-slash and slash request must resolve
 without a loop or multi-hop chain to the exact new canonical. A successful
 manager readback alone is not live redirect evidence.
 
-Measured 2026-10-17: Yoast **plain** redirects do not fire when the request
-carries a query string. `/habla-con-un-experto?utm_source=x` and a retired page
-with `?utm_source=` return 404, while old post slugs still redirect with the
-query through WordPress. Test a UTM variant and report it; do not patch one
-URL with a regex redirect, because the behavior affects the whole site.
-Before creating a redirect, also search for existing redirects whose *target* is
-the retiring URL and repoint them, so no chain is left. Case:
-`docs/public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md`.
+Measured 2026-10-17: Yoast Premium 27.7 matches the **whole REQUEST_URI,
+query included**, as an exact key (`redirect-handler.php` → `search()`; its
+fallback only toggles the trailing slash; no filter hook). So
+`/habla-con-un-experto?utm_source=x` returns 404 for pages and categories, while
+old post slugs are rescued by WordPress old-slug handling. Do not patch one URL
+with a regex redirect. The platform fix is the versioned mu-plugin
+`efeonce-redirect-query-passthrough.php` (runtime repo), which reads Yoast's
+plain option and keeps the query. Check whether it is installed before assuming
+UTM behavior. Diagnosis and rollout:
+`docs/public-site/YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md`.
+
+Chains: before creating a redirect, search for existing redirects whose
+*target* is the retiring URL and repoint them. After any retirement, run
+`scripts/public-website/flatten-yoast-redirect-chains.php` (dry-run by
+default). Case: `docs/public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md`.
 
 ## 5. Update Owned Internal Links
 

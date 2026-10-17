@@ -159,7 +159,8 @@ parámetros**:
   `/soluciones-…/?utm_source=x` responden **404**;
 - los posts con slug viejo sí redirigen conservando la query, por la redirección nativa de WordPress.
 Esto ya ocurría antes de este cambio y afecta a todo enlace de campaña con UTM que apunte a una URL redirigida.
-No se parchó para esta URL sola; queda como follow-up de plataforma.
+No se parchó para esta URL sola. Diagnóstico y propuesta de plataforma en
+[YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md](YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md).
 
 **Siguiente paso:** inspeccionar la URL legada en Search Console y, en 2–4 semanas, confirmar que salió del índice
 sin pérdida de impresiones en `/agencia-creativa/`. Cuando se publique Branding Studio (TASK-1803), se editan
