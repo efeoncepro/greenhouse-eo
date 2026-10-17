@@ -10,14 +10,16 @@ America/Santiago, owner de conversiones propio. Cuenta nueva según operador; tr
 [ADR](docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
 [arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) y
 [manual](docs/manual-de-uso/growth/conectar-google-ads-con-agentes.md).
-Doce consultas Ads, ninguna mutación. Credencial/recibos privados ignorados; listener cerrado.
-Pendiente, Growth/Platform: conexión de producto por organización y unidad de lectura/API/CLI;
-después captura/binding/intención/consentimiento y rollout por acción. Marca OAuth heredada «Claude»
-y verificación de scopes requieren revisión antes de ampliar uso. Sin publicación GTM, CRM writes,
-acciones nuevas, campañas, ingesta ni cambios Cloud/IAM. Dirección documental completa; implementación pendiente.
-Ratificación posterior del operador: OAuth de producción **Efeonce** y **CLI de consulta obligatoria**
-en fase 1, con discover, cuenta, campañas, conversiones/goals y reporting. Rebranding por proyecto requiere
-inventario de clientes/regresión GA4/GSC; verificación separada. Requisitos registrados; sin cambio Cloud ni CLI aún.
+Unidad posterior autorizada y alcance ampliado por el operador: **CLI local de lectura y gestión**
+`pnpm google-ads`, diez create/update por plan/hash/validateOnly/journal/readback. Campañas/grupos PAUSED;
+sin activación, eliminación, creatividades o ingesta. Lecturas reales del catálogo PASS; ninguna mutación Ads.
+OAuth del proyecto guardado como **Efeonce** con sus páginas públicas. Mismos clients/callbacks/scopes;
+grant Ads propio en Secret Manager `efeonce-google-ads-agent-oauth`, con principal verificado en Google.
+Regresión real GA4/GSC Efeonce y auth health/providers PASS; **verificación Google de marca/scopes pendiente**.
+[Cierre operativo](docs/audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
+Pendiente Growth/Platform: conexión de producto por organización/API/MCP, pruebas proveedor de escrituras
+con payload real autorizado, y luego captura/consentimiento/binding/rollout de conversiones. Sin publish GTM,
+CRM writes, acciones/campañas nuevas, migraciones, cambios IAM o deploy. Credenciales/recibos fuera de Git.
 
 ## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)
 

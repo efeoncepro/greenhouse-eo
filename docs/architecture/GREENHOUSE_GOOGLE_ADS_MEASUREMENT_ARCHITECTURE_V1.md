@@ -5,6 +5,8 @@
 - Estado: `Accepted` como dirección arquitectónica por instrucción del operador el **2026-10-17**.
 - Implementación de producto: **pendiente**. Este documento no despliega un sender, publica GTM,
   crea acciones, cambia puja ni habilita nuevas organizaciones.
+- Delta operativo 17/10: CLI local de lectura y gestión implementada; OAuth renombrado **Efeonce**.
+  [Evidencia y límites](../audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
 - Dueño: Growth / Measurement; corresponsables: RevOps / HubSpot, Platform / Identity, Data / Insights y Finance.
 - Decisión: [ADR de integración Google Ads](GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md).
 - Evidencia fechada: [discovery y prueba API](../audits/growth/2026-10-17-google-ads-api-discovery.md).
@@ -44,10 +46,15 @@ autorizado. El acceso del usuario a otras cuentas no amplía el binding de produ
 
 ### 1.2 Qué está autorizado en esta etapa
 
-La instrucción actual autoriza documentar la arquitectura, autorizar/probar acceso API **de lectura** a la
+La instrucción inicial autorizó documentar la arquitectura, autorizar/probar acceso API **de lectura** a la
 cuenta indicada y registrar evidencia. El alcance no incluye publicación GTM, altas de conversiones,
 ingesta de eventos, modificación CRM, campañas, presupuesto, IAM ni cambio de configuración OAuth Cloud.
 Las credenciales o grants privados no se copian al repositorio, documentación o salidas de comandos.
+
+El operador amplió posteriormente el alcance a OAuth Efeonce y CLI de lectura/gestión. Se autorizó el
+cambio de marca y la custodia propia del grant; ninguna mutación publicitaria concreta está autorizada
+por esa ampliación genérica. La prueba real de esta sesión se mantiene en lectura. El catálogo de gestión
+y la separación entre capacidad implementada y apply real se detallan en §5.4.
 
 ## 2. Problema, resultados y dueños de verdad
 
@@ -235,11 +242,12 @@ La unidad de conexión debe inventariar clientes/consumidores compartidos, estab
 dominios, soporte y políticas, revisar publicación/audiencia y resolver la verificación requerida.
 Cambiar el nombre no acredita verificación. El gate incluye nuevo consentimiento visible Efeonce y
 readback Ads, más regresión de las conexiones GA4/GSC afectadas. Administración y proyecto canónicos
-se mantienen; no se crea otro proyecto ni se modifica el cliente compartido durante este trabajo documental.
+se mantienen. En la unidad operativa posterior se guardaron nombre Efeonce y sus páginas públicas;
+IDs, callbacks y scopes de los clientes se preservaron. Configuración guardada no acredita verificación Google.
 
-Google Ads documenta `adwords` y no una variante de scope read-only. El primer cliente sólo expone
-operaciones allowlisted de lectura; el scope amplio no se presenta como permiso para mutar. Configure,
-ingest y report son capacidades separadas y denegadas por defecto cuando no estén habilitadas.
+Google Ads documenta `adwords` y no una variante de scope read-only. El cliente expone lecturas y las
+operaciones de gestión cerradas de §5.4; el scope amplio no habilita mutaciones fuera de ese contrato.
+Configure, ingest y report conservan autoridad separada; la ingesta no está implementada en esta CLI.
 
 Data Manager tiene scope `datamanager` y habilitación/autoridad propios. Autorizar Ads no activa ingesta.
 La [guía vigente de acceso Ads](https://developers.google.com/google-ads/api/docs/api-policy/developer-token),
@@ -310,9 +318,10 @@ puede ayudar al operador en lectura, pero no reemplaza el contrato multiorganiza
 
 #### CLI de consulta: entregable obligatorio de la fase 1
 
-El operador pidió una CLI equivalente en forma de uso a Meta, GA4 y GSC. El entrypoint propuesto es
-`pnpm google-ads`; **todavía no existe en package.json**. La implementación fija su contrato y ayuda
-antes de publicarlo. Se entrega con la conexión y los readers, sin esperar a UI o a la activación de tags.
+El operador pidió una CLI equivalente en forma de uso a Meta, GA4 y GSC y luego amplió el alcance a
+gestión. El entrypoint **implementado** es `pnpm google-ads`, contrato `google-ads-agent.v1`.
+La unidad actual es un adapter local de operador con grant propio en Secret Manager; la conexión
+multiorganización, API/MCP/UI y sync de producto siguen pendientes. No depende de activar tags.
 
 | Grupo propuesto | Datos / comportamiento de lectura |
 | --- | --- |
@@ -322,18 +331,41 @@ antes de publicarlo. Se entrega con la conexión y los readers, sin esperar a UI
 | `conversions` / `goals` | Acciones, tipos/estados, objetivos de cuenta/campaña/custom, valores y ventanas, sin cambiar configuración |
 | `report` | Impresiones, clics, coste, conversiones y valor disponibles; fechas/segmentos y grain explícitos |
 
-Los nombres son contrato propuesto, no comandos ejecutables hoy. La CLI consume el primitive canónico
-y la conexión de producto; no copia credenciales del piloto ni crea otro resolver de tokens. La primera
-entrega conserva target `6862539491` y manager comprobado, y rechaza otro anunciante aunque el principal
-pueda acceder por MCC. La ampliación multicuenta requiere su autoridad y binding propios.
+El catálogo ejecutable y sus flags salen de `pnpm --silent google-ads discover`; incluye también
+presupuestos, grupos y metadatos `ad_group_ad`. El secreto propio se instaló mediante importación explícita
+del grant autorizado, validando identidad y cuenta antes de guardarlo; no existe fallback implícito al piloto.
+Conserva target `6862539491` y manager comprobado y rechaza otro anunciante aunque el principal pueda
+acceder por MCC. La ampliación multicuenta requiere su autoridad y binding propios.
 
 Salida estructurada JSON y vista legible comparten schema versionado: rango solicitado, filtros/grain,
 `fetchedAt`, API version, moneda/timezone, filas, cobertura/paginación y errores. Coste conserva micros y
 unidad monetaria; se diferencia cero, no disponible y lectura parcial. Plantillas permiten únicamente
 combinaciones de campos/segmentos verificadas, con budgets, límite de resultados y cuota; GAQL arbitrario
-no es una vía para eludir esas restricciones. `mutate`, upload, publicación y cambios de campañas/goals
-quedan fuera del catálogo inicial. Aceptación: ayuda/discovery, errores sin secretos, negativos de
+no es una vía para eludir esas restricciones. La ampliación de gestión se rige por el contrato siguiente;
+upload y publicación GTM quedan fuera de esta CLI. Aceptación: ayuda/discovery, errores sin secretos, negativos de
 cuenta/org, paginación y una lectura real de esta cuenta nueva; inventarios vacíos son resultados válidos.
+
+#### Gestión autorizada por plan
+
+El operador amplió la capacidad de la CLI a creación/actualización; las lecturas reales de esta sesión
+no incluyen un apply. `write plan` compila un input privado cerrado; `write validate` usa `validateOnly`;
+`write apply --confirm DIGEST` valida con Google antes del único dispatch y reserva el digest en
+`.auth/google-ads-agent/writes/` con permisos 0700/0600, creación exclusiva y fsync antes del envío.
+El journal conserva preparado/dispatching/accepted/rejected/unknown. No borrar ni editar un recibo para
+reintentar: una incidencia requiere reconciliación y decisión operativa independiente.
+
+Catálogo actual: create/update de campaign Budget, campaña SEARCH, adGroup SEARCH_STANDARD y
+conversionAction WEBPAGE/UPLOAD_CLICKS; update de accountGoal/campaignGoal. Una operación por plan,
+sin partial failure ni máscaras arbitrarias; se omite ese campo donde el endpoint Google no lo admite.
+Campañas/grupos sólo PAUSED; valores monetarios, moneda y referencias de recursos se validan antes de
+Google. Activación, eliminación, creatividades e ingesta quedan fuera del catálogo. El principal OAuth
+amplio no habilita operaciones ausentes. El presupuesto de una campaña puede afectar gasto futuro;
+su payload concreto requiere revisión y autorización del operador antes de apply.
+
+`write verify` lee el resource name nativo con todos los campos derivados del plan y devuelve diff.
+Un recurso existente no acredita que sus campos coincidan. Ausencia/mismatch da exit 8; transporte
+ambiguo o digest ya reservado da exit 7. El ACK de mutate no se presenta como readback ni como conversión
+atribuida. [Manual](../manual-de-uso/growth/conectar-google-ads-con-agentes.md).
 
 ## 6. Información, identidad y atribución
 

@@ -11,6 +11,15 @@ Use this skill to **operate measurement instrumentation** for Efeonce: build and
 
 ## When to invoke
 
+Google Ads: `pnpm --silent google-ads discover` y el
+[manual](../../../docs/manual-de-uso/growth/conectar-google-ads-con-agentes.md). CLI local de lectura y
+creación/actualización por plan, validateOnly, hash, journal y readback; target único `6862539491`,
+manager `9531478329`, Ads `jreyes@efeoncepro.com`, Cloud siempre `julio.reyes@efeonce.org` / `efeonce-group`.
+No tokens en flags/env ni cuentas libres. Crear capacidad no autoriza un apply sin payload concreto;
+no reintentar un resultado unknown ni borrar el journal. OAuth guardado Efeonce; verificación Google
+pendiente. Conexión/API/MCP de producto e ingesta no están entregadas. Cargar el manual antes de operar.
+
+
 Para **consultar y operar Meta con agentes** (Ads, catálogo completo de métricas, stats/calidad,
 Página e Instagram), usar `pnpm --silent meta discover` y el
 [manual de la CLI](../../../docs/manual-de-uso/growth/consultar-meta-con-agentes.md).

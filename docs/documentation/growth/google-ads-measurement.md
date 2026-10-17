@@ -2,14 +2,21 @@
 
 La arquitectura adoptada conecta la inversión de Google Ads con solicitudes comerciales, reuniones,
 calificación y negocios, conservando la fuente y el nivel de evidencia de cada hecho. El 17-10-2026
-se comprobó **acceso API de lectura de operador** a `686-253-9491`. La integración de producto y las
-conversiones Ads siguen pendientes; no existe todavía un nuevo panel, CLI de producto o sender Ads.
+se comprobó **acceso API de lectura de operador** a `686-253-9491`. La CLI local `pnpm google-ads`
+ya consulta esa cuenta y ofrece gestión por planes. Conexión multiorganización, panel/API/MCP de producto
+y sender de conversiones siguen pendientes.
 
-Requisitos de la siguiente entrega, ratificados por el operador: autorización presentada como **Efeonce**
-y una **CLI de consulta Google Ads**, equivalente en uso a Meta/GA4/GSC. Permitirá verificar conexión,
-consultar cuenta, campañas, conversiones/objetivos y reportes por fechas con moneda, cobertura y errores
-explícitos. Su primera versión será de lectura y conservará el anunciante autorizado. La marca «Claude»
-observada en la prueba queda como antecedente histórico; el cambio de marca y la CLI están pendientes.
+El operador amplió expresamente la CLI a **lectura, creación y actualización**. Consultas: conexión,
+cuenta, campañas, presupuestos, grupos, metadatos de anuncios, conversiones/objetivos y reportes por
+fechas con moneda, cobertura y errores explícitos. Gestión: campañas Search, presupuestos, grupos,
+acciones de conversión y objetivos, según catálogo cerrado de `discover`. Una escritura exige plan,
+validación, confirmación del hash y recibo; la verificación posterior compara campos. Campañas/grupos
+quedan PAUSED; activación, eliminación, creatividades e ingesta están fuera del catálogo inicial.
+
+En Cloud se guardó la identidad **Efeonce** y sus enlaces públicos; la marca «Claude» queda como
+antecedente del piloto. La verificación de Google de marca/scopes sigue pendiente. El grant Ads tiene
+secreto propio; GA4 y GSC Efeonce conservaron sus grants y pasaron lecturas reales después del cambio.
+Las pruebas live de esta sesión sólo consultaron: **ninguna escritura publicitaria ejecutada**.
 
 | Componente | Función en la arquitectura |
 | --- | --- |

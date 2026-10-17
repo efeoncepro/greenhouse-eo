@@ -17,6 +17,11 @@
   ninguna mutación; conexión y sender de producto pendientes. Funcional y manual documentados.
 - Ratificación del operador: OAuth de producción **Efeonce** y CLI de consulta obligatoria en la primera
   unidad de lectura; catálogo y aceptación documentados. Rebranding y CLI pendientes de implementación.
+- Unidad posterior: `pnpm google-ads` local implementada, con gestión ampliada por el operador. Lecturas
+  reales PASS, planes create/update cerrados, validateOnly, hash, journal durable y readback por campo.
+  Marca Efeonce guardada y grant Ads en secreto propio; regresión GA4/GSC y auth PASS. Ninguna escritura
+  publicitaria ejecutada; verificación Google y conexión de producto pendientes.
+  [Evidencia](docs/audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
 
 ## 2026-10-17 — CLI local Meta para agentes
 

@@ -351,3 +351,31 @@ La [arquitectura §5.4](GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md#54-
 el catálogo inicial. La CLI no depende de activar conversiones ni de construir una UI; tampoco habilita
 mutaciones Ads por disponer del scope `adwords`. Su implementación queda para la siguiente unidad;
 esta ampliación sólo formaliza los requisitos y no cambia configuración Cloud ni crea la CLI.
+
+## Delta aceptado 2026-10-17 — CLI operativa con gestión y OAuth Efeonce
+
+El operador autorizó ejecutar el cambio OAuth e implementar la CLI, y amplió expresamente su alcance
+a **escritura y actualización**, manteniendo la prueba real de conexión en lectura. Este delta amplía
+el catálogo inicial de sólo lectura; no autoriza ninguna modificación publicitaria concreta por sí mismo.
+
+La CLI local `pnpm google-ads` usa el adaptador de dominio `src/lib/growth/google-ads/` y el binding fijo
+`6862539491` vía `9531478329`. El grant se custodia en Secret Manager como
+`efeonce-google-ads-agent-oauth`, con refresh, audiencia/scopes y principal comprobados con Google.
+Cloud opera explícitamente como `julio.reyes@efeonce.org`; Ads como `jreyes@efeoncepro.com`.
+No se promueve el grant a una conexión multiorganización ni se crean DB schema, UI, API o MCP de producto.
+Esas superficies quedan excluidas de esta unidad local por faltar conexión/autoridad de organización;
+cuando se implementen reutilizarán el adaptador y sus límites, sin otro transporte proveedor.
+
+El catálogo cerrado agrega diez operaciones de creación/actualización de campañas Search, presupuestos,
+grupos Search, acciones de conversión y objetivos. Campañas/grupos se crean o actualizan a PAUSED;
+activar, eliminar, crear creatividades e ingerir conversiones quedan fuera del catálogo actual.
+Cada operación usa input tipado, un plan determinista con digest, `validateOnly` del proveedor, confirmación
+del digest y journal privado duradero antes del dispatch. Un digest sólo se despacha una vez desde la CLI;
+un timeout conserva `unknown` y bloquea el replay automático. El readback compara todos los campos del
+plan; una diferencia o ausencia devuelve verificación pendiente, no éxito. No se promete exactly-once
+remoto ni verificación desde un HTTP 200.
+
+En Cloud se guardó nombre **Efeonce**, homepage y enlace de privacidad públicos existentes; clientes,
+callbacks, dominios, scopes y audiencia se preservaron. La verificación Google de marca/scopes sigue
+siendo un gate distinto. Lecturas reales, pruebas locales y límites de rollout:
+[cierre de implementación](../audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
