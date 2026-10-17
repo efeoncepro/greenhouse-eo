@@ -454,6 +454,13 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   `assetDeUso`, ni `usoPorPersona`/`usoPorColor` —la pieza PUESTA, la que viaja a la escena—, ni las
   vistas de `patronPorColor` entraban al lock; sustituir cualquiera de esos archivos no despertaba
   ningún gate. Hoy sella **las cuatro formas** en que un kit declara un archivo: **66 → 79 assets**.
+- **Tecnología en escena: siempre premium y de la generación vigente** **[operador, 2026-10-17]**: «*smartphone,
+  computadores y todo lo relacionado con tecnología sea premium y moderno, nada de los 2000*». Aplica a TODA persona
+  y pieza, no sólo a Nexa: portátil de aluminio unibody delgado con biseles mínimos, teléfono insignia de bordes finos,
+  tablet de biseles mínimos, monitores sin marco grueso, auriculares actuales. **NUNCA** portátil gris de plástico
+  grueso, biseles anchos, webcam externa vieja, teléfono con botón físico, cables enredados ni tablet de marco grueso.
+  Sin logos de terceros visibles (el plate nace sin logo). Se declara en la ficha y se revisa al 100 % antes de
+  animar. Familias concretas por persona: [`NEXA_TECH_PROPS_V1.md`](../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
 - **Código de vestuario Efeonce** **[operador, 2026-09-20]**: la prenda dice el REGISTRO de la escena.
   **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por

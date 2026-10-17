@@ -9,6 +9,10 @@
 > sin decirlo. Un portátil genérico o un reloj de agujas la contradicen en silencio, igual que una reunión
 > importante en hoodie dice lo contrario de lo que la foto cuenta.
 
+> **Delta 2026-10-17 — la regla se extiende a todos:** el operador pidió que *toda* la tecnología en escena (teléfonos,
+> computadores, tablets, monitores) sea premium y moderna, «nada de los 2000», con o sin Nexa en cuadro. Las familias
+> de esta lista sirven de dirección para cualquier persona; el plate sigue naciendo sin logos de terceros.
+
 ## La regla, antes que la lista
 
 **Siempre la generación vigente, nunca un modelo descontinuado.** Esta lista nombra **familias**, no números
