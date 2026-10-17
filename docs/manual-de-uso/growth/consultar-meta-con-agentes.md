@@ -5,6 +5,8 @@ Contrato: `meta-agent.v2`. [Decisión vigente](../../architecture/GREENHOUSE_MET
 [Capacidad funcional](../../documentation/growth/meta-agent-cli.md).
 [Activación de IDs nativos HubSpot](guardar-identidad-nativa-hubspot.md) (pendiente de rollout) y
 [límites de verificación individual Meta](../../documentation/growth/meta-individual-event-verification.md).
+[Recibos CAPI por evento](conservar-recibos-meta.md): código local preparado, sin activar/desplegar;
+`meta.receipt` sólo muestra evidencia persistida, no reconstruye históricos desde stats.
 La CLI local consulta y opera el perfil Efeonce. La medición CAPI y las políticas se operan por sus
 [comandos propios](configurar-medicion-conversiones.md).
 

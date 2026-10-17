@@ -5,6 +5,8 @@ Readout vigente **14/10/2026**: PR255/main9690efad publicado; **Server9/Web5**, 
 [Contrato vigente](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md),
 [ADR de políticas Accepted](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) y
 [release/prueba de alta sin redeploy](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+Preparación local posterior: [recibo por evento/intento](GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md),
+sin activación/deploy por orden del operador; no cambia el estado publicado de este ADR.
 Primera conversión comercial consentida y mejora EMQ siguen pendientes de tráfico real.
 La metadata inicial y deltas13/10 siguientes conservan la cronología de esta decisión;
 sus listas fijas, pendientes y versiones no son instrucciones de operación vigentes.

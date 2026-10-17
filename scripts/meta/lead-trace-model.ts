@@ -1,5 +1,6 @@
 /** Pure classification of metadata already read by the CLI. No I/O, payload decryption, or provider calls. */
 import { parseHubSpotFormReceipt, isNativeHubspotSubmissionId } from '../../src/lib/growth/forms/destinations/hubspot/receipts'
+import { summarizeMetaReceipts } from '../../src/lib/growth/measurement/meta-receipt'
 
 export type RemoteLeadTraceStatus = 'not_checked' | 'confirmed' | 'correlated' | 'not_found' | 'partial' | 'ambiguous' | 'unavailable' | 'not_applicable'
 export type LeadTraceDate = Date | string | null
@@ -33,6 +34,7 @@ export interface LeadDeliveryMetadata {
   http_status?: number | null
   safe_error_class?: string | null
   updated_at?: LeadTraceDate
+  provider_receipts_json?: unknown
 }
 
 export interface LeadHubspotAttemptMetadata {
@@ -102,6 +104,7 @@ export interface LeadTraceReport {
     }
   }
   meta: {
+    receipt: ReturnType<typeof summarizeMetaReceipts>
     delivery: {
       status: 'ack_recorded' | 'queued' | 'sending' | 'dead_letter' | 'not_recorded' | 'inconsistent'
       attempts?: number
@@ -363,7 +366,9 @@ return {
       projection: { encryptedPayload: encrypted === true ? 'present' : encrypted === false ? 'absent' : 'unknown',
         metaProjection: 'not_inspected', reasonCode: 'encrypted_payload_not_decrypted' }
     },
-    meta: { delivery, processing: { status: 'unknown', matching: 'unknown', deduplication: 'unknown', attribution: 'unknown', reasonCode: 'provider_event_processing_not_observed' } },
+    meta: { delivery, receipt: summarizeMetaReceipts(deliveryRow?.provider_receipts_json, eventId,
+      iso(conversion?.occurred_at) ? Math.floor(Date.parse(iso(conversion?.occurred_at)!) / 1000) : undefined, count(deliveryRow?.attempts)),
+      processing: { status: 'unknown', matching: 'unknown', deduplication: 'unknown', attribution: 'unknown', reasonCode: 'provider_event_processing_not_observed' } },
     hubspot: { localAttempt, remoteForm: remote('formSubmission'), remoteContact: remote('contact'), contactCreatedByThisSubmission: 'unknown' },
     issueCodes: [...issues], limitations: LIMITATIONS
   }

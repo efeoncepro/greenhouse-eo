@@ -28,15 +28,29 @@ const target = { destination_id: 'dest-1', portal_id: '48713323', form_guid: '33
 
 beforeEach(() => { vi.clearAllMocks(); statements.length = 0 })
 
-function arrangeSubmission(attemptOverrides: Record<string, unknown> = {}, targetOverrides: Record<string, unknown> = {}) {
+function arrangeSubmission(attemptOverrides: Record<string, unknown> = {}, targetOverrides: Record<string, unknown> = {}, deliveryOverrides: Record<string, unknown> = {}) {
   execute.mockResolvedValueOnce({ rows: [source] })
     .mockResolvedValueOnce({ rows: [conversion] })
-    .mockResolvedValueOnce({ rows: [{ event_id: event, destination: 'meta', state: 'http_accepted', attempts: 1, http_status: 200 }] })
+    .mockResolvedValueOnce({ rows: [{ event_id: event, destination: 'meta', state: 'http_accepted', attempts: 1, http_status: 200, ...deliveryOverrides }] })
     .mockResolvedValueOnce({ rows: [{ ...attempt, ...attemptOverrides }] })
     .mockResolvedValueOnce({ rows: [{ ...target, ...targetOverrides }] })
 }
 
 describe('canonical metadata-only lead trace store', () => {
+  it('reads receipts compatibly before migration and strips raw provider extras before JSON export', async () => {
+    const context = { eventId: event, eventTime: Math.floor(Date.parse(conversion.occurred_at) / 1000), attemptId: '33333333-3333-4333-8333-333333333333', attempt: 1 }
+
+    arrangeSubmission({}, {}, { provider_receipts_json: [{ contract: 'meta-attempt-receipt.v1', ...context,
+      status: 'recorded', recordedAt: conversion.occurred_at, raw: 'secret', receipt: { ...context, contract: 'meta-event-receipt.v1',
+        datasetId: '708931297255942', apiVersion: 'v25.0', eventName: 'Lead', requestEventCount: 1, graphHttpStatus: 200,
+        bodyStatus: 'valid', observedAtMs: context.eventTime * 1000 + 1000, eventsReceived: 1, fbtraceId: 'AX_trace',
+        user_data: { em: 'private@example.test' }, messages: ['secret'] } }] })
+    const result = await readGrowthLeadTrace(db, { kind: 'submission', id: submission })
+
+    expect(result.metadata.deliveries[0].provider_receipts_json).toMatchObject([{ status: 'recorded', receipt: { eventsReceived: 1 } }])
+    expect(JSON.stringify(result.metadata)).not.toMatch(/secret|user_data|messages|private@/)
+    expect(statements.some(s => s.text.includes('to_jsonb(measurement_delivery)'))).toBe(true)
+  })
   it('projects the source, occurrence and independent attempts without selecting full contact/encrypted payloads', async () => {
     arrangeSubmission()
     const result = await readGrowthLeadTrace(db, { kind: 'submission', id: submission })

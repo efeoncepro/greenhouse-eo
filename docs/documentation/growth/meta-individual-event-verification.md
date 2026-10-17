@@ -1,8 +1,10 @@
 # Verificación de un evento individual en Meta
 
 Revisión: 2026-10-17. Alcance: fuentes oficiales y código local del sender sGTM de Efeonce.
-No se enviaron eventos, no se consultaron credenciales y no se modificaron GTM ni el runtime.
-La propuesta de recibo siguiente está **sin implementar**.
+No se enviaron eventos, no se consultaron credenciales y no se modificaron GTM ni el runtime publicado.
+El recibo por evento está **implementado localmente, sin activar ni desplegar** por orden del operador.
+[ADR](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) ·
+[Preparación y límites](../../manual-de-uso/growth/conservar-recibos-meta.md).
 
 ## Qué podemos confirmar
 
@@ -51,7 +53,10 @@ recepción individual. Esa vinculación la acredita nuestro transporte: el conta
 un eco del UUID ni una lectura posterior dentro de Meta. Con un batch de varios eventos,
 un contador aislado no permite asignar resultados individuales.
 
-## Qué conserva hoy Efeonce
+## Qué conserva el carril publicado, sin activar el cambio local
+
+Esta sección describe el contrato publicado previo. Los archivos locales enlazados contienen
+también la implementación preparada de recibos, cuyo rollout no está autorizado.
 
 El código local y el snapshot saneado identifican el template oficial Meta fijado en
 `a575edb31aa447469b855c3006ed9991dad711cf`; esta revisión no relee el contenedor live.
@@ -64,11 +69,12 @@ El código local y el snapshot saneado identifican el template oficial Meta fija
    para conservar `events_received`, `messages` o `fbtrace_id`. También convierte
    `generate_lead` a `Lead`.
 3. [Dispatcher](../../../src/lib/growth/measurement/dispatch.ts): exige respuesta HTTP
-   exitosa de sGTM y `meta_tag_status=success`. No obtiene el estado HTTP original de Graph
-   ni su recibo. Su contador `processed` cuenta trabajos locales intentados.
+   exitosa de sGTM y `meta_tag_status=success`. El carril publicado no obtiene el recibo Graph;
+   el código local preparado valida su header sin cambiar el ACK. `processed` cuenta intentos locales.
 4. [Store](../../../src/lib/growth/measurement/store.ts): finaliza con CAS por lease y
    conserva `http_status`, clase segura, estado, intentos y fecha. No conserva recibos
-   CAPI por intento; `http_status=200` corresponde a sGTM.
+   CAPI por intento en el carril publicado; `http_status=200` corresponde a sGTM. El código local
+   prepara el append operacional por intento, sin migración aplicada.
 5. [Modelo de traza](../../../scripts/meta/lead-trace-model.ts): expone ACK registrado y
    mantiene procesamiento, matching, deduplicación y atribución como `unknown`.
 
@@ -101,7 +107,7 @@ estado efectivamente visible en la UI. Si la herramienta no muestra ese UUID, co
 limitación de correlación. Un estado visible allí describe esa evidencia de diagnóstico;
 no acredita por sí solo matching, audiencia ni atribución a un anuncio.
 
-## Mejora viable: recibo de recepción por intento
+## Implementación local preparada: recibo por evento e intento
 
 La mejora mantiene el único sender CAPI dentro de sGTM. Instrumenta su petición saliente;
 no añade un POST paralelo desde la CLI. Requiere un cambio gobernado del template/ingress,
@@ -116,14 +122,14 @@ persistencia y readers, con Preview, revisión y publicación conforme al
   `events_received`, `fbtrace_id` acotado y códigos numéricos de error cuando existan.
   No guardar el body libre, mensajes crudos, token, URL autenticada, PII, hashes ni cookies.
 - Validar JSON/tipos/tamaños. HTTP 2xx y `events_received=1` permite indicar
-  `provider_receipt_recorded`; recibo ausente o malformado queda explícitamente desconocido.
+  `meta.receipt.reception=acknowledged`; recibo ausente o malformado queda explícitamente desconocido.
   No transformar una respuesta 2xx ambigua en rechazo ni crear un reenvío automático nuevo
   sólo por faltar telemetría; preservar los retries existentes sin ampliar su semántica.
-- El tag puede publicar metadata saneada en una cabecera de respuesta reservada sólo para
+- El tag preparado publica metadata saneada en una cabecera de respuesta reservada sólo para
   el ingreso backend autenticado; el dispatcher la valida y persiste. Google documenta
   `sendHttpRequest` para obtener cuerpo/status y `setResponseHeader` para responder antes
-  de `returnResponse`. Es una opción técnica pendiente de probar: exige permisos acotados,
-  ausencia de colisiones y aislamiento entre eventos/peticiones concurrentes. No exportar
+  de `returnResponse`. Está probado con mocks del template fijado; la compilación de GTM queda
+  pendiente. Permisos acotados y queryPermission evitan que telemetría cambie el callback. No exportar
   el recibo por el carril público PageView.
   [APIs oficiales de sGTM](https://developers.google.com/tag-platform/tag-manager/server-side/api#sendHttpRequest).
 - Registrar cada intento de forma durable y asociarlo mediante CAS, sin sobreescribir un
@@ -133,10 +139,16 @@ persistencia y readers, con Preview, revisión y publicación conforme al
   Procesamiento individual, matching, deduplicación y atribución permanecen desconocidos
   salvo evidencia específica adicional; EMQ agregado no los sustituye.
 
-La propuesta exige pruebas de UUID distinto, contador inesperado, JSON inválido, timeout
+Las pruebas locales cubren UUID distinto, contador inesperado, JSON inválido, timeout
 posterior al envío, 4xx/5xx, dos peticiones concurrentes, respuesta tardía y ausencia de
 recibo. Después: Preview sin envío, validación del diff y, sólo con autorización de la
 prueba concreta, un envío controlado. Un test local o publish no certifica recepción Meta.
 
-Estado: **investigación/documentación completas; mejora de recibo sin implementar ni publicar**.
-No hay nuevo endpoint de lectura individual, schema aplicado ni evidencia Meta adicional.
+Persistencia preparada: `measurement_delivery.provider_receipts_json`, máximo cinco observaciones
+append-only; finalización y recibo comparten CAS por evento, destino, lease y número de intento.
+Header `x-efeonce-meta-receipt`; correlación backend mediante `x-efeonce-meta-attempt` y
+`x-efeonce-meta-attempt-number`, fuera del payload CAPI. Opción `captureEfeonceReceipt` default OFF.
+La CLI lee `meta.receipt` y tolera schema anterior sin inventar un recibo para los históricos.
+
+Estado: **implementado/probado localmente; sin activar, publicar ni desplegar**. SQL parqueado fuera
+del runner. No hay nuevo endpoint de lectura individual, schema aplicado ni evidencia Meta adicional.

@@ -28,6 +28,11 @@ Identidad nativa: [manual](../../../docs/manual-de-uso/growth/guardar-identidad-
 marker por envío, GET histórico y CAS del worker (rollout pendiente). Históricos sin marker siguen
 correlacionados. [Meta individual](../../../docs/documentation/growth/meta-individual-event-verification.md):
 sin GET por event_id; no usar Test Events como sandbox ni reenviar para completar evidencia.
+Recibos por evento: [ADR](../../../docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) +
+[manual](../../../docs/manual-de-uso/growth/conservar-recibos-meta.md). Implementación local sin activar/deploy:
+parche offline del template fijado, checkbox default OFF, header sólo del Client autenticado y
+append de metadata saneada en el CAS de finalización. `meta.receipt` no confirma procesamiento.
+No ejecutar el builder histórico de workspace ni publicar/enviar para completar evidencia.
 
 - Tagging a Growth Form, Growth CTA, native meeting scheduler or landing so its governed event reaches GA4.
 - Wiring form `gh_form_*`, CTA engine `greenhouse_cta_*`, legacy host `gh_cta_clicked` or native

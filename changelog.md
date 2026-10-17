@@ -30,6 +30,12 @@
   GET por `event_id`; captura del recibo CAPI propuesta, sin implementar ni reenviar eventos.
   [Cierre local](docs/audits/growth/2026-10-17-native-hubspot-receipt-closure.md): 262 tests/14 archivos,
   TS strict y lint PASS; SQL ejercitado en PostgreSQL aislado, lecturas reales sin mutaciones.
+- [Recibo CAPI por evento/intento](docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): sender
+  fijado instrumentado localmente, header backend saneado, historial de hasta cinco observaciones
+  en CAS de finalización y `meta.receipt` en CLI READ ONLY. No agrega sender ni retries por telemetría.
+  Opción del template default OFF y SQL parqueado. Por orden del operador: commit sin activar/desplegar.
+  [Cierre local](docs/audits/growth/2026-10-17-meta-event-receipt-local-closure.md): 402 tests Vitest +36 Node,
+  TS/lint y SQL aislado PASS; sin nuevos eventos ni cambios externos.
 
 ## 2026-10-17 — Landing Performance Marketing en producción (TASK-1865)
 

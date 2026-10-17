@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildLeadTrace, LeadTraceModelError, type LeadTraceInput, type LeadHubspotAttemptMetadata } from './lead-trace-model'
+import { metaReceiptObservation } from '../../src/lib/growth/measurement/meta-receipt'
 
 const EVENT = 'a1111111-1111-4111-8111-111111111111'
 const SUBMISSION = 'fsub-b2222222-2222-4222-8222-222222222222'
@@ -25,6 +26,27 @@ function attempt(overrides: Partial<LeadHubspotAttemptMetadata> = {}): LeadHubsp
 }
 
 describe('pure lead trace evidence model', () => {
+  it('reports a persisted Graph receipt while processing and attribution remain unknown', () => {
+    const data = input()
+    const context = { eventId: EVENT, eventTime: Math.floor(Date.parse(now) / 1000), attemptId: OTHER, attempt: 1 }
+
+    const observation = metaReceiptObservation(context, JSON.stringify({ ...context, contract: 'meta-event-receipt.v1', datasetId: '708931297255942',
+      apiVersion: 'v25.0', eventName: 'Lead', requestEventCount: 1, graphHttpStatus: 200, bodyStatus: 'valid',
+      observedAtMs: Date.parse(now) + 1000, eventsReceived: 1, fbtraceId: 'AX_trace', messages: ['private@example.test'] }))
+
+    data.deliveries = [{ event_id: EVENT, destination: 'meta', state: 'http_accepted', http_status: 200, attempts: 1, provider_receipts_json: [observation] }]
+    const report = buildLeadTrace(data)
+
+    expect(report.meta.receipt).toMatchObject({ status: 'recorded', reception: 'acknowledged', attempts: [{ receipt: { eventsReceived: 1, fbtraceId: 'AX_trace' } }] })
+    expect(report.meta.processing).toMatchObject({ status: 'unknown', matching: 'unknown', attribution: 'unknown' })
+    expect(JSON.stringify(report.meta.receipt)).not.toMatch(/private|attemptId/)
+  })
+  it('does not reconstruct a provider receipt from legacy HTTP ACK alone', () => {
+    const data = input()
+
+    data.deliveries = [{ event_id: EVENT, destination: 'meta', state: 'http_accepted', http_status: 200, attempts: 1 }]
+    expect(buildLeadTrace(data).meta.receipt).toEqual({ status: 'not_recorded', reception: 'unknown', attempts: [] })
+  })
   it.each([['received', 'unknown'], ['validated', 'unknown'], ['destination_failed', 'recorded']] as const)
   ('does not confuse source lifecycle %s with commercial acceptance', (status, acceptance) => {
     const data = input()

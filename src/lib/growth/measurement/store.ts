@@ -8,6 +8,7 @@ import type { PoolClient } from 'pg'
 import { getDb } from '@/lib/db'
 
 import type { MeasurementDestination, MeasurementSourceKind, PreparedMeasurement } from './contracts'
+import { metaReceiptObservation, parseMetaReceiptObservation, type MetaReceiptObservation } from './meta-receipt'
 
 /** Borrow the source transaction; a savepoint keeps instrumentation failures UX-safe. */
 export const enqueueMeasurementConversion = async (
@@ -68,6 +69,11 @@ export interface ClaimedMeasurementDelivery {
   encrypted_payload_json: PreparedMeasurement['encryptedPayload']
 }
 
+/** Missing schema is detected before claiming or POSTing Meta; other destinations remain independent. */
+export const assertMetaReceiptStorageReady = async () => {
+  await sql`SELECT provider_receipts_json FROM greenhouse_growth.measurement_delivery LIMIT 0`.execute(await getDb())
+}
+
 export const claimMeasurementDeliveries = async (destinations: MeasurementDestination[], limit: number) => {
   if (!destinations.length) return []
   const db = await getDb()
@@ -102,19 +108,33 @@ export const claimMeasurementDeliveries = async (destinations: MeasurementDestin
 
 export const finishMeasurementDelivery = async (
   row: ClaimedMeasurementDelivery,
-  outcome: { httpStatus: number | null; success: boolean; retryable: boolean; errorClass: string | null },
+  outcome: { httpStatus: number | null; success: boolean; retryable: boolean; errorClass: string | null; metaObservation?: MetaReceiptObservation },
 ) => {
   const db = await getDb()
   const state = outcome.success ? 'http_accepted' : outcome.retryable && row.attempts < 5 ? 'queued' : 'dead_letter'
   const delaySeconds = Math.min(3600, 60 * 2 ** Math.max(0, row.attempts - 1))
 
+  const context = {
+    eventId: row.event_id, eventTime: Math.floor(new Date(row.occurred_at).getTime() / 1000),
+    attemptId: row.lease_token, attempt: row.attempts,
+  }
+
+  let observation = row.destination === 'meta' ? parseMetaReceiptObservation(outcome.metaObservation ?? metaReceiptObservation(context, null, 'not_sent')) : null
+
+  if (row.destination === 'meta' && (!observation || observation.eventId !== row.event_id || observation.attemptId !== row.lease_token ||
+    observation.attempt !== row.attempts || observation.receipt && observation.receipt.eventTime !== context.eventTime))
+    observation = metaReceiptObservation(context, '{}') // Reject foreign evidence without retrying an already accepted POST.
+
+  // The same CAS finalizes delivery and appends evidence. Never write a receipt in a later operation.
+  const receiptUpdate = observation ? sql`, provider_receipts_json = provider_receipts_json || ${JSON.stringify([observation])}::jsonb` : sql``
+
   const result = await sql`
     UPDATE greenhouse_growth.measurement_delivery
     SET state = ${state}, http_status = ${outcome.httpStatus}, safe_error_class = ${outcome.errorClass},
         next_attempt_at = CURRENT_TIMESTAMP + make_interval(secs => ${delaySeconds}),
-        lease_token = NULL, lease_until = NULL, updated_at = CURRENT_TIMESTAMP
+        lease_token = NULL, lease_until = NULL, updated_at = CURRENT_TIMESTAMP ${receiptUpdate}
     WHERE event_id = ${row.event_id}::uuid AND destination = ${row.destination}
-      AND state = 'sending' AND lease_token = ${row.lease_token}::uuid
+      AND state = 'sending' AND lease_token = ${row.lease_token}::uuid AND attempts = ${row.attempts}
   `.execute(db)
 
   return result.numAffectedRows === 1n

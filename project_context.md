@@ -245,7 +245,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo componer Globe con Wave para producir experiencias launch-ready | `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md` + skills gemelas `greenhouse-globe` |
 | Cómo se administran créditos y capabilities de los usuarios de Globe (y por qué la llave de aprobación nunca sale de su runtime) | `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015) + `TASK-1566` + `.claude/rules/globe-administration.md` |
 | Cómo razona, documenta y se autoevalúa el arquitecto Codex | skill `software-architect-2026` + `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md` + `evals/software-architect-2026/` |
-| Forms/Meta/HubSpot | [Medición](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) · [CLI e IDs nativos](docs/manual-de-uso/growth/consultar-meta-con-agentes.md) |
+| Forms/Meta/HubSpot | [Medición](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) · [CLI/recibos](docs/manual-de-uso/growth/consultar-meta-con-agentes.md) |
 | Qué significa para producto/negocio | `docs/context/00_INDEX.md` + docs funcionales |
 | Cómo lo opera una persona/agente | `docs/manual-de-uso/**` y runbook aplicable |
 

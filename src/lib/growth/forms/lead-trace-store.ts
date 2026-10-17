@@ -4,6 +4,7 @@ import { sql, type QueryExecutorProvider } from 'kysely'
 
 import { hashIdentifier } from '../public-submission/abuse-guard'
 import { parseHubSpotFormReceipt, isNativeHubspotSubmissionId } from './destinations/hubspot/receipts'
+import { parseMetaReceiptObservation } from '../measurement/meta-receipt'
 
 type TraceDb = QueryExecutorProvider
 export type GrowthLeadTraceQuery = { kind: 'event' | 'submission'; id: string }
@@ -19,6 +20,7 @@ type Conversion = {
 type Delivery = {
   event_id: string; destination: string; state: string; attempts?: number; http_status?: number | null
   safe_error_class?: string | null; updated_at?: Date | string
+  provider_receipts_json?: unknown
 }
 type Attempt = {
   attempt_id?: string; submission_id: string; destination_id?: string; provider: string
@@ -124,8 +126,14 @@ export async function readGrowthLeadTrace(db: TraceDb, query: GrowthLeadTraceQue
 
   if (conversion) conversion = { ...conversion, consent_snapshot_json: consentMetadata(conversion.consent_snapshot_json) }
 
-  const deliveries = conversion ? (await sql<Delivery>`SELECT event_id::text,destination,state,attempts,http_status,safe_error_class,updated_at
-    FROM greenhouse_growth.measurement_delivery WHERE event_id=${conversion.event_id}::uuid ORDER BY destination`.execute(db)).rows : []
+  const deliveries = conversion ? (await sql<Delivery>`SELECT event_id::text,destination,state,attempts,http_status,safe_error_class,updated_at,
+    to_jsonb(measurement_delivery)->${'provider_receipts_json'} AS provider_receipts_json
+    FROM greenhouse_growth.measurement_delivery WHERE event_id=${conversion.event_id}::uuid ORDER BY destination`.execute(db)).rows.map(row => {
+      const raw = row.provider_receipts_json
+      const safe = Array.isArray(raw) && raw.length <= 5 ? raw.map(parseMetaReceiptObservation) : null
+
+      return { ...row, provider_receipts_json: raw === undefined || raw === null ? undefined : safe?.every(Boolean) ? safe : {} }
+    }) : []
 
   const rawAttempts = source ? (await sql<Attempt>`SELECT attempt_id,submission_id,destination_id,provider,adapter_version,status,
     http_status,external_id,error_class,retry_count,created_at,completed_at,

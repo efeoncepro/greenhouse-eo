@@ -30,6 +30,13 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 
 ## Lote pendiente
 
+### Meta event receipts — pendiente, 2026-10-17
+
+[SQL preparado](meta-event-receipts.sql.pending), dueño Growth / Measurement;
+[ADR](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md). Preparación y commit únicamente,
+sin activación/deploy por orden del operador. Reactivar con timestamp nuevo dentro de un release
+posterior autorizado; schema antes del POST Meta. No reenviar históricos para recuperar el recibo.
+
 ### HubSpot native form receipts — pendiente, 2026-10-17
 
 [SQL preparado](hubspot-native-form-receipts.sql.pending), dueño Growth / Integrations;
