@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.6: cuentas conciliadas en vivo; KYC enviado en la cuenta de producción; los doce assets anteriores pertenecen a la cuenta incorrecta)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.7: corrección de cuenta enviada a Cloris y Alejandro; copia en Enviados y registro HubSpot SENT verificados)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -316,3 +316,16 @@ Evidencia local (fuera del repo): `/Users/jreye/Documents/BytePlus-Asset-Service
 `cuenta-correcta-savings-plan-vigente.jpg`, `cuenta-correcta-acr-kyc-pendiente.jpg` y
 `kyc-cuenta-correcta-en-revision.jpg`. El correo previo a Cloris mencionaba `3003660328`: queda desactualizado;
 no se envió una nueva comunicación durante esta conciliación.
+
+### Corrección comunicada a BytePlus — 13:22 UTC
+
+Julio aprobó el texto y ordenó enviarlo con firma gráfica. Se respondió en el mismo hilo
+«RE: Colaboración Byteplus-Efeoncepro onboarding», desde `jreyes@efeoncepro.com` a
+`cloris.pan@bytedance.com` y `alejandro.mota@bytedance.com`, con firma gráfica oficial y CCO
+`48713323@bcc.hubspot.com`. Enviados confirma **2026-10-17 13:22:04 UTC**, destinatarios, contenido y firma.
+Se corrigió el ID de producción a `3004839361`, se explicó la carga equivocada en `3003660328` y el KYC de
+la misma empresa actualmente en revisión, y se consultó cómo regularizar la duplicidad y trasladar o volver a
+subir los retratos, conservando Entry gratuito durante las pruebas. HubSpot `48713323` registra el correo
+**`118790251018`**, dirección `EMAIL`, estado **`SENT`**, timestamp **13:22:08.147 UTC**. Esto acredita envío
+y registro, no entrega, respuesta ni resolución. Captura: `correccion-cuenta-correo-enviado.jpg` en la carpeta
+local de evidencia indicada arriba. El WhatsApp sólo se entregó como texto para que Julio lo copie al grupo.
