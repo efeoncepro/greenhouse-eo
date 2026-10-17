@@ -1,0 +1,25 @@
+{
+  "pageId": 251997,
+  "slug": "performance-marketing",
+  "parentId": 251077,
+  "landing": "performance",
+  "baseClass": "EO_Performance_Landing_Base_Widget",
+  "modules": [
+    ["hero", "01 · Hero", "dark"],
+    ["confianza", "02 · Partners y clientes", "dark"],
+    ["problema", "03 · El problema", "dark"],
+    ["solucion", "04 · Cómo lo resolvemos", "dark"],
+    ["plataformas", "05 · Plataformas", "dark"],
+    ["creatividad", "06 · Creatividad que aprende", "dark"],
+    ["autodiagnostico", "07 · Por qué ahora y autodiagnóstico", "dark"],
+    ["recibes", "08 · Qué recibes", "dark"],
+    ["condiciones", "09 · Sin letra chica", "dark"],
+    ["diagnostico", "10 · Diagnóstico, formulario y preguntas", "dark"]
+  ],
+  "formModule": "diagnostico",
+  "form": { "formKey": "71ea684f-1ad9-4656-982b-159e4de46dd8", "surface": "fhsf-efeonce-performance-diagnostic" },
+  "thumbnailId": 252002,
+  "preserveWidgetSettings": true,
+  "protectedPages": [249582, 251279, 251981],
+  "dryRun": true
+}

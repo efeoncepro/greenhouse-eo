@@ -102,10 +102,20 @@ diseño sigue el carril canvas → compilar → paquete → deploy.
 7. Verifica en vivo (ver [Qué revisar después](#qué-revisar-después)).
 
 **Ojo:** este carril cambia los archivos del plugin, no el documento guardado de la página. Si el cambio altera la
-lista de módulos o sus controles, la página existente no se reescribe sola: el publicador actual
-(`publish-performance-elementor-page.php`) **sólo crea** la página y se niega si el slug ya existe. Para reescribir
-el cuerpo de `251997` hace falta un republicador con guarda de hash, que todavía no existe. No uses el publicador
-de creación para eso.
+lista de módulos o sus títulos, reescribe el cuerpo con el **republicador** (nunca con el publicador de creación):
+
+1. Lee el hash actual: `pnpm public-website:wpcli -- --eval-file ./scripts/public-website/republish-source-led-page.php
+   --input-file ./scripts/public-website/performance-source/republish.json --input-file
+   ./scripts/public-website/performance-source/page-custom.css --wp-user 12` con `"dryRun": true` (no escribe). Devuelve
+   `currentSha`, si el árbol y el CSS ya coinciden y qué widgets conservan sus ajustes del editor.
+2. Copia el spec a un archivo temporal con `"dryRun": false` y `"expectedDataSha": "<currentSha>"`, ajusta `modules`
+   y vuelve a correrlo. Si alguien editó la página entre la lectura y la escritura, se detiene.
+3. Resultado `republished_verified`: guardó, conservó la imagen destacada (`252002`), dejó snapshot
+   `_gh_performance_republish_before_*` y purgó Kinsta. `unchanged` significa que no había nada que escribir.
+
+La estructura común del carril (compilador y base de widgets) es compartida con Agencia de Medios: antes de
+desplegar, corre `node scripts/public-website/verify-source-led-compilers.cjs` y
+`php scripts/public-website/verify-source-led-render.php`.
 
 ## Scripts del carril (referencia)
 
@@ -119,6 +129,7 @@ de creación para eso.
 | `fix-performance-ohio-layout.php` | Copia 164 metas `page_*` desde `249582`; sidebar `without` | `_gh_performance_ohio_layout_before_20261017_181400` |
 | `configure-performance-seo.php` | Metadatos Yoast + imagen social | `_gh_performance_seo_before_20261017_181342` |
 | `migrate-performance-legacy.php` | 301, página antigua privada, menú | `_gh_performance_migration_before_20261017_181625` |
+| `republish-source-led-page.php` + `performance-source/republish.json` | Reescribe el cuerpo con guarda de hash, conservando ediciones e imagen destacada | `_gh_performance_republish_before_*` |
 
 Los scripts PHP que reciben el id de la página lo aceptan como número o como ruta a un archivo que contiene el id.
 Por el wrapper de WP-CLI, pásalo **como archivo** (ver [Problemas comunes](#problemas-comunes)).
@@ -205,9 +216,9 @@ opción, toma antes un snapshot del estado actual y purga Kinsta al final.
 
 ## Pendientes conocidos
 
-Envío real del formulario y `generate_lead` en GA4, Rich Results y Search Console, revisión visual a 1536/890 con
-movimiento reducido y teclado, prueba de guardar/recargar en el editor, republicador con guarda de hash y extracción
-del núcleo común del carril (hoy es una copia del de Agencia de Medios).
+Verificado al cierre de TASK-1865 (envío real, GA4, Meta, Rich Results, viewports, re-guardado). El núcleo común y
+el republicador existen desde el 2026-10-17; desplegar la base común de widgets al sitio queda pendiente de
+autorización del operador. Falta pedir indexación de la URL en la interfaz de Search Console.
 
 ## Referencias técnicas
 

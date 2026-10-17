@@ -7,8 +7,38 @@ belong in `references/landings/home-claude-design-preview.md` and the linked aud
 Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
 and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
 `references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
-`references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17, rail cloned from Medios
-without extracting a shared core): `references/landings/performance-marketing.md`.
+`references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17): `references/landings/performance-marketing.md`.
+
+## Shared source-led core (2026-10-17)
+
+Medios and Performance now share one core; new canvas landings must use it instead of cloning a compiler.
+
+- **Compiler:** `scripts/public-website/lib/source-led-compiler.cjs` owns stages 2–3 (schema + template per section,
+  repeaters, Growth Form fields in `formModule`, Service/FAQPage fields in `serviceModule`, scoped CSS, optional
+  unscoped `page.css`, `used-assets.json`). A landing script owns only stage 1 (expand its canvas into
+  `section[data-gh-module]` + `tabCss`) and calls `compileSourceLedLanding({ landing, sourceDir, source, assets, $,
+  modules, tabCss, formModule, serviceModule, faq, serviceDefaults, pageLayer })`.
+- **Widget base:** runtime `includes/widgets/class-eo-source-led-landing-base.php`
+  (`EO_Source_Led_Landing_Base_Widget`). A landing base only declares `LANDING`, `TITLE_PREFIX`, `KEYWORDS`,
+  `FORM_MODULE` and defines `eo_<landing>_register_assets()`; definitions are cached per landing + module.
+- **Gates (both must pass before any package):** `node scripts/public-website/verify-source-led-compilers.cjs`
+  (re-compiles every migrated landing into a scratch root and compares byte by byte with the runtime plugin) and
+  `php scripts/public-website/verify-source-led-render.php` (fingerprint of name/title/keywords/deps/controls and four
+  render probes per module; diff before/after a base change must be empty; a one-character change is detected).
+- **Core release:** `build-source-led-core-package.cjs <live baseline>` → `deploy-source-led-core-package.php`
+  (contract `source-led-core-release.v1`, allowlist of the three base files, previous-SHA guard, backup tar). The
+  shared base is written **before** the landing bases so no request loads a base without its parent.
+- **Republisher:** `republish-source-led-page.php <spec.json> <page-custom.css>` with specs in
+  `<landing>-source/republish.json`. Requires `expectedDataSha` to write; keeps each module's live widget settings
+  (`preserveWidgetSettings`, default true); does nothing when the rebuilt tree, custom CSS and featured image already
+  match (`unchanged`); `dryRun` reports `sameTree/sameCss/keptWidgetSettings`; `force` saves anyway (canary). It fills
+  `post_featured_image`, restores and verifies `_thumbnail_id` after `Document::save()`, snapshots tree/settings/
+  thumbnail/page metas, checks protected pages and global chrome, and rebuilds the Yoast indexable with
+  `$_SERVER['HTTPS']='on'`. Live canary 2026-10-17 on Performance: same hash `687fa928…`, thumbnail `252002` kept.
+- **Yoast primary image over http:** any CLI rebuild of an indexable without HTTPS context stores plugin image URLs
+  with `http://`. Seen live on HubSpot `244079` (no featured image) and Contacto `20729`.
+  `repair-landing-primary-image.php` sets the OG image as featured image (or keeps none) and rebuilds over HTTPS;
+  applying it to those two pages needs operator approval (blocked 2026-10-17 as an out-of-scope production write).
 
 ## Source fidelity without losing editability
 

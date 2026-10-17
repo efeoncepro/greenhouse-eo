@@ -46,7 +46,8 @@
   (contract `performance-elementor-release.v1`) → `publish-performance-elementor-page.php` (creates only) →
   `fix-performance-ohio-layout.php` → `configure-performance-seo.php` → `migrate-performance-legacy.php`. The
   wpcli wrapper forwards only files: page ids go through a file (`tmp/performance-page-id.txt`). To change the body
-  later, write a hash-guarded republisher.
+  later use `republish-source-led-page.php` with `performance-source/republish.json` (hash guard, keeps editor
+  settings and the featured image; see `source-led-elementor-patterns.md` §Shared source-led core).
 - Rollback: page `251997` to draft; Yoast redirect `servicio-gestion-campanas-publicitarias` deleted and the 3
   repointed chains restored, `242862` to publish, `242915` object id back to `242862` (snapshot
   `_gh_performance_migration_before_20261017_181625`); plugin backup `/tmp/eo-performance-widgets-before-20261017-181240.tar`

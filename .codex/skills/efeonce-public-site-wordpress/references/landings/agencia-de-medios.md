@@ -42,8 +42,9 @@
 - Release rail: `build-medios-elementor-package.cjs <live baseline>` → `deploy-medios-elementor-package.php`
   (contract `medios-elementor-release.v1`, allowlist, previous-SHA guard, backup tar) → `publish-medios-elementor-page.php`
   (creates the page; refuses if the slug exists) → `fix-medios-ohio-layout.php` → `configure-medios-seo.php` →
-  `add-medios-menu-item.php`. To change the body later, write a republisher with a content-hash guard (the publisher
-  only creates).
+  `add-medios-menu-item.php`. To change the body later use `republish-source-led-page.php` with
+  `medios-source/republish.json` (the publisher only creates; see `source-led-elementor-patterns.md` §Shared
+  source-led core). Compiler and widget base are shared with Performance since 2026-10-17.
 - Rollback: page to draft + menu item `251987` deleted; SEO/Ohio snapshots above; plugin backup
   `/tmp/eo-medios-widgets-before-20261016-183011.tar` on Kinsta (temporary).
 - Verification 2026-10-16: live 1440 and 390 with `scrollWidth==clientWidth`, 16 modules, form contract renders 12
