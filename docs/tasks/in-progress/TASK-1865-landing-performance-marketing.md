@@ -18,9 +18,10 @@
 - **Envío consentido (19:19:43 UTC, alias `+meta` porque el form deduplica 60 min por email+form; el reenvío con el mismo
   correo devolvió el envío previo y no generó conversión):** submission `fsub-7d76a9ba…` `delivered` a HubSpot (200);
   `measurement_conversion` `474092ed…` con `advertisement=true`, GPC `false`, política `d03b8828…`; entrega `meta`
-  `http_accepted`, HTTP 200 al primer intento (19:20:02 UTC). Pendiente: leer el `Lead` de origen Server en las
-  estadísticas del dataset (bloque horario aún no publicado por Meta al cierre) y archivar el contacto de prueba con alias
-  en HubSpot.
+  `http_accepted`, HTTP 200 al primer intento (19:20:02 UTC). **Meta lo recibió:** estadísticas del dataset
+  `708931297255942` leídas a las 20:27 UTC muestran 1 `Lead` con `event_source=SERVER_ONLY` en el bloque 19:00–20:00 UTC
+  (el bloque tardó ~1 h en publicarse); es el primer Lead productivo desde el cutover del 14/10. Pendiente: archivar el
+  contacto de prueba con alias en HubSpot.
 
 - **Schema:** Rich Results Test (Google) rastrea sin errores y da 3 elementos válidos (rutas de exploración, empresa local,
   organización; único aviso opcional: `address` de la organización, que es de todo el sitio). Google no evalúa
@@ -155,7 +156,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Lead consentido entregado a Meta (http_accepted 200), falta leerlo en las estadísticas de Meta; Search Console invalid_grant`
+- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Lead consentido recibido por Meta como evento de servidor; Search Console invalid_grant`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
