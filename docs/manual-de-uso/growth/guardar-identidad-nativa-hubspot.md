@@ -61,3 +61,8 @@ se promueven mediante email/hora ni se vuelve a enviar su formulario.
 Pruebas locales incluyen límites, ambigüedad, paginación malformada, CAS, guard antes del POST y
 aislamiento de entrega. SQL Up repetido y constraints/triggers ejercitados en PostgreSQL 17.5
 aislado (PGlite), sin conexión a la base compartida. Esto no sustituye al readback del release.
+
+Revisión final local: `verified` sin checks/fecha/paginación completa se rechaza también en lecturas;
+marcador exacto sin `conversionId` válido no produce confirmación. El selector SQL protege el cast de
+fechas inválidas sin detener otros recibos; no corregir estos estados repitiendo el POST comercial.
+[Regresiones](../../audits/growth/2026-10-17-meta-cli-final-review.md), sin activación externa.

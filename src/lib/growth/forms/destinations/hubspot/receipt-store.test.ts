@@ -44,6 +44,7 @@ describe('durable native HubSpot receipt store', () => {
     expect(statements[0].text).toContain("provider='hubspot' AND status='succeeded' AND provider_submission_id IS NULL")
     expect(statements[0].text).toContain("provider_receipt_json->>'status'='pending'")
     expect(statements[0].text).toContain("(provider_receipt_json->>'nextCheckAt')::timestamptz <= CURRENT_TIMESTAMP")
+    expect(statements[0].text).toContain("CASE WHEN pg_input_is_valid(provider_receipt_json->>'nextCheckAt','timestamp with time zone')")
     expect(statements[0].text).not.toContain("INTERVAL '24 hours'")
     expect(statements[0].values).toEqual([8, 5])
     expect(statements[0].text).not.toMatch(/\b(?:INSERT|UPDATE|DELETE)\b/)
@@ -128,7 +129,7 @@ describe('durable native HubSpot receipt store', () => {
 
   it('allows terminal exhaustion without a native ID and never calls the provider', async () => {
     execute.mockResolvedValueOnce({ rows: [{ attempt_id: attemptId }] })
-    expect(await saveHubspotReceiptCheck({ attemptId, previous: { ...previous, checks: 7 }, receipt: { ...previous, checks: 8, status: 'exhausted', checkedAt: receipt.checkedAt } }, db)).toBe(true)
+    expect(await saveHubspotReceiptCheck({ attemptId, previous: { ...previous, checks: 7, checkedAt: receipt.checkedAt }, receipt: { ...previous, checks: 8, status: 'exhausted', checkedAt: receipt.checkedAt } }, db)).toBe(true)
     expect(statements[0].values[1]).toBeNull()
   })
 })

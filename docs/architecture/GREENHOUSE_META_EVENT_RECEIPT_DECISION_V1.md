@@ -52,3 +52,9 @@ los reintentos sólo para recuperar telemetría. La retención operacional sigue
 Fuentes: [Google APIs sGTM](https://developers.google.com/tag-platform/tag-manager/server-side/api),
 [template fijado](https://github.com/facebookincubator/ConversionsAPI-Tag-for-GoogleTagManager/blob/a575edb31aa447469b855c3006ed9991dad711cf/template.tpl),
 [límites de evidencia](../documentation/growth/meta-individual-event-verification.md).
+
+## Revisión local final del 17/10
+
+El reader exige intentos estrictamente crecientes (permite huecos sin recibo), y vincula el reloj
+Graph con `recordedAt` de la propia observación, con tolerancia de cinco minutos. Historia inválida
+no acredita recepción; no cambia el ACK ni induce otro POST. [Evidencia](../audits/growth/2026-10-17-meta-cli-final-review.md).

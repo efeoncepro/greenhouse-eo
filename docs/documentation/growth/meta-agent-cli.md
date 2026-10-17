@@ -68,3 +68,11 @@ Contrato vigente: [ADR de operación](../../architecture/GREENHOUSE_META_AGENT_W
 Foundation y evidencia inicial: [ADR de consultas](../../architecture/GREENHOUSE_META_AGENT_CLI_DECISION_V1.md).
 Es tooling local; no una integración productiva en Greenhouse, un MCP o acceso multiempresa. Las
 escrituras públicas no se certifican en vivo mediante fixtures ni las consultas históricas.
+
+## Revisión final local del 17/10
+
+Paginación Meta malformada queda parcial con error seguro; no se convierte en fin de lista.
+Los matches exactos de varios destinos HubSpot comparten la identidad `fsub-*`, conservando el
+`conversionId` en cada destino. Una mezcla de exactos/correlacionados mantiene `partial` y exit6,
+como cualquier resumen remoto ambiguo o incompleto. No se elige un ID nativo global arbitrario.
+[Regresiones y cierre local](../../audits/growth/2026-10-17-meta-cli-final-review.md); rollout pendiente.

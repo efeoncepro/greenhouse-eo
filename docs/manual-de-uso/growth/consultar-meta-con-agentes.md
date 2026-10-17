@@ -439,3 +439,10 @@ focal con imports canónicos DB/source/tests y ESLint global de archivos propios
 reales `read/find` también se verificaron; no se envió otro lead para probarlos.
 
 Relectura posterior del envío más reciente y contraste con stats Meta: [auditoría de Performance](../../audits/growth/2026-10-17-performance-latest-lead-trace.md).
+
+## Comprobaciones de la revisión final local
+
+Si Meta devuelve paginación malformada, conservar la cobertura parcial y su error; no tratar las filas
+leídas como el universo completo. Con varios destinos HubSpot, revisar `hubspotVerification` para cada
+ID nativo; el resumen confirmado conserva la ocurrencia local, sin elegir un ID de destino como global.
+Un resumen mixto queda `partial`/exit6. [Pruebas y estado](../../audits/growth/2026-10-17-meta-cli-final-review.md).

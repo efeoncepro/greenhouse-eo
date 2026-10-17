@@ -70,10 +70,21 @@ export function leadTraceCatalog() {
   }
 }
 
-function aggregate(evidence: RemoteStageEvidence[]): RemoteStageEvidence {
+function aggregate(evidence: RemoteStageEvidence[], stage: 'formSubmission' | 'contact'): RemoteStageEvidence {
   if (!evidence.length) return { status: 'not_checked', correlation: 'none', safeErrorCode: 'hubspot_target_unavailable' }
   if (evidence.length === 1) return evidence[0]
   const status = evidence.every(v => v.status === 'confirmed') ? 'confirmed' : evidence.every(v => v.status === 'correlated') ? 'correlated' : 'partial'
+
+  if (stage === 'formSubmission' && status === 'confirmed') {
+    const source = evidence[0].matchedSubmissionId
+
+    if (!source || evidence.some(v => v.correlation !== 'exact_uuid' || v.matchedSubmissionId !== source)) {
+      return { status: 'ambiguous', correlation: 'none' }
+    }
+    // Different destinations have different native IDs; retain those in the individual checks.
+
+    return { status: 'confirmed', correlation: 'exact_uuid', matchedSubmissionId: source }
+  }
 
   return { status, correlation: status === 'confirmed' ? 'identity' : 'none' }
 }
@@ -181,7 +192,7 @@ export async function runLeadTraceCommand(argv: string[], dependencies: { runtim
         })
       }
 
-      input.remoteHubspot = { formSubmission: aggregate(checks.map(v => v.formSubmission)), contact: aggregate(checks.map(v => v.contact)) }
+      input.remoteHubspot = { formSubmission: aggregate(checks.map(v => v.formSubmission), 'formSubmission'), contact: aggregate(checks.map(v => v.contact), 'contact') }
     }
 
     const report = buildLeadTrace(input)
@@ -191,7 +202,10 @@ export async function runLeadTraceCommand(argv: string[], dependencies: { runtim
 
     const checkedDestinations = new Set(checks.map(row => row.destinationId))
     const uncheckedDestinations = expectedDestinations.filter(id => !checkedDestinations.has(id))
-    const incomplete = !input.source || !values['source-only'] && (!checks.length || uncheckedDestinations.length > 0 || checks.some(v => [v.formSubmission, v.contact].some(e => ['partial', 'unavailable', 'ambiguous', 'not_checked'].includes(e.status))) || (snapshot?.privateHubspotTargets.length ?? 0) > 5)
+
+    const incomplete = !input.source || !values['source-only'] && (!checks.length || uncheckedDestinations.length > 0 ||
+      [report.hubspot.remoteForm, report.hubspot.remoteContact, ...checks.flatMap(v => [v.formSubmission, v.contact])]
+        .some(e => ['partial', 'unavailable', 'ambiguous', 'not_checked'].includes(e.status)) || (snapshot?.privateHubspotTargets.length ?? 0) > 5)
 
     return { exitCode: incomplete ? 6 : 0, output: { ok: true, command, data: report, hubspotVerification: checks, coverage: { sourceOnly: Boolean(values['source-only']), complete: !incomplete, uncheckedHubspotDestinations: values['source-only'] ? [] : uncheckedDestinations },
       notes: ['Evidence describes this exact persisted occurrence. No dispatch, CRM mutation or conversion was sent.', 'Native form records matched by email and time remain correlated; an existing CRM contact does not establish that this submission created it.', 'Meta processing and attribution require evidence beyond the stored sGTM tag ACK.'] } }

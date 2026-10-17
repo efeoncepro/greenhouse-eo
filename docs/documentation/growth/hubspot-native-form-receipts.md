@@ -37,3 +37,8 @@ convertiría en una prueba exacta. El último Performance conocido sigue en esta
 
 Activación: [manual](../../manual-de-uso/growth/guardar-identidad-nativa-hubspot.md).
 Meta tiene límites distintos: [verificación individual](meta-individual-event-verification.md).
+
+Revisión final local: estados verificados requieren checks/fecha/cobertura válidos también al leer;
+marcador sin ID nativo no basta. Fechas inválidas no abortan la selección SQL del reconciliador.
+La CLI agrega múltiples destinos por ocurrencia, conserva IDs nativos por destino y declara cobertura
+parcial ante evidencia mixta. [Revisión y regresiones](../../audits/growth/2026-10-17-meta-cli-final-review.md).

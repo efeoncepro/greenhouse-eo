@@ -64,7 +64,8 @@ export async function listPendingHubspotReceipts(limit = 5, db?: QueryExecutorPr
       AND provider_receipt_json->>'status'='pending'
       AND CASE WHEN provider_receipt_json->>'checks' ~ '^[0-8]$'
         THEN (provider_receipt_json->>'checks')::integer < ${HUBSPOT_RECEIPT_MAX_CHECKS} ELSE FALSE END
-      AND (provider_receipt_json->>'nextCheckAt')::timestamptz <= CURRENT_TIMESTAMP
+      AND CASE WHEN pg_input_is_valid(provider_receipt_json->>'nextCheckAt','timestamp with time zone')
+        THEN (provider_receipt_json->>'nextCheckAt')::timestamptz <= CURRENT_TIMESTAMP ELSE FALSE END
       AND created_at <= CURRENT_TIMESTAMP
     ORDER BY created_at,attempt_id LIMIT ${limit}`.execute(db ?? await getDb())
 

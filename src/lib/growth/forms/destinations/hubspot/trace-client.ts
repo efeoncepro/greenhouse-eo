@@ -196,6 +196,8 @@ export class HubSpotLeadTraceClient {
           if (hasNativeId && conversionId !== input.nativeSubmissionId) continue
           if (hasMarker && !markerMatched) continue
           if (!hasExactIdentity && !emailMatched) continue
+          // An occurrence marker cannot manufacture the native identity omitted by a malformed row.
+          if (hasExactIdentity && !conversionId) throw new SafeHubSpotError('hubspot_native_submission_id_missing')
           result.matches.push({ ...(conversionId ? { nativeSubmissionId: conversionId } : {}), submittedAtMs: row.submittedAt, emailMatched,
             matchedBy: hasNativeId ? 'conversion_id' : hasMarker ? 'occurrence_marker' : 'email_and_time' })
         }

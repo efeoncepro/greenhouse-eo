@@ -66,3 +66,10 @@ No se aplicó en la base compartida. Estado: código local, provisión HubSpot/m
 
 - [POST autenticado oficial](https://developers.hubspot.com/docs/api-reference/legacy/marketing/forms/v3-legacy/submit-data-authenticated).
 - [Historial de submissions: anuncio oficial](https://developers.hubspot.com/changelog/2019-01-23-new-feature-get-the-submissions-for-a-hubspot-form).
+
+## Revisión local final del 17/10
+
+El parser rechaza fechas UTC inexistentes y estados de verificación sin checks/fecha/cobertura.
+Una fila marcada sin `conversionId` válido no acredita identidad nativa. El selector de pendientes
+protege el cast de fecha con `pg_input_is_valid` (PostgreSQL 17); una fecha corrupta no aborta el batch.
+Sin cambios de autoridad o rollout. [Evidencia](../audits/growth/2026-10-17-meta-cli-final-review.md).

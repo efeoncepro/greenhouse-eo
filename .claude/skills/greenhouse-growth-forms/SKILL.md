@@ -112,6 +112,12 @@ sólo tras GET con match único y cobertura completa. El worker recupera evidenc
 aunque no haya nuevos leads. Nunca sustituir la ocurrencia por el valor actual del contacto,
 email/hora, URL o `hsforms-*`. Schema antes del POST; migración preparada fuera de `migrations/`.
 
+Revisión de recibos: exigir checks/fecha UTC/cobertura coherentes al leer `verified`; un marcador sin
+`conversionId` válido no confirma identidad nativa. El selector de pendientes debe proteger casts de
+fechas corruptas antes de evaluar SQL. Múltiples destinos conservan sus IDs por separado, con resumen
+por ocurrencia; evidencia mixta implica cobertura parcial. Nunca solucionar estos fallos con otro POST.
+[Revisión local](../../../docs/audits/growth/2026-10-17-meta-cli-final-review.md).
+
 ## Mental model — end to end
 
 ```

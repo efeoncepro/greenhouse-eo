@@ -27,7 +27,7 @@
   server-side, historial exacto, ID persistido por CAS y recuperación GET independiente del POST.
   Código local probado; SQL parqueado, provisión/mapping y release pendientes. Históricos conservan
   correlación. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin
-  GET por `event_id`; captura del recibo CAPI propuesta, sin implementar ni reenviar eventos.
+  GET por `event_id`; captura del recibo CAPI implementada localmente en el delta siguiente, sin reenviar eventos.
   [Cierre local](docs/audits/growth/2026-10-17-native-hubspot-receipt-closure.md): 262 tests/14 archivos,
   TS strict y lint PASS; SQL ejercitado en PostgreSQL aislado, lecturas reales sin mutaciones.
 - [Recibo CAPI por evento/intento](docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): sender
@@ -36,6 +36,11 @@
   Opción del template default OFF y SQL parqueado. Por orden del operador: commit sin activar/desplegar.
   [Cierre local](docs/audits/growth/2026-10-17-meta-event-receipt-local-closure.md): 402 tests Vitest +36 Node,
   TS/lint y SQL aislado PASS; sin nuevos eventos ni cambios externos.
+
+- [Revisión final local](docs/audits/growth/2026-10-17-meta-cli-final-review.md): paginación malformada
+  queda parcial, agregación HubSpot por ocurrencia/IDs por destino, fecha SQL protegida y validación
+  de estados/historial de recibos. 426 Vitest +36 Node, TS/lint y SQL aislado PASS; skills espejadas
+  y manuales actualizados. Sin push, activación, migraciones compartidas, eventos ni deploy.
 
 ## 2026-10-17 — Landing Performance Marketing en producción (TASK-1865)
 

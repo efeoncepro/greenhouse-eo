@@ -64,3 +64,11 @@ su contrato/base son anteriores y muta workspaces. El builder nuevo no lo invoca
 Rollback conserva los recibos y puede retirar el checkbox/instrumentación usando versiones
 compatibles. El Down no elimina evidencia. El carril antiguo puede seguir dando ACK sin recibo;
 esa falta nunca se reconstruye desde stats/EMQ ni prueba que Meta rechazó el evento.
+
+## Integridad al consultar
+
+El reader rechaza intentos fuera de orden; admite huecos causados por intentos sin evidencia durable.
+También rechaza una observación Graph posterior a su registro durable más allá de cinco minutos de
+margen entre relojes. Usa la fecha de la propia observación, sin reinterpretar históricos con el reloj
+actual. Un historial inválido muestra `invalid`/recepción desconocida y no habilita replay.
+[Revisión local final](../../audits/growth/2026-10-17-meta-cli-final-review.md).

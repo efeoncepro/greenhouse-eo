@@ -165,6 +165,34 @@ describe('lead trace CLI with injected runtime and provider transports', () => {
     expect(JSON.stringify(result)).not.toContain(TOKEN)
   })
 
+  it('aggregates exact matches across destinations without replacing occurrence identity with contact identity', async () => {
+    const f = fixture()
+
+    f.snapshot.privateHubspotTargets[0].occurrenceMarker = { name: 'ef_greenhouse_submission_id', value: SUBMISSION }
+    f.snapshot.privateHubspotTargets.push({ ...f.snapshot.privateHubspotTargets[0], destinationId: 'hubspot-second' })
+    f.snapshot.metadata.hubspotAttempts = [...f.snapshot.metadata.hubspotAttempts, { ...f.snapshot.metadata.hubspotAttempts[0], destination_id: 'hubspot-second' }]
+    f.setMarker(SUBMISSION)
+    const result = await runLeadTraceCommand(['leads', 'trace', '--submission-id', SUBMISSION], { runtime: f.runtime, hubspot: f.hubspot, now: NOW })
+
+    expect(result).toMatchObject({ exitCode: 0, output: { coverage: { complete: true }, data: { hubspot: {
+      remoteForm: { status: 'confirmed', correlation: 'exact_uuid', matchedSubmissionId: SUBMISSION }, remoteContact: { status: 'confirmed', correlation: 'identity' },
+    } } } })
+    expect(result.output).toHaveProperty('data.hubspot.remoteForm')
+    expect(result.output).not.toHaveProperty('data.hubspot.remoteForm.nativeSubmissionId')
+    expect(result.output.hubspotVerification).toHaveLength(2)
+  })
+
+  it('reports mixed exact and correlated destinations as incomplete in both summary and exit code', async () => {
+    const f = fixture()
+
+    f.snapshot.privateHubspotTargets.push({ ...f.snapshot.privateHubspotTargets[0], destinationId: 'hubspot-second', occurrenceMarker: { name: 'ef_greenhouse_submission_id', value: SUBMISSION } })
+    f.snapshot.metadata.hubspotAttempts = [...f.snapshot.metadata.hubspotAttempts, { ...f.snapshot.metadata.hubspotAttempts[0], destination_id: 'hubspot-second' }]
+    f.setMarker(SUBMISSION)
+    const result = await runLeadTraceCommand(['leads', 'trace', '--submission-id', SUBMISSION], { runtime: f.runtime, hubspot: f.hubspot, now: NOW })
+
+    expect(result).toMatchObject({ exitCode: 6, output: { coverage: { complete: false }, data: { hubspot: { remoteForm: { status: 'partial' } } } } })
+  })
+
   it('source-only exposes a persisted native ID only from a verified receipt bound to the selected occurrence', async () => {
     const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: FORM,
       markerProperty: 'ef_greenhouse_submission_id', markerValue: SUBMISSION, checks: 1,

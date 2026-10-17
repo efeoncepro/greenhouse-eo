@@ -53,6 +53,7 @@ export function parseMetaReceiptObservation(value: unknown): MetaReceiptObservat
   const r = raw === undefined ? null : parseMetaEventReceipt(raw)
 
   if (o.status === 'recorded' ? !r || r.eventId !== o.eventId || r.attemptId !== o.attemptId || r.attempt !== o.attempt : raw !== undefined) return null
+  if (r && r.observedAtMs > Date.parse(o.recordedAt) + 300_000) return null
 
   return { ...o, ...(r ? { receipt: r } : {}) }
 }
@@ -84,14 +85,14 @@ export function summarizeMetaReceipts(value: unknown, eventId: string | undefine
 
   if (value === undefined || value === null) return result
   if (!Array.isArray(value) || value.length > 5) return { ...result, status: 'invalid' as const }
-  const seen = new Set<number>()
+  let lastAttempt = 0
 
   for (const item of value) {
     const o = parseMetaReceiptObservation(item)
 
-    if (!o || o.eventId !== eventId || maximumAttempt === undefined || o.attempt > maximumAttempt || seen.has(o.attempt) ||
+    if (!o || o.eventId !== eventId || maximumAttempt === undefined || o.attempt > maximumAttempt || o.attempt <= lastAttempt ||
       (o.receipt && o.receipt.eventTime !== eventTime)) return { ...result, attempts: [], status: 'invalid' as const, reception: 'unknown' as const }
-    seen.add(o.attempt)
+    lastAttempt = o.attempt
 
     let receipt: Omit<MetaEventReceipt, 'attemptId'> | undefined
 

@@ -27,4 +27,16 @@ describe('native form receipt contract', () => {
   it.each([{ checks: 9 }, { checks: -1 }, { nextCheckAt: 'invalid' }, { safeErrorCode: 'raw private@example.test' }, { paginationComplete: 'true' }])('rejects malformed durable evidence', extra => {
     expect(parseHubSpotFormReceipt({ ...createHubSpotFormReceipt(mapping, SOURCE), ...extra })).toBeNull()
   })
+  it.each(['2026-02-30T12:00:00Z', '2026-10-17T12:00:00', '2026-10-17T12:00:00+01:00', 'infinity'])('rejects noncanonical or nonexistent UTC dates %s', nextCheckAt => {
+    expect(parseHubSpotFormReceipt({ ...createHubSpotFormReceipt(mapping, SOURCE), nextCheckAt })).toBeNull()
+  })
+  it.each([
+    { status: 'verified', checks: 0, checkedAt: '2026-10-17T20:01:00Z', paginationComplete: true },
+    { status: 'verified', checks: 1, paginationComplete: true },
+    { status: 'verified', checks: 1, checkedAt: '2026-10-17T20:01:00Z', paginationComplete: false },
+    { status: 'denied', checks: 0 }, { status: 'pending', checks: 8, checkedAt: '2026-10-17T20:01:00Z' },
+    { status: 'pending', checks: 1 },
+  ])('rejects impossible verification/check state %j', extra => {
+    expect(parseHubSpotFormReceipt({ ...createHubSpotFormReceipt(mapping, SOURCE), ...extra })).toBeNull()
+  })
 })

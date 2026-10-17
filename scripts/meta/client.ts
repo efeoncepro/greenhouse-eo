@@ -562,7 +562,11 @@ return datePrefix + Buffer.from(JSON.stringify({ v: 1, path: canonicalPath, para
         pages++
         // This cursor would now duplicate accepted rows; only the validated next page can resume safely.
         safeResumeCursor = undefined
-        const paging = object(result.paging) ? result.paging : {}
+        if (result.paging !== undefined && !object(result.paging)) throw new MetaReadError('META_INVALID_PAGINATION', 5)
+        const paging = result.paging ?? {}
+
+        if ((paging.next !== undefined && (typeof paging.next !== 'string' || !paging.next.length)) ||
+          (paging.cursors !== undefined && !object(paging.cursors))) throw new MetaReadError('META_INVALID_PAGINATION', 5)
 
         hasMore = typeof paging.next === 'string' && paging.next.length > 0
         const cursors = object(paging.cursors) ? paging.cursors : {}

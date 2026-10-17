@@ -26,7 +26,14 @@ export function isNativeHubspotSubmissionId(value: unknown): value is string {
 export function parseHubSpotFormReceipt(value: unknown): HubSpotFormReceipt | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null
   const r = value as Record<string, unknown>
-  const validDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v) && Number.isFinite(Date.parse(v))
+
+  const validDate = (v: unknown): v is string => {
+    if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(v)) return false
+    const ms = Date.parse(v)
+    const canonical = v.replace(/(?:\.(\d{1,3}))?Z$/, (_, fraction: string | undefined) => '.' + (fraction ?? '').padEnd(3, '0') + 'Z')
+
+    return Number.isFinite(ms) && new Date(ms).toISOString() === canonical
+  }
 
   if (r.contract !== HUBSPOT_RECEIPT_CONTRACT || !['pending', 'verified', 'ambiguous', 'exhausted', 'denied'].includes(String(r.status)) ||
     r.portalId !== '48713323' || typeof r.formGuid !== 'string' || !UUID.test(r.formGuid) ||
@@ -34,7 +41,11 @@ export function parseHubSpotFormReceipt(value: unknown): HubSpotFormReceipt | nu
     !Number.isInteger(r.checks) || Number(r.checks) < 0 || Number(r.checks) > HUBSPOT_RECEIPT_MAX_CHECKS || !validDate(r.nextCheckAt) ||
     (r.checkedAt !== undefined && !validDate(r.checkedAt)) ||
     (r.safeErrorCode !== undefined && (typeof r.safeErrorCode !== 'string' || !/^[a-z0-9_]{1,100}$/.test(r.safeErrorCode))) ||
-    (r.paginationComplete !== undefined && typeof r.paginationComplete !== 'boolean')) return null
+    (r.paginationComplete !== undefined && typeof r.paginationComplete !== 'boolean') ||
+    ((r.status !== 'pending' || Number(r.checks) > 0) && !validDate(r.checkedAt)) ||
+    (r.status !== 'pending' && r.checks === 0) ||
+    (r.status === 'pending' && r.checks === HUBSPOT_RECEIPT_MAX_CHECKS) ||
+    (r.status === 'verified' && r.paginationComplete !== true)) return null
 
   // Reconstruct an allowlisted object: extra response fields and PII are never persisted.
   return { contract: HUBSPOT_RECEIPT_CONTRACT, status: r.status as HubSpotFormReceipt['status'], portalId: r.portalId,

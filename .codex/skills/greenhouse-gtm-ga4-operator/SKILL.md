@@ -44,6 +44,12 @@ No ejecutar el builder histórico de workspace ni publicar/enviar para completar
 
 For **event naming / taxonomy / the gh_ house style** → `docs/reference/measurement-gtm-ga4/` (skill `growth-marketing-cro`). For **campaign/UTM measurement strategy** → `digital-marketing`.
 
+Revisión final CLI/recibos: paginación Meta malformada queda parcial; no anunciar fin de lista.
+La historia CAPI exige intentos crecientes (huecos permitidos) y reloj Graph compatible con su propio
+registro durable (margen cinco minutos). HubSpot multidestino agrega por `fsub-*`, conserva los IDs
+nativos por destino y devuelve exit6 con evidencia mixta. `verified` requiere checks/fecha/cobertura.
+[Revisión local](../../../docs/audits/growth/2026-10-17-meta-cli-final-review.md); activación pendiente.
+
 ## Meta CAPI / sGTM — cargar antes de proponer o ejecutar
 
 Canon: `docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md` (implementación vigente),

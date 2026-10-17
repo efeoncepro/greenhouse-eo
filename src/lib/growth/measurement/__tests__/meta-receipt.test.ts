@@ -47,6 +47,18 @@ describe('Meta per-event receipt boundary', () => {
     expect(JSON.stringify(result)).not.toContain(context.attemptId)
     expect(result).not.toHaveProperty('processing')
   })
+  it('rejects a historical receipt observed after its own durable record, without consulting the present clock', () => {
+    const observation = metaReceiptObservation(context, JSON.stringify(receipt))
+
+    expect(parseMetaReceiptObservation({ ...observation, recordedAt: new Date(receipt.observedAtMs - 300_001).toISOString() })).toBeNull()
+  })
+  it('rejects reordered retry history while allowing gaps for attempts with no durable evidence', () => {
+    const first = metaReceiptObservation(context, JSON.stringify(receipt))
+    const later = metaReceiptObservation({ ...context, attempt: 3 }, null)
+
+    expect(summarizeMetaReceipts([first, later], context.eventId, context.eventTime, 3).reception).toBe('acknowledged')
+    expect(summarizeMetaReceipts([later, first], context.eventId, context.eventTime, 3)).toMatchObject({ status: 'invalid', reception: 'unknown', attempts: [] })
+  })
   it.each(['foreign', 'duplicate', 'future_attempt', 'wrong_time'])('cannot promote corrupt historical ledger %s', kind => {
     const observation = metaReceiptObservation(context, JSON.stringify(receipt))
     const values = kind === 'foreign' ? [{ ...observation, eventId: context.attemptId }] : kind === 'duplicate' ? [observation, observation] : [observation]

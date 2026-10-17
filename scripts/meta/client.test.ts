@@ -196,6 +196,15 @@ describe('MetaReadClient read boundary', () => {
     expect(calls.every(call => !call.url.toString().includes(SYSTEM))).toBe(true)
   })
 
+  it.each([null, [], 'bad', { next: null }, { next: 123 }, { next: '' }, { cursors: [] }])('keeps malformed pagination %j partial instead of claiming exhaustion', async paging => {
+    const { client } = fixture(url => url.pathname.endsWith('/posts') ? json({ data: [{ id: '123' }], paging }) : undefined)
+    const result = await client.list('/' + p.pageId + '/posts', {}, { maxPages: 2, pageSize: 3 })
+
+    expect(result.data).toEqual([{ id: '123' }])
+    expect(result.pagination).toMatchObject({ complete: false, hasMore: true, error: { code: 'META_INVALID_PAGINATION' } })
+    expect(result.pagination).not.toHaveProperty('nextCursor')
+  })
+
   it('marks exhausted lists complete and supports explicit resumption', async () => {
     const { client, calls } = fixture()
 

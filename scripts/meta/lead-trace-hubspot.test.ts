@@ -36,6 +36,18 @@ function fixture(handler?: (url: URL) => Response | undefined) {
 }
 
 describe('HubSpot lead trace read-only correlation', () => {
+  it.each([undefined, 'hsforms-local', ''])('cannot call a marker exact when native conversionId is missing or invalid: %j', async conversionId => {
+    const occurrenceMarker = { name: 'ef_greenhouse_submission_id', value: 'fsub-11111111-1111-4111-8111-111111111111' }
+
+    const { client } = fixture(url => url.pathname.startsWith('/form-integrations/') ? json({ results: [{
+      submittedAt, conversionId, values: [occurrenceMarker],
+    }] }) : undefined)
+
+    const result = await client.findFormSubmission({ ...query, occurrenceMarker })
+
+    expect(result).toMatchObject({ status: 'unavailable', pagination: { complete: false }, safeErrorCode: 'hubspot_native_submission_id_missing' })
+    expect(result).not.toHaveProperty('conversionId')
+  })
   it('gates every data read on the fixed portal and caches that verification', async () => {
     const { client, calls, provider } = fixture()
 
