@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.2: carga autorizada de Antonio, readback de ids/estado/cupo y pruebas de inferencia)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.3: carga de Nexa, Hum, Isabella, Karo y Sophia por instrucción posterior de Julio; ids y cupo verificados)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -19,7 +19,7 @@ La biblioteca privada de assets de BytePlus es la vía para personajes propios. 
 | Cupo | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
-| Usados | **2 de 50 assets · 1 de 50 grupos** |
+| Usados | **12 de 50 assets · 6 de 50 grupos** |
 | Tier siguiente (oficial, 2026-10-13) | **USD 1.400/mes o USD 14.000/año**: 1M assets, 120 QPM. Premium: USD 4.200/mes o 42.000/año. Sin reembolso |
 
 El operador vio alrededor de USD 1.600 en la consola; la tabla oficial dice USD 1.400/mes. La diferencia podría ser
@@ -63,19 +63,41 @@ imagen = borrar y subir otra.
 
 ## 4. Cupos usados
 
-Usados: **2 de 50 assets · 1 de 50 grupos**.
+Usados: **12 de 50 assets · 6 de 50 grupos**.
 
 | # | Personaje | Tipo (elenco/cliente/real) | Asset group | Asset id(s) | Assets | Estado | Evidencia | Fecha | Aprobó |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | Antonio | elenco virtual | `Antonio — elenco Efeonce` · `group-20261017163741-plssb` | Rostro: `asset-20261017163742-t66nd` (`antonio-1-rostro.png`); cuerpo: `asset-20261017164311-42bch` (`antonio-2-cuerpo.png`) | 2 | Ambos: `warehoused` (literal de consola), sin error de carga. La UI no muestra el literal `Active`; uso por inferencia sin validar: ambas pruebas rechazadas con HTTP 400 `InvalidParameter` (§7) | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (prompts, logs, intermedias y `SUBIR/SHA256SUMS`); origen `_identidad-elenco/antonio/`, selección `antonio-elegida.png` v3a; captura `pruebas-antonio/antonio-consola.jpg` | 2026-10-17 | Julio |
+| 2 | Nexa | elenco virtual | `Nexa — Efeonce` · `group-20261017164814-5zvxt` | Rostro: `asset-20261017164815-fxjrl` (`nexa-1-rostro.png`); cuerpo: `asset-20261017164949-jrtdr` (`nexa-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
+| 3 | Hum | elenco virtual | `Hum — elenco Efeonce` · `group-20261017165042-vpj42` | Rostro: `asset-20261017165043-v7vzs` (`hum-1-rostro.png`); cuerpo: `asset-20261017165146-7p22d` (`hum-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
+| 4 | Isabella | elenco virtual | `Isabella — elenco Efeonce` · `group-20261017165249-zj7gv` | Rostro: `asset-20261017165250-xfvwb` (`isabella-1-rostro.png`); cuerpo: `asset-20261017165355-2l59r` (`isabella-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
+| 5 | Karo | elenco virtual | `Karo — elenco Efeonce` · `group-20261017165458-zqhpz` | Rostro: `asset-20261017165458-kc6kj` (`karo-1-rostro.png`); cuerpo: `asset-20261017165600-rqqgj` (`karo-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
+| 6 | Sophia | elenco virtual | `Sophia — elenco Efeonce` · `group-20261017165708-vln4l` | Rostro: `asset-20261017165709-knb82` (`sophia-1-rostro.png`); cuerpo: `asset-20261017165815-bnrr2` (`sophia-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
 
-### Cola aprobada para subir (2026-10-17)
+### Autorización y carga completada (2026-10-17)
 
 Aprobada por el operador el 2026-10-17 («súbelo»): **Antonio, Nexa, Hum, Isabella, Karo y Sophia**, 2 imágenes cada
 uno = **12 assets en 6 grupos**. Paquete listo con QA y checksums en
 `ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/` (ver su `LEEME.md`). Orden: Antonio solo primero, borrador
-de prueba y verificación del contador; después el resto. Cada uno pasa a la tabla de arriba al quedar `Active`.
-Readback 2026-10-17: el grupo de Antonio se creó sin mostrar una nueva carta; no se aceptó una nueva carta en esta carga. Si aparece en otro paso, la firma queda reservada a Julio. Contador independiente del plan Entry: **2/50 assets y 1/50 grupos usados**, **48 assets y 49 grupos disponibles** (consola, actualizado 2026-10-17 05:44:17; zona no indicada por la UI). Diferencia respecto del inicio: **+2 assets y +1 grupo usados**. Se mantiene el plan gratuito, sin compra ni cambio de plan. **Nexa, Hum, Isabella, Karo y Sophia no se subieron:** la prueba con referencias falló (§7), por lo que no se cumplió la condición del operador para continuar.
+de prueba y verificación del contador; después el resto. La tabla conserva el estado literal observado en consola.
+
+**Primera carga:** Antonio consumió 2 assets y 1 grupo; las pruebas de referencia y primer cuadro fallaron (§7).
+Se detuvo inicialmente la cola por la condición del operador.
+
+**Instrucción posterior del operador (2026-10-17):** «Subelas». Autoriza continuar con Nexa, Hum, Isabella, Karo y
+Sophia aunque la prueba 3a haya fallado. Se cargaron en ese orden, dos PNG originales del paquete `SUBIR/` por
+personaje y un grupo por personaje, con los nombres exactos del LEEME. No se volvió a cargar Antonio.
+
+**Readback final de consola:** **12/50 assets y 6/50 grupos usados**, **38 assets y 44 grupos disponibles**
+(actualizado 2026-10-17 05:58:18, zona no indicada por la UI). Esta continuación consumió **10 assets y 5 grupos**;
+el total desde el inicio de la tarea es **12 assets y 6 grupos**. Los doce archivos muestran `warehoused` sin error
+en la consola. No se verificó por API el literal `Active` ni se repitieron las pruebas de generación.
+
+**Plan y firma:** Entry gratuito, sin compra ni cambio de plan. No apareció una nueva carta de compromiso durante
+estas cargas y no se aceptó ninguna; si aparece más adelante, la firma sigue reservada a Julio.
+
+**Evidencia de cierre:** `ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/elenco-grupos-final.jpg`
+(seis grupos y nombres) y `elenco-cupo-final.jpg` en la misma carpeta (12/50 assets, 6/50 grupos y plan gratuito).
 
 ## 5. Evidencia obligatoria (carta de compromiso)
 
@@ -131,7 +153,7 @@ conserva el comando exacto, las fechas UTC, el código de salida y la comprobaci
 conserva el error. La estimación previa del intento con referencias fue **USD 0,4112**, no un cobro confirmado;
 para primer cuadro la CLI indicó precio variable sin cota calculable.
 
-**Cierre de esta carga:** sólo los dos PNG autorizados de Antonio, en un único grupo con el nombre indicado.
-Los checksums de los 12 archivos del paquete `SUBIR/` se verificaron antes de empezar. Los cinco personajes
-restantes conservan su aprobación, pero su carga queda pendiente de resolver y validar el uso de Antonio como
-referencia. No se afirma estado API `Active` ni compatibilidad por el solo estado visual `warehoused`.
+**Cierre de la primera etapa:** se habían cargado sólo los dos PNG de Antonio y la cola quedó detenida por el
+fallo de referencia. La instrucción posterior «Subelas» autorizó completar los cinco personajes restantes; su
+carga y el cupo final están en §4. Los checksums de los doce PNG del paquete `SUBIR/` se verificaron antes de
+cada etapa. No se afirma estado API `Active` ni compatibilidad por el solo estado visual `warehoused`.
