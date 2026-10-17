@@ -10,6 +10,16 @@ Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no ve
 La biblioteca privada de assets de BytePlus es la vía para personajes propios. Su cupo es escaso: este ledger es la
 única fuente de qué se subió, por qué y quién lo aprobó.
 
+## 0. Cuenta canónica (2026-10-17, confirmado por Julio)
+
+**La cuenta canónica de BytePlus es 3004839361**: es la de la credencial de inferencia de la CLI
+(`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas de esta tabla, el KYC, el plan Entry y
+la carta de compromiso se hicieron por error en la cuenta **3003660328**; por eso la API responde «Your account has not
+activated the Asset Service»: la clave no ve esos assets. **Los 12 assets de 3003660328 no sirven para la CLI.**
+Para usarlos hay que repetir en 3004839361: KYC de organización (si no lo tiene), Advanced Creation Rights (Entry),
+carta de compromiso y la subida de los 12 archivos de `SUBIR/`, y anotar los nuevos ids aquí. No borrar los de
+3003660328 sin decisión de Julio.
+
 ## 1. Estado del plan
 
 | Dato | Valor |
