@@ -784,5 +784,7 @@ láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-genera
 - **Regla:** el fondo de cualquier pieza o superficie de Efeonce es `#001a33`, sea cual sea la línea; `#091951` sólo en
   piezas de producto (Wave, Reach, Globe, submarcas SEO/AEO). Ante una contradicción entre el artifact del design system
   y esta skill, manda el ledger de esta skill; reportar la deriva del artifact en vez de seguirla.
+- **Corregido el mismo día** (operador): el artifact quedó en la versión `1792274262-8626` con el README, la nota de
+  `ground-family` y los contrastes de Engine (3,8:1) y Voice (4,7:1) medidos sobre `ground`.
 - **Misma pasada:** en un menú, los nombres de línea son navegación y van en Poppins (Bricolage sólo para títulos y voz
   editorial, [criteria.md](criteria.md), «Rooms: design system de producto»).
