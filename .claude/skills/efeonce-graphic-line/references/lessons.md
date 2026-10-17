@@ -770,3 +770,19 @@ láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-genera
 - **El generador en modo lienzo fallaba en silencio** cuando una imagen nueva no tenía su blob en `blobs.json`: al
   sumar una imagen, revisar primero esa entrada.
 - Página del reel y su reproductor: [video-player.md](video-player.md#página-suelta-de-muestra-en-think-2026-10-12).
+
+## 2026-10-17 — El manual del artifact «Efeonce — La órbita» todavía pinta las líneas sobre `#091951` (mega menú del sitio)
+
+- **Síntoma:** en el canvas del mega menú de efeoncepro.com, el fondo del panel cambiaba de `#001a33` (Growth) a
+  `#091951` al activar Brand, Engine, Voice o Revenue. El operador lo corrigió: «el azul es el mismo para toda la línea
+  de la órbita, la línea sólo aporta el acento».
+- **Causa:** se siguió el `project/README.md` y la `usage` del token `ground-family` del design system en Claude
+  (https://claude.ai/artifact/2ubRm8vTLamJukRCXR1xpc, versión 1792253949-5d96), que aún dicen «Las líneas Brand, Engine,
+  Voice y Revenue usan `ground-family` como oscuro». Esa regla quedó superada el 2026-10-09 ([ledger.md](ledger.md):
+  una pieza de línea lleva el fondo Efeonce `#001A33` y sólo el acento; `#091951` es de piezas de **producto**) y
+  coincide con D21 de la iconografía.
+- **Regla:** el fondo de cualquier pieza o superficie de Efeonce es `#001a33`, sea cual sea la línea; `#091951` sólo en
+  piezas de producto (Wave, Reach, Globe, submarcas SEO/AEO). Ante una contradicción entre el artifact del design system
+  y esta skill, manda el ledger de esta skill; reportar la deriva del artifact en vez de seguirla.
+- **Misma pasada:** en un menú, los nombres de línea son navegación y van en Poppins (Bricolage sólo para títulos y voz
+  editorial, [criteria.md](criteria.md), «Rooms: design system de producto»).
