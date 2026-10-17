@@ -907,6 +907,58 @@ objeto; el **super de dato** es una órbita que mide un dato con fuente; la **pa
 con un divisor en el acento; los **subtítulos** van quemados, en el tercio inferior y sin caja. Una esfera por
 pantalla.
 
+#### Delta 2026-10-17 — Subtítulos de video: vidrio denso con anillo de pregunta (operador)
+
+El operador aprobó el 2026-10-17 un estándar nuevo para los subtítulos quemados en video. **Reemplaza a «sin caja»
+en video** porque la medición mostró que el subtítulo sin caja no se lee.
+
+**La medición.** Contraste en el peor 5 % del fondo detrás de las letras, a 1080 × 1350, con Poppins 500 y una
+línea de dos renglones, sobre seis fondos: claro, cálido, oscuro, movimiento, interfaz y papel. El mínimo es 4,5:1.
+
+| Estilo | Resultado |
+|---|---|
+| Sin caja con sombra negra (token actual) | falla en los 6 fondos (1,0–2,0:1) |
+| Sin caja con halo navy | se probó y se rechazó: «muy 1998» |
+| Vidrio al 38 % | falla en claro, cálido, interfaz y papel |
+| **Vidrio denso al 60 %** | **es el más liviano que pasa en los 6 (4,7–13,7:1)** |
+| Lecho sólido al 92 % | pasa en todos, pero pesa y se confunde con la voz de la marca |
+
+Evidencia: `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/subtitulos/evidencia/` (`matriz.png`,
+`barrido.png`, `acentos.png` y los JSON de la medición). Es una prueba sobre cuadros fijos: en cada pieza se
+repite la medición sobre los cuadros reales del video.
+
+**Estándar de video**
+- **Bloque:** un solo bloque de vidrio con navy `#001A33` al 60 %, desenfoque de 24 px, saturación 1,4,
+  borde de luz de 1,5 px al 16 % y radio de 18 px.
+- **Esquina recta:** la esquina recta apunta a quien habla, como en los lechos. El bloque se alinea a ese lado.
+- **Texto:** Poppins 500 a 40 px en 4:5 y 9:16 (1080 de ancho) y a 46 px en 16:9. Interlineado 1,32 y máximo
+  2 líneas.
+- **Anillo = pregunta, esfera = respuesta.** Las preguntas reales llevan el anillo teal antes del texto, y el
+  anillo se dibuja como órbita abierta en 6 cuadros al entrar. La respuesta, cuando es de la marca, llega como
+  remate con esfera. Nunca va una esfera dentro de un subtítulo, ni teal en el texto o los signos. En piezas de una
+  línea de servicio, el anillo toma el acento de esa línea.
+- **Variante tinta navy sin caja:** sólo para piezas animadas sobre papel o interfaz, sin imagen filmada
+  (15–17:1). El anillo va en `#0E8C82`.
+- **Un estilo por pieza:** el vidrio y la tinta navy no se mezclan en un mismo video.
+- **Posición:**
+  - 4:5: el subtítulo termina en el 80 % del alto.
+  - 9:16: termina en el 70 %, dentro de la zona segura.
+  - Nunca tapa caras, manos ni producto: se mueve a la zona libre más cercana según el detector.
+- **Tiempos:**
+  - Entra con la primera sílaba y sale 2 a 4 cuadros después de la última, con fundido de 2 cuadros.
+  - Máximo 17 caracteres por segundo y mínimo 0,8 s en pantalla.
+  - Si un remate cae dentro de una línea larga, la línea se parte en el golpe.
+- **Archivo único:** un archivo de tiempos por idioma. De él salen los subtítulos quemados y el SRT de
+  accesibilidad, que lleva además las descripciones de sonido.
+
+**Pendiente de implementación**
+- **AXIS:** el token `type.subtitle` sigue «sin caja, sombra negra» y hay que actualizarlo en AXIS. No se tocó desde
+  esta sesión.
+- **Catálogo `graphic-line-overlays` (`subtitles`):** sigue emitiendo el subtítulo anterior. El vidrio no puede
+  salir como PNG con transparencia, porque necesita el cuadro de video debajo para desenfocarlo. Se renderiza en
+  el motor en código sobre los cuadros del video, o en edición con una capa de ajuste enmascarada.
+- **Referencia viva:** la lámina «Componentes de video · v3» del canvas del storyboard «¿Para cuándo?».
+
 **Firma:** firma la marca, nunca la toma: el cierre es el reveal aprobado, con sonido.
 
 **Cómo se compone:** los recursos de texto salen como **capas PNG con alfa** del catálogo `graphic-line-overlays`
