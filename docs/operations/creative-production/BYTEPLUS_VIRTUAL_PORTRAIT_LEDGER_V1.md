@@ -69,6 +69,14 @@ Usados: **0 de 50 assets · 0 de 50 grupos**.
 |---|---|---|---|---|---|---|---|---|---|
 | — | — | — | — | — | — | — | — | — | — |
 
+### Cola aprobada para subir (2026-10-17)
+
+Aprobada por el operador el 2026-10-17 («súbelo»): **Antonio, Nexa, Hum, Isabella, Karo y Sophia**, 2 imágenes cada
+uno = **12 assets en 6 grupos**. Paquete listo con QA y checksums en
+`ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/` (ver su `LEEME.md`). Orden: Antonio solo primero, borrador
+de prueba y verificación del contador; después el resto. Cada uno pasa a la tabla de arriba al quedar `Active`.
+Pendiente del operador: iniciar sesión y firmar la carta de compromiso con el primer grupo.
+
 ## 5. Evidencia obligatoria (carta de compromiso)
 
 Al subir retratos virtuales, Efeonce declara que el personaje es original, que hizo una selección y modificación
