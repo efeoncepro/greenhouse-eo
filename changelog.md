@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-17 — Google Ads: arquitectura y prueba API de lectura
+
+- [ADR adoptado](docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md) y
+  [arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md): OAuth/binding,
+  GTM web/server, identidad comercial, consentimiento, HubSpot/Data Manager, reporting y rollout.
+- [Probe API v26](docs/audits/growth/2026-10-17-google-ads-api-discovery.md) PASS para `6862539491`
+  vía manager `9531478329`; dos acciones GA4 ocultas, tracking inactivo y cuenta nueva. Doce consultas,
+  ninguna mutación; conexión y sender de producto pendientes. Funcional y manual documentados.
+
 ## 2026-10-17 — CLI local Meta para agentes
 
 - `pnpm --silent meta`, contrato `meta-agent.v2`: lecturas existentes, catálogo SDK25, consultas por campo
@@ -595,8 +604,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 ## 2026-10-04 — Discovery de población cliente SEO
 
 - TASK-1690: [discovery](docs/audits/seo/2026-10-04-task-1690-discovery.md) de contratos, fixtures y UX con tres subagentes; decisión GSC clics/CTR y rank independiente, cobertura/null/cero y cola canónica documentados. Estado `Diseno`; selección visual e implementación pendientes. Baseline: 53 tests PASS. Sin código ni cambios runtime.
-
-## 2026-10-04 — Ownership editorial y de informes SEO
-
-- El flujo editorial pertenece a Marketing Studio: TASK-1667/1669 → EPIC-049; TASK-1668 conserva medición/outcomes en EPIC-022. La auditoría técnica y su distribución especializada pertenecen a Insights: TASK-1672/1673 → EPIC-045, reusando renderer y transporte existentes.
-- [Mapa vigente y tareas pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md), arquitectura, criterios e índices reconciliados. GA4 TASK-1284 y referrals TASK-1787 distinguen código/evidencia histórica existente de sus pendientes reales. TASK-1284 pasa a in-progress con evidencia fechada y pendientes explícitos. Sin código, tareas nuevas, cierre de implementación ni cambio de runtime.

@@ -1,5 +1,21 @@
 # Handoff
 
+## 2026-10-17 — Google Ads: acceso API de lectura probado y arquitectura adoptada
+
+OAuth `jreyes@efeoncepro.com` verificado; Cloud siempre `julio.reyes@efeonce.org` / `efeonce-group`.
+API v26 PASS para **`6862539491`**, vía `login-customer-id: 9531478329` (directo 403); CLP,
+America/Santiago, owner de conversiones propio. Cuenta nueva según operador; tracking
+`NOT_CONVERSION_TRACKED`, dos acciones GA4 `HIDDEN` no primarias; campañas/goals consultados sin filas.
+[Auditoría](docs/audits/growth/2026-10-17-google-ads-api-discovery.md),
+[ADR](docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
+[arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) y
+[manual](docs/manual-de-uso/growth/conectar-google-ads-con-agentes.md).
+Doce consultas Ads, ninguna mutación. Credencial/recibos privados ignorados; listener cerrado.
+Pendiente, Growth/Platform: conexión de producto por organización y unidad de lectura/API/CLI;
+después captura/binding/intención/consentimiento y rollout por acción. Marca OAuth heredada «Claude»
+y verificación de scopes requieren revisión antes de ampliar uso. Sin publicación GTM, CRM writes,
+acciones nuevas, campañas, ingesta ni cambios Cloud/IAM. Dirección documental completa; implementación pendiente.
+
 ## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)
 
 Live en https://efeoncepro.com/servicios/performance-marketing/ (página `251997`, OG `252002`): 10 widgets
@@ -274,15 +290,3 @@ El operador presentó la oferta el 13/10 a las 08:56 (estado «Enviada», leído
 técnicos y uno económico; el video no se adjuntó (límite de 20 MB) y se ve por QR. [Registro](docs/commercial/tenders/sika-mexico-campana-creativa-1164/PRESENTACION-2026-10-13.md).
 Sin verificar: versión de cada adjunto. HubSpot: deal en `presentationscheduled` (lo movió el operador), con MXN 64.000 y cierre 16/10 cargados a su pedido y releídos. Resultado pendiente; cierre 16/10 a las 16:00 de Ciudad de México.
 Playbook, manual de Wherex y skills actualizados con el estado y con lo nuevo del portal (límite de adjuntos, condiciones, retirar para editar).
-
-## 2026-10-13 — Outreach personalizado y seguimiento HubSpot
-
-[Registro](docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md): Paula, Nicol, Fiorella,
-Sergio, Hernán y Jesús; Outlook web, firma gráfica, brochure contextual y seis EMAIL `SENT` en HubSpot.
-Rafael excluido; Paula conserva correo deducido sin verificación de entrega. Revisar hilos antes de
-seguimiento. [Procedimiento reusable](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md#prospección-personalizada--criterio-confirmado-el-13102026);
-sin renovación del corte global del pipeline. Mandato posterior: [seis secuencias HubSpot](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md),
-18 correos para 16/22/29 octubre; seis `Programado`, firma Julio y parada por respuesta verificados.
-Apollo detenido: seis borradores inactivos, cero inscritos. No duplicar ni ampliar este lote autorizado.
-Método incorporado a la [skill de prospección](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
-y manual; espejos Codex/Claude y fixtures de secuencias. Actualización documental, sin nuevos envíos.

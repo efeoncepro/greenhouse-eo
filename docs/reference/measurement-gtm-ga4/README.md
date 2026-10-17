@@ -11,6 +11,7 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 
 | Doc | Qué cubre |
 |---|---|
+| [Arquitectura Google Ads](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) | Dirección aceptada 17/10/2026: Ads API, GTM web/server y CRM; identidad, consentimiento, emisor único y rollout. Acceso de operador probado a `6862539491`; integración de producto y conversiones pendientes. |
 | **[TRACKING-PLAN.md](TRACKING-PLAN.md)** | **Registro vivo OBLIGATORIO** de forms & CTAs con su estado de tagging. Leer antes de crear un form/CTA; registrar su fila al crearlo (taggeado o no). |
 | **[LEARNINGS.md](LEARNINGS.md)** | Build-log de aprendizajes reales operando GTM/GA4 en runtime (gotchas verificados). Leer antes de construir tags. |
 | `container-snapshot.json` | Snapshot normalizado del config live del container **web** `GTM-NGHPGRLZ` (cuenta `6291647045`, container `218104216`). Lo escribe `pnpm gtm:snapshot`; diff en git + drift detection. Estrategia: ADR `GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1`. |
