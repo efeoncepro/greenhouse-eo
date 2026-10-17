@@ -954,8 +954,9 @@ repite la medición sobre los cuadros reales del video.
 **Estado de implementación (2026-10-17)**
 - **AXIS:** token y contrato actualizados en el checkout (delta (y) de `SURFACE_COMPOSITION_DECISION_V1.md`).
   Incluye `glass`, `ask`, `contrast`, `speaker`, `ink`, `fade` y `placement`, más los campos `who`, `ask` y `style`
-  en el intent. Las pruebas de contratos, tokens, graphic-line, `design:check` y typecheck pasan. **Falta publicarlo**
-  con commit, push y release de AXIS.
+  en el intent. **Publicado el 2026-10-17** con el tag `v0.7.3` (commit AXIS `86b826b`): `@efeoncepro/axis-tokens@0.6.3` y
+  `@efeoncepro/axis-ui-contracts@0.7.3`. Antes del tag pasó la CI de `main` del mismo commit (run `39055946054`) y
+  la publicación corrió en el run `39058389519`.
 - **Greenhouse** sigue fijado en `axis-tokens 0.3.41` y no ve el estándar nuevo hasta adoptar la versión que lo
   publique.
 - **Control de contraste:** disponible con `pnpm brand:subtitles:check`. Mide sobre los cuadros reales del corte con los
