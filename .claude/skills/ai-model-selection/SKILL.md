@@ -150,7 +150,7 @@ Para video, la pregunta no es «¿qué modelo?» sino «¿qué operación de qu�
 interfaces con personas, el [anexo](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) decide qué
 planos son nuestros (0 créditos) y cuáles generativos antes de elegir motor.
 🔴 Seedance por BytePlus rechaza rostros humanos aunque el KYC esté aprobado (2026-10-17); sólo pasan con `asset://` de la
-biblioteca de retratos virtuales (50 avatares en plan Free), con fila en el
+biblioteca de retratos virtuales (plan Entry gratuito: 50 assets ≈ 25 personajes, compartido con retratos reales; uso documentado como referencia), con fila en el
 [ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) antes de subir.
 
 ### Editar lo que ya existe: otra pregunta, otro árbol

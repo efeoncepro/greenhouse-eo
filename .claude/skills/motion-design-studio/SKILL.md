@@ -241,7 +241,7 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md); en 2.5, `--draft` (480p) y luego
   `--from-draft <task-id>` (final 1080p). 🔴 **Rostros humanos:** se rechazan (`PrivacyInformation`, sin cobro) y el KYC
   aprobado (2026-10-17) no lo levanta; la vía es `--image asset://<id>` de la biblioteca de retratos virtuales (Advanced
-  Creation Rights, plan Free: **50 avatares**), y ningún personaje se sube sin decisión del operador y fila en el
+  Creation Rights, plan Entry gratuito: **50 assets ≈ 25 personajes**, compartido con retratos reales; uso documentado con `--references`), y ningún personaje se sube sin decisión del operador y fila en el
   [ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md); personaje de una sola
   pieza → Higgsfield u otra vía, no cupo. Fal sigue como alternativa explícita:
   su endpoint se elige por duración/4K/costo en

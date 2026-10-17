@@ -1,78 +1,102 @@
-# Ledger de cupos — biblioteca de retratos virtuales BytePlus — V1
+# Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Claude
-> **Documentacion relacionada:** [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md) · [Guía de retratos virtuales del fabricante](https://docs.byteplus.com/en/docs/ModelArk/2333565)
+> **Ultima actualizacion:** 2026-10-17 por Claude (1.1: cupo verificado en la documentación oficial; antes 1.0 con supuestos)
+> **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
-Seedance 2.x rechaza imágenes de entrada con rostros humanos fotorrealistas que no vengan de una vía de confianza.
-La biblioteca privada de retratos virtuales es la vía para personajes ficticios propios. Sus cupos son escasos:
-este ledger es la única fuente de qué se subió, por qué y quién lo aprobó.
+Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
+La biblioteca privada de assets de BytePlus es la vía para personajes propios. Su cupo es escaso: este ledger es la
+única fuente de qué se subió, por qué y quién lo aprobó.
 
 ## 1. Estado del plan
 
 | Dato | Valor |
 |---|---|
 | KYC de organización | Enviado 2026-10-16; aprobado 2026-10-17 |
-| Advanced Creation Rights | Activado 2026-10-17 en el plan gratuito (Free) |
-| Cupos del plan Free | **50 avatares** |
-| Usados | **0 de 50** |
-| Tier siguiente | Alrededor de USD 1.600 (dato del operador). **Verificar en la consola antes de citarlo como precio vigente** |
+| Plan activo | **Advanced Creation Rights (Entry)**, gratuito, desde 2026-10-17 |
+| Cupo | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
+| Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
+| Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
+| Usados | **0 de 50 assets · 0 de 50 grupos** |
+| Tier siguiente (oficial, 2026-10-13) | **USD 1.400/mes o USD 14.000/año**: 1M assets, 120 QPM. Premium: USD 4.200/mes o 42.000/año. Sin reembolso |
+
+El operador vio alrededor de USD 1.600 en la consola; la tabla oficial dice USD 1.400/mes. La diferencia podría ser
+impuesto (sin verificar). **Antes de comprar, leer el precio final en el checkout.**
 
 **Decisión del operador (2026-10-17):** el tier pagado se evalúa sólo cuando la herramienta de producción (runtime)
-esté armada. Hasta entonces se opera sólo con los 50 cupos gratuitos.
+esté armada. Hasta entonces se opera sólo con el plan Entry.
 
-El KYC solo no levanta el filtro de rostros: la re-prueba del 2026-10-17 con el mismo cuadro fotorrealista de Antonio
-(GPT Image) volvió a rechazarse con `InputImageSensitiveContentDetected.PrivacyInformation` (requestId
+**Al vencer un tier pagado:** 15 días de gracia con cupo de Entry; después se **borran** los assets y grupos creados
+durante el período pagado (lo creado en Entry se conserva). Todo personaje que deba durar se sube en Entry o se
+renueva antes de vencer.
+
+El KYC no levanta el filtro de rostros: sólo habilita el plan. La re-prueba del 2026-10-17 con el cuadro de Antonio
+(GPT Image) se rechazó con `InputImageSensitiveContentDetected.PrivacyInformation` (requestId
 `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro).
 
-## 2. Qué cuenta como cupo [pendiente]
+## 2. Cuánto alcanza
 
-Sin verificar: si un «avatar» equivale a **una imagen** (asset) o a **un personaje** (grupo). La guía del fabricante
-recomienda 2 imágenes por personaje (cuerpo entero frontal + primer plano frontal neutro). Si cada imagen cuenta,
-50 cupos = **25 personajes**.
+El cupo que manda son los **50 assets**, no los 50 grupos. Con **2 imágenes por personaje** (cuerpo entero frontal y
+primer plano frontal neutro, la recomendación del fabricante) caben **25 personajes**. Con 3, caben 16.
 
-Se verifica en la consola con el **primer** personaje, antes de subir el resto. El resultado se anota acá y se
-actualiza el total de §1.
+Borrar un asset es irreversible y la documentación recomienda borrar lo que no se usa (`LastInferenceTime`); no dice
+explícitamente que libere cupo. No se puede reemplazar el archivo de un asset: sólo cambiarle el nombre. Corregir una
+imagen = borrar y subir otra.
 
 ## 3. Reglas de asignación
 
 1. **Ningún personaje se sube sin decisión explícita del operador** y su fila en §4. Primero la fila, después la subida.
-2. **Prioridad: personajes recurrentes de marca**, el elenco ficticio de Efeonce: Hum, Karo, Sophia, Isabella y Antonio
-   ([elenco](../brand-photography/EFEONCE_BRAND_CAST_V1.md)).
-3. **Personajes de cliente o de una sola pieza, sólo si recurren.** Si no, sus planos con rostro van por Higgsfield
-   u otra vía antes de gastar un cupo.
-4. **Nexa** tiene rostro humano fotorrealista (el más realista del elenco, según el operador, 2026-10-17): **necesita
-   cupo** y es prioridad, igual que el elenco recurrente.
-5. **Julio** (persona real) va por la biblioteca de retratos **reales** (verificación en vivo + consentimiento),
-   nunca por la virtual.
-6. **Prohibido «lavar» un cuadro con rostro** pasándolo por Seedream para que cuente como salida confiable. La vía de
-   salidas confiables es generar el cuadro nativamente en Seedream/Seedance de la misma cuenta, no reprocesar una
-   imagen externa para esquivar el filtro.
+2. **Prioridad: personajes recurrentes de marca.** Nexa (rostro humano fotorrealista, el más realista del elenco) y el
+   elenco ficticio de Efeonce: Hum, Karo, Sophia, Isabella y Antonio ([elenco](../brand-photography/EFEONCE_BRAND_CAST_V1.md)).
+3. **Personajes de cliente o de una sola pieza, sólo si recurren.** Si no, sus planos con rostro van por una vía sin
+   cupo: generarlos nativamente con **Seedream 5.0 texto-a-imagen** en esta cuenta (salida confiable por 30 días, sin
+   editar) o producirlos en Higgsfield.
+4. **Julio** (persona real) va por la biblioteca de retratos **reales** (QR, verificación en vivo con su propia cuenta,
+   consentimiento). Descuenta del mismo cupo. Nunca por la virtual.
+5. **Un retrato virtual no puede parecerse a ninguna persona real.** Es parte de la carta de compromiso firmada.
+6. **Prohibido «lavar» un cuadro con rostro** pasándolo por Seedream (edición o imagen-a-imagen) para que cuente como
+   salida confiable. La confianza oficial cubre sólo Seedream 5.0 **texto-a-imagen** y salidas de Seedance, originales.
+7. **Los personajes prediseñados de BytePlus** sólo sirven para probar el modelo y uso interno: nunca en piezas de
+   cliente.
 
 ## 4. Cupos usados
 
-Usados: **0 de 50**.
+Usados: **0 de 50 assets · 0 de 50 grupos**.
 
-| # | Personaje | Tipo (elenco/cliente/otro) | Asset group | Asset id(s) | Imágenes | Estado | Fecha | Aprobó |
-|---|---|---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — | — | — |
+| # | Personaje | Tipo (elenco/cliente/real) | Asset group | Asset id(s) | Assets | Estado | Evidencia | Fecha | Aprobó |
+|---|---|---|---|---|---|---|---|---|---|
+| — | — | — | — | — | — | — | — | — | — |
 
-## 5. Procedimiento para subir un personaje
+## 5. Evidencia obligatoria (carta de compromiso)
 
-1. **Decisión y fila.** El operador aprueba el personaje; se agrega su fila en §4 antes de subir.
-2. **Consola:** Model Playground → My assets → Virtual Portrait → Manage assets. Se crea un grupo por personaje.
-   La primera vez se firma la carta de autorización.
-3. **Imágenes:** cuerpo entero frontal y primer plano frontal neutro, de 300 a 6000 px y menos de 30 MB cada una.
-4. **Esperar `Active`.** BytePlus revisa cada asset. Mientras tanto la fila queda en revisión.
-5. **Anotar la fila:** asset group, asset id(s), número de imágenes, estado y fecha. Con el primer personaje, resolver
-   también §2.
-6. **Probar con un borrador 480p** antes de cualquier final:
+Al subir retratos virtuales, Efeonce declara que el personaje es original, que hizo una selección y modificación
+creativa **sustancial** si usó IA, y que puede mostrar en cualquier momento:
+
+- archivos fuente del proceso (proyectos, fichas, imágenes intermedias);
+- capturas o grabaciones del proceso;
+- licencias o cesiones, si aplican;
+- registros de uso de la herramienta de IA (prompts, logs de generación).
+
+Antes de subir un personaje, su carpeta de evidencia (ficha, prompts, logs de `pnpm ai:image`/`pnpm foto:generar`,
+intermedias y la imagen final) queda en un lugar durable y se anota en la columna «Evidencia».
+
+## 6. Procedimiento para subir un personaje
+
+1. **Decisión y fila.** El operador aprueba el personaje; se agrega su fila en §4.
+2. **Evidencia** reunida según §5.
+3. **Consola:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje. La primera vez
+   se firma la carta de compromiso. (Por API exige AK/SK y URL pública; no está implementado.)
+4. **Imágenes:** jpeg/png/webp, entre 300 y 6000 px por lado, proporción entre 0,4 y 2,5, menos de 30 MB. Cuerpo
+   entero vertical frontal y primer plano vertical frontal, sin expresión, con la cara cerca de 2/3 del encuadre.
+5. **Esperar `Active`** (`Processing` → `Active` o `Failed`). No hay plazo garantizado de revisión.
+6. **Anotar la fila:** grupo, id de cada asset (`asset-…`), cantidad, estado, fecha.
+7. **Probar con un borrador 480p.** El uso documentado es como **imagen de referencia**; en el prompt se nombra
+   «Image 1», nunca el id:
 
    ```bash
-   pnpm ai:byteplus --model seedance25 --draft --image asset://<id> --prompt-file toma.txt --duration 4 --out borrador.mp4 --yes
+   pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> --prompt-file toma.txt --duration 4 --out borrador.mp4 --yes
    ```
 
-La gestión de assets por API exige AK/SK y no está implementada: se suben por consola. El uso en la CLI
-(`--image asset://<id>`) ya existe (commit `25b81dd78`).
+   Como primer cuadro (`--image` sin `--references`) no está documentado: probarlo antes de planificar con él.

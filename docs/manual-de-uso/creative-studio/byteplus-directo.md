@@ -108,43 +108,47 @@ Seedance 2.5 y 2.0 **no aceptan imágenes ni videos de entrada con rostros human
 `InputImageSensitiveContentDetected.PrivacyInformation` (medido el 2026-10-16 con un cuadro fotorrealista de GPT Image).
 El comando traduce ese error con las vías oficiales ([guía de retratos](https://docs.byteplus.com/en/docs/ModelArk/2608626)):
 
-1. **Salidas propias de confianza:** una salida original de Seedream 5 (lite/pro/flash) o de Seedance 2.x de esta misma
-   cuenta, de menos de 30 días, sin editar ni recomprimir. Por eso el comando envía PNG/JPEG/WebP locales con sus bytes
-   originales.
-2. **Biblioteca de personajes digitales** del fabricante (`asset://<id>`).
-3. **Retratos autorizados** de personas reales, según el proceso de la cuenta (verificación KYC; ver ADR).
+1. **Salidas propias de confianza:** una salida original con rostro de **Seedream 5.0 (lite/pro/flash)
+   texto-a-imagen**, de un video de Seedance 2.x o de su último cuadro, generada en esta misma cuenta hace menos de
+   30 días, sin editar ni recomprimir. Por eso el comando envía PNG/JPEG/WebP locales con sus bytes originales.
+   Una edición o imagen-a-imagen de Seedream sobre una imagen externa no cuenta.
+2. **Biblioteca privada de assets** (`asset://<asset-id>`): personajes propios (retratos virtuales) o personas reales
+   autorizadas (retratos reales).
+3. **Retratos reales autorizados:** la persona entra con su propia cuenta por QR, acepta y hace verificación en vivo.
 
-Un cuadro de GPT Image con una persona no entra por ninguna de las tres vías sin ese proceso.
+Un cuadro de GPT Image con una persona no entra por ninguna de las tres vías sin ese proceso. Detalle verificado y
+fuentes: [investigación del 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md).
 
-**El KYC ya está aprobado (2026-10-17) y no basta solo.** Re-prueba del 2026-10-17 con el mismo cuadro fotorrealista
-de Antonio (GPT Image): rechazo `InputImageSensitiveContentDetected.PrivacyInformation`, requestId
+**El KYC está aprobado (2026-10-17) y no levanta el filtro:** sólo habilita el plan. Re-prueba del 2026-10-17 con el
+cuadro de Antonio (GPT Image): rechazo `InputImageSensitiveContentDetected.PrivacyInformation`, requestId
 `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro. No se «lava» un cuadro con rostro
-pasándolo por Seedream: la salida de confianza se genera nativamente en Seedream/Seedance de esta cuenta.
+pasándolo por Seedream.
 
-**Personajes ficticios propios (Paula, Antonio y el elenco): biblioteca privada de retratos virtuales**
+**Personajes propios (Nexa y el elenco): biblioteca privada de retratos virtuales**
 ([guía](https://docs.byteplus.com/en/docs/ModelArk/2333565)). Es la vía para personajes que poseemos y que no se parecen
-a ninguna persona real. Requisitos, en orden:
+a ninguna persona real. En orden:
 
-1. **Verificación de la cuenta (KYC de organización):** Consola → información básica de la cuenta (el nombre de la
-   organización debe ser idéntico al del certificado) → *Real name verification* → *Start verification*: número de
-   registro y fotos del certificado de la empresa. Revisión de 1 a 2 días hábiles. La hace el operador: el agente no
-   ingresa documentos de identidad ni datos tributarios. **Hecho:** enviado el 2026-10-16, aprobado el 2026-10-17.
-2. **Advanced Creation Rights** activado (guía de compra de Seedance en BytePlus). **Hecho:** activo desde el 2026-10-17
-   en el plan gratuito (Free), con **50 avatares** como máximo. El tier pagado se evalúa recién cuando la herramienta
-   de producción (runtime) esté armada. Sin verificar: si un avatar es una imagen o un personaje; si cuenta cada
-   imagen, 50 cupos = 25 personajes. Se verifica con el primer personaje antes de subir el resto.
-3. **Registrar en el [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
-   antes de subir (obligatorio):** decisión explícita del operador y fila en el ledger. Prioridad al elenco recurrente;
-   un personaje de cliente o de una sola pieza sólo si recurre.
-4. **Subir los personajes:** Model Playground → My assets → Virtual Portrait → Manage assets → crear un grupo por
-   personaje (la primera vez se firma una carta de autorización) y subir, por personaje, un cuerpo entero frontal
-   vertical y un primer plano frontal sin expresión (300–6000 px, menos de 30 MB). BytePlus revisa cada asset.
-5. **Usarlos** cuando estén `Active`: `--image asset://<id>` (o `--references`) en `pnpm ai:byteplus`. Primero un
-   borrador 480p; anotar asset group, asset id(s) y estado en el ledger.
+1. **KYC de organización.** **Hecho:** enviado el 2026-10-16, aprobado el 2026-10-17. Lo hace el operador: el agente no
+   ingresa documentos de identidad ni datos tributarios.
+2. **Advanced Creation Rights (Entry)**, gratuito. **Hecho:** activo desde el 2026-10-17. Cupo: **50 assets (archivos)
+   y 50 grupos (personajes)**, compartido con los retratos reales. Con 2 imágenes por personaje alcanza para 25. El
+   tier siguiente cuesta USD 1.400/mes o 14.000/año (oficial), sin reembolso; se evalúa recién cuando la herramienta
+   de producción esté armada.
+3. **Decisión y fila en el [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)**
+   antes de subir (obligatorio), con la **carpeta de evidencia** que exige la carta de compromiso: fichas, prompts,
+   logs de generación e intermedias.
+4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje (la primera vez
+   se firma la carta de compromiso). Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
+   expresión (300–6000 px, proporción 0,4–2,5, menos de 30 MB). Estados: `Processing` → `Active` o `Failed`.
+5. **Usarlos** cuando estén `Active`, como referencia, nombrándolos «Image 1» en el prompt (nunca el id):
+   `pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> ...`. Como primer cuadro
+   (`--image` sin `--references`) no está documentado: probar con un borrador antes de planificar con él. Anotar
+   grupo, asset id(s) y estado en el ledger.
 
-Una persona real (por ejemplo, Julio) va por la biblioteca de retratos reales, con verificación en vivo y
-consentimiento, no por la virtual. Nexa tiene rostro humano fotorrealista: necesita cupo, con la
-misma prioridad que el elenco. La gestión de assets por API exige AK/SK y no está implementada en este comando.
+Un personaje de una sola pieza no necesita cupo: genera su cuadro nativamente con Seedream 5.0 texto-a-imagen en esta
+cuenta (y úsalo dentro de 30 días, sin editar) o produce sus planos en Higgsfield. Una persona real (por ejemplo,
+Julio) va por la biblioteca de retratos reales y descuenta del mismo cupo. La gestión de assets por API exige AK/SK y
+URL pública por archivo; no está implementada en este comando.
 
 ## Comparación de costos de Seedance 2.5
 

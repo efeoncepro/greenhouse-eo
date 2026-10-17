@@ -72,7 +72,7 @@ pnpm -s ai:byteplus --model seedance25 --image $R/stills/$n-916.png --prompt-fil
 - 🔴 **Cuadro con rostro humano:** Seedance por BytePlus lo rechaza (`PrivacyInformation`); el KYC solo no basta. Va con
   `--image asset://<id>` de un personaje que ya tenga fila en el
   [ledger de retratos virtuales](../../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
-  (cupo de 50, decide el operador) o por Higgsfield; nunca se «lava» el cuadro por Seedream.
+  (cupo de 50 assets ≈ 25 personajes, decide el operador) o por Higgsfield; nunca se «lava» el cuadro por Seedream.
 
 ### 3. Capa de motion (HTML + GSAP → secuencia PNG con alfa)
 

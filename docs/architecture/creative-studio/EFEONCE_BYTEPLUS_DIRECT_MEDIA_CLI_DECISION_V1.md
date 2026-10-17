@@ -59,7 +59,7 @@ de 180 s no prueba cancelación ni cobro cero; un nuevo POST es un intento separ
   viajan con sus bytes originales para no romper la confianza en salidas propias de la cuenta. Los personajes
   ficticios aprobados en la biblioteca privada de retratos virtuales entran como `asset://<id>`; crearlos (KYC de
   organización, Advanced Creation Rights, carta de autorización) es un acto del operador en la consola, no del comando.
-  El plan Free admite 50 avatares; cada subida exige decisión del operador y fila previa en el
+  El plan Advanced Creation Rights (Entry), gratuito, admite 50 assets (archivos) y 50 grupos, compartidos con retratos reales ([investigación](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md)); cada subida exige decisión del operador y fila previa en el
   [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
 - Voice enrollment no se prueba ni compra slots de voz durante instalación. Las voces clonadas exigen speaker ID
   adquirido y consentimiento de la persona; credencial válida no prueba ese derecho.
