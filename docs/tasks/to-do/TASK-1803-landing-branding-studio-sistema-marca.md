@@ -12,6 +12,10 @@
   (2026-08-03 → 2026-10-14), 0 backlinks y sin keywords en Semrush. Plan propuesto, sin ejecutar: 301 inmediato a
   `/agencia-creativa/`, y al publicar Branding Studio se **edita ese mismo redirect** hacia su slug, sin cadena.
   Ver [plan de retiro](../../public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md).
+- **Ejecutado el mismo día:** la legada responde 301 a `/agencia-creativa/`; la página `247526` quedó `private`; se
+  quitó del menú el ítem «Branding & Identidad de Marca»; y se reapuntaron los enlaces de los posts `246315` y
+  `249056`. Al publicar esta landing hay que editar **dos** redirects Yoast (`agencia-diseno-estrategico` y
+  `soluciones-de-diseno-para-marketing-que-convierten`) y decidir cómo vuelve Branding al menú.
 
 ## Delta 2026-09-11
 

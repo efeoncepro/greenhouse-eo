@@ -1,9 +1,10 @@
 # Retiro de la landing legada `/agencia-diseno-estrategico/` con 301
 
 > **Tipo de documento:** Plan de migración de URL (sitio público)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-17 por Claude (sesión con Julio Reyes)
-> **Estado:** Propuesto · **nada publicado**. Ejecutar sólo con autorización explícita del operador.
+> **Última actualización:** 2026-10-17 por Claude — ejecutado en producción
+> **Estado:** **Ejecutado 2026-10-17 16:15 UTC** con autorización del operador («Redirigir y quitar del menú»). Ver §7.
 > **Rail técnico:** [`taxonomy-permalink-migrations.md`](../../.claude/skills/efeonce-public-site-wordpress/references/taxonomy-permalink-migrations.md) (Yoast SEO Premium, `WPSEO_Redirect_Manager`)
 > **Relacionados:** [TASK-1803 Branding Studio](../tasks/to-do/TASK-1803-landing-branding-studio-sistema-marca.md) · [Agencia Creativa vigente](../architecture/public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md) · [PDR-004](decisions/PDR-004-landing-agencia-creativa-posicionamiento.md) · precedente de retiro con 301: [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) / TASK-1865
 
@@ -102,6 +103,64 @@ Retirar el redirect creado, devolver la página a `publish`, restaurar el ítem 
 - Crear Branding Studio: eso es TASK-1803. Este plan sólo deja el redirect listo para reapuntarlo.
 - Las piezas del portafolio enlazadas desde la legada (`/project/*`) siguen vivas; no se tocan.
 
-## 6. Pendiente de decisión del operador
-- [ ] Autorizar la ventana de ejecución en producción.
-- [ ] Ítem de menú: reapuntar a `#marca` con el nombre nuevo, o quitarlo.
+## 6. Decisiones del operador
+- [x] Ventana de ejecución autorizada el 2026-10-17.
+- [x] Ítem de menú: **quitado** (no se reapuntó a `#marca`).
+
+## 7. Ejecución y evidencia (2026-10-17)
+
+**El preflight encontró tres cosas que el plan no había previsto:**
+- Ya existía el redirect Yoast `soluciones-de-diseno-para-marketing-que-convierten` → `agencia-diseno-estrategico`.
+  Se **reapuntó** a `agencia-creativa` para no dejar una cadena de dos saltos.
+- Dos posts publicados enlazaban a la legada:
+  - `246315` (`/marketing-digital/contratar-agencia-de-marketing/`): 3 enlaces con el texto «branding»;
+  - `249056` (`/loop-marketing/express-voz-marca-ia-loop-marketing/`): 1 enlace «aquí».
+  En los dos se reemplazó la URL por `https://efeoncepro.com/agencia-creativa/` (atributos `href` e `id`).
+- El ítem de menú era el `247616` del menú `61` (`primary`), hijo de `244255` «Estrategia & Posicionamiento», sin hijos.
+
+**Cambios aplicados (`--wp-user 12`, por el wrapper WP-CLI):**
+1. Redirect Yoast nuevo: `agencia-diseno-estrategico` → `agencia-creativa`, 301, plain. Los redirects pasaron de 114 a 115.
+2. Redirect existente reapuntado: `soluciones-de-diseno-para-marketing-que-convierten` → `agencia-creativa`.
+3. URL legada reemplazada en los posts `246315` y `249056`; quedan 0 ocurrencias.
+4. Ítem `247616` eliminado del menú; el menú pasó de 28 a 27 ítems.
+5. Página `247526` pasada a `private`, sin borrarla.
+6. `wp cache flush` y `wp kinsta cache purge --all`.
+
+**Verificación pública (anónima):**
+- `/agencia-diseno-estrategico/`, `/agencia-diseno-estrategico` y `/soluciones-de-diseno-para-marketing-que-convierten/`
+  → **un solo 301** a `https://efeoncepro.com/agencia-creativa/`, que responde 200 con canonical propio.
+- `page-sitemap.xml` ya no contiene la URL legada.
+- La URL legada aparece 0 veces en `/`, `/agencia-creativa/`, `/contacto/` y los dos posts editados.
+- El menú renderizado muestra todos los demás ítems (3 renders cada uno). El submenú «Soluciones» se revisó en
+  desktop: «Estrategia & Posicionamiento» quedó con Agencia Creativa y Producción Creativa. El menú móvil sólo se
+  verificó en el HTML, no visualmente.
+- El primer `curl` al slash devolvió 200 por la caché del borde de Cloudflare/Kinsta mientras propagaba. Un minuto
+  después respondía 301 (`x-kinsta-cache: MISS`).
+
+**Snapshot y rollback:**
+- El snapshot quedó en la opción WP `_gh_legacy_diseno_retire_before_20261017T161537Z`. Guarda:
+  - el estado de la página;
+  - el post y las metas del ítem de menú, más la secuencia completa del menú;
+  - el redirect encadenado original;
+  - el `post_content` y el hash de ambos posts.
+- Rollback:
+  1. borrar sólo el redirect `agencia-diseno-estrategico`;
+  2. devolver `soluciones-de-diseno-para-marketing-que-convierten` → `agencia-diseno-estrategico`;
+  3. restaurar el `post_content` de los dos posts desde el snapshot;
+  4. recrear el ítem con `wp_update_nav_menu_item()` (parent `244255`, `menu_order` 12) y validar la secuencia
+     contra la que guardó el snapshot;
+  5. devolver la página a `publish`;
+  6. purgar caché.
+  Script local: `tmp/legacy-diseno-rollback.php` (no versionado; recibe la clave del snapshot).
+
+**Hallazgo de todo el sitio, fuera de alcance:** los redirects *plain* de Yoast **no se activan cuando la URL trae
+parámetros**:
+- `/agencia-diseno-estrategico/?utm_source=x`, `/habla-con-un-experto?utm_source=x` y
+  `/soluciones-…/?utm_source=x` responden **404**;
+- los posts con slug viejo sí redirigen conservando la query, por la redirección nativa de WordPress.
+Esto ya ocurría antes de este cambio y afecta a todo enlace de campaña con UTM que apunte a una URL redirigida.
+No se parchó para esta URL sola; queda como follow-up de plataforma.
+
+**Siguiente paso:** inspeccionar la URL legada en Search Console y, en 2–4 semanas, confirmar que salió del índice
+sin pérdida de impresiones en `/agencia-creativa/`. Cuando se publique Branding Studio (TASK-1803), se editan
+**los dos** redirects para que apunten directo a su slug.

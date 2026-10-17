@@ -179,6 +179,15 @@ Still test both real HTTP variants. The no-slash and slash request must resolve
 without a loop or multi-hop chain to the exact new canonical. A successful
 manager readback alone is not live redirect evidence.
 
+Measured 2026-10-17: Yoast **plain** redirects do not fire when the request
+carries a query string. `/habla-con-un-experto?utm_source=x` and a retired page
+with `?utm_source=` return 404, while old post slugs still redirect with the
+query through WordPress. Test a UTM variant and report it; do not patch one
+URL with a regex redirect, because the behavior affects the whole site.
+Before creating a redirect, also search for existing redirects whose *target* is
+the retiring URL and repoint them, so no chain is left. Case:
+`docs/public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md`.
+
 ## 5. Update Owned Internal Links
 
 Search for every old canonical after the redirect exists. Replace owned links
