@@ -1,5 +1,48 @@
 # TASK-1865 — Landing pública Performance Marketing (Performance & Commerce Distribution)
 
+## Delta 2026-10-17 — dirección aprobada (source-led) y plan de paso al sitio
+
+- **Slice 3 resuelto en modo `source-led`.** Julio aprobó el 2026-10-17 un canvas de conversión en la línea Voice de La
+  órbita: «Esta dirección va. Sigue afinando y prepara el paso al sitio con la sesión de Medios, sin publicar todavía».
+  Fuente versionada en [`docs/ui/sources/TASK-1865/`](../../ui/sources/TASK-1865/README.md) (canvas, copia y mapa de
+  blobs). Antes rechazó una versión editorial: «esto no es un artículo de blog, es una landing page de conversión».
+- **Qué reemplaza.** La dirección A del documento de dirección visual (paleta pública, Poppins + Geist) y la estructura
+  R1–R15 del wireframe. Ahora son nueve secciones cortas, una por momento visual, con CTA en hero, explorador,
+  autodiagnóstico y formulario. El copy ledger del wireframe sigue siendo la fuente de hechos y claims, no de la
+  estructura.
+- **Cambios de contrato SEO que quedan abiertos para el Slice 2.** El H1 pasa a «Agencia de performance marketing que
+  optimiza tu pauta por ventas, no por clics.» y lleva la cabeza chilena. El FAQ visible baja a 6 preguntas, y
+  `FAQPage` marca sólo esas, porque el schema tiene que coincidir con lo visible. La definición queda en la línea bajo
+  el H1. Programmatic sale como canal y se enlaza a Medios desde el FAQ con el anchor «planificación y compra de
+  medios».
+- **Plan de paso al sitio** (acordado con la sesión de Medios; nada se ejecuta hasta la luz verde de Julio):
+  1. **Núcleo común.** Extraer `scripts/public-website/lib/source-led-compiler.cjs` y `class-eo-source-led-landing-base.php`
+     desde Medios. El gate es que Medios recompile con hash idéntico en `includes/medios/**` y `medios-landing.css`, y que
+     sus 16 módulos rendericen igual en el harness PHP local. Creativa queda fuera.
+  2. **Performance sobre el núcleo.** `compile-performance-elementor-source.cjs` lee `docs/ui/sources/TASK-1865/`.
+     Las interacciones nuevas van en `performance-landing.js` propio: pestañas con el contrato `data-gh-tabs`;
+     autodiagnóstico con `data-gh-quiz`, cuyas preguntas, pesos y umbrales son campos de Elementor y cuyo estado 0 se
+     renderiza en el servidor; y la carrera de creatividades con `--v` acotado en PHP sobre `animation-timeline`, con el
+     estado final estático como fallback.
+  3. **Formulario propio.** `efeonce-performance-diagnostic` con su formulario HubSpot «Lead Gen - Performance
+     Marketing», calcado de `scripts/growth/publish-media-diagnostic-form.ts`. Usa la variante `hubspot_pillar` y la
+     tarjeta en papel. No reusa el de Medios, para no mezclar la atribución. Necesita la fila en `TRACKING-PLAN.md`.
+  4. **Página candidata.** Publicador de página nueva → `fix-ohio-layout` (obligatorio: copia las metas `page_*` de
+     `249582`) → SEO de Yoast y OG → `includes/performance/seo.php` cargado desde el init del loader. Todo `noindex` y
+     sin menú.
+  5. **Migración en una ventana.** 301 de `242862` por el riel de Yoast Premium
+     (`references/taxonomy-permalink-migrations.md` §4: crear y revertir sólo ese redirect). Antes hay que coordinar con
+     la sesión dueña del commit `16937ca` (redirects con query string, sin desplegar). El ítem de menú `242915` se
+     reapunta conservando padre y orden, con snapshot y verificación del menú completo. La legacy pasa a privada.
+- **Riesgo del runtime.** `efeonce-public-site-runtime` tiene cambios sin commitear de otras sesiones en el loader,
+  `eo-elementor-widgets.php`, assets y un plugin nuevo `eo-axis-video/`. El loader vivo coincide con ese working tree.
+  Se commitea sólo el hunk propio (`git hash-object` + `update-index --cacheinfo`), sin `add` de archivos ajenos ni
+  stash. La línea base viva se exporta justo antes de cada build.
+- **Decisiones de Julio pendientes.** Formulario propio frente a reusar el de Medios; quién hace el núcleo común (la
+  sesión de Medios se ofreció); el label del menú; y si el botón flotante en móvil se mantiene (el compilador de Medios
+  lo quita).
+  — por la aprobación del canvas (2026-10-17)
+
 ## Delta 2026-10-16 — Agencia de Medios publicada: convivencia y no canibalización
 
 - `/servicios/agencia-de-medios/` (página `251981`) está live e indexable desde el 2026-10-16, en el menú bajo
@@ -37,11 +80,11 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Diseno`
+- Status real: `Diseño aprobado (source-led, 2026-10-17); paso al sitio planificado, sin ejecutar`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
-- Promotion blocked by: `dirección visual aprobada; copy ledger aprobado; revisión legal de la tabla de posición y de los hechos de 2026; Growth Form y Growth CTA publicados; slug y migración de la URL legacy validados`
+- Promotion blocked by: `copy ledger aprobado; revisión legal de la tabla de posición y de los hechos de 2026; Growth Form y Growth CTA publicados; slug y migración de la URL legacy validados`
 - Branch: `develop (Greenhouse) · efeonce-public-site-runtime según su contrato · sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
