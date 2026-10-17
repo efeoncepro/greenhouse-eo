@@ -2,6 +2,16 @@
 
 ## Delta 2026-10-17 (noche) — verificación en vivo
 
+- **Envío real (Julio, 19:07:59 UTC):** submission `fsub-98493cff…` `delivered`, dominio corporativo, snapshot de
+  consentimiento `efeonce-performance-diagnostic-v1` (`contact_permission`); HubSpot `hsforms-v3-secure-submit`
+  `succeeded` HTTP 200 con id externo. GA4 realtime (`486264460`): `form_start` y `generate_lead` recibidos.
+- **Meta: no recibió el Lead.** Dataset `708931297255942` sólo registra `PageView` en la ventana. Causa verificada: el
+  formulario no tiene política de medición (`greenhouse_growth.measurement_policy` sin fila para `71ea684f…`), así que
+  el backend nunca encola la conversión (`measurement_conversion` tiene 0 filas en total, de cualquier fuente). Medios
+  tampoco tiene política. Borrador validado sin escribir (`growth:measurement validate`: destino `meta`, mapping
+  email/firstName/lastName, versión `fver-e9f76dcb…`, sin bloqueos); publicar requiere aprobación del operador y
+  después un envío con consentimiento publicitario para leer el Lead de origen Server en Meta.
+
 - **Schema:** Rich Results Test (Google) rastrea sin errores y da 3 elementos válidos (rutas de exploración, empresa local,
   organización; único aviso opcional: `address` de la organización, que es de todo el sitio). Google no evalúa
   `Service` ni muestra FAQ para este tipo de sitio, así que se validó con validator.schema.org: **0 errores, 0
@@ -135,7 +145,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); pendiente envío real + GA4/HubSpot y reconexión de Search Console (invalid_grant)`
+- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Meta Lead bloqueado por falta de política de medición; Search Console invalid_grant`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
