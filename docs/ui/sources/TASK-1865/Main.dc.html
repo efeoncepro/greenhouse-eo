@@ -32,7 +32,7 @@ a{color:#ffffff}a:hover{color:#ffd9cc}
 .split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:72px;align-items:center}
 .split-r{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:64px;align-items:center}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-.split.split-75{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.split.split-75{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .split.split-56{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
 .tabbtn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px 0 10px;border-radius:999px;font-family:Poppins,sans-serif;font-size:16px;font-weight:600;cursor:pointer;box-sizing:border-box}
 .tabbtn:focus-visible,.yn:focus-visible{outline:2px solid #ffffff;outline-offset:3px}
@@ -127,6 +127,8 @@ button{font:inherit}
  .pop{animation:pop linear both;animation-timeline:view();animation-range:entry 20% cover 45%}
  .para{animation:para linear both;animation-timeline:scroll(root);animation-range:0px 900px}
  .draw{stroke-dasharray:1;animation:draw linear both;animation-timeline:view();animation-range:entry 30% cover 55%}
+ @keyframes growy{from{transform:scaleY(0)}}
+ .barg .ibar{transform-origin:bottom;animation:growy linear both;animation-timeline:view();animation-range:entry 20% cover 45%}
  .grow{transform-origin:left;animation:growx linear both;animation-timeline:view();animation-range:entry 40% cover 60%}
  .loser{animation:dim linear both;animation-timeline:view();animation-range:cover 45% cover 60%}
  .winner{animation:win linear both;animation-timeline:view();animation-range:cover 40% cover 58%}
@@ -181,6 +183,7 @@ button{font:inherit}
  .lane img{width:72px!important}
  .auto-q{grid-template-columns:minmax(0,1fr)!important}
  .fgrid{grid-template-columns:minmax(0,1fr)}
+ .split-75 ul{grid-template-columns:minmax(0,1fr)!important}
  .form-card{padding:24px!important}
  .mock3{grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 8px 12px 0}
  .mock3>*{scroll-snap-align:start}
@@ -562,7 +565,7 @@ button{font:inherit}
 <div class="wrap">
 <p class="eyebrow chip rv">Qué recibes</p>
 <h2 id="rec-h" class="h2 words" style="margin-top: 22px; max-width: 1100px"><span>Cada</span> <span>semana</span> <span>sabes</span> <span style="color: #f83902">qué cambió y por qué</span></h2>
-<div class="split split-75" style="margin-top: 72px; align-items: stretch">
+<div class="split split-75" style="margin-top: 72px; align-items: center">
 <article class="card-pad rv" style="border-radius: 30px; border: 1px solid rgba(255,255,255,0.16); background: rgba(0,26,51,0.6); padding: 32px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap"><h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; font-size: 28px; letter-spacing: -0.03em">Bitácora · Semana 42</h3><span style="font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo</span></div>
 <ul class="st" style="list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
@@ -571,20 +574,32 @@ button{font:inherit}
 <li class="log-row" style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(248,57,2,0.08); border: 1px solid rgba(248,57,2,0.5)"><img src="/_blob/de1e4399bda3646f5d1ab0fc68bf3a0b" alt="LinkedIn" style="width: 26px; height: 26px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Más presupuesto a cuentas con oportunidades</b><span style="display: block; color: #cfe4fa; font-size: 14px">Ventas aceptó dos oportunidades de esa lista.</span></span><span style="display: flex; align-items: center; gap: 10px"><img src="/_blob/0bf64d18434078a6c6c7de728d33ac7e" alt="Anuncio B2B en LinkedIn" style="width: 40px; height: 50px; object-fit: cover; object-position: 55% 50%; border-radius: 6px"><span class="chip" style="font-size: 11px; padding: 6px 10px; border-color: #ffffff">Escalado</span></span></li>
 </ul>
 </article>
-<article class="card-pad rv" style="border-radius: 30px; background: #f7f8f6; color: #001a33; padding: 32px; display: flex; flex-direction: column; gap: 20px">
-<img src="/_blob/340475bcfbe1f47d9585f77f81206537" alt="Efeonce Insights" style="height: 28px; width: auto; max-width: 100%; align-self: flex-start">
-<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; font-size: 28px; letter-spacing: -0.03em; line-height: 1.05">Cada mes, tu pauta leída en ventas</h3>
-<div aria-hidden="true" style="display: flex; align-items: flex-end; gap: 10px; height: 120px; padding: 0 4px; border-bottom: 1.5px solid #c9d3dc">
-<span style="flex: 1; height: 38%; border-radius: 8px 8px 0 0; background: #c9d3dc"></span>
-<span style="flex: 1; height: 52%; border-radius: 8px 8px 0 0; background: #c9d3dc"></span>
-<span style="flex: 1; height: 47%; border-radius: 8px 8px 0 0; background: #c9d3dc"></span>
-<span style="flex: 1; height: 68%; border-radius: 8px 8px 0 0; background: #6f89a2"></span>
-<span style="flex: 1; height: 86%; border-radius: 8px 8px 0 0; background: #001a33"></span>
+<article class="card-pad rv" style="border-radius: 30px; background: #f7f8f6; color: #001a33; padding: 32px; display: flex; flex-direction: column; gap: 22px; box-shadow: 0 40px 120px rgba(0,0,0,0.45)">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<img src="/_blob/340475bcfbe1f47d9585f77f81206537" alt="Efeonce Insights" style="height: 26px; width: auto; max-width: 70%">
+<span style="font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; border: 1px solid #c9d3dc; color: #023c70">Informe mensual</span>
 </div>
-<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.5; color: #33506b">
-<li>Lo que dicen las plataformas frente a lo que pasó en tus ventas</li>
-<li>Las pruebas del mes y lo que aprendimos</li>
-<li><b style="color: #001a33; font-weight: 600">Dónde poner el siguiente peso, y por qué</b></li>
+<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; font-size: clamp(26px, 2.4vw, 32px); letter-spacing: -0.03em; line-height: 1.05">Cada mes, tu pauta leída en ventas</h3>
+<figure style="margin: 0; padding: 18px 16px 14px; border-radius: 20px; background: #ffffff; border: 1px solid #e1e7ec">
+<div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 12px; color: #33506b; margin-bottom: 14px"><span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 10px; height: 10px; border-radius: 3px; background: #c9d3dc"></i>Lo que reportan las plataformas</span><span style="display: inline-flex; align-items: center; gap: 6px"><i style="width: 10px; height: 10px; border-radius: 3px; background: #023c70"></i>Ventas en tu CRM</span></div>
+<div class="barg" aria-hidden="true" style="display: flex; gap: 6px; border-bottom: 1.5px solid #c9d3dc; padding-bottom: 0">
+<div class="ibar-g" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1"><div style="display: flex; align-items: flex-end; gap: 4px; height: 150px; width: 100%; justify-content: center"><span class="ibar" style="width: 38%; height: 62%; border-radius: 6px 6px 0 0; background: #c9d3dc"></span><span class="ibar" style="width: 38%; height: 28%; border-radius: 6px 6px 0 0; background: #023c70"></span></div><span style="font-size: 11px; color: #5f7488">May</span></div>
+<div class="ibar-g" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1"><div style="display: flex; align-items: flex-end; gap: 4px; height: 150px; width: 100%; justify-content: center"><span class="ibar" style="width: 38%; height: 70%; border-radius: 6px 6px 0 0; background: #c9d3dc"></span><span class="ibar" style="width: 38%; height: 34%; border-radius: 6px 6px 0 0; background: #023c70"></span></div><span style="font-size: 11px; color: #5f7488">Jun</span></div>
+<div class="ibar-g" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1"><div style="display: flex; align-items: flex-end; gap: 4px; height: 150px; width: 100%; justify-content: center"><span class="ibar" style="width: 38%; height: 74%; border-radius: 6px 6px 0 0; background: #c9d3dc"></span><span class="ibar" style="width: 38%; height: 38%; border-radius: 6px 6px 0 0; background: #023c70"></span></div><span style="font-size: 11px; color: #5f7488">Jul</span></div>
+<div class="ibar-g" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1"><div style="display: flex; align-items: flex-end; gap: 4px; height: 150px; width: 100%; justify-content: center"><span class="ibar" style="width: 38%; height: 82%; border-radius: 6px 6px 0 0; background: #c9d3dc"></span><span class="ibar" style="width: 38%; height: 50%; border-radius: 6px 6px 0 0; background: #023c70"></span></div><span style="font-size: 11px; color: #5f7488">Ago</span></div>
+<div class="ibar-g" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1"><div style="display: flex; align-items: flex-end; gap: 4px; height: 150px; width: 100%; justify-content: center"><span class="ibar" style="width: 38%; height: 86%; border-radius: 6px 6px 0 0; background: #c9d3dc"></span><span class="ibar" style="width: 38%; height: 61%; border-radius: 6px 6px 0 0; background: #023c70"></span></div><span style="font-size: 11px; color: #5f7488">Sep</span></div>
+<div class="ibar-g" style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1"><div style="display: flex; align-items: flex-end; gap: 4px; height: 150px; width: 100%; justify-content: center"><span class="ibar" style="width: 38%; height: 90%; border-radius: 6px 6px 0 0; background: #c9d3dc"></span><span class="ibar" style="width: 38%; height: 72%; border-radius: 6px 6px 0 0; background: #f83902"></span></div><span style="font-size: 11px; color: #5f7488">Oct</span></div>
+</div>
+<figcaption style="margin-top: 12px; font-size: 12px; color: #5f7488">Ilustrativo: la brecha se cierra cuando la pauta aprende de ventas.</figcaption>
+</figure>
+<div style="border-radius: 18px; background: #001a33; color: #ffffff; padding: 18px 20px; display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 14px; align-items: center">
+<span style="width: 40px; height: 40px; border-radius: 12px; background: #f83902; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#001a33" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6 4 4 6-6"></path><path d="M14 9h6v6"></path></svg></span>
+<div><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #9fb6cc">Recomendación del mes</p><p style="margin: 4px 0 0; font-size: 15px; line-height: 1.45">Mover presupuesto de remarketing a búsqueda por categoría: trae compradores nuevos.</p></div>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; font-size: 13px; line-height: 1.35; color: #33506b">
+<li style="padding: 12px; border-radius: 14px; background: #ffffff; border: 1px solid #e1e7ec"><b style="display: block; color: #001a33; font-weight: 600; margin-bottom: 2px">Plataformas vs. ventas</b>Las dos lecturas, lado a lado</li>
+<li style="padding: 12px; border-radius: 14px; background: #ffffff; border: 1px solid #e1e7ec"><b style="display: block; color: #001a33; font-weight: 600; margin-bottom: 2px">Pruebas del mes</b>Qué ganó y qué aprendimos</li>
+<li style="padding: 12px; border-radius: 14px; background: #ffffff; border: 1px solid #e1e7ec"><b style="display: block; color: #001a33; font-weight: 600; margin-bottom: 2px">Tu medición</b>Qué llega completo y qué no</li>
 </ul>
 </article>
 </div>
