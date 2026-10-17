@@ -53,5 +53,8 @@
   on Kinsta (temporary).
 - Verification 2026-10-17: 1440 and 390 with `scrollWidth==innerWidth`, 10 modules ready, one `h1`, canonical,
   `index, follow`, OG/Twitter, Service + FAQPage, page sitemap lists the new URL and not the legacy, 301 tested (slash,
-  no slash, `?utm_`), Home menu links to the new URL, sibling landings 200 after deploy. Not yet: Rich Results/GSC,
-  real submission, GVC 1536/890 + reduced motion + keyboard, Elementor save/reload.
+  no slash, `?utm_`), Home menu links to the new URL, sibling landings 200 after deploy. Night pass 2026-10-17:
+  Rich Results 3 valid (only optional `address` warning, site-wide); validator.schema.org 0/0 with `FAQPage` and
+  `Service` (via `WebPage.about`); 1536/890/390 + reduced motion + keyboard OK; Elementor re-save kept data and render
+  identical but deleted the featured image (restored to `252002`, see `source-led-elementor-patterns.md`). Not yet:
+  real submission → GA4/HubSpot, URL Inspection (the efeoncepro.com GSC OAuth connection returns `invalid_grant`).

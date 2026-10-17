@@ -178,6 +178,10 @@ opción, toma antes un snapshot del estado actual y purga Kinsta al final.
 
 ## Problemas comunes
 
+- **Después de re-guardar la página por script, el schema muestra una imagen `http://` del plugin.** Re-guardar el
+  documento de Elementor desde WP-CLI con `get_settings()` borra la imagen destacada (pasó el 2026-10-17). Vuelve a
+  fijarla con la imagen OG (adjunto `252002`), reconstruye el indexable de Yoast y purga Kinsta. Desde el editor visual
+  no ocurre.
 - **No logro pasar el id de la página a un script.** `pnpm public-website:wpcli` sólo reenvía archivos
   (`--input-file`) como argumentos; no existe `-- <arg>`. Escribe el id en un archivo (por ejemplo
   `tmp/performance-page-id.txt`) y pásalo con `--input-file`. Los scripts aceptan número o ruta.

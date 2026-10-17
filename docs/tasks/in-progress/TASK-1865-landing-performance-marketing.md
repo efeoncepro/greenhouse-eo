@@ -1,5 +1,27 @@
 # TASK-1865 — Landing pública Performance Marketing (Performance & Commerce Distribution)
 
+## Delta 2026-10-17 (noche) — verificación en vivo
+
+- **Schema:** Rich Results Test (Google) rastrea sin errores y da 3 elementos válidos (rutas de exploración, empresa local,
+  organización; único aviso opcional: `address` de la organización, que es de todo el sitio). Google no evalúa
+  `Service` ni muestra FAQ para este tipo de sitio, así que se validó con validator.schema.org: **0 errores, 0
+  advertencias**, `FAQPage` `#faq` y `Service` anidado vía `WebPage.about`. Yoast sigue siendo dueño de WebPage y no
+  hay entidades duplicadas.
+- **Viewports:** Playwright en vivo a 1536, 890 y 390 con `prefers-reduced-motion: reduce` (1440 se revisó al publicar):
+  `scrollWidth == clientWidth` en los cuatro, 10 módulos inicializados, un `h1`, 26 campos, sin errores JS. Con
+  movimiento reducido no queda texto oculto. Teclado: las pestañas de plataformas cambian con flechas y conservan
+  `aria-pressed`; el autodiagnóstico se responde con Enter (5 «sí» → «5 de 5», mensaje final y `aria-label` al día).
+  Capturas mirándolas; no se corrió el scorecard visual.
+- **Elementor:** re-guardado por la API del documento con los mismos datos: `_elementor_data` y el render idénticos
+  (sha `687fa928…`), los 10 widgets cargan controles (389–463 por widget). **Efecto colateral corregido:** al pasar los
+  ajustes de página sin `post_featured_image`, Elementor borró la imagen destacada y Yoast tomó la primera imagen del
+  contenido con `http://` (URL de plugins en contexto CLI). Se restauró `_thumbnail_id=252002` y se reconstruyó el
+  indexable: `thumbnailUrl` vuelve a ser la OG con https. No se abrió el editor visual con una persona.
+- **Search Console:** bloqueado. La conexión OAuth de `sc-domain:efeoncepro.com` responde `invalid_grant` (refresh token
+  vencido o revocado); hay que reconectarla desde Greenhouse. Afecta también la sincronización GSC de Efeonce en SV360.
+- **Pendiente:** envío real del formulario → GA4 `generate_lead` (el acceso en tiempo real a la propiedad `486264460`
+  está verificado) y lead en HubSpot «Lead Gen - Performance Marketing»; reconexión GSC + inspección de URL.
+
 ## Delta 2026-10-17 (tarde) — publicada en producción y legacy retirada
 
 - **En vivo:** `https://efeoncepro.com/servicios/performance-marketing/` (page `251997`, `index, follow`), 10 widgets
@@ -113,7 +135,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Publicada 2026-10-17 en /servicios/performance-marketing/ (251997) con legacy retirada; pendiente envío real, GA4, Rich Results y documentación`
+- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); pendiente envío real + GA4/HubSpot y reconexión de Search Console (invalid_grant)`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
@@ -717,15 +739,15 @@ el motor ya soporta.
 - [ ] Los estados ready, loading, empty, partial, error, denied y success del form fueron verificados.
 - [ ] El CTA `performance-discovery-meeting` abre el scheduler nativo y no hay enlaces del proveedor.
 - [ ] La fila del form está en `TRACKING-PLAN.md` y ningún evento envía PII ni los datos comerciales del brief.
-- [ ] `Service` y `FAQPage` validan y sólo marcan contenido visible; no hay entidades de Yoast duplicadas.
+- [x] `Service` y `FAQPage` validan y sólo marcan contenido visible; no hay entidades de Yoast duplicadas.
 - [ ] Los tres gates `public-website:verify-performance-*` pasan en vivo después del último guardado y de la migración.
-- [ ] GVC premium capturado y mirado en 1536, 1440, 890 y 390, más reduced motion y teclado.
-- [ ] `scrollWidth === clientWidth` en los cuatro viewports.
+- [x] GVC premium capturado y mirado en 1536, 1440, 890 y 390, más reduced motion y teclado.
+- [x] `scrollWidth === clientWidth` en los cuatro viewports.
 - [ ] El scorecard visual cumple el umbral declarado.
 - [x] La URL legacy responde 301 a la nueva, el ítem de menú apunta a la nueva, no quedan enlaces internos a la legacy y
       la legacy está `private` y fuera del sitemap.
-- [ ] La página nueva está en `index, follow` con canonical, sitemap y enlace desde el hub.
-- [ ] La triple documentación, la fila en `PRIMITIVES.md`, el registry de la skill y la landing reference en ambas skills
+- [x] La página nueva está en `index, follow` con canonical, sitemap y enlace desde el hub.
+- [x] La triple documentación, la fila en `PRIMITIVES.md`, el registry de la skill y la landing reference en ambas skills
       existen.
 - [ ] No se creó ningún lead ni ninguna reserva ficticia durante QA.
 - [ ] El copy publicado respeta la regla terminológica del wireframe y los nombres públicos mapeados al catálogo.
@@ -754,10 +776,10 @@ el motor ya soporta.
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] PDR-022 pasó de `Draft for validation` al estado que corresponda y el roadmap del sitio quedó al día.
+- [x] PDR-022 pasó de `Draft for validation` al estado que corresponda y el roadmap del sitio quedó al día.
 - [ ] La fila de esta task en `EPIC-019` y el nodo en el flujo maestro de `EPIC-023` reflejan el estado final.
-- [ ] `TASK-1860` apunta a la URL nueva en su conexión digital.
-- [ ] La ficha de servicio registra la URL pública y los nombres públicos.
+- [x] `TASK-1860` apunta a la URL nueva en su conexión digital.
+- [x] La ficha de servicio registra la URL pública y los nombres públicos.
 
 ## Follow-ups
 

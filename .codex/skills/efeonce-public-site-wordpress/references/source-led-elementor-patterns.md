@@ -272,6 +272,12 @@ Release-rail lessons (Performance Marketing, 2026-10-17):
 - Retiring a legacy URL in the same release (301, chains, menu): `references/taxonomy-permalink-migrations.md`
   §4 (Yoast Premium redirect rail). A `?utm_` that survives the 301 does so through the mu-plugin `efeonce-redirect-query-passthrough`,
   not through Yoast.
+- Re-saving a page through `$document->save( [ 'elements' => …, 'settings' => $document->get_settings() ] )` from
+  WP-CLI deletes the featured image: the page-settings payload lacks a filled `post_featured_image`, and Elementor
+  treats the empty control as «remove thumbnail». `_elementor_data` and the render stay byte-identical, so a hash check
+  does not catch it; Yoast then falls back to the first content image, built with `http://` because `plugins_url()` is
+  http in CLI. Any republisher must read `_thumbnail_id` first and restore/verify it after `save()` (seen on
+  Performance 2026-10-17, restored to `252002`). The visual editor does not do this: it loads the control from the post.
 
 1. PHP renderer and native control-registration tests (including URL defaults and escaping).
 2. JS lifecycle tests for mount/replacement/removal, editor/reduced, filter and player cleanup.
