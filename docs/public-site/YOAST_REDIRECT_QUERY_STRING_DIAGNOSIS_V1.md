@@ -1,9 +1,10 @@
 # Redirects de Yoast con parámetros: diagnóstico y propuesta
 
 > **Tipo de documento:** Diagnóstico técnico + propuesta de plataforma (sitio público)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-17 por Claude (sesión con Julio Reyes)
-> **Estado:** **Propuesta lista para aprobar. Nada desplegado.** Producción sólo se tocó en lectura.
+> **Última actualización:** 2026-10-17 por Claude — desplegado
+> **Estado:** **Desplegado en producción el 2026-10-17 (~16:35 UTC)** con autorización del operador («Ok, hazlo»). Ver §7.
 > **Origen:** hallazgo del [retiro de `/agencia-diseno-estrategico/`](LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md) §7
 > **Rail:** [`taxonomy-permalink-migrations.md`](../../.claude/skills/efeonce-public-site-wordpress/references/taxonomy-permalink-migrations.md) · skill `efeonce-public-site-wordpress`
 
@@ -134,7 +135,37 @@ Script guardado: `scripts/public-website/flatten-yoast-redirect-chains.php`.
    - el error log no muestra entradas nuevas.
 5. Si algo falla: activar el kill switch o borrar el archivo, y restaurar el snapshot de las cadenas.
 
-## 6. Pendiente de decisión del operador
-- [ ] Autorizar la ventana de §5.3: mu-plugin y aplanado de cadenas.
+## 6. Decisiones del operador
+- [x] Ventana de §5.3 autorizada y ejecutada el 2026-10-17: mu-plugin y aplanado de cadenas.
 - [ ] Opcional: programar la actualización de Yoast SEO Premium (27.7 → la versión alineada con Free), por
   higiene y no como solución de este problema.
+
+## 7. Despliegue y verificación (2026-10-17)
+
+**Aplicado:**
+- **mu-plugin instalado** en `wp-content/mu-plugins/efeonce-redirect-query-passthrough.php`. sha256
+  `e960630fe89c9e857ddd318380e319cc8ddbb35908764c83ef8cbcded28b2cd4`, idéntico al commit `16937ca` del runtime.
+- **8 cadenas aplanadas.** Snapshot: `_gh_yoast_chain_flatten_before_20261017T163627Z`.
+- **Ajuste del script de aplanado:** el wrapper sólo pasa archivos al eval-file, así que la orden se entrega como
+  `--input-file` con un archivo que contiene el texto `apply`.
+
+**Verificación en vivo, sin sesión, de los 58 redirects 301:**
+- Con `?utm_source=audit`: **58 de 58 responden 301 en un solo salto y conservan la etiqueta**. Antes eran 30 con
+  404, 24 con 301 y 4 con 200.
+- Sin parámetros: **ningún cambio** frente a la medición previa.
+- Las 8 cadenas ya llegan **en un salto**, con y sin parámetros.
+- Siguen igual:
+  - `/`, `/?utm_source=x` y `/agencia-creativa/?utm_source=x` → 200;
+  - `/wp-admin/` → 302 al login;
+  - los 410 con parámetro → 404, como antes.
+- `error.log` sin entradas del plugin. Hay un warning previo del tema Ohio y dos purgas de caché limitadas por el
+  rate limit de Kinsta al hacerlas seguidas; la verificación en vivo se hizo igual después.
+
+**Dos destinos ya estaban rotos antes de este cambio** (fuera de alcance, para revisar aparte):
+- `product-category/starsocial` → `product-category/starsocial-cat/` da 404 (restos del tema demo);
+- `uncategorized/tu-cliente-ya-no-busca-solo-en-google-…` → `uncategorized/surround-discovery-seo-ia-marketplace-google/`
+  da 404. El post vive en `/aeo/surround-discovery-seo-google-video-marketplace/`.
+
+**Rollback:**
+- mu-plugin: borrar el archivo y purgar, o definir `EFEONCE_REDIRECT_QUERY_PASSTHROUGH_DISABLED` en `wp-config.php`.
+- Cadenas: restaurar desde el snapshot sólo los 8 destinos que cambiaron.

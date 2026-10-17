@@ -5,11 +5,12 @@
  * permite rollback restaurando sólo los destinos que cambió. Diagnóstico: docs/public-site/YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md.
  *
  *   pnpm public-website:wpcli -- --eval-file ./scripts/public-website/flatten-yoast-redirect-chains.php --wp-user 12
- *   (apply sólo con autorización del operador: agregar el argumento `apply` al eval-file)
+ *   Aplicar (sólo con autorización del operador): agregar `--input-file <archivo con el texto apply>`;
+ *   el wrapper sólo pasa archivos al eval-file.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
 if ( ! class_exists( 'WPSEO_Redirect_Manager' ) ) { WP_CLI::error( 'Yoast Premium missing.' ); }
-$apply   = in_array( 'apply', $args ?? array(), true );
+$apply   = in_array( 'apply', $args ?? array(), true ) || ( isset( $args[0] ) && is_file( $args[0] ) && 'apply' === trim( (string) file_get_contents( $args[0] ) ) );
 $manager = new WPSEO_Redirect_Manager();
 $map     = array();
 foreach ( $manager->get_all_redirects() as $r ) {
