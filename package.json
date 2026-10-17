@@ -173,6 +173,7 @@
     "dataforseo:catalog:check": "tsx scripts/dataforseo/generate-catalog.ts --check",
     "dataforseo:version:check": "node scripts/dataforseo/version-contract.mjs check",
     "dataforseo:version:bump": "node scripts/dataforseo/version-contract.mjs bump",
+    "meta": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/meta/cli.ts",
     "gtm:snapshot": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/gtm/snapshot.ts",
     "measurement:smoke": "node scripts/gtm/measurement-smoke.mjs",
     "growth:forms-tracking-audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/forms-tracking-audit.ts",

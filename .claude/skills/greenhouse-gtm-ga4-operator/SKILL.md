@@ -11,6 +11,20 @@ Use this skill to **operate measurement instrumentation** for Efeonce: build and
 
 ## When to invoke
 
+Para **consultar y operar Meta con agentes** (Ads, catálogo completo de métricas, stats/calidad,
+Página e Instagram), usar `pnpm --silent meta discover` y el
+[manual de la CLI](../../../docs/manual-de-uso/growth/consultar-meta-con-agentes.md).
+Tooling local `meta-agent.v2`: identidad/Business verificados, token de Secret Manager en memoria,
+lecturas con cobertura explícita y escrituras acotadas con plan/hash/receipt privado. Ads nuevos
+PAUSED; publicación/respuestas requieren autorización del payload real. Preparar no envía; `write verify`
+sólo consulta. Un resultado `unknown` nunca se reenvía automáticamente. No activa pauta ni envía DM.
+No sustituye sender CAPI/políticas, no amplía IAM, no ofrece datos individuales del pixel. Campos no
+soportados no son ceros; Lead de pruebas no es demanda comercial. No usar scripts ad hoc con tokens.
+Para seguir un lead: `leads find --input archivo-0600.json` devuelve candidatos; `leads trace` exige
+submission ID o event UUID. Cargar el mismo manual: runtime `greenhouse_app` READ ONLY, sin exportar
+identidad/descifrar/redispatchar. ACK sGTM no es procesamiento Meta; contacto CRM no prueba envío.
+HubSpot usa resolver canónico y portal verificado; `--source-only` omite esa comprobación remota.
+
 - Tagging a Growth Form, Growth CTA, native meeting scheduler or landing so its governed event reaches GA4.
 - Wiring form `gh_form_*`, CTA engine `greenhouse_cta_*`, legacy host `gh_cta_clicked` or native
   meeting `gh_meeting_*` events to GA4 without merging their namespaces.
