@@ -1,5 +1,24 @@
 # TASK-1865 — Landing pública Performance Marketing (Performance & Commerce Distribution)
 
+## Delta 2026-10-17 (tarde) — publicada en producción y legacy retirada
+
+- **En vivo:** `https://efeoncepro.com/servicios/performance-marketing/` (page `251997`, `index, follow`), 10 widgets
+  `greenhouse_performance_*` compilados desde el canvas aprobado (v25). Julio: «está aprobada… publícala», alcance
+  «Todo junto» y formulario propio.
+- **Desvío del plan de abajo:** no se extrajo el núcleo común `source-led-compiler`; el carril se clonó desde Medios
+  (`compile-/build-/deploy-/publish-performance-*`). La extracción queda como follow-up, con el gate de hash idéntico.
+- **Formulario:** `efeonce-performance-diagnostic` (key `71ea684f-…`, `hubspot_pillar`, destino directo «Lead Gen -
+  Performance Marketing»); reemplaza a `efeonce-performance-brief` del contrato original.
+- **SEO:** title «Agencia de performance marketing y publicidad digital | Efeonce», focus keyphrase «agencia de
+  performance marketing» (Semrush 2026-10-17), OG 1200×630 (`252002`), Service + FAQPage (6) y `about → #service`.
+- **Legacy:** `242862` privada; 301 plano en Yoast (con y sin barra, conserva `?utm_`); 3 redirects que apuntaban a la
+  legacy repuntados a la nueva; ítem de menú `242915` reapuntado; sitemap sin la legacy. Snapshot
+  `_gh_performance_migration_before_20261017_181625`.
+- **Verificado en vivo:** 1440 y 390 sin overflow, un `h1`, canonical, OG, schema, formulario con 26 campos, menú desde
+  la Home, landings hermanas 200 tras el deploy. **Pendiente:** primer envío real (Turnstile), GA4 `generate_lead`,
+  Rich Results/GSC, GVC 1536/890 + reduced motion, fila en `TRACKING-PLAN.md`, triple documentación y `PRIMITIVES.md`.
+  Referencia operativa: `.claude/skills/efeonce-public-site-wordpress/references/landings/performance-marketing.md`.
+
 ## Delta 2026-10-17 — dirección aprobada (source-led) y plan de paso al sitio
 
 - **Slice 3 resuelto en modo `source-led`.** Julio aprobó el 2026-10-17 un canvas de conversión en la línea Voice de La
@@ -79,7 +98,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -94,7 +113,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Diseño aprobado (source-led, 2026-10-17); paso al sitio planificado, sin ejecutar`
+- Status real: `Publicada 2026-10-17 en /servicios/performance-marketing/ (251997) con legacy retirada; pendiente envío real, GA4, Rich Results y documentación`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
@@ -677,13 +696,13 @@ el motor ya soporta.
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: flow` según el alcance real.
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: flow` según el alcance real.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC scenario
       plan y design decision log; si está en `yes`, pasa `pnpm task:lint --task TASK-1865`.
 - [ ] El wireframe, el flow, el motion y la dirección visual declarados existen.
 - [ ] La página nueva no reutiliza contenido, estructura ni assets de la legacy.
 - [ ] La demanda está triangulada con una segunda fuente y la decisión de URL quedó cerrada antes del canonical.
-- [ ] El H1 contiene `performance marketing`, el title contiene `agencia de performance marketing` y existe un solo H1.
+- [x] El H1 contiene `performance marketing`, el title contiene `agencia de performance marketing` y existe un solo H1.
 - [ ] Las dos cápsulas de R2 tienen entre 40 y 60 palabras y están bajo un H2 con la pregunta literal.
 - [ ] La firma cambia de primer ítem al cambiar la señal, funciona con teclado, anuncia el cambio y muestra el rótulo
       ilustrativo sin interacción.
@@ -703,7 +722,7 @@ el motor ya soporta.
 - [ ] GVC premium capturado y mirado en 1536, 1440, 890 y 390, más reduced motion y teclado.
 - [ ] `scrollWidth === clientWidth` en los cuatro viewports.
 - [ ] El scorecard visual cumple el umbral declarado.
-- [ ] La URL legacy responde 301 a la nueva, el ítem de menú apunta a la nueva, no quedan enlaces internos a la legacy y
+- [x] La URL legacy responde 301 a la nueva, el ítem de menú apunta a la nueva, no quedan enlaces internos a la legacy y
       la legacy está `private` y fuera del sitemap.
 - [ ] La página nueva está en `index, follow` con canonical, sitemap y enlace desde el hub.
 - [ ] La triple documentación, la fila en `PRIMITIVES.md`, el registry de la skill y la landing reference en ambas skills

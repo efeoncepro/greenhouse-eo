@@ -64,6 +64,7 @@ Read the minimal set:
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
 | Home `/` (former Claude Design preview) | `references/landings/home-claude-design-preview.md`; verify current CMS identity/hash before writes |
+| Performance Marketing `/servicios/performance-marketing/` | `references/landings/performance-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
 
 If several domains apply, load the smallest union. Do not preload every reference.

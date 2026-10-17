@@ -123,24 +123,24 @@ button{font:inherit}
  @keyframes dim{to{opacity:.35;filter:grayscale(1)}}
  @keyframes win{from{box-shadow:0 0 0 0 rgba(248,57,2,0)}to{box-shadow:0 0 0 3px #f83902,0 30px 80px rgba(248,57,2,.35)}}
  .rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 85%}
- .rvr{animation:rvr linear both;animation-timeline:view();animation-range:entry 5% cover 40%}
- .pop{animation:pop linear both;animation-timeline:view();animation-range:entry 20% cover 45%}
+ .rvr{animation:rvr linear both;animation-timeline:view();animation-range:entry 5% entry 90%}
+ .pop{animation:pop linear both;animation-timeline:view();animation-range:entry 10% entry 90%}
  .para{animation:para linear both;animation-timeline:scroll(root);animation-range:0px 900px}
- .draw{stroke-dasharray:1;animation:draw linear both;animation-timeline:view();animation-range:entry 30% cover 55%}
+ .draw{stroke-dasharray:1;animation:draw linear both;animation-timeline:view();animation-range:entry 20% entry 100%}
  @keyframes growy{from{transform:scaleY(0)}}
- .barg .ibar{transform-origin:bottom;animation:growy linear both;animation-timeline:view();animation-range:entry 20% cover 45%}
- .grow{transform-origin:left;animation:growx linear both;animation-timeline:view();animation-range:entry 40% cover 60%}
- .loser{animation:dim linear both;animation-timeline:view();animation-range:cover 45% cover 60%}
- .winner{animation:win linear both;animation-timeline:view();animation-range:cover 40% cover 58%}
+ .barg .ibar{transform-origin:bottom;animation:growy linear both;animation-timeline:view();animation-range:entry 10% entry 90%}
+ .grow{transform-origin:left;animation:growx linear both;animation-timeline:view();animation-range:entry 10% entry 70%}
+ .loser{animation:dim linear both;animation-timeline:view();animation-range:entry 70% entry 100%}
+ .winner{animation:win linear both;animation-timeline:view();animation-range:entry 60% entry 100%}
  .words>span{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 80%}
  .words>span:nth-child(2){animation-range:entry 8% entry 88%}
  .words>span:nth-child(3){animation-range:entry 16% entry 96%}
- .words>span:nth-child(4){animation-range:entry 24% cover 52%}
- .words>span:nth-child(5){animation-range:entry 32% cover 56%}
- .st>*{animation:lift linear both;animation-timeline:view();animation-range:entry 0% cover 35%}
- .st>*:nth-child(2){animation-range:entry 10% cover 40%}
- .st>*:nth-child(3){animation-range:entry 20% cover 45%}
- .st>*:nth-child(4){animation-range:entry 30% cover 50%}
+ .words>span:nth-child(4){animation-range:entry 24% entry 100%}
+ .words>span:nth-child(5){animation-range:entry 32% entry 100%}
+ .st>*{animation:lift linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+ .st>*:nth-child(2){animation-range:entry 10% entry 80%}
+ .st>*:nth-child(3){animation-range:entry 20% entry 90%}
+ .st>*:nth-child(4){animation-range:entry 30% entry 100%}
 }
 @media (max-width:1000px){
  .split,.split-r{grid-template-columns:minmax(0,1fr);gap:48px}
@@ -211,7 +211,7 @@ button{font:inherit}
 <p class="eyebrow chip in d1">Publicidad digital</p>
 <div>
 <p class="in d2" style="margin: 0; font-family: Poppins, sans-serif; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); line-height: 1.2; color: #ffffff">¿Dónde termina mi pauta?</p>
-<p class="in d3" style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(60px, 11.5vw, 184px); color: #ffffff">En <span style="white-space: nowrap">ventas<span class="sphere" aria-hidden="true"></span></span></p>
+<p class="in d3" style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(60px, 10.4vw, 150px); color: #ffffff; white-space: nowrap">En <span style="white-space: nowrap">ventas<span class="sphere" aria-hidden="true"></span></span></p>
 </div>
 <h1 id="hero-h1" class="in d4" style="margin: 10px 0 0; font-family: Poppins, sans-serif; font-weight: 500; font-size: clamp(20px, 1.7vw, 25px); line-height: 1.4; color: #ffffff; max-width: 580px">Agencia de performance marketing que optimiza tu pauta por ventas, no por clics.</h1>
 <p class="in d4" style="margin: 0; font-family: Poppins, sans-serif; font-weight: 300; font-size: clamp(16px, 1.3vw, 19px); line-height: 1.55; color: #dbe5ee; max-width: 540px">Google, Meta, TikTok y LinkedIn aprendiendo de lo que de verdad vendes, medido en tu sitio y en tu CRM.</p>
@@ -865,11 +865,11 @@ class Component extends DCLogic {
     });
     var step = st.step;
     var faqs = [
-      ['¿Qué hace una agencia de performance marketing?', 'Planifica, lanza y optimiza campañas pagadas para que la inversión produzca resultados de negocio. Hoy las plataformas automatizan la puja y la segmentación, así que lo que marca la diferencia es definir la señal correcta, probar creatividad con método, gobernar la automatización y leer qué causó cada resultado.'],
-      ['¿Cuánto cobran?', 'Un fee mensual por la operación, separado de tu inversión en medios, que pagas directo a las plataformas. El diagnóstico tiene precio cerrado. El fee depende de cuántos canales y mercados operamos y de cómo está tu medición.'],
+      ['¿Qué hace una agencia de performance marketing?', 'Planifica, lanza y optimiza campañas pagadas para que la inversión produzca resultados de negocio. Hoy las plataformas automatizan la puja y la segmentación, así que lo que marca la diferencia es definir la señal correcta, probar creatividad con método, gobernar la automatización y leer qué causó cada resultado. Operamos en Chile, México, Colombia, Perú y Estados Unidos.'],
+      ['¿Cuánto cobra una agencia de performance marketing?', 'Un fee mensual por la operación, separado de tu inversión en medios, que pagas directo a las plataformas. El diagnóstico tiene precio cerrado. El fee depende de cuántos canales y mercados operamos y de cómo está tu medición.'],
       ['¿Las cuentas publicitarias quedan a mi nombre?', 'Sí. Las cuentas, los píxeles, las audiencias y los datos están a tu nombre. Accedemos como partner y, si terminamos, te quedas con todo.'],
       ['¿Garantizan el retorno de la inversión?', 'No. El resultado depende también de tu oferta, tu precio, tu stock, tu sitio y tu equipo de ventas. Garantizamos cómo trabajamos: medición verificada, pruebas con método y una recomendación clara cada mes.'],
-      ['¿En qué países trabajan?', 'Operamos pauta en Chile, México, Colombia, Perú y Estados Unidos, para marcas de consumo, e-commerce y B2B.'],
+      ['¿Qué es pautar en redes sociales y en Google?', 'Pautar es pagar para que tus anuncios aparezcan en redes sociales como Meta, TikTok o LinkedIn, o en Google cuando alguien busca lo que vendes. Se paga por clic, por vista o por resultado, y la plataforma decide a quién mostrarlo según lo que le enseñas a optimizar. Por eso conviene que aprenda de ventas y no sólo de clics.'],
       ['¿En qué se diferencia de una agencia de medios?', 'Una agencia de medios decide dónde invertir y compra el mix completo, incluida TV conectada, audio y pantallas en la calle. Performance marketing opera y optimiza las campañas en Google, Meta, TikTok y LinkedIn para que aprendan de tus ventas. En Efeonce hacemos las dos y se conectan.']
     ].map(function (f) { return { q: f[0], a: f[1] }; });
 

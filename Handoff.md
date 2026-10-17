@@ -1,5 +1,16 @@
 # Handoff
 
+## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)
+
+Live en https://efeoncepro.com/servicios/performance-marketing/ (página `251997`, OG `252002`): 10 widgets
+`greenhouse_performance_*` compilados del canvas aprobado, Service + FAQPage (6), Growth Form
+`efeonce-performance-diagnostic` (direct a «Lead Gen - Performance Marketing»). Legacy `242862` privada con 301 plano
+en Yoast (3 cadenas repuntadas), ítem de menú `242915` reapuntado. QA en vivo 1440/390 sin overflow.
+[Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/performance-marketing.md) ·
+[Task](docs/tasks/in-progress/TASK-1865-landing-performance-marketing.md).
+Pendiente: envío real del form, GA4 `generate_lead`, Rich Results/GSC, GVC 1536/890, triple documentación, extraer el
+núcleo común source-led (hoy clonado de Medios). Runtime: commit propio en `efeonce-public-site-runtime` (sin push).
+
 ## 2026-10-17 — Brochures aprobados: no recortar ni revalidar
 
 Julio ratificó aprobación comercial completa: los brochures no necesitan nada más. [Regla vigente](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md), cargada por Codex/Claude y radar personal.
@@ -238,14 +249,3 @@ sin renovación del corte global del pipeline. Mandato posterior: [seis secuenci
 Apollo detenido: seis borradores inactivos, cero inscritos. No duplicar ni ampliar este lote autorizado.
 Método incorporado a la [skill de prospección](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
 y manual; espejos Codex/Claude y fixtures de secuencias. Actualización documental, sin nuevos envíos.
-
-## 2026-10-12 — Propuesta de campaña creativa: aprendizajes documentados (caso Sika N.º 1164)
-
-Paquete del caso terminado y **no presentado** en Wherex (cierre 16/10, 16:00 de Ciudad de México): anexo gráfico v2, deck técnico de 22 láminas,
-reel de 25 s con su página en Think y QR, y económica en la plantilla A4 (MXN 64.000 por lanzamiento tipo, por componente).
-Aprendizajes en el [playbook](docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md) y en las skills `greenhouse-public-private-tenders`,
-`deck-studio`, `creative-practice`, `efeonce-pricing-operator`, `motion-design-studio`, `audio-studio`, `efeonce-graphic-line` y `astro`; fila nueva en el router.
-Seis subagentes con alcance disjunto; espejos `.codex` sincronizados salvo `astro` y `efeonce-pricing-operator`, que ya diferían. Gates documentales PASS. Sin push.
-Por la noche, a pedido del operador: lámina 10 sin texto que limite el alcance y lámina 15 nueva con tiempos por nivel de complejidad (el SLA que espera Sika;
-plazos sin visto bueno de operaciones). Abierto para el operador: IVA y validez de la económica, evolución gráfica por lanzamiento o pago único, y las reglas que chocan con lo ya escrito (precio unitario «nunca», spec work, tercera persona en SOW):
-[expediente](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md).

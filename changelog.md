@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-17 — Landing Performance Marketing en producción (TASK-1865)
+
+- `/servicios/performance-marketing/` (page `251997`) publicada desde el canvas aprobado con el carril source-led de
+  Medios: compilador, paquete scoped `performance-elementor-release.v1`, publicador, Ohio, SEO y migración de la legacy.
+- Legacy `/servicio-gestion-campanas-publicitarias/` privada con 301; menú reapuntado; formulario propio
+  `efeonce-performance-diagnostic` con destino HubSpot directo.
+
 ## 2026-10-17 — BytePlus: cuenta obligatoria y Entry gratuito activo
 
 - [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y [ledger por cuenta](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
@@ -556,8 +563,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - Censo de 84 hijas (43 complete, 3 en curso, 38 to-do), estados TASK-1655/1670/1671/1672/1805 e índices conciliados. Flag de hallazgos y selectores Improved ETV revalidados en worker activo; pendientes conductuales conservados.
 - [Evidencia y límites](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Sin cierres de tasks, cambio de configuración, calls pagadas, backfill ni emisión de informes.
-
-## 2026-10-04 — Spot «Los Sparks»: Studio, Metricool y naming «Efeonce | AEO»
-
-- Spot cargado en Marketing Studio como CMP001-08 de CMP-001 (orgánico) y programado en Metricool: IG lun 05-oct 14:00 (portada 4:5), LinkedIn jue 08-oct 11:00; media re-alojada con SHA-256 idéntico.
-- Operador: la marca es Efeonce y el servicio «Efeonce | AEO» (con barra). Regla en el [ADR de naming](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md), skills de copy/AEO/social y `docs/context/`; recetas de Studio y Metricool documentadas.
