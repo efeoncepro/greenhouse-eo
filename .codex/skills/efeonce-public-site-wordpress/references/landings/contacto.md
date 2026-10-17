@@ -14,8 +14,10 @@
 >   a quien ya había visitado la página.
 > - **OG:** adjunto nuevo `251980` (`efeonce-contacto-og-1200x630-v3.png`, contrato `contacto-og.v3`), rotado con
 >   `scripts/public-website/rotate-contacto-og-image.php --input-file <json contrato/sha256/fileName>`. Siempre
->   archivo nuevo (URL nueva) para que CDN y redes no sirvan el anterior. **La página no lleva imagen destacada a
->   propósito: no escribir `_thumbnail_id`.** El OG (degradado + logo + «Conversemos.») sale determinístico de
+>   archivo nuevo (URL nueva) para que CDN y redes no sirvan el anterior. **Imagen destacada = el OG vigente
+>   (`_thumbnail_id` `251980`, decisión de Julio 2026-10-17):** sin ella, Yoast tomaba para el schema una imagen del
+>   plugin en `http://` desde la copia `post_content` que deja un guardado CLI. Al rotar el OG, actualizar también
+>   `_thumbnail_id` al adjunto nuevo (`repair-landing-primary-image.php`); antes la regla era no escribirla. El OG (degradado + logo + «Conversemos.») sale determinístico de
 >   `build-contacto-og.cjs`; el hero de la página no lleva degradado ni texto horneado.
 > - **Medición:** política Meta + Google UPD `89e531d8` publicada para `efeonce-contacto`; GA4 `generate_lead`
 >   verificado por GTM genérico. Detalle en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`.

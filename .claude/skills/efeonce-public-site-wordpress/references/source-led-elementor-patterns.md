@@ -43,8 +43,9 @@ Medios and Performance now share one core; new canvas landings must use it inste
   `$_SERVER['HTTPS']` later does not change it). When a page has no featured image, Yoast takes the schema
   `primaryImageOfPage` from that copy. Fix = featured image (use the OG attachment): HubSpot `244079` repaired
   2026-10-17 with `251991` (`repair-landing-primary-image.php`, snapshot `_gh_primary_image_repair_before_20261017_212620`).
-  Contacto `20729` still serves an http plugin image because it keeps no featured image; giving it its OG image is
-  the operator's call. Systemic option (not done): make the plugin URL constant scheme-aware.
+  Contacto `20729` repaired the same day with its OG `251980` by operator decision (snapshot
+  `_gh_primary_image_repair_before_20261017_212833`). Systemic option (not done): make the plugin URL constant
+  scheme-aware.
 
 ## Source fidelity without losing editability
 
