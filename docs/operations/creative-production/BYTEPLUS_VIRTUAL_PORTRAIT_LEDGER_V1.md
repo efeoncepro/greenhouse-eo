@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.8: KYC aprobado en 3004839361; Entry gratuito disponible, detenido en el proceso de carta para firma personal de Julio)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.9: Julio autoriza llenar cuestionario; preguntas 2 y 3 completadas, pregunta 1 pendiente de confirmación factual; carta sin aceptar)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -41,7 +41,7 @@ producción: no se cambió ni creó ninguna credencial. Seedance 2.5 está **Act
 | Dato | Valor |
 |---|---|
 | KYC de organización | **Aprobado**, `Verification successful`. Consola: **2026-10-18 00:57:32 UTC+8** = **2026-10-17 16:57:32 UTC / 13:57:32 Chile**. Correo oficial recibido 16:57:37 UTC confirma éxito para **3004839361**. El envío original fue 11:53:32 UTC, autorizado expresamente por Julio |
-| Advanced Creation Rights | **No activo todavía**; Entry **USD 0**, botón `Free Trial` habilitado tras renovar sesión y seguir `complete real-name verification`. Se abrió su proceso de cuestionario/carta/verificación de correo; detenido sin responder ni aceptar para firma personal de Julio |
+| Advanced Creation Rights | **No activo todavía**; Entry **USD 0**, `Free Trial` habilitado. Cuestionario parcialmente completado por instrucción de Julio: pregunta 2 `YES`, pregunta 3 uso interno. Pregunta 1 sin seleccionar hasta confirmar mecanismos/plan de incidentes; carta y verificación por correo pendientes |
 | Cupo de Entry, cuando se active | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
@@ -353,3 +353,20 @@ cuenta ni nuevas pruebas de inferencia. Sin compras. Pestaña Chrome abierta par
 verificar Entry y cupos, cargar sólo Antonio, esperar estado y ejecutar las dos pruebas con IDs nuevos.
 Evidencia fuera del repo: `kyc-cuenta-correcta-aprobado.jpg` y
 `entry-cuenta-correcta-pendiente-firma.jpg`, dentro de la carpeta local de §7.
+
+### Cuestionario autorizado por Julio — preparación sin firma
+
+Julio indicó **«Llena el KYC»**. Se comprobó de nuevo Account ID **3004839361** antes de rellenar. Se seleccionó:
+
+- **Pregunta 2: YES**, conocimiento de que todo retrato personal requiere autorización y de la responsabilidad
+  por utilizarlo sin ella, conforme al alcance y controles de derechos ya establecidos.
+- **Pregunta 3: For internal content production by our company / for our company's own purposes.** Esta ruta
+  usa la CLI local para producción propia; no integra Seedance en un producto o plataforma.
+- **Pregunta 1: sin respuesta.** BytePlus pregunta si la empresa cuenta ya con mecanismos de trazabilidad y
+  planes de respuesta ante incidentes para prevenir deepfakes. El repo respalda trazabilidad/reglas de derechos,
+  pero no basta para confirmar que ese plan está vigente. Se solicitó a Julio una respuesta factual `Sí/No`;
+  no se presume una respuesta por la instrucción general de completar el formulario.
+
+`Next` permanece deshabilitado. No se avanzó a aceptar la carta, no se solicitó código ni se activó Entry.
+La condición de firma personal de Julio se conserva. Evidencia:
+`kyc-cuestionario-parcial-cuenta-correcta.jpg`, en la misma carpeta local de §7. Pestaña abierta para continuar.
