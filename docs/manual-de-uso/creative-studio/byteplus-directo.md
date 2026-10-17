@@ -143,8 +143,8 @@ a ninguna persona real. Requisitos, en orden:
    borrador 480p; anotar asset group, asset id(s) y estado en el ledger.
 
 Una persona real (por ejemplo, Julio) va por la biblioteca de retratos reales, con verificación en vivo y
-consentimiento, no por la virtual. Nexa (mascota no humana) probablemente no necesita cupo: se prueba con un
-borrador antes de reservarle uno. La gestión de assets por API exige AK/SK y no está implementada en este comando.
+consentimiento, no por la virtual. Nexa tiene rostro humano fotorrealista: necesita cupo, con la
+misma prioridad que el elenco. La gestión de assets por API exige AK/SK y no está implementada en este comando.
 
 ## Comparación de costos de Seedance 2.5
 

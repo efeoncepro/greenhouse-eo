@@ -43,8 +43,8 @@ actualiza el total de §1.
    ([elenco](../brand-photography/EFEONCE_BRAND_CAST_V1.md)).
 3. **Personajes de cliente o de una sola pieza, sólo si recurren.** Si no, sus planos con rostro van por Higgsfield
    u otra vía antes de gastar un cupo.
-4. **Nexa** es mascota no humana: probablemente no necesita cupo (el filtro apunta a rostros humanos fotorrealistas).
-   Se verifica con un borrador antes de reservarle uno.
+4. **Nexa** tiene rostro humano fotorrealista (el más realista del elenco, según el operador, 2026-10-17): **necesita
+   cupo** y es prioridad, igual que el elenco recurrente.
 5. **Julio** (persona real) va por la biblioteca de retratos **reales** (verificación en vivo + consentimiento),
    nunca por la virtual.
 6. **Prohibido «lavar» un cuadro con rostro** pasándolo por Seedream para que cuente como salida confiable. La vía de
