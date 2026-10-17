@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.3: carga de Nexa, Hum, Isabella, Karo y Sophia por instrucción posterior de Julio; ids y cupo verificados)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.4: repetición de las dos pruebas de Antonio tras activación reportada del Asset Service; ambos intentos rechazados)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -91,7 +91,8 @@ personaje y un grupo por personaje, con los nombres exactos del LEEME. No se vol
 **Readback final de consola:** **12/50 assets y 6/50 grupos usados**, **38 assets y 44 grupos disponibles**
 (actualizado 2026-10-17 05:58:18, zona no indicada por la UI). Esta continuación consumió **10 assets y 5 grupos**;
 el total desde el inicio de la tarea es **12 assets y 6 grupos**. Los doce archivos muestran `warehoused` sin error
-en la consola. No se verificó por API el literal `Active` ni se repitieron las pruebas de generación.
+en la consola. En ese cierre no se verificó por API el literal `Active` ni se repitieron las pruebas de generación;
+la repetición posterior está registrada en §7.
 
 **Plan y firma:** Entry gratuito, sin compra ni cambio de plan. No apareció una nueva carta de compromiso durante
 estas cargas y no se aceptó ninguna; si aparece más adelante, la firma sigue reservada a Julio.
@@ -133,6 +134,8 @@ intermedias y la imagen final) queda en un lugar durable y se anota en la column
 
 ## 7. Pruebas de Antonio — 2026-10-17
 
+### Primera ejecución — 08:44 UTC
+
 **Resultado: no funcionó como referencia ni como primer cuadro.** Los dos intentos terminaron con HTTP 400
 `InvalidParameter`, código de salida 1 y sin archivo de video. No se obtuvo id de tarea ni `receipt.json` en ninguno.
 El error registrado por la CLI no identifica qué parámetro rechazó el proveedor; no permite atribuirlo al estado del
@@ -157,3 +160,32 @@ para primer cuadro la CLI indicó precio variable sin cota calculable.
 fallo de referencia. La instrucción posterior «Subelas» autorizó completar los cinco personajes restantes; su
 carga y el cupo final están en §4. Los checksums de los doce PNG del paquete `SUBIR/` se verificaron antes de
 cada etapa. No se afirma estado API `Active` ni compatibilidad por el solo estado visual `warehoused`.
+
+### Repetición autorizada tras activación reportada del Asset Service — 09:05–09:06 UTC
+
+**Resultado: ambas pruebas volvieron a fallar, sin video.** Julio transmitió la indicación de Claude de que ya había
+activado el Asset Service y pidió repetir los mismos comandos. Se ejecutó una vez cada comando conservado en
+`resultado.json`, sin cambiar modelo, prompt, ids, roles, duración (4 s), resolución (480p), modo draft ni rutas de
+salida. Las ejecuciones anteriores y sus errores se conservaron.
+
+| Prueba | Inicio–fin (UTC, 2026-10-17) | Resultado | Request id |
+|---|---|---|---|
+| Referencias (paso 3a) | 09:05:55–09:05:57 | HTTP 400 `InvalidParameter` en `content[1].image_url.url`; salida 1; sin `antonio-ref.mp4` | `02179222795750111300f35b2a874e35aceb4d35afb57b8f9aa5d` |
+| Primer cuadro (paso 3b) | 09:05:57–09:06:01 | HTTP 400 `InvalidParameter` en `content[1].image_url.url`; salida 1; sin `antonio-primer-cuadro.mp4` | `02179222796077630d072d337ea6fcc7bbfbe2f0c485be2873587` |
+
+**Diagnóstico devuelto:** en ambos rechazos, la CLI clasificó el mensaje del proveedor como
+`asset_service_not_activated` y explicó que los `asset://` requieren activar Asset Service en ModelArk, región
+`ap-southeast-1`. Se comprobó en el código vigente que esa clasificación exige que el mensaje del proveedor
+contenga `not activated the Asset Service`; no es una deducción a partir de cualquier HTTP 400.
+Por tanto, **la activación reportada aún no quedó validada para la cuenta utilizada por estas llamadas**. No se
+verificó si existe una diferencia de cuenta, región o propagación de la activación. La repetición no demuestra uso
+válido de estos assets como referencias ni como primer cuadro.
+
+**Evidencia:** en cada carpeta `pruebas-antonio/referencia/` y `pruebas-antonio/primer-cuadro/` quedaron
+`ejecucion-reintento-asset-service.log` y `resultado-reintento-asset-service.json` (comando exacto, fechas UTC,
+salida 1 y `videoExists: false`), junto al prompt y los registros originales. No se obtuvo id de tarea ni recibo
+en estos intentos. La estimación de referencias volvió a ser USD 0,4112; primer cuadro indicó precio variable.
+El cobro real no se verificó. No hubo reintentos automáticos adicionales ni subidas.
+
+**Karo y Sophia:** ya estaban cargadas antes de esta nueva instrucción, por el «Subelas» previo de Julio (§4).
+Durante esta repetición no se volvió a subir ninguno de sus archivos ni se modificó la biblioteca o el plan.
