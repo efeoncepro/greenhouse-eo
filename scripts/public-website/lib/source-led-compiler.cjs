@@ -35,6 +35,12 @@ const SERVICE_FIELDS = [
   { key: 'schema_service_catalog', type: 'textarea', label: 'Datos estructurados · componentes del servicio (uno por línea)' },
 ]
 
+// Ohio's .links-underline paints `linear-gradient(currentcolor…)` on every link hover with higher specificity than the
+// landing (5 classes). Buttons that set their fill with the `background` shorthand reset background-size, so the
+// gradient covers the whole button and hides its text (Performance and Medios hero CTAs, 2026-10-17). Scoped to the
+// landing by the selector rewrite below; no landing link uses its own background image.
+const OHIO_LINK_GUARD = '/* Ohio link-underline guard */\na:hover,a:focus-visible{animation:none !important;background-image:none !important}\n'
+
 const FORM_FALLBACK = 'Este formulario necesita JavaScript. Puedes escribirnos a hola@efeoncepro.com o agendar en efeoncepro.com/agenda.'
 
 /**
@@ -277,7 +283,7 @@ function compileSourceLedLanding(o) {
   /* ---------- 3. Scoped stylesheet (+ optional unscoped page layer) ---------- */
 
   const canvasCss = source.match(/<style>([\s\S]*?)<\/style>/)[1]
-  const css = styleAssets(canvasCss).replaceAll('%%asset_base%%', `../img/${landing}/`) + '\n/* Expanded selectors */\n' + tabCss.join('\n') + '\n' + fs.readFileSync(path.join(sourceDir, 'host.css'), 'utf8')
+  const css = styleAssets(canvasCss).replaceAll('%%asset_base%%', `../img/${landing}/`) + '\n/* Expanded selectors */\n' + tabCss.join('\n') + '\n' + fs.readFileSync(path.join(sourceDir, 'host.css'), 'utf8') + '\n' + OHIO_LINK_GUARD
   const ast = postcss.parse(css)
 
   ast.walkRules(rule => {

@@ -18,6 +18,11 @@ Medios and Performance now share one core; new canvas landings must use it inste
   unscoped `page.css`, `used-assets.json`). A landing script owns only stage 1 (expand its canvas into
   `section[data-gh-module]` + `tabCss`) and calls `compileSourceLedLanding({ landing, sourceDir, source, assets, $,
   modules, tabCss, formModule, serviceModule, faq, serviceDefaults, pageLayer })`.
+- **Ohio link-underline guard (in the core CSS):** Ohio's `.links-underline a:not(.button):not(.tag):not(.-undash):hover`
+  paints `linear-gradient(currentcolor…)` with 5-class specificity; a button that sets its fill with the `background`
+  shorthand resets `background-size`, so on hover the gradient covers it and hides its text (Performance and Medios
+  hero CTAs, fixed live 2026-10-17). The core appends `a:hover,a:focus-visible{animation:none !important;
+  background-image:none !important}` scoped to `.gh-<landing>`; never give a landing link its own background image.
 - **Widget base:** runtime `includes/widgets/class-eo-source-led-landing-base.php`
   (`EO_Source_Led_Landing_Base_Widget`). A landing base only declares `LANDING`, `TITLE_PREFIX`, `KEYWORDS`,
   `FORM_MODULE` and defines `eo_<landing>_register_assets()`; definitions are cached per landing + module.
