@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.4: repetición de las dos pruebas de Antonio tras activación reportada del Asset Service; ambos intentos rechazados)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.5: autorización cruzada aceptada con permiso expreso de Julio; la API sigue rechazando ambas pruebas por Asset Service inactivo)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -189,3 +189,48 @@ El cobro real no se verificó. No hubo reintentos automáticos adicionales ni su
 
 **Karo y Sophia:** ya estaban cargadas antes de esta nueva instrucción, por el «Subelas» previo de Julio (§4).
 Durante esta repetición no se volvió a subir ninguno de sus archivos ni se modificó la biblioteca o el plan.
+
+### Autorización cruzada aceptada y comprobación posterior — 10:46 UTC
+
+**Autorización de Julio:** después de revisar el cuadro «Perform cross-service authorization first», Julio indicó
+«Te aitorizo». Codex pulsó **Agree to authorize** para **Object Storage (TOS), Private Network (VPC) y Machine
+Learning Platform**. El cuadro desapareció y no reapareció al recargar la página. Esta concesión de permisos
+se distingue de la activación del Asset Service: **no resolvió el rechazo de inferencia**.
+
+Se repitió una vez cada comando original, con los mismos parámetros y archivos de prompt, después de aceptar
+el permiso. No existían salidas ni recibos de los intentos anteriores. Ambos terminaron sin tarea ni video:
+
+| Prueba | Inicio–fin (UTC, 2026-10-17) | Resultado | Request id |
+|---|---|---|---|
+| Referencias (paso 3a) | 10:46:48–10:46:50 | HTTP 400 `InvalidParameter` en `content[1].image_url.url`; causa `asset_service_not_activated`; salida 1; sin video | `02179223401037996d528c8df2143421f3e331d7739c2b1c8367e` |
+| Primer cuadro (paso 3b) | 10:46:50–10:46:53 | HTTP 400 `InvalidParameter` en `content[1].image_url.url`; causa `asset_service_not_activated`; salida 1; sin video | `021792234012616f9cb936a41ab283113693068986f31c339acdd` |
+
+**Evidencia local:** cada carpeta `pruebas-antonio/referencia/` y `pruebas-antonio/primer-cuadro/` conserva
+`ejecucion-post-autorizacion-cruzada.log` y `resultado-post-autorizacion-cruzada.json`. No hubo reintentos
+automáticos posteriores. El cobro real sigue sin verificar. Capturas en `pruebas-antonio/`:
+`asset-service-autorizacion-pendiente.jpg`, `asset-service-autorizacion-aceptada.jpg` y
+`asset-service-plan-entry-tras-autorizacion.jpg`.
+
+**Contrastes de consola y coordinación:** Julio autorizó consultar por chat a Claude en «Anuncio acuerdo
+Byteplus». Claude confirmó el mensaje original del proveedor y que no había localizado documentación de un
+control separado de Asset Service. Su referencia a la activación previa era una instrucción condicional,
+no evidencia de que el servicio ya estuviera habilitado. Identificó el nombre de la clave de la CLI como
+`efeonce-media-directa` según la auditoría del 2026-10-12; su cuenta propietaria no quedó comprobada.
+
+Codex abrió también la ruta exacta enlazada por el error (`console.byteplus.com/ark/.../openManagement`):
+tanto esa consola como `ai.byteplus.com` muestran la misma cuenta **3003660328**, root `julio_reyes`.
+La vista de API keys de `default` no muestra claves. La credencial de la CLI sí autentica y lista 11 tareas
+anteriores; eso no prueba que pertenezca a esa misma cuenta. No se pudo contrastar la tarea histórica
+`cgt-20261017085910-h4kbe` en una interfaz de historial de tareas de API. No se creó ni cambió ninguna clave.
+
+**Plan y cupo preservados:** Entry, Free, **12/50 assets y 6/50 grupos** (último readback de esta etapa:
+2026-10-17 07:47:44 en la UI, zona no indicada). «Subscription Plans» sólo ofrecía planes pagados de USD 1.400
+y USD 4.200 mensuales; se cerró con `cancel`, sin marcar términos, pagar ni cambiar plan. No hubo más subidas.
+
+**Pendiente concreto:** confirmar con BytePlus dónde se habilita Asset Service en Entry para la cuenta usada
+por la credencial de inferencia, y si esa credencial corresponde a 3003660328. El permiso cruzado aceptado y la
+presencia de los assets no bastan para declarar el servicio activo. Consulta preparada para soporte, aún no enviada:
+«Entry gratuito con 12 assets y 6 grupos en cuenta 3003660328; autorización TOS/VPC/Machine Learning Platform
+aceptada; inferencia por `asset://` sigue respondiendo “Your account has not activated the Asset Service”.
+¿Dónde se habilita para Entry y cómo verificamos que la clave `efeonce-media-directa` pertenece a esta cuenta?».
+Adjuntar los dos request ids de esta tabla, sin credenciales ni URLs firmadas.
