@@ -52,6 +52,13 @@ de 180 s no prueba cancelación ni cobro cero; un nuevo POST es un intento separ
 - `scripts/ai/inpaint/adapters/layerize-byteplus.ts`: adaptación al documento de capas existente.
 - Generación exige ejecución explícita; `--max-usd` permite un tope sobre el estimado conocido. El precio
   desconocido exige confirmación explícita y no acepta un límite ficticio.
+- Modo borrador (2026-10-16): el catálogo declara `draft` por modelo (hoy sólo `seedance25`: 480p, final 1080p,
+  7 días). `buildBytePlusDraftFinalRequest` arma el final con sólo `draft_task` y los campos que el fabricante permite;
+  la CLI rechaza antes de llamar resolución inválida, parámetros reutilizados, borrador vencido o sin terminar.
+- Rostros reales (2026-10-16): el rechazo `PrivacyInformation` se traduce a las vías oficiales; las imágenes locales
+  viajan con sus bytes originales para no romper la confianza en salidas propias de la cuenta. Los personajes
+  ficticios aprobados en la biblioteca privada de retratos virtuales entran como `asset://<id>`; crearlos (KYC de
+  organización, Advanced Creation Rights, carta de autorización) es un acto del operador en la consola, no del comando.
 - Voice enrollment no se prueba ni compra slots de voz durante instalación. Las voces clonadas exigen speaker ID
   adquirido y consentimiento de la persona; credencial válida no prueba ese derecho.
 
@@ -61,6 +68,13 @@ Cambian precios, permisos, identidades de modelo o protocolo upstream; se pide u
 se promueve una ruta Globe; o falta evidencia del transporte y de sus salidas reales.
 
 ## Evidence
+
+**Delta 2026-10-16 — modo borrador en vivo.** Borrador `cgt-20261017085910-h4kbe` (Seedance 2.5, 4 s, primer cuadro
+4:5, audio): 580×726, 39.887 tokens. Final `cgt-20261017090108-fzvku` desde ese borrador: 1288×1610, 196.432 tokens,
+misma toma cuadro a cuadro. El mismo día, un cuadro fotorrealista con una persona (GPT Image) fue rechazado al crear
+la tarea con `InputImageSensitiveContentDetected.PrivacyInformation`, sin tarea creada. Según la PDM de BytePlus,
+la restricción para personas se levanta con la verificación KYC de la cuenta; pendiente de completar y re-probar.
+Corrida: `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/byteplus-draft/`.
 
 OmniHuman 2.0 / Vision AI fue investigado el 2026-10-15 y sigue fuera de la implementación aceptada de
 ModelArk/Seed Speech de este ADR. Dos transportes oficiales (AK/SK y API Key IAM) no amplían nuestras claves

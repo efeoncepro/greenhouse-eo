@@ -16,6 +16,8 @@ export interface BytePlusModel {
   layerTiers?: readonly [number, number]
   maxDuration?: number
   resolutions?: readonly string[]
+  /** Modo borrador del fabricante: borrador a una resolución fija y final desde su task ID, dentro de la vigencia. */
+  draft?: { readonly resolution: string; readonly finalResolutions: readonly string[]; readonly ttlDays: number }
 }
 export const BYTEPLUS_MODELS: readonly BytePlusModel[] = [
   { id: 'seedream5-flash', model: 'dola-seedream-5-0-flash-260915', kind: 'image', layers: true, imageRate: 0.018, layerTiers: [0.018, 0.018] },
@@ -23,7 +25,9 @@ export const BYTEPLUS_MODELS: readonly BytePlusModel[] = [
   { id: 'seedream5-lite', model: 'seedream-5-0-lite-260128', kind: 'image', imageRate: 0.0315 },
   { id: 'seedream45', model: 'seedream-4-5-251128', kind: 'image', imageRate: 0.036 },
   { id: 'seedream4', model: 'seedream-4-0-250828', kind: 'image', imageRate: 0.027 },
-  { id: 'seedance25', model: 'dreamina-seedance-2-5-260628', kind: 'video', videoRate: 10.7, videoInputRate: 6.4, maxDuration: 30, resolutions: ['480p', '720p', '1080p'] },
+  // Borrador: tutorial oficial «Dreamina Seedance 2.5 Draft mode» (2026-10-16): 480p fijo, final sólo 1080p, 7 días.
+  { id: 'seedance25', model: 'dreamina-seedance-2-5-260628', kind: 'video', videoRate: 10.7, videoInputRate: 6.4, maxDuration: 30, resolutions: ['480p', '720p', '1080p'],
+    draft: { resolution: '480p', finalResolutions: ['1080p'], ttlDays: 7 } },
   { id: 'seedance2', model: 'dreamina-seedance-2-0-260128', kind: 'video', videoRate: 7, videoInputRate: 4.3, maxDuration: 15, resolutions: ['480p', '720p', '1080p', '4k'] },
   { id: 'seedance2-fast', model: 'dreamina-seedance-2-0-fast-260128', kind: 'video', videoRate: 2.8, videoInputRate: 1.65, maxDuration: 15, resolutions: ['480p', '720p'] },
   { id: 'seedance2-mini', model: 'dreamina-seedance-2-0-mini-260615', kind: 'video', videoRate: 1.4, videoInputRate: 0.84, maxDuration: 15, resolutions: ['480p', '720p'] },
@@ -72,6 +76,40 @@ export const bytePlusVideoDimensions = (resolution: string, ratio: string): read
   if (!nominal) throw new Error('Ratio no soportado; usa 16:9|4:3|1:1|3:4|9:16|21:9.')
 
   return resolution === '4k' ? [nominal[0]*2,nominal[1]*2] : nominal
+}
+
+/**
+ * Al finalizar un borrador el fabricante reutiliza prompt, referencias, duración, ratio, seed, audio y tipo de tarea:
+ * reenviarlos es error aunque coincidan. Sólo estos campos pueden acompañar al `draft_task`.
+ */
+export const BYTEPLUS_DRAFT_FINAL_ALLOWED_FIELDS = ['return_last_frame', 'output_format', 'watermark', 'service_tier',
+  'execution_expires_after', 'priority', 'callback_url', 'safety_identifier'] as const
+
+export const BYTEPLUS_TASK_ID_PATTERN = /^[a-zA-Z0-9_-]+$/
+
+/** Arma el cuerpo del video final desde un borrador; falla antes de cualquier llamada si el pedido viola el contrato. */
+export const buildBytePlusDraftFinalRequest = (model: BytePlusModel, draftTaskId: string, options: {
+  resolution?: string; extra?: Record<string, unknown>
+} = {}): Record<string, unknown> => {
+  if (!model.draft) throw new Error(`${model.id} no admite modo borrador.`)
+  if (!BYTEPLUS_TASK_ID_PATTERN.test(draftTaskId)) throw new Error('Task ID de borrador inválido.')
+  const resolution = options.resolution ?? model.draft.finalResolutions[0]
+
+  if (!model.draft.finalResolutions.includes(resolution)) throw new Error(`El final desde borrador sólo admite ${model.draft.finalResolutions.join('|')}.`)
+  const extra = options.extra ?? {}
+  const forbidden = Object.keys(extra).filter(key => !(BYTEPLUS_DRAFT_FINAL_ALLOWED_FIELDS as readonly string[]).includes(key))
+
+  if (forbidden.length) throw new Error(`Campos no permitidos al finalizar un borrador (el fabricante los reutiliza): ${forbidden.join(', ')}.`)
+
+  return { ...extra, model: model.model, content: [{ type: 'draft_task', draft_task: { id: draftTaskId } }], resolution }
+}
+
+/** Vigencia del borrador desde su `created_at` (segundos Unix). Sin dato, no se afirma vigencia: lo decide el fabricante. */
+export const bytePlusDraftExpiry = (model: BytePlusModel, createdAtSeconds: number | undefined, nowMs = Date.now()) => {
+  if (!model.draft || !Number.isFinite(createdAtSeconds)) return { known: false as const }
+  const expiresAtMs = (createdAtSeconds as number) * 1000 + model.draft.ttlDays * 86_400_000
+
+  return { known: true as const, expiresAt: new Date(expiresAtMs).toISOString(), expired: nowMs >= expiresAtMs }
 }
 
 export const estimateBytePlusVideo = (model: BytePlusModel, options: {

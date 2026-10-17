@@ -77,6 +77,62 @@ Las tarifas estimadas salen del catálogo de la cuenta. Con video de entrada hay
 no se inventa una cota. `--max-usd` sólo opera sobre una estimación conocida y no es un límite impuesto a BytePlus.
 `usage.completion_tokens` de la respuesta es la evidencia de consumo; estimación y factura son hechos distintos.
 
+### Modo borrador de Seedance 2.5 (desde 2026-10-16)
+
+Sirve para explorar barato y llevar a 1080p **la misma toma** que se aprobó, no otra parecida.
+
+```bash
+# 1. Borrador a 480p (siempre 480p; el comando rechaza otra resolución antes de llamar)
+pnpm ai:byteplus --model seedance25 --draft --image cuadro.png --prompt-file toma.txt --duration 4 --out borrador.mp4 --yes
+# 2. Final 1080p desde ese borrador: sin prompt, imágenes, duración, ratio ni audio
+pnpm ai:byteplus --model seedance25 --from-draft <task-id-del-borrador> --out final-1080p.mp4 --yes
+```
+
+- **Contrato del fabricante** ([tutorial Seedance 2.5, Draft mode](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedance-2-5#2.5_draft_mode)):
+  el borrador lleva `draft: true` y sólo 480p; el final lleva `content: [{type: "draft_task", draft_task: {id}}]`,
+  el mismo modelo y `resolution: "1080p"` (única admitida). BytePlus reutiliza prompt, referencias, duración, ratio,
+  seed, audio y tipo de tarea del borrador: **reenviarlos es error aunque coincidan**, y el comando lo bloquea antes
+  de llamar. Sólo admite además `watermark`, `return_last_frame`, `output_format`, `service_tier`,
+  `execution_expires_after`, `priority`, `callback_url` y `safety_identifier` (vía `--input-file`).
+- **Vigencia: 7 días desde `created_at` del borrador.** El recibo del borrador guarda `createdAt` y `draftExpiresAt`;
+  `--from-draft` lee el borrador (GET, sin costo) y rechaza uno vencido o que no terminó, sin crear nada.
+- **Cobro:** dos tareas independientes. El borrador se cobra como 480p y el final a la tarifa de 1080p (11,7 USD por
+  millón de tokens sin video de entrada). Con primer cuadro el ratio es `adaptive` y no hay cota previa.
+- **Medido el 2026-10-16** (plano de la lata, 4 s, primer cuadro 4:5, con audio): borrador 580×726, 39.887 tokens
+  (≈ USD 0,43); final 1288×1610, 196.432 tokens (≈ USD 2,30). El final es la misma toma, cuadro a cuadro.
+- `--draft` y `--from-draft` sólo existen para modelos con `draft` en el catálogo (hoy `seedance25`).
+
+### Rostros humanos reales: rechazo por privacidad
+
+Seedance 2.5 y 2.0 **no aceptan imágenes ni videos de entrada con rostros humanos reales**: responden
+`InputImageSensitiveContentDetected.PrivacyInformation` (medido el 2026-10-16 con un cuadro fotorrealista de GPT Image).
+El comando traduce ese error con las vías oficiales ([guía de retratos](https://docs.byteplus.com/en/docs/ModelArk/2608626)):
+
+1. **Salidas propias de confianza:** una salida original de Seedream 5 (lite/pro/flash) o de Seedance 2.x de esta misma
+   cuenta, de menos de 30 días, sin editar ni recomprimir. Por eso el comando envía PNG/JPEG/WebP locales con sus bytes
+   originales.
+2. **Biblioteca de personajes digitales** del fabricante (`asset://<id>`).
+3. **Retratos autorizados** de personas reales, según el proceso de la cuenta (verificación KYC; ver ADR).
+
+Un cuadro de GPT Image con una persona no entra por ninguna de las tres vías sin ese proceso.
+
+**Personajes ficticios propios (Paula, Antonio y el elenco): biblioteca privada de retratos virtuales**
+([guía](https://docs.byteplus.com/en/docs/ModelArk/2333565)). Es la vía para personajes que poseemos y que no se parecen
+a ninguna persona real. Requisitos, en orden:
+
+1. **Verificación de la cuenta (KYC de organización):** Consola → información básica de la cuenta (el nombre de la
+   organización debe ser idéntico al del certificado) → *Real name verification* → *Start verification*: número de
+   registro y fotos del certificado de la empresa. Revisión de 1 a 2 días hábiles. La hace el operador: el agente no
+   ingresa documentos de identidad ni datos tributarios.
+2. **Advanced Creation Rights** activado (guía de compra de Seedance en BytePlus).
+3. **Subir los personajes:** Model Playground → My assets → Virtual Portrait → Manage assets → crear un grupo por
+   personaje (la primera vez se firma una carta de autorización) y subir, por personaje, un cuerpo entero frontal
+   vertical y un primer plano frontal sin expresión (300–6000 px, menos de 30 MB). BytePlus revisa cada asset.
+4. **Usarlos** cuando estén `Active`: `--image asset://<id>` (o `--references`) en `pnpm ai:byteplus`.
+
+Una persona real (por ejemplo, Julio) va por la biblioteca de retratos reales, con verificación en vivo y
+consentimiento, no por la virtual. La gestión de assets por API exige AK/SK y no está implementada en este comando.
+
 ## Comparación de costos de Seedance 2.5
 
 Para 30 s, 16:9, sin video de entrada: **720p US$6,93** y **1080p US$17,06** por BytePlus con la tarifa

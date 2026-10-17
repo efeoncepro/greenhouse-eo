@@ -2,6 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import { BYTEPLUS_TASK_ID_PATTERN } from '@/lib/ai/byteplus-catalog'
 import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 export const BYTEPLUS_ARK_BASE = 'https://ark.ap-southeast.bytepluses.com/api/v3'
@@ -79,12 +80,18 @@ export interface BytePlusVideoTask {
   content?: { video_url?: string; last_frame_url?: string }
   usage?: Record<string, number>
   error?: { code?: string }
+  /** Segundos Unix. Ancla la vigencia de un borrador. */
+  created_at?: number
+  draft?: boolean
+  duration?: number
+  ratio?: string
+  resolution?: string
 }
 export const createBytePlusVideo = (input: Record<string, unknown>) =>
   bytePlusRequest<{ id: string }>('ark', '/contents/generations/tasks', { method: 'POST', body: input })
 
 export const getBytePlusVideo = (id: string) => {
-  if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error('Task ID inválido.')
+  if (!BYTEPLUS_TASK_ID_PATTERN.test(id)) throw new Error('Task ID inválido.')
 
   return bytePlusRequest<BytePlusVideoTask>('ark', `/contents/generations/tasks/${id}`)
 }
