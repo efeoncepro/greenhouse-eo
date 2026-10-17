@@ -25,7 +25,7 @@ describe('commercial transaction isolation',()=>{
   const query=vi.fn().mockResolvedValue({rows:[]}).mockResolvedValueOnce({rows:[]}).mockRejectedValueOnce(new Error('private-db-error'))
   const warning=vi.spyOn(console,'warn').mockImplementation(()=>{})
 
-  await expect(enqueueMeasurementConversion({query} as unknown as PoolClient,'form_submission','source',prepared)).resolves.toBeUndefined()
+  await expect(enqueueMeasurementConversion({query} as unknown as PoolClient,'form_submission','source',prepared)).resolves.toBe(false)
   expect(query.mock.calls.map(c=>c[0])).toContain('ROLLBACK TO SAVEPOINT measurement_enqueue')
   expect(query.mock.calls.at(-1)?.[0]).toBe('RELEASE SAVEPOINT measurement_enqueue')
   expect(JSON.stringify(warning.mock.calls)).not.toContain('private-db-error')
@@ -43,6 +43,14 @@ describe('commercial transaction isolation',()=>{
 
   await enqueueMeasurementConversion({query} as unknown as PoolClient,'form_submission','source',prepared)
   expect(query).toHaveBeenCalledTimes(4)
+ })
+
+ it('reports durable capture for Google-only receipts without queuing a backend sender',async()=>{
+  const query=vi.fn().mockResolvedValue({rows:[]}).mockResolvedValueOnce({rows:[]})
+   .mockResolvedValueOnce({rows:[{policy_id:'fixture'}]}).mockResolvedValueOnce({rows:[{event_id:prepared.eventId}]})
+
+  await expect(enqueueMeasurementConversion({query} as unknown as PoolClient,'form_submission','source',{...prepared,destinations:[]})).resolves.toBe(true)
+  expect(query.mock.calls.some(c=>String(c[0]).includes('INSERT INTO greenhouse_growth.measurement_delivery'))).toBe(false)
  })
  it.each([0n,1n])('counts only an actually finalized lease (%s affected)',async count=>{
   execute.mockResolvedValue({numAffectedRows:count})

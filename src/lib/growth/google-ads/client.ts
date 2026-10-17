@@ -3,6 +3,8 @@ import 'server-only'
 import { GoogleAdsError, GOOGLE_ADS_PROFILE, type ReadCommand, type ReadOptions } from './contracts'
 import { buildReadQuery, integerOption, projectRow } from './queries'
 import { buildWritePlan, getWriteRequestBody } from './writes'
+import { GOOGLE_ADS_MEASUREMENT_ACTION_KEYS, parseMeasurementActionBinding } from './measurement-actions'
+import type { GoogleAdsMeasurementBinding, GoogleAdsMeasurementActionKey } from './measurement-actions'
 
 const MAX_BYTES = 20 * 1024 * 1024
 const safeId = (v: unknown) => typeof v === 'string' && /^[A-Za-z0-9_-]{1,160}$/.test(v) ? v : undefined
@@ -96,6 +98,109 @@ export class GoogleAdsClient {
     })()
 
     return this.#identity
+  }
+
+  /** Closed provider readback. Snippet HTML stays inside the boundary and is never evaluated. */
+  async readMeasurementActionBindings(options: Pick<ReadOptions, 'pages'> = {}, now = new Date()) {
+    if (Object.keys(options).some(key => key !== 'pages')) throw new GoogleAdsError('BINDINGS_OPTION_NOT_ALLOWED')
+    const maxPages = integerOption(options.pages, 1, 1, 10)
+    const identity = await this.verifyIdentity()
+    const customer = identity.customer as Record<string, unknown>
+    const settings = customer.conversionTrackingSetting as Record<string, unknown> | undefined
+    const trackingId = settings?.conversionTrackingId
+
+    if (typeof trackingId !== 'string' || !/^[1-9]\d{0,18}$/.test(trackingId) ||
+        settings?.googleAdsConversionCustomer !== `customers/${GOOGLE_ADS_PROFILE.customerId}`)
+      throw new GoogleAdsError('CONVERSION_TRACKING_BINDING_UNAVAILABLE', 8)
+
+    const names: Record<GoogleAdsMeasurementActionKey, string> = {
+      commercial_lead: 'Efeonce - Solicitud comercial aceptada', meeting_booking: 'Efeonce - Agenda confirmada',
+    }
+
+    const fields = ['resource_name', 'name', 'owner_customer', 'status', 'type', 'category', 'counting_type', 'primary_for_goal', 'tag_snippets']
+    const query = `SELECT ${fields.map(field => `conversion_action.${field}`).join(', ')} FROM conversion_action WHERE conversion_action.name IN ('${names.commercial_lead}', '${names.meeting_booking}')`
+    const requestIds: string[] = []
+    const candidates = new Map<GoogleAdsMeasurementActionKey, GoogleAdsMeasurementBinding>()
+    const counts = new Map<GoogleAdsMeasurementActionKey, number>()
+    const blockers = new Set<string>()
+    const seenTokens = new Set<string>()
+    let pageToken: string | undefined
+    let pages = 0
+    let failure: { code: string; details: GoogleAdsError['details'] } | undefined
+
+    while (pages < maxPages) {
+      if (pageToken) seenTokens.add(pageToken)
+
+      try {
+        const { data, requestId } = await this.request('googleAds:search', { query, ...(pageToken ? { pageToken } : {}) })
+
+        if (data.results !== undefined && !Array.isArray(data.results)) throw new GoogleAdsError('INVALID_RESULTS_PAGE', 5)
+        const rows = (data.results ?? []) as unknown[]
+        const next = data.nextPageToken
+
+        if (rows.length > 10000) throw new GoogleAdsError('PROVIDER_PAGE_EXCEEDS_CONTRACT', 5)
+        if (next !== undefined && (typeof next !== 'string' || !next || next.length > 16384 || /[\u0000-\u0020]/.test(next) || seenTokens.has(next)))
+          throw new GoogleAdsError('INVALID_OR_REPEATED_PROVIDER_CURSOR', 5)
+
+        for (const row of rows) {
+          const action = row && typeof row === 'object' && !Array.isArray(row) ? (row as Record<string, unknown>).conversionAction : undefined
+
+          if (!action || typeof action !== 'object' || Array.isArray(action)) { blockers.add('invalid_native_action_readback'); continue }
+          const source = action as Record<string, unknown>
+          const actionKey = GOOGLE_ADS_MEASUREMENT_ACTION_KEYS.find(key => source.name === names[key])
+
+          if (!actionKey) { blockers.add('unexpected_conversion_action_name'); continue }
+          counts.set(actionKey, (counts.get(actionKey) ?? 0) + 1)
+
+          try {
+            const binding = parseMeasurementActionBinding({
+              actionKey, resourceName: source.resourceName, ownerCustomer: source.ownerCustomer,
+              status: source.status, type: source.type, category: source.category,
+              countingType: source.countingType, primaryForGoal: source.primaryForGoal, tagSnippets: source.tagSnippets,
+            })
+
+            if (binding.conversionId !== `AW-${trackingId}` || this.redact(binding.conversionLabel) !== binding.conversionLabel)
+              throw new Error('tracking binding invalid')
+            candidates.set(actionKey, binding)
+          } catch { blockers.add(`invalid_native_action_binding:${actionKey}`) }
+        }
+
+        pages++
+        if (requestId) requestIds.push(requestId)
+        pageToken = next as string | undefined
+        if (!pageToken) break
+      } catch (error) {
+        if (!pages) throw error
+        const safe = error instanceof GoogleAdsError ? error : new GoogleAdsError('PROVIDER_READ_FAILED', 5)
+
+        failure = { code: safe.code, details: safe.details }
+        break
+      }
+    }
+
+    const partial = Boolean(pageToken || failure)
+
+    if (partial) blockers.add('binding_inventory_incomplete')
+
+    for (const actionKey of GOOGLE_ADS_MEASUREMENT_ACTION_KEYS) {
+      const count = counts.get(actionKey) ?? 0
+
+      if (!count) blockers.add(`native_action_missing:${actionKey}`)
+      if (count > 1) { blockers.add(`native_action_duplicate:${actionKey}`); candidates.delete(actionKey) }
+      if (blockers.has(`invalid_native_action_binding:${actionKey}`)) candidates.delete(actionKey)
+    }
+
+    const bindings = GOOGLE_ADS_MEASUREMENT_ACTION_KEYS.flatMap(key => candidates.has(key) ? [candidates.get(key)!] : [])
+
+    if (new Set(bindings.map(binding => binding.resourceName)).size !== bindings.length ||
+        new Set(bindings.map(binding => `${binding.conversionId}/${binding.conversionLabel}`)).size !== bindings.length)
+      blockers.add('native_action_bindings_not_distinct')
+
+    return {
+      customerId: GOOGLE_ADS_PROFILE.customerId, bindings, ready: !blockers.size, blockers: [...blockers],
+      fetchedAt: now.toISOString(), requestIds,
+      coverage: { pages, complete: !partial, partial, error: failure },
+    }
   }
 
   async executeWrite(input: unknown, options: { validateOnly: boolean; confirmDigest?: string }) {

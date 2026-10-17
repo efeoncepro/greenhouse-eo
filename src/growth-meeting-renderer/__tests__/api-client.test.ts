@@ -14,6 +14,25 @@ const payload = {
 }
 
 describe('meeting API client', () => {
+  it('preserves Ads receipt only for a fresh eligible confirmation and ignores malformed instrumentation', async () => {
+    const now=Date.now()
+    const receipt={version:1,transactionId:'11111111-1111-4111-8111-111111111111',conversionKey:'meeting_booking',issuedAt:new Date(now).toISOString(),expiresAt:new Date(now+600000).toISOString(),userData:{sha256_email_address:'a'.repeat(64)}}
+    const book=async(patch:Record<string,unknown>={},status=200)=>createMeetingApiClient('https://greenhouse.example',vi.fn(async()=>new Response(JSON.stringify({...meetingConfirmedFixture(),googleAdsConversion:receipt,...patch}),{status,headers:{'content-type':'application/json'}})) as unknown as typeof fetch).book(payload,'intent-123')
+    const fresh=await book()
+
+    expect(fresh.outcome==='confirmed'&&fresh.googleAdsConversion).toEqual(receipt)
+
+    for(const patch of [{conversionEligible:false},{conversionReceipt:null},{googleAdsConversion:{...receipt,userData:{email:'raw@example.test'}}}]) {
+      const result=await book(patch)
+
+      expect(result.outcome).toBe('confirmed')
+      expect(result.outcome==='confirmed'&&result.googleAdsConversion).toBeUndefined()
+    }
+
+    const failed=await book({},400)
+
+    expect(failed.outcome==='confirmed'&&failed.googleAdsConversion).toBeUndefined()
+  })
   it('verifica el correo contra la surface gobernada sin exponerlo en la URL', async () => {
     const fetcher = vi.fn(async () => new Response(JSON.stringify({
       outcome: 'ok',

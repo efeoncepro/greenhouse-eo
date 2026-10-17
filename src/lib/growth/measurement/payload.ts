@@ -6,6 +6,7 @@ import { isIP } from 'node:net'
 import { measurementPolicyConfigSchema, type MeasurementPolicyRevision } from './policy-contract'
 
 import { publicMeasurementContextSchema, type MatchingContact, type MeasurementScope } from './contracts'
+import { googleAdsConversionReceiptSchema } from './google-ads-receipt'
 
 const HOSTS = new Set(['efeoncepro.com', 'think.efeoncepro.com'])
 const sha256 = (value: string) => createHash('sha256').update(value, 'utf8').digest('hex')
@@ -78,6 +79,7 @@ export const buildMeasurementPayloads = (input: {
   ip?: string | null
   userAgent?: string | null
   requestGlobalPrivacyControl?: boolean
+  googleAdsEnabled?: boolean
   now?: Date
   eventId?: string
 }) => {
@@ -142,5 +144,30 @@ export const buildMeasurementPayloads = (input: {
     // Intentionally no events: the browser owns the GA4 generate_lead mirror.
   } : null
 
-  return { eventId, occurredAt, consent, meta, google }
+  const googleAdsConfig = config.data.googleAds
+  const googleConsent = consent.googleConsent
+
+  const adsAuthorized = input.googleAdsEnabled === true && googleAdsConfig && consent.analytics && googleConsent &&
+    Object.values(googleConsent).every(value => value === 'granted') &&
+    Date.parse(googleAdsConfig.activationAt) <= now.getTime() &&
+    googleAdsConfig.conversionKey === (scope.sourceKind === 'meeting_booking' ? 'meeting_booking' : 'commercial_lead')
+
+  const googleAdsConversion = adsAuthorized ? googleAdsConversionReceiptSchema.parse({
+    version: 1, transactionId: eventId, conversionKey: googleAdsConfig.conversionKey,
+    issuedAt: occurredAt, expiresAt: new Date(now.getTime() + 10 * 60_000).toISOString(),
+    ...(googleAdsConfig.enhancedConversions ? { userData: {
+      ...(matches.google.sha256_email_address ? { sha256_email_address: matches.google.sha256_email_address[0] } : {}),
+      ...(matches.google.sha256_phone_number ? { sha256_phone_number: matches.google.sha256_phone_number[0] } : {}),
+    } } : {}),
+  }) : undefined
+
+  const click = consent.googleClick
+
+  const googleAds = googleAdsConversion ? {
+    ...googleAdsConversion, consent: googleConsent,
+    ...(click && now.getTime() - Date.parse(click.capturedAt) <= 30 * 24 * 60 * 60_000 && Date.parse(click.capturedAt) <= now.getTime()
+      ? { click } : {}),
+  } : null
+
+  return { eventId, occurredAt, consent, meta, google, googleAds, googleAdsConversion }
 }

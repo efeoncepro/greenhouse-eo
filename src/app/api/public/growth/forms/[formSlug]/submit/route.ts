@@ -155,8 +155,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
     }
 
     return NextResponse.json(
-      { outcome: result.outcome, submissionId: result.submissionId, message: result.reason },
-      { status: STATUS_BY_OUTCOME[result.outcome], headers },
+      { outcome: result.outcome, submissionId: result.submissionId, message: result.reason,
+        ...(result.googleAdsConversion ? { googleAdsConversion: result.googleAdsConversion } : {}) },
+      { status: STATUS_BY_OUTCOME[result.outcome], headers: { ...headers, 'Cache-Control': 'private, no-store' } },
     )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_forms_public_submit_route' } })

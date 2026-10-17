@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
 import { GoogleAdsClient } from '../../src/lib/growth/google-ads/client'
-import { GOOGLE_ADS_PROFILE, GOOGLE_ADS_CLI_VERSION, GoogleAdsError, READ_COMMANDS, type ReadCommand, type ReadOptions } from '../../src/lib/growth/google-ads/contracts'
+import { GOOGLE_ADS_PROFILE, GOOGLE_ADS_CLI_VERSION, GoogleAdsError, READ_COMMANDS, MEASUREMENT_BINDINGS_COMMAND, MEASUREMENT_BINDINGS_DESCRIPTION, type ReadCommand, type ReadOptions } from '../../src/lib/growth/google-ads/contracts'
 import { buildReadQuery, integerOption } from '../../src/lib/growth/google-ads/queries'
 import { buildWritePlan, verifyWritePlan, GoogleAdsWriteValidationError } from '../../src/lib/growth/google-ads/writes'
 
@@ -15,6 +15,7 @@ const readFlags = ['pages', 'cursor', 'customer-id', 'json']
 
 const commandFlags: Record<string, readonly string[]> = {
   discover: [], help: [], 'auth verify': [], 'connection verify': [], 'auth import': ['input'],
+  [MEASUREMENT_BINDINGS_COMMAND]: ['pages', 'customer-id', 'json'],
   ...Object.fromEntries(Object.keys(READ_COMMANDS).map(command => [command, command === 'report get' ? [...readFlags, 'since', 'until', 'days', 'level', 'daily'] : readFlags])),
   'write plan': ['input'], 'write validate': ['input'], 'write apply': ['input', 'confirm'], 'write verify': ['receipt']
 }
@@ -22,7 +23,7 @@ const commandFlags: Record<string, readonly string[]> = {
 export function discoverGoogleAds() {
   return {
     contractVersion: GOOGLE_ADS_CLI_VERSION, readOnly: false, profile: GOOGLE_ADS_PROFILE,
-    commands: Object.entries(commandFlags).map(([command, flags]) => ({ command, flags, description: READ_COMMANDS[command as ReadCommand] })),
+    commands: Object.entries(commandFlags).map(([command, flags]) => ({ command, flags, description: command === MEASUREMENT_BINDINGS_COMMAND ? MEASUREMENT_BINDINGS_DESCRIPTION : READ_COMMANDS[command as ReadCommand] })),
     writes: { operations: ['campaign.create', 'campaign.update', 'campaignBudget.create', 'campaignBudget.update', 'adGroup.create', 'adGroup.update', 'conversionAction.create', 'conversionAction.update', 'accountGoal.update', 'campaignGoal.update'], workflow: 'plan → validate (Google validateOnly) → apply --confirm DIGEST → verify --receipt FILE', oneOperationPerPlan: true, newCampaignsAndAdGroups: 'PAUSED', activationAndRemoval: 'unsupported', replayProtection: 'private durable journal by digest; unknown outcomes require reconciliation, no automatic retry' },
     credentials: { source: 'Google Secret Manager', secretRef: `projects/${GOOGLE_ADS_PROFILE.cloudProject}/secrets/${GOOGLE_ADS_PROFILE.secretName}/versions/latest`, cloudIdentity: GOOGLE_ADS_PROFILE.cloudIdentity, adsPrincipal: GOOGLE_ADS_PROFILE.authorizedEmail, tokenArgumentsOrEnvironment: false },
     options: { pages: { default: 1, max: 10 }, reportDays: { default: 'last 7 completed days in account timezone', max: 90 }, format: 'structured JSON', cursor: 'opaque; bind to exact query, account and version; provider expiration applies' },
@@ -102,6 +103,13 @@ export async function runGoogleAdsCli(args: string[], deps: { client?: GoogleAds
     const client = deps.client ?? new GoogleAdsClient({ tokenProvider: deps.tokenProvider ?? await (await import('./auth')).operatorTokenProvider() })
 
     if (command === 'auth verify' || command === 'connection verify') return success({ authorizedEmail: GOOGLE_ADS_PROFILE.authorizedEmail, identity: await client.verifyIdentity() })
+
+    if (command === MEASUREMENT_BINDINGS_COMMAND) {
+      const result = await client.readMeasurementActionBindings({ pages: parsed.options.pages }, deps.now)
+
+      return success(result, result.coverage.partial ? 6 : result.ready ? 0 : 8)
+    }
+
     if (command === 'write validate') return success(await client.executeWrite(input, { validateOnly: true }))
     if (command === 'write apply') return success(await applyOnce(input, parsed.values.confirm as string, client, JOURNAL))
 

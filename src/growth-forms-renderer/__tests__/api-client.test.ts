@@ -87,6 +87,17 @@ describe('growth-forms-renderer · verifyPublicEmail', () => {
 })
 
 describe('growth-forms-renderer · submitPublicForm', () => {
+  it('preserves only valid reserved Ads receipts after successful acceptance', async () => {
+    const now=Date.now()
+    const receipt={version:1,transactionId:'11111111-1111-4111-8111-111111111111',conversionKey:'commercial_lead',issuedAt:new Date(now).toISOString(),expiresAt:new Date(now+600000).toISOString(),userData:{sha256_email_address:'a'.repeat(64)}}
+
+    const submit=async(body:unknown,status=202)=>submitPublicForm(api,{fields:{},consent:true,consentCheckboxes:[]},vi.fn(async()=>jsonResponse(body,status)) as unknown as typeof fetch)
+
+    expect((await submit({outcome:'accepted',googleAdsConversion:receipt})).googleAdsConversion).toEqual(receipt)
+    expect((await submit({outcome:'accepted',googleAdsConversion:{...receipt,userData:{email:'raw@example.test'}}})).googleAdsConversion).toBeUndefined()
+    expect((await submit({outcome:'accepted',googleAdsConversion:receipt},400)).googleAdsConversion).toBeUndefined()
+    expect((await submit({outcome:'invalid',googleAdsConversion:receipt})).googleAdsConversion).toBeUndefined()
+  })
   it('passes captchaToken through the public submit body when provided', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({ outcome: 'accepted', submissionId: 'sub_1' }, 202)) as unknown as typeof fetch
 

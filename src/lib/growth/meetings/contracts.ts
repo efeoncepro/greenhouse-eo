@@ -1,3 +1,5 @@
+import type { GoogleAdsConversionReceipt } from '@/lib/growth/measurement/google-ads-receipt'
+
 export const MEETING_SCHEDULER_SCHEMA_VERSION = 'growth-meeting-scheduler.v1' as const
 
 export const MEETING_GTM_EVENTS = {
@@ -160,6 +162,7 @@ export interface MeetingBookingRequest {
 
 export interface MeetingBookingConfirmed {
   outcome: 'confirmed'
+  googleAdsConversion?: GoogleAdsConversionReceipt
   appointment: {
     startsAt: string
     endsAt: string

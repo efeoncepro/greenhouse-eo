@@ -14,6 +14,11 @@ export const measurementPolicyConfigSchema = z.object({
   origins: z.array(z.enum(MEASUREMENT_ORIGINS)).min(1).max(2).refine(v => new Set(v).size === v.length),
   destinations: z.array(measurementDestinationSchema).max(2).refine(v => new Set(v).size === v.length),
   mapping: measurementMappingSchema,
+  googleAds: z.object({
+    conversionKey: z.enum(['commercial_lead', 'meeting_booking']),
+    enhancedConversions: z.boolean(),
+    activationAt: z.string().datetime(),
+  }).strict().optional(),
 }).strict().refine(v => Boolean(v.mapping.email || v.mapping.phone), { message: 'identity_mapping_required', path: ['mapping'] })
 export const measurementPolicyScopeSchema = z.object({
   sourceKind: measurementSourceKindSchema,
@@ -36,6 +41,7 @@ export interface MeasurementPolicySource {
   scope: MeasurementPolicyScope; name: string; formSlug?: string; sourceVersion: string; origins: string[]
   fields: { key: string; type: 'email'|'tel'|'text'; derived?: boolean }[]
   blockingReasons: string[]
+  googleAdsEligible?: boolean
 }
 
 export const validateMeasurementMapping = (config: MeasurementPolicyConfig, source: MeasurementPolicySource): string[] => {
@@ -43,6 +49,11 @@ export const validateMeasurementMapping = (config: MeasurementPolicyConfig, sour
 
   if (config.sourceVersion !== source.sourceVersion) reasons.push('source_version_changed')
   if (!config.origins.every(v => source.origins.includes(v))) reasons.push('origin_out_of_scope')
+
+  if (config.googleAds) {
+    if (!source.googleAdsEligible) reasons.push('google_ads_source_not_commercial')
+    if (config.googleAds.conversionKey !== (source.scope.sourceKind === 'meeting_booking' ? 'meeting_booking' : 'commercial_lead')) reasons.push('google_ads_conversion_source_mismatch')
+  }
 
   for (const [target, key] of Object.entries(config.mapping)) {
     const field = source.fields.find(v => v.key === key)
@@ -74,6 +85,10 @@ export const MEASUREMENT_POLICY_AGENT_CONTRACT = {
   draftRequired: ['scope', 'config'],
   transitionRequired: ['policyId', 'revisionId'],
   destinations: ['meta', 'google_upd'],
+  googleAdsOnline: { configField: 'googleAds', optional: true, conversionKeys: ['commercial_lead', 'meeting_booking'],
+    required: ['conversionKey', 'enhancedConversions', 'activationAt'], globalFlag: 'GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED',
+    receiptField: 'googleAdsConversion', enhancedDataChannel: 'reserved Google Tag user_data only; never ordinary dataLayer/GA4',
+    delivery: 'browser Google Tag to sGTM; not a backend outbox destination' },
   defaults: { destinations: [] },
   retry: 'Reuse the exact command and idempotencyKey after an unknown outcome; after a receipt retry readback only.',
   concurrency: 'expectedPublishedRevisionId must equal the current published head, including null.',

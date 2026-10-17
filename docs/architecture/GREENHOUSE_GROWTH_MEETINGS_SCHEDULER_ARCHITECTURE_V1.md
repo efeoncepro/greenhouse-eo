@@ -283,3 +283,14 @@ They describe exposure context, not identity. A recipe change is diagnostic stat
 ### Verification matrix
 
 Each recipe is captured at its lower bound, midpoint and one pixel around a threshold, plus 200% zoom where practical. GVC must verify keyboard flow, focus return, reduced motion, zero horizontal overflow, stable selection across resize and exactly-once telemetry. The current `appearance` observation without recipe consumption and full `replaceChildren` rendering are implementation gaps, not the target architecture.
+
+
+## Delta 2026-10-17 — recibo Google Ads online preparado
+
+El [contrato Ads](GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md#92-captación-mediante-gtm)
+agrega opt-in publicado y gate global default OFF. Sólo commit comercial y enqueue real habilitan
+`googleAdsConversion`; replays/dedupe no repiten. Hashes EC opcionales viajan en respuesta dedicada
+private/no-store a memoria efímera y al user_data reservado Google, nunca telemetría ordinaria o
+estado confirmado UI. Destinos Meta/UPD y entrega CRM permanecen independientes. Sin migración ni
+nuevo worker. [Activación y límites](../manual-de-uso/growth/activar-conversiones-google-ads.md);
+no está publicado ni desplegado este delta.

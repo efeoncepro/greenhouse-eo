@@ -519,7 +519,7 @@ export interface PersistSubmissionInput {
  * `growth.forms.submission_accepted` en UNA transacción. La entrega al destino es
  * async (la drena el dispatcher), NUNCA inline (overlay #3 + CLAUDE.md outbox).
  */
-export const persistAcceptedSubmission = async (input: PersistSubmissionInput): Promise<FormSubmissionRow> =>
+export const persistAcceptedSubmission = async (input: PersistSubmissionInput): Promise<FormSubmissionRow & { measurementPersisted: boolean }> =>
   withTransaction(async client => {
     const submissionRows = await client.query(
       `INSERT INTO greenhouse_growth.form_submission (
@@ -547,7 +547,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
 
     const submission = (submissionRows.rows as FormSubmissionRow[])[0]
 
-    await enqueueMeasurementConversion(client, 'form_submission', submission.submission_id, input.measurement)
+    const measurementPersisted = await enqueueMeasurementConversion(client, 'form_submission', submission.submission_id, input.measurement)
 
     await client.query(
       `INSERT INTO greenhouse_growth.form_submission_consent_snapshot (
@@ -581,7 +581,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
       client,
     )
 
-    return submission
+    return { ...submission, measurementPersisted }
   })
 
 /** Submission rechazada: metadata operacional mínima, sin PII innecesaria. */

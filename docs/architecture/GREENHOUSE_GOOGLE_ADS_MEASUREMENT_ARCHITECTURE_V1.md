@@ -577,6 +577,31 @@ antes de fijar su ruta. No ampliar scope o mantener API legacy como fallback sil
 
 ### 9.2 Captación mediante GTM
 
+Implementación local 17/10: `config.googleAds` publica intención `commercial_lead|meeting_booking`,
+`activationAt` y EC independiente; gate `GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` default OFF.
+La captura existente cifra la proyección sin nuevo destino/cron/outbox. Sólo un enqueue confirmado
+en el commit comercial habilita el recibo público dedicado. Forms contact/diagnostic_intake/
+quote_request de riesgo low/medium requieren opt-in; lead_magnet/application/newsletter quedan fuera.
+La fuente y versión se revalidan al preparar; no hay backfill automático.
+
+`googleAdsConversion` lleva UUID durable como transactionId, key, fechas y hashes EC web opcionales.
+TTL recibo 10 minutos; memoria browser de hashes máximo 10 segundos o expiración previa. El getter
+no enumerable entrega sólo email/teléfono SHA256 al `user_data` reservado del tag; callback,
+timeout, pagehide y retiro vacían esa memoria. El evento dataLayer sólo contiene key/UUID y controles
+de callback. No persistir el receipt en estado UI, almacenamiento browser o telemetría ordinaria.
+
+El contexto común añade cuatro consentimientos Google explícitos y click IDs observados. El bridge
+conserva esos IDs tras grant durante un máximo de 30 días en cookie propia, sin tocar `_gcl_*` ni
+rejuvenecer su fecha al leer. Revocación/GPC limpia. El backend guarda contexto sólo cifrado con la
+retención existente de 48 h; no se proyecta a `hs_google_click_id` ni constituye binding CRM histórico.
+Los IDs no se fabrican, convierten entre sí ni se inyectan en parámetros internos Google.
+
+El tag web transporta `gh_ads_conversion` a GA4 Client, con cuatro additional consents y gate CMP.
+El Server selecciona acción por key, UUID, Client GA4, host canónico, gate explícito y consentimiento
+nativo G111; Ads nativo consume transaction_id/user_data. La excepción en tag GA4 18 evita un segundo
+evento analítico. Linker Server sólo page_view GA4 de hosts permitidos con consentimiento nativo.
+Meta y el espejo generate_lead quedan separados. [Operación y límites](../manual-de-uso/growth/activar-conversiones-google-ads.md).
+
 Baseline objetivo: señal de aceptación **comercial elegible**, sin PII, con ID estable; transporte web a
 sGTM; Ads Conversion Tracking y Conversion Linker servidor conforme a la
 [guía oficial](https://developers.google.com/tag-platform/tag-manager/server-side/ads-setup).

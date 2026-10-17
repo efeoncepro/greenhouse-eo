@@ -8,6 +8,7 @@
  * NUNCA recibe ni envía destination mapping, GUIDs, property names ni secrets.
  */
 import { readPublicMeasurementContext } from '../growth-measurement-context/context'
+import { parseGoogleAdsConversionReceipt } from '../growth-google-ads-conversion/conversion'
 import type { PublicSubmitOutcome, PublicSubmitResult, RenderContract } from './contract'
 
 export interface RendererApiConfig {
@@ -216,9 +217,13 @@ export const submitPublicForm = async (
 
   const outcome = (parsed.outcome as PublicSubmitOutcome | undefined) ?? (response.ok ? 'accepted' : 'invalid')
 
+  const googleAdsConversion = response.ok && outcome === 'accepted'
+    ? parseGoogleAdsConversionReceipt(parsed.googleAdsConversion, 'commercial_lead') : undefined
+
   return {
     outcome,
     submissionId: parsed.submissionId,
     reason: parsed.reason ?? (typeof parsed.message === 'string' ? parsed.message : undefined),
+    ...(googleAdsConversion ? { googleAdsConversion } : {}),
   }
 }

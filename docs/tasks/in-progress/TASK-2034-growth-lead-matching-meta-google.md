@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: corrección CAPI y configuración/agentes publicadas PR255/main9690efad, Server9; flags/hosts y Test Events verificados. Pendiente primera conversión comercial consentida y mejora EMQ con tráfico real.`
+- Status real: `Parcial: Meta/UPD publicados previamente; delta Ads online local17/10, dos acciones secundarias creadas/verificadas y GTM drafts Web8/Server12 compilados; Ads sin publish/deploy/flag ON. QA funcional/EC y primera conversión Ads pendientes.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -142,6 +142,16 @@ Snapshot de intake histórico. Para el estado vigente, usar Status real y el cie
 <!-- ZONE 4 — Verification & Closing -->
 
 ## Acceptance Criteria
+
+Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
+
+- [x] Recibo Ads sólo tras aceptación/confirmación persistida; dedupe/replay sin segunda señal; tests focales.
+- [x] Consent granular/GPC, click context30d y EC por user_data reservado, sin hash/PII en telemetría; tests.
+- [x] Dos acciones secundarias nativas propias creadas, readback por campo y bindings saneados completos.
+- [x] Workspaces GTM API Web8/Server12, tags nativos/Linker/excepción GA4 y quick_preview sin error.
+- [ ] Tag Assistant funcional, términos/EC efectivo y salida de conversión real comprobados; no se fabrica tráfico.
+- [ ] Release backend/bundles/bridge, GTM publicado con confirmación, policies/flag opt-in y primera recepción Ads.
+
 
 - [x] Public POST carries granular consent/context, never treats processing consent as ads consent.
 - [x] Backend builds Meta and Google normalized hashes separately; no PII custom GA4 params.
@@ -288,3 +298,16 @@ PR255 completa la corrección de contexto del visitante y la configuración admi
 API/CLI/panel; Server9 estricto, ambos hosts y fuente nueva sin redeploy verificados.
 [Release y recibos](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 La recepción en Test Events no cierra el acceptance comercial ni demuestra evolución de EMQ.
+
+## Delta 2026-10-17 — Google Ads online y conversiones mejoradas
+
+El operador pidió implementación de GTM para leads y agendas y subagentes de investigación, y recordó
+la API GTM. Se conserva ownership de esta task: no nueva task paralela ni infraestructura. Plan:
+contratos/fuentes → recibo postcommit → browser/contexto → acciones secundarias/plan GTM → borradores
+API/compilación → QA focal → documentación/commit; activación exige gates de publicación/release.
+[ADR](../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
+[manual](../../manual-de-uso/growth/activar-conversiones-google-ads.md) y
+[evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md) poseen el contrato y límites.
+26 suites/404 tests y TypeScript focal PASS; sin publicación ni conversión enviada. Data Manager,
+resultados CRM y TASK-1885 no se absorben. Primera conversión Meta comercial ya consta en runtime10;
+la condición conjunta formulario/reserva del acceptance histórico permanece parcial.

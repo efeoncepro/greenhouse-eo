@@ -10,6 +10,7 @@ import 'server-only'
 import { z } from 'zod'
 
 import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+import { publishedGoogleAdsReceipt } from '@/lib/growth/measurement/google-ads-receipt'
 
 
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -574,7 +575,9 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     },
   })
 
-  return { outcome: 'accepted', submissionId: submission.submission_id }
+  const googleAdsConversion = publishedGoogleAdsReceipt(measurement?.googleAdsConversion, submission.measurementPersisted)
+
+  return { outcome: 'accepted', submissionId: submission.submission_id, ...(googleAdsConversion ? { googleAdsConversion } : {}) }
 }
 
 /** Registra un rechazo explícito (para paths que ya resolvieron la versión). */

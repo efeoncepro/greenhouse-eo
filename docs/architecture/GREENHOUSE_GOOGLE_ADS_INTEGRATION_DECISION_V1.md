@@ -12,6 +12,23 @@
 
 ## Context
 
+### Delta de ejecución 2026-10-17 — conversiones online y EC
+
+El operador autorizó implementar GTM para Forms y agendas. Se conserva el baseline web→GA4 Client→
+Ads nativo servidor, con dos acciones secundarias propias y un recibo backend por ocurrencia.
+`googleAds` es opt-in de la política publicada, independiente de Meta/UPD; el gate global empieza OFF.
+El recibo sólo existe tras commit y captura cifrada real; dedupe/replay no lo repite.
+
+Se permite una respuesta dedicada `googleAdsConversion` con hashes EC web opcionales, jamás contacto
+crudo. El navegador mantiene esos hashes en un Map privado como máximo 10 segundos, con veto por
+revocación/GPC. GTM los obtiene por getter y los asigna exclusivamente al parámetro reservado
+`user_data`; no entran en dataLayer ni parámetros analíticos ordinarios. La señal técnica
+`gh_ads_conversion` se excluye del forwarding GA4. Es una entrega dependiente del navegador, no
+un sender backend durable ni ingesta Data Manager. [Contrato y rollout](../manual-de-uso/growth/activar-conversiones-google-ads.md).
+
+Las acciones nativas se crearon y verificaron; los workspaces compilan. **No publicados, sin deploy,
+sin conversión enviada ni EC efectiva acreditada**. [Evidencia](../audits/growth/2026-10-17-google-ads-online-conversions.md).
+
 El operador pidió habilitar medición de Google Ads para la cuenta Efeonce **686-253-9491**, investigar
 GTM Web/Server, profundizar la conexión API y avanzar con autorización y una prueba de lectura antes
 de implementar producto. El correo de Ads indicado es **jreyes@efeoncepro.com**. La administración

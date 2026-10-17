@@ -223,3 +223,15 @@ consented measurement projection retain separate mappings, outboxes and evidence
 registration, issuer/OAuth scope expansion or new infrastructure was introduced by this CLI.
 Provider delivery and real commercial outcomes require their own readback; CLI success is not
 that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.
+
+
+## Google Ads online y EC — delta 17-10-2026
+
+Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md)
+y [evidencia](../../../docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
+Recibo Ads postcommit con UUID/key, no dedupe/replay; policy opt-in + flag global default OFF,
+consentimiento Google explícito/GPC. Hashes sólo canal reservado user_data vía memoria privada≤10s,
+nunca dataLayer/telemetría ordinaria; evento Ads excluido del forwarding GA4. No derivar Ads del
+generate_lead genérico ni mezclar UPD/Meta. Acciones secundarias ya creadas; drafts Web8/Server12
+compilan, **sin publicación/rollout ni conversión enviada**. CLI `google-ads conversions bindings`
+relee IDs/labels saneados; compilador GTM offline no publica. No reejecutar scripts privados históricos.

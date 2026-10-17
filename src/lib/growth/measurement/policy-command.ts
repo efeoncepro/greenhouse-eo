@@ -69,6 +69,8 @@ export const previewMeasurementPolicyCommand = async (actor: TenantEntitlementSu
     const config=input.action==='draft'?input.config:revision!.config
     const reasons=input.action==='disable'?[]:source?validateMeasurementMapping(config,source):['source_unavailable']
 
-    return {...base,ok:reasons.length===0,blockingReasons:reasons,command:input,impact:{scope,destinations:config.destinations,expectedPublishedRevisionId:current,commercialAcceptanceChanged:false,crmDestinationChanged:false}}
+    return {...base,ok:reasons.length===0,blockingReasons:reasons,command:input,impact:{scope,destinations:config.destinations,
+      ...(config.googleAds ? { googleAds: config.googleAds } : {}),
+      expectedPublishedRevisionId:current,commercialAcceptanceChanged:false,crmDestinationChanged:false}}
   } catch {return {...base,ok:false,error:'policy_unavailable' as const,blockingReasons:[]}}
 }

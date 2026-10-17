@@ -275,14 +275,16 @@ export const markMeetingProviderDispatched = async (executionId: string): Promis
   return rows.length === 1
 }
 
-export const finalizeMeetingExecution = async (input: {
+type FinalizeMeetingExecutionInput = {
   executionId: string
   state: Exclude<MeetingExecutionState, 'claimed' | 'provider_dispatched'>
   safeOutcome: string
   safeErrorCategory?: string | null
   conversionReceiptHash?: string | null
   measurement?: PreparedMeasurement | null
-}): Promise<boolean> => {
+}
+
+export const finalizeMeetingExecutionWithMeasurement = async (input: FinalizeMeetingExecutionInput): Promise<{ persisted: boolean; measurementPersisted: boolean }> => {
   if (input.state === 'succeeded' && input.measurement) {
     return withTransaction(async client => {
       const result = await client.query<{ execution_id: string }>(
@@ -294,10 +296,10 @@ export const finalizeMeetingExecution = async (input: {
         [input.executionId, input.safeOutcome, input.safeErrorCategory ?? null, input.conversionReceiptHash ?? null],
       )
 
-      if (!result.rows.length) return false
-      await enqueueMeasurementConversion(client, 'meeting_booking', input.executionId, input.measurement)
+      if (!result.rows.length) return { persisted: false, measurementPersisted: false }
+      const measurementPersisted = await enqueueMeasurementConversion(client, 'meeting_booking', input.executionId, input.measurement)
 
-      return true
+      return { persisted: true, measurementPersisted }
     })
   }
 
@@ -321,8 +323,12 @@ export const finalizeMeetingExecution = async (input: {
     ],
   )
 
-  return rows.length === 1
+  return { persisted: rows.length === 1, measurementPersisted: false }
 }
+
+/** Compatibility for failure/reconciliation callers that only require the commercial CAS. */
+export const finalizeMeetingExecution = async (input: FinalizeMeetingExecutionInput): Promise<boolean> =>
+  (await finalizeMeetingExecutionWithMeasurement(input)).persisted
 
 export type MeetingMetricKind =
   | 'availability_failed'

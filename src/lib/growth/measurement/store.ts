@@ -16,11 +16,14 @@ export const enqueueMeasurementConversion = async (
   sourceKind: MeasurementSourceKind,
   sourceId: string,
   prepared: PreparedMeasurement | null | undefined,
-): Promise<void> => {
-  if (!prepared) return
-  await client.query('SAVEPOINT measurement_enqueue')
+): Promise<boolean> => {
+  if (!prepared) return false
+  let savepoint = false
 
   try {
+    await client.query('SAVEPOINT measurement_enqueue')
+    savepoint = true
+
     // Lock the publication pointer through enqueue: a concurrent disable wins before capture,
     // or waits until this accepted occurrence is persisted; dispatch checks again before HTTP.
     const authorized = await client.query(
@@ -31,7 +34,7 @@ export const enqueueMeasurementConversion = async (
 
     if (!authorized.rows.length) { await client.query('RELEASE SAVEPOINT measurement_enqueue');
 
-return }
+return false }
 
     const result = await client.query<{ event_id: string }>(
       `INSERT INTO greenhouse_growth.measurement_conversion
@@ -52,10 +55,17 @@ return }
     }
 
     await client.query('RELEASE SAVEPOINT measurement_enqueue')
+
+    return Boolean(result.rows[0])
   } catch {
-    await client.query('ROLLBACK TO SAVEPOINT measurement_enqueue')
-    await client.query('RELEASE SAVEPOINT measurement_enqueue')
+    if (savepoint) {
+      await client.query('ROLLBACK TO SAVEPOINT measurement_enqueue')
+      await client.query('RELEASE SAVEPOINT measurement_enqueue')
+    }
+
     console.warn('growth_measurement_enqueue_failed', { sourceKind })
+
+    return false
   }
 }
 

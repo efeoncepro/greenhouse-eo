@@ -95,3 +95,17 @@ Esta API configura autoridad de medición. No crea submissions/bookings/contacto
 canary a Meta/Google. Consentimiento del visitante, captura cifrada y revalidación antes de HTTP
 siguen siendo gates separados. Alta compatible por datos está probada en producción; recepción
 Test Events no prueba primera conversión comercial, mejora EMQ ni elegibilidad de remarketing.
+
+
+## Delta Google Ads online — implementación local17/10
+
+`sources[].googleAdsEligible` identifica elegibilidad técnica; `config.googleAds` opcional contiene
+`conversionKey: commercial_lead|meeting_booking`, `enhancedConversions: boolean` y `activationAt` ISO.
+La validación exige fuente/versión/origen y propósito compatible; no amplía destinos Meta/UPD.
+`destinations: []` puede coexistir con Ads-only. Discovery y dryRun declaran el impacto Ads;
+no publican GTM ni encienden `GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` (default OFF).
+
+El panel preserva ese fragmento al editar; autoría inicial Ads por API/CLI en esta unidad, sin
+nueva tool MCP. La respuesta pública Forms/Meetings puede contener el recibo dedicado
+`googleAdsConversion` tras commit/enqueue, con cache private/no-store; no es este DTO administrativo.
+[Contrato, privacidad y activación](../manual-de-uso/growth/activar-conversiones-google-ads.md).

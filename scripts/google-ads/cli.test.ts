@@ -64,6 +64,36 @@ describe('Google Ads CLI boundaries', () => {
     expect(r.exitCode).toBe(8)
     expect(r.output.ok).toBe(false)
   })
+
+  it('dispatches conversions bindings to the dedicated read-only primitive', async () => {
+    const readMeasurementActionBindings = vi.fn(async () => ({ ready: true, bindings: [], coverage: { partial: false } }))
+    const client = { readMeasurementActionBindings } as unknown as GoogleAdsClient
+    const result = await runGoogleAdsCli(['conversions', 'bindings', '--pages', '3'], { client })
+
+    expect(result.exitCode).toBe(0)
+    expect(result.output).toMatchObject({ readOnly: true, command: 'conversions bindings' })
+    expect(readMeasurementActionBindings).toHaveBeenCalledWith({ pages: 3 }, undefined)
+  })
+
+  it.each([{ ready: false, partial: false, exitCode: 8 }, { ready: false, partial: true, exitCode: 6 }])('preserves blocked/partial binding inventory in CLI exit $exitCode', async state => {
+    const client = { readMeasurementActionBindings: async () => ({ ready: state.ready, bindings: [], coverage: { partial: state.partial } }) } as unknown as GoogleAdsClient
+    const result = await runGoogleAdsCli(['conversions', 'bindings'], { client })
+
+    expect(result.exitCode).toBe(state.exitCode)
+    expect(result.output.ok).toBe(false)
+  })
+
+  it.each([
+    ['conversions', 'bindings', '--cursor', 'private'], ['conversions', 'bindings', '--input', 'private.json'],
+    ['conversions', 'bindings', '--customer-id', '9531478329'], ['conversions', 'bindings', '--fields', 'private'],
+  ].map(args => ({ args })))('rejects binding query expansion before authentication $args', async ({ args }) => {
+    const tokenProvider = vi.fn(async () => 'never')
+    const result = await runGoogleAdsCli(args, { tokenProvider })
+
+    expect(result.exitCode).not.toBe(0)
+    expect(tokenProvider).not.toHaveBeenCalled()
+    expect(JSON.stringify(result.output)).not.toContain('private')
+  })
 })
 
 describe('Durable write dispatch', () => {

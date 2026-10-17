@@ -13,6 +13,8 @@ export const GOOGLE_ADS_PROFILE = Object.freeze({
 
 export const GOOGLE_ADS_SCOPE = 'https://www.googleapis.com/auth/adwords'
 export const GOOGLE_ADS_CLI_VERSION = 'google-ads-agent.v1'
+export const MEASUREMENT_BINDINGS_COMMAND = 'conversions bindings'
+export const MEASUREMENT_BINDINGS_DESCRIPTION = 'Bindings nativos verificados de solicitud comercial y agenda; AW/label sin HTML ni datos de leads.'
 
 export class GoogleAdsError extends Error {
   constructor(

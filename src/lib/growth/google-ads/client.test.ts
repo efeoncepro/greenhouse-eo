@@ -88,6 +88,115 @@ describe('Google Ads bounded reader', () => {
   })
 })
 
+describe('Closed native measurement action bindings', () => {
+  const trackingIdentity = { results: [{ customer: {
+    id: '6862539491', timeZone: 'America/Santiago', currencyCode: 'CLP',
+    conversionTrackingSetting: { conversionTrackingId: '18432951465', googleAdsConversionCustomer: 'customers/6862539491' },
+  } }] }
+
+  const action = (meeting = false) => ({ conversionAction: {
+    name: meeting ? 'Efeonce - Agenda confirmada' : 'Efeonce - Solicitud comercial aceptada',
+    resourceName: `customers/6862539491/conversionActions/${meeting ? '124' : '123'}`, ownerCustomer: 'customers/6862539491',
+    status: 'ENABLED', type: 'WEBPAGE', category: meeting ? 'BOOK_APPOINTMENT' : 'SUBMIT_LEAD_FORM',
+    countingType: 'ONE_PER_CLICK', primaryForGoal: false,
+    tagSnippets: [{ type: 'WEBPAGE', pageFormat: 'HTML', eventSnippet: `{'send_to':'AW-18432951465/${meeting ? 'meeting' : 'lead'}'}; unexpectedPrivateMarkup()` }],
+  } })
+
+  it('paginates the two exact names and emits only verified binding fields', async () => {
+    const { client, fetchImpl } = setup([response(trackingIdentity), response({ results: [action()], nextPageToken: 'next-bindings' }), response({ results: [action(true)] })])
+    const result = await client.readMeasurementActionBindings({ pages: 3 })
+
+    expect(result).toMatchObject({ ready: true, blockers: [], coverage: { pages: 2, complete: true, partial: false } })
+    expect(result.bindings).toHaveLength(2)
+    expect(result.bindings[0]).toEqual({ actionKey: 'commercial_lead', customerId: '6862539491', resourceName: 'customers/6862539491/conversionActions/123', conversionId: 'AW-18432951465', conversionLabel: 'lead' })
+    expect(JSON.stringify(result)).not.toContain('unexpectedPrivateMarkup')
+    expect(JSON.stringify(result)).not.toContain('tagSnippets')
+    const query = JSON.parse(String((fetchImpl.mock.calls[1] as unknown as [string, RequestInit])[1].body)).query
+
+    expect(query).toContain("conversion_action.name IN ('Efeonce - Solicitud comercial aceptada', 'Efeonce - Agenda confirmada')")
+    expect(query).toContain('conversion_action.tag_snippets')
+    expect(fetchImpl.mock.calls.every(([url]) => String(url).endsWith('/googleAds:search'))).toBe(true)
+  })
+
+  it('preserves a verified first-page binding while blocking readiness on incomplete inventory', async () => {
+    const { client } = setup([response(trackingIdentity), response({ results: [action()], nextPageToken: 'next' }), response({ error: { message: 'private-access-token' } }, 500)])
+    const result = await client.readMeasurementActionBindings({ pages: 2 })
+
+    expect(result).toMatchObject({ ready: false, coverage: { pages: 1, partial: true, complete: false } })
+    expect(result.bindings).toHaveLength(1)
+    expect(result.blockers).toContain('binding_inventory_incomplete')
+    expect(JSON.stringify(result)).not.toContain('private-access-token')
+  })
+
+  it('does not assume completion after observing two rows if there is another page', async () => {
+    const { client } = setup([response(trackingIdentity), response({ results: [action(), action(true)], nextPageToken: 'next' })])
+
+    expect(await client.readMeasurementActionBindings()).toMatchObject({ ready: false, coverage: { partial: true } })
+  })
+
+  it('rejects duplicate same-name native actions across pages rather than choosing one', async () => {
+    const duplicate = action()
+
+    duplicate.conversionAction.resourceName = 'customers/6862539491/conversionActions/999'
+    const { client } = setup([response(trackingIdentity), response({ results: [action(), action(true)], nextPageToken: 'next' }), response({ results: [duplicate] })])
+    const result = await client.readMeasurementActionBindings({ pages: 2 })
+
+    expect(result.ready).toBe(false)
+    expect(result.blockers).toContain('native_action_duplicate:commercial_lead')
+    expect(result.bindings.map(item => item.actionKey)).toEqual(['meeting_booking'])
+  })
+
+  it.each([
+    { ownerCustomer: 'customers/9531478329' }, { type: 'GOOGLE_ANALYTICS_4_GENERATE_LEAD' },
+    { status: 'HIDDEN' }, { primaryForGoal: true }, { category: 'BOOK_APPOINTMENT' },
+    { tagSnippets: [{ type: 'WEBPAGE', pageFormat: 'HTML', eventSnippet: "{'send_to':'AW-999/wrong'}" }] },
+    { tagSnippets: [{ type: 'WEBPAGE', pageFormat: 'HTML', eventSnippet: "{'send_to':'AW-18432951465/lead','send_to':'AW-18432951465/other'}" }] },
+  ])('blocks incompatible provider readback without exposing snippet details %j', async change => {
+    const bad = { conversionAction: { ...action().conversionAction, ...change } }
+    const { client } = setup([response(trackingIdentity), response({ results: [bad, action(true)] })])
+    const result = await client.readMeasurementActionBindings()
+
+    expect(result.ready).toBe(false)
+    expect(result.blockers).toContain('invalid_native_action_binding:commercial_lead')
+    expect(result.bindings.map(item => item.actionKey)).not.toContain('commercial_lead')
+    expect(JSON.stringify(result)).not.toContain('send_to')
+  })
+
+  it('reports missing native actions as blocked, not a ready empty inventory', async () => {
+    const { client } = setup([response(trackingIdentity), response({ results: [] })])
+    const result = await client.readMeasurementActionBindings()
+
+    expect(result).toMatchObject({ ready: false, bindings: [], coverage: { complete: true } })
+    expect(result.blockers).toContain('native_action_missing:commercial_lead')
+    expect(result.blockers).toContain('native_action_missing:meeting_booking')
+  })
+
+  it('never leaks an active credential accidentally returned inside an otherwise valid label', async () => {
+    const row = action()
+
+    row.conversionAction.tagSnippets[0].eventSnippet = "{'send_to':'AW-18432951465/private-access-token'}"
+    const { client } = setup([response(trackingIdentity), response({ results: [row, action(true)] })])
+    const result = await client.readMeasurementActionBindings()
+
+    expect(result.ready).toBe(false)
+    expect(JSON.stringify(result)).not.toContain('private-access-token')
+  })
+
+  it('requires account tracking identity before querying action snippets', async () => {
+    const { client, fetchImpl } = setup([response(identity)])
+
+    await expect(client.readMeasurementActionBindings()).rejects.toMatchObject({ code: 'CONVERSION_TRACKING_BINDING_UNAVAILABLE' })
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+  })
+
+  it('rejects arbitrary IDs, fields or cursors before resolving credentials', async () => {
+    const { client, tokenProvider } = setup([])
+
+    await expect(client.readMeasurementActionBindings({ cursor: 'override' } as never)).rejects.toMatchObject({ code: 'BINDINGS_OPTION_NOT_ALLOWED' })
+    expect(tokenProvider).not.toHaveBeenCalled()
+  })
+})
+
 describe('Dates and query safety', () => {
   it('resolves completed days in Santiago, independent of host UTC date', () => {
     expect(reportRange({}, new Date('2026-10-18T01:30:00Z'))).toMatchObject({ since: '2026-10-10', until: '2026-10-16', timeZone: GOOGLE_ADS_PROFILE.timeZone })

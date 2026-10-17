@@ -1,4 +1,52 @@
 /** Browser-safe consent/context only. Contact values never enter telemetry. */
+export interface GoogleMeasurementConsent {
+  adStorage: 'granted' | 'denied'
+  adUserData: 'granted' | 'denied'
+  adPersonalization: 'granted' | 'denied'
+  analyticsStorage: 'granted' | 'denied'
+}
+
+export interface GoogleClickContext {
+  source: 'landing_query'
+  capturedAt: string
+  gclid?: string
+  gbraid?: string
+  wbraid?: string
+}
+
+export const readGoogleMeasurementConsent = (win: Window): GoogleMeasurementConsent | undefined => {
+  const attributes = ['ad-storage', 'ad-user-data', 'ad-personalization', 'analytics-storage']
+  const values = attributes.map(key => win.document.documentElement.getAttribute(`data-efeonce-google-${key}`))
+
+  if (!values.every(value => value === 'granted' || value === 'denied')) return undefined
+
+  return {
+    adStorage: values[0] as GoogleMeasurementConsent['adStorage'],
+    adUserData: values[1] as GoogleMeasurementConsent['adUserData'],
+    adPersonalization: values[2] as GoogleMeasurementConsent['adPersonalization'],
+    analyticsStorage: values[3] as GoogleMeasurementConsent['analyticsStorage'],
+  }
+}
+
+const readGoogleClick = (win: Window): GoogleClickContext | undefined => {
+  const value = (win as Window & { efeonceReadGoogleAdsAttribution?: () => unknown }).efeonceReadGoogleAdsAttribution?.()
+
+  if (!value || typeof value !== 'object') return undefined
+  const record = value as Record<string, unknown>
+  const observed = typeof record.capturedAt === 'string' ? Date.parse(record.capturedAt) : NaN
+
+  if (record.source !== 'landing_query' || !Number.isFinite(observed) || observed > Date.now() || Date.now() - observed > 30 * 86400_000) return undefined
+  const ids: Pick<GoogleClickContext, 'gclid' | 'gbraid' | 'wbraid'> = {}
+
+  for (const key of ['gclid', 'gbraid', 'wbraid'] as const) {
+    const id = record[key]
+
+    if (typeof id === 'string' && /^[A-Za-z0-9._~-]{1,512}$/.test(id)) ids[key] = id
+  }
+
+  return Object.keys(ids).length ? { source: 'landing_query', capturedAt: new Date(observed).toISOString(), ...ids } : undefined
+}
+
 export interface PublicMeasurementContext {
   source: 'hubspot_categories'
   policyVersion: 'efeonce-categories-2026-10-13'
@@ -9,6 +57,8 @@ export interface PublicMeasurementContext {
   clientId?: string
   fbp?: string
   fbc?: string
+  googleConsent?: GoogleMeasurementConsent
+  googleClick?: GoogleClickContext
 }
 
 export const readPublicMeasurementContext = (
@@ -27,6 +77,15 @@ export const readPublicMeasurementContext = (
     source: 'hubspot_categories', policyVersion: 'efeonce-categories-2026-10-13',
     capturedAt: new Date().toISOString(), advertisement: ads === 'granted' && !gpc,
     analytics: analytics === 'granted', globalPrivacyControl: gpc,
+  }
+
+  const googleConsent = readGoogleMeasurementConsent(win)
+
+  if (googleConsent) context.googleConsent = googleConsent
+
+  if (context.advertisement && googleConsent?.adStorage === 'granted' &&
+      googleConsent.adUserData === 'granted' && googleConsent.adPersonalization === 'granted') {
+    try { context.googleClick = readGoogleClick(win) } catch { /* Optional instrumentation cannot prevent submission. */ }
   }
 
   const cookie = (key: string): string | undefined => {

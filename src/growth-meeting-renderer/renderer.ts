@@ -1,4 +1,5 @@
 import type { MeetingApiClient, MeetingBookingPayload, MeetingEmailVerificationResult } from './api-client'
+import { emitGoogleAdsConversion } from '../growth-google-ads-conversion/conversion'
 import type { MeetingPublicErrorCode } from './contract'
 import { GH_GROWTH_MEETINGS_COPY as copy } from './copy'
 import {
@@ -1623,8 +1624,15 @@ export class MeetingRenderer {
 
     this.submissionPending = false
 
+    // Enhanced-conversion material has one ephemeral consumer, never renderer state or telemetry.
+    const safeResult = result.outcome === 'confirmed' ? {
+      outcome: result.outcome, appointment: result.appointment,
+      conversionReceipt: result.conversionReceipt, conversionEligible: result.conversionEligible,
+    } : result
+
     if (result.outcome === 'confirmed') {
-      this.telemetry({ type: 'booking_confirmed', response: result, context: selectedContext })
+      if (result.conversionEligible && result.conversionReceipt) emitGoogleAdsConversion(result.googleAdsConversion, 'meeting_booking')
+      this.telemetry({ type: 'booking_confirmed', response: safeResult, context: selectedContext })
     } else {
       this.telemetry({
         type: 'step_reached',
@@ -1633,7 +1641,7 @@ export class MeetingRenderer {
       })
     }
 
-    this.transition({ type: 'booking_result', result })
+    this.transition({ type: 'booking_result', result: safeResult })
   }
 
   private timezone(): string {

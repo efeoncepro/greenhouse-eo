@@ -23,6 +23,11 @@
   publicitaria ejecutada; verificación Google y conexión de producto pendientes.
   [Evidencia](docs/audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
 
+- Delta online: backend y renderers Forms/Meetings con recibo Ads postcommit, consentimiento explícito,
+  capture de IDs y EC reservado. Dos acciones secundarias creadas/verificadas; workspaces Web8/Server12
+  compilan por API. Sin publish/deploy/flag ON ni conversiones enviadas.
+  [Evidencia](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
+
 ## 2026-10-17 — CLI local Meta para agentes
 
 - `pnpm --silent meta`, contrato `meta-agent.v2`: lecturas existentes, catálogo SDK25, consultas por campo

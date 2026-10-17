@@ -26,6 +26,19 @@ Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión co
 
 ---
 
+## Google Ads online — preparado, no publicado (17-10-2026)
+
+| Fuente | Señal / acción | Estado |
+| --- | --- | --- |
+| Form comercial con policy Ads opt-in | Recibo backend → gh_ads_conversion / commercial_lead | Código local; acción7852486523; GTM Web8/Server12 draft, captura OFF |
+| Reserva Scheduler confirmada con policy Ads opt-in | Recibo backend → gh_ads_conversion / meeting_booking | Código local; acción7852487186; mismos drafts, captura OFF |
+
+El genérico accepted→generate_lead de las filas siguientes sigue siendo GA4, no habilita Ads.
+El bridge Ads exige cuatro permisos/GPC y UUID durable, no convierte clics/aperturas/replays. User_data
+reservado sólo para EC; ninguna PII/hash/click ID en dataLayer o analítica ordinaria. Server agrega Ads
+Tracking/Linker y excluye el bridge del forwarder GA4. **No se amplió ninguna policy publicada**.
+[Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
+
 ## Forms
 
 Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` no medible.

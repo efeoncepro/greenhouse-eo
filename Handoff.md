@@ -21,6 +21,18 @@ Pendiente Growth/Platform: conexión de producto por organización/API/MCP, prue
 con payload real autorizado, y luego captura/consentimiento/binding/rollout de conversiones. Sin publish GTM,
 CRM writes, acciones/campañas nuevas, migraciones, cambios IAM o deploy. Credenciales/recibos fuera de Git.
 
+Delta posterior autorizado — **Ads online Forms/Meetings implementado localmente** (TASK-2034).
+Dos acciones WEBPAGE secundarias creadas y verificadas en6862539491: lead7852486523/agenda7852487186,
+ONE_PER_CLICK, valor0CLP de medición. No campañas/pujas ni conversiones enviadas.
+GTM API: Web workspace8 y Server12 con tags nativos Ads/Linker y exclusión bridge del forwarder18;
+ambos quick_preview compilerError=false, live Web5/Server9. Flag Ads nuevo default OFF; policies intactas.
+[Contrato y activación](docs/manual-de-uso/growth/activar-conversiones-google-ads.md) ·
+[evidencia y gates pendientes](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
+Código con recibo postcommit, consent granular/GPC, IDs30d, EC web reservado y dedupe; Meta/UPD separados.
+Tag Assistant Web negativo PASS; EC OFF y términos de clientes sin aceptar (UI verificada).
+Faltan QA funcional positivo/confirmación contractual, release coordinado backend/bundles/bridge WP/Think,
+confirmación/publicación GTM y opt-in policy/flag, y primera ocurrencia real. No declarar medición activa.
+
 ## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)
 
 Live en https://efeoncepro.com/servicios/performance-marketing/ (página `251997`, OG `252002`): 10 widgets

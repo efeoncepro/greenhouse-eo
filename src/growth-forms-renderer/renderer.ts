@@ -1,4 +1,5 @@
 import type { GrowthInputBehaviorFactory } from './input-behavior-adapter'
+import { emitGoogleAdsConversion } from '../growth-google-ads-conversion/conversion'
 /**
  * TASK-1231 — Growth Forms portable renderer · motor framework-light.
  *
@@ -2808,6 +2809,7 @@ export class FormRenderer {
     this.turnstile?.reset()
 
     if (result.outcome === 'accepted') {
+      emitGoogleAdsConversion(result.googleAdsConversion, 'commercial_lead')
       this.telemetry.emit('gh_form_submission_accepted', {
         ...(result.submissionId ? { correlation_id: result.submissionId } : {}),
         success_behavior: this.contract.successBehavior.kind,

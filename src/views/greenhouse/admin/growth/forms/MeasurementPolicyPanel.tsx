@@ -114,8 +114,8 @@ export default function MeasurementPolicyPanel({ preferredFormSlug, initialCatal
                 {editing && <GreenhouseButton variant='solid' size='small' disabled={busy || reasons.length>0 || !catalog.permissions.author} onClick={()=>model.command('draft')}>{C.save}</GreenhouseButton>}
                 {canReview && <GreenhouseButton variant='solid' size='small' disabled={busy || reasons.length>0 || !catalog.permissions.author} onClick={()=>model.command('review')}>{C.review}</GreenhouseButton>}
                 {canReview && !catalog.permissions.author && <Typography variant='body2'>{C.noReviewPermission}</Typography>}
-                {canPublish && <GreenhouseButton variant='solid' size='small' disabled={busy || reasons.length>0 || !config?.destinations.length || !catalog.permissions.publish} onClick={()=>model.command('publish')}>{C.publish}</GreenhouseButton>}
-                {canPublish && !config?.destinations.length && <Typography variant='body2'>{C.noDestination}</Typography>}
+                {canPublish && <GreenhouseButton variant='solid' size='small' disabled={busy || reasons.length>0 || !(config?.destinations.length || config?.googleAds) || !catalog.permissions.publish} onClick={()=>model.command('publish')}>{C.publish}</GreenhouseButton>}
+                {canPublish && !(config?.destinations.length || config?.googleAds) && <Typography variant='body2'>{C.noDestination}</Typography>}
                 {canPublish && !catalog.permissions.publish && <Typography variant='body2'>{C.noPublishPermission}</Typography>}
                 {showEdit && <GreenhouseButton variant={canReview || canPublish ? 'text' : 'outlined'} size='small' disabled={busy} onClick={()=>{setConfirmDisable(false);model.edit()}}>{C.edit}</GreenhouseButton>}
                 {editing && revision && <GreenhouseButton variant='text' size='small' disabled={busy} onClick={model.cancelEdit}>{C.cancel}</GreenhouseButton>}

@@ -18,6 +18,12 @@ antecedente del piloto. La verificación de Google de marca/scopes sigue pendien
 secreto propio; GA4 y GSC Efeonce conservaron sus grants y pasaron lecturas reales después del cambio.
 Las pruebas live de esta sesión sólo consultaron: **ninguna escritura publicitaria ejecutada**.
 
+Delta online del mismo día: Forms y agendas ya tienen implementación local del recibo Ads, contexto
+consentido y canal EC reservado. Se crearon/verificaron las dos acciones nativas secundarias y los
+borradores Web8/Server12 compilan. **Sin despliegue ni publicación, captura Ads OFF; no está activo**.
+La afirmación anterior de cero escrituras corresponde al probe/CLI previo; este delta sí creó dos
+acciones, sin enviar conversiones ni cambiar campañas. [Activación y límites](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
+
 | Componente | Función en la arquitectura |
 | --- | --- |
 | Growth Forms / Meetings | Confirmar solicitudes y reservas, intención y consentimiento |

@@ -1,11 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { bookMeeting } from '../command'
+import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+import type { PreparedMeasurement } from '@/lib/growth/measurement/contracts'
+
+vi.mock('@/lib/growth/measurement/prepare', () => ({ prepareMeasurementConversion: vi.fn(async () => null) }))
 import { createMeetingPrivacyHasher } from '../privacy'
 import { MeetingProviderError, type MeetingSchedulingProvider } from '../provider/types'
 import {
   claimMeetingBooking,
   finalizeMeetingExecution,
+  finalizeMeetingExecutionWithMeasurement,
   getMeetingSurfaceAuthority,
   markMeetingProviderDispatched,
   recordMeetingMetric,
@@ -14,6 +19,7 @@ import {
 vi.mock('../store', () => ({
   claimMeetingBooking: vi.fn(),
   finalizeMeetingExecution: vi.fn(),
+  finalizeMeetingExecutionWithMeasurement: vi.fn(),
   getMeetingSurfaceAuthority: vi.fn(),
   markMeetingProviderDispatched: vi.fn(),
   recordMeetingMetric: vi.fn(),
@@ -91,7 +97,9 @@ beforeEach(() => {
   vi.mocked(claimMeetingBooking).mockResolvedValue({ kind: 'claimed', executionId: 'mbex-test' })
   vi.mocked(markMeetingProviderDispatched).mockResolvedValue(true)
   vi.mocked(finalizeMeetingExecution).mockResolvedValue(true)
+  vi.mocked(finalizeMeetingExecutionWithMeasurement).mockResolvedValue({ persisted: true, measurementPersisted: false })
   vi.mocked(recordMeetingMetric).mockResolvedValue(undefined)
+  vi.mocked(prepareMeasurementConversion).mockResolvedValue(null)
 })
 
 describe('meeting booking command', () => {
@@ -108,7 +116,7 @@ describe('meeting booking command', () => {
     expect(JSON.stringify(result)).not.toContain('private-contact-id')
     expect(JSON.stringify(result)).not.toContain('teams.microsoft.com')
     expect(markMeetingProviderDispatched).toHaveBeenCalledBefore(vi.mocked(meetingProvider.book))
-    expect(finalizeMeetingExecution).toHaveBeenCalledWith(expect.objectContaining({ state: 'succeeded' }))
+    expect(finalizeMeetingExecutionWithMeasurement).toHaveBeenCalledWith(expect.objectContaining({ state: 'succeeded' }))
   })
 
   it('reserva en la zona del visitante aunque la surface tenga Santiago como default', async () => {
@@ -217,5 +225,44 @@ describe('meeting booking command', () => {
     expect(result).toMatchObject({ outcome: 'error', error: { code: 'unavailable' } })
     expect(meetingProvider.getConfiguration).not.toHaveBeenCalled()
     expect(meetingProvider.book).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('Google Ads confirmed reservation receipt', () => {
+  const receipt = () => {
+    const issuedAt = new Date()
+
+    return { version: 1 as const, transactionId: 'a879b155-a143-40bd-9b15-731c2b62d173', conversionKey: 'meeting_booking' as const,
+      issuedAt: issuedAt.toISOString(), expiresAt: new Date(issuedAt.getTime() + 10 * 60_000).toISOString() }
+  }
+
+  it.each([false, true])('exposes the dedicated receipt only after durable measurement capture (%s)', async measurementPersisted => {
+    const googleAdsConversion = receipt()
+
+    vi.mocked(prepareMeasurementConversion).mockResolvedValue({ googleAdsConversion } as PreparedMeasurement)
+    vi.mocked(finalizeMeetingExecutionWithMeasurement).mockResolvedValue({ persisted: true, measurementPersisted })
+    const result = await bookMeeting(input, context(provider()))
+
+    expect(result.outcome).toBe('confirmed')
+    if (measurementPersisted) expect(result).toHaveProperty('googleAdsConversion', googleAdsConversion)
+    else expect(result).not.toHaveProperty('googleAdsConversion')
+  })
+
+  it('does not expose receipt or re-prepare on confirmed replay', async () => {
+    vi.mocked(claimMeetingBooking).mockResolvedValue({ kind: 'replay', startsAt, durationMs: 1_800_000, timezone: 'America/Santiago' })
+    const result = await bookMeeting(input, context(provider()))
+
+    expect(result).not.toHaveProperty('googleAdsConversion')
+    expect(prepareMeasurementConversion).not.toHaveBeenCalled()
+  })
+
+  it('does not issue receipt if the commercial CAS or commit fails', async () => {
+    vi.mocked(prepareMeasurementConversion).mockResolvedValue({ googleAdsConversion: receipt() } as PreparedMeasurement)
+    vi.mocked(finalizeMeetingExecutionWithMeasurement).mockResolvedValueOnce({ persisted: false, measurementPersisted: false })
+    const result = await bookMeeting(input, context(provider()))
+
+    expect(result.outcome).toBe('error')
+    expect(result).not.toHaveProperty('googleAdsConversion')
   })
 })
