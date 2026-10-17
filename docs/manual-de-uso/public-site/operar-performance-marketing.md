@@ -217,8 +217,8 @@ opción, toma antes un snapshot del estado actual y purga Kinsta al final.
 ## Pendientes conocidos
 
 Verificado al cierre de TASK-1865 (envío real, GA4, Meta, Rich Results, viewports, re-guardado). El núcleo común y
-el republicador existen desde el 2026-10-17; desplegar la base común de widgets al sitio queda pendiente de
-autorización del operador. Falta pedir indexación de la URL en la interfaz de Search Console.
+el republicador existen desde el 2026-10-17; la base común de widgets está desplegada desde las 21:25 UTC de ese día
+(HTML de los módulos idéntico antes y después). Falta pedir indexación de la URL en la interfaz de Search Console.
 
 ## Referencias técnicas
 

@@ -27,18 +27,24 @@ Medios and Performance now share one core; new canvas landings must use it inste
   render probes per module; diff before/after a base change must be empty; a one-character change is detected).
 - **Core release:** `build-source-led-core-package.cjs <live baseline>` → `deploy-source-led-core-package.php`
   (contract `source-led-core-release.v1`, allowlist of the three base files, previous-SHA guard, backup tar). The
-  shared base is written **before** the landing bases so no request loads a base without its parent.
+  shared base is written **before** the landing bases so no request loads a base without its parent. Deployed
+  2026-10-17 21:25 UTC (backup `/tmp/eo-source-led-core-before-20261017-212544.tar` on Kinsta); live module HTML of
+  Medios (16) and Performance (10) identical before/after. The Medios and Performance packages also ship the shared base.
 - **Republisher:** `republish-source-led-page.php <spec.json> <page-custom.css>` with specs in
   `<landing>-source/republish.json`. Requires `expectedDataSha` to write; keeps each module's live widget settings
   (`preserveWidgetSettings`, default true); does nothing when the rebuilt tree, custom CSS and featured image already
   match (`unchanged`); `dryRun` reports `sameTree/sameCss/keptWidgetSettings`; `force` saves anyway (canary). It fills
   `post_featured_image`, restores and verifies `_thumbnail_id` after `Document::save()`, snapshots tree/settings/
-  thumbnail/page metas, checks protected pages and global chrome, and rebuilds the Yoast indexable with
-  `$_SERVER['HTTPS']='on'`. Live canary 2026-10-17 on Performance: same hash `687fa928…`, thumbnail `252002` kept.
-- **Yoast primary image over http:** any CLI rebuild of an indexable without HTTPS context stores plugin image URLs
-  with `http://`. Seen live on HubSpot `244079` (no featured image) and Contacto `20729`.
-  `repair-landing-primary-image.php` sets the OG image as featured image (or keeps none) and rebuilds over HTTPS;
-  applying it to those two pages needs operator approval (blocked 2026-10-17 as an out-of-scope production write).
+  thumbnail/page metas, checks protected pages and global chrome, rebuilds the Yoast indexable and warns
+  (`primaryImageWarning`) when the page has no featured image. Live canary 2026-10-17 on Performance: same hash
+  `687fa928…`, thumbnail `252002` kept.
+- **Yoast primary image over http:** a CLI save makes Elementor write its `post_content` HTML copy with plugin image
+  URLs over `http://` (`EO_ELEMENTOR_WIDGETS_URL` is computed at plugin load, without HTTPS context; forcing
+  `$_SERVER['HTTPS']` later does not change it). When a page has no featured image, Yoast takes the schema
+  `primaryImageOfPage` from that copy. Fix = featured image (use the OG attachment): HubSpot `244079` repaired
+  2026-10-17 with `251991` (`repair-landing-primary-image.php`, snapshot `_gh_primary_image_repair_before_20261017_212620`).
+  Contacto `20729` still serves an http plugin image because it keeps no featured image; giving it its OG image is
+  the operator's call. Systemic option (not done): make the plugin URL constant scheme-aware.
 
 ## Source fidelity without losing editability
 

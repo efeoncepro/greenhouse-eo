@@ -23,8 +23,10 @@
  * Guarantees: identity + expected-hash guard; per-widget control/render preflight; no write when the rebuilt tree equals
  * the live one; rollback snapshot option (tree, settings, featured image, page_* metas) before writing; featured image
  * restored and verified after Document::save() (an API save without post_featured_image deletes it — Performance,
- * 2026-10-17); readback of widgets, unrelated pages and global chrome; Yoast indexable rebuilt over HTTPS so the
- * schema never gets plugin URLs with http:// from the CLI context; Kinsta purge.
+ * 2026-10-17); readback of widgets, unrelated pages and global chrome; Yoast indexable rebuilt; Kinsta purge.
+ * Keep a featured image (thumbnailId): a CLI save bakes plugin image URLs with http:// into Elementor's post_content
+ * copy (the plugin URL constant is computed at load, without HTTPS context), and Yoast takes the schema primary
+ * image from that copy when the page has no featured image. The report warns when there is none.
  * Rollback: Document::save() with the snapshot's elementor_data + settings, set_post_thumbnail(snapshot thumbnail).
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
@@ -103,7 +105,7 @@ $same_tree                  = json_decode( $current, true ) == $elements;
 $same_css                   = (string) ( $settings_doc['custom_css'] ?? '' ) === $custom_css;
 $thumbnail                  = (int) get_post_thumbnail_id( $id );
 $expected_thumbnail         = isset( $spec['thumbnailId'] ) ? (int) $spec['thumbnailId'] : $thumbnail;
-$report                     = array( 'pageId' => $id, 'currentSha' => $current_sha, 'sameTree' => $same_tree, 'sameCss' => $same_css, 'keptWidgetSettings' => $kept, 'thumbnail' => $thumbnail, 'expectedThumbnail' => $expected_thumbnail );
+$report                     = array( 'primaryImageWarning' => $expected_thumbnail ? null : 'No featured image: Yoast will take the schema primary image from post_content (http:// plugin URLs after a CLI save).', 'pageId' => $id, 'currentSha' => $current_sha, 'sameTree' => $same_tree, 'sameCss' => $same_css, 'keptWidgetSettings' => $kept, 'thumbnail' => $thumbnail, 'expectedThumbnail' => $expected_thumbnail );
 
 if ( $dry ) {
 	$report['status'] = 'dry_run';
@@ -148,8 +150,6 @@ foreach ( $modules as $index => $entry ) {
 foreach ( $protected as $post_id => $hash ) { if ( ! hash_equals( $hash, hash( 'sha256', (string) get_post_meta( $post_id, '_elementor_data', true ) ) ) ) { WP_CLI::error( 'Unrelated page changed: ' . $post_id . '. Snapshot: ' . $name ); } }
 foreach ( $shell as $key => $value ) { if ( get_option( $key ) !== $value ) { WP_CLI::error( 'Global site chrome changed: ' . $key . '. Snapshot: ' . $name ); } }
 
-// The CLI has no HTTPS context: plugins_url() would hand http:// URLs to the Yoast indexable and the schema.
-$_SERVER['HTTPS'] = 'on';
 if ( function_exists( 'YoastSEO' ) ) { YoastSEO()->classes->get( 'Yoast\\WP\\SEO\\Builders\\Indexable_Builder' )->build_for_id_and_type( $id, 'post' ); }
 \Elementor\Plugin::$instance->files_manager->clear_cache();
 WP_CLI::runcommand( 'cache flush', array( 'return' => true ) );

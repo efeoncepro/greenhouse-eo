@@ -5,7 +5,9 @@
  * Input (file): { "pages": [ { "id": 244079, "slug": "servicios-contratar-hubspot", "thumbnailId": 251991 },
  *                            { "id": 20729, "slug": "contacto", "thumbnailId": null } ] }
  * thumbnailId sets the featured image (must be an attachment; use the page's OG image); null keeps the page without one
- * and only rebuilds the indexable over HTTPS. Stores the previous thumbnails in a snapshot option. Purges Kinsta.
+ * and only rebuilds the indexable — that does NOT fix http:// URLs: they come from Elementor's post_content copy written
+ * by a CLI save (plugin URL constant computed at load without HTTPS), so only a featured image fixes the primary image
+ * (Contacto, 2026-10-17). Stores the previous thumbnails in a snapshot option. Purges Kinsta.
  * Rollback: set_post_thumbnail / delete_post_thumbnail from the snapshot, then rebuild the indexable.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
@@ -24,7 +26,6 @@ foreach ( $input['pages'] as $page ) {
 $name = '_gh_primary_image_repair_before_' . gmdate( 'Ymd_His' );
 if ( ! add_option( $name, $snapshot, '', false ) ) { WP_CLI::error( 'Snapshot failed.' ); }
 
-$_SERVER['HTTPS'] = 'on';
 $report = array();
 foreach ( $input['pages'] as $page ) {
 	$id    = (int) $page['id'];
