@@ -1,5 +1,18 @@
 # Producción y posproducción de video: método de principio a fin
 
+## Delta 2026-10-17 — método de producción narrativa (personajes, set y acción física)
+
+- **Fuente:** anuncio «¿Para cuándo?» (Efeonce × BytePlus, 30 s, 4:5), en curso. Hechos en
+  `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/` (biblia `v2-gpt/CONTINUIDAD.md`) y
+  `ai-generations/2026-10-17_breakr-marca/`.
+- **Qué cambia:** una pieza con personajes que se repiten, un set con geografía o una acción que viaja entre planos
+  sigue además el [método de producción narrativa](EFEONCE_NARRATIVE_VIDEO_PRODUCTION_METHOD_V1.md): biblia de
+  continuidad (planta, ejes, línea de 180°, lado fijo de la utilería, luz por tramo) antes de generar; escala del
+  producto calculada por distancia al lente; marca de producto ficticia o real armada determinística; reponer la cara
+  aprobada después de cada edición; auditoría de la secuencia completa con subagentes antes de corregir el clímax;
+  plan de luz, cámaras (emplazamientos y movimiento), audio, VFX y SFX por plano.
+- **Límite:** la producción no está cerrada; movimientos de cámara, VFX y SFX quedan como propuesta.
+
 ## Delta 2026-10-12 — reel de muestra para un cliente que pauta en TV
 
 - **Fuente:** reel de muestra de 25 s (9:16, 1080×1920, locución y música) para la propuesta a Sika Mexicana (Wherex
