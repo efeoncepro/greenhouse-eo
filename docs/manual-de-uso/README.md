@@ -23,6 +23,7 @@ La diferencia con otras capas de documentacion:
 - [OmniHuman 2.0 por API](creative-studio/omnihuman-2-api.md) — Vision AI, dos autenticaciones, payload, estados, errores, recuperación, costos y QA; aún sin consumidor local.
 
 - [Usar BytePlus directo](creative-studio/byteplus-directo.md) — claves separadas en Secret Manager; Seedream, Layerize, Seedance y Seed Speech con el contrato Johor, por CLI local.
+- [Subtítulos de video: control de contraste](creative-studio/subtitulos-video-contraste.md) — mide cada subtítulo quemado sobre tres cuadros del corte con el vidrio del token de AXIS; falla bajo 4,5:1.
 
 - [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de
   clasificación, camino propio o puente, dificultad por toma, referencias aprobadas antes de generar, motor y

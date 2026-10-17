@@ -333,6 +333,7 @@
     "brand:deck-plan": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/brand-surfaces/deck-plan.ts",
     "brand:deck-recipes": "node scripts/creative/deck-recipes/render-index.mjs",
     "brand:tokens": "tsx scripts/brand-surfaces/compile-tokens.ts",
+    "brand:subtitles:check": "node scripts/creative/subtitles/check-contrast.mjs",
     "glitch:compose": "tsx scripts/glitch/compose.ts",
     "glitch:editions": "tsx scripts/glitch/editions.ts",
     "glitch:tokens": "tsx scripts/glitch/compile-tokens.ts",

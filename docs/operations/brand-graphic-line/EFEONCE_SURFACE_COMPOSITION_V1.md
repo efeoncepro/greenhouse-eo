@@ -951,9 +951,15 @@ repite la medición sobre los cuadros reales del video.
 - **Archivo único:** un archivo de tiempos por idioma. De él salen los subtítulos quemados y el SRT de
   accesibilidad, que lleva además las descripciones de sonido.
 
-**Pendiente de implementación**
-- **AXIS:** el token `type.subtitle` sigue «sin caja, sombra negra» y hay que actualizarlo en AXIS. No se tocó desde
-  esta sesión.
+**Estado de implementación (2026-10-17)**
+- **AXIS:** token y contrato actualizados en el checkout (delta (y) de `SURFACE_COMPOSITION_DECISION_V1.md`).
+  Incluye `glass`, `ask`, `contrast`, `speaker`, `ink`, `fade` y `placement`, más los campos `who`, `ask` y `style`
+  en el intent. Las pruebas de contratos, tokens, graphic-line, `design:check` y typecheck pasan. **Falta publicarlo**
+  con commit, push y release de AXIS.
+- **Greenhouse** sigue fijado en `axis-tokens 0.3.41` y no ve el estándar nuevo hasta adoptar la versión que lo
+  publique.
+- **Control de contraste:** disponible con `pnpm brand:subtitles:check`. Mide sobre los cuadros reales del corte con los
+  valores del manifiesto de AXIS. [Manual](../../manual-de-uso/creative-studio/subtitulos-video-contraste.md).
 - **Catálogo `graphic-line-overlays` (`subtitles`):** sigue emitiendo el subtítulo anterior. El vidrio no puede
   salir como PNG con transparencia, porque necesita el cuadro de video debajo para desenfocarlo. Se renderiza en
   el motor en código sobre los cuadros del video, o en edición con una capa de ajuste enmascarada.
