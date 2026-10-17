@@ -38,8 +38,12 @@
   ajustes de página sin `post_featured_image`, Elementor borró la imagen destacada y Yoast tomó la primera imagen del
   contenido con `http://` (URL de plugins en contexto CLI). Se restauró `_thumbnail_id=252002` y se reconstruyó el
   indexable: `thumbnailUrl` vuelve a ser la OG con https. No se abrió el editor visual con una persona.
-- **Search Console:** bloqueado. La conexión OAuth de `sc-domain:efeoncepro.com` responde `invalid_grant` (refresh token
-  vencido o revocado); hay que reconectarla desde Greenhouse. Afecta también la sincronización GSC de Efeonce en SV360.
+- **Search Console (corregido):** la conexión OAuth de `sc-domain:efeoncepro.com` está activa. El `invalid_grant`
+  inicial fue un error del script de verificación: `listActiveSearchConsoleOrganizations()` no devuelve
+  `tokenSecretRef`, hay que leer `getSearchConsoleConnection(orgId)`. URL Inspection (2026-10-17 ~20:40 UTC): la nueva
+  URL aún «Google no reconoce esta URL»; la legacy sigue «Enviada e indexada» (último rastreo 17/10 00:34 UTC, antes del
+  301); `sitemap_index.xml` leído por Google por última vez el 11/10. La API es de sólo lectura: pedir indexación de la
+  URL nueva (y de la legacy, para que vea el 301) se hace en la interfaz de Search Console.
 - **Pendiente:** envío real del formulario → GA4 `generate_lead` (el acceso en tiempo real a la propiedad `486264460`
   está verificado) y lead en HubSpot «Lead Gen - Performance Marketing»; reconexión GSC + inspección de URL.
 
@@ -156,7 +160,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Lead consentido recibido por Meta como evento de servidor; Search Console invalid_grant`
+- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Lead consentido recibido por Meta como evento de servidor; Search Console: URL nueva aún no descubierta`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`

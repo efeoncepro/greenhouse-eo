@@ -57,4 +57,5 @@
   Rich Results 3 valid (only optional `address` warning, site-wide); validator.schema.org 0/0 with `FAQPage` and
   `Service` (via `WebPage.about`); 1536/890/390 + reduced motion + keyboard OK; Elementor re-save kept data and render
   identical but deleted the featured image (restored to `252002`, see `source-led-elementor-patterns.md`). Not yet:
-  real submission → GA4/HubSpot, URL Inspection (the efeoncepro.com GSC OAuth connection returns `invalid_grant`).
+  real submission → GA4/HubSpot, URL Inspection shows the new URL not yet known to Google (legacy still indexed, pre-301 crawl). To inspect via API read
+  the token ref with `getSearchConsoleConnection(orgId)`; `listActiveSearchConsoleOrganizations()` omits it (false `invalid_grant`).
