@@ -1,5 +1,7 @@
 # Registro de búsquedas comerciales
 
+**HSP-0032, corrección17/10 a las12:36 Santiago:** respuesta autorizada enviada en el hilo con enlace HubSpot al brochure completo de Marketing de Contenidos (57 láminas), firma gráfica y CCO, sin adjuntos. Outlook y EMAIL118825133964 `SENT`/asociaciones confirmados; sin nuevas altas ni secuencias. [Evidencia](runs/2026-10-17-1238-aloja-correccion.md) · [Consultas](queries/2026-10-17-1238-aloja-correccion.json).
+
 **Corrección de Julio, 17-10-2026:** los brochures están aprobados y no necesitan nada más. [Regla vigente](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md) · [antecedentes](../../audits/commercial/2026-10-17-approved-brochures-correction.md). No recortar ni volver a validar; copia Aloja de 38 láminas no aprobada. Corrección documental sin nuevas acciones CRM/envío.
 
 [Contrato operativo](README.md). Fechas y horas en America/Santiago. Conteos de empresas únicas;

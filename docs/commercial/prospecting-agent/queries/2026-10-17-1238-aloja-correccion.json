@@ -1,0 +1,65 @@
+{
+  "run_at": "2026-10-17T12:38:15-03:00",
+  "timezone": "America/Santiago",
+  "scope": "account_correction_only",
+  "account_id": "HSP-0032",
+  "country": "Perú",
+  "service": "creative_content_ugc",
+  "calendar_window": {
+    "from": "2026-10-12T00:00:00-03:00",
+    "to": "2026-10-17T12:38:15-03:00"
+  },
+  "discovery_queries": 0,
+  "coverage_20_cells": "not_applicable_focused_operator_action",
+  "published_at": null,
+  "deadline_at": null,
+  "queries": [
+    {
+      "source": "HubSpot Documents UI",
+      "query": "summary/357058082 -> create recipient-specific link -> internal preview",
+      "result": "Original confirmed at57 pages; link Q04BtyyQ0, no reupload",
+      "filters": "portal48713323, document357058082"
+    },
+    {
+      "source": "Outlook UI",
+      "query": "aloja-host.com",
+      "result": "Initial Sent email found; reply correction sent and independently reopened",
+      "redaction": "No individual email in domain search"
+    },
+    {
+      "source": "Outlook connector search",
+      "query": "to:[CORREO_INDIVIDUAL_REDACTADO] subject:\"Contenido, experiencias y UGC para Aloja Host\"",
+      "result": "2 messages, has_more=false",
+      "pii_redacted": true
+    },
+    {
+      "source": "Outlook fetch_message",
+      "query": "Fetch correction message returned by search; exact ID in private ledger",
+      "result": "recipient, BCC, full signature, full brochure link, no attachments verified",
+      "pii_redacted": true
+    },
+    {
+      "source": "HubSpot EMAIL search",
+      "query": "associatedWith CONTACT255793944973, latest timestamp DESC",
+      "executions": 2,
+      "result": "First query initial SENT only; second query initial and correction SENT, total2, no missing pages"
+    },
+    {
+      "source": "HubSpot CLI",
+      "query": "associations list --from emails:118825133964 --to companies --format json",
+      "result": "Aloja Host59391176252 and sender Efeonce40379321357; next=null"
+    },
+    {
+      "source": "HubSpot COMPANY read",
+      "query": "40379321357 name,domain",
+      "result": "Efeonce, sender company"
+    }
+  ],
+  "blocked_sources": [],
+  "uncertainties": [
+    "Recipient delivery/read not established",
+    "Publication exact date/deadline remain unknown"
+  ],
+  "approval": "Explicit operator instruction to send full Marketing de Contenidos HubSpot link; existing recipient/signature preserved",
+  "crm_state": "Existing contacts/companies reused; native BCC EMAIL SENT readback; no manual activity or further mutation"
+}
