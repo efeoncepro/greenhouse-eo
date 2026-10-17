@@ -94,6 +94,8 @@ button{font:inherit}
  .g3{grid-template-columns:minmax(0,1fr)}
  .sticky-col{position:static!important}
  .hline{display:none}
+ .sigstrip{grid-template-columns:minmax(0,1fr)!important}
+ .sig-flow svg{transform:rotate(90deg);width:60px!important}
  .step{display:grid!important;grid-template-columns:72px minmax(0,1fr);column-gap:22px;row-gap:12px;align-items:start;padding-bottom:12px}
  .step>*{grid-column:2}
  .step>.step-n{grid-column:1;grid-row:1 / span 4;position:relative;z-index:1}
@@ -113,6 +115,8 @@ button{font:inherit}
  .lane .lane-status{grid-column:2;text-align:left!important}
  .lane img{width:72px!important}
  .auto-q{grid-template-columns:minmax(0,1fr)!important}
+ .mock3{grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 8px 12px 0}
+ .mock3>*{scroll-snap-align:start}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -167,10 +171,33 @@ button{font:inherit}
 <p class="lead rv" style="margin-top: 28px; max-width: 460px">Cada plataforma se cuenta la misma venta. Sumadas, celebran más de lo que vendiste, y la pauta aprende del número equivocado.</p>
 </div>
 <figure style="margin: 0">
-<div class="st" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
-<div style="border-radius: 22px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); padding: 22px; display: flex; flex-direction: column; gap: 14px"><img src="/_blob/9b1132dcbdc66c509ebcdcc4314d8397" alt="" style="height: 30px; width: 30px; object-fit: contain"><span style="font-size: 13px; color: #cfe4fa">Google Ads reporta</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 40px; letter-spacing: -0.03em; line-height: 1">+1 <span style="font-size: 16px; font-weight: 500; letter-spacing: 0">conversión</span></span></div>
-<div style="border-radius: 22px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); padding: 22px; display: flex; flex-direction: column; gap: 14px"><img src="/_blob/0fe58d227cd28d07cd948509dcd9ca35" alt="" style="height: 30px; width: 44px; object-fit: contain"><span style="font-size: 13px; color: #cfe4fa">Meta reporta</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 40px; letter-spacing: -0.03em; line-height: 1">+1 <span style="font-size: 16px; font-weight: 500; letter-spacing: 0">conversión</span></span></div>
-<div style="border-radius: 22px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); padding: 22px; display: flex; flex-direction: column; gap: 14px"><img src="/_blob/25985003b63ee609d06ce8c4a7ae88a8" alt="" style="height: 30px; width: 30px; object-fit: contain"><span style="font-size: 13px; color: #cfe4fa">TikTok reporta</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: 40px; letter-spacing: -0.03em; line-height: 1">+1 <span style="font-size: 16px; font-weight: 500; letter-spacing: 0">conversión</span></span></div>
+<div class="st mock3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end">
+<div style="position: relative; padding-top: 18px">
+<div style="height: 300px; border-radius: 18px; background: #ffffff; color: #202124; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 30px 70px rgba(0,0,0,0.45)">
+<p style="margin: 0; font-size: 10px; color: #5f6368">Patrocinado · Shopping</p>
+<img src="/_blob/2f87d1bd343713c103ae42668be4bc9f" alt="Anuncio de Shopping de una zapatilla de una marca ficticia" style="width: 100%; flex: 1; min-height: 0; object-fit: cover; border-radius: 10px; display: block">
+<p style="margin: 0; font-size: 13px; font-weight: 600; line-height: 1.25">Zapatilla Volt · Nórtica</p>
+<p style="margin: 0; font-size: 13px; font-weight: 700">$89.990 <span style="font-weight: 400; color: #188038; font-size: 11px">Envío gratis</span></p>
+</div>
+<span class="pop" style="position: absolute; top: 0; right: -6px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #ffffff; color: #001a33; font-size: 12px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.4)"><img src="/_blob/cffa777d51b9654499b4b9324e56d7e5" alt="Google Ads" style="width: 18px; height: 18px">+1 conversión</span>
+</div>
+<div style="position: relative; padding-top: 18px">
+<div style="height: 300px; border-radius: 18px; background: #000000; color: #ffffff; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 30px 70px rgba(0,0,0,0.45)">
+<p style="margin: 0; padding: 9px 10px; display: flex; align-items: center; gap: 7px; font-size: 11px"><span style="width: 18px; height: 18px; border-radius: 50%; background: #d7ff2e; color: #000000; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center">N</span><span><b style="font-weight: 600">nortica</b><br><span style="color: #a8a8a8">Publicidad</span></span></p>
+<img src="/_blob/d000ba8e3ed4a623601e8245671c3393" alt="Anuncio en el feed de Instagram de una marca ficticia" style="width: 100%; flex: 1; min-height: 0; object-fit: cover; display: block">
+<p style="margin: 0; padding: 9px 10px; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; background: #1f1f1f">Comprar ahora <span aria-hidden="true">›</span></p>
+</div>
+<span class="pop" style="position: absolute; top: 0; right: -6px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #ffffff; color: #001a33; font-size: 12px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.4)"><img src="/_blob/9a135af9542349fd34c5e9259b0f6c14" alt="Meta" style="width: 22px; height: 16px; object-fit: contain">+1 conversión</span>
+</div>
+<div style="position: relative; padding-top: 18px">
+<div style="position: relative; height: 300px; border-radius: 18px; overflow: hidden; background: #000000; box-shadow: 0 30px 70px rgba(0,0,0,0.45)">
+<img src="/_blob/02015b911a8595916b23c48943669d01" alt="Anuncio vertical en TikTok de una marca ficticia" style="width: 100%; height: 100%; object-fit: cover; display: block">
+<span style="position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 4px; background: rgba(0,0,0,0.55); color: #ffffff">Patrocinado</span>
+<span aria-hidden="true" style="position: absolute; right: 8px; bottom: 54px; display: flex; flex-direction: column; gap: 10px"><span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.85)"></span><span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.85)"></span><span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.85)"></span></span>
+<span style="position: absolute; left: 8px; right: 8px; bottom: 8px; padding: 7px; border-radius: 6px; background: #fe2c55; color: #ffffff; font-size: 11px; font-weight: 700; text-align: center">Comprar ahora</span>
+</div>
+<span class="pop" style="position: absolute; top: 0; right: -6px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #ffffff; color: #001a33; font-size: 12px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.4)"><img src="/_blob/06bcf94038bf315ea47690b69003773b" alt="TikTok" style="width: 16px; height: 18px; object-fit: contain">+1 conversión</span>
+</div>
 </div>
 <svg viewBox="0 0 600 90" preserveAspectRatio="none" style="display: block; width: 100%; height: 90px" aria-hidden="true">
 <path class="draw" pathLength="1" d="M100 0 C100 50 300 40 300 90" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2"></path>
@@ -178,10 +205,10 @@ button{font:inherit}
 <path class="draw" pathLength="1" d="M500 0 C500 50 300 40 300 90" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2"></path>
 </svg>
 <div class="pop" style="border-radius: 26px; border: 2px solid #f83902; background: linear-gradient(160deg, rgba(248,57,2,0.14), rgba(0,26,51,0.2) 70%); padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap">
-<div><p class="eyebrow" style="font-size: 12px; color: #ffffff">Lo que llegó a tu CRM</p><p style="margin: 8px 0 0; font-size: 15px; color: #cfe4fa">Una sola compra, de una sola persona</p></div>
+<div style="display: flex; align-items: center; gap: 16px"><img src="/_blob/2f87d1bd343713c103ae42668be4bc9f" alt="" style="width: 64px; height: 64px; object-fit: cover; border-radius: 14px"><div><p class="eyebrow" style="font-size: 12px; color: #ffffff">Lo que llegó a tu CRM</p><p style="margin: 6px 0 0; font-size: 15px; color: #cfe4fa">Zapatilla Volt · $89.990 · una sola persona</p></div></div>
 <p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(56px, 6vw, 88px); letter-spacing: -0.05em; line-height: 0.9">1 <span style="font-size: 0.32em; font-weight: 600; letter-spacing: 0">venta real</span></p>
 </div>
-<figcaption style="margin-top: 16px; font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo. Una misma venta, atribuida por tres plataformas.</figcaption>
+<figcaption style="margin-top: 16px; font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo con una marca ficticia. Una misma venta, atribuida por tres plataformas.</figcaption>
 </figure>
 </div>
 </section>
@@ -213,6 +240,23 @@ button{font:inherit}
 </li>
 </ol>
 </div>
+<figure class="rv sigstrip" style="margin: 88px 0 0; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 2fr) minmax(0, 5fr); gap: 20px; align-items: center">
+<div style="border-radius: 24px; background: #ffffff; color: #001a33; padding: 18px; display: flex; gap: 16px; align-items: center; box-shadow: 0 30px 80px rgba(0,0,0,0.45)">
+<img src="/_blob/2f87d1bd343713c103ae42668be4bc9f" alt="" style="width: 84px; height: 84px; object-fit: cover; border-radius: 14px; flex: none">
+<div><p style="margin: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #1e6b3a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>Compra confirmada</p><p style="margin: 4px 0 0; font-size: 16px; font-weight: 600">Zapatilla Volt · talla 38</p><p style="margin: 2px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 760; letter-spacing: -0.02em">$89.990</p></div>
+</div>
+<div class="sig-flow" style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff">Señal con valor</span>
+<svg viewBox="0 0 200 16" preserveAspectRatio="none" style="width: 100%; height: 16px; display: block" aria-hidden="true"><path class="flow" d="M2 8 H186" stroke="#f83902" stroke-width="3" stroke-dasharray="10 14" stroke-linecap="round" fill="none"></path><path d="M182 2 L196 8 L182 14" stroke="#f83902" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span style="font-size: 12px; color: #9fb6cc">Desde tu e-commerce o tu CRM</span>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04)"><span style="width: 34px; height: 34px; border-radius: 10px; background: #ffffff; display: inline-flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/cffa777d51b9654499b4b9324e56d7e5" alt="" style="width: 20px; height: 20px"></span><span style="font-size: 15px"><b style="font-weight: 600">Google Ads</b> aprende: compra de $89.990</span></li>
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04)"><span style="width: 34px; height: 34px; border-radius: 10px; background: #ffffff; display: inline-flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/9a135af9542349fd34c5e9259b0f6c14" alt="" style="width: 22px; height: 16px; object-fit: contain"></span><span style="font-size: 15px"><b style="font-weight: 600">Meta</b> aprende: compra de $89.990</span></li>
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04)"><span style="width: 34px; height: 34px; border-radius: 10px; background: #ffffff; display: inline-flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/06bcf94038bf315ea47690b69003773b" alt="" style="width: 18px; height: 20px; object-fit: contain"></span><span style="font-size: 15px"><b style="font-weight: 600">TikTok</b> aprende: compra de $89.990</span></li>
+</ul>
+<figcaption style="grid-column: 1 / -1; font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo con una marca ficticia: la plataforma deja de aprender del clic y aprende de la venta.</figcaption>
+</figure>
 </div>
 </section>
 
@@ -256,6 +300,15 @@ button{font:inherit}
 <div style="position: relative; border-radius: 30px; overflow: hidden; aspect-ratio: 16 / 10; background: #0a3157">
 <img src="/_blob/99ea707ade86c74181258db5c18d1793" loading="lazy" alt="Tres teléfonos con el anuncio de una marca ficticia en Feed, Stories y Reels" style="width: 100%; height: 100%; object-fit: cover; display: block">
 <span class="chip" style="position: absolute; left: 20px; top: 20px; background: rgba(0,26,51,0.75)">Feed · Stories · Reels</span>
+<div class="floaty" style="position: absolute; right: 20px; bottom: 20px; width: min(250px, 58%); border-radius: 16px; background: #ffffff; color: #1c1e21; padding: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.5)">
+<p style="margin: 0 0 8px; display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600"><img src="/_blob/9a135af9542349fd34c5e9259b0f6c14" alt="" style="width: 18px; height: 12px; object-fit: contain">Advantage+ · tu catálogo</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<img src="/_blob/2f87d1bd343713c103ae42668be4bc9f" alt="" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px">
+<img src="/_blob/491d28c4c1351888548e70cd00a5d1cf" alt="" style="width: 100%; aspect-ratio: 1; object-fit: cover; object-position: 50% 40%; border-radius: 8px">
+<img src="/_blob/c4623411bd6e57f662136c453e3fc679" alt="" style="width: 100%; aspect-ratio: 1; object-fit: cover; object-position: 50% 45%; border-radius: 8px">
+</div>
+<p style="margin: 8px 0 0; padding: 7px; border-radius: 8px; background: #0866ff; color: #ffffff; font-size: 12px; font-weight: 600; text-align: center">Comprar ahora</p>
+</div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 18px">
 <p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.04em; font-size: clamp(40px, 4.4vw, 68px); line-height: 0.95">La pieza decide</p>
@@ -273,6 +326,10 @@ button{font:inherit}
 <div style="position: relative; border-radius: 30px; overflow: hidden; aspect-ratio: 16 / 10; background: #0a3157">
 <img src="/_blob/d928efffaf041c9a342f685cc1692019" loading="lazy" alt="Un pasajero en un bus ve el video vertical de una marca ficticia en su teléfono" style="width: 100%; height: 100%; object-fit: cover; display: block">
 <span class="chip" style="position: absolute; left: 20px; top: 20px; background: rgba(0,26,51,0.75)">Video vertical con sonido</span>
+<div class="floaty" style="position: absolute; right: 20px; bottom: 20px; width: min(230px, 55%); border-radius: 16px; overflow: hidden; background: #000000; color: #ffffff; box-shadow: 0 24px 60px rgba(0,0,0,0.55)">
+<div style="position: relative; height: 150px"><img src="/_blob/02015b911a8595916b23c48943669d01" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"><span style="position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 4px; background: rgba(0,0,0,0.55)">Spark Ads · @nortica</span></div>
+<p style="margin: 0; padding: 9px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px"><span style="display: inline-flex; align-items: center; gap: 6px"><img src="/_blob/06bcf94038bf315ea47690b69003773b" alt="" style="width: 14px; height: 16px; object-fit: contain">Video de tu cuenta</span><span style="padding: 5px 9px; border-radius: 6px; background: #fe2c55; font-weight: 700">Comprar</span></p>
+</div>
 </div>
 <div style="display: flex; flex-direction: column; gap: 18px">
 <p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.04em; font-size: clamp(40px, 4.4vw, 68px); line-height: 0.95">Hecho para TikTok</p>
@@ -413,9 +470,9 @@ button{font:inherit}
 <article class="card-pad rv" style="border-radius: 30px; border: 1px solid rgba(255,255,255,0.16); background: rgba(0,26,51,0.6); padding: 32px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap"><h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; font-size: 28px; letter-spacing: -0.03em">Bitácora · Semana 42</h3><span style="font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo</span></div>
 <ul class="st" style="list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
-<li style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.04)"><img src="/_blob/0fe58d227cd28d07cd948509dcd9ca35" alt="Meta" style="width: 32px; height: 24px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Pausamos la variante C</b><span style="display: block; color: #cfe4fa; font-size: 14px">Bajó su venta por impresión tres semanas seguidas.</span></span><span class="chip" style="font-size: 11px; padding: 6px 10px">Apagado</span></li>
-<li style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.04)"><img src="/_blob/9b1132dcbdc66c509ebcdcc4314d8397" alt="Google" style="width: 26px; height: 26px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Excluimos tu marca en Performance Max</b><span style="display: block; color: #cfe4fa; font-size: 14px">Pagábamos por clientes que ya te buscaban.</span></span><span class="chip" style="font-size: 11px; padding: 6px 10px">Ajustado</span></li>
-<li style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(248,57,2,0.08); border: 1px solid rgba(248,57,2,0.5)"><img src="/_blob/de1e4399bda3646f5d1ab0fc68bf3a0b" alt="LinkedIn" style="width: 26px; height: 26px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Más presupuesto a cuentas con oportunidades</b><span style="display: block; color: #cfe4fa; font-size: 14px">Ventas aceptó dos oportunidades de esa lista.</span></span><span class="chip" style="font-size: 11px; padding: 6px 10px; border-color: #ffffff">Escalado</span></li>
+<li style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.04)"><img src="/_blob/0fe58d227cd28d07cd948509dcd9ca35" alt="Meta" style="width: 32px; height: 24px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Pausamos la variante C</b><span style="display: block; color: #cfe4fa; font-size: 14px">Bajó su venta por impresión tres semanas seguidas.</span></span><span style="display: flex; align-items: center; gap: 10px"><img src="/_blob/c35c961f8f6b556f0c4b6a06d1156cda" alt="Variante C, «Más liviana»" style="width: 40px; height: 50px; object-fit: cover; border-radius: 6px; filter: grayscale(1); opacity: 0.6"><span class="chip" style="font-size: 11px; padding: 6px 10px">Apagado</span></span></li>
+<li style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.04)"><img src="/_blob/9b1132dcbdc66c509ebcdcc4314d8397" alt="Google" style="width: 26px; height: 26px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Excluimos tu marca en Performance Max</b><span style="display: block; color: #cfe4fa; font-size: 14px">Pagábamos por clientes que ya te buscaban.</span></span><span style="display: flex; align-items: center; gap: 10px"><img src="/_blob/2f87d1bd343713c103ae42668be4bc9f" alt="Anuncio de Shopping de la zapatilla" style="width: 40px; height: 50px; object-fit: cover; border-radius: 6px"><span class="chip" style="font-size: 11px; padding: 6px 10px">Ajustado</span></span></li>
+<li style="display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: start; padding: 16px; border-radius: 16px; background: rgba(248,57,2,0.08); border: 1px solid rgba(248,57,2,0.5)"><img src="/_blob/de1e4399bda3646f5d1ab0fc68bf3a0b" alt="LinkedIn" style="width: 26px; height: 26px; object-fit: contain"><span style="font-size: 15px; line-height: 1.45"><b style="font-weight: 600">Más presupuesto a cuentas con oportunidades</b><span style="display: block; color: #cfe4fa; font-size: 14px">Ventas aceptó dos oportunidades de esa lista.</span></span><span style="display: flex; align-items: center; gap: 10px"><img src="/_blob/0bf64d18434078a6c6c7de728d33ac7e" alt="Anuncio B2B en LinkedIn" style="width: 40px; height: 50px; object-fit: cover; object-position: 55% 50%; border-radius: 6px"><span class="chip" style="font-size: 11px; padding: 6px 10px; border-color: #ffffff">Escalado</span></span></li>
 </ul>
 </article>
 <article class="card-pad rv" style="border-radius: 30px; background: #f7f8f6; color: #001a33; padding: 32px; display: flex; flex-direction: column; gap: 20px">
@@ -520,7 +577,7 @@ button{font:inherit}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"initialPlatform":{"editor":"enum","options":["g","m","t","l"],"default":"g","section":"Plataformas"},"$preview":{"width":1440,"height":9800}}'>
+<script type="text/x-dc" data-dc-script data-props='{"initialPlatform":{"editor":"enum","options":["g","m","t","l"],"default":"g","section":"Plataformas"},"$preview":{"width":1440,"height":10200}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
