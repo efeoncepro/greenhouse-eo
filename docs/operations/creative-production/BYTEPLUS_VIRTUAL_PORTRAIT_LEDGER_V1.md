@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.5: autorización cruzada aceptada con permiso expreso de Julio; la API sigue rechazando ambas pruebas por Asset Service inactivo)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.6: cuentas conciliadas en vivo; KYC enviado en la cuenta de producción; los doce assets anteriores pertenecen a la cuenta incorrecta)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -13,23 +13,40 @@ La biblioteca privada de assets de BytePlus es la vía para personajes propios. 
 ## 0. Cuenta canónica (2026-10-17, confirmado por Julio)
 
 **La cuenta canónica de BytePlus es 3004839361**: es la de la credencial de inferencia de la CLI
-(`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas de esta tabla, el KYC, el plan Entry y
+(`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas históricas de §4.1, el KYC aprobado, el plan Entry y
 la carta de compromiso se hicieron por error en la cuenta **3003660328**; por eso la API responde «Your account has not
 activated the Asset Service»: la clave no ve esos assets. **Los 12 assets de 3003660328 no sirven para la CLI.**
-Para usarlos hay que repetir en 3004839361: KYC de organización (si no lo tiene), Advanced Creation Rights (Entry),
-carta de compromiso y la subida de los 12 archivos de `SUBIR/`, y anotar los nuevos ids aquí. No borrar los de
-3003660328 sin decisión de Julio.
+La recuperación se hace exclusivamente en 3004839361: el KYC ya está enviado y en revisión (§1); después faltan
+Entry, firma personal de Julio y las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
+cualquier eliminación o transferencia de sus assets.
 
 ## 1. Estado del plan
 
+### Cuenta de producción obligatoria
+
+**Única cuenta autorizada: `3004839361`, root `jreyes`, acceso Google SSO con
+`jreyes@efeoncepro.com`, región `ap-southeast-1`, proyecto `default`.** Antes de cualquier operación de
+consola, abrir Account y comprobar el ID. El perfil de Chrome o el dominio abierto no prueba la identidad.
+Si el ID difiere o no puede verificarse, detener la operación. **No volver a iniciar sesión ni operar la cuenta
+`3003660328` (`julio_reyes`)**, por instrucción expresa de Julio del 2026-10-17. Sus assets no se reutilizan
+en las llamadas de producción y sus cupos no se suman a los de esta cuenta.
+
+La clave ModelArk `efeonce-media-directa` aparece **Active**, creada por `3004839361`; se verificó en la UI
+sin revelar su valor. La referencia Secret Manager `greenhouse-byteplus-api-key` ya corresponde al carril de
+producción: no se cambió ni creó ninguna credencial. Seedance 2.5 está **Activated**. Un GET de la tarea
+`cgt-20261017085910-h4kbe` devolvió `succeeded`, sin generar ni consumir una nueva tarea.
+
+**Estado vigente de `3004839361`:**
+
 | Dato | Valor |
 |---|---|
-| KYC de organización | Enviado 2026-10-16; aprobado 2026-10-17 |
-| Plan activo | **Advanced Creation Rights (Entry)**, gratuito, desde 2026-10-17 |
-| Cupo | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
+| KYC de organización | **Enviado y en revisión**: `Verification reviewing`, 2026-10-17 **19:53:32 UTC+8** (11:53:32 UTC; 08:53:32 Chile). Julio autorizó expresamente aceptar los términos y enviarlo en `3004839361`. Plazo indicado: 1–2 días hábiles |
+| Advanced Creation Rights | **No activo**; Entry gratuito bloqueado hasta aprobar KYC empresarial. No se compró ni cambió plan |
+| Cupo de Entry, cuando se active | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
-| Usados | **12 de 50 assets · 6 de 50 grupos** |
+| Cargas de retratos en esta cuenta | **Ninguna realizada por esta operación**; contador aún sin verificar porque Entry no está activo |
+| Facturación de producción | Tarjeta predeterminada ••••2505 ya registrada; Savings Plan USD 30 **Effective** (vence 2026-11-12 UTC+8). No se realizó compra ni se modificó la tarjeta; estado de liquidación de la factura no verificado |
 | Tier siguiente (oficial, 2026-10-13) | **USD 1.400/mes o USD 14.000/año**: 1M assets, 120 QPM. Premium: USD 4.200/mes o 42.000/año. Sin reembolso |
 
 El operador vio alrededor de USD 1.600 en la consola; la tabla oficial dice USD 1.400/mes. La diferencia podría ser
@@ -42,7 +59,12 @@ esté armada. Hasta entonces se opera sólo con el plan Entry.
 durante el período pagado (lo creado en Entry se conserva). Todo personaje que deba durar se sube en Entry o se
 renueva antes de vencer.
 
-El KYC no levanta el filtro de rostros: sólo habilita el plan. La re-prueba del 2026-10-17 con el cuadro de Antonio
+**Corrección de alcance:** el KYC aprobado y Entry con 12 assets/6 grupos registrados antes de esta conciliación
+pertenecen a **`3003660328`**, la cuenta incorrecta (§4.1), y no habilitan la cuenta de la API.
+La carta firmada con código a las 07:53 UTC también corresponde sólo a esa cuenta. **Si aparece una nueva
+carta de compromiso en `3004839361`, detenerse para que Julio la firme personalmente.**
+
+El KYC por sí solo no prueba que se levante el filtro. La re-prueba del 2026-10-17 con el cuadro de Antonio
 (GPT Image) se rechazó con `InputImageSensitiveContentDetected.PrivacyInformation` (requestId
 `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro).
 
@@ -73,7 +95,26 @@ imagen = borrar y subir otra.
 
 ## 4. Cupos usados
 
-Usados: **12 de 50 assets · 6 de 50 grupos**.
+### Carga autorizada pendiente — cuenta correcta `3004839361`
+
+Julio pidió completar lo pendiente en esta cuenta y prohibió volver a usar la incorrecta. Se conserva el alcance:
+**sólo los 12 PNG de `SUBIR/`, dos por personaje**, sin compras. Primero Antonio y las pruebas de referencia/
+primer cuadro a 480p; continuar con el resto cuando funcione la referencia. No reutilizar los IDs históricos.
+
+| Personaje / grupo | Assets autorizados | Grupo e IDs nuevos | Estado | Fecha | Aprobó |
+|---|---|---|---|---|---|
+| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Pendientes | Bloqueado por KYC en revisión y Entry inactivo | 2026-10-17 | Julio |
+| Nexa — Efeonce | `nexa-1-rostro.png`, `nexa-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
+| Hum — elenco Efeonce | `hum-1-rostro.png`, `hum-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
+| Isabella — elenco Efeonce | `isabella-1-rostro.png`, `isabella-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
+| Karo — elenco Efeonce | `karo-1-rostro.png`, `karo-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
+| Sophia — elenco Efeonce | `sophia-1-rostro.png`, `sophia-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
+
+### 4.1. Histórico de la cuenta incorrecta `3003660328` — no usar
+
+Usados allí en el último readback histórico: **12 de 50 assets · 6 de 50 grupos**. Las filas siguientes conservan
+la evidencia de esa carga; **no acreditan assets disponibles en `3004839361`**. No se volvió a entrar, modificar,
+borrar ni transferir nada en la cuenta incorrecta después de la prohibición de Julio.
 
 | # | Personaje | Tipo (elenco/cliente/real) | Asset group | Asset id(s) | Assets | Estado | Evidencia | Fecha | Aprobó |
 |---|---|---|---|---|---|---|---|---|---|
@@ -84,7 +125,7 @@ Usados: **12 de 50 assets · 6 de 50 grupos**.
 | 5 | Karo | elenco virtual | `Karo — elenco Efeonce` · `group-20261017165458-zqhpz` | Rostro: `asset-20261017165458-kc6kj` (`karo-1-rostro.png`); cuerpo: `asset-20261017165600-rqqgj` (`karo-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
 | 6 | Sophia | elenco virtual | `Sophia — elenco Efeonce` · `group-20261017165708-vln4l` | Rostro: `asset-20261017165709-knb82` (`sophia-1-rostro.png`); cuerpo: `asset-20261017165815-bnrr2` (`sophia-2-cuerpo.png`) | 2 | Ambos `warehoused`, sin error en consola; API `Active` no verificado | `ai-generations/2026-10-17_byteplus-retratos-elenco/` (fuentes, prompts, logs, intermedias y `SUBIR/SHA256SUMS`) | 2026-10-17 | Julio |
 
-### Autorización y carga completada (2026-10-17)
+### Autorización y carga histórica en `3003660328` (2026-10-17)
 
 Aprobada por el operador el 2026-10-17 («súbelo»): **Antonio, Nexa, Hum, Isabella, Karo y Sophia**, 2 imágenes cada
 uno = **12 assets en 6 grupos**. Paquete listo con QA y checksums en
@@ -127,6 +168,8 @@ intermedias y la imagen final) queda en un lugar durable y se anota en la column
 
 ## 6. Procedimiento para subir un personaje
 
+0. **Cuenta obligatoria:** verificar `3004839361` en Account y la correspondencia con la clave de producción (§1).
+   KYC, Entry y assets deben pertenecer a esa misma cuenta y al proyecto `default`. Nunca usar `3003660328`.
 1. **Decisión y fila.** El operador aprueba el personaje; se agrega su fila en §4.
 2. **Evidencia** reunida según §5.
 3. **Consola:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje. La carta de
@@ -145,6 +188,10 @@ intermedias y la imagen final) queda en un lugar durable y se anota en la column
    Como primer cuadro (`--image` sin `--references`) no está documentado: probarlo antes de planificar con él.
 
 ## 7. Pruebas de Antonio — 2026-10-17
+
+**Alcance de todos los intentos históricos de esta sección:** la API usa `3004839361`, pero los IDs de entrada
+se cargaron en `3003660328`. Ninguno valida la biblioteca de la cuenta correcta. Nuevas pruebas pendientes de
+KYC aprobado, Entry gratuito activo, firma de Julio y nuevos IDs de Antonio en `3004839361`.
 
 ### Primera ejecución — 08:44 UTC
 
@@ -239,10 +286,33 @@ anteriores; eso no prueba que pertenezca a esa misma cuenta. No se pudo contrast
 2026-10-17 07:47:44 en la UI, zona no indicada). «Subscription Plans» sólo ofrecía planes pagados de USD 1.400
 y USD 4.200 mensuales; se cerró con `cancel`, sin marcar términos, pagar ni cambiar plan. No hubo más subidas.
 
-**Pendiente concreto:** confirmar con BytePlus dónde se habilita Asset Service en Entry para la cuenta usada
+**Pendiente histórico, resuelto por la conciliación siguiente:** confirmar con BytePlus dónde se habilita Asset Service en Entry para la cuenta usada
 por la credencial de inferencia, y si esa credencial corresponde a 3003660328. El permiso cruzado aceptado y la
 presencia de los assets no bastan para declarar el servicio activo. Consulta preparada para soporte, aún no enviada:
 «Entry gratuito con 12 assets y 6 grupos en cuenta 3003660328; autorización TOS/VPC/Machine Learning Platform
 aceptada; inferencia por `asset://` sigue respondiendo “Your account has not activated the Asset Service”.
 ¿Dónde se habilita para Entry y cómo verificamos que la clave `efeonce-media-directa` pertenece a esta cuenta?».
 Adjuntar los dos request ids de esta tabla, sin credenciales ni URLs firmadas.
+
+### Conciliación confirmada y KYC de la cuenta correcta — 11:53 UTC
+
+Google SSO con `jreyes@efeoncepro.com` abrió **`3004839361`**, root `jreyes`. La consola mostró Seedance 2.5
+activado y la clave `efeonce-media-directa` creada por ese ID. El GET de la tarea histórica devolvió `succeeded`.
+La cuenta conserva su tarjeta y Savings Plan; **no faltaba comprar ni volver a activar Seedance**.
+
+El control de Entry indicó falta de verificación empresarial. Se completó el KYC con la razón social, RUT y
+domicilio de Efeonce y el certificado oficial `estatutos-05-01-26.pdf`. Julio confirmó expresamente: «Sí, acepta
+y envía el KYC en 3004839361». Tras aceptar los términos y confirmar el nombre, la UI cambió a
+**`Verification reviewing`**, con fecha **2026-10-17 19:53:32 UTC+8**. El envío no equivale a aprobación.
+
+**Resultado vigente de las pruebas:** referencia **pendiente**; primer cuadro **pendiente** en la cuenta correcta.
+No se repitieron llamadas con los IDs de la cuenta incorrecta, no se subieron retratos y no hubo compras.
+**Siguiente paso:** esperar aprobación de BytePlus, activar sólo Entry gratuito y detenerse ante la nueva carta
+de compromiso para la firma personal de Julio. Luego cargar Antonio, comprobar estados/contador y ejecutar
+las dos pruebas con sus nuevos IDs; continuar en el orden de §4 sólo si funciona la referencia.
+
+Evidencia local (fuera del repo): `/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/`:
+`conciliacion-cuentas-byteplus.md`, `cuenta-correcta-seedance25-activado.jpg`,
+`cuenta-correcta-savings-plan-vigente.jpg`, `cuenta-correcta-acr-kyc-pendiente.jpg` y
+`kyc-cuenta-correcta-en-revision.jpg`. El correo previo a Cloris mencionaba `3003660328`: queda desactualizado;
+no se envió una nueva comunicación durante esta conciliación.
