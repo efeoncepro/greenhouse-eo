@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.10: Julio confirma mecanismos y plan de respuesta; cuestionario completo, carta abierta en paso 2 sin aceptar)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.11: Julio ordena firmar; carta y correo verificados, Entry gratuito activo; carga bloqueada por selector de Chrome)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -16,8 +16,8 @@ La biblioteca privada de assets de BytePlus es la vía para personajes propios. 
 (`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas históricas de §4.1, el KYC aprobado, el plan Entry y
 la carta de compromiso se hicieron por error en la cuenta **3003660328**; por eso la API responde «Your account has not
 activated the Asset Service»: la clave no ve esos assets. **Los 12 assets de 3003660328 no sirven para la CLI.**
-La recuperación se hace exclusivamente en 3004839361: el KYC ya está aprobado (§1); después faltan
-firma personal de Julio, activación de Entry y las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
+La recuperación se hace exclusivamente en 3004839361: KYC aprobado y Entry gratuito activo (§1),
+con carta aceptada por orden expresa posterior de Julio. Faltan las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
 cualquier eliminación o transferencia de sus assets.
 
 ## 1. Estado del plan
@@ -41,11 +41,11 @@ producción: no se cambió ni creó ninguna credencial. Seedance 2.5 está **Act
 | Dato | Valor |
 |---|---|
 | KYC de organización | **Aprobado**, `Verification successful`. Consola: **2026-10-18 00:57:32 UTC+8** = **2026-10-17 16:57:32 UTC / 13:57:32 Chile**. Correo oficial recibido 16:57:37 UTC confirma éxito para **3004839361**. El envío original fue 11:53:32 UTC, autorizado expresamente por Julio |
-| Advanced Creation Rights | **No activo todavía**; Entry **USD 0**, `Free Trial` habilitado. Cuestionario completo: preguntas 1 y 2 `YES`, pregunta 3 uso interno. Julio confirmó expresamente mecanismos y plan de respuesta. Paso 2 abierto: carta sin aceptar, reservada para su firma; verificación por correo pendiente |
-| Cupo de Entry, cuando se active | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
+| Advanced Creation Rights | **Entry activo, Billing mode Free**, 2026-10-17 17:37 UTC. Cuestionario completo; carta aceptada tras la orden expresa «Firmala» y verificación por correo completada con código entregado por Julio. Consola: `Apply for a free trial successfully` |
+| Cupo de Entry activo | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
-| Cargas de retratos en esta cuenta | **Ninguna realizada por esta operación**; contador aún sin verificar porque Entry no está activo |
+| Cargas de retratos en esta cuenta | **Ninguna**; consola confirma **0/50 assets y 0/50 grupos usados** al activar Entry, 50 de cada uno disponibles. Intento posterior de carga de Antonio bloqueado por Chrome; sin grupo creado |
 | Facturación de producción | Tarjeta predeterminada ••••2505 ya registrada; Savings Plan USD 30 **Effective** (vence 2026-11-12 UTC+8). No se realizó compra ni se modificó la tarjeta; estado de liquidación de la factura no verificado |
 | Tier siguiente (oficial, 2026-10-13) | **USD 1.400/mes o USD 14.000/año**: 1M assets, 120 QPM. Premium: USD 4.200/mes o 42.000/año. Sin reembolso |
 
@@ -62,7 +62,8 @@ renueva antes de vencer.
 **Corrección de alcance:** el KYC aprobado y Entry con 12 assets/6 grupos registrados antes de esta conciliación
 pertenecen a **`3003660328`**, la cuenta incorrecta (§4.1), y no habilitan la cuenta de la API.
 La carta firmada con código a las 07:53 UTC también corresponde sólo a esa cuenta. **Si aparece una nueva
-carta de compromiso en `3004839361`, detenerse para que Julio la firme personalmente.**
+carta de compromiso en `3004839361`, detenerse para que Julio la firme personalmente.** Se cumplió esa pausa;
+Julio después indicó **«Firmala»** y entregó el código. La carta de esta cuenta quedó aceptada y verificada (§7).
 
 El KYC por sí solo no prueba que se levante el filtro. La re-prueba del 2026-10-17 con el cuadro de Antonio
 (GPT Image) se rechazó con `InputImageSensitiveContentDetected.PrivacyInformation` (requestId
@@ -103,7 +104,7 @@ primer cuadro a 480p; continuar con el resto cuando funcione la referencia. No r
 
 | Personaje / grupo | Assets autorizados | Grupo e IDs nuevos | Estado | Fecha | Aprobó |
 |---|---|---|---|---|---|
-| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Pendientes | KYC aprobado; pendiente firma personal de Julio y activación de Entry | 2026-10-17 | Julio |
+| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Pendientes | Entry activo; carga bloqueada por selector de archivos de Chrome | 2026-10-17 | Julio |
 | Nexa — Efeonce | `nexa-1-rostro.png`, `nexa-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
 | Hum — elenco Efeonce | `hum-1-rostro.png`, `hum-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
 | Isabella — elenco Efeonce | `isabella-1-rostro.png`, `isabella-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
@@ -373,3 +374,26 @@ para la firma personal de Julio, conforme a su condición expresa. No hubo compr
 
 Evidencia en la misma carpeta local de §7: `kyc-cuestionario-completo-cuenta-correcta.jpg` y
 `entry-carta-abierta-para-firma-julio.jpg`. La captura parcial anterior se conserva como historia.
+
+
+### Carta aceptada y Entry gratuito activo — 2026-10-17 17:37 UTC
+
+Tras dejar la carta abierta sin aceptar, Julio indicó expresamente **«Firmala»**. Esa orden posterior autoriza
+aceptar la carta de **3004839361** y sustituye para este acto la reserva anterior de firma personal. Se leyó
+la carta, se pulsó `Agree and Continue` y se completó `Security Verification / Email Verification` con
+`jreyes@efeoncepro.com` y el código entregado por Julio (no se conserva el código en archivos).
+
+La consola confirmó que se cumplen los requisitos y mostró **`Apply for a free trial successfully`**.
+Advanced Creation Rights presenta **Entry**, **Billing mode Free**, **50 material assets + 50 material asset
+groups**, con **0/50 assets y 0/50 grupos usados**. Se volvió a abrir Account: **3004839361**, root **jreyes**.
+No hubo compra ni cambio a un plan pagado. La firma y activación no prueban todavía que funcione la inferencia.
+
+Se intentó cargar **sólo `antonio-1-rostro.png`** de `SUBIR/` para crear el primer grupo. La extensión de Chrome
+rechazó `fileChooser.setFiles` porque requiere `Allow access to file URLs`. Se probó también el selector nativo;
+el PNG correcto quedó seleccionado, pero `Abrir` permaneció deshabilitado y no se transmitió el archivo.
+La lista seguía vacía (`Total: 0`, creación `0/0`); se cerró el intento vacío. **No hay grupo ni assets nuevos**.
+Las dos pruebas de Antonio y el resto de personajes siguen pendientes; no se usan los IDs históricos.
+
+Evidencia fuera del repo, en la carpeta local de §7: `entry-carta-firmada-verificacion-completa.jpg` y
+`entry-gratuito-activo-cuenta-correcta.jpg`. El bloqueo pendiente es habilitar la carga de archivos de Chrome;
+no se amplió ningún permiso de la extensión ni se cambió la configuración de seguridad.
