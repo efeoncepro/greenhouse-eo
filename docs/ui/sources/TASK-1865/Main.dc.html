@@ -222,7 +222,7 @@ button{font:inherit}
 </div>
 <div class="rv" role="group" aria-label="Elige una plataforma" style="margin-top: 56px; display: flex; flex-wrap: wrap; gap: 10px">
 <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
-<button type="button" class="tabbtn" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="{{t.style}}"><span style="width: 34px; height: 34px; border-radius: 50%; background: #001a33; border: 1px solid rgba(255,255,255,0.25); box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center"><img src="{{t.icon}}" alt="" style="width: 20px; height: 20px; object-fit: contain"></span>{{t.label}}</button>
+<button type="button" class="tabbtn" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="{{t.style}}"><span style="width: 34px; height: 34px; border-radius: 10px; background: #ffffff; border: 1px solid rgba(0,26,51,0.14); box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center"><img src="{{t.icon}}" alt="" style="width: 20px; height: 20px; object-fit: contain"></span>{{t.label}}</button>
 </sc-for>
 </div>
 
@@ -525,10 +525,10 @@ class Component extends DCLogic {
     var self = this;
     var p = this.state.platform || this.props.initialPlatform || 'g';
     var tabDefs = [
-      { id: 'g', label: 'Google Ads', icon: '/_blob/9b1132dcbdc66c509ebcdcc4314d8397' },
-      { id: 'm', label: 'Meta Ads', icon: '/_blob/0fe58d227cd28d07cd948509dcd9ca35' },
-      { id: 't', label: 'TikTok Ads', icon: '/_blob/25985003b63ee609d06ce8c4a7ae88a8' },
-      { id: 'l', label: 'LinkedIn Ads', icon: '/_blob/de1e4399bda3646f5d1ab0fc68bf3a0b' }
+      { id: 'g', label: 'Google Ads', icon: '/_blob/cffa777d51b9654499b4b9324e56d7e5' },
+      { id: 'm', label: 'Meta Ads', icon: '/_blob/9a135af9542349fd34c5e9259b0f6c14' },
+      { id: 't', label: 'TikTok Ads', icon: '/_blob/06bcf94038bf315ea47690b69003773b' },
+      { id: 'l', label: 'LinkedIn Ads', icon: '/_blob/aa1551cf4d4f5bb9158e3619d634b658' }
     ];
     var tabs = tabDefs.map(function (t) {
       var on = t.id === p;
