@@ -207,6 +207,8 @@ export const archiveForm = async (formVersionId: string, formId: string): Promis
 
 export const addDestination = insertDestination
 export const setDestinationEnabledCommand = setDestinationEnabled
+// Internal release configuration; native schema/readback and operator authority are caller preconditions.
+export { configureHubSpotSubmissionTracing } from './destinations/hubspot/receipt-store'
 export const createHostSurface = insertHostSurface
 export const setHostSurfaceStatusCommand = setHostSurfaceStatus
 

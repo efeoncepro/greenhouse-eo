@@ -30,7 +30,15 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 
 ## Lote pendiente
 
-**Al 2026-09-03 no hay nada que ejecutar acá.** Las entradas de abajo se conservan por la lección que dejó cada
+### HubSpot native form receipts — pendiente, 2026-10-17
+
+[SQL preparado](hubspot-native-form-receipts.sql.pending), dueño Growth / Integrations;
+[ADR](../../architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md). Reactivar con timestamp nuevo
+dentro del release autorizado del worker compatible. No ejecutar un POST para comprobar el cambio.
+La CLI lectora tolera columnas ausentes; el dispatcher nuevo verifica el schema antes de cualquier POST.
+Faltan propiedad técnica/campo oculto nativo, mapping opt-in, despliegue y primer readback real.
+
+**Corte histórico 2026-09-03: no había nada que ejecutar.** Las entradas de abajo se conservan por la lección que dejó cada
 aplicación.
 
 ### TASK-1805 — CONTRACT de metodología ETV — APLICADA 2026-09-03 por TASK-1806

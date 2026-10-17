@@ -23,6 +23,10 @@ EMQ corresponde al evento y su muestra, no al negocio completo.
 
 ## Rastreo de una ocurrencia de Forms
 
+Delta local: [IDs nativos HubSpot](hubspot-native-form-receipts.md) con recibo persistido por el worker
+y marcador exacto. La CLI continúa READ ONLY; activación pendiente. Meta no permite GET por UUID:
+[evidencia individual y límites](meta-individual-event-verification.md).
+
 `leads find` busca candidatos con un selector de email en archivo privado y ventana acotada;
 `leads trace` sigue uno por submission ID o UUID de evento. El agente ve fuente, consentimiento,
 presencia de proyección, cola/ACK sGTM e intentos HubSpot por separado. Puede omitir el proveedor

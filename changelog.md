@@ -23,6 +23,13 @@
   HubSpot correlacionado, procesamiento Meta desconocido. Total actual: 172 tests/9 archivos, TS strict y
   lint propios PASS. Sin PII, descifrado, redispatch o CRM writes.
   [Último Performance releído](docs/audits/growth/2026-10-17-performance-latest-lead-trace.md): HubSpot recibido, ACK y un Lead servidor en Meta; sin fallos observados, identidad individual/atribución pendientes.
+- [Recibos nativos HubSpot](docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): marcador
+  server-side, historial exacto, ID persistido por CAS y recuperación GET independiente del POST.
+  Código local probado; SQL parqueado, provisión/mapping y release pendientes. Históricos conservan
+  correlación. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin
+  GET por `event_id`; captura del recibo CAPI propuesta, sin implementar ni reenviar eventos.
+  [Cierre local](docs/audits/growth/2026-10-17-native-hubspot-receipt-closure.md): 262 tests/14 archivos,
+  TS strict y lint PASS; SQL ejercitado en PostgreSQL aislado, lecturas reales sin mutaciones.
 
 ## 2026-10-17 — Landing Performance Marketing en producción (TASK-1865)
 

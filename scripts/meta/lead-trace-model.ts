@@ -1,4 +1,6 @@
 /** Pure classification of metadata already read by the CLI. No I/O, payload decryption, or provider calls. */
+import { parseHubSpotFormReceipt, isNativeHubspotSubmissionId } from '../../src/lib/growth/forms/destinations/hubspot/receipts'
+
 export type RemoteLeadTraceStatus = 'not_checked' | 'confirmed' | 'correlated' | 'not_found' | 'partial' | 'ambiguous' | 'unavailable' | 'not_applicable'
 export type LeadTraceDate = Date | string | null
 
@@ -45,11 +47,14 @@ export interface LeadHubspotAttemptMetadata {
   error_class?: string | null
   retry_count?: number | null
   created_at?: LeadTraceDate
+  provider_submission_id?: string | null
+  provider_receipt_json?: unknown
 }
 
 export interface RemoteStageEvidence {
   status: RemoteLeadTraceStatus
   matchedSubmissionId?: string
+  nativeSubmissionId?: string
   correlation?: 'exact_uuid' | 'time_email_fields' | 'identity' | 'none'
   safeErrorCode?: string
 }
@@ -126,6 +131,9 @@ export interface LeadTraceReport {
         httpStatus?: number
         safeErrorClass?: string
         externalIdKind: 'local_hsforms_receipt' | 'fake' | 'unverified_identifier' | 'absent'
+        nativeSubmissionId?: string
+        receiptStatus?: string
+        receiptCheckCount?: number
         createdAt?: string
       }[]
     }
@@ -293,15 +301,21 @@ export function buildLeadTrace(input: LeadTraceInput): LeadTraceReport {
 
   const localAttempt: LeadTraceReport['hubspot']['localAttempt'] = {
     status: localStatus, attemptCount: realAttempts.length, destinationCount: latest.size, ignoredFakeAttempts: fakeAttempts.length,
-    attempts: realAttempts.map(row => ({
+    attempts: realAttempts.map(row => {
+      const receipt = parseHubSpotFormReceipt(row.provider_receipt_json)
+      const bound = receipt?.markerValue === submissionId && row.status === 'succeeded'
+
+      return {
       ...(operationalId(row.attempt_id) ? { attemptId: operationalId(row.attempt_id) } : {}),
       ...(operationalId(row.destination_id) ? { destinationId: operationalId(row.destination_id) } : {}),
       status: ATTEMPT_STATES.has(row.status) ? row.status : 'unknown',
       ...(http(row.http_status) !== undefined ? { httpStatus: http(row.http_status) } : {}),
       ...(safeError(row.error_class) ? { safeErrorClass: safeError(row.error_class) } : {}),
       externalIdKind: !row.external_id ? 'absent' : row.external_id === 'hsforms-' + submissionId ? 'local_hsforms_receipt' : row.external_id.startsWith('fake-') ? 'fake' : 'unverified_identifier',
+      ...(bound && receipt ? { receiptStatus: receipt.status, receiptCheckCount: receipt.checks } : {}),
+      ...(bound && receipt?.status === 'verified' && receipt.paginationComplete && isNativeHubspotSubmissionId(row.provider_submission_id) ? { nativeSubmissionId: row.provider_submission_id } : {}),
       ...(iso(row.created_at) ? { createdAt: iso(row.created_at) } : {})
-    }))
+    } })
   }
 
   const remote = (stage: 'formSubmission' | 'contact'): RemoteStageEvidence => {
@@ -313,6 +327,8 @@ export function buildLeadTrace(input: LeadTraceInput): LeadTraceReport {
     const correlation = ['exact_uuid', 'time_email_fields', 'identity', 'none'].includes(evidence.correlation ?? '') ? evidence.correlation : undefined
 
     if (correlation) result.correlation = correlation
+    if (typeof evidence.nativeSubmissionId === 'string' && /^(?:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|[0-9]{1,40})$/i.test(evidence.nativeSubmissionId))
+      result.nativeSubmissionId = evidence.nativeSubmissionId
 
     if (stage === 'formSubmission' && result.status === 'confirmed') {
       if (correlation !== 'exact_uuid' || !submissionId || formSubmissionId(evidence.matchedSubmissionId) !== submissionId) {

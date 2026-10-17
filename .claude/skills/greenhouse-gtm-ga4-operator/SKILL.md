@@ -24,6 +24,10 @@ Para seguir un lead: `leads find --input archivo-0600.json` devuelve candidatos;
 submission ID o event UUID. Cargar el mismo manual: runtime `greenhouse_app` READ ONLY, sin exportar
 identidad/descifrar/redispatchar. ACK sGTM no es procesamiento Meta; contacto CRM no prueba envío.
 HubSpot usa resolver canónico y portal verificado; `--source-only` omite esa comprobación remota.
+Identidad nativa: [manual](../../../docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md);
+marker por envío, GET histórico y CAS del worker (rollout pendiente). Históricos sin marker siguen
+correlacionados. [Meta individual](../../../docs/documentation/growth/meta-individual-event-verification.md):
+sin GET por event_id; no usar Test Events como sandbox ni reenviar para completar evidencia.
 
 - Tagging a Growth Form, Growth CTA, native meeting scheduler or landing so its governed event reaches GA4.
 - Wiring form `gh_form_*`, CTA engine `greenhouse_cta_*`, legacy host `gh_cta_clicked` or native

@@ -64,13 +64,74 @@ describe('HubSpot lead trace read-only correlation', () => {
     expect(calls).toHaveLength(1)
   })
 
-  it('returns exact only for the native conversion ID plus the selected form/window', async () => {
+  it('matches native identity in the selected form independently of time and email', async () => {
     const { client } = fixture()
     const exact = await client.findFormSubmission({ ...query, nativeSubmissionId: NATIVE })
 
     expect(exact).toMatchObject({ status: 'exact_submission', conversionId: NATIVE, matchedCount: 1, matches: [{ nativeSubmissionId: NATIVE, matchedBy: 'conversion_id', emailMatched: true }] })
     expect((await client.findFormSubmission({ ...query, nativeSubmissionId: OTHER })).status).toBe('not_found')
-    expect((await client.findFormSubmission({ ...query, fromMs: submittedAt + 1, nativeSubmissionId: NATIVE })).status).toBe('not_found')
+    expect((await client.findFormSubmission({ ...query, fromMs: submittedAt + 1, email: 'different@example.test', nativeSubmissionId: NATIVE })).status).toBe('exact_submission')
+  })
+
+  it('matches an opaque occurrence field without using email/time and never exposes the marker', async () => {
+    const marker = { name: 'ef_greenhouse_submission_id', value: 'fsub-' + NATIVE }
+
+    const { client } = fixture(url => url.pathname.startsWith('/form-integrations/')
+      ? json({ results: [{ ...row(), values: [{ ...marker }], submittedAt: submittedAt - 86400000 }] }) : undefined)
+
+    const result = await client.findFormSubmission({ ...query, email: undefined, occurrenceMarker: marker })
+
+    expect(result).toMatchObject({ status: 'exact_submission', conversionId: NATIVE, matchedCount: 1,
+      matches: [{ matchedBy: 'occurrence_marker', emailMatched: false }], pagination: { complete: true } })
+    expect(JSON.stringify(result)).not.toContain(marker.value)
+    expect(JSON.stringify(result)).not.toContain(marker.name)
+  })
+
+  it('requires exact marker name/value equality with one occurrence of that field', async () => {
+    const marker = { name: 'ef_greenhouse_submission_id', value: 'fsub-' + NATIVE }
+
+    for (const values of [[{ name: 'wrong_property', value: marker.value }], [{ name: marker.name, value: 'fsub-' + OTHER }], [marker, marker]]) {
+      const { client } = fixture(url => url.pathname.startsWith('/form-integrations/') ? json({ results: [{ ...row(), values }] }) : undefined)
+
+      expect((await client.findFormSubmission({ ...query, occurrenceMarker: marker })).status).toBe('not_found')
+    }
+  })
+
+  it('does not fall back to email or a different marker when both native identities were supplied', async () => {
+    const marker = { name: 'ef_greenhouse_submission_id', value: 'fsub-' + NATIVE }
+    const { client } = fixture(url => url.pathname.startsWith('/form-integrations/') ? json({ results: [{ ...row(), values: [marker] }] }) : undefined)
+
+    expect((await client.findFormSubmission({ ...query, occurrenceMarker: marker, nativeSubmissionId: OTHER })).status).toBe('not_found')
+  })
+
+  it('reports duplicate native occurrences with the same marker as ambiguous', async () => {
+    const marker = { name: 'ef_greenhouse_submission_id', value: 'fsub-' + NATIVE }
+
+    const { client } = fixture(url => url.pathname.startsWith('/form-integrations/')
+      ? json({ results: [{ ...row(), values: [marker] }, { ...row(OTHER), values: [marker] }] }) : undefined)
+
+    expect(await client.findFormSubmission({ ...query, occurrenceMarker: marker })).toMatchObject({ status: 'ambiguous', matchedCount: 2 })
+  })
+
+  it.each(['marker', 'native'])('requires complete coverage before exact %s identity is confirmed', async kind => {
+    const marker = { name: 'ef_greenhouse_submission_id', value: 'fsub-' + NATIVE }
+
+    const { client } = fixture(url => url.pathname.startsWith('/form-integrations/')
+      ? json({ results: [{ ...row(), values: [marker] }], paging: { next: { after: 'NEXT' } } }) : undefined)
+
+    const result = await client.findFormSubmission({ ...query, maxPages: 1,
+      ...(kind === 'marker' ? { occurrenceMarker: marker } : { nativeSubmissionId: NATIVE }) })
+
+    expect(result).toMatchObject({ status: 'partial', matchedCount: 1, pagination: { complete: false } })
+    expect(result.conversionId).toBeUndefined()
+  })
+
+  it('rejects marker names and nonopaque marker values before resolving credentials', async () => {
+    const { client, calls } = fixture()
+
+    for (const occurrenceMarker of [{ name: 'bad name', value: NATIVE }, { name: 'email', value: EMAIL }, { name: 'valid', value: 'https://example.test' }])
+      expect(await client.findFormSubmission({ ...query, occurrenceMarker })).toMatchObject({ status: 'unavailable', safeErrorCode: 'hubspot_correlation_input_invalid' })
+    expect(calls).toHaveLength(0)
   })
 
   it('email and time alone are a candidate and never exact submission proof', async () => {
@@ -108,6 +169,23 @@ describe('HubSpot lead trace read-only correlation', () => {
     expect(complete).toMatchObject({ status: 'candidate', pagination: { pages: 2, complete: true, hasMore: false } })
     expect(calls.at(-1)?.url.searchParams.get('after')).toBe('CURSOR_A')
     expect(calls.every(v => v.url.hostname === 'api.hubapi.com')).toBe(true)
+  })
+
+  it.each(['unexpected', { next: 'unexpected' }, { next: [] }])('does not promote exact evidence with malformed paging %j', async paging => {
+    const marker = { name: 'ef_greenhouse_submission_id', value: 'fsub-' + NATIVE }
+
+    const { client, calls } = fixture(url => url.pathname.startsWith('/form-integrations/')
+      ? json({ results: [{ ...row(), values: [marker] }], paging }) : undefined)
+
+    const result = await client.findFormSubmission({ ...query, email: undefined, occurrenceMarker: marker })
+
+    expect(result).toMatchObject({ status: 'partial', matchedCount: 1,
+      pagination: { pages: 1, complete: false, hasMore: true }, error: { code: 'hubspot_invalid_pagination_response' } })
+    expect(result).not.toHaveProperty('conversionId')
+    expect(result.pagination).not.toHaveProperty('nextCursor')
+    expect(calls).toHaveLength(2)
+    expect(JSON.stringify(result)).not.toContain(marker.value)
+    expect(JSON.stringify(result)).not.toContain(TOKEN)
   })
 
   it('does not report absent after a page limit or a later failure', async () => {

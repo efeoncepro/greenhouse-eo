@@ -108,6 +108,13 @@ global conservan sus gates propios. Esta evidencia no certifica procesamiento in
 
 ## Revisit When
 
+Delta 2026-10-17: [identidad nativa de entregas HubSpot](GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md)
+añade recibos escritos por el worker; la CLI sigue READ ONLY. Lee el snapshot de destino/marcador y el
+ID nativo persistidos sin depender del mapping actual. Un UUID nativo distinto del `fsub-*` ya no se
+confunde con el ID de fuente. Lectura compatible con schema previo; activación del writer pendiente.
+[Límite individual Meta](../documentation/growth/meta-individual-event-verification.md): no hay GET
+documentado por `event_id`; mejorar recibo CAPI es una propuesta separada, todavía sin implementar.
+
 Fuentes distintas de Growth Forms, matching descifrado, export de identidad, redispatch, cambios CRM,
 consultas multiportal, nuevas credenciales o promoción a API/MCP/producto.
 

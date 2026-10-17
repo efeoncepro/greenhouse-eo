@@ -190,6 +190,39 @@ describe('pure lead trace evidence model', () => {
     data.query.id = SUBMISSION.slice(5)
     expect(() => buildLeadTrace(data)).toThrow('invalid_trace_uuid')
   })
+  it('exposes a native receipt ID only after complete verification bound to this occurrence', () => {
+    const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: DESTINATION,
+      markerProperty: 'ef_greenhouse_submission_id', markerValue: SUBMISSION, checks: 1, nextCheckAt: now, checkedAt: now, paginationComplete: true,
+      rawEmail: 'private@example.test', response: { token: 'PRIVATE_TOKEN' } }
+
+    const data = input()
+
+    data.hubspotAttempts = [attempt({ provider_submission_id: OTHER, provider_receipt_json: receipt })]
+    const report = buildLeadTrace(data)
+
+    expect(report.hubspot.localAttempt.attempts[0]).toMatchObject({ receiptStatus: 'verified', receiptCheckCount: 1, nativeSubmissionId: OTHER })
+    expect(report.hubspot.remoteForm.status).toBe('not_checked')
+    expect(JSON.stringify(report)).not.toMatch(/private@example|PRIVATE_TOKEN|provider_receipt_json|markerValue/)
+
+    for (const changed of [{ status: 'pending' }, { paginationComplete: false }, { markerValue: 'fsub-' + OTHER }, { portalId: '19893546' }, { markerProperty: 'email' }]) {
+      data.hubspotAttempts = [attempt({ provider_submission_id: OTHER, provider_receipt_json: { ...receipt, ...changed } })]
+      expect(buildLeadTrace(data).hubspot.localAttempt.attempts[0]).not.toHaveProperty('nativeSubmissionId')
+    }
+
+    data.hubspotAttempts = [attempt({ status: 'failed', provider_submission_id: OTHER, provider_receipt_json: receipt })]
+    expect(buildLeadTrace(data).hubspot.localAttempt.attempts[0]).not.toHaveProperty('nativeSubmissionId')
+  })
+
+  it('retains exact source occurrence and distinct native conversion IDs without conflating their namespaces', () => {
+    const data = input()
+
+    data.remoteHubspot = { formSubmission: { status: 'confirmed', correlation: 'exact_uuid', matchedSubmissionId: SUBMISSION, nativeSubmissionId: OTHER }, contact: { status: 'not_checked' } }
+    expect(buildLeadTrace(data).hubspot.remoteForm).toMatchObject({ status: 'confirmed', matchedSubmissionId: SUBMISSION, nativeSubmissionId: OTHER })
+    expect(buildLeadTrace(data).issueCodes).not.toContain('HUBSPOT_FORM_CORRELATION_MISMATCH')
+    data.remoteHubspot.formSubmission = { status: 'confirmed', correlation: 'time_email_fields', nativeSubmissionId: OTHER }
+    expect(buildLeadTrace(data).hubspot.remoteForm).toMatchObject({ status: 'correlated' })
+  })
+
   it('retains the canonical fatt-prefixed attempt ID as operational provenance', () => {
     const data = input()
 

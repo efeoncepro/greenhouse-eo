@@ -18,6 +18,7 @@ import 'server-only'
 import { isFormsHubSpotSecureSubmitEnabled } from '@/lib/growth/forms/flags'
 import type { FormConsentSnapshotRow, FormDestinationRow, FormSubmissionRow } from '@/lib/growth/forms/store'
 import { getHubSpotAccessToken } from '@/lib/hubspot/access-token'
+import { createHubSpotFormReceipt, HUBSPOT_SUBMISSION_ID_PROPERTY, type HubSpotFormReceipt } from './receipts'
 
 export const HUBSPOT_FORMS_ADAPTER_KIND = 'hubspot_forms_secure_submit' as const
 export const HUBSPOT_FORMS_ADAPTER_VERSION = 'hsforms-v3-secure-submit' as const
@@ -31,6 +32,7 @@ export interface HubSpotDeliveryResult {
   errorClass?: string
   httpStatus?: number | null
   externalId?: string | null
+  providerReceipt?: HubSpotFormReceipt
   /** El dispatch usa esto para decidir retry vs dead-letter. */
   retryable: boolean
 }
@@ -42,6 +44,8 @@ interface HubSpotDestinationMapping {
   fieldMapping?: Record<string, string>
   /** Texto de consentimiento para legalConsentOptions (HubSpot lo exige). */
   consentText?: string
+  /** Technical property installed in the native form; populated only from the server-generated source ID. */
+  submissionIdProperty?: string
 }
 
 const asMapping = (raw: unknown): HubSpotDestinationMapping =>
@@ -76,8 +80,13 @@ export const buildSecureSubmitBody = (
   const fieldMapping = mapping.fieldMapping ?? {}
 
   const fields = Object.entries(fieldMapping)
+    .filter(([, hsName]) => hsName !== HUBSPOT_SUBMISSION_ID_PROPERTY)
     .filter(([ghKey]) => values[ghKey] !== undefined && values[ghKey] !== null)
     .map(([ghKey, hsName]) => ({ name: hsName, value: String(values[ghKey]) }))
+
+  const receipt = createHubSpotFormReceipt(mapping, submission.submission_id)
+
+  if (receipt) fields.push({ name: receipt.markerProperty, value: receipt.markerValue })
 
   const body: Record<string, unknown> = {
     fields,
@@ -119,6 +128,10 @@ export const deliverToHubSpotForms = async (input: DeliverInput): Promise<HubSpo
     return { status: 'skipped', errorClass: 'hubspot_adapter_disabled', retryable: true }
   }
 
+  if (input.destination.provider !== 'hubspot' || input.destination.adapter_kind !== HUBSPOT_FORMS_ADAPTER_KIND) {
+    return { status: 'failed', errorClass: 'hubspot_destination_mismatch', retryable: false, httpStatus: null }
+  }
+
   const mapping = asMapping(input.destination.mapping_json)
 
   if (!mapping.portalId || !mapping.formGuid) {
@@ -126,8 +139,13 @@ export const deliverToHubSpotForms = async (input: DeliverInput): Promise<HubSpo
   }
 
   const body = buildSecureSubmitBody(input.submission, input.consent, mapping)
+  const providerReceipt = createHubSpotFormReceipt(mapping, input.submission.submission_id)
 
-  if (!Array.isArray(body.fields) || (body.fields as unknown[]).length === 0) {
+  if (mapping.submissionIdProperty !== undefined && !providerReceipt) {
+    return { status: 'failed', errorClass: 'invalid_submission_id_mapping', retryable: false, httpStatus: null }
+  }
+
+  if (!Array.isArray(body.fields) || !(body.fields as Array<{ name: string }>).some(field => field.name !== HUBSPOT_SUBMISSION_ID_PROPERTY)) {
     return { status: 'failed', errorClass: 'empty_field_mapping', retryable: false, httpStatus: null }
   }
 
@@ -148,6 +166,7 @@ export const deliverToHubSpotForms = async (input: DeliverInput): Promise<HubSpo
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       cache: 'no-store',
+      redirect: 'error',
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     })
 
@@ -156,6 +175,7 @@ export const deliverToHubSpotForms = async (input: DeliverInput): Promise<HubSpo
         status: 'succeeded',
         httpStatus: response.status,
         externalId: `hsforms-${input.submission.submission_id}`,
+        ...(providerReceipt ? { providerReceipt } : {}),
         retryable: false,
       }
     }

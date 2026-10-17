@@ -28,12 +28,12 @@ const target = { destination_id: 'dest-1', portal_id: '48713323', form_guid: '33
 
 beforeEach(() => { vi.clearAllMocks(); statements.length = 0 })
 
-function arrangeSubmission() {
+function arrangeSubmission(attemptOverrides: Record<string, unknown> = {}, targetOverrides: Record<string, unknown> = {}) {
   execute.mockResolvedValueOnce({ rows: [source] })
     .mockResolvedValueOnce({ rows: [conversion] })
     .mockResolvedValueOnce({ rows: [{ event_id: event, destination: 'meta', state: 'http_accepted', attempts: 1, http_status: 200 }] })
-    .mockResolvedValueOnce({ rows: [attempt] })
-    .mockResolvedValueOnce({ rows: [target] })
+    .mockResolvedValueOnce({ rows: [{ ...attempt, ...attemptOverrides }] })
+    .mockResolvedValueOnce({ rows: [{ ...target, ...targetOverrides }] })
 }
 
 describe('canonical metadata-only lead trace store', () => {
@@ -73,6 +73,63 @@ describe('canonical metadata-only lead trace store', () => {
     expect(scoped).not.toHaveProperty('nativeSubmissionId')
     expect(statements[4].text).toContain('COUNT(*)=1')
     expect(statements[4].values).toContain('email')
+  })
+
+  it('uses the persisted receipt portal/form snapshot when current destination mapping changes', async () => {
+    const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: target.form_guid,
+      markerProperty: 'ef_greenhouse_submission_id', markerValue: submission, checks: 1,
+      nextCheckAt: '2026-10-17T12:01:00Z', checkedAt: '2026-10-17T12:00:30Z', paginationComplete: true }
+
+    arrangeSubmission({ provider_submission_id: event, provider_receipt_json: receipt }, { portal_id: '19893546', form_guid: '44444444-4444-4444-8444-444444444444' })
+    const result = await readGrowthLeadTrace(db, { kind: 'submission', id: submission })
+
+    expect(result.privateHubspotTargets[0]).toMatchObject({ portalId: '48713323', formGuid: target.form_guid, nativeSubmissionId: event,
+      occurrenceMarker: { name: 'ef_greenhouse_submission_id', value: submission } })
+    expect(JSON.stringify(result)).not.toContain('19893546')
+    expect(statements[3].text).toContain('to_jsonb(form_destination_attempt)->>')
+    expect(statements[3].text).toContain('to_jsonb(form_destination_attempt)->')
+    expect(statements[3].values).toContain('provider_submission_id')
+    expect(statements[3].values).toContain('provider_receipt_json')
+  })
+
+  it('keeps a valid historical receipt target readable even if the current mapping becomes invalid', async () => {
+    const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: target.form_guid,
+      markerProperty: 'ef_greenhouse_submission_id', markerValue: submission, checks: 1,
+      nextCheckAt: '2026-10-17T12:01:00Z', checkedAt: '2026-10-17T12:00:30Z', paginationComplete: true }
+
+    arrangeSubmission({ provider_submission_id: event, provider_receipt_json: receipt }, { portal_id: null, form_guid: null })
+    const result = await readGrowthLeadTrace(db, { kind: 'submission', id: submission })
+
+    expect(result.privateHubspotTargets).toHaveLength(1)
+    expect(result.privateHubspotTargets[0]).toMatchObject({ portalId: '48713323', formGuid: target.form_guid, nativeSubmissionId: event })
+  })
+
+  it('does not promote pending, incomplete or foreign receipts to a native submission ID', async () => {
+    const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: target.form_guid,
+      markerProperty: 'ef_greenhouse_submission_id', markerValue: submission, checks: 1,
+      nextCheckAt: '2026-10-17T12:01:00Z', checkedAt: '2026-10-17T12:00:30Z', paginationComplete: true }
+
+    for (const changed of [{ status: 'pending' }, { paginationComplete: false }, { markerValue: 'fsub-' + event }, { portalId: '19893546' }]) {
+      arrangeSubmission({ provider_submission_id: event, provider_receipt_json: { ...receipt, ...changed } })
+      const result = await readGrowthLeadTrace(db, { kind: 'submission', id: submission })
+
+      expect(result.privateHubspotTargets[0]).not.toHaveProperty('nativeSubmissionId')
+    }
+  })
+
+  it('allowlists receipt metadata instead of exporting raw receipt extras or visitor values', async () => {
+    const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: target.form_guid,
+      markerProperty: 'ef_greenhouse_submission_id', markerValue: submission, checks: 1,
+      nextCheckAt: '2026-10-17T12:01:00Z', checkedAt: '2026-10-17T12:00:30Z', paginationComplete: true,
+      rawEmail: 'private.person@example.invalid', rawResponse: { token: 'PRIVATE_TOKEN', email: 'private.person@example.invalid' } }
+
+    arrangeSubmission({ provider_submission_id: event, provider_receipt_json: receipt })
+    const result = await readGrowthLeadTrace(db, { kind: 'submission', id: submission })
+
+    expect(result.metadata.hubspotAttempts[0].provider_receipt_json).toMatchObject({ markerValue: submission, status: 'verified' })
+    expect(JSON.stringify(result)).not.toMatch(/@|PRIVATE_TOKEN|rawResponse|rawEmail/)
+    expect(JSON.stringify({ ...result })).not.toMatch(/@|PRIVATE_TOKEN/)
+    expect(Object.getOwnPropertyDescriptor(result, 'privateHubspotTargets')?.enumerable).toBe(false)
   })
 
   it('returns meeting occurrence metadata without guessing a Forms submission or touching contact fields', async () => {

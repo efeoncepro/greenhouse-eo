@@ -248,9 +248,10 @@ Ampliación de rastreo [aceptada local](docs/architecture/GREENHOUSE_META_LEAD_T
 READ ONLY. Readback real fsub7d76a9ba/event474092ed: delivered, sGTM200, historialHubSpot correlated y
 contacto por identidad; MetaProcessed/contactCreatedBySubmission unknown. `coverage.complete` cubre
 observables, no todo procesamiento. Evidencia Documents/Meta-Efeonce-Connection/lead-trace-verification-2026-10-17/.
-Sin PII exportada/descifrado/redispatch/CRM writes. Suite actual: 172 tests/9 archivos, TS strict con
+Sin PII exportada/descifrado/redispatch/CRM writes. Corte anterior: 172 tests/9 archivos, TS strict con
 imports canónicos y ESLint propios PASS; source read/find y CLI full/source-only/evento verificados.
 [Relectura del último Performance](docs/audits/growth/2026-10-17-performance-latest-lead-trace.md): sigue fsub7d76a9ba, HubSpot recibido y Meta contabiliza 1 Lead servidor; sin fallos de entrega observados, binding exacto/atribución pendientes.
+Delta [ID nativo HubSpot](docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): código local, marcador por envío y recibo GET/CAS; SQL parqueado, propiedad/campo/mapping y release pendientes (Growth/Integrations). [Activación](docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md); plan privado Documents/Meta-Efeonce-Connection/occurrence-marker-2026-10-17/. Históricos no adquieren prueba exacta. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin GET por UUID; recibo CAPI propuesto, aún sin implementar.
 
 ## 2026-10-13 — Fabrimetal: continuidad de largo plazo
 

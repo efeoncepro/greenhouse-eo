@@ -150,7 +150,7 @@ export async function runLeadTraceCommand(argv: string[], dependencies: { runtim
         }
 
         const [form, contact] = await Promise.allSettled([
-          client.findFormSubmission({ formGuid: target.formGuid, nativeSubmissionId: target.nativeSubmissionId, email: target.privateEmail, fromMs: target.fromMs, toMs: target.toMs, maxPages: pages, pageSize: limit }),
+          client.findFormSubmission({ formGuid: target.formGuid, nativeSubmissionId: target.nativeSubmissionId, occurrenceMarker: target.occurrenceMarker, email: target.privateEmail, fromMs: target.fromMs, toMs: target.toMs, maxPages: pages, pageSize: limit }),
           target.privateEmail ? client.lookupContact(target.privateEmail) : Promise.resolve({ status: 'unavailable', safeErrorCode: 'contact_identity_unavailable' }),
         ])
 
@@ -171,7 +171,10 @@ export async function runLeadTraceCommand(argv: string[], dependencies: { runtim
           contactRecord: { ...('error' in c && c.error?.httpStatus !== undefined ? { httpStatus: c.error.httpStatus } : {}), ...(contactId ? { contactId } : {}), ...(createdAt ? { createdAt } : {}), ...(updatedAt ? { updatedAt } : {}),
             ...(createdAt && Number.isFinite(sourceAt) ? { createdBeforeSubmission: Date.parse(createdAt) < sourceAt } : {}) },
           formSubmission: { status: statuses[f.status] ?? 'unavailable', correlation: f.status === 'exact_submission' ? 'exact_uuid' : f.status === 'candidate' ? 'time_email_fields' : 'none',
-            ...(safeId('conversionId' in f ? f.conversionId : undefined) ? { matchedSubmissionId: safeId('conversionId' in f ? f.conversionId : undefined) } : {}),
+            ...(f.status === 'exact_submission' && (target.occurrenceMarker?.value === input.source.submission_id || target.nativeSubmissionId) ? {
+              matchedSubmissionId: input.source.submission_id,
+              ...(safeId('conversionId' in f ? f.conversionId : undefined) ? { nativeSubmissionId: safeId('conversionId' in f ? f.conversionId : undefined) } : {}),
+            } : {}),
             ...(safeCode(f.safeErrorCode) ? { safeErrorCode: safeCode(f.safeErrorCode) } : {}) },
           contact: { status: c.status === 'found' && 'emailMatches' in c && c.emailMatches === true && contactId ? 'confirmed' : c.status === 'not_found' ? 'not_found' : 'unavailable', correlation: 'identity',
             ...(safeCode(c.safeErrorCode) ? { safeErrorCode: safeCode(c.safeErrorCode) } : {}) },

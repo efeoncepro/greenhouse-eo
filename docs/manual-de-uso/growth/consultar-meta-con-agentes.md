@@ -3,6 +3,8 @@
 Contrato: `meta-agent.v2`. [Decisión vigente](../../architecture/GREENHOUSE_META_AGENT_WRITE_CLI_DECISION_V1.md).
 [Foundation y evidencia inicial](../../architecture/GREENHOUSE_META_AGENT_CLI_DECISION_V1.md).
 [Capacidad funcional](../../documentation/growth/meta-agent-cli.md).
+[Activación de IDs nativos HubSpot](guardar-identidad-nativa-hubspot.md) (pendiente de rollout) y
+[límites de verificación individual Meta](../../documentation/growth/meta-individual-event-verification.md).
 La CLI local consulta y opera el perfil Efeonce. La medición CAPI y las políticas se operan por sus
 [comandos propios](configurar-medicion-conversiones.md).
 

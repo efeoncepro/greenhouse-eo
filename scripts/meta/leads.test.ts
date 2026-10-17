@@ -54,6 +54,7 @@ function fixture() {
   const calls: URL[] = []
   let formStatus = 200
   let portalId = '48713323'
+  let markerValue: string | undefined
 
   const fetchImpl = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
     const url = new URL(String(input))
@@ -62,7 +63,7 @@ function fixture() {
     expect(init?.method).toBe('GET')
     if (url.pathname === '/account-info/v3/details') return Response.json({ portalId })
     if (url.pathname.startsWith('/form-integrations/')) return Response.json(formStatus === 200 ? {
-      results: [{ conversionId: NATIVE, submittedAt: NOW.getTime(), values: [{ name: 'email', value: EMAIL }] }]
+      results: [{ conversionId: NATIVE, submittedAt: NOW.getTime(), values: [{ name: 'email', value: EMAIL }, ...(markerValue ? [{ name: 'ef_greenhouse_submission_id', value: markerValue }] : [])] }]
     } : { error: 'raw provider body ' + EMAIL + ' ' + TOKEN }, { status: formStatus })
     if (url.pathname.includes('/contacts/')) return Response.json({ id: '12345', createdAt: '2020-01-01T00:00:00Z', properties: { email: EMAIL } })
     throw new Error('unexpected fixture request')
@@ -71,7 +72,7 @@ function fixture() {
   const hubspot = new HubSpotLeadTraceClient({ tokenProvider: runtime.tokenProvider, fetchImpl })
 
 
-return { snapshot, runtime, calls, hubspot, setFormStatus: (status: number) => { formStatus = status }, setPortal: (id: string) => { portalId = id } }
+return { snapshot, runtime, calls, hubspot, setMarker: (value: string) => { markerValue = value }, setFormStatus: (status: number) => { formStatus = status }, setPortal: (id: string) => { portalId = id } }
 }
 
 function privateInput(value: unknown = { email: EMAIL }): string {
@@ -148,6 +149,46 @@ describe('lead trace CLI with injected runtime and provider transports', () => {
     expect(f.calls.some(url => url.pathname.includes('/contacts/'))).toBe(true)
     expect(JSON.stringify(result)).not.toContain(EMAIL)
     expect(JSON.stringify(result)).not.toContain(TOKEN)
+  })
+
+  it('reconciles an exact occurrence marker with a distinct native conversion ID', async () => {
+    const f = fixture()
+
+    f.snapshot.privateHubspotTargets[0].occurrenceMarker = { name: 'ef_greenhouse_submission_id', value: SUBMISSION }
+    f.setMarker(SUBMISSION)
+    const result = await runLeadTraceCommand(['leads', 'trace', '--submission-id', SUBMISSION], { runtime: f.runtime, hubspot: f.hubspot, now: NOW })
+
+    expect(result).toMatchObject({ exitCode: 0, output: { data: { hubspot: { remoteForm: {
+      status: 'confirmed', correlation: 'exact_uuid', matchedSubmissionId: SUBMISSION, nativeSubmissionId: NATIVE
+    }, contactCreatedByThisSubmission: 'unknown' } }, hubspotVerification: [{ nativeForm: { candidateIds: [NATIVE] } }] } })
+    expect(JSON.stringify(result)).not.toContain(EMAIL)
+    expect(JSON.stringify(result)).not.toContain(TOKEN)
+  })
+
+  it('source-only exposes a persisted native ID only from a verified receipt bound to the selected occurrence', async () => {
+    const receipt = { contract: 'hubspot-form-receipt.v1', status: 'verified', portalId: '48713323', formGuid: FORM,
+      markerProperty: 'ef_greenhouse_submission_id', markerValue: SUBMISSION, checks: 1,
+      nextCheckAt: NOW.toISOString(), checkedAt: NOW.toISOString(), paginationComplete: true, rawEmail: EMAIL, rawToken: TOKEN }
+
+    const f = fixture()
+
+    Object.assign(f.snapshot.metadata.hubspotAttempts[0], { provider_submission_id: NATIVE, provider_receipt_json: receipt })
+    const args = ['leads', 'trace', '--submission-id', SUBMISSION, '--source-only']
+    const result = await runLeadTraceCommand(args, { runtime: f.runtime, hubspot: f.hubspot, now: NOW })
+
+    expect(result).toMatchObject({ exitCode: 0, output: { data: { hubspot: { localAttempt: { attempts: [{ nativeSubmissionId: NATIVE, receiptStatus: 'verified' }] }, remoteForm: { status: 'not_checked' } } } } })
+    expect(JSON.stringify(result)).not.toContain(EMAIL)
+    expect(JSON.stringify(result)).not.toContain(TOKEN)
+
+    for (const changed of [{ status: 'pending' }, { markerValue: SECOND }, { paginationComplete: false }, { portalId: '19893546' }]) {
+      Object.assign(f.snapshot.metadata.hubspotAttempts[0], { provider_receipt_json: { ...receipt, ...changed } })
+      const rejected = await runLeadTraceCommand(args, { runtime: f.runtime, hubspot: f.hubspot, now: NOW })
+
+      expect(JSON.stringify(rejected)).not.toContain(NATIVE)
+    }
+
+    expect(f.calls).toHaveLength(0)
+    expect(f.runtime.tokenProvider).not.toHaveBeenCalled()
   })
 
   it('keeps a denied Forms history independent from a successful contact lookup and source ACK', async () => {

@@ -4,6 +4,7 @@ import type { LeadTraceInput } from './lead-trace-model'
 export type PrivateHubspotTarget = {
   destinationId: string; portalId: string; formGuid: string; privateEmail?: string
   fromMs: number; toMs: number; nativeSubmissionId?: string
+  occurrenceMarker?: { name: string; value: string }
 }
 export type LeadTraceSnapshot = { metadata: LeadTraceInput; privateHubspotTargets: PrivateHubspotTarget[] }
 export type LeadTraceRuntime = {

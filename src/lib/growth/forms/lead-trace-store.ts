@@ -3,6 +3,7 @@ import 'server-only'
 import { sql, type QueryExecutorProvider } from 'kysely'
 
 import { hashIdentifier } from '../public-submission/abuse-guard'
+import { parseHubSpotFormReceipt, isNativeHubspotSubmissionId } from './destinations/hubspot/receipts'
 
 type TraceDb = QueryExecutorProvider
 export type GrowthLeadTraceQuery = { kind: 'event' | 'submission'; id: string }
@@ -23,6 +24,7 @@ type Attempt = {
   attempt_id?: string; submission_id: string; destination_id?: string; provider: string
   adapter_version: string; status: string; http_status?: number | null; external_id?: string | null
   error_class?: string | null; retry_count?: number; created_at?: Date | string; completed_at?: Date | string | null
+  provider_submission_id?: string | null; provider_receipt_json?: unknown
 }
 export type GrowthLeadTraceMetadata = {
   query: GrowthLeadTraceQuery; source: Source | null; conversion: Conversion | null
@@ -31,6 +33,7 @@ export type GrowthLeadTraceMetadata = {
 export type PrivateHubspotTraceTarget = {
   destinationId: string; formGuid: string; portalId: string; privateEmail?: string
   fromMs: number; toMs: number; nativeSubmissionId?: string
+  occurrenceMarker?: { name: string; value: string }
 }
 export type GrowthLeadTraceRead = {
   metadata: GrowthLeadTraceMetadata
@@ -124,11 +127,24 @@ export async function readGrowthLeadTrace(db: TraceDb, query: GrowthLeadTraceQue
   const deliveries = conversion ? (await sql<Delivery>`SELECT event_id::text,destination,state,attempts,http_status,safe_error_class,updated_at
     FROM greenhouse_growth.measurement_delivery WHERE event_id=${conversion.event_id}::uuid ORDER BY destination`.execute(db)).rows : []
 
-  const hubspotAttempts = source ? (await sql<Attempt>`SELECT attempt_id,submission_id,destination_id,provider,adapter_version,status,
-    http_status,external_id,error_class,retry_count,created_at,completed_at FROM greenhouse_growth.form_destination_attempt
+  const rawAttempts = source ? (await sql<Attempt>`SELECT attempt_id,submission_id,destination_id,provider,adapter_version,status,
+    http_status,external_id,error_class,retry_count,created_at,completed_at,
+    to_jsonb(form_destination_attempt)->>${'provider_submission_id'} AS provider_submission_id,
+    to_jsonb(form_destination_attempt)->${'provider_receipt_json'} AS provider_receipt_json FROM greenhouse_growth.form_destination_attempt
     WHERE submission_id=${source.submission_id} AND provider=${'hubspot'} ORDER BY created_at,attempt_id LIMIT 101`.execute(db)).rows : []
 
-  if (hubspotAttempts.length > 100) throw new GrowthLeadTraceStoreError('lead_trace_attempt_limit_exceeded')
+  if (rawAttempts.length > 100) throw new GrowthLeadTraceStoreError('lead_trace_attempt_limit_exceeded')
+
+  const hubspotAttempts = rawAttempts.map(attempt => {
+    const { provider_receipt_json: rawReceipt, provider_submission_id: rawNativeId, ...metadata } = attempt
+    const receipt = parseHubSpotFormReceipt(rawReceipt)
+    const bound = receipt?.markerValue === source?.submission_id && attempt.status === 'succeeded'
+
+    return { ...metadata, ...(bound ? { provider_receipt_json: receipt } : {}),
+      ...(bound && receipt?.status === 'verified' && receipt.paginationComplete === true && isNativeHubspotSubmissionId(rawNativeId)
+        ? { provider_submission_id: rawNativeId } : {}) }
+  })
+
   const metadata = { query: { kind: query.kind, id: query.id }, source, conversion, deliveries, hubspotAttempts }
 
   if (!source || !hubspotAttempts.length) return privateResult(metadata, [])
@@ -150,7 +166,6 @@ export async function readGrowthLeadTrace(db: TraceDb, query: GrowthLeadTraceQue
   const privateTargets: PrivateHubspotTraceTarget[] = []
 
   for (const target of targets.rows) {
-    if (!target.portal_id || !/^\d+$/.test(target.portal_id) || !target.form_guid || !UUID.test(target.form_guid)) continue
     const attempts = hubspotAttempts.filter(a => a.destination_id === target.destination_id)
     const starts = attempts.map(a => time(a.created_at)).filter((v): v is number => v !== null)
     const ends = attempts.map(a => time(a.completed_at ?? a.created_at)).filter((v): v is number => v !== null)
@@ -158,7 +173,25 @@ export async function readGrowthLeadTrace(db: TraceDb, query: GrowthLeadTraceQue
     if (!starts.length || !ends.length) continue
     const email = normalizedEmail(target.private_email)
 
-    privateTargets.push({ destinationId: target.destination_id, formGuid: target.form_guid, portalId: target.portal_id,
+    const tracked = [...attempts].reverse().find(a => {
+      const r = parseHubSpotFormReceipt(a.provider_receipt_json)
+
+      return a.status === 'succeeded' && r?.markerValue === source.submission_id
+    })
+
+    const receipt = parseHubSpotFormReceipt(tracked?.provider_receipt_json)
+
+    const nativeId = receipt?.status === 'verified' && receipt.paginationComplete === true && isNativeHubspotSubmissionId(tracked?.provider_submission_id)
+      ? tracked.provider_submission_id : undefined
+
+    const portalId = receipt?.portalId ?? target.portal_id
+    const formGuid = receipt?.formGuid ?? target.form_guid
+
+    if (!portalId || !/^\d+$/.test(portalId) || !formGuid || !UUID.test(formGuid)) continue
+
+    privateTargets.push({ destinationId: target.destination_id, formGuid, portalId,
+      ...(receipt ? { occurrenceMarker: { name: receipt.markerProperty, value: receipt.markerValue } } : {}),
+      ...(nativeId ? { nativeSubmissionId: nativeId } : {}),
       ...(email ? { privateEmail: email } : {}), fromMs: Math.min(...starts) - 30_000, toMs: Math.max(...ends) + 30_000 })
   }
 

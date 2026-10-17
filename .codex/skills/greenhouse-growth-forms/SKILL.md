@@ -103,6 +103,15 @@ Server 9 estricto, nueva fuente configurada por datos/CLI y recibida en Meta Tes
 redeploy ni publish GTM adicional; fixture desactivada/archivada. Un ACK, Test Events o flag ON
 no demuestra entrega CRM, primera conversión comercial, mejora EMQ ni elegibilidad de audiencia.
 
+## Identidad nativa de la entrega HubSpot
+
+Para `conversionId`/rastreo exacto, cargar el [ADR de recibos](../../../docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md)
+y el [manual de activación](../../../docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md). Código local,
+rollout pendiente: marcador server-side en campo técnico del form nativo; `provider_submission_id`
+sólo tras GET con match único y cobertura completa. El worker recupera evidencia sin otro POST,
+aunque no haya nuevos leads. Nunca sustituir la ocurrencia por el valor actual del contacto,
+email/hora, URL o `hsforms-*`. Schema antes del POST; migración preparada fuera de `migrations/`.
+
 ## Mental model — end to end
 
 ```

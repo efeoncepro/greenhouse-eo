@@ -1170,6 +1170,11 @@ Why:
 
 ### 22.2 Secondary: CRM Contacts API
 
+Per-occurrence native ID is governed separately by the
+[HubSpot Forms receipt ADR](GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): optional server-generated
+marker field, historical GET and durable `conversionId` receipt. Delivery success and evidence
+recovery stay independent. Local implementation only; provisioning/mapping/release pending.
+
 Use HubSpot CRM Contacts 2026-03 only when the destination is explicitly CRM upsert/enrichment rather than form submission history.
 
 Examples:

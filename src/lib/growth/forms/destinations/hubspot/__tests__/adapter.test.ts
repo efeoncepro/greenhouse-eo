@@ -119,6 +119,38 @@ describe('deliverToHubSpotForms', () => {
     expect(r.externalId).toContain('hsforms-')
   })
 
+  it('sends the server occurrence marker and keeps a pending receipt after HTTP 200 without a native ID', async () => {
+    ;(fetch as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, status: 200, json: () => { throw new Error('body unavailable') } })
+    const source = { ...submission({ email: 'a@b.com', spoof: 'attacker' }), submission_id: 'fsub-b2222222-2222-4222-8222-222222222222' }
+
+    const mapping = { ...VALID_MAPPING, formGuid: 'd4444444-4444-4444-8444-444444444444', submissionIdProperty: 'ef_greenhouse_submission_id',
+      fieldMapping: { email: 'email', spoof: 'ef_greenhouse_submission_id' } }
+
+    const result = await deliverToHubSpotForms({ submission: source, consent: consent(), destination: destination(mapping), env: ENV_ON })
+    const body = JSON.parse((fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body)
+
+    expect(body.fields).toEqual([{ name: 'email', value: 'a@b.com' }, { name: 'ef_greenhouse_submission_id', value: source.submission_id }])
+    expect(result).toMatchObject({ status: 'succeeded', retryable: false, providerReceipt: { status: 'pending', markerValue: source.submission_id } })
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(result)).not.toMatch(/a@b.com|attacker|redirectUri/)
+  })
+
+  it('rejects an invalid opt-in tracking mapping before making a non-idempotent POST', async () => {
+    const result = await deliverToHubSpotForms({ submission: submission(), consent: consent(),
+      destination: destination({ ...VALID_MAPPING, submissionIdProperty: 'email' }), env: ENV_ON })
+
+    expect(result).toMatchObject({ status: 'failed', errorClass: 'invalid_submission_id_mapping', retryable: false })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('rejects a mismatched provider before POST, so receipt persistence cannot cause a duplicate submission', async () => {
+    const target = { ...destination(VALID_MAPPING), provider: 'email' }
+
+    expect(await deliverToHubSpotForms({ submission: submission(), consent: consent(), destination: target, env: ENV_ON }))
+      .toMatchObject({ status: 'failed', errorClass: 'hubspot_destination_mismatch', retryable: false })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
   it('400 → validation_error (no retryable)', async () => {
     ;(fetch as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, status: 400 })
     const r = await deliverToHubSpotForms({ submission: submission(), consent: consent(), destination: destination(VALID_MAPPING), env: ENV_ON })
