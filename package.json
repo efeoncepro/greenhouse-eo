@@ -335,6 +335,8 @@
     "brand:deck-recipes": "node scripts/creative/deck-recipes/render-index.mjs",
     "brand:tokens": "tsx scripts/brand-surfaces/compile-tokens.ts",
     "brand:subtitles:check": "node scripts/creative/subtitles/check-contrast.mjs",
+    "creative:face:restore": "node scripts/creative/continuity/restore-face.mjs",
+    "creative:continuity:test": "node --test scripts/creative/continuity/*.test.mjs",
     "glitch:compose": "tsx scripts/glitch/compose.ts",
     "glitch:editions": "tsx scripts/glitch/editions.ts",
     "glitch:tokens": "tsx scripts/glitch/compile-tokens.ts",

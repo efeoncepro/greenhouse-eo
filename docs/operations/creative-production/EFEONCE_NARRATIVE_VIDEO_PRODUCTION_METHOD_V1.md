@@ -34,22 +34,36 @@ un video de interfaz, mandan las recetas del método madre.
 | Pantallas en escena | [anexo producto e interfaz](../../architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md) | Realismo de pantallas y UI de terceros (§G) |
 | **Biblia de continuidad, geografía, física, plan de luz, marca de producto** | **no existía** | **§B, §D, §E, §I** |
 
-## 1. El orden de preproducción
+## 1. Cómo se usa: un piso, no un techo
 
-No se genera ningún plano final hasta tener, en este orden:
+Este método es **el paso a paso mínimo** que toda producción narrativa cumple, en orden, con su entregable y su
+verificación. **No limita el oficio**: cuántas cámaras, qué ángulos y movimientos, qué luz, qué música, qué efectos
+y cómo se cuenta la historia lo decide quien produce con **todo** su conocimiento de cine, publicidad y producción.
+Las tablas de este documento son puntos de partida y ejemplos, nunca la única opción. Lo que sí es obligatorio:
 
-1. **Guion por beats** con duración por plano en una grilla musical (la fuente: 120 BPM, todo corte en un tiempo de 0,5 s).
-2. **Reparto** con referencias aprobadas de cada personaje (§A).
-3. **Producto**: marca ficticia o real del cliente, con su referencia única de producto (§B).
-4. **Biblia de continuidad**: planta, ejes de cámara, utilería, vestuario, luz (§D, §I).
-5. **Física de la acción central**: escalas calculadas, recorrido del objeto, causa y efecto (§E).
-6. **Storyboard** con los componentes de video aplicados plano por plano (§C, §F).
-7. **Auditoría de continuidad** de la secuencia completa, no plano por plano (§F.3).
-8. **Plan de cámaras, luz, audio y VFX** por plano (§I–§M).
-9. Recién entonces: video.
+- hacer cada paso y dejar su entregable;
+- no avanzar con la verificación de un paso en rojo;
+- escribir las decisiones en la biblia, para que el siguiente plano las respete;
+- cuando una decisión de oficio se aparta de un ejemplo de aquí, decir por qué en una línea.
 
-Saltarse el 4 y el 5 es lo que más costó en la fuente: más de 40 ediciones de imagen, la mitad para corregir
-consecuencias de no tener la planta.
+## 2. Paso a paso
+
+| Paso | Qué se hace | Entregable | Verificación para avanzar |
+|---|---|---|---|
+| 1. Guion | Beats, diálogo y duración de cada plano en una grilla de tiempo (música o ritmo) | Guion y lista de planos con tiempos | La historia se entiende sin texto en pantalla; cada plano tiene una función |
+| 2. Reparto | Quién es cada personaje, real o ficticio, y su regla de conducta | Referencias aprobadas por personaje (y retratos de video si el motor los exige) | El operador aprobó cada referencia (§A) |
+| 3. Producto | Marca ficticia o real, sistema y referencia única de producto | Activos determinísticos + referencia fotorrealista | Nombre chequeado; la marca nunca la dibujó el modelo (§B) |
+| 4. Biblia | Planta, ejes, línea de 180°, utilería con lado fijo, vestuario, luz por tramo | `CONTINUIDAD.md` desde la plantilla | Cada eje verificado con geometría (§D, §I) |
+| 5. Física | Escalas por distancia al lente, recorrido del objeto, causa y efecto | Sección de física en la biblia | Tamaños calculados, no a ojo (§E) |
+| 6. Cámaras | Emplazamientos, alturas, lentes, ángulos y movimientos por plano | Plan de cámaras | Todos del mismo lado de la línea; cada movimiento tiene función (§J) |
+| 7. Storyboard | Una lámina por plano con el componente de video aplicado | Storyboard en el canvas | Cada lámina declara eje, voz, componente y transición (§C, §F) |
+| 8. Auditoría | Revisar la **secuencia completa** contra la biblia, idealmente con dos revisores independientes (planta y física) | Lista de quiebres y bloqueo único | Ningún quiebre abierto en el clímax (§F.3) |
+| 9. Plan de sonido y efectos | Audio, VFX y SFX por plano | Planes en la biblia o el paquete | Cada efecto con técnica decidida; cada SFX con causa visible (§K–§M) |
+| 10. Planos finales | Generar o editar cada plano contra la biblia; reponer caras; revisar texto | `planos/final/` + prompts y costos | Revisión al 100 % de caras, texto y lado de cada objeto (§H) |
+| 11. Video y post | Según el [método madre](VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md) | Corte, mezcla, entrega | Gates del método madre |
+
+Saltarse los pasos 4, 5 y 8 es lo que más costó en la producción fuente: más de 40 ediciones de imagen, la mitad
+para corregir consecuencias de no tener la planta.
 
 ---
 
@@ -73,8 +87,9 @@ consecuencias de no tener la planta.
   anillo, borde difuso), no regenerando. Requisito: misma expresión y ángulo parecido. Si el ángulo cambió mucho, la
   búsqueda falla (en la fuente, el 17: correlación 0,52) y lo correcto es **conservar el plano aprobado y editar sólo
   alrededor de la persona** (se agregó la nuca de Antonio sin tocar a Paula).
-  Script de referencia: `ai-generations/2026-10-17_breakr-marca/herramientas/reponer-cara.cjs` (pendiente de llevar a
-  `scripts/creative/` con prueba).
+  Comando: `pnpm creative:face:restore -- --src aprobado.png --face cx,cy,rx,ry --dst editado.png --out salida.png`
+  (`scripts/creative/continuity/restore-face.mjs`, pruebas con `pnpm creative:continuity:test`). Sale con código 3
+  y no escribe si la correlación queda bajo 0,8.
 
 ## B. Producto: marca ficticia o marca real
 
@@ -121,7 +136,8 @@ consecuencias de no tener la planta.
 
 ## D. Geografía del set y biblia de continuidad
 
-La biblia es **un archivo por producción** (`CONTINUIDAD.md` junto a los planos) y es la fuente única. Todo plano nuevo
+La biblia es **un archivo por producción** (`CONTINUIDAD.md` junto a los planos), se arma desde la plantilla
+`motion-design-studio/templates/continuity-bible.md` y es la fuente única. Todo plano nuevo
 o corregido se revisa contra ella **antes** de mostrarlo.
 
 **Contenido mínimo**
@@ -205,103 +221,107 @@ o corregido se revisa contra ella **antes** de mostrarlo.
 
 # Parte 2 — Luz, cámaras, audio, VFX y SFX
 
-Esta parte fija el método y deja el plan de la producción fuente. Lo marcado **propuesta** todavía no está aprobado
-por el operador.
+Esta parte es **método general** (pasos 6 y 9): sirve para cualquier producción y cada una llega a decisiones distintas (otro set,
+otro número de cámaras, otros movimientos y ángulos). El vocabulario de oficio (tipos de plano, movimientos y la
+emoción que producen, lentes, iluminación, eje de 180°) vive en
+`motion-design-studio/modules/03_CINEMATIC_LANGUAGE.md`; aquí está **cómo se decide** con él. El plan concreto de la
+producción fuente está en el [Anexo A](#anexo-a--plan-de-para-cuándo), como ejemplo y no como norma.
 
 ## I. Luz
 
-**Método**
+1. **Luz motivada**: toda luz tiene una fuente que existe en la geografía (ventana, pantalla, lámpara, sol, fuego).
+   Una luz sin fuente se lee falsa aunque sea bonita.
+2. **Mundos de luz como recurso narrativo** (opcional): si la historia tiene un giro, la luz puede cambiar con él y en
+   ningún otro punto. Se escriben por tramo en la biblia.
+3. **La dirección se deduce, no se elige**: con la planta, la fuente y el eje de cada cámara, la luz de cada plano
+   queda determinada (fuente detrás del sujeto = contraluz; fuente detrás de la cámara = luz frontal o de tres cuartos).
+4. **Pantallas, fuego, neón**: también son fuentes y tiñen lo cercano.
+5. **Hora del día coherente con el relato**: si el texto en pantalla o el guion dicen una hora, la luz de todos los
+   lugares se ajusta a esa hora en su huso horario, y también lo que la muestre (relojes, «hace 1 minuto» en un feed).
+6. **Gate**: la luz de cada plano se revisa contra la biblia, igual que la utilería.
 
-1. **Luz motivada**: cada luz tiene una fuente que existe en la geografía (ventanal, pantalla, lámpara). Una luz sin
-   fuente se lee falsa aunque sea bonita (la fuente: luz dorada en la cara de Antonio desde una pared sin ventana).
-2. **Mundos de luz como recurso narrativo**: se escriben por tramo y se cambian sólo en un punto de giro.
-3. **Dirección por eje**: con la planta y la fuente fijadas, la dirección de la luz en cada eje se deduce, no se
-   elige (si el ventanal está detrás de Antonio, en el eje A hay contraluz; en el eje B la luz viene de detrás de la cámara).
-4. **Pantallas como fuentes**: una pantalla encendida tiñe lo que tiene cerca.
-5. **Gate**: la luz de cada plano se revisa contra la biblia igual que la utilería.
+**Plantilla por producción**: tramo · planos · fuente · dirección por eje · temperatura · calidad (dura o suave) ·
+qué la contradice.
 
-**Plan de la fuente**
+## J. Cámaras: cantidad, ángulos y movimiento
 
-| Tramo | Planos | Fuente | Calidad |
-|---|---|---|---|
-| Mundo frío | 01–09 | Ventanal al este, día nublado | Fría, pareja, sin sombras duras |
-| Mundo Efeonce | 10–18 | Sol de mañana bajo entrando por el ventanal | Cálida, con carácter: contraluz en el eje A, de frente o tres cuartos en el eje B |
-| Ciudades | 13–15 | Vallas LED de noche/atardecer | CDMX y Santiago cálidas, Bogotá en hora azul (contraste) |
-| Cierre | 20a–20b | — | Navy de Efeonce |
+No hay un número correcto de cámaras ni un movimiento estándar. Se decide por producción con estas preguntas:
 
-Pendiente detectado: los zócalos de las ciudades dicen «Lunes · 09:12» y las imágenes son de atardecer o noche.
+**1. ¿Cuántos emplazamientos?** Se cuentan posiciones de cámara en la planta, no planos: varios planos pueden
+compartir emplazamiento cambiando lente o encuadre. Menos emplazamientos dan más continuidad y menos riesgo; más
+emplazamientos dan variedad y ritmo.
 
-## J. Cámaras: cantidad y movimiento
+| Tipo de pieza | Punto de partida habitual |
+|---|---|
+| Diálogo entre dos personas | 3: plano general (o eje lateral) + plano y contraplano sobre el hombro, del mismo lado de la línea |
+| Grupo o reunión | 3–5: general, uno por personaje clave, inserto de objetos |
+| Producto o demostración | 2–4: héroe del producto, uso en mano, insertos de detalle, pantalla |
+| Testimonio o vocería | 1–2: frontal y un ángulo de corte |
+| Acción física (un objeto o fluido que viaja) | Uno por tramo del recorrido: origen, viaje, impacto, consecuencia, cada uno con su eje respecto de la línea de acción |
+| Recorrido por un lugar | Cámara que se mueve con el sujeto; pocos emplazamientos y mucho movimiento |
 
-**Método**
+**2. ¿Qué ángulo y altura?** El ángulo es una decisión de relato: a la altura de los ojos para el diálogo neutral;
+picado para quitar poder o mostrar una situación; contrapicado para dar poder; a ras de mesa o de piso para el objeto
+heroico; cenital para la geografía o el gag visual; sobre el hombro para plano y contraplano; subjetiva para meter al
+espectador. La altura se escribe en metros: es lo que más cambia una escena generada.
 
-- **Emplazamientos, no planos**: se cuentan las posiciones de cámara en la planta; varios planos comparten
-  emplazamiento (cambia lente o encuadre). Menos emplazamientos = más continuidad.
-- **Cada emplazamiento declara**: eje, altura, lente (como intención óptica), distancia al sujeto, movimiento y en
-  qué acto se mueve.
-- **El movimiento cuenta la historia**: cámara fija en el mundo frío, cámara que se mueve cuando entra la marca.
+**3. ¿Qué lente?** Como intención óptica: gran angular cerca (energía, distorsión, inmersión), normal (neutral),
+tele (aislamiento, compresión, intimidad). El mismo emplazamiento con otro lente da otro plano sin romper continuidad.
 
-**Plan de la fuente** (emplazamientos fijados; movimientos: **propuesta**)
+**4. ¿Qué movimiento?** Cada movimiento tiene una función; si no la tiene, la cámara queda fija.
 
-| Emplazamiento | Planos | Altura · lente | Movimiento (propuesta) |
-|---|---|---|---|
-| A: detrás del hombro derecho de Paula, mirando a Antonio | 06, 07, 09, 18 | Ojos sentado (≈1,15 m) · 50 mm; 85 mm en 07 y 18 | Fija en 06–09; leve push-in en el 18 |
-| B: detrás del hombro izquierdo de Antonio, mirando a Paula | 08, 11a, 11b, 17 | Ojos sentado · 35–50 mm | Fija en 08; en 11a dolly rápido hacia Paula siguiendo la ola; 11b cámara en mano con sacudida en el impacto; 17 fija |
-| C: extremo oeste de la mesa, a lo largo | 01, 04, 05, 12 | ≈1,2–1,4 m · 35 mm | Fija en 01–05; en el 12 paneo lento de las paredes que se encienden |
-| Inserto a ras de mesa | 10 | ≈15–20 cm sobre la mesa · 28 mm | Push-in hacia la pantalla en el instante en que sale la lata |
-| Grilla de videollamada | 02, 03, 19 | Pantalla | Zoom out de 4 a 16 a 64 recuadros (03); recuadros que se apagan (19) |
-| Ciudades | 13, 14, 15 | Calle · 35 mm | Corte encadenado por la forma de la lata; leve tilt hacia la valla |
-| Vocera | 16 | Plano medio · 50 mm | Fija |
-| Gancho | 00 | = 11b | Cuadro congelado y rebobinado en post |
+| Movimiento | Función típica |
+|---|---|
+| Fija | Observar, tensión contenida, comedia seca |
+| Push-in (acercarse) | Revelación, decisión, foco en un detalle |
+| Pull-out (alejarse) | Revelar el contexto o la consecuencia |
+| Paneo / tilt | Seguir una mirada o un objeto, mostrar un espacio |
+| Travelling lateral | Acompañar, dar ritmo |
+| Dolly siguiendo la acción | Velocidad, persecución, un objeto que viaja |
+| Grúa o dron | Escala, cambio de mundo, apertura o cierre |
+| Cámara en mano | Caos, impacto, urgencia |
+| Órbita | Héroe, objeto que importa |
+| Whip pan / barrido | Transición de lugar o de tiempo |
 
-Total: 3 ejes en la sala + 1 inserto + grilla + exteriores + vocera.
+**5. ¿Cuándo se mueve?** La gramática de movimiento acompaña al relato: es habitual fijar la cámara en un tramo y
+soltarla en el giro. Se escribe por acto.
+
+**6. Continuidad**: todos los emplazamientos de una escena van del mismo lado de la línea de 180°; si hay que
+cruzarla, se cruza en cámara (con un movimiento que se vea) o con un plano neutro sobre el eje.
+
+**Plantilla por emplazamiento**: id · eje en la planta · altura · lente · planos que lo usan · movimiento por plano y
+su función · entrada y salida (cómo empalma con el plano anterior y el siguiente).
 
 ## K. Audio: voz, música y mezcla
 
-**Método** (oficio completo en `audio-studio` y en el método madre, etapa 10):
+El oficio completo está en la skill `audio-studio` y en la etapa 10 del método madre. Lo propio de una pieza narrativa:
 
 - La **voz** se graba o genera después del corte mudo; los subtítulos se re-temporizan con la voz real.
-- La **música** va en un tramo continuo y el montaje se ajusta a su grilla (en la fuente, 120 BPM).
-- El **silencio** también se planifica (el agente no oye: la escucha es humana).
+- La **música** va en un tramo continuo y el montaje se ajusta a su grilla de tiempo.
+- El **silencio** se planifica como un evento más (corte de música en el punto de giro).
+- La voz de cada personaje se fija en la biblia (timbre, acento, edad), igual que su cara.
+- **Límite**: el agente no oye; la escucha es humana.
 
-**Plan de la fuente** (estado: sin grabar; el animatic aún no tiene sonido)
-
-| Elemento | Plan |
-|---|---|
-| Voces | Paula, Antonio y proveedores con ElevenLabs v4 (tomas de prueba de Antonio en `v2-gpt/voces/`); vocera en ES, EN y PT en el 16 |
-| Música | Mundo frío con música tensa que se corta en el 06 (silencio); el drop entra en el 10 con la lata; cierre sobre el drop |
-| Mezcla | −14 LUFS; voz por encima de la música; subtítulos a 17 cps máximo |
+**Plantilla**: elemento · plano y momento en la grilla · fuente (voz grabada, voz sintética, música licenciada,
+librería) · estado.
 
 ## L. VFX y composición
 
-| Plano | Efecto | Cómo (propuesta) |
-|---|---|---|
-| 00 | Congelado y rebobinado al 01 | Post (velocidad negativa con barrido) |
-| 10 | La lata sale a través del vidrio intacto, anillo de luz y onda de agua | Generativo en el plano + refuerzo del anillo en composición |
-| 11a–11b | Ola con física real, corona sobre Paula | Generativo; la lata y la cara de Paula se reponen si derivan |
-| 12 | Paredes que se encienden con la campaña | Generativo + encendido por pantalla en post |
-| 13–15, 09, 17, 18 | Pantallas con arte de campaña | Pasada de física de pantalla (§G) |
-| 15 | Feed de Instagram | UI determinística compuesta (§G) |
-| 19 | Recuadros de la llamada que se apagan uno a uno | Composición en post |
-| Todos | Texto y componentes | Composición en post sobre reservas |
+- Se decide por efecto, no por plano: **generativo en el plano** (el modelo lo pinta junto con la escena),
+  **composición en post** (capa aparte, exacta) o **mixto** (generativo + refuerzo compuesto).
+- Va a composición todo lo que tiene que ser exacto: texto, marcas, interfaces, cifras, la cara aprobada.
+- Va al generativo lo que necesita integrarse con la luz y la física de la escena: fluidos, partículas, pantallas
+  encendidas (§G).
+
+**Plantilla**: plano · efecto · técnica (generativo, composición, mixto) · referencia · riesgo · QA.
 
 ## M. SFX
 
-**Método**: un SFX por causa visible y ninguno sin causa (lecciones F12 del método madre). Se listan por plano con su
-momento exacto en la grilla.
+- Un SFX por causa visible, y ninguno sin causa.
+- Se listan por plano con su momento exacto en la grilla y su intensidad relativa.
+- Los componentes de video (lechos, golpes de esfera) tienen su propio sonido de interfaz, separado del mundo.
 
-**Plan de la fuente** (propuesta)
-
-| Plano | SFX |
-|---|---|
-| 01–05 | Teclado, notificaciones de la llamada, murmullo que crece con la grilla |
-| 06 | Corte a silencio; sólo el sorbo de café |
-| 09 | Clic suave al girar el portátil |
-| 10 | Zumbido de pantalla que sube, whoosh de la lata, burbujeo de agua |
-| 11a–11b | Ola corriendo por la mesa, golpe de agua, gotas cayendo |
-| 12 | Encendido de pantallas en cadena |
-| 13–15 | Ambiente de ciudad con transición por golpe de música |
-| Componentes | Tic al nacer el lecho, nota en cada golpe de esfera (6 en el animatic) |
+**Plantilla**: plano · momento · causa visible · sonido · capa (mundo o interfaz).
 
 ---
 
@@ -323,7 +343,68 @@ momento exacto en la grilla.
 
 ## Pendientes de este método
 
-- Llevar el script de reposición de cara a `scripts/creative/` con prueba.
-- Plantilla de biblia de continuidad en `motion-design-studio/templates/`.
-- Aprobar con el operador los movimientos de cámara, VFX y SFX marcados como propuesta.
-- Cerrar la producción fuente (video, audio, post) y versionar este documento a 1.1 con lo aprendido.
+- Aprobar con el operador los movimientos de cámara, VFX y SFX del Anexo A marcados como propuesta.
+- Cerrar la producción fuente (video, audio, post, cifra real del cierre «[X] h») y versionar este documento a 1.1.
+
+---
+
+## Anexo A — Plan de «¿Para cuándo?»
+
+Aplicación de la Parte 2 a la producción fuente. Es un ejemplo: otra producción llega a otro plan. Lo marcado
+**propuesta** espera la aprobación del operador.
+
+**Luz**
+
+| Tramo | Planos | Fuente | Calidad |
+|---|---|---|---|
+| Mundo frío | 01–09 | Ventanal al este, día nublado | Fría, pareja, sin sombras duras |
+| Mundo Efeonce | 10–18 | Sol de mañana bajo entrando por el ventanal | Cálida: contraluz en el eje A, frontal o tres cuartos en el eje B |
+| Ciudades | 13–15 | Mañana del lunes (zócalos 09:12–09:14), vallas LED encendidas | Sol bajo de mañana; la campaña aparece en el mismo instante que en la sala. Corregido el 2026-10-17: estaban al atardecer y de noche, contra la hora de los zócalos |
+| Cierre | 20a–20b | — | Navy de Efeonce |
+
+**Cámaras** (emplazamientos fijados; movimientos: propuesta)
+
+| Emplazamiento | Planos | Altura · lente | Movimiento (propuesta) |
+|---|---|---|---|
+| A: detrás del hombro derecho de Paula, mirando a Antonio | 06, 07, 09, 18 | Ojos sentado (≈1,15 m) · 50 mm; 85 mm en 07 y 18 | Fija en 06–09; leve push-in en el 18 |
+| B: detrás del hombro izquierdo de Antonio, mirando a Paula | 08, 11a, 11b, 17 | Ojos sentado · 35–50 mm | Fija en 08; dolly rápido hacia Paula con la ola en 11a; cámara en mano con sacudida en 11b; fija en 17 |
+| C: extremo oeste, a lo largo de la mesa | 01, 04, 05, 12 | ≈1,2–1,4 m · 35 mm | Fija en 01–05; paneo lento de las paredes en el 12 |
+| Inserto a ras de mesa | 10 | ≈15–20 cm · 28 mm | Push-in hacia la pantalla cuando sale la lata |
+| Grilla de videollamada | 02, 03, 19 | Pantalla | Zoom out de 4 a 16 a 64 (03); recuadros que se apagan (19) |
+| Ciudades | 13, 14, 15 | Calle · 35 mm | Corte encadenado por la forma de la lata; leve tilt hacia la valla |
+| Vocera | 16 | Plano medio · 50 mm | Fija |
+| Gancho | 00 | = 11b | Congelado y rebobinado en post |
+
+**Audio** (sin grabar)
+
+| Elemento | Plan |
+|---|---|
+| Voces | Paula, Antonio y proveedores con ElevenLabs v4 (pruebas de Antonio en `v2-gpt/voces/`); vocera en ES, EN y PT en el 16 |
+| Música | Tensa en el mundo frío, se corta en el 06; el drop entra en el 10 con la lata; cierre sobre el drop |
+| Mezcla | −14 LUFS; subtítulos a 17 cps máximo |
+
+**VFX** (propuesta)
+
+| Plano | Efecto | Técnica |
+|---|---|---|
+| 00 | Congelado y rebobinado al 01 | Composición |
+| 10 | La lata atraviesa el vidrio intacto, anillo de luz | Mixto |
+| 11a–11b | Ola con física real y corona sobre Paula | Generativo; cara y lata repuestas si derivan |
+| 12 | Paredes que se encienden | Generativo + encendido en post |
+| 09, 13–15, 17, 18 | Pantallas con la campaña | Pasada de física de pantalla |
+| 15 | Feed de Instagram | UI compuesta |
+| 19 | Recuadros que se apagan | Composición |
+| Todos | Texto y componentes | Composición |
+
+**SFX** (propuesta)
+
+| Plano | SFX |
+|---|---|
+| 01–05 | Teclado, notificaciones de la llamada, murmullo que crece con la grilla |
+| 06 | Silencio; sólo el sorbo de café |
+| 09 | Clic suave al girar el portátil |
+| 10 | Zumbido de pantalla que sube, whoosh de la lata, burbujeo |
+| 11a–11b | Ola por la mesa, golpe de agua, gotas |
+| 12 | Encendido de pantallas en cadena |
+| 13–15 | Ambiente de ciudad con transición por golpe de música |
+| Componentes | Tic al nacer el lecho; nota en cada golpe de esfera |
