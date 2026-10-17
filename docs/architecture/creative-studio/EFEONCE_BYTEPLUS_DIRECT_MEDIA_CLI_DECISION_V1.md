@@ -59,6 +59,8 @@ de 180 s no prueba cancelación ni cobro cero; un nuevo POST es un intento separ
   viajan con sus bytes originales para no romper la confianza en salidas propias de la cuenta. Los personajes
   ficticios aprobados en la biblioteca privada de retratos virtuales entran como `asset://<id>`; crearlos (KYC de
   organización, Advanced Creation Rights, carta de autorización) es un acto del operador en la consola, no del comando.
+  El plan Free admite 50 avatares; cada subida exige decisión del operador y fila previa en el
+  [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
 - Voice enrollment no se prueba ni compra slots de voz durante instalación. Las voces clonadas exigen speaker ID
   adquirido y consentimiento de la persona; credencial válida no prueba ese derecho.
 
@@ -73,7 +75,7 @@ se promueve una ruta Globe; o falta evidencia del transporte y de sus salidas re
 4:5, audio): 580×726, 39.887 tokens. Final `cgt-20261017090108-fzvku` desde ese borrador: 1288×1610, 196.432 tokens,
 misma toma cuadro a cuadro. El mismo día, un cuadro fotorrealista con una persona (GPT Image) fue rechazado al crear
 la tarea con `InputImageSensitiveContentDetected.PrivacyInformation`, sin tarea creada. Según la PDM de BytePlus,
-la restricción para personas se levanta con la verificación KYC de la cuenta. KYC de organización enviado el 2026-10-16 (revisión de 1 a 2 días hábiles); falta Advanced Creation Rights, subir los personajes y re-probar. Re-prueba del 2026-10-17 con el KYC aprobado: el mismo cuadro volvió a rechazarse con `PrivacyInformation` (requestId `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro); el KYC solo no levanta la restricción.
+la restricción para personas se levanta con la verificación KYC de la cuenta. KYC de organización enviado el 2026-10-16 (revisión de 1 a 2 días hábiles); falta Advanced Creation Rights, subir los personajes y re-probar. Re-prueba del 2026-10-17 con el KYC aprobado: el mismo cuadro volvió a rechazarse con `PrivacyInformation` (requestId `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro); el KYC solo no levanta la restricción. El mismo día quedó activado Advanced Creation Rights en el plan Free (50 avatares) y el operador decidió evaluar el tier pagado sólo cuando la herramienta de producción (runtime) esté armada.
 Corrida: `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/byteplus-draft/`.
 
 OmniHuman 2.0 / Vision AI fue investigado el 2026-10-15 y sigue fuera de la implementación aceptada de

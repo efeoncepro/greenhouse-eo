@@ -69,6 +69,10 @@ pnpm -s ai:byteplus --model seedance25 --image $R/stills/$n-916.png --prompt-fil
 - Lo entregado [medido con ffprobe]: HEVC 1080×1920, **24 fps**, 5,04 s. El montaje lo conforma a 30 fps.
 - La etiqueta del envase se mantuvo exacta en movimiento **en este caso**. No es garantía: revisar primer cuadro, último
   y dos intermedios al 100 %; si deriva, la etiqueta se compone.
+- 🔴 **Cuadro con rostro humano:** Seedance por BytePlus lo rechaza (`PrivacyInformation`); el KYC solo no basta. Va con
+  `--image asset://<id>` de un personaje que ya tenga fila en el
+  [ledger de retratos virtuales](../../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
+  (cupo de 50, decide el operador) o por Higgsfield; nunca se «lava» el cuadro por Seedream.
 
 ### 3. Capa de motion (HTML + GSAP → secuencia PNG con alfa)
 

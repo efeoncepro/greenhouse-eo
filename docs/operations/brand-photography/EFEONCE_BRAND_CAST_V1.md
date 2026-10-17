@@ -1,9 +1,9 @@
 # Elenco de marca Efeonce — V1
 
 > **Tipo de documento:** Norma operativa (fotografía de marca)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-02 por Claude (pedido y decisiones del operador)
-> **Ultima actualizacion:** 2026-10-03 por Claude (1.1: silueta y carácter en el reparto; cómo se pide un personaje;
+> **Ultima actualizacion:** 2026-10-17 por Claude (1.2: §7e, video en BytePlus directo). Antes, 2026-10-03 (1.1: silueta y carácter en el reparto; cómo se pide un personaje;
 > grupos de 3 a 5 con cualquier combinación de elenco, Nexa y Julio, sin elenco obligatorio; la prenda se elige por quien
 > la viste; Julio 37 resuelto; aros de Isabella alineados al catálogo; cómo sumar un personaje nuevo)
 > **Estado:** Elenco listo: los cinco personajes ficticios tienen set v3, cuerpo extendido y medido, registrados en
@@ -384,6 +384,14 @@ Un personaje nuevo entra por el mismo camino que los cinco, en este orden:
 10. **Archivar la exploración** (candidatos y descartes) con `pnpm ai-gen:archive apply --folder <carpeta>`: sube, verifica
     y recién entonces borra lo local; se recupera con `pnpm ai-gen:pull <carpeta>`.
 11. **Actualizar esta biblia**: §1, §3, §5 y §8.
+
+## 7e. Video en BytePlus directo (2026-10-17)
+
+Seedance 2.x por BytePlus rechaza cuadros fotorrealistas con rostro que no vengan de una vía de confianza. El elenco
+(Hum, Karo, Sophia, Isabella, Antonio) es candidato prioritario a la biblioteca privada de retratos virtuales.
+**Ninguno está subido aún**: cada subida exige decisión del operador y fila en el
+[ledger de cupos](../creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md). Julio, persona real, va por la
+biblioteca de retratos reales (verificación en vivo y consentimiento), nunca por la virtual.
 
 ## 8. Estado
 

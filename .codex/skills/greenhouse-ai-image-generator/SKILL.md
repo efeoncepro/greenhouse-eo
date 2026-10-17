@@ -1051,6 +1051,9 @@ o una capacidad que el contrato directo no cubra. Los slugs y precios de Fal sig
 `pnpm ai:byteplus --list` descubre los modelos conectados; `--doctor` verifica el consumer sin generar.
 [Manual de BytePlus](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) y
 [ADR](../../../docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
+🔴 Un cuadro con rostro humano que se animará en Seedance necesita un `asset://<id>` con fila en el
+[ledger de retratos virtuales](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
+(cupo de 50, decide el operador) o ir por Higgsfield. Prohibido «lavarlo» por Seedream para que cuente como salida confiable.
 
 `pnpm ai:layers` usa ahora **BytePlus Pro por defecto**; `--provider fal` conserva el carril anterior.
 BytePlus Pro y Flash admiten Layerize (`layer_decomposition: true`), con el mismo `layers.json` de las máscaras.

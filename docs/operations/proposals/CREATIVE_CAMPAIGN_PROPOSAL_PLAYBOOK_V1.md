@@ -132,6 +132,8 @@ Tubería **[medido]**:
 
 La elección de modelo no se decide de memoria: [guía de selección de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) y [BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md). El método general de video está en [Producción y posproducción de video](../creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md).
 
+Si un cuadro fijo lleva un rostro humano fotorrealista, Seedance 2.x por BytePlus lo rechaza como primer cuadro (medido el 2026-10-16 y el 2026-10-17, con el KYC aprobado). Vías y cupos: [ledger de retratos virtuales](../creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+
 Reglas **[operador]** que salieron de la revisión:
 
 | Regla | Cita |

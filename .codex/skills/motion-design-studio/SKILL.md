@@ -238,7 +238,12 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
   (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
   `pnpm ai:byteplus --model seedance25|seedance2` por defecto bajo el contrato directo de Johor;
-  [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md). Fal sigue como alternativa explícita:
+  [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md); en 2.5, `--draft` (480p) y luego
+  `--from-draft <task-id>` (final 1080p). 🔴 **Rostros humanos:** se rechazan (`PrivacyInformation`, sin cobro) y el KYC
+  aprobado (2026-10-17) no lo levanta; la vía es `--image asset://<id>` de la biblioteca de retratos virtuales (Advanced
+  Creation Rights, plan Free: **50 avatares**), y ningún personaje se sube sin decisión del operador y fila en el
+  [ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md); personaje de una sola
+  pieza → Higgsfield u otra vía, no cupo. Fal sigue como alternativa explícita:
   su endpoint se elige por duración/4K/costo en
   `workflows/engine-selection-by-fidelity-contract.md`; los 15 endpoints verificados 2026-09-16, incluido 2.5
   `editing`/`extension`; se observaron rechazos cobrados tras encolar referencias de marcas/personas en pruebas de septiembre; no generalizar a todos los endpoints. La fórmula por tokens tuvo coincidencia en pruebas cortas, pero subestimó SKY V11: incluir entradas, salida y tarifa de la ruta, y reconciliar por solicitud), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =

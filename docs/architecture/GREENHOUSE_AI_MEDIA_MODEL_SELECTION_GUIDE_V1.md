@@ -43,6 +43,12 @@ Para Seedream, Layerize, Seedance y Seed Speech del contrato Johor, usa `pnpm ai
 Los slugs, precios y mediciones de Fal/Higgsfield conservados abajo pertenecen a esos proveedores, que siguen
 como alternativas explícitas o para capacidades sin equivalencia directa. Esta elección local no habilita Globe.
 
+**Rostros en Seedance 2.x por BytePlus directo (2026-10-17):** una imagen de entrada con rostro humano fotorrealista
+ajeno a la cuenta se rechaza (`PrivacyInformation`, sin cobro), aun con el KYC aprobado. Vías: salida nativa de
+Seedream/Seedance de la misma cuenta, biblioteca privada de retratos virtuales (`asset://<id>`; plan Free con 50
+cupos, gobernados por el [ledger](../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)) o
+retratos reales con consentimiento. Fuera de esas vías, el plano con rostro va por Higgsfield u otro proveedor.
+
 **Prueba propia 2026-10-12:** [Nexa cine, Seedream 5 Pro standard directo y Sunburst max](../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md).
 Pro conserva rostro, traje y atmósfera a menor costo; Sunburst sigue mejor acción/geografía en esa pareja.
 Una salida por motor, tamaños nativos distintos; sin ranking universal ni cambio de anclas/default OpenAI.
