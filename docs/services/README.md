@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-10-16
+> **Última actualización:** 2026-10-17
 
 ## Propósito
 
@@ -32,6 +32,13 @@ esta carpeta ni define alcance o precio. Detalle: [composición de decks y broch
 <https://efeoncepro.com/servicios/agencia-de-medios/>, ambos del 2026-10-16, con el formulario `efeonce-media-diagnostic`
 como entrada de leads. Rutas y reglas de claims (rebates como margen de Efeonce, tecnología no es alianza, casos y
 cobertura): [Media & Distribution](media-distribution/README.md#material-comercial-vigente).
+
+**Landing de performance (línea Voice):** desde el 2026-10-17 la landing pública vigente del servicio
+[Performance & Commerce Distribution](media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) es
+<https://efeoncepro.com/servicios/performance-marketing/>, con el formulario `efeonce-performance-diagnostic` como
+entrada de leads. Reemplaza a la página legacy `/servicio-gestion-campanas-publicitarias/`, que quedó privada con un
+301 hacia la nueva (delta 2026-10-17; antes de esa fecha la legacy era la página pública del servicio). Detalle:
+[documentación funcional](../documentation/public-site/performance-marketing.md).
 
 ## Fronteras
 

@@ -1,13 +1,44 @@
 # Performance Marketing Landing — SEO/AEO Brief V1
 
-> **Estado:** hipótesis validada con Semrush en cinco países. La segunda fuente y la decisión de URL se cierran en el
-> Slice 1 de `TASK-1865`.
+> **Estado:** aplicado en producción el 2026-10-17 con los ajustes del Delta 2026-10-17. La segunda fuente de
+> demanda (Search Console) sigue pendiente.
+> **URL:** https://efeoncepro.com/servicios/performance-marketing/ (WordPress `251997`)
 > **Fecha:** 2026-09-11 · **Revisión:** V1.1, demanda y léxico por país
 > **Owner:** Media & Distribution + Public Site
 > **Posicionamiento:** [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md)
 > **Wireframe y copy:** [`TASK-1865` wireframe](../ui/wireframes/TASK-1865-landing-performance-marketing.md)
 > **Evidencia:** [investigación de términos por país 2026-09-11](../audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md)
 > y [market update 2026-09-10](../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md)
+
+## Delta 2026-10-17 — publicada: lo que quedó frente a este brief
+
+La landing se publicó el 2026-10-17 (`TASK-1865`). Lo aplicado difiere de §6, §7 y §9 en estos puntos; el resto del
+brief sigue como referencia:
+
+| Campo | Este brief proponía | Quedó publicado |
+|---|---|---|
+| Slug | `/servicios/performance-marketing/` (working) | La misma ruta, ahora **URL definitiva**, hija de `/servicios/` |
+| Robots / canonical | `noindex` en la candidata; `index, follow` y canonical al promover | `index, follow`, canonical propio y en `page-sitemap.xml` |
+| Title | `Agencia de performance marketing y publicidad digital \| Efeonce` | Igual |
+| Meta description | «…Google Ads, Meta, TikTok y LinkedIn optimizados hacia ventas reales, con tus cuentas a tu nombre.» | «Agencia de performance marketing y publicidad digital: pauta en Google, Meta, TikTok y LinkedIn optimizada por ventas, no por clics. Cuentas a tu nombre.» |
+| H1 | «Performance marketing que aprende de tus ventas, no de tus clics.» | «Agencia de performance marketing que optimiza tu pauta por ventas, no por clics.» |
+| Focus keyphrase | — | «agencia de performance marketing» (Semrush, 2026-10-17) |
+| OG | Título y descripción del copy ledger; imagen 1200×630 | OG title «Performance marketing optimizado por ventas, no por clics \| Efeonce»; imagen PNG 1200×630, attachment `252002` |
+| FAQ | Catorce preguntas (§4) | **Seis** preguntas visibles, editables como repeater en Elementor: qué hace una agencia de performance marketing, cuánto cobra, si las cuentas quedan a tu nombre, si garantizan el retorno, qué es pautar en redes y en Google, y en qué se diferencia de una agencia de medios (texto según la fuente versionada del canvas) |
+| Schema | `Service` + `FAQPage` activados por el marker `_eo_performance_enabled=1` | El widget `diagnostico` emite `Service` (`#service`) y `FAQPage` (`#faq`); `includes/performance/seo.php` agrega `about → #service` al `WebPage` de Yoast sólo en la página que tiene ese widget. Yoast sigue dueño de `WebPage`, `Breadcrumb` y `Organization` |
+
+Quedaron fuera del FAQ publicado, entre otras, las preguntas de qué es Google Ads/SEM, cuánto invertir en
+publicidad digital, auditoría de Google Ads, LinkedIn Ads, programmatic, ChatGPT Ads y Ley 21.719. Si se recuperan, entran por el repeater del FAQ y
+alimentan `FAQPage` sin tocar el diseño.
+
+**Migración (§9) aplicada:** la legacy `242862` quedó `private` y fuera del sitemap; el 301 plano de Yoast
+`servicio-gestion-campanas-publicitarias` → `/servicios/performance-marketing/` responde con barra, sin barra y con
+`?utm_source=x` (301 que conserva la query, gracias al mu-plugin `efeonce-redirect-query-passthrough`; ver
+[diagnóstico](YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md)). Tres redirects cuyo destino era la legacy se repuntaron a la
+nueva, y el ítem de menú `242915` apunta a `251997`.
+
+**Pendiente:** Rich Results Test, inspección de ambas URLs y cobertura en Search Console, revisión de queries servidas
+por Performance y Medios, y el seguimiento AEO de §11.
 
 ## Delta 2026-10-16 — Agencia de Medios ya está publicada
 
@@ -94,7 +125,7 @@ campañas digitales" (sin demanda).
 | Title | `Agencia de performance marketing y publicidad digital \| Efeonce` |
 | Meta description | `Agencia de performance marketing y publicidad digital: Google Ads, Meta, TikTok y LinkedIn optimizados hacia ventas reales, con tus cuentas a tu nombre.` |
 | H1 | `Performance marketing que aprende de tus ventas, no de tus clics.` |
-| Slug | `/servicios/performance-marketing/` (working) |
+| Slug | `/servicios/performance-marketing/` (working; definitiva desde 2026-10-17) |
 | Idioma | `es` para Latinoamérica, sin país en el title; mercados declarados en el cuerpo y en `areaServed` |
 | Canonical | Autorreferente, sólo al promover |
 | Robots | `noindex` en la candidata; `index, follow` al promover |

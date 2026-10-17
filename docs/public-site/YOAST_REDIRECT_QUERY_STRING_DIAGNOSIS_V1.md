@@ -1,9 +1,9 @@
 # Redirects de Yoast con parámetros: diagnóstico y propuesta
 
 > **Tipo de documento:** Diagnóstico técnico + propuesta de plataforma (sitio público)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-10-17 por Claude (sesión con Julio Reyes)
-> **Última actualización:** 2026-10-17 por Claude — desplegado
+> **Última actualización:** 2026-10-17 por Claude — desplegado; §8 primer retiro cubierto (PDR-022)
 > **Estado:** **Desplegado en producción el 2026-10-17 (~16:35 UTC)** con autorización del operador («Ok, hazlo»). Ver §7.
 > **Origen:** hallazgo del [retiro de `/agencia-diseno-estrategico/`](LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md) §7
 > **Rail:** [`taxonomy-permalink-migrations.md`](../../.claude/skills/efeonce-public-site-wordpress/references/taxonomy-permalink-migrations.md) · skill `efeonce-public-site-wordpress`
@@ -169,3 +169,17 @@ Script guardado: `scripts/public-website/flatten-yoast-redirect-chains.php`.
 **Rollback:**
 - mu-plugin: borrar el archivo y purgar, o definir `EFEONCE_REDIRECT_QUERY_PASSTHROUGH_DISABLED` en `wp-config.php`.
 - Cadenas: restaurar desde el snapshot sólo los 8 destinos que cambiaron.
+
+## 8. Primer retiro cubierto: Performance Marketing (2026-10-17)
+
+El retiro previsto en PDR-022 ya se ejecutó, después del despliegue del mu-plugin:
+
+- 301 plano de Yoast `servicio-gestion-campanas-publicitarias` → `/servicios/performance-marketing/`; la legacy
+  `242862` quedó `private` (no borrada) y fuera del sitemap.
+- Probado en vivo con barra, sin barra y con `?utm_source=x`: con parámetro responde 301 **conservando la query**. Eso
+  lo hace este mu-plugin, no Yoast.
+- Las cadenas que §5.2 anticipaba no se formaron: los **3 redirects cuyo destino era la legacy se repuntaron directo**
+  a la página nueva en la misma ventana (snapshot `_gh_performance_migration_before_20261017_181625`).
+
+Para el próximo retiro (PDR-013 u otro) el patrón es el mismo: 301 plano en Yoast, repuntar los redirects que apuntaban
+al origen retirado y probar con y sin barra y con un parámetro.

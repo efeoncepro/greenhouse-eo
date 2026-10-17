@@ -43,6 +43,43 @@ fallback sin JS; con variante de estilo, el override de tokens apunta a
 `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`), primer envío humano real y política
 de medición si el operador la quiere.
 
+## Diagnóstico de pauta (Performance Marketing)
+
+Alta del 2026-10-17 (TASK-1865), con formulario propio por decisión del operador («Uno propio»). Reemplaza al
+`efeonce-performance-brief` del contrato original de la task, que nunca se publicó. Registro de identidad; antes de
+operar, relee el contrato público.
+
+| Identidad | Valor |
+|---|---|
+| Landing | `https://efeoncepro.com/servicios/performance-marketing/` (página `251997`; host card en el widget `greenhouse_performance_diagnostico`) |
+| Slug / form key | `efeonce-performance-diagnostic` / `71ea684f-1ad9-4656-982b-159e4de46dd8` |
+| Surface | `fhsf-efeonce-performance-diagnostic` (`https://efeoncepro.com`, `https://www.efeoncepro.com`) |
+| Nombre / kind | «Diagnóstico de pauta · Performance Marketing» / `diagnostic_intake` |
+| Versión publicada | No registrada en este documento; leerla del store (`getPublishedVersionBySlug`) antes de operar |
+| Presentación | `styleVariant=hubspot_pillar`, `composition=multi_step_light` (dos pasos), CTA «Pide tu diagnóstico», success card con acción «Elegir un horario» a `/agenda/` |
+| Destino | HubSpot `direct` a «Lead Gen - Performance Marketing» por `hubspot-destinations.registry.ts`; campos estándar del registro (`FIRST_NAME`, `LAST_NAME`, `EMAIL`, `COMPANY`, `WEBSITE`, `country`) + `gh_form_performance_{audiencia,canales,inversion_mensual,objetivo,prioridad,crm,rol}` |
+| Medición | Pipeline GTM genérico; `generate_lead` sin verificar para este form ([Tracking Plan](../reference/measurement-gtm-ga4/TRACKING-PLAN.md#forms)) |
+
+Authoring: `scripts/growth/publish-performance-diagnostic-form.ts` (dry-run por defecto, `--apply`). La v1 nace
+`greenhouse_only`; el destino `direct` se adjunta después con
+`pnpm growth:forms:activate-hubspot-destinations -- --only=efeonce-performance-diagnostic`, una vez sumada la fila al
+registro. La política Turnstile se copia de la versión publicada de `efeonce-media-diagnostic`. En vivo el renderer
+dibuja 26 inputs.
+
+**Decisiones de mapeo (según el encabezado del publicador).** `hubspot_pillar` + `multi_step_light` es la combinación que el
+renderer de producción ya dibuja (encabezado de paso con progreso, `select` como chips de selección única,
+`multiselect` como chips con casilla); mismo patrón que `efeonce-hubspot-scope` y `efeonce-media-diagnostic`. El CRM es
+condicional: «A empresas» y «A ambos» comparten el prefijo `b2b` (`b2b`, `b2b-b2c`) y la condición es
+`includes: 'b2b'`. Sin íconos por opción. Nombre y apellido en un solo campo, partido en servidor. Los `value` de las
+opciones son estables.
+
+**Consentimiento.** Sólo la autorización obligatoria `contact_permission`. No hay casilla de novedades porque el
+adapter HubSpot envía `communications: []` y quedaría guardada sin efecto.
+
+**Pendientes.** Primer envío humano real desde navegador (Turnstile impide automatizarlo) para confirmar la entrega
+en HubSpot y `form_destination_attempt`, verificación de `generate_lead` en GA4 y política de medición publicitaria
+si el operador la quiere.
+
 ## Diagnóstico creativo (Agencia Creativa)
 
 Alta del 2026-10-15, autorizada por el operador. Registro de identidad; antes de operar, relee el

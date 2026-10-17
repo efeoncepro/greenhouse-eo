@@ -7,7 +7,8 @@ belong in `references/landings/home-claude-design-preview.md` and the linked aud
 Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
 and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
 `references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
-`references/landings/hubspot-services.md`.
+`references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17, rail cloned from Medios
+without extracting a shared core): `references/landings/performance-marketing.md`.
 
 ## Source fidelity without losing editability
 
@@ -134,6 +135,9 @@ Ohio or other pages. Two rules keep that scoping honest:
   Keep every button ≥ 44 px (48 px in practice), and `display:none` on desktop.
 - Without scroll-timeline support (`@supports not (animation-timeline: view())`) the dock stays always visible;
   lift it above the theme's fixed bottom chrome instead of letting them overlap.
+- In a hidden browser pane, `getComputedStyle` on a scroll-driven animation can return an old frame
+  (`opacity:0`) for an element that paints fine. Force a style recalculation or take a screenshot before
+  concluding the dock or a reveal is broken (Performance, 2026-10-17).
 - Ohio's bottom bar `.elements-bar.left` (light/dark switch) shares that corner. While the dock shows, move it
   aside with the same timelines from the page layer and bring it back from the destination on; verify both
   are never on screen at the same time at 390 px.
@@ -253,6 +257,21 @@ Keep "create" and "change" as different scripts. A new-page publisher only creat
 already exists (Medios: `publish-medios-elementor-page.php`); changing that page's body later needs a
 republisher that reads the current content hash, refuses if it differs from the expected one, and snapshots
 before saving. Never rerun a creator to update a live page.
+
+Release-rail lessons (Performance Marketing, 2026-10-17):
+
+- `pnpm public-website:wpcli` forwards only files (`--input-file`) to the eval as `$args`; there is no
+  `-- <arg>` passthrough. Pass a page id as a file, and let each script accept either a numeric id or a path
+  to a file that holds it.
+- In PHP lines that chain several assignments (`$id = …; $source = …;`), a trailing `//` comment silences
+  every assignment after it. It happened on Performance and the «Source identity drift» guard stopped the
+  script before any write: keep one assignment per line when annotating, and keep identity guards first.
+- If a runtime file you ship (e.g. the widget loader) carries other sessions' uncommitted changes, build the
+  package from the working tree only after `diff` proves live == working tree, and commit only your own hunk
+  (stage a blob with `git hash-object -w` + `git update-index --cacheinfo`), never the foreign WIP.
+- Retiring a legacy URL in the same release (301, chains, menu): `references/taxonomy-permalink-migrations.md`
+  §4 (Yoast Premium redirect rail). A `?utm_` that survives the 301 does so through the mu-plugin `efeonce-redirect-query-passthrough`,
+  not through Yoast.
 
 1. PHP renderer and native control-registration tests (including URL defaults and escaping).
 2. JS lifecycle tests for mount/replacement/removal, editor/reduced, filter and player cleanup.

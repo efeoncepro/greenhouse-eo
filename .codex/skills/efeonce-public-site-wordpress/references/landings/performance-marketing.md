@@ -5,7 +5,8 @@
 - URL: `https://efeoncepro.com/servicios/performance-marketing/` (child of `/servicios/`, `251077`)
 - WordPress `page_id`: `251997`, created and published 2026-10-17 (TASK-1865; operator: «Todo junto»).
 - Replaces legacy `242862` (`/servicio-gestion-campanas-publicitarias/`): now `private`, Yoast Premium plain 301
-  legacy → new (with and without trailing slash; query string kept by Yoast).
+  legacy → new (with and without trailing slash). `?utm_` survives the 301 because of the mu-plugin
+  `efeonce-redirect-query-passthrough` (runtime `16937ca`, deployed 2026-10-17), not because of Yoast.
 - Menu: primary `61`, item `242915` («Performance Marketing & Paid Ads») now points to `251997`; only its
   `_menu_item_object_id` changed (label, parent, order verified unchanged).
 - Canvas: Design artifact `https://claude.ai/artifact/PHjnoeTQbcaXEXNUEXK67j` (approved v25); versioned copy
@@ -23,6 +24,10 @@
   autodiagnostico,recibes,condiciones,diagnostico}`, base `class-eo-performance-landing-base.php` (registers its own
   assets via `eo_performance_register_assets()`), JS `performance-landing.js` (tabs + orbit). Loader: one widget
   entry + `require_once performance/seo.php`.
+- Elementor editing: native widgets (no HTML widget), one per container. Editable: texts (controls), FAQ repeater
+  (feeds FAQPage), form key/surface and Service description in `diagnostico`, «Animaciones» switch; no control
+  accepts HTML/CSS/JS. Not editable: each section's structure/design (templates compiled from the canvas); a layout
+  change is canvas → recompile → package. Editor open/save/reload not yet tested.
 - Mobile dock: `.mbar` uses `scroll(root)` + view-timeline `--form` hoisted with `timeline-scope` on `body`
   (`page.css`). A hidden browser pane reports stale `opacity:0`; force a frame or take a screenshot before calling it
   broken.
@@ -49,4 +54,4 @@
 - Verification 2026-10-17: 1440 and 390 with `scrollWidth==innerWidth`, 10 modules ready, one `h1`, canonical,
   `index, follow`, OG/Twitter, Service + FAQPage, page sitemap lists the new URL and not the legacy, 301 tested (slash,
   no slash, `?utm_`), Home menu links to the new URL, sibling landings 200 after deploy. Not yet: Rich Results/GSC,
-  real submission.
+  real submission, GVC 1536/890 + reduced motion + keyboard, Elementor save/reload.

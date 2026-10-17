@@ -10,6 +10,10 @@ en Yoast (3 cadenas repuntadas), ítem de menú `242915` reapuntado. QA en vivo 
 [Task](docs/tasks/in-progress/TASK-1865-landing-performance-marketing.md).
 Pendiente: envío real del form, GA4 `generate_lead`, Rich Results/GSC, GVC 1536/890, triple documentación, extraer el
 núcleo común source-led (hoy clonado de Medios). Runtime: commit propio en `efeonce-public-site-runtime` (sin push).
+Docs sincronizados (mismo día): funcional `docs/documentation/public-site/performance-marketing.md`, manual
+`docs/manual-de-uso/public-site/operar-performance-marketing.md`, PRIMITIVES, contrato de forms, TRACKING-PLAN
+(fila pendiente), servicios, PDR-022/021/025, briefs, EPIC-047, TASK-1860 (ancla `#plataformas`) y skill
+`efeonce-public-site-wordpress` (lecciones del carril). El `?utm_` en el 301 lo conserva el mu-plugin passthrough, no Yoast.
 
 ## 2026-10-17 — Brochures aprobados: no recortar ni revalidar
 

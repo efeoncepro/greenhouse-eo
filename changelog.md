@@ -13,6 +13,8 @@
   Medios: compilador, paquete scoped `performance-elementor-release.v1`, publicador, Ohio, SEO y migración de la legacy.
 - Legacy `/servicio-gestion-campanas-publicitarias/` privada con 301; menú reapuntado; formulario propio
   `efeonce-performance-diagnostic` con destino HubSpot directo.
+- Documentación sincronizada: funcional, manual, PRIMITIVES, contrato de forms, TRACKING-PLAN, servicios, PDRs,
+  briefs y skill del sitio público (lecciones del carril de release).
 
 ## 2026-10-17 — BytePlus: cuenta obligatoria y Entry gratuito activo
 

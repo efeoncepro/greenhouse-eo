@@ -4,7 +4,7 @@
 > **Estado:** Accepted · **publicada e indexable el 2026-10-16** (operador: «pública directo + menú»)
 > **URL:** https://efeoncepro.com/servicios/agencia-de-medios/ — página WordPress `251981`, hija de `/servicios/` (`251077`)
 > **Brief SEO/AEO:** [Agencia de Medios Landing SEO/AEO Brief V1](../AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md)
-> **Convive con:** [PDR-022](PDR-022-landing-performance-marketing-posicionamiento.md) (Performance Marketing, sin publicar)
+> **Convive con:** [PDR-022](PDR-022-landing-performance-marketing-posicionamiento.md) (Performance Marketing, publicada el 2026-10-17 en `/servicios/performance-marketing/`)
 > **Oferta:** [Media & Distribution](../../services/media-distribution/README.md) ·
 > [Publicidad programática — ficha](../../services/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md) ·
 > [Basis — oferta de medios 2026-10-12](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md)
@@ -14,6 +14,19 @@
 > `references/landings/agencia-de-medios.md` y fila en `references/landing-registry.md`
 > **Skills:** `efeonce-public-site-wordpress`, `seo-aeo`, `copywriting`, `efeonce-graphic-line`,
 > `greenhouse-growth-forms`.
+
+## Delta 2026-10-17 — Performance publicada y legacy retirada
+
+`TASK-1865` publicó la landing de Performance el 2026-10-17 en https://efeoncepro.com/servicios/performance-marketing/
+(página `251997`, `index, follow`). La legacy `/servicio-gestion-campanas-publicitarias/` quedó `private` con 301 hacia
+esa URL y el ítem «Performance Marketing & Paid Ads» del menú apunta a la página nueva. Efecto en esta decisión:
+
+- el Contexto y §Convivencia describían a Performance como no publicada y a la legacy en el menú: eso queda superado;
+- la tabla de términos de §Convivencia sigue vigente sin cambios;
+- el enlace por función Medios → Performance usa `/servicios/performance-marketing/`; no está en la fuente versionada
+  de Medios y queda pendiente de construir (cambiar el cuerpo exige el republicador con guarda de hash). La fuente del
+  canvas de Performance ya enlaza hacia Medios;
+- empieza la ventana de revisión en Search Console de ambas URLs.
 
 ## Contexto
 

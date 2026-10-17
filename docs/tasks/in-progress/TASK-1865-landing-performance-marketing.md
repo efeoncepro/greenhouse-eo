@@ -11,7 +11,7 @@
   Performance Marketing»); reemplaza a `efeonce-performance-brief` del contrato original.
 - **SEO:** title «Agencia de performance marketing y publicidad digital | Efeonce», focus keyphrase «agencia de
   performance marketing» (Semrush 2026-10-17), OG 1200×630 (`252002`), Service + FAQPage (6) y `about → #service`.
-- **Legacy:** `242862` privada; 301 plano en Yoast (con y sin barra, conserva `?utm_`); 3 redirects que apuntaban a la
+- **Legacy:** `242862` privada; 301 plano en Yoast (con y sin barra; `?utm_` se conserva por el mu-plugin `efeonce-redirect-query-passthrough`, no por Yoast); 3 redirects que apuntaban a la
   legacy repuntados a la nueva; ítem de menú `242915` reapuntado; sitemap sin la legacy. Snapshot
   `_gh_performance_migration_before_20261017_181625`.
 - **Verificado en vivo:** 1440 y 390 sin overflow, un `h1`, canonical, OG, schema, formulario con 26 campos, menú desde

@@ -1,5 +1,15 @@
 # TASK-1860 — Landing pública Trade Marketing & BTL (Channel & Commerce)
 
+## Delta 2026-10-17
+
+- La landing de Performance Marketing está publicada desde el 2026-10-17 en
+  `https://efeoncepro.com/servicios/performance-marketing/` (página `251997`). La legacy
+  `/servicio-gestion-campanas-publicitarias/` (página `242862`) quedó `private` y redirige con 301 a la nueva. El enlace
+  de esta task hacia Performance (conexión digital, `digital.items.retailMedia.link`) debe usar
+  `/servicios/performance-marketing/` (anchor `#plataformas`, verificado en vivo el 2026-10-17; `#canales` no existe) y nunca la legacy; el 301
+  sólo cubre enlaces viejos. La revisión de canibalización por retail media se hace contra la URL nueva. Cerrado por
+  [TASK-1865](../in-progress/TASK-1865-landing-performance-marketing.md).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -330,7 +340,7 @@ Reglas obligatorias:
 - Triangular la demanda con una segunda fuente (DataForSEO con autorización, o Search Console del sitio) y
   registrar el readback en el brief SEO/AEO.
 - Confirmar o reemplazar el slug `/servicios/trade-marketing/` y el title; fijar el canonical sólo después.
-- Revisar canibalización con `/servicio-gestion-campanas-publicitarias/` por retail media.
+- Revisar canibalización con `/servicios/performance-marketing/` por retail media (antes la legacy; ver Delta 2026-10-17).
 - Confirmar si existe una página pública de vacantes para el desvío de empleo.
 - Confirmar la duración real y la disponibilidad del scheduler `discovery`.
 - Entregable: brief SEO/AEO con sección de readback y PDR-021 con validaciones 1 a 3 resueltas.
@@ -463,7 +473,7 @@ contexto.
 ### Enlaces internos y menú
 
 - Entrada: hub `/servicios/` y menú `Soluciones → Crecimiento Multicanal`, después de Content Marketing.
-- Salida: Performance (`/servicio-gestion-campanas-publicitarias/`), SEO (`/servicios/posicionamiento-seo/`),
+- Salida: Performance (`/servicios/performance-marketing/`; la legacy redirige con 301, ver Delta 2026-10-17), SEO (`/servicios/posicionamiento-seo/`),
   AEO (`/aeo-2/`), Agencia Creativa (`/agencia-creativa/`) y `/contacto/` como respaldo.
 
 ### Gates de verificación nuevos
@@ -628,7 +638,7 @@ CTA, que el motor ya soporta.
 
 - La página de Performance que esta task enlaza desde su conexión digital (`/servicio-gestion-campanas-publicitarias/`,
   página `242862`) será reemplazada por `/servicios/performance-marketing/` con un 301, en el Slice 6 de
-  [TASK-1865](TASK-1865-landing-performance-marketing.md). El 301 mantiene el enlace funcionando, pero al construir el
+  [TASK-1865](../in-progress/TASK-1865-landing-performance-marketing.md). El 301 mantiene el enlace funcionando, pero al construir el
   enlace `digital.items.retailMedia.link` conviene apuntar a la URL nueva (anchor `#canales`) si `TASK-1865` ya promovió,
   para no depender de la redirección. Si ambas tasks construyen su módulo base a la vez, coordinar en Discovery para no
   duplicarlo.

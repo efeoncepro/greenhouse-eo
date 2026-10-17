@@ -1,9 +1,9 @@
 # Public Site WordPress — Inventario Ohio + Elementor
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-08-31 por Codex (inventario focal Content Marketing)
+> **Ultima actualizacion:** 2026-10-17 por Claude (inventario focal Performance Marketing y retiro de la página `242862`)
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime revalidado para Demo 35 (2026-08-22):** WordPress `7.1`, Kinsta, theme `ohio-child` `1.0.0` sobre Ohio `3.7.0`, Elementor `4.2.3`, Elementor Pro `4.2.2`, Ohio Extra `3.7.0`. Los conteos agregados de este inventario siguen siendo el snapshot del 2026-06-14.
@@ -73,6 +73,12 @@ no un formulario nuevo dentro de Elementor. [Contrato, módulos y límites](../.
 Este inventario focal no actualiza los conteos globales de 2026-06-14 ni certifica el roundtrip completo
 del editor. Consulta la [evidencia de publicación](../../audits/public-site/2026-08-31-content-marketing-publication.md)
 para las pruebas de registro, readback y navegador y los pendientes de contraste/conversión.
+
+## Extensión focal: Performance Marketing
+
+La publicación del 2026-10-17 (TASK-1865) añade diez widgets semánticos de `eo-elementor-widgets` en la página `251997` (`/servicios/performance-marketing/`), uno por contenedor y sin widgets HTML: `greenhouse_performance_hero`, `greenhouse_performance_confianza`, `greenhouse_performance_problema`, `greenhouse_performance_solucion`, `greenhouse_performance_plataformas`, `greenhouse_performance_creatividad`, `greenhouse_performance_autodiagnostico`, `greenhouse_performance_recibes`, `greenhouse_performance_condiciones` y `greenhouse_performance_diagnostico`. Usan controles nativos de texto, textarea, URL y media, un interruptor «Animaciones» por widget y un solo repeater (las preguntas frecuentes de `diagnostico`, que alimentan `FAQPage`). La estructura de cada sección sale de plantillas compiladas desde el canvas aprobado; no se edita en Elementor. La captura es un host de Growth Forms (`efeonce-performance-diagnostic`), no un formulario dentro de Elementor. Header y footer siguen siendo los de Ohio; las 164 metas `page_*` del layout se copiaron desde `249582`. [Documentación funcional](./performance-marketing.md) · [Manual de edición](../../manual-de-uso/public-site/operar-performance-marketing.md) · [Registro de primitives](../../architecture/public-site/PRIMITIVES.md#registry).
+
+Este inventario focal no actualiza los conteos globales de 2026-06-14 ni certifica el roundtrip completo del editor (abrir, guardar y recargar sigue pendiente).
 
 ## Fundaciones visuales: color, tipografia y motion
 
@@ -481,6 +487,8 @@ Advertencias:
 | 247526 | publish | `agencia-diseno-estrategico` | Soluciones de Diseno para Marketing | 131 KB | `spacer`, `ohio_heading`, `ohio_service_table`, `text-editor`, `image` |
 | 248003 | publish | `partnership` | Landing Aliados | 152 KB | `spacer`, `ohio_heading`, `text-editor`, `ohio_icon_box`, `ohio_service_table` |
 | 249770 | publish | `about-us-efeonce` | About us (Boceto) | 303 KB | `ohio_heading`, `ohio_badge`, `text-editor`, `spacer`, `ohio_icon_box` |
+
+> **Delta 2026-10-17 — `242862` ya no es una página activa.** Los estados de esta tabla son el snapshot del 2026-06-14. Desde el 2026-10-17 la página `242862` (`/servicio-gestion-campanas-publicitarias/`) está `private` (no borrada) y fuera del sitemap; su URL responde con un 301 plain de Yoast Premium hacia `/servicios/performance-marketing/` (`251997`), y el ítem de menú `242915` apunta a la página nueva. No la uses como patrón vigente de una landing publicada. Detalle en [Landing Performance Marketing](./performance-marketing.md#qué-pasó-con-la-página-antigua).
 
 ## Modulos disponibles por tipo de landing
 

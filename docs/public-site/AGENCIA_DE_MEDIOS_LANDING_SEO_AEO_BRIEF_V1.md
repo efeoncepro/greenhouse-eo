@@ -5,9 +5,22 @@
 > **Owner:** Media & Distribution + Public Site
 > **URL:** https://efeoncepro.com/servicios/agencia-de-medios/ (WordPress `251981`)
 > **Posicionamiento:** [PDR-025](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md)
-> **Convive con:** [Performance Landing SEO/AEO Brief V1](PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md) (sin publicar)
+> **Convive con:** [Performance Landing SEO/AEO Brief V1](PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md) (publicada el 2026-10-17 en `/servicios/performance-marketing/`)
 > **Operación:** skill `efeonce-public-site-wordpress` → `references/landings/agencia-de-medios.md`
 > **Fuente de la investigación:** Semrush, bases `cl`, `mx`, `co`, `pe` y `us`, 2026-10-16.
+
+## Delta 2026-10-17 — Performance ya está publicada
+
+La landing de Performance (PDR-022, `TASK-1865`) está en vivo e indexable desde el 2026-10-17 en
+https://efeoncepro.com/servicios/performance-marketing/ (página `251997`). La legacy
+`/servicio-gestion-campanas-publicitarias/` quedó `private` con 301 hacia esa URL y el ítem «Performance Marketing &
+Paid Ads» del menú ya apunta a la página nueva. Lo que dicen §2 y §7 sobre Performance «sin publicar» queda superado:
+
+- cualquier enlace de esta página hacia Performance usa `/servicios/performance-marketing/`, nunca la legacy;
+- la fuente del canvas de Performance enlaza hacia esta página y su FAQ explica la diferencia con una agencia de medios;
+  el enlace inverso (Medios → Performance, para la operación de campañas) no está en la fuente versionada de Medios y
+  sigue pendiente de construir;
+- el pendiente 2 de §8 se activa: revisar en Search Console qué queries sirven las dos URLs.
 
 ## 1. Demanda
 

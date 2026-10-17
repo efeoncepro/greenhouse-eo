@@ -145,6 +145,22 @@ Only true gaps (exact pill-chip look vs choice cards, AXIS checkbox styling, a c
 `country_select`) become a renderer extension in its own task and renderer release; flag them to the
 operator **before** publishing, not after. Field catalog and versioning: `greenhouse-growth-forms`.
 
+### Landing diagnostic forms (cases)
+
+One form per service landing, published by its own script and delivered `direct` to its own HubSpot form
+(registry row in `scripts/growth/hubspot-destinations.registry.ts`). Instance detail lives in the landing file.
+
+| Form | Landing | Key / surface | Variant | HubSpot form | Publisher |
+| --- | --- | --- | --- | --- | --- |
+| `efeonce-media-diagnostic` | Agencia de Medios (2026-10-16) | `d784b9e2-f6e4-4e24-b059-f164fc82f734` / `fhsf-efeonce-media-diagnostic` | `hubspot_pillar` | «Lead Gen - Agencia de Medios» | `scripts/growth/publish-media-diagnostic-form.ts` |
+| `efeonce-performance-diagnostic` | Performance Marketing (2026-10-17) | `71ea684f-1ad9-4656-982b-159e4de46dd8` / `fhsf-efeonce-performance-diagnostic` | `hubspot_pillar` / `multi_step_light`, CTA «Pide tu diagnóstico» | «Lead Gen - Performance Marketing» | `scripts/growth/publish-performance-diagnostic-form.ts` |
+
+Performance maps FIRST_NAME, LAST_NAME, EMAIL, COMPANY, WEBSITE, country and
+`gh_form_performance_{audiencia,canales,inversion_mensual,objetivo,prioridad,crm,rol}`; live it renders 26 inputs.
+It replaces the `efeonce-performance-brief` named in TASK-1865's original contract, which was never published.
+Both are pending a first real browser submission (Turnstile blocks automation) and the GA4 `generate_lead`
+check; Performance also lacks its TRACKING-PLAN row.
+
 ## Verification
 
 For form work, verify:

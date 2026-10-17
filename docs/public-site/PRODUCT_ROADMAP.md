@@ -38,6 +38,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
 | Programa SEO (Search Visibility 360) | Planificado (ADR Accepted, tasks fundacionales) | Motor de datos SEO | EPIC-022 |
 | Migración a Astro runtime | Dirección aceptada, sin cutover | Rail frontend objetivo | ADR Astro runtime strategy |
 | `/servicios/agencia-de-medios/` (Agencia de Medios) | Live e indexable desde 2026-10-16 (página `251981`, en el menú) | Spoke de demanda de la oferta de medios | [PDR-025](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) · skill `efeonce-public-site-wordpress` |
+| `/servicios/performance-marketing/` (Performance Marketing) | Live e indexable desde 2026-10-17 (página `251997`, en el menú); la legacy `242862` quedó `private` con 301 | Spoke de demand capture de Performance & Commerce Distribution | [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) · `TASK-1865` (in-progress) · skill `efeonce-public-site-wordpress` |
 
 ## Now
 
@@ -162,9 +163,16 @@ capability dentro del sistema, no presentarse como agencia suelta.
  cero que retira con 301 la legacy `242862` (`/servicio-gestion-campanas-publicitarias/`), sin parcharla mientras tanto.
  Ver
  [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) y
- `docs/tasks/to-do/TASK-1865-landing-performance-marketing.md`.
+ `docs/tasks/in-progress/TASK-1865-landing-performance-marketing.md`.
  Delta 2026-10-16: la landing de Agencia de Medios (PDR-025) ya está publicada; Performance no usa «agencia de medios»,
  «compra de medios» ni «planificación de medios» en title, H1 ni slug, y al publicarse ambas se enlazan por función.
+ **Delta 2026-10-17 — publicada e indexable:** página `251997` en `/servicios/performance-marketing/` (URL definitiva),
+ diez widgets nativos de Elementor compilados desde el canvas aprobado por el operador y formulario propio
+ `efeonce-performance-diagnostic` con destino HubSpot directo. La legacy `242862` quedó `private` con 301 a la nueva
+ (las UTM se conservan gracias al mu-plugin `efeonce-redirect-query-passthrough`, no a Yoast) y el ítem de menú
+ «Performance Marketing & Paid Ads» apunta a la página nueva. TASK-1865 sigue `in-progress`: faltan primer envío real
+ del formulario, GA4 `generate_lead`, Rich Results, Search Console, GVC con reduced motion y teclado, y un republicador
+ con guarda de hash.
 
 - **PDR-025 — Landing "Agencia de Medios"** (Accepted; **publicada e indexable el 2026-10-16**): página `251981` en
  `/servicios/agencia-de-medios/`, en el menú bajo Soluciones → Crecimiento Multicanal. «Agencia de medios» es la

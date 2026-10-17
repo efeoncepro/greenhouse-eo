@@ -195,6 +195,17 @@ Chains: before creating a redirect, search for existing redirects whose
 `scripts/public-website/flatten-yoast-redirect-chains.php` (dry-run by
 default). Case: `docs/public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md`.
 
+Case — retiring a service landing in the same release as its replacement (Performance Marketing,
+2026-10-17, `scripts/public-website/migrate-performance-legacy.php`, snapshot option
+`_gh_performance_migration_before_20261017_181625`): plain 301
+`servicio-gestion-campanas-publicitarias` → `/servicios/performance-marketing/`, after repointing the 3
+existing redirects that targeted the legacy URL straight to the new one (no chain); legacy `242862` set
+`private` (kept, out of the sitemap); primary menu item `242915` repointed by changing only
+`_menu_item_object_id`, with the whole menu read before and after to prove label, parent and order unchanged.
+Tested live with slash, without slash and with `?utm_source=x` (301 keeping the query, thanks to the
+passthrough mu-plugin, deployed to production 2026-10-17). Detail and rollback:
+`references/landings/performance-marketing.md`.
+
 ## 5. Update Owned Internal Links
 
 Search for every old canonical after the redirect exists. Replace owned links

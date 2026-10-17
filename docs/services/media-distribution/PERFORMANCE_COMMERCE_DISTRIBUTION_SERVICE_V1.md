@@ -4,15 +4,24 @@
 > **Marca contractual:** Efeonce · **Product brand habilitadora:** Reach, cuando aporte método o tooling
 > **Estado:** `Proposed` — la solución sigue `Approved for validation` en el catálogo de la línea; esta ficha propone su
 > estructura V1 y no autoriza precios públicos, claims ni venta general
-> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-16 (landing «Agencia de Medios» publicada; rebates como margen de Efeonce) · 2026-10-12 (composición integral y operación DSP acompañada en evaluación; tarifas sin cambio) · 2026-10-10 (paid social en el deck «Marketing de Contenidos»; estado sin cambio) · 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
+> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-17 (landing «Performance Marketing» publicada; legacy retirada con 301) · 2026-10-16 (landing «Agencia de Medios» publicada; rebates como margen de Efeonce) · 2026-10-12 (composición integral y operación DSP acompañada en evaluación; tarifas sin cambio) · 2026-10-10 (paid social en el deck «Marketing de Contenidos»; estado sin cambio) · 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
 > **Pricing:** [`Pricing Integrity Pack V1`](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md)
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
-> **Superficie pública:** [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md), en diseño; reemplaza
-> a la página legacy `/servicio-gestion-campanas-publicitarias/`, que sigue en el menú. Desde el 2026-10-16 la landing
+> **Superficie pública:** desde el 2026-10-17, la landing
+> [«Performance Marketing»](https://efeoncepro.com/servicios/performance-marketing/)
+> ([TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md);
+> [documentación funcional](../../documentation/public-site/performance-marketing.md)), con el formulario propio
+> `efeonce-performance-diagnostic` como entrada de leads (HubSpot «Lead Gen - Performance Marketing»; primer envío real
+> y `generate_lead` todavía sin verificar). Desde el 2026-10-16 la landing
 > [«Agencia de Medios»](https://efeoncepro.com/servicios/agencia-de-medios/) cubre performance por plataforma dentro
 > de la oferta de medios, sin «performance marketing» en title, H1 ni slug; material y reglas de claims en el
 > [catálogo de la línea](README.md#material-comercial-vigente)
+>
+> **Delta 2026-10-17 — superficie pública.** Hasta esta fecha la ficha decía que TASK-1865 estaba «en diseño» y que
+> la página legacy `/servicio-gestion-campanas-publicitarias/` seguía en el menú. La legacy (página `242862`) quedó
+> privada, no borrada, con un 301 hacia `/servicios/performance-marketing/` que conserva los parámetros de campaña, y
+> el ítem de menú «Performance Marketing & Paid Ads» apunta ahora a la página nueva.
 
 ## Qué es
 
