@@ -98,7 +98,9 @@ KYC, Entry/Advanced Creation Rights, portrait assets and inference credentials m
 First reconcile account, model activation, KYC, Entry and asset ownership; these are distinct checks. Do not rotate,
 replace or expose a working production key to match an incorrect browser session, and do not buy a plan to repair
 an identity mismatch. Keep only redacted owner/project/status metadata, request IDs and dated readback evidence;
-never persist API values, verification codes or signed URLs. Detailed portrait gates and upload-permission handling:
+never persist API values, verification codes or signed URLs. When checking portrait status through permitted console
+inspection, project allowlisted fields from the response rather than saving raw network payloads or session data.
+Detailed portrait gates, fresh group/status readback and user-controlled upload-permission recovery:
 `../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md`.
 
 ### Resend webhook signing secret

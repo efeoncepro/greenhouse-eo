@@ -37,9 +37,10 @@ Before any upload, read the approved batch manifest/LEEME and ledger. Upload onl
 names: one group per character, with the approved face and body images. Treat quota as non-recoverable; deletion is
 not a recovery strategy. Read the current plan counters, then verify the actual delta after each group.
 
-For the approved two-image pilot, upload only its face/body pair, wait for each literal `Active` state, and record
-account, group ID, each `asset-…` ID, state, date and named approver in the ledger. `Warehoused`, a thumbnail, an
-upload acknowledgement or `Processing` does not prove `Active`.
+For the approved two-image pilot, upload only its face/body pair and verify each exact `Active` state as described
+below. Record account, group ID, each `asset-…` ID, state, date and named approver in the ledger. Before continuing
+a resumed batch, reconcile the existing files/groups and current counters with that ledger; do not upload the pilot
+or a completed character again. A failed upload attempt is not proof that nothing was created.
 
 Run two separate Seedance 2.5 drafts at 480p and 4 seconds with the approved shot prompt:
 
@@ -47,10 +48,29 @@ Run two separate Seedance 2.5 drafts at 480p and 4 seconds with the approved sho
 - First frame: `--draft --image asset://<face-id>` without `--references`.
 
 Use the full command, model, prompt path and output paths from the manual/approved task. In prompt text call the
-inputs `Image 1` and `Image 2`, never their IDs. Save both outputs or sanitized failures, request/task IDs and usage
-when returned. A working reference test does not prove first-frame support; report the two results separately.
+inputs `Image 1` and `Image 2`, never their IDs. Give each variant its own output directory so `receipt.json` cannot
+be overwritten. Save the command, prompt, output or sanitized failure, request/task ID and returned usage. After a
+timeout, inspect the existing receipt/task and resume by task ID before considering a new request; timeout does not
+prove cancellation or zero charge. A working reference test does not prove first-frame support; report the two
+results separately. Verify downloaded media dimensions/duration and distinguish `resolution: 480p` in the draft
+receipt from physical dimensions under adaptive aspect. Technical success is not final creative or audio approval.
 Continue the remaining approved batch only after the reference test succeeds and follow its specified order.
 Never infer compatibility from the Entry activation banner alone, and never repeat the historical cross-account IDs.
+
+## Verify `Active` without confusing groups
+
+The console can label an asset `warehoused`; that label, a thumbnail, an upload acknowledgement or `Processing`
+does not prove the exact API state `Active`. When the documented browser tooling permits passive network
+inspection, observe the console's own `ListAssets` response; do not replay/mutate requests, create credentials or
+substitute a different account. If that capability is unavailable, retain the unverified state and its blocker.
+
+Let the group navigation complete before reading the response. Correlate it with the expected `GroupId`, exact
+asset IDs/names and project; use an explicit event cursor when the tool retains earlier network events. A previous
+group's fresh-looking response must not certify the next group. Read the response bodies before disabling the
+observer, then stop observation when verification is complete. Verify unique asset IDs and the expected pair per
+group across the batch. Persist only allowlisted account/group/asset/project/status metadata, request ID and time;
+exclude raw responses, headers, cookies, token values and signed URLs. Keep proof outside the repo and point to it
+from the ledger. Skills carry this method, not copied live quotas, asset IDs or completed-run state.
 
 ## Chrome upload permission failure
 
@@ -59,8 +79,16 @@ native chooser still left `Open` disabled. This is a local upload blocker, not p
 Inspect the actual chooser/error and list/counters before retrying; do not create empty or duplicate groups while
 probing. Record file transfer, group creation, review state and inference as separate outcomes.
 
+The observed recovery was that Julio personally enabled `Allow access to file URLs` for the ChatGPT extension and
+confirmed it with a screenshot. The extension reconnected with a different browser identifier; refresh the enabled
+browser/tab inventory and rebind it, then verify the visible BytePlus Account ID again before uploading. This is a
+recovery example, not proof the permission will remain enabled or authorization to change future settings.
+
 Use only the available documented UI/file chooser APIs and permitted paths. Do not silently broaden extension or
-browser security permissions, bypass disabled controls or use another account. If the permitted upload paths fail,
-leave a concrete handoff stating the required permission and pending files, with unchanged counters verified.
+browser security permissions, bypass disabled controls or use another account. If a browser tool explicitly blocks
+`chrome://extensions`, do not evade it through another automation route; explain the required setting for the user
+to change personally. After confirmation, retry only the pending approved file, checking the existing group/list
+and counters first. If permitted paths still fail, leave a concrete handoff with the required permission, pending
+files and verified counters.
 Evidence belongs outside the repo unless its canonical storage policy requires otherwise; link sanitized proof
 from the ledger and preserve history.

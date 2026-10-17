@@ -6,7 +6,7 @@
 - Scope: cliente server-only, catálogo BytePlus y comandos locales de imagen, capas, video y Seed Speech.
 - Reversibility: two-way
 - Confidence: high para imagen/video; las superficies de voz conservan evidencia por transporte.
-- Validated as of: 2026-10-17 (identidad de cuenta y Entry; transportes según evidencia fechada)
+- Validated as of: 2026-10-17 (identidad, Entry y dos pruebas de retratos exitosas; transportes según evidencia fechada)
 
 ## Context
 
@@ -78,6 +78,15 @@ Cambian precios, permisos, identidades de modelo o protocolo upstream; se pide u
 se promueve una ruta Globe; o falta evidencia del transporte y de sus salidas reales.
 
 ## Evidence
+
+**Cierre posterior de carga e inferencia — 2026-10-17 18:17 UTC.** Julio habilitó personalmente el permiso
+local de Chrome; se completó el lote autorizado en `3004839361`, con doce assets `Active` en seis grupos.
+Los borradores de Antonio como referencia de rostro/cuerpo y como primer cuadro sólo de rostro terminaron
+`succeeded` y sus MP4 se descargaron; sólo después del éxito como referencia se cargó el resto. No hubo compras,
+cambios de plan ni credenciales. Los IDs, cupos, task IDs y límites de validación viven en el
+[ledger §4/§7](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md), cierre `45315b12f`.
+Esta evidencia complementa la decisión aceptada; no incorpora gestión de assets a la CLI ni habilita Globe.
+Los cortes siguientes conservan la secuencia histórica: su bloqueo de Chrome quedó resuelto.
 
 **Conciliación de cuenta y Entry, 2026-10-17:** `efeonce-media-directa` Active fue creada por `3004839361` y
 Seedance 2.5 ya estaba activado allí; el GET de una tarea existente devolvió `succeeded`. No se rotó ni cambió

@@ -16,13 +16,16 @@
 - Documentación sincronizada: funcional, manual, PRIMITIVES, contrato de forms, TRACKING-PLAN, servicios, PDRs,
   briefs y skill del sitio público (lecciones del carril de release).
 
-## 2026-10-17 — BytePlus: cuenta obligatoria y Entry gratuito activo
+## 2026-10-17 — BytePlus: retratos activos y pruebas completadas en la cuenta correcta
 
 - [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y [ledger por cuenta](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
   fijan Google SSO `jreyes@efeoncepro.com` / **3004839361**; la cuenta histórica incorrecta queda excluida de operación.
-- KYC aprobado y carta aceptada por mandato posterior de Julio: Entry Free activo, 0/50 assets y 0/50 grupos.
-  Routers, contexto y skills Codex/Claude enlazan preflight, límites de autorización y pruebas separadas de retratos.
-  Carga de Antonio bloqueada por acceso de Chrome a archivos; sin retratos nuevos ni compatibilidad API verificada.
+- KYC aprobado y carta aceptada por mandato de Julio; Entry Free activo. Chrome resuelto con permiso de archivos
+  habilitado por Julio: **12 assets Active en 6 grupos**, sólo los PNG autorizados. Antonio primero; referencia y
+  primer cuadro exitosos, luego el resto en orden. Videos, recibos y metadatos fuera del repo; IDs y cupos en el ledger.
+- Documentación técnica, funcional, manual y skills Codex/Claude sincronizadas: verificar Active por respuesta y
+  GroupId, conservar evidencia sin secretos, evitar cargas/tareas duplicadas y separar Entry gratuito del consumo API.
+  Sin compras, cambio de plan, credenciales ni promoción a Globe; factura de inferencia aún sin conciliar.
 
 ## 2026-10-17 — Brochures aprobados, sin recortes ni validaciones adicionales
 

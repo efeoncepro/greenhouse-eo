@@ -11,6 +11,22 @@ Cada afirmación lleva su estado: **Verificado** (lo dice una página oficial le
 Las citas clave (precios, cupo, cuota compartida, carta de compromiso, salidas confiables) se re-verificaron contra
 el texto descargado.
 
+**Cierre operativo posterior — 2026-10-17 18:17 UTC.** La investigación oficial siguiente conserva sus
+hallazgos originales. En la cuenta de producción `3004839361`, el KYC quedó aprobado y Entry gratuito activo;
+el lote autorizado terminó con doce assets `Active` en seis grupos. Se verificaron IDs únicos, `GroupId` y
+proyecto `default` en respuestas `ListAssets` de la consola. Las dos pruebas de Antonio terminaron `succeeded`: como
+referencias de rostro/cuerpo y como primer cuadro sólo de rostro, Seedance 2.5, borrador de 4 s y resolución
+declarada 480p, con ambos videos descargados. Esto resuelve la duda operativa sobre `first_frame` para esa prueba,
+sin convertirla en una garantía general ni aprobación creativa. El cupo y los IDs vigentes están en el
+[ledger §1/§4/§7](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md), cuyo cierre se
+versionó en `45315b12f`. No hubo compra, cambio de plan ni modificación de credenciales.
+
+La cuenta histórica `3003660328` es independiente y está excluida de operación. Las observaciones de su firma
+a las 07:53 UTC no corresponden a la carta de producción, aceptada posteriormente por orden expresa de Julio.
+No reutilizar IDs de esa cuenta. La habilitación local de Chrome fue hecha por Julio; no fue una activación de
+Asset Service ni una compra de recursos. Evidencia limpia y recibos conservados fuera del repo en
+`/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/`.
+
 ## 1. Advanced Creation Rights y cupo
 
 | Plan | Precio | Cupo | Retrato virtual | Retrato real | QPM de subida |
@@ -34,6 +50,8 @@ el texto descargado.
   Conduct).
 - **No encontrado:** si borrar libera cupo (se recomienda borrar lo que no se usa); vencimiento del plan Entry; costo
   por usar un asset (el cobro de Seedance sigue siendo por tokens).
+  **Regla operativa del lote:** Julio indicó que el cupo no se recupera; conservar los assets y no borrar ni
+  volver a subir para comprobar capacidad. El hallazgo documental inicial no autoriza probar un borrado.
 - **Inferido:** los ~USD 1.600 que vio el operador pueden ser USD 1.400 + impuesto. Confirmar en el checkout.
 
 Fuentes: [Purchase Guide](https://docs.byteplus.com/en/docs/ModelArk/seedance-2-0-purchase-guide) ·
@@ -52,7 +70,8 @@ Fuentes: [Purchase Guide](https://docs.byteplus.com/en/docs/ModelArk/seedance-2-
   (`video_url`/`audio_url` para esos tipos). En el prompt se nombra «Image 1», «Video 1»; nunca el id.
 - **Verificado — rol:** todos los ejemplos oficiales usan `reference_image`, incluso mezclando asset y URL normal.
   **No encontrado:** ejemplo con `first_frame`; el campo acepta asset id sin restringir rol (**inferido:** podría
-  funcionar; probar con borrador).
+  funcionar; probar con borrador). **Observado después:** funcionó en la prueba de Antonio del cierre de arriba;
+  la ausencia de ejemplo oficial se conserva como hallazgo de esta investigación.
 - **Verificado — modelos:** Seedance 2.5 y la serie 2.0 (2.0, fast, mini). Seedance 2.5: hasta 30 imágenes, 10 videos,
   10 audios por request. El borrador final reutiliza las referencias (no se reenvían).
 - **No encontrado / inferido no:** Seedream (imagen) no acepta assets.
@@ -109,6 +128,7 @@ Fuentes: [Guía de retratos](https://docs.byteplus.com/en/docs/ModelArk/2608626)
 2. Un personaje de una sola pieza no necesita cupo si su cuadro se genera **nativamente con Seedream 5.0
    texto-a-imagen** en esta cuenta y se usa dentro de 30 días sin editar; o se produce en Higgsfield.
 3. Cada personaje subido necesita su carpeta de evidencia antes de la subida.
-4. Uso seguro documentado: `--references` con `asset://`; el primer cuadro con asset queda por probar.
+4. Uso documentado: `--references` con `asset://`; el primer cuadro no tenía ejemplo oficial localizado.
+   La prueba propia posterior del 17/10 fue exitosa en ambos roles (cierre de arriba y ledger §7).
 5. Implementar la gestión de assets por API exige AK/SK propias y URL pública por archivo: unidad aparte con revisión
    de credenciales.

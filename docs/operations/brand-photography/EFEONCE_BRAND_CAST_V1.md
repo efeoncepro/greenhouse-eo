@@ -388,9 +388,12 @@ Un personaje nuevo entra por el mismo camino que los cinco, en este orden:
 ## 7e. Video en BytePlus directo (2026-10-17)
 
 Seedance 2.x por BytePlus rechaza cuadros fotorrealistas con rostro que no vengan de una vía de confianza. El elenco
-(Hum, Karo, Sophia, Isabella, Antonio) y Nexa, cuyo rostro es fotorrealista, son candidatos prioritarios a la biblioteca privada de retratos virtuales.
-**Ninguno está subido aún**: cada subida exige decisión del operador y fila en el
-[ledger de cupos](../creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md). Julio, persona real, va por la
+(Hum, Karo, Sophia, Isabella, Antonio) y Nexa están cargados en la biblioteca privada de retratos virtuales de
+la cuenta autorizada `3004839361`: dos imágenes `Active` por personaje, verificado el 2026-10-17. Antonio pasó las
+pruebas de referencia y primer cuadro con Seedance 2.5; el resto tiene carga y estado verificados, sin generación
+propia probada en este lote. IDs, cupo y evidencia en el
+[ledger de cupos](../creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md). No volver a subirlos para
+recomprobar el acceso. Cada carga nueva exige decisión del operador y fila previa. Julio, persona real, va por la
 biblioteca de retratos reales (verificación en vivo y consentimiento), nunca por la virtual.
 
 ## 8. Estado

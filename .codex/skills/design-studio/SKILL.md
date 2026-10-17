@@ -77,9 +77,14 @@ Logo, textos y firma exactos se componen después; revisar que la animación no 
 **OmniHuman es BytePlus Vision AI**: la preferencia directa para Seedance/Seedream no extiende la API key de
 ModelArk a esta superficie. El [research fechado](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md)
 separa límites API, consola y claims comerciales; no es una ruta Globe ni una generación verificada.
-Un personaje humano que se animará con Seedance necesita un retrato virtual de BytePlus (cupo de 50 assets ≈ 25 personajes); no se sube sin
-decisión del operador y fila en el
-[ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+Para animar un personaje humano con Seedance, cargar el
+[preflight de retratos BytePlus](../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md)
+y el [manual de vías de confianza](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md).
+La biblioteca requiere decisión del operador y fila en el
+[ledger por cuenta](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md),
+que conserva cupos, IDs y pruebas vigentes. Antes de cargar, verificar si el personaje ya tiene su par aprobado;
+no consumir cupo de nuevo para retomar una prueba. Preparar imagen/identidad y validarla no prueba que el asset
+esté `Active` ni que la inferencia funcione.
 
 Para **paid media / scroll-stop / estáticos e híbridos**, carga
 [palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).

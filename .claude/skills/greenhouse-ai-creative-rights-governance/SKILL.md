@@ -30,3 +30,6 @@ the [direct manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo
 [account-scoped ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
 Reconcile account ownership before writes. Record factual KYC declarations and scoped human authorization;
 a prior letter signature is not blanket approval for another agreement or account. Keep live state in the ledger.
+
+The shared preflight owns Chrome upload recovery, exact `Active`/`ListAssets` readback and resuming existing work.
+A successful draft is technical evidence, not final creative approval; keep live state and IDs in the ledger.

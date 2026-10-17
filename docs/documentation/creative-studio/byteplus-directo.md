@@ -20,8 +20,8 @@ se verifica por separado.
 | Video generado | Evaluar un candidato | Revisión creativa, derechos y autorización de entrega/publicación |
 
 **Corte verificado 2026-10-17:** KYC aprobado, carta aceptada por instrucción expresa de Julio y Entry activo,
-`Billing mode Free`. La biblioteca correcta aún tiene **0/50 archivos y 0/50 grupos usados**. La carga de Antonio
-quedó detenida por el acceso local a archivos de Chrome; no se creó grupo ni se ejecutaron nuevas pruebas.
+`Billing mode Free`. La biblioteca correcta tiene **doce assets `Active` en seis grupos**. Chrome quedó habilitado
+por el operador; las dos pruebas de Antonio, referencia y primer cuadro, terminaron correctamente. El resto del lote se cargó después de comprobar el éxito como referencia.
 El [ledger por cuenta](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) conserva
 el estado vigente, los cambios de autorización y la evidencia fechada; consultar allí antes de continuar.
 
@@ -39,13 +39,17 @@ Entry gratuito habilita esa biblioteca. La generación de video mantiene su tari
 registrado y factura son estados distintos. Durante estas pruebas se conserva Entry gratuito; no hay autorización
 para comprar recursos, cambiar el plan o modificar credenciales.
 
-## Continuidad del lote autorizado
+## Lote autorizado completado
 
-El alcance pendiente es sólo el paquete aprobado de doce PNG, dos por personaje. Primero se carga Antonio,
-se espera `Active` en ambas imágenes y se verifica el cupo. Luego se prueban borradores de 4 segundos a 480p:
-como referencias de rostro/cuerpo y como primer cuadro sólo de rostro. La activación del plan aún no prueba
-ninguna de esas dos operaciones. Sólo después de una referencia exitosa se continúa con Nexa, Hum, Isabella,
-Karo y Sophia, en ese orden. Cada resultado, incluso un error, queda registrado en el ledger.
+El paquete aprobado de doce PNG, dos por personaje, quedó cargado el 2026-10-17. Primero se verificaron los dos
+assets de Antonio como `Active` y se comprobó su cupo. Los borradores de 4 segundos a 480p terminaron correctamente:
+uno como referencias de rostro/cuerpo y otro como primer cuadro sólo de rostro. Después del éxito como referencia
+se cargaron Nexa, Hum, Isabella, Karo y Sophia, en ese orden. La comprobación final cruzó grupo, proyecto y doce
+IDs únicos con `Status: Active`; la etiqueta visual `warehoused` no fue la prueba del estado.
+
+El ledger reúne IDs, resultados, cupo restante y evidencias. El lote está completo: no volver a cargarlo ni generar
+otras pruebas para reproducir este cierre. Un video técnicamente válido sigue pendiente de revisión creativa para
+su uso; el éxito de Antonio no prueba una generación con cada personaje del resto del elenco.
 
 El operador decide alcance, hechos declarados, firma y gasto. Un agente puede preparar o ejecutar actos cuando
 estén autorizados; una pausa expresa sigue vigente hasta que el operador la cambie. La orden posterior «Firmala»

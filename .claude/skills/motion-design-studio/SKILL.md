@@ -246,7 +246,11 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   `asset://` exige propiedad en la cuenta de inferencia y estado literal `Active`; Entry activo no prueba que
   funcione como referencia ni como primer cuadro. Probar ambos por separado con drafts de 480p/4 s, nombrando
   las entradas `Image 1`/`Image 2` en el prompt. El lote y el orden autorizados viven en el ledger; continuar
-  sólo tras éxito como referencia. Un plan Entry gratuito no vuelve gratuitas las generaciones.
+  sólo tras éxito como referencia. Para retomar, consultar primero los assets y resultados ya registrados;
+  no repetir cargas ni generaciones completadas. Conservar cada variante con su prompt, comando y recibo en
+  subcarpetas separadas; si expira la espera, recuperar la tarea por su ID. La UI `warehoused` requiere el
+  readback exacto de `Active` del preflight, y un draft exitoso no equivale a aprobación creativa o de audio.
+  Un plan Entry gratuito no vuelve gratuitas las generaciones.
   Para una sola pieza, evaluar las otras vías oficiales del manual sin consumir cupo por defecto.
   Fal sigue como alternativa explícita:
   su endpoint se elige por duración/4K/costo en

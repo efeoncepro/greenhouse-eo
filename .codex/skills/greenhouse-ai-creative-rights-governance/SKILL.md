@@ -51,6 +51,8 @@ the [direct manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo
 [account-scoped ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
 These own operational state and evidence; a skill must not maintain another live quota or approval record.
 Provider account approval and an Entry subscription do not replace input rights or prove portrait inference works.
+The preflight also owns safe Chrome upload recovery, exact `Active` readback and resuming existing tasks/batches;
+read it before repeating a previous attempt. A successful draft is technical evidence, not final creative approval.
 A one-time instruction to accept a specific letter does not authorize future agreements, account changes or plans.
 
 ## OmniHuman 2.0 / BytePlus Vision AI — dated routing 2026-10-15

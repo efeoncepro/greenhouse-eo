@@ -48,7 +48,9 @@ ajeno a la cuenta se rechaza (`PrivacyInformation`, sin cobro), aun con el KYC a
 Seedream 5.0 texto-a-imagen o de Seedance de la misma cuenta (< 30 días, sin editar); biblioteca privada de assets
 (`asset://<asset-id>`, uso documentado como referencia; plan Entry gratuito: 50 assets ≈ 25 personajes, compartido con
 retratos reales, gobernado por el [ledger](../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md));
-o retratos reales con consentimiento. Fuera de esas vías, el plano con rostro va por Higgsfield u otro proveedor.
+o retratos reales con consentimiento. **Prueba propia del 2026-10-17:** los assets de Antonio en la cuenta correcta
+funcionaron como referencias y como primer cuadro en Seedance 2.5 borrador de 4 s a 480p; recibos y límites en el
+ledger, sin garantía general para otros modelos o piezas. Fuera de esas vías, el plano con rostro va por Higgsfield u otro proveedor.
 [Investigación oficial](../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md).
 
 **Prueba propia 2026-10-12:** [Nexa cine, Seedream 5 Pro standard directo y Sunburst max](../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md).

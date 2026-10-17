@@ -25,24 +25,27 @@ ni se reutiliza. Corrección documental; no modifica PDF, documentos HubSpot ni 
 
 Historial de sesiones: [Handoff.archive.md](Handoff.archive.md).
 
-## 2026-10-17 — BytePlus: KYC y carta completos, Entry gratuito activo
+## 2026-10-17 — BytePlus: doce assets Active y ambas pruebas exitosas
 
 Usar sólo Google SSO `jreyes@efeoncepro.com` → **3004839361**, root `jreyes`. Julio prohibió volver a usar
 3003660328: sus 12 assets/6 grupos y KYC/Entry son históricos. Seedance 2.5, clave y tarjeta/Savings Plan están
-en la cuenta correcta; GET de tarea previa `succeeded`, sin generación ni compras. KYC enviado con autorización
+en la cuenta correcta; recuperación completada sin compras. KYC enviado con autorización
 expresa de Julio y **aprobado**, 17/10 16:57:32 UTC (13:57 Chile), verificado en consola y correo. Estado en el
 [ledger](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md); [preflight obligatorio](docs/manual-de-uso/creative-studio/byteplus-directo.md#cuenta-obligatoria-antes-de-operar).
 Julio confirmó mecanismos/plan de incidentes: cuestionario completo (1 y 2=YES, 3=uso interno).
 Julio después ordenó «Firmala»: carta aceptada y correo verificado con su código; Entry activo 17:37 UTC,
-Billing mode Free, 0/50 assets y 0/50 grupos. Carga de Antonio bloqueada: extensión requiere acceso a archivos;
-selector nativo dejó Abrir deshabilitado, sin carga. Pendiente: Antonio con IDs nuevos → pruebas 480p → resto si 3a funciona.
+Billing mode Free. Julio habilitó acceso a archivos de Chrome; lote completo en cuenta correcta: **12 Active / 6 grupos**,
+38 assets/44 grupos disponibles. Antonio primero → referencia y primer cuadro `succeeded`, 480p/4s → resto en orden.
+Estado Active confirmado en respuestas ListAssets, cotejando GroupId/pares; UI `warehoused`. MP4 y recibos en
+`/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/pruebas-antonio-cuenta-correcta-20261017T180127Z/`.
 Corrección enviada a Cloris/Alejandro con firma gráfica y CCO: 17/10 13:22 UTC; Enviados y HubSpot SENT
 `118790251018` verificados. Respuesta pendiente. WhatsApp entregado para copiar.
 Por orden de Julio, documentación y skills Codex/Claude sincronizan cuenta, autorización y recuperación de retratos;
 router y contexto enlazan el canon. ADR existente de media directa; sin cambio de integración ni promoción Globe.
-Estado operativo: Entry activo, cargas y pruebas pendientes; sin compras ni push.
-Validación documental, índices y espejos conforme; rutas globales detectan 64 faltantes previos (62 referencias
-ya en HEAD y 2 fuera del checkout), sin nuevos casos BytePlus. El contenido comprimido de CLAUDE se conserva en su canon.
+Estado operativo: lote y pruebas completados, sin compras/cambio de plan ni push. Ledger registrado en `45315b12f`;
+por orden posterior de Julio, cierre documental completo con subagentes y skills espejo. Factura de las dos generaciones
+sin conciliar; aprobación creativa final y publicación no forman parte de estas pruebas. El ledger conserva el detalle
+y las evidencias; no repetir cargas ni generaciones para validar documentación.
 
 ## 2026-10-16/17 — Landing HubSpot v2 publicada, dock móvil con agenda nativa y renderer CTA 1.3.1
 

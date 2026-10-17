@@ -490,4 +490,6 @@ después de que cada navegación de consola terminara, sin asumir que una respue
 mediciones y hashes conservados. Sólo se crearon esas dos tareas. El uso total reportado es **78.692 tokens**;
 no se comprobó la factura ni se afirmó costo cero para la inferencia. No se compró ni cambió el plan, no se
 modificaron credenciales y no se volvió a operar la cuenta incorrecta. La validación no equivale a publicación
-ni aprobación creativa final. Commit únicamente del ledger, sin push; actualizaciones de continuidad quedan locales.
+ni aprobación creativa final. Cierre operativo registrado sólo en el ledger con commit `45315b12f`, sin push.
+Por instrucción posterior de Julio se sincronizan también los documentos y las skills pertinentes, con subagentes;
+no se repiten operaciones de consola ni tareas de inferencia para ese cierre documental.

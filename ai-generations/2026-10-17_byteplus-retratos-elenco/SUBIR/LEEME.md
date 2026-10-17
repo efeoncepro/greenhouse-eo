@@ -7,7 +7,8 @@ Reglas, orden y registro: `docs/operations/creative-production/BYTEPLUS_VIRTUAL_
 `default`. Verificar Account antes de subir. Las cargas anteriores y sus IDs pertenecen a **`3003660328`**:
 son históricas y no sirven para la API de producción. Julio prohibió volver a usar esa cuenta. KYC de la correcta
 aprobado el 2026-10-17 16:57:32 UTC; Entry gratuito activo desde 17:37 UTC, carta aceptada tras la orden
-posterior «Firmala» y código entregado por Julio. Nuevas cargas pendientes, bloqueadas por el selector de Chrome.
+posterior «Firmala» y código entregado por Julio. **Lote completo: 12 assets Active en 6 grupos de esta cuenta**,
+con referencia y primer cuadro de Antonio exitosos. IDs y evidencias en el ledger. No volver a subir el lote.
 No comprar ni cambiar plan.
 
 | Grupo (nombre en consola) | Archivos | Origen |
@@ -23,11 +24,11 @@ Todas cumplen: PNG, 300–6000 px, proporción 0,4–2,5, < 30 MB. QA hecho: car
 textura craquelada; Hum conserva su piercing, Isabella sus pecas) y proporción de cuerpo medida con Vision
 (Antonio 7,29 · Hum 7,27 · Isabella 7,82 · Karo 7,61 · Sophia 7,45 cabezas; piso 7,2). Checksums en `SHA256SUMS`.
 
-## Orden de subida
+## Orden autorizado y ejecutado (no repetir)
 1. **Antonio primero, solo.** Esperar `Active`, anotar su fila en el ledger y probar un borrador 480p:
    `pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id-rostro> --image asset://<asset-id-cuerpo> --prompt-file <toma.txt> --duration 4 --out borrador.mp4 --yes`
-   (en el prompt: «Image 1» / «Image 2», nunca el id). Probar también primer cuadro (sin `--references`), que no está
-   documentado. Confirmar en la consola que el contador bajó 2 assets y 1 grupo.
+   (en el prompt: «Image 1» / «Image 2», nunca el id). Probar también primer cuadro (sin `--references` y sólo rostro),
+   validado en este lote como prueba técnica. Confirmar en la consola que el contador bajó 2 assets y 1 grupo.
 2. **Sólo si funciona la prueba como referencia (3a)**, subir Nexa y luego Hum, Isabella, Karo y Sophia, anotando
    cada fila. Guardar el resultado de ambas pruebas aunque fallen. La activación de Entry por sí sola no autoriza
    dar por exitosa la inferencia. Si la UI sólo muestra `warehoused`, no registrarlo como `Active`.
@@ -38,15 +39,17 @@ textura craquelada; Hum conserva su piercing, Isabella sus pecas) y proporción 
   la cuenta correcta y no autoriza volver a operar la incorrecta.
 - En **`3004839361`** se cumplió la condición inicial: detenerse ante la carta y avisar a Julio. Después Julio
   ordenó expresamente **«Firmala»** y entregó el código. Carta y verificación completadas el 2026-10-17
-  **17:37 UTC**; Entry activo **Free**, **0/50 assets y 0/50 grupos utilizados**.
+  **17:37 UTC**; Entry activo **Free**, inicialmente **0/50 assets y 0/50 grupos utilizados** (antes de las cargas).
 - Esa autorización corresponde a la carta ya aceptada. **Si aparece otra carta, detenerse y avisar a Julio**;
   no deducir autorización permanente ni ampliar el permiso a compras o cambios de plan.
 
-## Bloqueo local al cierre
-La extensión de Chrome pidió `Allow access to file URLs` al intentar cargar sólo el rostro de Antonio; el
-selector nativo tampoco habilitó `Abrir`. No se subió archivo ni se creó grupo. Resolver el selector local y
-volver a comprobar cuenta/cupo antes de continuar. El estado vigente se actualiza en el ledger, sin reutilizar
-los IDs históricos ni subir archivos adicionales para probar el acceso.
+## Cierre verificado — 2026-10-17
+Julio habilitó `Allow access to file URLs` en Chrome; la carga por selector funcionó. Se completó Antonio primero,
+se comprobó `Active` en sus dos assets y se ejecutaron las dos pruebas a 480p/4 s: ambas `succeeded`.
+Después se cargaron Nexa, Hum, Isabella, Karo y Sophia en ese orden. **Sólo estos 12 PNG, 6 grupos, todos Active**
+en `3004839361`, proyecto `default`; disponibles **38 assets y 44 grupos**. La UI muestra `warehoused`, pero
+el estado `Active` fue verificado en respuestas `ListAssets`, sin conservar secretos ni URLs firmadas.
+Videos y evidencia fuera del repo: `/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/`.
 
 ## Evidencia (carta de compromiso)
 Proceso y fuentes: `../prompts/` (prompts de esta edición), `../*/*.log` (registros de generación con modelo y uso),

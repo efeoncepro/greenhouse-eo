@@ -1056,7 +1056,10 @@ o una capacidad que el contrato directo no cubra. Los slugs y precios de Fal sig
 y el [ledger por cuenta](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
 Para `asset://`, KYC, Entry, assets y API deben pertenecer a la identidad obligatoria del manual, con assets
 literalmente `Active` y pruebas separadas como referencia/primer cuadro. Chrome, empresa o RUT no prueban esa
-identidad. Sólo se sube el lote aprobado; el cupo es limitado y Entry gratuito no incluye inferencia gratuita.
+identidad. La UI `warehoused` requiere readback exacto de estado según el preflight; al retomar, reconciliar
+el ledger y la biblioteca antes de consumir cupo o repetir una tarea. Sólo se sube el lote aprobado; el cupo es
+limitado y Entry gratuito no incluye inferencia gratuita. Los resultados técnicos no reemplazan la aprobación
+creativa de imagen/video ni autorizan publicación.
 Las otras vías oficiales se detallan en el manual; prohibido «lavar» una imagen externa por Seedream para
 presentarla como salida propia de confianza. La activación actual y los resultados se leen del ledger.
 

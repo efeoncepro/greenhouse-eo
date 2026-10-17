@@ -153,9 +153,9 @@ a ninguna persona real. En orden:
 2. **Advanced Creation Rights (Entry)**, gratuito, **activo en `3004839361`** desde 2026-10-17 17:37 UTC.
    Cuestionario completo (1 y 2 `YES`, 3 uso interno). Tras la pausa para firma personal, Julio ordenó «Firmala»;
    carta aceptada y verificación por correo completada con su código. Consola: `Billing mode Free` y
-   `Apply for a free trial successfully`. Cupo confirmado sin uso: **50 assets (archivos)
-   y 50 grupos (personajes)**, compartido con los retratos reales: **0/50 assets y 0/50 grupos usados** en ese
-   readback. Con 2 imágenes por personaje alcanza para 25. Entry habilita la biblioteca; las generaciones de video
+   `Apply for a free trial successfully`. Capacidad del plan: **50 assets (archivos)
+   y 50 grupos (personajes)**, compartida con los retratos reales. Con 2 imágenes por personaje alcanza para 25.
+   El consumo fechado y los IDs se consultan en el ledger. Entry habilita la biblioteca; las generaciones de video
    conservan su cobro propio. Mantener Entry gratuito durante las pruebas, sin comprar ni cambiar el plan.
 3. **Decisión y fila en el [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)**
    antes de subir (obligatorio), con la **carpeta de evidencia** que exige la carta de compromiso: fichas, prompts,
@@ -170,34 +170,44 @@ a ninguna persona real. En orden:
    `ap-southeast-1`. El error histórico fue `InvalidParameter` en `content[n].image_url.url`, con «Your account
    has not activated the Asset Service». Se produjo con la API de `3004839361` sin Entry y assets de `3003660328`;
    no demuestra que exista un interruptor adicional separado ni prueba incompatibilidad de los nuevos assets.
-   No repetir con esos IDs ni cambiar la clave de producción. Entry activo aún no acredita una inferencia exitosa.
+   No repetir con esos IDs ni cambiar la clave de producción. La activación aislada no acredita una inferencia:
+   las dos pruebas con los nuevos IDs de Antonio sí terminaron correctamente (§Lote de Antonio y el elenco).
 6. **Usarlos** cuando estén `Active`, como referencia, nombrándolos «Image 1» en el prompt (nunca el id):
    `pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> ...`. Como primer cuadro
-   (`--image` sin `--references`) no está documentado: probar con un borrador antes de planificar con él. Anotar
-   grupo, asset id(s) y estado en el ledger.
+   (`--image` sin `--references`) no se encontró un ejemplo oficial en la investigación inicial; la prueba propia
+   del 17/10 con Antonio fue exitosa. Es evidencia de esa operación y ese modelo, sin extenderla a otras
+   combinaciones. Anotar grupo, asset id(s) y estado en el ledger.
 
 
-### Retomar el lote de Antonio y el elenco — corte 2026-10-17
+### Lote de Antonio y el elenco — completado el 2026-10-17
 
-El [ledger por cuenta](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) es la fuente
-vigente de cupos, IDs, aprobaciones y resultados. La cuenta correcta sigue sin grupos ni assets: el intento de subir
-`antonio-1-rostro.png` no transmitió el archivo. En esta máquina, `fileChooser.setFiles` fue rechazado por el permiso
-`Allow access to file URLs` de la extensión; el selector nativo dejó `Abrir` deshabilitado aun con el PNG seleccionado.
-Es un bloqueo local de carga observado, no una restricción general de BytePlus. No se amplió ningún permiso.
+El [ledger por cuenta](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) conserva
+los IDs, aprobaciones, estados, resultados y evidencia. **12 assets Active en 6 grupos de `3004839361`**.
+El cupo disponible se consulta en §1 del ledger, con su fecha de readback. Ambas pruebas de Antonio terminaron `succeeded`: referencias de rostro/cuerpo
+y primer cuadro sólo de rostro, Seedance 2.5 `--draft`, 4 s, resolución declarada 480p. Videos y recibos descargados.
 
-Al resolver esa carga, conservar el alcance aprobado:
+Julio habilitó personalmente `Allow access to file URLs` en la extensión de Chrome y confirmó el cambio con captura;
+`fileChooser.setFiles` funcionó después. La herramienta no pudo abrir `chrome://extensions` por su política de URL;
+no se usó otra vía para modificar esa configuración. Si la extensión se desconecta al aplicar el cambio, recuperar
+la conexión del mismo perfil y volver a comprobar Account ID. No volver a operar la cuenta histórica incorrecta.
 
-1. Leer íntegros `ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/LEEME.md` y el ledger; subir sólo los
-   12 PNG del paquete, con sus seis nombres de grupo. El cupo consumido no se recupera al borrar.
-2. Crear sólo Antonio con rostro y cuerpo. Esperar ambos `Active`, registrar grupo y nuevos `asset-…`, fecha y
-   «Aprobó: Julio»; comprobar consumo de 2 assets y 1 grupo.
-3. Ejecutar las dos pruebas de 4 s a 480p con `s07-prompt.txt`: referencias de rostro/cuerpo y primer cuadro sólo
-   rostro. Usar «Image 1» / «Image 2» en los prompts, nunca IDs. Conservar resultados y errores de ambas.
-4. Sólo si funciona la referencia (paso 3a), continuar Nexa → Hum → Isabella → Karo → Sophia. Registrar cada fila
-   y resultado en el ledger. No hay pruebas nuevas de inferencia desde la activación de Entry.
+La UI etiqueta los assets como `warehoused`. Se verificó **Status: Active** en la respuesta `ListAssets` de la
+propia consola, observando su consulta con el diagnóstico de navegador permitido. Registrar sólo IDs, estado,
+proyecto y request ID; no guardar URLs firmadas, tokens ni claves. Cruzar siempre el GroupId esperado y los nombres
+de cada par: una respuesta previa no prueba el estado del grupo que se acaba de abrir. `warehoused` por sí solo
+no sustituye esa comprobación.
 
-Evidencia de activación fuera del repo:
-`/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/entry-gratuito-activo-cuenta-correcta.jpg`.
+Para una prueba nueva, usar una carpeta y recibo por variante (`--out-dir`); conservar comando, prompt, log,
+resultado, task ID, uso reportado, MP4 y medición. Un error también se conserva. Si ya hay task ID, recuperar esa
+tarea: no enviar otra para consultar su estado. Los dos MP4 de este lote son validación técnica, sin aprobación
+creativa final, publicación ni factura conciliada.
+
+Se cumplió el orden autorizado: Antonio con sus dos PNG → ambos `Active` → dos pruebas guardadas → referencia
+exitosa → Nexa → Hum → Isabella → Karo → Sophia, dos PNG por grupo. No volver a subir estos archivos para
+recomprobar el acceso. El cupo consumido no se recupera al borrar. Otro lote o prueba requiere su alcance autorizado.
+
+Evidencia fuera del repo: `/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/`.
+Pruebas: `pruebas-antonio-cuenta-correcta-20261017T180127Z/`, con subcarpetas `referencia/` y `primer-cuadro/`.
 
 Un personaje de una sola pieza no necesita cupo: genera su cuadro nativamente con Seedream 5.0 texto-a-imagen en esta
 cuenta (y úsalo dentro de 30 días, sin editar) o produce sus planos en Higgsfield. Una persona real (por ejemplo,
