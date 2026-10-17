@@ -38,14 +38,52 @@ a{color:#ffffff}a:hover{color:#ffd9cc}
 .tabbtn:focus-visible,.yn:focus-visible{outline:2px solid #ffffff;outline-offset:3px}
 .yn{min-width:72px;min-height:44px;padding:0 18px;border-radius:999px;font-family:Poppins,sans-serif;font-size:15px;font-weight:600;cursor:pointer}
 .sphere{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:#f83902;margin-left:.05em;animation:breathe 3.6s ease-in-out infinite}
-.fld{display:flex;flex-direction:column;gap:8px;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;color:#023c70}
-.fld input,.fld select{font:inherit;font-size:16px;font-weight:400;color:#001a33;background:#ffffff;border:1.5px solid #b8c6d4;border-radius:14px;padding:13px 16px;min-height:52px;box-sizing:border-box;width:100%}
-.fld input:focus,.fld select:focus{outline:2px solid #001a33;outline-offset:2px;border-color:#001a33}
-.pill{position:relative;display:inline-flex}
-.pill input{position:absolute;opacity:0;width:1px;height:1px}
-.pill span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid #b8c6d4;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;color:#023c70;cursor:pointer;box-sizing:border-box;background:#ffffff}
-.pill input:checked+span{background:#001a33;color:#ffffff;border-color:#001a33}
-.pill input:focus-visible+span{outline:2px solid #001a33;outline-offset:2px}
+.form-card{border-radius:28px;background:#f7f8f6;color:#001a33;padding:40px;display:flex;flex-direction:column;gap:24px;box-shadow:0 40px 120px rgba(0,0,0,.45)}
+.steps{display:flex;align-items:center;gap:14px;font-size:13px;font-weight:600;color:#33506b}
+.steps .bar{flex:1;height:4px;border-radius:4px;background:#dfe5ea;overflow:hidden}
+.steps .bar i{display:block;height:100%;border-radius:4px;background:#f83902;transition:width .5s cubic-bezier(.2,0,0,1)}
+.fset{border:0;margin:0;padding:0;min-width:0}
+.fset legend,.fld>span{display:block;padding:0;margin:0 0 10px;font-family:Poppins,sans-serif;font-size:14px;font-weight:600;color:#001a33}
+.hint{font-weight:400;font-size:13px;color:#5f7488;margin-left:6px}
+small.hint{display:block;margin:6px 0 0}
+.opt-tag{font-style:normal;font-weight:400;color:#5f7488}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #c3ced8;background:#ffffff;color:#023c70;font-family:Poppins,sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:border-color .15s,background-color .15s,color .15s}
+.opt:hover{border-color:#023c70}
+.opt[aria-pressed="true"]{background:#001a33;border-color:#001a33;color:#ffffff}
+.opt[aria-pressed="true"]::after{content:"";width:6px;height:10px;margin-left:2px;border-right:2px solid #ffffff;border-bottom:2px solid #ffffff;transform:rotate(45deg) translateY(-2px)}
+.opt:focus-visible{outline:2px solid #023c70;outline-offset:2px}
+.opt-ico{width:18px;height:18px;object-fit:contain}
+.opt[aria-pressed="true"] .opt-ico{background:#ffffff;border-radius:5px;padding:2px;box-sizing:content-box;width:14px;height:14px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 16px}
+.fld{display:flex;flex-direction:column;font-family:Poppins,sans-serif;min-width:0}
+.fld input,.fld select{font:inherit;font-size:16px;font-weight:400;color:#001a33;background:#ffffff;border:1px solid #c3ced8;border-radius:12px;padding:0 16px;min-height:52px;box-sizing:border-box;width:100%;transition:border-color .15s,box-shadow .15s}
+.fld input::placeholder{color:#8496a6}
+.fld input:hover,.fld select:hover{border-color:#8aa0b3}
+.fld input:focus,.fld select:focus{outline:none;border-color:#023c70;box-shadow:0 0 0 4px rgba(2,60,112,.14)}
+.fld select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:44px;background-image:linear-gradient(45deg,transparent 50%,#023c70 50%),linear-gradient(135deg,#023c70 50%,transparent 50%);background-position:calc(100% - 22px) 52%,calc(100% - 16px) 52%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+@supports (appearance: base-select){
+ .fld select,.fld select::picker(select){appearance:base-select}
+ .fld select{display:flex;align-items:center;background-image:none;padding-right:16px}
+ .fld select::picker-icon{content:"";width:8px;height:8px;margin:0 2px 4px auto;border-right:2px solid #023c70;border-bottom:2px solid #023c70;transform:rotate(45deg);transition:transform .25s cubic-bezier(.2,0,0,1)}
+ .fld select:open::picker-icon{transform:translateY(4px) rotate(225deg)}
+ .fld select:open{border-color:#023c70;box-shadow:0 0 0 4px rgba(2,60,112,.14)}
+ .fld select::picker(select){margin-top:8px;padding:6px;border-radius:16px;border:1px solid #d5dde4;background:#ffffff;color:#001a33;box-shadow:0 24px 60px rgba(0,26,51,.2),0 2px 6px rgba(0,26,51,.08);opacity:1;transform:translateY(0);transition:opacity .2s ease,transform .25s cubic-bezier(.05,.7,.1,1),display .25s allow-discrete,overlay .25s allow-discrete}
+ @starting-style{.fld select:open::picker(select){opacity:0;transform:translateY(-6px)}}
+ .fld select option{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:10px;font-size:15px;font-weight:500;color:#001a33;background:transparent;cursor:pointer}
+ .fld select option:hover,.fld select option:focus-visible{background:#eef2f5;outline:none}
+ .fld select option:checked{background:#ffe9e3;font-weight:600}
+ .fld select option::checkmark{order:2;margin-left:auto;color:#f83902;font-weight:700}
+ .fld select option[value=""]{display:none}
+ .fld select selectedcontent{font-size:16px}
+}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.5;color:#33506b;cursor:pointer}
+.consent input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:#001a33}
+.consent a{color:#023c70;font-weight:600}
+.back{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 4px;border:0;background:transparent;color:#023c70;font-family:Poppins,sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+.back:focus-visible{outline:2px solid #023c70;outline-offset:2px;border-radius:8px}
+.form-card .btn-p:focus-visible{outline-color:#023c70}
+.trust{display:flex;gap:10px;align-items:center;margin:0;padding-top:18px;border-top:1px solid #dfe5ea;font-size:13px;color:#33506b}
 details.faq{border-top:1px solid rgba(255,255,255,.14)}
 details.faq:last-child{border-bottom:1px solid rgba(255,255,255,.14)}
 details.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:22px 0;min-height:44px}
@@ -142,6 +180,8 @@ button{font:inherit}
  .lane .lane-status{grid-column:2;text-align:left!important}
  .lane img{width:72px!important}
  .auto-q{grid-template-columns:minmax(0,1fr)!important}
+ .fgrid{grid-template-columns:minmax(0,1fr)}
+ .form-card{padding:24px!important}
  .mock3{grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 8px 12px 0}
  .mock3>*{scroll-snap-align:start}
  .escala ul{justify-content:flex-start!important}
@@ -597,22 +637,78 @@ button{font:inherit}
 <p style="margin: 0; font-size: 14px; color: #cfe4fa">¿Prefieres hablar primero? <a href="#diagnostico" style="color: #ffffff; font-weight: 600">Agenda una reunión</a></p>
 </div>
 
-<form class="card-pad" aria-labelledby="form-h" style="border-radius: 28px; background: #f7f8f6; color: #001a33; padding: 40px; display: flex; flex-direction: column; gap: 20px">
-<div style="display: flex; justify-content: space-between; gap: 16px; align-items: start; flex-wrap: wrap">
-<h3 id="form-h" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; letter-spacing: -0.03em; font-size: 32px; line-height: 1.05">Cuéntanos lo esencial</h3>
-<span style="display: inline-flex; align-items: center; padding: 8px 14px; border-radius: 999px; border: 1.5px solid #b8c6d4; font-size: 13px; font-weight: 600; color: #023c70">2 minutos</span>
+<form class="form-card card-pad" aria-labelledby="form-h" novalidate>
+<div style="display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap">
+<div>
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #33506b">Diagnóstico de tu pauta</p>
+<h3 id="form-h" style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; letter-spacing: -0.03em; font-size: clamp(28px, 2.6vw, 34px); line-height: 1.05; color: #001a33">{{stepTitle}}</h3>
 </div>
-<label class="fld"><span>Nombre</span><input type="text" name="name" autocomplete="name" required></label>
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #ffffff; border: 1px solid #d5dde4; font-size: 13px; font-weight: 600; color: #023c70"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>2 minutos</span>
+</div>
+<div class="steps" aria-label="{{stepAria}}">
+<span>{{stepLabel}}</span>
+<span class="bar" aria-hidden="true"><i style="width: {{stepPct}}"></i></span>
+</div>
+
+<sc-if value="{{isStep1}}" hint-placeholder-val="{{ true }}">
+<div class="swap" style="display: flex; flex-direction: column; gap: 22px">
+<fieldset class="fset">
+<legend>¿A quién le vendes?</legend>
+<div class="opts">
+<sc-for list="{{businessOpts}}" as="o" hint-placeholder-count="3">
+<button type="button" class="opt" aria-pressed="{{o.pressed}}" onClick="{{o.pick}}">{{o.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+<fieldset class="fset">
+<legend>¿Dónde inviertes hoy? <span class="hint">Elige todas las que uses</span></legend>
+<div class="opts">
+<sc-for list="{{channelOpts}}" as="o" hint-placeholder-count="7">
+<button type="button" class="opt" aria-pressed="{{o.pressed}}" onClick="{{o.toggle}}"><sc-if value="{{o.icon}}" hint-placeholder-val="{{ true }}"><img src="{{o.icon}}" alt="" class="opt-ico"></sc-if>{{o.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+<div class="fgrid">
+<label class="fld"><span>Inversión mensual en medios</span><select name="spend" required><option value="">Elige un rango</option><option>Menos de USD 5.000</option><option>USD 5.000 a 20.000</option><option>USD 20.000 a 80.000</option><option>Más de USD 80.000</option><option>Prefiero no decirlo</option></select><small class="hint">Una estimación basta.</small></label>
+<label class="fld"><span>¿Qué quieres que traiga tu pauta?</span><select name="goal" required><option value="">Elige el objetivo</option><option>Ventas en línea</option><option>Oportunidades de venta B2B</option><option>Visitas a tienda o mensajes</option><option>Todavía no lo tengo claro</option></select></label>
+</div>
+<label class="fld"><span>¿Qué necesitas resolver primero?</span><select name="need" required><option value="">Elige lo principal</option><option>Revisar lo que ya invierto</option><option>Ordenar la medición y las conversiones</option><option>Que alguien opere mis campañas cada mes</option><option>Conectar la pauta con mi CRM</option><option>Sumar un canal nuevo</option><option>Producir más creatividades para probar</option></select></label>
+<sc-if value="{{showCrm}}" hint-placeholder-val="{{ false }}">
+<fieldset class="fset swap">
+<legend>¿Qué CRM usan?</legend>
+<div class="opts">
+<sc-for list="{{crmOpts}}" as="o" hint-placeholder-count="4">
+<button type="button" class="opt" aria-pressed="{{o.pressed}}" onClick="{{o.pick}}"><sc-if value="{{o.icon}}" hint-placeholder-val="{{ true }}"><img src="{{o.icon}}" alt="" class="opt-ico"></sc-if>{{o.label}}</button>
+</sc-for>
+</div>
+</fieldset>
+</sc-if>
+<div style="display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; justify-content: space-between; padding-top: 4px">
+<span style="font-size: 13px; color: #33506b">Sin compromiso</span>
+<button type="button" class="btn-p" onClick="{{goStep2}}">Continuar</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isStep2}}" hint-placeholder-val="{{ false }}">
+<div class="swap" style="display: flex; flex-direction: column; gap: 18px">
+<div class="fgrid">
+<label class="fld"><span>Nombre y apellido</span><input type="text" name="name" autocomplete="name" required></label>
 <label class="fld"><span>Correo de trabajo</span><input type="email" name="email" autocomplete="email" placeholder="nombre@empresa.com" required></label>
 <label class="fld"><span>Empresa</span><input type="text" name="company" autocomplete="organization" required></label>
-<fieldset style="border: 0; margin: 0; padding: 0"><legend style="font-size: 14px; font-weight: 500; color: #023c70; margin-bottom: 10px">A quién le vendes</legend>
-<div style="display: flex; flex-wrap: wrap; gap: 8px"><label class="pill"><input type="radio" name="business" checked><span>A consumidores</span></label><label class="pill"><input type="radio" name="business"><span>A empresas</span></label><label class="pill"><input type="radio" name="business"><span>A ambos</span></label></div>
-</fieldset>
-<label class="fld"><span>Inversión mensual en medios</span><select name="spend" required><option value="">Elige un rango</option><option>Menos de USD 5.000</option><option>Entre USD 5.000 y 20.000</option><option>Entre USD 20.000 y 80.000</option><option>Más de USD 80.000</option><option>Prefiero no decirlo</option></select></label>
-<label class="fld"><span>Qué necesitas resolver</span><select name="need" required><option value="">Elige lo principal</option><option>Revisar lo que ya invierto</option><option>Ordenar la medición y las conversiones</option><option>Operar mis campañas cada mes</option><option>Conectar la pauta con mi CRM</option><option>Todavía no lo tengo claro</option></select></label>
-<label style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: #33506b; cursor: pointer"><input type="checkbox" required style="width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: #001a33">Autorizo a Efeonce a usar estos datos para responderme.</label>
-<button type="submit" class="btn-p" style="align-self: flex-start">Pide tu diagnóstico</button>
-<p style="margin: 0; font-size: 13px; color: #33506b">Te responde una persona del equipo en un día hábil.</p>
+<label class="fld"><span>Sitio web <em class="opt-tag">opcional</em></span><input type="url" name="website" autocomplete="url" placeholder="empresa.com"></label>
+<label class="fld"><span>Tu cargo</span><select name="role" required><option value="">Elige tu cargo</option><option>Gerencia o dirección de marketing</option><option>Marketing, growth o e-commerce</option><option>Comercial o ventas</option><option>Fundador o gerencia general</option><option>Otro</option></select></label>
+<label class="fld"><span>País</span><select name="country" required><option value="">Elige tu país</option><option>Chile</option><option>México</option><option>Colombia</option><option>Perú</option><option>Estados Unidos</option><option>Otro país</option></select></label>
+</div>
+<label class="consent"><input type="checkbox" required><span>Autorizo a Efeonce a usar estos datos para responderme. <a href="#diagnostico">Cómo usamos tus datos</a></span></label>
+<div style="display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center; justify-content: space-between">
+<button type="button" class="back" onClick="{{goStep1}}"><span aria-hidden="true">←</span> Volver</button>
+<button type="submit" class="btn-p">Pide tu diagnóstico</button>
+</div>
+</div>
+</sc-if>
+
+<p class="trust"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>Te responde una persona del equipo en un día hábil. Tus datos no se comparten.</p>
 </form>
 </div>
 
@@ -637,7 +733,7 @@ button{font:inherit}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { platform: null, answers: [null, null, null, null, null] };
+    this.state = { platform: null, answers: [null, null, null, null, null], step: 1, business: null, channels: [], crm: null };
   }
   renderVals() {
     var self = this;
@@ -727,6 +823,32 @@ class Component extends DCLogic {
       resultText = 'Tu pauta aprende de lo que no vende. Empecemos por ahí.';
     }
 
+
+    var st = this.state;
+    var businessOpts = [['b2c', 'A consumidores'], ['b2b', 'A empresas'], ['both', 'A ambos']].map(function (o) {
+      return { label: o[1], pressed: st.business === o[0] ? 'true' : 'false', pick: function () { self.setState({ business: o[0] }); } };
+    });
+    var channelDefs = [
+      ['google', 'Google Ads', '/_blob/cffa777d51b9654499b4b9324e56d7e5'],
+      ['meta', 'Meta Ads', '/_blob/9a135af9542349fd34c5e9259b0f6c14'],
+      ['tiktok', 'TikTok Ads', '/_blob/06bcf94038bf315ea47690b69003773b'],
+      ['linkedin', 'LinkedIn Ads', '/_blob/aa1551cf4d4f5bb9158e3619d634b658'],
+      ['microsoft', 'Microsoft Ads', '/_blob/eae2e0fa70cc7c2cf865c319ffd3c387'],
+      ['other', 'Otro canal', ''],
+      ['none', 'Todavía no invertimos', '']
+    ];
+    var channelOpts = channelDefs.map(function (c) {
+      var on = st.channels.indexOf(c[0]) >= 0;
+      return { label: c[1], icon: c[2], pressed: on ? 'true' : 'false', toggle: function () {
+        var next = st.channels.filter(function (x) { return x !== c[0]; });
+        if (!on) { next = c[0] === 'none' ? ['none'] : next.filter(function (x) { return x !== 'none'; }).concat(c[0]); }
+        self.setState({ channels: next });
+      } };
+    });
+    var crmOpts = [['hubspot', 'HubSpot', '/_blob/4a4bd70f90c4d94a30c58a4b0ac24b9c'], ['salesforce', 'Salesforce', '/_blob/d7347d52c80326bb1874092f996234f7'], ['other', 'Otro CRM', ''], ['none', 'No usamos CRM', '']].map(function (c) {
+      return { label: c[1], icon: c[2], pressed: st.crm === c[0] ? 'true' : 'false', pick: function () { self.setState({ crm: c[0] }); } };
+    });
+    var step = st.step;
     var faqs = [
       ['¿Qué hace una agencia de performance marketing?', 'Planifica, lanza y optimiza campañas pagadas para que la inversión produzca resultados de negocio. Hoy las plataformas automatizan la puja y la segmentación, así que lo que marca la diferencia es definir la señal correcta, probar creatividad con método, gobernar la automatización y leer qué causó cada resultado.'],
       ['¿Cuánto cobran?', 'Un fee mensual por la operación, separado de tu inversión en medios, que pagas directo a las plataformas. El diagnóstico tiene precio cerrado. El fee depende de cuántos canales y mercados operamos y de cómo está tu medición.'],
@@ -747,7 +869,15 @@ class Component extends DCLogic {
       trailPath: arc(Math.max(0, deg - 28), deg),
       sx: end.x, sy: end.y,
       resultText: resultText,
-      faqs: faqs
+      faqs: faqs,
+      businessOpts: businessOpts, channelOpts: channelOpts, crmOpts: crmOpts,
+      showCrm: st.business === 'b2b' || st.business === 'both',
+      isStep1: step === 1, isStep2: step === 2,
+      goStep2: function () { self.setState({ step: 2 }); }, goStep1: function () { self.setState({ step: 1 }); },
+      stepTitle: step === 1 ? 'Cuéntanos de tu pauta' : '¿A quién le respondemos?',
+      stepLabel: step === 1 ? 'Paso 1 de 2' : 'Paso 2 de 2',
+      stepAria: step === 1 ? 'Paso 1 de 2: tu pauta' : 'Paso 2 de 2: tus datos',
+      stepPct: step === 1 ? '50%' : '100%'
     };
   }
 }

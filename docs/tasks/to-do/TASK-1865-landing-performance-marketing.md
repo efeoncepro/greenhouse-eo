@@ -42,6 +42,16 @@
   «agencia de performance marketing». ChatGPT Ads y X se presentan como canales que operamos, sin la salvedad de
   disponibilidad por país ni el «sólo bajo pedido»: «en México tenemos clientes». Prevalece sobre la redacción de la
   ficha y del copy ledger.
+- **Formulario propuesto en el canvas (2026-10-17, a pedido de Julio: «más premium» y «los campos necesarios para
+  calificar»).** Tiene dos pasos.
+  - Paso 1, la pauta: a quién le vendes (consumidores, empresas o ambos); dónde inviertes hoy (selección múltiple con
+    isotipos, con «Todavía no invertimos» excluyente); inversión mensual en medios por rango; qué quieres que traiga
+    la pauta; y qué necesitas resolver primero. Si vende a empresas, se suma qué CRM usa.
+  - Paso 2, los datos: nombre y apellido, correo de trabajo, empresa, sitio web (opcional), cargo, país y la
+    autorización obligatoria.
+  - Los desplegables usan `appearance: base-select`, con un panel propio y respaldo nativo.
+  - El contrato de `efeonce-performance-diagnostic` tiene que confirmar en el renderer el paso doble, la selección
+    múltiple con íconos y el campo condicional del CRM (Open Question vigente).
 - **Decisiones de Julio pendientes.** Formulario propio frente a reusar el de Medios; quién hace el núcleo común (la
   sesión de Medios se ofreció); el label del menú; y si el botón flotante en móvil se mantiene (el compilador de Medios
   lo quita).
