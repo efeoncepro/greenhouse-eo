@@ -15,6 +15,12 @@
   publish con recibos, 2026-10-17 19:16 UTC, destino `meta`, rev 1: Performance (`5266be6e…`), Medios (`75017b9b…`, con
   teléfono) y HubSpot scope (`bb95320b…`). `verify` OK y readback en PG. Actor de auditoría: `agent@greenhouse.efeonce.org`.
   Falta un envío con «Aceptar todas» para leer el `Lead` de origen Server en el dataset `708931297255942`.
+- **Envío consentido (19:19:43 UTC, alias `+meta` porque el form deduplica 60 min por email+form; el reenvío con el mismo
+  correo devolvió el envío previo y no generó conversión):** submission `fsub-7d76a9ba…` `delivered` a HubSpot (200);
+  `measurement_conversion` `474092ed…` con `advertisement=true`, GPC `false`, política `d03b8828…`; entrega `meta`
+  `http_accepted`, HTTP 200 al primer intento (19:20:02 UTC). Pendiente: leer el `Lead` de origen Server en las
+  estadísticas del dataset (bloque horario aún no publicado por Meta al cierre) y archivar el contacto de prueba con alias
+  en HubSpot.
 
 - **Schema:** Rich Results Test (Google) rastrea sin errores y da 3 elementos válidos (rutas de exploración, empresa local,
   organización; único aviso opcional: `address` de la organización, que es de todo el sitio). Google no evalúa
@@ -149,7 +155,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; política Meta publicada, falta leer el Lead Server con un envío consentido; Search Console invalid_grant`
+- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Lead consentido entregado a Meta (http_accepted 200), falta leerlo en las estadísticas de Meta; Search Console invalid_grant`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
