@@ -1051,9 +1051,14 @@ o una capacidad que el contrato directo no cubra. Los slugs y precios de Fal sig
 `pnpm ai:byteplus --list` descubre los modelos conectados; `--doctor` verifica el consumer sin generar.
 [Manual de BytePlus](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) y
 [ADR](../../../docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
-🔴 Un cuadro con rostro humano que se animará en Seedance necesita un `asset://<id>` con fila en el
-[ledger de retratos virtuales](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
-(cupo de 50 assets ≈ 25 personajes, decide el operador) o ir por Higgsfield. Prohibido «lavarlo» por Seedream para que cuente como salida confiable.
+🔴 Antes de usar un rostro externo en Seedance, cargar el
+[preflight de retratos](../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md)
+y el [ledger por cuenta](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+Para `asset://`, KYC, Entry, assets y API deben pertenecer a la identidad obligatoria del manual, con assets
+literalmente `Active` y pruebas separadas como referencia/primer cuadro. Chrome, empresa o RUT no prueban esa
+identidad. Sólo se sube el lote aprobado; el cupo es limitado y Entry gratuito no incluye inferencia gratuita.
+Las otras vías oficiales se detallan en el manual; prohibido «lavar» una imagen externa por Seedream para
+presentarla como salida propia de confianza. La activación actual y los resultados se leen del ledger.
 
 `pnpm ai:layers` usa ahora **BytePlus Pro por defecto**; `--provider fal` conserva el carril anterior.
 BytePlus Pro y Flash admiten Layerize (`layer_decomposition: true`), con el mismo `layers.json` de las máscaras.

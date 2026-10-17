@@ -20,6 +20,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [BytePlus directo y biblioteca de retratos](creative-studio/byteplus-directo.md) — cuenta obligatoria, aprobaciones
+  separadas, cupo por archivo y recuperación del lote; CLI local, sin integración Globe.
+
 - [OmniHuman: aplicaciones y estado de acceso](creative-studio/omnihuman.md) — imagen + audio, flujo de producción y límites; candidato sin integración.
 
 - [Clasificación y orquestación de la producción de video con IA](creative-production/clasificacion-y-orquestacion-de-video.md) —

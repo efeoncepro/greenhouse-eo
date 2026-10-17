@@ -6,7 +6,7 @@
 - Scope: cliente server-only, catálogo BytePlus y comandos locales de imagen, capas, video y Seed Speech.
 - Reversibility: two-way
 - Confidence: high para imagen/video; las superficies de voz conservan evidencia por transporte.
-- Validated as of: 2026-10-12
+- Validated as of: 2026-10-17 (identidad de cuenta y Entry; transportes según evidencia fechada)
 
 ## Context
 
@@ -21,6 +21,12 @@ Crear un cliente BytePlus server-only reutilizable y un catálogo con identidade
 opera ese cliente fuera del runtime del producto. `pnpm ai:layers --provider byteplus` conserva el mismo
 `layers.json` que consumen máscaras/inpainting. No se promueve ninguna ruta de Globe, no se despierta Globe
 y no se modifica ningún deploy. Se conserva Fal como proveedor explícito.
+
+La cuenta autorizada para esta operación es **`3004839361`**, root `jreyes`, con Google SSO
+`jreyes@efeoncepro.com`, región `ap-southeast-1` (Johor), proyecto `default`. Verificar el Account ID visible antes
+de operar: perfil de Chrome y correo aparente no sustituyen esa comprobación. `3003660328` es una cuenta
+independiente utilizada por error y Julio prohibió volver a operarla. La identidad de cuenta debe coincidir en KYC,
+Advanced Creation Rights, assets y credencial de inferencia; no adaptar la credencial a una sesión equivocada.
 
 ModelArk y Seed Speech usan claves separadas, limitadas al proyecto default y a media donde la consola permite
 restringir modelos. Sus valores viven en Secret Manager de `efeonce-group`; sólo referencias no secretas entran
@@ -43,6 +49,8 @@ Video registra el task ID antes de polling para poder recuperar el resultado sin
 Imágenes esperan hasta 600 s sin retry automático: Pro standard con ocho referencias terminó a los 227 s
 en la [prueba Nexa](../../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md). El timeout inicial
 de 180 s no prueba cancelación ni cobro cero; un nuevo POST es un intento separado.
+
+Alcance funcional y estados para el equipo: [BytePlus directo](../../documentation/creative-studio/byteplus-directo.md).
 
 ## Runtime Contract
 
@@ -71,11 +79,41 @@ se promueve una ruta Globe; o falta evidencia del transporte y de sus salidas re
 
 ## Evidence
 
+**Conciliación de cuenta y Entry, 2026-10-17:** `efeonce-media-directa` Active fue creada por `3004839361` y
+Seedance 2.5 ya estaba activado allí; el GET de una tarea existente devolvió `succeeded`. No se rotó ni cambió
+ninguna clave y no hubo compras. El KYC de producción, enviado con autorización expresa de Julio, quedó
+**aprobado a las 16:57:32 UTC** (2026-10-18 00:57:32 UTC+8), con readback de consola y correo oficial.
+
+Se completó el cuestionario para uso interno; Julio confirmó los mecanismos de trazabilidad y planes de respuesta
+ante incidentes. Primero se respetó su reserva de firma personal y se dejó la carta abierta. Su orden posterior
+**«Firmala»** autorizó aceptar esa carta; la verificación por correo con el código entregado por Julio se completó
+sin conservar el código. A las **17:37 UTC**, consola mostró `Apply for a free trial successfully`, **Entry activo**,
+**Billing mode Free**, **0/50 assets y 0/50 grupos usados**. No se contrató otro plan. Esta activación no acredita
+que funcionen las referencias ni el primer cuadro por `asset://`.
+
+La carga de Antonio no transmitió ningún archivo: en esta máquina la extensión exigió `Allow access to file URLs`
+y el selector nativo dejó `Abrir` deshabilitado. No se creó ningún grupo ni se ejecutaron pruebas nuevas. Ese bloqueo
+local no es un requisito general del servicio. Retomar Antonio con dos PNG y nuevos IDs de esta cuenta, esperar
+`Active`, probar referencia y primer cuadro a 480p y continuar el resto sólo si funciona la referencia.
+
+Los **12 assets / 6 grupos, KYC y Entry de las observaciones históricas previas** pertenecen a `3003660328` y no
+habilitaron la cuenta de inferencia; sus IDs no se reutilizan. Preflight en el
+[manual](../../manual-de-uso/creative-studio/byteplus-directo.md#cuenta-obligatoria-antes-de-operar), estado vivo y
+cronología en el [ledger](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+Evidencia local fuera del repo:
+`/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/entry-gratuito-activo-cuenta-correcta.jpg`.
+
 **Delta 2026-10-16 — modo borrador en vivo.** Borrador `cgt-20261017085910-h4kbe` (Seedance 2.5, 4 s, primer cuadro
 4:5, audio): 580×726, 39.887 tokens. Final `cgt-20261017090108-fzvku` desde ese borrador: 1288×1610, 196.432 tokens,
 misma toma cuadro a cuadro. El mismo día, un cuadro fotorrealista con una persona (GPT Image) fue rechazado al crear
 la tarea con `InputImageSensitiveContentDetected.PrivacyInformation`, sin tarea creada. Según la PDM de BytePlus,
-la restricción para personas se levanta con la verificación KYC de la cuenta. KYC de organización enviado el 2026-10-16 (revisión de 1 a 2 días hábiles); falta Advanced Creation Rights, subir los personajes y re-probar. Re-prueba del 2026-10-17 con el KYC aprobado: el mismo cuadro volvió a rechazarse con `PrivacyInformation` (requestId `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro); el KYC solo no levanta la restricción. El mismo día quedó activado Advanced Creation Rights en el plan Free (50 avatares) y el operador decidió evaluar el tier pagado sólo cuando la herramienta de producción (runtime) esté armada.
+la restricción para personas se levantaría con la verificación KYC. **Antecedente histórico, no estado vigente:**
+el KYC enviado el 2026-10-16 y su aprobación inicial correspondían a `3003660328`; la API usaba `3004839361`.
+Re-prueba del 2026-10-17 tras esa aprobación en la otra cuenta: el mismo cuadro volvió a rechazarse con
+`PrivacyInformation` (requestId `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro).
+Ese intento con cuentas distintas no valida los retratos de producción. La activación inicial de Advanced Creation
+Rights Free también fue en la cuenta incorrecta; el cupo es de 50 archivos y 50 grupos, no 50 personajes garantizados.
+La conciliación vigente está descrita arriba.
 Corrida: `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/byteplus-draft/`.
 
 OmniHuman 2.0 / Vision AI fue investigado el 2026-10-15 y sigue fuera de la implementación aceptada de

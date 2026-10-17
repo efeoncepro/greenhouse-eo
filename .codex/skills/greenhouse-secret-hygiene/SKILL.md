@@ -83,6 +83,24 @@ printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
   - PostgreSQL passwords require `pnpm pg:doctor` or a real connection test
 - If a secret publication error caused runtime degradation, document it as `ISSUE-###` even if the fix also includes defensive code.
 
+### BytePlus: reconcile account identity before credentials
+
+Before any BytePlus console, KYC, portrait, plan or API operation, load
+`docs/manual-de-uso/creative-studio/byteplus-directo.md#cuenta-obligatoria-antes-de-operar`
+and the account-scoped `docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md`.
+The required identity is Google SSO `jreyes@efeoncepro.com`, root `jreyes`, Account ID `3004839361`,
+Johor `ap-southeast-1`, project `default`. Never log into or operate the independent historical account
+`3003660328`. Chrome profile, domain, company name, RUT, or an existing card does not prove account identity.
+Read the visible Account ID and reconcile the API key's owner/project through safe metadata before a write.
+KYC, Entry/Advanced Creation Rights, portrait assets and inference credentials must belong to that same account.
+
+`Your account has not activated the Asset Service` is not proof of a bad secret or a separate activation switch.
+First reconcile account, model activation, KYC, Entry and asset ownership; these are distinct checks. Do not rotate,
+replace or expose a working production key to match an incorrect browser session, and do not buy a plan to repair
+an identity mismatch. Keep only redacted owner/project/status metadata, request IDs and dated readback evidence;
+never persist API values, verification codes or signed URLs. Detailed portrait gates and upload-permission handling:
+`../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md`.
+
 ### Resend webhook signing secret
 
 Treat `RESEND_WEBHOOK_SIGNING_SECRET` as an inbound verification secret, separate from the outbound

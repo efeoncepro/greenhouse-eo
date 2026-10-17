@@ -60,6 +60,11 @@ Nunca se crea documentación gobernante nueva en `efeonce-globe/docs/**`.
 
 ## Índice de arquitectura (repatriado — TASK-1492)
 
+BytePlus directo, carril local sin promoción Globe: [decisión](EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md),
+[funcional](../../documentation/creative-studio/byteplus-directo.md),
+[manual y cuenta obligatoria](../../manual-de-uso/creative-studio/byteplus-directo.md#cuenta-obligatoria-antes-de-operar)
+y [ledger por cuenta](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+
 OmniHuman 2.0 / Vision AI: [contrato externo](BYTEPLUS_OMNIHUMAN_2_API_CONTRACT_V1.md),
 [uso funcional](../../documentation/creative-studio/omnihuman.md),
 [manual API](../../manual-de-uso/creative-studio/omnihuman-2-api.md) y

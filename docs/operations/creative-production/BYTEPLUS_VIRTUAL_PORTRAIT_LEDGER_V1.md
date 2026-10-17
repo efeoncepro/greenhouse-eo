@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.11: Julio ordena firmar; carta y correo verificados, Entry gratuito activo; carga bloqueada por selector de Chrome)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.12: estado y recuperación conciliados en docs/skills; Entry activo, cargas y pruebas pendientes por bloqueo local de Chrome)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -14,8 +14,10 @@ La biblioteca privada de assets de BytePlus es la vía para personajes propios. 
 
 **La cuenta canónica de BytePlus es 3004839361**: es la de la credencial de inferencia de la CLI
 (`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas históricas de §4.1, el KYC aprobado, el plan Entry y
-la carta de compromiso se hicieron por error en la cuenta **3003660328**; por eso la API responde «Your account has not
-activated the Asset Service»: la clave no ve esos assets. **Los 12 assets de 3003660328 no sirven para la CLI.**
+la carta de compromiso se hicieron por error en la cuenta **3003660328**, independiente de la de producción.
+Los intentos históricos combinaron esa biblioteca con la credencial de **3004839361** y devolvieron «Your account
+has not activated the Asset Service». La discrepancia de cuentas está confirmada; todavía no hay una prueba
+con assets de la cuenta correcta que valide la recuperación. **Los 12 assets de 3003660328 no sirven para la CLI.**
 La recuperación se hace exclusivamente en 3004839361: KYC aprobado y Entry gratuito activo (§1),
 con carta aceptada por orden expresa posterior de Julio. Faltan las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
 cualquier eliminación o transferencia de sus assets.
@@ -64,6 +66,7 @@ pertenecen a **`3003660328`**, la cuenta incorrecta (§4.1), y no habilitan la c
 La carta firmada con código a las 07:53 UTC también corresponde sólo a esa cuenta. **Si aparece una nueva
 carta de compromiso en `3004839361`, detenerse para que Julio la firme personalmente.** Se cumplió esa pausa;
 Julio después indicó **«Firmala»** y entregó el código. La carta de esta cuenta quedó aceptada y verificada (§7).
+La orden posterior autorizó ese acto concreto; no autoriza por anticipado otras cartas ni cambios de plan.
 
 El KYC por sí solo no prueba que se levante el filtro. La re-prueba del 2026-10-17 con el cuadro de Antonio
 (GPT Image) se rechazó con `InputImageSensitiveContentDetected.PrivacyInformation` (requestId
@@ -177,22 +180,35 @@ intermedias y la imagen final) queda en un lugar durable y se anota en la column
    compromiso se firma al activar el plan, con un código por correo (observado 2026-10-17), no al crear el grupo. (Por API exige AK/SK y URL pública; no está implementado.)
 4. **Imágenes:** jpeg/png/webp, entre 300 y 6000 px por lado, proporción entre 0,4 y 2,5, menos de 30 MB. Cuerpo
    entero vertical frontal y primer plano vertical frontal, sin expresión, con la cara cerca de 2/3 del encuadre.
-5. **Esperar `Active`** (`Processing` → `Active` o `Failed`). No hay plazo garantizado de revisión.
-6. **Anotar la fila:** grupo, id de cada asset (`asset-…`), cantidad, estado, fecha.
-7. **Probar con un borrador 480p.** El uso documentado es como **imagen de referencia**; en el prompt se nombra
-   «Image 1», nunca el id:
+5. **Esperar `Active`** en los dos assets (`Processing` → `Active` o `Failed`). No hay plazo garantizado de revisión.
+   Si la UI sólo dice `warehoused`, registrar ese literal: no traducirlo a `Active` ni dar por validada la inferencia.
+6. **Anotar la fila:** grupo, id de cada asset (`asset-…`), cantidad, estado, fecha y «Aprobó: Julio».
+   Comprobar que Antonio consume **2 assets y 1 grupo**: desde el corte vigente 0/50 y 0/50, quedarían
+   **2/50 y 1/50 usados**, o **48 assets y 49 grupos disponibles**. No duplicar cargas para comprobarlo.
+7. **Probar los dos borradores de Antonio a 480p**, con IDs nuevos de esta cuenta y la toma
+   `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/byteplus-draft/s07-prompt.txt`.
+   Preparar una copia de la toma por variante; en el prompt nombrar **Image 1** (rostro) e **Image 2** (cuerpo,
+   sólo en referencias), nunca sus IDs. Los IDs van únicamente en los argumentos `--image`:
 
    ```bash
-   pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> --prompt-file toma.txt --duration 4 --out borrador.mp4 --yes
+   pnpm ai:byteplus --model seedance25 --draft --references --image asset://<id-rostro> --image asset://<id-cuerpo> --prompt-file <toma-referencias.txt> --duration 4 --out <carpeta>/antonio-ref.mp4 --yes
+   pnpm ai:byteplus --model seedance25 --draft --image asset://<id-rostro> --prompt-file <toma-primer-cuadro.txt> --duration 4 --out <carpeta>/antonio-primer-cuadro.mp4 --yes
    ```
 
-   Como primer cuadro (`--image` sin `--references`) no está documentado: probarlo antes de planificar con él.
+   Primer cuadro no está documentado como uso soportado de estos assets: ésta es una prueba, no una garantía.
+   Conservar ambos resultados aunque fallen: comando sin secretos, fechas, código de salida, error, request/task ID
+   si existe, comprobación del video y recibo si se genera. Un timeout no prueba cancelación; consultar la tarea
+   existente antes de crear otra. Entry gratuito no vuelve gratuitas estas generaciones.
+8. **Sólo tras el éxito como referencia (paso 3a)**, continuar en orden Nexa → Hum → Isabella → Karo → Sophia,
+   dos archivos por grupo y fila/cupo verificados. Si falla o queda sin resolver, detener la cola y registrar el bloqueo.
 
 ## 7. Pruebas de Antonio — 2026-10-17
 
 **Alcance de todos los intentos históricos de esta sección:** la API usa `3004839361`, pero los IDs de entrada
-se cargaron en `3003660328`. Ninguno valida la biblioteca de la cuenta correcta. Nuevas pruebas pendientes de
-KYC aprobado, Entry gratuito activo, firma de Julio y nuevos IDs de Antonio en `3004839361`.
+se cargaron en `3003660328`. Ninguno valida la biblioteca de la cuenta correcta. **KYC, carta y Entry gratuito ya
+están completados en `3004839361`**. Las nuevas pruebas dependen ahora de cargar Antonio, obtener IDs de esta
+cuenta y verificar ambos assets; la carga sigue bloqueada localmente por Chrome. Referencia y primer cuadro:
+**pendientes**, sin nuevas tareas de inferencia desde la activación de Entry.
 
 ### Primera ejecución — 08:44 UTC
 
@@ -396,4 +412,10 @@ Las dos pruebas de Antonio y el resto de personajes siguen pendientes; no se usa
 
 Evidencia fuera del repo, en la carpeta local de §7: `entry-carta-firmada-verificacion-completa.jpg` y
 `entry-gratuito-activo-cuenta-correcta.jpg`. El bloqueo pendiente es habilitar la carga de archivos de Chrome;
-no se amplió ningún permiso de la extensión ni se cambió la configuración de seguridad.
+no se amplió ningún permiso de la extensión ni se cambió la configuración de seguridad. Este bloqueo corresponde
+al entorno local observado; no acredita un rechazo de BytePlus ni requiere contratar un plan pagado.
+
+**Continuidad documental:** el manual directo, el ADR existente y las skills enlazadas por el router separan
+identidad, KYC, activación del modelo, Entry, carga y prueba de inferencia. El ledger conserva el estado por
+cuenta; la historia de la incorrecta no se reescribe como éxito en producción. La actualización de docs/skills
+no opera la consola, no carga assets y no consume generaciones.

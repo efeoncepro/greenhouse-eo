@@ -239,11 +239,16 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
   `pnpm ai:byteplus --model seedance25|seedance2` por defecto bajo el contrato directo de Johor;
   [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md); en 2.5, `--draft` (480p) y luego
-  `--from-draft <task-id>` (final 1080p). 🔴 **Rostros humanos:** se rechazan (`PrivacyInformation`, sin cobro) y el KYC
-  aprobado (2026-10-17) no lo levanta; la vía es `--image asset://<id>` de la biblioteca de retratos virtuales (Advanced
-  Creation Rights, plan Entry gratuito: **50 assets ≈ 25 personajes**, compartido con retratos reales; uso documentado con `--references`), y ningún personaje se sube sin decisión del operador y fila en el
-  [ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md); personaje de una sola
-  pieza → Higgsfield u otra vía, no cupo. Fal sigue como alternativa explícita:
+  `--from-draft <task-id>` (final 1080p). 🔴 **Rostros humanos externos:** se observó rechazo
+  `PrivacyInformation`; el KYC por sí solo no lo levanta. Para la biblioteca de retratos, cargar el
+  [preflight de cuenta, derechos, cupo y pruebas](../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md)
+  y el [ledger por cuenta](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+  `asset://` exige propiedad en la cuenta de inferencia y estado literal `Active`; Entry activo no prueba que
+  funcione como referencia ni como primer cuadro. Probar ambos por separado con drafts de 480p/4 s, nombrando
+  las entradas `Image 1`/`Image 2` en el prompt. El lote y el orden autorizados viven en el ledger; continuar
+  sólo tras éxito como referencia. Un plan Entry gratuito no vuelve gratuitas las generaciones.
+  Para una sola pieza, evaluar las otras vías oficiales del manual sin consumir cupo por defecto.
+  Fal sigue como alternativa explícita:
   su endpoint se elige por duración/4K/costo en
   `workflows/engine-selection-by-fidelity-contract.md`; los 15 endpoints verificados 2026-09-16, incluido 2.5
   `editing`/`extension`; se observaron rechazos cobrados tras encolar referencias de marcas/personas en pruebas de septiembre; no generalizar a todos los endpoints. La fórmula por tokens tuvo coincidencia en pruebas cortas, pero subestimó SKY V11: incluir entradas, salida y tarifa de la ruta, y reconciliar por solicitud), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =

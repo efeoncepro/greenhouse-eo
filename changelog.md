@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-17 — BytePlus: cuenta obligatoria y Entry gratuito activo
+
+- [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y [ledger por cuenta](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
+  fijan Google SSO `jreyes@efeoncepro.com` / **3004839361**; la cuenta histórica incorrecta queda excluida de operación.
+- KYC aprobado y carta aceptada por mandato posterior de Julio: Entry Free activo, 0/50 assets y 0/50 grupos.
+  Routers, contexto y skills Codex/Claude enlazan preflight, límites de autorización y pruebas separadas de retratos.
+  Carga de Antonio bloqueada por acceso de Chrome a archivos; sin retratos nuevos ni compatibilidad API verificada.
+
 ## 2026-10-17 — Brochures aprobados, sin recortes ni validaciones adicionales
 
 - Ratificación expresa de Julio: [uso comercial íntegro](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
@@ -553,8 +561,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - Spot cargado en Marketing Studio como CMP001-08 de CMP-001 (orgánico) y programado en Metricool: IG lun 05-oct 14:00 (portada 4:5), LinkedIn jue 08-oct 11:00; media re-alojada con SHA-256 idéntico.
 - Operador: la marca es Efeonce y el servicio «Efeonce | AEO» (con barra). Regla en el [ADR de naming](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md), skills de copy/AEO/social y `docs/context/`; recetas de Studio y Metricool documentadas.
-
-## 2026-10-04 — Insights: reconciliación de estado y revisión de cierre
-
-- EPIC-045 sincronizado a `in-progress`; 24 hijas (7 complete, 6 en curso, 11 to-do). Contratos TASK-1957/1962 desplegados, modelo vigente 1.4 y ocho flags Production exactos ON. Índices, arquitectura y skill espejo actualizados; historial conservado.
-- [Auditoría](docs/audits/insights/2026-10-04-epic-045-closure-review.md): 116 pruebas PASS; sin planes post-release en la lectura acotada. TASK-1962 candidata a cierre tras verificación productiva; las seis hijas en curso conservan sus pendientes. Sin cierres de tasks, cambios runtime ni envíos.

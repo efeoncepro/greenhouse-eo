@@ -23,3 +23,10 @@ For **OmniHuman 2.0 / BytePlus Vision AI**, load the canonical skill's dated Omn
 Apply the Vision AI Service Specific Terms and General AI Terms, dedicated likeness/voice permissions and
 asset-level clearance. Do not infer ModelArk indemnity, training consent or zero retention from partner status,
 task expiry or URL TTL; preserve provenance, disclosure and the default watermark.
+
+For **BytePlus ModelArk KYC, Entry, virtual portraits or `asset://` inference**, also load
+[the shared portrait preflight](references/byteplus-portrait-preflight.md), `greenhouse-secret-hygiene`,
+the [direct manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) and
+[account-scoped ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+Reconcile account ownership before writes. Record factual KYC declarations and scoped human authorization;
+a prior letter signature is not blanket approval for another agreement or account. Keep live state in the ledger.

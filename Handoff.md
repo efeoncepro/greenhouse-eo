@@ -7,6 +7,28 @@ El original de contenidos (57) está intacto; la copia Aloja (38), documento `35
 ni se reutiliza. Corrección documental; no modifica PDF, documentos HubSpot ni envía correos.
 [Antecedentes](docs/audits/commercial/2026-10-17-approved-brochures-correction.md).
 
+
+Historial de sesiones: [Handoff.archive.md](Handoff.archive.md).
+
+## 2026-10-17 — BytePlus: KYC y carta completos, Entry gratuito activo
+
+Usar sólo Google SSO `jreyes@efeoncepro.com` → **3004839361**, root `jreyes`. Julio prohibió volver a usar
+3003660328: sus 12 assets/6 grupos y KYC/Entry son históricos. Seedance 2.5, clave y tarjeta/Savings Plan están
+en la cuenta correcta; GET de tarea previa `succeeded`, sin generación ni compras. KYC enviado con autorización
+expresa de Julio y **aprobado**, 17/10 16:57:32 UTC (13:57 Chile), verificado en consola y correo. Estado en el
+[ledger](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md); [preflight obligatorio](docs/manual-de-uso/creative-studio/byteplus-directo.md#cuenta-obligatoria-antes-de-operar).
+Julio confirmó mecanismos/plan de incidentes: cuestionario completo (1 y 2=YES, 3=uso interno).
+Julio después ordenó «Firmala»: carta aceptada y correo verificado con su código; Entry activo 17:37 UTC,
+Billing mode Free, 0/50 assets y 0/50 grupos. Carga de Antonio bloqueada: extensión requiere acceso a archivos;
+selector nativo dejó Abrir deshabilitado, sin carga. Pendiente: Antonio con IDs nuevos → pruebas 480p → resto si 3a funciona.
+Corrección enviada a Cloris/Alejandro con firma gráfica y CCO: 17/10 13:22 UTC; Enviados y HubSpot SENT
+`118790251018` verificados. Respuesta pendiente. WhatsApp entregado para copiar.
+Por orden de Julio, documentación y skills Codex/Claude sincronizan cuenta, autorización y recuperación de retratos;
+router y contexto enlazan el canon. ADR existente de media directa; sin cambio de integración ni promoción Globe.
+Estado operativo: Entry activo, cargas y pruebas pendientes; sin compras ni push.
+Validación documental, índices y espejos conforme; rutas globales detectan 64 faltantes previos (62 referencias
+ya en HEAD y 2 fuera del checkout), sin nuevos casos BytePlus. El contenido comprimido de CLAUDE se conserva en su canon.
+
 ## 2026-10-16/17 — Landing HubSpot v2 publicada, dock móvil con agenda nativa y renderer CTA 1.3.1
 
 Live en https://efeoncepro.com/servicios-contratar-hubspot/ (página `244079`, OG `251991`): 14 widgets
@@ -227,16 +249,3 @@ Seis subagentes con alcance disjunto; espejos `.codex` sincronizados salvo `astr
 Por la noche, a pedido del operador: lámina 10 sin texto que limite el alcance y lámina 15 nueva con tiempos por nivel de complejidad (el SLA que espera Sika;
 plazos sin visto bueno de operaciones). Abierto para el operador: IVA y validez de la económica, evolución gráfica por lanzamiento o pago único, y las reglas que chocan con lo ya escrito (precio unitario «nunca», spec work, tercera persona en SOW):
 [expediente](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md).
-
-## 2026-10-12 — Medios: oferta integral y evaluación DSP acompañada
-
-Programmatic consolida la [oferta integral de medios Efeonce](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
-[Modelo V1.5](docs/business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) y pricing V1.4:
-tarifario aprobado sin cambio, gestión conjunta/incremental y gate de operación directa acompañada. Docs y skills
-Codex/Claude sincronizados; alcance documental, sin integración ni publicación. [Reunión Basis leída completa](docs/audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md):
-demo registrada **21-10 18:00–19:00 Chile**; porcentajes ilustrativos, formación/soporte declarados. Pendientes a cargo
-de Julio, Media y Finance/Legal: demo, oferta formal, RACI/capacidad, acceso, inventario Chile y crédito; sin gasto autorizado.
-
-[V3](data/pricing/README.md): local.
-Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
-Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).

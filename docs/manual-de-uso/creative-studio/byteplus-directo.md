@@ -7,6 +7,22 @@ El `--doctor` de esta CLI no valida acceso a Vision AI.
 Carril local del operador. Consume ModelArk/Seed Speech del fabricante en Johor y conserva Fal como alternativa
 explícita. No es una ruta de Globe, que permanece hibernado. [Decisión](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
 
+Alcance funcional, estados y responsabilidades: [BytePlus directo y biblioteca de retratos](../../documentation/creative-studio/byteplus-directo.md).
+
+## Cuenta obligatoria antes de operar
+
+**Usar únicamente Google SSO `jreyes@efeoncepro.com` → Account ID `3004839361`, root `jreyes`, región
+`ap-southeast-1`, proyecto `default`.** Verificar el ID visible en Account antes de cada operación de consola;
+el perfil de Chrome no identifica la cuenta de BytePlus. Si no coincide o no puede comprobarse, detenerse.
+**Prohibido volver a iniciar sesión u operar `3003660328` (`julio_reyes`)**, por instrucción de Julio del
+2026-10-17. Son cuentas independientes, no una cuenta principal y una subcuenta. No usar sus IDs de assets en
+la API de producción.
+
+La consola confirmó `efeonce-media-directa` Active y creada por `3004839361`; los secretos actuales ya son los
+de producción. No cambiar credenciales para hacerlas coincidir con una sesión equivocada. KYC, Advanced Creation
+Rights y assets deben pertenecer a la misma cuenta de inferencia. Estado vivo y evidencias en el
+[ledger](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md#1-estado-del-plan).
+
 ## Estado y credenciales
 
 Claves creadas el 2026-10-12: `efeonce-media-directa` (12 familias de media, sin LLMs ni modelos futuros) y
@@ -119,7 +135,10 @@ El comando traduce ese error con las vías oficiales ([guía de retratos](https:
 Un cuadro de GPT Image con una persona no entra por ninguna de las tres vías sin ese proceso. Detalle verificado y
 fuentes: [investigación del 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md).
 
-**El KYC está aprobado (2026-10-17) y no levanta el filtro:** sólo habilita el plan. Re-prueba del 2026-10-17 con el
+**Corrección de cuenta (2026-10-17):** el KYC aprobado y Entry que se habían observado pertenecían a
+`3003660328`, la cuenta incorrecta. El KYC de producción `3004839361` quedó **aprobado** el 2026-10-17 a las
+16:57:32 UTC (2026-10-18 00:57:32 UTC+8), verificado en consola y correo oficial. Seedance 2.5 ya está activado allí y conserva
+tarjeta/Savings Plan. No hubo compras. KYC por sí solo no acredita acceso a retratos. Re-prueba histórica con el
 cuadro de Antonio (GPT Image): rechazo `InputImageSensitiveContentDetected.PrivacyInformation`, requestId
 `021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro. No se «lava» un cuadro con rostro
 pasándolo por Seedream.
@@ -128,26 +147,57 @@ pasándolo por Seedream.
 ([guía](https://docs.byteplus.com/en/docs/ModelArk/2333565)). Es la vía para personajes que poseemos y que no se parecen
 a ninguna persona real. En orden:
 
-1. **KYC de organización.** **Hecho:** enviado el 2026-10-16, aprobado el 2026-10-17. Lo hace el operador: el agente no
-   ingresa documentos de identidad ni datos tributarios.
-2. **Advanced Creation Rights (Entry)**, gratuito. **Hecho:** activo desde el 2026-10-17. Cupo: **50 assets (archivos)
-   y 50 grupos (personajes)**, compartido con los retratos reales. Con 2 imágenes por personaje alcanza para 25. El
-   tier siguiente cuesta USD 1.400/mes o 14.000/año (oficial), sin reembolso; se evalúa recién cuando la herramienta
-   de producción esté armada.
+1. **KYC de organización en `3004839361`.** **Aprobado**, con evidencia en el ledger. Envío y términos originales
+   autorizados expresamente por Julio. Si ModelArk conserva el aviso pendiente, renovar la sesión con la identidad
+   correcta y seguir `complete real-name verification`; comprobar otra vez Account ID antes de continuar.
+2. **Advanced Creation Rights (Entry)**, gratuito, **activo en `3004839361`** desde 2026-10-17 17:37 UTC.
+   Cuestionario completo (1 y 2 `YES`, 3 uso interno). Tras la pausa para firma personal, Julio ordenó «Firmala»;
+   carta aceptada y verificación por correo completada con su código. Consola: `Billing mode Free` y
+   `Apply for a free trial successfully`. Cupo confirmado sin uso: **50 assets (archivos)
+   y 50 grupos (personajes)**, compartido con los retratos reales: **0/50 assets y 0/50 grupos usados** en ese
+   readback. Con 2 imágenes por personaje alcanza para 25. Entry habilita la biblioteca; las generaciones de video
+   conservan su cobro propio. Mantener Entry gratuito durante las pruebas, sin comprar ni cambiar el plan.
 3. **Decisión y fila en el [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)**
    antes de subir (obligatorio), con la **carpeta de evidencia** que exige la carta de compromiso: fichas, prompts,
    logs de generación e intermedias.
-4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje (la carta de
-   compromiso se firma antes, al activar el plan, con un código que llega por correo; observado 2026-10-17). Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
-   expresión (300–6000 px, proporción 0,4–2,5, menos de 30 MB). Estados: `Processing` → `Active` o `Failed`.
-5. **Activar el Asset Service** de la cuenta (una vez), en la consola de ModelArk → Open Management, región
-   ap-southeast-1. Sin eso, toda request con `asset://` falla con `InvalidParameter` en `content[n].image_url.url`
-   («Your account has not activated the Asset Service»), aunque los archivos ya estén subidos (medido el 2026-10-17).
-   La CLI lo explica así desde ese día. Lo activa el operador.
+4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje. La carta
+   se pidió al activar Entry y ya está aceptada en `3004839361`; no requiere volver a firmarse para este lote.
+   Una carta nueva o términos diferentes exigen revisar la autorización vigente del operador. La firma de otra
+   cuenta no se traslada. Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
+   expresión (300–6000 px, proporción 0,4–2,5, menos de 30 MB). Esperar `Active`; `Processing`, `Failed` y la etiqueta
+   visual `warehoused` no acreditan por sí solos ese estado.
+5. **Verificar Asset Service en la cuenta de inferencia**, en ModelArk → Open Management, región
+   `ap-southeast-1`. El error histórico fue `InvalidParameter` en `content[n].image_url.url`, con «Your account
+   has not activated the Asset Service». Se produjo con la API de `3004839361` sin Entry y assets de `3003660328`;
+   no demuestra que exista un interruptor adicional separado ni prueba incompatibilidad de los nuevos assets.
+   No repetir con esos IDs ni cambiar la clave de producción. Entry activo aún no acredita una inferencia exitosa.
 6. **Usarlos** cuando estén `Active`, como referencia, nombrándolos «Image 1» en el prompt (nunca el id):
    `pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> ...`. Como primer cuadro
    (`--image` sin `--references`) no está documentado: probar con un borrador antes de planificar con él. Anotar
    grupo, asset id(s) y estado en el ledger.
+
+
+### Retomar el lote de Antonio y el elenco — corte 2026-10-17
+
+El [ledger por cuenta](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) es la fuente
+vigente de cupos, IDs, aprobaciones y resultados. La cuenta correcta sigue sin grupos ni assets: el intento de subir
+`antonio-1-rostro.png` no transmitió el archivo. En esta máquina, `fileChooser.setFiles` fue rechazado por el permiso
+`Allow access to file URLs` de la extensión; el selector nativo dejó `Abrir` deshabilitado aun con el PNG seleccionado.
+Es un bloqueo local de carga observado, no una restricción general de BytePlus. No se amplió ningún permiso.
+
+Al resolver esa carga, conservar el alcance aprobado:
+
+1. Leer íntegros `ai-generations/2026-10-17_byteplus-retratos-elenco/SUBIR/LEEME.md` y el ledger; subir sólo los
+   12 PNG del paquete, con sus seis nombres de grupo. El cupo consumido no se recupera al borrar.
+2. Crear sólo Antonio con rostro y cuerpo. Esperar ambos `Active`, registrar grupo y nuevos `asset-…`, fecha y
+   «Aprobó: Julio»; comprobar consumo de 2 assets y 1 grupo.
+3. Ejecutar las dos pruebas de 4 s a 480p con `s07-prompt.txt`: referencias de rostro/cuerpo y primer cuadro sólo
+   rostro. Usar «Image 1» / «Image 2» en los prompts, nunca IDs. Conservar resultados y errores de ambas.
+4. Sólo si funciona la referencia (paso 3a), continuar Nexa → Hum → Isabella → Karo → Sophia. Registrar cada fila
+   y resultado en el ledger. No hay pruebas nuevas de inferencia desde la activación de Entry.
+
+Evidencia de activación fuera del repo:
+`/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/entry-gratuito-activo-cuenta-correcta.jpg`.
 
 Un personaje de una sola pieza no necesita cupo: genera su cuadro nativamente con Seedream 5.0 texto-a-imagen en esta
 cuenta (y úsalo dentro de 30 días, sin editar) o produce sus planos en Higgsfield. Una persona real (por ejemplo,

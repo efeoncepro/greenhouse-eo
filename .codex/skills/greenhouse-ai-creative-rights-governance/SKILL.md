@@ -43,6 +43,16 @@ Use canonical docs already owning the surrounding contracts; do not create a sec
 - `docs/architecture/creative-studio/README.md`
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
 
+## BytePlus ModelArk: account, declarations and portrait gate
+
+For console/KYC/Entry, virtual portraits or `asset://` inference, load
+[the portrait preflight](references/byteplus-portrait-preflight.md), `greenhouse-secret-hygiene`,
+the [direct manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) and the
+[account-scoped ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+These own operational state and evidence; a skill must not maintain another live quota or approval record.
+Provider account approval and an Entry subscription do not replace input rights or prove portrait inference works.
+A one-time instruction to accept a specific letter does not authorize future agreements, account changes or plans.
+
 ## OmniHuman 2.0 / BytePlus Vision AI — dated routing 2026-10-15
 
 Use the [API manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) and
