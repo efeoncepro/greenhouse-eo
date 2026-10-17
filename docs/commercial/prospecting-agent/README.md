@@ -1,5 +1,7 @@
 # Radar comercial Efeonce
 
+Brochures: [aprobados para uso comercial íntegro, sin revalidar ni recortar](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md), ratificado por Julio el 17-10-2026. Usar el documento existente de HubSpot; la copia Aloja de 38 láminas no está aprobada.
+
 Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
 aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;

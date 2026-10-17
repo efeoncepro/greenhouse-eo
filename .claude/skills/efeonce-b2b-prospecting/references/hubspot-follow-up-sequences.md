@@ -40,12 +40,11 @@ Criterio confirmado de Julio: incluir un brochure pertinente en cada correo de p
 instrucción distinta, y escribir **qué encontrará y para qué le sirve** antes del enlace. En HubSpot: **Insertar → Documentos**, material aprobado, texto
 legible del enlace, descarga permitida; sin exigir correo ni miniatura, salvo instrucción distinta.
 No copiar enlaces de tracking de otra persona ni adjuntar propuestas privadas de otros clientes.
-Si se comparte una copia acotada dentro del alcance autorizado, conservar el original y un manifiesto
-privado con páginas excluidas, razón, conteo y checksum; comprobar las páginas restantes. No eliminar
-claims para cambiar el sentido de una oferta ni presentar la copia como nueva edición canónica aprobada.
-Subir esa copia como documento distinguible y verificar identidad/ID; un nombre de archivo igual no prueba
-que el documento nativo sea la versión enviada. Datos privados y archivos permanecen fuera de Git.
-El documento aprobado no certifica todas sus cifras. Usar [mensaje y prueba](message-and-contextual-proof.md).
+Usar el brochure aprobado íntegro y el documento existente de HubSpot. No recortar, reescribir ni subir
+una copia por criterio del agente; una modificación requiere instrucción explícita de Julio sobre ese
+material. No reabrir validaciones históricas: los brochures están aprobados y no necesitan nada más.
+Verificar identidad/ID del documento elegido y el enlace correcto, sin convertir esa comprobación en una
+revisión editorial. Aplicar la [regla vigente](../../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 
 Si los cuerpos difieren de forma sustancial, usar una secuencia por persona o una personalización nativa
 que permita comprobar cada texto final; sustituir sólo nombre/empresa no basta. Desde el segundo paso,

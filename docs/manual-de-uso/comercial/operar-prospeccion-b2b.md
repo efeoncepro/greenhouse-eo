@@ -131,9 +131,10 @@ No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respo
 se distingue del CCO de Outlook. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
 
 Brochure por defecto para presentar Efeonce completa: el oficial «Agencia de Marketing 360°» (2026-10-16);
-el de una línea, sólo si la señal es de esa línea. Sus pendientes (cifras ANAM, «12 meses» Berel) se revisan antes de enviarlo.
-Verificar versión/ID del brochure en Documentos, además del nombre; si se usa una copia acotada autorizada,
-conservar original y manifiesto privado. Leer cuerpo y calendario finales de la inscripción, porque pueden
+el de una línea cuando la necesidad corresponda, como Marketing de Contenidos para contenidos/UGC.
+Julio ratificó el 17-10-2026 que los brochures están aprobados y no necesitan nada más. Usarlos completos,
+sin revalidar láminas ni crear copias recortadas; [regla vigente](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+Verificar versión/ID del documento existente en HubSpot y el enlace correspondiente, además del nombre. Leer cuerpo y calendario finales de la inscripción, porque pueden
 diferir de la plantilla y de la ventana general. Una firma HTML configurada no prueba render en un preview
 blob vacío ni entrega futura. [Aplicación web del 16/10 y límites](../../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
 

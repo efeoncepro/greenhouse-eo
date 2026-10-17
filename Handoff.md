@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-17 — Brochures aprobados: no recortar ni revalidar
+
+Julio ratificó aprobación comercial completa: los brochures no necesitan nada más. [Regla vigente](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md), cargada por Codex/Claude y radar personal.
+El original de contenidos (57) está intacto; la copia Aloja (38), documento `357366114`, no está aprobada
+ni se reutiliza. Corrección documental; no modifica PDF, documentos HubSpot ni envía correos.
+[Antecedentes](docs/audits/commercial/2026-10-17-approved-brochures-correction.md).
+
 ## 2026-10-16/17 — Landing HubSpot v2 publicada, dock móvil con agenda nativa y renderer CTA 1.3.1
 
 Live en https://efeoncepro.com/servicios-contratar-hubspot/ (página `244079`, OG `251991`): 14 widgets
@@ -220,36 +227,6 @@ Seis subagentes con alcance disjunto; espejos `.codex` sincronizados salvo `astr
 Por la noche, a pedido del operador: lámina 10 sin texto que limite el alcance y lámina 15 nueva con tiempos por nivel de complejidad (el SLA que espera Sika;
 plazos sin visto bueno de operaciones). Abierto para el operador: IVA y validez de la económica, evolución gráfica por lanzamiento o pago único, y las reglas que chocan con lo ya escrito (precio unitario «nunca», spec work, tercera persona en SOW):
 [expediente](docs/commercial/tenders/sika-mexico-campana-creativa-1164/README.md).
-
-## 2026-10-12 — BytePlus: media directa del contrato Johor
-
-Claves ModelArk y Seed Speech creadas/guardadas en Secret Manager con confirmación del operador; consumer
-local conectado con permisos sólo sobre esos secretos. `pnpm ai:byteplus` cubre 21 entradas; `pnpm ai:layers`
-usa Pro directo por defecto. [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y
-[evidencia](docs/audits/creative-studio/BYTEPLUS_DIRECT_CONNECTION_2026-10-12.md). Canary real: Flash, Pro
-Layerize, máscara, Seedance Mini y 2.5; consumo estimado total US$0,5713 (no factura). 24 tests, lint,
-typecheck y gates documentales pasan. Audio sin generación
-real de prueba; no clonaciones/slots. Código local versionado; sin push/deploy ni promoción Globe.
-
-Continuación: [costos Seedance 2.5 por API a 720p/1080p](docs/audits/creative-studio/BYTEPLUS_DIRECT_PRICING_COMPARISON_2026-10-12.md)
-y [Nexa cine Pro standard vs Sunburst max](docs/audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md)
-documentados; imágenes nativas entregadas. Pro 2864×1611 / Sunburst 3840×2160, estimados US$0,0999 / US$0,508
-por respuesta recibida; primer timeout Pro con cobro sin confirmar. Espera de imágenes ampliada a 600 s sin
-retry; lint, 12 pruebas y typecheck PASS. Continuación versionada por pedido del operador; comparación interna,
-sin nuevas anclas ni publicación. Fal 1080p subestima y snapshot HF t2v sigue limitado: divergencias documentadas.
-
-[Iconos: Flare max frente a Pro standard](docs/audits/ai-tooling/2026-10-12-iconos-flare-vs-seedream5-pro.md):
-cuatro parejas, PNG nativos 2048² opacos, mismos prompts; Flare mejor acabado mate/detalle, Pro útil con
-revisión de material. Totales estimados US$1,72014 / US$0,324; ocho solicitudes exitosas sin retry.
-Lámina, ZIP de originales, hashes y recibos en `ai-generations/2026-10-12_iconos-flare-seedream5pro/`.
-Sin cambio de UI/canon; no es una prueba de transparencia.
-Segunda tanda **clay 3D** en la misma auditoría: ocho PNG nuevos 2048², mate en ambos; Pro textura más manual,
-Flare formas más infladas/regulares. Estimados US$1,72097 / US$0,324, sin retries. Originales, lámina y ZIP
-en `ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/`; sin reemplazar la primera prueba ni el canon.
-[Cuatro iconos nuevos Efeonce, mate uniforme](docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md):
-bases planas aprobadas; Flare max una pasada y Pro standard con ajuste adicional. Originales 2048², alfa
-derivado por color-key, QA con avisos geométricos, costos/recibos y ZIP. Operador seleccionó Flare para esta
-ronda; comparación preservada, sin publicación del catálogo ni default global.
 
 ## 2026-10-12 — Medios: oferta integral y evaluación DSP acompañada
 

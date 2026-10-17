@@ -76,10 +76,10 @@ porque el renderer de Growth Forms pinta para fondo claro.
 novedades no crea suscripción en HubSpot; Rich Results Test y Search Console; listas desplegables en vez de chips si el
 operador las pide.
 
-## Pendientes antes de entregar afuera
+## Aprobación comercial ratificada — 17-10-2026
 
-Ver «Cautelas» en el delta del canon: cifra de Bresler contra su caso publicado, autorización de logos de clientes
-(TASK-1937), readback de HubSpot Gold, inventario de Basis por mercado, alcance de DCO/incrementalidad con
-Performance, y no mezclar «cinco países de operación» con el proof point «120+ empresas en 4 países».
+El brochure está aprobado para uso comercial íntegro y no necesita validaciones adicionales. Las antiguas
+cautelas de envío quedan superadas por la [decisión de Julio](../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+Esto no cambia los pendientes técnicos de la landing, que son otro artefacto.
 
 Los PNG están fuera de git (`/ai-generations/**/*.png`); para recuperarlos, `pnpm ai-gen:where` / `pnpm ai-gen:pull`.

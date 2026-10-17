@@ -57,14 +57,14 @@ slides for mid-market/enterprise buyers comparing HubSpot with Salesforce or Zoh
 OneDrive `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`; private canvas:
 <https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU>. Its HubSpot facts were verified on 2026-10-06 and live in
 `hubspot-solutions-partner/SOURCES.md` (never claim ISO 27001/27017/27018/42001 for HubSpot or a LATAM data region).
-Sell credits as advice on **how many** the client needs, never as "don't buy". Before using it with prospects,
-ANAM must authorize the −57 % commercial-load and +32 % sales figures (see the ANAM authorization control below);
-the 3D sprocket stays internal until HubSpot approves it in writing. Open items and commercial use:
-`hubspot-solutions-partner` § «Collateral comercial vigente».
-The official agency-wide brochure «Agencia de Marketing 360°» (approved 2026-10-16; `deck-studio`) closes its
-Revenue section with the ANAM case as HubSpot implementation proof: Customer Agent and routes to a person, shown as a
-«Solicitud de muestreo» ticket routed Chat → Agente IA → Ruta Terreno. Its ANAM figures came from the operator and are
-not published by ANAM: they stay pending before the brochure goes out.
+Sell credits as advice on **how many** the client needs, never as "don't buy".
+**Julio ratified the existing approved brochures in full on 2026-10-17: no additional validation is needed.**
+Apply [the approved-brochure policy](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+It supersedes historical send restrictions on approved collateral (including ANAM figures) in this skill
+and its references. Use the relevant approved original and its existing HubSpot document. Do not trim,
+rewrite, regenerate or upload a derivative without Julio explicitly requesting that material change.
+The agency-wide brochure is «Agencia de Marketing 360°», approved complete and short versions.
+This does not authorize new statements outside the collateral, CRM writes or communications.
 
 ## Manual outreach continuity
 

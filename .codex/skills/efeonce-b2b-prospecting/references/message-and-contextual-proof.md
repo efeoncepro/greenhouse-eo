@@ -49,10 +49,11 @@ aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura
    seguimiento. Proponer una entrada puntual y posible continuidad según la demanda, sin inventar
    capacidad, presupuesto, plazos ni compromisos.
 6. **Brochure contextualizado:** explicar qué encontrará y por qué sirve para evaluar a Efeonce;
-   compartir la versión pertinente sólo tras comprobar contenido, evidencia y permiso de uso.
-   Para presentar la agencia completa, el oficial es «Agencia de Marketing 360°» (aprobado 2026-10-16):
-   completo de 84 láminas o corto de 26, en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de
-   Marketing 360/`. Antes de enviarlo afuera siguen pendientes las cifras de ANAM y el «12 meses» de Berel.
+   compartir íntegra la versión aprobada pertinente, mediante su documento existente de HubSpot.
+   Los brochures están aprobados y no necesitan validaciones adicionales ni recortes (Julio, 17-10-2026).
+   Para presentar la agencia completa: «Agencia de Marketing 360°», completo de 84 láminas o corto de 26,
+   en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Para contenidos, usar
+   el brochure específico de Marketing de Contenidos. [Regla vigente](../../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 7. **Invitación natural:** pregunta útil sobre prioridades o criterios; enlace de reunión verificado
    y respuesta por correo como alternativas de la misma conversación.
 8. **Cierre e identidad:** despedida cordial, firma oficial y CCO según la
@@ -99,15 +100,15 @@ una muestra acotada; tras discovery suficiente, evaluación/demo/business case s
 Cada prueba extensa requiere pregunta, owner, costo/horas límite, deadline y evidencia de capacidad.
 La demostración no equivale a diagnóstico completo ni entregable contratado; evitar preventa ilimitada.
 
-Verificar claims, permiso de uso, mercado y estado del artefacto. Brochure aprobado no certifica cifras,
-logos o resultados pendientes. Simulación, meta, piloto y resultado observado van separados con sus fechas.
-No prometer incremento de venta en Channel & Commerce ni disponibilidad por naturaleza comercial del producto.
-La práctica elige material y valida su evidencia; Commercial compone el caso y Pricing decide economics.
-Contrastar el PDF concreto con su LEEME/canon antes de adjuntar o insertarlo: aprobado no significa que
-cada lámina pueda presentarse como resultado. Si dentro del alcance autorizado se usa una copia sin
-láminas pendientes, preservar el original, motivo/páginas/checksum y verificar el resto; no reescribir
-casos ni declarar corregida la edición maestra. Para secuencias, conservar la misma versión identificada
-en Documentos; el procedimiento está en [seguimientos HubSpot](hubspot-follow-up-sequences.md).
+Para una prueba nueva, verificar hechos, permiso de uso, mercado y estado del artefacto; distinguir
+simulación, meta, piloto y resultado observado. Para los brochures ya aprobados, manda la
+[ratificación de Julio](../../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md):
+no reabrir las antiguas cautelas del LEEME ni volver a pedir validación de cifras, casos o logos.
+El mandato de redactar o enviar no autoriza editar, recortar ni subir una copia derivada del brochure.
+Contextualizar el material en el correo y usar el documento original aprobado; la copia Aloja de 38 láminas
+no se reutiliza. Las afirmaciones nuevas del correo requieren sustento y no se inventan resultados.
+Para secuencias, conservar la versión aprobada identificada en Documentos; aplicar
+[seguimientos HubSpot](hubspot-follow-up-sequences.md).
 
 Canon: [venta con demostración contextual](../../../../docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md).
 Para preguntas/criterios y material por oferta o función, cargar [discovery y proof](discovery-and-proof.md).

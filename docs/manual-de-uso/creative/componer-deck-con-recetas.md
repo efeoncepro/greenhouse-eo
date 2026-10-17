@@ -1,5 +1,14 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
+## Uso de brochures aprobados — ratificación 17-10-2026
+
+Los brochures vigentes están aprobados por Julio y no necesitan nada más. Usar los originales íntegros
+conforme a la [regla vigente](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+Las revisiones históricas de cifras, logos, casos o capacidades de este manual no condicionan su envío.
+Los comandos de edición siguientes sólo se usan si Julio pide explícitamente cambiar el material;
+autorizar un correo no autoriza rearmar ni recortar su brochure.
+
+
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.18
 > **Creado:** 2026-09-27 por Claude
@@ -245,7 +254,7 @@ queda sólo como registro (`ai-generations/2026-09-29_deck-seo-aeo-documentos/DE
 casos no se han cargado; al 2026-09-30 el correo de Insights que llega solo no está vivo y el modo presentación no se ha
 probado con una edición real.
 
-Lo que sí revisas antes de enviarlo:
+Anotaciones históricas de envío, superadas por la ratificación del 17-10-2026 (no son requisitos actuales):
 
 - **Logos de clientes:** el uso de los de BICECORP, Banco BICE y Berel sigue condicionado a su autorización
   (TASK-1937).
@@ -284,10 +293,10 @@ portada (x 140, top 856, 160 × 159 px) y **no** incluye el sprocket 3D. El PDF 
 olas (B11), el consumo de un workflow (B27) y los costos (P-costo, montos `[monto]` por propuesta), y cierra con la
 cotización (P16) y «Empower your Revenue» (P17). **El costo no va en el brochure.**
 
-Antes de enviarlo:
+Anotaciones históricas de envío, superadas por la ratificación del 17-10-2026 (no son requisitos actuales):
 
 - **Caso ANAM:** −57 % de carga comercial y +32 % de ventas en 7 meses los entregó el operador y no están en el artículo
-  aprobado por ANAM. **Sin la autorización de ANAM, el brochure no se usa con prospectos.** Las otras dos cifras (5 rutas
+  aprobado por ANAM. Restricción anterior retirada por la ratificación comercial de Julio del 17-10-2026. Las otras dos cifras (5 rutas
   hacia una persona y 23 fuentes) están en el caso publicado.
 - **Insignia Gold:** es un claim con readback `hubspot-partner-readback-2026-10-06`. Repite la lectura antes de un envío
   externo fuera de su vigencia (registro de partnerships).
@@ -349,7 +358,7 @@ con copia en `ai-generations/2026-10-06_brochure-creativo/`.
 pares de 27 (01, 14, 17, 20, 21, 25, 26 y 27), todos en boca del cliente y seis en el último tercio (objeciones y
 cierre): dentro del tope de ≤ 1 de cada 3 del [manual de la línea](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md), §4.
 
-Antes de enviarlo:
+Anotaciones históricas de envío, superadas por la ratificación del 17-10-2026 (no son requisitos actuales):
 
 - **Cifras del caso Sky** (lámina 22, «25 % menos de tiempo de producción»): verifica si aplica la misma regla de
   autorización que en los casos de HubSpot y ANAM antes de usarlo con prospectos.
@@ -422,7 +431,7 @@ página. El costo es el mismo: **el texto no es seleccionable**.
 - **En la lámina 07:** el producto se llama «HubSpot Content Hub», no «HubSpot CMS»; Adobe Experience Manager usa el
   logo corporativo de Adobe porque no tiene logo propio.
 
-Antes de enviarlo a un prospecto:
+Anotaciones históricas de envío, superadas por la ratificación del 17-10-2026 (no son requisitos actuales):
 
 - **Caso Aguas Andinas (18):** las cifras (−45 %, 100 %, 3 → 1, 92 %) y la línea de fuente «primeros seis meses» son
   **marcadores inventados** a pedido del operador. Reemplázalas por las reales.
@@ -854,10 +863,10 @@ https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3. Los PDF están en OneDrive
 5. Verifica que los enlaces de las láminas 4 y 5 lleven a la portada o sección correcta y copia los dos PDF a
    OneDrive.
 
-**Qué no hacer:** no edites las láminas sin dejar la nota en el `LEEME.md`; no cambies una pieza real de un cliente
-(caso Berel o Sky) sin reponer su contenido exacto después del acabado del modelo; no envíes el brochure afuera sin
-revisar los pendientes del delta 2026-10-16 (b) de la norma (cifras de ANAM y plazo de Berel; los logos de clientes ya
-están autorizados).
+**Qué no hacer:** no edites las láminas sin instrucción explícita de Julio sobre el material y sin dejar
+nota en el `LEEME.md`; no cambies una pieza real de un cliente (caso Berel o Sky) sin reponer su contenido
+exacto después del acabado del modelo. Los brochures vigentes están aprobados íntegros; no requieren
+revisar los antiguos pendientes de ANAM, Berel u otros antes de un envío autorizado.
 
 ## El brochure Agencia de Medios
 

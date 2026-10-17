@@ -9,8 +9,8 @@ aprobado» y luego «Esto quedó aprobado, canonizalo»).
   Studio» (cinco vistas construidas).
 - **PDF (16:9, 57 páginas, rasterizado):** `Efeonce-Brochure-Marketing-de-Contenidos.pdf` en esta carpeta; copia en OneDrive
   `Alineación/4. Comercial/Brochures/2026/Marketing de Contenidos/` (pedida por el operador el 2026-10-10), junto con
-  la ruta corta (`…-Ruta-corta.pdf`, 21 páginas), que se regenera con el mismo comando y no entra a git. El deck no
-  se manda a un prospecto hasta cerrar los pendientes de abajo.
+  la ruta corta (`…-Ruta-corta.pdf`, 21 páginas), que se regenera con el mismo comando y no entra a git. El deck
+  está aprobado para uso comercial íntegro; no necesita validaciones adicionales.
 - **Fuente:** `project/*.dc.html` + `project/canvas.json` (copia exacta de lo publicado en el canvas, versión 65).
   `order.json` = orden de la página «Deck»; `order-ruta.json` = orden de la ruta corta (archivos `R-NN-*.dc.html`,
   copias de las láminas originales). `blobs/` = los assets del canvas (`/_blob/<id>`); los PNG/JPG no entran a git.
@@ -56,24 +56,12 @@ En `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` (§4.6
 - Patrón «franjas de foto», variantes de seis y de tres franjas («Seis frentes», «Momentos», «Programas») (`b6f6f4cec`).
 - Lámina de equipo «Expertos multidisciplinarios» con «+85» (`ddcdb79d4`).
 
-## Pendientes antes de mandarlo a un prospecto
+## Aprobación comercial ratificada — 17-10-2026
 
-- **Compromisos de servicio redactados por la sesión que armó el deck**, aprobados en conjunto y no uno por uno:
-  comunidad en canales cerrados (11), series (8), «lo orgánico prueba, la pauta escala» (23), social conectado al
-  CRM (49), resultados visibles en Marketing Studio (42), los cuatro compromisos de «Producción con IA» (10: «nunca
-  inventados», «derechos y uso comercial revisados»), Thought Leader Ads en LinkedIn (24) y las promesas de los
-  agentes de IA en social care (20–21). Contrastarlos con lo que Efeonce opera y garantiza hoy.
-- **«+85 expertos más en Latam» (45):** cifra del operador, sin fuente en el repo; la lámina no dice qué cuenta ni a
-  qué fecha.
-- **Marca y datos de muestra:** las interfaces y los anuncios usan la marca ficticia Mareas Café, con personas y
-  cifras inventadas. Casi todas llevan rótulo; en «Día a día» (40) las cifras del panel no lo llevan.
-- **Logos de terceros:** Metricool, Sprout Social y Favikon en «Stack» (39) y «Día a día» (40): falta verificar que
-  Efeonce los opere y la autorización de uso (TASK-1937). Logos de clientes sólo con autorización.
-- **Caso Sky (5):** el avión es un montaje del PNG oficial de Sky sobre un cielo generado; revisar restricciones de
-  marca de Sky. Las cifras vienen del caso publicado (12 meses de entrega).
-- **Voz:** «¿Cómo trabajamos contigo? Así» (40) no pasa la regla de voz del 2026-10-06; «Sí, pero lo hacemos bien»
-  (10) tiene cinco palabras. Aprobadas así por el operador.
-- **Detalles de foto:** Nexa aparece con anillos en dos tomas (6 y 31); en las franjas, revisar al 100 % las caras
-  de extras cortadas por el recorte.
-- **Sellos de partner (49):** HubSpot y Salesforce van como PNG rasterizado del SVG oficial, porque el canvas
-  pintaba el SVG en negro.
+Julio confirmó que los brochures están aprobados y no necesitan nada más. Este brochure completo de
+57 láminas y su ruta corta oficial se usan tal como fueron aprobados. No hay pendientes adicionales de
+contenido para enviarlos dentro de un mandato autorizado. Las anotaciones anteriores se retiraron como
+restricciones activas y se conservan sólo como [antecedente superado](../../../docs/audits/commercial/2026-10-17-approved-brochures-correction.md).
+
+Aplicar la [regla de brochures aprobados](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+La copia de 38 láminas creada para Aloja no está aprobada y no se debe reutilizar.

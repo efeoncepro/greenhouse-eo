@@ -69,9 +69,8 @@ Valen para el brochure, la landing, decks, propuestas y cualquier pieza nueva de
   no se publica por ahora.
 - **Cobertura.** «+120 empresas en 4 países» es el proof point de clientes; la operación cubre cinco países (Chile,
   Colombia, Perú, México y Estados Unidos). No fundir las dos cifras.
-- **Antes de enviar el brochure afuera** siguen abiertas: la cifra de Bresler contra su caso, la autorización de logos
-  de clientes ([TASK-1937](../../tasks/to-do/TASK-1937-third-party-brand-usage-authorization-library.md)), el readback de HubSpot Gold, el inventario de Basis por mercado y el alcance de DCO e
-  incrementalidad con Performance.
+- **Brochure íntegro aprobado:** Julio ratificó el 17-10-2026 que no necesita validaciones adicionales.
+  Usar el documento existente en HubSpot sin recortes; [regla vigente](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 
 ## Resultado que se vende
 

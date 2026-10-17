@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-17 — Brochures aprobados, sin recortes ni validaciones adicionales
+
+- Ratificación expresa de Julio: [uso comercial íntegro](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+- LEEME, canon, manual y skills Codex/Claude/radar dejan de imponer pendientes históricos. Una autorización
+  de envío no autoriza modificar el material; la copia Aloja de 38 láminas no se reutiliza.
+
 ## 2026-10-16 — Landing HubSpot v2 por los 4 resultados, con dock móvil y agenda nativa
 
 - Landing pública [`/servicios-contratar-hubspot/`](https://efeoncepro.com/servicios-contratar-hubspot/) (página
@@ -552,11 +558,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - EPIC-045 sincronizado a `in-progress`; 24 hijas (7 complete, 6 en curso, 11 to-do). Contratos TASK-1957/1962 desplegados, modelo vigente 1.4 y ocho flags Production exactos ON. Índices, arquitectura y skill espejo actualizados; historial conservado.
 - [Auditoría](docs/audits/insights/2026-10-04-epic-045-closure-review.md): 116 pruebas PASS; sin planes post-release en la lectura acotada. TASK-1962 candidata a cierre tras verificación productiva; las seis hijas en curso conservan sus pendientes. Sin cierres de tasks, cambios runtime ni envíos.
-
-## 2026-10-03 — Efeonce Insights: figuras nuevas en producción y cierre de TASK-1974
-
-- Release `36a73e7b7e19`: el planificador elige la figura por la pregunta; PDF y deck tienen página de cifras, cascada,
-  waffle, dona y barras apiladas; tarjeta con isotipo del canal; Think `0c5701a`; AXIS `v0.3.42`.
-- Verificación con GA4 real de Berel: apiladas y dona correctas. Dos correcciones: una parte que redondea a 0 % se lee
-  «<1 %» y la cifra queda unida a «%»/«pp» con espacio duro en los slots del PDF y el deck. El blanco del disco de canal
-  pasa al rol `channelDisc`. TASK-1974 complete; TASK-1975 espera la revisión del operador.

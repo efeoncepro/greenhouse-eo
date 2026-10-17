@@ -164,6 +164,15 @@ sin nuevo runtime, scheduler, schema, inscripción ni autorización de lotes adi
 [mandato de ejecución](GREENHOUSE_COMMERCIAL_FOLLOWUP_AGENT_DECISION_V1.md#mandato-separado-y-acotado--2026-10-13)
 y la [evidencia del caso](../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md) conservan su alcance separado.
 
+### Delta aceptado 2026-10-17 — respeto de brochures aprobados
+
+Julio ratificó expresamente que los brochures están aprobados y no necesitan nada más, tras un recorte
+no solicitado del brochure de Marketing de Contenidos. Rige la [decisión de uso íntegro](../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md):
+la aprobación comercial prevalece sobre cautelas históricas del agente. No recortar ni crear variantes sin
+instrucción de cambio de material; usar los documentos existentes de HubSpot. Se retiran las reglas de
+skills/manuales que reabrían validaciones y permitían inferir autorización de recorte desde un envío.
+Sin nuevo runtime, permisos de CRM, contactos, envíos o scheduler. [Antecedentes](../audits/commercial/2026-10-17-approved-brochures-correction.md).
+
 ## Alternatives Considered
 
 - **Ampliar sólo la skill personal:** no comparte método ni corrige routing/deriva entre agentes.

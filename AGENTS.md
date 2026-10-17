@@ -20,6 +20,7 @@ invariantes y skills versionadas.
 2. Leer la task/issue/epic/spec aplicable y la arquitectura dueña del dominio.
 3. Si hay impacto de producto, copy, naming, GTM, onboarding, cliente, HubSpot o métricas, cargar
    [`docs/context/00_INDEX.md`](docs/context/00_INDEX.md) y los archivos pertinentes.
+   Brochures comerciales aprobados: [uso íntegro, sin revalidar ni recortar](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md), ratificado por Julio el 17-10-2026.
 4. Revisar `git status --short`; no asumir árbol limpio ni sobrescribir cambios ajenos.
 5. Cargar las skills e invariantes indicadas por el [router de dominios](#router-de-dominios).
 

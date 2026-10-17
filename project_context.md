@@ -23,7 +23,7 @@ CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Manual de prospección y secuencias](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
+[Prospección, secuencias y brochures aprobados](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
 [CRM](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
 Outlook de Julio: [envíos](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 

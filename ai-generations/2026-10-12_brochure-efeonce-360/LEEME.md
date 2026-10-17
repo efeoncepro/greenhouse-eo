@@ -1,5 +1,7 @@
 # Brochure «Agencia de Marketing 360°» · 2026-10-12 (v9, 2026-10-15)
 
+**Regla vigente, 17-10-2026:** ambos brochures oficiales están aprobados para uso comercial íntegro, sin nuevas validaciones ni recortes. [Decisión de Julio](../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md). La bitácora histórica siguiente no reabre pendientes de envío.
+
 Canvas Design: https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3 (versión 35). PDF vigente: `Efeonce-Brochure-Agencia-de-Marketing-360-v9.pdf`
 (copia en OneDrive `4. Comercial/Brochures/2026/Agencia de Marketing 360/`). Láminas: `laminas-v9/` (26, numeradas en el orden del recorrido).
 Intents: `intents/` (primera pasada) e `intents/r2/` (pares reescritos con la regla del 2026-10-06 y revisados con la sesión del brochure HubSpot).
@@ -54,28 +56,11 @@ color de fondo y escribiendo el titular con la tipografía de la línea (Bricola
 | 25 | S32 | 25 · Empecemos. |
 | 26 | S33 | 26 · ¿Conversamos? Cuando quieras. |
 
-## Pendientes antes de enviarlo
+## Notas de producción históricas — sin bloqueo de envío
 
-- TASK-2012: en la v9 ya no hay láminas con escenario magenta en el recorrido. Cuando salga la voz `decision`, los 11 titulares se recomponen en el compositor en vez de sobre el visual.
-- Zoho en «El que encaje»: confirmar si va en un brochure de grupo (recomendación de la sesión HubSpot: sacarlo).
-- «Partner oficial de» (29): readback de insignia pendiente para Adobe, AWS, Microsoft y Salesforce en EFEONCE_PARTNERSHIP_REGISTRY_V1.
-- Cifras sin fuente en la lámina: «+90 empresas» (21). «+85 expertos» ya no aparece (la v9 lo tapa con el titular de equipo). Cifras de Sky (caso, clientes y «Talento adentro» no): autorización de Sky para prospectos sin confirmar.
-- Acentos dentro de un tramo: 03 y 04 (teal, acto 1 en growth); 22 y 23 recompuestas a mano en teal de Growth y fondo #001a33 (v8, regla registrada por la sesión de la línea gráfica el 2026-10-15: lo que viene de otra línea se recompone en el acento del tramo); 10 «Cuatro piezas» conserva el azul de Engine y pasa a fondo #001a33. Fuente: `render-src/native/` del deck SEO; las copias recoloreadas viven en `native-growth/` (ver su LEEME) y se hornean con `shot.cjs`.
-- «Ya no» y «Ordenado» nombran a HubSpot en la bajada: válidas sólo dentro del tramo Revenue (están ahí).
-- Karo aparece en la portada Brand (CR4) y en «Talento adentro» (SA1): dos tomas con la misma persona; el peer creativo pide máximo una de sus tres láminas con Karo (se tomó sólo A19).
-- Portadas Voice (15) y Brand (11): plates aprobados antes de la regla «el acento es puntuación, no luz»; no se regeneraron.
-- Logos de clientes y partners sólo con autorización archivada (TASK-1937). Sprocket 3D de HubSpot: aprobado (canon 2026-10-14).
-- Caso Sky (31): desde el 2026-10-15 es la lámina del deck de contenidos con el avión de Sky (`2026-10-09_deck-contenidos/out/C12-caso-sky/`, decision-case, línea growth, aprobada el 2026-10-10). Su LEEME advierte: el avión es un montaje del PNG oficial de Sky sobre un cielo generado; revisar restricciones de uso de la librea antes de enviarlo a prospectos.
-- Caso Sky (31): aprobada por el operador el 2026-10-15 como la lámina CANÓNICA del caso Sky para todos los decks («Esa es la canónica para los deck»); las versiones del ala por la ventana (SK1) y de la mesa de luz quedan como historia. Registro en la norma a cargo de la sesión de la línea gráfica.
-- 2026-10-15 (tarde): «A tu competencia» y «En ingresos» salen del acto 1 y entran al tramo Engine después de «No estás», recompuestas en línea engine con sus recetas (`decision-ai-answer`, `decision-traffic-to-revenue`); el operador objetó que entraban sin preámbulo.
-- 2026-10-15 (tarde): «¿Otra agencia más? Un sistema.» → «¿Cuántas agencias necesito? Una sola.» y «Un sistema 360°» → «Una agencia 360°» (el operador: «Efeonce un sistema????»); intent `intents/r2/n01-diferencia.json`.
-- **Titulares de la v9: workaround TEMPORAL.** Los 9 titulares se armaron sobre el visual compuesto con un panel del color de fondo (`native-growth/titulares-v9.mjs`). Condición de retiro: cuando las recetas acepten la voz `decision` (TASK-2012, etapa 2), esas láminas se recomponen desde el compositor y el panel desaparece. El generador usa rutas absolutas de esta máquina (`/Users/jreye/...`, sharp y `file://`) y bases del scratchpad de la sesión: no es reproducible en otra máquina. Tipografía igualada a la plantilla del compositor (eyebrow 16 px #e2e2e2, respuesta Bricolage 760 con tracking −0,045 em). Las dos láminas con foto (Voice «Directo a quien importa» y Revenue «Ya no») NO llevan panel: se leía como banda sobre la foto (regla: nunca un scrim sobre foto a sangre), así que quedan con su par original.
-- Voice (11): recompuesta el 2026-10-15 en línea voice (acento #f83902) con eyebrow «03 · Voice · Paid social»; intent `intents/r2/s15-paid-social-voice.json`.
-- **Densidad de pares: decisión del operador.** 13 de 26 (uno de cada dos); la regla del 2026-10-06 pone el tope en uno de cada tres (8 o 9 en 26). Opciones: aprobarla como excepción del 360, recortar los pares más débiles o esperar a TASK-2012.
-- **Franja azul corregida (2026-10-15, «Todas tienen una franja azul a la izquierda… se ve mal»).** El panel plano no calzaba con el degradado del fondo. Ahora el panel ES el fondo exacto de la lámina: la capa de escenario de cada receta (`stage.svg`, volcada con `native-growth/stage-layers.ts.txt` desde `planSurfacePiece`) sobre `#001a33`, verificada contra la lámina original con 1 a 3 niveles de diferencia; la de equipo usa el mismo halo CSS de su HTML; la de Insights se editó directo en su HTML nativo. Sin franja visible.
-- Lámina 04 (2026-10-16, «Dale muchísimo más impacto visual»): la lista se reemplazó por la órbita de La órbita con las cinco líneas como esferas alrededor de «Tu cliente» (hecha a mano, `native-growth/orbita-cinco-lineas-v04.mjs`, acento teal de Growth).
-- Lámina 04 con el acento de cada línea en su esfera y su etiqueta (2026-10-16, a pregunta del operador): Engine #0375db, Brand #ff6500, Voice #f83902, Revenue #e86bd0 (el de HubSpot, igual que su portada de tramo) y Growth #36c8bf; la órbita sigue en el teal de Growth. Es la segunda lámina con cinco acentos, después de la portada: excepción a «un acento por lámina» que el operador debe confirmar.
-- Portadas de tramo (2026-10-16, a pedido del operador): el rótulo «0N · momento · línea» va dentro de una ficha delineada de 2 px en el acento de su línea, sin relleno (`native-growth/chip-tramos.mjs`, dibujada sobre la portada compuesta). Sólo en las cinco aperturas de tramo; los rótulos de las láminas interiores siguen como texto. Al recomponer las portadas desde el compositor, la ficha debe pasar a la receta o volver a dibujarse.
+Las anotaciones de esta sección fueron sustituidas por la aprobación comercial ratificada el 17-10-2026.
+El completo de 84 láminas y el corto de 26 están aprobados y no necesitan nada más. Las notas previas se
+conservan como [antecedente superado](../../docs/audits/commercial/2026-10-17-approved-brochures-correction.md).
 
 ## 2026-10-16 · Brand con tres láminas de Agencia Creativa
 
@@ -239,7 +224,7 @@ El operador: «canonicemos todo, este es el brochure oficial de la agencia 360°
   `docs/documentation/creative/composicion-de-decks-y-brochures.md`, procedimiento en
   `docs/manual-de-uso/creative/componer-deck-con-recetas.md` y puntero en `docs/services/README.md`.
 - **Los PDF oficiales** son los de OneDrive. Los de esta carpeta son su copia de trabajo.
-- 2026-10-16 · Logos de clientes autorizados por el operador para este brochure («Podemos usar los logos de clientes sí»), incluidas las piezas de Sky y Berel de sus casos. Pendientes para enviarlo afuera: cifras de ANAM y plazo de Berel.
+- 2026-10-16 · Logos de clientes autorizados por el operador para este brochure («Podemos usar los logos de clientes sí»), incluidas las piezas de Sky y Berel de sus casos. Aprobación comercial íntegra ratificada el 17-10-2026, sin pendientes adicionales.
 
 ## 2026-10-16 · Caso ANAM con minivan y HubSpot
 

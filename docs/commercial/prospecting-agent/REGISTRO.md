@@ -1,5 +1,7 @@
 # Registro de búsquedas comerciales
 
+**Corrección de Julio, 17-10-2026:** los brochures están aprobados y no necesitan nada más. [Regla vigente](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md) · [antecedentes](../../audits/commercial/2026-10-17-approved-brochures-correction.md). No recortar ni volver a validar; copia Aloja de 38 láminas no aprobada. Corrección documental sin nuevas acciones CRM/envío.
+
 [Contrato operativo](README.md). Fechas y horas en America/Santiago. Conteos de empresas únicas;
 hallazgo nuevo no equivale a publicación reciente ni a convocatoria abierta.
 

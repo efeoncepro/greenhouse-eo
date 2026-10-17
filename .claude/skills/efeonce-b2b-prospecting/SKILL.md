@@ -5,6 +5,13 @@ description: Investiga cuentas B2B para Efeonce, identifica compradores y contac
 
 # Prospección B2B Efeonce
 
+## Brochures ya aprobados
+
+Aplicar la [decisión de Julio del 17-10-2026](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md):
+los brochures aprobados están listos para uso comercial íntegro y no necesitan validaciones adicionales.
+Usar el específico de la necesidad y su documento existente en HubSpot; no recortar, regenerar, subir
+una variante ni reabrir pendientes históricos sin una instrucción explícita de cambio de material.
+
 ## Nombres de negocios y leads Efeonce
 
 Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
