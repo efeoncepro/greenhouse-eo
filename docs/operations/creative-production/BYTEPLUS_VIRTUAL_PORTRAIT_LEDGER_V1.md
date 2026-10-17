@@ -97,7 +97,7 @@ la repetición posterior está registrada en §7.
 **Plan y firma:** Entry gratuito, sin compra ni cambio de plan. La carta de compromiso **ya estaba firmada** antes de
 estas cargas: BytePlus la pidió con un código enviado al correo de Julio (2026-10-17 07:53 UTC, «Sign the Commitment
 Letter for Uploading Virtual Avatar Assets», junto con el KYC Questionnaire), al activar el plan. Por eso no volvió a
-aparecer al crear los grupos. Quién ingresó el código: pendiente de confirmar por Julio.
+aparecer al crear los grupos. Julio entregó el código y Codex lo ingresó con su autorización (confirmado por Julio, 2026-10-17).
 
 **Evidencia de cierre:** `ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/elenco-grupos-final.jpg`
 (seis grupos y nombres) y `elenco-cupo-final.jpg` en la misma carpeta (12/50 assets, 6/50 grupos y plan gratuito).
