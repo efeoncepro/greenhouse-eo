@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-10-17
+
+- Medida la legada `/agencia-diseno-estrategico/` (página `247526`): 0 clics y 16 impresiones en GSC
+  (2026-08-03 → 2026-10-14), 0 backlinks y sin keywords en Semrush. Plan propuesto, sin ejecutar: 301 inmediato a
+  `/agencia-creativa/`, y al publicar Branding Studio se **edita ese mismo redirect** hacia su slug, sin cadena.
+  Ver [plan de retiro](../../public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md).
+
 ## Delta 2026-09-11
 
 - TASK-1799 (Content Marketing) y TASK-1358 (Home) se cerraron el 2026-09-11 por decisión del operador: sus
