@@ -203,8 +203,12 @@ o corregido se revisa contra ella **antes** de mostrarlo.
   pasada del modelo se aprobó para las 8 pantallas.
 - **El arte que va en pantalla es la versión fotográfica de la campaña**, no el KV plano (se rechazó en el teléfono).
 - **Interfaces de terceros (Instagram)**: la UI se arma en HTML con texto exacto (usuario, «Publicidad», copy, me gusta,
-  barra de navegación) y se compone determinísticamente en el teléfono, ajustada a su perspectiva y esquinas. Así el
-  texto queda exacto. Usuario, copy y cifras son ficticios.
+  barra de navegación) y se le pasa al modelo **como referencia de lo que muestra la pantalla**, para que la dibuje en
+  la perspectiva real del teléfono. Pegarla con cuatro esquinas medidas se ve montada: el teléfono está en perspectiva
+  y con bordes curvos, y un error de pocos píxeles la saca del marco (rechazado en el 15). Después se revisa cada texto
+  al 100 % y sólo lo que salió distinto (en la fuente, la hora y «Hace 1 minuto») se corrige con texto compuesto en
+  esa zona, con la inclinación del renglón vecino. Usuario, copy y cifras son ficticios y coherentes con el relato
+  (la hora de la escena, un post recién publicado).
 
 ## H. Edición, QA y registro
 
