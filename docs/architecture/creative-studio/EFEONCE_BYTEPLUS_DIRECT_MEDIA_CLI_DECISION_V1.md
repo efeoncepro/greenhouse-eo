@@ -73,7 +73,7 @@ se promueve una ruta Globe; o falta evidencia del transporte y de sus salidas re
 4:5, audio): 580×726, 39.887 tokens. Final `cgt-20261017090108-fzvku` desde ese borrador: 1288×1610, 196.432 tokens,
 misma toma cuadro a cuadro. El mismo día, un cuadro fotorrealista con una persona (GPT Image) fue rechazado al crear
 la tarea con `InputImageSensitiveContentDetected.PrivacyInformation`, sin tarea creada. Según la PDM de BytePlus,
-la restricción para personas se levanta con la verificación KYC de la cuenta; pendiente de completar y re-probar.
+la restricción para personas se levanta con la verificación KYC de la cuenta. KYC de organización enviado el 2026-10-16 (revisión de 1 a 2 días hábiles); falta Advanced Creation Rights, subir los personajes y re-probar.
 Corrida: `ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/byteplus-draft/`.
 
 OmniHuman 2.0 / Vision AI fue investigado el 2026-10-15 y sigue fuera de la implementación aceptada de
