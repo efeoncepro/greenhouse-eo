@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.12: estado y recuperación conciliados en docs/skills; Entry activo, cargas y pruebas pendientes por bloqueo local de Chrome)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.13: lote completo en cuenta correcta: 12 assets Active / 6 grupos; referencia y primer cuadro de Antonio exitosos)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -16,10 +16,11 @@ La biblioteca privada de assets de BytePlus es la vía para personajes propios. 
 (`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas históricas de §4.1, el KYC aprobado, el plan Entry y
 la carta de compromiso se hicieron por error en la cuenta **3003660328**, independiente de la de producción.
 Los intentos históricos combinaron esa biblioteca con la credencial de **3004839361** y devolvieron «Your account
-has not activated the Asset Service». La discrepancia de cuentas está confirmada; todavía no hay una prueba
-con assets de la cuenta correcta que valide la recuperación. **Los 12 assets de 3003660328 no sirven para la CLI.**
+has not activated the Asset Service». La discrepancia de cuentas quedó confirmada; las dos pruebas posteriores
+con assets de la cuenta correcta validaron la recuperación (§7). **Los 12 assets de 3003660328 no sirven para la CLI.**
 La recuperación se hace exclusivamente en 3004839361: KYC aprobado y Entry gratuito activo (§1),
-con carta aceptada por orden expresa posterior de Julio. Faltan las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
+con carta aceptada por orden expresa posterior de Julio. Los seis grupos ya tienen sus **12 assets Active** (§4);
+las dos pruebas de Antonio terminaron correctamente (§7). **No volver a entrar ni operar 3003660328**, incluida
 cualquier eliminación o transferencia de sus assets.
 
 ## 1. Estado del plan
@@ -47,7 +48,7 @@ producción: no se cambió ni creó ninguna credencial. Seedance 2.5 está **Act
 | Cupo de Entry activo | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
-| Cargas de retratos en esta cuenta | **Ninguna**; consola confirma **0/50 assets y 0/50 grupos usados** al activar Entry, 50 de cada uno disponibles. Intento posterior de carga de Antonio bloqueado por Chrome; sin grupo creado |
+| Cargas de retratos en esta cuenta | **Lote completo: 12/50 assets y 6/50 grupos usados**; quedan **38 assets y 44 grupos**. Los doce `Active` en respuestas `ListAssets`; UI `warehoused`. Referencia y primer cuadro de Antonio exitosos (§7) |
 | Facturación de producción | Tarjeta predeterminada ••••2505 ya registrada; Savings Plan USD 30 **Effective** (vence 2026-11-12 UTC+8). No se realizó compra ni se modificó la tarjeta; estado de liquidación de la factura no verificado |
 | Tier siguiente (oficial, 2026-10-13) | **USD 1.400/mes o USD 14.000/año**: 1M assets, 120 QPM. Premium: USD 4.200/mes o 42.000/año. Sin reembolso |
 
@@ -99,7 +100,7 @@ imagen = borrar y subir otra.
 
 ## 4. Cupos usados
 
-### Carga autorizada pendiente — cuenta correcta `3004839361`
+### Carga autorizada — cuenta correcta `3004839361`
 
 Julio pidió completar lo pendiente en esta cuenta y prohibió volver a usar la incorrecta. Se conserva el alcance:
 **sólo los 12 PNG de `SUBIR/`, dos por personaje**, sin compras. Primero Antonio y las pruebas de referencia/
@@ -107,12 +108,12 @@ primer cuadro a 480p; continuar con el resto cuando funcione la referencia. No r
 
 | Personaje / grupo | Assets autorizados | Grupo e IDs nuevos | Estado | Fecha | Aprobó |
 |---|---|---|---|---|---|
-| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Pendientes | Entry activo; carga bloqueada por selector de archivos de Chrome | 2026-10-17 | Julio |
-| Nexa — Efeonce | `nexa-1-rostro.png`, `nexa-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
-| Hum — elenco Efeonce | `hum-1-rostro.png`, `hum-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
-| Isabella — elenco Efeonce | `isabella-1-rostro.png`, `isabella-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
-| Karo — elenco Efeonce | `karo-1-rostro.png`, `karo-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
-| Sophia — elenco Efeonce | `sophia-1-rostro.png`, `sophia-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
+| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Grupo: `group-20261018020313-mhhhh`; rostro: `asset-20261018020314-x6th8`; cuerpo: `asset-20261018020355-fdzvx` | Ambos **Active**, comprobados en `ListAssets`; UI `warehoused`; referencia y primer cuadro **succeeded** | 2026-10-17 | Julio |
+| Nexa — Efeonce | `nexa-1-rostro.png`, `nexa-2-cuerpo.png` | Grupo: `group-20261018020936-lr6mc`; rostro: `asset-20261018020937-qw8ct`; cuerpo: `asset-20261018021026-5njrz` | Ambos **Active**, comprobados en `ListAssets`; UI `warehoused`; cargado tras éxito de 3a | 2026-10-17 | Julio |
+| Hum — elenco Efeonce | `hum-1-rostro.png`, `hum-2-cuerpo.png` | Grupo: `group-20261018021058-twcvm`; rostro: `asset-20261018021058-bp9xz`; cuerpo: `asset-20261018021128-hchwm` | Ambos **Active**, comprobados en `ListAssets`; UI `warehoused`; cargado tras éxito de 3a | 2026-10-17 | Julio |
+| Isabella — elenco Efeonce | `isabella-1-rostro.png`, `isabella-2-cuerpo.png` | Grupo: `group-20261018021204-2dmlt`; rostro: `asset-20261018021205-dhltm`; cuerpo: `asset-20261018021255-lxmjx` | Ambos **Active**, comprobados en `ListAssets`; UI `warehoused`; cargado tras éxito de 3a | 2026-10-17 | Julio |
+| Karo — elenco Efeonce | `karo-1-rostro.png`, `karo-2-cuerpo.png` | Grupo: `group-20261018021320-9gmjr`; rostro: `asset-20261018021320-w7krv`; cuerpo: `asset-20261018021352-w5zx5` | Ambos **Active**, comprobados en `ListAssets`; UI `warehoused`; cargado tras éxito de 3a | 2026-10-17 | Julio |
+| Sophia — elenco Efeonce | `sophia-1-rostro.png`, `sophia-2-cuerpo.png` | Grupo: `group-20261018021429-8fj5p`; rostro: `asset-20261018021429-lxgxx`; cuerpo: `asset-20261018021459-6cbwx` | Ambos **Active**, comprobados en `ListAssets`; UI `warehoused`; cargado tras éxito de 3a | 2026-10-17 | Julio |
 
 ### 4.1. Histórico de la cuenta incorrecta `3003660328` — no usar
 
@@ -206,9 +207,9 @@ intermedias y la imagen final) queda en un lugar durable y se anota en la column
 
 **Alcance de todos los intentos históricos de esta sección:** la API usa `3004839361`, pero los IDs de entrada
 se cargaron en `3003660328`. Ninguno valida la biblioteca de la cuenta correcta. **KYC, carta y Entry gratuito ya
-están completados en `3004839361`**. Las nuevas pruebas dependen ahora de cargar Antonio, obtener IDs de esta
-cuenta y verificar ambos assets; la carga sigue bloqueada localmente por Chrome. Referencia y primer cuadro:
-**pendientes**, sin nuevas tareas de inferencia desde la activación de Entry.
+están completados en `3004839361`**. Antonio ya está cargado con IDs nuevos de esa cuenta, ambos **Active**
+comprobados en la respuesta de consola. Referencia y primer cuadro: **ambos exitosos**; resultados de esta cuenta
+se registran al final de §7, separados de los intentos históricos con IDs incorrectos.
 
 ### Primera ejecución — 08:44 UTC
 
@@ -419,3 +420,74 @@ al entorno local observado; no acredita un rechazo de BytePlus ni requiere contr
 identidad, KYC, activación del modelo, Entry, carga y prueba de inferencia. El ledger conserva el estado por
 cuenta; la historia de la incorrecta no se reescribe como éxito en producción. La actualización de docs/skills
 no opera la consola, no carga assets y no consume generaciones.
+
+
+### Chrome resuelto y Antonio cargado — 2026-10-17 18:03–18:05 UTC
+
+Julio pidió resolver Chrome y continuar el lote. La herramienta bloqueó abrir `chrome://extensions` por su
+política de URL; no se intentó evadir ese bloqueo. Julio habilitó personalmente **Allow access to file URLs**, lo
+confirmó y aportó captura. Tras la reconexión de la extensión, `fileChooser.setFiles` funcionó con los PNG
+originales, verificados contra `SUBIR/SHA256SUMS` (12/12 correctos). Se volvió a verificar **3004839361**.
+
+Se subió sólo el rostro de Antonio para crear el grupo y se renombró **Antonio — elenco Efeonce**; luego el
+cuerpo se añadió al mismo grupo. No hubo otra carta, compra, cambio de plan, credencial ni carga duplicada.
+La consola confirma **2/50 assets y 1/50 grupos usados** (48 y 49 disponibles).
+
+La UI muestra `warehoused`. Para cumplir la condición de `Active`, se observó la respuesta de la consulta
+**ListAssets** de la propia consola, sin modificar sus solicitudes ni leer claves. Los dos IDs de §4 devolvieron
+**Status: Active**, **ProjectName: default**; request ID **202610171805409C9F5CDD384B25D50918**.
+Se guardó sólo metadata permitida, sin URL firmada ni tokens, y se desactivó la observación de red.
+No se infirió `Active` de una miniatura o de la traducción de la etiqueta.
+
+Evidencia fuera del repo, en la carpeta local de §7: `antonio-cuenta-correcta-active.json`,
+`antonio-cuenta-correcta-assets.jpg` y `antonio-cuenta-correcta-cupo.jpg`.
+Pruebas preparadas con copias de la toma original y referencias `Image 1` / `Image 2` en
+`pruebas-antonio-cuenta-correcta-20261017T180127Z/`, con subcarpetas `referencia/` y `primer-cuadro/`.
+
+
+### Pruebas con IDs de la cuenta correcta — ambas exitosas
+
+Se ejecutó una única solicitud por variante con Seedance 2.5, `--draft`, `--duration 4`, `--yes` y los IDs nuevos de §4.
+Las copias de la toma conservan el texto original; el prefijo sólo define `Image 1` / `Image 2`, sin IDs en el prompt.
+
+| Prueba | Task ID | Inicio–fin UTC | Resultado / archivo | Salida medida | Uso reportado |
+|---|---|---|---|---|---|
+| Referencia: rostro y cuerpo | `cgt-20261018020644-o5mw4` | 18:06:42–18:07:56 | **succeeded**, salida 0; `referencia/antonio-ref.mp4` | 854×480, 4.041667 s; H.264 + AAC | 38,830 tokens |
+| Primer cuadro: sólo rostro | `cgt-20261018020758-t1vqe` | 18:07:56–18:09:11 | **succeeded**, salida 0; `primer-cuadro/antonio-primer-cuadro.mp4` | 530×794, 4.041667 s; H.264 + AAC | 39,862 tokens |
+
+Los dos recibos confirman **draft: true, resolution: 480p**. Primer cuadro usa ratio adaptativo del rostro;
+sus dimensiones físicas medidas son las de la tabla, sin presentarlo como un 480×N fijo. Se descargaron los
+videos y se comprobaron streams y duración con `ffprobe`; se revisó visualmente un cuadro a los 2 s por variante.
+Es validación técnica y revisión puntual, no aprobación creativa final ni publicación.
+
+La carpeta de evidencia es `pruebas-antonio-cuenta-correcta-20261017T180127Z/` dentro de la carpeta local de §7. Cada variante conserva
+`s07-prompt.txt`, `comando.txt`, `ejecucion.log`, `resultado.json`, `receipt.json`, `ffprobe.json`, `frame-2s.png`
+y su MP4. No hubo error en estas dos ejecuciones. La estimación previa de referencia fue USD 0,411201;
+primer cuadro indicó precio variable. Los tokens son uso devuelto por API, no factura conciliada.
+
+**Condición 3a satisfecha:** se completó el lote restante autorizado en orden Nexa → Hum → Isabella → Karo → Sophia,
+dos archivos por grupo. No se ejecutaron generaciones adicionales para esos personajes.
+
+
+### Cierre del lote en la cuenta correcta — 2026-10-17 18:17 UTC
+
+Tras verificar el video de referencia exitoso, se subieron Nexa, Hum, Isabella, Karo y Sophia, en ese orden.
+Sólo los diez PNG restantes del paquete aprobado; junto con Antonio son **12 archivos en 6 grupos**, sin extras
+ni duplicados. Cada cuerpo se añadió al mismo grupo creado con su rostro; nombres exactos del LEEME.
+La tabla §4 registra todos los IDs nuevos, fecha, estado y **Aprobó: Julio**.
+
+Se cruzó cada respuesta `ListAssets` con su **GroupId esperado** y se verificaron **12 IDs únicos**, seis grupos,
+dos imágenes `Active` por grupo y proyecto `default`. Los metadatos limpios, con request ID por grupo, están en
+`elenco-cuenta-correcta-active.json`; no contiene URLs firmadas, tokens ni claves. Las respuestas se leyeron sólo
+después de que cada navegación de consola terminara, sin asumir que una respuesta previa pertenece al nuevo grupo.
+
+**Readback final de consola:** Account ID **3004839361**, root **jreyes**, Entry **Billing mode Free**,
+**12/50 assets y 6/50 grupos usados**, **38 assets y 44 grupos disponibles**. Panel actualizado
+**2026-10-17 15:17:51** (hora mostrada por UI). Capturas `elenco-cuenta-correcta-grupos.jpg` y
+`elenco-cuenta-correcta-cupo.jpg`, fuera del repo en la carpeta de evidencia de §7.
+
+**Resultados finales:** referencia **funcionó** y primer cuadro **funcionó**, con sus MP4, logs, comandos, recibos,
+mediciones y hashes conservados. Sólo se crearon esas dos tareas. El uso total reportado es **78.692 tokens**;
+no se comprobó la factura ni se afirmó costo cero para la inferencia. No se compró ni cambió el plan, no se
+modificaron credenciales y no se volvió a operar la cuenta incorrecta. La validación no equivale a publicación
+ni aprobación creativa final. Commit únicamente del ledger, sin push; actualizaciones de continuidad quedan locales.
