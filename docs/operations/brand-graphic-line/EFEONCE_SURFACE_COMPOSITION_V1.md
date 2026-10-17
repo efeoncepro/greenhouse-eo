@@ -966,6 +966,74 @@ repite la medición sobre los cuadros reales del video.
   el motor en código sobre los cuadros del video, o en edición con una capa de ajuste enmascarada.
 - **Referencia viva:** la lámina «Componentes de video · v3» del canvas del storyboard «¿Para cuándo?».
 
+#### Delta 2026-10-17 (b) — Kit de componentes de video, aprobado completo (operador)
+
+El 2026-10-17 el operador aprobó toda la lámina «Componentes de video · v4»: «Todos están aprobados, importante que
+tenemos color de esfera y/o acento con las líneas». Antes de aprobarla corrigió por comentarios:
+- la cita, con más aire;
+- la fuente del super de dato, lejos del borde del disco;
+- el pin en el zócalo de lugar;
+- «Antes.» con punto;
+- el gesto del callout;
+- el barrido, que ahora cubre el cuadro entero;
+- el iris, con el radio en porcentaje;
+- la burbuja URL en el cierre.
+
+**Color.** La línea de servicio de la pieza decide el acento. Lo toman la esfera, el anillo, el arco, la barra, el
+divisor y el anillo del iris. Lechos, disco y paneles conservan el navy de Efeonce, como en toda pieza de línea. Desde
+este delta, el vidrio del subtítulo también lleva el navy de Efeonce en todas las líneas. El acento de cada línea pasa
+3:1 sobre ese navy; Engine es el más justo, con 3,6:1.
+
+**Formatos:** 4:5 (feed), 9:16 (Reels, TikTok, Shorts) y 16:9 (YouTube), todo medido a 1080 px de lado corto.
+
+| Formato | Arriba | Márgenes laterales | Zócalo desde abajo | Notas |
+|---|---|---|---|---|
+| 4:5 | 6 % | 6 % | 20 % | Nada baja del 80 % |
+| 9:16 | 16 % | 6 % y 14 % | 24 % | La interfaz tapa el 15 % de arriba, el 20 % de abajo y el borde derecho |
+| 16:9 | 7 % | 5 % | 16 % | — |
+
+**Movimiento:** 120 BPM a 30 fps.
+- El lecho se revela desde su borde recto en 8 cuadros y se recoge en 6.
+- El texto sube por máscara 2 cuadros después del lecho.
+- La esfera cae en el golpe (0 → 110 % → 100 %) y es la primera en irse.
+
+**Los 18 componentes** (`video-*` en AXIS):
+
+| Grupo | Componente | Medidas y reglas |
+|---|---|---|
+| Zócalos | Lugar | Contexto 32 px con anillo y palabra 96 px con esfera. Si la palabra es un lugar, lleva delante el pin «ubicacion» en reposo. |
+| Zócalos | Persona | Cargo 30 px con anillo y nombre 90 px con esfera. |
+| Zócalos | Canal | El isotipo de la plataforma, en negativo, reemplaza al anillo del contexto. |
+| Texto | Remate | 124 px con la esfera en el golpe. |
+| Texto | Remate con pregunta | Pregunta 40 px en Poppins 400 y respuesta 124 px (3,1×). |
+| Texto | Cita | 64 px en peso 700, sin comillas; líneas a 0,42 em, lecho a 0,62/0,78 em. |
+| Voces y datos | Burbujas de voz | El vidrio del subtítulo en cápsula, de 48 a 96 px; la última cae en el golpe con la única esfera. |
+| Voces y datos | Super de dato | Disco navy de 560 px, arco de 9 px y la fuente en dos líneas. |
+| Voces y datos | Comparación | Etiqueta 34 px y valor 72 px. La etiqueta acepta un ícono Trazo en reposo, un logo o un isotipo oficial. |
+| Estructura | Cartela de capítulo | La palabra va dentro de un anillo de 300 px que mide el capítulo. |
+| Estructura | Cierre con CTA | Acción 150 px, burbuja URL de 400 px y logo al 20 % del lado corto. Va antes del reveal aprobado. |
+| Transiciones | Barrido navy | El panel es 160 px más ancho que el cuadro y lo cubre 2 cuadros antes del corte. |
+| Transiciones | Iris de anillo | El radio va del 4 % al 160 %, el plano anterior se apaga al abrir y la esfera nunca se agranda. |
+| Íconos y selección | Lista de pasos con íconos | Trazo 64 px o Plastilina 96 px según la línea; un solo ícono responde. |
+| Íconos y selección | Momento protagonista | `skewedOrbitHeroSvg`, con el objeto de 569 px o más. |
+| Íconos y selección | Plastilina en volumen | 160 px o más, sólo para marca propia. |
+| Íconos y selección | Callout con selección | El cursor entra en arco, arrastra la caja y la suelta en el golpe; ocho manijas, una por cuadro. |
+| Íconos y selección | Pantalla dividida | Divisor en el acento de la línea; «Antes.» lleva punto y «Ahora», la esfera. |
+
+**Regla nueva:** siempre que va la dirección, va la burbuja URL oficial, nunca como texto suelto.
+
+**Estado (2026-10-17):**
+- **AXIS:** delta (z) de `SURFACE_COMPOSITION_DECISION_V1.md`.
+  - Tokens: `@efeoncepro/axis-tokens` 0.6.4, con `surfaces.audiovisual.videoKit`, los formatos `4x5` y `9x16` y las
+    18 recetas.
+  - Contrato: `@efeoncepro/axis-ui-contracts` 0.7.4. El manifiesto trae `content.video` resuelto para la línea y el
+    formato de la pieza.
+  - Gates en verde. Commit, push y release esperan la confirmación del operador.
+- **Greenhouse** sigue fijado en `axis-tokens` 0.3.41.
+- **Pendiente:** dar de alta el isotipo de YouTube en negativo en `axis-brand-assets`.
+- **Referencia viva:** la lámina «Componentes de video · v4» del canvas del storyboard «¿Para cuándo?», con el selector
+  de línea arriba.
+
 **Firma:** firma la marca, nunca la toma: el cierre es el reveal aprobado, con sonido.
 
 **Cómo se compone:** los recursos de texto salen como **capas PNG con alfa** del catálogo `graphic-line-overlays`
