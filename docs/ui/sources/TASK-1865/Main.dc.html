@@ -120,6 +120,8 @@ button{font:inherit}
  .auto-q{grid-template-columns:minmax(0,1fr)!important}
  .mock3{grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 8px 12px 0}
  .mock3>*{scroll-snap-align:start}
+ .escala ul{justify-content:flex-start!important}
+ .escala li{width:30%!important}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -396,9 +398,7 @@ button{font:inherit}
 <li style="padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.14); display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 10px; font-size: 15px; color: #cfe4fa"><b style="color: #ffffff">1</b><span><b style="color: #ffffff; font-weight: 600">Publicamos versiones</b> con ganchos distintos.</span></li>
 <li style="padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.14); display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 10px; font-size: 15px; color: #cfe4fa"><b style="color: #ffffff">2</b><span><b style="color: #ffffff; font-weight: 600">Leemos cuál vende,</b> no cuál tiene más likes.</span></li>
 <li style="padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14); display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 10px; font-size: 15px; color: #cfe4fa"><b style="color: #ffffff">3</b><span><b style="color: #ffffff; font-weight: 600">Escalamos la ganadora</b> y apagamos el resto.</span></li>
-</ol>
-<p class="rv" style="margin: 6px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Probar así pide piezas nuevas cada mes. Las produce nuestro <a class="nlink" href="/agencia-creativa/">equipo creativo</a>, con el mismo método.</p>
-</div>
+</ol></div>
 <figure style="margin: 0">
 <div class="card-pad" style="border-radius: 30px; border: 1px solid rgba(255,255,255,0.14); background: rgba(0,26,51,0.55); padding: 32px; display: flex; flex-direction: column; gap: 18px">
 <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap"><span class="eyebrow" style="font-size: 12px">Presupuesto por variante</span><span style="font-size: 13px; color: #9fb6cc">Semana 1 → Semana 4</span></div>
@@ -415,6 +415,24 @@ button{font:inherit}
 </div>
 <figcaption style="margin-top: 14px; font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo con una marca ficticia.</figcaption>
 </figure>
+</div>
+<div class="wrap">
+<div class="split escala" style="margin-top: 96px; padding-top: 56px; border-top: 1px solid rgba(255,255,255,0.14); align-items: end">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<p class="eyebrow chip rv">Creatividad a escala</p>
+<p class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; letter-spacing: -0.035em; font-size: clamp(32px, 3.4vw, 52px); line-height: 1.02">La carrera necesita corredores nuevos cada mes.</p>
+<p class="rv" style="margin: 0; font-size: 17px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Nuestro equipo creativo produce las variantes que tu pauta prueba: ganchos nuevos, todos los formatos, la misma marca. Así la creatividad nunca se queda atrás de los datos.</p>
+<p class="rv" style="margin: 4px 0 0; font-size: 16px"><a class="nlink" href="/agencia-creativa-v2/">Conoce la producción creativa a escala</a></p>
+</div>
+<ul class="st" aria-label="Variantes y formatos de una misma idea, de una marca ficticia" style="list-style: none; margin: 0; padding: 0; display: flex; gap: 12px; align-items: flex-end; justify-content: flex-end; flex-wrap: wrap">
+<li style="width: 92px"><img src="/_blob/02015b911a8595916b23c48943669d01" alt="Formato vertical 9:16" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 12px; display: block"><span style="display: block; margin-top: 8px; font-size: 12px; color: #9fb6cc">9:16</span></li>
+<li style="width: 104px"><img src="/_blob/d000ba8e3ed4a623601e8245671c3393" alt="Formato 4:5" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px; display: block"><span style="display: block; margin-top: 8px; font-size: 12px; color: #9fb6cc">4:5</span></li>
+<li style="width: 104px"><img src="/_blob/a832cc28be1c9c09b0463215476c8a4d" alt="Formato cuadrado" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: block"><span style="display: block; margin-top: 8px; font-size: 12px; color: #9fb6cc">1:1</span></li>
+<li style="width: 88px"><img src="/_blob/c4623411bd6e57f662136c453e3fc679" alt="Variante «Corre de noche»" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px; display: block"><span style="display: block; margin-top: 8px; font-size: 12px; color: #9fb6cc">Gancho A</span></li>
+<li style="width: 88px"><img src="/_blob/491d28c4c1351888548e70cd00a5d1cf" alt="Variante «Hoy llueve, corre igual»" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px; display: block"><span style="display: block; margin-top: 8px; font-size: 12px; color: #9fb6cc">Gancho B</span></li>
+<li style="width: 88px"><img src="/_blob/a8696f24a8965adc7adb79cb6f4d6747" alt="Variante «Vuelve a correr»" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px; display: block"><span style="display: block; margin-top: 8px; font-size: 12px; color: #9fb6cc">Gancho C</span></li>
+</ul>
+</div>
 </div>
 </section>
 
@@ -584,7 +602,7 @@ button{font:inherit}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"initialPlatform":{"editor":"enum","options":["g","m","t","l"],"default":"g","section":"Plataformas"},"$preview":{"width":1440,"height":10200}}'>
+<script type="text/x-dc" data-dc-script data-props='{"initialPlatform":{"editor":"enum","options":["g","m","t","l"],"default":"g","section":"Plataformas"},"$preview":{"width":1440,"height":10600}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
