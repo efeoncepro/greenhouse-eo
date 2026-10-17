@@ -15,6 +15,9 @@ Pendiente, Growth/Platform: conexión de producto por organización y unidad de 
 después captura/binding/intención/consentimiento y rollout por acción. Marca OAuth heredada «Claude»
 y verificación de scopes requieren revisión antes de ampliar uso. Sin publicación GTM, CRM writes,
 acciones nuevas, campañas, ingesta ni cambios Cloud/IAM. Dirección documental completa; implementación pendiente.
+Ratificación posterior del operador: OAuth de producción **Efeonce** y **CLI de consulta obligatoria**
+en fase 1, con discover, cuenta, campañas, conversiones/goals y reporting. Rebranding por proyecto requiere
+inventario de clientes/regresión GA4/GSC; verificación separada. Requisitos registrados; sin cambio Cloud ni CLI aún.
 
 ## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)
 

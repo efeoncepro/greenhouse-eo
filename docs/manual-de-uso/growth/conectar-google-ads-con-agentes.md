@@ -33,6 +33,11 @@ acredita al usuario; no verifica la aplicación. En este piloto el operador conf
 completó el aviso/consentimiento. Para rollout, revisar marca y requisitos de verificación antes de
 presentarlo a más usuarios; no cambiar Cloud, audiencia o permisos para eludir ese proceso.
 
+El operador fijó **Efeonce** como marca obligatoria para la autorización de producción. La marca es
+del proyecto OAuth: renombrar solamente el client no cambia por sí solo la pantalla. Antes del cambio,
+inventariar consumidores compartidos y preparar readback/regresión de GA4/GSC, además del nuevo
+consentimiento Ads visible como Efeonce. La verificación de aplicación/scopes se comprueba aparte.
+
 ## Probar y leer el resultado
 
 1. Resolver la credencial sólo en memoria desde el almacén privado autorizado. No pegar bearer tokens,
@@ -73,3 +78,8 @@ contrato, custodia, errores, paginación, revocación y pruebas de aislamiento. 
 requiere además acción/owner/objetivo, intención, consentimiento, identidad, valor, escritor único,
 preview/readback y autorización de publicación. No usar un evento sintético o una escritura real
 para completar una prueba de acceso de lectura.
+
+La siguiente unidad debe entregar también la **CLI de consulta**: ayuda/discovery, conexión/cuenta,
+campañas, acciones/goals y reporting de métricas por fechas. Entry point propuesto `pnpm google-ads`,
+aún inexistente; los comandos y criterios de aceptación están en arquitectura §5.4. Conexión/reader
+y CLI comparten autoridad, resolver de tokens y reglas; esta primera entrega no incluye mutaciones.

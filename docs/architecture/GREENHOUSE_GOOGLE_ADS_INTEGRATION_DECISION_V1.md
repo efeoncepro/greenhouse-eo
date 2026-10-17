@@ -328,3 +328,26 @@ y se contrasta con la respuesta real documentada en auditoría.
 [google-devtoken]: https://developers.google.com/google-ads/api/docs/api-policy/developer-token
 [google-levels]: https://developers.google.com/google-ads/api/docs/api-policy/access-levels
 [google-deprecations]: https://developers.google.com/google-ads/api/docs/deprecations
+
+## Delta aceptado 2026-10-17 — OAuth Efeonce y CLI de consulta obligatoria
+
+Por instrucción posterior del operador, la autorización de producción debe presentar la identidad
+**Efeonce**. La marca histórica **Claude** queda registrada como evidencia del piloto; no satisface
+el gate de lanzamiento. App name, logo, soporte, dominios y políticas deben representar a Efeonce,
+con administración Cloud siempre `julio.reyes@efeonce.org` en `efeonce-group` y principal Ads
+`jreyes@efeoncepro.com` para el anunciante `6862539491`.
+
+La marca del consentimiento es configuración **del proyecto**, distinta del nombre interno de un
+OAuth client. Crear o renombrar un client dentro del mismo proyecto no proporciona por sí solo otra
+marca. Antes de aplicar el cambio se deben inventariar clientes y consumidores de GA4/GSC/OAuth del proyecto,
+se define la transición y se verifica su funcionamiento. Nombre visible y verificación de aplicación/scopes
+son gates separados. [Modelo oficial de marca por proyecto](https://developers.google.com/identity/protocols/oauth2/cross-client-identity).
+
+La primera unidad de producto incorpora una **CLI de Google Ads para consultas**, siguiendo el patrón
+de las herramientas de Meta, GA4 y GSC. Es un entregable obligatorio del reader canónico, con identidad,
+binding de cuenta/organización, credenciales privadas, ayuda/discovery, inventarios y reporting, JSON
+estructurado, errores seguros, paginación, cobertura, moneda/timezone y pruebas reales de lectura.
+La [arquitectura §5.4](GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md#54-api-cli-y-mcp) define
+el catálogo inicial. La CLI no depende de activar conversiones ni de construir una UI; tampoco habilita
+mutaciones Ads por disponer del scope `adwords`. Su implementación queda para la siguiente unidad;
+esta ampliación sólo formaliza los requisitos y no cambia configuración Cloud ni crea la CLI.

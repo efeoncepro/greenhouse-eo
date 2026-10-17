@@ -5,6 +5,12 @@ calificación y negocios, conservando la fuente y el nivel de evidencia de cada 
 se comprobó **acceso API de lectura de operador** a `686-253-9491`. La integración de producto y las
 conversiones Ads siguen pendientes; no existe todavía un nuevo panel, CLI de producto o sender Ads.
 
+Requisitos de la siguiente entrega, ratificados por el operador: autorización presentada como **Efeonce**
+y una **CLI de consulta Google Ads**, equivalente en uso a Meta/GA4/GSC. Permitirá verificar conexión,
+consultar cuenta, campañas, conversiones/objetivos y reportes por fechas con moneda, cobertura y errores
+explícitos. Su primera versión será de lectura y conservará el anunciante autorizado. La marca «Claude»
+observada en la prueba queda como antecedente histórico; el cambio de marca y la CLI están pendientes.
+
 | Componente | Función en la arquitectura |
 | --- | --- |
 | Growth Forms / Meetings | Confirmar solicitudes y reservas, intención y consentimiento |

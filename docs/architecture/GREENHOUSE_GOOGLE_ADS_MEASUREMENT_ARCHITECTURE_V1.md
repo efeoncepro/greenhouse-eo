@@ -227,6 +227,16 @@ La aplicación OAuth registrada puede reutilizar configuración técnica despué
 audiencia, callbacks y policy; el **grant, secreto y metadata de Ads son propios**. GA4/GSC ya usan scopes
 de lectura diferentes. No ampliar un grant existente ni sobrescribir su referencia de secreto.
 
+**Requisito de producción ratificado por el operador el 17/10:** la pantalla de autorización debe
+identificar a **Efeonce**. La marca histórica «Claude» del piloto no cumple ese requisito. Nombre interno
+del client y marca de consentimiento son configuraciones distintas: Google muestra
+[branding por proyecto](https://developers.google.com/identity/protocols/oauth2/cross-client-identity).
+La unidad de conexión debe inventariar clientes/consumidores compartidos, establecer la marca Efeonce,
+dominios, soporte y políticas, revisar publicación/audiencia y resolver la verificación requerida.
+Cambiar el nombre no acredita verificación. El gate incluye nuevo consentimiento visible Efeonce y
+readback Ads, más regresión de las conexiones GA4/GSC afectadas. Administración y proyecto canónicos
+se mantienen; no se crea otro proyecto ni se modifica el cliente compartido durante este trabajo documental.
+
 Google Ads documenta `adwords` y no una variante de scope read-only. El primer cliente sólo expone
 operaciones allowlisted de lectura; el scope amplio no se presenta como permiso para mutar. Configure,
 ingest y report son capacidades separadas y denegadas por defecto cuando no estén habilitadas.
@@ -297,6 +307,33 @@ Si se expone MCP, Greenhouse declara reader/command en su manifest; el gateway d
 tokens Ads o consultar DB. Acceso nativo first-party y consentimiento MCP delegado siguen separados.
 El [MCP oficial de Google Ads](https://developers.google.com/google-ads/api/docs/developer-toolkit/mcp-server)
 puede ayudar al operador en lectura, pero no reemplaza el contrato multiorganización del producto.
+
+#### CLI de consulta: entregable obligatorio de la fase 1
+
+El operador pidió una CLI equivalente en forma de uso a Meta, GA4 y GSC. El entrypoint propuesto es
+`pnpm google-ads`; **todavía no existe en package.json**. La implementación fija su contrato y ayuda
+antes de publicarlo. Se entrega con la conexión y los readers, sin esperar a UI o a la activación de tags.
+
+| Grupo propuesto | Datos / comportamiento de lectura |
+| --- | --- |
+| `discover` / `help` | Contrato, operaciones disponibles, filtros, métricas/dimensiones compatibles y ejemplos |
+| `connection verify` / `account` | Identidad segura, target, ruta manager, owner de conversiones, moneda/timezone, estado y scopes; sin material secreto |
+| `campaigns` | Inventario paginado, estado y canal de las campañas del anunciante vinculado |
+| `conversions` / `goals` | Acciones, tipos/estados, objetivos de cuenta/campaña/custom, valores y ventanas, sin cambiar configuración |
+| `report` | Impresiones, clics, coste, conversiones y valor disponibles; fechas/segmentos y grain explícitos |
+
+Los nombres son contrato propuesto, no comandos ejecutables hoy. La CLI consume el primitive canónico
+y la conexión de producto; no copia credenciales del piloto ni crea otro resolver de tokens. La primera
+entrega conserva target `6862539491` y manager comprobado, y rechaza otro anunciante aunque el principal
+pueda acceder por MCC. La ampliación multicuenta requiere su autoridad y binding propios.
+
+Salida estructurada JSON y vista legible comparten schema versionado: rango solicitado, filtros/grain,
+`fetchedAt`, API version, moneda/timezone, filas, cobertura/paginación y errores. Coste conserva micros y
+unidad monetaria; se diferencia cero, no disponible y lectura parcial. Plantillas permiten únicamente
+combinaciones de campos/segmentos verificadas, con budgets, límite de resultados y cuota; GAQL arbitrario
+no es una vía para eludir esas restricciones. `mutate`, upload, publicación y cambios de campañas/goals
+quedan fuera del catálogo inicial. Aceptación: ayuda/discovery, errores sin secretos, negativos de
+cuenta/org, paginación y una lectura real de esta cuenta nueva; inventarios vacíos son resultados válidos.
 
 ## 6. Información, identidad y atribución
 
@@ -757,7 +794,7 @@ en esta arquitectura no autoriza ejecutarla.
 | Fase | Implementación acotada | Gate para avanzar | Rollback |
 | --- | --- | --- | --- |
 | 0. Acceso de operador y evidencia | **Completada en esta sesión:** OAuth/probe read-only v26 a `6862539491` vía MCC `9531478329`, cuenta/owner/acciones/goals/moneda/timezone | Respuestas 200 y readback; dos acciones GA4 ocultas; `mutations=0`; evidencia en auditoría, sin atribución de producto desplegado | Revocar/eliminar credencial privada de prueba según autorización, sin tocar grants GA4/GSC |
-| 1. Conexión de producto y lectura | Binding por organización, state/actor/scopes, readers API/CLI, reporting limitado | Negativos de cuenta/org, scopes, errores, paginación y consistencia de grains; OAuth/revocation probados | Desconectar binding, detener sync; conservar recibos mínimos |
+| 1. Conexión de producto y lectura | OAuth visible **Efeonce**, binding por organización, state/actor/scopes, readers API y **CLI de consulta obligatoria**, reporting limitado | Branding/verificación aplicables, regresión GA4/GSC; CLI discover/inventario/report; negativos de cuenta/org, scopes, errores, paginación y grains; OAuth/revocation probados | Desconectar binding, detener sync; conservar recibos mínimos |
 | 2. Contrato de negocio/valor/datos | Clasificación de intención, acciones/goals, TTL y decisiones observables | Operador/RevOps/Privacy/Finance aceptan definiciones; sin blocker P0 | No activar senders; reglas revisionadas |
 | 3. Atribución e identidad | Captura click context, Forms receipt rollout independiente, booking binding y campaña renderer | Caso autorizado con uniones verificables y purge; no identidad histórica inventada | Detener captura nueva, volver contrato compatible y purgar según policy |
 | 4. Captación Ads | Workspace web/server, IDs/labels reales, selección comercial y dedupe | Preview/negativos, consentimiento, revisión de goals, publicación autorizada y primera recepción real | Desactivar acción/sender, versión GTM compatible; no borrar evidencia |

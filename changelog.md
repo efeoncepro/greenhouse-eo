@@ -15,6 +15,8 @@
 - [Probe API v26](docs/audits/growth/2026-10-17-google-ads-api-discovery.md) PASS para `6862539491`
   vía manager `9531478329`; dos acciones GA4 ocultas, tracking inactivo y cuenta nueva. Doce consultas,
   ninguna mutación; conexión y sender de producto pendientes. Funcional y manual documentados.
+- Ratificación del operador: OAuth de producción **Efeonce** y CLI de consulta obligatoria en la primera
+  unidad de lectura; catálogo y aceptación documentados. Rebranding y CLI pendientes de implementación.
 
 ## 2026-10-17 — CLI local Meta para agentes
 
