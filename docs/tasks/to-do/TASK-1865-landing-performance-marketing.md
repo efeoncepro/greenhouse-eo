@@ -38,6 +38,10 @@
   `eo-elementor-widgets.php`, assets y un plugin nuevo `eo-axis-video/`. El loader vivo coincide con ese working tree.
   Se commitea sólo el hunk propio (`git hash-object` + `update-index --cacheinfo`), sin `add` de archivos ajenos ni
   stash. La línea base viva se exporta justo antes de cada build.
+- **Decisiones de copy de Julio en el canvas (2026-10-17).** Eyebrow «Publicidad digital», porque el H1 ya lleva
+  «agencia de performance marketing». ChatGPT Ads y X se presentan como canales que operamos, sin la salvedad de
+  disponibilidad por país ni el «sólo bajo pedido»: «en México tenemos clientes». Prevalece sobre la redacción de la
+  ficha y del copy ledger.
 - **Decisiones de Julio pendientes.** Formulario propio frente a reusar el de Medios; quién hace el núcleo común (la
   sesión de Medios se ofreció); el label del menú; y si el botón flotante en móvil se mantiene (el compilador de Medios
   lo quita).
