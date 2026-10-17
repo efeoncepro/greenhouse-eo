@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.7: corrección de cuenta enviada a Cloris y Alejandro; copia en Enviados y registro HubSpot SENT verificados)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.8: KYC aprobado en 3004839361; Entry gratuito disponible, detenido en el proceso de carta para firma personal de Julio)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -16,8 +16,8 @@ La biblioteca privada de assets de BytePlus es la vía para personajes propios. 
 (`efeonce-media-directa`, secreto `greenhouse-byteplus-api-key`). Las cargas históricas de §4.1, el KYC aprobado, el plan Entry y
 la carta de compromiso se hicieron por error en la cuenta **3003660328**; por eso la API responde «Your account has not
 activated the Asset Service»: la clave no ve esos assets. **Los 12 assets de 3003660328 no sirven para la CLI.**
-La recuperación se hace exclusivamente en 3004839361: el KYC ya está enviado y en revisión (§1); después faltan
-Entry, firma personal de Julio y las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
+La recuperación se hace exclusivamente en 3004839361: el KYC ya está aprobado (§1); después faltan
+firma personal de Julio, activación de Entry y las nuevas cargas/IDs (§4). **No volver a entrar ni operar 3003660328**, incluida
 cualquier eliminación o transferencia de sus assets.
 
 ## 1. Estado del plan
@@ -40,8 +40,8 @@ producción: no se cambió ni creó ninguna credencial. Seedance 2.5 está **Act
 
 | Dato | Valor |
 |---|---|
-| KYC de organización | **Enviado y en revisión**: `Verification reviewing`, 2026-10-17 **19:53:32 UTC+8** (11:53:32 UTC; 08:53:32 Chile). Julio autorizó expresamente aceptar los términos y enviarlo en `3004839361`. Plazo indicado: 1–2 días hábiles |
-| Advanced Creation Rights | **No activo**; Entry gratuito bloqueado hasta aprobar KYC empresarial. No se compró ni cambió plan |
+| KYC de organización | **Aprobado**, `Verification successful`. Consola: **2026-10-18 00:57:32 UTC+8** = **2026-10-17 16:57:32 UTC / 13:57:32 Chile**. Correo oficial recibido 16:57:37 UTC confirma éxito para **3004839361**. El envío original fue 11:53:32 UTC, autorizado expresamente por Julio |
+| Advanced Creation Rights | **No activo todavía**; Entry **USD 0**, botón `Free Trial` habilitado tras renovar sesión y seguir `complete real-name verification`. Se abrió su proceso de cuestionario/carta/verificación de correo; detenido sin responder ni aceptar para firma personal de Julio |
 | Cupo de Entry, cuando se active | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
@@ -103,7 +103,7 @@ primer cuadro a 480p; continuar con el resto cuando funcione la referencia. No r
 
 | Personaje / grupo | Assets autorizados | Grupo e IDs nuevos | Estado | Fecha | Aprobó |
 |---|---|---|---|---|---|
-| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Pendientes | Bloqueado por KYC en revisión y Entry inactivo | 2026-10-17 | Julio |
+| Antonio — elenco Efeonce | `antonio-1-rostro.png`, `antonio-2-cuerpo.png` | Pendientes | KYC aprobado; pendiente firma personal de Julio y activación de Entry | 2026-10-17 | Julio |
 | Nexa — Efeonce | `nexa-1-rostro.png`, `nexa-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
 | Hum — elenco Efeonce | `hum-1-rostro.png`, `hum-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
 | Isabella — elenco Efeonce | `isabella-1-rostro.png`, `isabella-2-cuerpo.png` | Pendientes | Pendiente de Antonio y prueba 3a | 2026-10-17 | Julio |
@@ -329,3 +329,27 @@ subir los retratos, conservando Entry gratuito durante las pruebas. HubSpot `487
 **`118790251018`**, dirección `EMAIL`, estado **`SENT`**, timestamp **13:22:08.147 UTC**. Esto acredita envío
 y registro, no entrega, respuesta ni resolución. Captura: `correccion-cuenta-correo-enviado.jpg` en la carpeta
 local de evidencia indicada arriba. El WhatsApp sólo se entregó como texto para que Julio lo copie al grupo.
+
+### KYC aprobado y proceso de firma abierto — 2026-10-17
+
+El correo oficial **[Byteplus-Account] Real-Name Verification Notification**, remitido por
+`byteplus-noreply@byteplus.com` y recibido **16:57:37 UTC**, confirma expresamente la aprobación de
+**3004839361**. La consola, con Account ID comprobado en pantalla, muestra `Verification successful` y fecha
+**2026-10-18 00:57:32 UTC+8**. La duplicidad histórica no impidió esta aprobación; no se infiere ninguna
+relación IAM entre las dos cuentas independientes ni se volvió a operar la incorrecta.
+
+ModelArk conservaba inicialmente el aviso de KYC pendiente. Se renovó la sesión con Google SSO
+`jreyes@efeoncepro.com`, se volvió a comprobar **3004839361** y se siguió `complete real-name verification`.
+El aviso desapareció y `Free Trial`, para Entry **USD 0/mes**, quedó habilitado.
+
+Al pulsarlo se abrió el flujo de tres pasos: **1 Information Confirmation / Compliance Risk Assessment**,
+**2 Read and Confirm the Commitment Letter**, **3 Security Verification / Email Verification**. Se detuvo
+en el paso 1, con todas las respuestas sin seleccionar: mecanismos de trazabilidad/deepfakes, autorización
+de retratos y uso interno o integración en plataforma. **No se autoatestaron respuestas, no se aceptó la
+carta ni se solicitó un código. Julio debe completar personalmente el proceso**, conforme a su condición.
+
+**Estado de cierre:** KYC aprobado; Entry pendiente de firma, aún sin activar; ningún retrato cargado en esta
+cuenta ni nuevas pruebas de inferencia. Sin compras. Pestaña Chrome abierta para Julio. Luego de la firma:
+verificar Entry y cupos, cargar sólo Antonio, esperar estado y ejecutar las dos pruebas con IDs nuevos.
+Evidencia fuera del repo: `kyc-cuenta-correcta-aprobado.jpg` y
+`entry-cuenta-correcta-pendiente-firma.jpg`, dentro de la carpeta local de §7.
