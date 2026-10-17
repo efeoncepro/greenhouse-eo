@@ -1,9 +1,9 @@
 # Ledger de cupos — biblioteca de retratos de BytePlus — V1
 
 > **Tipo de documento:** Ledger operativo (SSOT de cupos)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-10-17 por Claude (decisiones del operador)
-> **Ultima actualizacion:** 2026-10-17 por Codex (1.9: Julio autoriza llenar cuestionario; preguntas 2 y 3 completadas, pregunta 1 pendiente de confirmación factual; carta sin aceptar)
+> **Ultima actualizacion:** 2026-10-17 por Codex (1.10: Julio confirma mecanismos y plan de respuesta; cuestionario completo, carta abierta en paso 2 sin aceptar)
 > **Documentacion relacionada:** [Investigación oficial 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md) · [Manual BytePlus directo](../../manual-de-uso/creative-studio/byteplus-directo.md) (§Rostros humanos reales) · [ADR BytePlus directo](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md) · [Elenco de marca](../brand-photography/EFEONCE_BRAND_CAST_V1.md)
 
 Seedance 2.x rechaza imágenes y videos de entrada con rostros humanos que no vengan de una vía de confianza.
@@ -41,7 +41,7 @@ producción: no se cambió ni creó ninguna credencial. Seedance 2.5 está **Act
 | Dato | Valor |
 |---|---|
 | KYC de organización | **Aprobado**, `Verification successful`. Consola: **2026-10-18 00:57:32 UTC+8** = **2026-10-17 16:57:32 UTC / 13:57:32 Chile**. Correo oficial recibido 16:57:37 UTC confirma éxito para **3004839361**. El envío original fue 11:53:32 UTC, autorizado expresamente por Julio |
-| Advanced Creation Rights | **No activo todavía**; Entry **USD 0**, `Free Trial` habilitado. Cuestionario parcialmente completado por instrucción de Julio: pregunta 2 `YES`, pregunta 3 uso interno. Pregunta 1 sin seleccionar hasta confirmar mecanismos/plan de incidentes; carta y verificación por correo pendientes |
+| Advanced Creation Rights | **No activo todavía**; Entry **USD 0**, `Free Trial` habilitado. Cuestionario completo: preguntas 1 y 2 `YES`, pregunta 3 uso interno. Julio confirmó expresamente mecanismos y plan de respuesta. Paso 2 abierto: carta sin aceptar, reservada para su firma; verificación por correo pendiente |
 | Cupo de Entry, cuando se active | **50 assets y 50 asset groups.** Un asset es **un archivo** (imagen, video o audio); un grupo es un personaje |
 | Compartido con | La biblioteca de **retratos reales**: un retrato real (Julio) descuenta del mismo cupo |
 | Alcance | Una suscripción por cuenta; los assets quedan aislados por proyecto (`default`) |
@@ -354,7 +354,7 @@ verificar Entry y cupos, cargar sólo Antonio, esperar estado y ejecutar las dos
 Evidencia fuera del repo: `kyc-cuenta-correcta-aprobado.jpg` y
 `entry-cuenta-correcta-pendiente-firma.jpg`, dentro de la carpeta local de §7.
 
-### Cuestionario autorizado por Julio — preparación sin firma
+### Cuestionario autorizado por Julio — completo, carta sin firmar
 
 Julio indicó **«Llena el KYC»**. Se comprobó de nuevo Account ID **3004839361** antes de rellenar. Se seleccionó:
 
@@ -362,11 +362,14 @@ Julio indicó **«Llena el KYC»**. Se comprobó de nuevo Account ID **300483936
   por utilizarlo sin ella, conforme al alcance y controles de derechos ya establecidos.
 - **Pregunta 3: For internal content production by our company / for our company's own purposes.** Esta ruta
   usa la CLI local para producción propia; no integra Seedance en un producto o plataforma.
-- **Pregunta 1: sin respuesta.** BytePlus pregunta si la empresa cuenta ya con mecanismos de trazabilidad y
-  planes de respuesta ante incidentes para prevenir deepfakes. El repo respalda trazabilidad/reglas de derechos,
-  pero no basta para confirmar que ese plan está vigente. Se solicitó a Julio una respuesta factual `Sí/No`;
-  no se presume una respuesta por la instrucción general de completar el formulario.
+- **Pregunta 1: YES.** Julio confirmó expresamente **«Sí, contamos con ambos»**, sobre los mecanismos de
+  trazabilidad de contenido IA y los planes de respuesta ante incidentes para prevenir deepfakes. La respuesta
+  se marcó con esa confirmación factual del operador.
 
-`Next` permanece deshabilitado. No se avanzó a aceptar la carta, no se solicitó código ni se activó Entry.
-La condición de firma personal de Julio se conserva. Evidencia:
-`kyc-cuestionario-parcial-cuenta-correcta.jpg`, en la misma carpeta local de §7. Pestaña abierta para continuar.
+`Next` quedó habilitado y se avanzó al **Step 2 / Read the Authorization Agreement**. La consola muestra
+**Read and Confirm the Commitment Letter**, con `Agree and Continue` deshabilitado hasta terminar la lectura.
+**No se aceptó ni firmó la carta**, no se solicitó código y Entry sigue sin activar. Se deja la pestaña abierta
+para la firma personal de Julio, conforme a su condición expresa. No hubo compras, cargas ni inferencia.
+
+Evidencia en la misma carpeta local de §7: `kyc-cuestionario-completo-cuenta-correcta.jpg` y
+`entry-carta-abierta-para-firma-julio.jpg`. La captura parcial anterior se conserva como historia.
