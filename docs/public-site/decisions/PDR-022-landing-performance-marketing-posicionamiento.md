@@ -4,7 +4,7 @@
 > **Estado:** Accepted · **publicada e indexable el 2026-10-17** (operador: «Bien, está aprobada… publícala»). Antes:
 > Draft for validation · 2026-09-10.
 > **URL:** https://efeoncepro.com/servicios/performance-marketing/ — página WordPress `251997`, hija de `/servicios/` (`251077`)
-> **Ejecución:** [TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md) (in-progress: publicada, con pendientes)
+> **Ejecución:** [TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md) (in-progress: publicada, con pendientes)
 > **Enmienda a:** [PDR-008](PDR-008-landing-agencia-marketing-digital-posicionamiento.md), sólo en su conclusión
 > "performance es capability listada, no cabecera"
 > **Oferta:** [Performance & Commerce Distribution — ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
@@ -67,7 +67,7 @@ Reglas para esta landing:
 - las primeras semanas tras publicar, revisar en Search Console si alguna query aparece servida por ambas URLs.
 
 Nada de lo anterior cambia el slug, el 301 de la legacy ni el resto de esta decisión. Ejecución:
-[TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md).
+[TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md).
 
 ## Delta 2026-09-11 — existe una página legacy de Performance
 

@@ -74,7 +74,7 @@ Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba
 | `04` | [TASK-1401](../../tasks/to-do/TASK-1401-landing-hubspot-precios.md) | HubSpot · Precios | Diseño | Única página del hub con demanda real (~1.500/mes en el bloque hispano); el Pillar ya está publicado | Decidir la URL padre del hub (ver decisiones) |
 | `05` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Servicio de agentes (diseño, construcción, despliegue y operación) | Diseño; contratos UI por rehacer | Familia formal «Agent Hub & Agentic Operations»; caso ANAM con Customer Agent activo y en producción; puente a TASK-1877 sólo tras live readback | URL padre del hub + verificar la métrica ANAM y el alcance de su autorización + rehacer dirección visual, wireframe, flow y motion |
 | `06` | [TASK-1812](../../tasks/to-do/TASK-1812-salesforce-services-landing.md) | Salesforce | Oferta, wireframe, flow y motion listos | La práctica no tiene superficie pública; oportunidad SGS observada. Reordenar si SGS pasa a pitch activo | Readback de partnership/derechos, first fold, CTA binding |
-| `07` | [TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md) | Performance Marketing | **Publicada 2026-10-17** en `/servicios/performance-marketing/` (`251997`); `in-progress` con pendientes (ver Delta 2026-10-17) | Mejor demanda pura de las nuevas: 480–590/mes en Chile, KD 11–13, Efeonce no rankea; retira la legacy `242862` con 301 | Validar PDR-022 |
+| `07` | [TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md) | Performance Marketing | **Complete 2026-10-17** en `/servicios/performance-marketing/` (`251997`); medición verificada (ver Delta 2026-10-17, cierre) | Mejor demanda pura de las nuevas: 480–590/mes en Chile, KD 11–13, Efeonce no rankea; retira la legacy `242862` con 301 | Validar PDR-022 |
 | `08` | [TASK-1860](../../tasks/to-do/TASK-1860-landing-trade-marketing-btl.md) | Trade Marketing & BTL | Diseño | ~880/mes, pero SERP informativo y laboral; el modificador comercial tiene ~10/mes | Validar PDR-021 |
 | `09` | [TASK-1803](../../tasks/to-do/TASK-1803-landing-branding-studio-sistema-marca.md) | Branding Studio | Estrategia y contratos UI listos | La ruta de Réditos incluye branding, pero está bloqueada | CTA/Brand Diagnostic, casos y derechos, SEO/canonical |
 | `10` | [TASK-1369](../../tasks/to-do/TASK-1369-about-us-identidad.md) | About Us | Diseño | Identidad y E-E-A-T, no captura | Bios reales del equipo + arte del hero |
@@ -230,6 +230,12 @@ aprobación explícita del operador. La legacy `242862` (`/servicio-gestion-camp
 La task **no** se cierra todavía: faltan el primer envío real del formulario, el evento GA4 `generate_lead`, Rich
 Results Test y Search Console, GVC con reduced motion y teclado, un republicador con guarda de hash y la prueba de
 guardar y recargar en el editor de Elementor. El ranking no cambia: `07` conserva su posición hasta el cierre.
+
+**Cierre (2026-10-17, tarde):** TASK-1865 pasa a `complete`. Se verificaron en vivo el envío real (HubSpot `delivered`,
+GA4 `generate_lead`), el `Lead` de origen Server en Meta tras publicar la política de medición, Rich Results y
+validator.schema.org, viewports con movimiento reducido y teclado, y el re-guardado en Elementor. Quedan como follow-ups
+pedir indexación en Search Console, archivar el contacto de prueba, el republicador con guarda de hash y extraer el
+núcleo común source-led.
 
 Efecto en otras hijas: TASK-1860 (rank `08`) enlaza a Performance desde su conexión digital y debe usar la URL nueva
 (delta en esa task).

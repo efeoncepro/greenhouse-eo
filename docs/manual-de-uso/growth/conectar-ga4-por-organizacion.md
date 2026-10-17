@@ -4,6 +4,10 @@
 > y Data API verificados históricamente en staging el 02/10; código/flag promovidos el 03/10 con
 > release `fe261ca2745f`. [Evidencia y pendientes](../../tasks/in-progress/TASK-1284-growth-ga4-multitenant-connection-signal.md).
 > Sin nuevo round-trip ni comprobación live de todas las organizaciones en esta revisión.
+>
+> **Delta 2026-10-17:** Efeonce se conectó por primera vez (propiedad `486264460`, «efeoncepro.com»); Berel y Sky
+> siguen activas. Las tres respondieron a una lectura sin escritura. Ver
+> [Estado vigente y diagnóstico](#estado-vigente-y-diagnóstico-2026-10-17).
 
 
 1. Abre **Agencia → Cliente → Ciclo de vida** de la organización correcta. Para Berel, usa **Grupo Berel**.
@@ -26,6 +30,37 @@ llegan desde buscadores y cuántas interactúan; en **Visibilidad en motores de 
 asistentes de IA (ChatGPT, Gemini, Perplexity, Claude, Copilot…) y cuál trae más. Si la organización no tiene GA4
 conectado, el informe lo dice como límite y le pide al cliente el acceso de lectura.
 
+
+## Cada organización tiene su propia conexión
+
+- Cada conexión es una fila propia en `greenhouse_growth.ga4_connections` (una por `organization_id`) con su propio
+  secreto `ga4-token-<orgId>` en Secret Manager (nombre derivado por `secretIdFor(orgId)` en
+  `src/lib/growth/analytics-ga4/command.ts`).
+- Conectar, reconectar o desconectar una organización **no afecta a otra**: conectar Berel o Sky no desconecta a
+  Efeonce, ni al revés.
+
+## Nunca conectada, desconectada o revocada
+
+| Lo que ves en la base | Qué significa |
+|---|---|
+| No hay fila para la organización | **Nunca se conectó.** No hubo desconexión. |
+| Fila con `status=revoked`, `token_secret_ref` vacío y sin `last_error_code` | Alguien usó **Desconectar** (la fila se conserva, no se borra). |
+| Fila con `status=revoked` y `last_error_code=invalid_grant` o `token_secret_missing` | Greenhouse marcó el token como inválido al usarlo. |
+
+Ojo: tanto el listado de propiedades (`listGa4PropertiesForOrg`) como el reader (`readGa4Analytics`) marcan la
+conexión `revoked` si Google responde `invalid_grant` o 401/403. Para diagnosticar sin efectos, refresca el token
+directamente (resolver el secreto y pedir un access token) en vez de pasar por esos comandos.
+
+## Estado vigente y diagnóstico (2026-10-17)
+
+| Organización | Propiedad | Estado |
+|---|---|---|
+| Efeonce (`org-2df565fb…`) | `486264460` «efeoncepro.com» | Conectada el 2026-10-17 desde la ficha de la organización. Antes no tenía fila: nunca estuvo conectada. |
+| Grupo Berel | `328274754` «Grupo Berel WWW - GA4» | Activa (secreto con una sola versión, del 2026-10-02). |
+| Sky | `354430952` «SKY web GA4 - Prod» | Activa (secreto con una sola versión, del 2026-10-15). |
+
+Verificación sin escritura del 2026-10-17 (refresh del token + `runReport` de sesiones de ayer): las tres propiedades
+respondieron 200 con datos.
 
 ## Verificar el resultado y sus límites
 

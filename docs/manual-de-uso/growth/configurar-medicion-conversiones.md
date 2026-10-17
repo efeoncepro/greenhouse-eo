@@ -6,6 +6,9 @@ fuente creada después del release: alta y publicación por datos → Meta Test 
 código/build/redeploy/publish GTM. La fixture quedó desactivada y archivada; no hubo registros
 comerciales sintéticos. [Recibos y límites](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 No se afirma conversión comercial real, mejora de EMQ ni elegibilidad de audiencias desde fixtures.
+**Delta 17/10/2026:** primera conversión comercial consentida observada en Meta con
+`efeonce-performance-diagnostic` (1 Lead SERVER_ONLY); 12 de 18 políticas publicadas.
+Ver [estado de políticas](#estado-de-políticas-al-17102026) y [cómo probar un formulario](#probar-un-formulario-después-de-publicar-su-política).
 Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 
 ## Alta compatible por datos
@@ -14,7 +17,7 @@ Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLI
 2. En el inspector de Growth Forms, seleccionar formulario o agenda y surface. Se resuelve su identidad estable y versión publicada; no introducir slugs en código.
 3. Asignar correo/teléfono/nombre/apellido desde el catálogo tipado. El teléfono debe tener normalización internacional; nombres derivados sólo si la fuente declara namePolicy.
 4. Seleccionar destinos independientes, guardar borrador, revisar y publicar. La revisión actual permanece activa hasta publicar su reemplazo. Cada comando lleva expectedPublishedRevisionId e idempotencyKey.
-5. Leer de vuelta revisión y alcance. Probar con consentimiento publicitario y test_event_code temporal real; no crear conversiones comerciales ficticias.
+5. Leer de vuelta revisión y alcance. Probar con consentimiento publicitario y test_event_code temporal real; no crear conversiones comerciales ficticias. Para un envío real, seguir [Probar un formulario después de publicar su política](#probar-un-formulario-después-de-publicar-su-política).
 
 Una versión nueva del formulario requiere revisar/publicar configuración, sin redeploy. Un cambio
 de código, evento, proveedor, campo de un tipo nuevo u origen fuera de los dos aprobados requiere
@@ -205,10 +208,54 @@ no envolver el archivo `draft.json` ni usar `dryRun:true` como comando de apply.
 el esquema cerrado y limita el cuerpo a 16 KiB. El permiso efectivo de cada acción procede del
 servidor; ninguna opción CLI ni campo actor/role amplía autoridad.
 
+## Probar un formulario después de publicar su política
+
+Un formulario **sin política publicada** llega a HubSpot y a GA4 (`generate_lead`), pero **no a
+Meta**: el backend no encola conversión. Por eso la prueba va siempre después del publish y de su
+`verify`.
+
+1. **Usar un correo nuevo.** El formulario deduplica por formulario + correo (sin espacios y en
+   minúsculas) durante 60 minutos y responde «aceptado» reutilizando el envío anterior, sin crear
+   conversión. Si ya enviaste con ese correo, usa un alias `+` (por ejemplo `nombre+meta@…`) o
+   espera 60 minutos. El alias crea otro contacto en HubSpot: archívalo al terminar.
+2. **Aceptar la publicidad.** En el banner elige «Aceptar todas» (o al menos publicidad). Sin
+   publicidad consentida, o con GPC activo, no hay conversión aunque el envío sea aceptado.
+3. **Leer la cola.** En `greenhouse_growth.measurement_conversion` debe existir la conversión con
+   `advertisement=true`, y en `measurement_delivery` el destino `meta` debe pasar a
+   `http_accepted` (HTTP 200). Leer sólo estado y conteos por el acceso canónico; no seleccionar
+   contactos ni el sobre cifrado.
+4. **Leer Meta con paciencia.** `http_accepted` es el acuse HTTP, no la lectura del proveedor. En el
+   dataset `708931297255942` las estadísticas por hora tardaron ~1 hora en mostrar el Lead
+   (`event_source=SERVER_ONLY`). Una lectura vacía a los pocos minutos no es una falla. No usar el
+   pixel `859508457409711`: la API lo rechaza como dataset inválido.
+
+Caso de referencia (17/10/2026, Performance): primer envío sin política → HubSpot y GA4 sí, Meta
+no; política publicada a las 19:16 UTC; envío consentido con alias `+meta` a las 19:19 →
+`http_accepted` a las 19:20 → 1 Lead visible en Meta a las 20:27.
+[Evidencia](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17).
+
+## Estado de políticas al 17/10/2026
+
+12 políticas publicadas de 18 filas. El 17/10 se publicaron (rev 1, destino `meta`) las de
+`efeonce-performance-diagnostic`, `efeonce-media-diagnostic` y `efeonce-hubspot-scope`.
+
+| Formulario | Política | Envío real verificado en Meta |
+| --- | --- | --- |
+| `efeonce-performance-diagnostic` | Publicada (email/nombre/apellido) | Sí, 1 Lead SERVER_ONLY el 17/10 |
+| `efeonce-media-diagnostic` | Publicada (email/teléfono/nombre/apellido) | Pendiente |
+| `efeonce-hubspot-scope` | Publicada (email/nombre/apellido) | Pendiente |
+| `efeonce-web-agentica-ebook` | Sin política | No aplica |
+| `efeonce-surround-discovery-ebook` | Sin política | No aplica |
+| `efeonce-creator-influence-brief` | Sin política | No aplica |
+| `efeonce-content-marketing` | Sin política | No aplica |
+
+Además hay filas antiguas sin publicar. Pendiente operativo: archivar en HubSpot el contacto de
+prueba con alias `+meta` (decisión del operador).
+
 ## Alcance que sigue pendiente
 
 Las políticas comerciales no implementan eventos CRO, abandono, Subscribe del blog ni resultados
 CRM; esos ítems permanecen en TASK-2035. El envío o matching tampoco marca por sí solo un evento
 como clave en GA4: revisar propiedad/evento y evidencia en TRACKING-PLAN. La primera aceptación
-comercial consentida, su conciliación con cada proveedor y la evolución de calidad requieren
-tráfico real. La prueba aislada de Meta no certifica Google Ads, atribución ni audiencias utilizables.
+comercial consentida ya se observó en Meta (Performance, 17/10); su conciliación con los demás
+formularios y proveedores y la evolución de calidad siguen requiriendo tráfico real. La prueba aislada de Meta no certifica Google Ads, atribución ni audiencias utilizables.

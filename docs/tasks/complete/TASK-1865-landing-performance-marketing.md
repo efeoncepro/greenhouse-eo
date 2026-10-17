@@ -1,5 +1,14 @@
 # TASK-1865 — Landing pública Performance Marketing (Performance & Commerce Distribution)
 
+## Delta 2026-10-17 (cierre)
+
+- Cerrada por instrucción del operador («cerremos esto»). Landing en producción, legacy retirada y medición verificada de
+  punta a punta con envíos reales: HubSpot `delivered`, GA4 `generate_lead` y Meta `Lead` de origen Server. Los
+  criterios del contrato original sustituidos por el canvas aprobado quedan anotados uno a uno en Acceptance Criteria.
+- Follow-ups: archivar en HubSpot el contacto de prueba con alias `+meta`; pedir indexación de la URL nueva (y de la
+  legacy, para que Google vea el 301) en la interfaz de Search Console; extraer el núcleo común source-led con Medios;
+  republicador con guard de hash que preserve `_thumbnail_id`; probar con envío real las políticas de Medios y HubSpot.
+
 ## Delta 2026-10-17 (noche) — verificación en vivo
 
 - **Envío real (Julio, 19:07:59 UTC):** submission `fsub-98493cff…` `delivered`, dominio corporativo, snapshot de
@@ -145,7 +154,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -160,7 +169,7 @@
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
 - Epic: `EPIC-047`
-- Status real: `Publicada y verificada en vivo 2026-10-17 (schema, viewports, teclado, Elementor); envío real OK en GA4 y HubSpot; Lead consentido recibido por Meta como evento de servidor; Search Console: URL nueva aún no descubierta`
+- Status real: `Complete 2026-10-17: landing en producción, legacy retirada, medición GA4/HubSpot/Meta verificada con envíos reales; follow-ups: archivar contacto de prueba, pedir indexación en Search Console, extraer núcleo source-led`
 - Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
@@ -745,37 +754,37 @@ el motor ya soporta.
 
 - [x] Se declaró `Execution profile: ui-ux` y `UI impact: flow` según el alcance real.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC scenario
-      plan y design decision log; si está en `yes`, pasa `pnpm task:lint --task TASK-1865`.
-- [ ] El wireframe, el flow, el motion y la dirección visual declarados existen.
-- [ ] La página nueva no reutiliza contenido, estructura ni assets de la legacy.
-- [ ] La demanda está triangulada con una segunda fuente y la decisión de URL quedó cerrada antes del canonical.
+      plan y design decision log; si está en `yes`, pasa `pnpm task:lint --task TASK-1865`. — **No aplica (cierre 2026-10-17):** la dirección aprobada fue el canvas source-led (Delta 2026-10-17); `UI ready` quedó en `no` y el contrato de wireframe R1–R15 quedó sustituido.
+- [x] El wireframe, el flow, el motion y la dirección visual declarados existen.
+- [x] La página nueva no reutiliza contenido, estructura ni assets de la legacy.
+- [ ] La demanda está triangulada con una segunda fuente y la decisión de URL quedó cerrada antes del canonical. — **Parcial (cierre 2026-10-17):** se decidió con Semrush (2026-10-17); la segunda fuente quedó registrada como pendiente en PDR-022 y no bloqueó publicar.
 - [x] El H1 contiene `performance marketing`, el title contiene `agencia de performance marketing` y existe un solo H1.
-- [ ] Las dos cápsulas de R2 tienen entre 40 y 60 palabras y están bajo un H2 con la pregunta literal.
+- [ ] Las dos cápsulas de R2 tienen entre 40 y 60 palabras y están bajo un H2 con la pregunta literal. — **No aplica (cierre 2026-10-17):** la estructura R1–R15 fue reemplazada por el canvas aprobado; la definición va en la línea bajo el H1.
 - [ ] La firma cambia de primer ítem al cambiar la señal, funciona con teclado, anuncia el cambio y muestra el rótulo
-      ilustrativo sin interacción.
-- [ ] Ninguna región muestra un número sin fuente y fecha, un contador, un logo de plataforma o un badge de partner.
+      ilustrativo sin interacción. — **No aplica (cierre 2026-10-17):** la firma `Clics / Ventas` no forma parte del diseño aprobado; su lugar lo ocupa el autodiagnóstico, verificado con teclado.
+- [ ] Ninguna región muestra un número sin fuente y fecha, un contador, un logo de plataforma o un badge de partner. — **No aplica (cierre 2026-10-17):** el diseño aprobado por el operador muestra partners (HubSpot, Salesforce), logos de plataformas en las pestañas y prueba social.
 - [ ] Las diez plataformas aparecen con qué hacemos en cada una, sin chip de estado ni mención de partner; Amazon Ads
-  dice que es para México y la región muestra su fecha de vigencia.
-- [ ] La tabla de posición no nombra ninguna empresa y muestra la nota por tipo de proveedor.
-- [ ] Ninguna sección promete ROAS, retorno, leads, pipeline, ventas ni precios.
-- [ ] La página no nombra partners ni dice que alguna plataforma se opera con partner.
-- [ ] El rol verde aparece exactamente en los tres CTAs de reunión.
-- [ ] El form `efeonce-performance-brief` está publicado con consentimiento, Turnstile, gate corporativo y retención `730d`.
-- [ ] Los estados ready, loading, empty, partial, error, denied y success del form fueron verificados.
-- [ ] El CTA `performance-discovery-meeting` abre el scheduler nativo y no hay enlaces del proveedor.
-- [ ] La fila del form está en `TRACKING-PLAN.md` y ningún evento envía PII ni los datos comerciales del brief.
+  dice que es para México y la región muestra su fecha de vigencia. — **No aplica (cierre 2026-10-17):** el diseño aprobado opera con pestañas por plataforma, no con la tabla de diez.
+- [ ] La tabla de posición no nombra ninguna empresa y muestra la nota por tipo de proveedor. — **No aplica (cierre 2026-10-17):** la tabla de posición no forma parte del diseño aprobado.
+- [ ] Ninguna sección promete ROAS, retorno, leads, pipeline, ventas ni precios. — **Sin verificar (cierre 2026-10-17):** no se auditó contra el copy final; el copy aprobado habla de optimizar por ventas, sin cifras ni garantías.
+- [ ] La página no nombra partners ni dice que alguna plataforma se opera con partner. — **No aplica (cierre 2026-10-17):** el operador aprobó mostrar HubSpot Gold Partner y Salesforce Partner.
+- [ ] El rol verde aparece exactamente en los tres CTAs de reunión. — **No aplica (cierre 2026-10-17):** la paleta aprobada es La órbita (acento naranja); no hay rol verde.
+- [ ] El form `efeonce-performance-brief` está publicado con consentimiento, Turnstile, gate corporativo y retención `730d`. — **No aplica (cierre 2026-10-17):** se publicó `efeonce-performance-diagnostic` (propio, `hubspot_pillar`, destino HubSpot directo), con consentimiento y Turnstile del motor.
+- [ ] Los estados ready, loading, empty, partial, error, denied y success del form fueron verificados. — **Parcial (cierre 2026-10-17):** se verificaron ready y success con envíos reales del operador; los demás estados son del motor Growth Forms, sin cambio en esta task.
+- [ ] El CTA `performance-discovery-meeting` abre el scheduler nativo y no hay enlaces del proveedor. — **No aplica (cierre 2026-10-17):** el diseño aprobado enlaza a la agenda existente («Agenda una reunión»); no se creó un CTA de agenda propio.
+- [x] La fila del form está en `TRACKING-PLAN.md` y ningún evento envía PII ni los datos comerciales del brief.
 - [x] `Service` y `FAQPage` validan y sólo marcan contenido visible; no hay entidades de Yoast duplicadas.
-- [ ] Los tres gates `public-website:verify-performance-*` pasan en vivo después del último guardado y de la migración.
+- [ ] Los tres gates `public-website:verify-performance-*` pasan en vivo después del último guardado y de la migración. — **No aplica (cierre 2026-10-17):** esos gates no se construyeron; la verificación se hizo con scripts con guardas y readback en vivo (Delta noche).
 - [x] GVC premium capturado y mirado en 1536, 1440, 890 y 390, más reduced motion y teclado.
 - [x] `scrollWidth === clientWidth` en los cuatro viewports.
-- [ ] El scorecard visual cumple el umbral declarado.
+- [ ] El scorecard visual cumple el umbral declarado. — **Sin verificar (cierre 2026-10-17):** no se corrió el scorecard; el diseño lo aprobó el operador en el canvas.
 - [x] La URL legacy responde 301 a la nueva, el ítem de menú apunta a la nueva, no quedan enlaces internos a la legacy y
       la legacy está `private` y fuera del sitemap.
 - [x] La página nueva está en `index, follow` con canonical, sitemap y enlace desde el hub.
 - [x] La triple documentación, la fila en `PRIMITIVES.md`, el registry de la skill y la landing reference en ambas skills
       existen.
-- [ ] No se creó ningún lead ni ninguna reserva ficticia durante QA.
-- [ ] El copy publicado respeta la regla terminológica del wireframe y los nombres públicos mapeados al catálogo.
+- [ ] No se creó ningún lead ni ninguna reserva ficticia durante QA. — **No cumplido (cierre 2026-10-17):** se crearon envíos reales de prueba del operador para verificar la medición (uno con alias `+meta`); el contacto de prueba en HubSpot queda por archivar.
+- [ ] El copy publicado respeta la regla terminológica del wireframe y los nombres públicos mapeados al catálogo. — **No aplica (cierre 2026-10-17):** el copy publicado es el del canvas aprobado por el operador; no se contrastó contra la regla del wireframe sustituido.
 
 ## Verification
 
@@ -794,15 +803,15 @@ el motor ya soporta.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] PDR-022 pasó de `Draft for validation` al estado que corresponda y el roadmap del sitio quedó al día.
-- [ ] La fila de esta task en `EPIC-019` y el nodo en el flujo maestro de `EPIC-023` reflejan el estado final.
+- [ ] La fila de esta task en `EPIC-019` y el nodo en el flujo maestro de `EPIC-023` reflejan el estado final. — **No aplica (cierre 2026-10-17):** la task pertenece a EPIC-047 (fila actualizada); EPIC-019 y EPIC-023 no la referencian.
 - [x] `TASK-1860` apunta a la URL nueva en su conexión digital.
 - [x] La ficha de servicio registra la URL pública y los nombres públicos.
 

@@ -4,7 +4,9 @@ Publicado14/10/2026: PR255, main `9690efad0c1b9d70d9b168d41131857e686b0f81`,
 orquestador38591329633 success y manifest released. [Release y recibos](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 GTM Server9 estricto v2; sólo template30 cambió, otros tags y Web5 preservados. Web/worker
 convergentes, SQL/grants aplicados, siete políticas equivalentes; watchdog6/6 y drift0.
-**Primera conversión comercial consentida y mejora EMQ siguen pendientes de tráfico real.**
+Al 14/10 la primera conversión comercial consentida seguía pendiente. **17/10: observada con
+`efeonce-performance-diagnostic` (1 Lead SERVER_ONLY en Meta; [evidencia](#primera-conversión-comercial-consentida--performance-2026-10-17)).**
+Mejora EMQ y el envío real de Medios y HubSpot scope siguen pendientes.
 
 [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md) ·
 [políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) ·
@@ -261,7 +263,8 @@ Meta Preview/TestEvents Processed/Server em/ph/fn/ln y clasificadores amboshosts
 más replayIDestable (no dedupe de atribución). Negativos live no dispararon tag.
 
 Pendiente: fuente real consentida → event_id proyección → delivery por destino → ackHTTP →
-lectura provider. No submissions/bookings/CRM/quotes/pagos falsos para cerrarlo. No afirmación
+lectura provider. Cerrado para Meta con Performance el 17/10 ([evidencia](#primera-conversión-comercial-consentida--performance-2026-10-17));
+sigue abierto para Meetings, Google UPD y las demás fuentes. No submissions/bookings/CRM/quotes/pagos falsos para cerrarlo. No afirmación
 de volumen/calidad/serving/rendimientoAds. Funnel meeting_step y sus dimensiones se verifican
 aparte de la confirmación publicada; un workspace previewado no publica todas sus etiquetas.
 Diagnóstico en orden: consentimiento/contexto → alcance/contactos/URL → flags/key → cola →
@@ -327,3 +330,34 @@ El form suma 3 envíos en total, el último el 2026-07-05, y a la fecha no hay n
 `greenhouse_growth.measurement_conversion` para ningún form. **La cadena Lead de punta a punta de
 este form no está probada con un envío real**; la configuración publicada no lo sustituye.
 
+## Primera conversión comercial consentida — Performance (2026-10-17)
+
+Form `efeonce-performance-diagnostic`, tráfico real en producción. Cadena observada de punta a punta:
+
+| Paso (UTC) | Evidencia |
+| --- | --- |
+| 19:07:59 primer envío, sin política | HubSpot `delivered` (adapter `hsforms-v3-secure-submit`, HTTP 200); GA4 realtime (486264460) con `form_start` y `generate_lead`. **Meta sin Lead:** sin política publicada el backend no encola; `measurement_conversion` tenía 0 filas de cualquier fuente. |
+| 19:16 política | Publicada rev 1, destino `meta`, con `pnpm --silent growth:measurement` (discover → validate → apply draft → review → publish; UUID de idempotencia y recibo por paso; `verify` OK y readback en PG). Actor de auditoría `agent@greenhouse.efeonce.org` (agent-auth en producción). `validate`: `commercialAcceptanceChanged:false`, `crmDestinationChanged:false`. Configuración por Product API, no release ni deploy. |
+| 19:19:43 envío consentido | Alias `+meta`, «Aceptar todas»: HubSpot `delivered` 200; `measurement_conversion` con `advertisement=true`, GPC false, `policyVersion efeonce-categories-2026-10-13` y la revisión de Performance; `measurement_delivery` `meta` → `http_accepted`, HTTP 200 al primer intento (19:20:02). |
+| Meta, dataset `708931297255942` | `ads_get_dataset_stats` (MCP de Meta Ads): a las 19:24 aún sin dato; a las 20:27 **1 Lead `event_source=SERVER_ONLY`** en el bloque 19:00–20:00. Primer Lead productivo desde el cutover del 14/10 (los 71 Leads de los últimos 28 días están entre el 13 y el 14/10). |
+
+En la misma pasada se publicaron (rev 1, destino `meta`) las políticas de `efeonce-media-diagnostic`
+(email/teléfono/nombre/apellido) y `efeonce-hubspot-scope` (email/nombre/apellido). Estado global:
+12 políticas publicadas de 18 filas; siguen sin política `efeonce-web-agentica-ebook`,
+`efeonce-surround-discovery-ebook`, `efeonce-creator-influence-brief` y `efeonce-content-marketing`
+(además de filas antiguas sin publicar).
+
+Lecturas que esta prueba fija:
+
+- **Dedupe del form:** un reenvío con el mismo correo dentro de 60 min no crea conversión.
+  `findRecentDuplicate` (forms/store.ts) compara `dedupe_fingerprint` (form + email con trim y
+  lowercase) y responde `accepted` reutilizando el envío previo. Para QA: esperar 60 min o usar
+  un alias `+` (en HubSpot crea otro contacto, que hay que archivar después).
+- **`http_accepted` no es lectura en Meta.** Las estadísticas por hora del dataset tardaron ~1 h y
+  `server_last_fired_time` también se actualiza con retraso: una lectura vacía minutos después
+  del envío no es una falla.
+- **Dataset real:** `708931297255942`. El pixel `859508457409711` de la doc 02 devuelve
+  «Invalid dataset_id» en la API.
+
+Pendiente: envío real con publicidad aceptada en Medios y HubSpot scope; mejora EMQ; archivar el
+contacto de prueba `+meta` en HubSpot (decisión del operador).

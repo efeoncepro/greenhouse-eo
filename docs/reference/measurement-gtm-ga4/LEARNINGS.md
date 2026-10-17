@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-10-17 — primer Lead comercial consentido: cómo se prueba de verdad
+
+[Evidencia](10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17) ·
+[manual de QA](../../manual-de-uso/growth/configurar-medicion-conversiones.md#probar-un-formulario-después-de-publicar-su-política).
+
+- **Formulario sin política = Meta sin Lead, aunque GA4 tenga `generate_lead`.** El primer envío
+  real de `efeonce-performance-diagnostic` llegó a HubSpot (200) y a GA4 realtime, y Meta no
+  recibió nada: sin política publicada el backend nunca encola conversión. Que GA4 vea el lead no
+  dice nada del carril Meta; revisar primero que la política del form esté publicada.
+- **El dedupe de 60 min invalida un reenvío como prueba.** El form deduplica por
+  `dedupe_fingerprint` (form + email con trim y lowercase) y responde `accepted` reutilizando el
+  envío anterior: no hay conversión nueva. Tras publicar la política, probar con un alias `+`
+  (otro correo; en HubSpot crea otro contacto que hay que archivar) o esperar 60 min.
+- **`http_accepted` no es lectura en Meta.** Es el ACK HTTP de la entrega. La lectura del
+  proveedor (`ads_get_dataset_stats`) tardó ~1 h: a los 5 min no había dato; a la hora, 1 Lead
+  `SERVER_ONLY` en el bloque horario. `server_last_fired_time` también llega tarde. Una lectura
+  vacía al rato del envío no es una falla.
+- **El dataset real es `708931297255942`.** El pixel `859508457409711` que figura en la doc 02 de
+  GTM devuelve «Invalid dataset_id» en la API: no usarlo para leer estadísticas.
+- **Publicar una política es configuración, no release.** Las tres políticas del 17/10 salieron
+  por la CLI gobernada (discover → validate → apply → review → publish, recibo por paso) con
+  `commercialAcceptanceChanged:false` y `crmDestinationChanged:false`, sin deploy.
+
 ## 2026-10-16 — drift de GTM con mecanismo, no con promesa
 
 [Snapshot y drift](README.md#snapshot-y-drift-de-los-dos-containers) ·

@@ -10,7 +10,7 @@
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
 > **Superficie pública:** desde el 2026-10-17, la landing
 > [«Performance Marketing»](https://efeoncepro.com/servicios/performance-marketing/)
-> ([TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md);
+> ([TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md);
 > [documentación funcional](../../documentation/public-site/performance-marketing.md)), con el formulario propio
 > `efeonce-performance-diagnostic` como entrada de leads (HubSpot «Lead Gen - Performance Marketing»; primer envío real
 > y `generate_lead` todavía sin verificar). Desde el 2026-10-16 la landing

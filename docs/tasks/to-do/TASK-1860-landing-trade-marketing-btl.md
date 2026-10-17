@@ -8,7 +8,7 @@
   de esta task hacia Performance (conexión digital, `digital.items.retailMedia.link`) debe usar
   `/servicios/performance-marketing/` (anchor `#plataformas`, verificado en vivo el 2026-10-17; `#canales` no existe) y nunca la legacy; el 301
   sólo cubre enlaces viejos. La revisión de canibalización por retail media se hace contra la URL nueva. Cerrado por
-  [TASK-1865](../in-progress/TASK-1865-landing-performance-marketing.md).
+  [TASK-1865](../complete/TASK-1865-landing-performance-marketing.md).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -638,7 +638,7 @@ CTA, que el motor ya soporta.
 
 - La página de Performance que esta task enlaza desde su conexión digital (`/servicio-gestion-campanas-publicitarias/`,
   página `242862`) será reemplazada por `/servicios/performance-marketing/` con un 301, en el Slice 6 de
-  [TASK-1865](../in-progress/TASK-1865-landing-performance-marketing.md). El 301 mantiene el enlace funcionando, pero al construir el
+  [TASK-1865](../complete/TASK-1865-landing-performance-marketing.md). El 301 mantiene el enlace funcionando, pero al construir el
   enlace `digital.items.retailMedia.link` conviene apuntar a la URL nueva (anchor `#canales`) si `TASK-1865` ya promovió,
   para no depender de la redirección. Si ambas tasks construyen su módulo base a la vez, coordinar en Discovery para no
   duplicarlo.

@@ -14,6 +14,11 @@ Docs sincronizados (mismo día): funcional `docs/documentation/public-site/perfo
 `docs/manual-de-uso/public-site/operar-performance-marketing.md`, PRIMITIVES, contrato de forms, TRACKING-PLAN
 (fila pendiente), servicios, PDR-022/021/025, briefs, EPIC-047, TASK-1860 (ancla `#plataformas`) y skill
 `efeonce-public-site-wordpress` (lecciones del carril). El `?utm_` en el 301 lo conserva el mu-plugin passthrough, no Yoast.
+**Cierre 2026-10-17 (tarde):** TASK-1865 `complete`. Envíos reales del operador: HubSpot `delivered`, GA4 `generate_lead`;
+Meta sin Lead hasta publicar políticas de medición (Performance, Medios, HubSpot scope; 12/18 publicadas) y luego 1 `Lead`
+Server en el dataset `708931297255942` (stats con ~1 h de retraso). Form deduplica 60 min por email: QA con alias `+`.
+Search Console activo (el `invalid_grant` era del script: usar `getSearchConsoleConnection`); GA4 de Efeonce conectado
+por primera vez hoy, Berel/Sky intactos. Follow-ups: archivar contacto `+meta` en HubSpot, pedir indexación en GSC.
 
 ## 2026-10-17 — Brochures aprobados: no recortar ni revalidar
 

@@ -22,7 +22,7 @@ del sitio.
 
 > Detalle técnico: página WordPress `251997`, hija de `251077`; canvas aprobado (v25) con copia versionada en
 > `docs/ui/sources/TASK-1865/`; trabajo registrado en
-> [TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md).
+> [TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md).
 
 ## A quién le habla
 

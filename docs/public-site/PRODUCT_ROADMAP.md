@@ -163,7 +163,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
  cero que retira con 301 la legacy `242862` (`/servicio-gestion-campanas-publicitarias/`), sin parcharla mientras tanto.
  Ver
  [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) y
- `docs/tasks/in-progress/TASK-1865-landing-performance-marketing.md`.
+ `docs/tasks/complete/TASK-1865-landing-performance-marketing.md`.
  Delta 2026-10-16: la landing de Agencia de Medios (PDR-025) ya está publicada; Performance no usa «agencia de medios»,
  «compra de medios» ni «planificación de medios» en title, H1 ni slug, y al publicarse ambas se enlazan por función.
  **Delta 2026-10-17 — publicada e indexable:** página `251997` en `/servicios/performance-marketing/` (URL definitiva),

@@ -1,8 +1,9 @@
 # Meta Conversions API mediante GTM Server
 
 > Canon operativo de CAPI/sGTM. **Readout14/10: Server9/Web5**, PR255/main9690efad publicado,
-> Lead backend único, contexto visitante y políticas versionadas. Primera conversión comercial
-> consentida y mejora EMQ aún no observadas; Test Events es evidencia controlada separada.
+> Lead backend único, contexto visitante y políticas versionadas. Test Events es evidencia
+> controlada separada. **17/10: primera conversión comercial consentida observada en Meta**
+> (Performance, 1 Lead SERVER_ONLY; [delta](#delta-2026-10-17--primer-lead-comercial-consentido)); mejora EMQ aún no observada.
 > Dirección: [ADR Meta](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md) y
 > [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 > [Runtime vigente](10-growth-lead-matching-runtime.md) · [release y pruebas](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md) ·
@@ -356,6 +357,16 @@ Processed/Server/website y todas las claves disponibles (sin inventar teléfono 
 temporal por petición, no tag fijo, sin pruebas ordinarias. Fuente/policy de QA archivada/desactivada
 con readback; aplicación y GTM idénticos durante el alta. [Expediente de release](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 No prueba mejora EMQ, audiencia utilizable ni aceptación comercial real; continúan pendientes.
+
+## Delta 2026-10-17 — primer Lead comercial consentido
+
+Envío real consentido de `efeonce-performance-diagnostic` (19:19:43 UTC, «Aceptar todas») tras
+publicar su política: `measurement_delivery` `meta` → `http_accepted` 200 al primer intento y el
+dataset `708931297255942` mostró **1 Lead `SERVER_ONLY`** en el bloque 19:00–20:00 UTC, leído a
+las 20:27 con `ads_get_dataset_stats` (las estadísticas por hora tardaron ~1 h). El envío previo,
+sin política, llegó a HubSpot y GA4 pero no a Meta: sin política el backend no encola. El pixel
+`859508457409711` citado en la doc 02 no es un dataset válido para la API. Medios y HubSpot scope
+tienen política publicada pero sin envío real. [Evidencia completa](10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17).
 
 ## Token Meta literal en el tag servidor — pendiente 2026-10-16
 

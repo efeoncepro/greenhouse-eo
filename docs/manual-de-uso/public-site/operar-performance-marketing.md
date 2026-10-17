@@ -216,6 +216,6 @@ del núcleo común del carril (hoy es una copia del de Agencia de Medios).
 - [Tracking Plan](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md#forms)
 - [Incrustar un formulario de Growth](../growth/incrustar-formulario-wordpress-astro.md)
 - [Decisión de posicionamiento PDR-022](../../public-site/decisions/PDR-022-landing-performance-marketing-posicionamiento.md)
-- [TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md)
+- [TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md)
 - Plugin: `efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets` (`class-eo-performance-landing-*`,
   `includes/performance/`, `assets/js/performance-landing.js`).

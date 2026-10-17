@@ -15,6 +15,8 @@
   `efeonce-performance-diagnostic` con destino HubSpot directo.
 - Documentación sincronizada: funcional, manual, PRIMITIVES, contrato de forms, TRACKING-PLAN, servicios, PDRs,
   briefs y skill del sitio público (lecciones del carril de release).
+- Cierre: TASK-1865 `complete`; políticas de medición Meta publicadas para Performance, Medios y HubSpot scope y primer
+  `Lead` de servidor recibido por Meta desde el 14/10.
 
 ## 2026-10-17 — BytePlus: retratos activos y pruebas completadas en la cuenta correcta
 

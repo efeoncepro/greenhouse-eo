@@ -45,7 +45,7 @@ de medios», con «compra de medios» y «planificación de medios» como secund
 title, H1 y slug a propósito: en Chile «agencia de performance marketing» es otra búsqueda (top 10 sin dominios en
 común con «agencia de medios» y 16 veces su volumen) y tiene su propia landing, publicada el 2026-10-17 en
 <https://efeoncepro.com/servicios/performance-marketing/>
-([TASK-1865](../../tasks/in-progress/TASK-1865-landing-performance-marketing.md)). Operación del sitio: skill
+([TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md)). Operación del sitio: skill
 `efeonce-public-site-wordpress`, landings `agencia-de-medios` y `performance-marketing`.
 
 > **Delta 2026-10-17.** Hasta esta fecha este párrafo decía que `/servicios/performance-marketing/` estaba sin
