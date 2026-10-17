@@ -15,6 +15,8 @@ const usedAssets = JSON.parse(fs.readFileSync(path.join(__dirname, 'performance-
 
 const relativeFiles = [
   'includes/class-eo-widgets-loader.php',
+  // The landing base extends the shared source-led base: ship them together (deploy writes the shared one first).
+  'includes/widgets/class-eo-source-led-landing-base.php',
   'includes/widgets/class-eo-performance-landing-base.php',
   'includes/widgets/class-eo-performance-landing-widgets.php',
   'includes/performance/seo.php',

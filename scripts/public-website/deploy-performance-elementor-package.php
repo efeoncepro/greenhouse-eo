@@ -7,7 +7,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'performance-elementor-release.v1' ) { 
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root = WP_PLUGIN_DIR . '/eo-elementor-widgets/';
-$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-performance-landing-(base|widgets)\.php|performance/seo\.php|performance/schemas/[a-z]+(-[a-z]+)*\.json|performance/templates/[a-z0-9_-]+\.html)|assets/(css/performance-landing\.css|js/performance-landing\.js|img/performance/[a-z0-9-]+\.(webp|mp4|svg)))$#';
+$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-performance-landing-(base|widgets)\.php|widgets/class-eo-source-led-landing-base\.php|performance/seo\.php|performance/schemas/[a-z]+(-[a-z]+)*\.json|performance/templates/[a-z0-9_-]+\.html)|assets/(css/performance-landing\.css|js/performance-landing\.js|img/performance/[a-z0-9-]+\.(webp|mp4|svg)))$#';
 $files = array();
 foreach ( $manifest['files'] as $entry ) {
 	$path = $entry['path'];
@@ -27,6 +27,9 @@ foreach ( $files as $path => $content ) {
 }
 $backup->addFromString( 'release-manifest.json', wp_json_encode( $manifest ) );
 $backup->addFromString( 'created-paths.json', wp_json_encode( $created ) );
+// The shared source-led base goes first: the landing base requires it.
+$shared = 'includes/widgets/class-eo-source-led-landing-base.php';
+if ( isset( $files[ $shared ] ) ) { $files = array( $shared => $files[ $shared ] ) + $files; }
 $loader = $files['includes/class-eo-widgets-loader.php'] ?? null;
 unset( $files['includes/class-eo-widgets-loader.php'] );
 if ( null !== $loader ) { $files['includes/class-eo-widgets-loader.php'] = $loader; }
