@@ -4,6 +4,7 @@ Evidencia visual, auditorias y revisiones operativas de superficies publicas de 
 
 ## Artefactos
 
+- [Landing Servicios HubSpot v2 — publicación, correcciones y dock móvil - 2026-10-16](2026-10-16-hubspot-v2-publication.md)
 - [Agencia Creativa — rollout de módulos Elementor - 2026-10-15](2026-10-15-agencia-creativa-elementor-rollout.md)
 - [Formularios del sitio y entrega a HubSpot — auditoría y rollout - 2026-10-09](2026-10-09-growth-forms-hubspot-delivery-audit.md)
 - [Web agéntica — cierre de publicación y QA live - 2026-07-18](2026-07-18-web-agentica-pillar-publication.md)

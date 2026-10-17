@@ -20,6 +20,31 @@
    rango horario, zona y Teams, y no volver a ofrecer selección ni otra acción de booking.
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
 11. En un host ancho, revisa que “Conversemos” no corte letras, que el carril no muestre aros recortados y que la marca monocroma de Teams aparezca sin fondo morado. Repite a 820 px y 390 px verificando `scrollWidth === clientWidth`.
+12. Revisa la cabecera del diálogo en el host real a 390 px y 820 px: el título no debe tomar la tipografía de los `h2` del
+    tema y «Cerrar agenda» debe quedar en una sola línea (≈128×44 px), sin overflow. El diálogo vive en `<body>` y hereda el
+    CSS del host, así que esta prueba sólo vale sobre la página real, no sobre el preview de `/growth/ctas`.
+
+## Incrustar el launcher como botón compacto
+
+Si el host necesita sólo el botón (un dock, una barra o una fila de acciones) y no el card completo, publica el CTA con
+placement `embedded` y style `minimal`, y reduce el card a su botón desde el CSS del host, acotado al contenedor:
+
+- oculta `.ghc-content` y `.ghc-dismiss`;
+- deja `.ghc-card` en `display: flex; gap: 0`, sin padding, borde, fondo, sombra ni animación, y `.ghc-actions` sin márgenes;
+- da al `.ghc-primary` el alto, radio y colores del host (área táctil ≥ 44 px) y fija `--gh-cta-reserve` al alto del botón
+  para que el renderer no reserve el espacio del card.
+
+Caso fuente: el dock móvil de `/servicios-contratar-hubspot/` (CTA `hubspot-discovery-meeting`, `cta-location=hubspot_mobile_dock`)
+reduce el CTA a un botón de 48 px junto a «Ir al formulario»; `/contacto/` usa el mismo patrón. El botón sigue abriendo el
+scheduler nativo en full-screen y la conversión sigue siendo el receipt `gh_meeting_*`, nunca el click. Si el host no tiene
+surface/key, el hueco debe caer a un enlace a `/agenda/`.
+
+## Problemas comunes
+
+| Síntoma | Causa | Qué hacer |
+| --- | --- | --- |
+| En móvil, la cabecera del scheduler se ve partida: título con la tipografía del tema y «Cerrar agenda» en tres líneas | Renderer ≤ 1.3.0: el shorthand `font` con `inherit` (`font: 650 .84rem/1 inherit`) es inválido, el navegador descarta la declaración y el diálogo hereda el CSS del host | Corregido en el renderer **1.3.1** (longhands con `font-family: inherit`, botón `flex: none` + `nowrap`); code complete, llega a los hosts sólo con el release a producción de `renderer-latest.js` (pendiente al 2026-10-17) |
+| El launcher compacto muestra el texto o el botón de descartar del card | El CSS del host no oculta `.ghc-content`/`.ghc-dismiss` o no está acotado al contenedor | Aplica las reglas de §Incrustar el launcher como botón compacto dentro del selector del contenedor |
 
 ## Comprobar medición y matching
 

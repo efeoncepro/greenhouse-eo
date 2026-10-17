@@ -1,5 +1,16 @@
 # TASK-1878 — Entradas a la oferta humano-agente desde Home, HubSpot y AEO
 
+## Delta 2026-10-17 — la landing HubSpot `244079` ya es la v2
+
+- Desde el 2026-10-16 la página son 14 widgets `greenhouse_hubspot_v2_*`; `HUBSPOT_ELEMENTOR_MODULES_V1.md` describe la v1
+  reemplazada. Un cambio page-scoped en HubSpot se hace por la fuente `scripts/public-website/hubspot-v2-source/` y el
+  republicador `republish-hubspot-v2-page.php` (snapshot + guard `GH_EXPECT_HASH`) — cerrado por la publicación v2
+  ([audit](../../audits/public-site/2026-10-16-hubspot-v2-publication.md),
+  [manual](../../manual-de-uso/public-site/hubspot-elementor.md)).
+- «CTA HubSpot intacta» ahora incluye el dock móvil: el Growth CTA `hubspot-discovery-meeting` («Agendar reunión») y el
+  salto `#agenda-form`, además del Growth Form `efeonce-hubspot-scope`. Republicar sin el tercer input (key del CTA) deja
+  el dock cayendo a `/agenda/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -6,7 +6,8 @@ primitive ownership: `docs/architecture/public-site/PRIMITIVES.md`. Dated Home e
 belong in `references/landings/home-claude-design-preview.md` and the linked audit.
 Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
 and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
-`references/landings/agencia-de-medios.md`.
+`references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
+`references/landings/hubspot-services.md`.
 
 ## Source fidelity without losing editability
 
@@ -46,7 +47,8 @@ and `references/landings/content-marketing.md`. Second canvas compiler (Agencia 
 Agencia Creativa (`scripts/public-website/compile-creativa-elementor-source.cjs`, source
 `scripts/public-website/creativa-source/Main.dc.html`) compiles a live canvas into schema-driven widgets;
 Agencia de Medios (`compile-medios-elementor-source.cjs`, source `medios-source/Main.dc.html`) is the second
-compiler built on the same pattern. Expand every dynamic part of the canvas into static, editable markup; do
+compiler built on the same pattern and HubSpot v2 (`compile-hubspot-v2-elementor-source.cjs`, source
+`hubspot-v2-source/`) the third. Expand every dynamic part of the canvas into static, editable markup; do
 not ship the canvas runtime:
 
 - Interactive tabs → one repeater whose row has two parts, rendered into `%%repeat_<key>__tab%%` and
@@ -74,6 +76,23 @@ not ship the canvas runtime:
 - An SVG data meter → a server-drawn number field, not an image of a number.
 - Repeater rows whose markup differs → explicit layout variants. Name row field labels by role
   (what the field is in every row), never by the first row's copy.
+- Name template tokens so they cannot collide with schema field keys. The renderer substitutes a field's value
+  into any `%%token%%` of the same name, so a token that matches a field is silently replaced by that field's
+  value (HubSpot v2: the dock's Growth CTA slot is `%%meeting_launcher%%` for that reason).
+
+#### Scoping the canvas CSS and the page layer
+
+The compiler scopes the canvas CSS under the landing root (`.gh-hsv2`, `.gh-medios`, …) so nothing leaks to
+Ohio or other pages. Two rules keep that scoping honest:
+
+- Rewrite `html`/`body` only as **element selectors**, never as substrings. A loose regex turned `.panel-body`
+  into `body` and stripped every panel's padding (HubSpot v2, 2026-10-16). After compiling, grep the output for
+  class names that contain `body`/`html` and compare a padded component against the source.
+- The scoper also rewrites `body` in the host layer, so a rule that genuinely must reach outside the landing
+  (`timeline-scope` on `body`, Ohio's bottom bar, other theme chrome) cannot live there. Keep it in a separate
+  page layer (`page.css`) that the compiler appends **without** scoping, and guard every rule with
+  `:has(.<root> …)` (for example `body:has(.gh-hsv2 .mdock)`) so it only matches the page that carries the
+  landing. Keep that layer minimal and comment why each rule escapes the scope.
 
 ## Native editorial revisions
 
@@ -102,6 +121,32 @@ not ship the canvas runtime:
 - Gate pinning by usable viewport height as well as width. Mobile, short viewports, reduced motion and
   JavaScript-off must retain readable chapters in normal flow; do not turn the fallback into blank space.
 
+## Scroll-driven reveals and mobile docks
+
+- A reveal bound to the scroll (`animation-timeline: view()`) must **finish when the element is fully in view**:
+  end its range at `entry 70%`–`entry 100%`, never at `cover N%`. A range that ends at `cover 35–60%` keeps
+  cards, titles and bars mid-animation (offset, faded) while the visitor is reading them (HubSpot v2,
+  2026-10-16). Check a frame with each element fully on screen, not only the entering edge.
+- A mobile dock (fixed capsule with the page's exits, e.g. «Agendar reunión» + «Ir al formulario») can be
+  shown and hidden by scroll alone: name a `view-timeline` on the hero and one on the destination section,
+  hoist both names with `timeline-scope` on `body` (from the page layer, since the hero lives in another
+  module), and animate the dock with two ranges: in on the hero's `exit`, out on the destination's `entry`.
+  Keep every button ≥ 44 px (48 px in practice), and `display:none` on desktop.
+- Without scroll-timeline support (`@supports not (animation-timeline: view())`) the dock stays always visible;
+  lift it above the theme's fixed bottom chrome instead of letting them overlap.
+- Ohio's bottom bar `.elements-bar.left` (light/dark switch) shares that corner. While the dock shows, move it
+  aside with the same timelines from the page layer and bring it back from the destination on; verify both
+  are never on screen at the same time at 390 px.
+- A Growth CTA can be one of the dock's buttons. Publish it as `embedded` + `minimal`, and in the host CSS,
+  scoped to the dock, hide `.ghc-content`/`.ghc-dismiss`, set the card to `display:flex; gap:0` with no
+  padding/border/background/shadow, and give `.ghc-primary` the dock button's size and colors
+  (`--gh-cta-reserve` = button height). Without surface/key the slot must fall back to a plain link (HubSpot v2:
+  `/agenda/`); a slot with neither should collapse (`:not(:has(...)){display:none}`). The CTA keeps its own
+  dialog and its conversion is the server receipt (`gh_meeting_*`), never the click. One CTA and one surface
+  per landing, published by `scripts/growth/publish-*-meeting-cta.ts` (key 0600 in `.auth/`, passed to the page
+  republisher; rerunning it rotates the key): skill `greenhouse-growth-ctas` and
+  `docs/manual-de-uso/growth/operar-motor-cta.md` own that contract.
+
 ## Composition and Ohio integration
 
 - Native scheme markers govern Ohio chrome. Scope content contrast to the module and expose a heading
@@ -115,6 +160,17 @@ not ship the canvas runtime:
   display type a mobile clamp and check 390 before publishing.
 - Test filled CTA normal, sustained hover, focus and reduced motion. Ohio's `-undash` opts a link out of
   `links-underline`; changing only `background-color` does not remove its animated background image.
+  The same `.links-underline a:hover` rule animates a background underline on **every** link, including whole
+  cards wrapped in an `<a>`: HubSpot v2's linked cards turned white on hover. Neutralize it in the host layer
+  inside the landing scope (background image/size reset on the module's links), never globally, and test
+  sustained hover on each linked card type.
+- A strikethrough over text that wraps (a "before" value in a comparison) must stay on every line. If the
+  struck element is a flex item it becomes a block and the line only crosses its box; wrap the text in an
+  inline span and add `box-decoration-break: clone` (with `-webkit-` prefix) so each line fragment gets its own
+  decoration. In a comparison that stacks on mobile, put the row label before each row
+  (`[role=rowheader]{order:-1}`) so the reader knows what each pair compares.
+- Static figures in display type (`+90`, `−56%`) need `white-space: nowrap`; an animated counter built on
+  `@property` must land exactly on the source value (HubSpot v2's ended at 89) — check its final frame.
 - A glow should fade to transparent within its own box. A tall clipped circular gradient can look like
   a hard green rectangle on tablet; a section-sized ellipse fixes the source of that seam.
 - Size a hero mark relative to its orbit/core, keep the same parallax depth, and inspect containment

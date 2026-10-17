@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-16 — Landing HubSpot v2 por los 4 resultados, con dock móvil y agenda nativa
+
+- Landing pública [`/servicios-contratar-hubspot/`](https://efeoncepro.com/servicios-contratar-hubspot/) (página
+  `244079`) rediseñada: 14 widgets compilados del canvas, HubSpot presentado como Agentic Customer Platform, SEO con
+  frase clave «partner hubspot» (Semrush CL/MX/CO), OG propia y Service + FAQPage.
+- Dock móvil con «Agendar reunión» (CTA gobernado `hubspot-discovery-meeting`, scheduler nativo) e «Ir al formulario».
+- Renderer CTA 1.3.1: la cabecera del scheduler ya no se parte en móvil (pendiente de release a producción).
+
 ## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
 
 - Landing pública [`/servicios/agencia-de-medios/`](https://efeoncepro.com/servicios/agencia-de-medios/) (página
@@ -552,8 +560,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 - Verificación con GA4 real de Berel: apiladas y dona correctas. Dos correcciones: una parte que redondea a 0 % se lee
   «<1 %» y la cifra queda unida a «%»/«pp» con espacio duro en los slots del PDF y el deck. El blanco del disco de canal
   pasa al rol `channelDisc`. TASK-1974 complete; TASK-1975 espera la revisión del operador.
-
-## 2026-10-03 — AI Visibility Report PDF: refresh local
-
-- TASK-1938: mismo motor y snapshot; seis páginas Engine con órbita, logos oficiales y cierres de cliente/prospecto, en ES/EN/PT-BR. Texto largo conserva contenido con continuación; fuentes registradas de forma aditiva. Las RRSS oficiales se muestran completas a su escala y el eslogan mantiene sus tres pesos.
-- [Dossier](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md): diez PDFs auditados, 24 comparaciones color/gris, 108 pruebas focales, TypeScript y build PASS. Fallo de metadata Manzanitas corregido en un commit separado; siete tests y sincronización PASS. Code complete local; rollout, revisión del adjunto real y paridad web/print pendientes. Sin push ni envío real.

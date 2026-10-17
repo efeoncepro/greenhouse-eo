@@ -1,5 +1,20 @@
 # Handoff
 
+## 2026-10-16/17 — Landing HubSpot v2 publicada, dock móvil con agenda nativa y renderer CTA 1.3.1
+
+Live en https://efeoncepro.com/servicios-contratar-hubspot/ (página `244079`, OG `251991`): 14 widgets
+`greenhouse_hubspot_v2_*` por los 4 resultados de HubSpot, header/footer de Ohio, Service + FAQPage, Growth Form
+`efeonce-hubspot-scope` (direct a HubSpot). Dos rondas de QA desktop/390 corregidas (reveals scroll-driven que terminan
+en `entry`, comparación y tachado en móvil, fichas de agentes, cifras estáticas). Dock móvil: «Agendar reunión» = CTA
+`hubspot-discovery-meeting` (scheduler nativo, surface propia `csur-56a96b52…`, publicador
+`scripts/growth/publish-hubspot-meeting-cta.ts`, key 0600 en `.auth/`) + «Ir al formulario». Renderer CTA 1.3.1 corrige
+la cabecera del scheduler en móvil (`font` shorthand con `inherit`), commit `e7db7f558`.
+[Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/hubspot-services.md) ·
+[Auditoría](docs/audits/public-site/2026-10-16-hubspot-v2-publication.md).
+Pendiente: release a producción del renderer 1.3.1 (hasta entonces el scheduler sigue partiendo «Cerrar agenda»),
+envío real del form, Rich Results/GSC, +90 vs +120 empresas, readback Gold. Fal sin saldo en ambas cuentas (A −0,29,
+B −0,35 USD); Higgsfield 3.690,6 créditos (Ultra).
+
 ## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
 
 Live en https://efeoncepro.com/servicios/agencia-de-medios/ (página `251981`, menú `251987`, OG `251986`), verificada a
@@ -248,24 +263,3 @@ de Julio, Media y Finance/Legal: demo, oferta formal, RACI/capacidad, acceso, in
 [V3](data/pricing/README.md): local.
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
-
-## 2026-10-12 — Insights: alcance de contenido por organización (TASK-2033, en curso)
-
-El informe SEO de Berel medía la propiedad completa de Search Console; lo que Efeonce trabaja es el 5,6 % de sus
-clics. [`TASK-2033`](docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md) agrega un alcance
-de contenido por organización (reglas de ruta, append-only) en `src/lib/growth/seo/content-scope/`; los readers dueños
-lo aplican y el adapter de Insights lo sella en cada fuente.
-**Desplegado** en Vercel staging y en el `ops-worker` (`ops-worker-00773-z98`, `d9a1c6a2d`), con CI verde. **Vercel
-Production sin release**: una edición creada desde el portal de producción sigue midiendo el sitio completo; una
-programada (la arma el worker) ya mide el alcance. Falta observarlo en una edición real de esos runtimes.
-**Aplicado en la base compartida**, con autorización del operador: la migración, el alcance v1 de Berel
-(`pnpm seo:content-scope`), sus logos oficiales (`default` y `on_dark`; el anterior era una imagen generada con IA) y
-su portada en blanca, la única que imprime «Qué mide este informe».
-Cambios que tocan a toda organización: la línea semanal de clics dibuja sólo semanas completas, y tres textos de
-Analytics pierden «al sitio».
-Vista previa real de septiembre de 2026: clics del contenido 661 → 799 (+20,9 %) con el sitio en −13,6 %. Los PDF
-quedaron en el OneDrive interno de Berel para que el operador los envíe; su portada dice «Sin emitir». **Para quien
-emita esa edición:** las visitas orgánicas de GA4 al contenido caen 51,9 % por un artículo de agosto con patrón de
-Google Discover; el informe lo imprime sin explicarlo.
-Pendiente: release a `main`, revisar y emitir la edición de septiembre, tool MCP de lectura (Slice 6) y un render desde
-producción con los logos nuevos. `CLAUDE.md governance` está rojo por 37 tokens desde antes de este trabajo.

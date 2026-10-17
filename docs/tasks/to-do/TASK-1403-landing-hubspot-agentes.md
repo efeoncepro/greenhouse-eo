@@ -1,5 +1,17 @@
 # TASK-1403 — Landing del servicio de agentes de IA en HubSpot: diseño, construcción, despliegue y operación
 
+## Delta 2026-10-17 — el Pillar `244079` ya es la v2 y tiene su propio módulo de agentes
+
+- `/servicios-contratar-hubspot/` dejó de ser la v1: desde el 2026-10-16 son 14 widgets `greenhouse_hubspot_v2_*`.
+  Incluye un módulo «agentes» («Cada agente responde a una persona», con supervisora humana y «¿Workflow o agente?») y un
+  módulo «caso» sobre el Customer Agent de ANAM. Esta landing debe diferenciarse de ese contenido y enlazarlo, no
+  repetirlo — cerrado por la publicación v2 ([audit](../../audits/public-site/2026-10-16-hubspot-v2-publication.md)).
+- «Reuse de widgets del Pillar» ya no apunta a los widgets v1 de `HUBSPOT_ELEMENTOR_MODULES_V1.md`: el patrón vigente es el
+  pipeline source-led v2 (`scripts/public-website/hubspot-v2-source/` + compilador + paquete + republicador). El motion del
+  Pillar es CSS ligado al scroll (`view-timeline`), no IntersectionObserver.
+- La v2 publica «−56 % de carga del equipo de atención de ANAM». Ese trabajo no re-verificó la métrica: el bloqueo de
+  verificar la métrica ANAM sigue igual.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

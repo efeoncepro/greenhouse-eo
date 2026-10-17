@@ -980,3 +980,31 @@ el run `29854833210`; el piloto `/agenda/` sigue aislado y no autoriza promoció
   (390, 9 frames; detalle = drawer canónico del shell). Sin flag nuevo, sin migración, sin
   cambios de telemetría SoT. Task: `docs/tasks/in-progress/TASK-1430-*.md` (rollout: push +
   smoke staging pendientes).
+
+## 29. Delta 2026-10-16 — renderer 1.3.1: cabecera del scheduler nativo en hosts con CSS propio (code complete)
+
+- **Bug (visto en `/servicios-contratar-hubspot/` y `/contacto/` a 390 px):** cuatro reglas del diálogo del scheduler
+  usaban `font: 650 .84rem/1 inherit`. `inherit` no puede ir dentro del shorthand `font`, así que el navegador descarta
+  la declaración completa: el título tomaba el `h2` del tema (Ohio) y «Cerrar agenda» quedaba en 74 px partido en tres
+  líneas. **Regla:** en `RENDERER_CSS` un keyword global como `inherit` sólo vale como valor completo
+  (`font: inherit`), nunca como componente del shorthand; se escriben longhands (`font-weight`, `font-size`,
+  `line-height`, `font-family: inherit`).
+- **Por qué lo muerde el host:** el diálogo/full-screen del scheduler se monta en `<body>`, fuera del scope del card,
+  y hereda el CSS del host; una declaración descartada no deja un default neutro, deja la del tema. La verificación de
+  la cabecera vale sólo sobre la página real del host, no sobre el preview de `/growth/ctas`.
+- **Fix:** `src/growth-cta-renderer/styles.ts` (longhands; botón de cierre `flex: none` + `white-space: nowrap`) y
+  `src/growth-cta-renderer/meeting-action.ts` (contenedor `.ghc-meeting-titles` con `min-width: 0`).
+  `RENDERER_VERSION` 1.3.0 → **1.3.1**. Guarda `src/growth-cta-renderer/__tests__/styles-font-shorthand.test.ts`:
+  falla si una declaración `font:` de `RENDERER_CSS` mezcla `inherit` con otros componentes. La guarda sólo nombra la
+  regresión: jsdom no descarta shorthands inválidos, así que el verificador real es el navegador sobre un host
+  WordPress a 390 px (fuente computada y alto de una línea de `.ghc-meeting-close`). Verificado así, sirviendo el
+  bundle local por interceptación sobre las dos páginas reales: botón 128×44 px en una línea a 390 y 820 px,
+  cabecera sin overflow.
+- **Trampa:** `RENDERER_CSS` es un template literal; un backtick dentro de un comentario CSS lo cierra y rompe el módulo.
+- **Rollout:** commit `e7db7f558` en develop; llega a los hosts sólo con el release a producción (`renderer-latest.js`).
+  Hasta entonces el estado es `code complete, rollout pendiente`.
+- **Contexto de host (mismo día):** la landing HubSpot v2 monta el CTA `hubspot-discovery-meeting`
+  (`open_meeting_scheduler`, placement `embedded`, style `minimal`, targeting `/servicios-contratar-hubspot/`) en su
+  surface propia `Efeonce HubSpot landing (WordPress)` (`csur-56a96b52-44ca-43d8-a61f-8c365c211487`), reducido a botón
+  dentro de un dock móvil por CSS del host. Patrón operativo de un CTA y una surface por landing:
+  `docs/manual-de-uso/growth/operar-motor-cta.md`.
