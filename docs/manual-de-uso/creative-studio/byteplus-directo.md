@@ -137,8 +137,8 @@ a ninguna persona real. En orden:
 3. **Decisión y fila en el [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)**
    antes de subir (obligatorio), con la **carpeta de evidencia** que exige la carta de compromiso: fichas, prompts,
    logs de generación e intermedias.
-4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje (la primera vez
-   se firma la carta de compromiso). Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
+4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje (la carta de
+   compromiso se firma antes, al activar el plan, con un código que llega por correo; observado 2026-10-17). Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
    expresión (300–6000 px, proporción 0,4–2,5, menos de 30 MB). Estados: `Processing` → `Active` o `Failed`.
 5. **Activar el Asset Service** de la cuenta (una vez), en la consola de ModelArk → Open Management, región
    ap-southeast-1. Sin eso, toda request con `asset://` falla con `InvalidParameter` en `content[n].image_url.url`

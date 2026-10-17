@@ -67,7 +67,9 @@ Fuentes: [Create asset](https://docs.byteplus.com/en/docs/ModelArk/create-asset-
 
 ## 3. Carta de compromiso (retratos virtuales)
 
-**Verificado** ([2275638](https://docs.byteplus.com/en/docs/ModelArk/2275638)): se firma al crear el primer grupo.
+**Verificado** ([2275638](https://docs.byteplus.com/en/docs/ModelArk/2275638)): la documentación dice que se firma al crear el primer grupo.
+**Observado (2026-10-17):** en la práctica BytePlus la pidió al activar el plan Entry, con un código enviado por correo
+(07:53 UTC, junto con el KYC Questionnaire); al crear los grupos ya no apareció.
 La empresa declara que el avatar es original y no se parece a ninguna persona natural; que, si usó IA, cumplió los
 términos de la herramienta e hizo una selección, creación y modificación **sustancial y creativa**; que no contiene
 marcas o logos de terceros sin autorización; y que conserva y puede mostrar en cualquier momento archivos fuente,

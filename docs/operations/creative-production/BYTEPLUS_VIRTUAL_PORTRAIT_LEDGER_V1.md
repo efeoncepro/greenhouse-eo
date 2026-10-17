@@ -94,8 +94,10 @@ el total desde el inicio de la tarea es **12 assets y 6 grupos**. Los doce archi
 en la consola. En ese cierre no se verificó por API el literal `Active` ni se repitieron las pruebas de generación;
 la repetición posterior está registrada en §7.
 
-**Plan y firma:** Entry gratuito, sin compra ni cambio de plan. No apareció una nueva carta de compromiso durante
-estas cargas y no se aceptó ninguna; si aparece más adelante, la firma sigue reservada a Julio.
+**Plan y firma:** Entry gratuito, sin compra ni cambio de plan. La carta de compromiso **ya estaba firmada** antes de
+estas cargas: BytePlus la pidió con un código enviado al correo de Julio (2026-10-17 07:53 UTC, «Sign the Commitment
+Letter for Uploading Virtual Avatar Assets», junto con el KYC Questionnaire), al activar el plan. Por eso no volvió a
+aparecer al crear los grupos. Quién ingresó el código: pendiente de confirmar por Julio.
 
 **Evidencia de cierre:** `ai-generations/2026-10-17_byteplus-retratos-elenco/pruebas-antonio/elenco-grupos-final.jpg`
 (seis grupos y nombres) y `elenco-cupo-final.jpg` en la misma carpeta (12/50 assets, 6/50 grupos y plan gratuito).
@@ -117,8 +119,8 @@ intermedias y la imagen final) queda en un lugar durable y se anota en la column
 
 1. **Decisión y fila.** El operador aprueba el personaje; se agrega su fila en §4.
 2. **Evidencia** reunida según §5.
-3. **Consola:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje. La primera vez
-   se firma la carta de compromiso. (Por API exige AK/SK y URL pública; no está implementado.)
+3. **Consola:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje. La carta de
+   compromiso se firma al activar el plan, con un código por correo (observado 2026-10-17), no al crear el grupo. (Por API exige AK/SK y URL pública; no está implementado.)
 4. **Imágenes:** jpeg/png/webp, entre 300 y 6000 px por lado, proporción entre 0,4 y 2,5, menos de 30 MB. Cuerpo
    entero vertical frontal y primer plano vertical frontal, sin expresión, con la cara cerca de 2/3 del encuadre.
 5. **Esperar `Active`** (`Processing` → `Active` o `Failed`). No hay plazo garantizado de revisión.
