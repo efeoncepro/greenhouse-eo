@@ -286,7 +286,7 @@ Plugin propio en `efeonce-public-site-runtime/wp-content/plugins/` (nombre de di
   previa del documento.
 - **Copia pública:** `GET /wp-json/eo/v1/site-nav`. Devuelve sólo el documento publicado, con `ETag` y
   `Cache-Control` corto. Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
-  decisión abierta de PDR-027.
+  decisión abierta de PDR-027 (punto 3).
 - **Permisos:** escribir requiere `manage_options` o una capability propia (`eo_manage_site_nav`). La REST pública es de
   sólo lectura.
 
@@ -397,8 +397,8 @@ PII.
 
 Vienen de la nota «Por confirmar» del canvas y de PDR-027:
 
-- Alcance en todo el sitio y piloto primero (PDR-027, decisiones abiertas 1 y 2).
-- Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, decisión abierta 3).
+- ~~Alcance en todo el sitio y piloto primero~~: decididos por el operador el 2026-10-18 (PDR-027, Accepted).
+- Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, punto abierto 3).
 - Orden de los servicios por línea (Inbound quedó en Revenue).
 - Si las respuestas aprobadas por línea («Tu squad», «Visible»…) viven también en el menú.
 - URL real del canal de YouTube: hoy el sitio apunta a `facebook.com/colabrio`, un resto del tema.

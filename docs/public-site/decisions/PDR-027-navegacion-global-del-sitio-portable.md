@@ -1,7 +1,8 @@
 # PDR-027 — Navegación global del sitio, portable entre sitios
 
 > **Tipo:** Product Decision Record de plataforma del sitio público.
-> **Estado:** Proposed · 2026-10-18 · dos puntos esperan decisión del operador (§Decisiones abiertas).
+> **Estado:** Accepted · 2026-10-18 · el operador decidió el alcance y el piloto el mismo día (§Decisiones del operador). Queda
+> abierta sólo la copia pública en el bucket, que se decide en la fase de Think.
 > **Ejecución:** [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) con tres tasks: `TASK-2040`
 > (mecanismo en AXIS), `TASK-2041` (plugin, contenido y fotos) y `TASK-2042` (puesta en el sitio). Las siete fases de
 > §Fases se reparten entre esas tres tasks.
@@ -157,16 +158,27 @@ commits ni mensajes. Si falta, el botón cae a un enlace normal a `/agenda/`.
 
 ### 6. Qué cambia en la doctrina
 
-Esta decisión, una vez aceptada, **reemplaza para el encabezado global** la regla de `native-navigation.md` de conservar
+Esta decisión, aceptada el 2026-10-18, **reemplaza para el encabezado global** la regla de `native-navigation.md` de conservar
 el menú de Ohio y la recomendación de usar su mega menú. El cambio de un ítem de menú pasa a hacerse en el documento del
 plugin, no en el término 61. Las reglas sobre landings sueltas no cambian: ninguna landing crea su propia navegación.
 
-## Decisiones abiertas
+## Decisiones del operador
 
-1. **Alcance:** reemplazar el encabezado de Ohio **en todo el sitio**: landings, blog, Glitch, 404 y archivos. Ohio hoy
-   tiene variantes de encabezado por página (transparente, oscuro, logo fijo), que hay que inventariar y resolver una por
-   una.
-2. **Piloto:** activar primero en una sola página detrás de un interruptor, antes de todo el sitio.
+Decididas el 2026-10-18:
+
+1. **Alcance: se reemplaza el encabezado de Ohio en todo el sitio** (landings, blog, Glitch, 404 y archivos). El
+   operador lo confirmó después de revisar las alternativas:
+   - ampliar el mega menú nativo de Ohio no soporta el diseño ni es portable;
+   - un encabezado de Elementor queda atado a WordPress y sin edición gobernada para agentes;
+   - meter la cápsula dentro del encabezado de Ohio deja dos encabezados que se pisan.
+
+   Ohio hoy tiene variantes de encabezado por página (transparente, oscuro, logo fijo), que se inventarían y resuelven
+   una por una en `TASK-2042`.
+2. **Piloto: primero en una sola página**, detrás del interruptor `eo_site_nav_enabled`, antes de todo el sitio. El go a
+   todo el sitio lo da el operador después de revisar el piloto.
+
+Queda abierta:
+
 3. **Copia pública del documento:** servirla desde el propio WordPress o publicarla también en el bucket de AXIS. Se
    decide en la fase de Think. Publicarla en el bucket exige credenciales de GCP en Kinsta, o un paso de sincronización
    fuera de WordPress.

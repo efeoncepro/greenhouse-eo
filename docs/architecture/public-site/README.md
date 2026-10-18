@@ -25,4 +25,4 @@ Use this folder when a reusable public landing component, Elementor widget, host
 - [Navegación global del sitio público V1](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) — navegación portable
   `efeonce.site-nav` que reemplazaría el encabezado de Ohio: contrato y primitive en AXIS, documento único en el
   plugin «EO Navegación», adaptador con interruptor y piloto en `ohio-child`, y Think más adelante. Propuesta según
-  PDR-027 (Proposed) y EPIC-055; aún no implementada.
+  PDR-027 (Accepted 2026-10-18) y EPIC-055; aún no implementada.

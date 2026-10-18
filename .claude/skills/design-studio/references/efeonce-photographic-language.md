@@ -1023,7 +1023,7 @@ sesión las tenía delante al armar.
 
 ### Fotos para el menú del sitio **[operador, 2026-10-18]**
 
-El menú global de efeoncepro.com (PDR-027 y EPIC-055, **propuestos, sin implementar**) lleva una foto por línea o
+El menú global de efeoncepro.com (PDR-027 aceptado y EPIC-055, **sin implementar**) lleva una foto por línea o
 recurso en dos superficies, y cada una se genera en su formato nativo:
 
 | Superficie | Formato | Cómo se ve | Regla de la toma |

@@ -533,7 +533,7 @@ vale en toda aplicación:
   (contrato y primitive en AXIS, TASK-2040; plugin «EO Navegación», TASK-2041; adaptador WordPress, TASK-2042). Nada
   está en runtime: `efeoncepro.com` sigue con el encabezado de Ohio. Contrato técnico:
   [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
-  (Propuesta) y PDR-027 (Proposed).
+  (Propuesta) y PDR-027 (Accepted 2026-10-18).
 - **Composición de escritorio** («Opción 2», operador 2026-10-17): hamburguesa · logo · cápsula de vidrio (Inicio,
   Nosotros ▾, Soluciones ▾, Recursos ▾, Contacto) · botón «Agenda tu diagnóstico». La cápsula con sus mega menús
   convive con la hamburguesa, que abre el onepage a pantalla completa; abrir uno cierra el otro. Bajo 1.181 px queda

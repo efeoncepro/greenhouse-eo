@@ -281,7 +281,7 @@ the page that first used it.
 
 **Status as of 2026-10-18: it does not exist.** AXIS has no navigation contract, schema, primitive, tokens or Lab page
 today. What follows is the approved design and the plan in [TASK-2040](../../../../docs/tasks/to-do/TASK-2040-axis-site-nav-contract-primitive.md)
-(program EPIC-055, decision PDR-027 in Proposed status). Never cite exports, versions or the Lab route as available
+(program EPIC-055, decision PDR-027 Accepted on 2026-10-18). Never cite exports, versions or the Lab route as available
 until there is a published release and a package readback.
 
 What it will be:

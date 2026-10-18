@@ -438,7 +438,7 @@ brochure (operador, 2026-10-16); la biblioteca formal es TASK-1937.
 
 ## Fotos del menú del sitio (2026-10-18) — lo que aprendimos
 
-Las fotos del menú global de efeoncepro.com (onepage a pantalla completa y mega menús; PDR-027 y EPIC-055, propuestos,
+Las fotos del menú global de efeoncepro.com (onepage a pantalla completa y mega menús; PDR-027 aceptado y EPIC-055 planificada,
 sin implementar en el sitio), aprobadas por el operador el 2026-10-18. Todas las fichas declaran `"registro": "cine"`.
 Fichas, prompts, scripts y logs en `ai-generations/2026-10-18_menu-sitio/` (`fichas/`, `prompts/`, `ui/`,
 `compuestas/`; binarios fuera de git). Las reglas de formato del menú (4:5 con sujeto centro-derecha, 16:9 legible a

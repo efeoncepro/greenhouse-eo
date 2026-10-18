@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Épica registrada el 2026-10-18. Diseño aprobado en el canvas (versión 67), PDR-027 Proposed y arquitectura escrita. 3 tasks hijas en to-do; ninguna empezada. Sin cambios en WordPress, AXIS ni el bucket.`
+- Status real: `Épica registrada el 2026-10-18. Diseño aprobado en el canvas (versión 67), PDR-027 Accepted (todo el sitio, piloto primero) y arquitectura escrita. 3 tasks hijas en to-do; ninguna empezada. Sin cambios en WordPress, AXIS ni el bucket.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Operador (alcance, piloto y go a todo el sitio) · Sitio público / WordPress (plugin y adaptador) · AXIS (contrato y primitive)`
@@ -137,12 +137,11 @@ task nueva sólo se crea si el trabajo no cabe en ninguna de las tres.
 
 - Adaptador Think: envoltura Astro que lee la copia pública y monta su propio agendador. Requiere la superficie de
   Growth CTA de Think.
-- Publicar también la copia pública en el bucket de AXIS (PDR-027, decisión abierta 3).
+- Publicar también la copia pública en el bucket de AXIS (PDR-027, punto abierto 3).
 
 ## Open Questions
 
-- Alcance en todo el sitio y piloto primero (PDR-027, decisiones abiertas 1 y 2). Se asumen en el plan de `TASK-2042` y
-  se confirman antes de su piloto.
+- ~~Alcance en todo el sitio y piloto primero~~: decididos por el operador el 2026-10-18 (PDR-027, Accepted).
 - Pendientes de contenido de la nota «Por confirmar» del canvas:
   - Orden de servicios por línea.
   - Respuestas por línea.
