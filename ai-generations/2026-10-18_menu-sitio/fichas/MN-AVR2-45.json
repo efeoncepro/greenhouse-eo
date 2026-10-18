@@ -1,0 +1,39 @@
+{
+  "id": "MN-AVR2-45",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "curiosa"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "proposal-cinematic",
+  "llave": {
+    "fuente": "a soft cool light coming from the empty air on her frame-right, its source out of view",
+    "lado": "from the frame-right, at head height",
+    "tamano": "broad and soft",
+    "distancia": "about one meter from her face"
+  },
+  "fondo": "a row of large cold blue practical lights far behind, melted into round bokeh",
+  "fenomeno": {
+    "que": "she reads something luminous in the air beside her, lit by its glow",
+    "esServicio": "Efeonce AI Visibility Report: cómo te ven hoy Google y la IA, en un informe vivo"
+  },
+  "linea": "revenue-hubspot",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark studio at night with thin haze): Nexa stands on the LEFT-CENTRE of the frame, framed from the waist up: her body is centred at about 38 % of the frame width and her frame-right shoulder ends at about 52 % of the frame width, so a wide band of empty air remains on her right, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. MOMENT: caught mid-read, the instant something catches her attention: her head turns slightly toward her frame-right and her eyes look into the air at head height about one meter beside her, with a curious, quietly pleased expression, a hint of a smile. Her hands are RELAXED and LOW — one hand rests in her jacket pocket, the other hangs naturally at her side; she does not touch or point at anything. The air on her FRAME-RIGHT, from about 56 % to about 96 % of the frame width and from her head height down to her waist, is EMPTY: only deep dark studio space with thin haze, no object, no screen, no panel, no light fixture, nothing floating. A soft, broad, cool white-azure light falls on the frame-right side of her face, hair and jacket, as if from something luminous just beside her, while its source is not visible; the haze on that side glows faintly. A cool azure rim from behind separates her from the dark; far behind, the studio melts into a few large cold round bokeh. The LEFT 30% of the frame is calm deep dark studio space with only faint haze. Rich contrast, no text, no logos of any other brand. COMPOSITION FOR A WEBSITE MENU (native to its frame): this vertical photo sits in the right column of a full-screen menu whose dark panel overlaps its LEFT third with a large curved corner at the top; so the SUBJECT and everything that carries the idea sits in the CENTRE-RIGHT of the frame, and the left third is calm continuation of the same scene, never empty and never a flat slab."
+}

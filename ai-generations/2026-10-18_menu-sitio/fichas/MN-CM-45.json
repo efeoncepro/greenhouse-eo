@@ -1,0 +1,37 @@
+{
+  "id": "MN-CM-45",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "curiosa"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a vast dark studio at night with thin haze): Nexa, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; her body is centred at about 58 % of the frame width, her head in the middle of the frame, and a band of calm darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: she holds a small clear glass prism between the fingertips of her left hand, raised at shoulder height on the frame-right side of her face, and looks at it with a focused, quietly delighted expression, not at the lens; head almost frontal, only her eyes turn toward the prism. One thin, dead-straight beam of azure-blue (#0375DB) and white light, the blue of the brand, comes down from high above at the top right into the prism. Out of the prism, the light fans open UPWARD above her toward the upper right of the frame, and the fan becomes FIVE thin frameless floating screens of clearly different shapes, spreading out in depth and size: a tall 9:16 reel, a 4:5 post, a square 1:1 post, a wide 16:9 video and a slim horizontal banner, the nearest large and sharp, the farthest small and soft. All five show the SAME single idea re-cut for each format: a bold close-up of a steaming coffee cup with a splash of color, each one a different vivid art-directed version, their colors are vivid and saturated but stay inside each screen and throw no colored light; the fan of light is clear white and azure, never a rainbow, and the haze and her face are lit only cool white and azure; any tiny text on them is too small and too blurred to read. The prism and the fan are the only strong light; the prism's white sparkle is the light on her face. The beam, the prism, the fan and all five screens stay inside the RIGHT 70% of the frame, above and beside her. A long dark matte presentation table runs between the camera and her, its near edge just in front of the lens. The LEFT 30% of the frame is calm, deep dark studio space with only faint haze: no screens, no beam, no objects. Enormous contrast, punchy color, no logos of any other brand, no readable text. COMPOSITION FOR A WEBSITE MENU (native to its frame): this vertical photo sits in the right column of a full-screen menu whose dark panel overlaps its LEFT third with a large curved corner at the top; so the SUBJECT and everything that carries the idea sits in the CENTRE-RIGHT of the frame, and the left third is calm continuation of the same scene, never empty and never a flat slab.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "deck-seccion",
+  "excepcion": "Operador 2026-10-09: elenco y Nexa con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)",
+  "llave": {
+    "fuente": "the small glass prism she holds and the white sparkle where the beam enters it",
+    "lado": "to the frame-right of her face, at shoulder height",
+    "distancia": "about 30 cm from her face"
+  },
+  "fondo": "the far depths of the studio melted into a few large cold round bokeh",
+  "fenomeno": {
+    "que": "one beam of light enters a prism and fans out into five formats of the same idea",
+    "esServicio": "Adaptación nativa: una idea, reinventada para cada plataforma"
+  }
+}

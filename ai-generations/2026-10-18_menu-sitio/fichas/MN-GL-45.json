@@ -1,0 +1,13 @@
+{
+  "formato": "4:5",
+  "impacto": true,
+  "registro": "documental",
+  "palanca": "oclusion",
+  "escena": "SCENE (Monday morning, a quiet modern café by a big window, Santiago, early light, NO face visible): an over-the-shoulder shot from just behind a reader seated at the counter: the dark out-of-focus curve of their shoulder and a few strands of dark hair occlude the LEFT third of the frame; past it, held up in their right hand at chest height, a current flagship phone with thin bezels in PORTRAIT orientation faces the camera at a slight angle, large and sharp, about 30 % of the frame width; its screen is ON and shows a perfectly flat, evenly lit, PURE WHITE blank rectangle edge to edge, with nothing on it — no text, no icons, no reflections, no glare, no fingerprints — clearly visible and NOT covered by any finger or object, so a real interface can be placed on it later. MOMENT: the thumb is mid-scroll, resting on the phone's aluminium edge, never on the screen. Beside it on the bare pale stone counter, a small matte white espresso cup throws a soft morning shadow. Cool morning window light from the right, a soft azure tint from the sky outside, the phone glow lighting the fingers. Background: the window and street blurred into soft cool bokeh. 50mm, f/2, focus on the phone. Everything unbranded. COMPOSITION FOR A WEBSITE MENU (native to its frame): this vertical photo sits in the right column of a full-screen menu whose dark panel overlaps its LEFT third with a large curved corner at the top; so the SUBJECT and everything that carries the idea sits in the CENTRE-RIGHT of the frame, and the left third is calm continuation of the same scene, never empty and never a flat slab.",
+  "lecho": {
+    "objeto": "the reader's own dark navy shoulder and sleeve, very close to the lens and completely out of focus",
+    "tono": "DARK navy in shadow"
+  },
+  "id": "MN-GL-45",
+  "ocluye": "the reader's own dark out-of-focus shoulder and hair, covering the left third of the frame"
+}

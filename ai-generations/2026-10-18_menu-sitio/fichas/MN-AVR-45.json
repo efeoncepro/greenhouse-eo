@@ -1,0 +1,39 @@
+{
+  "id": "MN-AVR-45",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "curiosa"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "proposal-cinematic",
+  "llave": {
+    "fuente": "the three floating panels of pure white light beside her",
+    "lado": "on the frame-right side of her face, at head height",
+    "tamano": "the largest panel is as wide as her shoulders",
+    "distancia": "about 60 cm from her face"
+  },
+  "fondo": "a row of large cold blue practical lights far behind, melted into round bokeh",
+  "fenomeno": {
+    "que": "a live report opens in the air beside her as three panels of light arranged on one gentle arc, and she reads it",
+    "esServicio": "Efeonce AI Visibility Report: cómo te ven hoy Google y la IA, en un informe vivo"
+  },
+  "linea": "revenue-hubspot",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark studio at night with thin haze): Nexa stands with her body centred at about 42 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. MOMENT: caught mid-read, the instant a line of the report catches her attention: her head turns slightly toward the panels and her eyes read them with a curious, quietly pleased expression, a hint of a smile. Her hands are RELAXED and LOW — one hand rests in her jacket pocket, the other hangs naturally at her side; she does NOT touch, point at or reach toward the panels. On the FRAME-RIGHT side of her, at a natural reading distance about one meter beside her, float THREE flat rectangular panels of PURE, EVENLY LIT WHITE LIGHT with crisp straight edges and slightly rounded corners, completely blank — no text, no lines, no icons, no reflections inside them. They are arranged as ONE coherent set on a gentle vertical arc, like three screens of the same curved display: ALL THREE share EXACTLY THE SAME PERSPECTIVE — each one is turned the same small angle toward her, so their right edges are slightly taller than their left edges, and all their top and bottom edges converge toward the same vanishing point on her side. None of them is tilted, rotated or skewed on its own. (1) the top panel is WIDE, about two and a third times wider than tall, at her head height, from about 58 % to about 92 % of the frame width; (2) the middle panel is smaller, about one and a half times wider than tall, at chest height, from about 62 % to about 84 % of the frame width; (3) the bottom panel is WIDE, about three times wider than tall, at waist height, from about 58 % to about 92 % of the frame width. They are stacked with even dark gaps between them, never overlapping each other or her body, and all three sit entirely inside the frame. The panels are the main light: they throw clean cool white light across her face and jacket from the frame-right, with a soft bloom in the haze around their edges. A cool azure rim from behind separates her from the dark; far behind, the studio melts into a few large cold round bokeh. The LEFT 30% of the frame is calm, deep dark studio space with only faint haze. Rich contrast, no text, no logos of any other brand. COMPOSITION FOR A WEBSITE MENU (native to its frame): this vertical photo sits in the right column of a full-screen menu whose dark panel overlaps its LEFT third with a large curved corner at the top; so the SUBJECT and everything that carries the idea sits in the CENTRE-RIGHT of the frame, and the left third is calm continuation of the same scene, never empty and never a flat slab."
+}

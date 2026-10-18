@@ -1,0 +1,11 @@
+MN-ES1-169 · 2048x1152 · 5 referencia(s):
+   ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png
+   ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-24-bienvenida.png
+   ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png
+   ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-17-puesto-frente-mujer-1024x1536-v01-fondo-estudio.png
+   ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png
+  $ costo estimado ≈ USD 0.037 (1 × 1243 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-18_menu-sitio/plates/MN-ES1-169.png (edit) …
+  ✓ 2249KB · gpt-image-2.5-sunburst · 1792x1024 · high
+    usage: in 9865 (img 7603 · txt 2262) · out 1243 · total 11108
+done
