@@ -46,9 +46,9 @@ const baseline = (target: 'web' | 'server') => ({
   accountId: target === 'web' ? '6291647045' : '6068297031',
   containerId: target === 'web' ? '218104216' : '191286361',
   publicId: target === 'web' ? 'GTM-NGHPGRLZ' : 'GTM-K2X4ZTTK',
-  // Read-only provider inventory obtained by the operator on 2026-10-17. Must recheck before draft writes.
-  liveVersionId: target === 'web' ? '5' : '9',
-  liveVersionFingerprint: target === 'web' ? '1791913373643' : '1791993298197',
+  // Production versions read back by the operator on 2026-10-18. Must recheck before draft writes.
+  liveVersionId: target === 'web' ? '6' : '10',
+  liveVersionFingerprint: target === 'web' ? '1792355588730' : '1792355562526',
   normalizedSnapshotSha256: hash(target === 'web' ? webSnapshot : serverSnapshot),
   comparisonRequiredBeforeDraft: true,
 })
@@ -137,6 +137,7 @@ export const buildGoogleAdsGtmPlan = (input: unknown = { bindings: [] }) => {
     mode: 'offline_candidate_review', deployable: false, providerCalls: 0, mutations: 0, publishSupported: false,
     sourceEvidence: { web: baseline('web'), server: baseline('server'),
       nativeTypesPrimarySource: GOOGLE_NATIVE_SERVER_TAG_SOURCE,
+      productionReadback: { date: '2026-10-18', webVersionId: '6', serverVersionId: '10', freshReadRequired: true, deliveryVerified: false, attributionVerified: false },
       apiDraftReadback: { date: '2026-10-17', webWorkspaceId: '8', serverWorkspaceId: '12',
         verifiedShapes: ['web_gaawe_four_additional_consent_types', 'web_consent_jsm', 'server_ed', 'server_always_event_name', 'server_sgtmadsct_conversionId_conversionLabel', 'server_sgtmadscl', 'server_forwarder_blockingTriggerId'],
         conversionLinkerApiVerified: true, forwarderExceptionReadbackVerified: true,

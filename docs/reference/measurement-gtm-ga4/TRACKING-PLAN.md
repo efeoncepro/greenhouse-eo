@@ -26,18 +26,28 @@ Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión co
 
 ---
 
-## Google Ads online — preparado, no publicado (17-10-2026)
+## Google Ads online — configuración publicada, primera ocurrencia pendiente (18-10-2026)
 
-| Fuente | Señal / acción | Estado |
+| Fuente autorizada | Señal / acción | Estado |
 | --- | --- | --- |
-| Form comercial con policy Ads opt-in | Recibo backend → gh_ads_conversion / commercial_lead | Código local; acción7852486523; GTM Web8/Server12 draft, captura OFF |
-| Reserva Scheduler confirmada con policy Ads opt-in | Recibo backend → gh_ads_conversion / meeting_booking | Código local; acción7852487186; mismos drafts, captura OFF |
+| Performance · `fhsf-efeonce-performance-diagnostic` | Recibo backend → gh_ads_conversion / commercial_lead · acción7852486523 | GTM Web6/Server10 publicado; policy Ads rev2, activation20:35Z; primera ocurrencia/recibo Ads pendientes |
+| Discovery · `fhsf-efeonce-lead-gen-web` | Reserva Scheduler confirmada → gh_ads_conversion / meeting_booking · acción7852487186 | Mismos tags publicados; policy Ads rev2, activation20:35Z; primera agenda/recibo Ads pendientes |
+
+Checkpoint20:43:28Z: Web6 fingerprint1792355588730 y Server10 fingerprint1792355562526 releídos;
+EC efectiva ON en6862539491 y bridge4250795666af… publicado en WordPress/Think. Flag de proyecto
+`true` guardado20:36:20Z; companion Vercel `dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk` del mismo mainEC
+READY con alias/SHA y cadena de configuración verificados (proyecto true + clave env/build).
+La API no expone el booleano congelado ni una conversión. Preview técnico
+Server y SDK Web live aislado4/4 PASS, sin salida de conversiones a proveedores; no cierran el E2E.
 
 El genérico accepted→generate_lead de las filas siguientes sigue siendo GA4, no habilita Ads.
 El bridge Ads exige cuatro permisos/GPC y UUID durable, no convierte clics/aperturas/replays. User_data
 reservado sólo para EC; ninguna PII/hash/click ID en dataLayer o analítica ordinaria. Server agrega Ads
-Tracking/Linker y excluye el bridge del forwarder GA4. **No se amplió ninguna policy publicada**.
-[Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
+Tracking/Linker y excluye el bridge del forwarder GA4. Sólo Performance/Discovery incorporaron el
+opt-in Ads; Meta/UPD y mappings previos se conservaron. No se habilitan otras fuentes por inferencia.
+Histórico17/10: acciones secundarias y drafts Web8/Server12 preparados, captura OFF y sin publish.
+[Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md) ·
+[auditoría18/10](../../audits/growth/2026-10-18-google-ads-activation.md).
 
 ## Forms
 
@@ -136,7 +146,7 @@ Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md),
 
 | Destino | Evento | Origen requerido | Estado | Evidencia pendiente |
 | --- | --- | --- | --- | --- |
-| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server9/Web5; transporte previo conservado, Test Events Server y tags reales verificados | Volumen/calidad ordinaria |
+| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server10/Web6; transporte PageView conservado; pruebas Server previas registradas, sin nuevo positivo con esta publicación | Volumen/calidad ordinaria |
 | Mismo destino/servidor | Lead formulario | Aceptación backend comercial + snapshot ads consentido | Client31/trigger33 autenticado, cola cifrada/worker ON; legacyMeta12 retirado | Observada 2026-10-17 con Performance: fuente→ledger→provider, 1 `Lead` SERVER_ONLY en Meta (ver doc 10). Pendiente en Meetings y en las demás fuentes |
 | Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida post-flip y replay real |
 

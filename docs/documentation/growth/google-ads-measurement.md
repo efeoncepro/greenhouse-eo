@@ -1,5 +1,15 @@
 # Medición Google Ads: alcance y estado
 
+**Checkpoint 18/10, 20:43:28Z:** GTM Web **6** (`1792355588730`) y Server **10**
+(`1792355562526`) publicados y releídos; EC **ON** en6862539491. Bridge `4250795666af…` servido
+en ambos hosts. Performance y Discovery publicaron Ads rev2 con activación20:35Z, preservando los
+destinos previos. El flag de proyecto quedó `true` a las20:36:20Z; el companion de main
+`ec317c928fffcb919d71bdb62821b80280af2347`, `dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk`, está
+**READY** con alias/SHA exactos y presencia de la clave en env/build. La cadena de configuración está
+verificada; la API sólo expone nombres y no acredita por sí sola el booleano congelado ni una conversión. El protocolo Preview y cuatro casos del SDK live pasaron sin conversiones
+externas; primera ocurrencia comercial, recibo proveedor y atribución siguen pendientes. E2E abierto.
+[Auditoría de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
+
 La arquitectura adoptada conecta la inversión de Google Ads con solicitudes comerciales, reuniones,
 calificación y negocios, conservando la fuente y el nivel de evidencia de cada hecho. El 17-10-2026
 se comprobó **acceso API de lectura de operador** a `686-253-9491`. La CLI local `pnpm google-ads`
@@ -27,7 +37,7 @@ acciones, sin enviar conversiones ni cambiar campañas. [Activación y límites]
 El18/10 se completó la validación local/API y se preparó el
 [paquete previo al release](../../operations/releases/google-ads-2026-10-18/README.md):499 pruebas
 focales y32 escenarios Chromium con respuestas simuladas y sin envíos externos. Términos aceptados
-confirmados por API; EC sigueOFF. Falta compatibilidad servida en hosts, protocolo GTM real y
+confirmados por API; EC seguíaOFF. Faltaban compatibilidad servida en hosts, protocolo GTM real y
 aprobación del candidato completo en aquel corte. No se publicaron tags ni políticas en esa validación.
 
 **Checkpoint 18/10, 19:51Z: release de código RELEASED.** Main
@@ -39,9 +49,10 @@ Canario admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store
 ni reserva. Schema de recibos aplicado; excepción específica de batch autorizada a las 18:53:53Z.
 [Auditoría y límites](../../audits/releases/2026-10-18-full-develop-production-release.md).
 
-El flag Ads sigue ausente en Production (readback a las 19:49:57.865Z) y el lector exige `true`: Ads conserva OFF. GTM sigue sin
-publicación; opt-in por fuente, compatibilidad de hosts, Preview, EC efectiva y resultado positivo
-permanecen pendientes. El deploy Greenhouse no activa esos pasos ni acredita recepción/atribución.
+En el checkpoint19:51Z, el flag Ads estaba ausente en Production (readback19:49:57.865Z) y el lector
+exigía `true`: Ads conservaba OFF. GTM, opt-in por fuente, hosts, Preview y EC efectiva estaban
+pendientes; su avance posterior se registra arriba. El deploy de código por sí solo no acredita
+recepción ni atribución.
 
 | Componente | Función en la arquitectura |
 | --- | --- |

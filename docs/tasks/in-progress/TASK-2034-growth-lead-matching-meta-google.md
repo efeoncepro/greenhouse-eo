@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: Meta/UPD publicados previamente; Ads local con acciones/drafts verificados por API18/10,499 tests y32 escenarios Chromium aislados PASS. Schema HubSpot/Meta autorizado y aplicado18/10; dispatcher existente recuperado200, dos submissions delivered sólo al ledger. Lote89d70ec13:1.445 archivos revisados, CI completo/build PASS; Deep falló por timeout de corpus pricing, corregido localmente138 casos con cobertura, revalidación remota pendiente. Términos aceptados/EC OFF; hosts/protocolo GTM real y release general pendientes. Sin nuevo deploy ni publish/activación Ads.`
+- Status real: `Parcial: release general ec317c928 efectivo; Web6/Server10 publicados18/10, EC ON, bridges4250795666af en ambos hosts y dos policies Ads publicadas20:35Z. HubSpot propiedad/campo14/mapping CONFIG_VERIFIED; captura de recibos Meta publicada en Server10. Flag Ads de proyecto ON20:36:20Z; deployment companion Vercel READY con alias/SHA y presencia de claves env/build verificados20:43:28Z; cadena configurada, booleano congelado no expuesto por API. Protocolo/negativos y configuración verificados; primera ocurrencia bajo esta activación, recibos individuales Graph/HubSpot, recepción Ads y atribución pendientes. Sin fabricar negocio.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -28,6 +28,8 @@ Enriquecer Leads aceptados/reservas confirmadas con matching compatible para Met
 Consentimiento granular en el POST de negocio, proyección cifrada durable, delivery por destino,
 Meta mediante el GTM Server existente y Google mediante UPD dedicado sin otra conversión GA4.
 Audiencias por formulario/reunión, con vínculo Ads y settings verificados.
+La ampliación Ads online usa acciones nativas propias para solicitud comercial y reserva confirmada,
+con recibo durable, canal reservado de EC y un único emisor por acción; conserva el espejo GA4.
 
 ## Why This Task Exists
 
@@ -52,12 +54,14 @@ ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin 
 - `docs/architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
+- `docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md`
 - `docs/reference/measurement-gtm-ga4/08-meta-conversions-api-server-side.md`
 
 ## Dependencies & Impact
 
 - Existing public Forms/Meetings commands and shared PostgreSQL transaction.
-- Existing sGTM GTM-K2X4ZTTK, template Meta pin a575edb31aa447469b855c3006ed9991dad711cf.
+- Existing sGTM GTM-K2X4ZTTK, template Meta base pin a575edb31aa447469b855c3006ed9991dad711cf; extensión de captura de recibos publicada con Server10.
 - Existing ops-worker Forms dispatch cadence; no new service/project/cron.
 - GA4 486264460 / G-KYPPY57M14 / stream 10593675149, Google Ads link 10593794382.
 
@@ -69,7 +73,7 @@ ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin 
 
 ## Current Repo State
 
-Snapshot de intake histórico. Para el estado vigente, usar Status real y el cierre14/10.
+Snapshot de intake histórico. Para el estado vigente, usar Status real y el checkpoint18/10.
 
 - Consentimiento granular ads/analytics, sin inferir publicidad del procesamiento; veto GPC.
 - Matching backend, renderer y worker released; SQL aplicada y capture/meta/google/retención ON.
@@ -149,8 +153,20 @@ Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
 - [x] Consent granular/GPC, click context30d y EC por user_data reservado, sin hash/PII en telemetría; tests.
 - [x] Dos acciones secundarias nativas propias creadas, readback por campo y bindings saneados completos.
 - [x] Workspaces GTM API Web8/Server12, tags nativos/Linker/excepción GA4 y quick_preview sin error.
-- [ ] Tag Assistant funcional, términos/EC efectivo y salida de conversión real comprobados; no se fabrica tráfico.
-- [ ] Release backend/bundles/bridge, GTM publicado con confirmación, policies/flag opt-in y primera recepción Ads.
+- [x] Protocolo Google real y negativos: cuatro casos SDK Preview y cuatro SDK live, transporte interceptado; Client GA4 reconstruye user_data en probe suprimido, sin salida Ads/Meta.
+- [x] Términos específicos aceptados con autorización y EC efectivo ON, método GTM; readback API/UI de cuenta6862539491.
+- [x] Backend y bundles promovidos en release general ec317c928, con CI/Deep y manifest del release verificados.
+- [x] Bridge canónico SHA4250795666af publicado e idéntico en WP/Think; cuatro casos UI y doce casos de consentimiento Google PASS.
+- [x] GTM Web6/Server10 publicados y releídos por versión/fingerprint/árbol exactos; captura de recibos Meta publicada en Server10.
+- [x] Policies Performance/Discovery revisión2 publicadas20:35Z con Ads opt-in; destinos Meta/UPD y mappings existentes preservados.
+- [x] HubSpot Performance: propiedad técnica, campo14 oculto/opcional y mapping por CAS CONFIG_VERIFIED; trece campos/settings preservados y defaults reconciliados por GET sin repetir PATCH.
+- [x] Flag Ads de proyecto ON verificado20:36:20Z; es configuración del proyecto, no prueba del valor congelado del deployment.
+- [x] Companion Vercel READY, alias/SHA exactos y cadena de configuración verificados20:43:28Z (proyecto true + clave env/build presentes). La API no expone el valor booleano congelado ni prueba una conversión.
+- [ ] Primera solicitud comercial real bajo esta activación: recibo durable y recepción de la acción Ads correspondiente; sin enviar formularios sintéticos.
+- [ ] Primera reserva comercial real confirmada bajo esta activación: recibo durable y recepción de la acción Ads correspondiente; no convertir clics o apertura de agenda.
+- [ ] Primera identidad nativa HubSpot exacta de una nueva submission marcada, con historial completo y conversionId verificado.
+- [ ] Recibo individual Graph y recepción positiva Google Ads comprobados con ocurrencias reales; configuración/probes suprimidos no los sustituyen.
+- [ ] Atribución Ads observada y reconciliada; recepción, Test Events y HTTP aceptado no prueban atribución.
 
 
 - [x] Public POST carries granular consent/context, never treats processing consent as ads consent.
@@ -161,7 +177,7 @@ Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
 - [x] Commercial audiences created/read back separately from matching delivery.
 - [x] Meta Test Events Server shows matching keys/classifiers; positives, six negatives and stable-ID replay verified (not attribution dedupe).
 - [x] Source/worker/renderer released, migration applied, scoped secrets and four flags verified live.
-- [ ] First accepted commercial form/confirmed booking with ads consent post-flip: source→ledger→destination ack→provider reception; not exercised, no synthetic business records.
+- [ ] Complete real source→ledger→destination ack→provider reception evidence for both form and confirmed booking under the current activation; historical Meta form evidence alone does not complete both sources or the new receipts.
 - [x] Docs, mirrored skills, audit/handoff and rollback synchronized; closure gates recorded in release dossier.
 
 <!-- ZONE 2 — Plan Mode -->
@@ -175,6 +191,19 @@ Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
 5. Verify readbacks and close with actual runtime status.
 
 ## Verification
+
+Checkpoint18/10 vigente: [activación y evidencia saneada](../../audits/growth/2026-10-18-google-ads-activation.md).
+Release general [ec317c928](../../audits/releases/2026-10-18-full-develop-production-release.md)
+efectivo; el fallo Deep anterior del candidato no es un bloqueo vigente de ese release.
+Comparación estructural API:173 comprobaciones, no173 tests unitarios. QA focal:15 pruebas de plan,
+16 del builder Meta y10 del guard HubSpot; SDK Preview4/live4 y hosts12 con transporte interceptado.
+Web6/Server10 releídos; EC ON; propiedades/formulario/mapping HubSpot verificados sin nuevas
+submissions/contactos/reservas. Policies revisión2 publicadas20:35Z; proyecto Ads ON20:36:20Z.
+Companion Vercel READY/alias/SHA exactos20:43:28Z y cadena de configuración verificada; la API sólo
+expone nombres de claves, no el booleano congelado ni ejecución de una conversión.
+Primera ocurrencia y recepción/atribución proveedor bajo esta activación siguen sin verificar.
+
+Evidencia histórica del rollout13/10:
 
 - Local: 71 tests10files +21Client tests, tipos/lint, portable Forms/Meetings y worker bundle PASS.
 - CI candidato38475587661/build y staging smoke38476441021 success. Main CI38479348660:
@@ -201,6 +230,7 @@ Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
 
 ## Progress Log
 
+- 2026-10-18: [activación Ads y trazabilidad](../../audits/growth/2026-10-18-google-ads-activation.md): release general ec317c928 efectivo, Web6/Server10 publicados y releídos, EC ON, bridges4250795666af en ambos hosts y QA de protocolo/negativos PASS. Policies Performance/Discovery revisión2 publicadas20:35Z; destinos anteriores preservados. HubSpot propiedad/campo14/CAS verificados y captura de recibos Meta publicada. Proyecto Ads ON20:36:20Z; companion Vercel READY, cadena de configuración verificada, primera ocurrencia/Graph/identidad nativa/recepción y atribución Ads pendientes. Task permanece parcial.
 - 2026-10-18: [revisión completa del candidato y reparación SQL autorizada](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md). Tres columnas/constraints y dos triggers verificados; scheduler existente recuperado sin POST manual. No certifica entrega HubSpot/Graph ni atribución Ads.
 
 - 2026-10-13: autorización de implementación, Google settings/audiencias y pruebas locales/Preview.
@@ -222,9 +252,11 @@ Acceptance evidence + Status real current, runtime and rollout gates passed, doc
 ## Handoff
 
 Owner Codex. Matching activo y permanente; no volver a ejecutar rollout por snapshots históricos.
-El operador exigió todo develop comprometido, ya promovido como PR254. Preservar WIP ajeno.
-Observar siguiente fuente real consentida y correlacionar ledger/ack/provider sin fabricar negocio;
-con esa evidencia completar el acceptance restante. No afirmar calidad/serving por Test Events.
+Release general vigente ec317c928 y configuración Ads/HubSpot publicados18/10; preservar WIP ajeno.
+Companion READY, alias/SHA y cadena de configuración releídos20:43:28Z; canarios/health/watchdog PASS.
+Siguiente evidencia: observar fuentes reales consentidas y correlacionar ledger/ack/provider, recibo individual
+Graph e identidad nativa HubSpot, sin fabricar negocio ni repetir envíos. No afirmar atribución,
+calidad o serving por configuración, protocolo local o Test Events.
 
 <!-- ZONE 3 — Execution Spec -->
 
@@ -236,6 +268,7 @@ con esa evidencia completar el acceptance restante. No afirmar calidad/serving p
 ## Scope
 
 - Source capture, encrypted queue, destination adapters, sGTM Client and GA4 audiences.
+- Ads online native actions/EC, receipt-gated browser transport and native HubSpot occurrence tracing.
 
 ## Out of Scope
 
@@ -243,7 +276,7 @@ con esa evidencia completar el acceptance restante. No afirmar calidad/serving p
 
 ## Detailed Spec
 
-Source/payload contracts live in `src/lib/growth/measurement`; explicit advertising context in public POST. Google enriches existing client_id with no events. Meta ownership switches only after backend/renderer rollout.
+Source/payload contracts live in `src/lib/growth/measurement`; explicit advertising context in public POST. Google UPD enriches existing client_id with no events. Ads online has its own receipt-gated reserved channel and native actions; it never creates another GA4 generate_lead. Meta ownership switches only after backend/renderer rollout.
 
 ## Rollout Plan & Risk Matrix
 
@@ -257,15 +290,24 @@ Ordering: source/worker → parked migration/secrets → Client preview → cont
 | Broad unrelated release | Production | Review actual diff and manifest | Release preflight |
 
 Flags: GROWTH_MEASUREMENT_CAPTURE_ENABLED, GROWTH_MEASUREMENT_META_ENABLED, GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED, GROWTH_MEASUREMENT_RETENTION_ENABLED default OFF; retention stays ON after rollout during rollback. Capture/send OFF restores data boundary; coordinate legacy Meta trigger restore with backend send disabled. Preserve receipts.
+Ads agrega GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED con default OFF y policies opt-in; el valor ON
+del proyecto18/10 se completó con companion READY y cadena de configuración verificada; no acredita
+por sí solo una conversión real ni recepción proveedor.
 
 ## Closing Protocol
 
-Checkpoint18/10: [validación previa y límites](../../audits/growth/2026-10-18-google-ads-prerelease-validation.md),
-[paquete de release](../../operations/releases/google-ads-2026-10-18/README.md). Dos propuestas offline
-Performance/Discovery preservan destinos. No cierran los acceptance de runtime/primera conversión;
-el lote general requiere revisión/CI y el bridge anterior sigue servido en WP/Think.
+Checkpoint18/10: [activación publicada y límites](../../audits/growth/2026-10-18-google-ads-activation.md).
+Release general ec317c928 efectivo; Web6/Server10, EC, bridge de ambos hosts, policies revisión2 y
+HubSpot configurados/releídos. Meta receipt capture publicado en Server10. El proyecto tiene Ads ON,
+y companion READY con alias/SHA y cadena de configuración verificados20:43:28Z; canarios, health y
+watchdog PASS. La API no expone el booleano congelado ni acredita una conversión real.
+Los planes [previos](../../audits/growth/2026-10-18-google-ads-prerelease-validation.md) y el
+[paquete de release](../../operations/releases/google-ads-2026-10-18/README.md) quedan como historia,
+no como indicación de volver a publicar. Observar tráfico real para cerrar recepción, identidades
+individuales y atribución, sin submissions/bookings/replay fabricados.
 
-- [ ] Runtime acceptance and current Status real recorded.
+- [x] Current Status real and published configuration/protocol evidence recorded with explicit limits.
+- [ ] Companion runtime acceptance, first real occurrences, individual receipts and provider reception/attribution verified.
 - [x] Task index, audit/handoff, changelog and mirrored skills synchronized.
 - [x] Scope/type/context and meaningful QA checks passed; task lint/mirrors/context strict and CI evidence in release dossier.
 

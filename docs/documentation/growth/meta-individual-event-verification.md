@@ -2,8 +2,11 @@
 
 Investigación inicial: 2026-10-17, fuentes oficiales y código local del sender sGTM de Efeonce.
 En ese corte no se enviaron eventos, consultaron credenciales ni modificaron GTM/runtime publicado.
-Actualización18/10: storage aplicado con autorización específica; worker compatible ya servido.
-El header de recibo en GTM sigue sin activar/publicar. La reparación no certifica recepción Graph.
+Checkpoint 18/10/2026, 20:33:29Z: **GTM Server 10 publicado y confirmado live**, con captura
+de recibos en el tag Meta 6, acotada al Lead backend autenticado. Schema y worker compatibles
+activos. El primer recibo Graph de una ocurrencia real sigue pendiente; publicación y configuración
+no certifican recepción ni atribución.
+[Auditoría de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
 [ADR](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) ·
 [Preparación y límites](../../manual-de-uso/growth/conservar-recibos-meta.md).
 
@@ -54,13 +57,12 @@ recepción individual. Esa vinculación la acredita nuestro transporte: el conta
 un eco del UUID ni una lectura posterior dentro de Meta. Con un batch de varios eventos,
 un contador aislado no permite asignar resultados individuales.
 
-## Qué conserva el carril publicado, sin activar el cambio local
+## Corte histórico del 17/10: carril previo sin recibos
 
-Esta sección describe el contrato publicado previo. Los archivos locales enlazados contienen
-también la implementación preparada de recibos, cuyo rollout no está autorizado.
-
-El código local y el snapshot saneado identifican el template oficial Meta fijado en
-`a575edb31aa447469b855c3006ed9991dad711cf`; esta revisión no relee el contenedor live.
+Esta sección conserva el contrato anterior a Server 10 para interpretar las ocurrencias históricas.
+Las menciones a código preparado o migración pendiente en esta sección corresponden a ese corte.
+El template oficial de base estaba fijado en `a575edb31aa447469b855c3006ed9991dad711cf`;
+no implican que el parche actual esté pendiente de publicar.
 
 1. [Client sGTM](../../../scripts/measurement/sgtm-lead-client.js): autentica el ingreso
    `/efeonce/lead-enrichment`, valida UUID y sobre, ejecuta el contenedor y observa el estado
@@ -108,11 +110,11 @@ estado efectivamente visible en la UI. Si la herramienta no muestra ese UUID, co
 limitación de correlación. Un estado visible allí describe esa evidencia de diagnóstico;
 no acredita por sí solo matching, audiencia ni atribución a un anuncio.
 
-## Implementación local preparada: recibo por evento e intento
+## Implementación activa: recibo por evento e intento
 
 La mejora mantiene el único sender CAPI dentro de sGTM. Instrumenta su petición saliente;
-no añade un POST paralelo desde la CLI. Requiere un cambio gobernado del template/ingress,
-persistencia y readers, con Preview, revisión y publicación conforme al
+no añade un POST paralelo desde la CLI. El cambio del template, persistencia y readers se activó
+con revisión, compilación y publicación gobernada conforme al
 [ADR vigente de CAPI](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
 
 - Conservar la relación exacta entre UUID, destino, intento y lease. Mantener una petición
@@ -126,11 +128,11 @@ persistencia y readers, con Preview, revisión y publicación conforme al
   `meta.receipt.reception=acknowledged`; recibo ausente o malformado queda explícitamente desconocido.
   No transformar una respuesta 2xx ambigua en rechazo ni crear un reenvío automático nuevo
   sólo por faltar telemetría; preservar los retries existentes sin ampliar su semántica.
-- El tag preparado publica metadata saneada en una cabecera de respuesta reservada sólo para
+- El tag instrumentado publica metadata saneada en una cabecera de respuesta reservada sólo para
   el ingreso backend autenticado; el dispatcher la valida y persiste. Google documenta
   `sendHttpRequest` para obtener cuerpo/status y `setResponseHeader` para responder antes
-  de `returnResponse`. Está probado con mocks del template fijado; la compilación de GTM queda
-  pendiente. Permisos acotados y queryPermission evitan que telemetría cambie el callback. No exportar
+  de `returnResponse`. Las pruebas con mocks del template fijado y la compilación GTM del conjunto pasaron.
+  Permisos acotados y `queryPermission` evitan que la telemetría cambie el callback. No exportar
   el recibo por el carril público PageView.
   [APIs oficiales de sGTM](https://developers.google.com/tag-platform/tag-manager/server-side/api#sendHttpRequest).
 - Registrar cada intento de forma durable y asociarlo mediante CAS, sin sobreescribir un
@@ -142,16 +144,29 @@ persistencia y readers, con Preview, revisión y publicación conforme al
 
 Las pruebas locales cubren UUID distinto, contador inesperado, JSON inválido, timeout
 posterior al envío, 4xx/5xx, dos peticiones concurrentes, respuesta tardía y ausencia de
-recibo. Después: Preview sin envío, validación del diff y, sólo con autorización de la
-prueba concreta, un envío controlado. Un test local o publish no certifica recepción Meta.
+recibo. La validación del diff, compilación y publicación de Server 10 no generaron una conversión
+positiva. La siguiente evidencia procede del próximo Lead real consentido; un test local o una
+publicación no certifican recepción Meta.
 
-Persistencia preparada: `measurement_delivery.provider_receipts_json`, máximo cinco observaciones
+Persistencia activa: `measurement_delivery.provider_receipts_json`, máximo cinco observaciones
 append-only; finalización y recibo comparten CAS por evento, destino, lease y número de intento.
 Header `x-efeonce-meta-receipt`; correlación backend mediante `x-efeonce-meta-attempt` y
 `x-efeonce-meta-attempt-number`, fuera del payload CAPI. Opción `captureEfeonceReceipt` default OFF.
 La CLI lee `meta.receipt` y tolera schema anterior sin inventar un recibo para los históricos.
 
-Estado 2026-10-18: **schema aplicado con autorización específica y worker compatible ya servido**.
-[Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md), sin nuevo
-deploy ni publicación/activación GTM. No hay nuevo endpoint de lectura individual ni evidencia
-Graph adicional certificada por esta reparación.
+El tag 6 tiene `captureEfeonceReceipt=true` y tipo nativo `cvt_191286361_3`; el default del template
+sigue OFF. El helper sólo captura un Lead del Client autenticado en `/efeonce/lead-enrichment`,
+para el dataset propio y con correlación de intento válida. PageView mantiene su contrato previo.
+Template 3 publicado: SHA256 de `templateData`
+`1331b38055d8b0fccb4701d6ed3beeadeee2eda70c7445ed7307073c3a4f9512`.
+
+La API rechazó el primer PUT por `galleryReference` no soportado; el GET confirmó ausencia de cambio.
+El cuerpo corregido omitió esa metadata y el readback observó un fork nativo. La normalización de las
+dos secciones JSON se validó estructuralmente; JavaScript, INFO, términos, tests y notas permanecieron
+byte a byte. Mantener estos guards en futuras actualizaciones, sin aceptar drift arbitrario ni repetir
+una escritura de resultado desconocido. [Procedimiento del operador](../../manual-de-uso/growth/conservar-recibos-meta.md#precauciones-de-la-api-gtm).
+
+El schema se aplicó con autorización específica y el worker compatible ya está servido. Server 10
+quedó publicado y verificado live a las 20:33:29Z del 18/10. El primer recibo Graph sigue pendiente:
+no hay backfill de los ACK históricos, nuevo endpoint de lectura individual ni evidencia adicional
+certificada de matching, deduplicación o atribución. Este carril de recibos es independiente de Ads.

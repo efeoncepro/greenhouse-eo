@@ -1,6 +1,15 @@
 # Google Ads — Arquitectura de medición comercial y conexión API V1
 
-Checkpoint 18/10, 19:51Z: **release de código RELEASED**, main
+Checkpoint operativo 18/10, 20:43:28Z: **configuración Ads activada y cadena de despliegue verificada**.
+Anunciante6862539491, EC ON con método GTM, Web6/Server10 live y políticas Performance/Discovery
+rev2 publicadas (activationAt20:35Z). Bridge compatible publicado en WordPress/Think; HubSpot
+submission tracing configurado y captura Meta incluida en Server10. Flag Production true leído
+20:36:20.421Z; companion deployment dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk del mismo mainEC READY,
+alias exacto y clave env/build presentes. API expone nombres, no el booleano congelado ni una conversión.
+Primera ocurrencia comercial, recibos positivos y atribución **pendientes**. El detalle vigente y
+sus límites están en la [auditoría de activación](../audits/growth/2026-10-18-google-ads-activation.md).
+
+Checkpoint histórico 18/10, 19:51Z: **release de código RELEASED**, main
 `ec317c928fffcb919d71bdb62821b80280af2347`. CI, Deep y smoke de main PASS; orquestador
 [39159325900](https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900) SUCCESS. Manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b`
 `released` a las 19:51:25.548Z, leído en PostgreSQL a las 19:51:44.315Z.
@@ -18,9 +27,9 @@ independientes. El [paquete previo](../operations/releases/google-ads-2026-10-18
 ## 1. Estado, alcance y precedencia
 
 - Estado: `Accepted` como dirección arquitectónica por instrucción del operador el **2026-10-17**.
-- Forms/Meetings: contrato online preparado y servido en el checkpoint 18/10, con emisión online Ads OFF.
+- Forms/Meetings: contrato online servido; configuración Ads activada para Performance y Discovery en el checkpoint operativo18/10, con companion deployment READY y cadena de configuración verificada.
   Conexión multiorganización, API/MCP de producto y sender de resultados CRM siguen **pendientes**.
-  Publicación GTM, nuevas organizaciones, puja y activación comercial requieren sus gates propios.
+  GTM6/10 publicado; nuevas organizaciones, puja y otras fuentes conservan sus gates propios. Primera recepción comercial sigue pendiente.
 - Delta operativo 17/10: CLI local de lectura y gestión implementada; OAuth renombrado **Efeonce**.
   [Evidencia y límites](../audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
 - Dueño: Growth / Measurement; corresponsables: RevOps / HubSpot, Platform / Identity, Data / Insights y Finance.
@@ -71,6 +80,11 @@ El operador amplió posteriormente el alcance a OAuth Efeonce y CLI de lectura/g
 cambio de marca y la custodia propia del grant; ninguna mutación publicitaria concreta está autorizada
 por esa ampliación genérica. La prueba real de esta sesión se mantiene en lectura. El catálogo de gestión
 y la separación entre capacidad implementada y apply real se detallan en §5.4.
+
+La autorización posterior del operador cubre release completo, bridges compatibles, publicación GTM,
+EC y las dos políticas comerciales documentadas en la auditoría de activación. Se preservan las
+identidades y los límites por fuente; esta ampliación no autoriza campañas, presupuestos, otras cuentas,
+replay histórico ni fabricación de conversiones. Los párrafos anteriores conservan el alcance inicial.
 
 ## 2. Problema, resultados y dueños de verdad
 
@@ -462,8 +476,9 @@ match exacto/único y `provider_submission_id = conversionId`. Estados y CAS exi
 ambigüedad/denegación/exhaustion; un fallo del recibo no modifica entrega ni vuelve a ejecutar el POST.
 
 Las expansiones SQL de recibos se aplicaron el 18/10 con autorización específica; el worker compatible
-está servido. La propiedad técnica, mapping y opt-in siguen pendientes de rollout. Históricos sin
-marcador no se promueven por email/hora.
+está servido. La propiedad técnica y el opt-in de mapping de Performance se configuraron y releyeron el18/10:13campos
+comerciales intactos y14º oculto/opcional. [Recibo operativo](../audits/growth/2026-10-18-google-ads-activation.md).
+Primera ocurrencia nativa pendiente; históricos sin marcador no se promueven por email/hora.
 El valor actual de la propiedad Contact tampoco prueba una submission anterior. Contact ID y deal ID
 se añaden al binding por evidencia independiente; no se interpreta `conversionId` como contact ID.
 

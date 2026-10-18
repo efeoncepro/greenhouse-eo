@@ -1,5 +1,17 @@
 # Handoff
 
+## 2026-10-18 — Activación Ads y trazabilidad de conversiones
+
+Cuenta6862539491: EC ON, GTMWeb6/Server10 publicados, bridge compatible WordPress/Think y policies
+Performance/Discovery rev2. HubSpot marker/config y captura Meta activos. Flag Production true;
+companion ER5 READY del mismo mainEC liberado, alias exacto, health200 y watchdogok6/6 sin drift.
+Canarios admin/public/negativos PASS, consentimiento hosts12/12 y SDKlive4/4 sin envíos comerciales.
+Primera ocurrencia, identidad nativa y recepción/atribución siguen pendientes: cero nuevas ocurrencias
+20:35–20:44Z. TASK-2034 parcial. Sin replay ni cambio de campañas/OAuth/IAM. WIP ajeno preservado.
+[Auditoría/evidencia](docs/audits/growth/2026-10-18-google-ads-activation.md),
+[arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
+[tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) e [historial](Handoff.archive.md).
+
 ## 2026-10-18 — Release completo de develop a producción
 
 Todo el candidato develop `77763331c` promovido a main `ec317c928` por PR #256: 1.583 archivos,
@@ -242,70 +254,6 @@ cierre de interés 05/10, no 24 horas exactas. Radar horario/CRM del 10/10 poste
 [Expediente del corte](docs/commercial/tenders/licitalab-actualizacion-2026-10-14/README.md): 1.142 códigos únicos revisados por perfil y keywords; 72 candidatas con lectura dirigida. Catorce bajas administrativas de plazo verificadas en HubSpot, dos prórrogas y UTEM preservada. 30 Deals nuevos y 3 RFI en Company + nota, con doble readback; cada alta conserva calificación/GO pendientes. Índices CRM y seguimiento local conciliados; historia y WIP ajeno preservados. No envío ni postulación.
 
 [Paquetes y pendientes](docs/commercial/tenders/licitalab-actualizacion-2026-10-14/PREPARACION-SUBDERE-TARAPACA.md): bases81/56p leídas, técnica/económica y anexos borradores en OneDrive canónico. Repo sólo trazabilidad liviana; sin binarios ni snapshots pesados. SUBDERE14.994MIVA candidato; Tarapacá cuatro unitarios/CPT5.355M, bolsa6.204Msin mínimos. Equipo, idoneidad, costo completo y subcontratación pendientes; sin GO, firmas ni envío.
-
-## 2026-10-14 — Medición escalable, CAPI y agentes publicados
-
-[Release completo](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md): PR255/main9690efad,
-orquestador38591329633 success, manifest released; health200 y watchdog6/6/drift0. SQL/seed7,
-API/panel/CLI agent-first y Server9 estricto (sólo template30) publicados. Nueva fuente por datos
-recibida Meta Server/website/nueve claves sin otro build/redeploy/GTM; fixture archivada y
-HTTP13 fuentes/siete policies. GVC1440/390 y12 estados PASS. Bridge WP/Think4bbd77… idéntico.
-Primera conversión comercial/EMQ siguen pendientes; consentimiento, GA4 y CRM preservados.
-Hook pesado omitido con autorización; sin build/tsc local. [Manual](docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
-
-[TASK-2035](docs/tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress: configuración/CAPI/cliente agente completados en TASK-2036/2037; CRO, abandono, newsletter y CRM permanecen sin iniciar, con dueñas existentes.
-
-Diseño La órbita aprobado con «Vamos, ponla»: [rollout visual WP/Think](docs/audits/measurement/CONSENT_UI_ROLLOUT_2026-10-13.md).
-Adapter sobre controles nativos HubSpot; sin nueva persistencia ni cambios en bridge/GTM/matching.
-Auditoría documental 14/10 con tres subagentes: [funcional](docs/documentation/growth/medicion-gtm-ga4.md#cookies-y-preferencias-del-visitante), [manual](docs/manual-de-uso/growth/operar-consentimiento-cookies-publico.md) y skills al día.
-
-Antecedente13/10: [release y recibos](docs/audits/releases/2026-10-13-full-develop-matching-release.md), PR254,
-main d692ab51dc48, orquestador38483437158 success y manifest released; CI/Deep/build/smoke PASS.
-GTM Server6/Web5, mismo hosting efeonce-group min0/max1. HubSpot categorías/GPC y banner
-primera visita WP/Think; preferencias inline en pie legal, sin franja extra. PageView consentido activo.
-Matching [TASK-2034](docs/tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md): SQL aplicada,
-Client backend autenticado único Meta Lead, legacy12/17 retirados y espejo GA4 preservado.
-Ops00775-fnh100%: Meta/Google/retención true, GitHub repo vars persistentes y secretos versión1
-resueltos en canary200. Vercel captura true, dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias.
-GA4 correcto486264460: UPD/ack, siete audiencias90d y linkAds9531478329. Meta Test Events
-Processed/Server em/ph/fn/ln y clasificadores; cola/leaseCAS/retención y negativos live PASS.
-Watchdog ok6/6 drift0. Primera aceptación/reserva comercial consentida post-flip sin observar;
-no submissions/bookings/CRM sintéticos ni promesa de calidad/serving. Status task Parcial por esa prueba.
-Incidente separado mindicador TLS/timeout sigue abierto, Sentry7790958718/7790964540; excepción
-auditada no bloqueante, sin afirmar solución. Dossier incluye rollback, digests y límites.
-Docs/skills espejo al día; cierre en develop, WIP ajeno preservado. Sin nuevo proyecto/cron para matching.
-
-Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
-ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md): antecedente integrado a **TASK-2035** y supersedido por el ADR de policy; foundation, panel y agentes publicados en PR255. Auditoría posterior con tres subagentes: [cobertura y correcciones](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md).
-
-El corte previo WP `cf7f10d1c` / Think `63e9fa7c7` quedó incluido en los pushes del rollout visual:
-WP `8d6ff95` (plugin1.1.0, payload9archivos), Think `f7d8f36` y Vercel `dpl_3iSjewwoA1wxPqW4oG9FDugXzmZ5` Ready.
-Panel/categorías/GPC verificados; QA intercepta transporte y no prueba nuevas recepciones Meta. [Rotación CLI 14/10](docs/audits/measurement/VERCEL_CREDENTIAL_ROTATION_2026-10-14.json): anterior revocada/403; nueva CLI/proyectos200, dos fuentes0600 y GitHub actualizados, wrappers retirados; vence14/10/2027. Sin nuevo workflow/deploy.
-
-**Delta 17/10 — CLI local Meta para agentes: lectura y ampliación de operación.**
-
-`pnpm --silent meta`, perfil Efeonce/Graph v25.0; [ADR vigente](docs/architecture/GREENHOUSE_META_AGENT_WRITE_CLI_DECISION_V1.md),
-[manual](docs/manual-de-uso/growth/consultar-meta-con-agentes.md) y [funcional](docs/documentation/growth/meta-agent-cli.md).
-El operador amplió a `meta-agent.v2`: catálogo SDK25 y métricas por campo, insights orgánicos, Ads nuevos
-PAUSED y publicación/respuestas públicas acotadas con plan/hash/receipt privado, envío único y readback
-GET. Preparar no publica; `unknown` no se reenvía. Sin activación, DM, IAM, nuevo CAPI, producto/MCP/deploy.
-Foundation verificada: 34 tests/17 comandos de lectura, ESLint/TS PASS; readback17:10–17:12Chile en
-`/Users/jreye/Documents/Meta-Efeonce-Connection/cli-verification-2026-10-17/` (`summary.json`, `final-stats.json`).
-Stats server7d: dos páginas/36 filas; final1d: dos páginas/seis filas, exit0. Lead EMQ6,9/PageView3 son
-agregados disponibles, no mejora causada por la CLI. V2: 105 tests/5 archivos, TS strict y lint global
-PASS; código completo, POST públicos no certificados en vivo. Probes privados en
-`/Users/jreye/Documents/Meta-Efeonce-Connection/cli-v2-verification-2026-10-17/`; fechas sociales: IG reach/day
-una fila+cursor (exit6), reanudación misma consulta cero filas completas (exit0); Page engagement una
-fila+cursor (exit6). Link observado v26.0, solicitud propia v25.0. Sin publicaciones/conversiones de prueba. [ADR inicial](docs/architecture/GREENHOUSE_META_AGENT_CLI_DECISION_V1.md).
-Ampliación de rastreo [aceptada local](docs/architecture/GREENHOUSE_META_LEAD_TRACE_CLI_DECISION_V1.md):
-`leads find/trace`, fuente/colas/ACK y HubSpot separados, selector privado/UUID, store canónico runtime
-READ ONLY. Readback real fsub7d76a9ba/event474092ed: delivered, sGTM200, historialHubSpot correlated y
-contacto por identidad; MetaProcessed/contactCreatedBySubmission unknown. `coverage.complete` cubre
-observables, no todo procesamiento. Evidencia Documents/Meta-Efeonce-Connection/lead-trace-verification-2026-10-17/.
-Sin PII exportada/descifrado/redispatch/CRM writes. Corte anterior: 172 tests/9 archivos, TS strict con
-imports canónicos y ESLint propios PASS; source read/find y CLI full/source-only/evento verificados.
-[Relectura del último Performance](docs/audits/growth/2026-10-17-performance-latest-lead-trace.md): sigue fsub7d76a9ba, HubSpot recibido y Meta contabiliza 1 Lead servidor; sin fallos de entrega observados, binding exacto/atribución pendientes.
-Delta [ID nativo HubSpot](docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): código local, marcador por envío y recibo GET/CAS; SQL parqueado, propiedad/campo/mapping y release pendientes (Growth/Integrations). [Activación](docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md); plan privado Documents/Meta-Efeonce-Connection/occurrence-marker-2026-10-17/. Históricos no adquieren prueba exacta. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin GET por UUID; [recibo CAPI](docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) ahora implementado localmente (header saneado, CAS por intento, CLI). Operador: commit sin activar/desplegar; checkbox OFF, SQL parqueado, sin envíos/publicaciones. [Revisión final](docs/audits/growth/2026-10-17-meta-cli-final-review.md): cobertura/paginación, multidestino, identidad nativa y coherencia de recibos corregidos; 426 Vitest +36 Node, TS/lint/SQL aislado PASS. Rollout pendiente.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

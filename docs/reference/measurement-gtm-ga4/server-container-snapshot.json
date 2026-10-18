@@ -1,14 +1,75 @@
 {
-  "name": "TASK2035 strict policy v2 after web/worker convergence",
+  "name": "Efeonce Ads consented online + scoped receipts 2026-10-18",
   "tags": [
     {
+      "name": "Efeonce Ads - commercial_lead",
+      "type": "sgtmadsct",
+      "notes": "Verified owner 6862539491/action customers/6862539491/conversionActions/7852486523; secondary/ONE/zero measurement default. Native tag reads transaction_id and reserved user_data. No synthetic conversions.",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "conversionId",
+          "value": "18432951465"
+        },
+        {
+          "type": "template",
+          "key": "conversionLabel",
+          "value": "NnDACPveraAdEKmJwtVE"
+        }
+      ],
+      "firingTriggerId": [
+        "42"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "Efeonce Ads - Conversion Linker",
+      "type": "sgtmadscl",
+      "firingTriggerId": [
+        "46"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
+      "name": "Efeonce Ads - meeting_booking",
+      "type": "sgtmadsct",
+      "notes": "Verified owner 6862539491/action customers/6862539491/conversionActions/7852487186; secondary/ONE/zero measurement default. Native tag reads transaction_id and reserved user_data. No synthetic conversions.",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "conversionId",
+          "value": "18432951465"
+        },
+        {
+          "type": "template",
+          "key": "conversionLabel",
+          "value": "kLr8CJLkraAdEKmJwtVE"
+        }
+      ],
+      "firingTriggerId": [
+        "44"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
+    },
+    {
       "name": "FB_CONVERSIONS_API-708931297255942-Server-Tag",
-      "type": "cvt_NCN6S",
+      "type": "cvt_191286361_3",
       "parameter": [
         {
           "type": "template",
           "key": "pixelId",
           "value": "708931297255942"
+        },
+        {
+          "type": "boolean",
+          "key": "captureEfeonceReceipt",
+          "value": "true"
         },
         {
           "type": "template",
@@ -228,12 +289,339 @@
       "firingTriggerId": [
         "20"
       ],
+      "blockingTriggerId": [
+        "41"
+      ],
       "consentSettings": {
         "consentStatus": "notSet"
       }
     }
   ],
   "triggers": [
+    {
+      "name": "Efeonce Ads - commercial_lead",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Client Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "GA4"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_ads_conversion"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - key}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "commercial_lead"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - allowed}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - transaction}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-8][a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - native GA4 consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "G111"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - consented GA4 page views",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Client Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "GA4"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "page_view"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - native GA4 consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "G111"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - exclude bridge from GA4",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Client Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "GA4"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_ads_conversion"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - meeting_booking",
+      "type": "always",
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Client Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "GA4"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Event Name}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_ads_conversion"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - key}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "meeting_booking"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - allowed}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - transaction}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-8][a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - native GA4 consent}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "G111"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{ED - page_location}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^https://(efeoncepro\\.com|think\\.efeoncepro\\.com)(/|$)"
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "FB_CONVERSIONS_API-708931297255942-Server-Trigger",
       "type": "always",
@@ -846,6 +1234,39 @@
       ]
     },
     {
+      "name": "Efeonce Ads - allowed",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "ads_conversion_allowed"
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - key",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "ads_conversion_key"
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - transaction",
+      "type": "ed",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "keyPath",
+          "value": "transaction_id"
+        }
+      ]
+    },
+    {
       "name": "Meta - safe page URL",
       "type": "remm",
       "parameter": [
@@ -1131,15 +1552,7 @@
   "customTemplates": [
     {
       "name": "Conversions API Tag",
-      "galleryReference": {
-        "host": "github.com",
-        "owner": "facebookincubator",
-        "repository": "ConversionsAPI-Tag-for-GoogleTagManager",
-        "version": "a575edb31aa447469b855c3006ed9991dad711cf",
-        "signature": "3e8ee0e2e9d9914f8c4cfa90d59ae1f4a3188baf79bbcffd4c7b934387c2c164",
-        "galleryTemplateId": "NCN6S"
-      },
-      "templateDataSha256": "e40d49da1812b20e0a632fd54496b37c1b90d76fe0f11273186cea8e30d2751f"
+      "templateDataSha256": "1331b38055d8b0fccb4701d6ed3beeadeee2eda70c7445ed7307073c3a4f9512"
     },
     {
       "name": "Efeonce backend Lead ingress",

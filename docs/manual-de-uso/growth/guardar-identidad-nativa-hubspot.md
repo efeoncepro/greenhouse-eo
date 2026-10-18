@@ -1,8 +1,9 @@
 # Activar y comprobar el ID nativo de HubSpot Forms
 
-Estado 2026-10-18: schema aplicado con autorización específica; worker compatible ya servido.
-Provisión HubSpot, mapping y primera identidad nativa verificada siguen pendientes.
+Estado 2026-10-18: schema y worker compatibles servidos; propiedad, campo nativo y mapping de
+Performance activos y verificados. La primera identidad nativa de una ocurrencia sigue pendiente.
 [Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
+[Activación y readback de configuración](../../audits/growth/2026-10-18-google-ads-activation.md).
 [Contrato funcional](../../documentation/growth/hubspot-native-form-receipts.md) ·
 [ADR](../../architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md).
 
@@ -19,6 +20,25 @@ Plan privado 0600 y evidencias fuera del repo:
 Contiene property-create, definición previa/PATCH/esperada, SHA256 y pre/postcondiciones. El plan
 no es una escritura. Antes de aplicarlo, revalidar identidad, ausencia o definición equivalente
 de propiedad y hash de la definición nativa; si hay drift, volver a preparar conservando lo nuevo.
+
+## Configuración activa verificada, 2026-10-18
+
+Portal `48713323` y app canónica `33235280` confirmados. Se creó
+`ef_greenhouse_submission_id` como string/text, `formField=true`, en `greenhouse_growth_forms`.
+El formulario Performance `89652ccf-8393-4361-a650-878982132cfe` conserva sus 13 campos/grupos
+originales y settings; un único PATCH añadió el 14.º, oculto y opcional, `objectTypeId=0-1`.
+HubSpot agregó sólo `groupType=default_group` y `richTextType=text` al grupo nuevo. La diferencia
+se reconcilió mediante GET y un guard acotado, sin repetir el PATCH.
+
+`configureHubSpotSubmissionTracing` activó `submissionIdProperty` por CAS del mapping fresco en
+el destino existente `fdst-563c7c71-fda6-4fde-a327-5786986b61ee`, preservando versión publicada,
+habilitación, mapping comercial y políticas. Readback independiente: propiedad, formulario y
+mapping verificados. Los pasos de provisión/configuración siguientes ya están aplicados para
+este destino; no repetirlos como prueba. No se crearon contactos, envíos ni reservas.
+[Evidencia de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
+
+El próximo envío real autorizado debe producir el marcador histórico y un `conversionId` exacto
+antes de declarar verificada la primera ocurrencia. No hacer backfill ni reenviar leads anteriores.
 
 ## Activación dentro del release autorizado
 

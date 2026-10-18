@@ -1,5 +1,17 @@
 # Conversiones Google Ads para Forms y agendas
 
+**Checkpoint 18/10, 20:43:28Z: configuración de producción verificada; primera conversión pendiente.**
+Server **10** (`1792355562526`) se publicó primero y Web **6** (`1792355588730`) después,
+con readback live. La cuenta6862539491 tiene EC efectiva **ON** y términos aceptados. El bridge
+`4250795666af…` está servido en WordPress y Think. Performance y Discovery tienen políticas Ads
+rev2 publicadas, con `activationAt=2026-10-18T20:35:00.000Z`; los destinos previos se conservaron.
+El flag de proyecto se guardó `true` a las20:36:20Z. El companion Vercel del mismo main
+`ec317c928fffcb919d71bdb62821b80280af2347`, `dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk`, está
+**READY** y el alias apunta a él (20:43:28Z). SHA exacto, proyecto true y claves congeladas env/build
+verifican la cadena de configuración; la API sólo expone nombres, no el booleano congelado ni ejecución
+de una conversión. Primera ocurrencia comercial, recibo proveedor y
+atribución siguen pendientes; el E2E no está cerrado. [Auditoría de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
+
 Corte 17-10-2026: código local y workspaces preparados, entonces **sin deploy ni publicación GTM**.
 [ADR](../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
 [arquitectura](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
@@ -20,9 +32,10 @@ Canario admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store
 real. Las expansiones SQL de recibos están aplicadas; excepción específica de batch autorizada a las 18:53:53Z.
 [Auditoría y límites](../../audits/releases/2026-10-18-full-develop-production-release.md).
 
-`GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` sigue ausente en Production (readback a las 19:49:57.865Z)
-y conserva OFF. No se publicó GTM ni se activaron políticas Ads con este release de código. El opt-in, hosts compatibles,
-Preview funcional, EC efectiva y la primera solicitud/reserva real consentida conservan sus gates.
+`GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` estaba ausente en Production en ese checkpoint
+(readback a las19:49:57.865Z) y conservaba OFF. No se publicó GTM ni se activaron políticas Ads con este release de código. El opt-in, hosts compatibles,
+Preview funcional, EC efectiva y la primera solicitud/reserva real consentida conservaban sus gates
+en ese corte; el avance posterior se registra en el checkpoint actual.
 El PASS del contrato servido no acredita conversión enviada, recepción ni atribución Ads.
 
 ## Qué registra
@@ -85,11 +98,14 @@ La fuente/versión se comprueba de nuevo al preparar; destinos[] es válido para
 El panel conserva la configuración Ads al editar una policy, pero su autoría inicial Ads es por API/CLI;
 no se incorporó un formulario visual ni nueva tool MCP para este delta.
 
-## Borradores GTM y siguiente activación
+## GTM publicado y operación posterior
 
-- Web `GTM-NGHPGRLZ`, workspace8: cuatro variables, trigger77 y tag78.
-- Server `GTM-K2X4ZTTK`, workspace12: variables38–40, triggers41/42/44/46, tags43/45/47;
-  forwarder18 agrega sólo blockingTriggerId41. Live sigue Web5/Server9.
+- Web `GTM-NGHPGRLZ`, live6: cuatro variables, trigger77 y tag78, preparados en workspace8.
+- Server `GTM-K2X4ZTTK`, live10: variables38–40, triggers41/42/44/46, tags43/45/47,
+  preparados en workspace12; forwarder18 agrega sólo blockingTriggerId41. El readback combinado
+  previo al publish pasó173 checks. Preview técnico Server reconstruyó `user_data` con tres
+  supresiones, sin etiquetas ni salidas; SDK Web live pasó cuatro casos con todo envío interceptado.
+  Esto acredita protocolo/negativos, no entrega de una conversión Ads.
 - `pnpm --silent google-ads conversions bindings` relee y verifica owner, tipo, estado, categoría,
   conteo, primary, AW y labels; salida sin HTML. No derivar AW del customer/actionID.
 - `pnpm exec tsx scripts/gtm/google-ads-plan.ts` genera revisión offline con blockers. No publica ni
@@ -100,9 +116,9 @@ Antes de publicar: comparar cuerpos/fingerprints frescos con el plan, confirmar 
 ajenos y repetir compilación/Preview. Validar Tag Assistant y el protocolo GA4 Client→Ads; comprobar
 que el bridge no llega a GA4 ordinario ni Meta. La compilación no prueba entrega. Verificar en la
 cuenta Ads los términos aplicables y habilitación efectiva EC; no inferirla de un tag configurado.
-Actualización17/10: el operador autorizó aceptar los términos y se guardaron; el panel reabierto
-confirma «Has leído y aceptado estos términos». EC continúa OFF: esa habilitación y el rollout
-no se ejecutaron al aceptar el contrato. [Evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md#confirmación-posterior--términos-aceptados).
+Histórico17/10: el operador autorizó aceptar los términos y se guardaron; el panel reabierto
+confirmó «Has leído y aceptado estos términos». EC continuaba OFF en ese corte: la habilitación y el
+rollout se realizaron después, según el checkpoint18/10 de este manual. [Evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md#confirmación-posterior--términos-aceptados).
 
 Coordinar release backend/renderers/bridge y sus hosts (WP/Think), publicar primero Server con la
 excepción, luego Web, y sólo después habilitar policy/flag del backend tras consent smoke. Registrar

@@ -1,5 +1,11 @@
 # Paquete previo al release — Google Ads, 18-10-2026
 
+**Actualización posterior al release —18/10:** GTM Web6/Server10 publicado, EC ON y políticas
+Performance/Discovery rev2 publicadas; flag Production true leído20:36:20Z, companion Vercel del
+mismo mainEC READY con alias/SHA y cadena de configuración verificados20:43:28Z. [Activación y evidencia vigente](../../../audits/growth/2026-10-18-google-ads-activation.md).
+Primera ocurrencia, recepción positiva y atribución pendientes. Los cortes siguientes son históricos.
+
+
 **Checkpoint 18/10, 19:51Z — release de código RELEASED; Ads sin activar.** El operador autorizó
 promover todo develop y confirmó la excepción específica de batch a las 18:53:53Z. PR #256 mergeado:
 main `ec317c928fffcb919d71bdb62821b80280af2347`, árbol idéntico al candidato 77763331.
