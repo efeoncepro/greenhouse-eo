@@ -1080,6 +1080,10 @@ Ejemplo: «Cuando le preguntan a la IA,» introduce; «¿aparece tu marca?» con
 En agenda, «Una conversación.» introduce y «Tu próximo paso.» toma el peso. No se extrapola
 esta aplicación aprobada a titulares arbitrarios ni se infiere énfasis por palabras clave.
 
+### Titulares largos en Bricolage: contraste de pesos — 2026-10-17
+
+El operador, revisando la landing de Inbound Marketing: «Bricolage necesita contraste en los títulos, cuando es muy largo necesita contraste con sus pesos, si no se vuelve muy pesado». Un titular largo entero en 740–780 se lee como un bloque. La parte que introduce va liviana (≈ 330, mismo tamaño y color) y la idea principal conserva el peso alto: «De cada 100 búsquedas,» introduce y «68 terminan sin un clic.» manda; «No murió.» introduce y «Se le murió el clic.» manda. Las listas de frases en Bricolage tampoco van todas en 700: bajan a ≈ 480. La respuesta corta con esfera (1 a 3 palabras) no se parte. Generaliza el caso Growth CTA de arriba a todo titular largo.
+
 ### Partners del footer público — 2026-10-14
 
 El operador rechazó los dos badges a color porque saturan el footer. Pide escala de grises y
