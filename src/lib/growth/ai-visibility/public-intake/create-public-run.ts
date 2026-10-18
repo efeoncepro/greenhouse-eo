@@ -56,6 +56,13 @@ export interface PublicIntakeContext {
   ip: string | null
   captchaToken: string | null
   idempotencyKey?: string | null
+  /** Visitor request only. The legacy non-Forms branch does not emit conversions. */
+  origin?: string | null
+  pageUri?: string | null
+  pageName?: string | null
+  userAgent?: string | null
+  requestGlobalPrivacyControl?: boolean
+  measurementContext?: unknown
   /** Verifier inyectable (tests). Default = Turnstile real (bypass dev / fail-closed prod). */
   verifier?: CaptchaVerifier
 }

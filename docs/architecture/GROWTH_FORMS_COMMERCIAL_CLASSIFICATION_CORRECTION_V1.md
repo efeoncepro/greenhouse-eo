@@ -44,3 +44,8 @@ productivos verificaron quote_request con la misma versión. No se envía un lea
 20 pruebas nuevas cubren permisos/identidad, schema, CAS, riesgo/estado, unicidad de versión y campos
 preservados; regresión focal53 PASS y TypeScript/ESLint PASS. Configuración no prueba recepción Ads
 ni atribución. [Manual operativo](../manual-de-uso/growth/corregir-clasificacion-comercial.md).
+
+
+Publicación y canarios del endpoint: [release Grader/clasificación](../audits/growth/2026-10-18-grader-measurement-release.md).
+El resultado HTTP registra actor/razón/hashes, pero no agrega auditoría durable server-side: conservar
+el resultado en el journal del operador. La CLI sí reserva journal antes de ejecutar.

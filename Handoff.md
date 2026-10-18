@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-18 — Grader: transporte medido y candidato de publicación
+
+GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
+completada con contexto visitante, CORS y recibo sólo tras persistencia; duplicados sin reenvío.
+Clasificación admin incluida en el candidato; release/API productivos aún pendientes.
+69 pruebas aisladas PASS; sin leads, reservas ni conversiones ficticias. Contacto fueraAds.
+[Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+
 ## 2026-10-18 — Ads publicado en todos los formularios comerciales validados
 
 API22:57Z:13 Forms comerciales y Discovery con Ads;12 altas adicionales, Grader comercial confirmado
@@ -249,23 +257,6 @@ activación, credencial mínima, consumidor, presupuesto y canario. Sin activaci
 manuales y routers enlazados. Nuevas altas autorizadas: marca/cuenta, país, iniciativa/necesidad,
 referencia/persona. Gana66065702426 renombrado y leído live; resto del histórico pendiente de lote,
 sin cambios de schema, automatizaciones ni calificación. [Caso](docs/commercial/tenders/gana-programatica-colombia-1541-2026/README.md).
-
-## 2026-10-15 — Correos comerciales y seguimiento puntual
-
-Julio aprobó la [estructura en Prospección](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio); referencia y routing espejados Codex/Claude, extensión adaptable por cuenta. Actualización documental local, sin nueva autorización de envío.
-
-[Socopur 15/10](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md): reply autorizado sólo a Katherine 07:13 Chile; firma gráfica/PDF y EMAIL `118603198768` SENT asociado verificados. Esperar respuesta sobre admisión; sin próximo envío. Método y registros actualizados, WIP ajeno preservado.
-
-**Actualización posterior, 16:54:36 UTC:** [Katherine confirmó cierre](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md)
-para nuevas postulaciones/propuestas de este período; resuelve la espera anterior. Credenciales guardadas
-sin fecha/invitación ni adjudicación inferidas. [Guía del radar](docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md)
-y skills espejo actualizados: primera puerta, señales tempranas, solape72h y tiempos separados;
-[verificación](docs/audits/commercial/2026-10-15-socopur-radar-docs-skills.md). Sólo docs del proyecto,
-sin CRM/envíos/código ni cambios de automatización. Adopción real y causa de tardanza sin verificar.
-Skill personal: dos playbooks de acción/frescura actualizados por aprobación puntual del entorno;
-SKILL.md intacto, sin cambio de permisos persistentes o automatización. Bloqueo de escritura resuelto.
-Corrección directa de Julio 15/10 17:51 UTC: detección 06/10/2026 sin hora/zona, un día calendario tras
-cierre de interés 05/10, no 24 horas exactas. Radar horario/CRM del 10/10 posteriores, sin explicar esa tardanza.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

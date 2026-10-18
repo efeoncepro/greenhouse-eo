@@ -118,3 +118,8 @@ medición online y por último hitos CRM con emisor y valor aprobados por acció
 la [arquitectura completa](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
 define fases y gates. [Evidencia de acceso](../../audits/growth/2026-10-17-google-ads-api-discovery.md)
 y [manual del operador](../../manual-de-uso/growth/conectar-google-ads-con-agentes.md).
+
+
+Grader: [ruta efectiva y fachada compatible](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+Think usa Forms portátil v8; la ruta histórica conserva captcha/coste y mide sólo mediante la política
+Forms y recibo post-persistencia. Estado del nuevo release en la auditoría enlazada, sin leads ficticios.

@@ -25,10 +25,14 @@ import { evaluateFormEmailGate } from '@/lib/growth/forms/email-verification'
 import { dedupeFingerprint } from '@/lib/growth/forms/hash'
 import {
   findRecentDuplicate,
+  getFormDefinitionById,
   getPublishedVersionBySlug,
   insertRejectedSubmission,
   persistAcceptedSubmission,
 } from '@/lib/growth/forms/store'
+import type { PreparedMeasurement } from '@/lib/growth/measurement/contracts'
+import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+import { publishedGoogleAdsReceipt } from '@/lib/growth/measurement/google-ads-receipt'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { isPublicIntakeEnabled } from '../flags'
@@ -179,14 +183,42 @@ export const createPublicGraderRunViaFormsEngine = async (
     // 6. Persistir submission gobernado del motor (submission + consent + outbox, in-tx). La
     //    calidad del email (verified/suspect + corporate/personal/disposable) viaja al submission
     //    como en `submitForm` (etiqueta el lead aunque la política no sea block_field).
+    const normalizedFields = toNormalizedFields(input)
+    // Resolve identity from the canonical Forms owner. Never accept a source key, version,
+    // policy or destination from the caller. A missing current version cannot authorize Ads.
+    let measurement: PreparedMeasurement | null = null
+
+    try {
+      const definition = version ? await getFormDefinitionById(GRADER_FORM_ID) : null
+
+      if (definition?.slug === GRADER_FORM_SLUG && version?.form_id === definition.form_id) {
+        measurement = await prepareMeasurementConversion({
+          scope: {
+            sourceKind: 'form_submission', sourceId: definition.form_id,
+            sourceKey: definition.form_key, sourceVersion: version.form_version_id,
+            origin: context.origin ?? null, pageUri: context.pageUri,
+            surfaceId: GRADER_SURFACE_ID, formSlug: GRADER_FORM_SLUG,
+          },
+          fields: normalizedFields,
+          measurementContext: context.measurementContext,
+          ip: context.ip, userAgent: context.userAgent,
+          requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
+        })
+      }
+    } catch {
+      // Instrumentation must not undo commercial acceptance; no PII or context in logs.
+      console.warn('growth_grader_measurement_prepare_failed')
+    }
+
     const submission = await persistAcceptedSubmission({
+      measurement,
       formId: GRADER_FORM_ID,
       formVersionId,
       surfaceId: GRADER_SURFACE_ID,
-      pageUri: null,
-      pageName: null,
+      pageUri: context.pageUri ?? null,
+      pageName: context.pageName ?? null,
       leadEmailHash: emailHash,
-      normalizedFields: toNormalizedFields(input),
+      normalizedFields,
       dedupeFingerprint: fingerprint,
       requestId: context.idempotencyKey ?? null,
       ipHash,
@@ -207,7 +239,9 @@ export const createPublicGraderRunViaFormsEngine = async (
       outcome: 'accepted',
     })
 
-    return result('accepted', submission.submission_id)
+    const googleAdsConversion = publishedGoogleAdsReceipt(measurement?.googleAdsConversion, submission.measurementPersisted)
+
+    return { ...result('accepted', submission.submission_id), ...(googleAdsConversion ? { googleAdsConversion } : {}) }
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_public_intake_forms_engine' } })
 

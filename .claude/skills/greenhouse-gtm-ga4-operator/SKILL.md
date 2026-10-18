@@ -457,3 +457,9 @@ Lead Gen Web corregido a quote_request por command/store Forms, preservando iden
 no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
 está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
 La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.
+
+
+Grader: cargar [contrato de transporte](../../../docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+Think vigente usa Forms portátil, no el POST histórico. La fachada histórica reutiliza UUID/versión
+publicados, contexto visitante y recibo sólo post-persistencia; duplicados no reemiten. Su publicación
+se verifica en la auditoría enlazada. Nunca probarla creando leads ni inferir recepción por CORS/READY.

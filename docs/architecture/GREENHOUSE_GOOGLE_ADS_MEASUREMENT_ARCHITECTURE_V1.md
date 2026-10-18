@@ -1010,3 +1010,7 @@ Referencias de código: `src/lib/growth/measurement/{contracts,policy-contract,p
 Las referencias oficiales enlazadas en las secciones 5 y 9 fueron contrastadas en el discovery de esta
 sesión. Disponibilidad documental, acceso real, recepción, procesamiento y atribución se verifican por
 separado. No copiar versiones/snippets de una página vieja cuando contradicen su guía vigente.
+
+
+El [contrato Grader](GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md) fija la ruta portátil verificada y
+la compatibilidad de la fachada histórica: contexto visitante y recibo post-persistencia, sin otro sender.
