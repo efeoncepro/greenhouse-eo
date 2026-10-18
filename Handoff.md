@@ -29,8 +29,8 @@ ambos quick_preview compilerError=false, live Web5/Server9. Flag Ads nuevo defau
 [Contrato y activación](docs/manual-de-uso/growth/activar-conversiones-google-ads.md) ·
 [evidencia y gates pendientes](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
 Código con recibo postcommit, consent granular/GPC, IDs30d, EC web reservado y dedupe; Meta/UPD separados.
-Tag Assistant Web negativo PASS; EC OFF y términos de clientes sin aceptar (UI verificada).
-Faltan QA funcional positivo/confirmación contractual, release coordinado backend/bundles/bridge WP/Think,
+Tag Assistant Web negativo PASS; EC OFF; términos de clientes aceptados y guardados por instrucción expresa posterior (UI reabierta).
+Faltan QA funcional positivo/EC, release coordinado backend/bundles/bridge WP/Think,
 confirmación/publicación GTM y opt-in policy/flag, y primera ocurrencia real. No declarar medición activa.
 
 ## 2026-10-17 — Landing Performance Marketing publicada y legacy retirada (TASK-1865)

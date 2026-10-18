@@ -103,14 +103,26 @@ Evidencia visual fuera de Git: `/Users/jreye/Documents/google-ads-architecture-d
 `gtm-google-ads-web-workspace.png` y `gtm-google-ads-tag-assistant-no-conversion.png`. Se detuvo sólo
 la sesión de depuración Efeonce tras verificar; no se tocó otro dominio de Tag Assistant.
 
-Pendientes: Tag Assistant positivo/protocolo browser→Ads; términos
-y habilitación efectiva EC de cuenta; release backend/renderers/bridge en WP/Think; publicación
+Pendientes: Tag Assistant positivo/protocolo browser→Ads; habilitación efectiva EC de cuenta; release backend/renderers/bridge en WP/Think; publicación
 coordinada Server→Web; policy/flag opt-in; primera ocurrencia comercial real y diagnóstico Ads.
 UI de Ads verificada como jreyes y target686: checkbox «Activar Conversiones mejoradas» OFF y
 «He leído y acepto los términos en nombre de mi empresa» sin marcar. No se aceptó ni guardó.
 Captura `google-ads-customer-data-terms-pending.png` en la misma carpeta externa de evidencia.
 La aceptación contractual exige confirmación del operador en ese paso; no se presume por el grant OAuth. Qualified/converted leads vía HubSpot/Data Manager,
 binding CRM durable, UTMs agendas y dominio propio sGTM conservan unidades independientes.
+
+
+## Confirmación posterior — términos aceptados
+
+El operador autorizó expresamente «Acepta los terminos de Google ads». Se marcó y guardó la
+aceptación de **Términos sobre los datos de los clientes** en cuenta6862539491, sesión
+jreyes@efeoncepro.com. Panel reabierto después de guardar: **«Has leído y aceptado estos términos»**.
+Registro de evidencia: 2026-10-17T21:11:30-03:00 (America/Santiago).
+
+Captura externa: `/Users/jreye/Documents/google-ads-architecture-discovery-2026-10-17/google-ads-customer-data-terms-accepted.png`.
+La observación anterior de términos pendientes es histórica y queda supersedida por esta aceptación.
+Este acto no habilitó el checkbox EC, publicó GTM, encendió flags, envió conversiones ni promovió
+Greenhouse a main. La habilitación y rollout continúan pendientes.
 
 Fuentes primarias: [setup server Ads y EC](https://developers.google.com/tag-platform/tag-manager/server-side/ads-setup),
 [ConsentSetting API](https://developers.google.com/tag-platform/tag-manager/api/reference/rest/v2/accounts.containers.workspaces.tags#ConsentSetting),

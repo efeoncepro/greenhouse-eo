@@ -27,6 +27,8 @@
   capture de IDs y EC reservado. Dos acciones secundarias creadas/verificadas; workspaces Web8/Server12
   compilan por API. Sin publish/deploy/flag ON ni conversiones enviadas.
   [Evidencia](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
+- Por instrucción posterior, términos de datos de clientes Ads aceptados/guardados y panel reabierto
+  verificado en6862539491. EC OFF; sin publicación GTM ni promoción a main.
 
 ## 2026-10-17 — CLI local Meta para agentes
 

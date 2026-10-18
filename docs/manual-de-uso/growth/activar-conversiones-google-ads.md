@@ -80,8 +80,9 @@ Antes de publicar: comparar cuerpos/fingerprints frescos con el plan, confirmar 
 ajenos y repetir compilación/Preview. Validar Tag Assistant y el protocolo GA4 Client→Ads; comprobar
 que el bridge no llega a GA4 ordinario ni Meta. La compilación no prueba entrega. Verificar en la
 cuenta Ads los términos aplicables y habilitación efectiva EC; no inferirla de un tag configurado.
-La UI17/10 confirma EC OFF y términos sin aceptar: solicitar confirmación en ese paso antes de marcar
-«He leído y acepto los términos en nombre de mi empresa» o habilitar/guardar EC.
+Actualización17/10: el operador autorizó aceptar los términos y se guardaron; el panel reabierto
+confirma «Has leído y aceptado estos términos». EC continúa OFF: esa habilitación y el rollout
+no se ejecutaron al aceptar el contrato. [Evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md#confirmación-posterior--términos-aceptados).
 
 Coordinar release backend/renderers/bridge y sus hosts (WP/Think), publicar primero Server con la
 excepción, luego Web, y sólo después habilitar policy/flag del backend tras consent smoke. Registrar
