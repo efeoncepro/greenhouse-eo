@@ -29,6 +29,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-10-18
+
+- El formulario de diagnóstico en dos pasos se publicó con el release de Greenhouse del 2026-10-18 (renderer con `ab622e958` en producción), no con esta task: `fver-7178aede-…` + política Meta revisión 2. El Slice 4 de esta task sólo debe verificar que el bundle de AXIS lo dibuje igual.
+
 ## Summary
 
 El web component `<greenhouse-form>` (hoy `src/growth-forms-renderer/` en Greenhouse) pasa a vivir en el repo AXIS:
@@ -331,7 +335,7 @@ marcador del script en el mismo cambio o la publicación quedará bloqueada.
 - [ ] El build de Greenhouse consume la versión exacta publicada del paquete, no una copia local del código.
 - [ ] La paridad de píxeles del bundle AXIS pasa para AEO, Contacto, diagnóstico creativo y Careers, salvo los cambios aprobados el 2026-10-15.
 - [ ] Un cambio visual del renderer se publica sin release de Greenhouse (evidencia: recibo de promoción con SHA de AXIS).
-- [ ] El formulario `efeonce-creative-diagnostic` corre en dos pasos en `/agencia-creativa/` y `/agencia-creativa-v2/`, con la política publicitaria revinculada a su versión.
+- [x] El formulario `efeonce-creative-diagnostic` corre en dos pasos en `/agencia-creativa/` y `/agencia-creativa-v2/`, con la política publicitaria revinculada a su versión.
 - [ ] Ningún test de telemetría ni de PII se relaja en el port.
 
 ## Verification
