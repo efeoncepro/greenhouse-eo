@@ -2,6 +2,7 @@
 
 Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md); estados publicados y límites comerciales conservados.
 
+- `TASK-2039` — [Landings que alimentan su formulario](to-do/TASK-2039-landing-signals-prefill-growth-forms.md), to-do; paraguas Growth Forms. Las preguntas de cada landing precargan su Growth Form; piloto en inbound, API de señales coordinada con TASK-2038. Siguiente ID libre `TASK-2040`.
 - `TASK-2038` — [Renderer de Growth Forms en AXIS](to-do/TASK-2038-growth-forms-renderer-on-axis.md), to-do; `EPIC-035`. Fuente y build del renderer a AXIS, publicación por el carril de EPIC-035 sin release de Greenhouse. Siguiente ID libre `TASK-2039`.
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.

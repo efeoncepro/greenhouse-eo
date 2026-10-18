@@ -2640,3 +2640,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro14/10: planTASK-2035 aprobado para configuración/CAPI; TASK-2036 foundation y TASK-2037 consumerUI. Siguiente ID libre TASK-2038.
 
 > Registro 2026-10-15: TASK-2038 reservada (renderer de Growth Forms en AXIS, hija de EPIC-035). Barrido por dominio/superficie: TASK-1517 es dueña de la publicación del renderer, no de su fuente; recibe Delta. Siguiente ID libre TASK-2039.
+
+| `TASK-2039` | `to-do` | **Landings que alimentan su formulario (señales de la página → Growth Form).** Paraguas: las preguntas interactivas de cada landing precargan su Growth Form, visible y editable; hijas A (API de señales del renderer, coordinada con TASK-2038), B (piloto inbound con `efeonce-inbound-diagnostic` y destino HubSpot) y C (patrón y adopción por landing). P2/Alto/Medio; umbrella, standard. Domain: growth. | `docs/tasks/to-do/TASK-2039-landing-signals-prefill-growth-forms.md` |
+
+> Registro 2026-10-18: TASK-2039 reservada (paraguas: landings que alimentan su Growth Form con señales de la página; pedido del operador tras el prototipo de la landing de inbound). Barrido por dominio/superficie (Growth Forms renderer `initial-values`, hosts WordPress, destinos HubSpot): TASK-2038 es dueña de mover la fuente del renderer a AXIS y TASK-1359 de la instrumentación multipaso; ninguna posee la API de señales ni el patrón de precarga desde la landing. Hijas A/B/C por crear. Siguiente ID libre TASK-2040.
