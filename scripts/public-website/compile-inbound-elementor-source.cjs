@@ -12,6 +12,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const cheerio = require('cheerio')
+
 const { compileSourceLedLanding } = require('./lib/source-led-compiler.cjs')
 
 const sourceDir = path.join(__dirname, 'inbound-source')
@@ -50,7 +51,11 @@ const lookup = (expr, scope) => {
   return expr.split('.').reduce((o, k) => (o == null ? undefined : o[k]), scope)
 }
 
-const interp = (s, scope) => s.replace(/\{\{([^}]+)\}\}/g, (_, e) => { const v = lookup(e, scope); return v == null || typeof v === 'function' ? '' : String(v) })
+const interp = (s, scope) => s.replace(/\{\{([^}]+)\}\}/g, (_, e) => { const v = lookup(e, scope);
+
+ 
+
+return v == null || typeof v === 'function' ? '' : String(v) })
 
 const $ = cheerio.load('<div id="__root">' + bodyHtml + '</div>', { decodeEntities: false }, false)
 

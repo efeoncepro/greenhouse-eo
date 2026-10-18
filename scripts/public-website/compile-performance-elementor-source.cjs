@@ -12,6 +12,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const cheerio = require('cheerio')
+
 const { compileSourceLedLanding } = require('./lib/source-led-compiler.cjs')
 
 const sourceDir = path.join(__dirname, 'performance-source')
@@ -60,7 +61,11 @@ const lookup = (expr, scope) => {
   return expr.split('.').reduce((o, k) => (o == null ? undefined : o[k]), scope)
 }
 
-const interp = (s, scope) => s.replace(/\{\{([^}]+)\}\}/g, (_, e) => { const v = lookup(e, scope); return v == null || typeof v === 'function' ? '' : String(v) })
+const interp = (s, scope) => s.replace(/\{\{([^}]+)\}\}/g, (_, e) => { const v = lookup(e, scope);
+
+ 
+
+return v == null || typeof v === 'function' ? '' : String(v) })
 
 function render(state) {
   const vals = valsFor(state)
@@ -158,6 +163,7 @@ const tabCss = []
   svg.attr('aria-label', '0 de 5 señales de que tu pauta pierde dinero')
   section.find('span').filter((_, el) => $(el).text().trim() === '0').first().attr('data-gh-quiz-score', '')
   const result = section.find('p[aria-live="polite"]').first()
+
   const messages = [
     'Responde las cinco. Cada sí mueve la esfera una señal.',
     'Tu pauta va bien encaminada. Un diagnóstico te dice dónde escalar.',
