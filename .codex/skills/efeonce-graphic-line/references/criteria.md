@@ -1086,6 +1086,8 @@ esta aplicación aprobada a titulares arbitrarios ni se infiere énfasis por pal
 
 El operador, revisando la landing de Inbound Marketing: «Bricolage necesita contraste en los títulos, cuando es muy largo necesita contraste con sus pesos, si no se vuelve muy pesado». Un titular largo entero en 740–780 se lee como un bloque. La parte que introduce va liviana (≈ 330, mismo tamaño y color) y la idea principal conserva el peso alto: «De cada 100 búsquedas,» introduce y «68 terminan sin un clic.» manda; «No murió.» introduce y «Se le murió el clic.» manda. Las listas de frases en Bricolage tampoco van todas en 700: bajan a ≈ 480. La respuesta corta con esfera (1 a 3 palabras) no se parte. Generaliza el caso Growth CTA de arriba a todo titular largo.
 
+**Reiterado el 2026-10-18** (landing Nosotros: «frases hiper largas con bricolage y sin un contraste adecuado de sus pesos se ve muy muy pesado»). Antes de entregar, contar las palabras de cada titular en Bricolage. Desde 13 palabras, además de partir los pesos, el titular baja al tamaño que le corresponde por largo (escala `ideaMedium`/`ideaLong` del tipo de la línea): a 76 px en una columna angosta, la idea principal en 740 sigue siendo un bloque. Las listas de frases en Bricolage (ítems, capacidades, la columna de una tabla, creencias) van a ≈ 480, no a 560–620.
+
 ### Partners del footer público — 2026-10-14
 
 El operador rechazó los dos badges a color porque saturan el footer. Pide escala de grises y
