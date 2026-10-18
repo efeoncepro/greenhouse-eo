@@ -81,3 +81,7 @@
 .gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check) > .ghf-check{order:0;flex:1 1 100%}
 .gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check) > .ghf-help{order:1;margin:0;font-size:13px}
 .gh-creativa .gh-creativa-form-card greenhouse-form .ghf-field:has(> .ghf-check) > .ghf-help:last-child{order:2;padding-left:0}
+/* Label icons as in the canvas (2026-10-18): 18px line icons in navy, no bubble. The renderer's default is a muted
+   14px icon inside a 22px circle, which read as missing next to the canvas. */
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-label .ghf-field-icon{inline-size:18px;block-size:18px;border:0;border-radius:0;color:#023c70}
+.gh-creativa .gh-creativa-form-card greenhouse-form .ghf-label .ghf-field-icon svg{inline-size:18px;block-size:18px;stroke-width:1.8}
