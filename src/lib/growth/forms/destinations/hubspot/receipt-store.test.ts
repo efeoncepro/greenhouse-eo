@@ -136,7 +136,7 @@ describe('durable native HubSpot receipt store', () => {
 
 describe('receipt migration preservation contract', () => {
   it('has markers, nullable native ID, JSON default, validation, index and immutable-evidence guards', () => {
-    const migration = readFileSync(new URL('../../../../../../docs/tasks/pending-migrations/hubspot-native-form-receipts.sql.pending', import.meta.url), 'utf8')
+    const migration = readFileSync(new URL('../../../../../../migrations/20261018174803715_hubspot-native-form-receipts.sql', import.meta.url), 'utf8')
     const [up, down] = migration.split('-- Down Migration')
 
     expect(up).toContain('-- Up Migration\n')

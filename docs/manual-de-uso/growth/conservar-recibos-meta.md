@@ -1,6 +1,7 @@
 # Preparar recibos de Meta por evento
 
-Estado 2026-10-17: código y pruebas locales; el operador ordenó **no activar ni desplegar**.
+Estado 2026-10-18: expansión DB autorizada y aplicada; worker compatible ya servido.
+Captura en GTM sin activar/publicar. [Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
 [ADR](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) ·
 [Qué demuestra cada evidencia](../../documentation/growth/meta-individual-event-verification.md).
 
@@ -49,14 +50,15 @@ su contrato/base son anteriores y muta workspaces. El builder nuevo no lo invoca
 
 1. Releer template/live del container servidor y revisar drift respecto del pin. No sobrescribir
    cambios recientes ni permitir que una actualización automática del gallery elimine el parche.
-2. Reactivar el [SQL pendiente](../../tasks/pending-migrations/meta-event-receipts.sql.pending)
-   con `pnpm migrate:create meta-event-receipts` y timestamp nuevo, dentro del release autorizado.
+2. La [expansión versionada](../../../migrations/20261018174804112_meta-event-receipts.sql)
+   se aplicó el 18/10 con autorización específica para reparar el worker existente, sin deploy.
    Verificar schema/trigger/constraint antes de reanudar Meta. Revisar dependencias del lote,
    incluido storage preparado de HubSpot, sin habilitar sus opt-ins por inferencia.
 3. Por el control plane habitual, preparar workspace, compilar Preview sin enviar eventos y
    revisar diff: sender, triggers, consentimiento, dataset y PageView preservados; header reservado
    sólo para Lead backend. Conceder permisos únicamente del manifest. Publicación no autorizada hoy.
-4. Desplegar worker compatible y, sólo con autorización, habilitar el checkbox del tag Lead.
+4. Verificar worker compatible activo (ya servido al reparar el18/10) y, sólo con autorización,
+   habilitar el checkbox del tag Lead. Cualquier nuevo deploy conserva el control plane habitual.
    Leer revisión activa, template/Client/tag, permisos y opciones reales; archivo local no es deploy.
 5. Con tráfico real autorizado, verificar receipt en la cola y la CLI. No reenviar un histórico ni
    crear un lead sintético sólo para llenar evidencia; Test Events tampoco es sandbox de descarte.

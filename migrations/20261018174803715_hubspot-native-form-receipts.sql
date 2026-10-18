@@ -1,8 +1,6 @@
--- Owner: Growth / Integrations. Prepared 2026-10-17, NOT applied.
--- Condition: operator-authorized release with compatible Forms worker in main;
--- apply additive expansion within that release before dispatch resumes. Never rerun a Forms POST to verify.
--- Reactivate with pnpm migrate:create hubspot-native-form-receipts, using a fresh timestamp.
--- ADR: docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md
+-- Authorized by Julio 2026-10-18: additive schema repair only; no deploy/GTM publication/replay.
+-- Compatible shared ops-worker already serves 9a8f1e1bf063762fb60ef8c3a527b48c3f48de21.
+-- See docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md.
 -- Up Migration
 SET search_path = greenhouse_growth, greenhouse_core, public;
 

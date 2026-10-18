@@ -1,8 +1,9 @@
 # Verificación de un evento individual en Meta
 
-Revisión: 2026-10-17. Alcance: fuentes oficiales y código local del sender sGTM de Efeonce.
-No se enviaron eventos, no se consultaron credenciales y no se modificaron GTM ni el runtime publicado.
-El recibo por evento está **implementado localmente, sin activar ni desplegar** por orden del operador.
+Investigación inicial: 2026-10-17, fuentes oficiales y código local del sender sGTM de Efeonce.
+En ese corte no se enviaron eventos, consultaron credenciales ni modificaron GTM/runtime publicado.
+Actualización18/10: storage aplicado con autorización específica; worker compatible ya servido.
+El header de recibo en GTM sigue sin activar/publicar. La reparación no certifica recepción Graph.
 [ADR](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) ·
 [Preparación y límites](../../manual-de-uso/growth/conservar-recibos-meta.md).
 
@@ -150,5 +151,7 @@ Header `x-efeonce-meta-receipt`; correlación backend mediante `x-efeonce-meta-a
 `x-efeonce-meta-attempt-number`, fuera del payload CAPI. Opción `captureEfeonceReceipt` default OFF.
 La CLI lee `meta.receipt` y tolera schema anterior sin inventar un recibo para los históricos.
 
-Estado: **implementado/probado localmente; sin activar, publicar ni desplegar**. SQL parqueado fuera
-del runner. No hay nuevo endpoint de lectura individual, schema aplicado ni evidencia Meta adicional.
+Estado 2026-10-18: **schema aplicado con autorización específica y worker compatible ya servido**.
+[Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md), sin nuevo
+deploy ni publicación/activación GTM. No hay nuevo endpoint de lectura individual ni evidencia
+Graph adicional certificada por esta reparación.

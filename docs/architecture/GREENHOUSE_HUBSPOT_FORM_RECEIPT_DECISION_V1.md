@@ -50,10 +50,12 @@ previa de la propiedad/form nativos por el operador. Retirar el opt-in usa el mi
 Los envíos anteriores a la activación no adquieren retrospectivamente el marcador.
 Pruebas cubren ambigüedad, paginación, independencia del email/hora, denegación, CAS y ausencia
 de un segundo POST. La evidencia de rollout se registra separada de las pruebas locales.
-SQL deliberadamente [parqueado fuera del runner](../tasks/pending-migrations/hubspot-native-form-receipts.sql.pending)
-hasta ese release; reactivar con `pnpm migrate:create` y timestamp nuevo. Probado en PostgreSQL 17.5
-aislado (PGlite): Up repetido, binding, rechazo de reemplazo terminal/ID ausente/fuente ajena y CAS stale.
-No se aplicó en la base compartida. Estado: código local, provisión HubSpot/mapping/rollout pendientes.
+SQL probado en PostgreSQL 17.5 aislado (PGlite): Up repetido, binding, rechazo de reemplazo
+terminal/ID ausente/fuente ajena y CAS stale. El 18/10 el operador autorizó la
+[expansión versionada](../../migrations/20261018174803715_hubspot-native-form-receipts.sql) al
+confirmar que el worker compatible ya estaba servido y fallaba por schema ausente. Aplicada
+sin nuevo deploy ni POST manual. [Readback](../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
+Provisión HubSpot, mapping opt-in y primer ID nativo exacto siguen pendientes.
 
 ## Alternativas
 

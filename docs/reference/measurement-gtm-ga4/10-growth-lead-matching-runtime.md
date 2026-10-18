@@ -13,7 +13,9 @@ Mejora EMQ y el envío real de Medios y HubSpot scope siguen pendientes.
 [consentimiento/hosts](09-hubspot-consent.md) ·
 [manual API/panel/CLI](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
 [Recibo CAPI por intento](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): implementación
-local preparada, opción default OFF y SQL parqueado; no activada/publicada/desplegada por orden del operador.
+con opción GTM default OFF. El18/10 se aplicó sólo el schema con autorización específica para
+reparar el worker compatible ya servido; sin nuevo deploy, publicación ni activación GTM.
+[Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
 La propuesta anterior quedó formalizada e implementada: no hay listas fijas de formularios o
 scheduler en el sender. Una fuente nueva con mapping businessEmail se habilitó por datos después
 del contrato inicial y llegó a Meta Test Events con nueve claves, sin código/build/redeploy/

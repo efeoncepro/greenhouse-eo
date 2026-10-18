@@ -30,20 +30,22 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 
 ## Lote pendiente
 
-### Meta event receipts — pendiente, 2026-10-17
+### Recibos HubSpot/Meta — APLICADAS 2026-10-18
 
-[SQL preparado](meta-event-receipts.sql.pending), dueño Growth / Measurement;
-[ADR](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md). Preparación y commit únicamente,
-sin activación/deploy por orden del operador. Reactivar con timestamp nuevo dentro de un release
-posterior autorizado; schema antes del POST Meta. No reenviar históricos para recuperar el recibo.
+El operador autorizó exclusivamente las dos expansiones aditivas al confirmar una incidencia
+actual: el worker compatible ya estaba servido en la revisión `ops-worker-00780-rhp` y fallaba
+antes del POST por columnas ausentes. Se usó `pnpm migrate:create` y el runner canónico; no se
+desplegó, publicó GTM ni reenvió ningún formulario manualmente.
 
-### HubSpot native form receipts — pendiente, 2026-10-17
+- [HubSpot](../../../migrations/20261018174803715_hubspot-native-form-receipts.sql): dos columnas,
+  dos constraints, índice parcial, función y trigger.
+- [Meta](../../../migrations/20261018174804112_meta-event-receipts.sql): columna JSONB, constraint,
+  función y trigger.
 
-[SQL preparado](hubspot-native-form-receipts.sql.pending), dueño Growth / Integrations;
-[ADR](../../architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md). Reactivar con timestamp nuevo
-dentro del release autorizado del worker compatible. No ejecutar un POST para comprobar el cambio.
-La CLI lectora tolera columnas ausentes; el dispatcher nuevo verifica el schema antes de cualquier POST.
-Faltan propiedad técnica/campo oculto nativo, mapping opt-in, despliegue y primer readback real.
+[Readback y recuperación](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
+Los opt-ins de marcador HubSpot y captura GTM Meta conservan sus gates independientes. Los Down
+son forward-only; no eliminar evidencia al revertir código. No quedan SQL de estos dos contratos
+pendientes en esta carpeta.
 
 **Corte histórico 2026-09-03: no había nada que ejecutar.** Las entradas de abajo se conservan por la lección que dejó cada
 aplicación.

@@ -1,6 +1,8 @@
 # Identidad nativa de cada envío a HubSpot
 
-Estado 2026-10-17: implementado y probado localmente; provisión, mapping y despliegue pendientes.
+Estado 2026-10-18: schema aplicado con autorización específica y worker compatible ya servido.
+Provisión, mapping y primera identidad nativa siguen pendientes.
+[Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
 [ADR](../../architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md).
 
 El POST Forms autenticado documenta una respuesta de presentación (`inlineMessage`/`redirectUri`),

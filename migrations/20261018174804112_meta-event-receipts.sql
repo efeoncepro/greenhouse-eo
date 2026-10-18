@@ -1,7 +1,6 @@
--- Owner: Growth / Measurement. Prepared 2026-10-17, NOT applied.
--- Condition: explicitly authorized release of compatible worker/readers; provision before Meta resumes.
--- Reactivate with pnpm migrate:create meta-event-receipts and a fresh timestamp. Do not replay old leads.
--- ADR: docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md
+-- Authorized by Julio 2026-10-18: additive schema repair only; no deploy/GTM publication/replay.
+-- Compatible shared ops-worker already serves 9a8f1e1bf063762fb60ef8c3a527b48c3f48de21.
+-- See docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md.
 -- Up Migration
 ALTER TABLE greenhouse_growth.measurement_delivery
   ADD COLUMN IF NOT EXISTS provider_receipts_json JSONB NOT NULL DEFAULT '[]'::jsonb;

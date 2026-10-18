@@ -6,6 +6,11 @@ Checkpoint18/10:499 tests y32 escenarios Chromium aislados PASS; API cuenta686/d
 [Paquete previo al release](docs/operations/releases/google-ads-2026-10-18/README.md) con propuestas,
 assets/hashes y rollback. Hosts/protocolo real/EC/CI pendientes; release general BLOCK. Sin activación.
 
+Revisión18/10:1.445 archivos de89d70ec13 inventariados; CI/build PASS; Deep corregido localmente, revalidación remota pendiente.
+Schema HubSpot/Meta autorizado y aplicado, worker existente recuperado200; dos submissions
+delivered al ledger sin destinos directos. [Auditoría](docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md).
+Sin deploy/GTM; hosts/EC/Preview y autorización del lote pendientes.
+
 OAuth `jreyes@efeoncepro.com` verificado; Cloud siempre `julio.reyes@efeonce.org` / `efeonce-group`.
 API v26 PASS para **`6862539491`**, vía `login-customer-id: 9531478329` (directo 403); CLP,
 America/Santiago, owner de conversiones propio. Cuenta nueva según operador; tracking

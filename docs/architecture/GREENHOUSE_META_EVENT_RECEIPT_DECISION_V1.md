@@ -39,8 +39,9 @@ recibo permanecen desconocidos; no se rellenan por stats ni se reenvían para fa
 
 ## Preparación y rollout separado
 
-SQL aditivo parqueado fuera de `migrations/`; reactivar con timestamp nuevo dentro de un release
-posterior autorizado. Worker comprueba storage antes de reclamar/enviar Meta; ausencia de schema
+[Expansión versionada](../../migrations/20261018174804112_meta-event-receipts.sql) aplicada el
+18/10 con autorización específica, al confirmar un worker compatible ya servido.
+[Reparación y readback](../audits/releases/2026-10-18-candidate-89d70ec13-review.md), sin deploy/GTM/replay. Worker comprueba storage antes de reclamar/enviar Meta; ausencia de schema
 no produce un POST sin finalización persistible y no bloquea el carril Google. Preview/compilación
 GTM y un readback de tráfico real son gates futuros, no pruebas locales ya satisfechas.
 No ejecutar builder histórico que muta workspace ni publicar template/flag para probar este cambio.

@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 1,
+  "base": "9690efad0c1b9d70d9b168d41131857e686b0f81",
+  "candidate": "89d70ec13b6bed14db8a08797a928bcc6b70856f",
+  "inventory": {
+    "files": 1445,
+    "groups": {
+      "skills": 168,
+      "ci": 1,
+      "configuration": 2,
+      "documentation": 361,
+      "assets_evidence": 655,
+      "operator_tooling": 179,
+      "application": 79
+    },
+    "binaryFiles": 101,
+    "bytes": 143303886,
+    "path": "/Users/jreye/Documents/google-ads-release-package-2026-10-18/release-review/candidate-89d70ec13-files.jsonl",
+    "sha256": "143b5fae92fc129cd28152f8fea63807bf2f7105438d86f1b1e24f4d3e87b058"
+  },
+  "staticChecks": {
+    "credentialPatternFindings": 0,
+    "jsonParseFailures": 0,
+    "syntax": {
+      "checks": {
+        "node_syntax": 79,
+        "svg_xml": 41,
+        "python_ast": 3,
+        "php_lint": 34
+      },
+      "failures": []
+    }
+  },
+  "applicationReview": {
+    "files": 79,
+    "productionSources": 51,
+    "testFiles": 28,
+    "areas": [
+      "public_forms_and_meetings_receipts",
+      "measurement_policy_consent_and_privacy",
+      "hubspot_native_occurrence_and_reconciliation",
+      "meta_readers_writes_and_receipts",
+      "google_ads_auth_readers_writes_and_journal",
+      "seo_value_and_gsc_additive_filters",
+      "byteplus_draft_and_error_boundaries",
+      "portable_renderers_and_policy_ui"
+    ]
+  },
+  "ci": {
+    "existingPush": {
+      "runId": 39144419403,
+      "conclusion": "success",
+      "passedTests": 20765,
+      "skippedTests": 616,
+      "failedTests": 0,
+      "build": "skipped"
+    },
+    "manualWithBuild": {
+      "runId": 39150476967,
+      "conclusion": "success",
+      "build": "success",
+      "functionSizeGate": "success",
+      "passedTests": 20765,
+      "failedTests": 0,
+      "skippedTests": 616,
+      "testFiles": 2172
+    },
+    "deep": {
+      "runId": 39150479431,
+      "conclusion": "failure",
+      "failure": "15000ms timeout in pricing-v3-market-floor.test.ts aggregate replay corpus",
+      "localCorrection": "52 artifact replays split into individual cases; all assertions and default timeout preserved",
+      "remoteRevalidation": "pending_validation_ref_authorization"
+    }
+  },
+  "schemaReadback": {
+    "observedAt": "2026-10-18T17:38:40.266Z",
+    "requiredMissing": [
+      "form_destination_attempt.provider_submission_id",
+      "form_destination_attempt.provider_receipt_json",
+      "measurement_delivery.provider_receipts_json"
+    ],
+    "requiredBeforeWorkerDeploy": true,
+    "mutations": 0,
+    "phase": "before"
+  },
+  "pendingSql": [
+    {
+      "path": "docs/tasks/pending-migrations/hubspot-native-form-receipts.sql.pending",
+      "sha256": "25ab6fc9a19130aa2a36efb24d6ed1523f8720caf97c0169b6c2ab5b245c266e",
+      "applied": true,
+      "migration": "migrations/20261018174803715_hubspot-native-form-receipts.sql",
+      "pathIsHistorical": true
+    },
+    {
+      "path": "docs/tasks/pending-migrations/meta-event-receipts.sql.pending",
+      "sha256": "c85b40301b5b378e5edad41c3a63cac6bdee8a6fa848f71a37876f616dcfe09d",
+      "applied": true,
+      "migration": "migrations/20261018174804112_meta-event-receipts.sql",
+      "pathIsHistorical": true
+    }
+  ],
+  "releasePolicy": {
+    "domain": "cloud_release",
+    "path": ".github/workflows/gtm-drift.yml",
+    "review": "readonly_observer_no_publish_route",
+    "classifierDecision": "requires_break_glass",
+    "overrideApplied": false
+  },
+  "deployment": {
+    "executed": false,
+    "gtmPublished": false,
+    "flagsChanged": false,
+    "sqlApplied": true
+  },
+  "releaseReady": false,
+  "runtimeIncident": {
+    "at": "2026-10-18T17:44:57.190Z",
+    "revision": "ops-worker-00780-rhp",
+    "gitSha": "9a8f1e1bf063762fb60ef8c3a527b48c3f48de21",
+    "sharedStagingProduction": true,
+    "formsDispatchEnabled": true,
+    "metaEnabled": true,
+    "logSampleLimit": 100,
+    "logSampleTruncated": true,
+    "observedMissingColumnErrors": 34,
+    "observedHttp502": 33,
+    "acceptedPending": 2,
+    "repairPrepared": true,
+    "repairApproved": true,
+    "approvalEvidence": "User explicitly approved the two additive SQL expansions in this thread",
+    "schemaRepaired": true,
+    "resolved": true
+  },
+  "schemaAfter": {
+    "at": "2026-10-18T17:53:04.498Z",
+    "columns": [
+      {
+        "table_name": "form_destination_attempt",
+        "column_name": "provider_submission_id",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "form_destination_attempt",
+        "column_name": "provider_receipt_json",
+        "data_type": "jsonb",
+        "is_nullable": "NO",
+        "column_default": "'{}'::jsonb"
+      },
+      {
+        "table_name": "measurement_delivery",
+        "column_name": "provider_receipts_json",
+        "data_type": "jsonb",
+        "is_nullable": "NO",
+        "column_default": "'[]'::jsonb"
+      }
+    ],
+    "constraints": [
+      {
+        "conname": "form_attempt_provider_receipt_object_ck",
+        "convalidated": true
+      },
+      {
+        "conname": "form_attempt_native_submission_ck",
+        "convalidated": true
+      },
+      {
+        "conname": "measurement_provider_receipts_shape_ck",
+        "convalidated": true
+      }
+    ],
+    "objects": [
+      {
+        "index_present": true,
+        "hubspot_function": true,
+        "meta_function": true,
+        "enabled_triggers": 2
+      }
+    ]
+  },
+  "recovery": {
+    "at": "2026-10-18T17:52:48.390Z",
+    "since": "2026-10-18T17:48:40Z",
+    "limit": 100,
+    "truncated": false,
+    "observations": [
+      {
+        "at": "2026-10-18T17:52:01.746298Z",
+        "revision": "ops-worker-00780-rhp",
+        "formsFailed": false,
+        "missingColumn": false,
+        "measurementFailure": false
+      },
+      {
+        "at": "2026-10-18T17:52:01.446097Z",
+        "revision": "ops-worker-00780-rhp",
+        "formsFailed": false,
+        "missingColumn": false,
+        "measurementFailure": false
+      },
+      {
+        "at": "2026-10-18T17:52:01.441958Z",
+        "revision": "ops-worker-00780-rhp",
+        "httpStatus": 200,
+        "formsFailed": false,
+        "missingColumn": false,
+        "measurementFailure": false
+      },
+      {
+        "at": "2026-10-18T17:50:01.951223Z",
+        "revision": "ops-worker-00780-rhp",
+        "formsFailed": false,
+        "missingColumn": false,
+        "measurementFailure": false
+      },
+      {
+        "at": "2026-10-18T17:50:01.428680Z",
+        "revision": "ops-worker-00780-rhp",
+        "formsFailed": false,
+        "missingColumn": false,
+        "measurementFailure": false
+      },
+      {
+        "at": "2026-10-18T17:50:01.424722Z",
+        "revision": "ops-worker-00780-rhp",
+        "httpStatus": 200,
+        "formsFailed": false,
+        "missingColumn": false,
+        "measurementFailure": false
+      }
+    ]
+  },
+  "backlogAfter": {
+    "at": "2026-10-18T17:50:22.449Z",
+    "forms": [],
+    "measurement": []
+  },
+  "deliveryAfter": {
+    "routing": [
+      {
+        "submissions": 2,
+        "with_enabled_direct_destination": 0
+      }
+    ],
+    "at": "2026-10-18T17:51:34.293Z",
+    "scope": "two previously accepted submissions by exact creation timestamps",
+    "forms": [
+      {
+        "status": "delivered",
+        "count": 2
+      }
+    ],
+    "attempts": []
+  },
+  "localRepairValidation": {
+    "receiptTestsPassed": 92,
+    "receiptTestFiles": 4,
+    "typecheck": "success",
+    "migrationMarkerGate": {
+      "conclusion": "success",
+      "scanned": 681,
+      "errors": 0,
+      "legacyWarnings": 2
+    },
+    "remoteCiForRepairCommit": "not_run_no_push",
+    "flagLedgerGate": "success_178_registered_no_activation",
+    "taskLint": {
+      "errors": 0,
+      "warnings": 0,
+      "lifecycle": "in-progress_unchanged"
+    },
+    "closure": "owners_present_lifecycle_heuristic_acknowledged",
+    "pricingCoverage": {
+      "passedTests": 138,
+      "files": 1,
+      "durationSeconds": 9.34,
+      "coverage": "v8_enabled",
+      "changedFinancialRuntime": false
+    }
+  }
+}

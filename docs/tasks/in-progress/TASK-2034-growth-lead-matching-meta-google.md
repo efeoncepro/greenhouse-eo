@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: Meta/UPD publicados previamente; Ads local con acciones/drafts verificados por API18/10,499 tests y32 escenarios Chromium aislados PASS. Paquete preparado, términos aceptados/EC OFF; hosts/protocolo GTM real/CI y release general pendientes. Sin publish/deploy/activación Ads.`
+- Status real: `Parcial: Meta/UPD publicados previamente; Ads local con acciones/drafts verificados por API18/10,499 tests y32 escenarios Chromium aislados PASS. Schema HubSpot/Meta autorizado y aplicado18/10; dispatcher existente recuperado200, dos submissions delivered sólo al ledger. Lote89d70ec13:1.445 archivos revisados, CI completo/build PASS; Deep falló por timeout de corpus pricing, corregido localmente138 casos con cobertura, revalidación remota pendiente. Términos aceptados/EC OFF; hosts/protocolo GTM real y release general pendientes. Sin nuevo deploy ni publish/activación Ads.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -200,6 +200,8 @@ Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
 - Dossier y lista de recibos saneados: docs/audits/releases/2026-10-13-full-develop-matching-release.md.
 
 ## Progress Log
+
+- 2026-10-18: [revisión completa del candidato y reparación SQL autorizada](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md). Tres columnas/constraints y dos triggers verificados; scheduler existente recuperado sin POST manual. No certifica entrega HubSpot/Graph ni atribución Ads.
 
 - 2026-10-13: autorización de implementación, Google settings/audiencias y pruebas locales/Preview.
 - 2026-10-13: full develop→main PR254; corregido heapCI6→8GiB sin quitar gates. No repetir

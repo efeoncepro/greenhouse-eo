@@ -7703,6 +7703,8 @@ export interface GreenhouseGrowthFormDestinationAttempt {
   http_status: number | null;
   next_retry_at: Timestamp | null;
   provider: string;
+  provider_receipt_json: Generated<Json>;
+  provider_submission_id: string | null;
   retry_count: Generated<number>;
   status: Generated<string>;
   submission_id: string;
@@ -8179,6 +8181,7 @@ export interface GreenhouseGrowthMeasurementDelivery {
   lease_token: string | null;
   lease_until: Timestamp | null;
   next_attempt_at: Generated<Timestamp>;
+  provider_receipts_json: Generated<Json>;
   safe_error_class: string | null;
   state: Generated<string>;
   updated_at: Generated<Timestamp>;

@@ -9,7 +9,24 @@ workflow de publicación, cambio de flag, nueva política publicada ni envío Ad
 [Manual canónico](../../../manual-de-uso/growth/activar-conversiones-google-ads.md) ·
 [ADR existente](../../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md).
 
-## Alcance y candidato
+## Revisión ampliada del candidato18/10
+
+[Revisión del lote y CI](../../../audits/releases/2026-10-18-candidate-89d70ec13-review.md):
+candidato fijo89d70ec13 ya remoto,1.445 archivos netos revisados (el corte anterior tenía1.406).
+CI con build PASS; Deep falló por timeout agregado del corpus de pricing. Corrección local con
+138 casos instrumentados PASS; revalidación remota pendiente del push autorizado a una rama
+codex de validación, sin develop/main ni deploy. El
+[manifest de revisión](candidate-89d70ec13-review.json) conserva fuentes y resultados separados.
+
+**Schema reparado con autorización específica:** el worker compartido ya servido devolvía502
+por columnas de recibos ausentes. Se aplicaron las dos expansiones versionadas HubSpot/Meta,
+sin nuevo deploy ni publicación GTM; columnas/constraints/triggers verificados. El scheduler
+existente respondió200 y las dos submissions quedaron delivered al ledger: cero destinos directos
+habilitados, sin envío de proveedor. La identidad nativa HubSpot
+y la recepción Graph no quedan certificadas por este resultado. Los gates de activación Ads y
+la autorización de promoción del lote siguen pendientes.
+
+## Corte inicial conservado — anterior a la revisión ampliada
 
 - Código Ads: `c92424961`; términos: `8b3217a91`. Ambos están contenidos en `origin/develop`.
 - Checkout probado al inicio: `b8cdf8b1f5aa0c891a978386b89bad816444cf36`.
@@ -17,7 +34,8 @@ workflow de publicación, cambio de flag, nueva política publicada ni envío Ad
 - Base main releída con fetch: `9690efad0c1b9d70d9b168d41131857e686b0f81`.
 - La diferencia neta del candidato frente a main es **1.406 archivos**, no sólo Ads.
   El preflight clasifica `.github/workflows/gtm-drift.yml` como `cloud_release` y devuelve
-  `requires_break_glass`. No se aplicó override ni se auditó/autoriza aquí ese lote completo.
+  `requires_break_glass`. En ese corte aún no se había auditado el lote completo; la revisión
+  ampliada de arriba documenta la auditoría posterior. No se aplicó override ni se autoriza la promoción.
 - El candidato local no está en remoto: GitHub devolvió422 al consultar el SHA, sin CI ni
   Playwright smoke ejecutados para él. Cero workflows **no es CI aprobado**.
 

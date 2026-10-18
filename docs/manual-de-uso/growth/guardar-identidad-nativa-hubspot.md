@@ -1,6 +1,8 @@
 # Activar y comprobar el ID nativo de HubSpot Forms
 
-Estado: código local; sin provisión HubSpot, cambios de mapping, migración compartida o deploy.
+Estado 2026-10-18: schema aplicado con autorización específica; worker compatible ya servido.
+Provisión HubSpot, mapping y primera identidad nativa verificada siguen pendientes.
+[Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
 [Contrato funcional](../../documentation/growth/hubspot-native-form-receipts.md) ·
 [ADR](../../architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md).
 
@@ -22,10 +24,10 @@ de propiedad y hash de la definición nativa; si hay drift, volver a preparar co
 
 1. Promover el código por el control plane habitual. Revisar el lote completo del release antes
    de autorizar push, deploy o transición DB. No ejecutar código local como prueba de producción.
-2. Releer base, generar timestamp nuevo con `pnpm migrate:create hubspot-native-form-receipts` y
-   copiar el [SQL pendiente](../../tasks/pending-migrations/hubspot-native-form-receipts.sql.pending).
-   Aplicar la expansión dentro del release antes de reanudar dispatch; regenerar tipos y comprobar
-   columnas, constraints, índice y trigger. El ledger conserva owner/grants y sus filas anteriores.
+2. La [expansión versionada](../../../migrations/20261018174803715_hubspot-native-form-receipts.sql)
+   se aplicó el 18/10 para reparar el dispatcher existente, sin nuevo despliegue. Releer columnas,
+   constraints, índice y trigger antes de activar el mapping; no repetir la migración ni un POST.
+   El ledger conserva owner/grants y sus filas anteriores.
 3. Crear o reusar propiedad `ef_greenhouse_submission_id`, `type=string`, `fieldType=text`,
    `formField=true`, grupo existente. Releer su definición y el formulario; aplicar el PATCH del
    campo oculto sólo contra el snapshot fresco. No crear contactos ni enviar leads de prueba.
@@ -35,7 +37,9 @@ de propiedad y hash de la definición nativa; si hay drift, volver a preparar co
    pública. CAS añade sólo `submissionIdProperty`, preserva el mapping y evita desactivar/recrear
    destinos o publicar otra versión de fuente/policy. Un `false` indica drift: releer y revisar.
    Releer destino y versión; no copiarlo a otros portales/formularios sin verificar su schema.
-5. Desplegar y verificar revisión activa del ops-worker. Los drains devuelven `hubspotReceipts`.
+5. Verificar la revisión activa compatible del ops-worker; ya estaba servida al reparar el18/10.
+   Si el release añade otro delta, desplegarlo sólo por el control plane autorizado.
+   Los drains devuelven `hubspotReceipts`.
    Una migración ausente detiene dispatch antes del POST; nunca arreglarlo redispatchando a ciegas.
 6. En el próximo envío real autorizado, comprobar `delivered`, recibo pendiente y luego `verified`
    con `provider_submission_id`. Releer el historial nativo con marcador/ID exactos y cobertura
