@@ -250,7 +250,7 @@ describe('Google Ads confirmed reservation receipt', () => {
   })
 
   it('does not expose receipt or re-prepare on confirmed replay', async () => {
-    vi.mocked(claimMeetingBooking).mockResolvedValue({ kind: 'replay', startsAt, durationMs: 1_800_000, timezone: 'America/Santiago' })
+    vi.mocked(claimMeetingBooking).mockResolvedValue({ kind: 'replay', executionId: 'exec-replay', startsAt, durationMs: 1_800_000, timezone: 'America/Santiago' })
     const result = await bookMeeting(input, context(provider()))
 
     expect(result).not.toHaveProperty('googleAdsConversion')

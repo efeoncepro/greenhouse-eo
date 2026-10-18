@@ -184,18 +184,6 @@ const checkContractLocally = () => {
 
   for (const key of stepped) if (!keys.includes(key)) problems.push(`step_unknown_field:${key}`)
 
-  for (const field of fieldSchema) {
-    for (const condition of [...(field.visibleWhen ?? []), ...(field.requiredWhen ?? [])]) {
-      const target = fieldSchema.find(candidate => candidate.key === condition.field)
-
-      if (!target) problems.push(`condition_unknown_field:${field.key}->${condition.field}`)
-
-      const matching = (target?.options ?? []).filter(option => option.value.includes(condition.includes ?? '')).map(option => option.value)
-
-      void matching
-    }
-  }
-
   return { ok: problems.length === 0, problems }
 }
 
@@ -257,7 +245,7 @@ const main = async () => {
           composition: 'multi_step_light',
           steps: steps.map(step => ({ key: step.key, label: step.label, fields: step.fieldKeys })),
           fields: fieldSchema.map(
-            field => `${field.key}:${field.type}${field.required ? '*' : ''}${field.visibleWhen ? ' (condicional)' : ''}`
+            field => `${field.key}:${field.type}${field.required ? '*' : ''}`
           ),
           localContractCheck: local,
           securityReference: { slug: SECURITY_REFERENCE_SLUG, captchaPolicyFound: Boolean(security) },

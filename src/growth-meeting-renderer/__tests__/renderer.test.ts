@@ -92,7 +92,7 @@ describe('MeetingRenderer', () => {
       const state=(renderer as unknown as {state:unknown}).state
 
       expect(JSON.stringify(state)).not.toContain('sha256_email_address')
-      expect(JSON.stringify((window as Window & {dataLayer:unknown[]}).dataLayer)).not.toContain('a'.repeat(64))
+      expect(JSON.stringify((window as unknown as {dataLayer:unknown[]}).dataLayer)).not.toContain('a'.repeat(64))
       expect(host.dataset.ghmState).toBe('confirmed')
       renderer.destroy()
     } finally {emit.mockRestore()}
