@@ -56,7 +56,7 @@ Read the minimal set:
 | Post-publication sitemap, GSC observation, indexing request or Platform Properties | `references/agentic-blogpost-end-to-end.md` + `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md` |
 | Direct SVG infographics, `<picture>`, Media Library, ALT/long description, featured/OG raster | `references/content-factory-gutenberg.md` + `.codex/skills/seo-aeo/references/editorial-image-seo.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
-| Link to an Efeonce service inside any text (mention with isotype) | `docs/architecture/public-site/PRIMITIVES.md` §`EfeonceMention` Contract: `<a class="eo-mention">`, site-wide stylesheet, never copied into a landing |
+| Link to an Efeonce service inside any text (mention with isotype) | `docs/architecture/public-site/PRIMITIVES.md` §`EfeonceMention` Contract: `<a class="axis-mention" data-line data-surface>` from AXIS `efeonce.mention` (byte copy `axis-mention.css`), site-wide, never copied into a landing |
 | Claude Design / canvas (`.dc.html`) → modular Elementor (compiler, tabs, rails, canvas forms), Home, brand marks, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |

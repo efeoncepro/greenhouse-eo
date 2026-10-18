@@ -20,10 +20,10 @@ const relativeFiles = [
   'includes/widgets/class-eo-inbound-landing-base.php',
   'includes/widgets/class-eo-inbound-landing-widgets.php',
   'includes/inbound/seo.php',
-  // Shared site-wide primitive «Mención Efeonce» (a.eo-mention); first shipped with this release.
+  // Site-wide «Mención Efeonce» (a.axis-mention): loader of the AXIS stylesheet, a byte copy of
+  // @efeoncepro/axis-ui-primitives ./mention.css. It replaced the local eo-mention.css on 2026-10-18.
   'includes/eo-mention.php',
-  'assets/css/eo-mention.css',
-  'assets/img/brand/efeonce-isotype.svg',
+  'assets/css/axis-mention.css',
   ...list('includes/inbound/schemas'),
   ...list('includes/inbound/templates'),
   'assets/css/inbound-landing.css',

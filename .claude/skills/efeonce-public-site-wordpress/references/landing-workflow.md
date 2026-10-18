@@ -27,7 +27,7 @@ Reusable mechanisms are optional building blocks; each landing decides whether t
 - Scoped release rail (package → deploy → publish → rollback with SHA guards and snapshots): the landing files
   under `references/landings/`.
 - Native meeting launcher of the shared base (`<gh-meeting-cta>`): `references/source-led-elementor-patterns.md`.
-- Site-wide `EfeonceMention` (`a.eo-mention`) for links to Efeonce services: `docs/architecture/public-site/PRIMITIVES.md`.
+- Site-wide `EfeonceMention` (`a.axis-mention`, AXIS `efeonce.mention`) for links to Efeonce services: `docs/architecture/public-site/PRIMITIVES.md`.
 - Growth Forms / Growth CTA integration: `references/growth-forms-wordpress.md` and skill `greenhouse-growth-ctas`.
 
 ## Standard Loop

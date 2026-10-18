@@ -89,7 +89,7 @@ canvas → compilar → paquete → deploy → publicar.
 
    Revisa la lista de archivos que cambian y el diff de **todos** los incluidos, en especial
    `includes/class-eo-widgets-loader.php` y `includes/widgets/class-eo-source-led-landing-base.php`, que son compartidos.
-   El paquete también lleva los tres archivos de `EfeonceMention` si difieren del vivo.
+   El paquete también lleva los dos archivos de `EfeonceMention` (`includes/eo-mention.php` y `assets/css/axis-mention.css`, copia del paquete AXIS) si difieren del vivo.
 
 6. Despliega (sólo con autorización vigente para ese cambio):
 
@@ -215,7 +215,7 @@ lugar se mide con su `cta-location`: `inbound_hero`, `inbound_closing` e `inboun
 - **No** re-corras el publicador del CTA sin republicar la página justo después.
 - **No** pegues HTML, CSS ni JavaScript en un widget, ni agregues un widget HTML.
 - **No** escribas `_elementor_data` a mano ni despliegues el checkout runtime completo.
-- **No** copies el CSS de `EfeonceMention` dentro de la landing: es global.
+- **No** copies el CSS de `EfeonceMention` dentro de la landing ni lo edites en `axis-mention.css`: es global y viene de AXIS (`@efeoncepro/axis-ui-primitives`, `./mention.css`).
 - **No** declares verificados el envío del formulario, `generate_lead` ni una reserva sin hacerlos de verdad.
 
 ## Problemas comunes

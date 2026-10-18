@@ -27,7 +27,7 @@
   `[data-gh-cycle-question]` in sync with the input and the market buttons (`data-gh-market`, `data-gh-market-where`).
 - `metodo` stage titles: «Amplificar/Optimizar» broke mid-word; fixed with `.stage h3{word-break:normal;
   overflow-wrap:normal;hyphens:none;white-space:nowrap}` and a title clamp of `clamp(40px,3.5vw,56px)`.
-- Service links use the shared site-wide primitive `EfeonceMention` (`a.eo-mention`, see
+- Service links use the shared site-wide primitive `EfeonceMention` (`a.axis-mention data-line="revenue-hubspot" data-surface="dark"`, AXIS `efeonce.mention` since 2026-10-18; see
   `docs/architecture/public-site/PRIMITIVES.md`). Never copy its CSS into the landing.
 - Form: Growth Form `efeonce-inbound-diagnostic`, key `70dc185f-9903-4458-8aa5-323f6f827152`, surface
   `fhsf-efeonce-inbound-diagnostic`, `hubspot_pillar` + `multi_step_light` (step 1: `loopStage`, `crm`, `country`;

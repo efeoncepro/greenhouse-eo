@@ -141,7 +141,7 @@ mención: el isotipo de Efeonce delante del nombre del servicio, sin subrayado, 
 el mouse. La página tiene diez menciones. Es un mecanismo de todo el sitio, no de esta landing: cualquier página puede
 usarlo.
 
-> Detalle técnico: primitive `EfeonceMention` (`a.eo-mention`), contrato en
+> Detalle técnico: primitive `EfeonceMention` (`a.axis-mention`, de AXIS `efeonce.mention`), contrato en
 > [PRIMITIVES.md](../../architecture/public-site/PRIMITIVES.md#efeoncemention-contract).
 
 ## Buscadores y redes sociales

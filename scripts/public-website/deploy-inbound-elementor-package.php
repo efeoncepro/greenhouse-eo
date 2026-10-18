@@ -7,7 +7,7 @@ if ( ( $manifest['contract'] ?? '' ) !== 'inbound-elementor-release.v1' ) { WP_C
 $zip = new ZipArchive();
 if ( true !== $zip->open( $args[0] ) ) { WP_CLI::error( 'Invalid ZIP.' ); }
 $root = WP_PLUGIN_DIR . '/eo-elementor-widgets/';
-$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-inbound-landing-(base|widgets)\.php|widgets/class-eo-source-led-landing-base\.php|inbound/seo\.php|eo-mention\.php|inbound/schemas/[a-z]+(-[a-z]+)*\.json|inbound/templates/[a-z0-9_-]+\.html)|assets/(css/inbound-landing\.css|css/eo-mention\.css|img/brand/efeonce-isotype\.svg|js/inbound-landing\.js|img/inbound/[a-z0-9-]+\.(webp|mp4|svg)))$#';
+$allowed = '#^(includes/(class-eo-widgets-loader\.php|widgets/class-eo-inbound-landing-(base|widgets)\.php|widgets/class-eo-source-led-landing-base\.php|inbound/seo\.php|eo-mention\.php|inbound/schemas/[a-z]+(-[a-z]+)*\.json|inbound/templates/[a-z0-9_-]+\.html)|assets/(css/inbound-landing\.css|css/eo-mention\.css|css/axis-mention\.css|img/brand/efeonce-isotype\.svg|js/inbound-landing\.js|img/inbound/[a-z0-9-]+\.(webp|mp4|svg)))$#';
 $files = array();
 foreach ( $manifest['files'] as $entry ) {
 	$path = $entry['path'];
