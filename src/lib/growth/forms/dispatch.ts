@@ -13,6 +13,9 @@ import { z } from 'zod'
 
 import { fieldDefinitionSchema, type FieldDefinition } from './contracts'
 import { deliverToHubSpotForms, HUBSPOT_FORMS_ADAPTER_KIND } from './destinations/hubspot'
+import type { HubSpotFormReceipt } from './destinations/hubspot/receipts'
+import { reconcilePendingHubspotReceipts, type HubSpotReceiptSummary } from './destinations/hubspot/reconcile-receipts'
+import { assertHubSpotReceiptStorageReady } from './destinations/hubspot/receipt-store'
 import { redactNationalIdFromBlob } from './pii/boundary'
 import {
   type FormDestinationRow,
@@ -33,6 +36,7 @@ const MAX_BACKOFF_SECONDS = 3600
 export interface DestinationAdapterResult {
   status: 'succeeded' | 'failed' | 'skipped'
   externalId?: string | null
+  providerReceipt?: HubSpotFormReceipt
   httpStatus?: number | null
   errorClass?: string | null
   retryable: boolean
@@ -63,6 +67,7 @@ export interface DispatchSummary {
   delivered: number
   failed: number
   deadLetter: number
+  hubspotReceipts?: HubSpotReceiptSummary
 }
 
 /**
@@ -95,6 +100,7 @@ const asBlobRecord = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 
 export const dispatchPendingSubmissions = async (limit = 50): Promise<DispatchSummary> => {
+  await assertHubSpotReceiptStorageReady()
   const pending = await listSubmissionsPendingDispatch(limit)
   let delivered = 0
   let failed = 0
@@ -166,6 +172,7 @@ export const dispatchPendingSubmissions = async (limit = 50): Promise<DispatchSu
         adapterVersion: destination.adapter_version,
         status: attemptStatus,
         externalId: result.externalId ?? null,
+        ...(result.providerReceipt && result.status === 'succeeded' ? { providerReceipt: result.providerReceipt } : {}),
         httpStatus: result.httpStatus ?? null,
         errorClass: result.errorClass ?? null,
         retryCount: newAttempts,
@@ -199,7 +206,11 @@ export const dispatchPendingSubmissions = async (limit = 50): Promise<DispatchSu
     }
   }
 
-  return { processed: pending.length, delivered, failed, deadLetter }
+  // Independent GET-only work also runs when no commercial submissions are pending.
+  // Receipt failures never cause another Forms POST or change delivery success.
+  const hubspotReceipts = await reconcilePendingHubspotReceipts()
+
+  return { processed: pending.length, delivered, failed, deadLetter, hubspotReceipts }
 }
 
 /** Rutea al adapter según `adapter_kind`. */

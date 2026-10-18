@@ -5,6 +5,15 @@ description: 'Operate the HubSpot ↔ Greenhouse write bridge Cloud Run service 
 
 # HubSpot Greenhouse Bridge Ops
 
+## Nombres de negocios y leads Efeonce
+
+Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
+[convención canónica](../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md), aceptada el 15/10/2026:
+Deal = marca/cuenta, país, iniciativa, referencia; Lead = marca/cuenta, país, necesidad, persona,
+separados por ` | `. La marca del alcance precede al holding; conservar Company legal y asociaciones.
+El formato no autoriza altas, calificación ni renombrados masivos. Nuevas altas autorizadas lo adoptan;
+registros existentes sólo cambian nombre dentro del mandato expreso, con antes/después y readback.
+
 Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `greenhouse-eo` runtime. The service is a Python Flask proxy with 23 HTTP routes + a webhook handler validated via HMAC. Its physical location is `greenhouse-eo/services/hubspot_greenhouse_integration/` (TASK-574 cutover 2026-04-24). The public Cloud Run URL `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app` is stable across the cutover — Vercel consumers did not need config changes.
 
 ## System boundary (don't mix these up)

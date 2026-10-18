@@ -1,0 +1,31 @@
+{
+  "pageId": 251981,
+  "slug": "agencia-de-medios",
+  "parentId": 251077,
+  "landing": "medios",
+  "baseClass": "EO_Medios_Landing_Base_Widget",
+  "modules": [
+    ["hero", "01 · Hero", "dark"],
+    ["canales", "02 · Canales", "dark"],
+    ["numeros", "03 · Números", "dark"],
+    ["diferencia", "04 · La diferencia", "dark"],
+    ["ciclo", "05 · Todo el ciclo", "dark"],
+    ["modo", "06 · ¿Cómo vendes?", "dark"],
+    ["senal", "07 · La señal", "dark"],
+    ["performance", "08 · Performance", "dark"],
+    ["pantallas", "09 · Pantallas", "dark"],
+    ["medicion", "10 · Medición", "dark"],
+    ["equipo", "11 · Equipo", "dark"],
+    ["cobro", "12 · Cómo cobramos", "light"],
+    ["metodo", "13 · Método", "dark"],
+    ["partners", "14 · Partners", "dark"],
+    ["preguntas", "15 · Preguntas frecuentes", "dark"],
+    ["agenda", "16 · Agenda y formulario", "dark"]
+  ],
+  "formModule": "agenda",
+  "form": { "formKey": "d784b9e2-f6e4-4e24-b059-f164fc82f734", "surface": "fhsf-efeonce-media-diagnostic" },
+  "thumbnailId": 251986,
+  "preserveWidgetSettings": true,
+  "protectedPages": [249582, 251279, 251997],
+  "dryRun": true
+}

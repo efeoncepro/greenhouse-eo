@@ -1,5 +1,17 @@
 # TASK-1401 — Cluster `/servicios/hubspot/precios/`: **"Cuánto cuesta HubSpot de verdad"**
 
+## Delta 2026-10-17 — el Pillar `244079` ya es la v2
+
+- `/servicios-contratar-hubspot/` dejó de ser la v1: desde el 2026-10-16 son 14 widgets `greenhouse_hubspot_v2_*`
+  organizados por los cuatro resultados de HubSpot. Las licencias ya no tienen sección propia: viven dentro del módulo
+  «riesgo» (licencias por rol y créditos de IA estimados), y la página no enlaza a una página de precios. Cuando esta
+  exista, el enlace pillar → precios hay que agregarlo en la fuente v2 — cerrado por la publicación v2
+  ([audit](../../audits/public-site/2026-10-16-hubspot-v2-publication.md)).
+- Supuesto invalidado: «hereda el motion contract del pillar» con tokens `--gh-hs-*` + IntersectionObserver. La fuente v2
+  (`scripts/public-website/hubspot-v2-source/`) no usa esos tokens; su motion es CSS ligado al scroll (`view-timeline`)
+  y todo reveal termina en `entry 70–100%`. Al retomar, alinear con la v2, no con `HUBSPOT_ELEMENTOR_MODULES_V1.md`.
+- El formulario del Pillar ya es el Growth Form `efeonce-hubspot-scope` con entrega `direct` a HubSpot.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

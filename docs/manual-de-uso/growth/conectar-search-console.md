@@ -1,7 +1,7 @@
 # Manual — Conectar Google Search Console a una marca
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0 · **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1282)
+> **Version:** 1.1 · **Ultima actualizacion:** 2026-10-17 por Claude (verificacion de la conexion de Efeonce)
 >
 > **Para que sirve:** conectar la propiedad de Google Search Console de una marca cliente para que Greenhouse lea sus datos reales de busqueda (Search Analytics, solo lectura). Modelo operador-mediado estilo Semrush: conectas tu cuenta de Google una vez y eliges la propiedad de cada cliente desde un menu.
 
@@ -42,11 +42,21 @@
 | **"No pudimos obtener tus propiedades"** | El runtime no puede leer el token (falta grant `secretAccessor` al SA `greenhouse-portal@` para `search-console-token-*`) | Verificar/aplicar el grant de lectura; ver nota tecnica abajo. |
 | El menu no muestra la propiedad del cliente | Tu cuenta de Google no tiene acceso a esa propiedad en Search Console | El cliente debe compartir su propiedad con tu correo de operador. |
 | **"La conexion se revoco o expiro"** | Google revoco el acceso | Reconectar desde el panel. |
+| Un script local de verificacion devuelve **`invalid_grant`** aunque el panel diga Conectado | El script leyo la conexion con `listActiveSearchConsoleOrganizations()`, que devuelve solo `organizationId` y `siteUrl` (sin `tokenSecretRef`), asi que no tenia la referencia correcta del token | Leer la conexion con `getSearchConsoleConnection(orgId)` y usar su `tokenSecretRef`. No reconectar: la conexion esta sana. |
+| El script local no arranca: falta la configuracion OAuth | `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` y la referencia del client secret no estan en `.env.local` | Cargar `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` desde el env de Vercel produccion y `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF=greenhouse-search-console-oauth-client-secret`. No copiar valores al repo ni al chat. |
+| Probaste con la cuenta de servicio de GTM y `sites.list` vuelve vacio | `greenhouse-gtm-publisher` no tiene acceso a Search Console | Usar la conexion OAuth de la organizacion; esa cuenta de servicio no sirve para Search Console. |
 
 ## Verificar que funciona (operador tecnico)
 
 - Estado en la base: la fila `greenhouse_growth.search_console_connections` de la org debe quedar `status=active` con el `site_url` elegido y `token_secret_ref` apuntando a `search-console-token-operator-<userId>`.
 - El reader `readSearchConsoleAnalytics(orgId, …)` debe devolver filas reales de Search Analytics (consultas con clics/impresiones).
+
+### Delta 2026-10-17 — verificar desde un script local sin efectos
+
+- **Estado vigente:** la conexion de Efeonce (`sc-domain:efeoncepro.com`, org `org-2df565fb-98aa-42f7-b324-ea9a2209017f`) esta activa. Un `invalid_grant` inicial de ese dia fue error del script de verificacion, no de la conexion.
+- **Leer la conexion correcta:** `listActiveSearchConsoleOrganizations()` (`src/lib/growth/search-console/connection-store.ts`) es para recorrer marcas en el batch diario y devuelve solo `organizationId` + `siteUrl`. Para obtener el token, leer `getSearchConsoleConnection(orgId)` y resolver su `tokenSecretRef`.
+- **Diagnosticar sin marcar revocada:** el listado de propiedades del panel (`listSearchConsoleSitesForOrg`) marca la conexion `revoked` si el refresh da `invalid_grant`. Para diagnosticar sin efectos, refrescar el token directamente en el script en vez de pasar por ese comando.
+- **URL Inspection:** con el token de la conexion de la org se puede consultar `urlInspection.index.inspect` (solo lectura) para observar el estado de una URL. La API no pide indexacion: solicitar indexacion se hace a mano en la interfaz de Search Console. Detalle en la skill `seo-aeo` (`references/google-search-console-api-indexing.md`).
 
 ## Referencias tecnicas
 

@@ -66,6 +66,69 @@
     try { w.sessionStorage.setItem(attributionKey, JSON.stringify(attributionMemory)); } catch (_) {}
     return attributionMemory;
   };
+  // Private first-party Ads context, separate from Google-owned _gcl cookies.
+  // Landing observation is memory-only until advertising consent; never put IDs in dataLayer.
+  var googleAttributionKey = 'efeonce.gads-attribution.v1';
+  var googleCookie = 'efeonce_gads';
+  var googleTtl = 2592000000; // 30 days, bounded and checked on every read.
+  var googleMemory = {};
+  var googleLanding = {};
+  function readLandingGoogleClick() {
+    var result = {};
+    try {
+      var params = new w.URL(w.location.href).searchParams;
+      ['gclid', 'gbraid', 'wbraid'].forEach(function (key) {
+        var value = params.get(key);
+        if (value && /^[A-Za-z0-9._~-]{1,512}$/.test(value)) result[key] = value;
+      });
+    } catch (_) {}
+    if (Object.keys(result).length) { result.source = 'landing_query'; result.capturedAt = new Date().toISOString(); }
+    return result;
+  }
+  googleLanding = readLandingGoogleClick();
+  function validGoogleClick(value) {
+    if (!value || typeof value !== 'object' || value.source !== 'landing_query') return false;
+    var observed = Date.parse(value.capturedAt);
+    if (!isFinite(observed) || observed > Date.now() || Date.now() - observed > googleTtl) return false;
+    var found = false;
+    var valid = true;
+    Object.keys(value).forEach(function (key) {
+      if (['source', 'capturedAt', 'gclid', 'gbraid', 'wbraid'].indexOf(key) < 0) valid = false;
+    });
+    ['gclid', 'gbraid', 'wbraid'].forEach(function (key) {
+      if (value[key] !== undefined) {
+        if (typeof value[key] !== 'string' || !/^[A-Za-z0-9._~-]{1,512}$/.test(value[key])) valid = false;
+        else found = true;
+      }
+    });
+    return valid && found;
+  }
+  function clearGoogleAttribution() {
+    googleMemory = {}; googleLanding = {};
+    try { w.sessionStorage.removeItem(googleAttributionKey); } catch (_) {}
+    writeAttributionCookie(googleCookie, '', 0);
+    try { d.cookie = googleCookie + '=; Path=/; Max-Age=0; SameSite=Lax; Secure'; } catch (_) {}
+  }
+  w.efeonceReadGoogleAdsAttribution = function () {
+    if (d.documentElement.getAttribute('data-efeonce-google-ad-storage') !== 'granted' ||
+        d.documentElement.getAttribute('data-efeonce-google-ad-user-data') !== 'granted' ||
+        d.documentElement.getAttribute('data-efeonce-google-ad-personalization') !== 'granted' || w.navigator.globalPrivacyControl === true) {
+      clearGoogleAttribution(); return {};
+    }
+    var stored = {};
+    try { stored = JSON.parse(readCookie(googleCookie) || '{}'); } catch (_) {}
+    if (!validGoogleClick(stored)) {
+      try { stored = JSON.parse(w.sessionStorage.getItem(googleAttributionKey) || '{}'); } catch (_) { stored = {}; }
+    }
+    var chosen = validGoogleClick(googleLanding) ? googleLanding : validGoogleClick(stored) ? stored : googleMemory;
+    if (!validGoogleClick(chosen)) { clearGoogleAttribution(); return {}; }
+    googleMemory = { source: 'landing_query', capturedAt: chosen.capturedAt };
+    ['gclid', 'gbraid', 'wbraid'].forEach(function (key) { if (chosen[key]) googleMemory[key] = chosen[key]; });
+    var remaining = Math.max(0, Math.floor((Date.parse(chosen.capturedAt) + googleTtl - Date.now()) / 1000));
+    writeAttributionCookie(googleCookie, JSON.stringify(googleMemory), remaining);
+    try { w.sessionStorage.setItem(googleAttributionKey, JSON.stringify(googleMemory)); } catch (_) {}
+    return Object.assign({}, googleMemory);
+  };
   var meetingIds = Object.create(null);
   // GTM uses its own event counter only as a local cache key; it never leaves the page.
   // The ID sent to CAPI is an independent UUID, not a receipt or business/provider ID.
@@ -101,6 +164,10 @@
   function reflect(ads, analytics) {
     d.documentElement.setAttribute('data-efeonce-ads-consent', ads);
     d.documentElement.setAttribute('data-efeonce-analytics-consent', analytics);
+    ['ad-storage', 'ad-user-data', 'ad-personalization'].forEach(function (key) {
+      d.documentElement.setAttribute('data-efeonce-google-' + key, ads);
+    });
+    d.documentElement.setAttribute('data-efeonce-google-analytics-storage', analytics);
   }
   reflect('denied', 'denied');
   w.dataLayer.push({ meta_ads_consent: 'denied', analytics_consent: 'denied' });
@@ -117,6 +184,8 @@
     reflect(adsState, analyticsState);
     if (ads) w.efeonceReadMetaAttribution();
     else if (categories.advertisement === false || w.navigator.globalPrivacyControl === true) clearAttribution();
+    if (ads) w.efeonceReadGoogleAdsAttribution();
+    else if (categories.advertisement === false || w.navigator.globalPrivacyControl === true) clearGoogleAttribution();
     w.gtag('consent', 'update', {
       ad_storage: adsState, ad_user_data: adsState, ad_personalization: adsState,
       analytics_storage: analyticsState,
@@ -124,6 +193,7 @@
       personalization_storage: functionality ? 'granted' : 'denied', security_storage: 'granted'
     });
     w.gtag('set', fields);
+    try { w.dispatchEvent(new w.Event('efeonce:privacy-consent')); } catch (_) {}
     w.clarity('consentv2', { ad_Storage: adsState, analytics_Storage: analyticsState });
     w.dataLayer.push({ event: 'gh_privacy_consent_updated', meta_ads_consent: adsState,
       analytics_consent: analyticsState, consent_source: 'hubspot_categories' });

@@ -1,0 +1,136 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "81c6ba39dc3f",
+  "key": "81c6ba39dc3fc4b4d8238f255c6e04600c93e0b2a25df1d03e0046942d9e8fa0",
+  "status": "completed",
+  "createdAt": "2026-10-16T15:18:11.270Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/formatos-comp.png",
+    "imageSha256": "66b5c19b535e1aae1121c5a4152e82c36ff4042d08b9656c6b59f6e2e8edc515",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/formatos-mask.png",
+    "maskSha256": "ed302f4ed4ce69c6cc881aacfd513394caddb1b5ca06ee59733906e0d0b86d14",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Night photograph of a person in a dark apartment with a city view. Three screens already show FINISHED advertisements for a fictional running brand: the large wall TV at the right, the laptop on the desk at the right, and a tall billboard screen on a distant skyscraper seen through the window. Keep every advertisement exactly as it is: same pictures, layout, letters, logo, stripe, colors, sizes and positions; do not redraw, retype or restyle them. Only add the physical finish that matches the photo: the TV and laptop screens read as emitted light with their real bezels, a faint reflection, and their glow softly lighting the wall, desk and air around them, with the same slight softness of focus as their surroundings; the distant skyscraper billboard sits far away behind the window glass, so it is out of focus like the other city lights, with soft bloom and a faint window reflection over it. Everything else stays exactly the same. No new text or logos.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nNight photograph of a person in a dark apartment with a city view. Three screens already show FINISHED advertisements for a fictional running brand: the large wall TV at the right, the laptop on the desk at the right, and a tall billboard screen on a distant skyscraper seen through the window. Keep every advertisement exactly as it is: same pictures, layout, letters, logo, stripe, colors, sizes and positions; do not redraw, retype or restyle them. Only add the physical finish that matches the photo: the TV and laptop screens read as emitted light with their real bezels, a faint reflection, and their glow softly lighting the wall, desk and air around them, with the same slight softness of focus as their surroundings; the distant skyscraper billboard sits far away behind the window glass, so it is out of focus like the other city lights, with soft bloom and a faint window reflection over it. Everything else stays exactly the same. No new text or logos.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.09283338274274554,
+    "editable": 170350,
+    "soft": 0,
+    "protected": 1664658
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1792,
+      "height": 1024
+    },
+    "target": {
+      "width": 1792,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 89 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0373,
+    "basis": "1 × salida 1792x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 27.641,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.68,
+        "bestError": 1.68,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        12.08,
+        16.47,
+        25.57
+      ],
+      "protected": {
+        "pixels": 1664658,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 170350,
+        "maxDelta": 234,
+        "meanDelta": 27.641,
+        "worst": {
+          "x": 1611,
+          "y": 367
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1664658,
+        "maxDelta": 154,
+        "meanDelta": 4.753,
+        "worst": {
+          "x": 1258,
+          "y": 483
+        }
+      },
+      "outputUsd": 0.0373,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3304,
+        "input_tokens_details": {
+          "image_tokens": 2958,
+          "text_tokens": 346
+        },
+        "output_tokens": 1243,
+        "output_tokens_details": {
+          "image_tokens": 1243,
+          "text_tokens": 0
+        },
+        "total_tokens": 4547
+      },
+      "meta": {
+        "size": "1792x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

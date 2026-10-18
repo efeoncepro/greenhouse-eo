@@ -1,7 +1,7 @@
 # Publicidad programática — ficha comercial V1
 
 > **Estado:** `Commercially approved` por el operador el 2026-10-09 — servicio, tarifario base y condiciones estándar
-> **Revisión:** 2026-10-12 — modelo V1.5; composición integral y operación directa acompañada en evaluación; valores/cobro sin cambio
+> **Revisión:** 2026-10-16 — material comercial vigente (brochure y landing «Agencia de Medios») y rebates como margen de Efeonce · 2026-10-12 — modelo V1.5; composición integral y operación directa acompañada en evaluación; valores/cobro sin cambio
 > **Habilitación operativa:** acuerdos externos, costo real, capacidad y autorización de compra por campaña
 > **Línea / solución:** Media & Distribution / Performance & Commerce Distribution
 > **Responsable frente al cliente:** Efeonce
@@ -28,6 +28,12 @@ social y programmatic se articulan por objetivo; producción, señal y CRM manti
 Explicar el objetivo primero y los formatos después. Presentar y cotizar el servicio con la marca **Efeonce**, sin
 nombrar los proveedores tecnológicos en el pitch, la ficha para clientes o la propuesta comercial estándar.
 La selección de proveedores se documenta internamente; no se presenta como plataforma propia o certificación oficial.
+
+**Material para presentarlo (desde 2026-10-16):** el brochure y la landing pública «Agencia de Medios»
+(<https://efeoncepro.com/servicios/agencia-de-medios/>); detalle, rutas y reglas de claims en el
+[catálogo de la línea](README.md#material-comercial-vigente). Esas piezas nombran Basis, DV360, The Trade Desk, IAS y
+DoubleVerify sólo como tecnología de compra y verificación que Efeonce opera, nunca como alianza o certificación; fuera
+de esa mención rige la regla de arriba.
 
 ## Formas de contratar
 
@@ -64,7 +70,8 @@ emisión, con fechas de caja compatibles y términos acordados en el SOW. Esto d
 Preferir que el cliente pague directamente los medios. Si Efeonce administra, conciliar gasto/obligaciones reales,
 liquidación pagadera a 15 días y confirmación previa de crédito externo, exposición y fechas. No anticipar
 a proveedores bajo la posición actual del operador. No hay porcentaje de medios añadido al fee fijo por defecto.
-Comisiones/rebates sólo contratados y declarados; el fee sostiene la economía con comisión cero.
+La comisión o rebate de un proveedor es margen de Efeonce (decisión del operador, 2026-10-16): la propuesta no promete
+declararlo ni traspasarlo al cliente. Queda fuera de la economía base: el fee sostiene costo y margen con comisión cero.
 
 Ver [modelo económico y ejemplos](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md#104-cómo-cobramos-el-servicio)
 y [calendario/caja detallados](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#32-calendario-estándar-de-facturación-y-cobro).

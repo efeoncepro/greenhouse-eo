@@ -1,0 +1,192 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f9df20c69d68",
+  "key": "f9df20c69d6800158d5cb5cd3b27b16d8b27b1cbb1435c717cf019085e95a24b",
+  "status": "completed",
+  "createdAt": "2026-10-15T23:32:00.912Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/base.png",
+    "imageSha256": "67710b45af03979ca35c9ae727b00132ca36ba26ebe27457cdb1951bf7602aab",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/mask-piel.png",
+    "maskSha256": "8aa24c2855f59397d60cfb345c4f81db47485a5ec8b85404ed0b803e8ffbb4e9",
+    "maskConvention": "white-editable",
+    "width": 1672,
+    "height": 1055,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:seedream5-pro-edit",
+    "provider": "fal",
+    "sendsMask": false,
+    "verifiedAt": "2026-09-16"
+  },
+  "request": {
+    "model": "bytedance/seedream/v5/pro/edit",
+    "quality": null,
+    "seed": null,
+    "count": 2,
+    "prompt": "Skin retouch of image 1, nothing else changes. Same woman, same exact face, same identity, same features, same closed-lip soft smile, same eyes and gaze to camera, same chin resting on her closed fist, same earrings, same lighting and blue studio color grade. Her skin becomes smooth, natural and healthy, like a high-end editorial portrait shot on a full-frame camera with an 85mm lens: fine real pores, a few soft natural freckles, even warm tone, gentle natural sheen on the forehead and cheekbones. Same skin on her neck and hand.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nSkin retouch of image 1, nothing else changes. Same woman, same exact face, same identity, same features, same closed-lip soft smile, same eyes and gaze to camera, same chin resting on her closed fist, same earrings, same lighting and blue studio color grade. Her skin becomes smooth, natural and healthy, like a high-end editorial portrait shot on a full-frame camera with an 85mm lens: fine real pores, a few soft natural freckles, even warm tone, gentle natural sheen on the forehead and cheekbones. Same skin on her neck and hand.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05063947028277285,
+    "editable": 67888,
+    "soft": 21438,
+    "protected": 1674634
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1672,
+      "height": 1055
+    },
+    "target": {
+      "width": 1680,
+      "height": 1056
+    },
+    "aspectError": 0.0038185511171293083,
+    "reason": "la zona con contexto ocupa 36 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.135,
+    "basis": "2 × 1 imagen(es) × USD 0.0675 (área ≤ 1536²)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 13.122,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.2,
+        "bestError": 2.2,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        1.29,
+        1.44,
+        0.14
+      ],
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 254,
+        "meanDelta": 14.93,
+        "worst": {
+          "x": 1160,
+          "y": 424
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 190,
+        "meanDelta": 7.398,
+        "worst": {
+          "x": 1188,
+          "y": 497
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 247,
+        "meanDelta": 8.014,
+        "worst": {
+          "x": 1271,
+          "y": 500
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "bytedance/seedream/v5/pro/edit",
+      "usage": null,
+      "meta": {
+        "requestId": "01a141e8-c22c-7b63-bad0-ec63a30a9c7b",
+        "account": "FAL_API_KEY"
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 10.304,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.74,
+        "bestError": 1.74,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        2.65,
+        1.75,
+        -0.13
+      ],
+      "protected": {
+        "pixels": 1674634,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 67888,
+        "maxDelta": 199,
+        "meanDelta": 11.683,
+        "worst": {
+          "x": 1090,
+          "y": 361
+        }
+      },
+      "seam": {
+        "pixels": 21438,
+        "maxDelta": 136,
+        "meanDelta": 5.938,
+        "worst": {
+          "x": 1195,
+          "y": 541
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1674634,
+        "maxDelta": 226,
+        "meanDelta": 6.649,
+        "worst": {
+          "x": 631,
+          "y": 574
+        }
+      },
+      "outputUsd": null,
+      "providerModel": "bytedance/seedream/v5/pro/edit",
+      "usage": null,
+      "meta": {
+        "requestId": "01a141e9-a768-7e91-ad77-b495b1586666",
+        "account": "FAL_API_KEY"
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "73a7b9c1446211d0d7b72de7fe7beeb23a4d97bb68933b1505b8752ccd52a92a",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:PG8-audio-digital",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG8-audio-digital.png",
+      "sha256": "fd92e9a204996516a863a8a16e7ebe9e2598ffc462f7b1268c8055a1cf2f9ec0"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

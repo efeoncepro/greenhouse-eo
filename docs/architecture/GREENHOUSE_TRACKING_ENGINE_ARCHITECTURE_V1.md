@@ -447,21 +447,26 @@ Elegir 1 opción, documentarla, y recién ahí construir tags. Mientras esto sig
 
 Todos a la **misma propiedad GA4 `486264460`** (funnel unificado). **Al sumar un host nuevo (mandato §19.2):** (1) instalar el snippet `GTM-NGHPGRLZ` en ese host; (2) si el host NO tiene otra fuente de page_view, agregar un GA4 Config gateado por hostname en el container (workspace → preview → confirmación → publish); (3) agregar la fila aquí; (4) verificar con Playwright (`/g/collect en=page_view tid=G-KYPPY57M14`, sin doble conteo). Patrón + gotchas (incl. cross-repo vía rama+PR; en Astro `is:inline` va SOLO en `<script>`, NUNCA en `<noscript>`): `docs/reference/measurement-gtm-ga4/LEARNINGS.md`.
 
-### 19.6 Meta CAPI y matching de servidor (estado de release 2026-10-13)
+### 19.6 Meta CAPI y políticas de matching (publicado 2026-10-14)
 
 Dirección [ADR CAPI por sGTM](GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
-contrato implementado [10](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md),
-consentimiento [09](../reference/measurement-gtm-ga4/09-hubspot-consent.md) y
-[evidencia](../audits/releases/2026-10-13-full-develop-matching-release.md).
-WebGTM-NGHPGRLZ live5 y ServerGTM-K2X4ZTTK live6; mismo hosting efeonce-group y dataset708931297255942.
-PageView explícito consentido permanece. Lead backend toma aceptaciónForms/confirmaciónMeeting,
-encola proyección cifrada transaccional y entrega por Client autenticado31/trigger33. LegacyMeta12/17
-retirados: no otro Lead desde ClientGA4. El mirror generate_lead conserva una sola conversiónGA4;
-UPDGoogle entrega user_data dedicado sin events, con client_id real y ads+analytics consentidos.
-Este matching no implementa todo el futuro TrackingEngine descrito en secciones anteriores.
-Allowlist fija en backend y Client: seis Forms y una pareja scheduler/surface. No autoalta por
-publicar otra fuente. Propuesta configurable sin GO: [documento](GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md).
-Source/worker/renderers released, SQL/flags/secrets activos; TestEventsServer y canariesPASS.
-Primera conversión comercial real consentida post-activación, calidad/serving/dedupe atribución
-sin observar. Snapshot/smoke web no prueban CAPI; Pixel complementario requiere identidad/dedupe
-propios y no sustituye el servidor. No nuevos proyectos/cron/servicio para este matching.
+[políticas](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md),
+[contrato runtime](../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) y
+[evidencia](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+Web GTM-NGHPGRLZ live5 y Server GTM-K2X4ZTTK live9 estricto schema2; mismo hosting y dataset
+708931297255942. PageView consentido permanece. Lead nace de aceptación Forms o confirmación
+Meeting, snapshot cifrado transaccional y Client autenticado. Triggers legacy12/17 retirados;
+GA4 conserva un generate_lead browser, Google UPD entrega user_data sin events y exige
+client_id real más ads/analytics consentidos. No implementa todo el futuro Tracking Engine.
+
+La autoridad es una policy server-only publicada por fuente/versión/surface/origen con mapping
+tipado y destinos independientes; no listas fijas. Agentes usan discovery versionado, dry-run,
+apply/verify por HTTP con la misma autoridad del panel. Alta compatible demostrada después del
+release sin código/build/redeploy/GTM. Cambios de versión/binding exigen revisar policy;
+nuevos contratos/hosts/proveedores requieren su cambio gobernado. No alta ni campañas automáticas.
+
+Contexto IP/UA del visitante, cookies consentidas y external_id normalizado/hasheado; website,
+URL segura y UUID/tiempo estables. SQL/flags/worker/hosts verificados. Meta Test Events confirmó
+ambos hosts y fuente nueva; no prueba tráfico comercial, evolución EMQ ni audiencia utilizable.
+Primera conversión comercial consentida y conciliación real siguen pendientes. Sin nuevos
+proyectos/cron/servicios. [Operación API/panel/CLI](../manual-de-uso/growth/configurar-medicion-conversiones.md).

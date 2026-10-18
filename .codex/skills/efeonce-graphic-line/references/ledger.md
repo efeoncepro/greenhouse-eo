@@ -1,5 +1,21 @@
 # Registro de decisiones y versiones
 
+### 2026-10-18 — Mención Efeonce: el isotipo en el texto convive con el logo (web)
+
+Decisión del operador: «Para el mention obviamente habría una excepción acá para web». La Mención Efeonce (enlace a un
+servicio o producto de Efeonce dentro del texto, con el isotipo delante; contrato AXIS `efeonce.mention`, A14) no rompe
+la regla «logo una vez por vista, logo o isotipo, nunca los dos» (M §8.1, §0 regla 9): en web es un enlace, no una
+firma, y convive con el logo de la página. La excepción es sólo para web; piezas gráficas, impresos y video siguen con la
+regla. Caso fuente: la landing Inbound (`/agencia-inbound-marketing/`), con logo en la cabecera y diez menciones.
+
+### 2026-10-18 — Mega menú del sitio: el logo de Glitch donde se nombra Glitch
+
+Decisión del operador: «Donde se nombre a Glitch en el menú pon el logo de Glitch». En el mega menú «Recursos» de efeoncepro.com, Glitch se nombra con su logo oficial negativo (`@efeoncepro/axis-brand-assets` → `assets/glitch/glitch-logo-negative.svg`, letras blancas y la manzana verde) en la columna de formatos, el antetítulo, la tarjeta destacada y la franja inferior. Es el logo de un producto que acompaña, como el de Insights: no trae el resto de la sub-línea (verde de fondo, cabecera «EDICIÓN #N», falla en bytes) ni cuenta como esfera de La órbita. Vale para el menú del sitio; no autoriza mezclar elementos de Glitch en otras piezas de Efeonce.
+
+### 2026-10-18 — Mega menú del sitio: dos esferas por panel, como excepción
+
+Decisión del operador: «Deja las dos esferas en el mega menú como excepción: titular y respuesta». En el panel «Soluciones» del mega menú de efeoncepro.com (canvas https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj) conviven la esfera como punto final del titular de la línea («Crecer con método●») y la de la respuesta (`Voice`) de la columna derecha, ambas en el acento de la línea. Vale sólo para ese panel; no autoriza dos esferas en otras piezas. En el mismo panel, el foco de servicio es un anillo sin esfera alrededor del ícono Trazo en reposo, y los íconos no pasan a «respuesta», para no sumar una tercera.
+
 ### 2026-10-13 — Privacidad pública: propuesta, aprobación y adopción publicada
 
 Decisión posterior del operador: «Vamos, ponla». Autoriza adopción en ambos sitios.
@@ -56,6 +72,7 @@ solo en memoria y no escribe consentimiento real. Dirección y QA en
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-17 | **Kit de componentes de video aprobado completo** (lámina «Componentes de video · v4» del canvas «¿Para cuándo?»; «Todos están aprobados, importante que tenemos color de esfera y/o acento con las líneas»). 18 componentes en 4:5, 9:16 y 16:9 a 1080 de lado corto: zócalos de lugar (con pin `ubicacion` en reposo si la palabra es un lugar), persona y canal; remate y remate con pregunta; cita; burbujas de voz; super de dato; comparación (la etiqueta acepta ícono en reposo, logo o isotipo); cartela de capítulo; cierre con CTA (antes del reveal); barrido e iris; lista de pasos con íconos; momento protagonista; Plastilina en volumen; callout con gesto; pantalla dividida («Antes.» con punto, «Ahora» con esfera). **La línea decide el acento; el fondo sigue siendo el navy de Efeonce** (también el vidrio del subtítulo). **Siempre que va la dirección, va la burbuja URL** (2026-10-17). En AXIS: delta (z), `surfaces.audiovisual.videoKit` + recetas `video-*`, `content.video` en el manifiesto (`axis-tokens` 0.6.4, `axis-ui-contracts` 0.7.4; publicación pendiente de confirmación). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.5, delta 2026-10-17 (b). |
 | 2026-10-13 | Privacidad pública: tras pedir una experiencia moderna/premium/elegante afín a La órbita, el operador autoriza «Vamos, ponla». Se adopta papel/navy, Bricolage/Poppins, aviso compacto y preferencias responsive en WordPress/Think. El footer conserva el enlace legal discreto; HubSpot conserva consentimiento y persistencia. Aplicación publicada y verificada; no habilita la propuesta escalable de medición ni migra otros productos. [Aplicación y mantenimiento](applications.md#producción-y-mantenimiento-de-esta-aplicación). |
 | 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |
 | 2026-10-10 | Deck **Marketing de Contenidos** aprobado (brochure de 57 láminas, línea Brand, ruta corta de 21; «Me encantó todo, queda aprobado»). Deja cuatro cosas en el canon: el patrón **franjas de foto** en seis y tres franjas, con tres excepciones sólo para él (una esfera por franja, foto de cine recortada, degradado bajo el título); la lámina a mano **«Producción con IA»** con la foto `CT24` en el índice de cine; **«Día a día»** con una interfaz de Marketing Studio **construida, no capturada**, como uso de `content-day-tools`; y la lámina de equipo **«Expertos multidisciplinarios»** con «+85 expertos más en Latam» («Personas reales» deja de ser el titular preferido). No se envía a un prospecto hasta cerrar sus pendientes (compromisos de servicio, «+85» sin fuente, logos de terceros). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y deltas 2026-10-10 (a–e); catálogo: `deck-recipes/README.md`. |

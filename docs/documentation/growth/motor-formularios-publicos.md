@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 2.1
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-13 por Codex (TASK-2034 — matching publicitario)
+> **Ultima actualizacion:** 2026-10-15 por Claude (opciones visibles en cualquier estilo, enlace de privacidad legible, íconos de etiqueta; TASK-2038)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -21,25 +21,38 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 
 ## Matching Meta y Google después de un envío aceptado
 
-Desde el release del 2026-10-13, seis formularios comerciales permiten enriquecer la medición con
-los datos de contacto disponibles: AEO, SEO, cotización web, Lead Gen web, auditoría social y
-AI Visibility Grader. Se exige autorización publicitaria del visitante; Google requiere además
-analítica e identificador GA4 real. La casilla para procesar la solicitud no reemplaza estos permisos.
-GPC y una elección desconocida o denegada bloquean el matching.
+El matching se autoriza mediante una **política publicada**, ligada al formulario, su versión,
+la surface y el origen permitido. La configuración inicial conserva AEO, SEO, cotización web,
+Lead Gen web, auditoría social y AI Visibility Grader; esa semilla no limita las altas futuras.
+Crear/publicar otro formulario no activa publicidad automáticamente. Para una fuente comercial
+compatible, se configura el mapping tipado y cada destino mediante API, CLI o el inspector de
+Forms, sin otro release ni publicación GTM. Una versión nueva requiere revisar y publicar su política.
 
-Greenhouse acepta el envío, prepara los datos normalizados como hashes y guarda una proyección
-cifrada para entregarla después. Meta recibe un Lead por GTM Server. Google recibe datos de usuario
-por su canal dedicado, manteniendo una sola conversión GA4. Si falla medición, el formulario sigue
-funcionando; los reintentos de publicidad son independientes de la entrega HubSpot.
+El agente y la persona usan los mismos permisos y contrato: descubrir → validar sin escribir →
+borrador → revisión → publicación → lectura independiente. Una política puede desactivarse sin
+retirar el formulario. El catálogo informa fuentes, campos y bloqueos; no se infiere autoridad de
+slugs o etiquetas. Subscribe, application, survey y fuentes de alto riesgo quedan fuera de este
+matching comercial. Nuevos eventos, proveedores, tipos de campos u otros hosts requieren su cambio
+gobernado. No se añadieron herramientas MCP/Nexa ni scopes OAuth en esta entrega.
 
-**Crear/publicar otro formulario no activa automáticamente este matching.** La autorización de
-esos seis formularios está fija en código y en GTM Server. Hacerla administrable por formulario
-es una propuesta pendiente de GO, aún no implementada; no hay un selector disponible en el cockpit.
-La instrumentación GA4 genérica y la autorización publicitaria son controles distintos.
+Después de una aceptación válida, Greenhouse prepara una proyección cifrada con los campos
+mapeados y disponibles. Meta recibe un Lead por GTM Server con IP/navegador del visitante,
+atribución publicitaria consentida e identidad normalizada/hasheada. Google recibe datos de usuario
+por su canal dedicado, sin otra conversión GA4. Se exige publicidad consentida, sin GPC; Google
+requiere además analítica e identificador GA4 real. La casilla de la solicitud no concede esos permisos.
+Un clic o intento de envío fallido no produce este Lead.
 
-[Contrato técnico y alcance exacto](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)
-· [activación y límites de evidencia](../../audits/releases/2026-10-13-full-develop-matching-release.md).
-Las pruebas controladas no sustituyen verificar la primera conversión comercial real consentida.
+Growth Forms conserva aceptación y consentimiento; el destino **HubSpot Forms** mantiene su propio
+mapping y outbox para entregar a CRM. El mapping publicitario no reemplaza el comercial. Denegar,
+desactivar o fallar medición no bloquea la aceptación ni su entrega comercial. Cada destino se
+verifica por separado; un recibo Meta no prueba que haya llegado el contacto a HubSpot.
+
+[Manual de configuración para agentes y panel](../../manual-de-uso/growth/configurar-medicion-conversiones.md) ·
+[contrato técnico](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) ·
+[release publicado y pruebas aisladas](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+La nueva fuente por datos y Meta Test Events se verificaron en producción. Las pruebas controladas
+no sustituyen la primera conversión comercial real consentida ni demuestran mejora de EMQ o
+una audiencia elegible. CRO, abandono, suscripciones y resultados CRM siguen fuera de este release.
 
 ## Como funciona (flujo)
 
@@ -152,6 +165,19 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
   encima de las filas siguientes del grid; las opciones selected/hover mantienen texto oscuro
   legible. Si un host como Ohio vuelve a enterrar un dropdown, se corrige en
   `src/growth-forms-renderer/**` o en la capa compartida de host, no con CSS de una landing.
+- **Opciones visibles como tarjetas, en cualquier estilo (2026-10-15):** una pregunta de opción única
+  puede mostrarse como desplegable o como tarjetas visibles que la persona toca de una vez. Las tarjetas
+  ya funcionan en todos los estilos del formulario (antes sólo en uno; en el estilo premium salía una
+  caja de texto vacía). Ocupan el ancho completo y se acomodan en dos columnas cuando hay espacio.
+  Cambiar de desplegable a tarjetas no cambia lo que llega a HubSpot ni a la medición.
+- **Enlace de privacidad legible:** el aviso de consentimiento muestra «Política de privacidad» (o
+  «Privacy policy» en inglés) en vez de la dirección web completa.
+- **Íconos de etiqueta limpios en WordPress:** los íconos junto a cada etiqueta (correo, teléfono,
+  empresa…) son dibujos, no letras; así el tema del sitio ya no los convierte en palabras sueltas.
+- **Cuándo se ven estos cambios en los sitios:** el renderer llega a WordPress y Astro sólo con una
+  publicación de producción de Greenhouse. Estos tres ajustes están listos pero esperan esa publicación.
+  Para que en el futuro un cambio visual salga sin esperar a Greenhouse, el renderer se mudará al
+  sistema de diseño AXIS (`TASK-2038`).
 
 ## Cockpit operativo — TASK-1232
 

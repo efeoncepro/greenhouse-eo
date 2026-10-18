@@ -223,31 +223,32 @@ describe('contract selection: 1.2.0 only when the market factor of the quote dec
     expect(catalogs.some(cat => declaring(cat).length === 0)).toBe(true)
   })
 
-  it('every committed artifact recomputes to the same bytes: values, key sets and key order', () => {
-    const replays: Record<string, (raw: unknown) => { semantic: unknown }> = {
-      'pricing-v3-local-artifact/1': replayPricingV3,
-      'pricing-v3-selection-quote/1': replayCatalogQuote,
-      'pricing-v3-resource-composition/1': replayResourceComposition
-    }
+  const replays: Record<string, (raw: unknown) => { semantic: unknown }> = {
+    'pricing-v3-local-artifact/1': replayPricingV3,
+    'pricing-v3-selection-quote/1': replayCatalogQuote,
+    'pricing-v3-resource-composition/1': replayResourceComposition
+  }
 
-    const walk = (dir: string): string[] =>
-      readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
-        const path = join(dir, entry.name)
+  const walkArtifacts = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+      const path = join(dir, entry.name)
 
-        return entry.isDirectory() ? walk(path) : entry.name.endsWith('.artifact.json') ? [path] : []
-      })
+      return entry.isDirectory() ? walkArtifacts(path) : entry.name.endsWith('.artifact.json') ? [path] : []
+    })
 
-    const files = [...walk('data/pricing'), ...walk(skyDir)]
+  const committedArtifacts = [...walkArtifacts('data/pricing'), ...walkArtifacts(skyDir)]
 
-    expect(files.length).toBeGreaterThanOrEqual(17)
+  it('keeps the complete committed artifact corpus under replay coverage', () => {
+    expect(committedArtifacts.length).toBeGreaterThanOrEqual(17)
+  })
 
-    for (const path of files) {
-      const artifact = read(path)
-      const replayed = clone(replays[artifact.artifactVersion](artifact).semantic) as { result: unknown }
+  // Each replay keeps the standard timeout under coverage; the corpus is never sampled or skipped.
+  it.each(committedArtifacts)('%s recomputes to the same bytes: values, key sets and key order', path => {
+    const artifact = read(path)
+    const replayed = clone(replays[artifact.artifactVersion](artifact).semantic) as { result: unknown }
 
-      // The digest of the frozen guard sorts keys; this comparison does not, so a reordered or added key shows here.
-      expect(JSON.stringify(replayed.result), path).toBe(JSON.stringify(artifact.semantic.result))
-    }
+    // The digest of the frozen guard sorts keys; this comparison does not, so a reordered or added key shows here.
+    expect(JSON.stringify(replayed.result), path).toBe(JSON.stringify(artifact.semantic.result))
   })
 
   it.each(['designer', 'service', 'crm-client-tools'])(

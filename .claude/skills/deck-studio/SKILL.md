@@ -13,7 +13,7 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "brochure Agencia Creativa", "brochure creativo", "brochure servicios web", "deck web", "deck SEO", "deck SV360". En marca
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "brochure Agencia Creativa", "brochure creativo", "brochure servicios web", "brochure 360", "brochure oficial", "qué hace Efeonce", "deck web", "deck SEO", "deck SV360". En marca
   propia Efeonce, elige láminas del catálogo de 100 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/;
   incluye las nueve SEO/AEO, las 16 del deck de práctica Salesforce y las seis del deck SEO/AEO), valida el plan con
   pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose), liga los datos reales de los slots con
@@ -296,6 +296,65 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   - **Titular de equipo.** «Expertos multidisciplinarios», no «Personas reales, un solo interlocutor».
   - **PDF rasterizado, no `page.pdf` por lámina.** El vectorial deja borde blanco y aplana el 3D (Partners,
     Plataformas, Resultados en vivo, Caso Aguas Andinas).
+- **Brochure oficial «Agencia de Marketing 360°» (aprobado 2026-10-16).** El documento **por defecto** cuando alguien
+  pregunta «¿qué hace Efeonce?»: la agencia completa con las cinco líneas («este es el brochure oficial de la agencia
+  360° con todos nuestros servicios», operador). Dos versiones de la misma fuente: **completa (84 láminas)** y **corta
+  (26, para presentar en reunión)**. **PDF oficiales** en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de
+  Marketing 360/` (`Efeonce-Brochure-Agencia-de-Marketing-360.pdf` y `…-Corto.pdf`); los de la carpeta de trabajo son
+  copia. **Canvas** (privado): <https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3>. Fuente, scripts y bitácora:
+  `ai-generations/2026-10-12_brochure-efeonce-360/` (`LEEME.md`). **El hilo:** cada lámina responde la pregunta que
+  deja la anterior — tu problema y quiénes somos (la vuelta del cliente, un proveedor por momento, un solo equipo, la
+  órbita de cinco líneas en la 04, índice en la 05) → la vuelta en cinco líneas, cada tramo abre con su portada cine
+  y, si tiene caso, cierra con él (Engine → Berel · Brand → Sky + Channel & Commerce · Voice · Revenue → ANAM · Growth)
+  → cómo lo vives → la prueba → cómo empiezas. Norma: delta 2026-10-16 (b) de `EFEONCE_SURFACE_COMPOSITION_V1.md`;
+  manual: «El brochure oficial Agencia de Marketing 360°» en `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
+  **Patrones medidos en esta corrida** (correcciones del operador):
+  - **Índice enlazable.** La 04 (órbita) enlaza cada esfera a la portada de su línea; la 05 «Todo el recorrido» es un
+    índice con número de página y cada fila es un enlace interno del PDF. `armar-indice.mjs <dirLaminas>` renderiza el
+    índice con las páginas reales y deja `.indice.json`; `build-pdf.mjs [dirLaminas] [salida]` agrega las anotaciones
+    Link (pdf-lib). La versión corta se arma con `armar-corto.cjs`. **Verifica los enlaces tras cada armado.** Si la
+    lámina que se pide como índice ya gusta, se complementa con otra en vez de rehacerla («la 4 me gustaba… complementa
+    con otro índice»).
+  - **Caso de cliente cinematográfico** (Berel, Sky, ANAM): escena generada con la referencia oficial del producto →
+    piezas reales del cliente compuestas determinísticas → acabado del modelo → **reponer el contenido exacto**; el logo
+    sobre un objeto va como vinilo compuesto, nunca terminado por el modelo; lo clave cae a la derecha de la curva del
+    panel de papel. Método completo: `design-studio`, `references/efeonce-photographic-language.md` §«Caso de cliente
+    con piezas reales». «Muchísimo más punch, cinematográfico»: contraluz, destello, bruma, profundidad, toma baja; una
+    tarjeta de UI blanca plana «se ve muy 1995» → panel de vidrio oscuro con desenfoque de fondo.
+  - **Channel & Commerce dentro de Brand** (CC1 activación, CC2 góndola auditada, CC3 mosaico BTL): copy del catálogo
+    `docs/services/channel-commerce/` en estado `Proposed` — sin promesa de venta, cobertura ni precio; la producción
+    física la ejecutan proveedores. La activación con BRÍO (marca ficticia, declarada) se produce creíble (contenedores,
+    truss, sol LED): una lata gigante «es irreal».
+  - **Antes de enviarlo afuera:** cifras de ANAM (las entregó el operador; ANAM no las publicó) y el «12 meses» del caso
+    Berel (cuenta ganada en mayo de 2026). Logos y piezas de clientes autorizados para este brochure (operador,
+    2026-10-16); biblioteca formal: TASK-1937. Caso BICECORP retirado; Voice y Growth no tienen caso.
+- **Brochure «Agencia de Medios» (aprobado 2026-10-16).** El collateral de la línea Voice (Media & Distribution):
+  **65 láminas** — portada, índice y seis capítulos (El cambio · Plataformas · Creatividad · Programática · Medición ·
+  Trabajar juntos) más glosario. **PDF vigente** en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de
+  Medios/Efeonce-Brochure-Agencia-de-Medios.pdf` (12,2 MB, sha256 `c4697c7a…`). **Canvas** (privado):
+  <https://claude.ai/code/artifact/d32a798b-3bb2-493f-85dc-8c46366ee077>. Fuente, scripts y pendientes:
+  `ai-generations/2026-10-13_brochure-agencia-medios/` (`LEEME.md`). Norma: delta 2026-10-16 de
+  `EFEONCE_SURFACE_COMPOSITION_V1.md`. **Patrones medidos en esta corrida:**
+  - **Mixto:** portada y láminas de voz con foto por receta (`pnpm brand:compose`); el resto nativo
+    (`native/formatos.mjs`); medición e insights traídos del 360 y recoloreados a Voice. Índice HTML vivo en la lámina
+    2 con 15 destinos internos (`pdf/build-pdf.mjs`); `outline: true` de Playwright no generó marcadores.
+  - **Titulares afirmativos, no preguntas forzadas** («esta dinámica de preguntas y respuestas se vuelve muy absurda y
+    forzada», operador): se quedan sólo las preguntas que nacen de la duda real del cliente («¿Y la tele?
+    Conectada.»).
+  - **Pantallas con anuncios de una marca de ejemplo ficticia** (Nórtica, Andara): composición por homografía, acabado
+    del modelo y **reponer el aviso exacto** encima (el acabado escribió «NÁRTIKA»); pantallas fuera de foco se
+    desenfocan dentro de su máscara, no con inpainting.
+  - **Logotipos de terceros, los oficiales** (Hulu, ESPN, Forbes, Peacock, DIRECTV en blanco monocromo,
+    `logos/terceros/`): un logotipo de tercero nunca se escribe con la tipografía de Efeonce. Basis, DV360, The Trade
+    Desk, IAS y DoubleVerify son tecnología que operamos, no partners; las plataformas de anuncios tampoco.
+  - **Cómo se cobra, sin rebates:** nunca prometer declarar ni traspasar rebates o comisiones de medios («la comisión
+    o rebate es nuestra, es parte de la ganancia», operador); el dato que queda es «Tus cuentas: siempre a tu nombre».
+  - **De brochure a landing:** la landing pública <https://efeoncepro.com/servicios/agencia-de-medios/> salió de este
+    brochure **recompuesta para web, sin incrustar láminas** (delta 2026-10-16 (c) de la misma norma); la ejecución en
+    el sitio es de `efeonce-public-site-wordpress`.
+  - **Antes de enviarlo afuera:** cifra de Bresler contra su caso publicado, autorización de logos de clientes
+    (TASK-1937), readback de HubSpot Gold, inventario de Basis por mercado, alcance de DCO e incrementalidad con
+    Performance, y no mezclar «cinco países de operación» con el proof point «120+ empresas en 4 países».
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`

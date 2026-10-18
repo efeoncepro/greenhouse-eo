@@ -1,0 +1,136 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "4842a44bdace",
+  "key": "4842a44bdace532078dc5069b88cfbf6f9ac6a3838ad4dd82119d9857fbb3df9",
+  "status": "completed",
+  "createdAt": "2026-10-16T11:42:27.102Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/tres-telefonos-comp.png",
+    "imageSha256": "2adca091f7b264449273aafbc83925efcbf6fb6d281b14e1281c3316e161b3e1",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/tres-telefonos-mask.png",
+    "maskSha256": "aa3d6b656f83a11fda53bb5738b5b117eaa7b0cd7b6c2d1e4867602c40bf1ed0",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Three smartphones stand on a dark glossy surface. Their screens already show FINISHED app interfaces with advertisements for a fictional running brand. Keep the screens' content exactly as it is: the same pictures, layout, letters, logo, icons, stripes, colors, sizes and positions; do not redraw, retype or restyle anything on the screens. Only add the physical finish of real phones photographed in a dark studio: the screens read as emitted light under glass with a very faint cool reflection, the phone frames catch the cool rim light, and on the glossy surface below each phone the reflection now mirrors that phone's lit screen content (soft, darker, slightly blurred) instead of a flat white rectangle. Same lens softness and grain as the rest. Nothing else changes.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nThree smartphones stand on a dark glossy surface. Their screens already show FINISHED app interfaces with advertisements for a fictional running brand. Keep the screens' content exactly as it is: the same pictures, layout, letters, logo, icons, stripes, colors, sizes and positions; do not redraw, retype or restyle anything on the screens. Only add the physical finish of real phones photographed in a dark studio: the screens read as emitted light under glass with a very faint cool reflection, the phone frames catch the cool rim light, and on the glossy surface below each phone the reflection now mirrors that phone's lit screen content (soft, darker, slightly blurred) instead of a flat white rectangle. Same lens softness and grain as the rest. Nothing else changes.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.648193359375,
+    "editable": 1019520,
+    "soft": 0,
+    "protected": 553344
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0412,
+    "basis": "1 × salida 1536x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 37.199,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 0.71,
+        "bestError": 0.71,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.36,
+        -0.56,
+        -0.83
+      ],
+      "protected": {
+        "pixels": 553344,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1019520,
+        "maxDelta": 218,
+        "meanDelta": 37.199,
+        "worst": {
+          "x": 1060,
+          "y": 740
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 553344,
+        "maxDelta": 63,
+        "meanDelta": 1.953,
+        "worst": {
+          "x": 1322,
+          "y": 813
+        }
+      },
+      "outputUsd": 0.0412,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3373,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 301
+        },
+        "output_tokens": 1372,
+        "output_tokens_details": {
+          "image_tokens": 1372,
+          "text_tokens": 0
+        },
+        "total_tokens": 4745
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

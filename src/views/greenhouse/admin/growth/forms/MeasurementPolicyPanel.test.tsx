@@ -17,6 +17,26 @@ const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status}
 afterEach(()=>{cleanup();vi.unstubAllGlobals()})
 
 describe('measurement operator workflow',()=>{
+  it('preserves reviewed Google Ads opt-in when an operator edits the shared policy',async()=>{
+    const googleAds={conversionKey:'commercial_lead' as const,enhancedConversions:true,activationAt:'2026-10-17T00:00:00.000Z'}
+    const adsPolicy={...policy,config:{...policy.config,googleAds}}
+    const data:MeasurementCatalog={...catalog,sources:catalog.sources.map(s=>({...s,googleAdsEligible:true})),policies:[adsPolicy]}
+    const bodies:Array<Record<string,unknown>>=[]
+
+    vi.stubGlobal('fetch',vi.fn(async(_url:unknown,options?:RequestInit)=>{
+      if(options?.method!=='POST') return json(data)
+      const body=JSON.parse(options.body as string)
+
+      bodies.push(body)
+
+      return json({ok:false,error:'policy_unavailable',blockingReasons:[]},503)
+    }))
+    renderWithTheme(<MeasurementPolicyPanel initialCatalog={data} />)
+    fireEvent.click(await screen.findByRole('button',{name:C.edit}))
+    fireEvent.click(await screen.findByRole('button',{name:C.save}))
+    await waitFor(()=>expect(bodies).toHaveLength(1))
+    expect(bodies[0]).toMatchObject({action:'draft',config:{googleAds}})
+  })
   it('defaults a new source to destinations OFF and requires typed identity mapping',async()=>{
     renderWithTheme(<MeasurementPolicyPanel initialCatalog={catalog} preferredFormSlug='source-b' />)
     const save=await screen.findByRole('button',{name:C.save})

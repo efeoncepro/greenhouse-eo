@@ -27,11 +27,36 @@ manual es documental contra código y recibos; no constituye una nueva ejecució
   privados y preview sin scripts de medición/banner. No ampliar esa condición por una mejora visual.
   WordPress carga el plugin sólo en frontend del host canónico; no en admin.
 - «Preferencias de cookies» permanece como texto del pie legal; abre el control nativo. No añadir
-  otra franja o CTA al footer ni cubrir en móvil el acceso con el CTA de reuniones.
+  otra franja o CTA al footer ni cubrir en móvil el acceso con el CTA de reuniones. En Think sólo se
+  monta en un host legal declarado (ver [footer nuevo](#declarar-la-fila-legal-en-un-footer-nuevo-de-think)).
 
 La UI usa Bricolage variable y Poppins 400/500 como WOFF2 locales, con las dos licencias distribuidas.
 Color, tipografía, geometría, botones, switches y motion salen de AXIS; fuentes y estilos se acotan al
 banner. Conservar reduced motion y el foco visible al cambiar la presentación.
+
+## Declarar la fila legal en un footer nuevo de Think
+
+Desde el 16/10 (`efeonce-think` main `425a1de`), el control «Preferencias de cookies» se monta sólo en:
+
+1. un contenedor marcado con el atributo `data-efeonce-legal-links`, o
+2. junto al enlace de privacidad del footer, si existe.
+
+Ya no se pega suelto al último `<footer>` de la página (eso lo dejaba fuera de la grilla, abajo a la
+izquierda). Para un footer nuevo que deba ofrecer el control:
+
+1. Agrupar los enlaces legales (como mínimo Privacidad) en un contenedor y marcarlo con
+   `data-efeonce-legal-links`; ese contenedor pasa a ser el host del control.
+2. Si el contenedor es flex o grid con `gap` de 16px o más, el separador «·» se omite solo; con un gap
+   menor o sin layout flex/grid se mantiene.
+3. Para informes AEO, seguir la fila base existente: `.report-footer-base` con el aviso a la izquierda y
+   `nav.report-footer-legal` (Privacidad + Preferencias de cookies) a la derecha.
+4. No crear el botón a mano ni otro handler: el clic sigue llamando `_hsp.push(['showBanner'])`.
+
+Una página cuyo footer no declara host (hoy InsightReport, StatusScreen y la muestra Sika) no muestra
+el control; el banner automático sí aparece cuando falta una elección. Si esa página necesita reabrir
+preferencias, declarar el host en su footer en vez de reintroducir el montaje global. Verificar en
+escritorio y 390px que el control queda alineado en la fila legal y que abre el aviso/panel nativo;
+recordar que `analytics=false` sigue excluyendo banner y control.
 
 ## Preparar un cambio sin publicar
 
@@ -137,3 +162,12 @@ el shim server-only. META_TEST_PREVIEW_HEADER_FILE es opcional para el draft; si
 el Client publicado. META_TEST_RECEIPT_FILE guarda sólo metadatos/estados, nunca user_data.
 No publicar testEventCode en el tag ni ejecutar el canary histórico sin este gate.
 No confundir los fixtures recibidos con formularios aceptados de clientes ni con mejora de EMQ.
+
+
+La entrega vigente usa Server 9 y políticas publicadas por API/CLI/panel; consultar el
+[manual de configuración](configurar-medicion-conversiones.md) y el
+[release del 14/10](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+El grant permite la captura publicitaria, pero no habilita una fuente sin política publicada,
+no dispara Lead al aceptar cookies y no prueba recepción de Meta. Denegación/revocación o GPC
+conservan la aceptación del formulario y la entrega comercial a HubSpot Forms/CRM. Cambiar el
+estilo del aviso no requiere ni autoriza cambiar políticas de matching o tags GTM.

@@ -54,6 +54,8 @@ export interface RendererSystemCopy {
   stepProgress: (current: number, total: number) => string
   stepEffort: (total: number) => string
   stepperAria: string
+  /** Visible text of the consent privacy link (the URL stays in href). */
+  privacyLinkLabel: string
   stepStatusComplete: (label: string) => string
   stepStatusCurrent: (label: string) => string
   stepStatusUpcoming: (label: string) => string
@@ -136,6 +138,7 @@ const esCL: RendererSystemCopy = {
   stepProgress: (current, total) => `Paso ${current} de ${total}`,
   stepEffort: total => `${total} pantallas breves`,
   stepperAria: 'Progreso del formulario',
+  privacyLinkLabel: 'Política de privacidad',
   stepStatusComplete: label => `${label}: completado`,
   stepStatusCurrent: label => `${label}: paso actual`,
   stepStatusUpcoming: label => `${label}: pendiente`,
@@ -232,6 +235,7 @@ const enUS: RendererSystemCopy = {
   stepProgress: (current, total) => `Step ${current} of ${total}`,
   stepEffort: total => `${total} short screens`,
   stepperAria: 'Form progress',
+  privacyLinkLabel: 'Privacy policy',
   stepStatusComplete: label => `${label}: complete`,
   stepStatusCurrent: label => `${label}: current step`,
   stepStatusUpcoming: label => `${label}: upcoming`,

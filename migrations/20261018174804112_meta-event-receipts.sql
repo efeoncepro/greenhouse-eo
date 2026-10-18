@@ -1,0 +1,80 @@
+-- Authorized by Julio 2026-10-18: additive schema repair only; no deploy/GTM publication/replay.
+-- Compatible shared ops-worker already serves 9a8f1e1bf063762fb60ef8c3a527b48c3f48de21.
+-- See docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md.
+-- Up Migration
+ALTER TABLE greenhouse_growth.measurement_delivery
+  ADD COLUMN IF NOT EXISTS provider_receipts_json JSONB NOT NULL DEFAULT '[]'::jsonb;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='measurement_provider_receipts_shape_ck'
+    AND conrelid='greenhouse_growth.measurement_delivery'::regclass) THEN
+    ALTER TABLE greenhouse_growth.measurement_delivery ADD CONSTRAINT measurement_provider_receipts_shape_ck CHECK (
+      CASE WHEN jsonb_typeof(provider_receipts_json)='array' THEN
+        jsonb_array_length(provider_receipts_json)<=5 AND pg_column_size(provider_receipts_json)<=16384
+        AND (destination='meta' OR provider_receipts_json='[]'::jsonb)
+      ELSE FALSE END
+    );
+  END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION greenhouse_growth.guard_measurement_provider_receipts() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE entry JSONB; receipt JSONB; n INTEGER;
+BEGIN
+  IF TG_OP='INSERT' THEN
+    IF NEW.provider_receipts_json <> '[]'::jsonb THEN RAISE EXCEPTION 'measurement_receipts_start_empty'; END IF;
+    RETURN NEW;
+  END IF;
+  IF OLD.provider_receipts_json <> '[]'::jsonb AND
+    (NEW.event_id,NEW.destination) IS DISTINCT FROM (OLD.event_id,OLD.destination) THEN
+    RAISE EXCEPTION 'measurement_receipts_identity_immutable';
+  END IF;
+  IF NEW.provider_receipts_json IS NOT DISTINCT FROM OLD.provider_receipts_json THEN RETURN NEW; END IF;
+  n := jsonb_array_length(NEW.provider_receipts_json);
+  IF NOT (OLD.destination='meta' AND OLD.state='sending' AND OLD.lease_token IS NOT NULL
+    AND NEW.lease_token IS NULL AND NEW.event_id=OLD.event_id AND NEW.destination=OLD.destination
+    AND NEW.attempts=OLD.attempts AND OLD.attempts BETWEEN 1 AND 5
+    AND n=jsonb_array_length(OLD.provider_receipts_json)+1
+    AND (NEW.provider_receipts_json-(n-1))=OLD.provider_receipts_json) IS TRUE THEN
+    RAISE EXCEPTION 'measurement_receipts_append_only';
+  END IF;
+  IF n>1 AND (OLD.provider_receipts_json->-1->>'attempt')::integer >= OLD.attempts THEN
+    RAISE EXCEPTION 'measurement_receipts_attempt_order';
+  END IF;
+  entry := NEW.provider_receipts_json->(n-1);
+  receipt := entry->'receipt';
+  IF NOT (jsonb_typeof(entry)='object' AND entry->>'contract'='meta-attempt-receipt.v1'
+    AND entry->>'eventId'=OLD.event_id::text AND entry->>'attemptId'=OLD.lease_token::text
+    AND entry->>'attempt'=OLD.attempts::text AND entry->>'recordedAt' IS NOT NULL
+    AND entry->>'status' IN ('recorded','missing','invalid','unavailable','not_sent')) IS TRUE THEN
+    RAISE EXCEPTION 'measurement_receipts_attempt_mismatch';
+  END IF;
+  IF entry->>'status'='recorded' THEN
+    IF NOT (jsonb_typeof(receipt)='object' AND receipt->>'contract'='meta-event-receipt.v1'
+      AND receipt->>'eventId'=entry->>'eventId' AND receipt->>'attemptId'=entry->>'attemptId'
+      AND receipt->>'attempt'=entry->>'attempt' AND receipt->>'eventName'='Lead'
+      AND receipt->>'datasetId'='708931297255942' AND receipt->>'apiVersion'='v25.0'
+      AND receipt->>'requestEventCount'='1') IS TRUE THEN
+      RAISE EXCEPTION 'measurement_receipts_event_mismatch';
+    END IF;
+  ELSIF entry ? 'receipt' THEN RAISE EXCEPTION 'measurement_receipts_unexpected_body';
+  END IF;
+  RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS trg_measurement_provider_receipts ON greenhouse_growth.measurement_delivery;
+CREATE TRIGGER trg_measurement_provider_receipts BEFORE INSERT OR UPDATE ON greenhouse_growth.measurement_delivery
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_growth.guard_measurement_provider_receipts();
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='greenhouse_growth'
+    AND table_name='measurement_delivery' AND column_name='provider_receipts_json' AND data_type='jsonb' AND is_nullable='NO')
+    OR NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='measurement_provider_receipts_shape_ck'
+      AND conrelid='greenhouse_growth.measurement_delivery'::regclass)
+    OR to_regprocedure('greenhouse_growth.guard_measurement_provider_receipts()') IS NULL
+    OR NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname='trg_measurement_provider_receipts'
+      AND tgrelid='greenhouse_growth.measurement_delivery'::regclass AND NOT tgisinternal)
+  THEN RAISE EXCEPTION 'Incomplete Meta event receipts expansion'; END IF;
+END $$;
+
+-- Down Migration
+DO $$ BEGIN RAISE EXCEPTION 'Forward-only: preserve operational Meta receipts; rollback compatible sender/worker'; END $$;

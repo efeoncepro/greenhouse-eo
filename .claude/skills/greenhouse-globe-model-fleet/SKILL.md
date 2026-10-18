@@ -41,6 +41,19 @@ No mezcles estas capas:
 La skill o una route card nunca pueden promover una ruta ni sustituir el reader live. Una divergencia entre reader y
 ledger es un hallazgo que se documenta, no una invitación a elegir el estado más conveniente.
 
+## OmniHuman 2.0: proveedor investigado, sin ruta Globe
+
+OmniHuman 2.0 de **BytePlus Vision AI** es imagen + audio para animación de personaje; no es Gemini Omni,
+Seedance/ModelArk ni Seed Speech. La preferencia de consumo directo BytePlus para Seedance/Seedream no extiende
+su API key ni el adapter a Vision AI. El contrato y el procedimiento del operador viven en el
+[manual API](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md); evidencia primaria y diferencias
+API/consola en la [auditoría 2026-10-15](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md).
+La cuenta observada tiene el modelo desactivado; no hay integración local, canary ni disponibilidad Globe
+acreditados. No inventes una route card, `routeId`, CLI o promoción para representar este discovery.
+Una integración futura necesita identidad exacta, contrato, adapter, credenciales, completion/ingest, rate,
+rights y evaluación propios bajo ADR-023. Este research conserva la hibernación; ni activar Vision AI ni
+probar el proveedor exige o autoriza despertar Globe.
+
 ## Compuerta de hibernación
 
 Antes de evaluar, canariar o promover una ruta, lee

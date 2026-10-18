@@ -1,0 +1,64 @@
+/* Host layer: what the canvas got from its own document and the WordPress theme does not give. */
+.gh-inbound{font-family:'Poppins',system-ui,sans-serif;color:#ffffff;width:100%;overflow-x:clip;-webkit-font-smoothing:antialiased;box-sizing:border-box}
+.gh-inbound *,.gh-inbound *::before,.gh-inbound *::after{box-sizing:border-box}
+.gh-inbound section{margin:0}
+/* Ohio skins headings, paragraphs, lists and buttons globally; the canvas sets what it needs inline. */
+.gh-inbound :is(h1,h2,h3,h4,h5,h6){font-family:inherit;color:inherit;text-transform:none;letter-spacing:inherit;margin:0}
+.gh-inbound :is(p,ul,ol,li,figure,figcaption,blockquote,summary,details,legend,fieldset){font-family:inherit;color:inherit;letter-spacing:inherit}
+.gh-inbound :is(ul,ol){list-style:none}
+.gh-inbound li::before{content:none}
+.gh-inbound summary{list-style:none;cursor:pointer}
+.gh-inbound summary::-webkit-details-marker{display:none}
+.gh-inbound button{text-transform:none;letter-spacing:normal;line-height:1.2;height:auto;box-shadow:none;font-family:inherit;margin:0}
+.gh-inbound a{text-decoration-thickness:1px;box-shadow:none}
+.gh-inbound a::after,.gh-inbound a::before{content:none}
+.gh-inbound img,.gh-inbound video{max-width:100%}
+.gh-inbound :is(a,button,summary):focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
+/* Tabs: one pressed state per group, panels switch without layout jumps. */
+.gh-inbound [data-gh-tab]{transition:background 220ms,border-color 220ms,color 220ms}
+.gh-inbound [data-gh-panels]:not([data-ready]) > [data-gh-panel]:not(:first-child),
+.gh-inbound [data-gh-panel][hidden]{display:none !important}
+@keyframes gh-inbound-panel-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.gh-inbound [data-gh-panels][data-ready] > [data-gh-panel]:not([hidden]){animation:gh-inbound-panel-in 420ms cubic-bezier(0.2,0,0,1) both}
+
+/* Growth Form host card: the renderer owns fields, consent, submit and the success state. */
+.gh-inbound .gh-inbound-form-card greenhouse-form{display:block;--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#023c70;--ghf-muted:#5c5866;--ghf-accent:#8e1b82;--ghf-accent-contrast:#ffffff;--ghf-field-bg:#f4f6f8;--ghf-border:rgba(2,60,112,0.18);--ghf-border-strong:#023c70;--ghf-radius:12px;--ghf-focus:rgba(2,60,112,0.18)}
+.gh-inbound .gh-inbound-form-card greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]){--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#023c70;--ghf-muted:#5c5866;--ghf-accent:#8e1b82;--ghf-accent-contrast:#ffffff;--ghf-field-bg:#f4f6f8;--ghf-border:rgba(2,60,112,0.18);--ghf-border-strong:#023c70;--ghf-focus:rgba(2,60,112,0.18)}
+.gh-inbound .gh-inbound-form-card greenhouse-form .ghf-actions{width:100%;--ghf-accent:#8e1b82;--ghf-accent-contrast:#ffffff;--ghf-action-shadow:0 12px 28px rgba(142,27,130,.28)}
+.gh-inbound .gh-inbound-form-card greenhouse-form .ghf-actions .ghf-btn:not(.ghf-btn--ghost){flex:1 1 0;min-height:58px;border-radius:14px}
+.gh-inbound .gh-inbound-form-fallback{margin:0;font-size:15px;line-height:1.5;color:#5c5866}
+
+/* Editor switch «Animaciones» off stops every loop; reduced motion is handled by the canvas styles. */
+.gh-inbound[data-motion="no"] *,.gh-inbound[data-motion="no"] *::after{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion:reduce){.gh-inbound [data-gh-panels][data-ready] > [data-gh-panel]{animation:none !important}}
+
+/* «Agenda una reunión»: governed Growth CTA (open_meeting_scheduler) painted as the landing's primary button.
+   The renderer owns the action, the dialog and telemetry; the host only skins the launcher. */
+.gh-inbound .meet-cta{display:flex}
+.gh-inbound .meet-cta greenhouse-cta{display:flex;width:min(100%,300px);--gh-cta-reserve:56px} /* the renderer contains its inline size: it needs an explicit width */
+.gh-inbound .meet-cta greenhouse-cta .ghc-card{display:flex!important;gap:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important}
+.gh-inbound .meet-cta greenhouse-cta :is(.ghc-content,.ghc-dismiss){display:none!important}
+.gh-inbound .meet-cta greenhouse-cta .ghc-actions{width:100%;margin:0!important;padding:0!important}
+.gh-inbound .meet-cta greenhouse-cta .ghc-primary{width:100%}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback){display:inline-flex;align-items:center;justify-content:center;gap:.625rem;min-height:56px;padding:1rem 1.6rem;border:0;border-radius:12px;font-family:'Poppins',system-ui,sans-serif;font-size:1rem;font-weight:500;line-height:1.4;letter-spacing:0;text-transform:none;white-space:nowrap;text-decoration:none!important;color:#001a33!important;background:#e86bd0!important;box-shadow:0 14px 34px rgba(232,107,208,.28)!important;cursor:pointer;transition:background-color 150ms,transform 200ms cubic-bezier(.2,0,0,1),box-shadow 200ms}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::before{content:"";flex:none;width:18px;height:18px;background:#001a33;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 9.5h18M8 2.5v4M16 2.5v4'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 9.5h18M8 2.5v4M16 2.5v4'/%3E%3C/svg%3E") center/contain no-repeat}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::after{content:"→";font-size:1.125rem;line-height:1;transition:transform 200ms cubic-bezier(.4,0,.2,1)}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:#f19ae0!important;transform:translateY(-1px);box-shadow:0 18px 40px rgba(232,107,208,.36)!important}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover::after{transform:translateX(.25rem)}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):focus-visible{outline:2px solid #ffffff;outline-offset:3px}
+
+/* Same launcher as the hero's secondary (outline) button and as half of the mobile dock. */
+.gh-inbound .meet-cta--ghost{flex:0 0 auto;width:min(100%,280px)} /* inside the hero's flex row the wrapper needs its own width */
+.gh-inbound .meet-cta--ghost greenhouse-cta{width:100%}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback){color:#ffffff!important;background:rgba(0,26,51,.72)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);box-shadow:none!important}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::before{background:#ffffff}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::after{content:none}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:rgba(10,49,87,.85)!important;border-color:rgba(255,255,255,.9);transform:none;box-shadow:none!important}
+.gh-inbound .meet-cta--dock{flex:1 1 50%;min-width:0}
+.gh-inbound .meet-cta--dock greenhouse-cta{flex:1 1 0;width:100%;min-width:0}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback){width:100%;min-height:56px;padding:0 6px;gap:.3rem;font-size:14px;white-space:nowrap;color:#ffffff!important;background:#001a33!important;border:1px solid rgba(255,255,255,.55);box-shadow:none!important}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::before{width:16px;height:16px;background:#ffffff}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::after{content:none}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:#0a3157!important;transform:none;box-shadow:none!important}
+.gh-inbound nav.mbar>*{flex:1 1 50%!important;min-width:0}.gh-inbound nav.mbar>.btn-p{white-space:nowrap}

@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "counts": {
+    "404_targets": 21,
+    "linked_404_targets": 20,
+    "historical_only_404_targets": 1,
+    "source_destination_edges": 70,
+    "source_posts": 68,
+    "layout_ids": 14,
+    "cta_posts": 68,
+    "cta_placements": 70,
+    "metadata_schema_affected_posts": 1697,
+    "metadata_drafts": 10,
+    "first_batch_actions": 12,
+    "approved_301": 0,
+    "changes_executed": 0,
+    "editorial_brief_metadata_drafts": 9,
+    "additional_technical_metadata_drafts": 1
+  },
+  "shortcode_id_placements": {
+    "3947": 9,
+    "4264": 2,
+    "4469": 2,
+    "4497": 7,
+    "4498": 10,
+    "4504": 13,
+    "4506": 19,
+    "4615": 1,
+    "4955": 7
+  },
+  "duplicates_gated": 14,
+  "null_metric_semantics": "Sin fila/dato en cohorte, no cero; sesiones por página no aditivas.",
+  "paid_cost_usd": 0,
+  "network_new_subjects": 10,
+  "network_scope": "8 destinoseditoriales +1 landing CTA +1 sujeto archivoantiguo (2 consultasCDX). No se repitió censo 1697/916."
+}

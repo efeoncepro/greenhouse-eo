@@ -1,0 +1,212 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "390678369b7e",
+  "key": "390678369b7e44d4a57934e11adf13235343d2734200f5300b71126a5266b5dd",
+  "status": "completed",
+  "createdAt": "2026-10-16T11:03:38.217Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG7e-tv-conectada.png",
+    "imageSha256": "f0e38f89d3520e2b00dbc71c716dfec650d4286da893fc5f088fd34fc2dde033",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG7e-mask-tv.png",
+    "maskSha256": "b82eeaa99ccd1901a159b54a9fbd48de0d35190da35b7c48d127d5691b2b7ee2",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "The wall-mounted TV in this dark living room is already showing a FINISHED advertisement for a fictional running brand: a runner at night, a lime diagonal stripe, the logo and the headline «CORRE DE NOCHE». Keep that picture exactly as it is: the same image, the same layout, the same letters, logo, stripe, colors, sizes and positions. Do not redraw, retype, move or restyle anything on the screen.\nOnly add the physical finish that a real TV photographed from four meters away would have, matching the rest of the photo: the screen reads as emitted light behind glass, with a very faint cool reflection of the room across the glass; a thin dark real bezel around the panel; the light of the screen softly spilling onto the dark wall around it and into the faint haze of the room; the same slight softness of focus, lens depth of field and photographic grain as the surrounding wall. The standby light stays a single tiny red-orange point at the lower right corner. Nothing else in the room changes.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nThe wall-mounted TV in this dark living room is already showing a FINISHED advertisement for a fictional running brand: a runner at night, a lime diagonal stripe, the logo and the headline «CORRE DE NOCHE». Keep that picture exactly as it is: the same image, the same layout, the same letters, logo, stripe, colors, sizes and positions. Do not redraw, retype, move or restyle anything on the screen.\nOnly add the physical finish that a real TV photographed from four meters away would have, matching the rest of the photo: the screen reads as emitted light behind glass, with a very faint cool reflection of the room across the glass; a thin dark real bezel around the panel; the light of the screen softly spilling onto the dark wall around it and into the faint haze of the room; the same slight softness of focus, lens depth of field and photographic grain as the surrounding wall. The standby light stays a single tiny red-orange point at the lower right corner. Nothing else in the room changes.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0514984130859375,
+    "editable": 94500,
+    "soft": 0,
+    "protected": 1740508
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 652,
+      "top": 86,
+      "width": 751,
+      "height": 633
+    },
+    "target": {
+      "width": 1120,
+      "height": 944
+    },
+    "aspectError": 0.000022568269013659555,
+    "reason": "la zona con contexto ocupa 25.7 % de la imagen: se genera recortada a 1120x944"
+  },
+  "estimate": {
+    "usd": 0.088,
+    "basis": "2 × salida 1120x944 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 25.926,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.56,
+        "bestError": 1.56,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        2.33,
+        6.47,
+        11.94
+      ],
+      "protected": {
+        "pixels": 1740508,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 94500,
+        "maxDelta": 247,
+        "meanDelta": 25.926,
+        "worst": {
+          "x": 944,
+          "y": 499
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1740508,
+        "maxDelta": 138,
+        "meanDelta": 1.008,
+        "worst": {
+          "x": 1377,
+          "y": 310
+        }
+      },
+      "outputUsd": 0.044,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2458,
+        "input_tokens_details": {
+          "image_tokens": 2100,
+          "text_tokens": 358
+        },
+        "output_tokens": 1468,
+        "output_tokens_details": {
+          "image_tokens": 1468,
+          "text_tokens": 0
+        },
+        "total_tokens": 3926
+      },
+      "meta": {
+        "size": "1120x944",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 30.715,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.87,
+        "bestError": 1.87,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        3.57,
+        9.27,
+        18.02
+      ],
+      "protected": {
+        "pixels": 1740508,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 94500,
+        "maxDelta": 254,
+        "meanDelta": 30.715,
+        "worst": {
+          "x": 1098,
+          "y": 399
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1740508,
+        "maxDelta": 165,
+        "meanDelta": 1.249,
+        "worst": {
+          "x": 1394,
+          "y": 660
+        }
+      },
+      "outputUsd": 0.044,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2458,
+        "input_tokens_details": {
+          "image_tokens": 2100,
+          "text_tokens": 358
+        },
+        "output_tokens": 1468,
+        "output_tokens_details": {
+          "image_tokens": 1468,
+          "text_tokens": 0
+        },
+        "total_tokens": 3926
+      },
+      "meta": {
+        "size": "1120x944",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

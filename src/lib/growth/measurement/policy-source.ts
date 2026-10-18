@@ -46,7 +46,7 @@ export const resolveMeasurementSource = async (scope: MeasurementPolicyScope): P
     const origins = MEASUREMENT_ORIGINS.filter(v => binding.origins.includes(v))
     const sourceVersion = createHash('sha256').update(JSON.stringify({ surface: binding.surfaceId, scheduler: binding.schedulerKey, origins: [...binding.origins].sort() })).digest('hex')
 
-    return { scope, name: binding.schedulerKey, sourceVersion, origins,
+    return { scope, name: binding.schedulerKey, sourceVersion, origins, googleAdsEligible: true,
       fields: [{key:'email',type:'email'},{key:'phone',type:'tel'},{key:'firstName',type:'text'},{key:'lastName',type:'text'}],
       blockingReasons: origins.length ? [] : ['origin_out_of_scope'] }
   }
@@ -65,6 +65,7 @@ export const resolveMeasurementSource = async (scope: MeasurementPolicyScope): P
   if (!origins.length) reasons.push('origin_out_of_scope')
 
   return { scope, name: definition.name, formSlug: definition.slug, sourceVersion: version?.form_version_id ?? '', origins,
+    googleAdsEligible: ['contact','diagnostic_intake','quote_request'].includes(definition.form_kind) && ['low','medium'].includes(definition.risk_profile),
     fields: matchingFieldCatalog(version?.field_schema_json, version?.validation_schema_json), blockingReasons: reasons }
 }
 

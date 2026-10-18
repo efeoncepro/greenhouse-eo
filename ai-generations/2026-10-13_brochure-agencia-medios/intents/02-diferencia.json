@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "decision",
+  "recipe": "decision-difference",
+  "voice": {
+    "eyebrow": "La diferencia",
+    "question": "¿Otra agencia de medios?",
+    "answer": [
+      "Una",
+      "operación"
+    ]
+  },
+  "body": "Comprar medios se volvió commodity. Lo que rinde es una operación que conecta plan, compra, creatividad y **medición**.",
+  "alternative": {
+    "kicker": "La alternativa",
+    "title": "Agencia tradicional"
+  },
+  "efeonce": {
+    "kicker": "Efeonce",
+    "title": "Operación integrada"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Optimiza cada canal por separado",
+      "efeonce": "Search, social y programática se articulan por objetivo"
+    },
+    {
+      "alternative": "Cobra un porcentaje de lo que inviertes",
+      "efeonce": "Fee fijo por capacidad; los medios van aparte, al costo"
+    },
+    {
+      "alternative": "Reporta el ROAS que declara cada plataforma",
+      "efeonce": "Declara qué mide cada capa: atribución no es incrementalidad"
+    },
+    {
+      "alternative": "Proveedores y costos que no ves",
+      "efeonce": "Inventario, costos y exclusiones documentados en cada plan"
+    },
+    {
+      "alternative": "Promete resultados que no controla",
+      "efeonce": "Sin garantías vacías: línea base, método y siguiente decisión"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y si lo hace mi equipo?",
+    "title": "Complemento, no reemplazo",
+    "pillars": [
+      {
+        "title": "Cobertura",
+        "description": "Formatos y pantallas más allá de search y social"
+      },
+      {
+        "title": "Método",
+        "description": "Plan, pacing, QA y reporte en cada ciclo"
+      },
+      {
+        "title": "Foco",
+        "description": "Tu equipo decide; nosotros operamos"
+      }
+    ]
+  }
+}

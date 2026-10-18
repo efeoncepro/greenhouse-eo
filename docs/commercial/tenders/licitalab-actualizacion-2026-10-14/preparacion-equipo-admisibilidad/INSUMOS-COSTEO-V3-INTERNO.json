@@ -1,0 +1,232 @@
+{
+  "review_date": "2026-10-14",
+  "classification": "INTERNAL_RESTRICTED_NO_PUBLICATION",
+  "status": "HOLD_INPUTS_ONLY",
+  "pricing_owner": "Julio / agente raíz",
+  "no_real_payroll": true,
+  "no_prices_computed": true,
+  "currency": "CLP",
+  "market": "Chile",
+  "cost_basis": "V3 vigentes --current; personas al nivel objetivo, nunca nómina. Proveedores según cotización real. Seniority aquí es hipótesis para simular, no nivel validado de persona.",
+  "slots": [
+    {
+      "id": "planned-instructional-design",
+      "process": "761-24-LE26",
+      "role": "Diseño instruccional/metodología",
+      "seniority_for_simulation": "senior",
+      "person": null,
+      "person_status": "not_available_currently_operator_statement",
+      "distinct_person_from": [
+        "planned-elearning-development"
+      ],
+      "units": [
+        "curso: diagnóstico/arquitectura",
+        "módulo: guion/matriz/actividades/evaluación",
+        "ronda ajustes"
+      ],
+      "hours": null,
+      "capacity_confirmed": false
+    },
+    {
+      "id": "planned-elearning-development",
+      "process": "761-24-LE26",
+      "role": "Desarrollo multimedia/e-learning",
+      "seniority_for_simulation": "senior",
+      "person": null,
+      "person_status": "pending_provider",
+      "distinct_person_from": [
+        "planned-instructional-design"
+      ],
+      "units": [
+        "módulo: virtualización",
+        "interacción/plantilla",
+        "QA exportación/LMS",
+        "entrega editables"
+      ],
+      "hours": null,
+      "capacity_confirmed": false
+    },
+    {
+      "id": "planned-project-coordination",
+      "process": "761-24-LE26",
+      "role": "Jefatura coordinadora",
+      "seniority_for_simulation": "lead",
+      "person": null,
+      "may_be_combined_with": [
+        "planned-instructional-design",
+        "planned-elearning-development"
+      ],
+      "units": [
+        "hito",
+        "reunión contraparte",
+        "control QA"
+      ],
+      "hours": null,
+      "capacity_confirmed": false,
+      "double_count_prohibited": true
+    },
+    {
+      "id": "planned-social-paidmedia-lead",
+      "process": "1422259-10-LE26-L2",
+      "role": "Gestión integral social/pauta",
+      "seniority_for_simulation": "senior",
+      "person": null,
+      "units": [
+        "mes gestión profesional"
+      ],
+      "hours": null,
+      "capacity_confirmed": false
+    },
+    {
+      "id": "planned-audiovisual-provider",
+      "process": "1422259-10-LE26-L2",
+      "role": "Producción audiovisual de terreno y postproducción",
+      "seniority_for_simulation": null,
+      "person": null,
+      "person_status": "not_available_currently_operator_statement",
+      "units": [
+        "reel/formato especial por video",
+        "video corporativo por video",
+        "jornada rodaje",
+        "traslado",
+        "alquiler kit"
+      ],
+      "hours": null,
+      "capacity_confirmed": false,
+      "contract_gate": "written_subcontracting_clarification"
+    },
+    {
+      "id": "planned-regional-creator",
+      "process": "1422259-10-LE26-L2",
+      "role": "Creador/influencer regional",
+      "seniority_for_simulation": null,
+      "person": null,
+      "units": [
+        "colaboración",
+        "derecho uso/publicación"
+      ],
+      "hours": null,
+      "capacity_confirmed": false,
+      "buyer_approval_required": true
+    }
+  ],
+  "processes": {
+    "761-24-LE26": {
+      "modules_observed": 7,
+      "module_total_hours": null,
+      "capsule_count": null,
+      "screen_count": null,
+      "tool_brand_required": false,
+      "tool_licensing_cost": null,
+      "buyer_lms_compatibility_pending": true,
+      "team_minimum_distinct_technical_people": 2,
+      "evaluated_functions": 3,
+      "three_fte_required": false,
+      "subcontracting_max_percent_of_total_contract": 30,
+      "core_capacity_subcontracting_restriction": true,
+      "subcontracting_structure_status": "pending_legal_review",
+      "corporate_elearning_cases_accredited": 0,
+      "technical_average_required": ">50 unweighted (proposal+company+team)/3; also comply with minimum sufficient/pertinent experience",
+      "unit_hours_and_scope_status": "pending_supplier_scope"
+    },
+    "1422259-10-LE26-L2": {
+      "buyer_budget_gross": 6204000,
+      "buyer_budget_currency": "CLP",
+      "includes_vat": true,
+      "budget_is_price_or_margin": false,
+      "max_corporate_videos": 5,
+      "purchased_quantity_guaranteed": false,
+      "corporate_video_duration_seconds": [
+        60,
+        90
+      ],
+      "special_format_duration_minutes": [
+        1,
+        3
+      ],
+      "months_count": null,
+      "reels_count": null,
+      "influencer_count": null,
+      "ad_spend": null,
+      "required_quote_units": [
+        "monthly_management_fee_considering_direct_Meta_TikTok_investment",
+        "special_format_video_unit",
+        "influencer_coordination_collaboration_unit",
+        "corporate_video_unit"
+      ],
+      "unit_values": null,
+      "payment_days_after_acceptance": 30,
+      "advance_payment": false,
+      "source_page_refs": [
+        "original pp5–10",
+        "pp21–24",
+        "p26",
+        "p31",
+        "p49",
+        "p54"
+      ],
+      "subcontracting_status": "conflicting_fiche_and_model_contract_requires_written_clarification",
+      "no_free_ooh_commitment": true
+    }
+  },
+  "cost_layers": [
+    {
+      "layer": "own_managed_work",
+      "items": [
+        "coordinación",
+        "gestión de medios",
+        "guion/diseño/QA realmente asumidos"
+      ],
+      "hours": null,
+      "target_level_costs": null,
+      "margin_floor_basis": "own_work_only_if_third_party_rebilled"
+    },
+    {
+      "layer": "external_production",
+      "items": [
+        "perfiles especializados legales",
+        "filmación/edición/kit/desplazamiento",
+        "creadores/derechos"
+      ],
+      "quotes": null,
+      "rebilling_structure": null,
+      "back_to_back_required": true
+    },
+    {
+      "layer": "media_and_licenses",
+      "items": [
+        "Meta/TikTok inversión directa",
+        "herramienta autor",
+        "música/imagen/fuentes/stock"
+      ],
+      "amount": null,
+      "payer_and_ownership": null
+    },
+    {
+      "layer": "contingency",
+      "items": [
+        "rondas adicionales",
+        "dependencia contenido comprador",
+        "traslado/rodaje",
+        "QA LMS",
+        "flujo caja sin anticipo"
+      ],
+      "amount": null,
+      "release_only_by_explicit_waiver": true
+    }
+  ],
+  "blocking_inputs": [
+    "estado hábil y personería actual",
+    "declaraciones/conflictos reales",
+    "difusión integridad versión vigente",
+    "capacidad/consentimiento de equipo y restricción SKY",
+    "SUBDERE estructura legal <=30% y experiencia pertinente",
+    "SUBDERE alcance de siete módulos y aceptación LMS",
+    "Tarapacá autorización/no autorización subcontratación",
+    "cotizaciones proveedores y licencias",
+    "cantidad/calendario de unidades y pauta",
+    "flujo caja, impuestos, costo y margen de trabajo propio",
+    "GO explícito de Julio tras revisión"
+  ],
+  "operational_boundary": "Preparar escenarios y drafts; no contratación, nominación externa, firma, carga ni envío."
+}

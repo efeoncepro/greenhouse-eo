@@ -13,6 +13,7 @@
 import { z } from 'zod'
 
 import { NAMED_VALIDATORS } from './validators/core'
+import type { GoogleAdsConversionReceipt } from '@/lib/growth/measurement/google-ads-receipt'
 
 // ─── Enums de dominio (state machines vía CHECK en DB; espejo en TS) ───────────
 
@@ -696,6 +697,7 @@ export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome
   submissionId?: string
   reason?: string
+  googleAdsConversion?: GoogleAdsConversionReceipt
 }
 
 // ─── Outbox event canónico del motor ──────────────────────────────────────────

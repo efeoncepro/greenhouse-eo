@@ -1,0 +1,150 @@
+[
+  {
+    "frame": 500,
+    "boxes": [
+      {
+        "id": "intro",
+        "text": "Ahora, también",
+        "x": 584.0625,
+        "y": 970,
+        "width": 991.875,
+        "height": 161.09375
+      },
+      {
+        "id": "agency",
+        "text": "en su blog.",
+        "x": 365.09375,
+        "y": 1203.09375,
+        "width": 1429.78125,
+        "height": 339.1875
+      },
+      {
+        "id": "scope",
+        "text": "Contenido con enfoque",
+        "x": 496.65625,
+        "y": 1638.28271484375,
+        "width": 1166.65625,
+        "height": 118.71875
+      },
+      {
+        "id": "seo",
+        "text": "SEO + AEO.",
+        "x": -626.34375,
+        "y": 1121.7242431640625,
+        "width": 3412.6875,
+        "height": 740.74267578125
+      }
+    ]
+  },
+  {
+    "frame": 510,
+    "boxes": [
+      {
+        "id": "intro",
+        "text": "Ahora, también",
+        "x": 584.0625,
+        "y": 970,
+        "width": 991.875,
+        "height": 161.09375
+      },
+      {
+        "id": "agency",
+        "text": "en su blog.",
+        "x": 365.09375,
+        "y": 1203.09375,
+        "width": 1429.78125,
+        "height": 339.1875
+      },
+      {
+        "id": "scope",
+        "text": "Contenido con enfoque",
+        "x": 496.65625,
+        "y": 1638.28125,
+        "width": 1166.65625,
+        "height": 118.71875
+      },
+      {
+        "id": "seo",
+        "text": "SEO + AEO.",
+        "x": 305.1973571777344,
+        "y": 1752.568359375,
+        "width": 1549.605224609375,
+        "height": 368.064453125
+      }
+    ]
+  },
+  {
+    "frame": 528,
+    "boxes": [
+      {
+        "id": "intro",
+        "text": "Ahora, también",
+        "x": 584.0625,
+        "y": 970,
+        "width": 991.875,
+        "height": 161.09375
+      },
+      {
+        "id": "agency",
+        "text": "en su blog.",
+        "x": 365.09375,
+        "y": 1203.09375,
+        "width": 1429.78125,
+        "height": 339.1875
+      },
+      {
+        "id": "scope",
+        "text": "Contenido con enfoque",
+        "x": 496.65625,
+        "y": 1638.28125,
+        "width": 1166.65625,
+        "height": 118.71875
+      },
+      {
+        "id": "seo",
+        "text": "SEO + AEO.",
+        "x": 321.62506103515625,
+        "y": 1767,
+        "width": 1516.75,
+        "height": 360.375
+      }
+    ]
+  },
+  {
+    "frame": 550,
+    "boxes": [
+      {
+        "id": "intro",
+        "text": "Ahora, también",
+        "x": 584.0625,
+        "y": 970,
+        "width": 991.875,
+        "height": 161.09375
+      },
+      {
+        "id": "agency",
+        "text": "en su blog.",
+        "x": 365.09375,
+        "y": 1203.09375,
+        "width": 1429.78125,
+        "height": 339.1875
+      },
+      {
+        "id": "scope",
+        "text": "Contenido con enfoque",
+        "x": 496.65625,
+        "y": 1638.28125,
+        "width": 1166.65625,
+        "height": 118.71875
+      },
+      {
+        "id": "seo",
+        "text": "SEO + AEO.",
+        "x": 321.625,
+        "y": 1767,
+        "width": 1516.75,
+        "height": 360.375
+      }
+    ]
+  }
+]

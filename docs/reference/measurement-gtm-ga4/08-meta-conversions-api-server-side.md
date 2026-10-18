@@ -1,10 +1,14 @@
 # Meta Conversions API mediante GTM Server
 
-> Canon operativo de CAPI/sGTM. Server6/Web5; matching TASK-2034 activado tras release completo PR254. Primera conversión comercial consentida post-flip todavía sin observar.
-> Dirección elegida por el operador: [ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md).
-> Estado vigente 2026-10-13: hosting existente recuperado en efeonce-group; consentimiento y transporte activos. §2 conserva el inventario inicial anterior al rollout.
-> [Implementación vigente completa](10-growth-lead-matching-runtime.md) · [release y evidencia](../../audits/releases/2026-10-13-full-develop-matching-release.md).
-> [Diagnóstico y recuperación histórica](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md).
+> Canon operativo de CAPI/sGTM. **Readout14/10: Server9/Web5**, PR255/main9690efad publicado,
+> Lead backend único, contexto visitante y políticas versionadas. Test Events es evidencia
+> controlada separada. **17/10: primera conversión comercial consentida observada en Meta**
+> (Performance, 1 Lead SERVER_ONLY; [delta](#delta-2026-10-17--primer-lead-comercial-consentido)); mejora EMQ aún no observada.
+> Dirección: [ADR Meta](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md) y
+> [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
+> [Runtime vigente](10-growth-lead-matching-runtime.md) · [release y pruebas](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md) ·
+> [API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md) · [manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
+> Inventarios/checkpoints13/10 siguientes conservan el antecedente; sus versiones/listas no son instrucciones live.
 
 ## 1. Separar Pixel, CAPI y contenedores
 
@@ -39,8 +43,9 @@ diagnóstico aportado por el operador; no se releyó Meta en esta auditoría. No
 el token esté vencido ni que la ausencia de transporte web sea la única causa: puede haber
 otras fuentes, scripts del host o un sender backend fuera de ese contenedor.
 
-`pnpm gtm:snapshot --check` compara **solamente el contenedor web** (ruta fija en
-`scripts/gtm/snapshot.ts`). Tampoco `pnpm measurement:smoke` certifica CAPI: comprueba GA4.
+Al 13/10 `pnpm gtm:snapshot --check` comparaba sólo el contenedor web. Desde el 16/10 versiona
+y compara **los dos** (`server-container-snapshot.json` para `GTM-K2X4ZTTK`, secretos tapados);
+detecta cambios de configuración, no entrega a Meta. Tampoco `pnpm measurement:smoke` certifica CAPI: comprueba GA4.
 La API distingue el tipo por `usageContext`; el nombre o ID público no basta.
 [Container API de Google](https://developers.google.com/tag-platform/tag-manager/api/reference/rest/v2/accounts.containers).
 
@@ -65,7 +70,8 @@ Ver [ingreso a sGTM](https://developers.google.com/tag-platform/tag-manager/serv
 - **Lead formulario:** aceptación en `greenhouse_growth.form_submission` y evento
   `growth.forms.submission_accepted`. La proyección de matching usa la transacción del source;
   un clic, submit intentado o agradecimiento no acreditan aceptación.
-- **Reunión:** confirmación elegible del proveedor/ledger, con allowlist scheduler/surface.
+- **Reunión:** confirmación elegible del proveedor/ledger, con policy publicada sobre binding activo,
+  fingerprint, scheduler/surface y origen.
   Apertura, selección, intento, error y replay no son conversiones nuevas. Preparar matching
   antes de descartar contacto del ledger HMAC; guardar sólo material cifrado48h en la proyección.
 - **GA4:** conserva un solo espejo `gh_form_submission_accepted` o
@@ -114,8 +120,8 @@ validar contrato vigente y template **instalado** antes de ejecutar. Fuentes ver
 - Hashing, server-side, dominio propio, `opt_out` y Limited Data Use no sustituyen autorización.
   Evitar texto libre, datos sensibles, cookies arbitrarias y querystrings con PII.
 - Token sólo servidor. No registrar valores ni serializar exports completos de tags/templates:
-  el tag existente tiene `apiAccessToken`. Un snapshot servidor debe redactar secretos antes
-  de persistir. No rotar ni reemplazar el token porque exista un parámetro no vacío.
+  el tag existente tiene `apiAccessToken`. El snapshot servidor (16/10) lo guarda como
+  `[redacted sha256:<12 hex>]` antes de escribir a disco. No rotar ni reemplazar el token porque exista un parámetro no vacío.
 - Registrar publisher, repositorio, SHA, permisos, Graph API y opciones de enriquecimiento/cookies.
   La gallery distribuye templates, no certifica su behavior. No actualizar SHA ni activar
   cookie extension/user enrichment automáticamente.
@@ -123,7 +129,7 @@ validar contrato vigente y template **instalado** antes de ejecutar. Fuentes ver
 ### 4.1. Lead utilizable para remarketing — requisito confirmado 2026-10-13
 
 El operador requiere coincidencia de personas y segmentación comercial, además de recepción
-de eventos. **Estado: desplegado y activado, Server6/Web5, source y worker con flags ON.**
+de eventos. **Estado14/10: desplegado y activado, Server9/Web5, source y worker con flags ON.**
 La primera conversión comercial consentida con matching post-flip sigue sin observarse.
 La recuperación histórica5/5 sólo transportaba IP/User-Agent. Ahora el backend prepara
 contactos validados y contexto consentido; `fbp`/`fbc` sólo si reales y disponibles.
@@ -141,8 +147,9 @@ El endpoint run.app no implica acceso a cookies de los hosts públicos.
 `form_slug`/`lead_source` presentes en Event Data no se copian automáticamente a Meta: la
 plantilla oficial instalada sólo añade propiedades arbitrarias desde `custom_properties`.
 El mapper construye `custom_properties` como JSON string: el template pin usa `.indexOf()` antes del control de tipo; un objeto produce error. Conservar `Lead`, URL limpia y
-momento/ID de la misma ocurrencia. `external_id` queda fuera hasta definir identidad estable
-y autorizada; `event_id` identifica una conversión, no una persona.
+momento/ID de la misma ocurrencia. `external_id` es SHA256hex del email normalizado o, si falta,
+teléfono internacional sin `+`; identidad estable del contacto. `event_id` identifica una conversión,
+no una persona. IP/UA se capturan en el POST original; el worker nunca los sustituye por los propios.
 
 **Flujo publicado y activado en el mismo GTM Server:**
 
@@ -155,7 +162,7 @@ y autorizada; `event_id` identifica una conversión, no una persona.
    contacto: su ledger HMAC no conserva email/nombre recuperables. Capturar snapshot e ID
    durable para retries mediante contrato transaccional propio, sin PII cruda en outbox/logs.
 3. Entregar esa proyección por ingreso autenticado exclusivo de servidor a sGTM, con Client
-   y allowlists propios. No pasar contactos ni hashes por eventos GA4 ordinarios, dimensiones, dataLayer o URLs. Google UPD usa su contrato dedicado descrito abajo.
+   y prueba de policy publicada/schema2 propios. No pasar contactos ni hashes por eventos GA4 ordinarios, dimensiones, dataLayer o URLs. Google UPD usa su contrato dedicado descrito abajo.
    Mantener el token de Meta exclusivamente en la etiqueta del servidor existente.
 4. Elegir un solo emisor Meta de Lead al hacer el cutover. El espejo GA4 de aceptación puede
    continuar, pero no debe emitir otro Lead CAPI independiente. El nonce browser de reuniones
@@ -184,12 +191,12 @@ y [plantilla instalada](https://github.com/facebookincubator/ConversionsAPI-Tag-
    trigger → tag → POST a Meta → respuesta. Encontrar el primer eslabón que falla; revisar
    filtros `always`, token/dataset y permisos sin imprimir credenciales.
 4. Determinar fuentes actuales de ambos hosts y backend. Diseñar PageView consentido y
-   Lead anclado al espejo de aceptación real, con consentimiento, validación, dedupe y
+   Lead anclado a aceptación/confirmación backend persistida, con consentimiento, validación, dedupe y
    fallo de medición independiente del éxito del submit. Crear cambios en workspaces aislados
    basados en la versión live correcta de **cada** contenedor; no publicar WIP ajeno.
 5. Revisar template instalado y mapping; construir/previewar ingress y tags. No inventar shapes
    server desde plantillas `gaawe` web. Los readers tipados actuales de Greenhouse no cubren
-   automáticamente Clients/templates ni snapshot servidor; registrar esa limitación.
+   automáticamente Clients/templates; el snapshot servidor existe desde el 16/10 (huella del código de templates, no el código).
 6. Ejecutar canary con `test_event_code`, evidencia saneada de request y respuesta
    (`events_received`, `messages`, `fbtrace_id`), y Test Events con origen **Server**.
    No usar datos de clientes para un canary ni activar entregas HubSpot/CRM inadvertidas.
@@ -224,13 +231,13 @@ demuestra salud. [Hosting](https://developers.google.com/tag-platform/tag-manage
 | Datos | Nada de token, PII o payload crudo en logs/artefactos; campos Meta no llegan a GA4 |
 | Cierre productivo | Versiones publicadas correctas, sin test code, readback live separado del canary |
 
-HTTP 200, tag disparado, `/healthy`, GA4 realtime y snapshot web no certifican entrega CAPI.
+HTTP 200, tag disparado, `/healthy`, GA4 realtime y los snapshots web/servidor no certifican entrega CAPI.
 Recepción no demuestra atribución publicitaria, match quality ni efectividad comercial.
 
 ## 7. Diagnóstico previo a publicación (histórico 2026-10-13)
 
 Este apartado conserva el punto previo de la investigación. No es el inventario servido:
-consultar [estado vigente](#estado-vigente--cierre-autorizado-2026-10-13) y [runtime](10-growth-lead-matching-runtime.md).
+consultar [cierre histórico](#estado-histórico--cierre-autorizado-2026-10-13) y [runtime](10-growth-lead-matching-runtime.md).
 
 [Auditoría](../../audits/measurement/META_CAPI_RECOVERY_2026-10-13.md): hosting del contenedor
 existente recuperado en `efeonce-group`; tagging/preview min 0/max 1, 1CPU/512MiB,
@@ -257,7 +264,7 @@ verificable procede de README/código oficial, no de tutoriales de terceros. Las
 son móviles: reverificar al implementar y contrastar con el SHA instalado.
 
 
-## Estado vigente — cierre autorizado 2026-10-13
+## Estado histórico — cierre autorizado 2026-10-13
 
 Server live6/Web live5, matching activado tras PR254/main d692ab51dc48 y SQL post-release.
 [Readbacks, runtime y límites](../../audits/releases/2026-10-13-full-develop-matching-release.md).
@@ -271,12 +278,16 @@ la primera aceptación/reserva comercial consentida tras matching sigue sin obse
 Evidencia/rollback en auditoría; estado previo descrito arriba es histórico, no el bloqueo actual.
 
 
-### 4.2. Implementación de matching y Google UPD — 2026-10-13
+### 4.2. Implementación inicial de matching y Google UPD — 2026-10-13 (histórico)
+
+El corte13/10 siguiente conserva las listas/Server6 iniciales; fue ampliado14/10 por
+[políticas Accepted](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md),
+schema2 estricto y Server9. Operar únicamente con el [runtime vigente](10-growth-lead-matching-runtime.md).
 
 Detalle implementado y frontera con la propuesta de configuración: [runtime](10-growth-lead-matching-runtime.md).
-Las listas de formularios y scheduler/surface siguen fijas tanto en backend como en Client sGTM;
+Al corte13/10, las listas de formularios y scheduler/surface seguían fijas en backend y Client sGTM;
 la [configuración administrable](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
-es una propuesta pendiente de GO, sin implementación ni publicación autorizadas.
+era una propuesta pendiente de GO, sin implementación ni publicación autorizadas en ese checkpoint.
 
 Dueño: [TASK-2034](../../tasks/in-progress/TASK-2034-growth-lead-matching-meta-google.md).
 `src/lib/growth/measurement` prepara proyecciones desde Forms aceptados/Meetings confirmados.
@@ -324,3 +335,54 @@ unavailableDestinations=[]; Meta/Google/retención true allí y en GitHub repo v
 Vercel true exacta y dpl_BxU6V7EGpo5R3REbazWxhXLsrVZT READY/alias canónico. SQL
 20261013233429748 aplicada, claims/leaseCAS/retención probados con rol greenhouse_app.
 No se ejercitó negocio real post-flip ni se acredita serving/calidad por fixtures Test Events.
+
+
+## Estado vigente — configuración escalable y contexto visitante 2026-10-14
+
+Política publicada por identidad estable de Form/versión/surface/origen o binding/fingerprint
+Meeting. Mapping sobre campos tipados, destinos independientes y defaultOFF; nueva fuente
+compatible mediante datos, sin editar template ni redeploy. No habilita todo el catálogo ni
+nuevos hosts/finalidades. [API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md)
+y CLI son clientes del mismo command/reader del panel; sesión interna, capacidades separadas,
+dry-run sin writes, CAS/idempotencia/recibos. No tools MCP nuevas ni SQL de configuración.
+
+Client31/template30 exige envelope autenticado schema2/proof cerrado, consentimiento website,
+UUID/tiempo/scope coherentes y contacto hash válido; retira proof antes de Meta. Legacy schema1
+rechazado400. Pixel708931297255942/tags6/18/Web5 sin cambios; publishServer9 sólo customTemplate30.
+El worker revalida policy/destino antes de HTTP; revocación/supersesión bloquea pendientes sin
+alterar aceptación ni outbox HubSpot Forms/CRM. Un HTTP iniciado no puede retirarse.
+
+Meta Test Events final verificó ambos hosts y fuente nueva creada tras el release, con
+Processed/Server/website y todas las claves disponibles (sin inventar teléfono Think). Código
+temporal por petición, no tag fijo, sin pruebas ordinarias. Fuente/policy de QA archivada/desactivada
+con readback; aplicación y GTM idénticos durante el alta. [Expediente de release](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+No prueba mejora EMQ, audiencia utilizable ni aceptación comercial real; continúan pendientes.
+
+## Delta 2026-10-17 — primer Lead comercial consentido
+
+Envío real consentido de `efeonce-performance-diagnostic` (19:19:43 UTC, «Aceptar todas») tras
+publicar su política: `measurement_delivery` `meta` → `http_accepted` 200 al primer intento y el
+dataset `708931297255942` mostró **1 Lead `SERVER_ONLY`** en el bloque 19:00–20:00 UTC, leído a
+las 20:27 con `ads_get_dataset_stats` (las estadísticas por hora tardaron ~1 h). El envío previo,
+sin política, llegó a HubSpot y GA4 pero no a Meta: sin política el backend no encola. El pixel
+`859508457409711` citado en la doc 02 no es un dataset válido para la API. Medios y HubSpot scope
+tienen política publicada pero sin envío real. [Evidencia completa](10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17).
+
+## Token Meta literal en el tag servidor — pendiente 2026-10-16
+
+El snapshot servidor versiona `GTM-K2X4ZTTK` con los secretos tapados: `apiAccessToken` del tag
+Meta CAPI y `tokenDigest` del client «Efeonce backend Lead ingress» quedan en git sólo como
+huella `[redacted sha256:<12 hex>]`. Una rotación cambia la huella y el chequeo diario
+`gtm-drift.yml` la reporta como drift ([detalle](README.md#snapshot-y-drift-de-los-dos-containers)).
+
+**Pendiente decidido por el operador (no ejecutar sin su autorización):** el token de Meta sigue
+como valor literal en el tag del container servidor, visible para cualquiera con lectura del
+container en GTM. En git está tapado; en GTM no. Solución propuesta, no implementada:
+
+1. Rotar el token en Meta Business Manager.
+2. Guardarlo en Secret Manager y entregarlo al sGTM mediante una variable «Firestore Lookup»
+   que sólo pueda leer la cuenta de servicio del Cloud Run de tagging.
+3. Añadir al chequeo de snapshot un fallo cuando un parámetro traiga un valor con forma de token.
+
+Hasta entonces: no exportar el tag completo, no copiar el valor y no tratar la huella como
+prueba de vigencia del token.

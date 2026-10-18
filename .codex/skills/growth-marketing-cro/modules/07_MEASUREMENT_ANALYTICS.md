@@ -49,8 +49,11 @@ Convenciones canónicas:
   Implementación Efeonce vigente: [contrato10](../../../../docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md),
   backend único de Lead → Client autenticado GTM Server; navegador conserva mirror GA4.
   Google matching usa user_data MP dedicado sin otro evento y requiere analytics+ads/client_id real.
-  La habilitación de formulario está fija en backend+Client; configuración sin release es
-  [propuesta pendiente de GO](../../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md).
+  La habilitación usa [políticas publicadas](../../../../docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md)
+  por fuente/versión/surface/origen, con mapping tipado. Alta compatible por API/panel/CLI sin
+  release/redeploy/publish GTM; nueva versión exige revisar/publicar la policy. Ver el
+  [manual para agentes](../../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
+  Esto no implementa automáticamente CRO, abandono, subscribe ni resultados CRM de TASK-2035.
 - **Warehouse-native:** métricas calculadas en el warehouse = una sola fuente de verdad
   (evita el "las métricas del tool no cuadran con negocio"). Habilita experimentación
   warehouse-native (Eppo/GrowthBook, `04`).

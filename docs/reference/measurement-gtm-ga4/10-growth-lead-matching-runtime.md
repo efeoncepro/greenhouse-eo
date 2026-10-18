@@ -1,17 +1,29 @@
 # Runtime de consentimiento y matching de Leads
 
-Código promovido en PR254, main `d692ab51dc486a0585b7950f95bb627197e6f2c6`.
-Últimos readbacks externos: 2026-10-14 UTC (Server8 compatible temporal y Test Events); [dossier de release](../../audits/releases/2026-10-13-full-develop-matching-release.md).
-**Matching activado; primera conversión comercial consentida post-activación sin observar.**
-Este documento describe lo construido; su actualización no certifica tráfico posterior.
+Publicado14/10/2026: PR255, main `9690efad0c1b9d70d9b168d41131857e686b0f81`,
+orquestador38591329633 success y manifest released. [Release y recibos](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+GTM Server9 estricto v2; sólo template30 cambió, otros tags y Web5 preservados. Web/worker
+convergentes, SQL/grants aplicados, siete políticas equivalentes; watchdog6/6 y drift0.
+Al 14/10 la primera conversión comercial consentida seguía pendiente. **17/10: observada con
+`efeonce-performance-diagnostic` (1 Lead SERVER_ONLY en Meta; [evidencia](#primera-conversión-comercial-consentida--performance-2026-10-17)).**
+Mejora EMQ y el envío real de Medios y HubSpot scope siguen pendientes.
 
-[ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md),
-[consentimiento/hosts](09-hubspot-consent.md), [recuperación e inventario histórico](08-meta-conversions-api-server-side.md).
-La [configuración escalable](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md)
-fue **aprobada e implementada en develop (PR255)**: DB/seed, API y panel con lifecycle real
-probado. Web producción aún sirve main PR254; Ops compartido00776-g9g ya sirve policy v2
-(bef1e2184). Server8 acepta v1 previo y v2 durante esta transición. Falta completar CI,
-QA de estados y release completo antes del Client estricto. [Estado/evidencia](../../audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
+[ADR](../../architecture/GREENHOUSE_META_CAPI_SERVER_GTM_DECISION_V1.md) ·
+[políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) ·
+[consentimiento/hosts](09-hubspot-consent.md) ·
+[manual API/panel/CLI](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
+[Recibo CAPI por intento](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): implementación
+con opción GTM default OFF. El18/10 se aplicó sólo el schema con autorización específica para
+reparar el worker compatible ya servido; sin nuevo deploy, publicación ni activación GTM.
+[Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
+La propuesta anterior quedó formalizada e implementada: no hay listas fijas de formularios o
+scheduler en el sender. Una fuente nueva con mapping businessEmail se habilitó por datos después
+del contrato inicial y llegó a Meta Test Events con nueve claves, sin código/build/redeploy/
+publish GTM. Comparación antes/después: mismo main, deployment y Server9/template/tags.
+Fixture desactivada/archivada, readback HTTP13 fuentes/siete políticas. Operación para agentes:
+`pnpm --silent growth:measurement discover|validate|apply|verify`, contrato compartido con UI,
+permisos efectivos y recibos privados; sin navegador ni SQL en el cliente. Sin nueva exposición
+MCP/OAuth. Growth Forms → HubSpot Forms → CRM conserva su mapping/outbox separado de medición.
 
 ## 1. Componentes y autoridad
 
@@ -23,7 +35,7 @@ QA de estados y release completo antes del Client estricto. [Estado/evidencia](.
 | Contexto publicitario | src/growth-measurement-context/context.ts; consentimiento/identificadores permitidos |
 | Matching/cola | src/lib/growth/measurement/* y proyección greenhouse_growth, sin segunda verdad de negocio |
 | Entrega | Ops existente, /growth/forms/dispatch, cadencia existente2min; no cron/servicio nuevo |
-| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live8 temporal v1/v2 |
+| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live9 estricto policy v2 |
 | GA4 | Propiedad486264460, stream10593675149, G-KYPPY57M14; GTM Web NGHPGRLZ live5 |
 
 ```mermaid
@@ -91,25 +103,26 @@ cambio de origen, credenciales/puerto, rutas no seguras incluidas shared/report/
 status/token. Son exclusiones de segmentos conocidos, no un detector universal de rutas
 privadas. No autorizar rutas privadas/tokenizadas ni respuestas libres en publicidad.
 
-| Origen | Allowlist actual |
+| Fuente | Autoridad vigente |
 | --- | --- |
-| Forms | efeonce-aeo-diagnostic, efeonce-seo-diagnostic, efeonce-desarrollo-web-cotizacion, efeonce-lead-gen-web, efeonce-social-audit, ai-visibility-grader |
-| Meetings | scheduler efeonce-discovery-30 **y** surface fhsf-efeonce-lead-gen-web |
+| Forms | form_key estable + versión publicada fver-* + surface/origen + policy publicada compatible |
+| Meetings | binding activo scheduler/surface + fingerprint + policy publicada; seed inicial discovery/fhsf-efeonce-lead-gen-web |
 
-Listas en measurement/payload.ts **y** scripts/measurement/sgtm-lead-client.js.
-No cubre automáticamente todo Form, calendario, host, postulación o formulario HubSpot/CF7.
-El tagging genérico GA4 y la elegibilidad de matching son diferentes. Agregar un slug hoy
-requiere código/release y actualizar/publicar el Client servidor después de Preview.
-La futura configuración administrable no existe ni quedó autorizada por documentarla.
-La API resuelve form_key UUID a su slug actual; el slug legacy pasa directo, sin registro
-general de aliases. Matching compara el slug: un rename puede perder elegibilidad aunque
-form_key siga estable. La propuesta usa identidad estable precisamente para corregirlo.
+No hay listas de slugs en payload/Client. El seed conserva los seis Forms iniciales y la agenda,
+pero no es la autoridad runtime ni un mecanismo de alta continua. Nueva fuente compatible:
+configurar/revisar/publicar datos por API/panel/CLI, sin otro release o publicación GTM. No se
+habilita automáticamente todo Form, calendario, host, postulación, HubSpot/CF7 o newsletter.
+El rename conserva form_key; una versión, binding, origen o campo incompatible requiere una
+revisión de policy válida. Fuentes de alto riesgo o finalidad no comercial quedan bloqueadas.
+El tagging GA4 y la autorización publicitaria son contratos distintos. [Procedimiento](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
 
 ## 4. Aceptación, datos e identidad
 
-Forms toma normalizedFields.email/phone/firstName/lastName después de guards comerciales;
-encola junto con la submission aceptada. Meetings prepara desde input.contact después de
-respuesta provider, antes de descartar contacto recuperable. Finalización CAS
+Forms entrega sus normalizedFields después de guards comerciales; la política publicada resuelve
+qué claves tipadas corresponden a email/phone/firstName/lastName (por ejemplo businessEmail→email).
+No se exigen nombres de campo fijos. Encola junto con la submission aceptada. Meetings prepara
+desde input.contact con su mapping autorizado después de respuesta provider, antes de descartar
+contacto recuperable. Finalización CAS
 provider_dispatched→succeeded y enqueue comparten transacción. Replay confirmado no encola
 de nuevo. El ledger Meetings conserva HMAC, no contactos recuperables.
 
@@ -167,10 +180,16 @@ alguno estáON. La expiración de la ventana de retries no invalida un lease tod
 
 POST /efeonce/lead-enrichment, Client31/template30/trigger33, priority100. Bearer64hex
 comparado por SHA256 con tokenDigest; tokenMeta sólo en tag servidor. Sólo reclama esa ruta,
-POST, raw.length≤16384, schema_version1, generate_lead, website, ads granted, backend_verified1,
+POST, raw.length≤16384, schema_version2, generate_lead, website, ads granted, backend_verified1,
 UUID y timestamp entero entre24h atrás y5min futuro. Campos adicionales, hash no hex64lower,
 ausencia simultánea de em y ph, cookies/URL/UA/IP o alcance inválidos se rechazan. custom_properties≤1000chars,
 cuatro claves permitidas, valores≤120 alfanuméricos/_/-.
+El proof cerrado lleva policy/revisión, source_kind/key/version, surface y commercial_lead;
+Form usa identidad estable/version opaca y Meetings fingerprint SHA256 del binding activo.
+Sólo el backend autenticado lo emite tras resolver policy y consentimiento; se retira antes
+del tag Meta. No enumera formularios. schema1 ya se rechaza; test_event_code sólo por petición
+operativa autenticada, nunca fijo en tag/producción. IP/UA son del visitante, sin hash/fallback
+worker; em/ph/fn/ln/external_id normalizados SHA256 hex; fbp/fbc consentidos sin hash.
 
 Meta tag6 dispara sólo PageView11 o backendLead33; legacyLead12/17 retirados. TemplateMeta3
 oficial pin a575edb31aa447469b855c3006ed9991dad711cf, Graphv25.0 al publicar. Client espera
@@ -188,13 +207,13 @@ SignalsOFF. Link10593794382 a customer9531478329, personalización activa.
 lead_source/scheduler_key nuevas dimensiones; form_slug/form_kind/surface_id existentes.
 Siete audiencias90d, filtros ligados al mismo generate_lead: AEO(2slugs), SEO, proyectosweb,
 contacto(efeonce-lead-gen-web), redes, reuniones(scheduler+surface) y comerciales. «Contacto»
-no es un séptimo slug fuera de allowlist. Comerciales usa OR entre seis form_slug o
+no agrega una séptima fuente al seed inicial. Comerciales usa OR entre seis form_slug o
 lead_source=meeting_booking; esa rama no exige scheduler/surface como sí Reuniones. Son
 filtros del espejo browserGA4, no autorización backend ni prueba de asociaciónUPD.
 Cuatro audiencias previas conservadas. No campañas/
 gasto, audienciasMeta/CustomerMatch ni importación CRM automáticas.
 
-## 7. Configuración y secuencia aplicada
+## 7. Configuración vigente y antecedente de activación13/10
 
 Cuatro flags prefijo GROWTH_MEASUREMENT_ / sufijo _ENABLED: CAPTURE en Vercel Production;
 META/GOOGLE_UPD/RETENTION en Ops y GitHub repo vars persistentes. Source-defaultOFF,
@@ -208,7 +227,7 @@ unavailableDestinations[]. Después capturaVercelON y redeployREADY/alias verifi
 Secrets sinTTL y bindingtagging sin condición temporal: configuración persistente, no tokenMeta
 eterno ni costo/disponibilidad garantizados.
 
-Orden: release source/worker/renderers → SQL post-release → refs/secrets → Preview/frozenartifact
+Antecedente13/10: release source/worker/renderers → SQL post-release → refs/secrets → Preview/frozenartifact
 verificado → Server6 retira legacy12/17 → destinos/retenciónworkerON → captura/redeployVercel
 última. SQL20261013233429748 aplicada. MIGRATE_SKIP_TYPES permitido, contrato explícito compilado;
 regenerar tipos con próxima proyección gobernada, no aplicar el parked retirado. Capability
@@ -226,7 +245,7 @@ read-only ni tienen dry-run. Inspeccionar estado/código/autorización antes de 
 | --- | --- |
 | hubspot-consent-bridge.js | Fuente browser; copias WP/Think byte-idénticas, sin editar a mano |
 | deploy-wordpress-consent.php | Escribe/activa2archivos WP; ZIP/manifest/prestatehash/backup/cache; scope live propio |
-| build-sgtm-lead-draft.ts | Muta draft, guard base live5; hoy live6, no rerun como diagnóstico. templates.list usa template |
+| build-sgtm-lead-draft.ts | Muta draft, guard base live5; estado vigente live9, no rerun como diagnóstico. templates.list usa template |
 | prepare-preview-canary.ts | Compila workspace explícito META_TEST_WORKSPACE_ID; nunca muta testEventCode del tag |
 | verify-lead-context.ts / send-preview-canary.ts | META_TEST_EVENT_CODE real obligatorio y temporal por petición; Preview header opcional; fixture reservado, ambos hosts, replay y negativos; sin CRM ni GA4 |
 | configure-google-lead-audiences.ts | Crea dimensiones/audiencias/readback; sin dry-run implícito ni campañas |
@@ -237,7 +256,7 @@ Builder no publica ni habilita cutover; revisar Meta/Client/template/fronteraGA4
 congelada antes del publish. Si falla tras create_version, recuperar versión/recibo, no recrear
 a ciegas. Retirar TestEvents code antes de publicar. Temporales privados propios se eliminaron.
 
-## 9. Evidencia y pendientes
+## 9. Evidencia base13/10 y pendiente comercial
 
 71tests10archivos +21Client PASS; suites contexto/payload/crypto/store/dispatch y contratoOps.
 Bridge16 y renderer30 en recuperación previa; no sumar suites solapadas. CI main20.100PASS,
@@ -248,7 +267,8 @@ Meta Preview/TestEvents Processed/Server em/ph/fn/ln y clasificadores amboshosts
 más replayIDestable (no dedupe de atribución). Negativos live no dispararon tag.
 
 Pendiente: fuente real consentida → event_id proyección → delivery por destino → ackHTTP →
-lectura provider. No submissions/bookings/CRM/quotes/pagos falsos para cerrarlo. No afirmación
+lectura provider. Cerrado para Meta con Performance el 17/10 ([evidencia](#primera-conversión-comercial-consentida--performance-2026-10-17));
+sigue abierto para Meetings, Google UPD y las demás fuentes. No submissions/bookings/CRM/quotes/pagos falsos para cerrarlo. No afirmación
 de volumen/calidad/serving/rendimientoAds. Funnel meeting_step y sus dimensiones se verifican
 aparte de la confirmación publicada; un workspace previewado no publica todas sus etiquetas.
 Diagnóstico en orden: consentimiento/contexto → alcance/contactos/URL → flags/key → cola →
@@ -269,7 +289,7 @@ La ruta compacta de project_context conserva aquí sus destinos anteriores:
 [Forms](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md).
 No cambia la autoridad de esos contratos ni la taxonomía/futuro del TrackingEngine.
 
-## Corrección verificada 2026-10-14
+## Corrección inicial14/10 — Server7; estado actualServer9
 
 [Auditoría y estados de entrega](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md).
 Server7 sólo modifica customTemplate30; tags/Client31/activadores/transformaciones/GA4 idénticos
@@ -288,6 +308,60 @@ en Test Events, así que los14 reportados no prueban por sí solos una regresió
 El canary anterior omitía IP/UA: el nuevo usa contexto explícito de request de fixture.
 Logs sólo clases/contadores; Sentry elimina body/headers/cookies/env/user de submit/book.
 
-## TASK-2035 configuration checkpoint — 14/10
+## Configuración escalable y agentes — cierre14/10
 
-Published policy data replaces fixed source lists in develop: [ADR](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md), [operator manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md), [evidence](../../audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md). Seven initial policies seeded, new source by data verified, schema2 Client compilado; live8 compatible temporal y workspace11 estricto sin publicar. UI lifecycle por datos y GVC premium1440/390 PASS; corrección de contraste de feedback/CI/release pendientes. Commercial traffic/EMQ not inferred from Test Events.
+[ADR](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md),
+[manual](../../manual-de-uso/growth/configurar-medicion-conversiones.md) y
+[release final](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+Main9690efad released, Server9 estricto,13 fuentes/siete policies publicadas tras QA. API/UI/CLI
+comparten lectura, validación, comandos, permisos, CAS/idempotencia y readback. GVC1440/390 y12
+estados PASS. Nueva fuente por datos después del contrato inicial, procesada en Meta con nueve
+claves sin código/build/redeploy/GTM; fixture desactivada/archivada y auditoría conservada.
+No hay nueva exposición MCP/OAuth. Tráfico comercial y EMQ siguen sin inferirse de Test Events.
+
+## Auditoría de solo lectura — form de think.efeoncepro.com/brand-visibility (2026-10-16)
+
+Form `ai-visibility-grader` (`form_kind=diagnostic_intake`, surface `fhsf-ai-visibility-grader`).
+Verificado en navegador: emite `gh_form_viewed` en producción.
+
+| Carril | Estado observado |
+| --- | --- |
+| GA4 | GTM web dispara `generate_lead` en `gh_form_submission_accepted` con form_slug/form_kind/surface_id/event_id; pasa por el servidor de tagging y el forwarding GA4 exige consentimiento de analítica. |
+| Meta PageView | Server-side verificado: hit con `meta_capi_page_view=1` y `event_id` viajando como `evnid`; el pixel `708931297255942` recibe eventos server de think.efeoncepro.com. |
+| Meta Lead | No sale del navegador: lo envía el backend (client «Efeonce backend Lead ingress», backend_verified) con consentimiento de publicidad. La política del form está publicada (origen `https://think.efeoncepro.com`, destinos meta + google_upd). |
+
+El form suma 3 envíos en total, el último el 2026-07-05, y a la fecha no hay ninguna fila en
+`greenhouse_growth.measurement_conversion` para ningún form. **La cadena Lead de punta a punta de
+este form no está probada con un envío real**; la configuración publicada no lo sustituye.
+
+## Primera conversión comercial consentida — Performance (2026-10-17)
+
+Form `efeonce-performance-diagnostic`, tráfico real en producción. Cadena observada de punta a punta:
+
+| Paso (UTC) | Evidencia |
+| --- | --- |
+| 19:07:59 primer envío, sin política | HubSpot `delivered` (adapter `hsforms-v3-secure-submit`, HTTP 200); GA4 realtime (486264460) con `form_start` y `generate_lead`. **Meta sin Lead:** sin política publicada el backend no encola; `measurement_conversion` tenía 0 filas de cualquier fuente. |
+| 19:16 política | Publicada rev 1, destino `meta`, con `pnpm --silent growth:measurement` (discover → validate → apply draft → review → publish; UUID de idempotencia y recibo por paso; `verify` OK y readback en PG). Actor de auditoría `agent@greenhouse.efeonce.org` (agent-auth en producción). `validate`: `commercialAcceptanceChanged:false`, `crmDestinationChanged:false`. Configuración por Product API, no release ni deploy. |
+| 19:19:43 envío consentido | Alias `+meta`, «Aceptar todas»: HubSpot `delivered` 200; `measurement_conversion` con `advertisement=true`, GPC false, `policyVersion efeonce-categories-2026-10-13` y la revisión de Performance; `measurement_delivery` `meta` → `http_accepted`, HTTP 200 al primer intento (19:20:02). |
+| Meta, dataset `708931297255942` | `ads_get_dataset_stats` (MCP de Meta Ads): a las 19:24 aún sin dato; a las 20:27 **1 Lead `event_source=SERVER_ONLY`** en el bloque 19:00–20:00. Primer Lead productivo desde el cutover del 14/10 (los 71 Leads de los últimos 28 días están entre el 13 y el 14/10). |
+
+En la misma pasada se publicaron (rev 1, destino `meta`) las políticas de `efeonce-media-diagnostic`
+(email/teléfono/nombre/apellido) y `efeonce-hubspot-scope` (email/nombre/apellido). Estado global:
+12 políticas publicadas de 18 filas; siguen sin política `efeonce-web-agentica-ebook`,
+`efeonce-surround-discovery-ebook`, `efeonce-creator-influence-brief` y `efeonce-content-marketing`
+(además de filas antiguas sin publicar).
+
+Lecturas que esta prueba fija:
+
+- **Dedupe del form:** un reenvío con el mismo correo dentro de 60 min no crea conversión.
+  `findRecentDuplicate` (forms/store.ts) compara `dedupe_fingerprint` (form + email con trim y
+  lowercase) y responde `accepted` reutilizando el envío previo. Para QA: esperar 60 min o usar
+  un alias `+` (en HubSpot crea otro contacto, que hay que archivar después).
+- **`http_accepted` no es lectura en Meta.** Las estadísticas por hora del dataset tardaron ~1 h y
+  `server_last_fired_time` también se actualiza con retraso: una lectura vacía minutos después
+  del envío no es una falla.
+- **Dataset real:** `708931297255942`. El pixel `859508457409711` de la doc 02 devuelve
+  «Invalid dataset_id» en la API.
+
+Pendiente: envío real con publicidad aceptada en Medios y HubSpot scope; mejora EMQ; archivar el
+contacto de prueba `+meta` en HubSpot (decisión del operador).

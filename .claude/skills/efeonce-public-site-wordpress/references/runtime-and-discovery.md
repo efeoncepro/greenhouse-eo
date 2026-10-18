@@ -25,7 +25,20 @@ Use this reference for public-site inventory, bridge inspection, runtime repo bi
   Redes Sociales wall assets v1 under `assets/img/social/wall/v1/`; full note
   `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
-## Measurement consent presentation — published 2026-10-13 Chile
+## Measurement integration — published contract 2026-10-14
+
+The host distributes the canonical consent bridge; IP/UA are captured by the visitor-facing
+Greenhouse request and policy/matching stay server-only. `_fbp`/`_fbc` and landing `fbclid`
+are used/persisted only after advertising grant; GPC/revoke are respected. Both public hosts
+were read back with identical bridge bytes in the [release evidence](../../../../docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+Compatible form or meeting measurement is configured via policy API/panel/CLI, without
+editing host code or publishing GTM for each source. A source version/binding change needs a
+reviewed policy; a new host/contract needs governed integration. Read the
+[operator manual](../../../../docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
+Measurement mapping is separate from HubSpot Forms delivery/CRM; no contacts or secrets
+belong in host markup, telemetry, logs or Sentry. Do not replay deployment helpers as diagnosis.
+
+## Measurement consent presentation — dated rollout 2026-10-13 Chile
 
 The dated consent rollout adds `eo-measurement-consent` **1.1.0** to the governed runtime inventory
 above; runtime repo `main` commit `8d6ff95`. It distributes the HubSpot consent bridge and the scoped
@@ -473,3 +486,14 @@ Pipe secrets through stdin. Do not pass secrets as command args or write them to
 - When using WP-CLI remotely, prefer the wrapper:
   `pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12`.
 - Use `wp kinsta cache purge --all` after live WordPress mutations.
+
+## Identidad SEO del sitio (2026-10-16)
+
+Decisión del operador: Yoast `website_name` = «Efeonce» y `alternate_website_name` = «Efeonce Group» (nodo `WebSite`
+del schema y `og:site_name`); tagline «Agencia de Inbound y Loop Marketing» sin «&» (WordPress lo guarda escapado y
+Yoast lo volvía a escapar en el schema); `og:locale` = `es_LA` por el mu-plugin versionado
+`wp-content/mu-plugins/efeonce-og-locale.php` (el idioma de WordPress sigue en `es_ES`). Script:
+`scripts/public-website/set-site-identity-seo.php`, snapshot `_gh_site_identity_seo_before_20261016_193457`.
+Tagline actualizado el mismo día por decisión del operador a «Agencia de marketing 360°» (alineado al brochure
+oficial; `scripts/public-website/set-site-tagline.php`, snapshot `_gh_site_tagline_before_20261016_194309`).
+

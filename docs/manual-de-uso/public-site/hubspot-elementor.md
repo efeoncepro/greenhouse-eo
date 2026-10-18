@@ -1,127 +1,242 @@
-# Editar y recuperar la landing HubSpot
+# Operar la landing Servicios HubSpot (v2)
 
-1. Abre WordPress → Páginas → página `244079` → Editar con Elementor.
-2. Selecciona uno de los once widgets «HubSpot · …». Edita textos, enlaces o Media en Contenido;
-   las preguntas, escenarios y paneles usan colecciones. Conserva las claves de presentación al editar.
-3. No dupliques anclas; hero, hubs, familias y evaluacion deben ser únicas. No elimines paneles dejando
-   botones que los referencian. La colección permite reordenar contenido; un cambio estructural requiere QA.
-4. Guarda y comprueba escritorio, 390 px, teclado, enlaces y formulario. Preserva imagen destacada `248703`,
-   el header/footer nativo y los ajustes de wrapper full width de esta página.
-5. Para cambiar campos/consentimiento/destinos usa authorDraftForm → reviewForm → publishForm en Growth Forms;
-   nunca modifiques una versión publicada ni agregues un formulario de Elementor independiente.
+> **Tipo de documento:** Manual de uso / runbook
+> **Version:** 2.0
+> **Creado:** 2026-08-31 por Codex
+> **Ultima actualizacion:** 2026-10-17 por Claude
+> **Documentacion tecnica:** contrato v2 pendiente; detalle en el
+> [audit de publicación v2](../../audits/public-site/2026-10-16-hubspot-v2-publication.md). El
+> [contrato v1](../../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) es histórico.
+> **Documentacion funcional:** [Landing Servicios HubSpot](../../documentation/public-site/hubspot-elementor.md)
 
-Verificación reproducible anónima: `node scripts/public-website/verify-hubspot-landing.cjs`.
-La prueba no crea leads aceptados. La comprobación PHP `verify-hubspot-elementor-live.php` crea un draft
-transitorio, prueba texto y reordenación con Document::save, relee/renderiza y lo envía a papelera.
-`verify-hubspot-package.php` compara hashes del manifest con runtime, sin escribir páginas.
+## Para qué sirve
 
-## Recuperación con autorización
+Para editar el contenido de [`/servicios-contratar-hubspot/`](https://efeoncepro.com/servicios-contratar-hubspot/)
+(página WordPress `244079`), cambiar su diseño de forma gobernada, desplegarlo, republicar la página, operar el
+botón «Agendar reunión» del dock móvil y revertir si algo sale mal.
 
-Respaldo durable de contenido/metas originales: opción `_gh_hubspot_rollback_20260830`, verificada
-contra revisión Elementor `251801`, hash `b453e9d1ba9a4094c886d230b5436bd293e036cec69f0d43d821614b4d0b35ce`.
-La opción conserva el árbol de elementos, settings y las metas capturadas antes del cambio.
-El primer snapshot JSON en postmeta no es la fuente de rollback: las barras escapadas se perdieron;
-se preservó y verificó la revisión exacta en la opción serializada indicada.
+Desde el 2026-10-16 la página es la **v2**: 14 widgets `greenhouse_hubspot_v2_*`. Los once widgets «HubSpot · …»
+de la v1 ya no están en esta página; lo que la v1 decía sobre paneles, timeline, licencias o iconografía no aplica.
 
-Antes de recuperar, verifica drift. Restaura `elements`/`settings` mediante Document::save (incluida
-imagen destacada explícita), y sólo las metas de página/Yoast cambiadas. No escribas `_elementor_data`
-directamente ni modifiques Home/menús/footer. Reinstala únicamente archivos del paquete si fuera necesario.
-El respaldo inicial del loader vive en `/tmp/eo-hubspot-before-20260831-014151.tar` en Kinsta;
-los archivos nuevos están listados en su `created-paths.json`. El manifest/audit fechado registra las
-correcciones posteriores; no asumas retención indefinida de `/tmp`. Exporta antes de usarlo.
-Tras restaurar: limpia CSS Elementor y cache Kinsta; comprueba URL, imagen, SEO y render anónimo.
+## Antes de empezar
 
-La URL no cambió. `/servicios/hubspot/` y su 301 siguen siendo otro alcance; no migrarlos implícitamente.
+- Lee el [audit de publicación v2](../../audits/public-site/2026-10-16-hubspot-v2-publication.md): ahí están los
+  hashes, snapshots y trampas conocidas.
+- El checkout es compartido: corre `git status --short` en Greenhouse y en `efeonce-public-site-runtime` antes de
+  tocar nada, y no te lleves cambios ajenos.
+- Para cualquier comando WP-CLI, corre primero `pnpm public-website:ssh-check`.
+- Los `--eval-file` de este manual apuntan a copias en `./tmp/` de los scripts de `scripts/public-website/`. El
+  wrapper sube el archivo local a Kinsta y lo ejecuta; cualquier ruta local sirve, pero copia siempre la versión
+  vigente del repo.
+- Confirma la identidad: `244079` es `/servicios-contratar-hubspot/`. El republicador toma el contrato Ohio de
+  `251981` (Agencia de Medios) y protege los hashes de Home, `249582`, `251279` y `251981`: si alguno cambia
+  durante la corrida, aborta.
+
+## Editar textos, imágenes y listas en Elementor
+
+1. Abre `wp-admin/post.php?post=244079&action=elementor`.
+2. En el navegador de estructura, cada módulo vive en un contenedor `gh-hsv2-section clb__dark_section` con su
+   widget `greenhouse_hubspot_v2_<módulo>`: hero, marquesina, numeros, punto, diferencia, resultados, riesgo,
+   agentes, metodo, seguridad, caso, partner, preguntas, agenda.
+3. Edita textos, enlaces e imágenes desde los controles; las imágenes se eligen de la biblioteca de Media. En las
+   listas (preguntas, resultados, agentes, etc.) agrega, quita o reordena filas. No hay campo para HTML.
+4. No dupliques anclas. `#agenda-form` (la card del formulario) y `#agenda` los usa el dock móvil: si cambian, el
+   botón «Ir al formulario» y el ocultamiento del dock dejan de funcionar.
+5. Guarda, purga la caché y revisa en 1440 y 390 px.
+
+**Ojo al recompilar:** el compilador numera los campos en orden (`fNNN_*`). Un cambio estructural en la fuente
+renumera los campos y las ediciones hechas a mano en Elementor quedan huérfanas. Antes de recompilar, lleva a la
+fuente lo que se haya editado en Elementor.
+
+## Cambiar el diseño (no el contenido)
+
+El diseño vive en `scripts/public-website/hubspot-v2-source/`:
+
+| Archivo | Qué contiene |
+| --- | --- |
+| `Main.dc.html` | El canvas aprobado más los ajustes SEO. |
+| `host.css` | La capa del host, acotada a `.gh-hsv2`. |
+| `page.css` | Reglas de página que deben salir de la landing (body, chrome de Ohio). El compilador las agrega **sin** acotar; cada regla se protege con `:has(.gh-hsv2 …)`. Hoy contiene el `timeline-scope` del body y la regla que aparta la barra inferior de Ohio. |
+| `page-custom.css` | CSS de página que el republicador deja en los settings de Elementor. |
+| `form.json` | `formKey` y `surface` del Growth Form. |
+| `blob-map.tsv`, `assets.json`, `used-assets.json` | Mapa y uso de los assets del canvas. |
+| `og/og.html`, `og/og-hubspot.png` | Fuente y resultado de la imagen social de 1200×630. |
+
+Para revisar sin WordPress: `node scripts/public-website/preview-hubspot-v2-local.cjs` escribe
+`tmp/hubspot-v2-preview/index.html` con los defaults de cada schema (el formulario sale como un recuadro: el renderer
+real sólo existe en el sitio). Si hay media nueva, prepárala con `prepare-hubspot-v2-assets.cjs`.
+
+### Secuencia de despliegue
+
+Desde la raíz de Greenhouse, en este orden:
+
+1. Recompila:
+
+   ```bash
+   node scripts/public-website/compile-hubspot-v2-elementor-source.cjs
+   ```
+
+   Emite en el repo runtime `wp-content/plugins/eo-elementor-widgets/includes/hubspot-v2/{schemas,templates}/` y
+   `assets/css/hubspot-v2-landing.css`.
+2. Exporta una baseline viva fresca (queda en `tmp/public-site-code-baselines/<ts>`):
+
+   ```bash
+   pnpm public-website:export-live-code
+   ```
+
+   Usa siempre una baseline nueva: el deploy compara el hash previo de cada archivo con lo que está vivo y aborta con
+   `Live drift` si no calza.
+3. Arma el paquete (contrato `hubspot-v2-elementor-release.v1`, salida `tmp/hubspot-v2-elementor-release`):
+
+   ```bash
+   node scripts/public-website/build-hubspot-v2-elementor-package.cjs <baseline>
+   ```
+
+4. Despliega:
+
+   ```bash
+   pnpm public-website:wpcli -- --eval-file ./tmp/deploy-hubspot-v2-elementor-package.php \
+     --input-file ./tmp/hubspot-v2-elementor-release/package.zip \
+     --input-file ./tmp/hubspot-v2-elementor-release/manifest.json --wp-user 12
+   ```
+
+   Sólo acepta rutas de la allowlist v2 (widgets `class-eo-hubspot-v2-landing-*`, `hubspot-v2/**`, `hubspot/seo.php`,
+   el loader y los assets v2) y deja un backup en Kinsta en `/tmp/eo-hubspot-v2-widgets-before-<fecha>.tar`.
+5. **Sólo si cambió el árbol de módulos o los settings de la página**, republica (sección siguiente). Un cambio de
+   CSS o de template se ve con el deploy más una purga.
+
+## Republicar la página
+
+```bash
+pnpm public-website:wpcli -- --eval-file ./tmp/republish-hubspot-v2-page.php \
+  --input-file ./scripts/public-website/hubspot-v2-source/page-custom.css \
+  --input-file ./scripts/public-website/hubspot-v2-source/form.json \
+  --input-file ./.auth/hubspot-v2-meeting-cta-surface.json --wp-user 12
+```
+
+- El **tercer input** es el JSON de la surface del CTA del dock (`surfaceId` + `embedKey`). Es opcional para el script,
+  pero **si lo omites el widget agenda queda sin key y el botón «Agendar reunión» cae al enlace `/agenda/`**.
+- Antes de escribir, el script guarda un snapshot `_gh_hubspot_v2_before_<fecha>` (árbol Elementor, settings, metas
+  `page_*`/`_page_*` e imagen destacada), prueba cada widget, guarda con `Document::save`, copia las metas Ohio de
+  `251981`, relee todo, verifica que las páginas protegidas no cambiaron y purga Kinsta.
+- Para que se niegue si alguien tocó la página desde la última lectura, pasa el hash vivo esperado en
+  `GH_EXPECT_HASH`. La salida imprime `previousHash`, `hash` y el nombre del snapshot: anótalos en el audit.
+
+## Publicar o rotar el CTA del dock
+
+«Agendar reunión» es el Growth CTA `hubspot-discovery-meeting` (`open_meeting_scheduler` con `meetingSurfaceId
+fhsf-efeonce-lead-gen-web` y `schedulerKey discovery`, placement `embedded`, style `minimal`, targeting
+`/servicios-contratar-hubspot/`, priority 180, `cta-location=hubspot_mobile_dock`). Tiene su propia surface,
+«Efeonce HubSpot landing (WordPress)» (`csur-56a96b52-44ca-43d8-a61f-8c365c211487`, origins `efeoncepro.com` y `www`).
+
+1. Levanta el proxy de Cloud SQL: `pnpm pg:connect`.
+2. Corre el publicador:
+
+   ```bash
+   GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME= npx tsx --env-file=.env.local \
+     --require ./scripts/lib/server-only-shim.cjs scripts/growth/publish-hubspot-meeting-cta.ts
+   ```
+
+   Hace author → review → publish, registra o rota la surface y corre un smoke de render. Escribe el embed key con
+   permisos 0600 en `.auth/hubspot-v2-meeting-cta-surface.json`. **Ese archivo nunca va al repo.**
+3. **Re-correr el publicador rota el key.** El key anterior deja de valer, así que en el mismo momento republica la
+   página con el tercer input (sección anterior). Si no lo haces, el dock queda apuntando a un key muerto.
+4. Verifica en vivo a 390 px (ver «Verificar»).
+
+No uses el CTA de contacto `contacto-discovery-meeting`: está targeteado sólo a `/contacto/` y no aparece en esta
+landing. La configuración general de un CTA con agendador está en
+[Configurar un Growth CTA con scheduler nativo](../growth/configurar-cta-scheduler-nativo.md).
 
 ## Operar SEO
 
-Edita título, metadescripción, breadcrumb y social en Yoast. El schema de servicio reutiliza título nativo y
-descripción, sin duplicar Organization ni publicar precios/ratings no respaldados. Para cambiar el perfil del
-partner usa el control «Fuente · perfil oficial de HubSpot» del módulo Caso.
+Título, descripción, frase clave, Open Graph/Twitter e imagen social se aplican con `configure-hubspot-v2-seo.php`,
+que recibe un único input: el PNG de `og/og-hubspot.png`. Cada corrida importa el PNG como **adjunto nuevo** y lo
+deja como imagen OG/Twitter y destacada (hoy el adjunto `251991`): no lo re-corras sólo para releer valores.
 
-El snapshot `_gh_hubspot_seo_20260831_093553` conserva el estado anterior. Restaura sólo campos afectados,
-no todo el postmeta sobre ediciones posteriores. Reconstruye el indexable Yoast y purga cache después.
-`_eo_hubspot_seo_enabled` desactiva por página los filtros SEO, la redirección HTTP y la optimización exclusiva;
-no borres archivos requeridos por el loader. El título H1 y la configuración Elementor no se reescribieron.
+El schema `Service` (`#service`) + `FAQPage` sale del widget de preguntas a través de `includes/hubspot-v2/seo.php`
+(WebPage `about → #service`). El adapter v1 `includes/hubspot/seo.php` sigue cargado, pero se salta su `Service`
+cuando la página tiene el FAQ v2: no lo borres ni lo reactives.
 
-Para reproducir el subset, usa FontTools/WOFF2 sobre Tabler 3.24.0 con los unicodes declarados en
-`hubspot-elementor.css`, `--drop-tables+=GSUB` y `--flavor=woff2`; verifica contornos y fallback de un icono
-no incluido. El mapa CSS completo y licencia MIT se conservan. No recortes la edición a sólo 11 iconos.
-[Audit y rollback](../../audits/public-site/2026-08-31-hubspot-seo-aeo.md).
+## Verificar
 
-Verificación SEO pública: `node scripts/public-website/verify-hubspot-seo.cjs` (sin login ni escrituras).
+- 1440 y 390 px: `scrollWidth == clientWidth`, un solo `h1`, los 14 módulos en orden.
+- Haz scroll real hasta cada sección antes de medir: las animaciones están ligadas al scroll.
+- Dock a 390 px: oculto en el hero, visible a mitad de página (la barra inferior de Ohio se aparta), abre el agendador
+  nativo en pantalla completa, Escape lo cierra, se oculta en la agenda y en el footer. En desktop no existe.
+- Formulario montado desde el contrato (no el texto alternativo), tres pasos.
+- JSON-LD con `Service` y `FAQPage`; header y footer de Ohio sin cambios.
+- La medición del dock es de la familia `greenhouse_cta_*` (se distingue por `cta_slug`). La conversión es la
+  reserva confirmada por el servidor (`gh_meeting_*`), nunca el click. No hagas reservas de prueba.
 
-Timeline/partner: `node scripts/public-website/verify-hubspot-timeline.cjs` comprueba cinco etapas, puntos,
-línea, teclado, movimiento reducido, 1414/768/390 px y contenido sin JS, sin enviar leads.
-La revisión de dos columnas retira sólo los controles f029–f031 del módulo Caso; no renumerar f032 ni anteriores.
-[Respaldo y recuperación de esta revisión](../../audits/public-site/2026-08-31-hubspot-timeline-partner-fix.md).
+## Rollback
 
-## Iconografía oficial y caso ANAM
+**Página:** toma primero un snapshot del estado actual. Lee la opción `_gh_hubspot_v2_before_<fecha>` de la
+republicación que quieres deshacer (la primera publicación de la v2 es `_gh_hubspot_v2_before_20261016_214609`, que
+contiene la v1). Restaura árbol y settings con `Document::save` —nunca escribiendo `_elementor_data` a mano—, luego
+las metas y la imagen destacada desde el snapshot, y purga.
 
-Marketing, Sales, Service, Content, Data y Revenue incluyen sus SVG oficiales de Brandfolder, sin
-modificar colores ni proporciones. Los seis controles «Icono oficial» son Media nativos del widget Hubs.
-El widget Caso incluye «Logo · ANAM» y su texto alternativo; en escritorio se alinea a la derecha del
-encabezado y en móvil se apila. La nota identifica el caso ANAM por instrucción del operador.
-No se modifican cifras, title, descripción SEO, header ni footer.
-[Fuentes, publicación y rollback](../../audits/public-site/2026-08-31-hubspot-brand-assets.md).
+**Archivos del plugin:** restaura el tar `/tmp/eo-hubspot-v2-widgets-before-<fecha>.tar` de Kinsta sólo sobre los
+paths del manifest. Los tar de `/tmp` son temporales: verifica que existan antes de contar con ellos.
 
-Revisión posterior: Smart CRM y agentes suman sus isotipos. En agentes se usa el recurso actual «Agent Hub»
-del proveedor, sin renombrar el contenido aprobado. El mismo Media de cada tarjeta gobierna el logo del
-panel seleccionado. No se identificó un logo oficial de AEO; se usa el icono semántico de búsqueda descrito abajo. «Licencias y operación» incluye el
-logo completo claro de HubSpot; el operador confirmó autorización.
-[Fuentes y evidencia](../../audits/public-site/2026-08-31-hubspot-product-marks.md).
+**SEO:** restaura cada campo desde `_gh_hubspot_v2_seo_before_20261016_214622` (borra los que no existían antes) y
+purga.
 
-MCP reutiliza los tres PNG originales de ChatGPT, Claude y Gemini de la página AEO: controles Media
-`brand_chatgpt_logo`, `brand_claude_logo`, `brand_gemini_logo`, compartidos entre tarjeta y panel.
-Grupo compacto sobre discos claros, sin recolorear archivos ni cambiar copy. No se modificó AEO.
-[Fuentes y rollback](../../audits/public-site/2026-08-31-hubspot-mcp-logos.md).
+**Volver a la v1:** los respaldos de la v1 siguen registrados (`_gh_hubspot_rollback_20260830` y los snapshots de copy
+del 2026-08-31) en las [auditorías de agosto](../../audits/public-site/2026-08-30-hubspot-elementor-publication.md).
+Volver a la v1 es una decisión del operador, no una recuperación de rutina.
 
-Revisión semántica: las cinco tarjetas restantes (AEO, Sales Workspace, Customer Success Workspace,
-Marketing Studio, Enablement) incorporan iconos Tabler descriptivos en azul claro `#cddeeb` y cinco
-Media `brand_*_semantic_icon`. Se comparten con su panel SSR; las marcas oficiales no se recolorean.
-Las 14 tarjetas tienen identidad visual; AEO usa un símbolo de búsqueda, no un isotipo oficial atribuido
-a HubSpot. [Mapa, fuentes y rollback](../../audits/public-site/2026-08-31-hubspot-semantic-icons.md).
+## Qué no hacer
 
-## Editar copy sin revertir revisiones aprobadas
+- **No** pegues HTML, CSS ni JavaScript en un widget ni agregues un widget HTML.
+- **No** edites `_elementor_data` directamente ni llames `Document::save` a mano: usa el republicador.
+- **No** despliegues todo el checkout runtime: tiene trabajo de otras sesiones. Usa el paquete acotado.
+- **No** pongas reglas de body o del chrome de Ohio en `host.css`: el compilador las reescribe y no llegan. Van en
+  `page.css`, protegidas con `:has(.gh-hsv2 …)`.
+- **No** llames a un token de plantilla igual que un campo del schema (ver «Problemas comunes»).
+- **No** commitees `.auth/hubspot-v2-meeting-cta-surface.json` ni pegues el embed key en el repo o en un audit.
+- **No** re-corras el publicador del CTA sin republicar la página después.
+- **No** cambies campos, consentimiento o destino del formulario desde la página: son de Growth Forms.
+- **No** toques header, footer, Home ni menús para arreglar algo de esta landing.
 
-1. Relee la página y su árbol Elementor antes de editar. La última evidencia registrada (2026-08-31,
-   11:27:34 UTC) tiene hash `cc9710c8adca07e54058c31e7edcecb0a80d78d2c95abf3e8042f3bddd2afe72`;
-   no asumas que sigue siendo el estado vivo en una sesión posterior.
-2. Conserva el overlay `scripts/public-website/hubspot-editorial-copy.json` en sus siete módulos:
-   licensing, proof-ledger, conversion, assessment, faq, sectors y delivery. Se aplica **después** del
-   adapter de marcas; no edites el export original ni uses una recompilación global como publicación.
-3. Para cambios aprobados, sincroniza sólo los defaults/repeaters afectados en los schemas y guarda
-   los campos de la página por Document::save. Los defaults por sí solos no sobrescriben lo guardado.
-   Preserva Media, `_layout`, IDs, anclas, imagen destacada y settings; compara el árbol antes/después.
-4. Valida texto completo, cuatro paneles sectoriales y cinco etapas, teclado, reduced motion y anchos
-   1414/878/390. `verify-hubspot-copy.cjs` y `verify-hubspot-section-copy.cjs` cubren estas revisiones;
-   actualiza sus expectativas sólo cuando cambie el copy aprobado. Repite SEO y formulario sin crear leads.
-5. Tras purgar, comprueba la URL pública normal sin interceptar respuestas. Si aún muestra caché anterior,
-   espera y vuelve a leer; no reejecutes una mutación que ya tuvo un readback correcto.
+## Problemas comunes
 
-### Recuperación editorial selectiva
+- **Los paneles quedan sin padding.** Un compilador anterior reescribía `.panel-body` como si fuera `body`. Hoy sólo
+  reemplaza `html`/`body` como selectores de elemento; si vuelve a pasar, revisa ese reemplazo antes de tocar CSS.
+- **Las cards enlazadas se ponen blancas al pasar el mouse.** Es el subrayado animado de Ohio
+  (`.links-underline a:hover`). Está neutralizado en `host.css` dentro de `.gh-hsv2`; no lo quites.
+- **Una cifra se parte o el contador termina en 89.** Las cifras son estáticas con `nowrap`; no vuelvas a un contador
+  con `@property`.
+- **Cards, títulos o barras quedan a medio animar mientras se lee.** Todo reveal debe terminar cuando el elemento entra
+  completo (`entry 70–100%`), nunca en `cover N%`.
+- **En móvil la comparación pierde la etiqueta, el tachado sale mal o un título se parte («expectativa-s»).** Revisa las
+  reglas móviles del audit: etiqueta con `[role=rowheader]{order:-1}`, tachado en un span inline con
+  `box-decoration-break: clone`, títulos de panel de 42 px.
+- **En desktop las fichas laterales de agentes quedan tapadas.** Su ancho es `min(230px, calc(50% - 132px))`.
+- **El dock no aparece, o el botón «Agendar reunión» abre `/agenda/`.** Falta la surface o el key: republica con el
+  tercer input; si rotaste el key, ese es el motivo.
+- **El dock no se oculta o la barra de Ohio no se aparta.** La regla está en `page.css` (el `timeline-scope` del body y la
+  barra). Si se movió a `host.css`, el compilador reescribió `body` y la regla no llega.
+- **El botón del dock muestra el valor de un campo en vez del CTA.** Un token de plantilla con el mismo nombre que un
+  campo del schema se reemplaza por el valor del campo. Por eso el token del dock se llama `meeting_launcher`.
+- **El card del CTA muestra texto o una X además del botón.** El host lo reduce al botón: oculta `.ghc-content` y
+  `.ghc-dismiss` y deja el card en `display:flex; gap:0`.
+- **En el agendador, a 390 px, el título sale enorme y «Cerrar agenda» se parte en tres líneas.** Es un bug del renderer
+  de CTAs (un `font` shorthand con `inherit`, que el navegador descarta). Está corregido en la versión 1.3.1, que llega
+  sólo con la próxima publicación de Greenhouse a producción; no lo parches desde la página.
+- **El deploy falla con `Live drift`.** La baseline no es fresca o alguien cambió un archivo vivo: exporta otra baseline
+  y revisa quién tocó ese archivo antes de reintentar.
+- **El republicador falla con `Unrelated page changed`.** Otra sesión editó Home, `249582`, `251279` o `251981` durante
+  la corrida. No reintentes a ciegas: confirma qué cambió.
 
-| Revisión | Snapshot de contenido | Backup de schemas | Alcance |
-| --- | --- | --- | --- |
-| Licencias, ANAM/partner y reunión | `_gh_hubspot_copy_20260831_111837` | `/tmp/eo-hubspot-before-20260831-112012.tar` | licensing, proof-ledger, conversion, assessment, faq |
-| Industrias, primer paso y método | `_gh_hubspot_copy_20260831_112547` | `/tmp/eo-hubspot-before-20260831-112652.tar` | sectors, assessment, delivery |
+## Referencias técnicas
 
-`assessment` aparece en ambas revisiones: restaurar completo el snapshot anterior borraría la segunda.
-Comprueba drift y recupera sólo los campos necesarios mediante guardado nativo, junto a sus schemas y
-al overlay correspondiente; no sobrescribas todo el postmeta ni escribas `_elementor_data` directamente.
-Verifica la existencia de los respaldos temporales antes de depender de ellos. Manifests, hashes y deltas
-exactos viven en las auditorías de [copy inicial](../../audits/public-site/2026-08-31-hubspot-editorial-copy.md)
-y [sectores/método](../../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).
-
-### Baselines y herramientas de revisión editorial
-
-Los verificadores `verify-hubspot-copy.cjs` y `verify-hubspot-section-copy.cjs` funcionan en modo live sin
-archivos temporales: verifican contenido e interacciones actuales. Para comparar HTML anterior usa
-`--baseline=/ruta/al/html-anterior`; sin ese archivo informan la comparación como no realizada, nunca
-como «sin cambios». La prueba de sectores/método mantiene no-JS en ambos modos live.
-
-`--preview` requiere render local reciente: ejecuta `php ../efeonce-public-site-runtime/tests/hubspot-modules.test.php render`
-y guarda la salida en el directorio temporal indicado por cada verificador. El preview del timeline usa
-`tmp/hubspot-visual-fix/rendered.html` y sustituye los módulos completos vigentes, no selectores de la versión antigua.
-El compilador y los scripts iniciales de publicación son herramientas operativas con fuentes externas y
-snapshots específicos: lee sus entradas y realiza preflight; no representan un rebuild/deploy autónomo desde Git.
+- [Audit de publicación v2](../../audits/public-site/2026-10-16-hubspot-v2-publication.md)
+- [Contrato runtime de Growth Forms](../../architecture/growth-public-forms-runtime-contract.md)
+- [Incrustar un formulario de Growth](../growth/incrustar-formulario-wordpress-astro.md)
+- [Configurar un Growth CTA con scheduler nativo](../growth/configurar-cta-scheduler-nativo.md)
+- [Plan de medición](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md) (§CTAs)
+- [Playbook de landings Ohio + Elementor](wordpress-ohio-elementor-landing-playbook.md)
+- Fuente: `scripts/public-website/hubspot-v2-source/` y scripts `*-hubspot-v2-*` en `scripts/public-website/`.
+- Publicador del CTA: `scripts/growth/publish-hubspot-meeting-cta.ts`.
+- Plugin: `efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets` (`class-eo-hubspot-v2-landing-*`,
+  `includes/hubspot-v2/`).

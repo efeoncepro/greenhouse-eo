@@ -1,0 +1,3 @@
+/* The mobile dock lives in the hero module and hides when the form module enters: its timeline is declared on
+   #diagnostico, another widget, so the name is hoisted to <body>. Guarded by :has so only this landing matches. */
+body:has(.gh-performance #diagnostico){timeline-scope:--form}

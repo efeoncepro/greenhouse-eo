@@ -1,0 +1,212 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "86ea373be0c1",
+  "key": "86ea373be0c1ad812f0ae1617843834868965f9314b25176aff263a16d7cf0fa",
+  "status": "completed",
+  "createdAt": "2026-10-16T11:10:13.941Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/juego-comp.png",
+    "imageSha256": "e13dfb9f1c977e782cb3d1cfa22eaab014286dc5044f58b635d2425ac0dec246",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/juego-mask.png",
+    "maskSha256": "e94c43210947c06520b262224a0687f3a02291bcc13ad2f32518c2442fd91184",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "This is a frame of a photorealistic racing video game at night. The billboard on the building at the right already shows a FINISHED advertisement for a fictional running brand (a runner, a lime diagonal stripe, the logo and the headline «CORRE DE NOCHE» with a lime button). Keep that advertisement exactly as it is: the same picture, layout, letters, logo, stripe, colors, sizes and position; do not redraw, retype or restyle it. Only give it the physical finish of a large backlit LED billboard rendered by the game engine at night: it reads as emitted light with a fine LED texture, its thin dark metal frame stays, its light softly spills onto the building facade around it and through the rain, with the same rain streaks, lens softness and grain as the rest of the frame.\nAlso change ONLY the colour of the car's rear light bar: it becomes a cold white-blue LED light bar (no red, no orange anywhere), and its reflection on the wet asphalt behind the car becomes the same cold white-blue. Keep the car shape, camera, framing and everything else in the frame exactly the same. No text, numbers or logos anywhere else.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nThis is a frame of a photorealistic racing video game at night. The billboard on the building at the right already shows a FINISHED advertisement for a fictional running brand (a runner, a lime diagonal stripe, the logo and the headline «CORRE DE NOCHE» with a lime button). Keep that advertisement exactly as it is: the same picture, layout, letters, logo, stripe, colors, sizes and position; do not redraw, retype or restyle it. Only give it the physical finish of a large backlit LED billboard rendered by the game engine at night: it reads as emitted light with a fine LED texture, its thin dark metal frame stays, its light softly spills onto the building facade around it and through the rain, with the same rain streaks, lens softness and grain as the rest of the frame.\nAlso change ONLY the colour of the car's rear light bar: it becomes a cold white-blue LED light bar (no red, no orange anywhere), and its reflection on the wet asphalt behind the car becomes the same cold white-blue. Keep the car shape, camera, framing and everything else in the frame exactly the same. No text, numbers or logos anywhere else.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.19490559895833334,
+    "editable": 306560,
+    "soft": 0,
+    "protected": 1266304
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0824,
+    "basis": "2 × salida 1536x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 40.571,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.02,
+        "bestError": 3.02,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        3.57,
+        6.76,
+        11.33
+      ],
+      "protected": {
+        "pixels": 1266304,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 306560,
+        "maxDelta": 246,
+        "meanDelta": 40.571,
+        "worst": {
+          "x": 1395,
+          "y": 57
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1266304,
+        "maxDelta": 204,
+        "meanDelta": 7.67,
+        "worst": {
+          "x": 579,
+          "y": 336
+        }
+      },
+      "outputUsd": 0.0412,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3465,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 393
+        },
+        "output_tokens": 1372,
+        "output_tokens_details": {
+          "image_tokens": 1372,
+          "text_tokens": 0
+        },
+        "total_tokens": 4837
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 37.539,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.13,
+        "bestError": 3.13,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        4.7,
+        8.97,
+        12.8
+      ],
+      "protected": {
+        "pixels": 1266304,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 306560,
+        "maxDelta": 241,
+        "meanDelta": 37.539,
+        "worst": {
+          "x": 942,
+          "y": 668
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1266304,
+        "maxDelta": 198,
+        "meanDelta": 8.005,
+        "worst": {
+          "x": 632,
+          "y": 332
+        }
+      },
+      "outputUsd": 0.0412,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3465,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 393
+        },
+        "output_tokens": 1372,
+        "output_tokens_details": {
+          "image_tokens": 1372,
+          "text_tokens": 0
+        },
+        "total_tokens": 4837
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

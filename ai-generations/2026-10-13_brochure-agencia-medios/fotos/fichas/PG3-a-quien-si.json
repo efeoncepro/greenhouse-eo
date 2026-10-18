@@ -1,0 +1,43 @@
+{
+  "id": "PG3-a-quien-si",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark hall at night): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 77 % of the frame width and her shoulder nearest the left never further left than 62 %; between the left edge of the frame and her body there is a wide band of empty darkness. She looks straight into the lens with a confident half-smile, turning her shoulders slightly toward the camera. Behind her, receding for hundreds of meters into the darkness, stands an immense crowd of thousands of anonymous people, all in dark silhouette, out of focus, barely visible. From high on the camera-RIGHT, behind her, a WIDE volumetric cool white-blue (#0375DB) follow-spot beam cuts down through thick haze, never entering the left half of the frame, and lands on exactly THREE people about 6 m behind her right shoulder: ONE at about 70 % of the frame width, ONE at about 80 %, ONE at about 90 %, soft and out of focus, glowing in the cold light while everyone else stays in darkness. The beam is the brightest element of the frame. A cool azure rim light from the hall's practical lamps outlines her hair. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows at the center of the pool of light on the floor around the three people, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no beams, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "the edge of the follow-spot column passing just beside her",
+    "tamano": "a column of light about 2 m wide",
+    "lado": "high on the camera-right of her face, raking across it",
+    "distancia": "about 1 m from her face"
+  },
+  "fondo": "the endless dark crowd and the far hall lights melted into cold bokeh",
+  "fenomeno": {
+    "que": "one cold beam picks out only three people in a crowd of thousands",
+    "esServicio": "Audiencias: la campaña llega a quien sí te compra"
+  },
+  "lecho": {
+    "objeto": "the dark matte stage riser edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

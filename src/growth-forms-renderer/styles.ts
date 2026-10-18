@@ -131,6 +131,32 @@ export const RENDERER_CSS = `
   }
 
   .ghf-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; z-index: 0; }
+
+  /* Visible choices (radio): cards with a radio mark, tokenized. hubspot_pillar keeps its own chips/cards. */
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) .ghf-choice-group { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  @container (min-width: 520px) {
+    .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) .ghf-choice-group--cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice {
+    position: relative; display: flex; align-items: center; gap: 12px; min-height: 52px; margin: 0;
+    padding: 12px 16px; border: 1px solid var(--ghf-border); border-radius: var(--ghf-radius);
+    background: var(--ghf-field-bg); color: var(--ghf-fg); font-family: var(--ghf-font); font-size: 15px;
+    line-height: 1.35; cursor: pointer; transition: border-color 160ms, background 160ms, box-shadow 160ms;
+  }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice input { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; margin: 0 !important; pointer-events: none; }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice::before {
+    content: ''; flex: none; width: 20px; height: 20px; box-sizing: border-box;
+    border: 1.5px solid var(--ghf-border-strong); border-radius: 50%; background: transparent;
+  }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice:hover { border-color: var(--ghf-border-strong); }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice:has(input:focus-visible) { outline: 3px solid var(--ghf-focus); outline-offset: 2px; }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice:has(input:checked) {
+    border-color: var(--ghf-accent); box-shadow: inset 0 0 0 1px var(--ghf-accent);
+    background: color-mix(in srgb, var(--ghf-accent) 7%, var(--ghf-field-bg)); font-weight: 600;
+  }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice:has(input:checked)::before { border: 6px solid var(--ghf-accent); }
+  .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) .ghf-choice-group[aria-invalid="true"] label.ghf-choice { border-color: var(--ghf-error); }
+  @media (prefers-reduced-motion: reduce) { .ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice { transition: none; } }
   .ghf-field:focus-within { z-index: 40; }
   .ghf-field[data-overlay-open="true"] { z-index: 80; }
   [data-ghf-style-variant="diagnostic_premium"] .ghf-field { gap: 8px; }

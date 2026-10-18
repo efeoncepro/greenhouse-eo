@@ -1,0 +1,24 @@
+{
+ "id": "R2-marca",
+ "formato": "4:5",
+ "impacto": true,
+ "linea": "brand",
+ "palanca": "proyeccion",
+ "identidad": [
+  {
+   "persona": "karo"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "hoodie-efeonce",
+   "persona": "karo",
+   "puesta": "espalda"
+  }
+ ],
+ "escena": "SCENE (documentary, a real photograph of a brand workshop in a raw studio in Santiago, at night): a projector behind the camera throws the NEW identity system of a fictitious brand onto a rough, unpainted plaster wall: a large abstract symbol made of two simple interlocking shapes, three bold colour fields (deep teal, warm sand and off-white), a grid of photographs and blocks of placeholder type drawn only as grey bars, no readable letters, no numbers. The plaster's cracks and unevenness bend and break the projected system. Karo, as in her reference, stands INSIDE the beam with her back to the camera, about one metre from the wall, wearing the Efeonce hoodie exactly as in its back reference; one arm is raised and her open hand rests on the wall right on the symbol, as if placing it, while the colour fields fall across her shoulders and back; her own shadow cuts a hard black shape through the projection. ONE tiny point of the projected system glows vivid orange (#FF6500), the only warm accent in the frame. The projection, a beam of cool azure-white light, is the ONLY light in the room; the floor and the sides of the studio fall into deep navy darkness. Camera about three metres behind her at standing height, 35mm f/2.8, framing the wall and her from the knees up. Real sensor grain, genuine depth of field, a little dust visible in the projector beam. No screens, no monitors, no readable text, no logos of any real brand.",
+ "lecho": {
+  "objeto": "the dark out-of-focus top of a road case on the studio floor right in front of the lens, outside the projector beam",
+  "tono": "DARK near black"
+ }
+}

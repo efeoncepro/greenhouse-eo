@@ -40,7 +40,11 @@ Criterio confirmado de Julio: incluir un brochure pertinente en cada correo de p
 instrucción distinta, y escribir **qué encontrará y para qué le sirve** antes del enlace. En HubSpot: **Insertar → Documentos**, material aprobado, texto
 legible del enlace, descarga permitida; sin exigir correo ni miniatura, salvo instrucción distinta.
 No copiar enlaces de tracking de otra persona ni adjuntar propuestas privadas de otros clientes.
-El documento aprobado no certifica todas sus cifras. Usar [mensaje y prueba](message-and-contextual-proof.md).
+Usar el brochure aprobado íntegro y el documento existente de HubSpot. No recortar, reescribir ni subir
+una copia por criterio del agente; una modificación requiere instrucción explícita de Julio sobre ese
+material. No reabrir validaciones históricas: los brochures están aprobados y no necesitan nada más.
+Verificar identidad/ID del documento elegido y el enlace correcto, sin convertir esa comprobación en una
+revisión editorial. Aplicar la [regla vigente](../../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 
 Si los cuerpos difieren de forma sustancial, usar una secuencia por persona o una personalización nativa
 que permita comprobar cada texto final; sustituir sólo nombre/empresa no basta. Desde el segundo paso,
@@ -82,7 +86,10 @@ nativos; no afirmar CCO si la pantalla no lo expone. Para Outlook directo conser
    Para inicio futuro elegir **Enviar más tarde** antes de **Iniciar secuencia**. El primer paso ofrece
    Enviar ahora por defecto: guardar la secuencia no programa por sí solo el inicio deseado.
 6. Leer las fechas calculadas de **todos** los pasos en la inscripción, no sólo los retrasos del editor.
-   Confirmar primer envío futuro, días/horas locales, destinatario único y contenidos finales. Iniciar
+   Confirmar primer envío futuro, días/horas locales, destinatario único y contenidos finales. Distinguir
+   ventana de la secuencia y hora personalizada de la inscripción: la evidencia de la segunda gobierna
+   el calendario que se comunica. Revisar también saltos de párrafo junto al documento nativo y el cierre;
+   guardar el cuerpo final personalizado cuando difiera de la plantilla base. Iniciar
    dentro del mandato vigente; ante resultado incierto, conciliar antes de pulsar otra vez.
 7. «Procesando inscripciones» es intermedio. Hacer lectura nueva de Inscripciones: contacto correcto,
    **Programado**, fecha de inicio y errores. Releer reglas guardadas de Automatizar. Conservar IDs y
@@ -108,6 +115,10 @@ se lee, sin cambiar el corte global del pipeline ni crear otro scheduler.
 Datos/direcciones/cuerpos reales permanecen en CRM/Outlook y expediente privado. Repo/skills conservan
 método; el registro del caso conserva IDs, contexto y estados fechados. Documentar límites de lectura o
 rendering. Esta actualización documental no autoriza nuevos envíos, altas, permisos o reinicios.
+
+[Aplicación del 16/10](../../../../docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md):
+copia de brochure identificada, calendario personalizado y firma configurada con preview limitado.
+Sus tres pasos y fechas son decisiones del caso, no una cadencia universal.
 
 Fuentes de comportamiento, contrastadas en el caso del 13/10: [crear/editar secuencias](https://knowledge.hubspot.com/sequences/create-and-edit-sequences)
 y [desinscripción](https://knowledge.hubspot.com/sequences/unenroll-from-sequence). Revalidar el portal y

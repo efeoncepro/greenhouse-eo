@@ -13,6 +13,8 @@
  * names/GUIDs, URLs privadas, secrets ni scoring server-only.
  */
 
+import type { GoogleAdsConversionReceipt } from '../growth-google-ads-conversion/conversion'
+
 export type RendererFieldType =
   | 'text'
   | 'email'
@@ -280,4 +282,6 @@ export interface PublicSubmitResult {
   outcome: PublicSubmitOutcome
   submissionId?: string
   reason?: string
+  /** Dedicated Ads channel; must never be spread into ordinary telemetry. */
+  googleAdsConversion?: GoogleAdsConversionReceipt
 }

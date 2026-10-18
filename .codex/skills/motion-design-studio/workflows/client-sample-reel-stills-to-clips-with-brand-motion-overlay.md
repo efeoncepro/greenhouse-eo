@@ -69,6 +69,12 @@ pnpm -s ai:byteplus --model seedance25 --image $R/stills/$n-916.png --prompt-fil
 - Lo entregado [medido con ffprobe]: HEVC 1080×1920, **24 fps**, 5,04 s. El montaje lo conforma a 30 fps.
 - La etiqueta del envase se mantuvo exacta en movimiento **en este caso**. No es garantía: revisar primer cuadro, último
   y dos intermedios al 100 %; si deriva, la etiqueta se compone.
+- 🔴 **Cuadro externo con rostro humano:** se observó rechazo `PrivacyInformation`; el KYC solo no basta.
+  Cargar el [preflight de retratos](../../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md)
+  y el [ledger por cuenta](../../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+  Un `asset://` exige el mismo propietario que la API y estado literal `Active`; probar referencia y primer cuadro
+  por separado a 480p/4 s antes de planificar este flujo a 1080p. Una fila histórica de otra cuenta no acredita
+  compatibilidad. Seguir las vías oficiales del manual o la alternativa autorizada, sin «lavar» el cuadro por Seedream.
 
 ### 3. Capa de motion (HTML + GSAP → secuencia PNG con alfa)
 

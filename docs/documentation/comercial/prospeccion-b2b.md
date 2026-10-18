@@ -1,5 +1,10 @@
 # Prospección B2B Efeonce
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 Método compartido para transformar una cuenta, señal o lista focalizada en una ruta comercial sustentada.
 Se opera con [efeonce-b2b-prospecting](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md).
 [Decisión técnica](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md) y
@@ -78,8 +83,23 @@ convierte el plan en pasos personalizados, brochures con contexto, firma predete
 laboral local. Para Julio se conserva HubSpot, no Apollo. Comprobar respuesta a cualquier correo, inicio
 futuro y estado Programado por persona; no confundir inscripción, envío, entrega o eficacia. La autorización
 es por lote, sin ampliar el heartbeat. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+La versión del documento compartido y el cuerpo/calendario personalizados de inscripción se conservan
+como evidencia separada de la plantilla y ventana generales. Firma configurada, preview renderizado y
+firma entregada no son equivalentes. [Caso web del 16/10](../../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
 
 ## Roles y continuidad
+
+Para radar de convocatorias, la [guía de primera entrada](../../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md)
+prioriza interés/credenciales/inscripción/visita además de propuesta final. Se avisan señales tempranas
+documentadas con acción útil al operador sin esperar el RFP ni certificar elegibilidad. Descubrimiento
+amplio y vigilancia de conocidos son independientes, igual que público/privado por Chile/Colombia/México/
+Perú; nonprofit aparte, LATAM primero y Palm Desert condicionado. Solape mínimo de 72 horas ampliable
+ante indexación tardía acreditada; bloqueo canónico de identidad/URL impide reintentos y avance de marcadores.
+Publicación, disponibilidad pública, detección, validación, aviso y margen útil se registran separados;
+alta CRM no acredita detección. Menos de cinco días hábiles a la primera puerta muestra detección tardía.
+[Socopur 2027](../../commercial/tenders/socopur-agencia-marketing-digital-2027/README.md): entrada tardía
+cerrada, sin adjudicación inferida. Método documental; frecuencia, suscripciones y permisos intactos,
+sin promesa de exhaustividad o automatización desplegada.
 
 Commercial dirige avance de venta; Customer Model el ICP/grupo comprador; prácticas oferta/capacidad/proof;
 Copywriting mensajes; HubSpot CRM/dedupe/asociaciones/readback. Sales opcional apoya la fase adecuada cuando
@@ -100,3 +120,12 @@ evidencia real de uso y, cuando corresponde, una autorización de acción distin
 Desde el 2026-10-12 la respuesta es proporcional al pedido: contesta primero lo que se preguntó y deja la
 entrega completa para dossier o handoff. Un [diferencial ciego bajo Claude](../../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md)
 mostró que la skill evita el alta de contactos sin correo, y que antes de la corrección respondía 74 % más largo.
+
+## Seguimiento de largo plazo
+
+La [política aceptada](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) conserva cuentas con encaje y proveedor
+actual tras detener el acercamiento. Hito comprador prevalece; proveedor recién contratado sin hito deja
+revisión interna a seis meses, owner/TASK única en **HubSpot** y restricciones vigentes. Notion conserva
+trabajo operativo/entregables; no duplica las tareas comerciales. El seguimiento recupera esa
+cola aunque cambie el mes del proyecto. Revisar, nutrir con permiso y recontactar autorizado son acciones
+distintas; la respuesta no crea opt-in ni oportunidad. [Caso Fabrimetal](../../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).

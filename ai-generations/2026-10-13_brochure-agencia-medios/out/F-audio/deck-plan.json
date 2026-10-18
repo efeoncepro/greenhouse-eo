@@ -1,0 +1,73 @@
+{
+  "tenderId": "F-audio",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 311,
+          "answerPx": 176,
+          "bodyTop": 538,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:PG8-audio-digital",
+          "alt": "Isabella con audífonos en el andén del metro, rodeada de ondas de sonido, entre personas que escuchan"
+        },
+        "voice": {
+          "question": "¿Y en audio?",
+          "answer": "Al oído",
+          "eyebrow": "Programática · Audio digital"
+        },
+        "body": "Anuncios entre canciones y episodios de podcast, en streaming de música y radio digital, con un banner que lo acompaña en pantalla.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:medios-voice-dark-44",
+            "kicker": "Dónde",
+            "name": "Música y podcast"
+          },
+          {
+            "icon": "asset-ref:icon:reloj-voice-dark-44",
+            "kicker": "Formato",
+            "name": "15 o 30 s"
+          },
+          {
+            "icon": "asset-ref:icon:web-voice-dark-44",
+            "kicker": "Acompaña",
+            "name": "Banner en pantalla"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-voice-dark-44",
+            "kicker": "Se mide",
+            "name": "Escucha completa"
+          }
+        ],
+        "note": "Inventario de audio y podcast se confirma por mercado.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

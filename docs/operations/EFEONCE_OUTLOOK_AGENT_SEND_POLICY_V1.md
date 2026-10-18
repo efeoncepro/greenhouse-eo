@@ -69,9 +69,16 @@ conserva las dos vías aprobadas y la autorización específica de cada envío.
   experiencia autorizada. Evitar elogios genéricos, catálogo completo, promesas de resultados y experiencia
   sectorial/regulatoria no acreditada. Respetar el trabajo que ya realiza el equipo interno.
 - Elegir la versión pertinente del brochure y explicar en el cuerpo qué encontrará y por qué se comparte.
-  Un enlace sin contexto no cumple. La presencia en OneDrive/HubSpot no valida cifras, casos, derechos o
-  compromisos pendientes: revisar el contenido y sus fuentes antes de usarlo. Si el enlace de Documents
-  fue creado para otro destinatario, generar uno propio o adjuntar el PDF; no reciclar su atribución.
+  Para presentar Efeonce completa, el pertinente es el brochure oficial «Agencia de Marketing 360°» (aprobado
+  el 2026-10-16; versión corta de 26 láminas para conversar, completa de 84 para leer), en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`; si la necesidad es de una sola línea,
+  el brochure de esa línea. Julio ratificó el 17-10-2026 que los brochures aprobados no necesitan nada más:
+  usarlos íntegros, sin reabrir validaciones ni recortar, conforme a la
+  [regla vigente](EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+  Explicar su utilidad antes del enlace. Usar el documento original existente en HubSpot; si el enlace
+  de Documents fue creado para otra persona, generar uno para el destinatario sobre el mismo documento.
+  No adjuntar el PDF cuando Julio haya pedido enlace, ni crear una variante del brochure.
+
 - Cerrar con una invitación proporcionada y una pregunta útil. No inventar agenda, duración ni URL.
 - Dirección cargada, dirección verificada y permiso de envío son estados distintos. La excepción
   documentada de Paula en esta ronda no convierte direcciones deducidas en un canal validado ni en regla

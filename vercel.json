@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "codex/google-ads-release-preflight-20261018": false
+    }
+  },
   "ignoreCommand": "node scripts/ci/vercel-ignore-build.mjs",
   "crons": [
     {

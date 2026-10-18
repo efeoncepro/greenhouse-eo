@@ -39,6 +39,13 @@ nativo:** Seedance 2.0 genera audio nativo que a veces cae en la policy del prov
 para chequear un slug sin gastar:** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no
 existe · **422** = la app existe (falló la validación de input por falta de campos).
 
+**OmniHuman 2.0 (research 2026-10-15):** BytePlus **Vision AI**, con carriles AK/SK firmado o
+API key IAM en hosts distintos;
+no reutiliza la API key de ModelArk ni la clave Seed Speech y no está integrado en las CLI actuales ni en Globe.
+El [manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) concentra el contrato API;
+la [auditoría](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) separa documentación,
+consola y ejecución. La preferencia directa Seedance/Seedream de esta tabla no amplía ese soporte.
+
 **Economía de provider (as-of 2026-07-26):** BytePlus/ModelArk directo es la ruta de volumen para Seedance 2.0;
 Fal sirve como gateway de prototipo/fallback, pero puede agregar markup. Para FLUX.2 y Recraft hay paridad pública
 en los endpoints comparados; decidir por SLA, auth, observabilidad y derechos. FLUX 3 fue anunciado por BFL el

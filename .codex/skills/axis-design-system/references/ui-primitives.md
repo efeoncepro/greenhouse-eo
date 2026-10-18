@@ -127,6 +127,11 @@ Inspect pixels with menus open and fields focused. Automated axe and emulated We
 VoiceOver/NVDA, physical touch, autofill/password managers or consumer server validation. macOS baselines
 are not Linux baselines. Persistence, permissions, retries and draft/navigation policy stay product-owned.
 
+CSS that embeds a data URI ships it **unquoted and fully percent-encoded** (`url(data:…)`). Bundlers that
+rewrite quoted `url("…")` as file paths can crash the consumer build: Astro 7's `astro:tsconfig-alias-css` pass
+failed Think with `ENAMETOOLONG` on the mention mask (primitives 0.6.8), which the alias-free AXIS Lab did not
+reproduce. Before releasing CSS consumed by another host, build that consumer against the local AXIS `dist`.
+
 Date/file controls and multiselect Combobox are outside this delivery. Published packages do not authorize
 replacing Greenhouse's existing MUI controls: record reuse/extend/adapt and verify the product boundary first.
 
@@ -231,3 +236,43 @@ streaming providers, review persistence and analytics consent remain consumer re
 No new package release or full browser matrix is required for this documentation consolidation.
 
 Verified against AXIS release `7fb549a`, main documentation `15b1898`; Think `cd428c7` — 2026-10-07.
+
+## Efeonce mention (`efeonce.mention`) — published 2026-10-18
+
+Inline link to an Efeonce service or product: isotype in front, pill in the accent of the service line,
+isotype tilt on hover (none under reduced motion; forced colors keep a LinkText border and the isotype).
+Only for Efeonce destinations; few per section, short labels (2–4 words); not a CTA, not for external links.
+Brand meaning and when to use it: [graphic-line applications](../../efeonce-graphic-line/references/applications.md#a14-mención-efeonce-en-texto-corrido-2026-10-18).
+
+| Layer | Owns |
+| --- | --- |
+| `axisMention` (`packages/tokens/src/mention.ts`) | Palette per line (growth, brand, engine, voice, revenue-hubspot, revenue-salesforce) × surface (light/dark): isotype accent ≥3:1 vs ground, pill tint rest/hover, ink ≥4.5:1; lengths in em, weight 500 |
+| Contract `efeonce.mention` 1.0.0 `candidate` (`packages/contracts/src/mention.ts`) | `resolveMention`, `isEfeonceHref`, `mentionOptions`, `MentionValidationError` (INVALID_INPUT, LABEL_REQUIRED, NOT_EFEONCE_HREF, INVALID_LINE, INVALID_SURFACE, INVALID_OPTION). Accepts a root-relative path or https on `efeoncepro.com` / `efeonce.org` and subdomains; rejects http, credentials, `//host`, `#`, mailto, tel and look-alike hosts. Defaults: surface light, line growth; `newTab` adds `target=_blank rel=noopener` |
+| `axis-ui-primitives` | `mentionHtml`, `mentionAttributes`, `mentionTree`, `mentionCss`, export `./mention.css`, React `<Mention>` in `/react`. Markup `<a class="axis-mention" href data-line data-surface>label</a>`, no JS |
+| Registry / Lab / quality | Capability `efeonce.mention`; `/patterns/efeonce.mention/`; AXIS `docs/quality/mention.md` |
+
+The isotype is a CSS mask data URI generated from the sealed `axis-brand-assets/assets/efeonce-isotype-negative.svg`
+by `node packages/primitives/scripts/mention-isotype.mjs`; a test fails when it drifts and another forbids quoted
+urls. Never put the isotype in markup or alt text. The doubled selector `a.axis-mention.axis-mention` plus
+`background-image:none` resists host link styles; a host may set `--axis-mention-accent|-tint|-tint-hover|-ink`
+on the anchor instead of forking the CSS.
+
+Published set: tag `v0.7.5` (`dd833d5`) = tokens 0.6.5, contracts 0.7.5, registry 0.7.3, primitives 0.6.8;
+tag `v0.6.9` (`69492cf`; mask fix `701a164`) = primitives 0.6.9 with the unquoted mask (see the data-URI rule above). **Pin primitives
+0.6.9 or later; never 0.6.8 in Astro hosts.**
+
+Consumers (verified 2026-10-18):
+
+- **WordPress** (`efeonce-public-site-runtime`, plugin `eo-elementor-widgets`): `assets/css/axis-mention.css` is a
+  byte copy of primitives 0.6.9 `dist/mention.css` with a header recording package version and sha256
+  (`baacdd7053ec7c6b70a881cefb32cae03b77ca8e77ca94c4d311fa8f0f8cee4f`); recopy it from
+  the package, never edit it. `includes/eo-mention.php` enqueues handle `axis-mention` site-wide (frontend, Elementor
+  preview, block editor). Live on the Inbound landing (`data-line="revenue-hubspot" data-surface="dark"`).
+- **Think**: exact pin 0.6.9; `src/components/EfeonceMention.astro` wraps `mentionHtml` + `mention.css` (props =
+  `MentionOptions`; a non-Efeonce href fails the build); noindex preview `https://think.efeoncepro.com/preview/mention`
+  (Think routes have no trailing slash; `/preview/mention/` answers 308). Live: commit `f603060`, Vercel production
+  Ready, 200 with 3 mentions, noindex, no overflow, `astro check` 0 errors. Published 0.6.9 `mention.css` sha256 =
+  the WordPress copy's.
+
+AXIS owns the mention; a landing or product never forks its CSS. The mention is a mechanism, not a template for
+the page that first used it.

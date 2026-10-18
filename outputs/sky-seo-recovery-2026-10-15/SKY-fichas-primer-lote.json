@@ -1,0 +1,900 @@
+{
+  "generatedAt": "2026-10-15",
+  "status": "Propuesta revisable; no publicación ni cambio de CMS",
+  "briefCount": 10,
+  "existingArticleBriefs": 9,
+  "technicalDecisionBriefs": 1,
+  "sources": {
+    "playbook": "https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e",
+    "voice": "https://app.notion.com/p/a7339c2fefe782b99e22013d9a5f0647",
+    "routes": "https://app.notion.com/p/c6bcd3d717794691b706befbc25c4b74"
+  },
+  "items": [
+    {
+      "rank": 1,
+      "url": "https://blog.skyairline.com/como-cambiar-un-vuelo-en-sky-pasos-y-condiciones/",
+      "wpId": null,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": null,
+      "visibleQueryClicks": null,
+      "visibleQueryCoverage": null,
+      "topQueryCountry": [],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": null,
+      "seo": null,
+      "description": null,
+      "intent": "Recuperar acceso a una guía histórica útil; decisión coordinada con R05, no un artículo nuevo adicional.",
+      "synopsis": "Reconstruir el contenido anterior o documentar equivalencia suficiente antes de consolidarlo con /cambiar-vuelo-sky/. Ambas URLs tuvieron tráfico en 2025; no consta que fueran un simple cambio de slug.",
+      "problems": [
+        "Destino actual 404 con valor histórico GA4.",
+        "No hay equivalencia acreditada ni copia histórica suficiente para aplicar 301 automáticamente."
+      ],
+      "sections": [],
+      "sources": [
+        "GA4 histórico, 404 público y búsqueda de versiones/archivo; confirmación de SKY."
+      ],
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/cambiar-vuelo-sky/",
+          "wpId": 6409,
+          "title": "Guía actual de cambios: candidata, equivalencia pendiente"
+        }
+      ],
+      "acceptance": "Decisión editorial documentada: restaurar contenido útil o aprobar equivalencia de consolidación. Si procede 301, un salto al destino 200 y canonical correcto. Sin equivalencia, conservar 404 correcto o retirar enlace; nunca enviar masivamente a home."
+    },
+    {
+      "rank": 2,
+      "url": "https://blog.skyairline.com/equipaje-de-cabina/",
+      "wpId": 1298,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 8263,
+      "visibleQueryClicks": 3265,
+      "visibleQueryCoverage": 0.3951349388841825,
+      "topQueryCountry": [
+        {
+          "query": "bolso de mano sky",
+          "country": "chl",
+          "clicks": 180,
+          "impressions": 1370,
+          "ctr": 0.13138686131386862,
+          "position": 1.7481751824817517
+        },
+        {
+          "query": "bolso de mano sky",
+          "country": "per",
+          "clicks": 133,
+          "impressions": 1199,
+          "ctr": 0.11092577147623019,
+          "position": 1.8748957464553795
+        },
+        {
+          "query": "equipaje de mano sky",
+          "country": "chl",
+          "clicks": 110,
+          "impressions": 555,
+          "ctr": 0.1981981981981982,
+          "position": 1.281081081081081
+        },
+        {
+          "query": "sky bolso de mano",
+          "country": "chl",
+          "clicks": 86,
+          "impressions": 200,
+          "ctr": 0.43,
+          "position": 1.6800000000000004
+        },
+        {
+          "query": "sky equipaje de mano",
+          "country": "chl",
+          "clicks": 80,
+          "impressions": 256,
+          "ctr": 0.3125,
+          "position": 1.3125
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Equipaje de cabina: qué llevar y qué revisar antes de volar",
+      "seo": "Equipaje de cabina: qué llevar y qué revisar | SKY",
+      "description": "Distingue el artículo personal del equipaje de cabina, organiza lo esencial y revisa las restricciones oficiales de SKY antes de preparar tu maleta.",
+      "intent": "Resolver una duda operativa antes de comprar o embarcar; preservar la respuesta sobre bolso de mano sin mezclar categorías.",
+      "synopsis": "Refresh de la guía actual con una comparación clara entre artículo personal y equipaje de cabina. La información oficial se presenta con mercado y fecha, y deriva a las condiciones aplicables a la reserva.",
+      "problems": [
+        "El texto actual define categorías, pero remite de forma general a ayuda: necesita una respuesta práctica sin inventar medidas o franquicias.",
+        "Metadescripción y JSON-LD ausentes en el HTML auditado.",
+        "La muestra móvil de laboratorio registra LCP de 11,52 s; es evidencia técnica de una ejecución, no dato de campo."
+      ],
+      "sections": [
+        "¿Qué se considera equipaje de cabina y qué es un artículo personal?",
+        "¿Cómo revisas qué incluye tu reserva en SKY?",
+        "¿Qué objetos requieren una comprobación adicional?",
+        "¿Qué debes revisar antes de llegar al aeropuerto?"
+      ],
+      "sources": [
+        "Centro de Ayuda SKY del mercado de la reserva: equipaje, objetos restringidos y franquicias vigentes.",
+        "Responsable de plantilla: imagen LCP, recursos bloqueantes, consentimiento y etiquetas."
+      ],
+      "acceptance": "Comparación inequívoca entre categorías; toda cifra/política con respaldo actual; mismo slug; meta única y BlogPosting fiel al contenido. Verificación móvil del LCP con condiciones repetibles sin romper consentimiento/medición.",
+      "currentTitle": "Equipaje de cabina: qué es, qué puedes llevar y cómo revisar las restricciones",
+      "sourcePostDate": "2026-01-05T09:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/tipos-de-equipaje/",
+          "wpId": 1907,
+          "title": "Tipo de equipaje y cuáles puedes llevar en tu viaje"
+        },
+        {
+          "url": "https://blog.skyairline.com/equipaje-de-mano-permitido/",
+          "wpId": 1922,
+          "title": "¿Qué no está permitido en el equipaje de mano?"
+        },
+        {
+          "url": "https://blog.skyairline.com/equipaje-de-bodega/",
+          "wpId": 7493,
+          "title": "Equipaje de bodega y de mano: qué llevar y cómo prepararte para tu vuelo"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://cda.skyairline.com/es/peru/servicios/centro-de-ayuda/category/37",
+        "https://cda.skyairline.com/es/chile/centro-de-ayuda",
+        "https://www.skyairline.com/es/otros",
+        "https://cda.skyairline.com/es/otros/centro-de-ayuda"
+      ]
+    },
+    {
+      "rank": 3,
+      "url": "https://blog.skyairline.com/tipos-de-equipaje/",
+      "wpId": 1907,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 5301,
+      "visibleQueryClicks": 1778,
+      "visibleQueryCoverage": 0.3354084135068855,
+      "topQueryCountry": [
+        {
+          "query": "sky equipaje",
+          "country": "chl",
+          "clicks": 89,
+          "impressions": 150,
+          "ctr": 0.5933333333333334,
+          "position": 1.16
+        },
+        {
+          "query": "equipaje sky",
+          "country": "chl",
+          "clicks": 79,
+          "impressions": 142,
+          "ctr": 0.5563380281690141,
+          "position": 1.1549295774647887
+        },
+        {
+          "query": "sky equipaje",
+          "country": "per",
+          "clicks": 79,
+          "impressions": 128,
+          "ctr": 0.6171875,
+          "position": 1.1640625
+        },
+        {
+          "query": "sky maletas",
+          "country": "chl",
+          "clicks": 77,
+          "impressions": 177,
+          "ctr": 0.4350282485875706,
+          "position": 1.3898305084745763
+        },
+        {
+          "query": "equipaje sky",
+          "country": "per",
+          "clicks": 52,
+          "impressions": 98,
+          "ctr": 0.5306122448979592,
+          "position": 1.2244897959183674
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Tipos de equipaje: cómo elegir qué llevar en tu viaje",
+      "seo": "Tipos de equipaje: cabina, bodega y especial | SKY",
+      "description": "Compara artículo personal, equipaje de cabina, bodega y equipaje especial. Identifica qué revisar en tu reserva y cómo elegir según tu viaje.",
+      "intent": "Comparar categorías; guiar hacia las páginas específicas, sin competir con la consulta detallada de cabina.",
+      "synopsis": "Convertir el listado actual en una guía de decisión según duración y necesidades del viaje, con una tabla comparativa y enlaces a cada categoría. No sustituye las reglas oficiales de la tarifa.",
+      "problems": [
+        "La pieza mezcla recomendaciones y condiciones generales; separar la elección editorial de las reglas de SKY.",
+        "La frontera de intención con equipaje de cabina debe quedar explícita antes de ampliar ambas piezas.",
+        "Metadescripción y JSON-LD ausentes en el HTML auditado."
+      ],
+      "sections": [
+        "¿En qué se diferencian el artículo personal y el equipaje de cabina?",
+        "¿Cuándo conviene despachar equipaje en bodega?",
+        "¿Qué requiere una gestión como equipaje especial?",
+        "¿Cómo compruebas qué equipaje incluye tu reserva?"
+      ],
+      "sources": [
+        "Centro de Ayuda SKY: clasificación de equipaje, tarifa y equipaje especial del mercado aplicable."
+      ],
+      "acceptance": "Tabla por categorías sin duplicar la guía de restricciones; denominaciones consistentes; condiciones verificadas; enlaces finales 200 y slug estable.",
+      "currentTitle": "Tipo de equipaje y cuáles puedes llevar en tu viaje",
+      "sourcePostDate": "2026-01-05T09:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/equipaje-de-cabina/",
+          "wpId": 1298,
+          "title": "Equipaje de cabina: qué es, qué puedes llevar y cómo revisar las restricciones"
+        },
+        {
+          "url": "https://blog.skyairline.com/equipaje-de-bodega/",
+          "wpId": 7493,
+          "title": "Equipaje de bodega y de mano: qué llevar y cómo prepararte para tu vuelo"
+        },
+        {
+          "url": "https://blog.skyairline.com/equipaje-de-mano-permitido/",
+          "wpId": 1922,
+          "title": "¿Qué no está permitido en el equipaje de mano?"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://cda.skyairline.com/es/peru/servicios/centro-de-ayuda/category/37",
+        "https://www.skyairline.com/es/otros",
+        "https://cda.skyairline.com/es/peru/centro-de-ayuda",
+        "https://www.skyairline.com/es/chile"
+      ]
+    },
+    {
+      "rank": 4,
+      "url": "https://blog.skyairline.com/sky-plus/",
+      "wpId": 8409,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 1818,
+      "visibleQueryClicks": 983,
+      "visibleQueryCoverage": 0.5407040704070407,
+      "topQueryCountry": [
+        {
+          "query": "sky plus",
+          "country": "chl",
+          "clicks": 295,
+          "impressions": 8340,
+          "ctr": 0.03537170263788969,
+          "position": 4.187290167865708
+        },
+        {
+          "query": "puntos sky plus",
+          "country": "chl",
+          "clicks": 100,
+          "impressions": 1090,
+          "ctr": 0.09174311926605505,
+          "position": 3.411926605504587
+        },
+        {
+          "query": "skyplus",
+          "country": "chl",
+          "clicks": 88,
+          "impressions": 4367,
+          "ctr": 0.020151133501259445,
+          "position": 4.9633615754522555
+        },
+        {
+          "query": "sky plus",
+          "country": "per",
+          "clicks": 50,
+          "impressions": 1333,
+          "ctr": 0.037509377344336084,
+          "position": 3.81695423855964
+        },
+        {
+          "query": "puntos sky",
+          "country": "chl",
+          "clicks": 37,
+          "impressions": 504,
+          "ctr": 0.07341269841269842,
+          "position": 3.607142857142857
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "SKY Plus: cómo revisar tu cuenta, puntos y canjes",
+      "seo": "SKY Plus: cuenta, puntos y canjes | SKY",
+      "description": "Consulta cómo gestionar tu cuenta SKY Plus, revisar puntos y preparar un canje. Encuentra las condiciones oficiales que debes comprobar antes de viajar.",
+      "intent": "Navegación y orientación del programa de fidelidad; distinguir cuenta, acumulación y canje.",
+      "synopsis": "Reordenar la guía existente alrededor de las tareas que busca resolver el usuario. Cada paso y regla se contrasta con el programa oficial, sin prometer acumulación automática ni beneficios universales.",
+      "problems": [
+        "El cuerpo actual afirma que comprar, volar y usar la cuenta basta para participar: validar la condición exacta antes de mantenerla.",
+        "No presentar la ausencia de filas GSC de 2025 como pérdida: la comparación debe partir de su primer período con datos.",
+        "Metadescripción y JSON-LD ausentes en el HTML auditado."
+      ],
+      "sections": [
+        "¿Cómo accedes o te registras en SKY Plus?",
+        "¿Dónde revisas los puntos de tu cuenta?",
+        "¿Qué debes comprobar para acumular puntos?",
+        "¿Qué condiciones debes revisar antes de canjear?"
+      ],
+      "sources": [
+        "Página y condiciones vigentes del programa SKY Plus; validar también mercado y denominaciones actuales."
+      ],
+      "acceptance": "Pasos reales contrastados con el programa; vigencias y exclusiones con fuente; enlace oficial comprobado; sin atribuir ventas o valor de cliente a los clics de esta guía.",
+      "currentTitle": "SKY Plus: cómo funciona el programa de fidelidad y cómo aprovecharlo al viajar",
+      "sourcePostDate": "2026-03-06T12:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/comprar-pasajes-sky/",
+          "wpId": 4282,
+          "title": "Cómo comprar y gestionar tus pasajes con SKY desde la APP"
+        },
+        {
+          "url": "https://blog.skyairline.com/sky-lanza-nuevo-programa-de-fidelidad-sky-plus/",
+          "wpId": 4382,
+          "title": "SKY lanza nuevo programa de fidelidad “SKY Plus”"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://www.skyairline.com/es/chile/skyplus"
+      ]
+    },
+    {
+      "rank": 5,
+      "url": "https://blog.skyairline.com/cambiar-vuelo-sky/",
+      "wpId": 6409,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 2922,
+      "visibleQueryClicks": 797,
+      "visibleQueryCoverage": 0.2727583846680356,
+      "topQueryCountry": [
+        {
+          "query": "sky cambio de vuelo",
+          "country": "chl",
+          "clicks": 64,
+          "impressions": 408,
+          "ctr": 0.1568627450980392,
+          "position": 2.6715686274509802
+        },
+        {
+          "query": "cambiar vuelo sky",
+          "country": "chl",
+          "clicks": 57,
+          "impressions": 315,
+          "ctr": 0.18095238095238095,
+          "position": 2.5428571428571427
+        },
+        {
+          "query": "sky cambio de pasajes",
+          "country": "chl",
+          "clicks": 52,
+          "impressions": 249,
+          "ctr": 0.20883534136546184,
+          "position": 2.353413654618474
+        },
+        {
+          "query": "cambio de pasaje sky",
+          "country": "chl",
+          "clicks": 44,
+          "impressions": 124,
+          "ctr": 0.3548387096774194,
+          "position": 2.346774193548387
+        },
+        {
+          "query": "cambiar pasaje sky",
+          "country": "chl",
+          "clicks": 42,
+          "impressions": 193,
+          "ctr": 0.21761658031088082,
+          "position": 2.4248704663212433
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Cómo cambiar un vuelo en SKY y revisar tus condiciones",
+      "seo": "Cómo cambiar un vuelo en SKY: pasos y condiciones",
+      "description": "Revisa dónde gestionar un cambio de vuelo en SKY y qué condiciones de tu tarifa debes comprobar. Distingue un cambio voluntario de una reprogramación.",
+      "intent": "Gestionar un cambio de reserva; separar cambios voluntarios, reprogramación y nombre del pasajero.",
+      "synopsis": "Actualizar la guía actual con pasos comprobados y condiciones oficiales. Coordinar su destino con la URL histórica rota después de demostrar equivalencia, evitando dos contenidos que respondan lo mismo.",
+      "problems": [
+        "El artículo contiene afirmaciones de costos, cambios de destino y plazos que requieren contraste oficial; no reutilizar el plazo de 24 h como regla vigente sin verificarlo.",
+        "El vínculo a una antigua URL no prueba equivalencia histórica: ambas rutas tuvieron tráfico en 2025.",
+        "La landing externa promocional usada en el cuerpo necesita un destino vigente autorizado."
+      ],
+      "sections": [
+        "¿Dónde puedes gestionar un cambio de vuelo en SKY?",
+        "¿Qué condiciones y diferencias de tarifa debes comprobar?",
+        "¿Qué cambia si SKY reprogramó o canceló el vuelo?",
+        "¿Cuándo necesitas asistencia para continuar la gestión?"
+      ],
+      "sources": [
+        "Centro de Ayuda SKY y flujo real de gestión de reserva por mercado, sin completar una compra.",
+        "Historial de versiones o copia de la guía larga; confirmación de intención editorial."
+      ],
+      "acceptance": "Revisión SKY de condiciones sensibles; pasos verificables sin transacción; coordinación con la decisión R01; ni consolidación ni 301 antes de comprobar equivalencia.",
+      "currentTitle": "Cómo cambiar un vuelo en SKY: pasos y condiciones",
+      "sourcePostDate": "2025-08-07T12:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/administra-tu-vuelo-sky/",
+          "wpId": 5088,
+          "title": "Administra tu vuelo SKY desde la APP: ¡Conoce cómo!"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://www.skyairline.com/es/chile/app?utm_source=BLOG&utm_medium=LINK&utm_campaign=DESCARGAAPP_BLOG&utm_content=DESCARGAAPP"
+      ]
+    },
+    {
+      "rank": 6,
+      "url": "https://blog.skyairline.com/lugares-turisticos-chile/",
+      "wpId": 1696,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 5,
+      "visibleQueryClicks": 2,
+      "visibleQueryCoverage": 0.4,
+      "topQueryCountry": [
+        {
+          "query": "lugar turístico",
+          "country": "chl",
+          "clicks": 1,
+          "impressions": 7,
+          "ctr": 0.14285714285714285,
+          "position": 10.714285714285714
+        },
+        {
+          "query": "lugares turisticos en chile",
+          "country": "col",
+          "clicks": 1,
+          "impressions": 1,
+          "ctr": 1.0,
+          "position": 31.0
+        },
+        {
+          "query": "atracciones",
+          "country": "chl",
+          "clicks": 0,
+          "impressions": 72,
+          "ctr": 0.0,
+          "position": 25.875
+        },
+        {
+          "query": "turismo",
+          "country": "chl",
+          "clicks": 0,
+          "impressions": 62,
+          "ctr": 0.0,
+          "position": 50.225806451612904
+        },
+        {
+          "query": "que ver en chile",
+          "country": "esp",
+          "clicks": 0,
+          "impressions": 56,
+          "ctr": 0.0,
+          "position": 75.375
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Lugares turísticos de Chile: cómo elegir tu recorrido",
+      "seo": "Lugares turísticos de Chile: elige tu recorrido | SKY",
+      "description": "Compara lugares turísticos de Chile según tu tiempo y tipo de viaje. Organiza un recorrido por zonas y revisa qué necesitas para planificarlo.",
+      "intent": "Elegir destinos de Chile y continuar hacia guías más específicas, en lugar de un listado promocional.",
+      "synopsis": "Reorganizar los lugares ya cubiertos por zonas y disponibilidad de tiempo. Aclarar la relación entre ciudad base, atractivo y traslado para evitar que Santiago, San Cristóbal y Atacama aparezcan como alternativas equivalentes.",
+      "problems": [
+        "Hay un shortcode CTA literal al inicio del contenido.",
+        "El listado mezcla regiones, ciudades y atractivos cercanos; necesita una jerarquía útil para el viajero.",
+        "Superlativos y recomendaciones requieren criterio y respaldo; revisar accesos y operatividad actual de cada atractivo."
+      ],
+      "sections": [
+        "¿Qué zona de Chile te conviene según los días disponibles?",
+        "¿Qué recorridos puedes combinar desde una misma ciudad base?",
+        "¿Qué necesitas verificar para visitar parques y atractivos?",
+        "¿Cómo eliges un viaje de naturaleza, ciudad o descanso?"
+      ],
+      "sources": [
+        "Organismos oficiales de turismo y administradores de parques/atractivos citados.",
+        "Catálogo vigente de rutas SKY: sólo filas activas del mercado pertinente, sin UTM."
+      ],
+      "acceptance": "Retirar código literal y validar el nuevo CTA; sin duplicación artificial de lugares; cada acceso/ruta respaldado; no ampliar a una ruta no confirmada.",
+      "currentTitle": "Los 15 mejores lugares turísticos de Chile",
+      "sourcePostDate": "2022-04-15T08:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/panoramas-para-ninos-en-santiago/",
+          "wpId": 7752,
+          "title": "10 Panoramas para Niños en Santiago: Guía para Una Aventura Familiar Inolvidable"
+        },
+        {
+          "url": "https://blog.skyairline.com/destinos-de-verano/",
+          "wpId": 991,
+          "title": "Dónde viajar en verano: 12 destinos imperdibles en América del Sur"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://flights.skyairline.com/es/vuelos-a-torres-del-paine"
+      ]
+    },
+    {
+      "rank": 7,
+      "url": "https://blog.skyairline.com/destinos-de-verano/",
+      "wpId": 991,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 29,
+      "visibleQueryClicks": 2,
+      "visibleQueryCoverage": 0.06896551724137931,
+      "topQueryCountry": [
+        {
+          "query": "donde viajar en verano",
+          "country": "chl",
+          "clicks": 1,
+          "impressions": 16491,
+          "ctr": 6.063913649869626e-05,
+          "position": 3.9828997635073677
+        },
+        {
+          "query": "donde veranear",
+          "country": "chl",
+          "clicks": 1,
+          "impressions": 2,
+          "ctr": 0.5,
+          "position": 9.0
+        },
+        {
+          "query": "donde viajar en verano",
+          "country": "bra",
+          "clicks": 0,
+          "impressions": 8469,
+          "ctr": 0.0,
+          "position": 9.822647301924667
+        },
+        {
+          "query": "donde viajar en verano",
+          "country": "arg",
+          "clicks": 0,
+          "impressions": 1991,
+          "ctr": 0.0,
+          "position": 10.772476142641889
+        },
+        {
+          "query": "donde viajar en verano",
+          "country": "per",
+          "clicks": 0,
+          "impressions": 1366,
+          "ctr": 0.0,
+          "position": 10.169106881405563
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Dónde viajar en verano: elige por clima y tipo de viaje",
+      "seo": "Dónde viajar en verano: destinos y cómo elegir | SKY",
+      "description": "Elige dónde viajar en verano según el clima, los días disponibles y el tipo de experiencia. Compara destinos y revisa cómo organizar tu recorrido.",
+      "intent": "Comparar destinos antes de planificar; reconocer estaciones y diferencias regionales.",
+      "synopsis": "Conservar los destinos pertinentes y convertir la lista en una selección por perfil, días disponibles y clima local. Separar una recomendación turística de la disponibilidad real de vuelos SKY.",
+      "problems": [
+        "El texto generaliza una mejora del clima de diciembre a marzo para países distintos: revisar cada destino y temporada con fuente local.",
+        "Eliminar superlativos vacíos y la promesa de que sólo falta hacer las maletas.",
+        "Revisar afirmaciones concretas de temperatura del agua y fauna; mantenerlas sólo con respaldo."
+      ],
+      "sections": [
+        "¿Qué destino encaja con tus días de vacaciones?",
+        "¿Cómo cambia el clima entre playa, montaña y selva?",
+        "¿Qué elegir si viajas en familia o buscas naturaleza?",
+        "¿Qué debes comprobar antes de reservar el viaje?"
+      ],
+      "sources": [
+        "Turismo y meteorología oficiales de cada destino conservado.",
+        "Catálogo activo de rutas SKY del día de producción; no afirmar vuelos directos sin fila válida."
+      ],
+      "acceptance": "Comparación por criterios concretos; temporadas verificadas por destino; sin precios fijos; únicamente rutas activas confirmadas y máximo dos menciones de ruta.",
+      "currentTitle": "Dónde viajar en verano: 12 destinos imperdibles en América del Sur",
+      "sourcePostDate": "2026-07-20T12:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/lugares-turisticos-chile/",
+          "wpId": 1696,
+          "title": "Los 15 mejores lugares turísticos de Chile"
+        },
+        {
+          "url": "https://blog.skyairline.com/vacaciones-en-familia/",
+          "wpId": 8029,
+          "title": "5 motivos para tomarte unas vacaciones en familia (y cómo aprovecharlas al máximo)"
+        },
+        {
+          "url": "https://blog.skyairline.com/playas-mancora/",
+          "wpId": 5862,
+          "title": "Mejores playas de Máncora que debes conocer en tu visita a Perú"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://www.skyairline.com/flights/es/"
+      ]
+    },
+    {
+      "rank": 8,
+      "url": "https://blog.skyairline.com/panoramas-para-ninos-en-santiago/",
+      "wpId": 7752,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 336,
+      "visibleQueryClicks": 159,
+      "visibleQueryCoverage": 0.4732142857142857,
+      "topQueryCountry": [
+        {
+          "query": "panoramas para niños en santiago",
+          "country": "chl",
+          "clicks": 28,
+          "impressions": 1400,
+          "ctr": 0.02,
+          "position": 8.475714285714286
+        },
+        {
+          "query": "panoramas para niños en santiago este fin de semana",
+          "country": "chl",
+          "clicks": 8,
+          "impressions": 311,
+          "ctr": 0.02572347266881029,
+          "position": 7.19935691318328
+        },
+        {
+          "query": "panorama para niños en santiago",
+          "country": "chl",
+          "clicks": 7,
+          "impressions": 369,
+          "ctr": 0.018970189701897018,
+          "position": 8.94579945799458
+        },
+        {
+          "query": "panoramas para niños hoy",
+          "country": "chl",
+          "clicks": 5,
+          "impressions": 296,
+          "ctr": 0.016891891891891893,
+          "position": 7.905405405405405
+        },
+        {
+          "query": "panoramas niños",
+          "country": "chl",
+          "clicks": 5,
+          "impressions": 150,
+          "ctr": 0.03333333333333333,
+          "position": 7.1066666666666665
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Panoramas para niños en Santiago: elige según tu familia",
+      "seo": "Panoramas para niños en Santiago: cómo elegir | SKY",
+      "description": "Organiza panoramas para niños en Santiago según sus edades, el clima y el tiempo disponible. Revisa qué comprobar antes de visitar cada lugar.",
+      "intent": "Elegir una actividad familiar viable y preparar la visita con información vigente.",
+      "synopsis": "Auditar uno por uno los diez lugares actuales y rehacer la selección por edad, clima y tiempo. No mantener la cifra del titular hasta verificar que todas las opciones sigan disponibles.",
+      "problems": [
+        "El artículo presenta como disponibles recintos y actividades que necesitan comprobación actual con sus operadores.",
+        "Duplicación de Parque Metropolitano y Zoológico Nacional como planes independientes sin aclarar la relación.",
+        "Promesas de seguridad, disponibilidad, entradas y tiempos de viaje necesitan revisión; quitar garantías y generalizaciones."
+      ],
+      "sections": [
+        "¿Qué panorama elegir según la edad de los niños?",
+        "¿Qué opciones sirven para lluvia o mucho calor?",
+        "¿Qué revisar sobre apertura, entradas y accesibilidad?",
+        "¿Cómo organizar el traslado y el tiempo de la visita?"
+      ],
+      "sources": [
+        "Operadores oficiales de cada recinto; comprobar apertura y disponibilidad en la fecha de producción.",
+        "Página oficial del parque y transporte correspondiente para los traslados."
+      ],
+      "acceptance": "Todos los recintos conservados con evidencia vigente; no inventar precios, edades mínimas o accesibilidad; listado coherente con la cantidad final y revisión móvil.",
+      "currentTitle": "10 Panoramas para Niños en Santiago: Guía para Una Aventura Familiar Inolvidable",
+      "sourcePostDate": "2025-12-04T08:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/lugares-turisticos-chile/",
+          "wpId": 1696,
+          "title": "Los 15 mejores lugares turísticos de Chile"
+        },
+        {
+          "url": "https://blog.skyairline.com/vacaciones-en-familia/",
+          "wpId": 8029,
+          "title": "5 motivos para tomarte unas vacaciones en familia (y cómo aprovecharlas al máximo)"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://www.skyairline.com/flights/es-cl/vuelos-a-santiago"
+      ]
+    },
+    {
+      "rank": 9,
+      "url": "https://blog.skyairline.com/viajar-con-perros/",
+      "wpId": 1938,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 2395,
+      "visibleQueryClicks": 532,
+      "visibleQueryCoverage": 0.2221294363256785,
+      "topQueryCountry": [
+        {
+          "query": "sky mascotas",
+          "country": "chl",
+          "clicks": 91,
+          "impressions": 166,
+          "ctr": 0.5481927710843374,
+          "position": 1.1144578313253013
+        },
+        {
+          "query": "sky mascotas",
+          "country": "per",
+          "clicks": 45,
+          "impressions": 68,
+          "ctr": 0.6617647058823529,
+          "position": 1.0
+        },
+        {
+          "query": "sky viaje con mascotas",
+          "country": "chl",
+          "clicks": 24,
+          "impressions": 48,
+          "ctr": 0.5,
+          "position": 1.125
+        },
+        {
+          "query": "sky mascotas requisitos bodega",
+          "country": "chl",
+          "clicks": 23,
+          "impressions": 55,
+          "ctr": 0.41818181818181815,
+          "position": 1.4181818181818182
+        },
+        {
+          "query": "sky mascotas en cabina",
+          "country": "chl",
+          "clicks": 22,
+          "impressions": 55,
+          "ctr": 0.4,
+          "position": 1.309090909090909
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Viajar con perros en avión: qué preparar y verificar",
+      "seo": "Viajar con perros en avión: qué revisar | SKY",
+      "description": "Prepara el viaje con tu perro: revisa disponibilidad del servicio, documentación y transporte autorizado. Consulta las reglas aplicables a tu ruta.",
+      "intent": "Planificar el traslado de una mascota, con alcance regulatorio por origen y destino.",
+      "synopsis": "Convertir la guía genérica en un flujo de comprobaciones: aptitud consultada al veterinario, disponibilidad de SKY, requisitos de las autoridades y preparación. La guía de cabina mantiene su intención específica.",
+      "problems": [
+        "Frases como medidas cercanas a las permitidas no sirven como criterio de aceptación de un transportador.",
+        "Documentos, antigüedad del certificado, canal de reserva y condiciones de cabina/bodega no deben generalizarse.",
+        "La autoridad sanitaria depende del país; separar una ruta doméstica de una internacional."
+      ],
+      "sections": [
+        "¿Cómo verificas si SKY ofrece el servicio para tu viaje?",
+        "¿Qué documentos debes consultar según origen y destino?",
+        "¿Qué transportador y condiciones exige el servicio elegido?",
+        "¿Qué debes confirmar antes del día del vuelo?"
+      ],
+      "sources": [
+        "Centro de Ayuda SKY: servicio vigente para mascotas en mercado/ruta aplicable.",
+        "Autoridades sanitarias de salida y entrada, como SAG o SENASA cuando corresponda; asesoría veterinaria para salud individual."
+      ],
+      "acceptance": "SKY valida política vigente; fuente de cada requisito por jurisdicción; sin recomendación clínica ni garantía de admisión; enlaces finales comprobados.",
+      "currentTitle": "Viajar con perros: lleva a tu mejor amigo contigo",
+      "sourcePostDate": "2026-01-06T13:31:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/mascotas-en-cabina/",
+          "wpId": 50,
+          "title": "Descubre cómo llevar mascotas en cabina de forma segura y legal"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://cda.skyairline.com/es/otros/servicios/centro-de-ayuda/category/36",
+        "https://www.skyairline.com/es/otros"
+      ]
+    },
+    {
+      "rank": 10,
+      "url": "https://blog.skyairline.com/trujillo-peru/",
+      "wpId": 5104,
+      "slugAction": "Conservar slug; ninguna redirección aplicada",
+      "status": "Propuesta preparada; validación de SKY y ejecución pendientes",
+      "period": "2026-08-01/2026-09-30",
+      "gscControlClicks": 6,
+      "visibleQueryClicks": 2,
+      "visibleQueryCoverage": 0.3333333333333333,
+      "topQueryCountry": [
+        {
+          "query": "trujillo altura",
+          "country": "per",
+          "clicks": 1,
+          "impressions": 74,
+          "ctr": 0.013513513513513514,
+          "position": 8.202702702702702
+        },
+        {
+          "query": "trujillo es costa?",
+          "country": "per",
+          "clicks": 1,
+          "impressions": 19,
+          "ctr": 0.05263157894736842,
+          "position": 6.947368421052632
+        },
+        {
+          "query": "donde queda trujillo",
+          "country": "per",
+          "clicks": 0,
+          "impressions": 254,
+          "ctr": 0.0,
+          "position": 10.17716535433071
+        },
+        {
+          "query": "trujillo",
+          "country": "per",
+          "clicks": 0,
+          "impressions": 233,
+          "ctr": 0.0,
+          "position": 30.665236051502145
+        },
+        {
+          "query": "dónde queda trujillo",
+          "country": "per",
+          "clicks": 0,
+          "impressions": 114,
+          "ctr": 0.0,
+          "position": 10.491228070175438
+        }
+      ],
+      "voice": "Español neutro y tuteo. Escenario hipotético, sin experiencias inventadas. Voz SKY para datos y condiciones con fuente oficial. Firma y fecha reales; no simular actualización. Claim sólo al cierre si corresponde.",
+      "h1": "Qué hacer en Trujillo, Perú: organiza tu visita",
+      "seo": "Qué hacer en Trujillo, Perú: cómo organizarte | SKY",
+      "description": "Organiza tu visita a Trujillo, Perú, entre el centro histórico, Chan Chan y Huanchaco. Elige qué recorrer según tus días y revisa cómo planificarlo.",
+      "intent": "Planificar una visita concreta a un destino doméstico de Perú prioritario para la cuenta.",
+      "synopsis": "Transformar la guía general en recorridos por tiempo disponible y cercanía. Dar prioridad al centro, Chan Chan y Huanchaco sin inventar tiempos, entradas o una conexión aérea no verificada.",
+      "problems": [
+        "La guía acumula cifras históricas, distancias y afirmaciones sobre libre acceso que requieren fuente.",
+        "Incluye hoteles concretos sin criterio actual verificado; retirar o verificar antes de recomendarlos.",
+        "Conserva enlaces con el prefijo antiguo: usar los destinos finales comprobados del manifiesto técnico."
+      ],
+      "sections": [
+        "¿Qué puedes recorrer según los días que tienes?",
+        "¿Cómo combinas el centro de Trujillo con Chan Chan?",
+        "¿Cuándo conviene dedicar tiempo a Huanchaco?",
+        "¿Qué debes revisar sobre entradas, traslados y llegada?"
+      ],
+      "sources": [
+        "Fuentes oficiales de turismo de Perú y gestores de los recintos arqueológicos.",
+        "Catálogo activo SKY para la combinación de origen/destino y mercado; no inventar tiempos de traslado."
+      ],
+      "acceptance": "Recorridos geográficamente coherentes; datos operativos fechados y oficiales; hoteles sólo con verificación; enlaces actuales 200; ruta SKY validada antes de enlazarla.",
+      "currentTitle": "Guía completa de Trujillo, Perú para conocerla completa",
+      "sourcePostDate": "2024-10-08T09:00:00",
+      "dateCaution": "Fecha actual del CMS; no demuestra origen de la pieza ni ausencia de actividad anterior.",
+      "internalLinks": [
+        {
+          "url": "https://blog.skyairline.com/lugares-turisticos-de-piura/",
+          "wpId": 2765,
+          "title": "Qué hacer en Piura: playas, naturaleza y cultura para armar tu itinerario"
+        },
+        {
+          "url": "https://blog.skyairline.com/que-hacer-en-chiclayo/",
+          "wpId": 9139,
+          "title": "Qué hacer en Chiclayo: Ciudad de la amistad"
+        },
+        {
+          "url": "https://blog.skyairline.com/oasis-de-huacachina/",
+          "wpId": 5096,
+          "title": "Descubre el oasis de Huacachina: uno de los lugares más instagrameables del mundo"
+        }
+      ],
+      "existingOfficialLinks": [
+        "https://www.skyairline.com/es/chile/app?utm_source=BLOG&utm_medium=LINK&utm_campaign=DESCARGAAPP_BLOG&utm_content=DESCARGAAPP"
+      ]
+    }
+  ]
+}

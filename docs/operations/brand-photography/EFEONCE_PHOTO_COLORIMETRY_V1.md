@@ -55,7 +55,7 @@ Los valores Lab se calcularon con la misma conversión que usa `metricas.cjs` (s
 | Secundario | Teal | `#12AFA2` | 64,5 | −39,4 | −3,8 | 39,6 | 186 |
 | Secundario | Magenta | `#BB1954` | 41,1 | 63,1 | 9,7 | 63,8 | 9 |
 | Secundario | Púrpura | `#633F93` | 34,6 | 33,9 | −40,7 | 53,0 | 310 |
-| Línea Reach | Naranja Reach | `#FF6500` | 62,1 | 55,4 | 71,2 | 90,3 | 52 |
+| Producto Reach (línea Voice) | Naranja Reach | `#FF6500` | 62,1 | 55,4 | 71,2 | 90,3 | 52 |
 | Cursor Nexa (AXIS) | Nexa | `#D6246E` | 47,9 | 69,6 | 3,8 | 69,7 | 3 |
 
 Lecturas técnicas:

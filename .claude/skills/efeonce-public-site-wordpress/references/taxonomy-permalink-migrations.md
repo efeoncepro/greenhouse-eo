@@ -179,6 +179,33 @@ Still test both real HTTP variants. The no-slash and slash request must resolve
 without a loop or multi-hop chain to the exact new canonical. A successful
 manager readback alone is not live redirect evidence.
 
+Measured 2026-10-17: Yoast Premium 27.7 matches the **whole REQUEST_URI,
+query included**, as an exact key (`redirect-handler.php` → `search()`; its
+fallback only toggles the trailing slash; no filter hook). So
+`/habla-con-un-experto?utm_source=x` returns 404 for pages and categories, while
+old post slugs are rescued by WordPress old-slug handling. Do not patch one URL
+with a regex redirect. The platform fix is the versioned mu-plugin
+`efeonce-redirect-query-passthrough.php` (runtime repo), which reads Yoast's
+plain option and keeps the query. Check whether it is installed before assuming
+UTM behavior. Diagnosis and rollout:
+`docs/public-site/YOAST_REDIRECT_QUERY_STRING_DIAGNOSIS_V1.md`.
+
+Chains: before creating a redirect, search for existing redirects whose
+*target* is the retiring URL and repoint them. After any retirement, run
+`scripts/public-website/flatten-yoast-redirect-chains.php` (dry-run by
+default). Case: `docs/public-site/LEGACY_AGENCIA_DISENO_ESTRATEGICO_RETIREMENT_PLAN_V1.md`.
+
+Case — retiring a service landing in the same release as its replacement (Performance Marketing,
+2026-10-17, `scripts/public-website/migrate-performance-legacy.php`, snapshot option
+`_gh_performance_migration_before_20261017_181625`): plain 301
+`servicio-gestion-campanas-publicitarias` → `/servicios/performance-marketing/`, after repointing the 3
+existing redirects that targeted the legacy URL straight to the new one (no chain); legacy `242862` set
+`private` (kept, out of the sitemap); primary menu item `242915` repointed by changing only
+`_menu_item_object_id`, with the whole menu read before and after to prove label, parent and order unchanged.
+Tested live with slash, without slash and with `?utm_source=x` (301 keeping the query, thanks to the
+passthrough mu-plugin, deployed to production 2026-10-17). Detail and rollback:
+`references/landings/performance-marketing.md`.
+
 ## 5. Update Owned Internal Links
 
 Search for every old canonical after the redirect exists. Replace owned links

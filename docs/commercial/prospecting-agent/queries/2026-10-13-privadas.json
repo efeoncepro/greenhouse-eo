@@ -1,0 +1,852 @@
+{
+  "run_id": "2026-10-13-privadas",
+  "timezone": "America/Santiago",
+  "method_at_execution": "48 horas y 7 días móviles; sustituido después por semana calendario. No relabelar consultas históricas como ejecutadas bajo la nueva regla.",
+  "new_policy_week_start": "2026-10-12",
+  "new_policy_week_end": "2026-10-18",
+  "queries": [
+    {
+      "service": "seo",
+      "query": "Chile agencia SEO AEO licitación proveedor convocatoria octubre 2026",
+      "recency_days": 2,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "Chile \"rediseño\" \"licitación\" \"web\" 2026",
+      "recency_days": 2,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "Chile \"buscamos agencia\" \"2026\"",
+      "recency_days": 2,
+      "market": "Chile"
+    },
+    {
+      "service": "crm",
+      "query": "Chile \"implementación CRM\" \"licitación\" 2026",
+      "recency_days": 2,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "Chile \"agencia de medios\" \"licitación\" 2026",
+      "recency_days": 2,
+      "market": "Chile"
+    },
+    {
+      "service": "seo",
+      "query": "Chile \"buscamos\" \"agencia SEO\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "Chile \"buscamos\" \"agencia web\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "Chile \"selección de agencia\" octubre 2026",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "crm",
+      "query": "site:linkedin.com/posts Chile (\"HubSpot\" OR \"CRM\") (\"proveedor\" OR \"partner\" OR \"licitación\")",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "site:linkedin.com/posts Chile (\"agencia de medios\" OR \"paid media\") (\"buscamos\" OR \"licitación\")",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "site:linkedin.com/posts Chile (\"rediseño\" OR \"sitio web\") (\"licitación\" OR \"convocatoria\")",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "site:linkedin.com/posts Chile (\"agencia creativa\" OR \"agencias\") (\"convocatoria\" OR \"licitación\")",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "seo",
+      "query": "site:linkedin.com/posts Chile (\"SEO\" OR \"AEO\") (\"busco\" OR \"buscamos\" OR \"proveedores\")",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "Chile \"licitación\" \"marketing\" \"octubre\" \"2026\" -site:mercadopublico.cl -site:todolicitaciones.cl",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "Chile \"2027\" \"agencia\" \"selección\" -empleo -trabajo",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "Chile \"licitación privada\" \"web\" -site:mercadopublico.cl",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "\"Chile\" \"rediseño web\" (\"convocatoria\" OR \"licitación\" OR \"buscamos\") -site:mercadopublico.cl -site:todolicitaciones.cl",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "\"Chile\" \"agencia creativa\" \"licitación\" -site:mercadopublico.cl -site:todolicitaciones.cl",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "\"Chile\" \"agencia de medios\" (\"concurso\" OR \"pitch\" OR \"selección\") \"octubre\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "crm",
+      "query": "\"Chile\" \"HubSpot\" (\"solicitamos\" OR \"cotizar\" OR \"licitación\")",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "seo",
+      "query": "\"Chile\" \"SEO\" (\"RFP\" OR \"licitación\" OR \"concurso\") -site:mercadopublico.cl -site:todolicitaciones.cl",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "\"Chile\" \"licitaciones\" \"comunicaciones\" \"2026\" (fundación OR corporación OR mutual)",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "\"Chile\" \"licitaciones\" \"sitio web\" \"2026\" (fundación OR universidad OR asociación)",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "\"Chile\" \"agencia\" \"proveedores\" \"octubre de 2026\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "all",
+      "query": "Chile licitaciones proveedores \"marketing\" \"2026\" -site:mercadopublico.cl -site:todolicitaciones.cl -site:licitacionesdechile.cl -site:licitados.cl",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "\"Chile\" \"sitio web\" \"licitación\" \"octubre\" \"2026\"",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "\"Chile\" \"agencia\" \"licitación\" \"octubre\" \"2026\" -site:mercadopublico.cl",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "crm",
+      "query": "\"Chile\" \"CRM\" \"licitación\" \"2026\" -site:mercadopublico.cl -site:todolicitaciones.cl -site:licitacionesdechile.cl -site:licitados.cl",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "all",
+      "query": "site:mutual.cl \"licitaciones\" \"2026\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "all",
+      "query": "site:cajalosandes.cl (\"licitación\" OR \"proveedores\") \"agencia\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "all",
+      "query": "site:fundacionchile.cl \"licitaciones\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "Chile \"concurso de agencias\" \"2026\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "Chile \"buscamos agencia\" after:2026-10-06 before:2026-10-14",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "media",
+      "query": "Chile \"licitación medios\" \"2026\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "Chile \"proveedor\" \"rediseño\" \"octubre\" \"2026\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "crm",
+      "query": "Chile \"CRM\" \"RFP\" \"2026\"",
+      "recency_days": 7,
+      "market": "Chile"
+    },
+    {
+      "service": "all",
+      "query": "ACHS Mutual Caja Los Andes licitaciones agencia marketing sitio web",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "all",
+      "query": "Fundación Chile licitaciones comunicaciones marketing sitio web",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "web",
+      "query": "\"Chile\" \"licitación\" \"rediseño\" \"privada\" -site:mercadopublico.cl -site:chilecompra.cl -site:gob.cl",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "creative",
+      "query": "\"Chile\" \"agencia\" \"convocatoria\" \"octubre 2026\" -empleo -empleos -concurso",
+      "recency_days": null,
+      "market": "Chile"
+    },
+    {
+      "service": "seo",
+      "q": "Perú convocatoria agencia SEO AEO posicionamiento proveedor octubre 2026",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "service": "web",
+      "q": "Perú licitación privada rediseño sitio web octubre 2026",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "service": "creativa",
+      "q": "Perú buscamos agencia creativa convocatoria octubre 2026",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "service": "crm",
+      "q": "Perú convocatoria implementación CRM HubSpot proveedor octubre 2026",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "service": "medios",
+      "q": "Perú licitación agencia medios marketing digital octubre 2026",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "site:linkedin.com/posts Perú (\"buscamos agencia\" OR \"licitación\" OR \"selección de agencia\") -empleo",
+      "recency": 2,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú (\"solicitud de propuestas\" OR \"convocatoria\") (\"sitio web\" OR \"SEO\" OR \"CRM\") -site:gob.pe -site:licitacionesperu.pe -site:todolicitaciones.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú (\"licitación\" OR \"convocatoria\") (\"agencia de medios\" OR \"agencia creativa\") -site:gob.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "site:asociacionunacem.org convocatoria comunicación marketing octubre 2026",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"buscamos agencia\" -site:gob.pe -trabajo -empleo",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"agencias\" \"convocatoria\" \"octubre\" \"2026\" -site:gob.pe -site:perutrabajos.com -site:convocatoriascas.com",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"CRM\" \"proveedores\" \"licitación\" -site:gob.pe -site:licitacionesperu.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"SEO\" \"buscamos\" \"agencia\" -site:clutch.co",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"licitación\" \"agencia\" \"2027\"",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"convocatoria\" \"agencia\" \"octubre de 2026\"",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"solicitud de propuestas\" \"comunicación\" \"octubre\" \"2026\"",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"buscamos\" \"partner\" \"HubSpot\" -empleo -jobs -site:hubspot.com -site:hubspot.es",
+      "recency": 2,
+      "market": "Perú"
+    },
+    {
+      "q": "site:pe.linkedin.com/posts (\"agencia\" OR \"web\") (\"licitación\" OR \"proveedor\") after:2026-10-06",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "site:linkedin.com/posts \"Perú\" \"agencia\" \"2027\" (\"convocatoria\" OR \"buscamos\")",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"consultoría\" \"campaña\" \"octubre 2026\" -site:gob.pe -empleo",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"licitación\" \"marketing\" \"octubre\" -site:gob.pe -site:todolicitaciones.pe -site:licitacionesperu.pe -site:perucontrata.com.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"agencia\" \"convocatoria\" \"octubre\" \"2026\" site:redinfor.com.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"rediseño\" \"convocatoria\" -site:gob.pe -site:licitacionesperu.pe -site:todolicitaciones.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"HubSpot\" \"licitación\" -site:gob.pe",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"agencia de medios\" \"buscamos\" -empleo -jobs",
+      "recency": 7,
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"convocatoria\" \"agencia\" octubre 2026 \"propuestas\" -site:gob.pe -site:licitacionesperu.pe",
+      "market": "Perú"
+    },
+    {
+      "q": "Perú \"licitación\" \"web\" \"2026\" \"octubre\" -site:gob.pe -site:licitacionesperu.pe -site:todolicitaciones.pe",
+      "market": "Perú"
+    },
+    {
+      "q": "\"[persona redactada]\" marketing",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "Perú \"agencia\" \"licitaciones\" \"Plan International\"",
+      "market": "Perú"
+    },
+    {
+      "q": "\"[persona redactada]\" Alfin \"Marketing\"",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"Alfin Banco\" empleados LinkedIn",
+      "purpose": "validation",
+      "market": "Perú"
+    },
+    {
+      "q": "\"[persona redactada]\" \"Display\" \"Search\"",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "site:pe.linkedin.com/in/ \"[persona redactada]\" \"Malpartida\"",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"[persona redactada]pérezmalpartida\" Alfin",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"[persona redactada]\" \"Experiencia\"",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"[persona redactada]\" \"Alfin Banco\"",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"[persona redactada]\" \"agencia\" \"Social Media\"",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "INTURSA LinkedIn \"Company size\"",
+      "purpose": "validation",
+      "market": "Perú"
+    },
+    {
+      "q": "\"[persona redactada]\" INTURSA marketing digital",
+      "purpose": "validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"INTURSA\" \"Marketing\" \"Gerente\" LinkedIn",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú"
+    },
+    {
+      "q": "\"INTURSA\" \"Marketing Digital\" \"[persona redactada]\"",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"INTURSA\" \"Comercial\" \"Carla Escudero\"",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú"
+    },
+    {
+      "q": "\"INTURSA\" \"Marketing\" \"Carla\"",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú"
+    },
+    {
+      "q": "\"[persona redactada]\" INTURSA linkedin",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"INTURSA\" \"jefe de marketing\"",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú"
+    },
+    {
+      "q": "\"INTURSA\" \"[persona redactada]\" LinkedIn",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"INTURSA\" \"[persona redactada]\" LinkedIn",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"Narly Paz\" \"INTURSA\" octubre 2026",
+      "purpose": "adjacent_contact_validation",
+      "market": "Perú"
+    },
+    {
+      "q": "Colombia licitación agencia SEO posicionamiento convocatoria octubre 2026",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia convocatoria rediseño sitio web empresa octubre 2026",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia buscamos agencia creativa licitación octubre 2026",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia licitación CRM HubSpot implementación octubre 2026",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"agencia de medios\" \"convocatoria\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"buscamos agencia\" \"octubre\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"licitación privada\" \"web\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"proveedor\" \"SEO\" \"convocatoria\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"selección de agencia\" \"2026\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"buscamos\" \"partner\" \"HubSpot\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"licitación\" \"posicionamiento\" \"2026\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"convocatoria\" \"diseño web\" \"2026\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"RFP\" \"marketing\"",
+      "recency": 2,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"rediseño\" \"convocatoria\" -site:gov.co -site:colombialicita.com",
+      "recency": 2,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"agencia\" \"licitación\" \"2027\"",
+      "recency": 2,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"CRM\" \"solicitud de propuestas\"",
+      "recency": 2,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"licitación\" \"agencia\" -site:gov.co -site:colombialicita.com -site:temploapp.co -site:colombiacontrata.com.co",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"convocatoria\" \"SEO\" -site:gov.co -site:reddit.com",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"buscamos agencia\" -empleo -freelance",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"proveedores\" \"sitio web\" \"convocatoria\"",
+      "recency": 7,
+      "market": "Colombia"
+    },
+    {
+      "q": "\"[persona redactada]\" \"Hood\" agencia",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"Hood Te Ayuda\" empleados",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"[persona redactada]\" \"Convocatoria agencia\"",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "Colombia \"agencia\" \"cotización\" \"octubre\" \"2026\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "Colombia \"SEO\" \"contratación\" \"octubre\" \"2026\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Hood\" \"Seguros\" \"empleados\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Hood Te Ayuda\" empresa",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"hood123.co\" \"agencia\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "site:linkedin.com/posts/ \"[persona redactada]\" \"agencia\"",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"Hood Seguros\" Colombia",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Hood\" \"hood123.co\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Buscamos agencia de marketing digital a la Vanguardia\" \"Nassi\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Hood Te Ayuda\" site:linkedin.com/company",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"[persona redactada]\" ciberseguridad",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"[persona redactada]\" \"AGENCIA\" \"Colombia\"",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"[persona redactada]\" \"marketing\" Guatemala",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"Hood\" \"Nassi\" \"empleados\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"[persona redactada]\" \"ciberseguridad\" \"agencia\"",
+      "market": "Colombia",
+      "pii_redacted": true
+    },
+    {
+      "q": "\"Hood Seguros\" \"15 de octubre\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Hood Seguros\" \"19 de octubre\"",
+      "market": "Colombia"
+    },
+    {
+      "q": "\"Hood Seguros\" \"2026\" agencia",
+      "market": "Colombia"
+    },
+    {
+      "q": "México (\"licitación\" OR \"convocatoria\" OR \"buscamos agencia\") (\"SEO\" OR \"AEO\") octubre 2026",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "México (\"licitación\" OR \"buscamos proveedor\") (\"rediseño web\" OR \"sitio web\") octubre 2026 -site:gob.mx",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "México (\"pitch\" OR \"licitación\" OR \"buscamos agencia\") (\"creativa\" OR \"publicidad\") octubre 2026",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "México (\"licitación\" OR \"convocatoria\" OR \"buscamos\") (\"implementación CRM\" OR \"HubSpot\") octubre 2026",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"agencia de medios\" \"convocatoria\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:linkedin.com/posts \"México\" \"buscamos agencia\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"RFP\" \"marketing\" \"2026\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"licitación\" \"SEO\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:linkedin.com/posts \"México\" \"agencia\" \"licitación\" \"octubre\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"buscamos\" \"agencia SEO\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"selección de agencia\" \"2027\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"proveedor\" \"HubSpot\" \"licitación\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:linkedin.com/posts \"México\" \"licitación\" \"agencia\" after:2026-10-06",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"convocatoria\" \"diseño web\" -site:gob.mx -empleo",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"agencia de medios\" \"pitch\" \"2026\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"solicitud de propuestas\" \"comunicación\" \"octubre\" \"2026\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:wwf.org.mx (\"convocatoria\" OR \"licitación\") (\"comunicación\" OR \"web\" OR \"campaña\")",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:savethechildren.mx (\"licitación\" OR \"convocatoria\") (\"agencia\" OR \"marketing\" OR \"comunicación\")",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:cemefi.org (\"licitación\" OR \"proveedor\" OR \"convocatoria\") (\"web\" OR \"campaña\" OR \"agencia\")",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"agencia\" \"pitch\" \"octubre 2026\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "México proveedores licitación agencia marketing octubre 2026 privada",
+      "market": "México"
+    },
+    {
+      "q": "site:wwf.org.mx \"convocatorias\"",
+      "market": "México"
+    },
+    {
+      "q": "site:savethechildren.mx \"licitaciones\"",
+      "market": "México"
+    },
+    {
+      "q": "México \"RFP\" \"website\" \"2026\"",
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"licitación privada\" (\"web\" OR \"marketing\" OR \"medios\")",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"invitación\" \"agencias\" \"octubre\" \"2026\" -site:gob.mx",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:linkedin.com/posts \"México\" \"buscando\" \"HubSpot\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "site:linkedin.com/posts \"México\" \"buscamos\" \"SEO\"",
+      "recency": 7,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"agencia de medios\" \"buscamos\"",
+      "recency": 2,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"RFP\" \"CRM\" -site:gob.mx",
+      "recency": 2,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"licitación\" \"rediseño\" \"sitio\" -site:gob.mx",
+      "recency": 2,
+      "market": "México"
+    },
+    {
+      "q": "\"México\" \"agencia creativa\" \"convocatoria\" \"octubre\"",
+      "recency": 2,
+      "market": "México"
+    }
+  ],
+  "count": 161,
+  "private_evidence_directory": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-private-tenders-2026-10-13"
+}

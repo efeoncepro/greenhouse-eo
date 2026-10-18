@@ -1,0 +1,362 @@
+{
+  "manifest_version": 1,
+  "status": "prepared_not_applied",
+  "generated_on": "2026-10-15",
+  "executed_changes": 0,
+  "items": [
+    {
+      "action_id": "B01",
+      "title": "Decidir recuperación del antiguo artículo de cambios de vuelo",
+      "candidate_ids": [
+        "404-01"
+      ],
+      "proposed_action": "Recuperar original y comparar ambas URLs; no 301 probada",
+      "owner_proposed": "SKY editorial/comercial + WP",
+      "dependency": [
+        "Recuperar original y comparar ambas URLs; no 301 probada"
+      ],
+      "status": "blocked_original_content",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B02",
+      "title": "Preparar recuperación de restaurantes temáticos Bogotá",
+      "candidate_ids": [
+        "404-02"
+      ],
+      "proposed_action": "Original/brief temático y locales vigentes",
+      "owner_proposed": "SKY editorial",
+      "dependency": [
+        "Original/brief temático y locales vigentes"
+      ],
+      "status": "blocked_content_recovery",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B03",
+      "title": "Corregir referencias al sur argentino",
+      "candidate_ids": [
+        "404-03"
+      ],
+      "proposed_action": "11 fuentes, candidata Patagonia con intención contextual",
+      "owner_proposed": "SKY editorial/WP",
+      "dependency": [
+        "11 fuentes, candidata Patagonia con intención contextual"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B04",
+      "title": "Corregir Desierto Florido y sus referencias",
+      "candidate_ids": [
+        "404-04"
+      ],
+      "proposed_action": "Primero resolver contradicción geográfica del destino",
+      "owner_proposed": "SKY editorial",
+      "dependency": [
+        "Primero resolver contradicción geográfica del destino"
+      ],
+      "status": "blocked_geography_validation",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B05",
+      "title": "Corregir viaje a Florianópolis",
+      "candidate_ids": [
+        "404-08"
+      ],
+      "proposed_action": "Validar rutas y 9 anclas antes de destino",
+      "owner_proposed": "SKY rutas/comercial + editorial",
+      "dependency": [
+        "Validar rutas y 9 anclas antes de destino"
+      ],
+      "status": "blocked_route_validation",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B06",
+      "title": "Corregir referencias a qué hacer en Río",
+      "candidate_ids": [
+        "404-12"
+      ],
+      "proposed_action": "5 fuentes a guía Río con cuerpo coherente",
+      "owner_proposed": "SKY editorial/WP",
+      "dependency": [
+        "5 fuentes a guía Río con cuerpo coherente"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B07",
+      "title": "Resolver enlaces de turismo gastronómico",
+      "candidate_ids": [
+        "404-06"
+      ],
+      "proposed_action": "8 fuentes, elegir concepto o destinos por contexto",
+      "owner_proposed": "SKY editorial/WP",
+      "dependency": [
+        "8 fuentes, elegir concepto o destinos por contexto"
+      ],
+      "status": "prepared_editorial_validation_required",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B08",
+      "title": "Recuperar CTA nativo: piloto curso y expansión 68 IDs",
+      "candidate_ids": [],
+      "proposed_action": "Landing 4955 actual 404; otros 8 IDsCTA sin definición acreditada",
+      "owner_proposed": "SKY marketing/HubSpot + WP",
+      "dependency": [
+        "Landing 4955 actual 404; otros 8 IDsCTA sin definición acreditada"
+      ],
+      "status": "blocked_cta_asset_and_landing",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B09",
+      "title": "Sacar 14 layouts de búsqueda y sitemap",
+      "candidate_ids": [],
+      "proposed_action": "Preservar render del tema; validar staging",
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "dependency": [
+        "Preservar render del tema; validar staging"
+      ],
+      "status": "prepared_owner_implementation_required",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B10",
+      "title": "Metadatos del lote editorial y propuesta adicional del curso",
+      "candidate_ids": [],
+      "proposed_action": "Adoptar las nueve metas del brief editorial como única propuesta y revisar una adicional para curso de tripulante; implementar Article/BreadcrumbList con datos verificados",
+      "owner_proposed": "SKY editorial + desarrollo WordPress",
+      "dependency": [
+        "Fuente única de nueve metas: recovery-plan/editorial-briefs.json; validar autoría, fechas y escritor SEO único. El curso tiene una propuesta técnica adicional."
+      ],
+      "status": "draft_owner_validation_required",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B11",
+      "title": "Resolver exposición del hostAzure",
+      "candidate_ids": [],
+      "proposed_action": "Determinar rol; ninguna regla general lista",
+      "owner_proposed": "SKY infra Azure/Cloudflare",
+      "dependency": [
+        "Determinar rol; ninguna regla general lista"
+      ],
+      "status": "blocked_host_role_confirmation",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "action_id": "B12",
+      "title": "Reparar CTA comercial href=blank de WP 3235",
+      "candidate_ids": [
+        "404-21"
+      ],
+      "proposed_action": "Error exacto documentado; SKY debe aportar destino comercial 200",
+      "owner_proposed": "SKY comercial + editorial/WP",
+      "dependency": [
+        "Error exacto documentado; SKY debe aportar destino comercial 200"
+      ],
+      "status": "blocked_approved_commercial_destination",
+      "evidence": [
+        "redirects-candidates.json",
+        "link-corrections-manifest.json",
+        "layouts-manifest.json",
+        "cta-native-manifest.json",
+        "metadata-schema-manifest.json",
+        "azure-host-manifest.json"
+      ],
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    }
+  ],
+  "count": 12,
+  "ready_for_unattended_execution": 0
+}

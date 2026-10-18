@@ -91,6 +91,25 @@ multi-property, canary de Platform Properties, Search Analytics completa, URL
 Inspection y seguimiento post-publicación. Hasta que esa task esté implementada
 y verificada, el flujo `0h/24h/72h` es contrato propuesto, no evidencia runtime.
 
+### Caso 2026-10-17: inspección puntual con la conexión de la organización
+
+- La API de URL Inspection se usó en un script local con el token OAuth de la
+  conexión por organización (`sc-domain:efeoncepro.com`); todavía no existe un
+  cliente `urlInspection` en `src/lib/growth/search-console/`. Resultado
+  observado: una landing nueva figuraba como «Google no reconoce esta URL»
+  mientras su URL legacy seguía «Enviada e indexada» con último rastreo previo
+  al 301.
+- **Gotcha:** `listActiveSearchConsoleOrganizations()` devuelve sólo
+  `organizationId` y `siteUrl`, sin `tokenSecretRef`. Para obtener el token hay
+  que leer `getSearchConsoleConnection(orgId)`; usar la otra lectura produjo un
+  `invalid_grant` falso con la conexión sana. Para diagnosticar, refrescar el
+  token directo: `listSearchConsoleSitesForOrg` marca la conexión `revoked` ante
+  `invalid_grant`.
+- La cuenta de servicio de GTM (`greenhouse-gtm-publisher`) no tiene acceso a
+  Search Console (`sites.list` vacío); la vía es la conexión OAuth de la org.
+- Pedir indexación sigue siendo **sólo por la interfaz** de Search Console.
+  Manual operativo: `docs/manual-de-uso/growth/conectar-search-console.md`.
+
 ## Fuentes primarias
 
 - [Platform Properties en Search Console](https://support.google.com/webmasters/answer/17148418)

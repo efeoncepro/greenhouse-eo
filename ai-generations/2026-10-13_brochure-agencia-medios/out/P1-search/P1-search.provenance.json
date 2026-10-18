@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "969b203ca262d10aad2a060533addc09f6964eaa3dc722130e4b9d9068e48884",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT20-social-search",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT20-social-search.png",
+      "sha256": "01675c8ade768684df4a12060db250f03eb131ff3ed0d0da49606a72a6fdd03a"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

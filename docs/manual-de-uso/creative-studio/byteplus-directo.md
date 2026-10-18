@@ -1,7 +1,27 @@
 # Usar BytePlus directo
 
+**OmniHuman 2.0 pertenece a Vision AI y no está conectado a estos comandos.** Ver su
+[manual API separado](omnihuman-2-api.md): autenticación, límites y recuperación distintos.
+El `--doctor` de esta CLI no valida acceso a Vision AI.
+
 Carril local del operador. Consume ModelArk/Seed Speech del fabricante en Johor y conserva Fal como alternativa
 explícita. No es una ruta de Globe, que permanece hibernado. [Decisión](../../architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
+
+Alcance funcional, estados y responsabilidades: [BytePlus directo y biblioteca de retratos](../../documentation/creative-studio/byteplus-directo.md).
+
+## Cuenta obligatoria antes de operar
+
+**Usar únicamente Google SSO `jreyes@efeoncepro.com` → Account ID `3004839361`, root `jreyes`, región
+`ap-southeast-1`, proyecto `default`.** Verificar el ID visible en Account antes de cada operación de consola;
+el perfil de Chrome no identifica la cuenta de BytePlus. Si no coincide o no puede comprobarse, detenerse.
+**Prohibido volver a iniciar sesión u operar `3003660328` (`julio_reyes`)**, por instrucción de Julio del
+2026-10-17. Son cuentas independientes, no una cuenta principal y una subcuenta. No usar sus IDs de assets en
+la API de producción.
+
+La consola confirmó `efeonce-media-directa` Active y creada por `3004839361`; los secretos actuales ya son los
+de producción. No cambiar credenciales para hacerlas coincidir con una sesión equivocada. KYC, Advanced Creation
+Rights y assets deben pertenecer a la misma cuenta de inferencia. Estado vivo y evidencias en el
+[ledger](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md#1-estado-del-plan).
 
 ## Estado y credenciales
 
@@ -72,6 +92,127 @@ Las salidas se guardan localmente antes de que venza la URL. Los recibos no guar
 Las tarifas estimadas salen del catálogo de la cuenta. Con video de entrada hay mínimos de tokens variables:
 no se inventa una cota. `--max-usd` sólo opera sobre una estimación conocida y no es un límite impuesto a BytePlus.
 `usage.completion_tokens` de la respuesta es la evidencia de consumo; estimación y factura son hechos distintos.
+
+### Modo borrador de Seedance 2.5 (desde 2026-10-16)
+
+Sirve para explorar barato y llevar a 1080p **la misma toma** que se aprobó, no otra parecida.
+
+```bash
+# 1. Borrador a 480p (siempre 480p; el comando rechaza otra resolución antes de llamar)
+pnpm ai:byteplus --model seedance25 --draft --image cuadro.png --prompt-file toma.txt --duration 4 --out borrador.mp4 --yes
+# 2. Final 1080p desde ese borrador: sin prompt, imágenes, duración, ratio ni audio
+pnpm ai:byteplus --model seedance25 --from-draft <task-id-del-borrador> --out final-1080p.mp4 --yes
+```
+
+- **Contrato del fabricante** ([tutorial Seedance 2.5, Draft mode](https://ai.byteplus.com/ark/region:ap-southeast-1/docs/seedance-2-5#2.5_draft_mode)):
+  el borrador lleva `draft: true` y sólo 480p; el final lleva `content: [{type: "draft_task", draft_task: {id}}]`,
+  el mismo modelo y `resolution: "1080p"` (única admitida). BytePlus reutiliza prompt, referencias, duración, ratio,
+  seed, audio y tipo de tarea del borrador: **reenviarlos es error aunque coincidan**, y el comando lo bloquea antes
+  de llamar. Sólo admite además `watermark`, `return_last_frame`, `output_format`, `service_tier`,
+  `execution_expires_after`, `priority`, `callback_url` y `safety_identifier` (vía `--input-file`).
+- **Vigencia: 7 días desde `created_at` del borrador.** El recibo del borrador guarda `createdAt` y `draftExpiresAt`;
+  `--from-draft` lee el borrador (GET, sin costo) y rechaza uno vencido o que no terminó, sin crear nada.
+- **Cobro:** dos tareas independientes. El borrador se cobra como 480p y el final a la tarifa de 1080p (11,7 USD por
+  millón de tokens sin video de entrada). Con primer cuadro el ratio es `adaptive` y no hay cota previa.
+- **Medido el 2026-10-16** (plano de la lata, 4 s, primer cuadro 4:5, con audio): borrador 580×726, 39.887 tokens
+  (≈ USD 0,43); final 1288×1610, 196.432 tokens (≈ USD 2,30). El final es la misma toma, cuadro a cuadro.
+- `--draft` y `--from-draft` sólo existen para modelos con `draft` en el catálogo (hoy `seedance25`).
+
+### Rostros humanos reales: rechazo por privacidad
+
+Seedance 2.5 y 2.0 **no aceptan imágenes ni videos de entrada con rostros humanos reales**: responden
+`InputImageSensitiveContentDetected.PrivacyInformation` (medido el 2026-10-16 con un cuadro fotorrealista de GPT Image).
+El comando traduce ese error con las vías oficiales ([guía de retratos](https://docs.byteplus.com/en/docs/ModelArk/2608626)):
+
+1. **Salidas propias de confianza:** una salida original con rostro de **Seedream 5.0 (lite/pro/flash)
+   texto-a-imagen**, de un video de Seedance 2.x o de su último cuadro, generada en esta misma cuenta hace menos de
+   30 días, sin editar ni recomprimir. Por eso el comando envía PNG/JPEG/WebP locales con sus bytes originales.
+   Una edición o imagen-a-imagen de Seedream sobre una imagen externa no cuenta.
+2. **Biblioteca privada de assets** (`asset://<asset-id>`): personajes propios (retratos virtuales) o personas reales
+   autorizadas (retratos reales).
+3. **Retratos reales autorizados:** la persona entra con su propia cuenta por QR, acepta y hace verificación en vivo.
+
+Un cuadro de GPT Image con una persona no entra por ninguna de las tres vías sin ese proceso. Detalle verificado y
+fuentes: [investigación del 2026-10-17](../../audits/creative-studio/BYTEPLUS_PORTRAIT_ASSETS_RESEARCH_2026-10-17.md).
+
+**Corrección de cuenta (2026-10-17):** el KYC aprobado y Entry que se habían observado pertenecían a
+`3003660328`, la cuenta incorrecta. El KYC de producción `3004839361` quedó **aprobado** el 2026-10-17 a las
+16:57:32 UTC (2026-10-18 00:57:32 UTC+8), verificado en consola y correo oficial. Seedance 2.5 ya está activado allí y conserva
+tarjeta/Savings Plan. No hubo compras. KYC por sí solo no acredita acceso a retratos. Re-prueba histórica con el
+cuadro de Antonio (GPT Image): rechazo `InputImageSensitiveContentDetected.PrivacyInformation`, requestId
+`021792214360538f9cb936a41ab283113693068986f31c344e0f1`, sin tarea ni cobro. No se «lava» un cuadro con rostro
+pasándolo por Seedream.
+
+**Personajes propios (Nexa y el elenco): biblioteca privada de retratos virtuales**
+([guía](https://docs.byteplus.com/en/docs/ModelArk/2333565)). Es la vía para personajes que poseemos y que no se parecen
+a ninguna persona real. En orden:
+
+1. **KYC de organización en `3004839361`.** **Aprobado**, con evidencia en el ledger. Envío y términos originales
+   autorizados expresamente por Julio. Si ModelArk conserva el aviso pendiente, renovar la sesión con la identidad
+   correcta y seguir `complete real-name verification`; comprobar otra vez Account ID antes de continuar.
+2. **Advanced Creation Rights (Entry)**, gratuito, **activo en `3004839361`** desde 2026-10-17 17:37 UTC.
+   Cuestionario completo (1 y 2 `YES`, 3 uso interno). Tras la pausa para firma personal, Julio ordenó «Firmala»;
+   carta aceptada y verificación por correo completada con su código. Consola: `Billing mode Free` y
+   `Apply for a free trial successfully`. Capacidad del plan: **50 assets (archivos)
+   y 50 grupos (personajes)**, compartida con los retratos reales. Con 2 imágenes por personaje alcanza para 25.
+   El consumo fechado y los IDs se consultan en el ledger. Entry habilita la biblioteca; las generaciones de video
+   conservan su cobro propio. Mantener Entry gratuito durante las pruebas, sin comprar ni cambiar el plan.
+3. **Decisión y fila en el [ledger de cupos](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)**
+   antes de subir (obligatorio), con la **carpeta de evidencia** que exige la carta de compromiso: fichas, prompts,
+   logs de generación e intermedias.
+4. **Subir:** Model Playground → My assets → Virtual Portrait → Manage assets → un grupo por personaje. La carta
+   se pidió al activar Entry y ya está aceptada en `3004839361`; no requiere volver a firmarse para este lote.
+   Una carta nueva o términos diferentes exigen revisar la autorización vigente del operador. La firma de otra
+   cuenta no se traslada. Por personaje, cuerpo entero vertical frontal y primer plano vertical frontal sin
+   expresión (300–6000 px, proporción 0,4–2,5, menos de 30 MB). Esperar `Active`; `Processing`, `Failed` y la etiqueta
+   visual `warehoused` no acreditan por sí solos ese estado.
+5. **Verificar Asset Service en la cuenta de inferencia**, en ModelArk → Open Management, región
+   `ap-southeast-1`. El error histórico fue `InvalidParameter` en `content[n].image_url.url`, con «Your account
+   has not activated the Asset Service». Se produjo con la API de `3004839361` sin Entry y assets de `3003660328`;
+   no demuestra que exista un interruptor adicional separado ni prueba incompatibilidad de los nuevos assets.
+   No repetir con esos IDs ni cambiar la clave de producción. La activación aislada no acredita una inferencia:
+   las dos pruebas con los nuevos IDs de Antonio sí terminaron correctamente (§Lote de Antonio y el elenco).
+6. **Usarlos** cuando estén `Active`, como referencia, nombrándolos «Image 1» en el prompt (nunca el id):
+   `pnpm ai:byteplus --model seedance25 --draft --references --image asset://<asset-id> ...`. Como primer cuadro
+   (`--image` sin `--references`) no se encontró un ejemplo oficial en la investigación inicial; la prueba propia
+   del 17/10 con Antonio fue exitosa. Es evidencia de esa operación y ese modelo, sin extenderla a otras
+   combinaciones. Anotar grupo, asset id(s) y estado en el ledger.
+
+
+### Lote de Antonio y el elenco — completado el 2026-10-17
+
+El [ledger por cuenta](../../operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) conserva
+los IDs, aprobaciones, estados, resultados y evidencia. **12 assets Active en 6 grupos de `3004839361`**.
+El cupo disponible se consulta en §1 del ledger, con su fecha de readback. Ambas pruebas de Antonio terminaron `succeeded`: referencias de rostro/cuerpo
+y primer cuadro sólo de rostro, Seedance 2.5 `--draft`, 4 s, resolución declarada 480p. Videos y recibos descargados.
+
+Julio habilitó personalmente `Allow access to file URLs` en la extensión de Chrome y confirmó el cambio con captura;
+`fileChooser.setFiles` funcionó después. La herramienta no pudo abrir `chrome://extensions` por su política de URL;
+no se usó otra vía para modificar esa configuración. Si la extensión se desconecta al aplicar el cambio, recuperar
+la conexión del mismo perfil y volver a comprobar Account ID. No volver a operar la cuenta histórica incorrecta.
+
+La UI etiqueta los assets como `warehoused`. Se verificó **Status: Active** en la respuesta `ListAssets` de la
+propia consola, observando su consulta con el diagnóstico de navegador permitido. Registrar sólo IDs, estado,
+proyecto y request ID; no guardar URLs firmadas, tokens ni claves. Cruzar siempre el GroupId esperado y los nombres
+de cada par: una respuesta previa no prueba el estado del grupo que se acaba de abrir. `warehoused` por sí solo
+no sustituye esa comprobación.
+
+Para una prueba nueva, usar una carpeta y recibo por variante (`--out-dir`); conservar comando, prompt, log,
+resultado, task ID, uso reportado, MP4 y medición. Un error también se conserva. Si ya hay task ID, recuperar esa
+tarea: no enviar otra para consultar su estado. Los dos MP4 de este lote son validación técnica, sin aprobación
+creativa final, publicación ni factura conciliada.
+
+Se cumplió el orden autorizado: Antonio con sus dos PNG → ambos `Active` → dos pruebas guardadas → referencia
+exitosa → Nexa → Hum → Isabella → Karo → Sophia, dos PNG por grupo. No volver a subir estos archivos para
+recomprobar el acceso. El cupo consumido no se recupera al borrar. Otro lote o prueba requiere su alcance autorizado.
+
+Evidencia fuera del repo: `/Users/jreye/Documents/BytePlus-Asset-Service-2026-10-17/`.
+Pruebas: `pruebas-antonio-cuenta-correcta-20261017T180127Z/`, con subcarpetas `referencia/` y `primer-cuadro/`.
+
+Un personaje de una sola pieza no necesita cupo: genera su cuadro nativamente con Seedream 5.0 texto-a-imagen en esta
+cuenta (y úsalo dentro de 30 días, sin editar) o produce sus planos en Higgsfield. Una persona real (por ejemplo,
+Julio) va por la biblioteca de retratos reales y descuenta del mismo cupo. La gestión de assets por API exige AK/SK y
+URL pública por archivo; no está implementada en este comando.
 
 ## Comparación de costos de Seedance 2.5
 

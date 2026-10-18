@@ -37,6 +37,11 @@ se manda. Recorre mapa de rutas → un capítulo por ruta → seis capacidades �
 armado y lecciones: `deck-studio`. **Antes de llevarlo a un prospecto**, verificar si las cifras y el testimonio del
 caso SKY requieren autorización del cliente (pendiente abierto).
 
+El brochure oficial de la agencia, «Agencia de Marketing 360°» (aprobado 2026-10-16; armado en `deck-studio`), incluye
+el caso Sky y, dentro de Brand, tres láminas de Channel & Commerce (activación, góndola auditada, BTL). Esas láminas
+respetan el estado `Proposed` de la línea: sin promesa de venta, cobertura ni precio, y la producción física la
+ejecutan proveedores; Efeonce opera y responde.
+
 **Cuando el comprador pide «staff augmentation»** (decisión del operador, 2026-10-06): no se le corrige la palabra ni
 se le venden perfiles sueltos. Se responde con la **lámina 19**, «Tu equipo, con talento de Efeonce adentro.»: talento
 creativo embebido con respaldo de Efeonce. Su palabra va **sólo en el eyebrow** («Talento embebido · Staff

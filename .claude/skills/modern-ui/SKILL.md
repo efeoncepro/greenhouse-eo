@@ -216,6 +216,8 @@ sale SIEMPRE del sistema. **Tabla de traducción obligatoria + checklist pre-JSX
 `docs/architecture/ui-platform/CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md`. Además: todo scenario
 GVC de una vista nueva declara `quality.layout` + `quality.runtime` + `quality.enterpriseRubric`
 (el wireframe-look pasó el gate porque el rubric es opt-in y no estaba declarado).
+Si el destino es el sitio público (WordPress/Elementor), el puerto lo gobierna `efeonce-public-site-wordpress`
+(`references/source-led-elementor-patterns.md` §Canvas, incluidos los formularios del canvas).
 
 ## Version
 

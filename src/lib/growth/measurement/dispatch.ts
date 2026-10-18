@@ -5,7 +5,8 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 import type { MeasurementDestination } from './contracts'
 import { decryptMeasurementPayload } from './crypto'
 import { measurementPolicyAllowsDelivery } from './policy-store'
-import { claimMeasurementDeliveries, expireMeasurementDeliveries, finishMeasurementDelivery } from './store'
+import { assertMetaReceiptStorageReady, claimMeasurementDeliveries, expireMeasurementDeliveries, finishMeasurementDelivery } from './store'
+import { META_RECEIPT_HEADER, META_ATTEMPT_HEADER, META_ATTEMPT_NUMBER_HEADER, metaReceiptContextSchema, metaReceiptObservation, type MetaReceiptContext } from './meta-receipt'
 
 const TAGGING_ORIGIN = 'https://efeonce-gtm-tagging-183008134038.us-central1.run.app'
 const MEASUREMENT_ID = 'G-KYPPY57M14'
@@ -15,16 +16,30 @@ export const sendMeasurementPayload = async (
   payload: Record<string, unknown>,
   secret: string,
   fetcher: typeof fetch = fetch,
+  receiptContext?: MetaReceiptContext,
 ) => {
+  // Validate correlation before the non-idempotent network operation; keep it out of CAPI user_data.
+  const context = destination === 'meta' && receiptContext ? metaReceiptContextSchema.parse(receiptContext) : undefined
+
+  if (context && (payload.event_id !== context.eventId || payload.event_time !== context.eventTime || payload.event_name !== 'generate_lead'))
+    throw new Error('meta_receipt_request_context_mismatch')
+  let observation = context ? metaReceiptObservation(context, null, 'unavailable') : undefined
+
   try {
     const url = destination === 'meta' ? `${TAGGING_ORIGIN}/efeonce/lead-enrichment` :
       `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${encodeURIComponent(secret)}`
 
     const response = await fetcher(url, {
       method: 'POST', redirect: 'error', signal: AbortSignal.timeout(15_000),
-      headers: { 'Content-Type': 'application/json', ...(destination === 'meta' ? { Authorization: `Bearer ${secret}` } : {}) },
+      headers: { 'Content-Type': 'application/json', ...(destination === 'meta' ? { Authorization: `Bearer ${secret}` } : {}),
+        ...(context ? { [META_ATTEMPT_HEADER]: context.attemptId, [META_ATTEMPT_NUMBER_HEADER]: String(context.attempt) } : {}) },
       body: JSON.stringify(payload),
     })
+
+    if (context) {
+      try { observation = metaReceiptObservation(context, response.headers.get(META_RECEIPT_HEADER)) }
+      catch { /* Receipt instrumentation cannot turn a known successful POST into a retry. */ }
+    }
 
     let success = response.ok
 
@@ -34,13 +49,16 @@ export const sendMeasurementPayload = async (
       success = receipt.meta_tag_status === 'success'
     }
 
+
     return {
       success, httpStatus: response.status,
       retryable: response.status === 429 || response.status >= 500 || (response.ok && !success),
       errorClass: success ? null : destination === 'meta' && response.ok ? 'meta_ack_invalid' : `provider_http_${response.status}`,
+      ...(observation ? { metaObservation: observation } : {}),
     }
   } catch {
-    return { success: false, httpStatus: null, retryable: true, errorClass: 'transport_or_ack_failed' }
+    return { success: false, httpStatus: null, retryable: true, errorClass: 'transport_or_ack_failed',
+      ...(observation ? { metaObservation: observation } : {}) }
   }
 }
 
@@ -67,6 +85,11 @@ export const dispatchMeasurementConversions = async (limit = 50, env: NodeJS.Pro
     } catch {
       unavailableDestinations.push(destination)
     }
+  }
+
+  if (secrets.has('meta')) {
+    try { await assertMetaReceiptStorageReady() }
+    catch { secrets.delete('meta'); unavailableDestinations.push('meta') }
   }
 
   const availableDestinations = [...secrets.keys()]
@@ -97,7 +120,9 @@ export const dispatchMeasurementConversions = async (limit = 50, env: NodeJS.Pro
         const payload = row.destination === 'meta' ? payloads.meta : payloads.google
 
         if (!payload) throw new Error('measurement_projection_missing')
-        result = await sendMeasurementPayload(row.destination,payload,secrets.get(row.destination)!)
+        result = await sendMeasurementPayload(row.destination,payload,secrets.get(row.destination)!, fetch,
+          row.destination === 'meta' ? { eventId: row.event_id, eventTime: Math.floor(new Date(row.occurred_at).getTime() / 1000),
+            attemptId: row.lease_token, attempt: row.attempts } : undefined)
       } catch {
         result = {success:false,httpStatus:null,retryable:false,errorClass:'measurement_payload_invalid'}
       }

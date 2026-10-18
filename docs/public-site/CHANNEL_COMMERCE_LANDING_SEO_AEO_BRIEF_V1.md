@@ -7,6 +7,13 @@
 > **Confianza general:** media — una sola fuente de volumen; DataForSEO respondió `authorization_denied` en esta
 > sesión. Slice 1 de la task debe triangular antes de fijar canonical.
 
+## Delta 2026-10-17 — la página de Performance cambió de URL
+
+La landing de Performance Marketing se publicó el 2026-10-17 en `/servicios/performance-marketing/` (`TASK-1865`,
+PDR-022). La legacy `/servicio-gestion-campanas-publicitarias/` quedó `private` y redirige con 301 a la nueva. El enlace
+de «Conexión digital» de §6 apunta ahora a la URL nueva; el 301 mantendría funcionando un enlace viejo, pero no se
+enlaza a un redirect.
+
 ## 1. Diagnóstico
 
 La línea no tiene superficie pública. La demanda existe, pero su forma obliga a una estrategia distinta a la de
@@ -142,7 +149,7 @@ Las cápsulas son contenido visible y no una promesa de rich result.
 |---|---|---|
 | Hub `/servicios/` | Esta landing | Descubrimiento de la línea |
 | Menú `Soluciones → Crecimiento Multicanal` | Esta landing | Navegación principal |
-| Esta landing · Conexión digital | `/servicio-gestion-campanas-publicitarias/` | Retail media y performance — no canibalizar |
+| Esta landing · Conexión digital | `/servicios/performance-marketing/` (antes `/servicio-gestion-campanas-publicitarias/`, hoy 301; ver Delta 2026-10-17) | Retail media y performance — no canibalizar |
 | Esta landing · Conexión digital | `/servicios/posicionamiento-seo/` y `/aeo-2/` | Anaquel digital y visibilidad en IA |
 | Esta landing · BTL / contenido | `/agencia-creativa/` | Producción de material y contenido |
 | Esta landing · Conversión | `/contacto/` | Respaldo sin JavaScript |

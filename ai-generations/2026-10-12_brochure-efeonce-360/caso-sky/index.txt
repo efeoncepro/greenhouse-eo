@@ -1,0 +1,25 @@
+c01 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/05. DMAND GEN/CL (ESTATICOS)/AON_DGen_CL-AR.png
+c02 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/05. DMAND GEN/CL (ESTATICOS)/AON_DGen_CL-BR.png
+c03 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/05. DMAND GEN/CL (ESTATICOS)/AON_DGen_CL-Sud.png
+c04 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/05. DMAND GEN/CL (ESTATICOS)/AON_DGen_VXCL.png
+c05 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/07. ALIANZAS/01. SERNATUR/02_ESTATICOS (HPH-PPLA)/Mesa de trabajo 1.png
+c06 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/07. ALIANZAS/02. FLN/FLN_HPH-BR-1.png
+c07 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/07. ALIANZAS/03. PROMPERU/HPH/PROMPE_HPH-BR-1.png
+c08 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/06. Always ON/09. FERIADOS/Mesa de trabajo 1_1.png
+c09 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_AR.png
+c10 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_BR.png
+c11 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_CL.png
+c12 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_PERU-CANA.png
+c13 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_PERU-CANCUN.png
+c14 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_PERU-MIAMI.png
+c15 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_USA.png
+c16 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/05. 48Hrs PUSH/48H_PUSH_UY.png
+c17 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/09.Travel SKY/KV1.png
+c18 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/09.Travel SKY/KV2.png
+c19 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/02_2025_Septiembre/09.Travel SKY/KV3.png
+c20 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/03_2025_Octubre/06. Esta bueno SKY 2/EBS2_POST_BR.png
+c21 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/03_2025_Octubre/06. Esta bueno SKY 2/EBS2_POST_USA.png
+c22 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/03_2025_Octubre/06. Esta bueno SKY 2/EBS2_STORY_BR.png
+c23 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/03_2025_Octubre/06. Esta bueno SKY 2/EBS2_STORY_USA.png
+c24 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/03_2025_Octubre/06. Esta bueno SKY 2/MW_POST_CL.png
+c25 /Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2025/03_2025_Octubre/06. Esta bueno SKY 2/MW_STORY_CL.png

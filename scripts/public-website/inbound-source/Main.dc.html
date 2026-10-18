@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Agencia de inbound marketing · Loop Marketing · Efeonce</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&amp;family=Lexend+Deca:wght@500;600&amp;display=swap">
+<style>
+body{margin:0;background:#001a33}
+a{color:#ffffff}a:hover{color:#f6d3ef}
+*{box-sizing:border-box}
+.wrap{max-width:1320px;margin:0 auto;padding:0 40px}
+.eyebrow{font-family:Poppins,sans-serif;font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#9fb6cc;margin:0}
+.chip{display:inline-flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:9px 16px;border:1.5px solid rgba(255,255,255,.38);border-radius:999px;font-size:12px;line-height:1.1;color:#ffffff}
+/* Bricolage: el peso lo decide el largo (escala AXIS) y la entrada va liviana */
+.idea{font-family:'Bricolage Grotesque',sans-serif;font-variation-settings:'opsz' 96,'wdth' 100;margin:0}
+.t-impact{font-weight:780;letter-spacing:-.05em;line-height:.86}
+.t-short{font-weight:740;letter-spacing:-.04em;line-height:.92}
+.t-medium{font-weight:620;letter-spacing:-.03em;line-height:.98}
+.t-long{font-weight:500;letter-spacing:-.02em;line-height:1.05}
+.lt{font-weight:300;letter-spacing:-.025em}
+.h2{font-size:clamp(46px,6.4vw,104px);color:#ffffff}
+.lead{font-family:Poppins,sans-serif;font-weight:300;font-size:clamp(17px,1.35vw,20px);line-height:1.6;color:#cfe4fa;margin:0}
+.acc{color:#e86bd0}
+.il{color:#ffffff;text-decoration:underline;text-decoration-color:rgba(232,107,208,.8);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.il:hover{color:#f6d3ef;text-decoration-color:#e86bd0}
+.btn-p,.btn-s{display:inline-flex;align-items:center;justify-content:center;gap:.625rem;min-height:3.5rem;padding:1rem 1.6rem;border:1px solid transparent;border-radius:.75rem;font-family:Poppins,sans-serif;font-size:1rem;font-weight:500;line-height:1.4;text-decoration:none;cursor:pointer;transition:background-color 150ms,border-color 150ms,transform 150ms}
+.btn-p{background:#e86bd0;border-color:#e86bd0;color:#001a33}
+.btn-p::after{content:"→";font-size:1.125rem;line-height:1;transition:transform 200ms cubic-bezier(.4,0,.2,1)}
+.btn-p:hover{background:#f19ae0;border-color:#f19ae0;color:#001a33}
+.btn-p:hover::after{transform:translateX(.25rem)}
+.btn-s{background:transparent;border-color:rgba(255,255,255,.55);color:#ffffff}
+.btn-s:hover{background:rgba(255,255,255,.08);color:#ffffff}
+.btn-p:focus-visible,.btn-s:focus-visible,.mk:focus-visible,.il:focus-visible,.sym:focus-visible{outline:2px solid #ffffff;outline-offset:3px}
+.sphere{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:#e86bd0;margin-left:.04em;animation:breathe 3.6s ease-in-out infinite}
+.mk{min-height:44px;padding:0 18px;border-radius:999px;font-family:Poppins,sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.scan{position:absolute;top:0;bottom:0;width:38%;left:-40%;background:linear-gradient(90deg,rgba(232,107,208,0) 0%,rgba(232,107,208,.08) 70%,rgba(232,107,208,.4) 99%,rgba(255,255,255,.7) 100%);mix-blend-mode:screen;pointer-events:none;animation:scan 7s cubic-bezier(.65,0,.35,1) infinite}
+.hero-media{position:absolute;top:0;right:0;bottom:0;width:62%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24%);mask-image:linear-gradient(90deg,transparent 0,#000 24%)}
+.hero-media img{width:100%;height:100%;object-fit:cover;object-position:64% 40%;display:block}
+.dot{width:100%;aspect-ratio:1;border-radius:50%}
+.inp{font:inherit;font-family:Poppins,sans-serif;font-size:clamp(20px,2vw,28px);font-weight:500;color:#ffffff;background:transparent;border:0;border-bottom:2px solid #e86bd0;padding:10px 2px;width:100%;outline:none}
+.inp::placeholder{color:rgba(207,228,250,.45)}
+.inp:focus{border-bottom-color:#ffffff}
+.phase-img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:16px;display:block}
+.sym{display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:24px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);text-decoration:none;color:#ffffff;transition:border-color .2s,background-color .2s,transform .3s cubic-bezier(.2,0,0,1)}
+.sym:hover{border-color:#e86bd0;background:rgba(232,107,208,.06);color:#ffffff;transform:translateY(-4px)}
+.stage{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,6fr) minmax(0,3fr);gap:clamp(24px,4vw,64px);align-items:start;padding:clamp(40px,4vw,60px) 0;border-top:1px solid rgba(255,255,255,.16);scroll-margin-top:40px}
+.kpi{position:relative;overflow:hidden;padding:26px 24px 24px;border-radius:20px;background:linear-gradient(160deg,rgba(232,107,208,.22) 0%,rgba(232,107,208,.06) 60%,rgba(232,107,208,.02) 100%);border:1px solid rgba(232,107,208,.55);box-shadow:0 20px 60px rgba(232,107,208,.12)}
+.kchart{display:block;width:100%;height:auto;margin:4px 0 14px;overflow:visible}
+.kcap{margin:12px 0 0;font-size:11px;color:#9fb6cc}
+@keyframes kgrow{from{transform:scaleY(0)}}@keyframes khgrow{from{transform:scaleX(0)}}@keyframes kdraw{from{stroke-dashoffset:1}}
+.kbar{transform-box:fill-box;transform-origin:bottom;animation:kgrow 1.1s cubic-bezier(.2,0,0,1) both}
+.khbar{transform-box:fill-box;transform-origin:left;animation:khgrow 1.1s cubic-bezier(.2,0,0,1) both}
+.kline{stroke-dashoffset:0;animation:kdraw 1.6s .3s cubic-bezier(.4,0,.2,1) both}
+@supports (animation-timeline: view()){.kbar,.khbar,.kline{animation-duration:1ms;animation-delay:0s!important;animation-timeline:view();animation-range:entry 20% cover 45%}}
+.kpi-word{font-size:clamp(34px,3vw,44px);color:#e86bd0;margin:6px 0 10px}
+.stage h3{word-break:normal;overflow-wrap:normal;hyphens:none;white-space:nowrap}
+.layer{margin:0 0 6px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#9fb6cc}
+.layer-body{margin:0;font-size:17px;line-height:1.6}
+.form-card{border-radius:28px;background:#f7f8f6;color:#001a33;padding:40px;display:flex;flex-direction:column;gap:20px;box-shadow:0 40px 120px rgba(0,0,0,.45)}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 16px}
+.fld{display:flex;flex-direction:column;font-family:Poppins,sans-serif;min-width:0}
+.fld>span{display:block;margin:0 0 10px;font-size:14px;font-weight:600;color:#001a33}
+.fld input,.fld select{font:inherit;font-size:16px;color:#001a33;background:#ffffff;border:1px solid #c3ced8;border-radius:12px;padding:0 16px;min-height:52px;width:100%}
+.fld input:focus,.fld select:focus{outline:none;border-color:#023c70;box-shadow:0 0 0 4px rgba(2,60,112,.14)}
+.dd{position:relative}
+.dd-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:0 16px;font:inherit;font-size:16px;text-align:left;background:#ffffff;border:1px solid #c3ced8;border-radius:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.dd-btn:hover{border-color:#8fa3b6}
+.dd-btn:focus-visible,.dd-btn[aria-expanded="true"]{outline:none;border-color:#023c70;box-shadow:0 0 0 4px rgba(2,60,112,.14)}
+.dd-val{display:flex;align-items:center;gap:10px;min-width:0}
+.dd-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-chev{flex:none;transition:transform .2s cubic-bezier(.2,0,0,1)}
+.dd-list{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 8px);margin:0;padding:6px;list-style:none;background:#ffffff;border:1px solid #dfe5ea;border-radius:14px;box-shadow:0 24px 60px rgba(0,26,51,.18),0 2px 8px rgba(0,26,51,.08);max-height:300px;overflow:auto;animation:ddin .18s cubic-bezier(.2,0,0,1) both}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
+.dd-opt{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:10px;font-size:15px;color:#001a33;cursor:pointer}
+.dd-opt:hover{background:#f1f4f7}
+.dd-ico{width:20px;height:20px;object-fit:contain;flex:none}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.5;color:#33506b}
+.consent input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:#001a33}
+.form-card .btn-p{background:#8e1b82;border-color:#8e1b82;color:#ffffff}
+.form-card .btn-p:hover{background:#6f1466;border-color:#6f1466}
+details.faq{border-top:1px solid rgba(255,255,255,.14)}
+details.faq:last-of-type{border-bottom:1px solid rgba(255,255,255,.14)}
+details.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:22px 0;min-height:44px}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq .plus{flex:none;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);display:inline-flex;align-items:center;justify-content:center;transition:transform .3s cubic-bezier(.2,0,0,1)}
+details.faq[open] .plus{transform:rotate(45deg)}
+button{font:inherit}
+.mbar{display:none}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(32px,5vw,80px)}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,24px)}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.evo{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,4fr) minmax(0,6fr);gap:clamp(24px,3vw,48px);align-items:end}
+.offer{transition:transform .3s cubic-bezier(.2,0,0,1)}
+.offer:hover{transform:translateY(-4px)}
+.flow{stroke-dasharray:6 10;animation:flow 2.4s linear infinite}
+.leak-l,.leak-r{transform-box:fill-box;animation:leakl 2.8s cubic-bezier(.5,0,1,1) infinite}
+.leak-r{animation-name:leakr}
+.leak-l.d2,.leak-r.d2{animation-delay:.9s}.leak-l.d3,.leak-r.d3{animation-delay:1.7s}
+@keyframes leakl{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(-46px,120px);opacity:0}}
+@keyframes leakr{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(46px,120px);opacity:0}}
+@keyframes flow{to{stroke-dashoffset:-32}}
+@keyframes lprun{to{stroke-dashoffset:-1}}
+@keyframes lpspark{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.75;transform:scale(.86)}}
+.lp-run{animation:lprun 6s linear infinite}
+.lp-spark{transform-box:fill-box;transform-origin:center;animation:lpspark 2.8s ease-in-out infinite}
+@keyframes up{from{opacity:0;transform:translateY(46px)}}
+@keyframes kb{from{transform:scale(1.12)}}
+@keyframes breathe{0%,100%{box-shadow:0 0 30px rgba(232,107,208,.45)}50%{box-shadow:0 0 70px rgba(232,107,208,.85),0 0 0 10px rgba(232,107,208,.08)}}
+@keyframes scan{0%{left:-40%}55%,100%{left:105%}}
+@keyframes dotin{from{opacity:0;transform:scale(.3)}}
+.in{animation:up 1.2s cubic-bezier(.05,.7,.1,1) both}
+.d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}.d5{animation-delay:.7s}
+.kb{animation:kb 3.4s cubic-bezier(.2,0,0,1) both}
+@supports (animation-timeline: view()){
+ @keyframes rv{from{opacity:0;transform:translateY(80px)}}
+ @keyframes lift{from{opacity:0;transform:translateY(140px)}}
+ @keyframes spin{from{opacity:0;transform:rotate(-30deg) scale(.85)}}
+ .rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 85%}
+ .spin{animation:spin linear both;animation-timeline:view();animation-range:entry 0% entry 80%}
+ .st>*{animation:lift linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+ .st>*:nth-child(2){animation-range:entry 10% entry 80%}
+ .st>*:nth-child(3){animation-range:entry 20% entry 90%}
+ .st>*:nth-child(4){animation-range:entry 30% entry 100%}
+ .dots .dot{animation:dotin linear both;animation-timeline:view();animation-range:entry 10% cover 40%}
+}
+@media (max-width:1100px){.stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.stage>:first-child{grid-column:1/-1}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){
+ .g2,.g3,.evo,.evo2{grid-template-columns:minmax(0,1fr)!important}
+ .sticky-col{position:static!important}
+}
+@media (max-width:640px){
+ .wrap{padding:0 16px}
+ .sec{padding-top:88px!important;padding-bottom:88px!important}
+ .g4,.stage{grid-template-columns:minmax(0,1fr)}
+ .fgrid{grid-template-columns:minmax(0,1fr)}
+ .form-card{padding:24px}
+ .hero-sec{display:block!important}
+ .hero-media{position:relative!important;width:100%!important;height:56vh;-webkit-mask-image:none!important;mask-image:none!important}
+ .hero-copy{padding-top:28px!important;padding-bottom:56px}
+ .mbar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:20}
+ .page{padding-bottom:84px}
+ .flow-wide{display:none!important}
+ .flow-narrow{display:block!important}
+}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="page" style="background: #001a33; color: #ffffff; font-family: Poppins, sans-serif; overflow-x: clip">
+
+<!-- 0 · Hero -->
+<section class="hero-sec" aria-labelledby="hero-h1" style="position: relative; min-height: max(820px, min(100vh, 1000px)); overflow: hidden; display: flex; flex-direction: column; justify-content: center; background: radial-gradient(ellipse 60% 70% at 14% 55%, rgba(232,107,208,0.12) 0%, rgba(232,107,208,0.03) 45%, rgba(232,107,208,0) 70%), #001a33">
+<div class="hero-media"><img class="kb" src="/_blob/a94af0ce3ae4614e5d29ed7269115526" fetchpriority="high" alt="Un estratega de Efeonce, de espaldas con la bomber de la marca, supervisa a un Spark que lee con una línea de luz magenta una página web proyectada sobre un muro de concreto"></div>
+<div class="scan" aria-hidden="true"></div>
+<div class="wrap" style="position: relative; width: 100%">
+<div class="hero-copy" style="position: relative; z-index: 1; max-width: 640px; padding-top: clamp(96px, 11vh, 132px)">
+<p class="eyebrow chip in d1">Agencia de inbound marketing</p>
+<p class="in d2" style="margin: 36px 0 0; font-weight: 300; font-size: clamp(28px, 3vw, 44px); line-height: 1.15; color: #ffffff">¿Qué viene después del inbound?</p>
+<p class="idea t-impact in d3" style="font-size: clamp(116px, 15vw, 240px); color: #ffffff; white-space: nowrap">El <span style="white-space: nowrap">loop<span class="sphere" aria-hidden="true"></span></span></p>
+<h1 id="hero-h1" class="in d4" style="margin: 32px 0 0; font-weight: 500; font-size: clamp(20px, 1.8vw, 26px); line-height: 1.38; color: #ffffff; max-width: 600px">Agencia de inbound marketing: estrategia, contenido, búsqueda, medios y datos funcionando como un solo ciclo.</h1>
+<p class="in d4" style="margin: 16px 0 0; font-weight: 300; font-size: clamp(16px, 1.3vw, 19px); line-height: 1.55; color: #dbe5ee; max-width: 560px">La IA cambió cómo te encuentran tus clientes. Lo que no cambió es que alguien tiene que convertir eso en un sistema. Lo diseñamos contigo y lo implementamos en las herramientas que ya usas, en Latinoamérica y Estados Unidos.</p>
+<div class="in d5" style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px">
+<a class="btn-p" href="#diagnostico">Agenda un diagnóstico</a>
+<a class="btn-s" href="https://efeoncepro.com/agenda/">Agenda una reunión</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Partner y clientes -->
+<section aria-label="Partner y clientes" style="padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1)">
+<div class="wrap" style="display: flex; flex-wrap: wrap; gap: 28px 48px; align-items: center; justify-content: space-between">
+<div style="display: flex; flex-wrap: wrap; gap: 20px 36px; align-items: center">
+<span style="display: inline-flex; align-items: center; gap: 12px"><img src="/_blob/8583d2afdde6d23cf1bd67b95f705b1e" alt="" style="height: 30px"><span style="font-size: 14px; line-height: 1.25"><b style="font-weight: 600">HubSpot</b><br><span style="color: #cfe4fa">Gold Partner</span></span></span>
+<span style="font-size: 14px; line-height: 1.25; padding-left: 24px; border-left: 1px solid rgba(255,255,255,0.2)"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 740; font-size: 26px; letter-spacing: -0.03em">+120 empresas</b><br><span style="color: #cfe4fa">han crecido con Efeonce en 4 países</span></span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 24px 40px; align-items: center">
+<img src="/_blob/6c86f9b3e3741234270c54498843af87" loading="lazy" alt="Berel" style="height: 36px; filter: brightness(0) invert(1)">
+<img src="/_blob/6e23ee799c338584a67bd7a9e4dc1117" loading="lazy" alt="Bresler" style="height: 24px; filter: brightness(0) invert(1)">
+<img src="/_blob/6f0c2122f55685c6cf5db60d2e7e6264" loading="lazy" alt="Carozzi" style="height: 22px; filter: brightness(0) invert(1)">
+<img src="/_blob/1475196af5f76b17798fdbb834606867" loading="lazy" alt="Aguas Andinas" style="height: 30px">
+<img src="/_blob/4c4718a0f5cc767c370f319699422117" loading="lazy" alt="ANAM" style="height: 24px">
+<img src="/_blob/5fc010b4b34d22750dfa2b84fb0cf93e" loading="lazy" alt="Marca Chile" style="height: 32px; filter: brightness(0) invert(1)">
+</div>
+</div>
+</section>
+
+<!-- 1 · El punto de partida -->
+<section class="sec" aria-labelledby="clic-h" style="padding: 160px 0 140px">
+<div class="wrap g2" style="align-items: center">
+<div>
+<p class="eyebrow chip rv">El punto de partida</p>
+<h2 id="clic-h" class="idea t-medium h2 rv" style="margin-top: 24px"><span class="lt">De cada 100 búsquedas,</span> <span class="acc">68</span> terminan sin un <span style="white-space: nowrap">clic<span class="sphere" aria-hidden="true"></span></span></h2>
+<p class="lead rv" style="margin-top: 28px; max-width: 520px">Tu cliente sigue buscando, pero la respuesta le llega antes de visitar tu sitio: en Google, en un asistente de IA, en LinkedIn o en un video. El inbound que vivía del tráfico se quedó sin piso.</p>
+<p class="rv" style="margin: 20px 0 0; font-size: 13px; color: #9fb6cc">SparkToro, 2026 · búsquedas en Google, EE. UU., enero a abril.</p>
+</div>
+<figure class="rv" style="margin: 0">
+<div class="dots" role="img" aria-label="Cien puntos: 68 apagados son búsquedas sin clic y 32 encendidos son búsquedas que terminan en un clic" style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: clamp(8px, 1.2vw, 16px)">
+<sc-for list="{{dots}}" as="d" hint-placeholder-count="100">
+<span class="dot" style="{{d.style}}"></span>
+</sc-for>
+</div>
+<figcaption style="margin-top: 20px; display: flex; gap: 28px; flex-wrap: wrap; font-size: 14px; color: #cfe4fa"><span style="display: inline-flex; align-items: center; gap: 10px"><i style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(207,228,250,0.4)"></i>68 sin clic</span><span style="display: inline-flex; align-items: center; gap: 10px"><i style="width: 14px; height: 14px; border-radius: 50%; background: #ffffff"></i>32 llegan a un sitio</span></figcaption>
+</figure>
+</div>
+</section>
+
+<!-- 2 · Qué sigue vivo y qué murió -->
+<section class="sec" aria-labelledby="vivo-h" style="padding: 150px 0; background: #f7f8f6; color: #001a33">
+<div class="wrap">
+<p style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #5f7488">El inbound, sin nostalgia</p>
+<h2 id="vivo-h" class="idea t-short rv" style="margin-top: 24px; font-size: clamp(48px, 7vw, 116px); color: #001a33"><span class="lt">No murió.</span><br>Se le murió <span style="white-space: nowrap"><span style="color: #8e1b82">el clic</span><span class="sphere" aria-hidden="true" style="background: #8e1b82; animation: none"></span></span></h2>
+<div class="g2" style="margin-top: 80px">
+<div>
+<p style="margin: 0 0 8px; font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #023c70">Sigue vivo</p>
+<ul class="st" style="list-style: none; margin: 0; padding: 0">
+<li class="idea" style="padding: 22px 0; border-top: 2px solid #001a33; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15">Ayudar antes de vender.</li>
+<li class="idea" style="padding: 22px 0; border-top: 1px solid #c9d3dc; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15">Un punto de vista que nadie más tiene.</li>
+<li class="idea" style="padding: 22px 0; border-top: 1px solid #c9d3dc; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15">El CRM como memoria de la relación.</li>
+<li class="idea" style="padding: 22px 0; border-top: 1px solid #c9d3dc; border-bottom: 1px solid #c9d3dc; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15">La confianza que dan otros.</li>
+</ul>
+</div>
+<div>
+<p style="margin: 0 0 8px; font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #8e1b82">Murió</p>
+<ul class="st" style="list-style: none; margin: 0; padding: 0; color: #6d6777">
+<li class="idea" style="padding: 22px 0; border-top: 2px solid #8e1b82; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15; text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: #8e1b82">El tráfico como meta.</li>
+<li class="idea" style="padding: 22px 0; border-top: 1px solid #c9d3dc; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15; text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: #8e1b82">El blog de relleno para Google.</li>
+<li class="idea" style="padding: 22px 0; border-top: 1px solid #c9d3dc; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15; text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: #8e1b82">Una herramienta distinta por cada canal.</li>
+<li class="idea" style="padding: 22px 0; border-top: 1px solid #c9d3dc; border-bottom: 1px solid #c9d3dc; font-size: clamp(24px, 2.4vw, 34px); font-weight: 460; letter-spacing: -0.02em; line-height: 1.15; text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: #8e1b82">Revisar resultados una vez por trimestre.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 3 · El cambio de fondo -->
+<section class="sec" aria-labelledby="evo-h" style="padding: 160px 0; background: radial-gradient(ellipse 55% 55% at 74% 58%, rgba(255,70,1,0.14) 0%, rgba(255,70,1,0.03) 45%, rgba(255,70,1,0) 70%), #001a33">
+<div class="wrap">
+<p class="eyebrow chip rv">El cambio de fondo</p>
+<h2 id="evo-h" class="idea t-medium h2 rv" style="margin-top: 24px; max-width: 1100px"><span class="lt">Tu cliente ya no baja por un embudo.</span> Se mueve en <span style="color: #ff7a52">ciclos</span><span class="sphere" aria-hidden="true"></span></h2>
+<div style="display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(32px, 5vw, 80px); align-items: center; margin-top: 88px" class="evo2">
+<figure class="rv" style="margin: 0; display: flex; flex-direction: column; gap: 24px; opacity: 0.9">
+<svg viewBox="0 0 300 320" role="img" aria-label="El embudo roto: sus piezas atraer, convertir y cerrar están separadas y torcidas, con una grieta, y los clientes se escapan por los costados" style="width: 100%; height: auto; display: block; overflow: visible">
+<g fill="none" stroke="#cfe4fa" stroke-opacity="0.55" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" font-family="Poppins, sans-serif" font-size="19" text-anchor="middle">
+<g transform="rotate(-4 150 46)"><path d="M13.8 21.6 Q6 10 20.0 10.0 L280.0 10.0 Q294 10 286.2 21.6 L253.8 70.4 Q246 82 232.0 82.0 L68.0 82.0 Q54 82 46.2 70.4 Z"></path><path d="M150 10 L141 30 L156 44 L144 62 L152 82" stroke="#ffffff" stroke-opacity="0.9" stroke-width="2"></path><text x="96" y="53" fill="#cfe4fa" stroke="none">Atraer</text></g>
+<g transform="translate(12 8) rotate(6 150 127)"><path d="M61.0 106.1 Q54 94 68.0 94.0 L232.0 94.0 Q246 94 239.0 106.1 L215.0 147.9 Q208 160 194.0 160.0 L106.0 160.0 Q92 160 85.0 147.9 Z"></path><text x="150" y="134" fill="#cfe4fa" stroke="none">Convertir</text></g>
+<g transform="translate(-16 22) rotate(-11 150 201)"><path d="M98.4 184.4 Q92 172 106.0 172.0 L194.0 172.0 Q208 172 201.6 184.4 L184.4 217.6 Q178 230 164.0 230.0 L136.0 230.0 Q122 230 115.6 217.6 Z"></path><text x="150" y="208" fill="#cfe4fa" stroke="none">Cerrar</text></g>
+<g transform="translate(26 46) rotate(28 150 266)"><path d="M125.4 255.6 Q122 242 136.0 242.0 L164.0 242.0 Q178 242 174.6 255.6 L169.4 276.4 Q166 290 152.0 290.0 L148.0 290.0 Q134 290 130.6 276.4 Z"></path></g>
+</g>
+<g fill="#e86bd0">
+<circle class="leak-l" cx="52" cy="90" r="5"></circle><circle class="leak-l d2" cx="70" cy="96" r="4"></circle>
+<circle class="leak-r" cx="252" cy="96" r="5"></circle><circle class="leak-r d3" cx="236" cy="104" r="4"></circle>
+<circle class="leak-l d3" cx="96" cy="182" r="4.5"></circle><circle class="leak-r d2" cx="214" cy="176" r="4.5"></circle>
+</g>
+</svg>
+<figcaption><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #9fb6cc">Lo que asumía el embudo</p><p style="margin: 10px 0 0; font-size: 17px; line-height: 1.55; color: #cfe4fa">Que el cliente entraba arriba, bajaba en línea recta y compraba al final. Hoy decide antes de llegar a tu sitio y se escapa por todos lados.</p></figcaption>
+</figure>
+<figure class="spin" style="margin: 0; display: flex; flex-direction: column; gap: 24px">
+<div style="width: 100%; background: transparent; padding: 0; box-sizing: border-box;">
+<svg viewBox="-40 -40 1400 803" role="img" aria-label="Loop Marketing de HubSpot: un infinito con cuatro fases. 01 Definir, 02 Adaptar, 03 Amplificar y 04 Optimizar, con la IA al centro." style="display: block; width: 100%; height: auto; overflow: visible">
+<defs>
+<linearGradient id="lpBand" x1="0" y1="0" x2="1320" y2="722" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff2f00"></stop><stop offset="0.5" stop-color="#ff5a1f"></stop><stop offset="1" stop-color="#ff2f00"></stop></linearGradient>
+<radialGradient id="lpHalo" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ff4601" stop-opacity="0.32"></stop><stop offset="0.5" stop-color="#ff4601" stop-opacity="0.08"></stop><stop offset="1" stop-color="#ff4601" stop-opacity="0"></stop></radialGradient>
+<filter id="lpGlow" x="-20%" y="-30%" width="140%" height="160%"><feGaussianBlur stdDeviation="22"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="660" cy="361" rx="700" ry="330" fill="url(#lpHalo)"></ellipse>
+<path d="M1020.77,61.24c-77.78,0-148.63,29.67-201.86,78.31,0,0-8.53,8.05-12.6,12.22l-146.24,141.88-146.24-141.88c-4.07-4.18-12.6-12.22-12.6-12.22-53.23-48.64-124.08-78.31-201.86-78.31C134.03,61.24,0,195.27,0,360.61s134.03,299.36,299.36,299.36c84.12,0,160.11-34.71,214.5-90.56l146.2-141.85,146.2,141.85c54.38,55.86,130.38,90.56,214.5,90.56,165.33,0,299.36-134.03,299.36-299.36S1186.1,61.24,1020.77,61.24ZM444.95,502.36c-36.92,37.92-88.51,61.48-145.62,61.48-112.24,0-203.24-90.99-203.24-203.24s90.99-203.24,203.24-203.24c52.81,0,100.91,20.14,137.04,53.16,0,0,5.79,5.46,8.56,8.3l146.13,141.78-146.11,141.75ZM1020.81,563.85c-57.11,0-108.7-23.56-145.62-61.48l-146.11-141.75,146.13-141.78c2.76-2.84,8.56-8.3,8.56-8.3,36.14-33.02,84.24-53.16,137.04-53.16,112.24,0,203.24,90.99,203.24,203.24s-90.99,203.24-203.24,203.24Z" fill="#ff3b0a" opacity="0.55" filter="url(#lpGlow)"></path>
+<path d="M1020.77,61.24c-77.78,0-148.63,29.67-201.86,78.31,0,0-8.53,8.05-12.6,12.22l-146.24,141.88-146.24-141.88c-4.07-4.18-12.6-12.22-12.6-12.22-53.23-48.64-124.08-78.31-201.86-78.31C134.03,61.24,0,195.27,0,360.61s134.03,299.36,299.36,299.36c84.12,0,160.11-34.71,214.5-90.56l146.2-141.85,146.2,141.85c54.38,55.86,130.38,90.56,214.5,90.56,165.33,0,299.36-134.03,299.36-299.36S1186.1,61.24,1020.77,61.24ZM444.95,502.36c-36.92,37.92-88.51,61.48-145.62,61.48-112.24,0-203.24-90.99-203.24-203.24s90.99-203.24,203.24-203.24c52.81,0,100.91,20.14,137.04,53.16,0,0,5.79,5.46,8.56,8.3l146.13,141.78-146.11,141.75ZM1020.81,563.85c-57.11,0-108.7-23.56-145.62-61.48l-146.11-141.75,146.13-141.78c2.76-2.84,8.56-8.3,8.56-8.3,36.14-33.02,84.24-53.16,137.04-53.16,112.24,0,203.24,90.99,203.24,203.24s-90.99,203.24-203.24,203.24Z" fill="url(#lpBand)"></path>
+<path class="lp-run" pathLength="1" d="M1020.77,61.24c-77.78,0-148.63,29.67-201.86,78.31,0,0-8.53,8.05-12.6,12.22l-146.24,141.88-146.24-141.88c-4.07-4.18-12.6-12.22-12.6-12.22-53.23-48.64-124.08-78.31-201.86-78.31C134.03,61.24,0,195.27,0,360.61s134.03,299.36,299.36,299.36c84.12,0,160.11-34.71,214.5-90.56l146.2-141.85,146.2,141.85c54.38,55.86,130.38,90.56,214.5,90.56,165.33,0,299.36-134.03,299.36-299.36S1186.1,61.24,1020.77,61.24ZM444.95,502.36c-36.92,37.92-88.51,61.48-145.62,61.48-112.24,0-203.24-90.99-203.24-203.24s90.99-203.24,203.24-203.24c52.81,0,100.91,20.14,137.04,53.16,0,0,5.79,5.46,8.56,8.3l146.13,141.78-146.11,141.75ZM1020.81,563.85c-57.11,0-108.7-23.56-145.62-61.48l-146.11-141.75,146.13-141.78c2.76-2.84,8.56-8.3,8.56-8.3,36.14-33.02,84.24-53.16,137.04-53.16,112.24,0,203.24,90.99,203.24,203.24s-90.99,203.24-203.24,203.24Z" fill="none" stroke="#ffd2bf" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.05 0.95"></path>
+<g fill="#ffffff"><path d="M238.3,127.34c-1.69,0-3.14-.4-4.36-1.21-1.21-.81-2.15-1.93-2.8-3.37-.65-1.43-.98-3.09-.98-4.98s.33-3.54.98-4.98c.65-1.43,1.58-2.56,2.8-3.37,1.21-.81,2.67-1.21,4.36-1.21s3.14.4,4.34,1.21c1.21.81,2.13,1.93,2.79,3.37.65,1.44.98,3.09.98,4.98s-.33,3.54-.98,4.98c-.65,1.44-1.58,2.56-2.79,3.37-1.21.81-2.65,1.21-4.34,1.21ZM238.3,124.01c.86,0,1.62-.25,2.27-.77.65-.51,1.16-1.23,1.53-2.15s.55-2.03.55-3.31-.19-2.39-.55-3.31c-.37-.92-.88-1.64-1.53-2.15-.65-.51-1.41-.77-2.27-.77s-1.62.26-2.27.77c-.65.51-1.16,1.23-1.53,2.15-.37.92-.55,2.03-.55,3.31s.18,2.39.55,3.31c.37.92.88,1.64,1.53,2.15s1.41.77,2.27.77Z"></path><path d="M251.74,127.02v-14.23l-3.3.87v-2.96l4.89-2.17h2.22v18.48h-3.8Z"></path><path d="M238.3,614.39c-1.69,0-3.14-.4-4.36-1.21-1.21-.81-2.15-1.93-2.8-3.37-.65-1.43-.98-3.09-.98-4.98s.33-3.54.98-4.98c.65-1.43,1.58-2.56,2.8-3.37,1.21-.81,2.67-1.21,4.36-1.21s3.14.4,4.34,1.21c1.21.81,2.13,1.93,2.79,3.37.65,1.44.98,3.09.98,4.98s-.33,3.54-.98,4.98c-.65,1.44-1.58,2.56-2.79,3.37-1.21.81-2.65,1.21-4.34,1.21ZM238.3,611.07c.86,0,1.62-.25,2.27-.77.65-.51,1.16-1.23,1.53-2.15s.55-2.03.55-3.31-.19-2.39-.55-3.31c-.37-.92-.88-1.64-1.53-2.15-.65-.51-1.41-.77-2.27-.77s-1.62.26-2.27.77c-.65.51-1.16,1.23-1.53,2.15-.37.92-.55,2.03-.55,3.31s.18,2.39.55,3.31c.37.92.88,1.64,1.53,2.15s1.41.77,2.27.77Z"></path><path d="M257.9,614.08v-3.27h-9.06v-2.96l8.58-12.25h4.17v11.99h2.35v3.22h-2.35v3.27h-3.7ZM252.77,607.58h5.36v-7.92l-5.36,7.92Z"></path><path d="M1072.27,127.34c-1.69,0-3.14-.4-4.36-1.21-1.21-.81-2.15-1.93-2.8-3.37-.65-1.43-.98-3.09-.98-4.98s.33-3.54.98-4.98c.65-1.43,1.58-2.56,2.8-3.37,1.21-.81,2.67-1.21,4.36-1.21s3.14.4,4.34,1.21c1.21.81,2.13,1.93,2.79,3.37.65,1.44.98,3.09.98,4.98s-.33,3.54-.98,4.98c-.65,1.44-1.58,2.56-2.79,3.37-1.21.81-2.65,1.21-4.34,1.21ZM1072.27,124.01c.86,0,1.62-.25,2.27-.77s1.16-1.23,1.53-2.15c.37-.92.55-2.03.55-3.31s-.18-2.39-.55-3.31c-.37-.92-.88-1.64-1.53-2.15-.65-.51-1.41-.77-2.27-.77s-1.62.26-2.27.77c-.65.51-1.16,1.23-1.53,2.15-.37.92-.55,2.03-.55,3.31s.18,2.39.55,3.31.88,1.64,1.53,2.15,1.41.77,2.27.77Z"></path><path d="M1089.52,127.34c-1.2,0-2.3-.22-3.3-.66-1-.44-1.81-1.11-2.42-2.01-.61-.9-.93-2.04-.96-3.43h3.64c0,.56.12,1.07.37,1.53.25.46.6.82,1.06,1.08.46.26,1,.4,1.64.4.6,0,1.11-.12,1.53-.36.42-.24.74-.55.95-.95.21-.4.32-.85.32-1.36,0-.58-.15-1.07-.44-1.47-.29-.4-.7-.7-1.21-.91-.52-.21-1.12-.32-1.81-.32h-1.37v-3.04h1.37c.84,0,1.56-.19,2.14-.58s.87-.99.87-1.8c0-.65-.22-1.17-.65-1.56-.43-.39-1.01-.58-1.73-.58-.85,0-1.5.24-1.95.73-.46.48-.71,1.08-.77,1.78h-3.59c.05-1.18.35-2.19.88-3.04.54-.84,1.27-1.49,2.21-1.93.93-.44,2.01-.66,3.22-.66,1.28,0,2.38.22,3.27.67s1.58,1.05,2.03,1.81c.46.76.69,1.58.69,2.48,0,.74-.14,1.39-.41,1.94-.27.55-.64,1.02-1.1,1.39-.46.37-.95.63-1.48.79.69.14,1.29.41,1.8.81.51.4.91.9,1.2,1.52.29.62.44,1.32.44,2.11,0,1-.25,1.93-.74,2.79s-1.22,1.54-2.18,2.05c-.96.51-2.13.77-3.52.77Z"></path><path d="M1072.27,614.39c-1.69,0-3.14-.4-4.36-1.21-1.21-.81-2.15-1.93-2.8-3.37-.65-1.43-.98-3.09-.98-4.98s.33-3.54.98-4.98c.65-1.43,1.58-2.56,2.8-3.37,1.21-.81,2.67-1.21,4.36-1.21s3.14.4,4.34,1.21c1.21.81,2.13,1.93,2.79,3.37.65,1.44.98,3.09.98,4.98s-.33,3.54-.98,4.98c-.65,1.44-1.58,2.56-2.79,3.37-1.21.81-2.65,1.21-4.34,1.21ZM1072.27,611.07c.86,0,1.62-.25,2.27-.77s1.16-1.23,1.53-2.15c.37-.92.55-2.03.55-3.31s-.18-2.39-.55-3.31c-.37-.92-.88-1.64-1.53-2.15-.65-.51-1.41-.77-2.27-.77s-1.62.26-2.27.77c-.65.51-1.16,1.23-1.53,2.15-.37.92-.55,2.03-.55,3.31s.18,2.39.55,3.31.88,1.64,1.53,2.15,1.41.77,2.27.77Z"></path><path d="M1082.78,614.08v-2.72c1.11-.9,2.19-1.79,3.25-2.68,1.06-.89,2.01-1.77,2.85-2.64.85-.87,1.51-1.73,2.01-2.56.49-.84.74-1.65.74-2.44,0-.46-.09-.89-.26-1.29-.18-.4-.45-.73-.82-.98-.37-.25-.85-.37-1.45-.37s-1.08.14-1.49.41c-.41.27-.72.64-.92,1.1-.2.46-.3.98-.3,1.56h-3.57c.04-1.39.34-2.54.91-3.46.57-.92,1.34-1.6,2.3-2.05.96-.45,2.03-.67,3.21-.67,1.32,0,2.43.24,3.34.73.91.48,1.59,1.14,2.06,1.98.47.84.7,1.78.7,2.84,0,.81-.15,1.6-.44,2.36-.29.77-.69,1.51-1.2,2.23-.51.72-1.09,1.41-1.73,2.07s-1.31,1.29-2.01,1.89c-.7.6-1.38,1.16-2.05,1.69h7.84v3.01h-12.97Z"></path><path class="lp-spark" d="M695.87,359.43h-.11c-9.35-.06-16.91-7.65-16.91-17.01,0-.65-.53-1.18-1.18-1.18s-1.18.53-1.18,1.18c0,9.36-7.56,16.95-16.91,17.01h-.23v-37.04c0-.65-.53-1.18-1.18-1.18h-.01c-.64,0-1.17.52-1.17,1.17,0,20.46-16.59,37.05-37.05,37.05-.64,0-1.17.52-1.17,1.17v.02c0,.61.46,1.1,1.05,1.16.04,0,.08,0,.12,0h.07c20.42.04,36.96,16.61,36.97,37.04h0c0,.65.52,1.17,1.17,1.17h.03c.64,0,1.17-.52,1.17-1.17v-37.05h.22c9.35.06,16.91,7.65,16.91,17.01,0,.65.53,1.18,1.18,1.18s1.18-.53,1.18-1.18c0-9.36,7.56-16.95,16.91-17.01h.11c.65,0,1.18-.53,1.18-1.18h0c0-.65-.53-1.18-1.18-1.18Z"></path></g>
+<g fill="#ff7a52" font-family="'Lexend Deca', 'Poppins', sans-serif" font-weight="600" font-size="40"><text x="26" y="34">Definir</text><text x="1320" y="34" text-anchor="end">Amplificar</text><text x="26" y="721">Optimizar</text><text x="1320" y="721" text-anchor="end">Adaptar</text></g>
+</svg>
+</div>
+<figcaption><p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #ff7a52">Cómo funciona ahora</p><p style="margin: 10px 0 0; font-size: 17px; line-height: 1.55; color: #ffffff">Descubre, compara y vuelve por muchos canales. Por eso el marketing también tiene que operar en ciclo: definir, adaptar, amplificar y optimizar, y que cada ciclo deje lo aprendido para el siguiente.</p></figcaption>
+</figure>
+</div>
+</div>
+</section>
+
+<!-- 4 · Dónde se rompe -->
+<section class="sec" aria-labelledby="rompe-h" style="padding: 150px 0; border-top: 1px solid rgba(255,255,255,0.08)">
+<div class="wrap">
+<div class="g2" style="align-items: end">
+<div>
+<p class="eyebrow chip rv">Por dónde empezar</p>
+<h2 id="rompe-h" class="idea t-short h2 rv" style="margin-top: 24px"><span class="lt">¿Dónde se te</span> <span style="white-space: nowrap">rompe?<span class="sphere" aria-hidden="true"></span></span></h2>
+</div>
+<p class="lead rv">Nadie llega pidiendo un ciclo. Llegas con un problema concreto, y casi siempre vive en una de estas cuatro etapas. Empezamos por ahí y conectamos el resto.</p>
+</div>
+<div class="g4 st" style="margin-top: 72px">
+<a class="sym" href="#definir">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #ff7a52">01 · Definir</span>
+<span class="idea t-long" style="font-size: clamp(24px, 2vw, 30px)">«No sabemos qué decir ni por qué nos elegirían.»</span>
+<span style="margin-top: auto; font-size: 14px; color: #cfe4fa">Ver cómo lo resolvemos ↓</span>
+</a>
+<a class="sym" href="#adaptar">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #ff7a52">02 · Adaptar</span>
+<span class="idea t-long" style="font-size: clamp(24px, 2vw, 30px)">«Mandamos lo mismo a todos y no convierte.»</span>
+<span style="margin-top: auto; font-size: 14px; color: #cfe4fa">Ver cómo lo resolvemos ↓</span>
+</a>
+<a class="sym" href="#amplificar">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #ff7a52">03 · Amplificar</span>
+<span class="idea t-long" style="font-size: clamp(24px, 2vw, 30px)">«Hacemos buen contenido, pero nadie nos encuentra.»</span>
+<span style="margin-top: auto; font-size: 14px; color: #cfe4fa">Ver cómo lo resolvemos ↓</span>
+</a>
+<a class="sym" href="#optimizar">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #ff7a52">04 · Optimizar</span>
+<span class="idea t-long" style="font-size: clamp(24px, 2vw, 30px)">«No sabemos qué está funcionando.»</span>
+<span style="margin-top: auto; font-size: 14px; color: #cfe4fa">Ver cómo lo resolvemos ↓</span>
+</a>
+</div>
+</div>
+</section>
+
+<!-- 5 · Cómo trabajamos -->
+<section class="sec" id="metodo" aria-labelledby="metodo-h" style="padding: 160px 0; background: radial-gradient(ellipse 70% 50% at 50% 0%, #0a3157 0%, #001a33 70%)">
+<div class="wrap">
+<div class="g2" style="align-items: end">
+<div>
+<p class="eyebrow chip rv">Cómo trabajamos</p>
+<h2 id="metodo-h" class="idea t-medium h2 rv" style="margin-top: 24px"><span class="lt">Primero la estrategia.</span> Después, las <span style="white-space: nowrap">herramientas<span class="sphere" aria-hidden="true"></span></span></h2>
+</div>
+<p class="lead rv">Gran parte del trabajo se hace fuera de cualquier plataforma: entender a tu cliente, decidir qué decir y a quién. Recién entonces lo implementamos en tu stack, sea cual sea: CRM, sitio, medios o analítica.</p>
+</div>
+
+<!-- Fundamentos -->
+<div style="margin-top: 96px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<p class="idea t-short rv" style="font-size: clamp(32px, 3.2vw, 48px)"><span class="lt">La base:</span> tres fundamentos.</p>
+<span class="chip rv">Semanas 1 a 4</span>
+</div>
+<div class="g3 st" style="margin-top: 32px">
+<article style="border-radius: 24px; border: 1px solid rgba(255,255,255,0.16); padding: 30px; display: flex; flex-direction: column; gap: 12px">
+<p class="idea t-short" style="font-size: 28px">Mapa de tu cliente</p>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cfe4fa">Quién compra de verdad, quién más decide, qué pregunta antes de elegirte y qué lo hace dudar. Lo armamos con entrevistas, datos de ventas e investigación de mercado, no con supuestos.</p>
+</article>
+<article style="border-radius: 24px; border: 1px solid rgba(255,255,255,0.16); padding: 30px; display: flex; flex-direction: column; gap: 12px">
+<p class="idea t-short" style="font-size: 28px">Guía de estilo</p>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cfe4fa">Tu voz, tu punto de vista y lo que nunca dirías, escritos para que el equipo y la IA suenen a ti y no a todos los demás.</p>
+</article>
+<article style="border-radius: 24px; border: 2px solid #e86bd0; background: rgba(232,107,208,0.05); padding: 30px; display: flex; flex-direction: column; gap: 12px">
+<p class="idea t-short" style="font-size: 28px">Capa de datos</p>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cfe4fa">Una sola lectura de lo que pasa con tus clientes, aunque los datos vivan en muchas herramientas. Así cada etapa sabe qué pasó en la anterior.</p>
+</article>
+</div>
+
+<!-- Datos y stack fragmentado -->
+<div class="rv" style="margin-top: 48px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.025); padding: clamp(28px, 4vw, 56px)">
+<div class="g2" style="align-items: end; gap: 24px 48px">
+<p class="idea t-medium" style="font-size: clamp(32px, 3.4vw, 52px)"><span class="lt">Tu stack no tiene un problema de herramientas.</span> Tiene uno de conversación.</p>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #cfe4fa">Cada canal mide en su propia plataforma y cuenta su propia historia. El ciclo se corta justo ahí. No te pedimos cambiar todo: conectamos lo que ya tienes para que se lea como una sola cosa.</p>
+</div>
+<svg class="flow-wide" viewBox="0 0 1200 360" role="img" aria-label="Seis fuentes de datos (CRM, analítica web, Search Console, plataformas de medios, ventas y ERP, encuestas y entrevistas) se conectan en una capa de datos que alimenta las cuatro etapas: definir, adaptar, amplificar y optimizar" style="display: block; width: 100%; height: auto; margin-top: 40px">
+<g font-family="Poppins, sans-serif" font-size="17" fill="#ffffff">
+<g fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.28)" stroke-width="1.5">
+<rect x="0" y="6" width="270" height="44" rx="22"></rect><rect x="0" y="66" width="270" height="44" rx="22"></rect><rect x="0" y="126" width="270" height="44" rx="22"></rect><rect x="0" y="186" width="270" height="44" rx="22"></rect><rect x="0" y="246" width="270" height="44" rx="22"></rect><rect x="0" y="306" width="270" height="44" rx="22"></rect>
+</g>
+<text x="24" y="34">CRM</text><text x="24" y="94">Analítica web</text><text x="24" y="154">Search Console</text><text x="24" y="214">Plataformas de medios</text><text x="24" y="274">Ventas y ERP</text><text x="24" y="334">Encuestas y entrevistas</text>
+</g>
+<g fill="none" stroke="#e86bd0" stroke-opacity="0.6" stroke-width="2" class="flow">
+<path d="M270 28 C 400 28, 420 178, 520 178"></path><path d="M270 88 C 400 88, 420 178, 520 178"></path><path d="M270 148 C 400 148, 420 178, 520 178"></path><path d="M270 208 C 400 208, 420 178, 520 178"></path><path d="M270 268 C 400 268, 420 178, 520 178"></path><path d="M270 328 C 400 328, 420 178, 520 178"></path>
+<path d="M760 178 L 860 178"></path>
+</g>
+<rect x="520" y="118" width="240" height="120" rx="24" fill="#e86bd0"></rect>
+<text x="640" y="172" text-anchor="middle" font-family="'Bricolage Grotesque', sans-serif" font-weight="740" font-size="30" fill="#001a33">Capa de</text>
+<text x="640" y="206" text-anchor="middle" font-family="'Bricolage Grotesque', sans-serif" font-weight="740" font-size="30" fill="#001a33">datos</text>
+<g font-family="'Lexend Deca', Poppins, sans-serif" font-weight="600" font-size="22" fill="#ff7a52">
+<rect x="860" y="58" width="340" height="240" rx="28" fill="rgba(255,90,31,0.08)" stroke="#ff7a52" stroke-opacity="0.55" stroke-width="1.5"></rect>
+<text x="896" y="112">01 · Definir</text><text x="896" y="164">02 · Adaptar</text><text x="896" y="216">03 · Amplificar</text><text x="896" y="268">04 · Optimizar</text>
+</g>
+</svg>
+<ul class="flow-narrow" style="display: none; list-style: none; margin: 32px 0 0; padding: 0; columns: 2; column-gap: 12px; font-size: 14px; color: #cfe4fa">
+<li style="margin-bottom: 8px">CRM</li><li style="margin-bottom: 8px">Analítica web</li><li style="margin-bottom: 8px">Search Console</li><li style="margin-bottom: 8px">Plataformas de medios</li><li style="margin-bottom: 8px">Ventas y ERP</li><li style="margin-bottom: 8px">Encuestas y entrevistas</li>
+</ul>
+</div>
+</div>
+
+<!-- Las cuatro etapas -->
+<div style="margin-top: 120px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<p class="idea t-short rv" style="font-size: clamp(32px, 3.2vw, 48px)"><span class="lt">Sobre esa base,</span> las cuatro etapas.</p>
+<span class="chip rv">Primer ciclo completo en 90 días</span>
+</div>
+
+<article id="definir" class="stage" style="margin-top: 32px; border-top: 2px solid #e86bd0">
+<div>
+<p class="idea t-impact" style="font-size: clamp(72px, 7vw, 116px); color: rgba(207,228,250,0.2)">01</p>
+<h3 class="idea t-impact" style="margin-top: 12px; font-size: clamp(40px, 3.5vw, 56px)">Definir</h3>
+<p style="margin: 10px 0 0; font-size: 16px; color: #cfe4fa">Define tu historia, como solo tú sabes.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 24px">
+<div><p class="layer">Estrategia</p><p class="layer-body">Encontramos qué puedes decir que nadie más puede, y lo convertimos en la historia de la campaña y en un recurso que valga la pena: una guía, un estudio, una herramienta.</p></div>
+<div><p class="layer">Implementación</p><p class="layer-body">Nuestra <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/agencia-creativa/">agencia creativa</a> le da forma al concepto y planificamos la campaña completa a partir de ese recurso.</p></div>
+</div>
+<div class="kpi">
+<p class="layer" style="color: #f6d3ef">Cómo se mide</p>
+<p class="idea t-short kpi-word">Eficiencia</p>
+<svg class="kchart" viewBox="0 -2 240 94" role="img" aria-label="Gráfico ilustrativo: tiempo y costo por pieza, ciclo a ciclo"><defs><linearGradient id="kge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86bd0"/><stop offset="1" stop-color="#e86bd0" stop-opacity="0.25"/></linearGradient></defs><line x1="0" y1="89" x2="240" y2="89" stroke="rgba(255,255,255,0.25)" stroke-width="1"/><rect class="kbar" style="animation-delay:0.00s" x="6.0" y="8" width="28.0" height="80" rx="4" fill="url(#kge)"/><rect class="kbar" style="animation-delay:0.08s" x="46.0" y="22" width="28.0" height="66" rx="4" fill="url(#kge)"/><rect class="kbar" style="animation-delay:0.16s" x="86.0" y="34" width="28.0" height="54" rx="4" fill="url(#kge)"/><rect class="kbar" style="animation-delay:0.24s" x="126.0" y="44" width="28.0" height="44" rx="4" fill="url(#kge)"/><rect class="kbar" style="animation-delay:0.32s" x="166.0" y="52" width="28.0" height="36" rx="4" fill="url(#kge)"/><rect class="kbar" style="animation-delay:0.40s" x="206.0" y="58" width="28.0" height="30" rx="4" fill="url(#kge)"/><polyline class="kline" pathLength="1" points="20,6 60,20 100,32 140,42 180,50 220,56" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="1" stroke-linecap="round"/></svg>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #ffffff">Cuánto tarda y cuánto cuesta producir cada pieza.</p>
+<p class="kcap">Ilustrativo: la curva real sale de tus datos.</p>
+</div>
+</article>
+
+<article id="adaptar" class="stage">
+<div>
+<p class="idea t-impact" style="font-size: clamp(72px, 7vw, 116px); color: rgba(207,228,250,0.2)">02</p>
+<h3 class="idea t-impact" style="margin-top: 12px; font-size: clamp(40px, 3.5vw, 56px)">Adaptar</h3>
+<p style="margin: 10px 0 0; font-size: 16px; color: #cfe4fa">Adapta tus mensajes a cada cliente.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 24px">
+<div><p class="layer">Estrategia</p><p class="layer-body">Pasamos de segmentos amplios a la hiperpersonalización: qué necesita oír cada cliente según su industria, su cargo y el momento en que está. Quien firma, quien usa y quien recomienda reciben mensajes distintos.</p></div>
+<div><p class="layer">Implementación</p><p class="layer-body">Las variantes de texto, pieza y formato para cada segmento salen de nuestra <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/agencia-creativa-v2/">producción creativa a escala</a>, con IA alimentada por tu guía de estilo y tus datos, y las conectamos a tu CRM, sea <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/servicios-contratar-hubspot/">HubSpot</a> u otra plataforma, y a la automatización de correos y nutrición. La IA escribe a escala; una persona del equipo revisa antes de que salga.</p></div>
+</div>
+<div class="kpi">
+<p class="layer" style="color: #f6d3ef">Cómo se mide</p>
+<p class="idea t-short kpi-word">Interacción</p>
+<svg class="kchart" viewBox="0 -2 240 94" role="img" aria-label="Gráfico ilustrativo: clics por canal y segmento"><defs><linearGradient id="kgi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86bd0"/><stop offset="1" stop-color="#e86bd0" stop-opacity="0.25"/></linearGradient></defs><line x1="0" y1="89" x2="240" y2="89" stroke="rgba(255,255,255,0.25)" stroke-width="1"/><path class="karea" d="M0,78 C40,74 60,62 90,60 S150,40 180,30 S220,14 240,10 L240,88 L0,88 Z" fill="url(#kgi)" opacity="0.55"/><path class="kline" pathLength="1" d="M0,78 C40,74 60,62 90,60 S150,40 180,30 S220,14 240,10" fill="none" stroke="#e86bd0" stroke-width="2.5" stroke-dasharray="1" stroke-linecap="round"/><circle cx="240" cy="10" r="4" fill="#ffffff"/></svg>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #ffffff">Tasa de clics por canal y por segmento.</p>
+<p class="kcap">Ilustrativo: la curva real sale de tus datos.</p>
+</div>
+</article>
+
+<article id="amplificar" class="stage">
+<div>
+<p class="idea t-impact" style="font-size: clamp(72px, 7vw, 116px); color: rgba(207,228,250,0.2)">03</p>
+<h3 class="idea t-impact" style="margin-top: 12px; font-size: clamp(40px, 3.5vw, 56px)">Amplificar</h3>
+<p style="margin: 10px 0 0; font-size: 16px; color: #cfe4fa">Amplifica tu presencia donde está tu cliente.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 24px">
+<div><p class="layer">Estrategia</p><p class="layer-body">Decidimos dónde tiene que estar cada pieza y en qué forma de expresión: video corto, audio, comunidades, la voz de un creador o la respuesta de un asistente de IA. Así cada recurso tiene más de una vida.</p></div>
+<div><p class="layer">Implementación</p><p class="layer-body">Te posicionamos en Google con <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/servicios/posicionamiento-seo/">SEO</a> y en las respuestas de ChatGPT, Gemini y Perplexity con <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/aeo-2/">AEO</a>. Movemos el contenido en <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/servicios/redes-sociales/">redes sociales</a>, lo ponemos en boca de creadores con <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/servicios/agencia-de-influencers/">marketing de influencers</a> y lo aceleramos con <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/servicios/performance-marketing/">performance</a> y <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/servicios/agencia-de-medios/">planificación de medios</a> cuando hace falta llegar más rápido.</p></div>
+</div>
+<div class="kpi">
+<p class="layer" style="color: #f6d3ef">Cómo se mide</p>
+<p class="idea t-short kpi-word">Conversión</p>
+<svg class="kchart" viewBox="0 -2 240 94" role="img" aria-label="Gráfico ilustrativo: conversión por canal"><text x="0" y="12" font-family="Poppins, sans-serif" font-size="11" fill="#cfe4fa">Búsqueda</text><rect x="70" y="3" width="170" height="12" rx="6" fill="rgba(255,255,255,0.08)"/><rect class="khbar" style="animation-delay:0.0s" x="70" y="3" width="128" height="12" rx="6" fill="#e86bd0"/><text x="0" y="34" font-family="Poppins, sans-serif" font-size="11" fill="#cfe4fa">IA</text><rect x="70" y="25" width="170" height="12" rx="6" fill="rgba(255,255,255,0.08)"/><rect class="khbar" style="animation-delay:0.1s" x="70" y="25" width="102" height="12" rx="6" fill="#e86bd0"/><text x="0" y="56" font-family="Poppins, sans-serif" font-size="11" fill="#cfe4fa">Correo</text><rect x="70" y="47" width="170" height="12" rx="6" fill="rgba(255,255,255,0.08)"/><rect class="khbar" style="animation-delay:0.2s" x="70" y="47" width="86" height="12" rx="6" fill="#e86bd0"/><text x="0" y="78" font-family="Poppins, sans-serif" font-size="11" fill="#cfe4fa">Social</text><rect x="70" y="69" width="170" height="12" rx="6" fill="rgba(255,255,255,0.08)"/><rect class="khbar" style="animation-delay:0.3s" x="70" y="69" width="60" height="12" rx="6" fill="#e86bd0"/></svg>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #ffffff">Tasa por canal y presencia en las respuestas de la IA.</p>
+<p class="kcap">Ilustrativo: la curva real sale de tus datos.</p>
+</div>
+</article>
+
+<article id="optimizar" class="stage" style="border-bottom: 1px solid rgba(255,255,255,0.16)">
+<div>
+<p class="idea t-impact" style="font-size: clamp(72px, 7vw, 116px); color: rgba(207,228,250,0.2)">04</p>
+<h3 class="idea t-impact" style="margin-top: 12px; font-size: clamp(40px, 3.5vw, 56px)">Optimizar</h3>
+<p style="margin: 10px 0 0; font-size: 16px; color: #cfe4fa">Optimiza tu estrategia en tiempo real.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 24px">
+<div><p class="layer">Estrategia</p><p class="layer-body">Decidimos qué vamos a medir, qué experimentos correr y qué cambiaría tu forma de invertir.</p></div>
+<div><p class="layer">Implementación</p><p class="layer-body">Instalamos la medición en tu <a class="axis-mention" data-line="revenue-hubspot" data-surface="dark" href="https://efeoncepro.com/desarrollo-sitios-web/">sitio web</a>, cruzamos CRM, analítica y medios en un mismo tablero y corremos experimentos rápidos. Lo aprendido vuelve a Definir y el ciclo empieza otra vez, mejor informado.</p></div>
+</div>
+<div class="kpi">
+<p class="layer" style="color: #f6d3ef">Cómo se mide</p>
+<p class="idea t-short kpi-word">Velocidad</p>
+<svg class="kchart" viewBox="0 -2 240 94" role="img" aria-label="Gráfico ilustrativo: experimentos y leads calificados por mes"><defs><linearGradient id="kgv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e86bd0"/><stop offset="1" stop-color="#e86bd0" stop-opacity="0.25"/></linearGradient></defs><line x1="0" y1="89" x2="240" y2="89" stroke="rgba(255,255,255,0.25)" stroke-width="1"/><rect class="kbar" style="animation-delay:0.00s" x="6.0" y="70" width="28.0" height="18" rx="4" fill="url(#kgv)"/><rect class="kbar" style="animation-delay:0.08s" x="46.0" y="60" width="28.0" height="28" rx="4" fill="url(#kgv)"/><rect class="kbar" style="animation-delay:0.16s" x="86.0" y="62" width="28.0" height="26" rx="4" fill="url(#kgv)"/><rect class="kbar" style="animation-delay:0.24s" x="126.0" y="46" width="28.0" height="42" rx="4" fill="url(#kgv)"/><rect class="kbar" style="animation-delay:0.32s" x="166.0" y="34" width="28.0" height="54" rx="4" fill="url(#kgv)"/><rect class="kbar" style="animation-delay:0.40s" x="206.0" y="16" width="28.0" height="72" rx="4" fill="url(#kgv)"/><circle cx="20" cy="60" r="3.5" fill="#ffffff"/><circle cx="60" cy="50" r="3.5" fill="#ffffff"/><circle cx="100" cy="52" r="3.5" fill="#ffffff"/><circle cx="140" cy="36" r="3.5" fill="#ffffff"/><circle cx="180" cy="24" r="3.5" fill="#ffffff"/><circle cx="220" cy="6" r="3.5" fill="#ffffff"/></svg>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #ffffff">Leads calificados y experimentos por mes.</p>
+<p class="kcap">Ilustrativo: la curva real sale de tus datos.</p>
+</div>
+</article>
+</div>
+</div>
+</section>
+
+<!-- 6 · Arma tu primer ciclo -->
+<section class="sec" id="ciclo" aria-labelledby="ciclo-h" style="padding: 160px 0; background: radial-gradient(ellipse 70% 60% at 20% 30%, #0a3157 0%, #001a33 70%)">
+<div class="wrap">
+<p class="eyebrow chip rv">Pruébalo con tu negocio</p>
+<h2 id="ciclo-h" class="idea t-short h2 rv" style="margin-top: 24px"><span class="lt">Arma tu primer</span> <span class="acc">ciclo</span><span class="sphere" aria-hidden="true"></span></h2>
+<div class="g2" style="margin-top: 64px; align-items: end">
+<label class="rv" style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 14px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #cfe4fa">¿Qué vende tu empresa?</span>
+<input class="inp" data-gh-cycle-input type="text" value="{{product}}" onInput="{{setProduct}}" placeholder="software para clínicas" aria-describedby="ciclo-ayuda">
+<span id="ciclo-ayuda" style="font-size: 13px; color: #9fb6cc">Escribe tu categoría. El ciclo se arma solo, aquí abajo.</span>
+</label>
+<div class="rv" style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 14px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #cfe4fa">¿Dónde vendes?</span>
+<div role="group" aria-label="Elige tu mercado" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{markets}}" as="m" hint-placeholder-count="5">
+<button type="button" class="mk" data-gh-market="{{m.id}}" data-gh-market-where="{{m.where}}" aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" style="{{m.style}}">{{m.label}}</button>
+</sc-for>
+</div>
+</div>
+</div>
+<ol class="g4 st" aria-live="polite" style="list-style: none; margin: 72px 0 0; padding: 0">
+<li style="border-radius: 24px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.03); padding: 20px 20px 26px; display: flex; flex-direction: column; gap: 14px">
+<img class="phase-img" src="/_blob/c4c7f00f95a8db2986c7381508a12018" loading="lazy" alt="Un estratega ordena con la mano una página de contenido proyectada en el aire">
+<span class="idea t-short" style="font-size: 22px; color: #ff7a52">01 · Definir</span>
+<p style="margin: 0; font-size: 16px; line-height: 1.5">Encontramos la historia que solo tu <b data-gh-cycle-product style="color: #e86bd0; font-weight: 600">{{productLabel}}</b> puede contar y la convertimos en un recurso principal.</p>
+</li>
+<li style="border-radius: 24px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.03); padding: 20px 20px 26px; display: flex; flex-direction: column; gap: 14px">
+<img class="phase-img" src="/_blob/9d08c8fdef84e0a00e3007f22bf08075" loading="lazy" alt="Una consultora sostiene la ficha de un contacto conectada a llamadas, correos y reuniones">
+<span class="idea t-short" style="font-size: 22px; color: #ff7a52">02 · Adaptar</span>
+<p style="margin: 0; font-size: 16px; line-height: 1.5">Un mensaje distinto sobre <b data-gh-cycle-product style="color: #e86bd0; font-weight: 600">{{productLabel}}</b> para cada cliente: quien firma, quien lo usa y cada industria, producido a escala con IA.</p>
+</li>
+<li style="border-radius: 24px; border: 2px solid #e86bd0; background: rgba(232,107,208,0.07); padding: 20px 20px 26px; display: flex; flex-direction: column; gap: 14px">
+<img class="phase-img" src="/_blob/20f1ee0f56599ba91be12b2ad0c82dca" loading="lazy" alt="Una estratega junto a una barra de búsqueda iluminada con resultados">
+<span class="idea t-short" style="font-size: 22px; color: #ff7a52">03 · Amplificar</span>
+<p style="margin: 0; font-size: 16px; line-height: 1.5">La llevamos a buscadores, redes, correo y medios, y a la pregunta que hace tu cliente:</p>
+<p data-gh-cycle-question style="margin: 0; padding: 12px 14px; border-radius: 18px; background: #ffffff; color: #1f2328; font-size: 15px; line-height: 1.45">{{question}}</p>
+</li>
+<li style="border-radius: 24px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.03); padding: 20px 20px 26px; display: flex; flex-direction: column; gap: 14px">
+<img class="phase-img" src="/_blob/b6845682637d8e7ff9bdfe7a1616306e" loading="lazy" alt="Un analista de Efeonce frente a una red de datos de luz">
+<span class="idea t-short" style="font-size: 22px; color: #ff7a52">04 · Optimizar</span>
+<p style="margin: 0; font-size: 16px; line-height: 1.5">Cada semana cruzamos CRM, sitio y medios para ver qué trajo oportunidades en <span data-gh-cycle-market>{{marketName}}</span>, y ajustamos el siguiente ciclo.</p>
+</li>
+</ol>
+<div class="rv" style="margin-top: 40px; display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center">
+<a class="btn-p" href="#diagnostico">Quiero armar mi primer ciclo</a>
+<span style="font-size: 14px; color: #9fb6cc">Ejemplo ilustrativo: en el diagnóstico lo armamos con tus datos reales.</span>
+</div>
+</div>
+</section>
+
+<!-- 7 · Formas de empezar -->
+<section class="sec" id="planes" aria-labelledby="planes-h" style="padding: 160px 0; border-top: 1px solid rgba(255,255,255,0.08)">
+<div class="wrap">
+<div class="g2" style="align-items: end">
+<div>
+<p class="eyebrow chip rv">Formas de empezar</p>
+<h2 id="planes-h" class="idea t-short h2 rv" style="margin-top: 24px"><span class="lt">Empieza</span> por donde <span style="white-space: nowrap">estás<span class="sphere" aria-hidden="true"></span></span></h2>
+</div>
+<p class="lead rv">Antes de venderte nada, te mostramos si te sirve. Después eliges: resolver la etapa que más te duele o que operemos el ciclo completo contigo.</p>
+</div>
+<div class="g3" style="margin-top: 72px; align-items: stretch">
+<article class="offer" style="display: flex; flex-direction: column; gap: 18px; padding: clamp(28px, 3vw, 40px); border-radius: 24px; border: 1.5px solid rgba(255,255,255,0.22)">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #cfe4fa">Para empezar · Sin costo</p>
+<h3 class="idea t-short" style="font-size: clamp(30px, 2.8vw, 40px)">Diagnóstico</h3>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.5; color: #cfe4fa; flex-grow: 1">
+<li>Cómo está tu inbound hoy: contenido, canales y resultados</li>
+<li>Qué herramientas usas y qué tan conectados están tus datos</li>
+<li>En qué etapa se te rompe el ciclo</li>
+<li>Una recomendación honesta, aunque sea no trabajar juntos</li>
+</ul>
+<a href="#diagnostico" style="display: inline-flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.7); font-size: 16px; font-weight: 600; text-decoration: none; color: #ffffff">Agenda el diagnóstico</a>
+</article>
+<article class="offer" style="display: flex; flex-direction: column; gap: 18px; padding: clamp(28px, 3vw, 40px); border-radius: 24px; border: 1.5px solid rgba(255,255,255,0.22)">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #cfe4fa">Proyecto · Por etapa</p>
+<h3 class="idea t-short" style="font-size: clamp(30px, 2.8vw, 40px)">Una etapa a fondo</h3>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.5; color: #cfe4fa; flex-grow: 1">
+<li>Atacamos la etapa que más te duele</li>
+<li>Estrategia e implementación en tu stack</li>
+<li>Conectada a los fundamentos, no suelta</li>
+<li>Lista para sumar las otras etapas cuando quieras</li>
+</ul>
+<a href="#diagnostico" style="display: inline-flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.7); font-size: 16px; font-weight: 600; text-decoration: none; color: #ffffff">Cotizar una etapa</a>
+</article>
+<article class="offer" style="display: flex; flex-direction: column; gap: 18px; padding: clamp(28px, 3vw, 40px); border-radius: 24px; border: 2px solid #e86bd0; background: rgba(232,107,208,0.06)">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #ffffff">Servicio continuo · Mensual</p>
+<h3 class="idea t-short" style="font-size: clamp(30px, 2.8vw, 40px)">El ciclo completo</h3>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.5; color: #cfe4fa; flex-grow: 1">
+<li>Arranque de 90 días: fundamentos y primer ciclo</li>
+<li>Un equipo que opera las cuatro etapas contigo</li>
+<li>Experimentos y ajustes cada semana</li>
+<li>Reporte mensual con la métrica de cada etapa</li>
+</ul>
+<a class="btn-p" href="#diagnostico" style="border-radius: 12px">Quiero el ciclo completo</a>
+</article>
+</div>
+</div>
+</section>
+
+<!-- 8 · Las reglas -->
+<section class="sec" aria-labelledby="verdad-h" style="padding: 150px 0; background: radial-gradient(ellipse 70% 60% at 80% 30%, #0a3157 0%, #001a33 70%)">
+<div class="wrap">
+<p class="eyebrow chip rv">Las reglas, antes de firmar</p>
+<h2 id="verdad-h" class="idea t-short h2 rv" style="margin-top: 24px"><span class="lt">Lo que no te vamos a</span> <span class="acc">prometer</span><span class="sphere" aria-hidden="true"></span></h2>
+<div class="g2 st" style="margin-top: 72px">
+<div style="display: flex; flex-direction: column">
+<p style="margin: 0; padding: 26px 0; border-top: 2px solid #e86bd0; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.4">Resultados en el primer mes. <span style="color: #cfe4fa; font-weight: 300">El ciclo mejora cada vez que se completa; en el diagnóstico te damos una estimación con sus supuestos.</span></p>
+<p style="margin: 0; padding: 26px 0; border-top: 1px solid rgba(255,255,255,0.16); font-size: clamp(20px, 1.8vw, 24px); line-height: 1.4">Más tráfico. <span style="color: #cfe4fa; font-weight: 300">Puede bajar y aun así venderte más. Te reportamos oportunidades, no visitas.</span></p>
+<p style="margin: 0; padding: 26px 0; border-top: 1px solid rgba(255,255,255,0.16); border-bottom: 1px solid rgba(255,255,255,0.16); font-size: clamp(20px, 1.8vw, 24px); line-height: 1.4">Que cambies todas tus herramientas. <span style="color: #cfe4fa; font-weight: 300">Primero conectamos lo que ya tienes. Si algo sobra, te lo decimos con números.</span></p>
+</div>
+<div style="border-radius: 28px; background: #f7f8f6; color: #001a33; padding: clamp(28px, 3vw, 44px); display: flex; flex-direction: column; gap: 18px">
+<p style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #8e1b82">Lo que sí te prometemos</p>
+<p class="idea t-short" style="font-size: clamp(32px, 3.2vw, 48px)"><span class="lt">Que cada mes</span> sabrás dónde estás.</p>
+<ul style="list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; font-size: 16px; line-height: 1.5; color: #33506b">
+<li style="padding: 14px 0; border-top: 1px solid #dfe5ea"><b style="color: #001a33">La métrica de cada etapa</b>: eficiencia, interacción, conversión y velocidad.</li>
+<li style="padding: 14px 0; border-top: 1px solid #dfe5ea"><b style="color: #001a33">Qué contenido trajo oportunidades</b>, cruzando CRM, sitio y medios.</li>
+<li style="padding: 14px 0; border-top: 1px solid #dfe5ea"><b style="color: #001a33">Qué cambiamos</b> en el ciclo siguiente, y por qué.</li>
+<li style="padding: 14px 0; border-top: 1px solid #dfe5ea; border-bottom: 1px solid #dfe5ea"><b style="color: #001a33">Una persona del equipo</b> revisa todo antes de publicar.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 9 · Diagnóstico -->
+<section id="diagnostico" class="sec" aria-labelledby="cta-h" style="padding: 160px 0 140px; background: radial-gradient(ellipse 60% 60% at 30% 30%, rgba(232,107,208,0.12) 0%, rgba(232,107,208,0.02) 50%, rgba(232,107,208,0) 70%), #001a33">
+<div class="wrap g2" style="align-items: start">
+<div class="sticky-col" style="position: sticky; top: 40px; display: flex; flex-direction: column; gap: 22px">
+<p style="margin: 0; font-weight: 300; font-size: clamp(26px, 2.4vw, 36px)">¿Conversamos?</p>
+<p class="idea t-impact" style="margin-top: -12px; font-size: clamp(72px, 8vw, 128px)">Cuando <span style="white-space: nowrap">quieras<span class="sphere" aria-hidden="true"></span></span></p>
+<h2 id="cta-h" style="margin: 12px 0 0; font-weight: 500; font-size: clamp(20px, 1.6vw, 24px); line-height: 1.4">Te mostramos dónde se te rompe el ciclo y por dónde empezar.</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cfe4fa; max-width: 520px">Sin costo. Revisamos tu inbound, tus herramientas y tus mercados. Te responde una persona del equipo en un día hábil.</p>
+<div style="display: flex; flex-direction: column; gap: 14px; margin-top: 8px; padding: 24px; border-radius: 20px; border: 1px solid rgba(232,107,208,0.45); background: rgba(232,107,208,0.06); max-width: 520px">
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #f6d3ef">¿Prefieres conversarlo en vivo?</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #ffffff">Elige un horario y revisamos juntos tu caso en una videollamada con alguien del equipo.</p>
+<a class="btn-p" href="https://efeoncepro.com/agenda/" style="align-self: flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#001a33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="3"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>Agenda una reunión</a>
+</div>
+</div>
+<form class="form-card" aria-labelledby="form-h" novalidate>
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #33506b">Diagnóstico de inbound marketing</p>
+<h3 id="form-h" class="idea t-short" style="font-size: clamp(28px, 2.6vw, 36px)"><span class="lt">Cuéntanos</span> de tu marketing.</h3>
+<div class="fgrid">
+<label class="fld" style="grid-column: 1 / -1"><span>Tu sitio web</span><input type="text" name="brand" placeholder="empresa.com" required></label>
+<div class="fld dd"><span id="mk-lbl">Mercado principal</span>
+<button type="button" class="dd-btn" aria-haspopup="listbox" aria-labelledby="mk-lbl" aria-expanded="{{mkExpanded}}" onClick="{{mkToggle}}"><span class="dd-val" style="{{mkValueStyle}}"><sc-if value="{{mkHasIcon}}" hint-placeholder-val="{{ false }}"><img src="{{mkIcon}}" alt="" class="dd-ico"></sc-if><span class="dd-txt">{{mkDisplay}}</span></span><svg class="dd-chev" style="{{mkChevStyle}}" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#001a33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"></path></svg></button>
+<sc-if value="{{mkOpen}}" hint-placeholder-val="{{ false }}">
+<ul class="dd-list" role="listbox" aria-labelledby="mk-lbl">
+<sc-for list="{{mkOptions}}" as="o" hint-placeholder-count="5">
+<li role="option" aria-selected="{{o.selected}}" class="dd-opt" style="{{o.style}}" onClick="{{o.pick}}"><sc-if value="{{o.hasIcon}}" hint-placeholder-val="{{ false }}"><img src="{{o.icon}}" alt="" class="dd-ico"></sc-if><span style="flex: 1">{{o.label}}</span><sc-if value="{{o.isSel}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8e1b82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"></path></svg></sc-if></li>
+</sc-for>
+</ul>
+</sc-if>
+<input type="hidden" name="market" value="{{mkValue}}">
+</div>
+<div class="fld dd"><span id="crm-lbl">¿Qué CRM usan?</span>
+<button type="button" class="dd-btn" aria-haspopup="listbox" aria-labelledby="crm-lbl" aria-expanded="{{crmExpanded}}" onClick="{{crmToggle}}"><span class="dd-val" style="{{crmValueStyle}}"><sc-if value="{{crmHasIcon}}" hint-placeholder-val="{{ false }}"><img src="{{crmIcon}}" alt="" class="dd-ico"></sc-if><span class="dd-txt">{{crmDisplay}}</span></span><svg class="dd-chev" style="{{crmChevStyle}}" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#001a33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"></path></svg></button>
+<sc-if value="{{crmOpen}}" hint-placeholder-val="{{ false }}">
+<ul class="dd-list" role="listbox" aria-labelledby="crm-lbl">
+<sc-for list="{{crmOptions}}" as="o" hint-placeholder-count="5">
+<li role="option" aria-selected="{{o.selected}}" class="dd-opt" style="{{o.style}}" onClick="{{o.pick}}"><sc-if value="{{o.hasIcon}}" hint-placeholder-val="{{ false }}"><img src="{{o.icon}}" alt="" class="dd-ico"></sc-if><span style="flex: 1">{{o.label}}</span><sc-if value="{{o.isSel}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8e1b82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"></path></svg></sc-if></li>
+</sc-for>
+</ul>
+</sc-if>
+<input type="hidden" name="crm" value="{{crmValue}}">
+</div>
+<label class="fld"><span>Nombre y apellido</span><input type="text" name="name" autocomplete="name" required></label>
+<label class="fld"><span>Correo de trabajo</span><input type="email" name="email" autocomplete="email" placeholder="nombre@empresa.com" required></label>
+</div>
+<label class="consent"><input type="checkbox" required><span>Autorizo a Efeonce a usar estos datos para responderme.</span></label>
+<button type="submit" class="btn-p" style="align-self: flex-start">Pide tu diagnóstico</button>
+</form>
+</div>
+
+<div class="wrap" style="margin-top: 140px; max-width: 1000px">
+<h2 class="idea t-short rv" style="margin: 0 0 24px; font-size: clamp(32px, 3vw, 44px)"><span class="lt">Lo que ya</span> nos preguntan</h2>
+<sc-for list="{{faqs}}" as="f" hint-placeholder-count="7">
+<details class="faq">
+<summary><h3 style="margin: 0; font-size: 18px; font-weight: 600; line-height: 1.4">{{f.q}}</h3><span class="plus" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"><path d="M7 1v12M1 7h12"></path></svg></span></summary>
+<p style="margin: 0; padding: 0 56px 24px 0; font-size: 16px; line-height: 1.6; color: #cfe4fa">{{f.a}}</p>
+</details>
+</sc-for>
+<p style="margin: 64px 0 0; font-size: 13px; color: #9fb6cc">Loop Marketing es un modelo de HubSpot, Inc.; el gráfico está redibujado sobre su forma original.</p>
+</div>
+</section>
+
+<nav class="mbar" aria-label="Empezar con Efeonce" style="gap: 8px"><a class="btn-s" href="https://efeoncepro.com/agenda/" style="flex: 1; background: #001a33; padding: 1rem">Agenda reunión</a><a class="btn-p" href="#diagnostico" style="flex: 1; padding: 1rem">Diagnóstico</a></nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":12400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { product: 'software para clínicas', market: 'mx', formMarket: '', formCrm: '', openDd: '' };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var productLabel = (st.product || '').trim() || 'lo que vendes';
+    var marketDefs = [
+      { id: 'cl', label: 'Chile', name: 'Chile', where: 'en Chile' },
+      { id: 'mx', label: 'México', name: 'México', where: 'en México' },
+      { id: 'co', label: 'Colombia', name: 'Colombia', where: 'en Colombia' },
+      { id: 'pe', label: 'Perú', name: 'Perú', where: 'en Perú' },
+      { id: 'us', label: 'Estados Unidos', name: 'Estados Unidos', where: 'para el mercado hispano de Estados Unidos' }
+    ];
+    var current = marketDefs.filter(function (m) { return m.id === st.market; })[0] || marketDefs[1];
+    var markets = marketDefs.map(function (m) {
+      var on = m.id === current.id;
+      return {
+        id: m.id,
+        where: m.where,
+        label: m.label,
+        pressed: on ? 'true' : 'false',
+        style: on ? 'background: #ffffff; color: #001a33; border: 1.5px solid #ffffff' : 'background: transparent; color: #ffffff; border: 1.5px solid rgba(255,255,255,0.35)',
+        pick: function () { self.setState({ market: m.id }); }
+      };
+    });
+    var dots = [];
+    for (var i = 0; i < 100; i++) {
+      dots.push({ style: i >= 68 ? 'background: #ffffff; box-shadow: 0 0 18px rgba(255,255,255,0.35)' : 'border: 1.5px solid rgba(207,228,250,0.28)' });
+    }
+    var faqs = [
+      ['¿Qué hace una agencia de inbound marketing hoy?', 'Atrae clientes con contenido útil en vez de interrumpirlos, lo conecta con tus datos y mide qué negocio trae. Hoy lo trabajamos como un ciclo de cuatro etapas: definir tu historia, adaptarla a cada cliente, amplificarla en todos los canales y optimizarla cada semana. Trabajamos en Chile, México, Colombia, Perú y Estados Unidos, entre otros mercados.'],
+      ['¿El Loop Marketing reemplaza al inbound?', 'No, lo extiende. Los principios del inbound siguen siendo la base: educar, aportar valor y construir relación. Lo que cambia es cómo se opera, porque tu cliente encuentra respuestas antes de llegar a tu sitio.'],
+      ['¿Necesito una herramienta en particular?', 'No. El método no depende de una plataforma. Trabajamos con el CRM, el sitio y las plataformas de medios que ya usas. Si usas HubSpot o quieres hacerlo, somos Gold Partner.'],
+      ['¿Puedo contratar solo una etapa?', 'Sí. La mayoría empieza por la etapa que más le duele. La diferencia es que la conectamos con los fundamentos, para que no quede suelta y puedas sumar las demás cuando quieras.'],
+      ['¿Qué pasa con mis datos si están repartidos en muchas herramientas?', 'Es lo normal. Parte de los fundamentos es conectar CRM, analítica, medios y ventas para leerlos juntos. No te pedimos migrar todo a una sola plataforma.'],
+      ['¿Cuándo se ven los resultados?', 'Las primeras mejoras suelen verse en el primer ciclo, sobre todo en eficiencia e interacción. Los leads y las oportunidades dependen de tu punto de partida y de tu mercado: en el diagnóstico te damos una estimación con sus supuestos.'],
+      ['¿Y el AEO?', 'Es parte de la etapa de amplificar: trabajamos para que tu marca aparezca en las respuestas de los asistentes de IA. Si es lo único que necesitas, tenemos un servicio de AEO dedicado.']
+    ].map(function (f) { return { q: f[0], a: f[1] }; });
+    var HS = '', SF = ''; // the form is drawn by the Growth Forms renderer on the site
+    function dropdown(key, stateKey, placeholder, opts) {
+      var value = st[stateKey], open = st.openDd === key, out = {};
+      var cur = opts.filter(function (o) { return o.v === value; })[0];
+      out[key + 'Open'] = open;
+      out[key + 'Expanded'] = open ? 'true' : 'false';
+      out[key + 'Value'] = value;
+      out[key + 'Display'] = cur ? cur.l : placeholder;
+      out[key + 'HasIcon'] = !!(cur && cur.i);
+      out[key + 'Icon'] = cur && cur.i ? cur.i : '';
+      out[key + 'ValueStyle'] = cur ? 'color: #001a33' : 'color: #6b7f92';
+      out[key + 'ChevStyle'] = open ? 'transform: rotate(180deg)' : '';
+      out[key + 'Toggle'] = function () { self.setState({ openDd: open ? '' : key }); };
+      out[key + 'Options'] = opts.map(function (o) {
+        var sel = o.v === value;
+        return { label: o.l, icon: o.i || '', hasIcon: !!o.i, isSel: sel, selected: sel ? 'true' : 'false',
+          style: sel ? 'background: rgba(142,27,130,0.08); font-weight: 600' : '',
+          pick: function () { var u = { openDd: '' }; u[stateKey] = o.v; self.setState(u); } };
+      });
+      return out;
+    }
+    var ddMk = dropdown('mk', 'formMarket', 'Elige un mercado', [
+      { v: 'cl', l: 'Chile' }, { v: 'mx', l: 'México' }, { v: 'co', l: 'Colombia' }, { v: 'pe', l: 'Perú' },
+      { v: 'us', l: 'Estados Unidos' }, { v: 'otro', l: 'Otro país' }, { v: 'varios', l: 'Varios mercados' }]);
+    var ddCrm = dropdown('crm', 'formCrm', 'Elige una opción', [
+      { v: 'hubspot', l: 'HubSpot', i: HS }, { v: 'salesforce', l: 'Salesforce', i: SF },
+      { v: 'otro', l: 'Otro CRM' }, { v: 'ninguno', l: 'Todavía ninguno' }]);
+    var ret = {
+      product: st.product,
+      productLabel: productLabel,
+      setProduct: function (e) { self.setState({ product: e.target.value }); },
+      markets: markets,
+      marketName: current.name,
+      question: '¿Qué ' + productLabel + ' me recomiendas ' + current.where + '?',
+      dots: dots,
+      faqs: faqs
+    };
+    Object.assign(ret, ddMk, ddCrm);
+    return ret;
+  }
+}
+</script>
+</body>
+</html>

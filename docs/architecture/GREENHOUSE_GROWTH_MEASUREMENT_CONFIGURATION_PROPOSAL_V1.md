@@ -1,6 +1,6 @@
 # Propuesta — configuración de medición por formulario y calendario
 
-- Status: **Proposed; goal de configuración escalable y CAPI confirmado por el operador14/10. Plan P1 aprobado; decisión formalizada en GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md; implementación en curso.**
+- Status: **Propuesta histórica supersedida por [ADR Accepted de políticas](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md); implementación publicada14/10, PR255/main9690efad.**
 - Fecha: 2026-10-13, conversación posterior a PR254.
 - Owner propuesto: Growth Forms / Meetings / Measurement.
 - Scope: elegibilidad y matching; sin nueva infraestructura ni cambio de sender.
@@ -9,11 +9,11 @@
 La petición del 14/10 autoriza registrar el alcance integral en
 [TASK-2035](../tasks/in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md),
 incluyendo CRO, audiencias, suscripciones y calidad HubSpot, además de esta configuración.
-Este documento conserva la propuesta técnica base: ubicación/schema, envelope y planes de
+El texto siguiente conserva el antecedente13/10, no instrucciones runtime vigentes. El estado actual vive en el ADR/manual/runtime enlazados. Propuesta original: ubicación/schema, envelope y planes de
 ejecución aún requieren sus decisiones/checkpoints. El registro no crea schema/API/UI ni
 publica ClientGTM, flags, secretos, audiencias o un release.
 
-## Problema confirmado
+## Problema de base — corte13/10, resuelto por el contrato publicado
 
 Forms ya publica versiones desde datos. Matching enumera seis slugs y una pareja
 scheduler/surface en measurement/payload.ts y scripts/measurement/sgtm-lead-client.js.
@@ -95,5 +95,9 @@ runtimes destino y lectura provider proporcional.
 | Habilitar todos los Forms | Rompe finalidad/alcance comercial; rechazada |
 | Policy versionada por dominio | Propuesta recomendada; reutiliza ciclo actual, implementación inicial coordinada |
 
-Reabrir si cambia dueño/contrato de extracción de Growth. No supersede ADR MetaCAPI Accepted
-ni se presenta como capacidad disponible hoy. La ejecución se gobierna por TASK-2035 y sus unidades/checkpoints; planificación iniciada en [plan](../tasks/plans/TASK-2035-plan.md), implementación pendiente de su aprobación.
+Reabrir si cambia dueño/contrato de extracción de Growth. Esta propuesta histórica no supersede
+el ADR MetaCAPI Accepted. La configuración escalable descrita se implementó bajo el
+[ADR de políticas Accepted](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md) y las unidades
+TASK-2036/2037 del [plan aprobado](../tasks/plans/TASK-2035-plan.md). [Cierre14/10](../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md): alta por datos vía CLI productiva y Meta Test Events sin redeploy/publishGTM,
+fixture archivada. El resto de TASK-2035 (CRO, abandono, suscripciones, outcomes CRM) permanece fuera
+del alcance publicado; la implementación y evidencia actuales se consultan en esos canones.

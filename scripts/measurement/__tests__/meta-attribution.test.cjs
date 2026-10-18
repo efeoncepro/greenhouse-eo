@@ -60,3 +60,54 @@ test('advertising IDs never enter dataLayer/GA4 ordinary events',()=>{const b=br
 b.grant();const raw=JSON.stringify(b.window.dataLayer);
 
 assert.ok(!raw.includes('fixture-click'));assert.ok(!raw.includes(b.read().fbp));});
+
+test('Google landing IDs are memory-only before consent and persist for cross-subdomain booking after grant',()=>{
+  const b=browser({url:'https://efeoncepro.com/?gclid=observed-click&gbraid=observed-braid'});
+
+  assert.equal(b.cookies.size,0);assert.equal(b.storage.size,0);b.grant();
+  const first=b.window.efeonceReadGoogleAdsAttribution();
+
+  assert.equal(first.gclid,'observed-click');assert.equal(first.gbraid,'observed-braid');assert.equal(first.source,'landing_query');
+  assert.equal(b.document.documentElement.getAttribute('data-efeonce-google-ad-user-data'),'granted');
+  const next=browser({cookies:b.cookies,storage:b.storage,url:'https://think.efeoncepro.com/agenda/'});
+
+  next.grant();assert.equal(next.window.efeonceReadGoogleAdsAttribution().gclid,'observed-click');
+  assert.equal(next.window.efeonceReadGoogleAdsAttribution().capturedAt,first.capturedAt);
+  assert.ok(!JSON.stringify(next.window.dataLayer).includes('observed-click'));
+});
+test('Google IDs never fabricate, reject malformed/oversized values, and a real new landing replaces prior context',()=>{
+  const invalid=browser({url:'https://efeoncepro.com/?gclid='+encodeURIComponent('email@example.test')+'&gbraid='+'a'.repeat(513)});
+
+  invalid.grant();assert.equal(Object.keys(invalid.window.efeonceReadGoogleAdsAttribution()).length,0);
+  const first=browser({url:'https://efeoncepro.com/?wbraid=first-braid'});
+
+first.grant();
+  const next=browser({cookies:first.cookies,storage:first.storage,url:'https://efeoncepro.com/?gclid=second-click'});
+
+next.grant();
+  const context=next.window.efeonceReadGoogleAdsAttribution();
+
+assert.equal(context.gclid,'second-click');assert.equal(context.wbraid,undefined);
+});
+test('Google stored context expires after 30 days and never refreshes acquisition time',()=>{
+  const old={source:'landing_query',capturedAt:new Date(Date.now()-31*86400000).toISOString(),gclid:'old-click'};
+  const b=browser({url:'https://efeoncepro.com/',cookies:new Map([['efeonce_gads',encodeURIComponent(JSON.stringify(old))]]),storage:new Map([['efeonce.gads-attribution.v1',JSON.stringify(old)]])});
+
+  b.grant();assert.equal(Object.keys(b.window.efeonceReadGoogleAdsAttribution()).length,0);assert.ok(!b.cookies.has('efeonce_gads'));assert.ok(!b.storage.has('efeonce.gads-attribution.v1'));
+});
+test('Google revocation/GPC clear context and regrant does not resurrect old landing',()=>{
+  const b=browser({url:'https://efeoncepro.com/?gclid=do-not-resurrect'});
+
+b.grant();b.grant(false);b.grant();
+  assert.equal(Object.keys(b.window.efeonceReadGoogleAdsAttribution()).length,0);
+  const g=browser({url:'https://efeoncepro.com/?gclid=blocked',gpc:true});
+
+g.grant();
+  assert.equal(Object.keys(g.window.efeonceReadGoogleAdsAttribution()).length,0);assert.ok(!g.cookies.has('efeonce_gads'));
+});
+test('Google blocked cookie/storage leaves only bounded memory and does not interrupt consent',()=>{
+  const b=browser({url:'https://efeoncepro.com/?gclid=memory-click',blockCookies:true,blockStorage:true});
+
+b.grant();
+  assert.equal(b.window.efeonceReadGoogleAdsAttribution().gclid,'memory-click');assert.equal(b.cookies.size,0);assert.equal(b.storage.size,0);
+});

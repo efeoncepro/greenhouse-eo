@@ -29,6 +29,7 @@ Load only the references required by the current landing, widget, or operation.
   Elementor may compose a template/shell, but must not duplicate the body, cluster registry, canonical or schema.
 - Do not use `efeonce-web` as deploy source for the live public site unless a new ADR moves the runtime to Astro/headless.
 - Treat direct Kinsta filesystem edits as emergency-only and backport governed runtime code changes to `efeoncepro/efeonce-public-site-runtime`.
+- Each landing derives its design pattern from its own need (audience, funnel stage, offer, proof, the decision the visitor must make). Never use an existing landing (Inbound, Performance, Medios, Content…) as a template or call it «the site's style»; reuse mechanisms, not looks: `references/landing-workflow.md` §Start from the landing's need.
 - For visual landing work, pair with `greenhouse-gvc-playwright`; close with Playwright/GVC-style evidence on desktop and mobile 390px, including overflow checks.
 - At closure for implementation, rollout, incident, workflow, skill, or docs changes, use `greenhouse-documentation-governor`.
 
@@ -55,7 +56,8 @@ Read the minimal set:
 | Post-publication sitemap, GSC observation, indexing request or Platform Properties | `references/agentic-blogpost-end-to-end.md` + `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md` |
 | Direct SVG infographics, `<picture>`, Media Library, ALT/long description, featured/OG raster | `references/content-factory-gutenberg.md` + `.codex/skills/seo-aeo/references/editorial-image-seo.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
-| Claude Design → modular Elementor, Home, brand marks, rails, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
+| Link to an Efeonce service inside any text (mention with isotype) | `docs/architecture/public-site/PRIMITIVES.md` §`EfeonceMention` Contract: `<a class="axis-mention" data-line data-surface>` from AXIS `efeonce.mention` (byte copy `axis-mention.css`), site-wide, never copied into a landing |
+| Claude Design / canvas (`.dc.html`) → modular Elementor (compiler, tabs, rails, canvas forms), Home, brand marks, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
 | 404, search/no-results, category/tag/author/date archives, impossible pagination or empty taxonomy | `references/miscellaneous-surfaces.md` + `references/runtime-and-discovery.md`; add the SEO technical module when robots, canonical, schema, or indexability changes |
@@ -64,6 +66,8 @@ Read the minimal set:
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
 | Home `/` (former Claude Design preview) | `references/landings/home-claude-design-preview.md`; verify current CMS identity/hash before writes |
+| Performance Marketing `/servicios/performance-marketing/` | `references/landings/performance-marketing.md` + `references/source-led-elementor-patterns.md` |
+| Inbound Marketing `/agencia-inbound-marketing/` | `references/landings/inbound-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
 
 If several domains apply, load the smallest union. Do not preload every reference.

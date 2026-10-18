@@ -1,5 +1,13 @@
 # Handoff a CRM y Commercial
 
+## Nombre de Deal y Lead
+
+Aplicar la [convención de nombres](../../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
+en el changeset: Deal `Marca o cuenta | País | Iniciativa | Referencia`; Lead
+`Marca o cuenta | País | Necesidad | Nombre Apellido`. Verificar marca frente a holding, mercado y
+referencia; conservar IDs, asociaciones, admisión y nombres históricos. Renombrar exige mandato que
+incluya el registro, valor anterior/nuevo y lectura posterior; no normalizar al editar otro campo.
+
 La fase de enrichment entrega evidencia y propuesta; las mutaciones pertenecen a HubSpot y requieren el
 alcance autorizado. Sales enrichment no ejecuta CRM/outreach: cambiar de fase explícitamente con su owner.
 Approval vigente para un lote se reutiliza; no pedir confirmación por segunda vez para sus mismos cambios.

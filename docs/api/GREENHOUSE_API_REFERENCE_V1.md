@@ -99,6 +99,15 @@ Key rules:
   activos para uso interno desde 2026-08-16 con allow `200` y deny base-only `403` verificados; MCP no expone los
   commands ni CV/contacto.
 
+### Growth measurement — Product API interna
+
+`GET|POST /api/admin/growth/measurement`: configuración versionada por fuente/surface,
+discovery `growth-measurement-policy.v1`, dry-run y comandos draft/review/publish/disable.
+Agentes y panel comparten contrato/cliente; sesión user-bound interna, capabilities separadas,
+CAS/idempotencia/auditoría y recibos con readback. No es API de ingestión ni amplía OAuth/MCP.
+[Contrato y errores](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md) ·
+[manual CLI](../manual-de-uso/growth/configurar-medicion-conversiones.md).
+
 ### 2. Integrations API
 
 Purpose:

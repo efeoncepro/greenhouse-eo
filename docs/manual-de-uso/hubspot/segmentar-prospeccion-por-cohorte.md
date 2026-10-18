@@ -1,5 +1,10 @@
 # Segmentar una prospección en HubSpot por cohorte y propiedades
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 Manual de operador. Método verificado el 2026-10-06 en portal Efeonce `48713323` con Agent CLI `0.15.1`
 (build 1348), definiciones nativas y membresía leída por MCP. Revalidar portal, versión y permisos al reutilizarlo.
 Contrato: [runbook CLI/MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) y

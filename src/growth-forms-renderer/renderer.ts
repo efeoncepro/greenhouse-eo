@@ -1,4 +1,5 @@
 import type { GrowthInputBehaviorFactory } from './input-behavior-adapter'
+import { emitGoogleAdsConversion } from '../growth-google-ads-conversion/conversion'
 /**
  * TASK-1231 — Growth Forms portable renderer · motor framework-light.
  *
@@ -672,18 +673,10 @@ export class FormRenderer {
       const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId })
 
       if (field.presentation?.icon && !this.usesInlineControlIcons()) {
-        // Country fields use the semantic globe SVG. The legacy text glyph for
-        // `globe` was the external-link arrow (↗), which made “País” look like
-        // a broken link in the public Contacto form.
-        if (field.presentation.icon === 'globe') {
-          const globeIcon = this.renderIcon('globe', 'ghf-field-icon')
-
-          // Ohio's global CSS targets [data-icon] and injects the legacy
-          // textual “globe ↗” marker. Labels use the SVG directly, so avoid
-          // that selector while preserving data-icon on control icons.
-          globeIcon.removeAttribute('data-icon')
-          labelEl.appendChild(globeIcon)
-        } else {
+        // Label icons are inline SVGs. The text glyphs (`@`, `+`, `·`, `↗`…) rendered as broken words on
+        // WordPress: Ohio's global CSS targets [data-icon] and injects its own legacy text marker, so the
+        // label icon drops that attribute (control icons keep it). LinkedIn keeps its `in` mark.
+        if (field.presentation.icon === 'linkedin') {
           labelEl.appendChild(
             el(
               this.doc,
@@ -692,6 +685,11 @@ export class FormRenderer {
               this.fieldIconGlyph(field.presentation.icon)
             )
           )
+        } else {
+          const labelIcon = this.renderIcon(field.presentation.icon, 'ghf-field-icon')
+
+          labelIcon.removeAttribute('data-icon')
+          labelEl.appendChild(labelIcon)
         }
       }
 
@@ -790,6 +788,7 @@ export class FormRenderer {
 
     if (
       field.type === 'textarea' ||
+      field.type === 'radio' ||
       field.type === 'multiselect' ||
       field.type === 'checkbox' ||
       field.type === 'consent' ||
@@ -834,10 +833,13 @@ export class FormRenderer {
 
     const current = this.values[field.key]
 
+    // A radio field is a visible choice in every style variant; before this it only rendered under
+    // hubspot_pillar and fell through to a text input elsewhere. Pillar keeps its select/multiselect chips.
     if (
-      this.contract.styleVariant === 'hubspot_pillar' &&
-      ['radio', 'select', 'multiselect'].includes(field.type) &&
-      !this.usesPremiumSelect(field)
+      field.type === 'radio' ||
+      (this.contract.styleVariant === 'hubspot_pillar' &&
+        ['select', 'multiselect'].includes(field.type) &&
+        !this.usesPremiumSelect(field))
     ) {
       return this.renderChoiceGroup(field, fieldId, required, describedBy)
     }
@@ -2293,7 +2295,7 @@ export class FormRenderer {
         this.doc,
         'a',
         { href: consent.privacyUrl, target: '_blank', rel: 'noopener noreferrer' },
-        consent.privacyUrl
+        this.copy.privacyLinkLabel
       )
 
       p.appendChild(a)
@@ -2807,6 +2809,7 @@ export class FormRenderer {
     this.turnstile?.reset()
 
     if (result.outcome === 'accepted') {
+      emitGoogleAdsConversion(result.googleAdsConversion, 'commercial_lead')
       this.telemetry.emit('gh_form_submission_accepted', {
         ...(result.submissionId ? { correlation_id: result.submissionId } : {}),
         success_behavior: this.contract.successBehavior.kind,

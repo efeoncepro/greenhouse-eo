@@ -102,6 +102,11 @@ artefacto versionado usa `orange` por su contraste con la portada clara.
 
 ## Collateral comercial
 
+- **Brochure oficial «Agencia de Marketing 360°»** (aprobado por el operador el 2026-10-16): el tramo **Revenue**
+  («te compran») cierra con el caso ANAM, mostrado como lo que fue, una implementación de HubSpot con Customer Agent y
+  rutas hacia una persona (ticket «Solicitud de muestreo» ruteado Chat → Agente IA → Ruta Terreno). El logo de ANAM
+  está autorizado para ese brochure (2026-10-16); **las cifras del caso siguen pendientes** de la misma verificación que
+  en el brochure de servicios HubSpot. Para conversaciones sólo de HubSpot se usa el brochure de abajo.
 - **Brochure de servicios HubSpot** (27 láminas, 16:9; cerrado y aprobado por el operador el 2026-10-06,
   [TASK-1943](../../tasks/in-progress/TASK-1943-hubspot-deck-content-series.md)): para mid-market y enterprise que
   comparan HubSpot con Salesforce o Zoho y que evalúa también TI. PDF en OneDrive

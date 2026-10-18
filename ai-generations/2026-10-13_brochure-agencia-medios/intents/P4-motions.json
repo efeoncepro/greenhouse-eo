@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "decision",
+  "recipe": "decision-provider-fit",
+  "voice": {
+    "eyebrow": "Performance · Cómo operamos",
+    "question": "¿Qué optimiza mi pauta?",
+    "answer": [
+      "Lo que",
+      "vendes"
+    ]
+  },
+  "body": "Mismo oficio, distintos compradores: la señal, los canales y la métrica cambian según cómo **vendes**.",
+  "note": "Ejemplo ilustrativo · la forma de operar sale del diagnóstico",
+  "verdicts": [
+    {
+      "glyph": "objetivo",
+      "title": "Commerce",
+      "description": "B2C y e-commerce: compra, valor y margen como señal en Meta, Google y TikTok."
+    },
+    {
+      "glyph": "crm",
+      "title": "B2B",
+      "description": "Ciclo consultivo: cada etapa del CRM vuelve a la pauta como conversión."
+    },
+    {
+      "glyph": "embudo",
+      "title": "Retail",
+      "description": "Marketplaces y cadenas: catálogo, stock y venta cerca del punto de compra."
+    },
+    {
+      "glyph": "checklist",
+      "title": "Señal",
+      "description": "Sin un CRM confiable, partimos midiendo bien antes de escalar la inversión."
+    }
+  ],
+  "selectedVerdict": 1
+}

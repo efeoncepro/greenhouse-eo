@@ -1,0 +1,43 @@
+{
+  "id": "PG4-la-puja-que-rinde",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark space at night): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 77 % of the frame width and her shoulder nearest the left never further left than 62 %; between the left edge of the frame and her body there is a wide band of empty darkness. Behind her, entirely inside the right 55 % of the frame, rises a colossal wall of thousands of small floating glass tiles in rows, dim grey-blue glass, barely lit, flickering faintly like a live auction of bids happening in milliseconds; every tile of the wall is dim grey-blue glass with NO orange, red or amber light anywhere. Her left hand, on the camera-right side of her body, is held open at chest height about 30 cm in front of her, lifting ONE single glass tile about 12 cm across resting on her palm, at the exact moment she draws it out of the wall toward the camera; her other arm hangs relaxed at her side, the whole arm visible. Her head stays almost frontal and her eyes look down at the tile, a quiet smile. That tile glows bright cool white from inside, the brightest thing in the frame. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; the only red-orange in the whole frame is ONE tiny point (#F83902) at one corner of the tile in her palm, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no beams, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "the single glowing glass tile on her palm",
+    "tamano": "about 12 cm across",
+    "lado": "below and to the camera-right of her face, at chest height",
+    "distancia": "about 35 cm from her face"
+  },
+  "fondo": "the wall of thousands of dim glass tiles melting into cold bokeh in the depth",
+  "fenomeno": {
+    "que": "from a wall of thousands of flickering bids she holds the single one that pays off",
+    "esServicio": "Compra programática: de miles de pujas por segundo, la que rinde"
+  },
+  "lecho": {
+    "objeto": "the dark matte trading desk edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

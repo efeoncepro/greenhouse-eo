@@ -260,6 +260,16 @@ efímero; no gobierna preferencias. Producción viste controles nativos y HubSpo
 categorías, persistencia y `showBanner`; no convertir el prototipo en CMP ni habilitar tracking desde él.
 La adopción de presentación no cambia el contrato de eventos o matching.
 
+**Footers y «Preferencias de cookies» (publicado 2026-10-16, main `425a1de`).** `BaseLayout.astro` inyecta el botón
+`[data-efeonce-cookie-settings]` sólo con `analytics=true`, y lo monta **sólo** en un host declarado
+`[data-efeonce-legal-links]` o junto al enlace de privacidad del footer; ya no se pega al último `<footer>` (quedaba
+fuera de la grilla, abajo a la izquierda). El separador «·» se omite si el host es flex/grid con gap ≥ 16px. Los
+informes AEO (`/brand-visibility` y `/brand-visibility/r/[token]`) usan la fila base `.report-footer-base` (aviso a la
+izquierda; `nav.report-footer-legal` con Privacidad + Preferencias de cookies a la derecha; estilos en
+`src/styles/global.css`), reutilizable en footers nuevos. El clic llama `_hsp.push(['showBanner'])` (consent-bridge).
+- **SIEMPRE** que una página nueva de Think tenga footer, declarar su fila legal con `data-efeonce-legal-links`. Sin
+  host declarado no hay botón (el banner sí aparece), y eso deja al visitante sin forma de reabrir sus preferencias.
+
 efeonce-think mide con la **misma propiedad GA4** que efeoncepro.com (funnel unificado; subdominio = mismo stream, `486264460`). El snippet **GTM (`GTM-NGHPGRLZ`)** vive en `BaseLayout.astro`: `<script is:inline>` con el loader en `<head>` (`is:inline` SÍ — evita que Astro bundlee el snippet) + `<noscript>` **SIN** `is:inline` (esa directiva es solo para `<script>`/`<style>`; en `<noscript>` Astro 7 estricto puede colarla como atributo raro — flag de Copilot, fix PR #11). El `page_view` lo dispara un GA4 Config gateado por hostname DENTRO del container (no en el sitio Astro); los `<greenhouse-form>` ya emiten `gh_form_*` → conversiones medidas por construcción.
 
 - **SIEMPRE** que se sume un host/sitio nuevo del ecosistema → hereda/instala el tag GA4 (mandato Tracking Engine §19.2/§19.5). Contrato + patrón + gotchas: `greenhouse-eo/docs/reference/measurement-gtm-ga4/` + skill `greenhouse-gtm-ga4-operator`.

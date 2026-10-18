@@ -1,5 +1,10 @@
 # Operar prospección B2B con agentes
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 Canon: [skill](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md),
 [decisión](../../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md) y
 [funcionamiento](../../documentation/comercial/prospeccion-b2b.md).
@@ -32,6 +37,28 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
    antes de repetir. Si sólo se autorizó investigar, entregar propuesta y no escribir.
 7. Entregar action pack a Commercial/seguimiento: estado observado, owner, próximo paso/fecha, fuentes y brechas.
    Mantener HSP e historial privados en radar existente; no cambiar scheduler ni crear otro.
+
+## Radar: primera puerta y aviso temprano
+
+1. Leer la [guía compartida](../../commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md) y el estado del proceso.
+   Separar descubrimiento de vigilancia; registrar por país/servicio público y privado independientes,
+   nonprofit aparte. Prioridad LATAM; Palm Desert sigue condicionado.
+2. Antes de abrir, prechequear identidad canónica y URL contra bloqueos. Si falla, registrar intento y
+   brecha, conservar marcadores de éxito/cobertura/IDs y detener ese acceso; no usar rutas equivalentes.
+3. Aplicar solape mínimo de 72 horas desde el último corte exitoso, incluso al cruzar semana; ampliar
+   ante indexación tardía acreditada/interrupción. No sustituye la frecuencia vigente ni permite simular lecturas.
+4. Ordenar interés, credenciales, inscripción, visita, consultas y cierre final. Avisar al operador una
+   señal primaria documentada con una acción útil sin esperar el RFP completo; acceso/eligibilidad
+   pendientes siguen explícitos. Menos de cinco días hábiles a la primera puerta muestra detección tardía.
+5. Registrar publicación, disponibilidad pública, detección, validación y aviso separados, con fuentes/
+   precisión/zona y margen útil. No usar creación CRM como primera detección ni borrador como aviso entregado.
+   No inferir causa del retraso ni prometer exhaustividad. Una guía no es una automatización desplegada.
+
+[Socopur 2027](../../commercial/tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md):
+la respuesta del 15/10 16:54:36 UTC cerró nuevas postulaciones/propuestas de este período. No insistir,
+ampliar a colegas ni preparar oferta; credenciales guardadas no prometen invitación/fecha o adjudicación.
+El seguimiento puntual enlazado abajo es un corte histórico anterior a esa respuesta. Estos pasos no
+modifican permisos, frecuencia o suscripciones ni autorizan comunicaciones o registros CRM.
 
 ## Cuando el pedido involucra ABM / ABS
 
@@ -78,6 +105,20 @@ El piloto del informe es propuesta y requiere parámetros/capacidad aprobados an
 Usar sólo las plantillas del paso actual y enlazar expediente/HSP/seguimiento existente. Las cinco mejoras
 actualizan el método; la autorización para crearlas no inicia piloto, campañas, pausas, DNS ni registros CRM.
 
+## Evaluar y enviar otro correo puntual
+
+Cargar [criterio de seguimiento](../../../.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#decidir-si-vale-la-pena-otro-correo)
+y el [adapter de envío/readback](../../../.codex/skills/hubspot-as-a-service/references/manual-outreach-follow-up.md#reply-con-firma-gráfica-y-pdf-en-outlook).
+Reconstruir contactos de toda la iniciativa, respuestas y pendientes; decidir si el aporte nuevo justifica
+otro toque. Elegir un receptor y una pregunta útil, sin repetir la presentación ni rodear restricciones.
+La autorización condicional «si vale la pena, hazlo» permite ese envío si el criterio se cumple, sin crear
+una secuencia. En procesos cerrados, preguntar por evaluación no acredita reapertura o admisión.
+
+Con firma gráfica solicitada, usar la vía Outlook permitida y comprobar el render. Si corresponde PDF,
+adjuntar la versión aprobada como copia y verificar carga terminada; no convertirla en enlace público.
+Después leer mensaje, destinatarios, adjunto y EMAIL/asociaciones CRM por separado. Registrar fecha,
+aporte y decisión pendiente; esperar respuesta no programa otro envío. [Socopur: aplicación y evidencia](../../commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md).
+
 ## Programar seguimientos personalizados en HubSpot
 
 Cargar el [módulo de secuencias](../../../.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
@@ -87,7 +128,15 @@ Verificar mailbox/firma, días laborables y zona local, respuesta a cualquier co
 si el mandato exige seguir hasta respuesta. Seleccionar **Enviar más tarde**, comprobar las fechas de todos
 los pasos e iniciar dentro del permiso. «Procesando» no es cierre: releer contacto, Programado y fecha.
 No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respondió. El logging nativo CRM
-se distingue del CCO de Outlook. [Caso real y límites](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+se distingue del CCO de Outlook. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+
+Brochure por defecto para presentar Efeonce completa: el oficial «Agencia de Marketing 360°» (2026-10-16);
+el de una línea cuando la necesidad corresponda, como Marketing de Contenidos para contenidos/UGC.
+Julio ratificó el 17-10-2026 que los brochures están aprobados y no necesitan nada más. Usarlos completos,
+sin revalidar láminas ni crear copias recortadas; [regla vigente](../../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+Verificar versión/ID del documento existente en HubSpot y el enlace correspondiente, además del nombre. Leer cuerpo y calendario finales de la inscripción, porque pueden
+diferir de la plantilla y de la ventana general. Una firma HTML configurada no prueba render en un preview
+blob vacío ni entrega futura. [Aplicación web del 16/10 y límites](../../commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md).
 
 ## Problemas frecuentes
 
@@ -121,3 +170,14 @@ y correr cierre/contexto después de la última edición. No confundir evaluaci�
 Para medir un cambio, comparar a ciegas respuestas con y sin la skill sobre los mismos escenarios y mirar
 también la extensión: el [diferencial del 2026-10-12](../../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md)
 describe el procedimiento y sus límites.
+
+## Conservar cuentas con proveedor actual
+
+Aplicar la [política de seguimiento a largo plazo](../../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md).
+Detener la cadencia actual, conservar encaje/historia y fijar una revisión interna con owner/TASK única
+en HubSpot. Asociar Contact/Company y Deal pertinente, verificar readback y registrar el ID nativo.
+Notion conserva trabajo operativo/entregables; cancelar duplicado comercial después del readback.
+Con agencia recién contratada y sin hito, usar seis meses; hito del comprador y restricciones prevalecen.
+Mantener tarea en el seguimiento existente aunque cambie el mes; revisión no autoriza contacto.
+Nutrición por email requiere permiso verificable y autoridad de ejecución, distintos de presencia pública.
+Caso con tarea/readback: [Fabrimetal](../../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).

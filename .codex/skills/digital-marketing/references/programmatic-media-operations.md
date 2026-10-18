@@ -38,6 +38,22 @@
    causalidad; reporte conjunto no deduplica personas ni conversiones entre plataformas. Estudios e integraciones
    requieren alcance y cotización; no se presume una integración DSP en Greenhouse o Marketing Studio.
 
+## Material comercial vigente y claims (2026-10-16)
+
+El material de medios es el brochure «Agencia de Medios» (OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de
+Medios/`) y la landing pública <https://efeoncepro.com/servicios/agencia-de-medios/>; su formulario
+`efeonce-media-diagnostic` es la entrada de leads de medios (HubSpot «Lead Gen - Agencia de Medios»). Rutas y detalle:
+[catálogo de la línea](../../../../docs/services/media-distribution/README.md#material-comercial-vigente). Al reutilizar
+o escribir una pieza de medios:
+
+- La comisión o rebate del proveedor es margen de Efeonce (decisión del operador): nunca prometer declararla ni
+  traspasarla. Sigue fuera del margen base y no rescata un fee insuficiente.
+- Basis, DV360, The Trade Desk, IAS y DoubleVerify son tecnología que Efeonce opera, no alianzas; partners declarados:
+  HubSpot (Gold) y Salesforce.
+- Sin caso Sky de medios; Eusari no se publica por ahora.
+- «+120 empresas en 4 países» es el proof point; la operación cubre cinco países (Chile, Colombia, Perú, México y
+  Estados Unidos). No fundirlos.
+
 ## Evidencia y autoridad
 
 Usar marca Efeonce en pitch y propuesta estándar; proveedores en expediente interno y contratos/permisos cuando

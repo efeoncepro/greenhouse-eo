@@ -93,3 +93,72 @@ el plazo de pago, el reajuste y la salida anticipada siguen abiertos.
 
 Para reproducir: `pnpm --silent pricing:v3 replay --input <archivo>.artifact.json` y
 `pnpm --silent pricing:v3 compose document --input cotizacion-2027.artifact.json --brief cotizacion-2027.document-brief.json --option extendida=cotizacion-2027.opcion-cobertura-extendida.artifact.json --option bloque=cotizacion-2027.opcion-bloque-conversaciones.artifact.json`.
+
+## Variante con Redclick (14/10/2026)
+
+Jaime Herrera respondió el 14/10 que SKY ya recibe los comentarios clasificados desde un partner (Redclick) y pidió
+revisar el valor para un modelo de sólo respuesta. El CEO definió responder sin llevar la conversación a un precio
+por comentario (el fee es por el servicio completo), cobrar la integración con Redclick en la puesta en marcha (deja
+de ser bonificada) y bajar el fee a CLP 4.490.000 si el modelo es viable.
+
+`cotizacion-2027-redclick.*`: la vigente con agentes sólo de redacción (dos paquetes de mil en lugar de diez) y fee
+acordado CLP 4.490.000. El asiento de Sprout sigue adentro porque en el catálogo la tarea de responder exige una
+bandeja; quitarlo pide un cambio de catálogo (una opción de respuesta desde las herramientas de cada red).
+
+| Lectura | Costo mensual promedio | Margen |
+| --- | --- | --- |
+| Vigente, CLP 4.990.000 | CLP 3.247.719 | 34,9 % |
+| Redclick con Sprout, CLP 4.490.000 (calculada) | CLP 3.167.720 | 29,4 % |
+| Redclick sin Sprout, CLP 4.490.000 (calculada menos USD 499 al mes, unos CLP 499.000 al cambio de la corrida) | ≈ CLP 2.668.700 | ≈ 40,6 % |
+| Piso de 45 % sin Sprout | — | precio ≈ CLP 4.850.000 |
+
+- Los CLP 4.490.000 se sostienen sólo si se responde sin Sprout. Con Sprout, el margen baja a 29,4 %.
+- Sin verificar: que Redclick tenga API y qué entrega (no aparece en la web), que responder desde las herramientas de
+  cada red sea viable para 13 cuentas, el precio mensual de Sprout y el consumo de los agentes.
+- La puesta en marcha con la integración no está cotizada: depende de revisar la API de Redclick.
+
+### Decisión del mismo día: se mantiene Sprout, en plan Professional
+
+El CEO descartó responder desde las herramientas de cada red: con este volumen no es operable. Con Redclick, la
+bandeja sólo sirve para responder (los comentarios llegan clasificados por su API), así que no hace falta la API de
+Sprout, que sólo trae el plan Advanced. `cotizacion-2027-redclick-professional.*`: un asiento de Sprout Professional
+con facturación anual, alineada al contrato de 12 meses.
+
+| Lectura (calculada) | Fee mensual | Costo mensual promedio | Margen |
+| --- | --- | --- | --- |
+| Redclick + Sprout Professional anual | CLP 4.490.000 | CLP 2.967.720 | 33,9 % |
+| Redclick + Sprout Professional anual | CLP 4.690.000 | CLP 2.967.720 | 36,7 % |
+
+- La fila «Redclick sin Sprout» de la tabla anterior queda descartada.
+- Precio de Professional (USD 299 al mes con pago anual) tomado de la página de Sprout, sin confirmar con ellos; el
+  precio con facturación mensual no aparece. Que Professional cubra las 13 cuentas y el uso compartido del asiento
+  en campaña están sin validar.
+
+### Sin líder de servicio (14/10/2026)
+
+El CEO decidió quitar la línea de líder de servicio (20 %): ese rol lo asume él o la misma persona dedicada. Se
+quitó también su asiento de Notion y Microsoft 365. Costo calculado, que no depende del fee:
+
+| Variante | Archivos | Costo mensual promedio | Precio al 45 % |
+| --- | --- | --- | --- |
+| Modelo actual (Sprout Advanced mensual, agentes clasifican) | `cotizacion-2027-sin-lider.*` | CLP 2.810.980 | ≈ CLP 5.111.000 |
+| Redclick (Sprout Professional anual, agentes sólo redactan) | `cotizacion-2027-redclick-sin-lider.*` | CLP 2.530.981 | ≈ CLP 4.602.000 |
+
+| Fee mensual | Margen, modelo actual | Margen, Redclick |
+| --- | --- | --- |
+| CLP 4.990.000 | 43,7 % | — |
+| CLP 4.490.000 | 37,4 % | 43,6 % |
+| CLP 4.290.000 | 34,5 % | 41,0 % |
+
+- El tiempo del CEO como líder no está costeado. Las ausencias de la persona dedicada se cubren con la reserva de
+  reemplazo que ya trae su línea.
+
+### Oferta ajustada a CLP 4.490.000 (14/10/2026)
+
+Redclick quedó descartado como base del precio: su clasificación sirve para estadística y alertas, y responder desde
+cada red no es operable con este volumen (decisión del CEO). La oferta ajustada es el modelo actual sin líder de
+servicio: `cotizacion-2027-sin-lider.*` con fee acordado CLP 4.490.000 (neto 12 meses CLP 53.880.000, IVA
+CLP 10.237.200, total CLP 64.117.200), costo CLP 2.810.980 al mes, margen 37,4 %. Documento:
+`cotizacion-2027-sin-lider.document-brief.json` (Equipo: «supervisión directa de Efeonce») →
+`cotizacion-2027-sin-lider.document.json` → `../cotizacion/v5/`, copiado a OneDrive como
+«Efeonce - Oferta Económica Social Care SKY 2027 (14-10-2026).pdf». Las variantes `redclick*` quedan como historia.

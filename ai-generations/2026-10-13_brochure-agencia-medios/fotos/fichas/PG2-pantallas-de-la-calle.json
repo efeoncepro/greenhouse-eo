@@ -1,0 +1,43 @@
+{
+  "id": "PG2-pantallas-de-la-calle",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a raised pedestrian walkway over a wide avenue in a Latin American capital at night, just after rain): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 77 % of the frame width and her shoulder nearest the left never further left than 62 %; between the left edge of the frame and her body there is a wide band of empty darkness. She looks straight into the lens with calm confidence, a tablet held low in her right hand, turning her head toward the lens at the exact moment the wave of light starts running down the avenue. A slim dark digital totem stands fully inside the frame at about 90 % of the width, its top and base visible; only the narrow edge facing her glows, its cool white-blue light raking across her face; nothing bright touches the right edge of the frame. Behind her the avenue starts at the right edge of the frame and recedes toward a vanishing point at about 66 % of the frame width, never further left; the LEFT 45 % of the frame shows only the dark, unlit side of a tall building, no street, no traffic, no lights. The avenue recedes into the distance lined with large digital out-of-home screens: a huge curved LED facade on a tower, digital billboards on rooftops, glowing bus-shelter screens along the sidewalk, and a wave of light travels away from her down the avenue: the nearest screens already glow cool azure and white, the middle ones are just switching on, the farthest ones are still dark. Cool azure-blue street lamps line the avenue; the traffic far below shows only cold white headlights, no red tail lights; wet asphalt shows soft cold reflections far below. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows on the farthest screen at the end of the avenue, lighting up right now, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no beams, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "the narrow glowing edge of a slim dark digital totem standing fully inside the frame at about 90 % of the width",
+    "tamano": "about 1.8 m tall and 0.6 m wide",
+    "lado": "camera-right of her face, at head height",
+    "distancia": "about 50 cm from her face"
+  },
+  "fondo": "the far city lights and the lit screens melted into round cold bokeh down the avenue",
+  "fenomeno": {
+    "que": "street screens down the avenue light up one after another with the same campaign",
+    "esServicio": "pDOOH: tu marca en las pantallas de la calle, comprada por ubicación y horario"
+  },
+  "lecho": {
+    "objeto": "the dark matte metal handrail of the walkway close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

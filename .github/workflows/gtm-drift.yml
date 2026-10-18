@@ -1,0 +1,69 @@
+# GTM container drift watch (ADR GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1).
+#
+# El ADR exige que el snapshot commiteado refleje el container live, pero eso era una
+# regla sin mecanismo: un cambio hecho a mano en la UI de GTM (o un publish por script
+# sin snapshot) quedaba invisible hasta que alguien corría `--check` por casualidad, y el
+# container servidor (sGTM / Meta CAPI) ni siquiera estaba versionado.
+#
+# Este job compara a diario la versión LIVE de los dos containers —web GTM-NGHPGRLZ y
+# servidor GTM-K2X4ZTTK— contra los snapshots de docs/reference/measurement-gtm-ga4/.
+# Si difieren, FALLA: esa es la alerta (mismo criterio que nexa-knowledge-qa-nightly).
+# Los secretos nunca salen del job: el snapshot los tapa con una huella sha256.
+#
+# Tooling, no async-critical (GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1): no alimenta
+# ningún pipeline; sólo mide.
+name: GTM drift
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Diario 12:00 UTC (≈ 08:00/09:00 America/Santiago): llega en horario laboral.
+    - cron: '0 12 * * *'
+
+permissions:
+  contents: read # checkout
+  packages: read # @efeoncepro/* en pnpm install
+  id-token: write # WIF → greenhouse-gtm-publisher (lectura de GTM)
+
+concurrency:
+  group: gtm-drift
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npmrc="$RUNNER_TEMP/greenhouse-npmrc"
+          trap 'rm -f "$npmrc"' EXIT
+          printf '%s\n' '@efeoncepro:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+          NPM_CONFIG_USERCONFIG="$npmrc" pnpm install --frozen-lockfile
+
+      # El job se autentica DIRECTO como el SA de GTM (que tiene acceso en ambas cuentas
+      # GTM). Requiere roles/iam.workloadIdentityUser de este repo sobre ese SA; el script
+      # pide sólo el scope tagmanager.readonly.
+      - name: Authenticate to Google Cloud as the GTM service account
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com
+
+      - name: Compare live containers with committed snapshots
+        env:
+          GTM_SNAPSHOT_DIRECT_AUTH: '1'
+        run: pnpm gtm:snapshot --check

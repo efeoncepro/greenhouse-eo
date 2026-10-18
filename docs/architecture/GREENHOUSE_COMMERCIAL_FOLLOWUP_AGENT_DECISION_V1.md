@@ -56,3 +56,27 @@ y parada por respuesta, y precisó **secuencias en HubSpot, no Apollo**. [Alcanc
 Es una operación nativa de HubSpot sobre el mailbox conectado; no un nuevo worker ni una ampliación
 del heartbeat de preparación. No duplicar esos envíos desde el heartbeat. No extender destinatarios,
 mensajes o ciclos por inferencia; mantener la autoridad general anterior para las demás cuentas.
+
+## Continuidad de largo plazo aceptada — 2026-10-13
+
+Mandato explícito de Julio: aplicar y dejar como política el seguimiento de cuentas con proveedor actual.
+La [política](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) conserva tareas de revisión interna por ID/clave,
+incluso fuera de la ventana reciente y al terminar el proyecto mensual. El heartbeat existente las
+recupera y alerta dentro de su ventana de siete días, sin borrador comercial o comunicación automática.
+El default de seis meses aplica a proveedor recién contratado sin hito, con encaje y sin baja/restricción;
+HOLD, hito del comprador y supresión prevalecen. Nutrición por email exige permiso verificable y mandato
+de ejecución. No cambia la prohibición general de envío/CRM ni habilita nuevos schedulers.
+[Fabrimetal](../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md) registra tarea
+Notion y notas CRM autorizadas por separado; configuración y ejecución futura se informan distintas.
+
+## Destino comercial corregido por el operador — 2026-10-13
+
+Julio indica «Estas tareas mejor crearlas en Hubspot, son tareas comerciales». Supersede el destino
+Notion del contrato original para **tareas comerciales nuevas**: revisiones de cuenta, follow-ups,
+llamadas y próximos pasos de venta se crean/reutilizan en HubSpot. Notion conserva trabajo operativo,
+entregables e históricos; sin migración masiva o tarea comercial duplicada como efecto de este mandato.
+La autonomía recurrente de tareas cubre únicamente TASK y asociaciones a registros existentes verificados,
+con identidad/owner/enums/dedupe/readback; no otros objetos/etapas/segmentos, nuevos Deals ni envío.
+La [política](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) y el prompt vigente del heartbeat consumen este destino.
+Fabrimetal: TASK HubSpot `118419088700`, revisión 13/04/2027 09:00 Chile; duplicado Notion Cancelado
+tras verificar el reemplazo. La revisión futura permanece pendiente y las comunicaciones detenidas.

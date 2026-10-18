@@ -7,6 +7,161 @@
 
 Este documento captura contratos runtime vigentes que no deben crecer como deltas dentro del monolito de arquitectura base.
 
+## Diagnóstico de medios (Agencia de Medios)
+
+Alta del 2026-10-16, autorizada por el operador («crear uno dedicado» con su propio formulario HubSpot).
+Registro de identidad; antes de operar, relee el contrato público.
+
+| Identidad | Valor |
+|---|---|
+| Landing | `https://efeoncepro.com/servicios/agencia-de-medios/` (embed a cargo del operador) |
+| Slug / form key | `efeonce-media-diagnostic` / `d784b9e2-f6e4-4e24-b059-f164fc82f734` |
+| Surface | `fhsf-efeonce-media-diagnostic` (`https://efeoncepro.com`, `https://www.efeoncepro.com`) |
+| Versión publicada | `fver-d448c02d-9fda-4612-9ba8-5bebd4a5139f` (v2 con destino `direct`; v1 `fver-fc49b604-243f-45b6-9489-d879123394d3` deprecada) |
+| Presentación | `styleVariant=hubspot_pillar`, `static`, success card con acción a `/agenda/` |
+| Destino | HubSpot «Lead Gen - Agencia de Medios» por `hubspot-destinations.registry.ts`; properties `gh_form_medios_{modelo_venta,canales,inversion_mensual}` + estándar (`jobtitle`, `country`, `message`) |
+| Medición | Sin política publicitaria publicada |
+
+Authoring: `scripts/growth/publish-media-diagnostic-form.ts` (dry-run por defecto, `--apply`); Turnstile
+se copia de la versión publicada de `efeonce-creative-diagnostic`. Smoke secure-submit del 2026-10-16:
+completo 200 y mínimo 200 con el contacto marcado `greenhouse-smoke+forms-20261016@efeonce.org`.
+
+**Por qué `hubspot_pillar` y no `diagnostic_premium`.** El diseño pide «Dónde pautas hoy» como chips de
+selección múltiple. El renderer sólo dibuja `multiselect` como chips bajo `hubspot_pillar`; en
+`diagnostic_premium` cae a un `<select multiple>` nativo (verificado contra el bundle de producción). En
+pillar, «¿Cómo vendes?» e «Inversión mensual» (diseño: listas desplegables) se ven como chips de
+selección única; «País» usa `country_select`. Los `value` son estables, así que cambiar variante o control
+más adelante no toca HubSpot ni la medición.
+
+**Consentimiento.** El motor exige un consentimiento de procesamiento obligatorio para aceptar el envío
+(`contact_permission`). La casilla opcional `marketing_updates` (novedades) queda en el snapshot de
+consentimiento de Greenhouse, pero el adapter HubSpot envía `communications: []`: **no crea suscripción en
+HubSpot**. Para que el opt-in llegue a HubSpot hace falta mapearlo a un `subscriptionTypeId` en el adapter.
+
+**Pendientes.** Embed en la landing (el host dibuja el título «Agenda tu diagnóstico», la tarjeta oscura y el
+fallback sin JS; con variante de estilo, el override de tokens apunta a
+`greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`), primer envío humano real y política
+de medición si el operador la quiere.
+
+## Diagnóstico de pauta (Performance Marketing)
+
+Alta del 2026-10-17 (TASK-1865), con formulario propio por decisión del operador («Uno propio»). Reemplaza al
+`efeonce-performance-brief` del contrato original de la task, que nunca se publicó. Registro de identidad; antes de
+operar, relee el contrato público.
+
+| Identidad | Valor |
+|---|---|
+| Landing | `https://efeoncepro.com/servicios/performance-marketing/` (página `251997`; host card en el widget `greenhouse_performance_diagnostico`) |
+| Slug / form key | `efeonce-performance-diagnostic` / `71ea684f-1ad9-4656-982b-159e4de46dd8` |
+| Surface | `fhsf-efeonce-performance-diagnostic` (`https://efeoncepro.com`, `https://www.efeoncepro.com`) |
+| Nombre / kind | «Diagnóstico de pauta · Performance Marketing» / `diagnostic_intake` |
+| Versión publicada | No registrada en este documento; leerla del store (`getPublishedVersionBySlug`) antes de operar |
+| Presentación | `styleVariant=hubspot_pillar`, `composition=multi_step_light` (dos pasos), CTA «Pide tu diagnóstico», success card con acción «Elegir un horario» a `/agenda/` |
+| Destino | HubSpot `direct` a «Lead Gen - Performance Marketing» por `hubspot-destinations.registry.ts`; campos estándar del registro (`FIRST_NAME`, `LAST_NAME`, `EMAIL`, `COMPANY`, `WEBSITE`, `country`) + `gh_form_performance_{audiencia,canales,inversion_mensual,objetivo,prioridad,crm,rol}` |
+| Medición | Pipeline GTM genérico; `generate_lead` sin verificar para este form ([Tracking Plan](../reference/measurement-gtm-ga4/TRACKING-PLAN.md#forms)) |
+
+Authoring: `scripts/growth/publish-performance-diagnostic-form.ts` (dry-run por defecto, `--apply`). La v1 nace
+`greenhouse_only`; el destino `direct` se adjunta después con
+`pnpm growth:forms:activate-hubspot-destinations -- --only=efeonce-performance-diagnostic`, una vez sumada la fila al
+registro. La política Turnstile se copia de la versión publicada de `efeonce-media-diagnostic`. En vivo el renderer
+dibuja 26 inputs.
+
+**Decisiones de mapeo (según el encabezado del publicador).** `hubspot_pillar` + `multi_step_light` es la combinación que el
+renderer de producción ya dibuja (encabezado de paso con progreso, `select` como chips de selección única,
+`multiselect` como chips con casilla); mismo patrón que `efeonce-hubspot-scope` y `efeonce-media-diagnostic`. El CRM es
+condicional: «A empresas» y «A ambos» comparten el prefijo `b2b` (`b2b`, `b2b-b2c`) y la condición es
+`includes: 'b2b'`. Sin íconos por opción. Nombre y apellido en un solo campo, partido en servidor. Los `value` de las
+opciones son estables.
+
+**Consentimiento.** Sólo la autorización obligatoria `contact_permission`. No hay casilla de novedades porque el
+adapter HubSpot envía `communications: []` y quedaría guardada sin efecto.
+
+**Pendientes.** Primer envío humano real desde navegador (Turnstile impide automatizarlo) para confirmar la entrega
+en HubSpot y `form_destination_attempt`, verificación de `generate_lead` en GA4 y política de medición publicitaria
+si el operador la quiere.
+
+## Diagnóstico creativo (Agencia Creativa)
+
+Alta del 2026-10-15, autorizada por el operador. Registro de identidad; antes de operar, relee el
+contrato público y el ledger.
+
+| Identidad | Valor |
+|---|---|
+| Landing WordPress | `/agencia-creativa/`, página `249582` |
+| Slug / form key | `efeonce-creative-diagnostic` / `e913d958-2ad7-48a5-8015-dbff53eca4a3` |
+| Surface | `fhsf-efeonce-creative-diagnostic` (`https://efeoncepro.com`, `https://www.efeoncepro.com`) |
+| Versión publicada | `fver-79bbb3b4-a66e-4e23-9465-5344e6454b6d` (v2 con destino `direct`; v1 `fver-8f5ef209-c663-4345-ae24-6f7dd7285ebf` deprecada) |
+| Presentación | `styleVariant=diagnostic_premium`, `static`, success card con acción a `/agenda/` |
+| Destino | HubSpot «Lead Gen - Agencia Creativa» por `hubspot-destinations.registry.ts`; properties `gh_form_creative_{rol,freno,tamano_equipo,plazo}` |
+| Medición | Política `485f38e5-76b2-4f9d-b922-44324faaa931` publicada (rev. `cf4ae435-…`), sólo `meta`, mapping email/phone/firstName/lastName |
+
+Authoring: `scripts/growth/publish-creative-diagnostic-form.ts` (dry-run por defecto, `--apply`);
+Turnstile se copia de la versión publicada de `efeonce-seo-diagnostic`. No hay casilla de
+comunicaciones comerciales: el adapter HubSpot envía `communications: []`, así que una casilla
+opcional quedaría guardada sin efecto. Un cambio de campos exige revisar también la política de
+medición, porque cada versión nueva se revalida.
+
+**Embed vivo (2026-10-15).** El módulo `greenhouse_creativa_diagnostico` de `/agencia-creativa/` incrusta
+`<greenhouse-form form-key="e913d958-…" surface="fhsf-efeonce-creative-diagnostic" locale="es-CL"
+color-scheme="light" appearance="bare">`. El renderer es dueño de campos, consentimiento y envío; el host,
+del chrome de la tarjeta y del fallback sin JS. Contrato de la landing:
+[AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md](public-site/AGENCIA_CREATIVA_ELEMENTOR_MODULES_V1.md).
+Falta el primer envío humano real (Turnstile bloquea automatización) para confirmar
+`form_destination_attempt=succeeded`.
+
+**Override de tokens con variante de estilo.** `diagnostic_premium` re-declara `--ghf-*` en
+`.ghf-root[data-ghf-style-variant]`; un override sólo en `greenhouse-form` no gana (el CTA salió teal
+`#36c8bf`). El host debe apuntar a `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant])`.
+
+**Brecha de fidelidad frente al canvas (mayormente configuración).** La versión publicada usa `select`
+para `mainBlocker` y `startTimeline` y no declara iconos, aunque el renderer soporta `type: 'radio'` como
+tarjetas (`ghf-choice-group--cards`) y `presentation.icon`. Las dos columnas dependen de
+`@container (min-width: 520px)`; en vivo el formulario midió 516 px dentro de la tarjeta host de 588 px
+(36 px de padding). La URL de privacidad cruda es copy del formulario. Brechas reales del renderer: look
+exacto de chip/pill, checkbox AXIS `axis-choice` y listbox custom más allá de
+`presentation.control: 'country_select'`. Remediación pendiente: versión nueva con radio + iconos por
+`publish-creative-diagnostic-form.ts`, **conservando los mismos valores de opción** (el mapping HubSpot ya
+existe), más ajuste de padding/ancho de la tarjeta host, y re-verificación en vivo.
+
+**Corrección 2026-10-15 al párrafo anterior.** Dos afirmaciones no eran ciertas en el renderer servido:
+`radio` sólo salía como tarjetas bajo `hubspot_pillar` (en `diagnostic_premium` caía a un input de texto
+vacío), y la URL cruda de privacidad la dibujaba el renderer, no el copy del formulario. Ambas las corrige
+el commit `ab622e958` (ver §«Renderer: opciones visibles, enlace de privacidad e íconos de etiqueta»).
+La previsualización por intercepción en el host real (manual
+[operar-motor-formularios.md](../manual-de-uso/growth/operar-motor-formularios.md)) destapó la primera
+antes de publicar una versión.
+
+**Versión en dos pasos preparada (2026-10-15, no publicada).**
+`scripts/growth/activate-creative-diagnostic-two-step.ts` (commit `32395e5fb`; dry-run por defecto,
+`--apply` publica) clona la versión publicada esperada `fver-79bbb3b4-…` conservando destinos,
+seguridad, políticas y copy, y cambia a `composition: multi_step_light` con los pasos `operacion`
+(`mainBlocker`, `marketingTeamSize`, `startTimeline` como `radio`, **mismos valores de opción**) y
+`datos` (`firstName`, `lastName`, `email`, `phone`, `companyName`, `role`, `context`), más íconos de
+etiqueta y placeholders. Rechaza `--apply` si el bundle de producción no trae el marcador CSS
+`.ghf-root:not([data-ghf-style-variant="hubspot_pillar"]) label.ghf-choice` o si la versión publicada o
+sus campos se movieron. Dry-run del 2026-10-15: `fieldsMatch=true`, `productionRendererReady=false`
+(espera el release de Greenhouse que lleve `ab622e958`). Después de publicar: revincular la política de
+medición (atada al `form_version_id` exacto) con `pnpm --silent growth:measurement` y verificar en vivo
+las dos landings.
+
+## Renderer: opciones visibles, enlace de privacidad e íconos de etiqueta
+
+Contrato del renderer desde el commit `ab622e958` (code complete; llega a los hosts con el próximo
+release de producción de Greenhouse, porque `renderer-latest.js` se construye en su `prebuild`).
+
+- **`type: 'radio'`** = radiogroup nativo de tarjetas (`ghf-choice-group ghf-choice-group--cards`,
+  `label.ghf-choice` con su `input type=radio`) en **cualquier** `styleVariant`. Ocupa la fila completa y
+  pasa a dos columnas con `@container (min-width: 520px)`. Estilos tokenizados `--ghf-*` bajo
+  `.ghf-root:not([data-ghf-style-variant="hubspot_pillar"])`; pillar mantiene sus chips/tarjetas para
+  `select`/`multiselect`. Cambiar `select` → `radio` no cambia los `value`, así que destinos y medición
+  reciben lo mismo; sí exige versión nueva del formulario.
+- **Enlace de privacidad del consentimiento:** el texto visible es copy de sistema `privacyLinkLabel`
+  según locale («Política de privacidad» / «Privacy policy»); `consent.privacyUrl` va sólo en `href`.
+- **Íconos de etiqueta (`presentation.icon`):** SVG inline (`renderIcon`) **sin** atributo `data-icon`,
+  para todos los íconos salvo `linkedin`, que conserva su glifo `in`. El CSS global de Ohio apunta a
+  `[data-icon]` e inyecta texto heredado; con glifos de texto salían palabras como «user ID». Los íconos
+  de control conservan `data-icon`. El host no debe reintroducir íconos por CSS sobre la etiqueta.
+
 ## Content Marketing: presentación, host y distribución del renderer
 
 Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger

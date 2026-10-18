@@ -1,5 +1,13 @@
 # Diccionario efectivo y captura comercial
 
+## Nombre de Deal y Lead
+
+Aplicar la [convención de nombres](../../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
+en el changeset: Deal `Marca o cuenta | País | Iniciativa | Referencia`; Lead
+`Marca o cuenta | País | Necesidad | Nombre Apellido`. Verificar marca frente a holding, mercado y
+referencia; conservar IDs, asociaciones, admisión y nombres históricos. Renombrar exige mandato que
+incluya el registro, valor anterior/nuevo y lectura posterior; no normalizar al editar otro campo.
+
 Antes de crear/reutilizar/actualizar Contact, Company, Lead o Deal de Efeonce, cargar el
 [manual por objeto y fase](../../../../docs/manual-de-uso/hubspot/llenar-propiedades-comerciales.md) y sólo
 las filas necesarias del [inventario fechado](../../../../docs/audits/commercial/hubspot-properties-2026-10-11/README.md).

@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-07-21 (TASK-1509/1510: adapter `open_meeting_scheduler` native-only liberado)
+> **Ultima actualizacion:** 2026-10-17 por Claude (CTAs y superficies por landing; renderer 1.3.1)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -19,7 +19,14 @@ El motor de CTAs es el sistema que decide **qué invitación a la acción (promp
 - Con el release de hoy (`d5db8b568`) también están **en producción**: el **respeto al visitante (suppression) operando de verdad** — el motor ya no repite un CTA a quien lo descartó, dentro de su ventana —, los **frenos de emergencia** (kill switch global y por superficie, verificados en vivo sin necesidad de deploy) y el formato **slide-in** listo en el motor.
 - El registro incorpora de forma aditiva `open_meeting_scheduler`: abre el scheduler nativo en diálogo desktop o
   full-screen móvil, conserva la misma instancia al cerrar/reabrir y no expone links de HubSpot. El piloto aislado
-  `/agenda/` está live; Contacto y RRSS no están promovidos. `book_meeting` conserva su semántica histórica de navegación.
+  `/agenda/` está live; RRSS no está promovido. `book_meeting` conserva su semántica histórica de navegación.
+- Desde entonces cada landing que necesita su propio «Agendar reunión» recibe **un CTA y una superficie dedicados**:
+  `/contacto/` (`contacto-discovery-meeting`), la landing de influencers (`influencer-discovery-meeting`, TASK-1598) y
+  la landing HubSpot (`hubspot-discovery-meeting`, 2026-10-16, como botón dentro del dock móvil). El targeting de cada
+  CTA es por ruta, así que no se reutilizan entre páginas.
+- El renderer **1.3.1** (2026-10-16) corrige la cabecera del scheduler en móvil sobre hosts con CSS propio (título con la
+  tipografía del tema y «Cerrar agenda» partido en tres líneas). Está terminado en código y llega a los sitios con el
+  próximo release a producción.
 - Falta por decisión del negocio: el **placement amplio en WordPress** (qué páginas, tras validar la prueba), **publicar la primera campaña interruptiva** (el formato slide-in ya está listo; falta elegir superficie, mensaje y momento) y el cockpit de autoría visual (hoy se autora por API/CLI).
 
 ## Cómo funciona (en simple)

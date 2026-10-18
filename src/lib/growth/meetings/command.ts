@@ -3,6 +3,7 @@ import 'server-only'
 import { randomBytes } from 'node:crypto'
 
 import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+import { publishedGoogleAdsReceipt } from '@/lib/growth/measurement/google-ads-receipt'
 
 import { turnstileCaptchaVerifier, type CaptchaVerifier } from '@/lib/growth/public-submission/captcha'
 
@@ -17,6 +18,7 @@ import { isSupportedMeetingTimezone } from './timezone'
 import {
   claimMeetingBooking,
   finalizeMeetingExecution,
+  finalizeMeetingExecutionWithMeasurement,
   getMeetingSurfaceAuthority,
   markMeetingProviderDispatched,
   recordMeetingMetric,
@@ -298,7 +300,7 @@ export const bookMeeting = async (
       requestGlobalPrivacyControl: context.requestGlobalPrivacyControl,
     }, env)
 
-    const persisted = await finalizeMeetingExecution({
+    const persisted = await finalizeMeetingExecutionWithMeasurement({
       executionId: claim.executionId,
       state: 'succeeded',
       safeOutcome: 'confirmed',
@@ -306,7 +308,8 @@ export const bookMeeting = async (
       measurement,
     })
 
-    if (!persisted) return error('provider_degraded', 'check_email', false)
+    if (!persisted.persisted) return error('provider_degraded', 'check_email', false)
+    const googleAdsConversion = publishedGoogleAdsReceipt(measurement?.googleAdsConversion, persisted.measurementPersisted)
 
     await recordMeetingMetric({
       metricKind: 'booking_confirmed',
@@ -316,6 +319,7 @@ export const bookMeeting = async (
 
     return {
       outcome: 'confirmed',
+      ...(googleAdsConversion ? { googleAdsConversion } : {}),
       appointment: {
         startsAt: booking.startsAt,
         endsAt: booking.endsAt,

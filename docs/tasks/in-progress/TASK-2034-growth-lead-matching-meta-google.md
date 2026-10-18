@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: released PR254/main d692ab51dc48; SQL, GTM6/5 y cuatro flags activos/verificados. Pendiente primera conversión comercial consentida post-flip y su recepción provider.`
+- Status real: `Parcial: Meta/UPD publicados previamente; Ads local con acciones/drafts verificados por API18/10,499 tests y32 escenarios Chromium aislados PASS. Schema HubSpot/Meta autorizado y aplicado18/10; dispatcher existente recuperado200, dos submissions delivered sólo al ledger. Lote89d70ec13:1.445 archivos revisados, CI completo/build PASS; Deep falló por timeout de corpus pricing, corregido localmente138 casos con cobertura, revalidación remota pendiente. Términos aceptados/EC OFF; hosts/protocolo GTM real y release general pendientes. Sin nuevo deploy ni publish/activación Ads.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -68,6 +68,8 @@ ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin 
 - `services/ops-worker/server.ts`, dedicated scripts/templates and scoped measurement docs.
 
 ## Current Repo State
+
+Snapshot de intake histórico. Para el estado vigente, usar Status real y el cierre14/10.
 
 - Consentimiento granular ads/analytics, sin inferir publicidad del procesamiento; veto GPC.
 - Matching backend, renderer y worker released; SQL aplicada y capture/meta/google/retención ON.
@@ -141,6 +143,16 @@ ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin 
 
 ## Acceptance Criteria
 
+Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
+
+- [x] Recibo Ads sólo tras aceptación/confirmación persistida; dedupe/replay sin segunda señal; tests focales.
+- [x] Consent granular/GPC, click context30d y EC por user_data reservado, sin hash/PII en telemetría; tests.
+- [x] Dos acciones secundarias nativas propias creadas, readback por campo y bindings saneados completos.
+- [x] Workspaces GTM API Web8/Server12, tags nativos/Linker/excepción GA4 y quick_preview sin error.
+- [ ] Tag Assistant funcional, términos/EC efectivo y salida de conversión real comprobados; no se fabrica tráfico.
+- [ ] Release backend/bundles/bridge, GTM publicado con confirmación, policies/flag opt-in y primera recepción Ads.
+
+
 - [x] Public POST carries granular consent/context, never treats processing consent as ads consent.
 - [x] Backend builds Meta and Google normalized hashes separately; no PII custom GA4 params.
 - [x] Atomic durable capture + destination-specific retry, no second GA4 generate_lead. SQL role-runtime canary + template6 Client GA4 boundary verified.
@@ -188,6 +200,8 @@ ya activos. Primera aceptación/reserva comercial consentida post-flip aún sin 
 - Dossier y lista de recibos saneados: docs/audits/releases/2026-10-13-full-develop-matching-release.md.
 
 ## Progress Log
+
+- 2026-10-18: [revisión completa del candidato y reparación SQL autorizada](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md). Tres columnas/constraints y dos triggers verificados; scheduler existente recuperado sin POST manual. No certifica entrega HubSpot/Graph ni atribución Ads.
 
 - 2026-10-13: autorización de implementación, Google settings/audiencias y pruebas locales/Preview.
 - 2026-10-13: full develop→main PR254; corregido heapCI6→8GiB sin quitar gates. No repetir
@@ -246,6 +260,11 @@ Flags: GROWTH_MEASUREMENT_CAPTURE_ENABLED, GROWTH_MEASUREMENT_META_ENABLED, GROW
 
 ## Closing Protocol
 
+Checkpoint18/10: [validación previa y límites](../../audits/growth/2026-10-18-google-ads-prerelease-validation.md),
+[paquete de release](../../operations/releases/google-ads-2026-10-18/README.md). Dos propuestas offline
+Performance/Discovery preservan destinos. No cierran los acceptance de runtime/primera conversión;
+el lote general requiere revisión/CI y el bridge anterior sigue servido en WP/Think.
+
 - [ ] Runtime acceptance and current Status real recorded.
 - [x] Task index, audit/handoff, changelog and mirrored skills synchronized.
 - [x] Scope/type/context and meaningful QA checks passed; task lint/mirrors/context strict and CI evidence in release dossier.
@@ -279,3 +298,23 @@ ambos hosts, código temporal por request. Bridge WP421eaa3 / Think PR14, extern
 normalización y helper IP/UA de POST preparados para release completo develop→main.
 63 Vitest +25 Client +8 attribution +16 bridge PASS. Primera aceptación comercial sigue
 pendiente: ledger últimos7d sin conversiones al corte; no usar fixtures para cerrar ese criterio.
+
+## Verificación del 14/10/2026
+
+PR255 completa la corrección de contexto del visitante y la configuración administrable por
+API/CLI/panel; Server9 estricto, ambos hosts y fuente nueva sin redeploy verificados.
+[Release y recibos](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+La recepción en Test Events no cierra el acceptance comercial ni demuestra evolución de EMQ.
+
+## Delta 2026-10-17 — Google Ads online y conversiones mejoradas
+
+El operador pidió implementación de GTM para leads y agendas y subagentes de investigación, y recordó
+la API GTM. Se conserva ownership de esta task: no nueva task paralela ni infraestructura. Plan:
+contratos/fuentes → recibo postcommit → browser/contexto → acciones secundarias/plan GTM → borradores
+API/compilación → QA focal → documentación/commit; activación exige gates de publicación/release.
+[ADR](../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
+[manual](../../manual-de-uso/growth/activar-conversiones-google-ads.md) y
+[evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md) poseen el contrato y límites.
+26 suites/404 tests y TypeScript focal PASS; sin publicación ni conversión enviada. Data Manager,
+resultados CRM y TASK-1885 no se absorben. Primera conversión Meta comercial ya consta en runtime10;
+la condición conjunta formulario/reserva del acceptance histórico permanece parcial.

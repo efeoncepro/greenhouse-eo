@@ -162,6 +162,9 @@ Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas*
 transparente. Programmatic amplía el mix dentro de Media & Distribution; proveedores permanecen en el expediente
 interno, con identificación contractual/de datos cuando aplique. Es una composición de servicio, no nueva marca
 ni reclasificación de la empresa. [Contrato de oferta](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+Su cara pública desde el 2026-10-16 es el brochure y la landing «Agencia de Medios» (línea Voice): nombran Basis, DV360,
+The Trade Desk, IAS y DoubleVerify sólo como tecnología que Efeonce opera, nunca como alianza; los partners que la marca
+declara son HubSpot (Gold) y Salesforce. [Reglas de claims](../services/media-distribution/README.md#material-comercial-vigente).
 > Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.
 
 > **Submarcas de producto que acompañan (2026-09-29):** distintas de las product brands de la tabla, **Efeonce | SV360**, **Efeonce | AEO**, **Efeonce | AEO Assessment** y **Efeonce | AI Visibility Report** (línea Engine / Digital Services & Engineering) son submarcas de producto de Efeonce con logo: van siempre en lockup con Efeonce (mismo patrón que Efeonce Insights) y nunca firman solas. [ADR de naming §Delta 2026-09-29](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md#delta-2026-09-29--submarcas-de-producto-seoaeo-con-logo).
@@ -345,6 +348,13 @@ clientes ni a la UI de Greenhouse. Fuente de verdad en AXIS (`efeonceGraphicLine
 Desde el 2026-09-27 (D24) hay una tercera capa, **Plastilina en volumen**: cada glifo de Plastilina en arcilla mate
 inflada (PNG con alfa), sólo para momentos protagonistas —portada, key visual, escenario, merch—, uno por pieza y
 nunca en UI, listas ni decks ([manual §14.1](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)).
+
+**Brochure oficial de la agencia (2026-10-16):** el brochure «Agencia de Marketing 360°» es la presentación canónica
+de la masterbrand: habla siempre Efeonce y recorre las cinco líneas (Engine, Brand con Channel & Commerce, Voice,
+Revenue y Growth) como un solo equipo alrededor de la vuelta del cliente. La lámina de la órbita de cinco líneas sirve
+de índice con enlaces a cada línea. El «360°» del título se sostiene con su mecanismo en las láminas (equipo, primeros
+90 días, día a día en vivo, casos, partners), no como frase suelta. [Catálogo de servicios](../services/README.md) ·
+[norma de composición, delta 2026-10-16 (b)](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 
 ## Identidad en informes
 

@@ -1,5 +1,9 @@
 # Changeset account-based — <cuenta / fecha>
 
+Aplicar la [convención de nombres](../../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
+Nombre propuesto de Deal/Lead: <componentes verificados y valor final; antes/después si es renombrado>.
+Identidad/dedupe, mandato del cambio y readback esperado: <IDs; no ampliar el lote por normalización>.
+
 Portal/identidad/carril/versiones comprobados: <lectura actual, sin credenciales>.
 Mandato vigente: <acción, objetos/campos, lote y límites; no implica outreach>.
 Cuenta y ancla de iniciativa: <Company ID, necesidad/decisión; Deal existente si aplica>.

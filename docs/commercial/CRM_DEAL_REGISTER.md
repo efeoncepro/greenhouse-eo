@@ -1,12 +1,48 @@
 # Registro operativo general de negocios CRM
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
+## Gana — programática Colombia — alta verificada 15-10-2026
+
+Nombre CRM vigente: **Gana \| CO \| Programática omnicanal \| GRD-1541**; sólo `dealname` normalizado bajo la convención aprobada, con readback del 15/10/2026.
+
+**Marca: Gana**, separada de las demás marcas del holding. [Deal 66065702426](https://app.hubspot.com/contacts/48713323/record/0-3/66065702426?utm_source=codex&utm_medium=ai_agent) creado por instrucción de Julio; [Grupo Reditos 34264439413](https://app.hubspot.com/contacts/48713323/record/0-2/34264439413?utm_source=codex&utm_medium=ai_agent) reutilizada como **Principal**, nota118603990273 asociada. Dos readbacks: default/appointmentscheduled (entrada administrativa, sin reunión/calificación completa), Strategic Bets, newbusiness, Julio75788512. Presupuesto comprador **COP30.000.000/mes**, sin amount ni closedate; duración/IVA pendientes. Cierre20/10: invitación14:00Colombia vs UI18:00sinzona, datetime por conciliar.
+Sin contacto individual identificado en bases/invitación/portal; no altas ni asociaciones de contactos históricos por inferencia. Efeonce presta y factura siempre; proveedores sólo apoyan a Efeonce. Evaluación condicionada, sin GO ni postulación. [Expediente](tenders/gana-programatica-colombia-1541-2026/README.md) y [readbacks/contactos](tenders/gana-programatica-colombia-1541-2026/research/CRM-ALTA-2026-10-15-INTERNO.md). Otros procesos y WIP preservados.
+
+## Licitaciones públicas — corte vigente 14-10-2026
+
+[Actualización de LicitaLAB y recibos CRM](tenders/licitalab-actualizacion-2026-10-14/README.md): Deals `65678411411`, `65678240928`, `65678397325`, `65806293639`, `65806334790`, `65832763160` y `65806250773` quedaron **closedlost por cierre administrativo de plazo**, sin derrota competitiva inferida. Dos readbacks preservaron monto, `closedate`, pipeline, bucket y Company. Las filas anteriores de esos procesos quedan como historia.
+
+FUCOA `65832737849`: deadline de postulación **19/10/2026 15:30 Chile**; Aysén `65832697782`: **23/10/2026 15:00 Chile**. UTEM `65832566144` conserva presentación y seguimiento de evaluación. Nuevos Deals públicos autorizados expresamente por Julio; precio, capacidad, admisibilidad y GO siguen pendientes donde lo indica cada expediente. **30 Deals creados y verificados**, únicos por código/llave, con Company Primary y nota; `amount` y `closedate` vacíos. [Tabla completa con enlaces](tenders/licitalab-actualizacion-2026-10-14/README.md#hubspot--altas-verificadas). Las 3 consultas RFI conservan Company + nota.
+
+## Laboratorio Chile / Teva — agencia digital — 14-10-2026
+
+[Deal 65970954279](https://app.hubspot.com/contacts/48713323/record/0-3/65970954279?utm_source=codex&utm_medium=ai_agent) y [Lead 596443805748](https://app.hubspot.com/contacts/48713323/objects/0-136/views/all/list?leadId=596443805748&utm_source=codex&utm_medium=ai_agent) creados por instrucción expresa de Julio. Empresa preexistente 53966854218 reutilizada, contacto nuevo con correo publicado y Primary verificados. Lead New/COLD; deal default/appointmentscheduled, Strategic Bets, sin monto/moneda/cierre. La etapa inicial no acredita cita: descripción aclara que no hay contacto, reunión, propuesta ni admisión. Efeonce no tiene experiencia farmacéutica; brecha Rx/HCP declarada por Julio. [Expediente](tenders/laboratorio-chile-teva-agencia-digital-2026/README.md). Sin envío ni créditos.
+
 ## Socopur — Agencia Digital 2027 — 10-10-2026
+
+**Estado vigente documental, 15/10/2026 16:54:36 UTC: cerrado para entrada tardía.** Katherine confirmó
+que el proceso de selección concluyó y no recibe nuevas postulaciones/propuestas para este período.
+Conservará credenciales sin promesa de fecha o invitación; no inferir adjudicación. No insistir ni
+producir oferta. [Fuente y cronología](tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md).
+Deal `65871170058` sólo como referencia: no consultado ni editado en esta actualización.
+
+**Corrección directa de Julio, 15/10/2026 17:51 UTC:** detección **06/10/2026**, sin hora/zona,
+un día calendario después del cierre de interés del **05/10**; no equivale a 24 horas exactas.
+Radar horario y alta CRM del 10/10 son posteriores y no explican la tardanza del día 6. Publicación,
+primera disponibilidad/indexación, primer aviso exacto y causa siguen sin acreditar.
+
+**Cortes históricos siguientes:** conservan etapa/fecha y espera previas; no son estado live revalidado
+ni próximos pasos vigentes después de la respuesta de cierre.
 
 [Deal 65871170058](https://app.hubspot.com/contacts/48713323/record/0-3/65871170058?utm_source=codex&utm_medium=ai_agent) creado por instrucción expresa de Julio, tras deduplicación por nombre y asociaciones. Dos lecturas: `default/qualifiedtobuy`, `Strategic Bets`, `newbusiness`, owner `75788512`, sin amount. **Cierre previsto actualizado por Julio: 13-11-2026**, final de la ventana de selección/comunicación 9–13/11; no adjudicación confirmada. USD es moneda predeterminada CRM, no negociación confirmada. Company `59118554799` Primary, Contact `254187252267` y Note `118330098975` asociados y releídos.
 
-**Estado real: recuperación de ingreso tardío**, bases/presupuesto/admisibilidad pendientes. No inferir calificación completa de la etapa administrativa. Próximo paso: esperar respuesta sobre admisión/bases; Q&A previsto 8–13/10. Correo enviado por Julio; sin oferta presentada. [Expediente](tenders/socopur-agencia-marketing-digital-2027/README.md) y [auditoría](tenders/socopur-agencia-marketing-digital-2027/research/hubspot-verificacion-2026-10-10-INTERNO.md).
+**Estado real: recuperación de ingreso tardío**, bases/presupuesto/admisibilidad pendientes. No inferir calificación completa de la etapa administrativa. Próximo paso: esperar respuesta sobre admisión/bases tras el seguimiento del 15/10; Q&A 8–13/10 ya transcurrió y la fase de propuestas 14–30/10 no reabre inscripción. Sin oferta presentada. [Expediente](tenders/socopur-agencia-marketing-digital-2027/README.md) y [auditoría](tenders/socopur-agencia-marketing-digital-2027/research/hubspot-verificacion-2026-10-10-INTERNO.md).
 
-**Actualización de envío 10/10:** Julio confirmó que envió el correo a Katherine. Próximo paso vigente: esperar respuesta sobre ingreso tardío y bases. Envío declarado por remitente, sin inspección de Enviados ni recepción confirmada; sustituye indicaciones anteriores de envío pendiente. Sin seguimiento automático autorizado.
+**Actualización verificada 15/10:** historial de envíos 10 y 12/10 a Katherine y 13/10 a Mariela contrastado en Outlook/CRM. Seguimiento puntual autorizado por Julio enviado sólo a Katherine a las 07:13 Chile, con firma gráfica y PDF creativo; EMAIL `118603198768` SENT asociado al Contact y Company canónicos. [Evidencia y límites](tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md). Sin respuesta/admisión observada ni otro envío programado; no cambia etapa, cierre o GO.
 
 ## SKY Social Care 2027 — solicitud y seguimiento — 09-10-2026
 
@@ -17,6 +53,8 @@
 **Estado vigente 09/10/2026:** Julio envió a Jesús Vargas Serpa, en el hilo «Pibank | SEO Efeonce», la propuesta técnica SEO/AEO 2027 v13 (49 láminas) y la cotización detallada en USD y PEN. Programa anual con compromiso inicial de seis meses y renovación trimestral: base US$4.500/mes + módulos; ruta recomendada **US$79.200 al año** (S/ 272,210.40 a S/ 3.437 por US$, BCRP venta SBS 06-10-2026); primer semestre US$42.500; ruta integral US$89.200. [Deal 65352884246](https://app.hubspot.com/contacts/48713323/record/0-3/65352884246): `presentationscheduled` / Presentación de soluciones (antes `1356915244` Sample Sprint / Validación), `amount=272210.40` PEN (antes 126,596.45); readback verificado el 09-10. Próximo hito declarado por el cliente: revisión con gerencia la semana del 19-10 y decisión en noviembre. Archivos enviados: `00 FINAL ENVIAR 2026-10-09 - …` en OneDrive `4. Comercial/Licitaciones/Banco Pichincha/`. Expediente: [prospecto](prospects/banco-pichincha-peru-seo-2026/README.md).
 
 ## Pierre Fabre Chile — licitación agencia integral 2027 — 09-10-2026
+
+**Estado actualizado por Julio el15/10/2026:** preinscripción realizada. Julio preparará las credenciales **el viernes16/10** para enviar; envío todavía pendiente. Las menciones a «sin inscripción» del corte histórico09/10 quedan superadas. Registro documental; sin cambios HubSpot ni envíos por el agente.
 
 **Aclaración del enlace y contacto de credenciales:** [expediente con formulario completo verificado y requisitos](tenders/pierre-fabre-agencia-integral-2027/README.md). La URL copiada que termina en «…» está truncada. Contacto de credenciales `254011713292` registrado y asociado a la misma Company/Deal; fuente: apartado 10 del formulario, sin cargo ni entregabilidad inferidos. Descripción y nota CRM actualizadas; sin envío.
 

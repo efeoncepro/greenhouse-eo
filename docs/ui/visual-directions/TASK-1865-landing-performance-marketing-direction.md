@@ -1,5 +1,10 @@
 # TASK-1865 — Landing Performance Marketing — Visual Direction
 
+> **Delta 2026-10-17 — reemplazada.** El owner aprobó una fuente `source-led` en la línea Voice de La órbita
+> ([`docs/ui/sources/TASK-1865/`](../sources/TASK-1865/README.md)). Esa fuente reemplaza la dirección A de este documento
+> (paleta pública, Poppins + Geist, circuito de la señal en el hero). Lo que sigue vigente de aquí son los antipatrones:
+> nada de dashboard ficticio, de muro de logos de plataformas como prueba ni de cifras sin rótulo.
+
 ## Estado y autoridad
 
 - Status: `proposed — pending owner approval`. **Esta dirección no está aprobada.** Hasta que el owner de Media &

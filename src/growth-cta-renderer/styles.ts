@@ -462,6 +462,9 @@ greenhouse-cta, .ghc-scope {
 }
 
 /* ── Native meeting task surface ────────────────────────────────────── */
+/* The dialog lives in <body>, outside any host container. inherit is NOT valid inside the font
+   shorthand: it drops the whole declaration and the host theme styles the text (giant h2, Arial button).
+   Use longhands with font-family: inherit. */
 dialog.ghc-meeting-surface {
   width: min(1180px, calc(100vw - 48px));
   max-width: none;
@@ -499,8 +502,9 @@ dialog.ghc-meeting-surface::backdrop {
   border-bottom: 1px solid #e1e7ef;
   backdrop-filter: blur(18px);
 }
-.ghc-meeting-kicker { display: block; color: #52708f; font: 700 .7rem/1.2 inherit; letter-spacing: .1em; text-transform: uppercase; }
-.ghc-meeting-heading { margin: 4px 0 0; color: #172033; font: 750 clamp(1rem, 2vw, 1.25rem)/1.2 inherit; letter-spacing: -.02em; }
+.ghc-meeting-titles { flex: 1 1 auto; min-width: 0; }
+.ghc-meeting-kicker { display: block; color: #52708f; font-family: inherit; font-size: .7rem; font-weight: 700; line-height: 1.2; letter-spacing: .1em; text-transform: uppercase; }
+.ghc-meeting-heading { margin: 4px 0 0; color: #172033; font-family: inherit; font-size: clamp(1rem, 2vw, 1.25rem); font-weight: 750; line-height: 1.2; letter-spacing: -.02em; text-transform: none; }
 .ghc-meeting-close {
   appearance: none;
   min-width: 72px;
@@ -512,7 +516,12 @@ dialog.ghc-meeting-surface::backdrop {
   border-radius: 999px;
   box-shadow: 0 1px 2px rgba(9, 30, 66, .08);
   cursor: pointer;
-  font: 650 .84rem/1 inherit;
+  flex: none;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: .84rem;
+  font-weight: 650;
+  line-height: 1;
   transition: transform 160ms cubic-bezier(.2,0,0,1), border-color 160ms ease, box-shadow 160ms ease;
 }
 .ghc-meeting-close:hover { border-color: #9eb5cc; box-shadow: 0 6px 18px rgba(9,30,66,.12); transform: translateY(-1px); }
@@ -549,7 +558,10 @@ dialog.ghc-meeting-surface::backdrop {
   border: 1px solid #023c70;
   border-radius: 10px;
   cursor: pointer;
-  font: 700 .88rem/1 inherit;
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 700;
+  line-height: 1;
 }
 .ghc-meeting-retry:hover { background: #02599f; border-color: #02599f; }
 

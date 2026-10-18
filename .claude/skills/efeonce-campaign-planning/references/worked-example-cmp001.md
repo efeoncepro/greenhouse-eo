@@ -62,7 +62,8 @@ BOFU entra en noviembre. [media plan §2; `operating_rules.first_wave`]
 
 - UTM registrada: `utm_source` `linkedin|meta`, `utm_medium` `paid-social`, `utm_campaign`
   `cmp001-la-ia-dice-de-ti`, `utm_content` `c01-tofu-4x5-imagen-feed-image-ha-v01`. [catálogo, 72 anuncios]
-- GA4 `G-KYPPY57M14` + GTM `GTM-K2X4ZTTK` existen; `gh_form_submitted` es intento; IDs de conversión de las
+- GA4 `G-KYPPY57M14` + GTM web `GTM-NGHPGRLZ` existen (el media plan citaba `GTM-K2X4ZTTK`, que es el container
+  servidor sGTM/Meta CAPI); `gh_form_submitted` es intento; IDs de conversión de las
   cuentas `no registrados`. [media plan §4; `operating_rules.conversion`]
 
 ## 9. Presupuesto

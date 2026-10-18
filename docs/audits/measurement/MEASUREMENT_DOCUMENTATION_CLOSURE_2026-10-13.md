@@ -1,5 +1,8 @@
 # Auditoría documental integral de medición — 2026-10-13 Chile
 
+Este es el corte histórico previo a la configuración escalable. Para instrucciones vigentes,
+ver la [auditoría14/10](MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md) y el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
+
 ## Mandato y estado
 
 El operador pidió tres subagentes y documentación de **todo lo construido**, antes del GO

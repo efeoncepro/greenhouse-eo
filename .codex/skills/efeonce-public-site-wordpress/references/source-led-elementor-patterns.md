@@ -5,7 +5,84 @@ lessons, not a live-state ledger. Architecture: `docs/architecture/public-site/A
 primitive ownership: `docs/architecture/public-site/PRIMITIVES.md`. Dated Home evidence, hashes and rollback
 belong in `references/landings/home-claude-design-preview.md` and the linked audit.
 Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
-and `references/landings/content-marketing.md`.
+and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
+`references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
+`references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17): `references/landings/performance-marketing.md`. Fifth (Inbound
+Marketing, 2026-10-18, first with the native meeting launcher): `references/landings/inbound-marketing.md`. Each is a
+reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
+
+## Shared source-led core (2026-10-17)
+
+Medios and Performance now share one core; new canvas landings must use it instead of cloning a compiler.
+
+- **Compiler:** `scripts/public-website/lib/source-led-compiler.cjs` owns stages 2–3 (schema + template per section,
+  repeaters, Growth Form fields in `formModule`, Service/FAQPage fields in `serviceModule`, scoped CSS, optional
+  unscoped `page.css`, `used-assets.json`). A landing script owns only stage 1 (expand its canvas into
+  `section[data-gh-module]` + `tabCss`) and calls `compileSourceLedLanding({ landing, sourceDir, source, assets, $,
+  modules, tabCss, formModule, serviceModule, faq, serviceDefaults, pageLayer })`.
+- **Ohio link-underline guard (in the core CSS):** Ohio's `.links-underline a:not(.button):not(.tag):not(.-undash):hover`
+  paints `linear-gradient(currentcolor…)` with 5-class specificity; a button that sets its fill with the `background`
+  shorthand resets `background-size`, so on hover the gradient covers it and hides its text (Performance and Medios
+  hero CTAs, fixed live 2026-10-17). The core appends `a:hover,a:focus-visible{animation:none !important;
+  background-image:none !important}` scoped to `.gh-<landing>`; never give a landing link its own background image.
+- **Widget base:** runtime `includes/widgets/class-eo-source-led-landing-base.php`
+  (`EO_Source_Led_Landing_Base_Widget`). A landing base only declares `LANDING`, `TITLE_PREFIX`, `KEYWORDS`,
+  `FORM_MODULE` and defines `eo_<landing>_register_assets()`; definitions are cached per landing + module.
+- **Gates (both must pass before any package):** `node scripts/public-website/verify-source-led-compilers.cjs`
+  (re-compiles every migrated landing into a scratch root and compares byte by byte with the runtime plugin) and
+  `php scripts/public-website/verify-source-led-render.php` (fingerprint of name/title/keywords/deps/controls and four
+  render probes per module; diff before/after a base change must be empty; a one-character change is detected).
+- **Core release:** `build-source-led-core-package.cjs <live baseline>` → `deploy-source-led-core-package.php`
+  (contract `source-led-core-release.v1`, allowlist of the three base files, previous-SHA guard, backup tar). The
+  shared base is written **before** the landing bases so no request loads a base without its parent. Deployed
+  2026-10-17 21:25 UTC (backup `/tmp/eo-source-led-core-before-20261017-212544.tar` on Kinsta); live module HTML of
+  Medios (16) and Performance (10) identical before/after. The Medios and Performance packages also ship the shared base.
+- **Native meeting launcher (2026-10-18, first used by Inbound):** a mechanism, optional per landing. Write
+  `<gh-meeting-cta></gh-meeting-cta>` in stage 1 and pass `meeting: { module | modules: [...], cta, location,
+  fallbackUrl, fallbackLabel }` to the core; every listed module gets the `MEETING_FIELDS` (`meeting_cta`,
+  `meeting_surface`, `meeting_embed_key`, `meeting_location`, `meeting_fallback_url`, `meeting_fallback_label`). The
+  embed key is never a schema default: the page publisher writes surface + key from the 0600 file into the modules
+  that carry a launcher. The base renders `<greenhouse-cta cta surface embed-key cta-location locale="es-CL"
+  color-scheme="dark" appearance="bare">`, or the fallback link `a.gh-<landing>-meeting-fallback` (default `/agenda/`)
+  when settings are missing, and enqueues the CTA renderer only for modules with `meeting_cta`.
+  - **Location override:** `<gh-meeting-cta location="x">` compiles to `%%meeting_launcher__x%%` and overrides
+    `meeting_location`, so ONE CTA is measured per placement (Inbound: closing, hero, mobile dock).
+  - **Look is each landing's decision.** The launcher button skin and the dialog skin belong to the landing's design
+    (host CSS / unscoped `page.css` guarded by `body:has(.gh-<landing>)`); Inbound's floating scheduler and glass
+    close button are one example, not the standard.
+  - **Mechanism lessons (any landing):**
+    - `<greenhouse-cta>` contains its inline size (`container-type: inline-size`): give it an explicit width or it
+      measures 0; inside a flex row its wrapper needs its own width too.
+    - The dialog is `<dialog class="ghc-meeting-surface">` appended to `<body>` and opened with `showModal()` (top
+      layer, no z-index fights); style it from `page.css`, not from the scoped host CSS. A modal dialog has
+      `top:0;bottom:0`: it needs `height:fit-content` or it stretches.
+    - The production CTA bundle has no `ghc-meeting-titles` class; target `.ghc-meeting-toolbar>:not(.ghc-meeting-close)`.
+    - The renderer locks scroll with `html.style.overflow=hidden` (restores the previous value) and returns focus to the
+      launcher on close; on phones it sets `[data-full-screen]`.
+    - Splitting a flex row: `flex-basis:0` leaves padding outside the split, so a padded half grows; use
+      `flex:1 1 50%` + `min-width:0` on both halves.
+    - Inline styles copied from the canvas beat stylesheet rules: overriding them needs `!important`.
+    - An outline/transparent button over a photo or gradient boundary shows the seam through it: give it its own
+      backdrop (background + `backdrop-filter`).
+    - Cache-bust live checks with `?v=`; `?m=1` returns 404 on WordPress (date query var).
+    - PHP-FPM opcache: a change to an existing PHP file takes ~1–2 min to reach web requests.
+    - `sanitize_key` is not available in the render gate stub; sanitize with `preg_replace`.
+- **Republisher:** `republish-source-led-page.php <spec.json> <page-custom.css>` with specs in
+  `<landing>-source/republish.json`. Requires `expectedDataSha` to write; keeps each module's live widget settings
+  (`preserveWidgetSettings`, default true); does nothing when the rebuilt tree, custom CSS and featured image already
+  match (`unchanged`); `dryRun` reports `sameTree/sameCss/keptWidgetSettings`; `force` saves anyway (canary). It fills
+  `post_featured_image`, restores and verifies `_thumbnail_id` after `Document::save()`, snapshots tree/settings/
+  thumbnail/page metas, checks protected pages and global chrome, rebuilds the Yoast indexable and warns
+  (`primaryImageWarning`) when the page has no featured image. Live canary 2026-10-17 on Performance: same hash
+  `687fa928…`, thumbnail `252002` kept.
+- **Yoast primary image over http:** a CLI save makes Elementor write its `post_content` HTML copy with plugin image
+  URLs over `http://` (`EO_ELEMENTOR_WIDGETS_URL` is computed at plugin load, without HTTPS context; forcing
+  `$_SERVER['HTTPS']` later does not change it). When a page has no featured image, Yoast takes the schema
+  `primaryImageOfPage` from that copy. Fix = featured image (use the OG attachment): HubSpot `244079` repaired
+  2026-10-17 with `251991` (`repair-landing-primary-image.php`, snapshot `_gh_primary_image_repair_before_20261017_212620`).
+  Contacto `20729` repaired the same day with its OG `251980` by operator decision (snapshot
+  `_gh_primary_image_repair_before_20261017_212833`). Systemic option (not done): make the plugin URL constant
+  scheme-aware.
 
 ## Source fidelity without losing editability
 
@@ -40,6 +117,58 @@ and `references/landings/content-marketing.md`.
   itself can be replaced. Test that typed fields, validation and step state survive neighboring controls.
   Growth Forms owns the field contract; use `references/growth-forms-wordpress.md` for its gates.
 
+### Canvas (`.dc.html`) → static native modules
+
+Agencia Creativa (`scripts/public-website/compile-creativa-elementor-source.cjs`, source
+`scripts/public-website/creativa-source/Main.dc.html`) compiles a live canvas into schema-driven widgets;
+Agencia de Medios (`compile-medios-elementor-source.cjs`, source `medios-source/Main.dc.html`) is the second
+compiler built on the same pattern and HubSpot v2 (`compile-hubspot-v2-elementor-source.cjs`, source
+`hubspot-v2-source/`) the third. Expand every dynamic part of the canvas into static, editable markup; do
+not ship the canvas runtime:
+
+- Interactive tabs → one repeater whose row has two parts, rendered into `%%repeat_<key>__tab%%` and
+  `%%repeat_<key>__panel%%`, with `%%row_first%%` for the initial pressed state. Bounded JS switches them
+  (click + arrow keys); CSS hides non-first panels until JS marks `data-ready`.
+- Selectors written as conditional branches (`sc-if` on a state variable, e.g. Medios' Commerce/B2B and
+  platform pickers) are tabs too: one panel per branch, state carried by `aria-pressed` on the buttons. Do
+  not hand-write the pressed look: generate the on/off CSS from the styles the canvas itself applies to the
+  selected and unselected button, keyed on `[aria-pressed="true"|"false"]`, so the compiled page keeps the
+  canvas' exact selection treatment.
+- Marquee duplicates: remove them from the source and let JS recreate them as `aria-hidden` loop copies
+  (see Continuous rails).
+- Live imports of other canvases (e.g. Creative Studio screens) → screenshots captured locally with
+  Playwright in the theme the canvas uses; check that theme in the capture.
+- A designed form → Growth Forms host card (`<greenhouse-form>`); the host never draws fields. Map each
+  canvas control to the renderer before publishing (`references/growth-forms-wordpress.md`). The renderer
+  paints for a light background (`color-scheme="light"`): if the canvas drew the form card on a dark
+  section, make the card paper (Medios: `#f7f8f6`, with its own title and the trust line under the form)
+  instead of forcing dark tokens into the renderer.
+- Images inside an SVG (`<image href>`, e.g. isotypes placed in a diagram) are not found by the regular
+  `<img>`/background asset pass. Map them explicitly to the uploaded asset base (Medios: `%%asset_base%%`)
+  and check that each one paints on the live page.
+- Decorative glyphs marked `aria-hidden` (bullets, dots, arrows drawn as text) are markup, not copy: keep
+  them out of the editable controls so the editor exposes only real text.
+- An SVG data meter → a server-drawn number field, not an image of a number.
+- Repeater rows whose markup differs → explicit layout variants. Name row field labels by role
+  (what the field is in every row), never by the first row's copy.
+- Name template tokens so they cannot collide with schema field keys. The renderer substitutes a field's value
+  into any `%%token%%` of the same name, so a token that matches a field is silently replaced by that field's
+  value (HubSpot v2: the dock's Growth CTA slot is `%%meeting_launcher%%` for that reason).
+
+#### Scoping the canvas CSS and the page layer
+
+The compiler scopes the canvas CSS under the landing root (`.gh-hsv2`, `.gh-medios`, …) so nothing leaks to
+Ohio or other pages. Two rules keep that scoping honest:
+
+- Rewrite `html`/`body` only as **element selectors**, never as substrings. A loose regex turned `.panel-body`
+  into `body` and stripped every panel's padding (HubSpot v2, 2026-10-16). After compiling, grep the output for
+  class names that contain `body`/`html` and compare a padded component against the source.
+- The scoper also rewrites `body` in the host layer, so a rule that genuinely must reach outside the landing
+  (`timeline-scope` on `body`, Ohio's bottom bar, other theme chrome) cannot live there. Keep it in a separate
+  page layer (`page.css`) that the compiler appends **without** scoping, and guard every rule with
+  `:has(.<root> …)` (for example `body:has(.gh-hsv2 .mdock)`) so it only matches the page that carries the
+  landing. Keep that layer minimal and comment why each rule escapes the scope.
+
 ## Native editorial revisions
 
 - For Home-specific message, comparison evidence, FAQ emphasis and copy persistence, load
@@ -67,6 +196,35 @@ and `references/landings/content-marketing.md`.
 - Gate pinning by usable viewport height as well as width. Mobile, short viewports, reduced motion and
   JavaScript-off must retain readable chapters in normal flow; do not turn the fallback into blank space.
 
+## Scroll-driven reveals and mobile docks
+
+- A reveal bound to the scroll (`animation-timeline: view()`) must **finish when the element is fully in view**:
+  end its range at `entry 70%`–`entry 100%`, never at `cover N%`. A range that ends at `cover 35–60%` keeps
+  cards, titles and bars mid-animation (offset, faded) while the visitor is reading them (HubSpot v2,
+  2026-10-16). Check a frame with each element fully on screen, not only the entering edge.
+- A mobile dock (fixed capsule with the page's exits, e.g. «Agendar reunión» + «Ir al formulario») can be
+  shown and hidden by scroll alone: name a `view-timeline` on the hero and one on the destination section,
+  hoist both names with `timeline-scope` on `body` (from the page layer, since the hero lives in another
+  module), and animate the dock with two ranges: in on the hero's `exit`, out on the destination's `entry`.
+  Keep every button ≥ 44 px (48 px in practice), and `display:none` on desktop.
+- Without scroll-timeline support (`@supports not (animation-timeline: view())`) the dock stays always visible;
+  lift it above the theme's fixed bottom chrome instead of letting them overlap.
+- In a hidden browser pane, `getComputedStyle` on a scroll-driven animation can return an old frame
+  (`opacity:0`) for an element that paints fine. Force a style recalculation or take a screenshot before
+  concluding the dock or a reveal is broken (Performance, 2026-10-17).
+- Ohio's bottom bar `.elements-bar.left` (light/dark switch) shares that corner. While the dock shows, move it
+  aside with the same timelines from the page layer and bring it back from the destination on; verify both
+  are never on screen at the same time at 390 px.
+- A Growth CTA can be one of the dock's buttons. Publish it as `embedded` + `minimal`, and in the host CSS,
+  scoped to the dock, hide `.ghc-content`/`.ghc-dismiss`, set the card to `display:flex; gap:0` with no
+  padding/border/background/shadow, and give `.ghc-primary` the dock button's size and colors
+  (`--gh-cta-reserve` = button height). Without surface/key the slot must fall back to a plain link (HubSpot v2:
+  `/agenda/`); a slot with neither should collapse (`:not(:has(...)){display:none}`). The CTA keeps its own
+  dialog and its conversion is the server receipt (`gh_meeting_*`), never the click. One CTA and one surface
+  per landing, published by `scripts/growth/publish-*-meeting-cta.ts` (key 0600 in `.auth/`, passed to the page
+  republisher; rerunning it rotates the key): skill `greenhouse-growth-ctas` and
+  `docs/manual-de-uso/growth/operar-motor-cta.md` own that contract.
+
 ## Composition and Ohio integration
 
 - Native scheme markers govern Ohio chrome. Scope content contrast to the module and expose a heading
@@ -75,14 +233,34 @@ and `references/landings/content-marketing.md`.
   `!important`. Inspect computed position and the winning selector in the real theme, then target only
   the affected page's owned Elementor containers. Keep inner content gutters and native chrome intact;
   clipping horizontal overflow alone does not correct a shifted section or certify responsive layout.
+- Ohio resets `ul` `list-style`; a list the source shows with disc bullets needs a module-scoped
+  `list-style` restore. Source display sizes that fit a desktop canvas can overflow phones: give
+  display type a mobile clamp and check 390 before publishing.
 - Test filled CTA normal, sustained hover, focus and reduced motion. Ohio's `-undash` opts a link out of
   `links-underline`; changing only `background-color` does not remove its animated background image.
+  The same `.links-underline a:hover` rule animates a background underline on **every** link, including whole
+  cards wrapped in an `<a>`: HubSpot v2's linked cards turned white on hover. Neutralize it in the host layer
+  inside the landing scope (background image/size reset on the module's links), never globally, and test
+  sustained hover on each linked card type.
+- A strikethrough over text that wraps (a "before" value in a comparison) must stay on every line. If the
+  struck element is a flex item it becomes a block and the line only crosses its box; wrap the text in an
+  inline span and add `box-decoration-break: clone` (with `-webkit-` prefix) so each line fragment gets its own
+  decoration. In a comparison that stacks on mobile, put the row label before each row
+  (`[role=rowheader]{order:-1}`) so the reader knows what each pair compares.
+- Static figures in display type (`+90`, `−56%`) need `white-space: nowrap`; an animated counter built on
+  `@property` must land exactly on the source value (HubSpot v2's ended at 89) — check its final frame.
 - A glow should fade to transparent within its own box. A tall clipped circular gradient can look like
   a hard green rectangle on tablet; a section-sized ellipse fixes the source of that seam.
 - Size a hero mark relative to its orbit/core, keep the same parallax depth, and inspect containment
   at the intermediate width where the graphic shrinks. Desktop-only success is insufficient.
 - A sticky FAQ's help/CTA belongs inside its aside. Stack at the appropriate tablet breakpoint and
-  disable sticky in short viewports; check after scroll, not only at section entry.
+  disable sticky in short viewports; check after scroll, not only at section entry. A two-column section
+  whose title column sits beside a long list (FAQ, diagnostic beside its form) reads best with that title
+  column `position: sticky` from 1000 px and stacked below; Medios applies it to both.
+- A page created with `wp_insert_post` (not cloned in the editor) inherits Ohio's blog defaults, including
+  the sidebar. Copy every `page_*` / `_page_*` meta from a published landing with the right chrome (Medios
+  copied 164 from Agencia Creativa `249582`), snapshot the previous values first, then verify header,
+  footer and full width live.
 - Reuse a CTA composition with a scoped modifier for a compact destination CTA. Remove superseded
   repeater/data controls when intentionally retiring cards; hide optional notices with a native select
   when the operator asks to hide rather than delete. Preserve a recoverable content snapshot.
@@ -149,15 +327,42 @@ and `references/landings/content-marketing.md`.
 
 Use `references/elementor-mutation.md` for identity/hash/snapshot/Document::save/metas/readback/cache.
 Deploy only manifest-listed runtime files with previous/new hashes and scoped backups, not unrelated WIP.
+Keep "create" and "change" as different scripts. A new-page publisher only creates and refuses when the slug
+already exists (Medios: `publish-medios-elementor-page.php`); changing that page's body later needs a
+republisher that reads the current content hash, refuses if it differs from the expected one, and snapshots
+before saving. Never rerun a creator to update a live page.
+
+Release-rail lessons (Performance Marketing, 2026-10-17):
+
+- `pnpm public-website:wpcli` forwards only files (`--input-file`) to the eval as `$args`; there is no
+  `-- <arg>` passthrough. Pass a page id as a file, and let each script accept either a numeric id or a path
+  to a file that holds it.
+- In PHP lines that chain several assignments (`$id = …; $source = …;`), a trailing `//` comment silences
+  every assignment after it. It happened on Performance and the «Source identity drift» guard stopped the
+  script before any write: keep one assignment per line when annotating, and keep identity guards first.
+- If a runtime file you ship (e.g. the widget loader) carries other sessions' uncommitted changes, build the
+  package from the working tree only after `diff` proves live == working tree, and commit only your own hunk
+  (stage a blob with `git hash-object -w` + `git update-index --cacheinfo`), never the foreign WIP.
+- Retiring a legacy URL in the same release (301, chains, menu): `references/taxonomy-permalink-migrations.md`
+  §4 (Yoast Premium redirect rail). A `?utm_` that survives the 301 does so through the mu-plugin `efeonce-redirect-query-passthrough`,
+  not through Yoast.
+- Re-saving a page through `$document->save( [ 'elements' => …, 'settings' => $document->get_settings() ] )` from
+  WP-CLI deletes the featured image: the page-settings payload lacks a filled `post_featured_image`, and Elementor
+  treats the empty control as «remove thumbnail». `_elementor_data` and the render stay byte-identical, so a hash check
+  does not catch it; Yoast then falls back to the first content image, built with `http://` because `plugins_url()` is
+  http in CLI. Any republisher must read `_thumbnail_id` first and restore/verify it after `save()` (seen on
+  Performance 2026-10-17, restored to `252002`). The visual editor does not do this: it loads the control from the post.
 
 1. PHP renderer and native control-registration tests (including URL defaults and escaping).
 2. JS lifecycle tests for mount/replacement/removal, editor/reduced, filter and player cleanup.
 3. Real Elementor registration/render probe and semantic CMS readback.
+   Pre-live, run the host-swap harness from `references/landing-workflow.md` §7 on the new body; it caught
+   Ohio's gutter offset, the `ul` reset, oversized phone type and a wrong screenshot theme on Creativa.
 4. Fresh public Browser render, actual clicks/playback, sustained hover, scroll, 1280/890/390 layout,
    reduced motion, overflow and console observations; add wider rail samples when needed.
 5. Authenticated Elementor edit/save/reload remains its own gate. Server probes cannot certify that UI.
 
-Current executable anchors: runtime `tests/agency-modules.test.php`; main-repo
+Current executable anchors: runtime `tests/agency-modules.test.php` and `tests/creativa-modules.test.php`; main-repo
 `scripts/public-website/agency-elementor-lifecycle.test.cjs` and
 `scripts/public-website/verify-agency-elementor-contract.php`. Counts evolve with schema changes: verify
 the current schema, not an old audit's total. Captures with host-emulation scaling need DOM geometry and

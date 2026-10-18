@@ -1,0 +1,682 @@
+{
+  "status": "draft_for_review",
+  "repoPolicy": "lightweight_record_and_links_only",
+  "oneDriveFolder": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26",
+  "files": [
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/bases/10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV_15KB.docx",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/01. Bases y anexos originales/Originales Word descargados sin modificación.zip#10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV_15KB.docx",
+      "bytes": 15936,
+      "sha256": "aeb736337b54d5cc4a420db90d4f48815b703a7f0d561239db2efb9e65a331c7",
+      "standaloneWordContentVerified": true,
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/bases/10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/01. Bases y anexos originales/Originales Word descargados sin modificación.zip#10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+      "bytes": 15936,
+      "sha256": "aeb736337b54d5cc4a420db90d4f48815b703a7f0d561239db2efb9e65a331c7",
+      "standaloneWordContentVerified": true,
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/bases/11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/01. Bases y anexos originales/11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+      "bytes": 3090587,
+      "sha256": "a7b9b43d50d1cbbe5ecc9785b08e2955c4abf69d6ee21aa2f6dd26a698309f04",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/corporativo-resumen.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/corporativo-resumen.json",
+      "bytes": 19539,
+      "sha256": "2be3629dd84b99bb57082169aaf15960fdaa8ac9147ca140d80b75b632b54a00",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/corporativo-demanda.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/corporativo-demanda.json",
+      "bytes": 8964,
+      "sha256": "cf1fb1bf81e01eda8efb2d7c3d851837f5d22fd38fac3ff460ee7b50a241cbf6",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/influencer-demanda.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/influencer-demanda.json",
+      "bytes": 4971,
+      "sha256": "05c884424641b88bbeac90ef0022663ab60d3f6307e67ca7c82e25ff3e433c14",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/influencer-resumen.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/influencer-resumen.json",
+      "bytes": 12620,
+      "sha256": "a92d3a8b15c30ff3dcdc365a6bb631bb6471d4f82db7dc7f4a0beadf2a2f9814",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/corporativo-cotizacion.json.gz",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/corporativo-cotizacion.json.gz",
+      "bytes": 51314,
+      "sha256": "0352f3a4f5a57380ed8d67f1a65ecb0ce5510f9acaf9a9bdbfaa4baa3434083b",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/economica-manifest.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/economica-manifest.json",
+      "bytes": 735,
+      "sha256": "37e97c4ffcb6ceb71c3a100181f764bda98ad213cdb0df7812b2bb6e2cb1da48",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/fee-mes-cotizacion.json.gz",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/fee-mes-cotizacion.json.gz",
+      "bytes": 51062,
+      "sha256": "aff910a55be582d3507a60a33d2b62bb714ffeade1ecc3b997277d5a155159a4",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/reel-resumen.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/reel-resumen.json",
+      "bytes": 16134,
+      "sha256": "f2833f3eac0affe49367548d9e726898538c7bb042d8cf472d725fc8b24aa71f",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/reel-demanda.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/reel-demanda.json",
+      "bytes": 7355,
+      "sha256": "ce63c18c23d6b13ed2a578540abd116ce2719a51d6c737dd75f61d31d4197c5d",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/fee-mes-demanda.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/fee-mes-demanda.json",
+      "bytes": 9032,
+      "sha256": "879a997ca6b60edeadd79c06ebd65e63fb336cdc9b40990a5c181b1503487ec8",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/reel-cotizacion.json.gz",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/reel-cotizacion.json.gz",
+      "bytes": 49670,
+      "sha256": "91ab41f0bafbe813ad33d9c2132da4af96fd5887c0624056904d6bd91691cb07",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/influencer-cotizacion.json.gz",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/influencer-cotizacion.json.gz",
+      "bytes": 47304,
+      "sha256": "09e084f272874987300143defe39b7022f0262fe916957429a95d0e04699e3c3",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/research/pricing/fee-mes-resumen.json",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/04. Interno/Costeo V3/fee-mes-resumen.json",
+      "bytes": 18399,
+      "sha256": "d221ae41ca610cc0b92f504b470956a7dbf4977a185e6acea8f6b55131038e26",
+      "localReadback": true,
+      "remoteReadback": false
+    },
+    {
+      "source": "docs/commercial/tenders/tarapaca-medios-linea2-2026/anexos/ANEXO-6-ECONOMICO-BORRADOR.docx",
+      "destination": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/Corporación Regional de Desarrollo de Tarapacá/1. Plan de medios línea 2 1422259-10-LE26/03. Anexos borradores sin firma/ANEXO-6-ECONOMICO-BORRADOR.docx",
+      "bytes": 13882,
+      "sha256": "81b6288eb61450bb9a29f6309be7ee20ff66aaa8c1c984d7044567348805f26a",
+      "localReadback": true,
+      "remoteReadback": false
+    }
+  ],
+  "submitted": false,
+  "signed": false,
+  "currentLocalFiles": [
+    {
+      "path": "03. Anexos borradores sin firma/ANEXO-6-ECONOMICO-BORRADOR.docx",
+      "bytes": 23270,
+      "sha256": "3dc5a6517ed24bbd9c5c4d2076c72d2d3f9d2101e0dfca70833f50b57421fb93"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/ANEXO-6-ECONOMICO-BORRADOR-v2.pdf",
+      "bytes": 59070,
+      "sha256": "7b48c8c54c91fdcbc9257b7062703f48f690f66fd669e1cdfafc5ca3627827d8"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-1-administrativo-borrador.pdf",
+      "bytes": 212742,
+      "sha256": "8cf48018def647d196b4916eddc88488e1f0af9c527bca6854ee04532b36eeae"
+    },
+    {
+      "path": "03. Anexos borradores sin firma/anexo-4-tecnico-linea2-borrador.pdf",
+      "bytes": 317720,
+      "sha256": "144aa74d4178c57ac3f4aef0826f65666b75f91191af415d7ef8ad17ad47e4a4"
+    },
+    {
+      "path": "02. Propuesta en trabajo/oferta-tecnica-linea2-borrador.pdf",
+      "bytes": 77173,
+      "sha256": "459a273847289e2d3ab6b47f187bca470687d666b85bf5b3a3eb4cc9a9058f29"
+    },
+    {
+      "path": "01. Bases y anexos originales/10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV_15KB.docx",
+      "bytes": 23068,
+      "sha256": "1d8def50fe7ce112b7834797d037182e4c808d3ae82be791ba16a9d1c2bae840"
+    },
+    {
+      "path": "01. Bases y anexos originales/11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+      "bytes": 3090587,
+      "sha256": "a7b9b43d50d1cbbe5ecc9785b08e2955c4abf69d6ee21aa2f6dd26a698309f04"
+    },
+    {
+      "path": "01. Bases y anexos originales/anexo-2-contratar-original-extraido.pdf",
+      "bytes": 53884,
+      "sha256": "463f360f1584c766ebb04601cc9582bde009ca4d1361c809c9954c1cc0cb69ed"
+    },
+    {
+      "path": "01. Bases y anexos originales/anexo-7-utp-original-extraido.pdf",
+      "bytes": 50970,
+      "sha256": "623b1d85379f3eaa3169bb47c0c8295ea3e601e52d93c8cdbecec21b8d1d7d0d"
+    },
+    {
+      "path": "01. Bases y anexos originales/10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+      "bytes": 23068,
+      "sha256": "09fb3be3e3f01f539ff96ff1dff5531e6410ae6eccf654fefba3a2431babf534"
+    },
+    {
+      "path": "01. Bases y anexos originales/Originales Word descargados sin modificación.zip",
+      "bytes": 26768,
+      "sha256": "ec8cf245f5a60bbf462d9cc3c0d99bf8ea5b95c5b82581b1069a30312e9a056a"
+    },
+    {
+      "path": "01. Bases y anexos originales/anexo-1-administrativo-original-extraido.pdf",
+      "bytes": 86274,
+      "sha256": "590c7bdc0153274a30d817faefa1276a01fd20491ce3f8845bd3c2da1abbcb72"
+    },
+    {
+      "path": "01. Bases y anexos originales/anexo-4-tecnico-linea2-original-extraido.pdf",
+      "bytes": 121580,
+      "sha256": "3023b9e7e179fd2c17bff66a4461d29679e2552b3910059009f121927e82f2fe"
+    },
+    {
+      "path": "04. Interno/TARAPACA_QA_ANEXO6_DOCX_READONLY_2026-10-14.zip",
+      "bytes": 412981,
+      "sha256": "b61be708cc738012cd44646eed7b11fe157f58adb3fd199fb2eb500c5397aa11"
+    },
+    {
+      "path": "04. Interno/EQUIPO-Y-EXPERIENCIAS-INTERNO.md",
+      "bytes": 8813,
+      "sha256": "f4448ef4ddbf10e4924b0612ec0f5b1b4a4a0a0d55c5a475cd158fa69560ee03"
+    },
+    {
+      "path": "04. Interno/BRIEF-PROVEEDORES-INTERNO.md",
+      "bytes": 8448,
+      "sha256": "4f138bd78c0e9291845c13f587091767dfb0dfd4b2ba415478247ea61063f26e"
+    },
+    {
+      "path": "04. Interno/Indice repo.md",
+      "bytes": 3900,
+      "sha256": "6d56e24fc33dc5f71bb29b2ce4fe9989aaa0f5975a2bb883b100ff69879a6be8"
+    },
+    {
+      "path": "04. Interno/fuentes-tecnica-20261014.json",
+      "bytes": 6283,
+      "sha256": "142c316fbb862f1a3c88a8da4eb5938d6dd2daff3c9a776bb1832f54cd9685dd"
+    },
+    {
+      "path": "04. Interno/README-INTERNO.md",
+      "bytes": 2741,
+      "sha256": "e65de49fdf935b6fdd709641e28eba5bd12e5b994a8f0910a183f5576f63cb49"
+    },
+    {
+      "path": "04. Interno/resolucion-42-2026-ocr.txt",
+      "bytes": 145906,
+      "sha256": "43d415916c6c22e898ffc6152323dd322c271cd661170d04bbcbc395ae034dfc"
+    },
+    {
+      "path": "04. Interno/paginas-tecnica.json",
+      "bytes": 243,
+      "sha256": "b9caf8a3407356a0ab1398c363c20f60beaa3589187f0e9c06174ce6297c0508"
+    },
+    {
+      "path": "04. Interno/LEDGER-ADMISIBILIDAD-INTERNO.md",
+      "bytes": 9123,
+      "sha256": "f2a3a6cd49735fb5b87a86d597d145f5e6e1cffa8799fa7042a0d8cd73b00ef0"
+    },
+    {
+      "path": "04. Interno/matriz-admisibilidad-INTERNO.md",
+      "bytes": 11086,
+      "sha256": "deb6e182f0845e6e297a3b0c5cb9fd5b3c1a63ff7ac114f9eb952212de00d59c"
+    },
+    {
+      "path": "04. Interno/FUENTES-INTERNO.json",
+      "bytes": 10158,
+      "sha256": "d58156dc8a01ea7417e7f16f7d4e0de367963e9fda58da60d3a14b971f06eaa8"
+    },
+    {
+      "path": "04. Interno/costeo-INTERNO.md",
+      "bytes": 6741,
+      "sha256": "01b0b0b7d54d78c9e931ff60080b43bd6c78adaa7d3aac98c34f056687b10567"
+    },
+    {
+      "path": "04. Interno/INSUMOS-COSTEO-V3-INTERNO.json",
+      "bytes": 7225,
+      "sha256": "dd0e0314a84e18de55e257de02ea3bf2b1a2cf9a735e0bdb3a786a90e54fb2ca"
+    },
+    {
+      "path": "04. Interno/Versiones económicas/ANEXO-6-ECONOMICO-BORRADOR-v1.pdf",
+      "bytes": 111328,
+      "sha256": "641dee72bdb97b146ebe954411bd38e81abcf91f02819b5b5ac8ed009f62f2e8"
+    },
+    {
+      "path": "04. Interno/Costeo V3/corporativo-resumen.json",
+      "bytes": 19539,
+      "sha256": "2be3629dd84b99bb57082169aaf15960fdaa8ac9147ca140d80b75b632b54a00"
+    },
+    {
+      "path": "04. Interno/Costeo V3/corporativo-demanda.json",
+      "bytes": 8964,
+      "sha256": "cf1fb1bf81e01eda8efb2d7c3d851837f5d22fd38fac3ff460ee7b50a241cbf6"
+    },
+    {
+      "path": "04. Interno/Costeo V3/influencer-demanda.json",
+      "bytes": 4971,
+      "sha256": "05c884424641b88bbeac90ef0022663ab60d3f6307e67ca7c82e25ff3e433c14"
+    },
+    {
+      "path": "04. Interno/Costeo V3/influencer-resumen.json",
+      "bytes": 12620,
+      "sha256": "a92d3a8b15c30ff3dcdc365a6bb631bb6471d4f82db7dc7f4a0beadf2a2f9814"
+    },
+    {
+      "path": "04. Interno/Costeo V3/corporativo-cotizacion.json.gz",
+      "bytes": 51314,
+      "sha256": "0352f3a4f5a57380ed8d67f1a65ecb0ce5510f9acaf9a9bdbfaa4baa3434083b"
+    },
+    {
+      "path": "04. Interno/Costeo V3/economica-manifest.json",
+      "bytes": 735,
+      "sha256": "37e97c4ffcb6ceb71c3a100181f764bda98ad213cdb0df7812b2bb6e2cb1da48"
+    },
+    {
+      "path": "04. Interno/Costeo V3/fee-mes-cotizacion.json.gz",
+      "bytes": 51062,
+      "sha256": "aff910a55be582d3507a60a33d2b62bb714ffeade1ecc3b997277d5a155159a4"
+    },
+    {
+      "path": "04. Interno/Costeo V3/reel-resumen.json",
+      "bytes": 16134,
+      "sha256": "f2833f3eac0affe49367548d9e726898538c7bb042d8cf472d725fc8b24aa71f"
+    },
+    {
+      "path": "04. Interno/Costeo V3/reel-demanda.json",
+      "bytes": 7355,
+      "sha256": "ce63c18c23d6b13ed2a578540abd116ce2719a51d6c737dd75f61d31d4197c5d"
+    },
+    {
+      "path": "04. Interno/Costeo V3/fee-mes-demanda.json",
+      "bytes": 9032,
+      "sha256": "879a997ca6b60edeadd79c06ebd65e63fb336cdc9b40990a5c181b1503487ec8"
+    },
+    {
+      "path": "04. Interno/Costeo V3/reel-cotizacion.json.gz",
+      "bytes": 49670,
+      "sha256": "91ab41f0bafbe813ad33d9c2132da4af96fd5887c0624056904d6bd91691cb07"
+    },
+    {
+      "path": "04. Interno/Costeo V3/influencer-cotizacion.json.gz",
+      "bytes": 47304,
+      "sha256": "09e084f272874987300143defe39b7022f0262fe916957429a95d0e04699e3c3"
+    },
+    {
+      "path": "04. Interno/Costeo V3/fee-mes-resumen.json",
+      "bytes": 18399,
+      "sha256": "d221ae41ca610cc0b92f504b470956a7dbf4977a185e6acea8f6b55131038e26"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/anexo4-1.png",
+      "bytes": 230996,
+      "sha256": "3d202bf6d53fface561c7a44de8181a6deb3f6ef1f2f6adeac1386042331db96"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/anexo4-3.png",
+      "bytes": 86514,
+      "sha256": "f762a15ef902bf965d73018a953400bb21278728c23284347f306498800380b2"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/anexo4-2.png",
+      "bytes": 224007,
+      "sha256": "da47a08748025e328d6e02ff01d4656e450c82bd52820e4e411bd56a9d64dcc8"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/original-p9.png",
+      "bytes": 172130,
+      "sha256": "58678c110be40838095ccc84e040353a2cae0c9bc523891b1103d10421fb3c41"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/original-p31.png",
+      "bytes": 165156,
+      "sha256": "39fb8e3716d8bfe3c7f39f97975b8334d0991c5804f2fb261474b25261c37f2f"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/economico-f54.png",
+      "bytes": 258500,
+      "sha256": "bf4185047a351c9e2819088869fbf7a9a62b49fe76fbd868f92e511f1a421484"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/original-p37.png",
+      "bytes": 145607,
+      "sha256": "56523cdb3243c9e5f21f344c5628d1cbaa09d6ba9cb838984894bf2c8da13ef2"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/original-p23.png",
+      "bytes": 190021,
+      "sha256": "e3fdd1c4cf02478c16b3cce8b98aab904d8f02c1a257a68bcfa6f685033ed478"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/anexo1-1.png",
+      "bytes": 190920,
+      "sha256": "5df381f2a6c86456ebf4ff54b3fabdd2cf4f5e93e63d36125abe1fc9218783dc"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/original-p22.png",
+      "bytes": 199742,
+      "sha256": "fafbaad07d4922da26c8d5697a6cfcc0e5c9666469c4e5b180caa276b623145d"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/anexo1-2.png",
+      "bytes": 156119,
+      "sha256": "3b1a9f54351676f001aa45d18aa6c4d61b86bb43ccc990cdeed9c4fc1f0353d7"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-49.png",
+      "bytes": 154836,
+      "sha256": "96d45690e6c1bec554bb716b179fb70b7c3c22bbf3fcfff6fea00dcc3f521d7d"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/original-p10.png",
+      "bytes": 141089,
+      "sha256": "9504c55da3d966db611970fb4dae31b70af00979ec52e2b1d6be105acecf4bde"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-2.png",
+      "bytes": 340280,
+      "sha256": "279a52cfa57510ac7e9509f6fb5181e8c8d9245a479229dd61ce60481a116072"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-51.png",
+      "bytes": 47888,
+      "sha256": "cd7607be1b495f3366bfda1fa8ad489132f107c87450073bbc53d66f4e4a4f19"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-50.png",
+      "bytes": 160800,
+      "sha256": "bf24641d60eed5c0e24095ba4ec87e2dddce850d89882fda24e43e76490ab79b"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-3.png",
+      "bytes": 305379,
+      "sha256": "560e16e271ee0c1c3858f6056447f38ba27c27a9bad736196aead540f51c7f61"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-1.png",
+      "bytes": 295059,
+      "sha256": "5e212ebd265d23fd7c0a17902c0af1223733ad692919cec28425e53cad35ed58"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/tech-4.png",
+      "bytes": 282158,
+      "sha256": "01fd8694f1caf14d2572b52383b64e4753d8576d27214be3adc25be29f711b26"
+    },
+    {
+      "path": "04. Interno/qa-tecnica-20261014/economico-p54.png",
+      "bytes": 181191,
+      "sha256": "ed939d6c5ab7479807f6ee69ddbb3623e5f1a8ea53e3665376f4767add90318c"
+    }
+  ],
+  "remoteReadback": {
+    "code": "1422259-10-LE26",
+    "remotePresenceVerified": true,
+    "files": [
+      {
+        "name": "oferta-tecnica-linea2-borrador.pdf",
+        "itemId": "017EGG3WAGW4YEEUWHIBEYA544OYB2TWZC",
+        "size": 77173,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/02.%20Propuesta%20en%20trabajo/oferta-tecnica-linea2-borrador.pdf"
+      },
+      {
+        "name": "anexo-1-administrativo-borrador.pdf",
+        "itemId": "017EGG3WFZPQAZU76JLZHY2OJOYNNGBMDX",
+        "size": 212742,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma/anexo-1-administrativo-borrador.pdf"
+      },
+      {
+        "name": "anexo-4-tecnico-linea2-borrador.pdf",
+        "itemId": "017EGG3WHXMNAA2HWK2JEYIM7XPHTZ4H35",
+        "size": 317720,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma/anexo-4-tecnico-linea2-borrador.pdf"
+      },
+      {
+        "name": "ANEXO-6-ECONOMICO-BORRADOR.docx",
+        "itemId": "017EGG3WC4M5PFZIO2O5HZXT25CIIADU57",
+        "size": 23270,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B5C5E675C-DAA1-4F77-9BCF-5D121001D3BF%7D&file=ANEXO-6-ECONOMICO-BORRADOR.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "ANEXO-6-ECONOMICO-BORRADOR-v2.pdf",
+        "itemId": "017EGG3WDBE2A52GJG5JAJ4YN4QQ2HNZIO",
+        "size": 59070,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma/ANEXO-6-ECONOMICO-BORRADOR-v2.pdf"
+      },
+      {
+        "name": "10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+        "itemId": "017EGG3WGE2YTM7ZVGYJHKCJUEIGYJRYXH",
+        "size": 23068,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BCF26D6C4-A6E6-4EC2-A126-8441B098E2E7%7D&file=10.5%20ANEXO%20ECONOMICO%20DE%20OFERTA%20-%20LINEA%202%20RRSS%20Y%20VIDEOS%20CORPORATIV.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV_15KB.docx",
+        "itemId": "017EGG3WAWGF5YXNDJGFF3VCFRBWGYGK6Q",
+        "size": 23068,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B8B7B3116-69B4-4B31-BA88-B10D8D832BD0%7D&file=10.5%20ANEXO%20ECONOMICO%20DE%20OFERTA%20-%20LINEA%202%20RRSS%20Y%20VIDEOS%20CORPORATIV_15KB.docx&action=default&mobileredirect=true"
+      },
+      {
+        "name": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+        "itemId": "017EGG3WGWQ52JUEJ2RRC3ZJHWQBPRVNZF",
+        "size": 3090587,
+        "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/11.%20RESOL%2042-2026%20APRUEBA%20BASES%20PLAN%20DE%20MEDIOS%20CRDT%20-%20SEGUNDO%20LLA.pdf"
+      }
+    ],
+    "checkedAt": "2026-10-14 12:21:54 UTC",
+    "byteIdentityClaim": "PDFs checked by source/localcopy hash and remote size; Word has changed container metadata, body XML equal, raw bytes preserved in ZIP."
+  },
+  "closureRemoteReadback": {
+    "checkedAt": "2026-10-14 12:22:58 UTC",
+    "folders": [
+      {
+        "key": "tarapaca",
+        "folder": "01. Bases y anexos originales",
+        "isError": false,
+        "items": [
+          {
+            "name": "10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV.docx",
+            "itemId": "017EGG3WGE2YTM7ZVGYJHKCJUEIGYJRYXH",
+            "size": 23068,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7BCF26D6C4-A6E6-4EC2-A126-8441B098E2E7%7D&file=10.5%20ANEXO%20ECONOMICO%20DE%20OFERTA%20-%20LINEA%202%20RRSS%20Y%20VIDEOS%20CORPORATIV.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "10.5 ANEXO ECONOMICO DE OFERTA - LINEA 2 RRSS Y VIDEOS CORPORATIV_15KB.docx",
+            "itemId": "017EGG3WAWGF5YXNDJGFF3VCFRBWGYGK6Q",
+            "size": 23068,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B8B7B3116-69B4-4B31-BA88-B10D8D832BD0%7D&file=10.5%20ANEXO%20ECONOMICO%20DE%20OFERTA%20-%20LINEA%202%20RRSS%20Y%20VIDEOS%20CORPORATIV_15KB.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "11. RESOL 42-2026 APRUEBA BASES PLAN DE MEDIOS CRDT - SEGUNDO LLA.pdf",
+            "itemId": "017EGG3WGWQ52JUEJ2RRC3ZJHWQBPRVNZF",
+            "size": 3090587,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/11.%20RESOL%2042-2026%20APRUEBA%20BASES%20PLAN%20DE%20MEDIOS%20CRDT%20-%20SEGUNDO%20LLA.pdf"
+          },
+          {
+            "name": "anexo-1-administrativo-original-extraido.pdf",
+            "itemId": "017EGG3WEVAE7XACFKFJGYLRX2DZMXBZT5",
+            "size": 86274,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/anexo-1-administrativo-original-extraido.pdf"
+          },
+          {
+            "name": "anexo-2-contratar-original-extraido.pdf",
+            "itemId": "017EGG3WE6RAAYKRZSA5FIYARVRNEB25SA",
+            "size": 53884,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/anexo-2-contratar-original-extraido.pdf"
+          },
+          {
+            "name": "anexo-4-tecnico-linea2-original-extraido.pdf",
+            "itemId": "017EGG3WEZOIOYBROLYJAKLRARVC252BQT",
+            "size": 121580,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/anexo-4-tecnico-linea2-original-extraido.pdf"
+          },
+          {
+            "name": "anexo-7-utp-original-extraido.pdf",
+            "itemId": "017EGG3WHGZU6U3M5PFFB3AFWFZJTKSTTG",
+            "size": 50970,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/anexo-7-utp-original-extraido.pdf"
+          },
+          {
+            "name": "Originales Word descargados sin modificación.zip",
+            "itemId": "017EGG3WCWPI37HIJOLFGYTMEEZN3PS5RQ",
+            "size": 26768,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/01.%20Bases%20y%20anexos%20originales/Originales%20Word%20descargados%20sin%20modificaci%C3%B3n.zip"
+          }
+        ]
+      },
+      {
+        "key": "tarapaca",
+        "folder": "03. Anexos borradores sin firma",
+        "isError": false,
+        "items": [
+          {
+            "name": "anexo-1-administrativo-borrador.pdf",
+            "itemId": "017EGG3WFZPQAZU76JLZHY2OJOYNNGBMDX",
+            "size": 212742,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma/anexo-1-administrativo-borrador.pdf"
+          },
+          {
+            "name": "anexo-4-tecnico-linea2-borrador.pdf",
+            "itemId": "017EGG3WHXMNAA2HWK2JEYIM7XPHTZ4H35",
+            "size": 317720,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma/anexo-4-tecnico-linea2-borrador.pdf"
+          },
+          {
+            "name": "ANEXO-6-ECONOMICO-BORRADOR.docx",
+            "itemId": "017EGG3WC4M5PFZIO2O5HZXT25CIIADU57",
+            "size": 23270,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/_layouts/15/Doc.aspx?sourcedoc=%7B5C5E675C-DAA1-4F77-9BCF-5D121001D3BF%7D&file=ANEXO-6-ECONOMICO-BORRADOR.docx&action=default&mobileredirect=true"
+          },
+          {
+            "name": "ANEXO-6-ECONOMICO-BORRADOR-v2.pdf",
+            "itemId": "017EGG3WDBE2A52GJG5JAJ4YN4QQ2HNZIO",
+            "size": 59070,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/03.%20Anexos%20borradores%20sin%20firma/ANEXO-6-ECONOMICO-BORRADOR-v2.pdf"
+          }
+        ]
+      },
+      {
+        "key": "tarapaca",
+        "folder": "04. Interno/Costeo V3",
+        "isError": false,
+        "items": [
+          {
+            "name": "corporativo-cotizacion.json.gz",
+            "itemId": "017EGG3WBIL6VNF7F7WBC22T54LH2RXL3K",
+            "size": 51314,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/corporativo-cotizacion.json.gz"
+          },
+          {
+            "name": "corporativo-demanda.json",
+            "itemId": "017EGG3WFF7MULZNTMNZEJ626OA57SDK2P",
+            "size": 8964,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/corporativo-demanda.json"
+          },
+          {
+            "name": "corporativo-resumen.json",
+            "itemId": "017EGG3WCXGXTFYHX64JBY2IEE574HWFOT",
+            "size": 19539,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/corporativo-resumen.json"
+          },
+          {
+            "name": "economica-manifest.json",
+            "itemId": "017EGG3WANPRU2URIKYZCYAIKKP5K4S6BT",
+            "size": 735,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/economica-manifest.json"
+          },
+          {
+            "name": "fee-mes-cotizacion.json.gz",
+            "itemId": "017EGG3WFQPZQWSERSSRGZPOSNF47S4YJC",
+            "size": 51062,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/fee-mes-cotizacion.json.gz"
+          },
+          {
+            "name": "fee-mes-demanda.json",
+            "itemId": "017EGG3WDVN7NICVXPKNG3UG5TTJOOPSDX",
+            "size": 9032,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/fee-mes-demanda.json"
+          },
+          {
+            "name": "fee-mes-resumen.json",
+            "itemId": "017EGG3WGCRBXJJRQER5FJUFZQ72YFMTR6",
+            "size": 18399,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/fee-mes-resumen.json"
+          },
+          {
+            "name": "influencer-cotizacion.json.gz",
+            "itemId": "017EGG3WDOEZPCQIQQDJD2W4UHFLSZQYYX",
+            "size": 47304,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/influencer-cotizacion.json.gz"
+          },
+          {
+            "name": "influencer-demanda.json",
+            "itemId": "017EGG3WC5SU736HIGCBE2G6EN6MTX2VJM",
+            "size": 4971,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/influencer-demanda.json"
+          },
+          {
+            "name": "influencer-resumen.json",
+            "itemId": "017EGG3WE5FABCBQWCLNFJSP7NSJTAKYWH",
+            "size": 12620,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/influencer-resumen.json"
+          },
+          {
+            "name": "reel-cotizacion.json.gz",
+            "itemId": "017EGG3WGKADK3E55F3BBYDAOCJTTWL7TG",
+            "size": 49670,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/reel-cotizacion.json.gz"
+          },
+          {
+            "name": "reel-demanda.json",
+            "itemId": "017EGG3WCI7Z32NDJ3QNAZUX4VZQ5MODPG",
+            "size": 7355,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/reel-demanda.json"
+          },
+          {
+            "name": "reel-resumen.json",
+            "itemId": "017EGG3WF2NOVPNBBKMNBZC255SUFUHCLN",
+            "size": 16134,
+            "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Corporaci%C3%B3n%20Regional%20de%20Desarrollo%20de%20Tarapac%C3%A1/1.%20Plan%20de%20medios%20l%C3%ADnea%202%201422259-10-LE26/04.%20Interno/Costeo%20V3/reel-resumen.json"
+          }
+        ]
+      }
+    ],
+    "allFoldersVerified": true
+  }
+}

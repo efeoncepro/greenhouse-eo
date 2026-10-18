@@ -59,6 +59,9 @@ Efeonce organiza el portfolio en líneas de negocio/prácticas. Las product bran
 planificación, compra/operación, creatividad, medición y gestión de inversión. Se compone dentro de las tres
 soluciones existentes; no crea marca ni aprueba todas sus capacidades. Canon de alcance, owners, estados y economía:
 [Media & Distribution §1.1](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+Desde el 2026-10-16 la entrada pública es la landing <https://efeoncepro.com/servicios/agencia-de-medios/> (frase clave
+«agencia de medios»; formulario `efeonce-media-diagnostic` hacia HubSpot) y el brochure «Agencia de Medios»; reglas de
+claims en el [catálogo de la línea](../services/media-distribution/README.md#material-comercial-vigente).
 **Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
 Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
 Creative Studio, **modo operativo por run** (`efeonce-managed`, `co-operated`, `client-operated`). Staff

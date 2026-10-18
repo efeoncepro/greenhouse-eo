@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Programática · Audio digital",
+    "question": "¿Y en audio?",
+    "answer": [
+      "Al oído"
+    ]
+  },
+  "body": "Anuncios entre canciones y episodios de podcast, en streaming de música y radio digital, con un banner que lo acompaña en pantalla.",
+  "steps": [
+    {
+      "glyph": "medios",
+      "kicker": "Dónde",
+      "name": "Música y podcast"
+    },
+    {
+      "glyph": "reloj",
+      "kicker": "Formato",
+      "name": "15 o 30 s"
+    },
+    {
+      "glyph": "web",
+      "kicker": "Acompaña",
+      "name": "Banner en pantalla"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "Se mide",
+      "name": "Escucha completa"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG8-audio-digital.png",
+    "alt": "Isabella con audífonos en el andén del metro, rodeada de ondas de sonido, entre personas que escuchan"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Inventario de audio y podcast se confirma por mercado."
+}

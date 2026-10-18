@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Publicidad programática",
+    "question": "¿Y fuera de search y social?",
+    "answer": [
+      "También"
+    ]
+  },
+  "body": "Compra programática para llegar a tu audiencia en los medios y pantallas que sí mira: sitios, streaming, audio y la calle.",
+  "steps": [
+    {
+      "glyph": "web",
+      "kicker": "Sitios y apps",
+      "name": "Display y native"
+    },
+    {
+      "glyph": "multimedia",
+      "kicker": "Streaming",
+      "name": "Video y CTV"
+    },
+    {
+      "glyph": "medios",
+      "kicker": "Podcasts y radio",
+      "name": "Audio digital"
+    },
+    {
+      "glyph": "ubicacion",
+      "kicker": "En la calle",
+      "name": "pDOOH"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG1-una-compra-todas-las-pantallas.png",
+    "alt": "Isabella, especialista de medios de Efeonce, en una azotea de noche: de un nudo de luz sobre su palma sale un haz que se reparte en cuatro pantallas de la ciudad"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Cada formato se confirma por campaña y mercado."
+}

@@ -19,6 +19,12 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    id: 'sky-blog-seo',
+    mode: 'byte-identical',
+    codex: '.codex/skills/sky-blog-seo',
+    claude: '.claude/skills/sky-blog-seo',
+  },
+  {
     // CRM y el adapter account-based conservan los mismos permisos y readbacks en ambos agentes.
     id: 'hubspot-as-a-service',
     mode: 'byte-identical',

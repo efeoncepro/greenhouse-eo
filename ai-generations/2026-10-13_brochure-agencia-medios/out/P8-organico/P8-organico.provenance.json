@@ -1,0 +1,35 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "c6366fc30dc873aefa1a347426fc827563cc312a69124d10df3904f782cc5c08",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-surround-cycle",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:publicar",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/publicar.png",
+      "sha256": "4444ce2010878332fbfc83561c3201af7c39f102e83345c4cb09060e341fe8a4"
+    },
+    {
+      "ref": "asset-ref:file:leer",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/leer.png",
+      "sha256": "0b1382a2f9a5fcf6c6a114b7256e0a047cec9fc5798d97cd53c3236ff4f786f7"
+    },
+    {
+      "ref": "asset-ref:file:pautar",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/pautar.png",
+      "sha256": "6e5cc0d0af6d1b3b0333dbdcecd44e19456666d01a0bac4770559f9fd349112f"
+    },
+    {
+      "ref": "asset-ref:file:aprender",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/iconos/aprender.png",
+      "sha256": "ee33ad6427a0c20811764f12215d01da6a4d46610ffeecfce6b671b66bacbc72"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

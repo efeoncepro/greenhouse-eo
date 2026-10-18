@@ -38,3 +38,12 @@ Siguiente revisión: <acción, owner, fecha/evento>. Datos a revalidar: <fuente 
 
 Plantilla de método, no scheduler. Un plan preparado no está inscrito, enviado ni pausado.
 Para programar, aplicar [ejecución y readback HubSpot](../references/hubspot-follow-up-sequences.md).
+
+## Continuidad de largo plazo, cuando aplique
+
+Política: [seguimiento de largo plazo](../../../../docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md).
+Motivo declarado / encaje vigente: <hecho y fuente; desconocidos>.
+Revisión interna / owner HubSpot / TASK ID, URL, asociaciones y clave estable: <fecha del equipo, distinta de hito comprador; no duplicar en Notion>.
+Contacto próximo aprobado: <fecha/canal o ninguno; la revisión no lo aprueba>.
+Nutrición por email: <permiso confirmado/pendiente/denegado; fuente, fecha, alcance y autoridad de ejecución>.
+Restricciones / trigger de evaluación: <qué sigue detenido; una señal no levanta baja/HOLD>.

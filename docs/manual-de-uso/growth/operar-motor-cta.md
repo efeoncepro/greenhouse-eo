@@ -1,9 +1,9 @@
 # Operar el motor de CTAs (`/growth/ctas` + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
+> **Ultima actualizacion:** 2026-10-17 por Claude (surfaces por landing y patrón `publish-*-meeting-cta.ts`)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio (agentes):** `greenhouse-growth-ctas`
 
@@ -55,7 +55,26 @@ Motor **encendido en staging y producción**. Primer CTA (`ai-visibility-report-
 2. La respuesta trae el **embed key secret UNA sola vez** — guárdalo server-side en el host (wp-config / Vercel env). En DB solo queda el hash.
 3. Rotar: `{ action: 'rotate_embed_key', surfaceId }` (invalida la anterior en el acto).
 
-Surfaces vivas hoy: `Efeonce public site (WordPress)` y `Think (Astro)` (esta última ya configurada en el Vercel de `efeonce-think`).
+Surfaces vivas hoy: `Efeonce public site (WordPress)` y `Think (Astro)` (esta última ya configurada en el Vercel de `efeonce-think`), más una surface por landing que monta su propio CTA de agenda: `Efeonce contacto (WordPress)` (`/contacto/`), `Efeonce influencer landing (WordPress)` (`/servicios/agencia-de-influencers/`, TASK-1598) y `Efeonce HubSpot landing (WordPress)` (`csur-56a96b52-44ca-43d8-a61f-8c365c211487`, `/servicios-contratar-hubspot/`).
+
+### Patrón: un CTA y una surface por landing
+
+Cuando una landing del sitio público necesita su propio CTA (por ejemplo «Agendar reunión» con el scheduler nativo), no se reutiliza el CTA ni la surface de otra página: se publican **un CTA y una surface dedicados** con un script `scripts/growth/publish-*-meeting-cta.ts` (hoy `publish-contacto-form-and-meeting-cta.ts`, `publish-influencer-meeting-cta.ts` y `publish-hubspot-meeting-cta.ts`). El script hace, idempotente:
+
+1. author → `submit_review` → publish del CTA (salta si ya hay una versión publicada), con el targeting a la ruta de esa landing;
+2. registra la surface (origins `efeoncepro.com` + `www`, `allowedCtaSlugs` sólo con ese CTA) o, si ya existe, **rota su embed key**;
+3. smoke de render arbitrado contra la ruta real (debe resolver el CTA y su acción);
+4. escribe `{ surfaceId, embedKeyId, embedKey }` en `.auth/<nombre>.json` con permisos **0600** (ignorado por git; el key nunca se loguea ni va al repo).
+
+El publicador WordPress de esa landing recibe ese archivo como `--input-file` y deja el key en los settings del widget, que es donde los embed keys de CTA están diseñados para vivir. Se corre con el proxy Cloud SQL arriba (`pnpm pg:connect`):
+
+```bash
+GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME= \
+npx tsx --env-file=.env.local --require ./scripts/lib/server-only-shim.cjs \
+  scripts/growth/publish-hubspot-meeting-cta.ts
+```
+
+**Re-correr el script rota el key**: el key anterior deja de valer en el acto, así que después hay que volver a correr el publicador de la página con el archivo nuevo (en HubSpot, `republish-hubspot-v2-page.php` con `.auth/hubspot-v2-meeting-cta-surface.json` como tercer input). Sin surface/key, el host debe caer a un enlace (`/agenda/`), nunca a un card roto.
 
 ## Incrustar el CTA en un host
 
@@ -174,6 +193,7 @@ Para el procedimiento específico de binding, continuidad al reabrir, booking co
 | Síntoma | Causa probable | Qué hacer |
 | --- | --- | --- |
 | El CTA no aparece en el host | Motor apagado en ese ambiente, CTA no publicado, ruta fuera del targeting, o surface/embed key mal configurada | Chip de estado en `/growth/ctas`; probar `GET /render` con la surface real; revisar el signal de forja |
+| Un CTA que funciona en una landing no aparece en otra | Su targeting es por ruta: por ejemplo `contacto-discovery-meeting` sólo apunta a `/contacto/`, y la surface de cada landing sólo admite su propio slug | No amplíes el targeting de un CTA ajeno: publica un CTA y una surface para esa landing con un `scripts/growth/publish-*-meeting-cta.ts` (ver §Patrón: un CTA y una surface por landing) |
 | Publish rechaza con `growth_cta_action_not_resolvable` | El form de destino no está publicado (`action_destination_unavailable`), el destino no pasa la gobernanza (`action_destination_invalid`: protocolo/host/credenciales/path fuera del contrato), la policy no cumple el shape del kind (`action_policy_invalid`) o el kind no está registrado (`action_kind_unsupported`) | Revisar `blockingReasons` de la respuesta; corregir la policy o publicar el Growth Form primero |
 | Signal `surface_unauthorized_attempt` > 0 | Ingest forjado o host mal configurado (embed key/origin) | Revisar el host; si es ataque, rotar embed key |
 | Signal `form_handoff_failed` > 0 | Un CTA publicado apunta a un form despublicado | Pausar el CTA o republicar el form |

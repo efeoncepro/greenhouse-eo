@@ -102,3 +102,17 @@ Rejected. Billing Usage is official for gross/net spend but cannot explain which
 - GitHub Budgets REST API: organization budget endpoints require admin/billing-manager level permissions and are public preview as of 2026-05-24.
 - Vercel `vercel.json` `ignoreCommand` and system env vars
   `VERCEL_GIT_PREVIOUS_SHA` / `VERCEL_GIT_COMMIT_SHA`.
+
+## Validation ref without deployment — 2026-10-18
+
+For the authorized prerelease checks, `vercel.json` disables Git auto-deployment on the exact ref
+`codex/google-ads-release-preflight-20261018` via `git.deploymentEnabled`. This is narrower than
+an ignored build: migrations, config and runtime paths would otherwise continue to a Preview
+build. Unspecified refs keep their existing behavior; no project setting or deployment is changed
+by preparing the local config. All GitHub push workflows were inspected: their branch filters
+are `develop`/`main`, never this validation ref. Only manual CI/CI Deep are intended here.
+
+[Official Vercel configuration](https://vercel.com/docs/project-configuration/git-configuration#gitdeploymentenabled)
+confirms exact-branch disable and default-true for unspecified branches. Publish only after
+operator push authorization, then read back Vercel to confirm no deployment for the validation SHA.
+[Audit](../audits/releases/2026-10-18-candidate-89d70ec13-review.md).

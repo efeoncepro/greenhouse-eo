@@ -1,0 +1,43 @@
+# Equipo y experiencia acreditable — interno
+
+No constituye nómina de oferta ni disponibilidad confirmada. Los CV son declaraciones de sus autores; no se validaron títulos, fechas laborales, consentimiento para esta licitación ni capacidad actual. Las rutas/hash están en [FUENTES-INTERNO.json](FUENTES-INTERNO.json); no se copiaron CV, contactos ni datos personales al repo.
+
+## Cupos a resolver
+
+| Proceso | Cupo | Evidencia requerida y estado |
+| --- | --- | --- |
+| SUBDERE | `planned-instructional-design` | Metodólogo/diseñador instruccional con experiencia demostrable en cursos virtuales, objetivos, secuencia, guiones, actividades y evaluación. PENDIENTE externo; Julio confirma que no lo tiene |
+| SUBDERE | `planned-elearning-development` | Profesional distinto al anterior; desarrollo multimedia/e-learning, herramienta de autor, HTML5/SCORM o formato compatible aprobado, pruebas LMS y entrega de editables. PENDIENTE externo |
+| SUBDERE | `planned-project-coordination` | Responsable de coordinación, contraparte, hitos, control de calidad; puede ser uno de los dos perfiles técnicos o tercero. Identidad y experiencia por función PENDIENTE; no presupuestar automáticamente tercer FTE |
+| Tarapacá línea 2 | `planned-audiovisual-provider` | Producción regional, persona responsable, kit/equipo, fechas, derechos, transporte, filmación y edición. PENDIENTE; contratación condicionada a aclarar subcontratación |
+| Tarapacá línea 2 | `planned-social-paidmedia-lead` | Gestión mensual Meta/TikTok, pauta, reporte, protocolo de crisis y coordinación de contenidos; persona senior responsable PENDIENTE |
+| Tarapacá línea 2 | `planned-regional-creator` | Colaboraciones sujetas a aprobación; probar audiencia regional/engagement y referencia de seguidores exigida por bases. Cantidad, persona, derechos y precio PENDIENTE |
+
+## Personas reales con CV para apoyos, sin nominación
+
+| Persona / fuente | Match respaldado por CV | Limitación para estas ofertas |
+| --- | --- | --- |
+| Melkin Hernández, `Documentación/CV Melkin Hernández.pdf`; revisión visual del original | Diseño gráfico, motion, Adobe/Blender; experiencia autodeclarada en Vos TV/TBWA y docencia parcial de diseño | No demuestra diseño instruccional ni SCORM ni kit 4K. Resolver pertenencia a equipo SKY/exclusividad, disponibilidad y consentimiento |
+| Daniela Infante, `Documentación/CV Daniela Infante.pdf` | Branding, diseño/motion, Figma/Framer, Adobe | Apoyo visual posible; no acredita desarrollador e-learning, LMS/SCORM ni rol instruccional. Título y capacidad pendientes |
+| Daniela Ferreira, `Documentación/CV Daniela Ferreira.pdf` | Gráfica social, fotografía y edición Adobe | Apoyo remoto posible; ubicación actual no verificada, CV referencia España. No asumir cobertura terreno Tarapacá ni kit ni SCORM |
+| Wendy Burgos, `Documentación/CV Wendy Burgos.pdf` | Dirección creativa, branding, postproducción, social/WordPress; docencia Premiere declarada | Enseñar edición no acredita metodología de aprendizaje ni proyecto SCORM. No prueba producción de campo ni kit; capacidad pendiente |
+| Valentina Hoyos, `Laborales/Valentina Hoyos/CV VALENTINA HOYOS (2).pdf` | Periodismo/editorial, contenido social, SEO/WordPress, investigación y analítica | Posible apoyo de guiones/contenido; no acredita diseñador instruccional o desarrollador SCORM. No sustituye validación técnica de contenidos SUBDERE |
+| Anderson Badillo, `Talento/TRaffickers/Anderson Badillo CV (3).pdf` | Medios pagados Meta/Google/TikTok, reportes, presupuesto/A-B, GA4/Looker y coordinación programática declarados | Match para gestión de pauta; carpeta Talento no prueba contratación actual. Validar casos, seniority, disponibilidad, acceso/licencias y aprobación; no prueba equipo de filmación |
+
+No se propone a Aldo ni Wilson: los CV revisados no aportan evidencia suficiente para estas funciones. No se encontró CV actual de Andrés en el conjunto revisado; no nominación por antecedente oral o nombre de un dossier anterior.
+
+Para cualquier persona: obtener CV actualizado, respaldos de experiencia por función, consentimiento para nominación, disponibilidad escrita en el calendario real y confirmación de obligaciones previas. Entregar externamente sólo lo requerido y autorizado. No se publicó vacante ni se contactó a nadie.
+
+## Experiencias corporativas con respaldo existente
+
+| Caso distinto | Evidencia y alcance real | Uso potencial / brecha |
+| --- | --- | --- |
+| Gobierno de Santiago, “Cuidando a quienes cuidan de la RM” | [Certificado firmado de recibo conforme](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Gobierno de Santiago/Certificado Recibo Conforme - EFEONCE.pdf>), 04/02/2026, EP9, refiere OC1003780-11-AG25; [factura de servicios enero 2026](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Gobierno de Santiago/FAC-EL_111_61923200-3.pdf>), 20/02/2026. Certificado acredita gráfica de difusión, cápsulas audiovisuales y contenidos/web, incluida visita y filmación en San Bernardo | Caso fuerte para Tarapacá por difusión audiovisual/social y entrega conforme. No acredita virtualización, herramienta de autor, SCORM ni LMS; filmar capacitación no equivale a diseñar un curso e-learning. Confirmar elegibilidad y no multiplicar EP9/mensualidades como casos |
+| SKY, agencia creativa / design management 2025 | [Contrato firmado](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/SKY/Contrato-Sky-830c0de8-ff76-48a8-afe4-b897fb2b9eb9.pdf>), 01/08/2025; [PO221970](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/SKY/PO_221970_0.pdf>); [factura y referencia HES/OC](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/SKY/FAC-EL_56_88417000-1.pdf>), 20/08/2025; [carta de referencia firmada](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Legales/Documentos Efeonce/Referencia-Sky-FIRMA.pdf>) con alcance gráfico/audiovisual multiformato | Potencial Tarapacá; revisar vigencia y confidencialidad/autorización de uso. Carta complementaria no sustituye los comprobantes que piden bases. No SCORM. Restricción del equipo asignado impide prometer reutilización automática |
+| Berel, blog / gráfica estática y animada / reporte | [Contrato firmado junio 2026](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Berel/Contrato de Prestacion de Servicios EFEONCE .pdf-firmado.pdf>); [factura agosto 2026](</Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/4. Comercial/Licitaciones/AGCID/04. Interno/Respaldos de experiencia — revisión/Berel/FAC-EXPE_53_PBE970101718.pdf>) | Potencial difusión digital/creativa para Tarapacá sujeto a pertinencia. SEO/AEO en glosa no demuestra producción de video en terreno ni e-learning. No contar factura mensual como servicio adicional |
+
+**No hay caso corporativo de e-learning acreditado en estas fuentes.** No se atribuye a Efeonce experiencia de un futuro proveedor ni experiencia personal de candidatos.
+
+SUBDERE considera diez años hacia atrás desde publicación **09/10/2026**, bases pp36–38. Experiencia oferente: ≥6 / 4–5 / 2–3 / 1 / 0 servicios →100 /75 /50 /25 /0. Experiencia por función: ≥5 /3–4 /2 /1 /0 →100 /75 /50 /25 /0. Confirmar respaldo aceptado por servicio/función. El promedio técnico >50 es puerta distinta a esos tramos. El mínimo técnico no exige título específico ni número determinado de años; sí experiencia referencial pertinente y dos personas distintas (pp11–12). §5.4 p16 exige experiencia suficiente/pertinente del oferente: la rúbrica 0 servicios =0 puntos no demuestra admisibilidad automática.
+
+Tarapacá considera servicios similares desde 01/01/2020, bases pp21/49: OC aceptada/conforme, contrato firmado o factura/boleta con glosa pertinente. 9–10 /6–8 /3–5 /1–2 /0 casos →100 /70 /50 /30 /0, peso20%. No se detectó mínimo excluyente de casos. Estos tres paquetes son **candidatos a revisión**, no tres casos puntuados garantizados; el certificado GORE es el más directo. Buscar un caso adicional sólo si existe respaldo real; no completar cantidad con muestras, PO/factura del mismo caso o meses repetidos.

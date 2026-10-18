@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Agencia de medios · Efeonce</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&amp;display=swap">
+<style>
+body{margin:0;background:#001a33}
+a{color:#ffffff}a:hover{color:#ffd9cc}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.eyebrow{font-family:Poppins,sans-serif;font-size:14px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#9fb6cc;margin:0}
+.h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:760;letter-spacing:-.04em;line-height:.95;font-size:clamp(48px,7vw,112px);color:#ffffff;margin:0}
+.lead{font-family:Poppins,sans-serif;font-weight:300;font-size:clamp(17px,1.35vw,20px);line-height:1.6;color:#cfe4fa;margin:0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.split{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:64px;align-items:end}
+.case{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:56px;align-items:stretch}
+.orbgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:40px;align-items:center}
+.navlinks{display:flex;gap:30px}
+.words>span{display:inline-block}
+.mbar{display:none}
+.fld>span{display:block}
+.fld input:user-invalid,.fld select:user-invalid{border-color:#ff7a59}
+.chk{position:relative;display:inline-flex}
+.chk input{position:absolute;opacity:0;width:1px;height:1px}
+.chk span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid rgba(255,255,255,.3);font-size:14px;font-weight:500;color:#ffffff;cursor:pointer;box-sizing:border-box}
+.chk input:checked+span{background:#ffffff;color:#001a33;border-color:#ffffff}
+.chk input:focus-visible+span{outline:2px solid #ffffff;outline-offset:2px}
+.chk-line{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45;color:#cfe4fa;cursor:pointer}
+.chk-line input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:#f83902}
+.platgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:48px;align-items:center}
+.dcogrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:center}
+.bento{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px}
+.b-wide{min-height:440px}.b-tall{grid-row:span 1;min-height:440px}.b-row{grid-column:1/-1}
+.dash{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:18px}
+@keyframes flow{to{stroke-dashoffset:-104}}
+.flow{animation:flow 1.6s linear infinite}
+@keyframes popin{from{opacity:0;transform:scale(.94) translateY(20px)}}
+.pop-in{animation:popin .8s cubic-bezier(.05,.7,.1,1) both}
+@media (max-width:1000px){.platgrid,.bento,.dash,.dcogrid{grid-template-columns:minmax(0,1fr)}}
+.chip{display:inline-flex;align-items:center;width:max-content;max-width:100%;box-sizing:border-box;padding:9px 16px;border:1.5px solid rgba(255,255,255,.38);border-radius:999px;font-size:13px;line-height:1.1;color:#ffffff}
+.vs-row{display:grid;grid-template-columns:minmax(0,1fr) 170px minmax(0,1.25fr)}
+@media (max-width:640px){.vs-row{grid-template-columns:minmax(0,1fr)}.vs-t{justify-content:flex-start!important;padding:18px 0 8px}.vs-l,.vs-r{border-radius:18px!important;border:1px solid rgba(255,255,255,0.14)!important}.vs-r{border:2px solid #f83902!important;margin-top:8px}}
+.fld{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500;color:#cfe4fa}
+.fld input,.fld select,.fld textarea{font:inherit;font-size:16px;font-weight:400;color:#ffffff;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.28);border-radius:14px;padding:14px 16px;min-height:52px;box-sizing:border-box;width:100%}
+.fld select option{color:#001a33}
+.fld select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:46px;background-image:linear-gradient(45deg,transparent 50%,#ffffff 50%),linear-gradient(135deg,#ffffff 50%,transparent 50%);background-position:calc(100% - 24px) 52%,calc(100% - 18px) 52%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+.fld select:hover{border-color:rgba(255,255,255,.55)}
+@supports (appearance: base-select){
+ .fld select,.fld select::picker(select){appearance:base-select}
+ .fld select{display:flex;align-items:center;background-image:none;padding-right:16px}
+ .fld select::picker-icon{content:"";width:8px;height:8px;margin:0 4px 4px auto;border-right:2px solid #ffffff;border-bottom:2px solid #ffffff;transform:rotate(45deg);transition:transform .25s cubic-bezier(.2,0,0,1)}
+ .fld select:open::picker-icon{transform:translateY(4px) rotate(225deg)}
+ .fld select:open{border-color:#ffffff;box-shadow:0 0 0 4px rgba(248,57,2,.25)}
+ .fld select::picker(select){margin-top:8px;padding:8px;border-radius:18px;border:1.5px solid rgba(255,255,255,.22);background:linear-gradient(160deg,#0b3460,#04213f);color:#ffffff;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.2);opacity:1;transform:translateY(0);transition:opacity .2s ease,transform .25s cubic-bezier(.05,.7,.1,1),display .25s allow-discrete,overlay .25s allow-discrete}
+ @starting-style{.fld select:open::picker(select){opacity:0;transform:translateY(-8px)}}
+ .fld select option{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 14px;border-radius:12px;font-size:15px;font-weight:500;color:#ffffff;background:transparent;cursor:pointer}
+ .fld select option:hover,.fld select option:focus-visible{background:rgba(255,255,255,.09);outline:none}
+ .fld select option:checked{background:rgba(248,57,2,.14);font-weight:600}
+ .fld select option::checkmark{order:2;margin-left:auto;color:#f83902;font-weight:700}
+ .fld select option[value=""]{color:#9fb6cc;font-weight:400}
+ .fld select selectedcontent{font-size:16px}
+}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid #ffffff;outline-offset:2px;border-color:#ffffff}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+button{font:inherit;cursor:pointer}
+
+@keyframes up{from{opacity:0;transform:translateY(46px)}}
+@keyframes kb{from{transform:scale(1.16)}}
+@keyframes breathe{0%,100%{box-shadow:0 0 30px rgba(248,57,2,.45)}50%{box-shadow:0 0 70px rgba(248,57,2,.85),0 0 0 10px rgba(248,57,2,.08)}}
+@keyframes marquee{to{transform:translateX(-50%)}}
+@keyframes cue{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(10px);opacity:1}}
+@keyframes swap{from{opacity:0;transform:translateY(24px)}}
+.in{animation:up 1.2s cubic-bezier(.05,.7,.1,1) both}
+.d1{animation-delay:.15s}.d2{animation-delay:.3s}.d3{animation-delay:.45s}.d4{animation-delay:.6s}.d5{animation-delay:.8s}
+.kb{animation:kb 3.2s cubic-bezier(.2,0,0,1) both}
+.sphere{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:#f83902;margin-left:.05em;animation:breathe 3.6s ease-in-out infinite}
+.marquee{display:flex;width:max-content;animation:marquee 38s linear infinite}
+.cue{animation:cue 2.2s ease-in-out infinite}
+.swap{animation:swap .7s cubic-bezier(.05,.7,.1,1) both}
+
+@supports (animation-timeline: view()){
+ @keyframes rv{from{opacity:0;transform:translateY(80px)}}
+ @keyframes rvl{from{opacity:0;transform:translateX(-90px)}}
+ @keyframes rvr{from{opacity:0;transform:translateX(90px)}}
+ @keyframes clip{from{clip-path:inset(22% 16% 22% 16% round 40px);transform:scale(1.22)}}
+ @keyframes strike{from{background-size:0% 2px}}
+ @keyframes lift{from{opacity:0;transform:translateY(160px)}}
+ @keyframes pop{from{opacity:0;transform:scale(.6)}}
+ @keyframes lit{from{color:rgba(255,255,255,.12)}to{color:#ffffff}}
+ @keyframes litA{from{color:rgba(248,57,2,.18)}to{color:#f83902}}
+ @keyframes para{to{transform:translateY(22%)}}
+ @keyframes hs{to{transform:translateX(calc(-100% + 100vw))}}
+ @keyframes fill{from{width:0%}}
+ @keyframes count{from{--n:0}}
+ @keyframes orbit{from{transform:rotate(-200deg)}}
+ @keyframes draw{from{stroke-dashoffset:1}}
+ .draw{stroke-dasharray:1;animation:draw cubic-bezier(.2,0,0,1) both;animation-timeline:view();animation-range:entry 40% cover 60%}
+ @keyframes growy{from{transform:scaleY(0)}}
+ .barg .bar{transform-origin:bottom;animation:growy cubic-bezier(.2,0,0,1) both;animation-timeline:view();animation-range:entry 30% cover 55%}
+ @keyframes growx{from{transform:scaleX(0)}}
+ @keyframes dotson{from{opacity:.25;filter:none}to{opacity:1;filter:drop-shadow(0 0 6px rgba(127,182,255,.9))}}
+ .dots-on{animation:dotson linear both;animation-timeline:view();animation-range:entry 30% cover 55%}
+ .grow{transform-origin:left;animation:growx cubic-bezier(.2,0,0,1) both;animation-timeline:view();animation-range:entry 30% cover 50%}
+
+ @keyframes arc{from{stroke-dashoffset:802.9}}
+ .orb-arc{animation:arc cubic-bezier(.2,0,0,1) both;animation-timeline:view();animation-range:entry 20% cover 50%}
+ @keyframes ring{from{opacity:0;transform:scale(.55)}}
+ .rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 85%}
+ .rvl{animation:rvl linear both;animation-timeline:view();animation-range:entry 5% cover 40%}
+ .rvr{animation:rvr linear both;animation-timeline:view();animation-range:entry 5% cover 40%}
+ .clip{animation:clip linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+ .strike{animation:strike linear both;animation-timeline:view();animation-range:entry 60% cover 55%}
+ .pop{animation:pop linear both;animation-timeline:view();animation-range:entry 20% cover 45%}
+ .words>span{animation:rv linear both;animation-timeline:view();animation-range:entry 0% entry 80%}
+ .words>span:nth-child(2){animation-range:entry 8% entry 88%}
+ .words>span:nth-child(3){animation-range:entry 16% entry 96%}
+ .words>span:nth-child(4){animation-range:entry 24% cover 52%}
+ .words>span:nth-child(5){animation-range:entry 32% cover 56%}
+ .st>*{animation:lift linear both;animation-timeline:view();animation-range:entry 0% cover 35%}
+ .st>*:nth-child(2){animation-range:entry 10% cover 40%}
+ .st>*:nth-child(3){animation-range:entry 20% cover 45%}
+ .st>*:nth-child(4){animation-range:entry 30% cover 50%}
+ .st>*:nth-child(5){animation-range:entry 40% cover 55%}
+ .st>*:nth-child(n+6){animation-range:entry 45% cover 58%}
+ .lit{animation:lit linear both;animation-timeline:view();animation-range:cover 25% cover 45%}
+ .litA{animation:litA linear both;animation-timeline:view();animation-range:cover 25% cover 45%}
+ .para{animation:para linear both;animation-timeline:scroll(root);animation-range:0px 900px}
+ .hs{view-timeline-name:--hs;height:calc(min(100vh,900px) + 2600px)}
+ .hs-pin{position:sticky;top:0;height:min(100vh,900px)}
+ .hs-track{animation:hs linear both;animation-timeline:--hs;animation-range:contain 0% contain 100%}
+ .hs-bar{animation:fill linear both;animation-timeline:--hs;animation-range:contain 0% contain 100%}
+ .pipe{animation:fill linear both;animation-timeline:view();animation-range:entry 70% cover 60%}
+ .count{animation:count linear both;animation-timeline:view();animation-range:entry 10% cover 45%}
+ .orb-ring{transform-origin:50% 50%;animation:ring linear both;animation-timeline:view();animation-range:entry 10% cover 40%}
+ .orb-sphere{transform-origin:50% 50%;transform-box:view-box;animation:orbit cubic-bezier(.2,0,0,1) both;animation-timeline:view();animation-range:entry 20% cover 50%}
+}
+@property --n{syntax:'<integer>';inherits:false;initial-value:0}
+.count{counter-reset:n var(--n)}
+.count::after{content:counter(n)}
+
+@media (max-width:1000px){
+ .sticky-col{position:static!important}
+ .g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .split,.case,.orbgrid{grid-template-columns:minmax(0,1fr);gap:28px}
+ .navlinks{display:none}
+}
+@media (max-width:640px){
+ .wrap{padding:0 16px}
+ .g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}
+ .g5{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hs-panel{width:84vw!important}
+ .mbar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:20}
+ .hero{height:auto!important;display:block!important}
+ .hero .hero-media{position:relative!important;height:440px}
+ .hero .hero-media img{object-position:72% 30%!important}
+ .hero .wrap{padding-top:28px!important;padding-bottom:56px!important}
+ .vs-t{order:-1}
+ .gmock{grid-template-columns:minmax(0,1fr)!important}
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .kpis p:last-child{font-size:30px!important}
+ .stairs li{min-height:0!important}
+ .formcard{padding:24px 18px!important}
+ .hs-pin{padding-top:72px!important;padding-bottom:40px!important}
+ .hs-panel{min-height:0!important}
+ .cue{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+ *,*::before,*::after{animation:none!important}
+ .hs{height:auto!important}.hs-pin{position:static!important;height:auto!important}
+ .hs-track{overflow-x:auto}
+}
+</style>
+</helmet>
+<div style="background: #001a33; color: #ffffff; font-family: Poppins, sans-serif; overflow-x: clip">
+
+
+<section class="hero" aria-labelledby="hero-h1" style="position: relative; height: max(820px, min(100vh, 1000px)); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end">
+<div class="para hero-media" style="position: absolute; inset: 0">
+<img class="kb" src="/_blob/cbddb709495738246434c4e0561372df" fetchpriority="high" alt="Isabella, de Efeonce, sostiene una esfera de luz naranja de la que salen líneas hacia muchas pantallas" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 66% 40%">
+</div>
+<div class="wrap" style="position: relative; width: 100%; padding-bottom: 92px">
+<div style="max-width: 700px; display: flex; flex-direction: column; gap: 20px">
+<p class="eyebrow chip in d1">Efeonce · Agencia de medios</p>
+<div>
+<p class="in d2" style="margin: 0; font-family: Poppins, sans-serif; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); line-height: 1.2; color: #ffffff">¿Dónde invierto?</p>
+<p class="in d3" style="margin: 4px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(88px, 12.5vw, 196px); color: #ffffff">Donde rinde<span class="sphere" aria-hidden="true"></span></p>
+</div>
+<h1 id="hero-h1" class="in d4" style="margin: 6px 0 0; font-family: Poppins, sans-serif; font-weight: 400; font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; color: #dbe5ee; max-width: 560px">Agencia de medios que conecta tu inversión publicitaria con tus ventas.</h1>
+<p class="in d4" style="margin: 0; font-family: Poppins, sans-serif; font-weight: 400; font-size: clamp(18px, 1.5vw, 22px); line-height: 1.5; color: #dbe5ee; max-width: 560px">Search, social, video, TV conectada, audio, DOOH y retail media en una sola operación.</p>
+<div class="in d5" style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px">
+<a href="#agenda" style="text-decoration: none; font-size: 16px; font-weight: 600; color: #001a33; background: #ffffff; padding: 16px 30px; border-radius: 999px; min-height: 54px; box-sizing: border-box; display: inline-flex; align-items: center; box-shadow: 0 0 0 5px rgba(248,57,2,0.4), 0 20px 60px rgba(248,57,2,0.35)">Agenda un diagnóstico</a>
+<a href="#como-vendes" style="text-decoration: none; font-size: 16px; font-weight: 500; color: #ffffff; padding: 16px 26px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.5); min-height: 54px; box-sizing: border-box; display: inline-flex; align-items: center">Cómo trabajamos</a>
+</div>
+</div>
+</div>
+<div class="cue" aria-hidden="true" style="position: absolute; left: 50%; bottom: 26px; margin-left: -11px; width: 22px; height: 36px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.6); box-sizing: border-box"></div>
+</section>
+
+<section aria-label="Canales que operamos" style="padding: 34px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); overflow: hidden">
+<div class="marquee" aria-hidden="true" style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.04em; font-size: clamp(56px, 7vw, 104px); line-height: 1; white-space: nowrap">
+<span style="padding: 0 34px">Search</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">Social</span><span style="padding: 0 34px">Video</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">TV conectada</span><span style="padding: 0 34px">Audio</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">DOOH</span><span style="padding: 0 34px">Retail media</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">In-game</span>
+<span style="padding: 0 34px">Search</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">Social</span><span style="padding: 0 34px">Video</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">TV conectada</span><span style="padding: 0 34px">Audio</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">DOOH</span><span style="padding: 0 34px">Retail media</span><span style="padding: 0 34px; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.55)">In-game</span>
+</div>
+<p class="eyebrow" style="text-align: center; margin-top: 18px; font-size: 12px">Search, social, video, TV conectada, audio, DOOH, retail media e in-game</p>
+</section>
+
+<section aria-label="Efeonce en números" style="padding: 110px 0 60px">
+<div class="wrap g4 st" style="gap: 32px">
+<div style="border-top: 2px solid #f83902; padding-top: 22px"><p aria-label="Más de 120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9">+<span class="count" style="--n: 120"></span></p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">empresas han crecido con Efeonce en 4 países</p></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 22px"><p aria-label="5" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9"><span class="count" style="--n: 5"></span></p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">países donde operamos medios</p></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 22px"><p aria-label="10" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9"><span class="count" style="--n: 10"></span></p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">plataformas y canales en un mismo plan</p></div>
+<div style="border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 22px"><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; font-size: clamp(72px, 8vw, 128px); line-height: 0.9">1</p><p style="margin: 12px 0 0; font-size: 16px; font-weight: 300; color: #cfe4fa">operación, un equipo y una medición</p></div>
+</div>
+<div class="wrap rv" style="margin-top: 80px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 40px; opacity: 0.9">
+<img src="/_blob/290c6281220a3b783ba773b1e51f8469" loading="lazy" alt="Sky Airline" style="height: 34px; filter: brightness(0) invert(1)">
+<img src="/_blob/1f00f9615b7c9665815b8d160c0967e1" loading="lazy" alt="Berel" style="height: 44px; filter: brightness(0) invert(1)">
+<img src="/_blob/9c4785267ec2b4ed4cd4e943d980b34c" loading="lazy" alt="Bresler" style="height: 30px; filter: brightness(0) invert(1)">
+<img src="/_blob/144b1dfb4ad531d182d8e8e50c15ebc6" loading="lazy" alt="Carozzi" style="height: 26px; filter: brightness(0) invert(1)">
+<img src="/_blob/de45eb8b6009db53c942cee9218cda3e" loading="lazy" alt="Aguas Andinas" style="height: 34px">
+<img src="/_blob/83a334dc4643f40aa2f59fc775ebcb2b" loading="lazy" alt="ANAM" style="height: 28px; filter: brightness(0) invert(1)">
+<img src="/_blob/51f403322d05244f9a6601f6bf78e306" loading="lazy" alt="Marca Chile" style="height: 40px; filter: brightness(0) invert(1)">
+</div>
+</section>
+
+<section aria-labelledby="dif-h" style="padding: 140px 0">
+<div class="wrap">
+<p class="eyebrow chip rv">La diferencia</p>
+<h2 id="dif-h" class="h2 words" style="margin-top: 22px; max-width: 1100px"><span>Una</span> <span style="color: #f83902">operación,</span> <span>no</span> <span>otra</span> <span>agencia</span></h2>
+<p class="lead rv" style="margin-top: 30px; max-width: 640px">Comprar medios se volvió commodity. Lo que rinde es una operación que conecta plan, compra, creatividad y medición, y te deja ver cada costo y cada decisión.</p>
+<div role="table" aria-label="Agencia tradicional frente a Efeonce" class="vs" style="margin-top: 80px; filter: drop-shadow(0 0 0 transparent)">
+<div role="row" class="vs-row">
+<div role="columnheader" class="vs-l" style="padding: 26px 30px 18px; border-radius: 22px 22px 0 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-bottom: 0; display: flex; align-items: center; min-height: 92px; box-sizing: border-box"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #8fa6bd">Agencia tradicional</span></div>
+<div role="columnheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; color: #6f89a2">vs</span></div>
+<div role="columnheader" class="vs-r" style="padding: 26px 30px 18px; border-radius: 26px 26px 0 0; background: linear-gradient(90deg, rgba(248,57,2,0.16), rgba(248,57,2,0.06)); border: 2px solid #f83902; border-bottom: 0; box-shadow: 0 -20px 80px rgba(248,57,2,0.18); display: flex; align-items: center; min-height: 92px; box-sizing: border-box"><img src="/_blob/a8d85947f6b28058b897dd7df1f93123" alt="Efeonce" style="height: 40px; width: auto"></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) 0 55% / 100% 1.5px no-repeat">Optimiza cada canal por separado</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Canales</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(248,57,2,0.10), rgba(248,57,2,0.04)); border-left: 2px solid #f83902; border-right: 2px solid #f83902; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#f83902" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2">Search, social y programática articulados por objetivo</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) 0 55% / 100% 1.5px no-repeat">Un porcentaje de lo que inviertes</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Cobro</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(248,57,2,0.10), rgba(248,57,2,0.04)); border-left: 2px solid #f83902; border-right: 2px solid #f83902; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#f83902" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2">Fee fijo; los medios van aparte, al costo</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) 0 55% / 100% 1.5px no-repeat">El ROAS que declara cada plataforma</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Reporte</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(248,57,2,0.10), rgba(248,57,2,0.04)); border-left: 2px solid #f83902; border-right: 2px solid #f83902; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#f83902" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2">Cruzado con tu CRM: una venta cuenta una vez</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 22px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) 0 55% / 100% 1.5px no-repeat">Proveedores y costos que no ves</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Transparencia</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 22px 30px; background: linear-gradient(90deg, rgba(248,57,2,0.10), rgba(248,57,2,0.04)); border-left: 2px solid #f83902; border-right: 2px solid #f83902; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#f83902" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2">Inventario, costos y exclusiones documentados</span></div>
+</div>
+<div role="row" class="vs-row">
+<div role="cell" class="vs-l rvl" style="padding: 26px 30px 30px; background: rgba(255,255,255,0.03); border-left: 1px solid rgba(255,255,255,0.12); border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12); border-radius: 0 0 22px 22px; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M6 6l12 12M18 6L6 18" stroke="#6f89a2" stroke-width="2.2" stroke-linecap="round"></path></svg><span class="strike" style="font-size: 18px; font-weight: 300; line-height: 1.4; color: #8fa6bd; background: linear-gradient(#6f89a2, #6f89a2) 0 55% / 100% 1.5px no-repeat">Resultados que no controla</span></div>
+<div role="rowheader" class="vs-t" style="display: flex; align-items: center; justify-content: center"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff; padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.28); background: #001a33">Promesa</span></div>
+<div role="cell" class="vs-r rvr" style="padding: 26px 30px 30px; background: linear-gradient(90deg, rgba(248,57,2,0.10), rgba(248,57,2,0.04)); border-left: 2px solid #f83902; border-right: 2px solid #f83902; border-radius: 0 0 26px 26px; border-bottom: 2px solid #f83902; display: flex; align-items: center; gap: 14px; min-height: 96px; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#f83902" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(22px, 2vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2">Línea base, método y la siguiente decisión</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-label="Todo el ciclo" style="padding: 60px 0 150px">
+<div class="wrap" style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.92; font-size: clamp(64px, 10vw, 168px)">
+<p class="lit" style="margin: 0; color: #ffffff">Planificar.</p>
+<p class="lit" style="margin: 0; color: #ffffff">Crear.</p>
+<p class="lit" style="margin: 0; color: #ffffff">Comprar.</p>
+<p class="lit" style="margin: 0; color: #ffffff">Medir.</p>
+<p class="litA" style="margin: 0; color: #f83902">Un equipo.</p>
+</div>
+<div class="wrap g4 st" style="gap: 32px; margin-top: 90px">
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720; letter-spacing: -0.02em">Estrategia y planificación</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Audiencias, mix, presupuesto y plan de medición antes de comprar un solo espacio.</p></div>
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720; letter-spacing: -0.02em">Creatividad para performance</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Mensajes, formatos y variaciones que aprenden: qué escalar y qué detener.</p></div>
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720; letter-spacing: -0.02em">Compra y operación</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Search, social, video, retail media y programática: activación, pacing y optimización.</p></div>
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720; letter-spacing: -0.02em">Medición e inversión</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Señales de negocio, reporte reconciliado y la recomendación del siguiente ciclo.</p></div>
+</div>
+</section>
+
+<section id="como-vendes" aria-labelledby="modo-h" style="padding: 140px 0; background: radial-gradient(ellipse 80% 70% at 75% 40%, #0a3157 0%, #001a33 70%)">
+<div class="wrap">
+<div class="split">
+<div>
+<p class="eyebrow chip rv">Cómo operamos</p>
+<h2 id="modo-h" class="h2 words" style="margin-top: 22px"><span>Optimizamos</span> <span>lo</span> <span>que</span> <span style="color: #f83902">vendes</span></h2>
+</div>
+<p class="lead rv">Mismo oficio, distintos compradores: la señal, los canales y la métrica cambian según cómo vendes. Elige el tuyo.</p>
+</div>
+<div class="rv" role="group" aria-label="¿Cómo vendes?" style="margin-top: 56px; display: inline-flex; flex-wrap: wrap; gap: 8px; padding: 8px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.22); background: rgba(255,255,255,0.04)">
+<sc-if value="{{isCommerce}}" hint-placeholder-val="{{true}}">
+<button type="button" aria-pressed="true" style="min-height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600">Vendo online o en tiendas</button>
+<button type="button" aria-pressed="false" onClick="{{pickB2b}}" style="min-height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: transparent; color: #ffffff; font-size: 16px; font-weight: 500">Vendo a empresas</button>
+</sc-if>
+<sc-if value="{{isB2b}}" hint-placeholder-val="{{false}}">
+<button type="button" aria-pressed="false" onClick="{{pickCommerce}}" style="min-height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: transparent; color: #ffffff; font-size: 16px; font-weight: 500">Vendo online o en tiendas</button>
+<button type="button" aria-pressed="true" style="min-height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600">Vendo a empresas</button>
+</sc-if>
+</div>
+<sc-if value="{{isCommerce}}" hint-placeholder-val="{{true}}">
+<div class="swap" aria-live="polite" style="margin-top: 48px">
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(30px, 3.6vw, 56px); font-weight: 760; letter-spacing: -0.035em">
+<li style="color: #9fb6cc">Visita</li><li aria-hidden="true" style="color: #6f89a2">→</li><li style="color: #cfe4fa">Carrito</li><li aria-hidden="true" style="color: #6f89a2">→</li><li style="color: #ffffff">Compra</li><li aria-hidden="true" style="color: #6f89a2">→</li><li style="color: #f83902">Margen</li>
+</ol>
+<div class="g3" style="gap: 24px; margin-top: 44px">
+<div style="padding: 28px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 12px">La señal</p><p style="margin: 12px 0 0; font-size: 18px; line-height: 1.5">Compra, valor del carrito y margen vuelven a las plataformas como conversión.</p></div>
+<div style="padding: 28px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 12px">Los canales</p><div style="display: flex; gap: 10px; margin-top: 12px"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 22px; width: auto"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 22px; width: auto"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="height: 22px; width: auto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-2 11H5z"></path><path d="M8 9V6a4 4 0 0 1 8 0v3"></path></svg></div><p style="margin: 12px 0 0; font-size: 18px; line-height: 1.5">Google Search, Shopping y Performance Max, Meta, TikTok y retail media en cadenas y marketplaces.</p></div>
+<div style="padding: 28px; border-radius: 22px; border: 2px solid #f83902"><p class="eyebrow" style="font-size: 12px; color: #ffffff">Lo que se mide</p><p style="margin: 12px 0 0; font-size: 18px; line-height: 1.5">Costo por venta, retorno sobre la inversión y margen del mix completo.</p></div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{isB2b}}" hint-placeholder-val="{{false}}">
+<div class="swap" aria-live="polite" style="margin-top: 48px">
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(30px, 3.6vw, 56px); font-weight: 760; letter-spacing: -0.035em">
+<li style="color: #9fb6cc">Lead</li><li aria-hidden="true" style="color: #6f89a2">→</li><li style="color: #cfe4fa">Calificado</li><li aria-hidden="true" style="color: #6f89a2">→</li><li style="color: #ffffff">Oportunidad</li><li aria-hidden="true" style="color: #6f89a2">→</li><li style="color: #f83902">Venta</li>
+</ol>
+<div class="g3" style="gap: 24px; margin-top: 44px">
+<div style="padding: 28px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 12px">La señal</p><p style="margin: 12px 0 0; font-size: 18px; line-height: 1.5">Cada etapa de tu CRM, en HubSpot o Salesforce, vuelve a la pauta como conversión.</p></div>
+<div style="padding: 28px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 12px">Los canales</p><div style="display: flex; gap: 10px; margin-top: 12px"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="height: 22px; width: auto"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 22px; width: auto"><img src="/_blob/f1d169aa14ba1f8bec5ff12bc6a0178f" alt="" style="height: 22px; width: auto"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 22px; width: auto"></div><p style="margin: 12px 0 0; font-size: 18px; line-height: 1.5">LinkedIn por empresa y cargo, Google Search, Microsoft y Meta para cuentas objetivo.</p></div>
+<div style="padding: 28px; border-radius: 22px; border: 2px solid #f83902"><p class="eyebrow" style="font-size: 12px; color: #ffffff">Lo que se mide</p><p style="margin: 12px 0 0; font-size: 18px; line-height: 1.5">Costo por oportunidad y pipeline generado, no costo por lead.</p></div>
+</div>
+</div>
+</sc-if>
+<p style="margin: 28px 0 0; font-size: 14px; color: #9fb6cc">¿Sin un CRM confiable todavía? Partimos midiendo bien antes de escalar la inversión.</p>
+</div>
+</section>
+
+<section aria-labelledby="senal-h" style="padding: 140px 0">
+<div class="wrap">
+<p class="eyebrow chip rv">Performance · Señal</p>
+<h2 id="senal-h" class="h2 words" style="margin-top: 22px"><span>Tu</span> <span>pauta</span> <span>termina</span> <span>en</span> <span style="color: #f83902">ventas</span></h2>
+<p class="lead rv" style="margin-top: 30px; max-width: 620px">Optimizamos hacia compras, margen y etapas del CRM, no hacia clics: el algoritmo aprende de lo que vendes.</p>
+<div style="position: relative; margin-top: 90px">
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12)"><div class="pipe" style="height: 100%; width: 100%; border-radius: 2px; background: linear-gradient(90deg, rgba(248,57,2,0.25), #f83902); box-shadow: 0 0 24px rgba(248,57,2,0.7)"></div></div>
+<ol class="g4 st" style="list-style: none; margin: 0; padding: 36px 0 0; gap: 20px">
+<li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">Paso 1</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.03em">Alcance</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Quién vio tu anuncio y en qué red.</span><span style="margin-top: auto; padding-top: 18px; font-size: 13px; color: #9fb6cc; display: flex; align-items: center; gap: 8px"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 18px; width: auto"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 18px; width: auto"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="height: 18px; width: auto"><span>Meta · Google · TikTok</span></span></li>
+<li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">Paso 2</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.03em">Visitas</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Quién llegó, desde qué pieza y qué buscaba.</span><span style="margin-top: auto; padding-top: 18px; font-size: 13px; color: #9fb6cc; display: flex; align-items: center; gap: 8px"><img src="/_blob/b33672d9f8ec537d2e2729cf6bb05256" alt="" style="height: 18px; width: auto"><span>GA4 · UTMs</span></span></li>
+<li style="padding: 30px 26px; border-radius: 22px; border: 1.5px dashed rgba(255,255,255,0.35); background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">Paso 3</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.03em">Conversiones</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Compras y leads medidos en tu sitio, sin duplicar.</span><span style="margin-top: auto; padding-top: 18px; font-size: 13px; color: #ffffff; font-weight: 500">La mayoría de las campañas se optimiza hasta aquí</span></li>
+<li style="padding: 30px 26px; border-radius: 22px; border: 2px solid #f83902; background: rgba(248,57,2,0.1); box-shadow: 0 0 80px rgba(248,57,2,0.3); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff">Paso 4 · Efeonce</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.03em">Ventas</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #e6edf3">Lo que la pauta trajo a tu negocio, medido en tu CRM.</span><span style="margin-top: auto; padding-top: 18px; font-size: 13px; color: #ffffff; display: flex; align-items: center; gap: 8px"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="" style="height: 18px; width: auto"><img src="/_blob/a98f7cff868281c750398184592bd4db" alt="" style="height: 18px; width: auto"><span>HubSpot · Salesforce</span></span></li>
+</ol>
+</div>
+<div style="margin-top: 100px; padding-top: 44px; border-top: 1px solid rgba(255,255,255,0.14)">
+<p class="eyebrow rv" style="font-size: 12px">Por qué revisar tu pauta ahora · Actualizado en octubre de 2026</p>
+<div class="g3 st" style="gap: 48px; margin-top: 28px">
+<div><p style="margin: 0 0 12px; display: flex"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 26px; width: auto"></p><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 720; letter-spacing: -0.02em; line-height: 1.15">Meta cambió cómo atribuye los clics</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Desde marzo de 2026 el click-through cuenta sólo clics en el enlace: tus KPIs históricos dejan de compararse.</p></div>
+<div><p style="margin: 0 0 12px; display: flex"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 26px; width: auto"></p><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 720; letter-spacing: -0.02em; line-height: 1.15">Google lleva tu búsqueda a AI Max</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Sin DSA ni broad match de campaña nuevos desde septiembre; la migración automática llega en febrero de 2027.</p></div>
+<div><p style="margin: 0 0 12px; display: flex"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg></p><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 720; letter-spacing: -0.02em; line-height: 1.15">Nuevas reglas para tus datos</p><p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">México y Perú las renovaron en 2025; Chile, desde diciembre de 2026. Compartir datos con plataformas pide base documentada.</p></div>
+</div>
+</div>
+</div>
+</section>
+
+
+<section id="performance" aria-labelledby="perf-h" style="padding: 160px 0 120px; background: radial-gradient(ellipse 70% 60% at 80% 30%, #0a3157 0%, #001a33 70%)">
+<div class="wrap">
+<div class="split">
+<div>
+<p class="eyebrow chip rv">Performance marketing</p>
+<h2 id="perf-h" class="h2 words" style="margin-top: 22px"><span>Cada</span> <span>plataforma,</span> <span>con</span> <span>su</span> <span style="color: #f83902">lenguaje</span></h2>
+</div>
+<p class="lead rv">Elegimos los canales por lo que vendes y a quién, y en cada uno operamos lo que de verdad mueve el algoritmo: la señal, la pieza y la lectura. Las cuentas quedan siempre a tu nombre.</p>
+</div>
+<div class="rv" role="group" aria-label="Elige una plataforma" style="margin-top: 56px; display: flex; flex-wrap: wrap; gap: 10px">
+<sc-if value="{{isG}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="true" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border-radius: 50%; background: #001a33; display: inline-flex; align-items: center; justify-content: center"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="width: 18px; height: 18px; object-fit: contain"></span>Google</button></sc-if><sc-if value="{{notG}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="false" onClick="{{pickG}}" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.22); background: transparent; color: #ffffff; font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="width: 22px; height: 22px; object-fit: contain">Google</button></sc-if>
+<sc-if value="{{isM}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="true" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border-radius: 50%; background: #001a33; display: inline-flex; align-items: center; justify-content: center"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="width: 18px; height: 18px; object-fit: contain"></span>Meta</button></sc-if><sc-if value="{{notM}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="false" onClick="{{pickM}}" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.22); background: transparent; color: #ffffff; font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="width: 22px; height: 22px; object-fit: contain">Meta</button></sc-if>
+<sc-if value="{{isT}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="true" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border-radius: 50%; background: #001a33; display: inline-flex; align-items: center; justify-content: center"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="width: 18px; height: 18px; object-fit: contain"></span>TikTok</button></sc-if><sc-if value="{{notT}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="false" onClick="{{pickT}}" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.22); background: transparent; color: #ffffff; font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="width: 22px; height: 22px; object-fit: contain">TikTok</button></sc-if>
+<sc-if value="{{isL}}" hint-placeholder-val="{{false}}"><button type="button" aria-pressed="true" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border-radius: 50%; background: #001a33; display: inline-flex; align-items: center; justify-content: center"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="width: 18px; height: 18px; object-fit: contain"></span>LinkedIn</button></sc-if><sc-if value="{{notL}}" hint-placeholder-val="{{true}}"><button type="button" aria-pressed="false" onClick="{{pickL}}" style="min-height: 56px; padding: 0 22px 0 16px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.22); background: transparent; color: #ffffff; font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="width: 22px; height: 22px; object-fit: contain">LinkedIn</button></sc-if>
+</div>
+<sc-if value="{{isG}}" hint-placeholder-val="{{true}}">
+<div class="platgrid swap" aria-live="polite" style="margin-top: 44px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="width: 44px; height: 44px; object-fit: contain"><span style="font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.5)">Core en consumo y B2B</span></div>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.045em; line-height: 0.92; font-size: clamp(56px, 6.4vw, 104px)">La señal</p>
+<p style="margin: 0; font-size: 17px; font-weight: 300; line-height: 1.6; color: #cfe4fa; max-width: 520px">Search, Performance Max, Demand Gen y YouTube aprenden de lo que les mandamos: conversiones con valor, exclusiones de marca y listas desde tu CRM. Cuando la búsqueda migre a AI Max en 2027, llegamos con los controles puestos.</p>
+<div class="g3" style="gap: 18px; margin-top: 8px"><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Le mandamos</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Conversiones con valor y listas del CRM</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Controlamos</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Exclusiones de marca y de búsqueda</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Febrero 2027</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Búsqueda migra a AI Max</p></div></div>
+</div>
+<div class="pop-in gmock" style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px">
+<div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 16px">Search</p><div style="height: 40px; border-radius: 20px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22); display: flex; align-items: center; padding: 0 16px; font-size: 14px; color: #cfe4fa">zapatillas para correr de noche</div><div style="margin-top: 12px; padding: 14px; border-radius: 12px; outline: 2.5px solid #f83902; outline-offset: 2px; background: rgba(255,255,255,0.04)"><p style="margin: 0; font-size: 12px; color: #cfe4fa"><b style="color: #ffffff">Patrocinado</b> · nortica.ejemplo</p><p style="margin: 6px 0 0; font-size: 18px; font-weight: 600; line-height: 1.25; color: #9fd0ff">Zapatillas de running · Suela lima reflectante</p><p style="margin: 6px 0 0; font-size: 13px; line-height: 1.4; color: #d9e3ec">Corre de noche con más visibilidad. Envío a todo el país.</p></div></div>
+<div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 16px">Shopping · PMax</p><div style="border-radius: 12px; overflow: hidden; outline: 2.5px solid #f83902; outline-offset: 2px; background: rgba(255,255,255,0.05)"><img src="/_blob/84530393cafa9f1abd55ff9fa780d45f" alt="Zapatilla de la marca de ejemplo" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block"><div style="padding: 10px 12px"><p style="margin: 0; font-size: 13px; font-weight: 600">Nórtica Night Run</p><p style="margin: 2px 0 0; font-size: 15px; font-weight: 700">$ 89.990</p><p style="margin: 2px 0 0; font-size: 11px; color: #9fb6cc">PATROCINADO</p></div></div></div>
+<div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/0ce829ad4df7bc161695097040ce9a48" alt="" style="height: 16px">YouTube</p><div style="position: relative; border-radius: 12px; overflow: hidden; outline: 2.5px solid #f83902; outline-offset: 2px"><img src="/_blob/898aa68bcf81ee842e98eb4e480b859a" alt="Anuncio en video de la marca de ejemplo" style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block"><span style="position: absolute; left: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,0.65)">Anuncio · 0:06</span><span style="position: absolute; right: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.5)">Omitir ›</span></div></div>
+<div style="border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); padding: 16px"><p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 16px">Demand Gen</p><div style="border-radius: 12px; overflow: hidden; outline: 2.5px solid #f83902; outline-offset: 2px"><img src="/_blob/7a5bb9e91735d604a5a3e845bd5cb800" alt="Anuncio de la marca de ejemplo en Demand Gen" style="width: 100%; aspect-ratio: 764 / 400; display: block"></div><p style="margin: 10px 0 0; font-size: 13px; font-weight: 600">La suela que se nota de noche</p><p style="margin: 2px 0 0; font-size: 11px; color: #9fb6cc">Patrocinado · Nórtica</p></div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{isM}}" hint-placeholder-val="{{false}}">
+<div class="platgrid swap" aria-live="polite" style="margin-top: 44px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="width: 44px; height: 44px; object-fit: contain"><span style="font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.5)">Core en consumo · selectivo en B2B</span></div>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.045em; line-height: 0.92; font-size: clamp(56px, 6.4vw, 104px)">La pieza</p>
+<p style="margin: 0; font-size: 17px; font-weight: 300; line-height: 1.6; color: #cfe4fa; max-width: 520px">Con Advantage+ el algoritmo elige a quién mostrar. Lo que decide es la creatividad y la señal: producimos y probamos variantes para Feed, Stories y Reels, y leemos el resultado con la atribución que Meta cambió en 2026.</p>
+<div class="g3" style="gap: 18px; margin-top: 8px"><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">La palanca</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Variantes creativas probadas</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">La señal</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">API de Conversiones con valor</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">La lectura</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Con la atribución de 2026</p></div></div>
+</div>
+<div class="pop-in"><div style="position: relative; border-radius: 26px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.18); box-shadow: 0 40px 100px rgba(0,0,0,0.55)"><img src="/_blob/088491ce572a8d20dd920ce8f40cbc5e" alt="Tres teléfonos con el anuncio de la marca de ejemplo en Feed, Stories y Reels" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block"><div style="position: absolute; left: 18px; top: 16px; display: flex; gap: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(0,26,51,0.7)"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 24px"><img src="/_blob/12793e20b5e16030bfbaf220e4e16b8f" alt="" style="height: 24px"></div></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; text-align: center">
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 760">Feed</p><p style="margin: 2px 0 0; font-size: 14px; color: #cfe4fa">Pieza 4:5 con texto</p></div>
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 760">Stories</p><p style="margin: 2px 0 0; font-size: 14px; color: #cfe4fa">Vertical, de lado a lado</p></div>
+<div><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 760">Reels</p><p style="margin: 2px 0 0; font-size: 14px; color: #cfe4fa">Video vertical con sonido</p></div>
+</div></div>
+</div>
+</sc-if>
+<sc-if value="{{isT}}" hint-placeholder-val="{{false}}">
+<div class="platgrid swap" aria-live="polite" style="margin-top: 44px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="width: 44px; height: 44px; object-fit: contain"><span style="font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.5)">Core en consumo</span></div>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.045em; line-height: 0.92; font-size: clamp(56px, 6.4vw, 104px)">Hecho para TikTok</p>
+<p style="margin: 0; font-size: 17px; font-weight: 300; line-height: 1.6; color: #cfe4fa; max-width: 520px">TikTok premia lo que parece hecho para TikTok: video vertical, con creadores o con tu equipo, al ritmo de la plataforma. Sin producción nativa, no lo activamos.</p>
+<div class="g3" style="gap: 18px; margin-top: 8px"><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Requisito</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Producción vertical nativa</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">La señal</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Events API con valor</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Con quién</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Creadores o tu propio equipo</p></div></div>
+</div>
+<div class="pop-in"><div style="position: relative; border-radius: 26px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.18); box-shadow: 0 40px 100px rgba(0,0,0,0.55)"><img src="/_blob/f91745a5b1c76b91c305232fcbb8fb47" alt="Un pasajero en un bus ve el video vertical de la marca de ejemplo en su teléfono" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block"><div style="position: absolute; left: 18px; top: 16px; display: flex; gap: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(0,26,51,0.7)"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="height: 24px"></div><div style="position: absolute; right: 18px; bottom: 18px; max-width: 46%; padding: 14px 16px; border-radius: 16px; background: rgba(0,26,51,0.88); border: 1.5px solid rgba(255,255,255,0.3)"><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 760">Video vertical</p><p style="margin: 4px 0 0; font-size: 13px; line-height: 1.4; color: #cfe4fa">Nativo, con sonido, en los primeros segundos</p></div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px"><span style="font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.3)">Creadores y Spark Ads</span><span style="font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.3)">Pruebas de ganchos</span><span style="font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.3)">Compra en la app: México y Brasil</span></div></div>
+</div>
+</sc-if>
+<sc-if value="{{isL}}" hint-placeholder-val="{{false}}">
+<div class="platgrid swap" aria-live="polite" style="margin-top: 44px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="width: 44px; height: 44px; object-fit: contain"><span style="font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.5)">Core en B2B</span></div>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.045em; line-height: 0.92; font-size: clamp(56px, 6.4vw, 104px)">Directo al comité</p>
+<p style="margin: 0; font-size: 17px; font-weight: 300; line-height: 1.6; color: #cfe4fa; max-width: 520px">Pautamos a las empresas y cargos que tu equipo comercial ya persigue, con documentos y formularios que vuelven al CRM como oportunidades. Es caro por diseño: se justifica por la cuenta alcanzada.</p>
+<div class="g3" style="gap: 18px; margin-top: 8px"><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">A quién</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Empresas y cargos de tu lista</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Vuelve como</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Oportunidad, no como lead</p></div><div style="padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,0.2)"><p class="eyebrow" style="font-size: 11px">Se mide</p><p style="margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: #ffffff">Pipeline y cuentas alcanzadas</p></div></div>
+</div>
+<div class="pop-in"><div style="position: relative; border-radius: 26px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.18); box-shadow: 0 40px 100px rgba(0,0,0,0.55)"><img src="/_blob/754b5cf8ab8b836d804de4e6cf725c0c" alt="Un portátil con el anuncio de una marca B2B de ejemplo en LinkedIn" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block"><div style="position: absolute; left: 18px; top: 16px; display: flex; gap: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(0,26,51,0.7)"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="height: 24px"></div><div style="position: absolute; left: 18px; bottom: 18px; width: 44%; min-width: 220px; padding: 16px; border-radius: 16px; background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(6,25,48,0.95)); border: 1.5px solid rgba(255,255,255,0.3); box-shadow: 0 24px 60px rgba(0,0,0,0.6); box-sizing: border-box">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 760; color: #38d6ff">▲ andara</span><span style="font-size: 11px; color: #cfe4fa">Formulario</span></div>
+<p style="margin: 10px 0 0; font-size: 11px; color: #9fb6cc">Cargo</p><p style="margin: 2px 0 0; font-size: 13px; padding: 7px 10px; border-radius: 8px; background: rgba(255,255,255,0.08)">Gerente de operaciones</p>
+<p style="margin: 8px 0 0; font-size: 11px; color: #9fb6cc">Empresa</p><p style="margin: 2px 0 0; font-size: 13px; padding: 7px 10px; border-radius: 8px; background: rgba(255,255,255,0.08)">Distribuidora del Sur</p>
+<p style="margin: 10px 0 0; height: 34px; border-radius: 17px; background: #38d6ff; color: #05080c; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center">Descargar guía</p></div></div>
+<div style="display: flex; align-items: center; gap: 14px; margin-top: 18px"><svg width="64" height="24" viewBox="0 0 64 24" aria-hidden="true" style="flex: none"><path d="M2 12 H54" stroke="#f83902" stroke-width="2.5" stroke-linecap="round"></path><path d="M46 5 L56 12 L46 19" fill="none" stroke="#f83902" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg><span style="display: inline-flex; align-items: center; gap: 12px; padding: 10px 18px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.05)"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="HubSpot" style="height: 22px"><img src="/_blob/a98f7cff868281c750398184592bd4db" alt="Salesforce" style="height: 20px"><span style="font-size: 15px; font-weight: 600">Llega como oportunidad en tu CRM</span></span></div></div>
+</div>
+</sc-if>
+
+<div class="rv" style="margin-top: 48px; padding: 22px 26px; border-radius: 20px; border: 1.5px dashed rgba(255,255,255,0.28); display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px">
+<span class="eyebrow" style="font-size: 12px">Y cuando suman</span>
+<div style="display: flex; align-items: center; gap: 18px"><img src="/_blob/f1d169aa14ba1f8bec5ff12bc6a0178f" alt="Microsoft Advertising" style="height: 26px"><img src="/_blob/0ce829ad4df7bc161695097040ce9a48" alt="YouTube" style="height: 26px"><img src="/_blob/7c1213c786a3de5b04c1b3bc723540b6" alt="ChatGPT Ads" style="height: 26px"><img src="/_blob/b7a8978260b42c1f1a9432dffd772217" alt="X" style="height: 26px"></div>
+<span style="font-size: 15px; font-weight: 300; color: #cfe4fa">Microsoft para búsqueda corporativa, YouTube para alcance en video, ChatGPT Ads donde ya existe y X sólo a pedido, con revisión de seguridad de marca.</span>
+</div>
+
+<div style="margin-top: 130px">
+<div class="split"><div><p class="eyebrow chip rv">Creatividad por plataforma</p><h3 class="h2 words" style="margin-top: 20px; font-size: clamp(44px, 5.6vw, 92px)"><span>Una</span> <span>idea</span> <span>que</span> <span style="color: #f83902">se adapta</span></h3></div><p class="lead rv">Llevamos la idea al formato, la duración y el lenguaje de cada plataforma. Lo vertical no es un horizontal recortado.</p></div>
+<div class="st" style="margin-top: 56px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 32px 24px"><figure style="margin: 0; display: flex; flex-direction: column; gap: 16px"><img src="/_blob/2802c1090ef06ca8af4f6f42488db1be" loading="lazy" alt="La pieza de la marca de ejemplo en formato 9:16" style="width: 214px; max-width: 100%; aspect-ratio: 214 / 380; height: auto; display: block; border-radius: 14px; box-shadow: 0 30px 70px rgba(0,0,0,0.55); outline: 1px solid rgba(255,255,255,0.14)"><figcaption><span style="display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; line-height: 1">9:16</span><span style="display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: #cfe4fa"><img src="/_blob/12793e20b5e16030bfbaf220e4e16b8f" alt="" style="height: 16px"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="height: 16px">Reels, Stories, TikTok</span></figcaption></figure><figure style="margin: 0; display: flex; flex-direction: column; gap: 16px"><img src="/_blob/ba3e92aca17c45bc56841ee9037fb61d" loading="lazy" alt="La pieza de la marca de ejemplo en formato 4:5" style="width: 240px; max-width: 100%; aspect-ratio: 240 / 300; height: auto; display: block; border-radius: 14px; box-shadow: 0 30px 70px rgba(0,0,0,0.55); outline: 1px solid rgba(255,255,255,0.14)"><figcaption><span style="display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; line-height: 1">4:5</span><span style="display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: #cfe4fa"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 16px">Feed</span></figcaption></figure><figure style="margin: 0; display: flex; flex-direction: column; gap: 16px"><img src="/_blob/fe5d9cc9db06b1dc7c9e0d60b1b30ae1" loading="lazy" alt="La pieza de la marca de ejemplo en formato 1:1" style="width: 260px; max-width: 100%; aspect-ratio: 260 / 260; height: auto; display: block; border-radius: 14px; box-shadow: 0 30px 70px rgba(0,0,0,0.55); outline: 1px solid rgba(255,255,255,0.14)"><figcaption><span style="display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; line-height: 1">1:1</span><span style="display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: #cfe4fa"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 16px"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="height: 16px">Feed y carrusel</span></figcaption></figure><figure style="margin: 0; display: flex; flex-direction: column; gap: 16px"><img src="/_blob/898aa68bcf81ee842e98eb4e480b859a" loading="lazy" alt="La pieza de la marca de ejemplo en formato 16:9" style="width: 410px; max-width: 100%; aspect-ratio: 410 / 231; height: auto; display: block; border-radius: 14px; box-shadow: 0 30px 70px rgba(0,0,0,0.55); outline: 1px solid rgba(255,255,255,0.14)"><figcaption><span style="display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; line-height: 1">16:9</span><span style="display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: #cfe4fa"><img src="/_blob/0ce829ad4df7bc161695097040ce9a48" alt="" style="height: 16px">YouTube y TV conectada</span></figcaption></figure></div>
+</div>
+<div class="dcogrid" style="margin-top: 130px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<p class="eyebrow chip rv">Creatividad dinámica</p>
+<h3 class="h2 words" style="font-size: clamp(44px, 5vw, 84px)"><span>Una</span> <span>pieza,</span> <span style="color: #f83902">mil</span> <span style="color: #f83902">versiones</span></h3>
+<p class="lead rv">Armamos una plantilla con piezas intercambiables y las reglas eligen qué versión ve cada persona.</p>
+<ul class="st" style="list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px"><li style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9fb6cc">Audiencia</span><span style="font-size: 16px; font-weight: 500">Ya compró antes</span></li><li style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9fb6cc">Ciudad</span><span style="font-size: 16px; font-weight: 500">Santiago</span></li><li style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9fb6cc">Clima</span><span style="font-size: 16px; font-weight: 500">Llueve hoy</span></li><li style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9fb6cc">Producto</span><span style="font-size: 16px; font-weight: 500">Zapatilla en stock</span></li></ul>
+</div>
+<ul class="st" style="list-style: none; margin: 0; padding: 18px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px"><li style="position: relative"><img src="/_blob/154ffa5f9e48d99ead49b5855feba880" loading="lazy" alt="Versión «Corre de noche»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/54f153f244b3a8c82ef8826b01d00c26" loading="lazy" alt="Versión «Hoy llueve, corre igual»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 3px solid #f83902; outline-offset: 4px; box-shadow: 0 0 60px rgba(248,57,2,0.45)"><span style="position: absolute; left: 50%; top: -16px; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px; background: #f83902; color: #ffffff">La que ve esta persona</span></li><li style="position: relative"><img src="/_blob/7458bfa9a46dc5c11c8ce2d2d180ecc7" loading="lazy" alt="Versión «Más liviana»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/e702b0883cab5b98d7e820ceb949235e" loading="lazy" alt="Versión «Tu primer 10K»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/c6cad92b837d12adfb7511641430309e" loading="lazy" alt="Versión «Vuelve a correr»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/d0690120bbbbe8bb372425dbe668ac39" loading="lazy" alt="Versión «Santiago corre»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/00e6e129ac3c010b986ca856eb8a939d" loading="lazy" alt="Versión «CDMX corre»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/4d63ce5b4f399f057c2761802d89ffff" loading="lazy" alt="Versión «Últimas tallas»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li><li style="position: relative"><img src="/_blob/3aa78a0cdeca05ee3c692f6925f88191" loading="lazy" alt="Versión «Elige tu suela»" style="width: 100%; aspect-ratio: 4 / 5; display: block; border-radius: 12px; outline: 1px solid rgba(255,255,255,0.14); opacity: 0.78"></li></ul>
+</div>
+<div class="bento" style="margin-top: 110px">
+<div class="b-row" style="border-radius: 30px; border: 1.5px solid rgba(255,255,255,0.16); padding: 34px 36px; background: rgba(255,255,255,0.03)">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px"><p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(34px, 3.4vw, 52px); font-weight: 760; letter-spacing: -0.035em">Probado antes de <span style="color: #f83902">escalar</span></p><p style="margin: 0; font-size: 15px; font-weight: 300; color: #cfe4fa; max-width: 420px">Lo orgánico prueba y la pauta escala: ponemos presupuesto en las piezas que ganan.</p></div>
+<ol class="g4 st" style="list-style: none; margin: 30px 0 0; padding: 0; gap: 16px">
+<li style="padding-top: 18px; border-top: 2px solid rgba(255,255,255,0.25)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; color: #6f89a2">01</span><p style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720">Publicar</p><p style="margin: 6px 0 0; font-size: 14px; font-weight: 300; color: #cfe4fa">Varias versiones de cada idea, con ganchos distintos.</p></li>
+<li style="padding-top: 18px; border-top: 2px solid rgba(255,255,255,0.25)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; color: #6f89a2">02</span><p style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720">Leer</p><p style="margin: 6px 0 0; font-size: 14px; font-weight: 300; color: #cfe4fa">Cuál retiene de verdad: tiempo de vista, guardados y comentarios.</p></li>
+<li style="padding-top: 18px; border-top: 2px solid #f83902"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; color: #f83902">03</span><p style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720">Pautar</p><p style="margin: 6px 0 0; font-size: 14px; font-weight: 300; color: #cfe4fa">Presupuesto a las piezas elegidas, con la razón registrada.</p></li>
+<li style="padding-top: 18px; border-top: 2px solid rgba(255,255,255,0.25)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; color: #6f89a2">04</span><p style="margin: 6px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 720">Aprender</p><p style="margin: 6px 0 0; font-size: 14px; font-weight: 300; color: #cfe4fa">Lo que la pauta enseña vuelve al calendario editorial.</p></li>
+</ol>
+</div>
+</div>
+<p style="margin: 16px 0 0; font-size: 13px; color: #9fb6cc">Anuncios de una marca de ejemplo, creada para mostrar formatos.</p>
+
+<div class="split" style="margin-top: 160px">
+<h3 class="h2 words" style="font-size: clamp(44px, 5.6vw, 92px)"><span>Fuera</span> <span>de</span> <span>search</span> <span>y</span> <span>social, <span style="color: #f83902">también</span></span></h3>
+<p class="lead rv">Una compra programática que llega a display, video, TV conectada, audio, pantallas en la calle y retail media, con el mismo plan, las mismas audiencias y una sola medición.</p>
+</div>
+<div class="rv" style="margin-top: 56px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.16); border-bottom: 1px solid rgba(255,255,255,0.16)">
+<div style="max-width: 380px"><p class="eyebrow" style="font-size: 12px">Tecnología con la que compramos</p><p style="margin: 12px 0 0; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">Plataformas que operamos para comprar y verificar. Son tecnología de trabajo, no alianzas.</p></div>
+<div style="display: flex; flex-direction: column; gap: 36px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 40px"><span class="eyebrow" style="font-size: 11px; width: 120px; flex: none">Compra</span><ul class="st" style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 44px">
+<li><img src="/_blob/0f4556e7bf9d16ee5f010219e80f5111" loading="lazy" alt="Basis" style="height: 40px; filter: brightness(0) invert(1)"></li>
+<li style="display: flex; align-items: center; gap: 12px"><img src="/_blob/5e0596d0a0284820975d62378b48b004" loading="lazy" alt="" style="height: 38px; filter: brightness(0) invert(1)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.05">Display &amp;<br>Video 360</span></li>
+<li><img src="/_blob/4dd8455dad6de8b38ec0b5e172760c33" loading="lazy" alt="The Trade Desk" style="height: 32px; filter: brightness(0) invert(1)"></li>
+</ul></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 40px"><span class="eyebrow" style="font-size: 11px; width: 120px; flex: none">Verificación</span><ul class="st" style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 44px">
+<li><img src="/_blob/6b9b2492500a98a6177762b258fe6c3e" loading="lazy" alt="Integral Ad Science (IAS)" style="height: 32px; filter: brightness(0) invert(1); opacity: 0.85"></li>
+<li><img src="/_blob/8a4a8d9dd34fc183d8bc717e1f5fd468" loading="lazy" alt="DoubleVerify" style="height: 32px; filter: brightness(0) invert(1); opacity: 0.85"></li>
+</ul></div>
+</div>
+</div>
+<ul class="g5 st" aria-label="Medios disponibles" style="list-style: none; margin: 56px 0 0; padding: 0; border-top: 1px solid rgba(255,255,255,0.12); border-left: 1px solid rgba(255,255,255,0.12)">
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/f47b8c17b79219c7d7878d60e82b6174" loading="lazy" alt="Hulu" style="height: 38px; filter: brightness(0) invert(1)"></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/8a70de6dcee865722210f7efa8c8a57d" loading="lazy" alt="CNN" style="height: 38px; filter: brightness(0) invert(1)"></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/5b0b7c456c57af5326ab6f86f9a2e6ab" loading="lazy" alt="" style="height: 34px; filter: brightness(0) invert(1)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 720">Twitch</span></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/faa3d76c68edb8d232c1a2e1e8bbc746" loading="lazy" alt="ESPN" style="height: 30px; filter: brightness(0) invert(1)"></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/35ef4250c25d90c26eaac79e09ee2de8" loading="lazy" alt="" style="height: 34px; filter: brightness(0) invert(1)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 720">Spotify</span></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; gap: 10px; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/3a29463c26db10c7e379ef2eefc298f9" loading="lazy" alt="" style="height: 34px; filter: brightness(0) invert(1)"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 720; line-height: 1.05">The New<br>York Times</span></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/112413ff2291416f96f8b52b7a45267b" loading="lazy" alt="Forbes" style="height: 36px; filter: brightness(0) invert(1)"></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/a247abe00d1f41fc81d68c4a211ded3e" loading="lazy" alt="Peacock" style="height: 34px; filter: brightness(0) invert(1)"></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/756d294bc53dd384c4839befd915c683" loading="lazy" alt="Tubi" style="height: 32px; filter: brightness(0) invert(1)"></li>
+<li style="height: 120px; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12)"><img src="/_blob/faa75fe863a71ee6186e402cfa195d49" loading="lazy" alt="DIRECTV" style="height: 26px; filter: brightness(0) invert(1)"></li>
+</ul>
+<p style="margin: 18px 0 0; font-size: 13px; line-height: 1.5; color: #9fb6cc">La disponibilidad de cada medio se confirma por mercado y campaña.</p>
+</div>
+</section>
+
+<section id="pantallas" class="hs" aria-labelledby="pant-h" style="position: relative">
+<div class="hs-pin" style="display: flex; flex-direction: column; justify-content: center; gap: 40px; overflow: hidden; padding: 120px 0 64px; box-sizing: border-box">
+<div class="wrap" style="width: 100%; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 24px">
+<div>
+<p class="eyebrow chip">Formatos · Una idea</p>
+<h2 id="pant-h" class="h2" style="margin-top: 16px; font-size: clamp(44px, 5.4vw, 88px)">En cada pantalla que <span style="color: #f83902">mira</span></h2>
+</div>
+<p style="margin: 0; max-width: 360px; font-size: 15px; font-weight: 300; line-height: 1.55; color: #cfe4fa">La misma idea, en tres creatividades que rotan en cada formato. Anuncios de una marca de ejemplo.</p>
+</div>
+<div class="hs-track" style="display: flex; gap: 28px; padding-left: max(40px, calc((100vw - 1200px) / 2)); padding-right: max(40px, calc((100vw - 1200px) / 2)); width: max-content; flex: 1; min-height: 0; box-sizing: content-box">
+<figure class="hs-panel" style="margin: 0; width: min(62vw, 880px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><video data-loop="1" src="/_blob/73fbe1c198ad23d8eb1596d998445aa8" poster="/_blob/0dd5b09635bb6656b9d6d507f4bfedd2" autoplay="" muted="" loop="" playsinline="" preload="metadata" aria-label="Avenida de noche: tres pantallas rotan los anuncios de la marca de ejemplo" style="width: 100%; height: 100%; object-fit: cover; display: block"></video><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">DOOH</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">Pantallas de calle por circuito y horario</span></figcaption></figure>
+<figure class="hs-panel" style="margin: 0; width: min(36vw, 520px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><video data-loop="1" src="/_blob/72cd4002ba4775550a5ba944320928ff" poster="/_blob/e568d4c9e82bf28a08d5b7f03c752d64" autoplay="" muted="" loop="" playsinline="" preload="metadata" aria-label="Un teléfono rota tres stories de la marca de ejemplo" style="width: 100%; height: 100%; object-fit: cover; display: block"></video><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">Social</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">Stories y reels que se prueban</span></figcaption></figure>
+<figure class="hs-panel" style="margin: 0; width: min(54vw, 780px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><img src="/_blob/2e100c6ee53314674788b9e135f647b9" loading="lazy" alt="Un living de noche con la TV conectada mostrando el anuncio de la marca de ejemplo" style="width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; display: block"><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">TV conectada</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">Comprada por audiencia, no por programa</span></figcaption></figure>
+<figure class="hs-panel" style="margin: 0; width: min(54vw, 780px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><video data-loop="1" src="/_blob/7dbe257e9d76e53160fc9f48fe48d667" poster="/_blob/74a4abe6dabcffbd8f6b29376ea9b81c" autoplay="" muted="" loop="" playsinline="" preload="metadata" aria-label="Un juego de carreras con una valla que rota los anuncios de la marca de ejemplo" style="width: 100%; height: 100%; object-fit: cover; display: block"></video><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">In-game</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">Vallas e intersticiales dentro del juego</span></figcaption></figure>
+<figure class="hs-panel" style="margin: 0; width: min(40vw, 580px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><img src="/_blob/7675cdd3389de86371fffeb1121aa340" loading="lazy" alt="Isabella escucha con audífonos en un andén" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; display: block"><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">Audio</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">Spotify, podcasts y radio online</span></figcaption></figure>
+<figure class="hs-panel" style="margin: 0; width: min(54vw, 780px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><video data-loop="1" src="/_blob/054fd89c514c4892644f7aa9df6f6b04" poster="/_blob/2280d130f5d794a79a47e647ed51f581" autoplay="" muted="" loop="" playsinline="" preload="metadata" aria-label="Una tienda con una pantalla que rota los anuncios de la marca de ejemplo" style="width: 100%; height: 100%; object-fit: cover; display: block"></video><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">Retail media</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">Donde se compra, medido contra la venta</span></figcaption></figure>
+<figure class="hs-panel" style="margin: 0; width: min(54vw, 780px); height: 100%; min-height: 360px; position: relative; border-radius: 30px; overflow: hidden; border: 1px solid rgba(255,255,255,0.16)"><video data-loop="1" src="/_blob/e42aea68ef15db349af21463ad60cd41" poster="/_blob/ec4f4d43d9e0b40d51d897d1bab703d6" autoplay="" muted="" loop="" playsinline="" preload="metadata" aria-label="Un pasajero en un bus ve rotar los anuncios de la marca de ejemplo en su teléfono" style="width: 100%; height: 100%; object-fit: cover; display: block"></video><figcaption style="position: absolute; left: 34px; bottom: 32px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.03em; text-shadow: 0 2px 20px rgba(0,0,0,0.6)">Video móvil</span><span style="font-size: 14px; font-weight: 500; background: rgba(0,26,51,0.85); padding: 6px 12px; border-radius: 999px; align-self: flex-start">En el trayecto, con sonido o sin él</span></figcaption></figure>
+</div>
+<div class="wrap" style="width: 100%"><div aria-hidden="true" style="height: 3px; border-radius: 2px; background: rgba(255,255,255,0.14)"><div class="hs-bar" style="height: 100%; width: 100%; border-radius: 2px; background: #f83902"></div></div></div>
+</div>
+</section>
+
+<section id="medicion" aria-labelledby="med-h" style="padding: 160px 0 150px; background: radial-gradient(ellipse 70% 50% at 50% 20%, #0a3157 0%, #001a33 70%)">
+<div class="wrap">
+<div class="split">
+<div>
+<p class="eyebrow chip rv">Medición</p>
+<h2 id="med-h" class="h2 words" style="margin-top: 22px"><span>Un</span> <span>número</span> <span>en</span> <span>el</span> <span style="color: #f83902">que confiar</span></h2>
+</div>
+<p class="lead rv">Diseñamos qué medir, instalamos cada tag y conectamos medios, CRM y analítica. La pauta aprende de tu venta y tú lees un solo número.</p>
+</div>
+
+<div class="rv" style="margin-top: 80px; padding: 40px 36px 34px; border-radius: 32px; border: 1.5px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.025)">
+<p class="eyebrow" style="font-size: 12px">01 · La señal que le mandamos a cada plataforma</p>
+<div style="margin-top: 26px"><svg viewBox="0 0 1200 520" role="img" aria-label="Tu sitio, tu CRM y tu venta offline pasan por Google Tag Manager, donde la señal se limpia, se deduplica y recibe valor, y llega a Meta, Google, TikTok, LinkedIn y Microsoft" style="width: 100%; height: auto; display: block; overflow: visible"><defs><radialGradient id="hubG" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0375db" stop-opacity="0.45"></stop><stop offset="1" stop-color="#0375db" stop-opacity="0"></stop></radialGradient></defs><path d="M300 90 C 430 90, 470 260, 520 260" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M300 90 C 430 90, 470 260, 520 260" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -0.0s"></path><rect x="40" y="52" width="260" height="76" rx="18" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><text x="64" y="86" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="24" font-weight="720">Tu sitio</text><text x="64" y="112" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="15" font-weight="300">Compras y formularios</text><path d="M300 260 C 430 260, 470 260, 520 260" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M300 260 C 430 260, 470 260, 520 260" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -0.5s"></path><rect x="40" y="222" width="260" height="76" rx="18" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><text x="64" y="256" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="24" font-weight="720">Tu CRM</text><text x="64" y="282" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="15" font-weight="300">Oportunidades y ventas</text><path d="M300 430 C 430 430, 470 260, 520 260" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M300 430 C 430 430, 470 260, 520 260" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -1.0s"></path><rect x="40" y="392" width="260" height="76" rx="18" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><text x="64" y="426" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="24" font-weight="720">Venta offline</text><text x="64" y="452" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="15" font-weight="300">Tienda y teléfono</text><path d="M680 260 C 730 260, 770 50, 880 50" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M680 260 C 730 260, 770 50, 880 50" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -0.0s"></path><rect x="880" y="16" width="290" height="68" rx="16" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><image href="/_blob/bc08c3ae07c90f6860494bc38dc453d9" x="900" y="36" width="28" height="28"></image><text x="944" y="48" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="21" font-weight="720">Meta</text><text x="944" y="70" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="14" font-weight="300">API de Conversiones</text><path d="M680 260 C 730 260, 770 150, 880 150" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M680 260 C 730 260, 770 150, 880 150" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -0.35s"></path><rect x="880" y="116" width="290" height="68" rx="16" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><image href="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" x="900" y="136" width="28" height="28"></image><text x="944" y="148" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="21" font-weight="720">Google</text><text x="944" y="170" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="14" font-weight="300">Conversiones mejoradas</text><path d="M680 260 C 730 260, 770 250, 880 250" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M680 260 C 730 260, 770 250, 880 250" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -0.7s"></path><rect x="880" y="216" width="290" height="68" rx="16" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><image href="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" x="900" y="236" width="28" height="28"></image><text x="944" y="248" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="21" font-weight="720">TikTok</text><text x="944" y="270" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="14" font-weight="300">Events API</text><path d="M680 260 C 730 260, 770 350, 880 350" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M680 260 C 730 260, 770 350, 880 350" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -1.0499999999999998s"></path><rect x="880" y="316" width="290" height="68" rx="16" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><image href="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" x="900" y="336" width="28" height="28"></image><text x="944" y="348" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="21" font-weight="720">LinkedIn</text><text x="944" y="370" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="14" font-weight="300">Conversiones</text><path d="M680 260 C 730 260, 770 450, 880 450" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"></path><path class="flow" d="M680 260 C 730 260, 770 450, 880 450" fill="none" stroke="#f83902" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 22" style="animation-delay: -1.4s"></path><rect x="880" y="416" width="290" height="68" rx="16" fill="#06284a" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"></rect><image href="/_blob/f1d169aa14ba1f8bec5ff12bc6a0178f" x="900" y="436" width="28" height="28"></image><text x="944" y="448" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="21" font-weight="720">Microsoft</text><text x="944" y="470" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="14" font-weight="300">Conversiones offline</text><circle cx="600" cy="260" r="170" fill="url(#hubG)"></circle><circle cx="600" cy="260" r="92" fill="#06284a" stroke="#f83902" stroke-width="2.5"></circle><image href="/_blob/3947d3347a8c99d5b856b93f22f83ad6" x="579" y="190" width="42" height="42"></image><text x="600" y="256" text-anchor="middle" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="14.5" font-weight="700">Se limpia,</text><text x="600" y="274" text-anchor="middle" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="14.5" font-weight="700">se deduplica</text><text x="600" y="292" text-anchor="middle" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="14.5" font-weight="700">y recibe valor</text></svg></div>
+</div>
+
+<div class="orbgrid" style="margin-top: 120px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<p class="eyebrow rv" style="font-size: 12px">02 · Atribución</p>
+<p class="rv" style="margin: 0 0 10px; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(36px, 3.6vw, 58px); font-weight: 760; letter-spacing: -0.04em; line-height: 0.98">Cada plataforma se atribuye <span style="color: #f83902">la misma venta</span></p>
+<div class="st" style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 18px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 28px"><span style="font-size: 17px; flex: 1">Meta reporta</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 760"><span class="count" style="--n: 120"></span></b></div>
+<div style="display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 18px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 28px"><span style="font-size: 17px; flex: 1">Google reporta</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 760"><span class="count" style="--n: 110"></span></b></div>
+<div style="display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 18px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="height: 28px"><span style="font-size: 17px; flex: 1">TikTok reporta</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 760"><span class="count" style="--n: 40"></span></b></div>
+<div style="display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 18px; border: 1.5px dashed rgba(255,255,255,0.35)"><span style="font-size: 17px; flex: 1; color: #cfe4fa">Suman las plataformas</span><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 760; color: #9fb6cc; text-decoration: line-through; text-decoration-color: #f83902">270</b></div>
+</div>
+</div>
+<div style="position: relative; width: 100%; max-width: 560px; aspect-ratio: 1 / 1; margin: 0 auto">
+<svg viewBox="0 0 560 560" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible">
+<defs><radialGradient id="orbHalo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0375db" stop-opacity="0.34"></stop><stop offset="0.7" stop-color="#0375db" stop-opacity="0.07"></stop><stop offset="1" stop-color="#0375db" stop-opacity="0"></stop></radialGradient></defs>
+<g class="orb-ring"><circle cx="280" cy="280" r="270" fill="url(#orbHalo)"></circle><circle cx="280" cy="280" r="230" fill="none" stroke="#ffffff" stroke-opacity="0.32" stroke-width="2.5"></circle></g>
+<path class="orb-arc" d="M280 50 A230 230 0 1 1 201.34 496.13" fill="none" stroke="#f83902" stroke-width="5" stroke-linecap="round" stroke-dasharray="802.9" stroke-dashoffset="0"></path>
+<g class="orb-sphere"><circle cx="201.34" cy="496.13" r="34" fill="#f83902" fill-opacity="0.16"></circle><circle cx="201.34" cy="496.13" r="16" fill="#f83902"></circle></g>
+</svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 22%">
+<p class="eyebrow" style="font-size: 12px; color: #ffffff">Tu CRM</p>
+<p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; font-size: clamp(72px, 8vw, 128px); letter-spacing: -0.05em; line-height: 0.9"><span class="count" style="--n: 150"></span></p>
+<p style="margin: 10px 0 0; font-size: 15px; font-weight: 300; line-height: 1.45; color: #e6edf3">ventas reales, de las 270 que suman las plataformas</p>
+</div>
+</div>
+</div>
+<div class="g2 st" style="gap: 20px; margin-top: 48px">
+<div style="padding: 24px 26px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.16)"><p style="margin: 0; font-size: 14px; color: #9fb6cc">Costo por venta según las plataformas</p><div style="margin-top: 14px; height: 14px; border-radius: 7px; background: rgba(255,255,255,0.1)"><div class="grow" style="width: 56%; height: 100%; border-radius: 7px; background: #6f89a2"></div></div><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760; color: #9fb6cc">US$ 56</p></div>
+<div style="padding: 24px 26px; border-radius: 20px; border: 2px solid #f83902"><p style="margin: 0; font-size: 14px; color: #ffffff">Costo por venta real, en tu CRM</p><div style="margin-top: 14px; height: 14px; border-radius: 7px; background: rgba(255,255,255,0.1)"><div class="grow" style="width: 100%; height: 100%; border-radius: 7px; background: #f83902; box-shadow: 0 0 24px rgba(248,57,2,0.6)"></div></div><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 760">US$ 100</p></div>
+</div>
+<p style="margin: 14px 0 0; font-size: 13px; color: #9fb6cc">Ejemplo ilustrativo con una inversión de US$ 15.000. El arco mide las ventas reales: 150 de 270.</p>
+
+<div class="rv" style="margin-top: 120px; border-radius: 32px; border: 1.5px solid rgba(255,255,255,0.18); background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)); padding: 34px 34px 30px; box-shadow: 0 60px 140px rgba(0,0,0,0.5)">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 14px"><img src="/_blob/d87664017eda36864cc70babede08980" alt="Efeonce Insights" style="height: 26px; width: auto"><span class="eyebrow" style="font-size: 12px">03 · Tu tablero, cada semana</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><img src="/_blob/b33672d9f8ec537d2e2729cf6bb05256" alt="Google Analytics" style="height: 22px"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="HubSpot" style="height: 22px"><img src="/_blob/a98f7cff868281c750398184592bd4db" alt="Salesforce" style="height: 20px"><span style="font-size: 12px; color: #9fb6cc">Datos de muestra</span></div>
+</div>
+<div class="g4 st kpis" style="gap: 14px; margin-top: 26px"><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Inversión del mes</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">US$ 15.000</p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Ventas en tu CRM</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff"><span class="count" style="--n: 150"></span></p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Costo por venta real</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">US$ 100</p></div><div style="padding: 20px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)"><p style="margin: 0; font-size: 13px; color: #9fb6cc">Ventas contadas dos veces</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #f83902"><span class="count" style="--n: 120"></span></p></div></div>
+<div class="dash" style="margin-top: 18px">
+<div style="padding: 22px 24px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12)">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap"><p style="margin: 0; font-size: 14px; color: #ffffff; font-weight: 500">Ventas por semana · con campaña y zona de control</p><p style="margin: 0; font-size: 12px; color: #9fb6cc"><span style="color: #f83902">━</span> Con campaña &#160; <span style="color: #6f89a2">┅</span> Control</p></div>
+<svg viewBox="0 0 640 240" aria-hidden="true" style="width: 100%; height: auto; display: block; margin-top: 14px">
+<g stroke="#ffffff" stroke-opacity="0.08"><path d="M0 40H640M0 100H640M0 160H640M0 220H640"></path></g>
+<path d="M0 200 L80 196 L160 190 L240 186 L320 160 L400 128 L480 104 L560 84 L640 66 L640 240 L0 240 Z" fill="#f83902" fill-opacity="0.10"></path>
+<path class="draw" pathLength="1" d="M0 200 L80 196 L160 190 L240 186 L320 160 L400 128 L480 104 L560 84 L640 66" fill="none" stroke="#f83902" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></path>
+<path class="draw" pathLength="1" d="M0 202 L80 199 L160 195 L240 192 L320 190 L400 186 L480 183 L560 180 L640 178" fill="none" stroke="#6f89a2" stroke-width="2.5" stroke-dasharray="6 6" stroke-linecap="round"></path>
+<path d="M240 20 V230" stroke="#ffffff" stroke-opacity="0.4" stroke-dasharray="3 5"></path><text x="248" y="32" fill="#cfe4fa" font-family="Poppins, sans-serif" font-size="13">Sale la campaña</text>
+<circle cx="640" cy="66" r="7" fill="#f83902"></circle>
+</svg>
+</div>
+<div style="padding: 22px 24px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column">
+<p style="margin: 0; font-size: 14px; color: #ffffff; font-weight: 500">Ventas reales por canal</p>
+<div class="barg" style="flex: 1; min-height: 240px; margin-top: 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: end"><div style="display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 720">62</span><div class="bar" style="width: 100%; max-width: 64px; height: 198.4px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #f83902, rgba(3,117,219,0.35))"></div><span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: #cfe4fa"><img src="/_blob/bc08c3ae07c90f6860494bc38dc453d9" alt="" style="height: 22px; width: auto">Meta</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 720">55</span><div class="bar" style="width: 100%; max-width: 64px; height: 176.0px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #3d86d8, rgba(3,117,219,0.35))"></div><span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: #cfe4fa"><img src="/_blob/60e45493b4cd6a84ab5d00afdb477d2c" alt="" style="height: 22px; width: auto">Google</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 720">21</span><div class="bar" style="width: 100%; max-width: 64px; height: 67.2px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #3d86d8, rgba(3,117,219,0.35))"></div><span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: #cfe4fa"><img src="/_blob/d08f332c5a946dc9cc3c3a85e37ae159" alt="" style="height: 22px; width: auto">TikTok</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 720">12</span><div class="bar" style="width: 100%; max-width: 64px; height: 38.400000000000006px; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #3d86d8, rgba(3,117,219,0.35))"></div><span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: #cfe4fa"><img src="/_blob/4c1a10cc2a1c05d5c4db0547a41cac81" alt="" style="height: 22px; width: auto">LinkedIn</span></div></div>
+</div>
+</div>
+</div>
+
+<div class="g2" style="gap: 28px; margin-top: 28px; align-items: stretch">
+<div role="img" aria-label="Zonas con campaña frente a zonas de control parecidas sin campaña; desde que sale la campaña, las ventas de las zonas con campaña suben y las de control siguen planas. Gráfico ilustrativo." style="display: flex; flex-direction: column; gap: 16px">
+<div class="g2 st" style="gap: 16px">
+<div style="padding: 18px 20px 22px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.22); background: radial-gradient(ellipse 80% 70% at 50% 60%, rgba(3,117,219,0.28), rgba(0,26,51,0) 70%)"><p class="eyebrow" style="font-size: 11px; color: #ffffff">Zonas con campaña</p><div class="dots-on" style="margin-top: 14px; height: 150px; border-radius: 12px; background-image: radial-gradient(circle, #cfe4fa 2.6px, transparent 3.2px); background-size: 22px 22px; background-position: center"></div></div>
+<div style="padding: 18px 20px 22px; border-radius: 20px; border: 1.5px dashed rgba(255,255,255,0.22)"><p class="eyebrow" style="font-size: 11px">Zonas de control, sin campaña</p><div style="margin-top: 14px; height: 150px; border-radius: 12px; background-image: radial-gradient(circle, rgba(207,228,250,0.28) 2px, transparent 2.6px); background-size: 22px 22px; background-position: center"></div></div>
+</div>
+<div class="rv" style="padding: 20px 22px 16px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.03)">
+<svg viewBox="0 0 600 220" aria-hidden="true" style="width: 100%; height: auto; display: block">
+<g stroke="#ffffff" stroke-opacity="0.08"><path d="M0 50H600M0 110H600M0 170H600"></path></g>
+<path d="M210 12 V210" stroke="#f83902" stroke-width="2"></path><text x="220" y="26" fill="#ffffff" font-family="Poppins, sans-serif" font-size="13" font-weight="600">Sale la campaña</text>
+<path d="M210 168 L270 150 L330 128 L390 110 L450 96 L520 86 L590 78 L590 210 L210 210 Z" fill="#f83902" fill-opacity="0.10"></path>
+<path class="draw" pathLength="1" d="M0 172 L70 171 L140 170 L210 168 L270 150 L330 128 L390 110 L450 96 L520 86 L590 78" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></path>
+<path class="draw" pathLength="1" d="M0 174 L70 173 L140 172 L210 171 L270 170 L330 169 L390 168 L450 167 L520 166 L590 165" fill="none" stroke="#6f89a2" stroke-width="2.5" stroke-dasharray="6 6" stroke-linecap="round"></path>
+<circle cx="590" cy="78" r="7" fill="#f83902"></circle>
+<text x="470" y="62" fill="#ffffff" font-family="Bricolage Grotesque, sans-serif" font-size="17" font-weight="720">Lo que sumó</text>
+</svg>
+<p style="margin: 8px 0 0; display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: #9fb6cc"><span><span style="color: #ffffff">━</span> Con campaña</span><span><span style="color: #6f89a2">┅</span> Control</span><span>Gráfico ilustrativo, sin datos reales</span></p>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 10px 6px">
+<p class="eyebrow rv" style="font-size: 12px">04 · Incrementalidad</p>
+<p class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(36px, 3.6vw, 58px); font-weight: 760; letter-spacing: -0.04em; line-height: 0.98">Lo que la campaña <span style="color: #f83902">sumó</span></p>
+<p class="lead rv">Comparamos zonas con campaña contra zonas parecidas sin ella: medimos lo que la campaña agregó, no lo que habría pasado igual.</p>
+<ol class="st" style="list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.14)"><img src="/_blob/3947d3347a8c99d5b856b93f22f83ad6" alt="" style="height: 24px"><span style="font-size: 15px">Auditoría de medición y plan de tags</span></li>
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.14)"><img src="/_blob/b33672d9f8ec537d2e2729cf6bb05256" alt="" style="height: 24px"><span style="font-size: 15px">GA4 y Tag Manager implementados</span></li>
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.14)"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="" style="height: 24px"><span style="font-size: 15px">CRM conectado de vuelta a la pauta</span></li>
+<li style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 14px; border: 2px solid #f83902"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg><span style="font-size: 15px">Holdouts, geo-tests y lectura mensual</span></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+
+
+<section aria-labelledby="eq-h" style="padding: 140px 0; border-top: 1px solid rgba(255,255,255,0.1)">
+<div class="wrap">
+<div class="split">
+<div>
+<p class="eyebrow chip rv">Quién opera tu cuenta</p>
+<h2 id="eq-h" class="h2 words" style="margin-top: 22px"><span>Un</span> <span style="color: #f83902">squad,</span> <span>no</span> <span>un</span> <span>ejecutivo</span></h2>
+</div>
+<p class="lead rv">Personas con oficio en medios, datos y creatividad trabajan sobre tu cuenta, con agentes que leen las plataformas y una persona que decide cada cambio.</p>
+</div>
+<div class="g3 st" style="gap: 0; margin-top: 64px; border-top: 1px solid rgba(255,255,255,0.14); border-left: 1px solid rgba(255,255,255,0.14)">
+<div style="padding: 32px 30px; border-right: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14); background: rgba(248,57,2,0.06)"><p class="eyebrow" style="font-size: 12px; color: #ffffff">Tu interlocutor</p><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 740; letter-spacing: -0.02em">Responsable de cuenta</p><p style="margin: 8px 0 0; font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Una persona que conoce tu negocio y responde por el resultado.</p></div>
+<div style="padding: 32px 30px; border-right: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14)"><p class="eyebrow" style="font-size: 12px">Plan</p><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 740; letter-spacing: -0.02em">Estrategia de medios</p><p style="margin: 8px 0 0; font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Plan, mix e inversión por objetivo.</p></div>
+<div style="padding: 32px 30px; border-right: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14)"><p class="eyebrow" style="font-size: 12px">Compra</p><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 740; letter-spacing: -0.02em">Operación de campañas</p><p style="margin: 8px 0 0; font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Search, social y programática, cada semana.</p></div>
+<div style="padding: 32px 30px; border-right: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14)"><p class="eyebrow" style="font-size: 12px">Señal</p><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 740; letter-spacing: -0.02em">Datos y medición</p><p style="margin: 8px 0 0; font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Tags, señal, tableros y la lectura mensual.</p></div>
+<div style="padding: 32px 30px; border-right: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14)"><p class="eyebrow" style="font-size: 12px">Piezas</p><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 740; letter-spacing: -0.02em">Creatividad de performance</p><p style="margin: 8px 0 0; font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Variantes y pruebas que aprenden.</p></div>
+<div style="padding: 32px 30px; border-right: 1px solid rgba(255,255,255,0.14); border-bottom: 1px solid rgba(255,255,255,0.14)"><p class="eyebrow" style="font-size: 12px">Con IA</p><p style="margin: 12px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 740; letter-spacing: -0.02em">Agentes</p><p style="margin: 8px 0 0; font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Leen las plataformas y proponen; una persona confirma.</p></div>
+</div>
+</div>
+</section>
+
+<section id="cobro" aria-labelledby="cobro-h" style="padding: 150px 0; background: #f7f8f6; color: #023c70">
+<div class="wrap g2" style="gap: 64px; align-items: center">
+<div style="border-radius: 30px; overflow: hidden; aspect-ratio: 4 / 3.6"><img class="clip" src="/_blob/1324055d5a4bafada504762173383c7c" loading="lazy" alt="Isabella pone sobre la mesa dos cubos de luz separados: tus medios y nuestro fee" style="width: 100%; height: 100%; object-fit: cover; object-position: 55% 50%; display: block"></div>
+<div style="display: flex; flex-direction: column; gap: 22px">
+<p class="eyebrow chip rv" style="color: #023c70; border-color: rgba(2,60,112,0.4)">Cómo cobramos</p>
+<h2 id="cobro-h" class="h2 words" style="color: #023c70"><span>Medios</span> <span>y</span> <span>fee,</span> <span style="color: #f83902">aparte</span></h2>
+<div class="st" style="margin-top: 18px; display: flex; flex-direction: column; gap: 16px">
+<div style="padding: 26px 28px; border-radius: 22px; border: 1.5px solid rgba(2,60,112,0.22); background: #ffffff"><p class="eyebrow" style="font-size: 12px; color: #6d6777">01 · Tus medios</p><p style="margin: 10px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.035em; line-height: 1">Al costo</p><p style="margin: 10px 0 0; font-size: 16px; font-weight: 400; line-height: 1.5; color: #4a5568">Lo que inviertes va a cada plataforma o proveedor, sin recargo, y ves sus facturas.</p></div>
+<div style="padding: 26px 28px; border-radius: 22px; border: 2px solid #f83902; background: #ffffff"><p class="eyebrow" style="font-size: 12px; color: #6d6777">02 · Nuestro fee</p><p style="margin: 10px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 760; letter-spacing: -0.035em; line-height: 1">Fijo y aparte</p><p style="margin: 10px 0 0; font-size: 16px; font-weight: 400; line-height: 1.5; color: #4a5568">Por campaña o por mes, según el alcance que acordamos. No es un porcentaje de tu inversión.</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="metodo" aria-labelledby="met-h" style="padding: 160px 0 140px">
+<div class="wrap">
+<p class="eyebrow chip rv">Cómo empezamos</p>
+<h2 id="met-h" class="h2 words" style="margin-top: 22px"><span>Por</span> <span style="color: #f83902">etapas,</span> <span>con</span> <span>evidencia</span></h2>
+<p class="lead rv" style="margin-top: 30px; max-width: 600px">Una escalera: cada etapa deja evidencia para decidir la siguiente, sin amarrarte a ciegas.</p>
+<ol class="g4 st stairs" style="list-style: none; margin: 80px 0 0; padding: 0; gap: 20px; align-items: end">
+<li style="padding: 30px 26px; border-radius: 22px; border: 2px solid #f83902; background: rgba(248,57,2,0.08); min-height: 240px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #ffffff">Empieza aquí</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Diagnóstico</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Inversión, cuentas, señal y creatividad; plan de 90 días en 2 a 4 semanas.</span></li>
+<li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.22); min-height: 290px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">8 a 12 semanas</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Activation Sprint</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Señal remediada, cuentas ordenadas, primera matriz creativa y línea base.</span></li>
+<li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.22); min-height: 340px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">Mínimo 3 meses</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Managed Performance</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Operación mensual, testing, reporte ejecutivo y gobierno trimestral.</span></li>
+<li style="padding: 30px 26px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.22); min-height: 390px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9fb6cc">Con madurez</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.03em">Incrementalidad</span><span style="font-size: 15px; font-weight: 300; line-height: 1.5; color: #cfe4fa">Holdouts, geo-tests y MMM para decidir dónde va el próximo peso.</span></li>
+</ol>
+</div>
+</section>
+
+<section aria-label="Partners oficiales" style="padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); background: radial-gradient(ellipse 60% 80% at 50% 50%, #0a3157 0%, #001a33 75%)">
+<div class="wrap" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 40px">
+<div class="rvl" style="display: flex; align-items: center; gap: 28px">
+<img src="/_blob/f38a34ef46fce580b8d6e1fdcf1b9fec" loading="lazy" alt="Sprocket de HubSpot en 3D" style="height: 120px; width: 120px; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5))">
+<div><p class="eyebrow" style="font-size: 12px">Partners oficiales</p><p style="margin: 8px 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.15">HubSpot Solutions Partner Gold<br>y Salesforce Partner</p></div>
+<img src="/_blob/a98f7cff868281c750398184592bd4db" loading="lazy" alt="Salesforce" style="width: 110px; filter: drop-shadow(0 0 30px rgba(23,152,193,0.5))">
+</div>
+<ul class="st" aria-label="Partners de nube, creatividad e IA" style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px">
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/693b860ae605b914ce8d4ed7bb70c748" loading="lazy" alt="AWS" style="max-width: 76px; max-height: 30px"></li>
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/0ccd0eb0ab18100d22d742b36977bb89" loading="lazy" alt="Microsoft" style="max-width: 86px; max-height: 22px"></li>
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/75e404df9ed8db5ffe72b7b6ca47abdc" loading="lazy" alt="Google Cloud" style="max-width: 90px; max-height: 20px"></li>
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/56046c568be03669b1ce5f3daed23635" loading="lazy" alt="Adobe" style="max-width: 82px; max-height: 22px"></li>
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/87207af6716a1ccc3a22686fd145173c" loading="lazy" alt="Claude de Anthropic" style="max-width: 82px; max-height: 22px"></li>
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/3d0dddf8e098b583d7f172909fde4580" loading="lazy" alt="OpenAI" style="max-width: 82px; max-height: 24px"></li>
+<li style="width: 112px; height: 64px; border-radius: 14px; background: #ffffff; display: flex; align-items: center; justify-content: center"><img src="/_blob/a992a4f39148fc78a585b83b0aec7e61" loading="lazy" alt="BytePlus" style="max-width: 86px; max-height: 20px"></li>
+</ul>
+</div>
+</section>
+
+<section id="faq" aria-labelledby="faq-h" style="padding: 150px 0 130px">
+<div class="wrap split" style="align-items: start">
+<div class="sticky-col" style="display: flex; flex-direction: column; gap: 22px; position: sticky; top: 120px; align-self: start">
+<p class="eyebrow chip rv">Preguntas frecuentes</p>
+<h2 id="faq-h" class="h2 words"><span>Lo</span> <span>que</span> <span>nos</span> <span>preguntan</span></h2>
+</div>
+<div class="st" style="border-top: 1px solid rgba(255,255,255,0.16)">
+<details open style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué hace una agencia de medios?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Planifica, compra, optimiza y mide tu inversión publicitaria. En Efeonce eso cubre search, social, video, TV conectada, audio, pantallas en la calle y retail media, conectado a tus ventas y a tu CRM.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Cómo cobran?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Los medios van al costo, con la factura de cada proveedor. Nuestro fee es fijo, por campaña o por mes, y no es un porcentaje de tu inversión.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Las cuentas publicitarias quedan a mi nombre?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Sí. Las cuentas y los datos son tuyos; nosotros operamos con acceso de agencia.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Garantizan un ROAS?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">No. Ninguna agencia controla la subasta ni tu mercado. Te entregamos una línea base, un método de prueba y la recomendación del siguiente ciclo, con la evidencia a la vista.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué es la compra de medios y en qué se diferencia de la planificación?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">La planificación decide dónde, cuándo y con cuánto aparece tu marca: canales, audiencias, presupuesto y metas. La compra ejecuta ese plan: activa los espacios en plataformas como Google o Meta, o de forma programática, y los optimiza mientras corren. En Efeonce las hace el mismo equipo, para que lo que se aprende comprando corrija el plan.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué incluye un plan de medios?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">El objetivo y la métrica con que se va a evaluar, las audiencias, los canales y formatos, el presupuesto por canal y por mes, el calendario y las pruebas que haremos antes de escalar.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué es la TV conectada (CTV)?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Es la publicidad en televisores conectados a internet, dentro de apps y servicios de streaming con anuncios. Se compra por audiencia, de forma programática, y se mide por alcance, frecuencia y las visitas o ventas que vienen después.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué es DOOH?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Digital out-of-home: las pantallas digitales en la calle, centros comerciales, transporte y puntos de venta. Se puede comprar de forma programática, por horario y ubicación, y cambiar la pieza según el momento.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué es el retail media y cuándo conviene?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Es la publicidad dentro de los sitios y apps de retailers y marketplaces, con sus datos de compra. Conviene cuando vendes a través de ese retailer: el anuncio aparece cerca de la decisión y la venta se mide en la misma plataforma.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿Qué es la publicidad programática?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Es la compra automatizada de espacios en sitios, apps, TV conectada, audio y pantallas de calle, por audiencia y en tiempo real. La operamos con Basis, DV360 y The Trade Desk.</p></details>
+<details style="border-bottom: 1px solid rgba(255,255,255,0.16); padding: 26px 0"><summary style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; display: flex; justify-content: space-between; gap: 20px">¿En qué países operan?<span aria-hidden="true" style="color: #9fb6cc">+</span></summary><p style="margin: 14px 0 0; font-size: 16px; font-weight: 300; line-height: 1.6; color: #cfe4fa">Chile, Colombia, Perú, México y Estados Unidos. La disponibilidad de cada medio se confirma por mercado.</p></details>
+</div>
+</div>
+</section>
+
+<section id="agenda" aria-labelledby="cta-h">
+<div style="position: relative; height: max(640px, min(86vh, 820px)); overflow: hidden; display: flex; align-items: center">
+<img class="clip" src="/_blob/f0fc909f7cf10cbf5300e9bd4ad7c85e" loading="lazy" alt="Isabella sostiene una esfera de luz de la que salen líneas hacia muchas pantallas" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 30%">
+<div class="wrap" style="position: relative; width: 100%">
+<div style="max-width: 560px; display: flex; flex-direction: column; gap: 18px">
+<p class="rv" style="margin: 0; font-family: Poppins, sans-serif; font-weight: 300; font-size: clamp(28px, 2.8vw, 42px); color: #ffffff">¿Conversamos?</p>
+<h2 id="cta-h" class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; font-size: clamp(76px, 9.5vw, 156px); color: #ffffff">Cuando quieras<span class="sphere" aria-hidden="true"></span></h2>
+<p class="lead rv" style="color: #e6edf3; max-width: 440px">Empieza con un diagnóstico de tu pauta.</p>
+</div>
+</div>
+</div>
+<div class="wrap g2" style="gap: 56px; padding-top: 90px; padding-bottom: 150px; align-items: start; position: relative">
+<div class="sticky-col" style="display: flex; flex-direction: column; gap: 22px; position: sticky; top: 48px; align-self: start">
+<p class="eyebrow chip rv">El diagnóstico</p>
+<p class="rv" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(36px, 3.6vw, 56px); font-weight: 760; letter-spacing: -0.035em; line-height: 1">Tu pauta, revisada <span style="color: #f83902">a fondo</span></p>
+<ul class="st" style="list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-width: 520px">
+<li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">2 a 4 semanas.</b> <span style="color: #cfe4fa; font-weight: 300">Revisamos tu inversión, tus cuentas, tu señal y tu creatividad.</span></li>
+<li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">Sales con un plan de 90 días.</b> <span style="color: #cfe4fa; font-weight: 300">Qué ordenar, qué probar y dónde mover la inversión.</span></li>
+<li style="padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.2)"><b style="font-weight: 600">Lo que necesitamos de ti:</b> <span style="color: #cfe4fa; font-weight: 300">acceso de lectura a tus cuentas y una reunión de inicio.</span></li>
+</ul>
+</div>
+<div class="rvr formcard" style="padding: 36px 34px; border-radius: 28px; background: rgba(0,26,51,0.92); border: 1.5px solid rgba(255,255,255,0.24); box-shadow: 0 40px 100px rgba(0,0,0,0.5)">
+<sc-if value="{{notSent}}" hint-placeholder-val="{{true}}">
+<form aria-labelledby="form-h" onSubmit="{{submitForm}}" style="display: flex; flex-direction: column; gap: 18px">
+<div><p id="form-h" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.025em">Agenda tu diagnóstico</p><p style="margin: 6px 0 0; font-size: 14px; color: #cfe4fa">Los campos con <span style="color: #f83902">*</span> son obligatorios.</p></div>
+<div class="g2" style="gap: 16px">
+<label class="fld"><span>Nombre<span aria-hidden="true" style="color: #f83902"> *</span></span><input type="text" name="nombre" autocomplete="given-name" required=""></label>
+<label class="fld"><span>Apellido<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><input type="text" name="apellido" autocomplete="family-name"></label>
+<label class="fld"><span>Correo<span aria-hidden="true" style="color: #f83902"> *</span></span><input type="email" name="email" autocomplete="email" inputmode="email" required=""></label>
+<label class="fld"><span>Teléfono<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><input type="tel" name="telefono" autocomplete="tel" inputmode="tel" placeholder="+56 9 1234 5678"></label>
+<label class="fld"><span>Empresa<span aria-hidden="true" style="color: #f83902"> *</span></span><input type="text" name="empresa" autocomplete="organization" required=""></label>
+<label class="fld"><span>Cargo<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><input type="text" name="cargo" autocomplete="organization-title"></label>
+<label class="fld"><span>País<span aria-hidden="true" style="color: #f83902"> *</span></span><select name="pais" required=""><option value="">Elige un país</option><option>Chile</option><option>Colombia</option><option>México</option><option>Perú</option><option>Estados Unidos</option><option>Otro país</option></select></label>
+<label class="fld"><span>¿Cómo vendes?<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><select name="modo"><option value="">Elige una opción</option><option>Online o en tiendas</option><option>A empresas</option><option>Ambas</option><option>Aún no lo sé</option></select></label>
+</div>
+<fieldset style="margin: 0; padding: 0; border: 0"><legend class="fld" style="padding: 0; margin-bottom: 10px"><span>Dónde pautas hoy<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span></legend><div style="display: flex; flex-wrap: wrap; gap: 8px"><label class="chk"><input type="checkbox" name="canales" value="Google"><span>Google</span></label><label class="chk"><input type="checkbox" name="canales" value="Meta"><span>Meta</span></label><label class="chk"><input type="checkbox" name="canales" value="TikTok"><span>TikTok</span></label><label class="chk"><input type="checkbox" name="canales" value="LinkedIn"><span>LinkedIn</span></label><label class="chk"><input type="checkbox" name="canales" value="Programática"><span>Programática</span></label><label class="chk"><input type="checkbox" name="canales" value="Aún ninguno"><span>Aún ninguno</span></label></div></fieldset>
+<label class="fld"><span>Inversión mensual en medios<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><select name="inversion"><option value="">Elige un rango</option><option>Menos de USD 3.000</option><option>USD 3.000 a 10.000</option><option>USD 10.000 a 50.000</option><option>Más de USD 50.000</option><option>Por definir</option></select></label>
+<label class="fld"><span>¿Qué quieres resolver?<span style="font-weight: 400; color: #9fb6cc"> (opcional)</span></span><textarea name="mensaje" rows="3" style="resize: vertical; min-height: 96px" placeholder="Por ejemplo: no sabemos qué canal trae ventas, o queremos sumar programática."></textarea></label>
+<label class="chk-line"><input type="checkbox" name="novedades" value="si"><span>Quiero recibir novedades y contenidos de Efeonce. Puedes darte de baja cuando quieras.</span></label>
+<div aria-label="Por qué confiar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.03)">
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600"><img src="/_blob/d19da033f3873f81ca27425a68e8bcc0" alt="" style="height: 20px">HubSpot Solutions Partner Gold</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600"><img src="/_blob/a98f7cff868281c750398184592bd4db" alt="" style="height: 18px">Salesforce Partner</span>
+<span style="font-size: 13px; font-weight: 600"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 760">+120</span> empresas en 4 países</span>
+</div>
+<button type="submit" style="min-height: 56px; border-radius: 999px; border: 0; background: #ffffff; color: #001a33; font-size: 17px; font-weight: 600; box-shadow: 0 0 0 5px rgba(248,57,2,0.4)">Enviar y coordinar la reunión</button>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9fb6cc">Usamos tus datos sólo para responder esta solicitud. Más detalle en la <a href="#privacidad" style="color: #ffffff">política de privacidad</a>.</p>
+<p style="margin: 0; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.14); font-size: 14px; color: #cfe4fa">¿Prefieres elegir el horario tú? <a href="#agendar" style="color: #ffffff; font-weight: 600">Agenda directo en el calendario</a></p>
+</form>
+</sc-if>
+<sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+<div role="status" class="swap" style="display: flex; flex-direction: column; gap: 16px; padding: 10px 0">
+<svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="#f83902" stroke-width="1.6"></circle><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 750; letter-spacing: -0.025em">Recibimos tu solicitud</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #cfe4fa">Te escribimos al correo que dejaste para coordinar la reunión de inicio del diagnóstico.</p>
+<p style="margin: 0; font-size: 14px; color: #cfe4fa">Si prefieres no esperar, <a href="#agendar" style="color: #ffffff; font-weight: 600">elige un horario en el calendario</a>.</p>
+<button type="button" onClick="{{resetForm}}" style="align-self: flex-start; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.4); background: transparent; color: #ffffff; font-size: 15px; font-weight: 500">Enviar otra solicitud</button>
+</div>
+</sc-if>
+</div>
+</div>
+</section>
+
+<footer style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 0 110px">
+<div class="wrap" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; font-size: 14px; color: #9fb6cc">
+<span>© 2026 Efeonce Group SpA</span>
+<nav aria-label="Pie de página" style="display: flex; flex-wrap: wrap; gap: 24px"><a href="https://efeoncepro.com/" style="text-decoration: none; color: #cfe4fa">Inicio</a><a href="https://efeoncepro.com/blog/" style="text-decoration: none; color: #cfe4fa">Blog</a><a href="https://efeoncepro.com/contacto/" style="text-decoration: none; color: #cfe4fa">Contacto</a></nav>
+</div>
+</footer>
+
+<div class="mbar"><a href="#agenda" style="flex: 1; text-decoration: none; min-height: 54px; border-radius: 999px; background: #ffffff; color: #001a33; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 4px rgba(248,57,2,0.4), 0 16px 40px rgba(0,0,0,0.5)">Agenda un diagnóstico</a></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":23500}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { modo: 'commerce', plat: 'G', sent: false };
+}
+componentDidMount() {
+var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.querySelectorAll('video[data-loop]').forEach(function (v) {
+v.muted = true;
+if (quieto) { v.removeAttribute('autoplay'); v.pause(); return; }
+var p = v.play && v.play();
+if (p && p.catch) p.catch(function () {});
+});
+}
+renderVals() {
+var modo = this.state.modo;
+var self = this;
+return {
+isCommerce: modo === 'commerce',
+isB2b: modo === 'b2b',
+pickCommerce: function () { self.setState({ modo: 'commerce' }); },
+pickB2b: function () { self.setState({ modo: 'b2b' }); },
+isG: this.state.plat === 'G', notG: this.state.plat !== 'G', pickG: function () { self.setState({ plat: 'G' }); },
+isM: this.state.plat === 'M', notM: this.state.plat !== 'M', pickM: function () { self.setState({ plat: 'M' }); },
+isT: this.state.plat === 'T', notT: this.state.plat !== 'T', pickT: function () { self.setState({ plat: 'T' }); },
+isL: this.state.plat === 'L', notL: this.state.plat !== 'L', pickL: function () { self.setState({ plat: 'L' }); },
+sent: this.state.sent, notSent: !this.state.sent,
+submitForm: function (e) { if (e && e.preventDefault) e.preventDefault(); self.setState({ sent: true }); },
+resetForm: function () { self.setState({ sent: false }); }
+};
+}
+}
+</script>
+</body>
+</html>

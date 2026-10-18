@@ -2,6 +2,28 @@
 
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-contacto` v4 entrega en `direct` al formulario HubSpot «Contact Form - EO» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
 
+> **Delta 2026-10-16 — Nexa canónica, voz nueva, OG v3, cache-busting y medición Meta.**
+> - **Hero:** el retrato original (Codex) **no era Nexa** y tenía piel craquelada de upscaler. Ahora lleva el rostro
+>   canónico de `ai-generations/_identidad-nexa/1-anclas/` (ancla-1 v2 + ancla-2) por `pnpm ai:inpaint image` con
+>   `gpt-image-2.5-sunburst`; zona protegida idéntica bit a bit. Corrida: `ai-generations/2026-10-15_contacto-nexa-piel/`.
+> - **Voz «Escucha a Nexa»:** latina con acento mexicano — ElevenLabs «Lucia – Warm Conversational»
+>   (`akOBlaKhFd59YlK6xz9u`), `eleven_v4`, nivelada a −16 LUFS / ≤ −1,5 dBTP, 25,7 s. Guion y procedencia:
+>   `ai-generations/2026-10-15_contacto-nexa-voz/LEEME.md`.
+> - **Cache-busting:** el widget del hero versiona `hero_image` y `audio_url` con `?ver=filemtime`
+>   (`versioned_plugin_asset_url`). Antes la URL era fija con `max-age` de un año: reemplazar el archivo no le llegaba
+>   a quien ya había visitado la página.
+> - **OG:** adjunto nuevo `251980` (`efeonce-contacto-og-1200x630-v3.png`, contrato `contacto-og.v3`), rotado con
+>   `scripts/public-website/rotate-contacto-og-image.php --input-file <json contrato/sha256/fileName>`. Siempre
+>   archivo nuevo (URL nueva) para que CDN y redes no sirvan el anterior. **Imagen destacada = el OG vigente
+>   (`_thumbnail_id` `251980`, decisión de Julio 2026-10-17):** sin ella, Yoast tomaba para el schema una imagen del
+>   plugin en `http://` desde la copia `post_content` que deja un guardado CLI. Al rotar el OG, actualizar también
+>   `_thumbnail_id` al adjunto nuevo (`repair-landing-primary-image.php`); antes la regla era no escribirla. El OG (degradado + logo + «Conversemos.») sale determinístico de
+>   `build-contacto-og.cjs`; el hero de la página no lleva degradado ni texto horneado.
+> - **Medición:** política Meta + Google UPD `89e531d8` publicada para `efeonce-contacto`; GA4 `generate_lead`
+>   verificado por GTM genérico. Detalle en `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md`.
+> - **Paquete acotado:** armar siempre desde el `export-live-code` fresco + sólo los archivos que cambian; el runtime
+>   local puede traer trabajo no desplegado (el 2026-10-16, `contact-landing.js`).
+
 Estado live verificado 2026-09-15: página `20729` reconstruida con cinco widgets Elementor propios, Growth Form
 `efeonce-contacto`, dos Growth CTA de agenda y narración de Nexa. El hero conserva el header/footer globales,
 usa `clb__dark_section`, omite el eyebrow redundante y mantiene una zona de respeto superior para que la imagen
@@ -56,7 +78,7 @@ ni el logo. Yoast conserva la propiedad del grafo: la página se expresa como `C
 a la misma pieza social, el nodo `Organization` existente se enriquece con dirección y puntos de contacto, y el bloque
 visible de preguntas se vincula como `FAQPage`. No se agrega `LocalBusiness`, `Service`, reseñas ni horarios porque la
 página no ofrece evidencia suficiente para esos claims. La mutación SEO se guarda bajo
-`_gh_contacto_before_seo_20260915_145610`; el adjunto social vigente es `251930`.
+`_gh_contacto_before_seo_20260915_145610`; el adjunto social vigente es `251980` (v3, desde 2026-10-16; ver delta arriba).
 
 `TASK-1801` cerró el 2026-09-15 por aprobación explícita del operador sobre esta landing pública. El cierre es
 page-scoped: no inferir owners/SLA, destinos, booking end-to-end ni graduación completa de Meetings desde la

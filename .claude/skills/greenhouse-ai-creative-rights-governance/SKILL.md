@@ -16,3 +16,20 @@ Preserve the canonical invariants: commercial clearance is bound to exact
 rights policy is immutable per asset; promotion only makes a route available and is never delivery; and no secret,
 signed URL, provider payload, prompt, client content, stack trace, or raw upstream prose may cross the safe
 evidence boundary.
+
+For **OmniHuman 2.0 / BytePlus Vision AI**, load the canonical skill's dated OmniHuman routing and the
+[API manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) with its
+[research evidence](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md).
+Apply the Vision AI Service Specific Terms and General AI Terms, dedicated likeness/voice permissions and
+asset-level clearance. Do not infer ModelArk indemnity, training consent or zero retention from partner status,
+task expiry or URL TTL; preserve provenance, disclosure and the default watermark.
+
+For **BytePlus ModelArk KYC, Entry, virtual portraits or `asset://` inference**, also load
+[the shared portrait preflight](references/byteplus-portrait-preflight.md), `greenhouse-secret-hygiene`,
+the [direct manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) and
+[account-scoped ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+Reconcile account ownership before writes. Record factual KYC declarations and scoped human authorization;
+a prior letter signature is not blanket approval for another agreement or account. Keep live state in the ledger.
+
+The shared preflight owns Chrome upload recovery, exact `Active`/`ListAssets` readback and resuming existing work.
+A successful draft is technical evidence, not final creative approval; keep live state and IDs in the ledger.

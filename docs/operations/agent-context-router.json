@@ -4,6 +4,27 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "byteplus-direct-account",
+      "triggers": ["BytePlus directo", "consola BytePlus", "KYC BytePlus", "Entry BytePlus", "Asset Service BytePlus", "retratos BytePlus", "pnpm ai:byteplus"],
+      "skills": ["greenhouse-secret-hygiene", "greenhouse-ai-creative-rights-governance"],
+      "sources": [
+        "docs/manual-de-uso/creative-studio/byteplus-directo.md",
+        "docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md",
+        "docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md"
+      ]
+    },
+    {
+      "id": "sky-blog-seo",
+      "triggers": ["servicio SEO SKY", "recuperación blog SKY", "indicador orgánico SKY", "operación SEO blog SKY"],
+      "skills": ["sky-blog-seo", "seo-aeo", "dataforseo-operator"],
+      "sources": [
+        "docs/services/sky-blog-seo/README.md",
+        "docs/services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md",
+        "docs/architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md",
+        "docs/manual-de-uso/growth/valorar-trafico-organico.md"
+      ]
+    },
+    {
       "id": "creative-workbench",
       "triggers": [
         "Creative Workbench",
@@ -697,7 +718,8 @@
         "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md",
         "docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md",
         "docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md",
-        "docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md"
+        "docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md",
+        "docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md"
       ]
     },
     {

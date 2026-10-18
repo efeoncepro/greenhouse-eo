@@ -1,0 +1,36 @@
+{
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "lecho": {
+    "objeto": "the dark out-of-focus edge of the broadcast desk close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "fondo": "a row of large cold blue practical lights far behind, melted into round bokeh",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "explicando"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "llave": {
+    "fuente": "the wall of news screens behind her and the small screen glow",
+    "lado": "from behind and slightly frame-right",
+    "tamano": "a whole wall",
+    "distancia": "about three meters behind her"
+  },
+  "fenomeno": {
+    "que": "the microphone opens and the week's news glow behind her, with the green signal breaking into bytes",
+    "esServicio": "Glitch: IA, marketing y negocios, cada lunes"
+  },
+  "id": "MN-GLT-45",
+  "formato": "4:5",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark editorial broadcast studio before dawn on a Monday, thin haze): Nexa, the voice of Glitch, sits at a dark matte desk, framed from the chest up, body centred at about 60 % of the frame width, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. MOMENT: the microphone opens — caught mid-sentence at the instant she starts the week's edition, lips parted on a word, eyes on her notes and not at the lens, one hand lightly raised as she speaks. A professional broadcast microphone on a black boom arm enters from the frame-right and sits close to her mouth, its foam windscreen sharp. Far behind her, out of focus, a wall of many small news screens glows cool azure-white with blurred headlines and thumbnails, unreadable by distance and focus; ONE accent of vivid Glitch green (#6EC207) lights a single small square tally lamp on the desk, and on the frame-right edge that green light breaks into a few small square pixels drifting in the haze, like a signal glitching into bytes. The light of the screens rims her hair and shoulders; a soft cool key from the screens falls on her face. Everything else is deep navy dark. No readable text anywhere, no logos of any other brand, no apple shapes. The LEFT 30% of the frame is calm dark studio with only faint haze and soft bokeh. COMPOSITION FOR A WEBSITE MENU (native to its frame): this vertical photo sits in the right column of a full-screen menu whose dark panel overlaps its LEFT third with a large curved corner at the top; so the SUBJECT and everything that carries the idea sits in the CENTRE-RIGHT of the frame, and the left third is calm continuation of the same scene, never empty and never a flat slab."
+}

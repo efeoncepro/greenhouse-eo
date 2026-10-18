@@ -1,5 +1,11 @@
 # Commercial
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
+- Brochure oficial para presentar la agencia completa: «Agencia de Marketing 360°» (aprobado 2026-10-16; 84 láminas y corto de 26) en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Antes de enviarlo afuera: cifras de ANAM y «12 meses» de Berel. [Detalle](../documentation/creative/composicion-de-decks-y-brochures.md#el-brochure-oficial-agencia-de-marketing-360).
 - [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
 
 - [Outreach personalizado del 13/10/2026](follow-up-agent/runs/2026-10-13-outreach-personalizado.md): seis correos enviados por Outlook web con firma gráfica, brochure contextual y actividades HubSpot `SENT`; Rafael excluido. Referencia para próximos primeros contactos y su verificación.
@@ -31,7 +37,7 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 | Superficie                                                                                     | Autoridad                                                                                        |
 | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| HubSpot                                                                                        | Company, Contact, Deal, asociaciones, owner, pipeline, stage, monto, moneda y fechas comerciales |
+| HubSpot                                                                                        | Company, Contact, Deal, TASK comerciales, asociaciones, owner, pipeline, stage, monto, moneda y fechas comerciales |
 | [`CRM_DEAL_REGISTER.md`](CRM_DEAL_REGISTER.md)                                                 | Índice transversal de Deals verificados y su siguiente movimiento operativo                      |
 | [`SALES_GOALS_OPERATING_MODEL_V1.md`](SALES_GOALS_OPERATING_MODEL_V1.md)                       | Definiciones, fórmulas, categorías de forecast, gates y cadencia de actualización                |
 | [`SALES_GOALS_2026_Q4_2027.md`](SALES_GOALS_2026_Q4_2027.md)                                   | Baseline, metas aprobables, escenarios, forecast vigente y supuestos de capacidad                |
@@ -45,6 +51,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 | Finance                                                                                        | Facturación, cobro, revenue reconocido, costos, margen, cash y tratamiento fiscal                |
 | SharePoint / Teams / propuesta                                                                 | Evidencia de alcance, comité, interacción bilateral, versiones y proceso de compra               |
 
+- [Política de seguimiento de prospectos a largo plazo](../operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md): proveedor vigente, revisión interna, nutrición con permiso y reactivación autorizada.
+
 ## Regla de uso
 
 1. Lee primero el plan de metas vigente.
@@ -56,7 +64,7 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Workspaces comerciales
 
-- [Socopur — Agencia Digital 2027](tenders/socopur-agencia-marketing-digital-2027/README.md): cinco láminas revisadas, calendario completo y matriz de admisibilidad; respuesta sobre ingreso tardío pendiente. Q&A previsto 8–13/10; empresa/contacto y nota asociados al Deal `65871170058`, creado por instrucción expresa y verificado; Julio confirmó envío manual el 10/10, respuesta pendiente.
+- [Socopur — Agencia Digital 2027](tenders/socopur-agencia-marketing-digital-2027/README.md): **cerrado para entrada tardía**, respuesta de Katherine 15/10 16:54:36 UTC confirmada por el operador; selección concluida, sin nuevas postulaciones/propuestas este período. Credenciales guardadas sin fecha/invitación ni adjudicación inferidas. [Fuente y cronología](tenders/socopur-agencia-marketing-digital-2027/research/cierre-y-aprendizajes-2026-10-15-INTERNO.md); seguimiento e historial previos conservados. **Julio corrigió el 15/10 17:51 UTC: detección 06/10/2026, sin hora/zona, un día calendario después del cierre de interés del 05/10, no 24 horas exactas**. Radar horario y CRM del 10/10 posteriores, sin explicar la tardanza del día 6. Publicación/disponibilidad/indexación inicial, primer aviso exacto y causa sin acreditar. CRM `65871170058` sin consultar/editar; no insistir ni preparar oferta.
 
 - [Oferta económica rápida para licitación / Compra Ágil](templates/cotizacion-a4/README.md): plantilla A4 derivada de UTEM, con slots, JSON y [presentación multimoneda/FX explícito](templates/cotizacion-a4/MULTIMONEDA.md); prepara HTML/PDF desde precio y alcance aprobados. Su guía distingue la emisión documental de una cotización persistida: no crea `quoteId`, no ejecuta pricing/costing ni actualiza CRM o Finance. Para operar el sistema de cotizaciones Greenhouse, seguir [pricing comercial](../documentation/finance/pricing-comercial.md) y el [canon de Finance](../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), verificando runtime vigente.
 - [Costeo V3 para roles y servicios con agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md): selección por demanda, recursos base/por tarea, presupuesto IA, capacidad declarada y desglose congelado. La [superficie local](../documentation/finance/cotizador-v3-superficie-implementada.md) y el [handoff canónico](../documentation/finance/cotizador-v3-promocion-canonica.md) separan simulación, revisión comercial y emisión/aprobación en Greenhouse.
@@ -96,4 +104,5 @@ No almacenes credenciales, tokens, cookies, datos personales innecesarios ni doc
 
 ## Casos documentales del radar — corte 10-10-2026
 
+- [Guía de primera entrada y alertas tempranas — 15/10](tenders/RADAR_EARLY_ENTRY_GUIDE.md): interés/credenciales/inscripción/visita antes del cierre final, carriles independientes y trazabilidad temporal; método documental sin cambio de frecuencia o permisos.
 - [18 casos investigados en cinco países](tenders/RADAR_CASES_2026-10-10.md): convocatorias, búsquedas privadas, RFI, planes y referencia excluida; métodos de postulación, documentos, próximos pasos y bloqueos. Estudios sin GO ni nuevas mutaciones CRM; Pierre Fabre reutilizado, cierre Aysén actualizado en fuente y GORE preservado.

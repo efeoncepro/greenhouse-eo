@@ -10,6 +10,7 @@ import 'server-only'
 import { z } from 'zod'
 
 import { prepareMeasurementConversion } from '@/lib/growth/measurement/prepare'
+import { publishedGoogleAdsReceipt } from '@/lib/growth/measurement/google-ads-receipt'
 
 
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -207,6 +208,8 @@ export const archiveForm = async (formVersionId: string, formId: string): Promis
 
 export const addDestination = insertDestination
 export const setDestinationEnabledCommand = setDestinationEnabled
+// Internal release configuration; native schema/readback and operator authority are caller preconditions.
+export { configureHubSpotSubmissionTracing } from './destinations/hubspot/receipt-store'
 export const createHostSurface = insertHostSurface
 export const setHostSurfaceStatusCommand = setHostSurfaceStatus
 
@@ -572,7 +575,9 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     },
   })
 
-  return { outcome: 'accepted', submissionId: submission.submission_id }
+  const googleAdsConversion = publishedGoogleAdsReceipt(measurement?.googleAdsConversion, submission.measurementPersisted)
+
+  return { outcome: 'accepted', submissionId: submission.submission_id, ...(googleAdsConversion ? { googleAdsConversion } : {}) }
 }
 
 /** Registra un rechazo explícito (para paths que ya resolvieron la versión). */

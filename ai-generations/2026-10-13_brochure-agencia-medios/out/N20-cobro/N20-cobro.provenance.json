@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "68cd8510bd021c9c04773b7870cc567bda047acd535855554d85fdc45f5c6edb",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:PG6-aparte",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG6-aparte.png",
+      "sha256": "db47dfa8dc96eac59f5655fa5ed6c4c987da895d049724bed57f594595a9dfe2"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

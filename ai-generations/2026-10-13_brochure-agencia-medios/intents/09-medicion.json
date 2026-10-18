@@ -1,0 +1,51 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "method",
+  "recipe": "method-staircase",
+  "layout": "flat",
+  "voice": {
+    "eyebrow": "Escalera de medición",
+    "question": "¿Cómo sé qué funcionó?",
+    "answer": [
+      "Con",
+      "evidencia"
+    ]
+  },
+  "body": "Cada capa responde una pregunta distinta. Te decimos cuál estás comprando y cuál no.",
+  "levels": [
+    {
+      "name": "Registro",
+      "descriptor": "qué ocurrió de verdad"
+    },
+    {
+      "name": "Atribución",
+      "descriptor": "quién recibe el crédito"
+    },
+    {
+      "name": "Optimización",
+      "descriptor": "la señal del algoritmo"
+    },
+    {
+      "name": "Incremental",
+      "descriptor": "qué causó tu inversión"
+    },
+    {
+      "name": "Efectividad",
+      "descriptor": "dónde va el próximo peso"
+    }
+  ],
+  "note": "Incrementalidad y MMM exigen volumen, historial y datos.",
+  "selection": {
+    "target": "level",
+    "level": 3,
+    "label": "Medios",
+    "participantKind": "department",
+    "anchor": "bottom-start"
+  }
+}

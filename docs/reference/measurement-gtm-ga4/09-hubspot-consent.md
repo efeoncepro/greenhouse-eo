@@ -30,6 +30,16 @@ del hero existente, sin prolongar su altura ni introducir otro fondo.
 WP monta el control dentro del grupo legal de Ohio y usa handler nativo, con espacio
 inferior dentro del pie para el CTA móvil; Think lo monta en el pie legal y usa el bridge. No interpretar fallo de click por superposición como fallo del CMP.
 
+**Montaje en Think (vigente desde 2026-10-16, `efeonce-think` main `425a1de`).** El botón sólo se
+monta en un host declarado con `[data-efeonce-legal-links]` o junto al enlace de privacidad del
+footer. Ya **no** se pega suelto al último `<footer>`: eso lo dejaba fuera de la grilla, abajo a la
+izquierda. El separador «·» se omite si el contenedor es flex/grid con `gap` ≥ 16px. Los footers de
+informes AEO tienen una fila base `.report-footer-base`: aviso a la izquierda y
+`nav.report-footer-legal` con Privacidad + Preferencias de cookies a la derecha. Páginas cuyo footer
+no declara host (InsightReport, StatusScreen, muestra Sika) ya no muestran el botón; el banner sí
+aparece. El clic sigue llamando `_hsp.push(['showBanner'])`. Un footer nuevo que deba ofrecer el
+control declara el host; [cómo hacerlo](../../manual-de-uso/growth/operar-consentimiento-cookies-publico.md#declarar-la-fila-legal-en-un-footer-nuevo-de-think).
+
 Default Google Consent Mode antes de scripts: ad_storage, ad_user_data,
 ad_personalization, analytics_storage, functionality_storage y personalization_storage
 **denied**; security_storage granted. El host emite el default inline, incluso si falla

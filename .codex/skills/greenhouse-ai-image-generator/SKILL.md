@@ -1039,12 +1039,29 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 
 ### BytePlus directo (2026-10-12)
 
+**OmniHuman 2.0 es Vision AI**, actuación de imagen + audio aprobado, con API/auth diferentes de ModelArk.
+No está en `pnpm ai:byteplus`; las claves actuales no prueban acceso. Para derivar una imagen aprobada a
+video, cargar `motion-design-studio` y el [manual API](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md).
+No crear un slug o ruta Globe por el anuncio; estado por superficie y fuentes en la
+[auditoría](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md).
+
 El operador autorizó el carril directo del fabricante para aprovechar el contrato de Johor.
 Para Seedream/Seedance/Seed Speech, usa BytePlus directo por defecto; Fal/Higgsfield sólo por elección explícita
 o una capacidad que el contrato directo no cubra. Los slugs y precios de Fal siguientes pertenecen a ese proveedor.
 `pnpm ai:byteplus --list` descubre los modelos conectados; `--doctor` verifica el consumer sin generar.
 [Manual de BytePlus](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) y
 [ADR](../../../docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
+🔴 Antes de usar un rostro externo en Seedance, cargar el
+[preflight de retratos](../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md)
+y el [ledger por cuenta](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+Para `asset://`, KYC, Entry, assets y API deben pertenecer a la identidad obligatoria del manual, con assets
+literalmente `Active` y pruebas separadas como referencia/primer cuadro. Chrome, empresa o RUT no prueban esa
+identidad. La UI `warehoused` requiere readback exacto de estado según el preflight; al retomar, reconciliar
+el ledger y la biblioteca antes de consumir cupo o repetir una tarea. Sólo se sube el lote aprobado; el cupo es
+limitado y Entry gratuito no incluye inferencia gratuita. Los resultados técnicos no reemplazan la aprobación
+creativa de imagen/video ni autorizan publicación.
+Las otras vías oficiales se detallan en el manual; prohibido «lavar» una imagen externa por Seedream para
+presentarla como salida propia de confianza. La activación actual y los resultados se leen del ledger.
 
 `pnpm ai:layers` usa ahora **BytePlus Pro por defecto**; `--provider fal` conserva el carril anterior.
 BytePlus Pro y Flash admiten Layerize (`layer_decomposition: true`), con el mismo `layers.json` de las máscaras.

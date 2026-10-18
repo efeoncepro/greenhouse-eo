@@ -7,7 +7,164 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-Meta Lead14/10: Server7, atribución consentida persistente, external_id SHA256 y request IP/UA; [prueba Server/website](docs/audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md). Backend/renderers y panel lifecycle por políticas preparados;12 pruebas UI/red y13 Forms/CRM PASS, GTM8 compatible temporal, UI/GVC12 estados PASS y CLI agent-first24 pruebas PASS; HTTP/CI/release pendientes; [checkpoint TASK-2035](docs/audits/measurement/SCALABLE_POLICY_IMPLEMENTATION_2026-10-14.md).
+## 2026-10-17 — Google Ads: arquitectura y prueba API de lectura
+
+- Checkpoint18/10:499 tests y32 escenarios Chromium/API PASS; [paquete previo al release](docs/operations/releases/google-ads-2026-10-18/README.md), propuestas/hashes/rollback. Sin publicación ni deploy; hosts/protocolo real/EC/CI y alcance general pendientes.
+
+- Revisión18/10:1.445 archivos de89d70ec13 auditados; CI/build PASS; Deep corregido localmente, revalidación remota pendiente. Reparación SQL HubSpot/Meta autorizada, versionada y verificada; dispatcher existente200 y dos submissions delivered al ledger sin destinos directos. [Auditoría](docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md). Sin deploy ni publicación GTM.
+
+- [ADR adoptado](docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md) y
+  [arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md): OAuth/binding,
+  GTM web/server, identidad comercial, consentimiento, HubSpot/Data Manager, reporting y rollout.
+- [Probe API v26](docs/audits/growth/2026-10-17-google-ads-api-discovery.md) PASS para `6862539491`
+  vía manager `9531478329`; dos acciones GA4 ocultas, tracking inactivo y cuenta nueva. Doce consultas,
+  ninguna mutación; conexión y sender de producto pendientes. Funcional y manual documentados.
+- Ratificación del operador: OAuth de producción **Efeonce** y CLI de consulta obligatoria en la primera
+  unidad de lectura; catálogo y aceptación documentados. Rebranding y CLI pendientes de implementación.
+- Unidad posterior: `pnpm google-ads` local implementada, con gestión ampliada por el operador. Lecturas
+  reales PASS, planes create/update cerrados, validateOnly, hash, journal durable y readback por campo.
+  Marca Efeonce guardada y grant Ads en secreto propio; regresión GA4/GSC y auth PASS. Ninguna escritura
+  publicitaria ejecutada; verificación Google y conexión de producto pendientes.
+  [Evidencia](docs/audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
+
+- Delta online: backend y renderers Forms/Meetings con recibo Ads postcommit, consentimiento explícito,
+  capture de IDs y EC reservado. Dos acciones secundarias creadas/verificadas; workspaces Web8/Server12
+  compilan por API. Sin publish/deploy/flag ON ni conversiones enviadas.
+  [Evidencia](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
+- Por instrucción posterior, términos de datos de clientes Ads aceptados/guardados y panel reabierto
+  verificado en6862539491. EC OFF; sin publicación GTM ni promoción a main.
+
+## 2026-10-17 — CLI local Meta para agentes
+
+- `pnpm --silent meta`, contrato `meta-agent.v2`: lecturas existentes, catálogo SDK25, consultas por campo
+  y métricas orgánicas; Ads nuevos PAUSED y publicación/respuestas propias con plan/hash/receipt privado,
+  envío único y verificación GET. Resultado ambiguo sin reenvío; sin activación, DM ni nuevo sender CAPI.
+- [Funcional](docs/documentation/growth/meta-agent-cli.md), [manual](docs/manual-de-uso/growth/consultar-meta-con-agentes.md)
+  y [ADR vigente](docs/architecture/GREENHOUSE_META_AGENT_WRITE_CLI_DECISION_V1.md); foundation preservada.
+  105 tests/5 archivos, TS strict y lint global PASS; código completo y lecturas/probes reales,
+  POST públicos no certificados en vivo. Paginación social por fechas y reanudación IG verificadas.
+  Sin integración productiva, MCP, deploy o ampliación IAM.
+- [Rastreo Forms → medición → HubSpot](docs/architecture/GREENHOUSE_META_LEAD_TRACE_CLI_DECISION_V1.md):
+  `leads find/trace` con selector privado y UUID, conexión/store canónicos READ ONLY; ACK local,
+  historial HubSpot y contacto separados. Readback de un envío existente y sus IDs locales, sin mutación;
+  HubSpot correlacionado, procesamiento Meta desconocido. Total actual: 172 tests/9 archivos, TS strict y
+  lint propios PASS. Sin PII, descifrado, redispatch o CRM writes.
+  [Último Performance releído](docs/audits/growth/2026-10-17-performance-latest-lead-trace.md): HubSpot recibido, ACK y un Lead servidor en Meta; sin fallos observados, identidad individual/atribución pendientes.
+- [Recibos nativos HubSpot](docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): marcador
+  server-side, historial exacto, ID persistido por CAS y recuperación GET independiente del POST.
+  Código local probado; SQL parqueado, provisión/mapping y release pendientes. Históricos conservan
+  correlación. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin
+  GET por `event_id`; captura del recibo CAPI implementada localmente en el delta siguiente, sin reenviar eventos.
+  [Cierre local](docs/audits/growth/2026-10-17-native-hubspot-receipt-closure.md): 262 tests/14 archivos,
+  TS strict y lint PASS; SQL ejercitado en PostgreSQL aislado, lecturas reales sin mutaciones.
+- [Recibo CAPI por evento/intento](docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): sender
+  fijado instrumentado localmente, header backend saneado, historial de hasta cinco observaciones
+  en CAS de finalización y `meta.receipt` en CLI READ ONLY. No agrega sender ni retries por telemetría.
+  Opción del template default OFF y SQL parqueado. Por orden del operador: commit sin activar/desplegar.
+  [Cierre local](docs/audits/growth/2026-10-17-meta-event-receipt-local-closure.md): 402 tests Vitest +36 Node,
+  TS/lint y SQL aislado PASS; sin nuevos eventos ni cambios externos.
+
+- [Revisión final local](docs/audits/growth/2026-10-17-meta-cli-final-review.md): paginación malformada
+  queda parcial, agregación HubSpot por ocurrencia/IDs por destino, fecha SQL protegida y validación
+  de estados/historial de recibos. 426 Vitest +36 Node, TS/lint y SQL aislado PASS; skills espejadas
+  y manuales actualizados. Sin push, activación, migraciones compartidas, eventos ni deploy.
+
+## 2026-10-17 — Landing Performance Marketing en producción (TASK-1865)
+
+- `/servicios/performance-marketing/` (page `251997`) publicada desde el canvas aprobado con el carril source-led de
+  Medios: compilador, paquete scoped `performance-elementor-release.v1`, publicador, Ohio, SEO y migración de la legacy.
+- Legacy `/servicio-gestion-campanas-publicitarias/` privada con 301; menú reapuntado; formulario propio
+  `efeonce-performance-diagnostic` con destino HubSpot directo.
+- Documentación sincronizada: funcional, manual, PRIMITIVES, contrato de forms, TRACKING-PLAN, servicios, PDRs,
+  briefs y skill del sitio público (lecciones del carril de release).
+- Cierre: TASK-1865 `complete`; políticas de medición Meta publicadas para Performance, Medios y HubSpot scope y primer
+  `Lead` de servidor recibido por Meta desde el 14/10.
+
+## 2026-10-17 — BytePlus: retratos activos y pruebas completadas en la cuenta correcta
+
+- [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y [ledger por cuenta](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
+  fijan Google SSO `jreyes@efeoncepro.com` / **3004839361**; la cuenta histórica incorrecta queda excluida de operación.
+- KYC aprobado y carta aceptada por mandato de Julio; Entry Free activo. Chrome resuelto con permiso de archivos
+  habilitado por Julio: **12 assets Active en 6 grupos**, sólo los PNG autorizados. Antonio primero; referencia y
+  primer cuadro exitosos, luego el resto en orden. Videos, recibos y metadatos fuera del repo; IDs y cupos en el ledger.
+- Documentación técnica, funcional, manual y skills Codex/Claude sincronizadas: verificar Active por respuesta y
+  GroupId, conservar evidencia sin secretos, evitar cargas/tareas duplicadas y separar Entry gratuito del consumo API.
+  Sin compras, cambio de plan, credenciales ni promoción a Globe; factura de inferencia aún sin conciliar.
+
+## 2026-10-17 — Brochures aprobados, sin recortes ni validaciones adicionales
+
+- Ratificación expresa de Julio: [uso comercial íntegro](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+- LEEME, canon, manual y skills Codex/Claude/radar dejan de imponer pendientes históricos. Una autorización
+  de envío no autoriza modificar el material; la copia Aloja de 38 láminas no se reutiliza.
+
+## 2026-10-16 — Landing HubSpot v2 por los 4 resultados, con dock móvil y agenda nativa
+
+- Landing pública [`/servicios-contratar-hubspot/`](https://efeoncepro.com/servicios-contratar-hubspot/) (página
+  `244079`) rediseñada: 14 widgets compilados del canvas, HubSpot presentado como Agentic Customer Platform, SEO con
+  frase clave «partner hubspot» (Semrush CL/MX/CO), OG propia y Service + FAQPage.
+- Dock móvil con «Agendar reunión» (CTA gobernado `hubspot-discovery-meeting`, scheduler nativo) e «Ir al formulario».
+- Renderer CTA 1.3.1: la cabecera del scheduler ya no se parte en móvil (pendiente de release a producción).
+
+## 2026-10-16 — Agencia de Medios: brochure canonizado y landing publicada
+
+- Landing pública [`/servicios/agencia-de-medios/`](https://efeoncepro.com/servicios/agencia-de-medios/) (página
+  `251981`, menú Soluciones → Crecimiento Multicanal): 16 widgets compilados del canvas, header/footer de Ohio, SEO con
+  frase clave «agencia de medios» (Semrush), OG propia y formulario `efeonce-media-diagnostic` con destino HubSpot.
+- Brochure «Agencia de Medios» (65 láminas, PDF `c4697c7a…`) con logotipos oficiales de terceros y sin promesa de
+  rebates. Canon: [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (deltas 2026-10-16),
+  [PDR-025](docs/public-site/decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) y
+  [material comercial de medios](docs/services/media-distribution/README.md).
+
+## 2026-10-16 — GTM: drift vigilado en web y servidor
+
+- `pnpm gtm:snapshot` versiona también el container servidor (sGTM/Meta CAPI) y tapa secretos con huella sha256;
+  `gtm-drift.yml` compara a diario ambos containers live contra git y falla ante drift. El publish por script
+  reescribe los snapshots. [ADR, delta 2026-10-16](docs/architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md).
+
+## 2026-10-16 — Contacto: Nexa canónica, voz mexicana y medición Meta
+
+- Hero de `/contacto/` con el rostro canónico de Nexa (inpaint Sunburst + anclas), voz «Escucha a Nexa» nueva
+  (ElevenLabs Lucía es-MX, −16 LUFS), OG v3 en adjunto nuevo y cache-busting `?ver=filemtime` en hero/audio del widget.
+- Política Meta + Google UPD publicada para `efeonce-contacto`; GA4 `generate_lead` verificado. Bible de Nexa: voz
+  mexicana por decisión del operador. [Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
+
+## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°»
+
+- Aprobado como brochure oficial de la agencia: versión completa (84 láminas) y corta (26), con índice linkeable,
+  Channel & Commerce dentro de Brand y casos Berel y Sky compuestos con piezas reales. Registrado en la
+  [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md), la documentación funcional y el manual.
+
+## 2026-10-16 — Seguimiento web y evidencia reutilizable
+
+- [Fabricio / Toyota del Bajío](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md):
+  envío inicial verificado y tres seguimientos HubSpot Programado con salida por respuesta a cualquier correo.
+- Prospección y adapter HubSpot Codex/Claude precisan versión de brochure, cuerpo/calendario de inscripción,
+  límites de firma y conciliación BCC_TO_CRM. Manual, funcional y registro actualizados; sin nuevas acciones externas.
+
+## 2026-10-15 — SKY: cobertura de auditoría y skills SEO
+
+- [Matriz de siete frentes abiertos](docs/services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md),
+  informe, marco de cuenta y plan distinguen diagnóstico base entregado, auditoría integral parcial y lote preparado.
+- Skills `sky-blog-seo`/`seo-aeo` espejadas y modelo de informes conservan cobertura/denominadores y baseline real;
+  GSC anterior no disponible no bloquea profundizar. Actualización documental, sin cambios al sitio ni nuevas compras.
+
+## 2026-10-15 — OmniHuman: contrato API y routing de producción
+
+- [Manual](docs/manual-de-uso/creative-studio/omnihuman-2-api.md),
+  [funcional](docs/documentation/creative-studio/omnihuman.md) y
+  [auditoría](docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) separan Vision AI de ModelArk,
+  AK/SK de IAM Bearer, capacidad publicada de acceso efectivo y permisos de imagen/voz.
+- Skills de imagen, motion, audio, derechos y flota canalizadas al contrato; sin activación, inferencia,
+  implementación CLI o promoción Globe. API300s y ficha UI120s quedan registrados por superficie.
+
+## 2026-10-15 — Convención comercial de nombres
+
+- Adoptada la [convención de negocios y leads](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
+  aprobada por Julio, con routing en skills Codex/Claude, captura CRM, licitaciones y prospección.
+- Primera aplicación: Gana66065702426; renombrado con readback. Nuevas altas autorizadas usan la regla;
+  histórico pendiente de lote. Sin schema, workflows, envíos ni migración masiva.
+
+Medición14/10: todo develop publicado en main9690efad (PR255/orquestador38591329633), Server9 estricto y watchdog6/6/drift0. API/panel/CLI para agentes comparten políticas y comandos; alta nueva por datos recibida en Meta Test Events con nueve claves sin otro build/redeploy/GTM. Consentimiento y Forms→HubSpot Forms→CRM preservados; fixtures archivados. [Release y límites](docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); [auditoría integral docs/skills](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md). Tráfico comercial/EMQ y resto de TASK-2035 pendientes.
 
 Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independientes y partners gris. [QA y reversión](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 
@@ -42,8 +199,19 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - Auditoría integral con tres subagentes: [inventario y cierre](docs/audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-13.md), [runtime10](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
   ADR/Forms/Meetings/host/skills y referencias sincronizados; historial preservado. [Configuración escalable](docs/architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md) **propuesta sin GO, no implementada**. Commit documental, sin publicación/release adicional.
 
+## 2026-10-13 — Radar comercial con registro por corrida
+
+- Automatización existente convertida a tarea nueva diaria en greenhouse-eo, conservando 09:00 Santiago.
+- [Contrato y ledger](docs/commercial/prospecting-agent/README.md): búsquedas saneadas en repo, datos privados separados,
+  cinco líneas × cuatro mercados; nuevas convocatorias para postular dentro de la misma semana calendario.
+- INTURSA y Alfin registradas bajo autorización; cuatro contactos verificados vía Apollo. Históricos tratados como
+  prospección futura. No Deals, notas ni envíos nuevos. Próxima ejecución programada todavía no observada.
+
 ## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
 
+- 15/10: [Socopur](docs/commercial/tenders/socopur-agencia-marketing-digital-2027/research/seguimiento-2026-10-15-INTERNO.md), seguimiento puntual autorizado a Katherine con firma gráfica/PDF y EMAIL `118603198768` SENT asociado. Dossier y registros conciliados; Prospecting/HubSpot Codex-Claude precisan decisión por historial de cuenta, aporte nuevo y verificación de reply/adjunto/CRM. Sin admisión, secuencia o nuevo permiso futuro.
+
+- 14/10: Prospección Codex/Claude incorpora la [estructura de correo robusto aprobada por Julio](.codex/skills/efeonce-b2b-prospecting/references/message-and-contextual-proof.md#correo-comercial-robusto-de-julio): contexto, encaje, aportes, enfoque sectorial, forma de trabajo, brochure explicado e invitación; profundidad adaptable, firma por la vía pedida y permiso de envío separado.
 - [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
   empatía, motivo para elegir Efeonce, brochure explicado y firma instalada en Outlook web; Enviados,
   adjuntos y EMAIL de HubSpot comprobados por separado. Criterio enlazado desde las skills espejo de HubSpot.
@@ -56,6 +224,7 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 - [Módulo de secuencias en Prospecting](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md),
   routing, cadencia/mensaje/respuesta/entregabilidad, template, manual y adapter HubSpot espejados.
   Fixtures v9 P51–P55 cubren plataforma, autorización, programación, personalización y evidencia; sin nueva ejecución externa.
+- [Política de seguimiento a largo plazo](docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) aprobada: proveedor vigente, revisión interna a seis meses sin hito, nutrición con permiso y reactivación autorizada. Skills espejo/fixtures v11 y seguimiento existentes actualizados; tareas comerciales en HubSpot por corrección de Julio. Fabrimetal: TASK 118419088700 para 13/04/2027 09:00 Chile, duplicado Notion Cancelado y nota CRM conciliada, sin envío.
 
 ## 2026-10-12 — Propuesta de campaña creativa: playbook y skills
 
@@ -453,134 +622,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 ## 2026-10-04 — Discovery de población cliente SEO
 
 - TASK-1690: [discovery](docs/audits/seo/2026-10-04-task-1690-discovery.md) de contratos, fixtures y UX con tres subagentes; decisión GSC clics/CTR y rank independiente, cobertura/null/cero y cola canónica documentados. Estado `Diseno`; selección visual e implementación pendientes. Baseline: 53 tests PASS. Sin código ni cambios runtime.
-
-## 2026-10-04 — Ownership editorial y de informes SEO
-
-- El flujo editorial pertenece a Marketing Studio: TASK-1667/1669 → EPIC-049; TASK-1668 conserva medición/outcomes en EPIC-022. La auditoría técnica y su distribución especializada pertenecen a Insights: TASK-1672/1673 → EPIC-045, reusando renderer y transporte existentes.
-- [Mapa vigente y tareas pendientes](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md), arquitectura, criterios e índices reconciliados. GA4 TASK-1284 y referrals TASK-1787 distinguen código/evidencia histórica existente de sus pendientes reales. TASK-1284 pasa a in-progress con evidencia fechada y pendientes explícitos. Sin código, tareas nuevas, cierre de implementación ni cambio de runtime.
-
-## 2026-10-04 — SEO: reconciliación documental de EPIC-022
-
-- Censo de 84 hijas (43 complete, 3 en curso, 38 to-do), estados TASK-1655/1670/1671/1672/1805 e índices conciliados. Flag de hallazgos y selectores Improved ETV revalidados en worker activo; pendientes conductuales conservados.
-- [Evidencia y límites](docs/audits/seo/2026-10-04-epic-022-documentation-reconciliation.md). Sin cierres de tasks, cambio de configuración, calls pagadas, backfill ni emisión de informes.
-
-## 2026-10-04 — Spot «Los Sparks»: Studio, Metricool y naming «Efeonce | AEO»
-
-- Spot cargado en Marketing Studio como CMP001-08 de CMP-001 (orgánico) y programado en Metricool: IG lun 05-oct 14:00 (portada 4:5), LinkedIn jue 08-oct 11:00; media re-alojada con SHA-256 idéntico.
-- Operador: la marca es Efeonce y el servicio «Efeonce | AEO» (con barra). Regla en el [ADR de naming](docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md), skills de copy/AEO/social y `docs/context/`; recetas de Studio y Metricool documentadas.
-
-## 2026-10-04 — Insights: reconciliación de estado y revisión de cierre
-
-- EPIC-045 sincronizado a `in-progress`; 24 hijas (7 complete, 6 en curso, 11 to-do). Contratos TASK-1957/1962 desplegados, modelo vigente 1.4 y ocho flags Production exactos ON. Índices, arquitectura y skill espejo actualizados; historial conservado.
-- [Auditoría](docs/audits/insights/2026-10-04-epic-045-closure-review.md): 116 pruebas PASS; sin planes post-release en la lectura acotada. TASK-1962 candidata a cierre tras verificación productiva; las seis hijas en curso conservan sus pendientes. Sin cierres de tasks, cambios runtime ni envíos.
-
-## 2026-10-03 — Efeonce Insights: figuras nuevas en producción y cierre de TASK-1974
-
-- Release `36a73e7b7e19`: el planificador elige la figura por la pregunta; PDF y deck tienen página de cifras, cascada,
-  waffle, dona y barras apiladas; tarjeta con isotipo del canal; Think `0c5701a`; AXIS `v0.3.42`.
-- Verificación con GA4 real de Berel: apiladas y dona correctas. Dos correcciones: una parte que redondea a 0 % se lee
-  «<1 %» y la cifra queda unida a «%»/«pp» con espacio duro en los slots del PDF y el deck. El blanco del disco de canal
-  pasa al rol `channelDisc`. TASK-1974 complete; TASK-1975 espera la revisión del operador.
-
-## 2026-10-03 — AI Visibility Report PDF: refresh local
-
-- TASK-1938: mismo motor y snapshot; seis páginas Engine con órbita, logos oficiales y cierres de cliente/prospecto, en ES/EN/PT-BR. Texto largo conserva contenido con continuación; fuentes registradas de forma aditiva. Las RRSS oficiales se muestran completas a su escala y el eslogan mantiene sus tres pesos.
-- [Dossier](docs/ui/reviews/TASK-1938-ai-visibility-report-pdf-la-orbita/README.md): diez PDFs auditados, 24 comparaciones color/gris, 108 pruebas focales, TypeScript y build PASS. Fallo de metadata Manzanitas corregido en un commit separado; siete tests y sincronización PASS. Code complete local; rollout, revisión del adjunto real y paridad web/print pendientes. Sin push ni envío real.
-
-## 2026-10-03 — Elenco 2D de Efeonce canonizado
-
-- [Canon](docs/operations/brand-characters/EFEONCE_2D_CAST_V1.md): Tomás, Camila, Renata y Mateo, ficticios y
-  dibujados, representan al grupo de compra del cliente y supervisan a los Sparks; estilo «vector con volumen» con
-  sello Efeonce (línea de luz azul + objeto azul).
-- Hojas de giro y expresiones en `ai-generations/_identidad-elenco-2d/`, selladas en el lock (catálogo `ELENCO_2D`,
-  rol `ilustracion-2d`, 560 assets) y publicadas en el canon. GPT Image 2.5 Sunburst, ≈ USD 0,78.
-- Primer uso: spot animado Sparks × Efeonce AEO aprobado (49,6 s). Método transversal de video y workflow del spot 2D
-  documentados: [método](docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md),
-  [retrospectiva](docs/operations/social/2026-10-03-sparks-aeo-spot-animado-production-method.md),
-  [funcional](docs/documentation/creative/spot-animado-2d.md), [manual](docs/manual-de-uso/creative/producir-spot-animado.md);
-  `motion-design-studio`, `audio-studio`, guía de modelos, SPARKS_V1 e identidad sonora al día.
-
-## 2026-10-03 — Video con IA: taxonomía, producto e interfaces y pipelines por plan (EPIC-051)
-
-- [Taxonomía de video](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md) por fase, tipo, look,
-  dificultad y fidelidad, neutral de motor y con «propio primero, proveedor como puente»; [anexo de producto e
-  interfaces con personas](docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCT_AND_INTERFACE_V1.md); matriz operación × motor
-  y presupuestos por toma en la guía (§4.3, §7.4).
-- [ADR-025 aceptada](docs/architecture/creative-studio/EFEONCE_VIDEO_PRODUCTION_PIPELINE_ARCHITECTURE_V1.md): plan
-  declarativo por toma, ejecutores y compuertas; ningún video generativo con referencias sin aprobar.
-- EPIC-051 con TASK-1979…1989 (runner TASK-1989); capas funcional y manual; sin runtime ni gasto.
-
-## 2026-10-03 — Decisiones de marca convertidas en capacidad de ejecución escalable
-
-- [Dirección estratégica aceptada](docs/architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md): hacer operables, automatizables y escalables
-  decisiones creativas para acelerar salida al mercado preservando calidad, consistencia e identidad; recorrido
-  completo o tramo delimitado. Visión, modelo corporativo, oferta, método y skills/routing enlazados; validación
-  económica/comercial permanece por oferta. Cambio documental local, sin alterar runtime ni publicar.
-
-## 2026-10-03 — Elenco de marca, vistas puestas elegidas por el comando y Nexa con expresiones reales
-
-- Elenco ficticio en `ELENCO` (Hum, Karo, Sophia, Isabella, Antonio) con su biblia; grupos de 3 a 5 entre elenco, Nexa
-  y Julio (sin elenco obligatorio). Julio: 37 con canas prematuras en su bloque.
-- `foto:prompt` elige la vista puesta por silueta, giro (45°/70°, frente y espalda), cámara baja y oclusión, e imprime
-  las alternativas; 126 vistas puestas nuevas en bomber, softshell, polo, hoodie y gorra; el macro viaja con la prenda.
-- `foto:isotipo` compone por detrás de los oclusores, con pliegues y escorzo; `canon-sync` baja del canon GCP lo
-  sellado que falta o está viejo; `pnpm foto:rostro` mide la proporción del rostro.
-- Nexa: la expresión va detrás del ancla frontal (la pose sale de la escena), ancla v2 con la proporción del canon y 25
-  expresiones casi de frente aprobadas. Exploración archivada (> 1,3 GB liberados).
-
-## 2026-10-03 — Técnicas de edición sobre el pipeline de inpainting (TASK-1973)
-
-- Nuevo `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen: capas con nombre, máscara por elemento y clean plate
-  = base + las demás capas; la base se cobra como una capa) y `pnpm ai:inpaint erase|move|place|background|expand` +
-  `--zone-resolution`. `place` incorpora un elemento de una foto en otra y el modelo sólo hace el acabado.
-- Canario real (≈ USD 0,90): la sombra proyectada se mide contra el plate y nunca se toma la de un vecino; borrar con
-  el plate y Sunburst por instrucción borran limpio (Flare con máscara y Flux Fill dibujaron otra taza; el residuo se mide contra el fondo);
-  `expand` usa Flux Fill por defecto (Flare reencuadra, Sunburst copia el relleno en espejo). Herramienta out-of-band.
-- Slice 2 (`foto:expandir` sobre el núcleo) pasa a TASK-1925; BFL FLUX Tools (Outpainting, Erase) queda como follow-up.
-
-## 2026-10-02 — Login V4 premium y novedades del login (TASK-1963, TASK-1964)
-
-- Novedades del login gobernadas: tabla `greenhouse_core.login_announcements` (migración aplicada en la instancia
-  compartida), reader `listActiveLoginAnnouncements` (hasta 3 publicadas y vigentes por prioridad), `GET
-  /api/public/login-announcements` y API admin con `login_announcements.manage`. Vigentes: Engine, Brand y Growth.
-- `/login` pasa al V4 premium en develop/staging: formulario sobre papel con Efeonce como marca principal, escenario con
-  fotos producidas, lente reconstruida al canon de AXIS y anclada al sujeto, voz con anillo y esfera, transición «La
-  lente te lleva adentro» y mejoras de contraste en avisos y alertas. No está en producción; `pnpm test` completo pendiente.
-- Canon de foto y skills: la referencia de cara del equipo pasa al avatar con la bomber; personajes de casting con retrato ancla (piel v3) antes de la escena; casebook cine (fallas 14–20, `LG1`/`LG2e` como recetas), registro cine (excepción del login), guía de modelos, regla `brand-photography` y `efeonce-graphic-line` (lecciones, ledger, aplicación §A12) actualizados.
-- Docs: [funcional](docs/documentation/identity/novedades-del-login.md) y [manual](docs/manual-de-uso/identity/administrar-novedades-del-login.md).
-
-## 2026-10-02 — Inpainting de imagen y video en los CLIs (TASK-1965)
-
-- Nuevos `pnpm ai:mask` (máscara canónica con fuentes, operaciones y guardas de cobertura) y `pnpm ai:inpaint image|video`:
-  recorte con contexto, generación por adaptador (OpenAI, `fal:flux-pro-fill`, Seedream edit; video `fal:flux3-edit`),
-  recomposición obligatoria y verificación del archivo en delta máximo 0, dry-run, caché por hash y manifiesto.
-- Medido: Sunburst con máscara devuelve un panel negro plano (3 de 3) → default Flare con máscara y Sunburst sin máscara
-  con corrección de color en anillo; modo boceto y referencias (como el Markup de ChatGPT). `ai:image --mask` avisa que
-  no recompone. Canario en `ai-generations/2026-10-02_task-1965-canary/`. Herramienta out-of-band: no toca runtime.
-- Cerrada el 2026-10-03: en producción con el release `fe261ca27`; siguiente paso, TASK-1973 (expandir, capas, borrar, fondo y detalle).
-
-## 2026-10-02 — Marketing Studio: commands del catálogo verificados en staging (TASK-1894, Entregable B)
-
-- Studio suma escrituras gobernadas del catálogo: máquinas de estado (revisión, creativo, medios, lanzamiento),
-  campaña, brief literal, conceptos, piezas, derechos, copy byte a byte, anuncios, flight, líneas de presupuesto
-  (sólo `proposed`; aprobar crea la `approved`) y posts planificados (Studio nunca publica). Las aprobaciones son T2:
-  sólo una persona por la CLI `pnpm studio:write … --apply --confirm`; por API, 403 `confirmation_required` hasta
-  TASK-1899.
-- Autoridad por campaña (`source_of_truth`): escribir en una campaña de OneDrive responde 409
-  `campaign_not_studio_owned`; el importador salta las campañas `studio`. API 1.4.0, 44 tools, permisos proyectados y
-  `ETag`. Migración `1790967435017` aplicada en staging y producción (aditiva); sandbox `CMP-900` en staging.
-- **No está en producción:** Studio `a8c7886` sin empujar a `main`; Greenhouse `9d0d698d4` (capabilities
-  `marketing_studio.asset.write` y `.campaign.write`) sólo en `develop`; gateway con filtro de sólo lecturas preparado
-  sin sincronizar. Entregable C diferido.
-
-## 2026-10-02 — CMP-004 completa: 44 piezas aprobadas, horizontales 1,91:1 y grilla de Studio corregida
-
-- Las 11 horizontales 1,91:1 (LinkedIn 1200×628 y Meta horizontal) se hacen desde la escena 1:1 aprobada:
-  `pnpm foto:expandir` gana `--lienzo`, `--ancla`, `--fundido` y `--reponer no` (`2ff39fe96`); la escena va a la
-  derecha al 80 % del alto y el modelo extiende sólo la columna de texto. Concepto reducido aprobado por el operador:
-  la bajada va en el titular del anuncio (CDR-012, `ec9e8a00d`). `foto:cta:gate --reproducir` exit 0 en las 11.
-- Entregadas en canvas, OneDrive Finales (`CONTROL-DE-PIEZAS` 44 filas), Marketing Studio y AXIS Lab (`25f1b40`).
-  En Studio se subieron con `--ratio 191x100` (la API exige `^\d+x\d+$`) y se aprobaron: 44 piezas, 0 pendientes.
-- La grilla de piezas de Studio tenía columnas fijas y escondía las 1,91:1 cargadas y aprobadas; ahora muestra las
-  proporciones presentes en la campaña y rotula `191x100` como «1,91:1» (Studio `23e5787`, verificado en el navegador).
-  Commits de este repo sin push.

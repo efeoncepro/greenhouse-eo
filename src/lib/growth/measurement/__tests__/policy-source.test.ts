@@ -25,6 +25,14 @@ describe('source authority and typed contact mapping',()=>{
   vi.mocked(getFormDefinitionByKey).mockResolvedValue({...form,form_kind:kind} as Awaited<ReturnType<typeof getFormDefinitionByKey>>)
   expect((await resolveMeasurementSource(p.scope))?.blockingReasons).toContain('purpose_not_commercial')
  })
+ it.each(['lead_magnet','application','subscribe','event_registration','survey'])('keeps %s ineligible for Ads even if other destinations remain configured',async kind=>{
+  vi.mocked(getFormDefinitionByKey).mockResolvedValue({...form,form_kind:kind} as Awaited<ReturnType<typeof getFormDefinitionByKey>>)
+  expect((await resolveMeasurementSource(p.scope))?.googleAdsEligible).toBe(false)
+ })
+ it.each(['contact','diagnostic_intake','quote_request'])('allows an explicit policy opt-in only for the commercial %s source',async kind=>{
+  vi.mocked(getFormDefinitionByKey).mockResolvedValue({...form,form_kind:kind} as Awaited<ReturnType<typeof getFormDefinitionByKey>>)
+  expect((await resolveMeasurementSource(p.scope))?.googleAdsEligible).toBe(true)
+ })
  it('exposes only declared typed fields and explicit namePolicy outputs',()=>{
   const fields=matchingFieldCatalog([{key:'fullName',type:'text'},{key:'email',type:'email'},{key:'phone',type:'text'},{key:'nationalId',type:'national_id'}],{namePolicy:{mode:'split_full_name',sourceField:'fullName',firstNameField:'firstName',lastNameField:'lastName'}})
 

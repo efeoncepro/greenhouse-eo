@@ -1,0 +1,1143 @@
+{
+  "run_id": "2026-10-14-0655",
+  "recorded_at": "2026-10-14T06:48:49.259590-03:00",
+  "timezone": "America/Santiago",
+  "window_start": "2026-10-12T00:00:00-03:00",
+  "window_end": "2026-10-14T06:48:49.259590-03:00",
+  "queries_count": 137,
+  "queries_by_market": {
+    "Chile": 35,
+    "Perú": 42,
+    "Colombia": 40,
+    "México": 20
+  },
+  "count_scope": "Consultas de descubrimiento transcritas; validaciones nominales y lecturas directas adicionales no se suman.",
+  "new_weekly_verified_open": 0,
+  "coverage": [
+    {
+      "market": "Chile",
+      "lines": [
+        "creative",
+        "web",
+        "seo_aeo",
+        "crm_hubspot",
+        "media"
+      ],
+      "new_weekly_verified_open": 0,
+      "scope": "Búsqueda pública parcial; no censo de demanda"
+    },
+    {
+      "market": "Perú",
+      "lines": [
+        "creative",
+        "web",
+        "seo_aeo",
+        "crm_hubspot",
+        "media"
+      ],
+      "new_weekly_verified_open": 0,
+      "scope": "Búsqueda pública parcial; no censo de demanda"
+    },
+    {
+      "market": "Colombia",
+      "lines": [
+        "creative",
+        "web",
+        "seo_aeo",
+        "crm_hubspot",
+        "media"
+      ],
+      "new_weekly_verified_open": 0,
+      "scope": "Búsqueda pública parcial; no censo de demanda"
+    },
+    {
+      "market": "México",
+      "lines": [
+        "creative",
+        "web",
+        "seo_aeo",
+        "crm_hubspot",
+        "media"
+      ],
+      "new_weekly_verified_open": 0,
+      "scope": "Búsqueda pública parcial; no censo de demanda"
+    }
+  ],
+  "queries": [
+    {
+      "market": "Chile",
+      "query": "Chile \"buscamos agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile licitación \"sitio web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile (\"SEO\" OR \"AEO\") (\"licitación\" OR \"buscamos\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile (\"HubSpot\" OR \"CRM\") (\"licitación\" OR \"buscamos partner\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"agencia de medios\" licitación octubre 2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts Chile agencia licitación octubre 2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"convocatoria\" \"agencia creativa\" octubre 2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"buscamos agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"licitación\" \"web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"SEO\" \"agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"HubSpot\" \"partner\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"agencia\" \"licitación\" \"14 de octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"agencia\" \"licitación\" \"13 de octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"buscamos\" (\"agencia\" OR \"proveedor\") after:2026-10-12",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile (\"RFP\" OR \"licitación\") (\"CRM\" OR \"marketing\" OR \"web\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"licitación\" \"agencia\" \"octubre 2026\" -site:mercadopublico.cl -site:boletinoficial*",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"buscamos\" \"partner digital\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"recomendaciones\" \"agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"selección\" \"agencia de medios\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"buscamos agencia\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"licitación\" \"agencia\" \"12 de octubre\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"buscamos\" \"SEO\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"HubSpot\" \"implementación\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile licitación privada \"marketing\" \"2026\" \"octubre\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"rediseño\" \"licitación\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile \"CRM\" \"solicitud de propuestas\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"licitación\" \"agencia\" \"Chile\" \"2027\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"licitación\" (\"campaña\" OR \"contenidos\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" (\"recomendación\" OR \"recomiendan\") (\"SEO\" OR \"CRM\" OR \"web\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"RFP\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "site:linkedin.com/posts \"Chile\" \"buscamos\" \"agencia de medios\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "Chile (\"licitación\" OR \"RFP\") (\"sitio web\" OR \"SEO\" OR \"medios\") after:2026-10-12",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"necesitamos agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"licitación SEO\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Chile",
+      "query": "\"Chile\" \"proveedor\" \"migración\" \"HubSpot\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"buscamos agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"licitación\" \"web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"SEO\" \"convocatoria\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"HubSpot\" \"proveedor\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"agencia de medios\" \"convocatoria\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:linkedin.com/posts Perú \"agencia\" \"licitación\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"solicitud de propuestas\" \"marketing\" octubre 2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"buscamos\" \"SEO\" \"agencia\" octubre 2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:linkedin.com/posts \"agencia\" \"Perú\" \"octubre\" \"2026\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"licitación\" \"creativa\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"CRM\" \"solicitud\" \"proveedor\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"rediseño web\" \"convocatoria\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"convocatoria\" \"agencia digital\" \"octubre 2026\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"convocatoria\" \"comunicación\" \"12 de octubre de 2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"cotización\" \"diseño web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:care.org.pe \"octubre\" \"2026\" \"consultoría\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:pe.linkedin.com/posts \"agencias\" \"buscando\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"selección de agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"RFP\" \"SEO\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"HubSpot\" \"recomendación\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:care.org.pe \"convocatoria\" \"comunicación\" \"2026\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:profonanpe.org.pe \"convocatoria\" \"comunicaciones\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"agencia\" \"licitación\" \"14 de octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "Perú \"agencia\" \"licitación\" \"13 de octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"comunicación\" \"licitación\" \"octubre\" \"2026\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"marketing\" \"solicitud de propuestas\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"agencia\" \"RFP\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"producción audiovisual\" \"convocatoria\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"buscamos partner\" \"HubSpot\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"CRM\" \"RFP\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"busco\" \"agencia SEO\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"posicionamiento\" \"proveedores\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Buscamos agencia\" \"redes sociales\" Perú after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"buscamos\" \"programática\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"agencia de medios\" \"buscando\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"buscamos agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"licitación\" \"sitio web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"SEO\" \"convocatoria\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"HubSpot\" \"proveedor\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"agencia de medios\" \"convocatoria\" octubre2026 after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts Colombia \"agencia\" \"buscamos\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"invitación\" \"rediseño\" \"web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"CRM\" \"solicitud de propuestas\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"agencia\" \"licitación\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"SEO\" \"proveedor\" \"buscamos\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"CRM\" \"invitación\" \"2026\" \"octubre\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia \"marketing\" \"términos de referencia\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts \"Colombia\" (\"licitación\" OR \"convocatoria\") (\"agencia\" OR \"web\") \"2026\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"agencia de medios\" \"2027\" convocatoria",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"rediseño\" \"proveedor\" \"octubre\"2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:porkcolombia.co/contratacion \"2026\" \"octubre\" agencia",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" (\"busco agencia\" OR \"recomienden agencia\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" (\"SEO\" OR \"AEO\") (\"RFP\" OR \"licitación\" OR \"selección de agencia\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" (\"HubSpot\" OR \"CRM\") (\"buscamos partner\" OR \"buscamos proveedor\" OR \"licitación\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" (\"web\" OR \"página web\") (\"licitación privada\" OR \"convocatoria proveedores\") after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "licitación agencia creativa Colombia octubre2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "convocatoria rediseño web Colombia octubre2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "buscamos agencia SEO Colombia octubre2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "convocatoria agencia medios Colombia octubre2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:co.linkedin.com/posts \"agencia\" \"convocatoria\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts \"Bogotá\" \"agencia\" \"licitación\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"selección de agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"RFP\" \"marketing\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia contratar agencia creativa \"12 de octubre de2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia agencia web \"13 de octubre de2026\" convocatoria",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia marketing \"14 de octubre de2026\" licitación",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "Colombia implementación CRM proveedor octubre2026",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts \"Colombia\" \"agencia creativa\" after:2026-10-11 -jobs",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts \"Colombia\" \"agencia digital\" \"recomendaciones\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts \"Colombia\" \"HubSpot\" \"implementación\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:linkedin.com/posts \"Colombia\" \"rediseño web\" after:2026-10-11",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "site:fenavi.org/contrataciones \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"agencia\" \"convocatoria\" \"13\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"rediseño\" \"licitación\" \"12\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Colombia",
+      "query": "\"Colombia\" \"SEO\" \"licitación\" \"14\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "source": "web_search",
+      "date": "2026-10-14",
+      "filter_evidence": "Ver informe de mercado privado; after en consulta no acredita fecha de publicación."
+    },
+    {
+      "market": "Perú",
+      "query": "site:pe.linkedin.com/posts \"licitación\" \"agencia\" \"2027\"",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "Perú",
+      "query": "site:care.org.pe \"octubre\" \"proveedores\"",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "Perú",
+      "query": "site:wwf.org.pe \"convocatoria\" \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "Perú",
+      "query": "site:profonanpe.org.pe \"2026\" \"marketing\" \"octubre\"",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"AEO\" \"buscamos\" after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"GEO\" \"agencia\" \"licitación\" after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "Perú",
+      "query": "\"Perú\" \"visibilidad en IA\" \"proveedor\" after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"buscamos agencia\" after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México (\"licitación\" OR \"convocatoria\" OR \"RFP\") \"sitio web\" after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México (\"buscamos\" OR \"proveedor\") (\"SEO\" OR \"AEO\") after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México (\"CRM\" OR \"HubSpot\") (\"licitación\" OR \"buscamos partner\") after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"agencia de medios\" (\"convocatoria\" OR \"buscamos\" OR \"pitch\") after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "site:linkedin.com/posts México (\"buscamos agencia\" OR \"buscando agencia\") after:2026-10-11",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México (\"solicitud de propuestas\" OR \"licitación\") (\"marketing\" OR \"comunicación\" OR \"diseño\") \"octubre\" \"2026\"",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México (\"SEO\" OR \"HubSpot\" OR \"CRM\") (\"solicitud de propuestas\" OR \"convocatoria\") \"octubre 2026\"",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"convocatoria\" \"agencia\" \"octubre\" \"2026\" -empleo -vacante -gob -gobierno",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"solicitud de propuestas\" \"comunicación\" \"2026\" octubre",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"rediseño\" \"convocatoria\" \"2026\" octubre",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"licitación\" \"marketing digital\" 2026 octubre",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"agencia creativa\" \"octubre\" \"2026\" \"buscamos\"",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"proveedor\" \"CRM\" \"octubre\" \"2026\" -empleo -vacante",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"RFP\" \"website\" \"October\" \"2026\"",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"licitaciones\" \"comunicación\" WWF Save the Children 2026",
+      "phase": "discovery",
+      "recency_days": 3,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"buscamos\" \"agencia\" \"12 de octubre\" \"2026\"",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"convocatoria\" \"SEO\" octubre 2026",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"licitación\" \"CRM\" octubre 2026",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    },
+    {
+      "market": "México",
+      "query": "México \"agencia de medios\" \"13 de octubre\" 2026",
+      "phase": "discovery",
+      "recency_days": null,
+      "date": "2026-10-14"
+    }
+  ],
+  "limitations": [
+    "Fecha de rastreo no equivale a publicación.",
+    "Lecturas originales de LinkedIn por navegador corrigieron fechas del agregador.",
+    "HubSpot no pudo establecer identidad: error de transporte; deduplicación local solamente.",
+    "CODESSER y partes de Porkcolombia/Profonanpe inaccesibles."
+  ]
+}

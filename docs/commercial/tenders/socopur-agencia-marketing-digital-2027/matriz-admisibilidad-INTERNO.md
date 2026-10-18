@@ -1,5 +1,10 @@
 # Matriz de admisibilidad — Socopur — INTERNO
 
+> **Actualización 15/10/2026 16:54:36 UTC:** entrada tardía cerrada por respuesta de Katherine;
+> no reciben nuevas postulaciones/propuestas para este período. Esta matriz conserva la evaluación
+> histórica del 10/10 y sus brechas; no es un plan vigente para solicitar ingreso. PDF enviado el 15/10
+> según el corte de seguimiento; no acredita admisión ni cumplimiento. [Cierre y fuente](research/cierre-y-aprendizajes-2026-10-15-INTERNO.md).
+
 **Corte:** 10-10-2026. **Decisión:** investigar y preparar recuperación; no GO definitivo. Fuente: [lectura por lámina](bases/convocatoria-2026-10-10.md).
 
 | Condición | Fuente / naturaleza | Estado Efeonce | Evidencia o acción |

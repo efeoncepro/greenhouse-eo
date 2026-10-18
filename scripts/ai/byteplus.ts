@@ -7,8 +7,8 @@ import { dirname, extname, join, resolve } from 'node:path'
 import { config as loadEnv } from 'dotenv'
 import sharp from 'sharp'
 
-import { BYTEPLUS_MODELS, bytePlusImageRate, bytePlusVideoDimensions, estimateBytePlusVideo, findBytePlusModel } from '@/lib/ai/byteplus-catalog'
-import { bytePlusDoctor, bytePlusRequest, createBytePlusVideo, generateBytePlusImages, getBytePlusVideo, readBytePlusOutput } from '@/lib/ai/byteplus'
+import { BYTEPLUS_MODELS, buildBytePlusDraftFinalRequest, bytePlusDraftExpiry, bytePlusImageRate, bytePlusVideoDimensions, estimateBytePlusVideo, findBytePlusModel } from '@/lib/ai/byteplus-catalog'
+import { BytePlusError, bytePlusDoctor, bytePlusRequest, createBytePlusVideo, generateBytePlusImages, getBytePlusVideo, readBytePlusOutput } from '@/lib/ai/byteplus'
 import { generateBytePlusAudio, generateBytePlusTts, queryBytePlusAsrFile, submitBytePlusAsrFile } from '@/lib/ai/byteplus-speech'
 
 import { runBytePlusLayerize } from './inpaint/adapters/layerize-byteplus'
@@ -36,6 +36,8 @@ const HELP = `pnpm ai:byteplus — media directa de BytePlus (Johor)
   --yes                                    Ejecuta explícitamente; sin él no se genera
   --max-usd <n>                            Rechaza una estimación que excede el tope
   --task-id <id> / --status / --detach      Recuperar/consultar video o ASR sin reencolar
+  --draft                                  Seedance 2.5: borrador barato a 480p (vigente 7 días)
+  --from-draft <task-id>                   Seedance 2.5: final 1080p de ese borrador; sin prompt ni referencias
   --no-audio                               Video silencioso
   --consent                                Enrollment: declaración explícita de consentimiento
 
@@ -44,6 +46,8 @@ Ejemplos:
   pnpm ai:layers --provider byteplus --image imagen.png --dry-run
   pnpm ai:byteplus --model seedance25 --prompt 'Un paisaje al amanecer' --duration 5 --estimate
   pnpm ai:byteplus --model tts2 --prompt 'Hola' --speaker <voice-id> --out voz.mp3 --yes
+  pnpm ai:byteplus --model seedance25 --draft --image cuadro.png --prompt-file toma.txt --duration 4 --out borrador.mp4 --yes
+  pnpm ai:byteplus --model seedance25 --from-draft <task-id-del-borrador> --out final-1080p.mp4 --yes
 Los servicios de voz tienen tarifa variable: --yes confirma uso; enrollment nunca compra slots.
 `
 
@@ -52,8 +56,8 @@ type Flags = Record<string, string | boolean>
 export const parseBytePlusArgs = (argv: string[]) => {
   const flags: Flags = {}
   const media: Record<'image' | 'video' | 'audio', string[]> = { image: [], video: [], audio: [] }
-  const booleans = ['list','doctor','layers','references','estimate','dry-run','yes','status','detach','no-audio','consent','help']
-  const values = ['model','prompt','prompt-file','end-image','size','resolution','duration','aspect','operation','speaker','input-file','out','out-dir','max-usd','task-id']
+  const booleans = ['list','doctor','layers','references','estimate','dry-run','yes','status','detach','no-audio','consent','help','draft']
+  const values = ['model','prompt','prompt-file','end-image','size','resolution','duration','aspect','operation','speaker','input-file','out','out-dir','max-usd','task-id','from-draft']
 
   for (let i=0; i<argv.length; i++) {
     if (argv[i] === '--') continue
@@ -80,11 +84,36 @@ const httpsMedia = (value: string) => {
   return value
 }
 
-const imageInput = async (value: string) => {
+/**
+ * PNG/JPEG/WebP viajan con sus bytes originales: la confianza de ModelArk en salidas propias con rostro (Seedream 5,
+ * Seedance 2.x, misma cuenta, 30 días) se pierde si el archivo se recomprime. Sólo otros formatos se convierten a PNG.
+ */
+export const bytePlusImageInput = async (value: string) => {
   if (/^https:\/\//.test(value)) return value
-  const bytes = await sharp(await readFile(resolve(value))).png().toBuffer()
+  // Personaje de la biblioteca privada de retratos virtuales (estado Active tras la revisión del fabricante).
+  if (/^asset:\/\/[a-zA-Z0-9_-]+$/.test(value)) return value
+  if (value.startsWith('asset://')) throw new Error('Referencia asset:// inválida; usa asset://<id> tal como lo entrega la biblioteca de BytePlus.')
+  const original = await readFile(resolve(value))
+  const format = (await sharp(original).metadata()).format
 
-  return `data:image/png;base64,${bytes.toString('base64')}`
+  if (format === 'png' || format === 'jpeg' || format === 'webp') return `data:image/${format};base64,${original.toString('base64')}`
+
+  return `data:image/png;base64,${(await sharp(original).png().toBuffer()).toString('base64')}`
+}
+
+const imageInput = bytePlusImageInput
+
+/** Traduce rechazos accionables del fabricante; el resto conserva el código seguro de BytePlusError. */
+export const explainBytePlusError = (error: unknown): unknown => {
+  if (error instanceof BytePlusError && error.cause_ === 'asset_service_not_activated') {
+    return new Error(`${error.message}. La cuenta no tiene activado el Asset Service: los asset:// no se pueden usar hasta activarlo en la consola de ModelArk (Open Management, región ap-southeast-1). Lo activa el operador; ver el ledger de retratos.`)
+  }
+
+  if (error instanceof BytePlusError && /PrivacyInformation/i.test(error.code)) {
+    return new Error(`${error.message}. Seedance 2.x no acepta rostros humanos reales como entrada. Vías oficiales: una salida original de Seedream 5 o Seedance 2.x de esta misma cuenta (menos de 30 días, sin editar ni recomprimir), un personaje de la biblioteca digital (asset://) o un retrato autorizado. Ver el manual de BytePlus directo.`)
+  }
+
+  return error
 }
 
 const writeOutput = async (path: string, value: Buffer | string) => {
@@ -188,7 +217,7 @@ return }
 
     // Seedream 4/4.5 sólo devuelve JPEG; la conversión local respeta la extensión pedida.
     if (model.id === 'seedream4' || model.id === 'seedream45') delete (request as Partial<typeof request>).output_format
-    const result = await generateBytePlusImages(request)
+    const result = await generateBytePlusImages(request).catch(error => { throw explainBytePlusError(error) })
 
     await receipt({ requestId:result.requestId, usage:result.data.usage, estimatedUsd:usd })
 
@@ -210,10 +239,57 @@ return }
 
   if (model.kind === 'video') {
     let id = taskId
+    let receiptMeta: Record<string, unknown> = {}
+    const fromDraft = stringFlag(f,'from-draft')
+
+    if (f.draft && fromDraft) throw new Error('Usa --draft para crear un borrador o --from-draft para finalizarlo, no ambos.')
+    if ((f.draft || fromDraft) && !model.draft) throw new Error(`${model.id} no admite modo borrador; usa seedance25.`)
+
+    if (fromDraft && !id) {
+      // El fabricante reutiliza prompt, referencias, duración, ratio, seed y audio del borrador: reenviarlos es error.
+      const resent = ['prompt','prompt-file','end-image','duration','aspect','operation','references','no-audio'].filter(key => f[key] !== undefined)
+
+      if (resent.length || media.image.length || media.video.length || media.audio.length) {
+        throw new Error(`Al finalizar un borrador no se reenvían prompt, referencias, duración, ratio ni audio (${[...resent, ...(media.image.length ? ['image'] : []), ...(media.video.length ? ['video'] : []), ...(media.audio.length ? ['audio'] : [])].join(', ')}).`)
+      }
+
+      const draftTask = (await getBytePlusVideo(fromDraft)).data
+
+      if (draftTask.status !== 'succeeded') throw new Error(`El borrador ${fromDraft} está en ${draftTask.status}; sólo se finaliza un borrador terminado.`)
+      if (draftTask.draft === false) throw new Error(`${fromDraft} no es un borrador.`)
+      const expiry = bytePlusDraftExpiry(model, draftTask.created_at)
+
+      if (expiry.known && expiry.expired) throw new Error(`El borrador ${fromDraft} venció el ${expiry.expiresAt}; genera uno nuevo.`)
+      const resolution = stringFlag(f,'resolution',model.draft!.finalResolutions[0])
+      const request = buildBytePlusDraftFinalRequest(model, fromDraft, { resolution, extra: raw })
+      let usd: number | null = null
+
+      // Cota con la tarifa sin video de entrada: si el borrador usó video, el cobro real es menor, nunca mayor.
+      if (draftTask.ratio && draftTask.ratio !== 'adaptive' && Number.isInteger(draftTask.duration) && (draftTask.duration as number) > 0) {
+        try {
+          const [width,height] = bytePlusVideoDimensions(resolution, draftTask.ratio)
+
+          usd = estimateBytePlusVideo(model,{ width, height, duration: draftTask.duration as number, resolution })
+        } catch { usd = null }
+      }
+
+      if (!confirm(usd)) return
+      const created = await createBytePlusVideo(request).catch(error => { throw explainBytePlusError(error) })
+
+      id = created.data.id
+      receiptMeta = { fromDraftTaskId: fromDraft, draftCreatedAt: draftTask.created_at ?? null, resolution }
+      await receipt({ taskId:id, ...receiptMeta, estimatedUsd:usd })
+      process.stdout.write(`Final ${id} desde el borrador ${fromDraft}; recuperar con --model ${model.id} --task-id ${id}.\n`)
+      if (f.detach) return
+    }
 
     if (!id) {
       if (!prompt && !Array.isArray(raw.content)) throw new Error('--prompt o content es obligatorio.')
-      const resolution = String(raw.resolution ?? stringFlag(f,'resolution','720p'))
+      const requestedResolution = String(raw.resolution ?? stringFlag(f,'resolution', f.draft ? model.draft!.resolution : '720p'))
+
+      if (f.draft && requestedResolution !== model.draft!.resolution) throw new Error(`El borrador sólo se genera a ${model.draft!.resolution}; la resolución final se elige al finalizar.`)
+      if (f.draft && raw.draft === false) throw new Error('--draft contradice draft=false en --input-file.')
+      const resolution = requestedResolution
       const operation = stringFlag(f,'operation','generate')
       const duration = Number(raw.duration ?? stringFlag(f,'duration','5'))
       const ratio = String(raw.ratio ?? stringFlag(f,'aspect','16:9'))
@@ -247,11 +323,13 @@ return }
       const created = await createBytePlusVideo({ ...raw, model:model.model, content:content.length ? content : raw.content, resolution,
         ratio:adaptive ? 'adaptive' : ratio, duration:operation==='edit' ? -1 : duration,
         ...(!model.id.startsWith('seedance1-') ? { generate_audio:f['no-audio'] ? false : raw.generate_audio ?? true } : {}),
-        ...(operation!=='generate' ? {omni_reference_task_type:operation} : {}) })
+        ...(operation!=='generate' ? {omni_reference_task_type:operation} : {}),
+        ...(f.draft ? {draft:true} : {}) }).catch(error => { throw explainBytePlusError(error) })
 
       id = created.data.id
-      await receipt({taskId:id,estimatedUsd:usd})
-      process.stdout.write(`Tarea ${id}; recuperar con --model ${model.id} --task-id ${id}.\n`)
+      receiptMeta = f.draft ? { draft:true, resolution } : {}
+      await receipt({taskId:id,...receiptMeta,estimatedUsd:usd})
+      process.stdout.write(`${f.draft ? 'Borrador' : 'Tarea'} ${id}; recuperar con --model ${model.id} --task-id ${id}.\n`)
       if (f.detach) return
     }
 
@@ -265,10 +343,15 @@ return }
 return}
 
       if (result.data.status==='succeeded') {
-        await receipt({taskId:id,status:result.data.status,usage:result.data.usage})
+        const isDraft = result.data.draft === true || receiptMeta.draft === true
+        const expiry = isDraft ? bytePlusDraftExpiry(model, result.data.created_at) : { known: false as const }
+
+        await receipt({taskId:id,...receiptMeta,status:result.data.status,usage:result.data.usage,
+          ...(isDraft ? { draft:true, createdAt:result.data.created_at ?? null, draftExpiresAt:expiry.known ? expiry.expiresAt : null } : {})})
         if (!result.data.content?.video_url) throw new Error('Video succeeded sin salida; recuperar por task ID.')
         await writeOutput(out,await readBytePlusOutput({url:result.data.content.video_url}))
         process.stdout.write(`${out}\n`)
+        if (isDraft) process.stdout.write(`Borrador listo. Final: --model ${model.id} --from-draft ${id}${expiry.known ? ` (vence ${expiry.expiresAt})` : ''}.\n`)
 
         return
       }

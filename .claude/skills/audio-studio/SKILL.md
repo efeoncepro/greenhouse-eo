@@ -80,6 +80,19 @@ description: Produce y dirige audio enterprise con IA y humanos para voz, VO, TT
 | 10 | `modules/10_AI_AUDIO_PIPELINE_STUDIO.md` | selección de modelo, licenciamiento, humano+IA, orquestación, enhance/restore |
 | 11 | `modules/11_STUDIO_CREDITS_AND_RIGHTS.md` | credits por operación/duración/tier/attempt, lifecycle, VO/música/lip-sync, retries, derechos y modos |
 
+**Audio de entrada para OmniHuman 2.0**
+
+OmniHuman anima una imagen a partir de un **archivo de audio externo**; no lo trates como TTS ni voice cloning.
+Aprueba primero guion, voz, pronunciación, pausas e interpretación; conserva el master y sus derechos, y valida
+formato/duración/peso según la superficie en el
+[manual OmniHuman 2.0 API](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md).
+Cambiar ese audio puede cambiar la duración, el lip-sync y la actuación: nueva versión exige QA audiovisual con
+`motion-design-studio`, incluido el video completo y su correspondencia con el master. No declares probado
+el español ni la calidad emocional sólo por el listado de idiomas del proveedor.
+Es **Vision AI**, con autenticación separada de Seed Speech y ModelArk; `pnpm ai:byteplus` no integra OmniHuman.
+La [auditoría fechada](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) conserva
+las diferencias API/consola. Documentar su uso no activa el modelo, no genera audio/video ni habilita Globe.
+
 ## 4. La mano de ejecución (por qué es "studio")
 
 Cierra el loop **idear → guion/brief → producir → editar → mezclar → masterizar → entregar**

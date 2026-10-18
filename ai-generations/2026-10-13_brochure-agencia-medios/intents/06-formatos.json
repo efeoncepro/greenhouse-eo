@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Programática · formatos",
+    "question": "¿En qué pantallas aparezco?",
+    "answer": [
+      "Donde mira"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
+  "items": [
+    {
+      "title": "Display, native y video",
+      "desc": "Formatos estándar, HTML5 y rich media en sitios y apps con inventario de calidad."
+    },
+    {
+      "title": "TV conectada y audio digital",
+      "desc": "Streaming de video y audio con segmentación por audiencia, contexto y geografía."
+    },
+    {
+      "title": "pDOOH: pantallas en la calle",
+      "desc": "Vía pública digital comprada por ubicación, horario y audiencia, con prueba de emisión."
+    },
+    {
+      "title": "In-game y nuevos entornos",
+      "desc": "Formatos que se suman cuando hay inventario, presupuesto y creatividad pertinentes."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Medios",
+    "participantKind": "department"
+  }
+}

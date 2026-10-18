@@ -1,0 +1,39 @@
+{
+  "id": "MN-HS-45",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "complicidad"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): she stands with her body centred at about 50 % of the frame width, her head in the upper-middle of the frame, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no watch, no rings. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm, she does not lean toward the lens. Beside her, on the FRAME-RIGHT side of her body, floats a translucent glass card about as tall as her torso; it spans from about 66 % to about 94 % of the frame width, entirely to the right of her shoulder, never in front of her; the left 30 % of the frame is empty darkness. The card is a customer record made of light, with a round avatar glow at the top and SIX horizontal rows below it. Three thin streams of light travel to the card from three sources that hang far behind her, behind her and small: ONE glowing phone handset above and behind her right shoulder, ONE glowing envelope behind her at head height, ONE glowing calendar square lower and farther on the right; all three soft and out of focus. Where each stream touches the card, one of its rows lights up azure-white as if filling itself in; four rows are already lit, two are still dim and filling. The rows are abstract light bars: no letters, no numbers, nothing legible. Her hands rest relaxed, her left hand lightly open toward the card on her side without touching it — she is NOT typing, NOT writing, the record updates itself — and she looks straight into the lens with a calm, knowing half-smile. The light of the card paints her face and jacket; card and streams are cool azure blue (#0375DB) and white, the light of Efeonce; only the three small sources (phone, envelope, calendar) glow magenta-pink (#E86BD0) as the accent. Thin haze catches the streams. The LEFT 30% of the frame is calm, deep dark studio space with only faint haze: no card, no streams, no objects. Rich contrast, no text, no logos of any other brand. COMPOSITION FOR A WEBSITE MENU (native to its frame): this vertical photo sits in the right column of a full-screen menu whose dark panel overlaps its LEFT third with a large curved corner at the top; so the SUBJECT and everything that carries the idea sits in the CENTRE-RIGHT of the frame, and the left third is calm continuation of the same scene, never empty and never a flat slab.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "proposal-cinematic",
+  "llave": {
+    "fuente": "the glowing customer-record card of azure-white light beside her",
+    "lado": "on the frame-right side of her face, at chest height",
+    "tamano": "about as tall as her torso",
+    "distancia": "about 60 cm from her face"
+  },
+  "fondo": "a row of large cold blue practical lights far behind, melted into round bokeh",
+  "fenomeno": {
+    "que": "three streams of light — a call, an email and a meeting — flow into a floating customer record and light up its rows by themselves",
+    "esServicio": "Smart CRM que se actualiza solo: el registro se llena con llamadas, emails y reuniones, sin digitar"
+  },
+  "linea": "revenue-hubspot"
+}

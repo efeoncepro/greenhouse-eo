@@ -11,6 +11,7 @@ import { enqueueMeasurementConversion } from '@/lib/growth/measurement/store'
 
 import { query, withTransaction } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { parseHubSpotFormReceipt, type HubSpotFormReceipt } from './destinations/hubspot/receipts'
 
 import {
   FORM_SUBMISSION_ACCEPTED_EVENT,
@@ -138,6 +139,8 @@ export type FormDestinationAttemptRow = {
   adapter_version: string
   status: string
   external_id: string | null
+  provider_submission_id?: string | null
+  provider_receipt_json?: unknown
   http_status: number | null
   error_class: string | null
   retry_count: number
@@ -516,7 +519,7 @@ export interface PersistSubmissionInput {
  * `growth.forms.submission_accepted` en UNA transacción. La entrega al destino es
  * async (la drena el dispatcher), NUNCA inline (overlay #3 + CLAUDE.md outbox).
  */
-export const persistAcceptedSubmission = async (input: PersistSubmissionInput): Promise<FormSubmissionRow> =>
+export const persistAcceptedSubmission = async (input: PersistSubmissionInput): Promise<FormSubmissionRow & { measurementPersisted: boolean }> =>
   withTransaction(async client => {
     const submissionRows = await client.query(
       `INSERT INTO greenhouse_growth.form_submission (
@@ -544,7 +547,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
 
     const submission = (submissionRows.rows as FormSubmissionRow[])[0]
 
-    await enqueueMeasurementConversion(client, 'form_submission', submission.submission_id, input.measurement)
+    const measurementPersisted = await enqueueMeasurementConversion(client, 'form_submission', submission.submission_id, input.measurement)
 
     await client.query(
       `INSERT INTO greenhouse_growth.form_submission_consent_snapshot (
@@ -578,7 +581,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
       client,
     )
 
-    return submission
+    return { ...submission, measurementPersisted }
   })
 
 /** Submission rechazada: metadata operacional mínima, sin PII innecesaria. */
@@ -756,16 +759,23 @@ export const insertAttempt = async (input: {
   adapterVersion: string
   status: string
   externalId?: string | null
+  providerReceipt?: HubSpotFormReceipt
   httpStatus?: number | null
   errorClass?: string | null
   retryCount?: number
 }): Promise<FormDestinationAttemptRow> => {
+  const receipt = input.providerReceipt ? parseHubSpotFormReceipt(input.providerReceipt) : null
+
+  if (input.providerReceipt && (!receipt || receipt.status !== 'pending' || receipt.checks !== 0 ||
+    receipt.markerValue !== input.submissionId || input.provider !== 'hubspot' || input.status !== 'succeeded'))
+    throw new Error('invalid_hubspot_form_receipt')
+
   const rows = await query<FormDestinationAttemptRow>(
     `INSERT INTO greenhouse_growth.form_destination_attempt (
        submission_id, destination_id, provider, adapter_version, status,
-       external_id, http_status, error_class, retry_count, completed_at)
+       external_id, http_status, error_class, retry_count, completed_at, provider_receipt_json)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9,0),
-       CASE WHEN $5 IN ('succeeded','failed','dead_letter') THEN NOW() ELSE NULL END)
+       CASE WHEN $5 IN ('succeeded','failed','dead_letter') THEN NOW() ELSE NULL END, $10::jsonb)
      RETURNING *`,
     [
       input.submissionId,
@@ -777,6 +787,7 @@ export const insertAttempt = async (input: {
       input.httpStatus ?? null,
       input.errorClass ?? null,
       input.retryCount ?? 0,
+      JSON.stringify(receipt ?? {}),
     ],
   )
 

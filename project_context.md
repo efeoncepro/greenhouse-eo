@@ -16,15 +16,15 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Documentación
 
-Forms/Medición/CRM/CLI: [manual](docs/manual-de-uso/growth/configurar-medicion-conversiones.md).
+[Forms](docs/manual-de-uso/growth/configurar-medicion-conversiones.md)/[Ads/EC](docs/documentation/growth/google-ads-measurement.md)
 CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
 
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Comercial](docs/commercial/README.md). [Prospección y secuencias](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
-[CRM](docs/context/11_hubspot-bowtie.md).
+[Prospección, secuencias y brochures aprobados](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
+[CRM](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
 Outlook de Julio: [envíos](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
@@ -71,15 +71,14 @@ Flota de modelos de Globe: se resuelve y promueve por identidad exacta de ruta. 
 sin ruta Globe; cargar `higgsfield-provider` y su ADR antes de integrar. Estado live en
 `globe.producer.fleet.list`, mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
-amplía la allowlist global: sólo se acepta para una salida exacta esperada tras verificar sus bytes. Método transversal
-para añadir o auditar proveedores: `greenhouse-globe-model-fleet` (espejado Codex/Claude); sus route cards machine-readable viven en `docs/architecture/creative-studio/model-fleet/routes/` y nunca
-sustituyen la autoridad live del reader. ADR-023 separa evidencia del proveedor, cables de integración y disponibilidad
-de Globe. “Imagen 2 de ChatGPT” se normaliza a
+amplía la allowlist global: sólo se acepta para una salida exacta esperada tras verificar sus bytes. Proveedores: `greenhouse-globe-model-fleet` (Codex/Claude), fichas en
+`docs/architecture/creative-studio/model-fleet/routes/`. ADR-023 separa evidencia, integración y disponibilidad;
+las fichas no sustituyen al reader live. “Imagen 2 de ChatGPT” se normaliza a
 `gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. La transparencia GPT Image 2 sigue en preview y gated hasta
 canary y readback. `gpt-image-2.5` (Sunburst/Flare): provider-supported, sin ruta Globe ni Batch;
 el helper transporta 2.5. CLI `ai:image`: OpenAI,
 default `gpt-image-2`, con 2.5 seleccionable. [Matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
-BytePlus: `pnpm ai:byteplus`/`ai:layers`, sin Globe.
+[BytePlus](docs/manual-de-uso/creative-studio/byteplus-directo.md); sin Globe. [Vision AI](docs/manual-de-uso/creative-studio/omnihuman-2-api.md): sin CLI.
 CLI: [Nano 2.1](docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) · [Omni](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md).
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
@@ -113,17 +112,18 @@ ledger y Globe Producer muestra un self-view read-only de effective/funding/cap-
 Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
 `GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
 
-Growth SEO (`growth.seo`, EPIC-022) está en producción y federado, fail-closed por organización.
+Growth SEO (`growth.seo`, EPIC-022): producción y federación, fail-closed por organización.
 `enforceSeoRunEntitlement` autoriza cada run con `seo_v2`; app/ecosystem/MCP reusan readers canónicos.
 La cola append-only de TASK-1700 es la única autoridad de prioridad: sin demanda medida el score es NULL.
-CTR distingue ausencia de muestra de cero; discovery identifica keywords normalizadas. `GROWTH_SEO_ENABLED`
-gobierna Vercel y `ops-worker` conjuntamente; no flip aislado. Contratos, crons y verificación:
+CTR separa falta de muestra y cero; discovery identifica keywords normalizadas. `GROWTH_SEO_ENABLED`
+gobierna Vercel y `ops-worker`; no flip aislado. Contratos, crons y verificación:
 [arquitectura SEO](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [invariantes ops](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
 SEO: [categoría y representación](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md).
-Greenhouse posee datos/prioridad/outcomes; Marketing Studio posee flujo editorial; Insights posee informes.
+Greenhouse: datos/prioridad/outcomes; Marketing Studio: flujo editorial; Insights: informes.
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
+SKY: `sky-blog-seo` · [cuenta](docs/services/sky-blog-seo/README.md).
 
 Marketing Studio: skills `efeonce-marketing-studio` y `efeonce-campaign-planning`; el catálogo versionado
 rige canales y límites, no los aliases históricos. [Contrato](docs/documentation/marketing-studio/catalogo-canales-y-referencias-icp.md).
@@ -245,7 +245,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo componer Globe con Wave para producir experiencias launch-ready | `docs/architecture/EFEONCE_EXPERIENCE_LAUNCHOPS_GLOBE_CREATIVE_PRODUCTION_INTEGRATION_V1.md` + skills gemelas `greenhouse-globe` |
 | Cómo se administran créditos y capabilities de los usuarios de Globe (y por qué la llave de aprobación nunca sale de su runtime) | `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015) + `TASK-1566` + `.claude/rules/globe-administration.md` |
 | Cómo razona, documenta y se autoevalúa el arquitecto Codex | skill `software-architect-2026` + `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md` + `evals/software-architect-2026/` |
-| Forms/CTAs/Meetings, consentimiento y matching | `docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md` + skills `greenhouse-growth-forms`, `greenhouse-growth-meetings`, `greenhouse-gtm-ga4-operator` |
+| Forms/Meta/HubSpot | [Medición](docs/reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) · [CLI y trazabilidad](docs/manual-de-uso/growth/consultar-meta-con-agentes.md) |
 | Qué significa para producto/negocio | `docs/context/00_INDEX.md` + docs funcionales |
 | Cómo lo opera una persona/agente | `docs/manual-de-uso/**` y runbook aplicable |
 

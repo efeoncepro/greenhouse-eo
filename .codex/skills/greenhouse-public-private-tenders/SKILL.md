@@ -8,6 +8,15 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 
 # greenhouse-public-private-tenders — Operador de Licitaciones
 
+## Nombres de negocios y leads Efeonce
+
+Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
+[convención canónica](../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md), aceptada el 15/10/2026:
+Deal = marca/cuenta, país, iniciativa, referencia; Lead = marca/cuenta, país, necesidad, persona,
+separados por ` | `. La marca del alcance precede al holding; conservar Company legal y asociaciones.
+El formato no autoriza altas, calificación ni renombrados masivos. Nuevas altas autorizadas lo adoptan;
+registros existentes sólo cambian nombre dentro del mandato expreso, con antes/después y readback.
+
 ## Envíos desde el Outlook de Julio
 
 Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
@@ -20,6 +29,21 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ## Cuándo invocar
 
 - Descubrir/filtrar oportunidades de compra pública o privada (radar comercial).
+  Cargar la [guía de primera entrada y alertas tempranas](../../../docs/commercial/tenders/RADAR_EARLY_ENTRY_GUIDE.md):
+  interés/credenciales/inscripción/visita antes del cierre final; señal primaria con acción útil al operador
+  sin esperar el RFP completo, sin certificar elegibilidad ni enviar automáticamente. Separar descubrimiento
+  amplio y vigilancia de conocidos, público/privado por Chile/Colombia/México/Perú y nonprofit aparte;
+  LATAM primero y Palm Desert condicionado. Solape mínimo de 72 horas ampliable por indexación tardía
+  acreditada; prechequear identidad canónica/URL y bloqueos sin avanzar marcadores si falla.
+  Registrar publicación, disponibilidad pública, detección, validación, aviso y margen útil por separado;
+  menos de cinco días hábiles a la primera puerta muestra «detección tardía». No usar alta CRM como detección.
+  No prometer exhaustividad ni modificar frecuencia, suscripciones o permisos por actualizar esta guía.
+  [Socopur 2027](../../../docs/commercial/tenders/socopur-agencia-marketing-digital-2027/README.md):
+  entrada tardía cerrada por respuesta 15/10 16:54:36 UTC; sin inferir adjudicación o invitación futura.
+  Corrección directa de Julio, 15/10/2026 17:51 UTC: detección **06/10/2026**, sin hora/zona; interés
+  cerrado **05/10**: un día calendario después, no 24 horas exactas. Radar horario y alta CRM del 10/10
+  son posteriores y no explican la tardanza del día 6; publicación, disponibilidad/indexación inicial,
+  primer aviso exacto y causa sin acreditar. Mantener los cortes anteriores como históricos.
 - Calificar una solicitud pública de proveedor y preparar su abordaje según fecha, estado y rol →
   `prospect-intent-segmentation.md`; la operación de cohortes/segmentos pertenece a `hubspot-as-a-service`.
 - Decidir si Efeonce participa: screening + **bid/no-bid con margen sobre loaded cost**.
@@ -243,6 +267,9 @@ Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (
 alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
 enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
 No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.
+Para presentar la agencia completa, el brochure oficial es «Agencia de Marketing 360°» (aprobado 2026-10-16; skill
+`deck-studio`); su lámina del caso ANAM es la prueba visual de una implementación HubSpot. Sus cifras de ANAM y el
+«12 meses» de Berel siguen pendientes antes de entregarlo afuera.
 
 ## Costeo reproducible de una demanda con Cotizador V3
 

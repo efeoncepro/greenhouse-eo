@@ -1,10 +1,20 @@
 name: commercial-expert-greenhouse-overlay
+
 description: Greenhouse-specific pinned decisions that OVERRIDE the global commercial-expert skill defaults. Load this first whenever commercial-expert is invoked inside the greenhouse-eo repo. Specializes in ASaaS doctrine (Manifesto V1), Bow-tie alignment with Greenhouse runtime, 3 client_kind playbooks (Active/Self-Serve/Project), Globe clients ICP (enterprise marketing teams), 4-product positioning (servicio agencia / Kortex / Verk / Greenhouse portal), HubSpot portal 48713323 operations, Nubox billing implications, ICO health score integration.
 type: overlay
 overrides: commercial-expert
 user-invocable: true
 argument-hint: "[area or specific question]"
 ---
+
+## Nombres de negocios y leads Efeonce
+
+Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
+[convención canónica](../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md), aceptada el 15/10/2026:
+Deal = marca/cuenta, país, iniciativa, referencia; Lead = marca/cuenta, país, necesidad, persona,
+separados por ` | `. La marca del alcance precede al holding; conservar Company legal y asociaciones.
+El formato no autoriza altas, calificación ni renombrados masivos. Nuevas altas autorizadas lo adoptan;
+registros existentes sólo cambian nombre dentro del mandato expreso, con antes/después y readback.
 
 Para el modelo transversal de cliente —ICP, JTBD, buying group, stakeholder map, decision/paper process y evidence— cargar
 `efeonce-customer-model-operator`. Para arquitectura transversal de packaging, pricing, billing, descuentos, credits y guardrails cargar
@@ -238,6 +248,8 @@ para el negocio. Canon, mapa a servicios y reglas: [`EFEONCE_AI_CONTEXT_NARRATIV
 ## Sales-enablement assets que YA existen (no los reinventes)
 
 - **🔴 Radiografía AEO** — muestra de trabajo viva en `think.efeoncepro.com/muestras/<slug>-<token>`. Escribe un artículo **real** para el cliente y lo **abre en canal** en 4 pantallas (el hueco medido · el artículo · la capa técnica acoplada · dónde más vive). Hace **dos** trabajos: **educar** al cliente/prospecto que no entiende qué significa *"aparecer en ChatGPT"* (**sirve sin venta en curso**: educación, retención) y **habilitar la venta** (enlace + lámina de deck + demo en vivo + prueba que el comité **verifica solo**). En una categoría donde **todas las ofertas dicen lo mismo y ninguna muestra**, es la pieza que rompe el empate — y **el competidor de fondo es la indecisión**, no la otra agencia. **Un cliente nuevo = un payload JSON, cero código.** Cargar: `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md`; playbook comercial en `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`; craft/invariantes en `docs/think/radiografia-aeo-*.md`; oficio: `seo-aeo`; venta: `seo-aeo-practice`.
+- **🔴 Brochure oficial «Agencia de Marketing 360°»** (aprobado 2026-10-16) — el documento **por defecto** cuando alguien pregunta «¿qué hace Efeonce?»: la agencia completa con las cinco líneas. Completo (84 láminas) o corto (26, para presentar en reunión). PDF en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/` (`Efeonce-Brochure-Agencia-de-Marketing-360.pdf` y `…-Corto.pdf`). Casos: Berel (Engine), Sky (Brand), ANAM (Revenue, implementación HubSpot); Voice y Growth sin caso. **Antes de enviarlo afuera:** cifras de ANAM (no publicadas por ANAM) y el «12 meses» del caso Berel (cuenta ganada en mayo de 2026). Armado y pendientes: `deck-studio`.
+- **🔴 Brochure y landing «Agencia de Medios»** (línea Voice, 2026-10-16) — material por defecto para cualquier conversación de medios (planificación, compra, programática, performance por plataforma, pantallas, medición). Brochure de 65 láminas en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Medios/Efeonce-Brochure-Agencia-de-Medios.pdf`; landing pública `https://efeoncepro.com/servicios/agencia-de-medios/`, cuyo formulario `efeonce-media-diagnostic` deja el lead en HubSpot («Lead Gen - Agencia de Medios»). **Claims:** la comisión o rebate es margen de Efeonce, nunca se promete declararla ni traspasarla; Basis/DV360/The Trade Desk/IAS/DoubleVerify son tecnología, no alianzas; sin caso Sky de medios; Eusari no se publica por ahora; «+120 empresas en 4 países» ≠ cinco países de operación. Detalle y pendientes antes de enviarlo: `docs/services/media-distribution/README.md#material-comercial-vigente`.
 
 ## Synergies with other skills
 

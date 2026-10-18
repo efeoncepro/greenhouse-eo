@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "method",
+  "recipe": "method-waves",
+  "voice": {
+    "eyebrow": "Performance · Cómo empiezas",
+    "question": "¿Cuánto me comprometo de entrada?",
+    "answer": [
+      "Por",
+      "etapas"
+    ]
+  },
+  "body": "Una escalera: cada etapa deja evidencia para decidir la siguiente, sin **amarrarte** a ciegas.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Diagnóstico",
+      "desc": "Inversión, cuentas, señal y creatividad; plan de 90 días en 2 a 4 semanas."
+    },
+    {
+      "kicker": "8 a 12 semanas",
+      "name": "Activation Sprint",
+      "desc": "Señal remediada, cuentas ordenadas, primera matriz creativa y línea base."
+    },
+    {
+      "kicker": "Mínimo 3 meses",
+      "name": "Managed Performance",
+      "desc": "Operación mensual, testing, reporte ejecutivo y gobierno trimestral."
+    },
+    {
+      "kicker": "Con madurez",
+      "name": "Incrementalidad",
+      "desc": "Holdouts, geo-tests y MMM para decidir dónde va el próximo peso."
+    }
+  ],
+  "selectedStep": 1
+}

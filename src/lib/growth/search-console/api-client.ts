@@ -103,6 +103,10 @@ export const querySearchAnalytics = async (
       endDate: params.range.endDate,
       dimensions: params.dimensions ?? ['query'],
       rowLimit: params.rowLimit ?? 100,
+      ...(params.type ? { type: params.type } : {}),
+      ...(params.dataState ? { dataState: params.dataState } : {}),
+      ...(params.aggregationType ? { aggregationType: params.aggregationType } : {}),
+      ...(params.dimensionFilterGroups ? { dimensionFilterGroups: params.dimensionFilterGroups } : {}),
       // `startRow` sólo viaja cuando el caller pagina (TASK-1302). Omitirlo deja el
       // payload idéntico al previo — Google asume 0.
       ...(typeof params.startRow === 'number' && params.startRow > 0 ? { startRow: params.startRow } : {})

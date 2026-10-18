@@ -1,0 +1,212 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "560e3ad55ba0",
+  "key": "560e3ad55ba0f63f85c4c5e4cd53ce42f175f135b5624af69fa2acd9a5e46673",
+  "status": "completed",
+  "createdAt": "2026-10-16T11:18:26.498Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/tienda-comp.png",
+    "imageSha256": "6018b2eff2818116889aa60164b21fbd3f3a2da3ded6940131c7ce2a556121e6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/tienda-mask.png",
+    "maskSha256": "8c4e82020349f9f4295f9fa7e3b182d9c4887cdb97156d5f4b407a3a041c1eae",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "This is a photograph inside a dark premium sports store. The tall digital screen at the end of the aisle already shows a FINISHED advertisement for a fictional running brand: a white shoe with a lime sole, a lime diagonal stripe, the logo, the headline «PRUÉBALA AQUÍ» and a small lime button. Keep that advertisement exactly as it is: the same picture, layout, letters, logo, stripe, colors, sizes and position; do not redraw, retype, move or restyle it.\nOnly add the physical finish of a real in-store digital screen photographed from a distance: it reads as emitted light with a fine pixel texture, its thin dark frame and stand stay, its light softly spills onto the wall and floor around it and reflects on the polished concrete floor, with the same slight softness of focus and grain as the rest of the store. Everything else stays exactly the same. No new text or logos anywhere.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nThis is a photograph inside a dark premium sports store. The tall digital screen at the end of the aisle already shows a FINISHED advertisement for a fictional running brand: a white shoe with a lime sole, a lime diagonal stripe, the logo, the headline «PRUÉBALA AQUÍ» and a small lime button. Keep that advertisement exactly as it is: the same picture, layout, letters, logo, stripe, colors, sizes and position; do not redraw, retype, move or restyle it.\nOnly add the physical finish of a real in-store digital screen photographed from a distance: it reads as emitted light with a fine pixel texture, its thin dark frame and stand stay, its light softly spills onto the wall and floor around it and reflects on the polished concrete floor, with the same slight softness of focus and grain as the rest of the store. Everything else stays exactly the same. No new text or logos anywhere.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0507354736328125,
+    "editable": 79800,
+    "soft": 0,
+    "protected": 1493064
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 393,
+      "top": 0,
+      "width": 614,
+      "height": 775
+    },
+    "target": {
+      "width": 912,
+      "height": 1152
+    },
+    "aspectError": 0.0007470288624787994,
+    "reason": "la zona con contexto ocupa 30.1 % de la imagen: se genera recortada a 912x1152"
+  },
+  "estimate": {
+    "usd": 0.0836,
+    "basis": "2 × salida 912x1152 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 28.044,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.1,
+        "bestError": 3.1,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        3.91,
+        3.53,
+        -0.6
+      ],
+      "protected": {
+        "pixels": 1493064,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 79800,
+        "maxDelta": 248,
+        "meanDelta": 28.044,
+        "worst": {
+          "x": 674,
+          "y": 196
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1493064,
+        "maxDelta": 191,
+        "meanDelta": 1.298,
+        "worst": {
+          "x": 558,
+          "y": 461
+        }
+      },
+      "outputUsd": 0.0418,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2426,
+        "input_tokens_details": {
+          "image_tokens": 2088,
+          "text_tokens": 338
+        },
+        "output_tokens": 1392,
+        "output_tokens_details": {
+          "image_tokens": 1392,
+          "text_tokens": 0
+        },
+        "total_tokens": 3818
+      },
+      "meta": {
+        "size": "912x1152",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 30.199,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.25,
+        "bestError": 3.25,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        9.84,
+        12.05,
+        7.28
+      ],
+      "protected": {
+        "pixels": 1493064,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 79800,
+        "maxDelta": 234,
+        "meanDelta": 30.199,
+        "worst": {
+          "x": 692,
+          "y": 457
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 1493064,
+        "maxDelta": 205,
+        "meanDelta": 1.447,
+        "worst": {
+          "x": 558,
+          "y": 462
+        }
+      },
+      "outputUsd": 0.0418,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2426,
+        "input_tokens_details": {
+          "image_tokens": 2088,
+          "text_tokens": 338
+        },
+        "output_tokens": 1392,
+        "output_tokens_details": {
+          "image_tokens": 1392,
+          "text_tokens": 0
+        },
+        "total_tokens": 3818
+      },
+      "meta": {
+        "size": "912x1152",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

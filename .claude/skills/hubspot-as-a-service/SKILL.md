@@ -5,6 +5,15 @@ description: 'Deliver and operate HubSpot as a managed client service across Sma
 
 # HubSpot as a Service
 
+## Nombres de negocios y leads Efeonce
+
+Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la
+[convención canónica](../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md), aceptada el 15/10/2026:
+Deal = marca/cuenta, país, iniciativa, referencia; Lead = marca/cuenta, país, necesidad, persona,
+separados por ` | `. La marca del alcance precede al holding; conservar Company legal y asociaciones.
+El formato no autoriza altas, calificación ni renombrados masivos. Nuevas altas autorizadas lo adoptan;
+registros existentes sólo cambian nombre dentro del mandato expreso, con antes/después y readback.
+
 ## Envíos desde el Outlook de Julio
 
 Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma oficial completa y CCO `48713323@bcc.hubspot.com`, incluidos respuestas/reenvíos. Ambas vías están aprobadas: conector con firma completa en texto, u Outlook UI con firma gráfica oficial (HTML). Elegir según el pedido y la capacidad disponible, sin pedir otra aprobación por la vía. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.
@@ -48,10 +57,14 @@ slides for mid-market/enterprise buyers comparing HubSpot with Salesforce or Zoh
 OneDrive `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`; private canvas:
 <https://claude.ai/artifact/FzFy2GMoU32898wyhwHUxU>. Its HubSpot facts were verified on 2026-10-06 and live in
 `hubspot-solutions-partner/SOURCES.md` (never claim ISO 27001/27017/27018/42001 for HubSpot or a LATAM data region).
-Sell credits as advice on **how many** the client needs, never as "don't buy". Before using it with prospects,
-ANAM must authorize the −57 % commercial-load and +32 % sales figures (see the ANAM authorization control below);
-the 3D sprocket stays internal until HubSpot approves it in writing. Open items and commercial use:
-`hubspot-solutions-partner` § «Collateral comercial vigente».
+Sell credits as advice on **how many** the client needs, never as "don't buy".
+**Julio ratified the existing approved brochures in full on 2026-10-17: no additional validation is needed.**
+Apply [the approved-brochure policy](../../../docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
+It supersedes historical send restrictions on approved collateral (including ANAM figures) in this skill
+and its references. Use the relevant approved original and its existing HubSpot document. Do not trim,
+rewrite, regenerate or upload a derivative without Julio explicitly requesting that material change.
+The agency-wide brochure is «Agencia de Marketing 360°», approved complete and short versions.
+This does not authorize new statements outside the collateral, CRM writes or communications.
 
 ## Manual outreach continuity
 

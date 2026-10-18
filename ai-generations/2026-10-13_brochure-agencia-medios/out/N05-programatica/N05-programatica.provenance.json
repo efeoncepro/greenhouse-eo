@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "4326437d81d8c7a631f811f4037c5acbbd5ef227923a655ef450c48b5339ba6c",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:PG1-una-compra-todas-las-pantallas",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG1-una-compra-todas-las-pantallas.png",
+      "sha256": "d08f03e52709ff5afbd0564576aea606e6b124b29c8ea20740b56d66f13b1f62"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,14 @@
+// Temporal (sesión brochure 360): vuelca las capas de escenario de una receta para reconstruir su fondo exacto.
+import fs from 'node:fs'
+import { planSurfacePiece, type SurfaceIntent } from '@/lib/brand-surfaces'
+const [intentPath, outDir] = process.argv.slice(2)
+const piece = planSurfacePiece(JSON.parse(fs.readFileSync(intentPath, 'utf8')) as SurfaceIntent, { artifactId: 'plate' })
+fs.mkdirSync(outDir, { recursive: true })
+for (const a of piece.assets as Array<Record<string, unknown>>) {
+  const keys = Object.keys(a)
+  const body = (a.svg ?? a.content ?? a.data) as string | undefined
+  console.log(a.ref, a.kind, keys.join(','), typeof body === 'string' ? body.length : '')
+  if (typeof body === 'string' && String(a.ref).includes('stage')) fs.writeFileSync(`${outDir}/stage.svg`, body)
+}
+const f = (piece.plan.slides[0] as { slots: { frame: Record<string, unknown> } }).slots.frame
+console.log(JSON.stringify(Object.fromEntries(Object.entries(f).filter(([k]) => /bg|background|color|line/i.test(k)))).slice(0, 400))

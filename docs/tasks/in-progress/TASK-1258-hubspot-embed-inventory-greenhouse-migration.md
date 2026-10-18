@@ -1,5 +1,13 @@
 # TASK-1258 — HubSpot Embed Inventory + Greenhouse Forms Migration Control Plane
 
+## Delta 2026-10-17 — `/servicios-contratar-hubspot/` ya no es candidata a migración
+
+- El formulario del cuerpo de la página `244079` ya no es un embed de HubSpot: es el Growth Form `efeonce-hubspot-scope` (entrega
+  `direct` a HubSpot desde el 2026-10-09). La v2 publicada el 2026-10-16 lo mantiene. El form `b76c4bba` y la pregunta de
+  si la primera migración real debe ser esta página quedan superados para esta URL; el tracking global de HubSpot no se
+  revisó en este trabajo — cerrado por la publicación v2
+  ([audit](../../audits/public-site/2026-10-16-hubspot-v2-publication.md)).
+
 ## Delta 2026-06-26 (sesión Claude — precondiciones de TASK-1259 SHIPPED, resto diferido)
 
 - **Decisión operador 2026-06-26: construir las 2 precondiciones backend de TASK-1259 PRIMERO** (no el inventory/dry-run/apply/cutover). Entregado local-first (develop, sin push, commit `5746e4908`):

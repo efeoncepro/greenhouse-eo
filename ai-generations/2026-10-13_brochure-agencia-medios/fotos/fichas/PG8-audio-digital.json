@@ -1,0 +1,43 @@
+{
+  "id": "PG8-audio-digital",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast underground train platform at night): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 77 % of the frame width and her shoulder nearest the left never further left than 62 %; between the left edge of the frame and her body there is a wide band of empty darkness. She wears over-ear headphones resting around her neck and looks straight into the lens with a calm smile, lifting one hand to the headphones at the exact moment a wave passes. Behind her, entirely inside the right 55 % of the frame, scattered commuters in dark silhouette wait along the platform, each with earbuds or headphones, soft and out of focus. From her headphones a soft ring of cool white-blue light expands outward like a sound wave through the haze, passing gently through the far commuters. Overhead, a long line of cold white platform lights recedes into the depth. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows at one earcup of her headphones, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "a cold white platform light directly above and slightly in front of her",
+    "tamano": "a light bar about 1.2 m long",
+    "lado": "above and to the camera-right of her face",
+    "distancia": "about 1.5 m from her face"
+  },
+  "fondo": "the long line of platform lights and the far tunnel melted into cold round bokeh",
+  "fenomeno": {
+    "que": "a soft ring of cool light expands from her headphones like a sound wave through the listeners",
+    "esServicio": "Audio digital: tu mensaje en streaming, radio digital y podcasts, al oído de tu audiencia"
+  },
+  "lecho": {
+    "objeto": "the black matte back of a platform bench, the lens a few centimetres behind its near edge, its top surface in full shadow, outside every platform light",
+    "tono": "DARK near black"
+  }
+}

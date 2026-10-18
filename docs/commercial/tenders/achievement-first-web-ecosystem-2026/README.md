@@ -1,5 +1,7 @@
 # Achievement First — Website Redesign & Ecosystem Development
 
+> **Actualización verificada el 15/10/2026, 16:00:** la [convocatoria oficial](https://www.achievementfirst.org/request-for-proposals-website-redesign-ecosystem-development/) coincide ahora en consultas hasta el 19/10, respuestas el 23/10 y ofertas hasta el 9/11; sin hora ni zona publicadas. Kick-off en enero de 2027. El conflicto principal del 10/10 que se describe debajo queda como histórico, sustituido por este corte. La selección aún difiere entre el 11 de diciembre y la semana del 14. No enviar el borrador antiguo sin revisar. Elegibilidad, seguros, tres casos, TCO y GO pendientes. [Lectura y continuidad](../../follow-up-agent/runs/2026-10-15-1600.md).
+
 > **Estado:** Estudio; contacto publicado confirmado; plazos contradictorios · **Clasificación:** Convocatoria ONG educativa.
 > **Responsable:** Julio Reyes · **Corte de fuentes:** 10-10-2026 · **Proposal:** no creada por este trabajo.
 

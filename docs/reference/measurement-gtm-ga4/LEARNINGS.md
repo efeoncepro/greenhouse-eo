@@ -4,7 +4,79 @@
 
 ---
 
-## 2026-10-13 — recuperación, consentimiento y matching backend
+## 2026-10-17 — primer Lead comercial consentido: cómo se prueba de verdad
+
+[Evidencia](10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17) ·
+[manual de QA](../../manual-de-uso/growth/configurar-medicion-conversiones.md#probar-un-formulario-después-de-publicar-su-política).
+
+- **Formulario sin política = Meta sin Lead, aunque GA4 tenga `generate_lead`.** El primer envío
+  real de `efeonce-performance-diagnostic` llegó a HubSpot (200) y a GA4 realtime, y Meta no
+  recibió nada: sin política publicada el backend nunca encola conversión. Que GA4 vea el lead no
+  dice nada del carril Meta; revisar primero que la política del form esté publicada.
+- **El dedupe de 60 min invalida un reenvío como prueba.** El form deduplica por
+  `dedupe_fingerprint` (form + email con trim y lowercase) y responde `accepted` reutilizando el
+  envío anterior: no hay conversión nueva. Tras publicar la política, probar con un alias `+`
+  (otro correo; en HubSpot crea otro contacto que hay que archivar) o esperar 60 min.
+- **`http_accepted` no es lectura en Meta.** Es el ACK HTTP de la entrega. La lectura del
+  proveedor (`ads_get_dataset_stats`) tardó ~1 h: a los 5 min no había dato; a la hora, 1 Lead
+  `SERVER_ONLY` en el bloque horario. `server_last_fired_time` también llega tarde. Una lectura
+  vacía al rato del envío no es una falla.
+- **El dataset real es `708931297255942`.** El pixel `859508457409711` que figura en la doc 02 de
+  GTM devuelve «Invalid dataset_id» en la API: no usarlo para leer estadísticas.
+- **Publicar una política es configuración, no release.** Las tres políticas del 17/10 salieron
+  por la CLI gobernada (discover → validate → apply → review → publish, recibo por paso) con
+  `commercialAcceptanceChanged:false` y `crmDestinationChanged:false`, sin deploy.
+
+## 2026-10-16 — drift de GTM con mecanismo, no con promesa
+
+[Snapshot y drift](README.md#snapshot-y-drift-de-los-dos-containers) ·
+[token Meta pendiente](08-meta-conversions-api-server-side.md#token-meta-literal-en-el-tag-servidor--pendiente-2026-10-16).
+
+- **Una regla sin ejecutor es una regla apagada.** El ADR de tagging exigía «SIEMPRE correr el
+  snapshot tras tocar el container», pero `pnpm gtm:snapshot --check` no corría en CI ni en cron y
+  sólo miraba el container web. El container servidor (sGTM, Meta CAPI) nunca se había versionado.
+  Ahora el snapshot cubre ambos y `.github/workflows/gtm-drift.yml` lo corre a diario y falla si
+  hay drift: la falla es la alerta.
+- **Tapar antes de escribir, no después.** Secretos por nombre de parámetro o por forma de valor
+  se guardan como huella `[redacted sha256:<12 hex>]`; una rotación aparece como drift sin que el
+  valor llegue a git. Las referencias `{{variable}}` no se tapan.
+- **Un workflow programado vive en `main`.** Commitear `gtm-drift.yml` en `develop` no lo activa:
+  el chequeo corre recién después del release que lo lleve a `main`. Al 16/10 no había corrido.
+- **El permiso del job es más amplio que lo que pide.** El job pide sólo `tagmanager.readonly`,
+  pero la SA que impersona (WIF, `roles/iam.workloadIdentityUser` concedido al repo) también puede
+  publicar. Alternativa de mínimo privilegio estricto, no implementada: SA dedicada de sólo lectura.
+- **Montar un control junto al «último footer» rompe la grilla.** En Think, «Preferencias de
+  cookies» quedaba suelto abajo a la izquierda; ahora sólo se monta en un host declarado
+  (`[data-efeonce-legal-links]`) o junto al enlace de privacidad, y una página sin host no lo
+  muestra (el banner sigue apareciendo). [Detalle](09-hubspot-consent.md).
+
+## 2026-10-14 — políticas publicadas y agentes como consumidores de primera clase
+
+[Contrato vigente](10-growth-lead-matching-runtime.md), [API interna](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md)
+y [prueba productiva/release](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+
+- **Un seed no es autoridad permanente:** seis Forms y un binding conservan equivalencia inicial.
+  La autoridad nueva es policy publicada por identidad estable/versión/surface/origen. Renombrar
+  no cambia identidad; publicar versión nueva exige revisar mapping. El Client schema2 no enumera slugs.
+- **Agent-first exige contrato y recuperación:** discovery versionado y dry-run de sólo lectura;
+  panel/CLI consumen los mismos commands, permisos internos, CAS e idempotencia. Un recibo conocido
+  se guarda antes del GET; se reintenta sólo lectura. Outcome desconocido conserva cuerpo y clave.
+  No pasar roles/actor en JSON ni escribir SQL para administrar una política.
+- **La alta por datos se prueba después del publish:** una fuente creada tras el release se publicó
+  mediante CLI y llegó a Meta Test Events manteniendo deployment y Server9 idénticos. Fixture
+  desactivada/archivada, readback independiente; no se fabricaron submissions/bookings/contactos CRM.
+- **El mapping manda:** un campo businessEmail puede ser email autorizado; una fuente sin teléfono
+  no produce ph. La prueba de Think tuvo ocho claves y las de agenda/fuente nueva nueve.
+- **IP/UA pertenecen al visitante:** capturarlos en el POST original, no en el worker. Atribución
+  consentida persistida y external_id normalizado/hash complementan contactos sin tocar GA4 ordinario.
+- **Test Events requiere escucha vigente y prueba temporal:** renovar la pestaña inactiva antes de
+  confirmar Processed/Server/website. ACK no basta; no fijar el código en tags ni enviar canaries
+  ordinarios al dataset. Recepción sintética tampoco prueba mejora EMQ o tráfico comercial.
+- **Server9 es estricto:** compatibilidad schema1 temporal retirada tras convergencia de productores
+  y cola. Sólo customTemplate30 cambió; pixel, tags6/18 y Web5 se conservaron. No repetir builders
+  históricos de bases antiguas como diagnóstico ni restaurar Server5 con productor schema2 activo.
+
+## 2026-10-13 — recuperación, consentimiento y matching backend (histórico)
 
 [Contrato vigente completo](10-growth-lead-matching-runtime.md), [consentimiento](09-hubspot-consent.md)
 y [release completo](../../audits/releases/2026-10-13-full-develop-matching-release.md).
@@ -34,9 +106,10 @@ Server6/Web5 publicados, primera conversión comercial consentida post-flip aún
   Vercel última con redeploy y alias READY. Repo vars y revisión live se mantienen juntas.
 - **Rollback conserva limpieza:** captura/senders OFF, retención ON, key/ciphertext48h, SQL
   aditivo. El cifrado no reemplaza consentimiento y los hashes no dejan de ser datos personales.
-- **Escalabilidad todavía pendiente:** backend y Client sGTM enumeran seis forms y un binding
+- **Al corte13/10, escalabilidad pendiente (resuelta14/10):** backend y Client sGTM enumeran seis forms y un binding
   de calendario. Publicar otro formulario no habilita matching automáticamente; configuración
-  administrable es [propuesta pendiente de GO](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md).
+  administrable era una [propuesta](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_CONFIGURATION_PROPOSAL_V1.md),
+  sustituida por el ADR de políticas Accepted y el cierre14/10 anterior.
 
 ## 2026-08-20 — CTA anidado en una tarjeta enlazada: `Click URL` vacío no significa que no exista destino
 

@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "decision",
+  "recipe": "decision-ai-market",
+  "voice": {
+    "eyebrow": "Performance · Lo que cambió",
+    "question": "¿Por qué revisar mi pauta ahora?",
+    "answer": [
+      "Cambió"
+    ]
+  },
+  "body": "Tres cambios mueven la señal de casi todos los anunciantes en tus mercados. El diagnóstico los revisa **antes** de que te cuesten.",
+  "figures": [
+    {
+      "value": "Meta",
+      "label": "Cambió cómo atribuye los clics.",
+      "source": "Meta",
+      "detail": "Desde marzo, el click-through cuenta sólo clics en el enlace: tus KPIs históricos dejan de compararse.",
+      "year": "2026"
+    },
+    {
+      "value": "IA",
+      "label": "Google lleva tu búsqueda a AI Max.",
+      "source": "Google Ads",
+      "detail": "Sin DSA ni broad match de campaña nuevos desde septiembre; la migración automática llega en febrero de 2027.",
+      "year": "2026"
+    },
+    {
+      "value": "3",
+      "label": "Mercados con nuevas reglas de datos.",
+      "source": "Leyes de datos",
+      "detail": "México y Perú las renovaron en 2025; Chile, desde diciembre. Compartir datos con plataformas pide base documentada.",
+      "year": "2026"
+    }
+  ]
+}

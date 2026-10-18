@@ -221,6 +221,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **La excepción que confirma la regla:** en la firma de correo conviven el punto del nombre (la única voz de titular)
   y la línea que termina en la esfera; lo que **no** se repite es la línea con esfera. La regla de la zona de partners
   va sin esfera, porque «si la esfera se repite, deja de ser identidad» (manual §10.2).
+- **Segunda excepción, sólo el mega menú del sitio** (operador, 2026-10-18): en el panel «Soluciones» conviven la
+  esfera del titular de la línea y la de la respuesta; no se extiende a otras piezas ([ledger](ledger.md)).
 
 **Anillo propio de la esfera (`sphereRing`) — «en vivo»** (operador, 2026-09-26, D8):
 
@@ -1079,6 +1081,10 @@ en 400 y una única idea principal en 700, sin cambiar copy, tamaño o color den
 Ejemplo: «Cuando le preguntan a la IA,» introduce; «¿aparece tu marca?» concentra el énfasis.
 En agenda, «Una conversación.» introduce y «Tu próximo paso.» toma el peso. No se extrapola
 esta aplicación aprobada a titulares arbitrarios ni se infiere énfasis por palabras clave.
+
+### Titulares largos en Bricolage: contraste de pesos — 2026-10-17
+
+El operador, revisando la landing de Inbound Marketing: «Bricolage necesita contraste en los títulos, cuando es muy largo necesita contraste con sus pesos, si no se vuelve muy pesado». Un titular largo entero en 740–780 se lee como un bloque. La parte que introduce va liviana (≈ 330, mismo tamaño y color) y la idea principal conserva el peso alto: «De cada 100 búsquedas,» introduce y «68 terminan sin un clic.» manda; «No murió.» introduce y «Se le murió el clic.» manda. Las listas de frases en Bricolage tampoco van todas en 700: bajan a ≈ 480. La respuesta corta con esfera (1 a 3 palabras) no se parte. Generaliza el caso Growth CTA de arriba a todo titular largo.
 
 ### Partners del footer público — 2026-10-14
 

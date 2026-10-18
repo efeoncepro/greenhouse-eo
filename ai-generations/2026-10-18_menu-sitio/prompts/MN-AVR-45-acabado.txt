@@ -1,0 +1,9 @@
+FINISHING PASS on a finished cinematic photograph. Keep the image IDENTICAL in composition, framing and size: the same woman (same face, same features, same expression, same hair, same pose, same hands, same jacket with its embroidered emblem exactly as it is), the same dark studio, the same bokeh, the same three floating panels in exactly the same positions, sizes and perspective.
+
+The CONTENT inside the three panels is final and must not be redrawn: keep every word, number, gauge, bar, icon and layout inside them exactly as it is. Do not rewrite, sharpen, translate or invent any text.
+
+Your only job is MATERIAL AND LIGHT, so the panels look physically real in the scene instead of pasted on:
+- each panel becomes a thin slab of glass emitting light: a very fine bright bevel along its edges, a faint cool reflection streak across its surface, and a subtle soft glow that spills into the haze around it;
+- the light of the panels falls naturally on her: soft cool white light on the frame-right side of her face, hair and jacket, consistent with the panels' position;
+- the haze between her and the panels catches a little of that light;
+- everything stays cool azure and white; no warm or amber light, no new objects, no new text, no logos.

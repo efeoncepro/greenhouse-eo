@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "content",
+  "recipe": "content-text",
+  "voice": {
+    "eyebrow": "Publicidad programática",
+    "question": "¿Y fuera de search y social?",
+    "answer": [
+      "También"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
+  "body": "Compra programática para llegar a tu audiencia en los medios y pantallas que sí mira.",
+  "points": [
+    {
+      "name": "Inventario",
+      "text": "abierto, privado o garantizado"
+    },
+    {
+      "name": "Audiencias",
+      "text": "contexto, geografía y datos propios"
+    },
+    {
+      "name": "Control",
+      "text": "marca segura y presupuesto vigilado"
+    }
+  ],
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  }
+}

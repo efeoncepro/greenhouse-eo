@@ -1,0 +1,54 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Programática · Formatos",
+    "question": "¿En qué pantallas aparezco?",
+    "answer": [
+      "Donde mira"
+    ]
+  },
+  "body": "La misma campaña en el teléfono, el computador, la TV conectada y las pantallas de la ciudad, con un solo plan y un solo reporte.",
+  "steps": [
+    {
+      "glyph": "web",
+      "kicker": "Display",
+      "name": "Sitios y apps"
+    },
+    {
+      "glyph": "multimedia",
+      "kicker": "Video",
+      "name": "Online y CTV"
+    },
+    {
+      "glyph": "medios",
+      "kicker": "Audio",
+      "name": "Streaming y podcasts"
+    },
+    {
+      "glyph": "contenido",
+      "kicker": "Nuevos entornos",
+      "name": "In-game"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG5c-cada-pantalla-que-mira.png",
+    "alt": "Isabella mira su teléfono en un living de noche; detrás, un computador, una TV conectada y una pantalla de la ciudad muestran la misma campaña"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "note": "Los formatos disponibles dependen del mercado y del inventario."
+}

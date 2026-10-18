@@ -10,24 +10,50 @@
 
 1. En el cockpit de Growth CTA, selecciona **Abrir agenda nativa**.
 2. Ingresa la **Surface de reuniones**; por ejemplo, `efeonce-public-site`.
-3. Ingresa el **Scheduler key**; por ejemplo, `efeonce-discovery-30`.
+3. Ingresa el **Scheduler key**; por ejemplo, `discovery` si el catálogo/binding vigente confirma esa key.
 4. Ajusta el copy del launcher. No prometas una descarga, formulario o navegación si la acción abre la agenda.
 5. Publica una versión nueva del CTA y asígnala sólo a una surface autorizada.
 6. Verifica que el launcher no cambie de tamaño al abrir: desktop debe usar diálogo y móvil full-screen.
 7. Selecciona fecha y horario, cierra y vuelve a abrir. La misma selección debe permanecer.
 8. Verifica `greenhouse_cta_clicked`/`greenhouse_cta_action_started` y el funnel `gh_meeting_step_reached` sin PII. No debe existir conversión por abrir.
-9. Completa una reserva controlada y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
+9. Con alcance comercial autorizado, completa una reserva y revisa la confirmación: debe reemplazar todo el calendario, mostrar fecha,
    rango horario, zona y Teams, y no volver a ofrecer selección ni otra acción de booking.
 10. Comprueba que el foco llegue al título confirmado y que el email o receipt interno no aparezcan en DOM/dataLayer.
 11. En un host ancho, revisa que “Conversemos” no corte letras, que el carril no muestre aros recortados y que la marca monocroma de Teams aparezca sin fondo morado. Repite a 820 px y 390 px verificando `scrollWidth === clientWidth`.
+12. Revisa la cabecera del diálogo en el host real a 390 px y 820 px: el título no debe tomar la tipografía de los `h2` del
+    tema y «Cerrar agenda» debe quedar en una sola línea (≈128×44 px), sin overflow. El diálogo vive en `<body>` y hereda el
+    CSS del host, así que esta prueba sólo vale sobre la página real, no sobre el preview de `/growth/ctas`.
+
+## Incrustar el launcher como botón compacto
+
+Si el host necesita sólo el botón (un dock, una barra o una fila de acciones) y no el card completo, publica el CTA con
+placement `embedded` y style `minimal`, y reduce el card a su botón desde el CSS del host, acotado al contenedor:
+
+- oculta `.ghc-content` y `.ghc-dismiss`;
+- deja `.ghc-card` en `display: flex; gap: 0`, sin padding, borde, fondo, sombra ni animación, y `.ghc-actions` sin márgenes;
+- da al `.ghc-primary` el alto, radio y colores del host (área táctil ≥ 44 px) y fija `--gh-cta-reserve` al alto del botón
+  para que el renderer no reserve el espacio del card.
+
+Caso fuente: el dock móvil de `/servicios-contratar-hubspot/` (CTA `hubspot-discovery-meeting`, `cta-location=hubspot_mobile_dock`)
+reduce el CTA a un botón de 48 px junto a «Ir al formulario»; `/contacto/` usa el mismo patrón. El botón sigue abriendo el
+scheduler nativo en full-screen y la conversión sigue siendo el receipt `gh_meeting_*`, nunca el click. Si el host no tiene
+surface/key, el hueco debe caer a un enlace a `/agenda/`.
+
+## Problemas comunes
+
+| Síntoma | Causa | Qué hacer |
+| --- | --- | --- |
+| En móvil, la cabecera del scheduler se ve partida: título con la tipografía del tema y «Cerrar agenda» en tres líneas | Renderer ≤ 1.3.0: el shorthand `font` con `inherit` (`font: 650 .84rem/1 inherit`) es inválido, el navegador descarta la declaración y el diálogo hereda el CSS del host | Corregido en el renderer **1.3.1** (longhands con `font-family: inherit`, botón `flex: none` + `nowrap`); code complete, llega a los hosts sólo con el release a producción de `renderer-latest.js` (pendiente al 2026-10-17) |
+| El launcher compacto muestra el texto o el botón de descartar del card | El CSS del host no oculta `.ghc-content`/`.ghc-dismiss` o no está acotado al contenedor | Aplica las reglas de §Incrustar el launcher como botón compacto dentro del selector del contenedor |
 
 ## Comprobar medición y matching
 
 El binding y la publicación del CTA habilitan la experiencia de reserva, no el matching por sí solos.
-La autorización actual de matching es fija: `efeonce-discovery-30` +
-`fhsf-efeonce-lead-gen-web` en los origins públicos Efeonce/Think.
-La surface de ejemplo `efeonce-public-site` de este manual no amplía ese alcance.
-No hay opción de configuración sin release: la propuesta está sin GO y no implementada.
+La autorización de matching es una policy publicada ligada al binding activo; el seed usa
+`discovery`/`fhsf-efeonce-lead-gen-web`. La surface de ejemplo `efeonce-public-site` no amplía
+ese alcance por sí sola. Para una agenda/surface nueva compatible, usar [configuración por
+API/panel/CLI](configurar-medicion-conversiones.md): mapping tipado, destinos explícitos,
+review/publish y lectura de confirmación. No cambiar una lista en código o GTM.
 
 Después de una reserva real autorizada y confirmada, distinguir tres evidencias: receipt/ledger
 server-side, mirror GA4 `generate_lead`, y entrega backend a Meta/Google.
@@ -37,8 +63,9 @@ consentimiento publicitario. El UUID de medición es independiente del recibo pr
 
 Meta Lead sale por el Client autenticado de GTM Server; el antiguo sender Lead basado en GA4 está
 retirado. Google UPD no agrega eventos ni otra conversión. Nunca crear reservas ficticias ni repetir
-booking para probar transporte. Las pruebas controladas de TASK-2034 y sus límites están en el
-[release](../../audits/releases/2026-10-13-full-develop-matching-release.md); el procedimiento completo,
+booking para probar transporte. Usar Meta Test Events efímero para esa prueba aislada, siguiendo el
+[manual CAPI](operar-meta-capi-servidor.md). Las pruebas controladas y sus límites están en el
+[release vigente](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md); el procedimiento completo,
 reintentos/retención y rollback en el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md).
 
 ## Degradación y rollback

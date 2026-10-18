@@ -1,0 +1,89 @@
+{
+  "mode": "offline_proposal_only",
+  "applied": false,
+  "reviewedAt": "2026-10-18T15:09:22.483Z",
+  "proposals": [
+    {
+      "name": "Diagnóstico de pauta · Performance Marketing",
+      "reviewRequired": true,
+      "refreshBeforeApply": [
+        "sourceVersion",
+        "expectedPublishedRevisionId",
+        "activationAt",
+        "idempotencyKey"
+      ],
+      "command": {
+        "action": "draft",
+        "scope": {
+          "sourceKind": "form_submission",
+          "sourceKey": "71ea684f-1ad9-4656-982b-159e4de46dd8",
+          "surfaceId": "fhsf-efeonce-performance-diagnostic"
+        },
+        "config": {
+          "purpose": "commercial_lead",
+          "sourceVersion": "fver-e9f76dcb-3766-46e9-99b3-b880b3e3dca8",
+          "origins": [
+            "https://efeoncepro.com"
+          ],
+          "destinations": [
+            "meta"
+          ],
+          "mapping": {
+            "email": "email",
+            "firstName": "firstName",
+            "lastName": "lastName"
+          },
+          "googleAds": {
+            "conversionKey": "commercial_lead",
+            "enhancedConversions": true,
+            "activationAt": "2026-10-18T15:09:22.483Z"
+          }
+        },
+        "expectedPublishedRevisionId": "d03b8828-2cf1-4613-9f67-36cf03d98f14",
+        "idempotencyKey": "461b9998-4729-4763-97e1-149a904fc71a"
+      }
+    },
+    {
+      "name": "discovery",
+      "reviewRequired": true,
+      "refreshBeforeApply": [
+        "sourceVersion",
+        "expectedPublishedRevisionId",
+        "activationAt",
+        "idempotencyKey"
+      ],
+      "command": {
+        "action": "draft",
+        "scope": {
+          "sourceKind": "meeting_booking",
+          "sourceKey": "discovery",
+          "surfaceId": "fhsf-efeonce-lead-gen-web"
+        },
+        "config": {
+          "purpose": "commercial_lead",
+          "sourceVersion": "e177ad8f5c28a87aefef6311207758c95132897a025a148ce718a2df83dc2d47",
+          "origins": [
+            "https://efeoncepro.com"
+          ],
+          "destinations": [
+            "meta",
+            "google_upd"
+          ],
+          "mapping": {
+            "email": "email",
+            "phone": "phone",
+            "firstName": "firstName",
+            "lastName": "lastName"
+          },
+          "googleAds": {
+            "conversionKey": "meeting_booking",
+            "enhancedConversions": true,
+            "activationAt": "2026-10-18T15:09:22.483Z"
+          }
+        },
+        "expectedPublishedRevisionId": "5542bc01-cca3-4b55-8cf2-f99656255d75",
+        "idempotencyKey": "c27570fa-3da2-44c3-be13-61aa7ae6feba"
+      }
+    }
+  ]
+}

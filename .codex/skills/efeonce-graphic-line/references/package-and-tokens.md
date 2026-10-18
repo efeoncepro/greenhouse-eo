@@ -1603,3 +1603,20 @@ SSR y tokens permanecen portables; el consumidor importa CSS y no copia componen
 inventario histórico, no acredita descubrimiento de estos exports.
 
 Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, primitives 0.6.5, [release 37669427070 SUCCESS](https://github.com/efeoncepro/axis-design-system/actions/runs/37669427070) — 2026-10-07. Adopción Think: pin/lockfile 0.6.5; estado de despliegue en el runbook vigente.
+
+## Mención Efeonce — publicada 2026-10-18
+
+Aplicación del isotipo en texto corrido ([applications.md §A14](applications.md#a14-mención-efeonce-en-texto-corrido-2026-10-18)).
+No vive en `efeonceGraphicLine` ni en `axis-graphic-line`:
+
+| Pieza | Dónde |
+|---|---|
+| Tokens `axisMention` | `axis-tokens` 0.6.5 (`packages/tokens/src/mention.ts`): paleta por línea × superficie, largos en em, peso 500 |
+| Contrato `efeonce.mention` 1.0.0 `candidate` | `axis-ui-contracts` 0.7.5: `resolveMention`, `isEfeonceHref`, `mentionOptions`, `MentionValidationError` |
+| Primitive | `axis-ui-primitives` **0.6.9 o superior** (0.6.8 rompe hosts Astro): `mentionHtml`, `mentionAttributes`, `mentionTree`, `mentionCss`, `./mention.css`, `<Mention>` en `/react` |
+| Isotipo | máscara CSS generada desde `axis-brand-assets/assets/efeonce-isotype-negative.svg` (`node packages/primitives/scripts/mention-isotype.mjs`) |
+| Lab | `/patterns/efeonce.mention/` |
+
+API completa, consumidores (WordPress, Think) y flujo de release: skill `axis-design-system` →
+`references/ui-primitives.md`.
+

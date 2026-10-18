@@ -5,6 +5,14 @@ Fecha: 2026-10-04. Dirección de implementación autorizada por el operador. Est
 AXIS incorpora las entradas en `a0c6130` y sincroniza assets en `6fff346`; el código de
 `axis-ui-primitives@0.5.0` no constituye una versión instalable publicada.
 
+## Delta 2026-10-15 — el renderer pasa a AXIS (TASK-2038)
+
+Decisión del operador: fuente y build del renderer de Growth Forms se mudan al repo AXIS y se publican
+por el delivery plane de EPIC-035 (`TASK-2038`, hija de EPIC-035). Esta decisión no cambia: AXIS sigue
+poseyendo el comportamiento de entrada y Growth Forms la autoridad de schemas, validación, consentimiento
+y envíos. La adopción de `inputBehaviors` contra el package publicado queda como follow-up de TASK-2038
+(dentro de AXIS ya no necesita import entre repos); hasta entonces vale el estado de adopción descrito abajo.
+
 ## Decisión y ownership
 
 AXIS posee presentación/formato portable, input behavior y adapters HTML/React. Growth Forms conserva

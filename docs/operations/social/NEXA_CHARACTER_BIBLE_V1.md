@@ -159,6 +159,14 @@ editorial.**
 
 ## 4. Especificaciones de audio y voz
 
+> **Delta 2026-10-16 — decisión del operador: Nexa es latina con voz mexicana.** Reemplaza el «no mexicano» de
+> §4.4 y cierra la «voz base» pendiente de §4.5. Voz elegida: **ElevenLabs «Lucia – Warm Conversational»**
+> (`akOBlaKhFd59YlK6xz9u`, biblioteca, español mexicano cálido y conversacional), modelo `eleven_v4` con tags de
+> dirección (`[warmly]`, `[curious]`, `[short pause]`, `[softly]`). Primer uso: «Escucha a Nexa» en `/contacto/`
+> (`ai-generations/2026-10-15_contacto-nexa-voz/LEEME.md`). La versión anterior sonaba artificial a juicio del
+> operador. Nivelar al destino (web −16 LUFS, pico ≤ −1 dBTP); la salida cruda viene en ~−27 LUFS. El **copy**
+> sigue en español neutro con tuteo: el acento lo pone la voz, no el texto.
+
 ### 4.1 Características vocales
 
 - **Registro:** medio, tirando a medio-alto. Ni voz grave de locutora ni aguda que canse. El rango donde

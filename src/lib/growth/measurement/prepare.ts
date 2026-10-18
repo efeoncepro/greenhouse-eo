@@ -26,19 +26,20 @@ export const prepareMeasurementConversion = async (
     if(!version) return null
     const policy=await resolvePublishedMeasurementPolicy(scope,version,input.scope.origin)
 
-    if(!policy || !policy.config.destinations.length) return null
+    if(!policy || (!policy.config.destinations.length && !policy.config.googleAds)) return null
     const fields=input.fields??input.contact??{}
     const mapping=policy.config.mapping
 
     const contact={email:mapping.email?fields[mapping.email]:undefined,phone:mapping.phone?fields[mapping.phone]:undefined,
       firstName:mapping.firstName?fields[mapping.firstName]:undefined,lastName:mapping.lastName?fields[mapping.lastName]:undefined}
 
-    const payloads = buildMeasurementPayloads({...input,scope:{...input.scope,sourceVersion:version},contact,policy})
+    const payloads = buildMeasurementPayloads({...input,scope:{...input.scope,sourceVersion:version},contact,policy,
+      googleAdsEnabled: env.GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED === 'true' && source?.googleAdsEligible === true && source.sourceVersion === version})
 
     if (!payloads) return null
     const destinations = [...(policy.config.destinations.includes('meta') ? ['meta' as const] : []), ...(payloads.google ? ['google_upd' as const] : [])]
 
-    if (!destinations.length) return null
+    if (!destinations.length && !payloads.googleAdsConversion) return null
     const secret = await resolveSecret({ envVarName: 'GROWTH_MEASUREMENT_PAYLOAD_KEY', env })
 
     if (!secret.value) throw new Error('measurement_key_unavailable')
@@ -50,9 +51,11 @@ export const prepareMeasurementConversion = async (
         source: payloads.consent.source, policyVersion: payloads.consent.policyVersion,
         capturedAt: payloads.consent.capturedAt, advertisement: payloads.consent.advertisement,
         analytics: payloads.consent.analytics, globalPrivacyControl: payloads.consent.globalPrivacyControl,
+        ...(payloads.googleAdsConversion ? { googleConsent: payloads.consent.googleConsent } : {}),
       },
-      encryptedPayload: encryptMeasurementPayload({ meta: policy.config.destinations.includes('meta') ? payloads.meta : null, google: payloads.google }, secret.value, payloads.eventId),
+      encryptedPayload: encryptMeasurementPayload({ meta: policy.config.destinations.includes('meta') ? payloads.meta : null, google: payloads.google, googleAds: payloads.googleAds }, secret.value, payloads.eventId),
       destinations,
+      ...(payloads.googleAdsConversion ? { googleAdsConversion: payloads.googleAdsConversion } : {}),
     }
   } catch {
     // Neither key failure nor instrumentation failure may change commercial acceptance.

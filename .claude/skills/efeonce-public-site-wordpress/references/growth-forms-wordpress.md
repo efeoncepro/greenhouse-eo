@@ -102,6 +102,64 @@ For non-AEO embeds, the widget/minimal host should be routine:
 5. For premium custom selects, open the listbox and assert `aria-expanded=true`, the top option is
    actually above following fields, selected/hover text stays dark and `scrollWidth==clientWidth`.
 6. Fix renderer/shared host adapter issues globally before adding one-off page CSS.
+7. Host token overrides with a `styleVariant` (e.g. `diagnostic_premium`): the variant re-declares
+   `--ghf-*` on the inner `.ghf-root[data-ghf-style-variant]`, so an override on `greenhouse-form` or
+   `.ghf-scope` loses (Creativa's live CTA painted the variant teal instead of the host `#0375db`).
+   Scope under the host card: `greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]) { --ghf-* }`,
+   and verify the submit button's computed style on the live page.
+
+## Canvas-designed forms
+
+A form drawn in a canvas is a brief for configuring the governed renderer; the host never draws fields.
+Before approving or implementing the canvas, map each canvas control to an existing renderer type or
+`presentation` and configure it in the form version, with visual parity as the acceptance criterion:
+
+- chip/card choices → `type: 'radio'` (renders `ghf-choice-group--cards`), not `select`. **Renderer-version
+  dependent:** before Greenhouse `ab622e958`, `radio` outside `hubspot_pillar` rendered as an empty text box.
+  Check which renderer is live in production (`/growth-forms/renderer-latest.js`) and preview by interception
+  (below) before promising cards to the operator;
+- multi-select chips: in production only the `hubspot_pillar` variant draws a multiple selection as chips
+  (case `efeonce-media-diagnostic`, Agencia de Medios 2026-10-16); other variants need a renderer release first;
+- per-label icons → `presentation.icon` (user, mail, phone, link, linkedin, briefcase, calendar, clock,
+  message, file, globe);
+- country picker → `presentation.control: 'country_select'`;
+- two columns are adaptive (`@container (min-width: 520px)` on `greenhouse-form`): the host card's width
+  and padding decide it. Creativa measured 516 px inside a 588 px card with 36 px padding → one column, 8
+  fields stacked beside an empty column. Fix in the host layout, not the form: give the form column room
+  (Creativa 2026-10-15: grid `.82fr / 1.18fr` from 1200 px with the companion column `position: sticky`,
+  stacked full-width below → 622 px, two columns);
+- privacy link text is form copy, not host markup.
+
+Measure the `greenhouse-form` width (≥520 px for two columns), radio groups and icons live before closing.
+
+Host theming of the action: declare the tokens on `.ghf-actions` (e.g. `--ghf-accent`, `--ghf-accent-contrast`,
+`--ghf-action-shadow`) inside the host card instead of fighting the variant with `!important`. Host CSS for a
+not-yet-published version can ship ahead if it is forward-compatible (selectors that only match once the new
+field types exist), as Creativa did for its two-step version.
+
+Preview before publishing: a contract or renderer change can be seen on the live host page without touching
+production by intercepting, in a Playwright test browser, the form contract API response (and, if needed, the
+renderer bundle) and serving the candidate version. Use it to validate host width, Ohio CSS and host tokens at
+desktop and 390 before promising a design or running a publish.
+Only true gaps (exact pill-chip look vs choice cards, AXIS checkbox styling, a custom listbox beyond
+`country_select`) become a renderer extension in its own task and renderer release; flag them to the
+operator **before** publishing, not after. Field catalog and versioning: `greenhouse-growth-forms`.
+
+### Landing diagnostic forms (cases)
+
+One form per service landing, published by its own script and delivered `direct` to its own HubSpot form
+(registry row in `scripts/growth/hubspot-destinations.registry.ts`). Instance detail lives in the landing file.
+
+| Form | Landing | Key / surface | Variant | HubSpot form | Publisher |
+| --- | --- | --- | --- | --- | --- |
+| `efeonce-media-diagnostic` | Agencia de Medios (2026-10-16) | `d784b9e2-f6e4-4e24-b059-f164fc82f734` / `fhsf-efeonce-media-diagnostic` | `hubspot_pillar` | «Lead Gen - Agencia de Medios» | `scripts/growth/publish-media-diagnostic-form.ts` |
+| `efeonce-performance-diagnostic` | Performance Marketing (2026-10-17) | `71ea684f-1ad9-4656-982b-159e4de46dd8` / `fhsf-efeonce-performance-diagnostic` | `hubspot_pillar` / `multi_step_light`, CTA «Pide tu diagnóstico» | «Lead Gen - Performance Marketing» | `scripts/growth/publish-performance-diagnostic-form.ts` |
+
+Performance maps FIRST_NAME, LAST_NAME, EMAIL, COMPANY, WEBSITE, country and
+`gh_form_performance_{audiencia,canales,inversion_mensual,objetivo,prioridad,crm,rol}`; live it renders 26 inputs.
+It replaces the `efeonce-performance-brief` named in TASK-1865's original contract, which was never published.
+Both are pending a first real browser submission (Turnstile blocks automation) and the GA4 `generate_lead`
+check; Performance also lacks its TRACKING-PLAN row.
 
 ## Verification
 

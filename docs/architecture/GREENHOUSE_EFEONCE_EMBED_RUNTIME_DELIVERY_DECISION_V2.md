@@ -9,6 +9,10 @@
   shared `efeonce-group` is a one-way project mutation and is not authorized by this decision
 - Supersedes: [Efeonce Embed Runtime Delivery Decision V1](GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V1.md)
 
+> **Nota 2026-10-15 — enmienda pendiente.** El operador decidió que la *fuente* del renderer de Forms pase
+> a AXIS (hoy el punto 1 de la decisión la deja en Greenhouse). La enmienda se hará en `TASK-2038` Slice 1;
+> mientras no se aplique, el texto de esta decisión sigue vigente sin cambios.
+
 ## Context
 
 The business outcome is not “move static files to Firebase”. It is to let Greenhouse-owned Forms, CTAs and Meetings

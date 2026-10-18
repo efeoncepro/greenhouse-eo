@@ -1,0 +1,47 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "voice",
+  "role": "decision",
+  "recipe": "decision-traffic-to-revenue",
+  "voice": {
+    "eyebrow": "Performance · Señal",
+    "question": "¿Dónde termina mi pauta?",
+    "answer": [
+      "En",
+      "ventas"
+    ]
+  },
+  "body": "Optimizamos hacia compras, margen y etapas del CRM, no hacia clics: el algoritmo aprende de lo que **vendes**.",
+  "steps": [
+    {
+      "number": "01",
+      "name": "Alcance",
+      "description": "Quién vio tu anuncio y en qué red.",
+      "channel": "Meta · Google · TikTok"
+    },
+    {
+      "number": "02",
+      "name": "Visitas",
+      "description": "Quién llegó, desde qué pieza y qué buscaba.",
+      "channel": "GA4 · UTMs"
+    },
+    {
+      "number": "03",
+      "name": "Conversiones",
+      "description": "Compras y leads medidos en tu sitio, sin duplicar.",
+      "channel": "Píxel · CAPI"
+    },
+    {
+      "number": "04",
+      "name": "Ventas",
+      "description": "Lo que la pauta trajo a tu negocio, medido en tu CRM.",
+      "channel": "HubSpot · Salesforce"
+    }
+  ],
+  "cutLabel": "La mayoría de las campañas se optimiza hasta aquí"
+}

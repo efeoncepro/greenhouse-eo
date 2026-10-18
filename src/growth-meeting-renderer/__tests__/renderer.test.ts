@@ -6,6 +6,7 @@ import { createMeetingFixtureApi, meetingConfigFixture } from '../fixtures'
 import { MeetingRenderer } from '../renderer'
 import type { MeetingApiClient } from '../api-client'
 import type { MeetingTurnstilePort } from '../turnstile'
+import * as adsConversion from '../../growth-google-ads-conversion/conversion'
 
 const turnstile: MeetingTurnstilePort = {
   mount() {
@@ -76,6 +77,26 @@ beforeEach(() => {
 })
 
 describe('MeetingRenderer', () => {
+  it('consumes reserved enhanced data once and excludes it from confirmed state and ordinary telemetry', async () => {
+    const fixture=createMeetingFixtureApi('confirmed')
+    const now=Date.now()
+    const receipt={version:1 as const,transactionId:'11111111-1111-4111-8111-111111111111',conversionKey:'meeting_booking' as const,issuedAt:new Date(now).toISOString(),expiresAt:new Date(now+600000).toISOString(),userData:{sha256_email_address:'a'.repeat(64)}}
+    const emit=vi.spyOn(adsConversion,'emitGoogleAdsConversion').mockReturnValue(true)
+    const api:MeetingApiClient={...fixture,book:async(...args)=>({...await fixture.book(...args),googleAdsConversion:receipt})}
+
+    try {
+      const {host,renderer}=await mount('confirmed',api)
+
+      await completeBooking(host)
+      expect(emit).toHaveBeenCalledExactlyOnceWith(receipt,'meeting_booking')
+      const state=(renderer as unknown as {state:unknown}).state
+
+      expect(JSON.stringify(state)).not.toContain('sha256_email_address')
+      expect(JSON.stringify((window as unknown as {dataLayer:unknown[]}).dataLayer)).not.toContain('a'.repeat(64))
+      expect(host.dataset.ghmState).toBe('confirmed')
+      renderer.destroy()
+    } finally {emit.mockRestore()}
+  })
   it('usa el logo monocromo de Teams y no renderiza la órbita decorativa recortada', async () => {
     const { host, renderer } = await mount()
 

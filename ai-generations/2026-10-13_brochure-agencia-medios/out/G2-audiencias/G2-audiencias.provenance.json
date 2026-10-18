@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "2167b6e3859e6e702bc079debfc9a48c005722531349315774e16e5dee024b63",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT9b-voz-ejecutiva",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT9b-voz-ejecutiva.png",
+      "sha256": "0f89135c2f2f63edd43551e9502081cfe786fa2c428f9912f0fd6f89c89c0ee4"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

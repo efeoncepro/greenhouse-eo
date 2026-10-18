@@ -43,6 +43,33 @@ Use canonical docs already owning the surrounding contracts; do not create a sec
 - `docs/architecture/creative-studio/README.md`
 - `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`
 
+## BytePlus ModelArk: account, declarations and portrait gate
+
+For console/KYC/Entry, virtual portraits or `asset://` inference, load
+[the portrait preflight](references/byteplus-portrait-preflight.md), `greenhouse-secret-hygiene`,
+the [direct manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) and the
+[account-scoped ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+These own operational state and evidence; a skill must not maintain another live quota or approval record.
+Provider account approval and an Entry subscription do not replace input rights or prove portrait inference works.
+The preflight also owns safe Chrome upload recovery, exact `Active` readback and resuming existing tasks/batches;
+read it before repeating a previous attempt. A successful draft is technical evidence, not final creative approval.
+A one-time instruction to accept a specific letter does not authorize future agreements, account changes or plans.
+
+## OmniHuman 2.0 / BytePlus Vision AI — dated routing 2026-10-15
+
+Use the [API manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) and
+[dated research](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) as the evidence
+owners. Revalidate the [Service Specific Terms](https://docs.byteplus.com/en/docs/legal/docs-service-specific-terms)
+section **Seed Speech and Vision AI**, which names OmniHuman, together with the
+[General Terms for AI Services](https://docs.byteplus.com/en/docs/legal/AI-Services-terms), AUP and applicable
+customer agreement/DPA. Do not import ModelArk indemnity or commercial clearance into Vision AI by analogy.
+Clear both likeness/image and voice permissions for synthetic performance, plus audio/music and client-upload
+rights, before generation. General AI terms distinguish no foundation-model training (with feedback and written
+consent exceptions) from retention for service, fraud/abuse and security purposes. Task expiry or download-URL TTL
+is not a deletion commitment or zero retention; verify the exact account, service and contractual data path.
+Preserve provenance, disclosure and the default watermark; account eligibility or partner status does not sign
+an asset-level rights grant or establish indemnity, exclusivity or enterprise data clearance.
+
 ## Workflow: intake → classify → clear → produce → verify → deliver → close
 
 ### 1. Intake and scope

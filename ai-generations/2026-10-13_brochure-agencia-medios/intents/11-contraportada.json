@@ -1,0 +1,19 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "brochure",
+  "line": "growth",
+  "role": "close",
+  "recipe": "close-brochure",
+  "layout": "orbit",
+  "voice": {
+    "question": "¿Conversamos?",
+    "answer": [
+      "Cuando",
+      "quieras"
+    ]
+  }
+}

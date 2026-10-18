@@ -8,6 +8,26 @@
 > [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`](../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md);
 > el runbook operativo en [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1`](./AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+## Actualización — 2026-10-18: Mención Efeonce (`efeonce.mention`) publicada y adoptada
+
+AXIS posee la mención desde el 2026-10-18: tokens `axisMention`, contrato `efeonce.mention` 1.0.0 `candidate`,
+primitive en `@efeoncepro/axis-ui-primitives` (`mentionHtml`, `mentionCss`, `./mention.css`, `<Mention>` en `/react`) y
+página del Lab `/patterns/efeonce.mention/`. Publicado en tag `v0.7.5` (tokens `0.6.5`, contracts `0.7.5`, registry
+`0.7.3`, primitives `0.6.8`) y corregido en tag `v0.6.9` (primitives `0.6.9`, máscara sin comillas para Astro).
+
+| Consumidor | Estado |
+| --- | --- |
+| WordPress | En vivo: copia byte a byte de `mention.css` `0.6.9` con versión y sha256 en la cabecera; Inbound con 10 menciones |
+| Think | En producción (commit `f603060`, Vercel Production Ready): pin `0.6.9`, componente `EfeonceMention.astro` y preview noindex `https://think.efeoncepro.com/preview/mention` (sin barra final; con barra, 308) verificada en vivo con 200, 3 menciones, sin desborde y `astro check` 0 errores; mismo sha256 de `mention.css` que WordPress; sin uso en páginas de producción |
+| Greenhouse | Sin adopción; pines de `package.json` sin cambio (no fija `axis-ui-primitives`) |
+| Globe / Studio | Fuera del alcance de este corte; no se acredita adopción |
+
+Publicar `0.6.9` exigió dos arreglos de pipeline en AXIS `main`: `b1cb16b` (`brand:sync` del Lab antes de los tests de
+`release-packages.yml`) y `bec3d01` (suite de navegador del video estabilizada). El tag `v0.6.9` se borró y se recreó
+sobre `69492cf` porque la corrida fallida no había publicado nada. Lección: no empujar nada entre un arreglo y su tag.
+
+Detalle y evidencia: [runbook](AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md), corte del 2026-10-18.
+
 ## Actualización — 2026-10-12: `axis-brand-assets` 0.4.25 y sus dependientes
 
 **Pines vigentes** (`package.json`): `axis-tokens` `0.3.41`, `axis-ui-contracts` `0.3.40`, `axis-graphic-line` `0.11.0`,

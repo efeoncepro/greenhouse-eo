@@ -305,6 +305,12 @@ No se ejecutaron generaciones, restauraciones ni cambios audiovisuales para escr
 
 ## 12. Preproducción transversal: orden y gates
 
+> **Pieza narrativa (personajes, set con geografía, acción que viaja entre planos):** además de este orden, aplicar el
+> [método de producción narrativa](../../../../docs/operations/creative-production/EFEONCE_NARRATIVE_VIDEO_PRODUCTION_METHOD_V1.md):
+> biblia de continuidad con planta y línea de 180° antes de generar, escala por distancia al lente, marca de producto
+> determinística, reponer la cara aprobada tras cada edición y auditar la secuencia completa, no plano por plano
+> (caso «¿Para cuándo?», 2026-10-17).
+
 **Origen:** SKY (2026-09-24) y el spot animado 2D «Sparks × Efeonce AEO» (2026-10-03, v2 aprobada). El operador
 pidió fijar esta secuencia como común a todos los videos: *«la metodología de preproducción siento que va a ser
 similar en todos los videos que hagamos»*. Los pasos son transversales; lo que cambia por tipo de producción está al

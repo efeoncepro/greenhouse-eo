@@ -1,0 +1,323 @@
+{
+ "schemaVersion": "pricing-v3-composition-demand/1",
+ "commercialUnit": "managed_service",
+ "brief": {
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-14",
+  "offerId": "creative-managed-service",
+  "engagementCode": "monthly",
+  "accountId": "sky-airline-simulation",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "CLP",
+  "periods": 12,
+  "lines": [
+   {
+    "lineId": "titular",
+    "profile": "ECG-007",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "1"
+    },
+    "allocationMode": "dedicated",
+    "allocationPolicyId": "allocation:dedicated",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": true,
+    "choices": [
+     {
+      "requirementId": "assurance",
+      "resourceId": "provision-backfill-coverage"
+     },
+     {
+      "requirementId": "operations",
+      "resourceId": "provision-on-call-alert-guard"
+     }
+    ]
+   },
+   {
+    "lineId": "refuerzo",
+    "profile": "ECG-007",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.25"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": true,
+    "choices": [],
+    "activePeriods": [
+     3,
+     5,
+     8,
+     10,
+     11
+    ]
+   },
+   {
+    "lineId": "agentes",
+    "profile": "ECG-021",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.1"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": true,
+    "choices": []
+   }
+  ],
+  "adjustments": [
+   {
+    "adjustmentId": "sky-precio-redclick",
+    "kind": "agreed_net",
+    "amount": "4490000",
+    "billing": "monthly",
+    "lineIds": [
+     "titular",
+     "refuerzo",
+     "agentes"
+    ],
+    "reason": "Variante 14/10/2026 (respuesta de Jaime Herrera): los comentarios llegan clasificados desde Redclick; agentes sólo de redacción. El asiento de Sprout se mantiene en esta corrida porque la tarea de responder exige una bandeja en el catálogo; su costo se descuenta aparte si se responde desde las herramientas de cada red. Fee CLP 4.490.000 más IVA al mes; la integración con Redclick se cobra en la puesta en marcha (no cotizada aquí). Sin línea de líder de servicio: por decisión del CEO (14/10/2026) ese rol lo asume él o la misma persona dedicada."
+   }
+  ],
+  "taxTreatment": {
+   "kind": "exclusive",
+   "rate": "0.19",
+   "policyRef": "tax:cl-iva-19",
+   "source": {
+    "reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+    "effectiveFrom": "2026-01-01",
+    "effectiveUntil": "9999-12-31",
+    "status": "confirmed"
+   }
+  },
+  "engagementForm": "on_going"
+ },
+ "work": [
+  {
+   "lineId": "titular",
+   "assigneeIds": [
+    "sky-care-titular"
+   ],
+   "tasks": [
+    "social-care"
+   ],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": [
+    {
+     "task": "social-publishing",
+     "reason": "Este rol responde comentarios; no programa ni publica contenido."
+    },
+    {
+     "task": "express-design",
+     "reason": "Este rol responde comentarios; no diseña piezas ni usa Adobe Express."
+    }
+   ]
+  },
+  {
+   "lineId": "refuerzo",
+   "assigneeIds": [
+    "sky-care-refuerzo"
+   ],
+   "tasks": [
+    "social-care"
+   ],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": [
+    {
+     "task": "social-publishing",
+     "reason": "Este rol responde comentarios; no programa ni publica contenido."
+    },
+    {
+     "task": "express-design",
+     "reason": "Este rol responde comentarios; no diseña piezas ni usa Adobe Express."
+    }
+   ]
+  },
+  {
+   "lineId": "agentes",
+   "assigneeIds": [
+    "sky-care-agentes"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": [
+    {
+     "task": "crm-automation",
+     "reason": "Este rol mantiene los agentes y la base de conocimiento; sin automatización de CRM en el alcance."
+    }
+   ]
+  }
+ ],
+ "serviceToolIds": [
+  "agent-runtime-usage"
+ ],
+ "allocations": [
+  {
+   "periodIds": [
+    1,
+    2,
+    4,
+    6,
+    7,
+    9,
+    12
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "2",
+   "serviceShare": "0.575",
+   "seatCapacity": 2,
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "2",
+    "allocatedUnits": "1.15"
+   },
+   "reason": "Hipótesis de simulación: 3 asientos nominativos (titular, especialista de agentes); al servicio se le carga 1.35 de 3, su dedicación declarada. No es cartera real ni permiso de acceso. Sin líder de servicio (14/10/2026)."
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    4,
+    6,
+    7,
+    9,
+    12
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "2",
+   "serviceShare": "0.575",
+   "seatCapacity": 2,
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "2",
+    "allocatedUnits": "1.15"
+   },
+   "reason": "Hipótesis de simulación: 3 asientos nominativos (titular, especialista de agentes); al servicio se le carga 1.35 de 3, su dedicación declarada. No es cartera real ni permiso de acceso. Sin líder de servicio (14/10/2026)."
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "toolId": "agent-runtime-usage",
+   "priceId": "hypothesis-per-1000-items",
+   "quantity": "2",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "thousand-items-processed",
+    "totalUnits": "2",
+    "allocatedUnits": "2"
+   },
+   "reason": "Hipótesis de simulación: con Redclick la clasificación llega hecha; los agentes sólo redactan para unas 1.300 conversaciones al mes (se compran dos paquetes de mil). No está medido."
+  },
+  {
+   "periodIds": [
+    3,
+    5,
+    8,
+    10,
+    11
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "3",
+   "serviceShare": "0.45",
+   "seatCapacity": 3,
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "3",
+    "allocatedUnits": "1.35"
+   },
+   "reason": "Hipótesis de simulación: 4 asientos nominativos (titular, refuerzo, especialista de agentes); al servicio se le carga 1.55 de 4, su dedicación declarada. No es cartera real ni permiso de acceso. Sin líder de servicio (14/10/2026)."
+  },
+  {
+   "periodIds": [
+    3,
+    5,
+    8,
+    10,
+    11
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "3",
+   "serviceShare": "0.45",
+   "seatCapacity": 3,
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "3",
+    "allocatedUnits": "1.35"
+   },
+   "reason": "Hipótesis de simulación: 4 asientos nominativos (titular, refuerzo, especialista de agentes); al servicio se le carga 1.55 de 4, su dedicación declarada. No es cartera real ni permiso de acceso. Sin líder de servicio (14/10/2026)."
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "toolId": "social-inbox",
+   "priceId": "sprout-professional-annual",
+   "quantity": "1",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "named-seats",
+    "totalUnits": "1",
+    "allocatedUnits": "1"
+   },
+   "reason": "Variante 14/10/2026: con Redclick los comentarios llegan clasificados por su API, así que la bandeja sólo sirve para responder y no necesita la API de Sprout (sólo en Advanced). Sprout Professional, un asiento, facturación anual alineada al contrato de 12 meses."
+  }
+ ],
+ "creditBudgets": [],
+ "fxRecordIds": [],
+ "seatSharing": [
+  {
+   "periodIds": [
+    3,
+    5,
+    8,
+    10,
+    11
+   ],
+   "toolId": "social-inbox",
+   "assigneeIds": [
+    "sky-care-titular",
+    "sky-care-refuerzo"
+   ],
+   "reason": "Decisión del CEO (11/10/2026): no hay un segundo asiento; en las semanas de campaña la persona dedicada y la de refuerzo comparten el asiento de la bandeja. Que Sprout permita compartir un asiento nominativo no está validado."
+  }
+ ]
+}

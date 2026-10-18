@@ -1,5 +1,12 @@
 # Plan — TASK-2035: configuración escalable y CAPI
 
+## Estado de ejecución
+
+Alcance limitado completado: TASK-2036/2037, PR255/main9690efad y Server9 publicados;
+API/panel/CLI y alta por datos sin redeploy verificados. [Cierre y límites](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+Este plan conserva el discovery y orden aprobados antes de construir. No repetir la ejecución
+ni el rollout por sus verbos futuros. El resto del paraguas y tráfico comercial/EMQ siguen pendientes.
+
 ## Alcance y aprobación
 
 Goal confirmado por el operador14/10/2026: **limitar ahora a configuración escalable y CAPI**.
@@ -7,9 +14,9 @@ Un único release final completo develop→main. No ejecutar los slices CRO, aba
 CRM/outcomes del paraguas; siguen pendientes. No nuevo servicio, proyecto, cron ni gasto.
 Checkpoint de este plan: **aprobado por el operador14/10/2026** mediante «Apruebo el plan; ejecuta».
 La ejecución sigue el alcance acotado y el orden documentado. La corrección CAPI previa fue
-encargada y autorizada por separado; commit ba9b8c9cc, backend aún sin release.
+encargada y autorizada por separado; commit ba9b8c9cc, backend aún sin release al aprobar el plan (publicado después en PR255).
 
-## Discovery summary
+## Discovery summary (snapshot previo a la implementación)
 
 - Forms se autoriza/publica por datos; form_key UUID ya es estable, form_version_id identifica
   contenido y form_host_surface permite origen/formulario. Matching enumera seis slugs en
@@ -95,7 +102,9 @@ encargada y autorizada por separado; commit ba9b8c9cc, backend aún sin release.
 ## Subagent strategy
 
 Sequential. Policy/schema→captura/envelope→API→UI→cutover tiene dependencia causal y archivos
-compartidos. No hay autorización vigente de subagentes; no se usa fork ni checkout alterno.
+compartidos. Durante la implementación no se autorizó delegación; no se usó fork ni checkout alterno.
+La auditoría documental posterior14/10 sí fue solicitada explícitamente con subagentes;
+no cambia la estrategia secuencial que ejecutó este plan.
 WIP comercial/documental ajeno queda intacto; commits y staging sólo de archivos/hunks propios.
 
 ## Execution order

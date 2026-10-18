@@ -1,0 +1,414 @@
+{
+  "manifest_version": 1,
+  "status": "prepared_not_applied",
+  "generated_on": "2026-10-15",
+  "executed_changes": 0,
+  "items": [
+    {
+      "wp_id": 6812,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/blog-item-details/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6813,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/blog-item-masonry/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6817,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/footer-beige/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6816,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/footer-dark/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6818,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/footer-main/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6815,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-centered/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6811,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-default/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6823,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-default-dark/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6820,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-default-with-cart/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6824,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-default-with-slider/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6822,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-default-without-title/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6819,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/header-single/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6821,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/layout-with-banner/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    },
+    {
+      "wp_id": 6814,
+      "post_type": "cpt_layouts",
+      "source_url": "https://blog.skyairline.com/layouts/submenu-for-shop/",
+      "proposed_destination_url": null,
+      "current_http_status": 200,
+      "current_in_sitemap": true,
+      "current_noindex": false,
+      "proposed_action": "Excluir del sitemap y noindex de ruta pública de layout; preservar uso interno de tema",
+      "evidence": [
+        "site/extra-checks.json",
+        "site/sitemap-complete.json"
+      ],
+      "dependency": [
+        "Confirmar post_type y renderizado Tripster/TRX en staging; no pasar a draft/private ni eliminar"
+      ],
+      "owner_proposed": "SKY desarrollo WordPress + SEO",
+      "status": "prepared_owner_implementation_required",
+      "preflight": [
+        "Owner SKY aprueba alcance, contenido y destino; permisos y ventana documentados.",
+        "Capturar revisión WordPress y hash/configuración antes; validar en staging con los IDs explícitos.",
+        "Revalidar justo antes el HTTP, contenido, canonical y robots del destino; detener si 404/soft 404/loop.",
+        "Comparar home/artículo/categoría y header/footer antes/después en escritorio/móvil."
+      ],
+      "rollback": [
+        "Restaurar sólo revisión/configuración de este ítem; retirar regla estrecha si se hubiera aprobado.",
+        "Purgar caché afectada y comprobar origen público, lectura, CTA, robots y canonical."
+      ]
+    }
+  ]
+}

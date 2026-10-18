@@ -1,0 +1,6 @@
+file 'head.mp4'
+duration 12.208333333333
+file 'middle.mp4'
+duration 13.333333333333
+file 'tail.mp4'
+duration 3.958333333333

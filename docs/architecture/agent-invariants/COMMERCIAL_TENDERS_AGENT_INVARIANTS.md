@@ -1,5 +1,10 @@
 # Commercial / Tenders — invariantes operativos para agentes
 
+Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 > **Tipo:** Companion de invariantes (load-on-demand)
 > **Versión:** 1.2
 > **Creado:** 2026-07-12 por Claude

@@ -1,5 +1,10 @@
 # HubSpot Agent CLI y MCP — selección del carril operativo
 
+Nombres de Deal/Lead: [convención vigente Efeonce](EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
+aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
+El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
+no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
+
 > Observaciones locales: 2026-09-29, 2026-10-06 y 2026-10-07. Este documento registra acceso del operador, no un runtime de Greenhouse ni un entitlement permanente de un portal cliente. Revalidar identidad, scopes y capacidad en cada sesión y antes de cada cambio.
 
 ## Carriles

@@ -1,0 +1,73 @@
+{
+  "tenderId": "E-ctv",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 315,
+          "answerPx": 155,
+          "bodyTop": 515,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:PG7f-tv-conectada",
+          "alt": "Isabella con control remoto en un living de noche; detrás, la familia ve en la TV conectada un spot de una marca de ejemplo"
+        },
+        "voice": {
+          "question": "¿Y la tele?",
+          "answer": "Conectada",
+          "eyebrow": "Programática · TV conectada"
+        },
+        "body": "Tu spot en las apps de streaming del televisor, comprado por hogar, horario y audiencia, sin pagar la tanda completa.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:multimedia-voice-dark-44",
+            "kicker": "Pantalla",
+            "name": "Smart TV"
+          },
+          {
+            "icon": "asset-ref:icon:objetivo-voice-dark-44",
+            "kicker": "Compra",
+            "name": "Por audiencia"
+          },
+          {
+            "icon": "asset-ref:icon:reloj-voice-dark-44",
+            "kicker": "Formato",
+            "name": "15 o 30 s"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-voice-dark-44",
+            "kicker": "Se mide",
+            "name": "Video completado"
+          }
+        ],
+        "note": "Marca de ejemplo. Inventario y apps se confirman por mercado.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

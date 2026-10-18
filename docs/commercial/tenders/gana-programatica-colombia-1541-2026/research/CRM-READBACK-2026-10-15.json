@@ -1,0 +1,47 @@
+{
+  "schema": "efeonce.tender-crm-readback.v1",
+  "asOf": "2026-10-15",
+  "portal": 48713323,
+  "brand": "Gana",
+  "companyId": 34264439413,
+  "dealId": 66065702426,
+  "noteId": 118603990273,
+  "contactCreated": false,
+  "contactAssociated": false,
+  "firstReadback": {
+    "dealname": "Gana — Publicidad programática omnicanal Colombia — GRD-1541",
+    "pipeline_bucket": "Strategic Bets",
+    "presupuesto_de_la_licitacion": "30000000",
+    "modalidad_de_venta": "Licitación",
+    "ficha_de_licitacion": "https://system.wherex.com/secured/supplier_user/proposal/get/7543223?tab=information",
+    "id_de_licitacion": "GRD-1541",
+    "gh_idempotency_key": "hubspot-private-tender:wherex:GRD-1541",
+    "servicios_especificos": "performance_paid_media",
+    "pipeline": "default",
+    "hs_next_step": "Julio/Media: validar experiencia y acceso DSP, equipo, inventario Colombia y categoría apuestas; costear y verificar margen; conciliar hora de cierre 20/10. Insumos proveedores solicitados 19/10.",
+    "deal_currency_code": "COP",
+    "canal_de_adqusicion": "WherEX",
+    "hubspot_owner_id": "75788512",
+    "dealstage": "appointmentscheduled",
+    "dealtype": "newbusiness"
+  },
+  "finalReadback": {
+    "pipeline": "default",
+    "dealname": "Gana — Publicidad programática omnicanal Colombia — GRD-1541",
+    "deal_currency_code": "COP",
+    "hubspot_owner_id": "75788512",
+    "pipeline_bucket": "Strategic Bets",
+    "dealstage": "appointmentscheduled",
+    "presupuesto_de_la_licitacion": "30000000",
+    "id_de_licitacion": "GRD-1541",
+    "gh_idempotency_key": "hubspot-private-tender:wherex:GRD-1541",
+    "dealtype": "newbusiness"
+  },
+  "companyPrimaryVerifiedBy": "MCP association create + independent Company association search + authenticated HubSpot UI Principal",
+  "contactCount": 0,
+  "noteAssociated": [
+    118603990273
+  ],
+  "dealCountForTenderId": 1,
+  "sourceOriginalSha256": "452fc79b6d25e7c0c4904df9323ac911e0bb491a6faae77f03bd57e94c04fcc2"
+}

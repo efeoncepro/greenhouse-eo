@@ -76,6 +76,19 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 - **Expandir = Flux Fill, nunca GPT Image:** Flare achicó la escena (escala 0,88–0,90 → código 3) y Sunburst copió el
   relleno en espejo como contenido. Elegir un modelo de OpenAI en `expand` avisa.
 - **Seedream edit (Lite y Pro) deja costura en superficies lisas** y Lite ignoró `image_size`: no es para pieza final.
+- **Rostros y piel → OpenAI directo, Sunburst + `--reference`** [verificado 2026-10-16, hero de `/contacto/`;
+  operador: «OpenAI, más barato y directo»]. Reemplazar una cara por una identidad canónica (anclas de Nexa en
+  `ai-generations/_identidad-nexa/1-anclas/`) salió a la primera con `--model gpt-image-2.5-sunburst --quality high
+  --reference <ancla-frontal> --reference <ancla-3/4>`: USD ~0,08 por dos candidatos, delta 0 fuera de la zona. La
+  máscara cubre cara + cuello + mano para que el tono de piel calce. **Flux Fill inventó otra persona** (y con la
+  palabra «cracked» en el prompt dibujó grietas: los negativos no funcionan en Flux). Flare con
+  `--zone-resolution 2048` devolvió panel negro. Probar fal sólo si OpenAI no cubre el caso.
+- **Numeración de imágenes con Sunburst:** como la máscara no viaja, la **imagen 2 es la guía magenta** y las
+  `--reference` empiezan en la **3**. Un prompt que diga «la mujer de la imagen 2» apunta a la guía.
+- **El guardián de marca bloquea el nombre «Nexa»** (lo lee como asset/logo). Para un retoque de persona, no nombrarla:
+  describir la identidad y pasarla por `--reference`. `--allow-brand` es para ediciones de contexto, no para esto.
+- **Piel craquelada / «papel arrugado»** en una foto IA es artefacto de upscaler; se corrige con la misma ruta. Si la
+  persona además no es la canónica, cambiar la cara por las anclas resuelve las dos cosas en una pasada.
 
 **`expand` vs `pnpm foto:expandir`:** son contratos distintos. `expand` deja la escena en delta 0 y sólo rellena el
 área nueva (Flux Fill). `foto:expandir` (Sunburst, `--reponer no`) **redibuja** la escena entera y es el flujo aprobado

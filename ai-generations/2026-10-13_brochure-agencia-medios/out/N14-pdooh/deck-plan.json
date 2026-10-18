@@ -1,0 +1,73 @@
+{
+  "tenderId": "N14-pdooh",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:PG2-pantallas-de-la-calle",
+          "alt": "Isabella en una pasarela sobre una avenida de noche, mientras las pantallas digitales de la calle se encienden una tras otra"
+        },
+        "voice": {
+          "question": "¿Mi marca en la calle?",
+          "answer": "A la vista",
+          "eyebrow": "Programática · pDOOH"
+        },
+        "body": "Pantallas digitales de exterior e interior compradas por ubicación, horario y audiencia, con prueba de emisión en cada plan.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:ubicacion-voice-dark-44",
+            "kicker": "Dónde",
+            "name": "Ubicaciones"
+          },
+          {
+            "icon": "asset-ref:icon:reloj-voice-dark-44",
+            "kicker": "Cuándo",
+            "name": "Horarios"
+          },
+          {
+            "icon": "asset-ref:icon:objetivo-voice-dark-44",
+            "kicker": "A quién",
+            "name": "Audiencia"
+          },
+          {
+            "icon": "asset-ref:icon:checklist-voice-dark-44",
+            "kicker": "Evidencia",
+            "name": "Prueba de emisión"
+          }
+        ],
+        "note": "Una reproducción no es una persona única ni una visita.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

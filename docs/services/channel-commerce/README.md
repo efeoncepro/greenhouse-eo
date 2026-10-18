@@ -6,7 +6,7 @@
 > **Decisión de negocio 2026-09-10:** oferta completa desde el primer contrato, ejecución mixta gobernada y
 > tecnología propia como destino de fase 3. Owner de línea: Julio Reyes (interino)
 > **Mercado inicial:** Chile
-> **Última actualización:** 2026-09-10
+> **Última actualización:** 2026-10-16 (tres láminas en el brochure oficial «Agencia de Marketing 360°») · 2026-09-10
 > **Decisión canónica:** [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md) (`Accepted` 2026-09-10)
 > **Modelo económico:** [`CHANNEL_COMMERCE_BUSINESS_MODEL_V1`](../../business-models/channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
 > **Fases y capital:** [`roadmap`](../../business-models/channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md) · [`modelo de caja`](../../business-models/channel-commerce/CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1.md) · [`proveedores`](../../business-models/channel-commerce/CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md)
@@ -741,6 +741,21 @@ activos. La activación deja de ser un costo que se agota el día del evento.
 **Excluido de Efeonce.** Impresión, bodegaje y logística de material físico. Va como pass-through de proveedor.
 
 ---
+
+## Collateral comercial
+
+Channel & Commerce aparece dentro del tramo **Brand** del brochure oficial «Agencia de Marketing 360°» (aprobado por
+el operador el 2026-10-16; OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`) con tres láminas:
+
+| Lámina | Mensaje | Qué muestra |
+|---|---|---|
+| CC1 · «Te viven» | Activación | Activación de BRÍO, marca ficticia, con bar en contenedores, truss y sol LED |
+| CC2 · «Lo sabes» | Trade marketing | Góndola auditada con selecciones (Ejecución OK, Quiebre de stock P1, Frenteo incompleto P2) y lista priorizada |
+| CC3 · «Medidas» | BTL | Mosaico de nueve fotos, una por servicio BTL |
+
+Las tres respetan los límites de `Proposed` de esta ficha: no prometen venta, cobertura ni precio, y dicen que la
+producción física la ejecutan proveedores mientras Efeonce opera y responde. La versión corta (26 láminas) conserva
+sólo CC1. Este brochure no reemplaza un diagnóstico T1 ni habilita claims de la sección «Estado y límites».
 
 ## Composición y fronteras
 

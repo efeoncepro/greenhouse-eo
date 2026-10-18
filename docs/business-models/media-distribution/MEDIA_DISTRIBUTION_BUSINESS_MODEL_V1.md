@@ -6,7 +6,7 @@
 > **Date:** 2026-07-26
 > **Validated as of:** 2026-07-26
 > **Review cadence:** después de cada piloto pagado y, como mínimo, trimestral
-> **Última actualización:** 2026-10-12 — dirección de oferta integral de medios y operación programática acompañada; conserva estados y decisiones abiertas del deck 10-10 (§10)
+> **Última actualización:** 2026-10-16 — material comercial vigente (brochure y landing «Agencia de Medios») y rebates como margen de Efeonce (§1.1) · 2026-10-12 — dirección de oferta integral de medios y operación programática acompañada; conserva estados y decisiones abiertas del deck 10-10 (§10)
 > **Related service:** [`Media & Distribution — catálogo de servicios`](../../services/media-distribution/README.md)
 > **Related architecture:** [`Efeonce Portfolio, Brand and Business Line Architecture V1`](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
 
@@ -56,6 +56,15 @@ deduplica automáticamente personas ni conversiones y no garantiza ventas, ROAS 
 
 **Presentación recomendada:** «En Efeonce conectamos estrategia, creatividad y medios para planificar, ejecutar y
 optimizar la inversión publicitaria de tu marca, con una gestión integrada y transparente».
+
+**Material comercial vigente (2026-10-16):** esta oferta se presenta con el brochure «Agencia de Medios» y la landing
+pública <https://efeoncepro.com/servicios/agencia-de-medios/>, cuyo formulario `efeonce-media-diagnostic` entrega los
+leads de medios a HubSpot. Rutas, recorrido y reglas de claims viven en el
+[catálogo de la línea](../../services/media-distribution/README.md#material-comercial-vigente). Dos de esas reglas son
+económicas y de oferta: la comisión o rebate del proveedor es margen de Efeonce (decisión del operador) y no se promete
+declararla ni traspasarla, aunque sigue fuera del margen base; y la tecnología de compra y verificación que Efeonce
+opera (Basis, DV360, The Trade Desk, IAS, DoubleVerify) no se presenta como alianza. Las piezas no cambian los estados
+de esta línea ni aprueban capacidades o bandas.
 
 La reunión [Basis 12-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) añade evidencia para
 evaluar operación del DSP por el equipo Efeonce con formación y acompañamiento. Sigue pendiente acceso, términos,
@@ -346,5 +355,6 @@ necesita decisión del operador y, donde se indica, revisión de Finance o Legal
 - [Performance media — canales, partners, precios y demanda 2026-09-10](../../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md)
 - [Performance & Commerce Distribution — ficha de servicio](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
 - Reach brochure 2026 — `Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`, referencia comercial local revisada 2026-07-26; no es source of truth
+- Brochure «Agencia de Medios» (2026-10-16) — `Alineación/4. Comercial/Brochures/2026/Agencia de Medios/Efeonce-Brochure-Agencia-de-Medios.pdf`, y landing <https://efeoncepro.com/servicios/agencia-de-medios/>; material comercial vigente, no source of truth de alcance ni precio
 - [Portfolio, Brand and Business Line Architecture V1](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
 - [Efeonce Product Service Operating Model V1](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)

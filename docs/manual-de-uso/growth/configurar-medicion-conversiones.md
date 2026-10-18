@@ -1,11 +1,14 @@
 # Configurar medición de conversiones
 
-Estado14/10/2026: TASK-2036 implementada en develop, migración y seed aplicados. Panel TASK-2037
-con lifecycle implementado y12 pruebas UI/red PASS; QA remota y release pendientes. GTM8
-es compatible v1/v2 temporalmente; el corte final estricto v2 queda pendiente del release.
-Alta controlada real mediante UI y readback API probada; GVC premium1440/390 PASS. Revisión final de estados pendiente tras corregir contraste del
-feedback con tokens nativos. El harness distingue estados simulados de presentación y
-comandos reales sobre una fixture controlada.
+Estado al 14/10/2026: **publicado en producción** mediante PR #255, main `9690efad`, orquestador
+`38591329633` y GTM Server 9 estricto. API, panel y CLI comparten el contrato. Se verificó una
+fuente creada después del release: alta y publicación por datos → Meta Test Events sin otro
+código/build/redeploy/publish GTM. La fixture quedó desactivada y archivada; no hubo registros
+comerciales sintéticos. [Recibos y límites](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
+No se afirma conversión comercial real, mejora de EMQ ni elegibilidad de audiencias desde fixtures.
+**Delta 17/10/2026:** primera conversión comercial consentida observada en Meta con
+`efeonce-performance-diagnostic` (1 Lead SERVER_ONLY); 12 de 18 políticas publicadas.
+Ver [estado de políticas](#estado-de-políticas-al-17102026) y [cómo probar un formulario](#probar-un-formulario-después-de-publicar-su-política).
 Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).
 
 ## Alta compatible por datos
@@ -14,7 +17,7 @@ Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLI
 2. En el inspector de Growth Forms, seleccionar formulario o agenda y surface. Se resuelve su identidad estable y versión publicada; no introducir slugs en código.
 3. Asignar correo/teléfono/nombre/apellido desde el catálogo tipado. El teléfono debe tener normalización internacional; nombres derivados sólo si la fuente declara namePolicy.
 4. Seleccionar destinos independientes, guardar borrador, revisar y publicar. La revisión actual permanece activa hasta publicar su reemplazo. Cada comando lleva expectedPublishedRevisionId e idempotencyKey.
-5. Leer de vuelta revisión y alcance. Probar con consentimiento publicitario y test_event_code temporal real; no crear conversiones comerciales ficticias.
+5. Leer de vuelta revisión y alcance. Probar con consentimiento publicitario y test_event_code temporal real; no crear conversiones comerciales ficticias. Para un envío real, seguir [Probar un formulario después de publicar su política](#probar-un-formulario-después-de-publicar-su-política).
 
 Una versión nueva del formulario requiere revisar/publicar configuración, sin redeploy. Un cambio
 de código, evento, proveedor, campo de un tipo nuevo u origen fuera de los dos aprobados requiere
@@ -42,9 +45,11 @@ comercial real permanece separado cuando no se ha observado.
 
 ## Product API y permisos
 
+[Referencia HTTP y DTOs](../../api/GREENHOUSE_GROWTH_MEASUREMENT_POLICY_API_V1.md).
+
 GET /api/admin/growth/measurement devuelve sources, policies y permissions; POST acepta draft,
 review, publish o disable. El actor sale de la sesión interna canónica. Capacidades separadas:
-growth.measurement.read/author/publish/disable; sólo admin/operations internos. Un cliente o
+growth.measurement.read/author/publish/disable; sólo identidades internas autorizadas de administración/operaciones. Un cliente o
 una ruta interna por sí solos no autorizan cambios. Contrato estricto en policy-contract.ts.
 No se amplía MCP/OAuth. No introducir contactos, IP, secretos, valores libres ni JavaScript.
 
@@ -81,25 +86,28 @@ La CLI consume HTTP y el mismo cliente del panel; no accede a SQL ni fabrica aut
 
 1. Obtener una sesión ligada al operador mediante el procedimiento canónico
    `scripts/playwright-auth-setup.mjs` (modo API no abre navegador). Conservar su storage state
-   ignorado dentro de `.auth/`, con permiso0600; secretos por entorno, nunca argumentos/logs.
+   ignorado dentro de `.auth/`, con permiso `0600`; secretos por entorno, nunca argumentos/logs.
+   Ejecutar el helper con `umask 077` o aplicar `chmod 600` al archivo: la CLI rechaza permisos
+   de grupo/otros. `AGENT_AUTH_BASE_URL` y `AGENT_AUTH_STORAGE_PATH` deben apuntar al mismo
+   host y archivo que las variables de medición; el default localhost del helper no sirve aquí.
    Configurar `GROWTH_MEASUREMENT_BASE_URL` al origen HTTPS correcto y
    `GROWTH_MEASUREMENT_STORAGE_STATE` a ese archivo. La sesión debe corresponder exactamente
    al host, estar vigente y tener las capabilities internas. No exportar cookies al gateway.
-2. `pnpm growth:measurement discover`: JSON con fuentes, versiones, campos, políticas, cabeza
+2. `pnpm --silent growth:measurement discover`: JSON con fuentes, versiones, campos, políticas, cabeza
    publicada y permisos efectivos. `--help` describe comandos, entorno y códigos de salida sin auth.
 3. Crear un archivo JSON de comando con **nombres de campos**, nunca datos de contactos.
    Para draft: `action`, `scope` descubierto, `config` (`purpose:commercial_lead`, `sourceVersion`,
    `origins`, `destinations`, `mapping`), `expectedPublishedRevisionId` actual (o null) y un UUID
    `idempotencyKey`. Destinos vacíos por defecto; escoger cada destino expresamente.
    Para review/publish/disable: `action`, `policyId`, `revisionId`, cabeza esperada y UUID propio.
-4. `pnpm growth:measurement validate comando.json`: preflight fresco, **sin escrituras**.
+4. `pnpm --silent growth:measurement validate comando.json`: preflight fresco, **sin escrituras**.
    Devuelve blockers, conflicto de cabeza/estado o rutas/códigos de schema; no eco de valores.
    Presentar impacto al operador y respetar la autorización existente antes de ejecutar.
-5. `pnpm growth:measurement apply comando.json --apply --receipt .auth/recibo.json`:
+5. `pnpm --silent growth:measurement apply comando.json --apply --receipt .auth/recibo.json`:
    escritura explícita, auditada e idempotente; éxito sólo tras GET independiente. El archivo0600
    se reserva antes del POST y conserva comando/origen/recibo conocido antes del GET.
 6. Revisar/publicar con comandos y claves distintos para cada transición. No saltar review.
-   `pnpm growth:measurement verify .auth/recibo.json` sólo lee y confirma el estado y cabeza.
+   `pnpm --silent growth:measurement verify .auth/recibo.json` sólo lee y confirma el estado y cabeza.
    Desactivar usa el mismo contrato; no cambia la aceptación comercial ni el mapping de HubSpot.
 
 Ante timeout/outcome desconocido, repetir **el mismo comando y recibo**, no generar otro UUID.
@@ -111,3 +119,143 @@ validación verde o un ACK como publicación/recepción de Meta; cada destino re
 La CLI no envía formularios, reuniones, contactos CRM ni pruebas a proveedores. No hay nuevas
 tools MCP/Nexa registradas por esta entrega; el contrato compartido permite adaptarlas con su
 gobernanza propia, sin duplicar lógica.
+
+Para consumir stdout como JSON, usar `pnpm --silent growth:measurement …`; `pnpm exec tsx scripts/measurement/policy-cli.ts …` también evita banners del runner.
+
+## Ejemplo de contrato para un agente
+
+Primero, con la identidad y secreto ya cargados por el mecanismo autorizado (sin imprimirlos),
+generar la sesión y descubrir. Estos comandos no publican políticas:
+
+```bash
+umask 077
+export AGENT_AUTH_MODE="api"
+export AGENT_AUTH_BASE_URL="https://greenhouse.efeoncepro.com"
+export AGENT_AUTH_STORAGE_PATH=".auth/measurement-storage.json"
+node scripts/playwright-auth-setup.mjs
+chmod 600 .auth/measurement-storage.json
+export GROWTH_MEASUREMENT_BASE_URL="https://greenhouse.efeoncepro.com"
+export GROWTH_MEASUREMENT_STORAGE_STATE=".auth/measurement-storage.json"
+pnpm --silent growth:measurement discover > .auth/measurement-catalog.json
+```
+
+Requisitos: `AGENT_AUTH_EMAIL` y `AGENT_AUTH_SECRET` ya presentes para el modo API. No usar una
+identidad distinta a la autorizada. La CLI envía sólo la cookie de sesión vigente para el host
+exacto, por HTTPS, a esta ruta; rechaza redirects. El bypass de Vercel es opcional para staging,
+no sustituye la sesión ni las capabilities. La salida del setup es operacional; stdout JSON puro
+corresponde a los comandos `growth:measurement`, no al helper de autenticación.
+
+Crear `draft.json` con esta forma, **reemplazando todos los marcadores por metadata de discovery**;
+no es un archivo listo para ejecutar. Cada campo de mapping debe existir con el tipo compatible:
+`email` → email, `phone` → tel E.164, nombres → text declarado o derivado por namePolicy.
+No inventar `phone` si la fuente no lo ofrece. El nombre del campo puede ser `businessEmail`;
+el valor de la persona nunca aparece en este JSON.
+
+```json
+{
+  "action": "draft",
+  "scope": {
+    "sourceKind": "form_submission",
+    "sourceKey": "<form_key UUID descubierto>",
+    "surfaceId": "<surface descubierta>"
+  },
+  "config": {
+    "purpose": "commercial_lead",
+    "sourceVersion": "<versión publicada descubierta>",
+    "origins": ["https://efeoncepro.com"],
+    "destinations": ["meta"],
+    "mapping": {"email": "<campo email descubierto>"}
+  },
+  "expectedPublishedRevisionId": null,
+  "idempotencyKey": "<UUID nuevo para este borrador>"
+}
+```
+
+El origen debe estar en la fuente; `null` sólo si no existe cabeza publicada. Destinos permitidos:
+`meta`, `google_upd`, ambos o ninguno; no hay destino GA4 de conversión en esta política. Para
+Meetings se usa `sourceKind:meeting_booking`, el scheduler key como sourceKey y el fingerprint
+sourceVersion del catálogo, con su surface real. No usar el ejemplo Forms para fabricar su versión.
+
+```bash
+pnpm --silent growth:measurement validate draft.json
+pnpm --silent growth:measurement apply draft.json --apply --receipt .auth/draft-receipt.json
+pnpm --silent growth:measurement verify .auth/draft-receipt.json
+```
+
+Con los IDs devueltos, cada transición usa su propio archivo y UUID. La forma es:
+
+```json
+{
+  "action": "review",
+  "policyId": "<policyId del borrador>",
+  "revisionId": "<revisionId del borrador>",
+  "expectedPublishedRevisionId": "<cabeza publicada actual; usar null si no existe>",
+  "idempotencyKey": "<UUID nuevo para la revisión>"
+}
+```
+
+Validar/aplicar/verificar `review.json`; después hacer lo mismo para `publish.json` con
+`action:publish`, IDs revisados, cabeza actual y otra clave. Para `disable.json`, usar
+`action:disable`, la revisión publicada y su cabeza actual. En los tres casos se repite la
+forma de comando anterior con un **archivo de recibo distinto por intención**. No reemplazar
+por el string `"null"`: debe ser JSON `null`. Conservar los recibos privados para recuperar
+reintentos y auditoría; no guardarlos en git. Un recibo antiguo puede verificar conflicto si
+la revisión ya avanzó; descubrir el estado actual antes de concluir que falló el write.
+
+Para un consumidor HTTP propio, discovery es GET y ejecución POST a la misma ruta;
+la validación usa POST `{"dryRun":true,"command":{...}}`. Este wrapper lo añade la CLI:
+no envolver el archivo `draft.json` ni usar `dryRun:true` como comando de apply. POST valida
+el esquema cerrado y limita el cuerpo a 16 KiB. El permiso efectivo de cada acción procede del
+servidor; ninguna opción CLI ni campo actor/role amplía autoridad.
+
+## Probar un formulario después de publicar su política
+
+Un formulario **sin política publicada** llega a HubSpot y a GA4 (`generate_lead`), pero **no a
+Meta**: el backend no encola conversión. Por eso la prueba va siempre después del publish y de su
+`verify`.
+
+1. **Usar un correo nuevo.** El formulario deduplica por formulario + correo (sin espacios y en
+   minúsculas) durante 60 minutos y responde «aceptado» reutilizando el envío anterior, sin crear
+   conversión. Si ya enviaste con ese correo, usa un alias `+` (por ejemplo `nombre+meta@…`) o
+   espera 60 minutos. El alias crea otro contacto en HubSpot: archívalo al terminar.
+2. **Aceptar la publicidad.** En el banner elige «Aceptar todas» (o al menos publicidad). Sin
+   publicidad consentida, o con GPC activo, no hay conversión aunque el envío sea aceptado.
+3. **Leer la cola.** En `greenhouse_growth.measurement_conversion` debe existir la conversión con
+   `advertisement=true`, y en `measurement_delivery` el destino `meta` debe pasar a
+   `http_accepted` (HTTP 200). Leer sólo estado y conteos por el acceso canónico; no seleccionar
+   contactos ni el sobre cifrado.
+4. **Leer Meta con paciencia.** `http_accepted` es el acuse HTTP, no la lectura del proveedor. En el
+   dataset `708931297255942` las estadísticas por hora tardaron ~1 hora en mostrar el Lead
+   (`event_source=SERVER_ONLY`). Una lectura vacía a los pocos minutos no es una falla. No usar el
+   pixel `859508457409711`: la API lo rechaza como dataset inválido.
+
+Caso de referencia (17/10/2026, Performance): primer envío sin política → HubSpot y GA4 sí, Meta
+no; política publicada a las 19:16 UTC; envío consentido con alias `+meta` a las 19:19 →
+`http_accepted` a las 19:20 → 1 Lead visible en Meta a las 20:27.
+[Evidencia](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17).
+
+## Estado de políticas al 17/10/2026
+
+12 políticas publicadas de 18 filas. El 17/10 se publicaron (rev 1, destino `meta`) las de
+`efeonce-performance-diagnostic`, `efeonce-media-diagnostic` y `efeonce-hubspot-scope`.
+
+| Formulario | Política | Envío real verificado en Meta |
+| --- | --- | --- |
+| `efeonce-performance-diagnostic` | Publicada (email/nombre/apellido) | Sí, 1 Lead SERVER_ONLY el 17/10 |
+| `efeonce-media-diagnostic` | Publicada (email/teléfono/nombre/apellido) | Pendiente |
+| `efeonce-hubspot-scope` | Publicada (email/nombre/apellido) | Pendiente |
+| `efeonce-web-agentica-ebook` | Sin política | No aplica |
+| `efeonce-surround-discovery-ebook` | Sin política | No aplica |
+| `efeonce-creator-influence-brief` | Sin política | No aplica |
+| `efeonce-content-marketing` | Sin política | No aplica |
+
+Además hay filas antiguas sin publicar. Pendiente operativo: archivar en HubSpot el contacto de
+prueba con alias `+meta` (decisión del operador).
+
+## Alcance que sigue pendiente
+
+Las políticas comerciales no implementan eventos CRO, abandono, Subscribe del blog ni resultados
+CRM; esos ítems permanecen en TASK-2035. El envío o matching tampoco marca por sí solo un evento
+como clave en GA4: revisar propiedad/evento y evidencia en TRACKING-PLAN. La primera aceptación
+comercial consentida ya se observó en Meta (Performance, 17/10); su conciliación con los demás
+formularios y proveedores y la evolución de calidad siguen requiriendo tráfico real. La prueba aislada de Meta no certifica Google Ads, atribución ni audiencias utilizables.

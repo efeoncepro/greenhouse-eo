@@ -1,0 +1,218 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "08f54d53f13b",
+  "key": "08f54d53f13bb75c54fe9f8a226dd52ced00cc5e7370a8947665b0467346734c",
+  "status": "completed",
+  "createdAt": "2026-10-16T11:10:14.095Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/telefono-comp.png",
+    "imageSha256": "ffdc26275fa93452e267cb4098b505c3d2e821f9149d208bd99c0641183fcaa3",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/telefono-mask.png",
+    "maskSha256": "f24e6b8427cd268213f1ecede9c2eba97fd51b57b1e21b143b197bef2a22f900",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "The smartphone screen already shows a FINISHED full-screen advertisement for a fictional running brand (a runner at night, a lime diagonal stripe, the logo, the headline «CORRE DE NOCHE», a lime button and a small close button). Keep that advertisement exactly as it is: the same picture, layout, letters, logo, stripe, colors, sizes and positions; do not redraw, retype, move or restyle anything on the screen. Only add the physical finish of a real phone display photographed in a dark studio: the image reads as emitted light under glass, with a very faint cool reflection across the glass, the screen light gently illuminating the thumb and fingers that wrap the edges of the phone and the inner edge of the frame, the same lens softness and photographic grain as the rest of the photo. The hand, the phone shape, the camera and the background stay exactly the same.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nThe smartphone screen already shows a FINISHED full-screen advertisement for a fictional running brand (a runner at night, a lime diagonal stripe, the logo, the headline «CORRE DE NOCHE», a lime button and a small close button). Keep that advertisement exactly as it is: the same picture, layout, letters, logo, stripe, colors, sizes and positions; do not redraw, retype, move or restyle anything on the screen. Only add the physical finish of a real phone display photographed in a dark studio: the image reads as emitted light under glass, with a very faint cool reflection across the glass, the screen light gently illuminating the thumb and fingers that wrap the edges of the phone and the inner edge of the frame, the same lens softness and photographic grain as the rest of the photo. The hand, the phone shape, the camera and the background stay exactly the same.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.22291183471679688,
+    "editable": 350243,
+    "soft": 367,
+    "protected": 1222254
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    "target": {
+      "width": 1536,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 83 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0824,
+    "basis": "2 × salida 1536x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 23.919,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 0.95,
+        "bestError": 0.95,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -1.45,
+        -2.04,
+        -1.56
+      ],
+      "protected": {
+        "pixels": 1222254,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 350243,
+        "maxDelta": 201,
+        "meanDelta": 23.943,
+        "worst": {
+          "x": 601,
+          "y": 87
+        }
+      },
+      "seam": {
+        "pixels": 367,
+        "maxDelta": 9,
+        "meanDelta": 1.45,
+        "worst": {
+          "x": 624,
+          "y": 50
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1222254,
+        "maxDelta": 116,
+        "meanDelta": 3.073,
+        "worst": {
+          "x": 544,
+          "y": 284
+        }
+      },
+      "outputUsd": 0.0412,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3401,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 329
+        },
+        "output_tokens": 1372,
+        "output_tokens_details": {
+          "image_tokens": 1372,
+          "text_tokens": 0
+        },
+        "total_tokens": 4773
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 17.12,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 0.95,
+        "bestError": 0.95,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -2.12,
+        -2.67,
+        -2.62
+      ],
+      "protected": {
+        "pixels": 1222254,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 350243,
+        "maxDelta": 203,
+        "meanDelta": 17.137,
+        "worst": {
+          "x": 596,
+          "y": 499
+        }
+      },
+      "seam": {
+        "pixels": 367,
+        "maxDelta": 8,
+        "meanDelta": 1.275,
+        "worst": {
+          "x": 624,
+          "y": 50
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1222254,
+        "maxDelta": 124,
+        "meanDelta": 3.377,
+        "worst": {
+          "x": 544,
+          "y": 284
+        }
+      },
+      "outputUsd": 0.0412,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3401,
+        "input_tokens_details": {
+          "image_tokens": 3072,
+          "text_tokens": 329
+        },
+        "output_tokens": 1372,
+        "output_tokens_details": {
+          "image_tokens": 1372,
+          "text_tokens": 0
+        },
+        "total_tokens": 4773
+      },
+      "meta": {
+        "size": "1536x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

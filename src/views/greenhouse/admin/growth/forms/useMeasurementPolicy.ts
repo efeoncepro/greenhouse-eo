@@ -10,6 +10,7 @@ const configForSource = (source: MeasurementPolicySource, prior?: MeasurementPol
   purpose: 'commercial_lead', sourceVersion: source.sourceVersion,
   origins: MEASUREMENT_ORIGINS.filter(origin => source.origins.includes(origin) && (!prior || prior.origins.includes(origin))),
   destinations: prior?.destinations ?? [],
+  ...(prior?.googleAds ? { googleAds: prior.googleAds } : {}),
   mapping: prior ? Object.fromEntries(Object.entries(prior.mapping).filter(([target, key]) => source.fields.some(field => field.key === key && field.type === (target === 'email' ? 'email' : target === 'phone' ? 'tel' : 'text')))) : {},
 })
 

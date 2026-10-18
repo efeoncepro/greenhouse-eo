@@ -8,6 +8,13 @@
 > `greenhouse-growth-ctas`, `greenhouse-growth-meetings`, `efeonce-public-site-wordpress`,
 > `greenhouse-ai-design-studio`, `greenhouse-ux-content-accessibility`, `modern-web-guidance`.
 
+## Delta 2026-10-17 — Performance publicada en su URL nueva
+
+La landing de Performance Marketing está publicada desde el 2026-10-17 en `/servicios/performance-marketing/`
+(`TASK-1865`, PDR-022); la legacy `/servicio-gestion-campanas-publicitarias/` quedó `private` con 301 hacia ella. La
+validación 2 de abajo (canibalización por retail media) se evalúa ahora contra la URL nueva, y el enlace de esta landing
+hacia Performance usa `/servicios/performance-marketing/`.
+
 ## Contexto
 
 Efeonce abrió la línea Channel & Commerce el 2026-09-10 con un catálogo canónico de 23 servicios —13 de trade
@@ -168,7 +175,8 @@ no se fuerza un término único. Detalle en la regla terminológica del wirefram
 ## Validaciones pendientes
 
 1. Segunda fuente de demanda (DataForSEO negó autorización en esta sesión) y confirmación del slug `/servicios/trade-marketing/`.
-2. Riesgo de canibalización con `/servicio-gestion-campanas-publicitarias/` por retail media.
+2. Riesgo de canibalización con `/servicios/performance-marketing/` (antes `/servicio-gestion-campanas-publicitarias/`; ver
+   Delta 2026-10-17) por retail media.
 3. Existencia de una página de vacantes pública para el desvío de empleo.
 4. Revisión legal de la tabla comparativa por tipo de proveedor y del dato laboral fechado.
 5. Nombre, campos y destino final del brief; duración real del meeting del surface `discovery`.

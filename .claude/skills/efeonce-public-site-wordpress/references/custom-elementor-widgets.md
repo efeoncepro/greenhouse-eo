@@ -54,6 +54,14 @@ The widget only emits a host element and loads a governed external renderer. The
 
 Use this when WordPress is only the shell and must not own fields, validations, or destinations.
 
+### Schema-driven module family
+
+Example: `greenhouse_creativa_*` (15 widgets on `/agencia-creativa/`), one shared base class
+(`class-eo-creativa-landing-base.php`) plus generated `includes/creativa/{schemas,templates}` (schema
+`creativaModule.v1`). A build-time compiler writes the schemas/templates from an approved source; never
+hand-edit generated files. Field types map to native controls, including `video` (Media control with
+`media_types => ['video']`). Patterns for the compiler: `references/source-led-elementor-patterns.md`.
+
 ## Deployment Rail
 
 For plugin code:
@@ -61,6 +69,13 @@ For plugin code:
 - edit in the runtime repo;
 - lint/check PHP/JS before upload;
 - deploy through the governed rail or documented emergency `scp` path;
+- for a scoped plugin release, follow the Contacto/Creativa rail: export the live baseline
+  (`pnpm public-website:export-live-code -- --output <dir>`) → scoped package builder whose
+  `previousSha256` comes from that baseline → guarded deploy (file allowlist, live drift guard, tar
+  backup, loader last) → guarded publisher for the page;
+- if the local `class-eo-widgets-loader.php` differs from git HEAD because other sessions deployed
+  entries they have not committed, compare it with the LIVE loader in the baseline, add only your entry
+  and do not commit the loader;
 - reset OPcache when needed;
 - purge Kinsta cache;
 - verify regression pages that use existing widgets.
@@ -73,4 +88,5 @@ For plugin code:
 - Avoid table-row/cell transforms; animate child spans/icons instead.
 - Use `filemtime()` or another cache-busting version for local widget assets.
 - If a widget exposes agent-governed settings, define a single `theme_schema()`/manifest contract and keep Greenhouse schema in parity.
-- Elementor URL controls require array defaults, including empty repeater fields: `array( 'url' => '' )`. Normalize at the shared control boundary, then exercise real widget registration; an HTML renderer-only test cannot catch a registration failure.
+- Elementor URL and Media controls require array defaults, at top level and inside repeaters: `array( 'url' => '' )`. A string default throws `TypeError array_merge()` in `elementor/includes/managers/controls.php` when the control is built, which can abort `Document::save()` half-way (see `references/elementor-mutation.md`). Normalize at the shared control boundary, make local test stubs reject non-array URL/Media defaults (top level and repeater fields), then exercise real widget registration; an HTML renderer-only test cannot catch a registration failure.
+- Quick live diagnostic for a control error: a WP-CLI eval script that iterates `\Elementor\Plugin::$instance->widgets_manager->get_widget_types()` and calls `get_controls()` on each inside `try/catch (\Throwable)`, printing the widget name and message. It is read-only.

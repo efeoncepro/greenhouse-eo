@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 
     const status = result.outcome === 'confirmed' ? 201 : statusByCode[result.error.code]
 
-    return NextResponse.json(result, { status, headers })
+    return NextResponse.json(result, { status, headers: { ...headers, 'Cache-Control': 'private, no-store' } })
   } catch (caught) {
     if (caught instanceof IdempotencyKeyError || caught instanceof SyntaxError) {
       return NextResponse.json({ outcome: 'error', error: { code: 'validation_failed' } }, { status: 400, headers })

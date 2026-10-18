@@ -35,6 +35,7 @@ describe('Growth Forms → HubSpot Forms → CRM / measurement boundary',()=>{
     const accepted=await persistAcceptedSubmission({...input,measurement:mode==='no_advertising_consent'?null:prepared})
 
     expect(accepted.status).toBe('accepted')
+    expect(accepted.measurementPersisted).toBe(false)
     expect(accepted.normalized_fields_json).toEqual(input.normalizedFields)
     expect(query.mock.calls.some(([statement])=>statement.includes('INSERT INTO greenhouse_growth.form_submission_consent_snapshot'))).toBe(true)
     expect(publishOutboxEvent).toHaveBeenCalledWith(expect.objectContaining({eventType:'growth.forms.submission_accepted',aggregateId:'fixture-submission'}),expect.objectContaining({query}))

@@ -1,4 +1,5 @@
 import { readPublicMeasurementContext } from '../growth-measurement-context/context'
+import { parseGoogleAdsConversionReceipt } from '../growth-google-ads-conversion/conversion'
 import {
   MEETING_SCHEDULER_SCHEMA_VERSION,
   type MeetingAvailability,
@@ -230,6 +231,17 @@ export const createMeetingApiClient = (baseUrl: string, fetcher: typeof fetch = 
         return {
           outcome: 'error',
           error: { code: 'provider_degraded', recovery: 'check_email', retryable: false },
+        }
+      }
+
+      if (data.outcome === 'confirmed') {
+        const googleAdsConversion = response.ok && data.conversionEligible && data.conversionReceipt
+          ? parseGoogleAdsConversionReceipt(data.googleAdsConversion, 'meeting_booking') : undefined
+
+        return {
+          outcome: data.outcome, appointment: data.appointment,
+          conversionReceipt: data.conversionReceipt, conversionEligible: data.conversionEligible,
+          ...(googleAdsConversion ? { googleAdsConversion } : {}),
         }
       }
 

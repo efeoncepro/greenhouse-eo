@@ -1,0 +1,68 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "d9a301c75ad3",
+  "key": "d9a301c75ad3d2fc41f6bc1eedb14ab81ab519f2c12f15bd197c086856cfa878",
+  "status": "dry-run",
+  "createdAt": "2026-10-16T16:28:12.175Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/contacto-nexa-hero-piel-v2.png",
+    "imageSha256": "069507bb9a07ae391ac359a3e5494929708fce02e349157dd3088cb92066ffeb",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/mask-piel.png",
+    "maskSha256": "8aa24c2855f59397d60cfb345c4f81db47485a5ec8b85404ed0b803e8ffbb4e9",
+    "maskConvention": "white-editable",
+    "width": 1672,
+    "height": 1055,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png",
+        "sha256": "e2ffe732d00d5301dff0762781c9520aff342eb7ea4dd13abfd948b228f6a15c"
+      },
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png",
+        "sha256": "0ab381b2da1175c1f71ca1ac1f31ab5b14649f3e21d28d592eb97c12434564a2"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Identity replacement in image 1 only: the woman in image 1 becomes the exact same woman shown in image 2 (frontal) and image 3 (three-quarter view). Copy her face precisely from images 2 and 3: her bone structure, oval face, dark brown almond eyes with winged eyeliner, thick dark brows, nose, full lips with soft pink color, warm olive skin with natural freckles across nose and cheeks, the small mole on her right cheek, real pores and fine natural texture. Keep everything else from image 1 exactly: her head angle turned slightly to her left, her gaze straight into the camera, her soft closed-lip smile, her chin resting on her closed fist, the long dark wavy hair, the small gold hoop earrings, the royal blue hoodie, and the same cool blue studio light and color grade falling on her face. Photorealistic editorial portrait shot on a full-frame camera with an 85mm lens.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 4 is a reference of the object or element to bring into image 1; match its look, shape and material.\nIdentity replacement in image 1 only: the woman in image 1 becomes the exact same woman shown in image 2 (frontal) and image 3 (three-quarter view). Copy her face precisely from images 2 and 3: her bone structure, oval face, dark brown almond eyes with winged eyeliner, thick dark brows, nose, full lips with soft pink color, warm olive skin with natural freckles across nose and cheeks, the small mole on her right cheek, real pores and fine natural texture. Keep everything else from image 1 exactly: her head angle turned slightly to her left, her gaze straight into the camera, her soft closed-lip smile, her chin resting on her closed fist, the long dark wavy hair, the small gold hoop earrings, the royal blue hoodie, and the same cool blue studio light and color grade falling on her face. Photorealistic editorial portrait shot on a full-frame camera with an 85mm lens.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05063947028277285,
+    "editable": 67888,
+    "soft": 21438,
+    "protected": 1674634
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1672,
+      "height": 1055
+    },
+    "target": {
+      "width": 1680,
+      "height": 1056
+    },
+    "aspectError": 0.0038185511171293083,
+    "reason": "la zona con contexto ocupa 36 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0816,
+    "basis": "2 × salida 1680x1056 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": []
+}

@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-10-09
+> **Última actualización:** 2026-10-17
 
 ## Propósito
 
@@ -22,6 +22,23 @@ Esta categoría complementa las tres capas documentales obligatorias:
 | `docs/manual-de-uso/` | ¿Cómo se ejecuta, verifica, diagnostica y escala? |
 
 El foco comercial transversal —beachheads, ofertas de entrada, expansión y proof— vive en [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`](../strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md). Las fichas de servicio mantienen el alcance y la accountability; no deben convertirse en un catálogo de adquisición sin buyer, trigger y motion.
+
+**Material comercial oficial de la agencia completa:** el brochure «Agencia de Marketing 360°» (aprobado 2026-10-16;
+completo de 84 láminas y corto de 26), en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`.
+Presenta las cinco líneas y es el documento por defecto cuando se pregunta qué hace Efeonce; no reemplaza las fichas de
+esta carpeta ni define alcance o precio. Detalle: [composición de decks y brochures](../documentation/creative/composicion-de-decks-y-brochures.md).
+
+**Material comercial de medios (línea Voice):** el brochure «Agencia de Medios» (65 láminas) y la landing pública
+<https://efeoncepro.com/servicios/agencia-de-medios/>, ambos del 2026-10-16, con el formulario `efeonce-media-diagnostic`
+como entrada de leads. Rutas y reglas de claims (rebates como margen de Efeonce, tecnología no es alianza, casos y
+cobertura): [Media & Distribution](media-distribution/README.md#material-comercial-vigente).
+
+**Landing de performance (línea Voice):** desde el 2026-10-17 la landing pública vigente del servicio
+[Performance & Commerce Distribution](media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) es
+<https://efeoncepro.com/servicios/performance-marketing/>, con el formulario `efeonce-performance-diagnostic` como
+entrada de leads. Reemplaza a la página legacy `/servicio-gestion-campanas-publicitarias/`, que quedó privada con un
+301 hacia la nueva (delta 2026-10-17; antes de esa fecha la legacy era la página pública del servicio). Detalle:
+[documentación funcional](../documentation/public-site/performance-marketing.md).
 
 ## Fronteras
 
@@ -62,6 +79,10 @@ ownership. Campaña y kit son ejemplos opcionales. [Decisión aceptada](../archi
 modelo `Approved for validation`, sin precio público ni capacidad runtime nueva.
 
 ## Familias disponibles
+
+Instancia de cuenta: [Servicio SEO del Blog SKY](sky-blog-seo/README.md), marco de operación,
+recovery, editorial y medición. Preparación aprobada el 15-10-2026; cantidades y metas se confirman
+con anexo/auditoría. Reutiliza Search Visibility 360 y el playbook del cliente, sin crear una línea nueva.
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
 - [Salesforce Practice](salesforce/README.md) — arquitectura de oferta por outcomes y lifecycle para CRM core,

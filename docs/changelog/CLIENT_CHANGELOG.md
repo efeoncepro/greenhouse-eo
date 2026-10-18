@@ -42,6 +42,28 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.10-stable.1
+
+**Canal:** Stable
+**Fecha:** 2026-10-14
+**Disponible para:** internal
+**Módulos:** Growth / Medición
+
+### Novedades
+
+- Operaciones internas pueden revisar y publicar la medición de formularios y agendas desde
+  el inspector existente. Los agentes disponen de API/CLI con los mismos permisos y verificaciones.
+- Nuevas fuentes compatibles se habilitan por configuración, sin desplegar la aplicación ni
+  publicar GTM por cada alta. Una nueva versión del formulario exige revisar su configuración.
+- Se corrigió el contexto consentido del visitante en Meta CAPI conservando el flujo comercial
+  Growth Forms → HubSpot Forms → CRM y la conversión GA4 existente.
+
+### Notas
+
+Disponibilidad interna; no habilita campañas, suscripciones, CRO o nuevos resultados CRM.
+Recepción comprobada en Meta Test Events; mejora de calidad y primera conversión comercial
+requieren tráfico real. [Manual](../manual-de-uso/growth/configurar-medicion-conversiones.md).
+
 ## 2026.09-stable.1
 
 **Canal:** Stable

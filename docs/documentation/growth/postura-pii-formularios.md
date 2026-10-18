@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-26 por Claude
-> **Ultima actualizacion:** 2026-06-26 por Claude
+> **Ultima actualizacion:** 2026-10-14 por Codex (proyección publicitaria independiente)
 > **Documentacion tecnica:** [TASK-1255](../../tasks/in-progress/TASK-1255-growth-forms-pii-hardening-ley-21719.md) · [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Postura PII de los Formularios Públicos (Ley 21.719)
@@ -24,6 +24,27 @@ Greenhouse aplica una postura **proporcional al dato** (no todo se protege igual
 ## Por qué la cédula es distinta
 
 La cédula es el dato más sensible y **no hace falta** que viaje a HubSpot (HubSpot necesita el correo, no el RUT). Por eso se cifra y se queda en Greenhouse. El correo, en cambio, sí debe fluir al CRM para crear y contactar al lead, así que se mantiene en claro — pero enmascarado en el panel para que no quede a la vista de cualquiera.
+
+## Proyección publicitaria consentida
+
+El matching Meta/Google tiene su propia proyección cifrada, independiente del almacenamiento y
+mapping comercial de Growth Forms → HubSpot Forms → CRM. Sólo se prepara tras una aceptación
+válida o reunión confirmada, con política publicada y publicidad consentida; GPC y denegación la
+bloquean. Google exige además analítica e identificador GA4 real. El consentimiento de la solicitud
+no sustituye esas elecciones. Desactivar publicidad no impide aceptar ni entregar la solicitud.
+
+Email/teléfono/nombres y external_id se normalizan y hashean para el proveedor; IP/navegador
+originales y fbp/fbc consentidas viajan sin hash por el carril servidor autorizado. No se añaden
+a dataLayer, parámetros GA4 ordinarios, URLs, logs o Sentry. Los hashes tampoco son dimensiones
+analíticas ni datos para copiar a tickets. La política administrativa contiene nombres de campos,
+identidades de fuentes y permisos de destino; no valores personales ni secretos.
+
+La proyección cifrada de medición tiene su retención específica de 48 h, distinta de la retención
+de submissions descrita en «Retención (pendiente)». Su purga no borra el registro comercial ni los
+datos ya entregados al proveedor. Las pruebas aisladas usan Meta Test Events y metadata saneada,
+sin crear contactos/reservas comerciales ficticios.
+[Contrato técnico](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md) ·
+[configuración por agentes y panel](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
 
 ## Revelar un dato (ver el valor completo)
 

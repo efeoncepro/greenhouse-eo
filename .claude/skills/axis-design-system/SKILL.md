@@ -84,6 +84,10 @@ The same reference records product compositions and the approved Growth CTA/sche
 release (2026-10-07): primitives 0.6.5, Cinema/Editorial/Review, Think registry adoption, WordPress
 candidate and the open intermittent in-app blue-paint incident. Package publication is not contract promotion
 or a claim of native/device/streaming certification.
+It also owns the Efeonce mention (`efeonce.mention`, published 2026-10-18: primitives 0.6.9+, WordPress byte copy,
+Think wrapper) and the rule for CSS that embeds a data URI: ship it unquoted and percent-encoded, and build the
+consumer against the local AXIS `dist` before releasing. Release flow: `pnpm release:packages <version>`
+([agent consumption](references/agent-consumption.md#incremental-publication-correction--2026-10-07)).
 
 ### Tokens, contracts or registry
 

@@ -1,8 +1,10 @@
 # PDR-022 — Posicionamiento de la landing Performance Marketing
 
 > **Tipo:** Product Decision Record de posicionamiento y conversión del sitio público.
-> **Estado:** Draft for validation · 2026-09-10
-> **Ejecución:** [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md) (ui-ux · flow · UI ready no)
+> **Estado:** Accepted · **publicada e indexable el 2026-10-17** (operador: «Bien, está aprobada… publícala»). Antes:
+> Draft for validation · 2026-09-10.
+> **URL:** https://efeoncepro.com/servicios/performance-marketing/ — página WordPress `251997`, hija de `/servicios/` (`251077`)
+> **Ejecución:** [TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md) (in-progress: publicada, con pendientes)
 > **Enmienda a:** [PDR-008](PDR-008-landing-agencia-marketing-digital-posicionamiento.md), sólo en su conclusión
 > "performance es capability listada, no cabecera"
 > **Oferta:** [Performance & Commerce Distribution — ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
@@ -10,6 +12,62 @@
 > **Skills de ejecución:** `efeonce-public-site-wordpress`, `seo-aeo`, `copywriting`, `growth-marketing-cro`,
 > `greenhouse-growth-forms`, `greenhouse-growth-ctas`, `greenhouse-growth-meetings`, `digital-marketing`,
 > `greenhouse-ai-design-studio`.
+
+## Delta 2026-10-17 — publicada; la decisión queda aplicada
+
+La landing está en vivo desde el 2026-10-17 en `/servicios/performance-marketing/` (página `251997`), `index, follow`,
+con canonical propio y en `page-sitemap.xml`. El operador aprobó el canvas («Bien, está aprobada… publícala»), con
+alcance «Todo junto» y formulario «Uno propio». Lo que quedó aplicado frente a esta decisión:
+
+- **Slug:** el working slug pasa a URL definitiva. No hubo inversión hacia la URL legacy.
+- **Legacy:** `242862` (`/servicio-gestion-campanas-publicitarias/`) quedó `private` (no borrada) y fuera del sitemap,
+  con un 301 plano de Yoast hacia la nueva. Se probó con barra, sin barra y con `?utm_source=x`; la query se conserva
+  gracias al mu-plugin `efeonce-redirect-query-passthrough`, no a Yoast. Tres redirects cuyo destino era la legacy se
+  repuntaron directo a la nueva para no formar cadena. Queda una sola URL indexable, como pedía el Delta 2026-09-11.
+- **Menú:** el ítem `242915` («Performance Marketing & Paid Ads», menú primario `61`) apunta a `251997`; label, padre y
+  orden no cambiaron. La Home no tenía enlaces a la legacy.
+- **Title y H1:** title «Agencia de performance marketing y publicidad digital | Efeonce» (el del Delta 2026-09-11 (b));
+  H1 «Agencia de performance marketing que optimiza tu pauta por ventas, no por clics.», que conserva el término y
+  expresa el *one thing* sin la estructura literal *no es X, es Y*. Focus keyphrase «agencia de performance marketing»
+  (Semrush, 2026-10-17).
+- **Estructura:** la página publicada tiene diez secciones (hero, confianza, problema, solución con el circuito
+  medición → señal → optimización, plataformas en pestañas, creatividad, autodiagnóstico de cinco preguntas, qué
+  recibes, sin letra chica, y diagnóstico con formulario y FAQ). Reemplaza la arquitectura de diez puntos de esta
+  decisión: los canales viven en pestañas dentro de una sección, no como un H2 por canal, y «Momento 2026» no
+  es una sección aparte: va al inicio del módulo de autodiagnóstico («Por qué revisar tu pauta ahora»: atribución de
+  Meta, AI Max y Ley 21.719, con fuentes y la aclaración de que no es asesoría legal).
+- **FAQ y schema:** el FAQ publicado tiene seis preguntas (no las ocho a catorce planteadas) y alimenta `FAQPage`; el
+  widget de diagnóstico emite además `Service`. Yoast sigue siendo dueño de `WebPage`, `Breadcrumb` y `Organization`.
+- **Conversión:** formulario propio `efeonce-performance-diagnostic` (CTA «Pide tu diagnóstico»), con destino HubSpot
+  directo «Lead Gen - Performance Marketing» y preguntas de audiencia, canales, inversión mensual, objetivo, prioridad,
+  CRM y rol. Reemplaza al `efeonce-performance-brief` del contrato original, que nunca se publicó.
+- **Convivencia con Medios:** la fuente del canvas incluye un enlace hacia `/servicios/agencia-de-medios/` y una
+  pregunta del FAQ sobre la diferencia con una agencia de medios. El enlace inverso Medios → Performance no forma parte
+  de esta publicación.
+
+**Pendiente (no hecho):** primer envío real del formulario (Turnstile bloquea la automatización), evento GA4
+`generate_lead` y su fila en el tracking plan, Rich Results Test, Search Console (incluida la revisión de queries
+servidas por Performance y Medios), GVC con reduced motion y teclado, y un republicador con guarda de hash para cambiar
+el cuerpo. De las validaciones de abajo, la 4 (formulario) quedó resuelta; la 1 deja de bloquear porque el slug
+ya se publicó, pero la confirmación de demanda con Search Console sigue pendiente; la 2, 3, 5 y 6 siguen abiertas.
+
+## Delta 2026-10-16 — convivencia con la landing de Agencia de Medios
+
+La landing de Agencia de Medios ([PDR-025](PDR-025-landing-agencia-de-medios-posicionamiento.md)) está publicada e
+indexable desde el 2026-10-16 en `/servicios/agencia-de-medios/`, en el menú junto al ítem «Performance Marketing &
+Paid Ads». Semrush (2026-10-16) muestra que en Chile «agencia de medios» y «agencia de performance marketing» no
+comparten dominios en el top 10 y que performance tiene 16 veces más volumen: son dos intenciones y caben dos páginas.
+Reglas para esta landing:
+
+- no usa «agencia de medios», «compra de medios», «planificación de medios» ni «plan de medios» en title, H1 ni slug;
+- «publicidad programática» es secundaria de Medios (confirmado por el operador el 2026-10-16): Performance conserva programmatic como canal en su sección de
+  canales y enlaza a la sección de Medios en vez de competir por el término;
+- al publicarse, las dos páginas se enlazan por función (Performance → Medios para planificación, compra y
+  programática; Medios → Performance para la operación de campañas);
+- las primeras semanas tras publicar, revisar en Search Console si alguna query aparece servida por ambas URLs.
+
+Nada de lo anterior cambia el slug, el 301 de la legacy ni el resto de esta decisión. Ejecución:
+[TASK-1865](../../tasks/complete/TASK-1865-landing-performance-marketing.md).
 
 ## Delta 2026-09-11 — existe una página legacy de Performance
 

@@ -1,7 +1,7 @@
 # Publicidad programática — Pricing Integrity Pack V1.4
 
 > **Estado:** `commercially_approved` — tarifario base y condiciones estándar aprobados por el operador
-> **Fecha / revisión:** V1.4 · 2026-10-12; calibración, operación directa acompañada y composición integral; tarifario aprobado 09-10 sin cambio
+> **Fecha / revisión:** V1.4 · 2026-10-12; calibración, operación directa acompañada y composición integral; tarifario aprobado 09-10 sin cambio · delta 2026-10-16: comisión/rebate como margen de Efeonce (§3.5)
 > **Alcance:** política comercial Efeonce; costos/margen observados, acuerdos externos y compra se comprueban por oportunidad
 > **Owner:** Media & Distribution + Commercial + Finance
 > **Modelo:** [Programmatic Media Operations](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md)
@@ -292,8 +292,8 @@ que no cubre el trabajo.
 ### 3.5 Comisión, descuentos y cambios de alcance
 
 El caso base cobra el servicio con comisión/rebate **cero**. Si existe un beneficio externo contratado, documentar
-base elegible, período, importe, liquidación y destinatario. Recomendación: trasladarlo al cliente mediante ajuste
-o crédito cuando se confirme; remuneración adicional de Efeonce sólo si fue declarada y pactada expresamente.
+base elegible, período, importe y liquidación. Desde el 2026-10-16 es margen de Efeonce por decisión del operador: la
+propuesta no promete declararlo ni traspasarlo al cliente (sustituye la recomendación anterior de trasladarlo).
 Nunca calcular 10% sobre todo el presupuesto (incluidos nuestros fees o impuestos), anticipar un rebate incierto
 como descuento, ni llamarlo ahorro realizado antes de su liquidación. La oferta temporal no se prolonga a 2027.
 
@@ -324,7 +324,7 @@ varios clientes suponiendo que las mismas horas se pueden vender simultáneament
 | Markup sobre medios/costos externos | 0% | Traslado del costo conciliado, sin margen oculto |
 | Porcentaje añadido al fee fijo | 0% | No sumar porcentaje de inversión por defecto |
 | Descuento automático | 0% | Excepción negociada, costeada y documentada; no gasto externo ficticiamente descontado |
-| Comisión/rebate en economía base | 0% | Sólo beneficios contratados/liquidados y declarados fuera del caso base |
+| Comisión/rebate en economía base | 0% | Margen de Efeonce fuera del caso base, sólo liquidado; no se promete declararlo ni traspasarlo (2026-10-16) |
 | Pago de honorarios | 30 días desde emisión | Hitos y cantidades de §3.2 |
 | Pago de liquidación de medios administrados | 15 días desde emisión | Sujeto a habilitar el circuito de crédito/caja antes de comprar |
 | Emisión de liquidación | Hasta 5 días hábiles desde soportes disponibles | Conciliar gasto y obligaciones no cancelables |

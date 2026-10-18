@@ -1,5 +1,17 @@
 # TASK-2012 — La órbita: voz de decisión por defecto y acento como puntuación en contrato, recetas, compositor y gates
 
+## Delta 2026-10-15
+
+- **Evidencia de la etapa 2 (voz de decisión en el compositor):** el brochure «Agencia de Marketing 360°» v9 tiene 11
+  titulares de decisión armados encima de láminas ya compuestas, tapando la columna de voz con un panel del color del
+  fondo, porque el compositor todavía exige pregunta y respuesta. Generador:
+  `ai-generations/2026-10-12_brochure-efeonce-360/native-growth/titulares-v9.mjs`. Es un workaround temporal; se retira
+  cuando las recetas acepten la voz `decision`. En las dos láminas con foto (V11 y V13) el panel cae sobre la reserva de
+  la foto: revisar que no se lea como velo.
+- **Evidencia de la etapa 3 (escenario por línea):** el operador rechazó el escenario magenta de Revenue en el 360: «No
+  me gusta esa luz rosada la verdad porque no sirve de acento sino de luz» (2026-10-12). La v9 ya no lleva láminas con
+  escenario magenta.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -73,6 +73,21 @@ description: >-
 
 ## 1. Cómo se usa esta skill (router)
 
+**Presentadores y personajes audio-driven: OmniHuman 2.0**
+
+Para animar una imagen con una locución o interpretación ya aprobada, usa el
+[manual OmniHuman 2.0 API](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) y compón con
+`design-studio` (imagen/identidad), `audio-studio` (master y actuación) y derechos. Es **BytePlus Vision AI**,
+separado de ModelArk/Seedance, Seed Speech y Gemini Omni: ni `pnpm ai:byteplus` ni `pnpm ai:omni` lo integran.
+Planifica la toma a partir del audio, fija actuación/cámara en el prompt opcional y conserva las referencias
+aprobadas. QA del video completo: sincronía labial, identidad, dientes/manos, expresión, silencios, continuidad
+y correspondencia con el master; un buen primer cuadro no valida una toma larga. Textos, subtítulos y firma
+exactos van en posproducción. Conserva el watermark por defecto y la evidencia de procedencia.
+Límites, estados asíncronos, cancelación y recuperación viven en el manual; la
+[auditoría](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md) distingue API documentada,
+consola observada y capacidad ejecutada. Modelo desactivado en la cuenta al 2026-10-15: no se habilita ni se
+somete una generación para completar una investigación documental. Sin ruta Globe; conserva su hibernación.
+
 **Clasificar antes de producir:** toda pieza de video se clasifica primero con la
 [taxonomía de producción de video](../../../docs/architecture/GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md):
 pieza, **tipo de video** (hiperrealista, cine, producto, UGC, personaje 3D, 2D, motion graphics, demo de UI,
@@ -223,7 +238,21 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
   (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
   `pnpm ai:byteplus --model seedance25|seedance2` por defecto bajo el contrato directo de Johor;
-  [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md). Fal sigue como alternativa explícita:
+  [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md); en 2.5, `--draft` (480p) y luego
+  `--from-draft <task-id>` (final 1080p). 🔴 **Rostros humanos externos:** se observó rechazo
+  `PrivacyInformation`; el KYC por sí solo no lo levanta. Para la biblioteca de retratos, cargar el
+  [preflight de cuenta, derechos, cupo y pruebas](../greenhouse-ai-creative-rights-governance/references/byteplus-portrait-preflight.md)
+  y el [ledger por cuenta](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md).
+  `asset://` exige propiedad en la cuenta de inferencia y estado literal `Active`; Entry activo no prueba que
+  funcione como referencia ni como primer cuadro. Probar ambos por separado con drafts de 480p/4 s, nombrando
+  las entradas `Image 1`/`Image 2` en el prompt. El lote y el orden autorizados viven en el ledger; continuar
+  sólo tras éxito como referencia. Para retomar, consultar primero los assets y resultados ya registrados;
+  no repetir cargas ni generaciones completadas. Conservar cada variante con su prompt, comando y recibo en
+  subcarpetas separadas; si expira la espera, recuperar la tarea por su ID. La UI `warehoused` requiere el
+  readback exacto de `Active` del preflight, y un draft exitoso no equivale a aprobación creativa o de audio.
+  Un plan Entry gratuito no vuelve gratuitas las generaciones.
+  Para una sola pieza, evaluar las otras vías oficiales del manual sin consumir cupo por defecto.
+  Fal sigue como alternativa explícita:
   su endpoint se elige por duración/4K/costo en
   `workflows/engine-selection-by-fidelity-contract.md`; los 15 endpoints verificados 2026-09-16, incluido 2.5
   `editing`/`extension`; se observaron rechazos cobrados tras encolar referencias de marcas/personas en pruebas de septiembre; no generalizar a todos los endpoints. La fórmula por tokens tuvo coincidencia en pruebas cortas, pero subestimó SKY V11: incluir entradas, salida y tarifa de la ruta, y reconciliar por solicitud), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =

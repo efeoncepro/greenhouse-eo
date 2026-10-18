@@ -1,0 +1,43 @@
+{
+  "id": "PG7-tv-conectada",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "registro": "cine",
+  "alcance": "proposal-cinematic",
+  "linea": "voice",
+  "desde": "AE2b",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a large dark modern living room at night): Isabella, the Efeonce paid media specialist, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands in the right part of the frame, framed from the waist up, her face at about 79 % of the frame width and her left shoulder at about 66 % of the frame width, never further left; between the left edge of the frame and her body there is a wide band of empty darkness. She looks straight into the lens with a warm, confident smile, a slim TV remote in her right hand at her side, turning toward the camera at the exact moment the room lights up. Behind her, about four meters away, a huge wall-mounted connected TV hangs FULLY VISIBLE between 48 % and 63 % of the frame width, with a clear band of dark wall between its right edge and her hair; nothing overlaps the screen: it glows with a soft flat field of cool azure light, the brightest surface of the room, and in front of it, on a low sofa, two anonymous people in dark silhouette watch it, soft and out of focus. A tall slim floor lamp of cold white light stands at the camera-right edge of her body. Everything that emits light in the frame is cool azure (#0375DB) and cold white, the light of Efeonce; only ONE tiny point of red-orange (#F83902) glows on the standby light under the TV at its lower right corner, far behind her, the only accent in the frame; it lights nothing around it. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm f/2. The LEFT 45% of the frame is calm, deep dark space with only faint haze, no screens, no objects. Enormous contrast, punchy, awe-inspiring. Every screen shows only a flat field of light: no image, no interface, no letters, no numbers, no icons, no logos.",
+  "llave": {
+    "fuente": "a tall slim floor lamp of cold white light",
+    "tamano": "a lamp shade about 40 cm tall",
+    "lado": "camera-right of her face, at head height",
+    "distancia": "about 80 cm from her face"
+  },
+  "fondo": "the dark living room and a glass wall over the night city melted into cold round bokeh",
+  "fenomeno": {
+    "que": "the living-room TV glows with the campaign while a family watches from the sofa",
+    "esServicio": "TV conectada: el alcance de la televisión con la precisión de lo digital"
+  },
+  "lecho": {
+    "objeto": "the dark matte back of an armchair close to the lens, outside every light",
+    "tono": "DARK near black"
+  }
+}

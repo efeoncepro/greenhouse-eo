@@ -164,6 +164,21 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-18: CTA `inbound-discovery-meeting` publicado** (landing `/agencia-inbound-marketing/`, surface propia).
+  Primer consumidor del lanzador de reunión genérico de la base source-led (`<gh-meeting-cta location="…">` →
+  `<greenhouse-cta appearance="bare" cta-location="…">`). Un mismo CTA se renderiza desde **tres placements** de la
+  landing, distinguidos por el override de location: `inbound_closing` (bloque «¿Prefieres conversarlo en vivo?»),
+  `inbound_hero` (botón secundario del hero) e `inbound_mobile_dock` (mitad de la barra móvil); verificado live con los
+  tres lanzadores en el HTML. El diálogo lleva la piel propia de esa landing (scoped `body:has(.gh-inbound)`): es un
+  ejemplo, no el estándar; cada host lo viste según su necesidad. Lecciones de integración: ver «Integración del
+  lanzador de reunión en un host» en Hard rules.
+
+- **2026-10-16: bundle `1.3.1` code complete, rollout pendiente.** Corrige la cabecera del scheduler nativo en móvil
+  (shorthands `font` inválidos + botón de cierre sin `flex: none`/`nowrap`). Verificado con el bundle local servido por
+  interceptación sobre las páginas reales `/servicios-contratar-hubspot/` y `/contacto/` (390 y 820 px: botón en una
+  línea, cabecera sin overflow). Llega a los hosts cuando el release a producción publique `renderer-latest.js`.
+  Mismo día: CTA `hubspot-discovery-meeting` publicado (dock móvil de la landing HubSpot, surface propia).
+
 - **2026-07-21: quinta acción `open_meeting_scheduler` + piloto `/agenda/` RELEASED.** El Action
   Registry y el renderer ya abren la experiencia nativa `meeting_scheduler`; el piloto público
   de WordPress opera native-only, sin link ni iframe de fallback HubSpot. Pendiente para cerrar
@@ -251,6 +266,26 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   enforcement staging + smoke kill switch sin redeploy → prod gradual (ledger §Pendientes).
 
 ## Hard rules (anti-regression — arch §20 + aprendizajes de implementación)
+
+- **NUNCA** (2026-10-16, bundle `1.3.1`) mezclar `inherit` dentro del shorthand `font` (`font: 650 .84rem/1 inherit`):
+  `inherit` sólo vale como valor completo, así que el navegador **descarta la declaración entera** y el tema del host
+  pinta el texto. Pasó en el diálogo del scheduler nativo (vive en `<body>`, fuera de todo contenedor): en WordPress el
+  título tomó el `h2` de Ohio y «Cerrar agenda» se partió en tres líneas a 390 px. Usa longhands con
+  `font-family: inherit`. Guarda: `__tests__/styles-font-shorthand.test.ts`; el verificador real es el navegador
+  (jsdom no descarta shorthands inválidos), abriendo el scheduler en un host WP a 390 px.
+- **NUNCA** escribir backticks en un comentario dentro de `RENDERER_CSS`: es un template literal y el backtick lo cierra.
+- **Integración del lanzador de reunión en un host** (2026-10-18, landing Inbound; aplica a cualquier host):
+  - `<greenhouse-cta>` contiene su tamaño en línea (`container-type: inline-size`): dale un ancho explícito o mide 0;
+    dentro de una fila flex, el wrapper también necesita su propio ancho.
+  - El diálogo es `<dialog class="ghc-meeting-surface">` agregado a `<body>` y abierto con `showModal()` (top layer:
+    sin peleas de `z-index`). Un `<dialog>` modal tiene `top:0;bottom:0`: para ajustarlo al contenido usa
+    `height: fit-content`, no `auto`.
+  - El bundle de producción NO trae la clase `ghc-meeting-titles`; para apuntar al título usa
+    `.ghc-meeting-toolbar>:not(.ghc-meeting-close)`.
+  - El renderer bloquea el scroll con `overflow: hidden` en `<html>` (restaura el valor previo) y devuelve el foco al
+    lanzador al cerrar: el host no debe reimplementar ninguno de los dos.
+  - La piel del diálogo es decisión de cada host/landing según su necesidad; la de Inbound es un ejemplo, nunca la
+    plantilla para otros hosts.
 
 - **NUNCA** (TASK-1431) agregar un action kind sin su entry completo: enum en `contracts.ts` +
   metadata browser-safe + entry del registry (schema+resolver) + espejo/executor del renderer

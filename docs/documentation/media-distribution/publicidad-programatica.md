@@ -1,6 +1,6 @@
 # Publicidad programática: funcionamiento y estados
 
-> **Fecha:** 2026-10-12 · **Owner:** Media & Distribution
+> **Fecha:** 2026-10-12 · **Actualizado:** 2026-10-16 (material comercial y rebates) · **Owner:** Media & Distribution
 > **Alcance:** servicio comercial con proveedores externos; no hay una nueva integración o pantalla DSP en Greenhouse
 > **Estado comercial:** `Commercially approved` por el operador el 2026-10-09; activación por campaña
 
@@ -11,6 +11,10 @@ oferta Efeonce con el trabajo propio y la inversión/costos externos identificad
 Programmatic contribuye a la [oferta integral como agencia de medios](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios):
 planificación, compra/operación, creatividad, medición y control de inversión conectados. Son responsabilidades
 compuestas en las soluciones existentes; no una nueva marca ni aprobación global del portfolio.
+
+Desde el 2026-10-16 la oferta se presenta con el brochure y la landing pública «Agencia de Medios»
+(<https://efeoncepro.com/servicios/agencia-de-medios/>), que nombran la tecnología de compra y verificación sólo como
+tecnología, nunca como alianza. Rutas y reglas de claims: [catálogo de la línea](../../services/media-distribution/README.md#material-comercial-vigente).
 
 ## Rutas de ejecución
 
@@ -40,6 +44,9 @@ contable son estados separados; este documento no crea facturas, cobros o polít
 Los mínimos Efeonce siguen aprobados, con costeo/margen por validar; los porcentajes ilustrativos de la reunión no
 son tarifas externas ni cambian el fee. En cuenta integral se costea gestión conjunta y sólo trabajo adicional al
 retainer, sin doble cobro de planificación, setup, coordinación o reporting.
+
+La comisión o rebate que pague un proveedor es margen de Efeonce (decisión del operador, 2026-10-16): la oferta no
+promete declararla ni traspasarla al cliente, y el fee sigue sosteniendo costo y margen sin ella.
 
 ## Estados que deben distinguirse
 

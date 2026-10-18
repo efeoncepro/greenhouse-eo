@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "5c2bfdae9c3b7e3e7dde8cc8594ae45c9755ea4d803c50a3dea1cbcdbff37162",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:PG2-pantallas-de-la-calle",
+      "path": "ai-generations/2026-10-13_brochure-agencia-medios/fotos/plates/PG2-pantallas-de-la-calle.png",
+      "sha256": "bd9e5821f8aff932405895d9ee9b3a2ddece2279981078471fd0c3849b312ea7"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

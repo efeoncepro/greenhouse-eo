@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-14",
+  "source": "LicitaLAB authenticated visible UI; Todos+Búsqueda libre; fichas, inventarios y fragmentos RAG oficiales",
+  "all_profile": {
+    "pages": 2,
+    "page_size": 100,
+    "rows": 158,
+    "unique_codes": 158
+  },
+  "free_keywords": {
+    "Google Cloud": {
+      "visible_count_text": "32 resultados",
+      "pages": 2,
+      "rows": 32,
+      "unique_codes": 32
+    },
+    "GCP": {
+      "visible_count_text": "2 resultados",
+      "pages": 1,
+      "rows": 2,
+      "unique_codes": 2
+    },
+    "Google Tag Manager": {
+      "visible_count_text": "21 resultados",
+      "pages": 2,
+      "rows": 21,
+      "unique_codes": 21
+    },
+    "Google Analytics": {
+      "visible_count_text": "10 resultados",
+      "pages": 1,
+      "rows": 10,
+      "unique_codes": 10
+    },
+    "GTM": {
+      "visible_count_text": "5 resultados",
+      "pages": 1,
+      "rows": 5,
+      "unique_codes": 5
+    },
+    "CRM": {
+      "visible_count_text": "5 resultados",
+      "pages": 1,
+      "rows": 5,
+      "unique_codes": 5
+    },
+    "HubSpot": {
+      "visible_count_text": "0 resultados",
+      "pages": 1,
+      "rows": 0,
+      "unique_codes": 0
+    },
+    "Salesforce": {
+      "visible_count_text": "0 resultados",
+      "pages": 1,
+      "rows": 0,
+      "unique_codes": 0
+    },
+    "Zoho": {
+      "visible_count_text": "0 resultados",
+      "pages": 1,
+      "rows": 0,
+      "unique_codes": 0
+    },
+    "hosting": {
+      "visible_count_text": "5 resultados",
+      "pages": 1,
+      "rows": 5,
+      "unique_codes": 5
+    },
+    "infraestructura web": {
+      "visible_count_text": "275 resultados",
+      "pages": 14,
+      "rows": 275,
+      "unique_codes": 271
+    },
+    "medición": {
+      "visible_count_text": "74 resultados",
+      "pages": 4,
+      "rows": 74,
+      "unique_codes": 74
+    },
+    "publicidad digital": {
+      "visible_count_text": "387 resultados",
+      "pages": 20,
+      "rows": 387,
+      "unique_codes": 386
+    },
+    "agencia digital": {
+      "visible_count_text": "336 resultados",
+      "pages": 17,
+      "rows": 336,
+      "unique_codes": 336
+    },
+    "diseño web": {
+      "visible_count_text": "435 resultados",
+      "pages": 22,
+      "rows": 435,
+      "unique_codes": 433
+    },
+    "agencia creativa": {
+      "visible_count_text": "49 resultados",
+      "pages": 3,
+      "rows": 49,
+      "unique_codes": 49
+    },
+    "SEO": {
+      "visible_count_text": "No encontramos lo que buscas",
+      "pages": 1,
+      "rows": 0,
+      "unique_codes": 0
+    },
+    "sitio web": {
+      "visible_count_text": "82 resultados",
+      "pages": 5,
+      "rows": 82,
+      "unique_codes": 82
+    }
+  },
+  "union_unique_codes": 1142,
+  "deep_review": {
+    "records": 72,
+    "dispositions": {
+      "intake": 33,
+      "exclude": 6,
+      "radar": 33
+    }
+  },
+  "limits": [
+    "Universo autenticado de LicitaLAB y keywords indicadas,no todo MercadoPúblico ni cobertura de privados.",
+    "Buscador libre usa OR entre palabras:incluye ruido físico y categorías equivocadas.",
+    "Ranking y conteos pueden moverse durante paginación; conservar filas únicas y cobertura por consulta.",
+    "RAG=fragmentos,no lectura íntegra de cada original;partial/indexing/unsupported conservados.",
+    "Ausente CRM no significa publicado hoy.",
+    "Montos comprador,no fee,ingreso ni margen Efeonce.",
+    "CRM mayorUSD1000/mes no demostrado:no importar falsospositivos,por ejemplo PuertoVarasfotogrametría.",
+    "Ficha oficial SSAN revalidada enMercadoPúblico09/11 15:30;consultasdirectasChillán/Tarapacá no devolvieroncontenido,no asumirverificaciónoficialglobal."
+  ]
+}

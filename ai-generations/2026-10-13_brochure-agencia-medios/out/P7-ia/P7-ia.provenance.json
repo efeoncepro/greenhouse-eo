@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "e9dfab340c0e7dbe27329f37248d01c54488cb49a2e171f0a8ca338c00e5baa4",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT15-ejecutivos-sesion",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT15-ejecutivos-sesion.png",
+      "sha256": "2a8031d49c26bed5a23b270ca1a7b4d1491b675b92728c0d0f2540f24c8b068a"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

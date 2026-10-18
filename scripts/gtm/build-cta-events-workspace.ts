@@ -195,6 +195,13 @@ const main = async () => {
 
   await client.publishVersion(ACCOUNT_ID, CONTAINER_ID, version.containerVersionId)
   console.log(`PUBLICADO: versión ${version.containerVersionId} live en GTM-NGHPGRLZ.`)
+
+  // Publicar sin dejar el snapshot al día es exactamente el drift que vigila `gtm-drift.yml`:
+  // se escribe aquí mismo y queda para commitear junto con este cambio.
+  const { writeLiveSnapshots } = await import('./snapshot')
+
+  await writeLiveSnapshots()
+  console.log('Snapshots GTM actualizados: commitea docs/reference/measurement-gtm-ga4/*-snapshot.json.')
   process.exit(0)
 }
 

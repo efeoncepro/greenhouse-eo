@@ -1,5 +1,85 @@
 # Landing: HubSpot Services
 
+> **Delta 2026-10-16 (noche) — correcciones post-publicación, detalle del dock y renderer CTA 1.3.1.** Complementa los
+> dos deltas siguientes (no los repite).
+> - **Correcciones de implementación** (en la fuente `hubspot-v2-source/` y el compilador): el compilador
+>   reescribía `.panel-body` como `body` (regex) → paneles sin padding; ahora sólo reemplaza `html`/`body` como selectores de
+>   elemento. `.links-underline a:hover` de Ohio volvía blancas las cards enlazadas → neutralizado en `host.css` dentro de
+>   `.gh-hsv2`. Cifras estáticas (+90, 6, −56%, +10) con `nowrap`; el contador `@property` terminaba en 89. Reveals ligados al
+>   scroll que terminaban en `cover 35–60%` dejaban cards/títulos/barras desfasados mientras se leía → todo reveal termina en
+>   `entry 70–100%`. Móvil: etiqueta de la comparación antes de cada fila (`[role=rowheader]{order:-1}`), tachado en cada
+>   línea (span inline + `box-decoration-break: clone`; el span tachado era ítem flex), grilla «¿Workflow o agente?» a una
+>   columna, fichas laterales de agentes ocultas, títulos de panel 42 px (evita «expectativa-s»), áreas táctiles ≥ 44 px, sin
+>   indicador de scroll. Desktop: fichas laterales de agentes `width: min(230px, calc(50% - 132px))` y etiqueta «Supervisora»
+>   bajo el botón. Se quitó la línea «Bresler: +180 % de ventas digitales · caso publicado» bajo los logos (pedido del
+>   operador). Reglas generales en `references/source-led-elementor-patterns.md`.
+> - **Dock, lo que falta arriba:** CTA `hubspot-discovery-meeting` = `open_meeting_scheduler` (`fhsf-efeonce-lead-gen-web` /
+>   `discovery`), placement `embedded`, style `minimal`, label «Agendar reunión», targeting `/servicios-contratar-hubspot/`,
+>   priority 180; surface «Efeonce HubSpot landing (WordPress)» `csur-56a96b52-44ca-43d8-a61f-8c365c211487` (origins
+>   `efeoncepro.com` + `www`). El CTA de contacto `contacto-discovery-meeting` no sirve aquí: su targeting es sólo
+>   `/contacto/`. El host reduce el card al botón (oculta `.ghc-content`/`.ghc-dismiss`, card `display:flex; gap:0`). Sin
+>   soporte de scroll-timeline el dock queda siempre visible, más arriba (84 px); en desktop `display:none`. Las reglas que
+>   salen del scope (`timeline-scope`, barra de Ohio) van en `page.css` porque el scoping del compilador también reescribe
+>   `body` en `host.css`. **Re-correr el publicador rota el key** → hay que volver a correr `republish-hubspot-v2-page.php`
+>   con el archivo nuevo. Publicador: con `pnpm pg:connect` arriba,
+>   `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME= npx tsx --env-file=.env.local --require ./scripts/lib/server-only-shim.cjs scripts/growth/publish-hubspot-meeting-cta.ts`.
+>   Medición: fila en `TRACKING-PLAN.md` §CTAs (familia `greenhouse_cta_*` por `cta_slug`); conversión = receipt
+>   server-confirmed `gh_meeting_*`, nunca el click; sin reserva de prueba. Verificado live a 390 px: oculto en el hero,
+>   visible a mitad de página con la barra de Ohio oculta, abre el scheduler full-screen, Escape cierra, se oculta en la
+>   agenda y en el footer; desktop sin dock.
+> - **Secuencia de deploy:** `node scripts/public-website/compile-hubspot-v2-elementor-source.cjs` →
+>   `pnpm public-website:export-live-code` (baseline fresca en `tmp/public-site-code-baselines/<ts>`) →
+>   `node scripts/public-website/build-hubspot-v2-elementor-package.cjs <baseline>` →
+>   `pnpm public-website:wpcli -- --eval-file ./tmp/deploy-hubspot-v2-elementor-package.php --input-file ./tmp/hubspot-v2-elementor-release/package.zip --input-file ./tmp/hubspot-v2-elementor-release/manifest.json --wp-user 12`
+>   → sólo si cambia el árbol o los settings:
+>   `pnpm public-website:wpcli -- --eval-file ./tmp/republish-hubspot-v2-page.php --input-file ./scripts/public-website/hubspot-v2-source/page-custom.css --input-file ./scripts/public-website/hubspot-v2-source/form.json --input-file ./.auth/hubspot-v2-meeting-cta-surface.json --wp-user 12`.
+>   El republicador guarda snapshot `_gh_hubspot_v2_before_<fecha>`, exige `GH_EXPECT_HASH` y protege los hashes de la Home,
+>   `249582`, `251279` y `251981`; el deploy deja backup tar en `/tmp/eo-hubspot-v2-widgets-before-<fecha>.tar`.
+> - **Commits:** runtime `efeoncepro/efeonce-public-site-runtime` (main, empujados) `28912f9`, `1d3646f`, `8c0a627`,
+>   `af2c3c0`, `05fb924` — el «sin push» del delta v2 ya no aplica; greenhouse-eo (develop) `d9340a3f0`, `bc84ee41a`,
+>   `6a4db1cfe`, `e6a223022`, `0f065206b` y `e7db7f558` (local al 2026-10-16).
+> - **Renderer CTA 1.3.1 (code complete, rollout pendiente):** en el scheduler nativo, `font: 650 .84rem/1 inherit` (y otras
+>   tres reglas) son inválidas y el navegador las descarta; el diálogo vive en `<body>` y hereda el CSS de Ohio, así que el
+>   título tomaba el `h2` del tema y «Cerrar agenda» quedaba en 74 px partido en tres líneas a 390 px (aquí y en
+>   `/contacto/`). Corregido en `src/growth-cta-renderer/styles.ts` + `meeting-action.ts`, guarda
+>   `styles-font-shorthand.test.ts`, commit `e7db7f558`; verificado por interceptación del bundle local (128×44 px en una
+>   línea a 390 y 820 px). Llega a la página sólo con el release a producción de `renderer-latest.js`. Arquitectura: `GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md` §29.
+> - **Pendientes:** envío real controlado del formulario y lectura en HubSpot; Rich Results Test + solicitud de indexación en
+>   GSC; decidir +90 vs +120 empresas; readback del nivel Gold en el directorio de HubSpot; release del renderer 1.3.1.
+
+> **Delta 2026-10-16 (tarde) — dock móvil.** Bajo 760 px, `244079` muestra un dock fijo con «Agendar reunión» y «Ir al
+> formulario» (`#agenda-form`). Aparece al salir del hero y se oculta al entrar a `#agenda` (scroll-driven, `timeline-scope`
+> en `body` vía `hubspot-v2-source/page.css`, la capa que se agrega SIN scoping); mientras se ve, la `.elements-bar.left` de
+> Ohio se aparta y vuelve desde el formulario. «Agendar reunión» es el CTA gobernado `hubspot-discovery-meeting`
+> (`open_meeting_scheduler`, scheduler nativo, `cta-location=hubspot_mobile_dock`) con surface propia; publicador
+> `scripts/growth/publish-hubspot-meeting-cta.ts` (key 0600 en `.auth/hubspot-v2-meeting-cta-surface.json`, que
+> `republish-hubspot-v2-page.php` recibe como tercer input; nunca al repo). Sin surface/key el dock cae a `/agenda/`.
+> El token de plantilla es `meeting_launcher`: un token con el mismo nombre que un campo lo reemplaza el valor del campo.
+
+> **Delta 2026-10-16 — v2 publicada (rediseño por los 4 resultados de HubSpot).** El cuerpo de `244079` ya no son los
+> 11 widgets `greenhouse_hubspot_*`: son **14 widgets `greenhouse_hubspot_v2_*`** (hero, marquesina, numeros, punto,
+> diferencia, resultados, riesgo, agentes, metodo, seguridad, caso, partner, preguntas, agenda) compilados desde el canvas
+> Design `https://claude.ai/artifact/K5kub2AHMQzB1sAwACe9X9` (copia en `scripts/public-website/hubspot-v2-source/Main.dc.html`,
+> con dos FAQ SEO extra). Pipeline: `prepare-hubspot-v2-assets.cjs` → `compile-hubspot-v2-elementor-source.cjs` →
+> `build-hubspot-v2-elementor-package.cjs <baseline>` → `deploy-hubspot-v2-elementor-package.php` (contrato
+> `hubspot-v2-elementor-release.v1`) → `republish-hubspot-v2-page.php` (snapshot `_gh_hubspot_v2_before_20261016_214609`:
+> árbol, settings, metas Ohio y thumbnail anteriores; hash previo `cc9710c8…`, nuevo `52308ef5…`; metas Ohio copiadas de
+> `251981`) → `configure-hubspot-v2-seo.php` (snapshot `_gh_hubspot_v2_seo_before_20261016_214622`; OG/thumbnail
+> attachment `251991`; title «Partner HubSpot: implementación de CRM y agentes de IA | Efeonce», focus «partner hubspot»,
+> Semrush CL/MX/CO 2026-10-16). Preview local sin WordPress: `preview-hubspot-v2-local.cjs`. Runtime commit en
+> `efeonce-public-site-runtime` (feat(hubspot): v2 landing modules…, sin push). Formulario: el mismo Growth Form
+> gobernado `efeonce-hubspot-scope` (`bb220383-…`, surface `fhsf-efeonce-hubspot-scope`, multipaso, HubSpot `direct`)
+> en tarjeta de papel; el diseño de dos pasos del canvas queda como brief para una versión futura del formulario.
+> Schema: el widget `preguntas` emite Service `#service` (cinco países, catálogo sin precios) + FAQPage (6);
+> `includes/hubspot-v2/seo.php` agrega `about → #service` y el adaptador v1 (`includes/hubspot/seo.php`) no agrega su
+> Service mientras el FAQ v2 esté en la página. Rollback del cuerpo: `Document::save()` con el árbol y settings del
+> snapshot + metas; plugin backup `/tmp/eo-hubspot-v2-widgets-before-20261016-214459.tar` (temporal). Verificado live
+> 1440/390 sin desborde, 14 módulos, un H1, canonical, OG, Service+FAQPage únicos, formulario paso 1 de 3.
+> Decisiones del operador (2026-10-16): fotos cine aprobadas en esta web; leyes de datos por mercado (5 países), nunca
+> sólo Chile; sin fotos de Julio (plate HS6b rechazado); cifras ANAM públicas sólo de atención (−56 %, −76 %, 5 rutas,
+> 23 fuentes); sin montos. **Todo lo que sigue sobre los 11 widgets v1 es historia** (siguen instalados como rollback).
+
+
 > **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-hubspot-scope` v4 entrega en `direct` al formulario HubSpot «Lead Gen - Servicios HubSpot» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
 
 ## Identity and owners
