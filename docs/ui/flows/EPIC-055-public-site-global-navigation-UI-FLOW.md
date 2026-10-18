@@ -48,8 +48,9 @@ El menú se comporta igual en `efeoncepro.com` y en cualquier sitio que lo adopt
    1. cierra el panel abierto y suelta el bloqueo de scroll;
    2. abre el diálogo del agendador con su `cta-location` (`menu_header`, `menu_mega` o `menu_onepage`);
    3. al cerrar el diálogo, el foco vuelve al lanzador.
-8. **Scroll.** Al bajar, la cabecera se oculta (estado «Bajando»). Al subir, aparece fija y sólida (estado
-   «Subiendo»). Si había un panel abierto al empezar el scroll, se cierra (propuesto: el canvas no lo define; se confirma en el Lab).
+8. **Scroll.** Al bajar, la cabecera se oculta (estado «Bajando»). Al subir, vuelve como isla de vidrio flotante
+   (estado «Subiendo»), en tono oscuro o claro según la sección que tiene debajo, y cambia de tono al cruzar de una
+   sección a otra. Si había un panel abierto al empezar el scroll, se cierra (propuesto: el canvas no lo define; se confirma en el Lab).
 
 ## Recovery Branches
 

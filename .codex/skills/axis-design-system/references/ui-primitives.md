@@ -289,7 +289,7 @@ What it will be:
 | Layer (planned) | Responsibility |
 | --- | --- |
 | Contract `efeonce.site-nav` + schema `site-nav.v1` (JSON Schema) | Structure of the menu document, states, ARIA roles, emitted events (`site_nav_open`, `site_nav_line_view`, `site_nav_click`) and consumed tokens. Holds no content and knows nothing about WordPress. |
-| Tokens | Single glass recipe (capsule, «Agenda tu diagnóstico» button and hamburger), header heights 96/72, logo 164/140 and menu timings in `axisMotion`. Today they are literals in the canvas. |
+| Tokens | Single glass recipe (capsule, «Agenda tu diagnóstico» button and hamburger), header height 96 and the fixed-state glass island (61 px, 12 px from the edge, dark and light tones), logo 164/128 and menu timings in `axisMotion`. Today they are literals in the canvas. |
 | Primitive in `@efeoncepro/axis-ui-primitives` | Server-side HTML render (pure function: links ship in the HTML), `site-nav.css` with the glass recipe from tokens, and a lightweight framework-free `site-nav.js` as progressive enhancement (hover intent, keyboard, focus, scroll, onepage, reduced motion). It fetches nothing and does not know the scheduler: it only exposes the CTA slot. |
 | Lab | `/patterns/efeonce.site-nav/` with a sample document and «Contexto» / «Cabecera» controls. |
 

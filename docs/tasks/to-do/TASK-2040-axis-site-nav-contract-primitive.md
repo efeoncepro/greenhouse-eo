@@ -283,7 +283,7 @@ Reglas obligatorias:
 - Esquema `site-nav.v1` exportado como JSON Schema, con límites de profundidad, texto plano, alt obligatorio y fotos por
   recorte.
 - Documento de ejemplo con el contenido del canvas.
-- Tokens: receta de vidrio, alturas de cabecera (96 y 72), anchos de logo (164 y 140) y tiempos del menú en `axisMotion`.
+- Tokens: receta de vidrio, receta de la isla en sus dos tonos, cabecera de 96 px, isla de 61 px a 12 px del borde, anchos de logo (164 y 128) y tiempos del menú en `axisMotion`.
 
 ### Slice 2 — Render de servidor y CSS
 

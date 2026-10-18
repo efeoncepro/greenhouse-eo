@@ -538,9 +538,11 @@ vale en toda aplicación:
   Nosotros ▾, Soluciones ▾, Recursos ▾, Contacto) · botón «Agenda tu diagnóstico». La cápsula con sus mega menús
   convive con la hamburguesa, que abre el onepage a pantalla completa; abrir uno cierra el otro. Bajo 1.181 px queda
   sólo la hamburguesa.
-- **Cabecera en tres estados:** arriba transparente sobre el hero, 96 px; al bajar se oculta; al subir aparece fija y
-  sólida en navy `#001a33`, 72 px, con logo claro y el botón del agendador en sólido blanco.
-- **Logo:** 164 px arriba y 140 px en la cabecera fija (eran 148/128; se amplió el 2026-10-18 tras analizarlo a pedido
+- **Cabecera en tres estados:** arriba transparente sobre el hero, 96 px; al bajar se oculta; al subir vuelve como una
+  **isla de vidrio flotante** (12 px del borde, radio 24, 61 px) que cambia de tono: oscura sobre fotos y secciones
+  oscuras, clara con logo y texto navy sobre secciones claras. Aprobada el 2026-10-18 en reemplazo de la barra navy
+  sólida («poco premium»). Recetas de los dos tonos en la arquitectura, §Isla de vidrio.
+- **Logo:** 164 px arriba y 128 px dentro de la isla de la cabecera fija (arriba eran 148 px; se amplió el 2026-10-18 tras analizarlo a pedido
   del operador); 152 px en los tableros de 1280 y 1200.
 - **Una sola receta de vidrio** para cápsula, botón y hamburguesa (aprobada el 2026-10-18, probada sobre navy, negro,
   navy con resplandor y fotos):
@@ -555,7 +557,7 @@ vale en toda aplicación:
   El botón usa el mismo material con relleno `.12→.04`, borde `.18` y canto `.34`. Estos valores pasan a tokens de
   AXIS en TASK-2040; ningún CSS de sitio los repite a mano.
 - **Estados del botón «Agenda tu diagnóstico»:** en vidrio, el hover lo ilumina, refuerza el canto y lo sube 1 px; al
-  presionar escala a 98 %. En sólido blanco (cabecera fija) el hover pasa a `#cfe4fa` y sube 1 px. Foco `2px #72ded8`
+  presionar escala a 98 %. En la isla oscura el botón es blanco y su hover pasa a `#cfe4fa`; en la isla clara es navy y su hover pasa a `#023c70`; en ambos sube 1 px. Foco `2px #72ded8`
   en ambos. Con movimiento reducido no se desplaza ni escala.
 - **Lo que enseñó el vidrio** (por qué la receta es así):
   1. un vidrio **tintado navy** se ve distinto en cada pieza (cápsula, botón y hamburguesa no parecen el mismo material);

@@ -30,8 +30,12 @@
 | Tipo de página | Cabecera arriba | Hero |
 |---|---|---|
 | Landing con hero oscuro a sangre | Transparente sobre el hero (estado «Arriba») | Sube hasta el borde, sin margen superior. |
-| Página sin hero o con fondo claro (blog, post, 404, archivo) | Arranca en estado sólido (fija) | El contenido empieza bajo los 72 px. |
-| Glitch | Arranca en estado sólido | Respeta su propia cabecera editorial bajo el menú. |
+| Página sin hero o con fondo claro (blog, post, 404, archivo) | Arranca con la isla en tono claro | El contenido empieza bajo la isla (12 + 61 px). |
+| Glitch | Arranca con la isla en el tono de su cabecera | Respeta su propia cabecera editorial bajo el menú. |
+
+**Tono de la isla:** cada plantilla marca sus secciones con `data-site-nav-tone="light|dark"` para que la isla cambie de
+tono al pasar sobre ellas (arquitectura §Isla de vidrio). El inventario de variantes de Ohio incluye qué secciones son
+claras u oscuras en cada plantilla.
 
 La regla final por tipo sale del **inventario de variantes de Ohio** que hace la task: metas de página (encabezado
 transparente u oscuro), logo fijo de ACF y plantillas especiales. Cada variante queda mapeada a un estado del primitive

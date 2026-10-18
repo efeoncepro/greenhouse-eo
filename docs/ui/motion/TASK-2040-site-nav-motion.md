@@ -32,7 +32,7 @@ El motion explica de dónde viene cada cosa; no decora.
 | Momento | Movimiento | Duración y curva |
 |---|---|---|
 | Bajando | Sale hacia arriba | 300 ms `emphasizedAccelerate` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
-| Subiendo | Entra fija y sólida | 400 ms `emphasized` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
+| Subiendo | Entra la isla de vidrio desde arriba | 400 ms `emphasized` (propuesto: el canvas no fija este tiempo; se confirma en el Lab) |
 
 ### Mega menú y desplegable
 
@@ -65,7 +65,8 @@ El motion explica de dónde viene cada cosa; no decora.
 | Hamburguesa | Al pasar el mouse los trazos intercambian largo (20↔12 px). Al abrir se cruzan en X (±45°). Sobre la X, el mouse la gira 90°. El botón no se mueve | 350 a 450 ms `emphasized` |
 | Hamburguesa, presionar | Baja a 94 % | 200 ms |
 | Botón del agendador en vidrio | Al pasar el mouse se ilumina el vidrio, se intensifica el canto y sube 1 px. Al presionar, 98 % | 250 ms `standard` / 200 ms `emphasized` |
-| Botón del agendador sólido | Pasa a `#cfe4fa` y sube 1 px | 250 ms `standard` |
+| Botón del agendador en la isla | Oscura: blanco que pasa a `#cfe4fa`; clara: navy que pasa a `#023c70`. Sube 1 px | 250 ms `standard` |
+| Cambio de tono de la isla | Fondo, borde, sombra, texto, logo y botón cruzan de tono al cambiar la sección bajo la isla | 300 ms `emphasized` |
 
 ## Tokens and Performance
 

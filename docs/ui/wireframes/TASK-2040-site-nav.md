@@ -41,13 +41,13 @@
 
 ### Cabecera
 
-| Región | Arriba (96 px) | Fija al subir (72 px) |
+| Región | Arriba (96 px) | Isla al subir (61 px, a 12 px del borde) |
 |---|---|---|
-| Hamburguesa | Círculo de 48 px de vidrio en x=40, centrado vertical. | Igual, top 12 px. |
-| Logo | 164 px de ancho, a 116 px del borde. | 140 px, a 108 px del borde. |
-| Cápsula | Centrada por `space-between`. Padding 4, ítems 10×16 a 15 px/500, radio 20. Vidrio. | Sin vidrio, sobre navy. |
-| Botón agendador | Vidrio, 13×20 a 15 px/600, radio 20. | Sólido blanco, texto navy, radio 10. |
-| Fondo | Transparente sobre el hero. | `#001a33` y borde inferior `rgba(207,228,250,.14)`. |
+| Contenedor | Ancho completo, transparente sobre el hero. | Una isla centrada, `min(1180px, 100% − 48px)`, radio 24, padding 8 (72 a la izquierda para la hamburguesa). Vidrio que cambia de tono: oscuro sobre fotos y secciones oscuras, claro sobre secciones claras. |
+| Hamburguesa | Círculo de 48 px de vidrio en x=40, centrado vertical. | 44 px dentro de la isla (x=8). En tono claro, trazos navy sobre `rgba(0,26,51,.06)`. |
+| Logo | 164 px de ancho, a 116 px del borde. | 128 px. Negativo en tono oscuro y navy en tono claro. |
+| Cápsula | Centrada por `space-between`. Padding 4, ítems 10×16 a 15 px/500, radio 20. Vidrio. | Ítems sin vidrio propio; texto blanco u navy según el tono. |
+| Botón agendador | Vidrio, 13×20 a 15 px/600, radio 20. | 11×18, radio 16. Blanco con texto navy en tono oscuro; navy con texto blanco en tono claro. |
 
 Bajando: la cabecera sale de vista. Subiendo: entra la versión fija.
 
