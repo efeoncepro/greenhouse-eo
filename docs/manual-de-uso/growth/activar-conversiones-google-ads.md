@@ -86,17 +86,49 @@ La API y CLI comparten CAS, revisión/publicación y autorización existentes. P
   "googleAds": {
     "conversionKey": "commercial_lead",
     "enhancedConversions": true,
-    "activationAt": "2026-10-17T00:00:00.000Z"
+    "activationAt": "2026-10-18T20:35:00.000Z"
   }
 }
 ```
 
-Ese fragmento no es un comando completo ni activa nada por sí solo. Agendas usan `meeting_booking`.
+Ese fragmento muestra el corte histórico de las dos políticas activadas; no es un comando completo
+ni una fecha para reutilizar en nuevas fuentes. Revisar un activationAt propio, sin backfill.
+Agendas usan `meeting_booking`.
 Elegibilidad: Forms contact/diagnostic_intake/quote_request de riesgo low/medium y binding activo de
 Meetings, con intención comercial revisada. Excluir soporte, contenido/newsletter, careers y pruebas.
 La fuente/versión se comprueba de nuevo al preparar; destinos[] es válido para Ads-only.
 El panel conserva la configuración Ads al editar una policy, pero su autoría inicial Ads es por API/CLI;
 no se incorporó un formulario visual ni nueva tool MCP para este delta.
+
+## Ampliar a los demás formularios comerciales
+
+Performance y Discovery nombran fuentes del sitio: el formulario de diagnóstico de pauta y la
+agenda de descubrimiento, respectivamente. No son tipos de campañas publicitarias.
+
+La ampliación solicitada se limita a formularios que captan solicitudes comerciales de servicios.
+Reutiliza `commercial_lead` y los tags publicados. Ebooks/descargas, newsletter, careers,
+soporte y pruebas no se incorporan. La reserva Discovery conserva `meeting_booking`.
+
+1. Releer por API el catálogo, fuente, propósito, clasificación, riesgo, versión y surface. Contrastar
+   intención comercial con campos y recorrido; superar el gate técnico no la acredita.
+2. Conciliar discrepancias antes de preparar apply. Lead Gen - Web declara propósito comercial pero
+   sigue lead_magnet; AI Visibility Grader es diagnostic_intake pero declara propósito lead magnet.
+   No reclasificar ni activar por deducción. Un contacto mixto requiere condiciones comerciales explícitas.
+3. Preparar la revisión de la política existente con `googleAds.conversionKey=commercial_lead`, EC,
+   activationAt revisado y mapping válido, preservando Meta/UPD y demás configuración. No crear un
+   segundo emisor ni una nueva etiqueta por formulario. La identidad nativa HubSpot se configura
+   por destino mediante su [manual](guardar-identidad-nativa-hubspot.md); la marca técnica configurada
+   en Performance no se presume provisionada en los demás formularios nativos.
+4. Validar y verificar la propuesta; publicar mediante el flujo canónico sólo con la revisión concreta
+   autorizada. Releer la revisión publicada y su binding de fuente/versión/surface/origin.
+5. Repetir negativos y seguir la primera ocurrencia real consentida, sin leads ni GCLIDs fabricados.
+   Guardar evidencia saneada de recepción; dejar atribución pendiente hasta disponer de evidencia Ads.
+
+El corte del 18/10 contiene 12 propuestas técnicamente validadas **sin publicar**, incluidas fuentes
+cuya intención sigue pendiente de revisión. No son 12 activaciones ni 12 conversiones certificadas.
+[Inventario y alcance actual](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+Una nueva versión publicada exige revisar su política; la inscripción y control automáticos para
+formularios futuros **no están implementados**. Esta ampliación no modifica campañas, goals ni puja.
 
 ## GTM publicado y operación posterior
 

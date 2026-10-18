@@ -1,7 +1,7 @@
 # Google Ads — Arquitectura de medición comercial y conexión API V1
 
 Checkpoint operativo 18/10, 20:43:28Z: **configuración Ads activada y cadena de despliegue verificada**.
-Anunciante6862539491, EC ON con método GTM, Web6/Server10 live y políticas Performance/Discovery
+Anunciante6862539491, EC ON con método GTM, Web 6/Server 10 live y políticas Performance/Discovery
 rev2 publicadas (activationAt20:35Z). Bridge compatible publicado en WordPress/Think; HubSpot
 submission tracing configurado y captura Meta incluida en Server10. Flag Production true leído
 20:36:20.421Z; companion deployment dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk del mismo mainEC READY,
@@ -19,9 +19,9 @@ Canarios admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-stor
 sin lead ni reserva real. Las expansiones SQL de recibos están aplicadas. Excepción específica
 de batch autorizada a las 18:53:53Z. [Auditoría y límites](../audits/releases/2026-10-18-full-develop-production-release.md).
 
-Readback a las 19:49:57.865Z: Ads conserva flag ausente/OFF, sin publicación GTM ni políticas Ads nuevas. Hosts compatibles,
-Preview funcional, opt-in por fuente, EC efectiva y primer resultado positivo siguen siendo gates
-independientes. El [paquete previo](../operations/releases/google-ads-2026-10-18/README.md) y la
+Readback histórico a las19:49:57.865Z: Ads conservaba flag ausente/OFF, sin publicación GTM ni políticas
+Ads nuevas en ese corte. Hosts compatibles, Preview funcional, opt-in por fuente, EC efectiva y primer
+resultado positivo conservaban gates independientes; su avance posterior figura en el checkpoint operativo. El [paquete previo](../operations/releases/google-ads-2026-10-18/README.md) y la
 [validación inicial](../audits/growth/2026-10-18-google-ads-prerelease-validation.md) conservan sus cortes fechados.
 
 ## 1. Estado, alcance y precedencia
@@ -78,7 +78,7 @@ Las credenciales o grants privados no se copian al repositorio, documentación o
 
 El operador amplió posteriormente el alcance a OAuth Efeonce y CLI de lectura/gestión. Se autorizó el
 cambio de marca y la custodia propia del grant; ninguna mutación publicitaria concreta está autorizada
-por esa ampliación genérica. La prueba real de esta sesión se mantiene en lectura. El catálogo de gestión
+por esa ampliación genérica. La prueba inicial del 17/10 se mantuvo en lectura. El catálogo de gestión
 y la separación entre capacidad implementada y apply real se detallan en §5.4.
 
 La autorización posterior del operador cubre release completo, bridges compatibles, publicación GTM,
@@ -144,7 +144,7 @@ Snapshot del **17-10-2026**; no es configuración garantizada para futuras ejecu
 | Growth Measurement | Políticas por fuente/surface/version, cifrado, worker y destinos `meta` / `google_upd` | No existe destino Google Ads equivalente |
 | `google_upd` | Envía `user_data` sin `events` a GA4 Measurement Protocol | No registra una conversión Ads |
 | Forms / CRM / Meta | Handoff actualizado: envíos reales TASK-1865 entregados a HubSpot, GA4 `generate_lead` y una `Lead` Meta Server observada | No acredita por sí solo identidad exacta HubSpot, atribución Ads ni mejora causada en performance |
-| Recibos nativos HubSpot y Meta | Baseline 17/10: código local y pruebas; checkpoint 18/10: schema aplicado y worker compatible servido | Propiedad/mapping HubSpot y captura GTM Meta siguen opt-in; sin primera identidad nativa/recepción Graph certificadas |
+| Recibos nativos HubSpot y Meta | Baseline 17/10: código local y pruebas; checkpoint 18/10: schema aplicado y worker compatible servido | En18/10, propiedad/mapping Performance y captura Meta configurados con opt-in; primera identidad nativa/recepción Graph pendientes |
 
 La entrada anterior de Handoff que mencionaba cero filas/ausencia de Lead es histórica y fue superada por
 el cierre de TASK-1865. La [relectura del último lead Performance](../audits/growth/2026-10-17-performance-latest-lead-trace.md)
@@ -468,6 +468,35 @@ Descargar contenido no implica pedir servicio ni estar calificado. No se introdu
 opaca sobre texto libre para decidir puja. Un formulario aceptado no comercial mantiene su CRM/operación
 y analítica apropiada, pero no genera la acción comercial Ads.
 
+### 6.3.1 Cobertura de formularios comerciales
+
+El alcance confirmado por el operador el 18/10 comprende **todos los formularios que reciben
+solicitudes comerciales de leads**: contacto, cotización, diagnóstico de servicio y brief comercial.
+Ebooks, descargas, newsletter, postulaciones, soporte y pruebas permanecen fuera de la acción
+`commercial_lead`; no se propone incorporarlos a Ads en esta ampliación.
+
+La elegibilidad técnica de `contact|diagnostic_intake|quote_request` y riesgo low/medium es una
+condición necesaria, no una declaración de intención comercial. Se revisan propósito, campos,
+versión publicada y surface. Contacto mixto y fuentes cuyo propósito declare contenido/lead magnet
+no se habilitan por el nombre o por superar `validate`. En el catálogo del 18/10, Lead Gen - Web
+presenta propósito comercial pero `form_kind=lead_magnet`; AI Visibility Grader pasa el gate técnico
+como diagnostic_intake aunque su propósito declara lead magnet. Ambas discrepancias requieren
+revisión de intención/clasificación antes de activar; no se ha corregido ninguna por inferencia.
+
+Se reutilizan la acción «Solicitud comercial aceptada», `conversionKey=commercial_lead` y los tags
+Web/Server ya publicados. Cada fuente conserva su política revisada/publicada, mapping y destinos
+previos; no se crea una etiqueta, acción Ads o campaña por formulario. «Performance» identifica
+el diagnóstico de pauta y «Discovery» la agenda: son fuentes del sitio, no tipos de campaña Ads.
+Discovery mantiene `meeting_booking` y su acción de reserva confirmada.
+
+El inventario distingue 13 Forms técnicamente elegibles, Performance activo y 12 propuestas validadas
+**sin publicar**. No equivale a 12 formularios comerciales aprobados: los casos ambiguos conservan
+su revisión. [Cobertura y plan pendientes](../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+Una versión nueva de una fuente exige revisar el binding/política vigente antes de medirla.
+El control automático de cobertura al publicar formularios es **propuesta, no implementación**;
+no hay inscripción automática de fuentes actuales o futuras. Esta conciliación documental no
+publica políticas, cambia clasificación ni modifica objetivos de campaña o puja.
+
 ### 6.4 Unión con HubSpot Forms
 
 Reutilizar el [ADR de identidad nativa](GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): marcador
@@ -476,7 +505,7 @@ match exacto/único y `provider_submission_id = conversionId`. Estados y CAS exi
 ambigüedad/denegación/exhaustion; un fallo del recibo no modifica entrega ni vuelve a ejecutar el POST.
 
 Las expansiones SQL de recibos se aplicaron el 18/10 con autorización específica; el worker compatible
-está servido. La propiedad técnica y el opt-in de mapping de Performance se configuraron y releyeron el18/10:13campos
+está servido. La propiedad técnica y el opt-in de mapping de Performance se configuraron y releyeron el 18/10:13campos
 comerciales intactos y14º oculto/opcional. [Recibo operativo](../audits/growth/2026-10-18-google-ads-activation.md).
 Primera ocurrencia nativa pendiente; históricos sin marcador no se promueven por email/hora.
 El valor actual de la propiedad Contact tampoco prueba una submission anterior. Contact ID y deal ID

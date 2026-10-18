@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-18 — Documentación y skills de medición conciliadas
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- Arquitectura/ADRs, runtime/tracking y manuales reflejan Web6/Server10, EC ON, OAuth Efeonce/CLI de gestión y tracing HubSpot/Meta; evidencias comerciales pendientes.
+- Cuatro pares Codex/Claude sincronizados; distingue fuentes Performance/Discovery de tipos de campaña y configuración de recepción/atribución.
+- [Cobertura sólo comercial](docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):12 propuestas DRY_RUN sin aplicar; Lead Gen Web pendiente de clasificación y revisión de intención en Grader/Contacto. Sin mutaciones runtime.
+
 ## 2026-10-18 — Ads activado y trazabilidad preparada para ocurrencias reales
 
 [Historial interno](docs/changelog/internal/README.md).
@@ -602,16 +610,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 ## 2026-10-04 — TASK-1899 retirada por el operador
 
 - Implementación local de escritura MCP revertida en Greenhouse y Studio; sin cambios de runtime desplegados. Se retira como requisito previo al desarrollo de Studio; futura federación pendiente de nueva decisión.
-
-## 2026-10-04 — AXIS: recursos, agentes, tipografía y botones
-
-- [Entradas especializadas y Growth Forms](docs/audits/2026-10-04-axis-specialized-inputs.md): AXIS `a0c6130`/`6fff346` subido; teléfono/correo/URL/documentos/decimales, 245 países con búsqueda y filas alineadas. Adapter Greenhouse opt-in y skills Codex/Claude sincronizadas. Primitives 0.5.0 pendiente de publicación; sin cambio de pins ni activación en hosts.
-
-- Colores y ramps de La órbita, siete compactos y diez familias de formularios distribuidos desde AXIS; foco continuo, iconos de apoyo y selectores enriquecidos. Docs y skills Codex/Claude sincronizados con tres subagentes. [Estado de publicación, instalación y límites](docs/audits/2026-10-04-axis-forms-release.md). Adopción y pins consumidores separados.
-
-- Familia portable de botones: contexto heredado, radio/toolbar, menús controlados y top layer modal; 52 recorridos en cuatro perfiles y 32 referencias visuales. Lab desplegado; VoiceOver/NVDA manual y zoom nativo pendientes. La adopción mantiene sus pins. [Release y evidencia](docs/audits/2026-10-04-axis-buttons-release.md).
-
-- Iconos AEO/SEO/Autoridad, logos propios y terceros, búsqueda, navegación, capacidades para agentes y Bricolage editorial centralizados en AXIS. `aee99d2` pushed y Lab desplegado; `graphic-line@0.17.0` publicado, nueva API `/logos` pendiente de release. Docs y skills Codex/Claude reconciliados sin cambiar pins consumidores. [Cierre, evidencias y alcance](docs/audits/2026-10-04-axis-documentation-closure.md).
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 

@@ -142,9 +142,10 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
   and `08-meta-conversions-api-server-side.md` before changing flags, capture, identity or destinations.
   Runtime/evidence:
   [published release](../../../docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
-  Server 9 strict v2 and both hosts were independently confirmed in Meta Test Events; compatible
-  new-source enrollment was proven without redeploy/GTM publish. Real commercial conversion,
-  CRM reconciliation and EMQ remain separate pending evidence.
+  In that historical 14/10 cut, Server 9 strict v2 and both hosts were independently confirmed in Meta
+  Test Events; compatible new-source enrollment was proven without redeploy/GTM publish. The 18/10
+  checkpoint below supersedes the live version/configuration; real commercial conversion, CRM
+  reconciliation and EMQ remain separate pending evidence.
 
 ## Verification proportional to the change
 
@@ -225,13 +226,45 @@ Provider delivery and real commercial outcomes require their own readback; CLI s
 that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.
 
 
-## Google Ads online y EC — delta 17-10-2026
+## Google Ads online y EC — contrato y checkpoint 18-10-2026
 
-Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md)
-y [evidencia](../../../docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
-Recibo Ads postcommit con UUID/key, no dedupe/replay; policy opt-in + flag global default OFF,
-consentimiento Google explícito/GPC. Hashes sólo canal reservado user_data vía memoria privada≤10s,
-nunca dataLayer/telemetría ordinaria; evento Ads excluido del forwarding GA4. No derivar Ads del
-generate_lead genérico ni mezclar UPD/Meta. Acciones secundarias ya creadas; drafts Web8/Server12
-compilan, **sin publicación/rollout ni conversión enviada**. CLI `google-ads conversions bindings`
-relee IDs/labels saneados; compilador GTM offline no publica. No reejecutar scripts privados históricos.
+Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
+[arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
+y [evidencia de activación](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).
+Recibo Ads postcommit con UUID/key, nunca en dedupe/replay; policy opt-in y flag global default OFF.
+Exigir los cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el canal reservado
+`user_data`, con memoria privada ≤10 s; nunca en dataLayer ni telemetría ordinaria. El evento dedicado
+`gh_ads_conversion` queda excluido del forwarding GA4. No derivar Ads del `generate_lead` genérico
+ni mezclar UPD/Meta. GCLID/GBRAID/WBRAID se observan con consentimiento; no se generan ni se disparan.
+El circuito online sigue dependiendo del navegador y no tiene retries backend.
+
+Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero; EC efectiva ON en
+**6862539491**, bridge compatible publicado en WordPress/Think y flag Production true con companion
+READY del mismo main liberado. Sólo Performance (formulario comercial) y Discovery (reserva) tienen
+política Ads rev2 publicada. Son nombres de fuentes del sitio, no tipos de campaña Ads. Ambas acciones
+siguen secundarias, ONE_PER_CLICK y valor de medición 0 CLP; no se modificaron pujas ni campañas.
+Primera ocurrencia real, recepción proveedor y atribución siguen **sin verificar**; protocolo aislado,
+negativos, tag fired, un flag o HTTP 200 no sustituyen esa evidencia. Releer estado live antes de operar.
+Los drafts Web 8/Server 12 del [corte 17/10](../../../docs/audits/growth/2026-10-17-google-ads-online-conversions.md)
+fueron consumidos por la publicación; no reconstruirlos ni reejecutar scripts privados históricos.
+`pnpm --silent google-ads conversions bindings` relee IDs/labels saneados; el compilador offline no publica.
+
+### Cobertura comercial por política
+
+El alcance ratificado por el operador es sólo formularios que captan solicitudes comerciales
+(contacto, cotización, diagnósticos y briefs elegibles). Excluye ebooks/descargas, newsletter,
+postulaciones, soporte, encuestas y fixtures. La intención y `kind` se verifican en la fuente:
+no inferir elegibilidad del nombre de la landing ni cambiar una clasificación por SQL directo.
+Reutilizar `commercial_lead` y los tags genéricos; no crear un tag por formulario ni hardcodear slugs.
+La agenda conserva `meeting_booking`, con confirmación proveedor y política propias.
+
+Para ampliar: descubrir versión/surface/origen/head frescos, validar mapping y elegibilidad,
+preservar destinos Meta/UPD y mapping CRM, luego draft→review→publish→readback mediante el comando
+canónico dentro del alcance autorizado. El flag global no inscribe nuevas fuentes. Publicar una
+versión Forms o cambiar un binding exige revisar la compatibilidad de su política; GA4 tagged no
+significa Ads habilitado. La revisión al publicar es hoy un paso del operador, no una autopolicy.
+
+[Inventario y pendientes 18/10](../../../docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):
+12 ampliaciones comerciales validadas en dry-run **sin publicar**. Lead Gen - Web conserva
+`lead_magnet` y requiere corrección gobernada antes de habilitarlo; esa corrección no está aplicada.
+No presentar el lote preparado como cobertura activa ni incorporar los ebooks por completar el catálogo.

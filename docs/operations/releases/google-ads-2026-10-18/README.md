@@ -6,6 +6,10 @@ mismo mainEC READY con alias/SHA y cadena de configuración verificados20:43:28Z
 Primera ocurrencia, recepción positiva y atribución pendientes. Los cortes siguientes son históricos.
 
 
+Cobertura posterior acotada por Julio: [sólo formularios comerciales](../../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+Doce propuestas DRY_RUN validadas sin publicar; Lead Gen - Web necesita corrección canónica de tipo.
+No se crean acciones para ebooks/careers/newsletter ni se ejecuta el plan previo por leer este dossier.
+
 **Checkpoint 18/10, 19:51Z — release de código RELEASED; Ads sin activar.** El operador autorizó
 promover todo develop y confirmó la excepción específica de batch a las 18:53:53Z. PR #256 mergeado:
 main `ec317c928fffcb919d71bdb62821b80280af2347`, árbol idéntico al candidato 77763331.

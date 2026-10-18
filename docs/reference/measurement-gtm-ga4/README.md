@@ -1,5 +1,13 @@
 # Reference — Medición GTM + GA4 + Meta CAPI (Efeonce/Greenhouse)
 
+Checkpoint18/10: [activación publicada](../../audits/growth/2026-10-18-google-ads-activation.md),
+Web6/Server10, EC ON, Performance/Discovery y tracing HubSpot/Meta configurados; primera recepción y
+atribución pendientes. [Cobertura comercial](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):
+12 propuestas dry-run validadas sin publicar; Lead Gen - Web requiere corrección canónica de tipo.
+Ebooks/careers/newsletter/support/tests quedan fuera de la ampliación solicitada. Los cortes16/10 y
+anteriores de este índice son historia; para operar leer el runtime10 y los manuales vigentes.
+
+
 > **Referencia canónica de medición.** Una sola copia, leída por Claude, Codex, humanos y Nexa. Las skills (`growth-marketing-cro`, `greenhouse-growth-forms`, `digital-marketing`, `efeonce-public-site-wordpress`) apuntan aquí — no duplican.
 > Documentación oficial de Google Tag Manager + GA4 + best practice de taxonomía de eventos, más la house style de Greenhouse aterrizada al runtime real.
 

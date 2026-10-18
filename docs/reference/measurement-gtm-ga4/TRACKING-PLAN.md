@@ -45,6 +45,13 @@ El bridge Ads exige cuatro permisos/GPC y UUID durable, no convierte clics/apert
 reservado sólo para EC; ninguna PII/hash/click ID en dataLayer o analítica ordinaria. Server agrega Ads
 Tracking/Linker y excluye el bridge del forwarder GA4. Sólo Performance/Discovery incorporaron el
 opt-in Ads; Meta/UPD y mappings previos se conservaron. No se habilitan otras fuentes por inferencia.
+La ampliación posterior pedida por el operador corresponde sólo a **Forms comerciales**: doce
+comandos de draft DRY_RUN validados, sin crear/publicar revisiones; no hay cobertura Ads adicional
+activada. `efeonce-lead-gen-web` continúa `lead_magnet`, con clasificación comercial pendiente.
+Ebooks, postulaciones, newsletter, soporte y pruebas no se incorporan a Ads. Contacto mezcla motivos:
+resolver los no comerciales antes de una activación; la compatibilidad de tipo no basta. Inventario,
+fuentes y límites: [auditoría de cobertura](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+No crear etiquetas por slug ni equiparar el tagging GA4 de esta tabla a opt-in publicitario.
 Histórico17/10: acciones secundarias y drafts Web8/Server12 preparados, captura OFF y sin publish.
 [Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md) ·
 [auditoría18/10](../../audits/growth/2026-10-18-google-ads-activation.md).
@@ -148,10 +155,10 @@ Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md),
 | --- | --- | --- | --- | --- |
 | Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server10/Web6; transporte PageView conservado; pruebas Server previas registradas, sin nuevo positivo con esta publicación | Volumen/calidad ordinaria |
 | Mismo destino/servidor | Lead formulario | Aceptación backend comercial + snapshot ads consentido | Client31/trigger33 autenticado, cola cifrada/worker ON; legacyMeta12 retirado | Observada 2026-10-17 con Performance: fuente→ledger→provider, 1 `Lead` SERVER_ONLY en Meta (ver doc 10). Pendiente en Meetings y en las demás fuentes |
-| Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida post-flip y replay real |
+| Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida real; no fabricar ni reenviar para completar evidencia |
 
 Tagging/preview mismo efeonce-group, min0/max1, 1CPU/512MiB, instance-based. Sin proyecto,
-servicio o cron nuevo para matching. GTM6 publicado sin Test Events code; tag6 sólo[11,33],
+servicio o cron nuevo para matching. Server10 conserva el tag6 sólo[11,33], sin Test Events code;
 PageView11 preservado. ForwardingGA4 exige Client Name=GA4, excluye Client backend.
 Incidente histórico: Lead QA sin Test Events pasó por regex .+; gate UUID corregido,
 no fue submission/reserva ni cuenta como conversión real. No repetir positivos fuera de Test Events.
@@ -178,4 +185,4 @@ Alta comercial compatible mediante API/panel/CLI, revisión y readback; nuevo ho
 requerir código. No activar automáticamente todas las fuentes ni convertir subscribe en Lead.
 Fixtures metadata-only del programa TASK-2036/2037 están archivadas/sin embed keys; no son nuevas
 superficies de captación comercial. Inventario/IDs/recibos y la prueba de fuente nueva posterior
-al contrato inicial en el release enlazado. Catálogo activo final13 fuentes/siete policies.
+al contrato inicial en el release enlazado. Catálogo de ese corte14/10:13 fuentes/siete policies; no representa el inventario actual.

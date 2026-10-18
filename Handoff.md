@@ -1,5 +1,16 @@
 # Handoff
 
+## 2026-10-18 — Medición: cierre documental y alcance comercial
+
+Arquitectura/ADRs, runtime/tracking, manuales OAuth/CLI/Ads, índices y cuatro pares de skills
+Codex/Claude conciliados con el cierre publicado: Web6/Server10, EC ON, ER5 READY del mainEC y
+tracing HubSpot/Meta configurados. Primera identidad/recibo/recepción/atribución sigue sin verificar.
+Nueva cobertura solicitada **sólo forms comerciales**: catálogo16forms+1agenda, sóloPerformance/Discovery
+Ads activos;12 propuestas DRY_RUN sin aplicar. Lead Gen Web sigue lead_magnet; Grader/Contacto
+requieren revisar intención. Sin inscripción automática ni nuevos eventos/acciones/puja/deploy/GTM.
+[Inventario y siguiente paso](docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md),
+[activación](docs/audits/growth/2026-10-18-google-ads-activation.md) e [historial](Handoff.archive.md).
+
 ## 2026-10-18 — Activación Ads y trazabilidad de conversiones
 
 Cuenta6862539491: EC ON, GTMWeb6/Server10 publicados, bridge compatible WordPress/Think y policies
@@ -248,12 +259,6 @@ cierre de interés 05/10, no 24 horas exactas. Radar horario/CRM del 10/10 poste
 ## 2026-10-14 — Footer público: composición compacta
 
 [Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
-
-## 2026-10-14 — LicitaLAB: radar público y conciliación CRM
-
-[Expediente del corte](docs/commercial/tenders/licitalab-actualizacion-2026-10-14/README.md): 1.142 códigos únicos revisados por perfil y keywords; 72 candidatas con lectura dirigida. Catorce bajas administrativas de plazo verificadas en HubSpot, dos prórrogas y UTEM preservada. 30 Deals nuevos y 3 RFI en Company + nota, con doble readback; cada alta conserva calificación/GO pendientes. Índices CRM y seguimiento local conciliados; historia y WIP ajeno preservados. No envío ni postulación.
-
-[Paquetes y pendientes](docs/commercial/tenders/licitalab-actualizacion-2026-10-14/PREPARACION-SUBDERE-TARAPACA.md): bases81/56p leídas, técnica/económica y anexos borradores en OneDrive canónico. Repo sólo trazabilidad liviana; sin binarios ni snapshots pesados. SUBDERE14.994MIVA candidato; Tarapacá cuatro unitarios/CPT5.355M, bolsa6.204Msin mínimos. Equipo, idoneidad, costo completo y subcontratación pendientes; sin GO, firmas ni envío.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

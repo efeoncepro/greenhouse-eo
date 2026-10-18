@@ -1,14 +1,19 @@
 # ADR — Recibo CAPI por evento e intento
 
-- Status: `Accepted` — implementación local solicitada el 2026-10-17, sin activación/deploy.
+- Status: `Accepted` — implementación solicitada17/10; schema/worker y captura Server10 publicados18/10; primer recibo real pendiente.
 - Date: `2026-10-17`.
-- Confidence: `high` en contrato y pruebas locales; compilación/publicación GTM y recepción real pendientes.
-- Validated as of: `2026-10-17`, sin mutaciones externas ni nuevas conversiones.
+- Confidence: `high` en contrato, pruebas y configuración publicada; recepción individual Graph real pendiente.
+- Validated as of: `2026-10-18`, configuración/compilación/readbacks; sin nuevas conversiones comerciales.
 - Owner: Growth / Measurement.
 - Scope: sender sGTM existente, worker/ledger/readers canónicos y CLI READ ONLY.
 - Reversibility: `two-way`; conservar evidencia, retirar instrumentación sin reenviar.
 - Modular placement: `src/lib/growth/measurement` y tooling local `scripts/measurement`; sin servicio,
   credencial, evento, autoridad o sender adicionales.
+
+Checkpoint18/10: [activación y límites](../audits/growth/2026-10-18-google-ads-activation.md).
+Expansión SQL aplicada, worker compatible servido y captura `captureEfeonceReceipt=true` en el tag6
+existente de Server10. El default del template sigue OFF; PageView no emite recibos. Primer Graph
+individual no verificado. El cierre documental no repite PUT/publish ni envía eventos para probar.
 
 ## Decisión
 
@@ -37,13 +42,14 @@ no matching, deduplicación efectiva, procesamiento, audiencia ni atribución. E
 transporte, no una consulta Meta por UUID. La CLI muestra estas etapas separadas. Históricos sin
 recibo permanecen desconocidos; no se rellenan por stats ni se reenvían para fabricar la evidencia.
 
-## Preparación y rollout separado
+## Preparación y rollout separado — cortes históricos
 
 [Expansión versionada](../../migrations/20261018174804112_meta-event-receipts.sql) aplicada el
 18/10 con autorización específica, al confirmar un worker compatible ya servido.
 [Reparación y readback](../audits/releases/2026-10-18-candidate-89d70ec13-review.md), sin deploy/GTM/replay. Worker comprueba storage antes de reclamar/enviar Meta; ausencia de schema
 no produce un POST sin finalización persistible y no bloquea el carril Google. Preview/compilación
-GTM y un readback de tráfico real son gates futuros, no pruebas locales ya satisfechas.
+GTM se completó posteriormente con Server10. El readback de tráfico real sigue pendiente; no es una
+prueba local ya satisfecha.
 No ejecutar builder histórico que muta workspace ni publicar template/flag para probar este cambio.
 
 Alternativas rechazadas: nuevo sender directo, raw responses en logs, contador agregado como

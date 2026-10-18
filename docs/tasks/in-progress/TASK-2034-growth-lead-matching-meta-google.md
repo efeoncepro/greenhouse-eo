@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: release general ec317c928 efectivo; Web6/Server10 publicados18/10, EC ON, bridges4250795666af en ambos hosts y dos policies Ads publicadas20:35Z. HubSpot propiedad/campo14/mapping CONFIG_VERIFIED; captura de recibos Meta publicada en Server10. Flag Ads de proyecto ON20:36:20Z; deployment companion Vercel READY con alias/SHA y presencia de claves env/build verificados20:43:28Z; cadena configurada, booleano congelado no expuesto por API. Protocolo/negativos y configuración verificados; primera ocurrencia bajo esta activación, recibos individuales Graph/HubSpot, recepción Ads y atribución pendientes. Sin fabricar negocio.`
+- Status real: `Parcial: release general ec317c928 efectivo; Web6/Server10 publicados18/10, EC ON, bridges4250795666af en ambos hosts y dos policies Ads publicadas20:35Z. HubSpot propiedad/campo14/mapping CONFIG_VERIFIED; captura de recibos Meta publicada en Server10. Flag Ads de proyecto ON20:36:20Z; deployment companion Vercel READY con alias/SHA y presencia de claves env/build verificados20:43:28Z; cadena configurada, booleano congelado no expuesto por API. Protocolo/negativos y configuración verificados; primera ocurrencia bajo esta activación, recibos individuales Graph/HubSpot, recepción Ads y atribución pendientes. Sin fabricar negocio. Ampliación sólo a forms comerciales:12 propuestas DRY_RUN sin aplicar y Lead Gen Web pendiente de clasificación; intención mixta/Grader requiere revisión.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -162,6 +162,8 @@ Delta Ads online autorizado17/10 (no cambia la evidencia histórica Meta/UPD):
 - [x] HubSpot Performance: propiedad técnica, campo14 oculto/opcional y mapping por CAS CONFIG_VERIFIED; trece campos/settings preservados y defaults reconciliados por GET sin repetir PATCH.
 - [x] Flag Ads de proyecto ON verificado20:36:20Z; es configuración del proyecto, no prueba del valor congelado del deployment.
 - [x] Companion Vercel READY, alias/SHA exactos y cadena de configuración verificados20:43:28Z (proyecto true + clave env/build presentes). La API no expone el valor booleano congelado ni prueba una conversión.
+- [x] Cobertura inventariada por API y12 propuestas DRY_RUN técnicamente validadas; evidencia saneada y skills/docs actualizados, sin publicar ni mutar fuente.
+- [ ] Revisar intención y publicar ampliación únicamente comercial; corregir Lead Gen - Web por el dominio Forms y verificar cobertura servida sin activar otras finalidades.
 - [ ] Primera solicitud comercial real bajo esta activación: recibo durable y recepción de la acción Ads correspondiente; sin enviar formularios sintéticos.
 - [ ] Primera reserva comercial real confirmada bajo esta activación: recibo durable y recepción de la acción Ads correspondiente; no convertir clics o apertura de agenda.
 - [ ] Primera identidad nativa HubSpot exacta de una nueva submission marcada, con historial completo y conversionId verificado.
@@ -239,6 +241,16 @@ Evidencia histórica del rollout13/10:
 - 2026-10-13: released, SQL aplicada, canary cola real, GTM6 cutover, worker ON y capture/redeploy
   último. Rollout operativo completo; Status Parcial por primera conversión consentida no ejercitada.
 
+### Conciliación documental18/10 — cobertura comercial
+
+[Inventario verificado y alcance](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):
+16forms+1agenda en catálogo; sólo Performance/Discovery Ads publicados. Doce propuestas pasaron
+validación sin crear revisiones ni publicar. Lead Gen - Web conserva `lead_magnet` pese a propósito
+comercial; corregir con el writer Forms, sin SQL directo desde un consumer ni bypass por slug.
+AI Grader declara propósito lead magnet y Contacto admite motivos mixtos: revisar intención además
+de la elegibilidad técnica. Ebooks, careers, newsletter, soporte y fixtures fuera de esta ampliación.
+Skills Codex/Claude y docs conciliadas; inscripción automática/publish guard futuros no implementados.
+
 ## Risks & Open Questions
 
 - Google UPD policy/ack aceptados el2026-10-13 tras autorización; no repetir aceptación.
@@ -254,6 +266,7 @@ Acceptance evidence + Status real current, runtime and rollout gates passed, doc
 Owner Codex. Matching activo y permanente; no volver a ejecutar rollout por snapshots históricos.
 Release general vigente ec317c928 y configuración Ads/HubSpot publicados18/10; preservar WIP ajeno.
 Companion READY, alias/SHA y cadena de configuración releídos20:43:28Z; canarios/health/watchdog PASS.
+Siguiente configuración: revisar/publicar ampliación sólo comercial según el inventario, aún sin aplicar.
 Siguiente evidencia: observar fuentes reales consentidas y correlacionar ledger/ack/provider, recibo individual
 Graph e identidad nativa HubSpot, sin fabricar negocio ni repetir envíos. No afirmar atribución,
 calidad o serving por configuración, protocolo local o Test Events.

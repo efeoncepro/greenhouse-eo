@@ -17,7 +17,10 @@ creación/actualización por plan, validateOnly, hash, journal y readback; targe
 manager `9531478329`, Ads `jreyes@efeoncepro.com`, Cloud siempre `julio.reyes@efeonce.org` / `efeonce-group`.
 No tokens en flags/env ni cuentas libres. Crear capacidad no autoriza un apply sin payload concreto;
 no reintentar un resultado unknown ni borrar el journal. OAuth guardado Efeonce; verificación Google
-pendiente. Conexión/API/MCP de producto e ingesta no están entregadas. Cargar el manual antes de operar.
+pendiente. Google Ads no ofrece scope OAuth separado de sólo lectura; el runner/catálogo y la
+autoridad de cada operación restringen su uso. La marca cambió sin sustituir clients, callbacks,
+scopes ni grants GA4/GSC; esas conexiones pasaron consultas posteriores al cambio. Conexión/API/MCP
+de producto e ingesta no están entregadas. Cargar el manual antes de operar.
 
 
 Para **consultar y operar Meta con agentes** (Ads, catálogo completo de métricas, stats/calidad,
@@ -34,14 +37,18 @@ submission ID o event UUID. Cargar el mismo manual: runtime `greenhouse_app` REA
 identidad/descifrar/redispatchar. ACK sGTM no es procesamiento Meta; contacto CRM no prueba envío.
 HubSpot usa resolver canónico y portal verificado; `--source-only` omite esa comprobación remota.
 Identidad nativa: [manual](../../../docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md);
-marker por envío, GET histórico y CAS del worker (rollout pendiente). Históricos sin marker siguen
-correlacionados. [Meta individual](../../../docs/documentation/growth/meta-individual-event-verification.md):
+marker por envío, GET histórico y CAS del worker. Checkpoint 18/10: schema/worker servidos y
+propiedad/campo/mapping Performance configurados; primera identidad nativa pendiente. Históricos
+sin marker siguen correlacionados, sin backfill ni otro POST.
+[Meta individual](../../../docs/documentation/growth/meta-individual-event-verification.md):
 sin GET por event_id; no usar Test Events como sandbox ni reenviar para completar evidencia.
 Recibos por evento: [ADR](../../../docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) +
-[manual](../../../docs/manual-de-uso/growth/conservar-recibos-meta.md). Implementación local sin activar/deploy:
-parche offline del template fijado, checkbox default OFF, header sólo del Client autenticado y
-append de metadata saneada en el CAS de finalización. `meta.receipt` no confirma procesamiento.
-No ejecutar el builder histórico de workspace ni publicar/enviar para completar evidencia.
+[manual](../../../docs/manual-de-uso/growth/conservar-recibos-meta.md). Checkpoint 18/10: Server 10 live,
+template 3/tag 6 instrumentados y `captureEfeonceReceipt=true` para el Lead backend autenticado;
+schema/worker compatibles servidos. Default del template sigue OFF; PageView no recibe ese header.
+Primer recibo Graph real pendiente. `meta.receipt` puede acreditar recepción de una petición exacta,
+no procesamiento, matching ni atribución. No publicar/enviar ni repetir un lead para llenar evidencia;
+no ejecutar el builder histórico de workspace. Antes de modificar, releer versión/template/tag y el manual.
 
 - Tagging a Growth Form, Growth CTA, native meeting scheduler or landing so its governed event reaches GA4.
 - Wiring form `gh_form_*`, CTA engine `greenhouse_cta_*`, legacy host `gh_cta_clicked` or native
@@ -57,7 +64,8 @@ Revisión final CLI/recibos: paginación Meta malformada queda parcial; no anunc
 La historia CAPI exige intentos crecientes (huecos permitidos) y reloj Graph compatible con su propio
 registro durable (margen cinco minutos). HubSpot multidestino agrega por `fsub-*`, conserva los IDs
 nativos por destino y devuelve exit6 con evidencia mixta. `verified` requiere checks/fecha/cobertura.
-[Revisión local](../../../docs/audits/growth/2026-10-17-meta-cli-final-review.md); activación pendiente.
+[Revisión local 17/10](../../../docs/audits/growth/2026-10-17-meta-cli-final-review.md); la configuración
+posterior está en la auditoría 18/10 y no certifica primera recepción real.
 
 ## Meta CAPI / sGTM — cargar antes de proponer o ejecutar
 
@@ -105,7 +113,7 @@ Publicar Client/retiro legacy →destinos y retención worker ON →captura/rede
 Forwarding GA4 restringido a `Client Name = GA4`: el Client backend no reenvía otro generate_lead.
 Verificar versión congelada antes de publicar; recibo tras create_version permite recuperación
 sin recrear workspace/versión a ciegas.
-**Estado publicado y alta de fuentes:**
+**Checkpoint histórico 14/10 y alta de fuentes:**
 [release 14/10](../../../docs/audits/releases/2026-10-14-scalable-measurement-agent-first-release.md),
 PR255/main `9690efad`, orquestador success y manifest released. Server **9** estricto schema 2;
 Web **5** sin cambios. Sólo customTemplate30 cambió en el Server; pixel708931297255942,
@@ -133,10 +141,11 @@ no es prerrequisito de UPD. Respetar la restricción shared workspace antes del 
 
 Verificado 2026-10-13: hosting del mismo `GTM-K2X4ZTTK` recuperado en `efeonce-group`,
 tagging + preview min 0/max 1, 1CPU/512MiB, instance-based; `/healthy` 200 y Preview funcional.
-En ese corte histórico GTM Web **5**/Server **6** estaban publicados; Server actual **9** según
-el readback14/10 anterior. HubSpot categoría opt-in y
+En ese corte histórico GTM Web **5**/Server **6** estaban publicados; el readback 14/10 posterior
+fijó Server 9 y el checkpoint 18/10 de esta skill fija Web 6/Server 10. HubSpot categoría opt-in y
 routing WP/Think activos. Test Events Server procesados y PageView real completó ambos destinos.
-Próximas conversiones comerciales/replay pendientes. Ver estado/URLs en la auditoría.
+Primera conversión comercial y reconciliación pendientes en ese corte; esto no autoriza replay.
+Ver estado/URLs en la auditoría.
 Cargar `09-hubspot-consent.md`: API banner `_hsp`, boolean categories, nunca legacy `allowed`
 ni `_hsq`. Default inline denied antes de tags; analítica no concede Meta, GPC bloquea publicidad.
 PV explícito una vez/destino: `meta_only` gatea GA4, `meta_capi_page_view` + UUID gatean Meta.
@@ -403,13 +412,56 @@ Provider delivery and real commercial outcomes require their own readback; CLI s
 that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.
 
 
-## Google Ads online y EC — delta 17-10-2026
+## Google Ads online y EC — contrato y checkpoint 18-10-2026
 
-Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md)
-y [evidencia](../../../docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
-Recibo Ads postcommit con UUID/key, no dedupe/replay; policy opt-in + flag global default OFF,
-consentimiento Google explícito/GPC. Hashes sólo canal reservado user_data vía memoria privada≤10s,
-nunca dataLayer/telemetría ordinaria; evento Ads excluido del forwarding GA4. No derivar Ads del
-generate_lead genérico ni mezclar UPD/Meta. Acciones secundarias ya creadas; drafts Web8/Server12
-compilan, **sin publicación/rollout ni conversión enviada**. CLI `google-ads conversions bindings`
-relee IDs/labels saneados; compilador GTM offline no publica. No reejecutar scripts privados históricos.
+Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
+[arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
+y [evidencia de activación](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).
+Recibo Ads postcommit con UUID/key, nunca en dedupe/replay; policy opt-in y flag global default OFF.
+Exigir los cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el canal reservado
+`user_data`, con memoria privada ≤10 s; nunca en dataLayer ni telemetría ordinaria. El evento dedicado
+`gh_ads_conversion` queda excluido del forwarding GA4. No derivar Ads del `generate_lead` genérico
+ni mezclar UPD/Meta. GCLID/GBRAID/WBRAID se observan con consentimiento; no se generan ni se disparan.
+El circuito online sigue dependiendo del navegador y no tiene retries backend.
+
+Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero; EC efectiva ON en
+**6862539491**, bridge compatible publicado en WordPress/Think y flag Production true con companion
+READY del mismo main liberado. Sólo Performance (formulario comercial) y Discovery (reserva) tienen
+política Ads rev2 publicada. Son nombres de fuentes del sitio, no tipos de campaña Ads. Ambas acciones
+siguen secundarias, ONE_PER_CLICK y valor de medición 0 CLP; no se modificaron pujas ni campañas.
+Primera ocurrencia real, recepción proveedor y atribución siguen **sin verificar**; protocolo aislado,
+negativos, tag fired, un flag o HTTP 200 no sustituyen esa evidencia. Releer estado live antes de operar.
+Los drafts Web 8/Server 12 del [corte 17/10](../../../docs/audits/growth/2026-10-17-google-ads-online-conversions.md)
+fueron consumidos por la publicación; no reconstruirlos ni reejecutar scripts privados históricos.
+`pnpm --silent google-ads conversions bindings` relee IDs/labels saneados; el compilador offline no publica.
+
+### Cobertura comercial por política
+
+El alcance ratificado por el operador es sólo formularios que captan solicitudes comerciales
+(contacto, cotización, diagnósticos y briefs elegibles). Excluye ebooks/descargas, newsletter,
+postulaciones, soporte, encuestas y fixtures. La intención y `kind` se verifican en la fuente:
+no inferir elegibilidad del nombre de la landing ni cambiar una clasificación por SQL directo.
+Reutilizar `commercial_lead` y los tags genéricos; no crear un tag por formulario ni hardcodear slugs.
+La agenda conserva `meeting_booking`, con confirmación proveedor y política propias.
+
+Para ampliar: descubrir versión/surface/origen/head frescos, validar mapping y elegibilidad,
+preservar destinos Meta/UPD y mapping CRM, luego draft→review→publish→readback mediante el comando
+canónico dentro del alcance autorizado. El flag global no inscribe nuevas fuentes. Publicar una
+versión Forms o cambiar un binding exige revisar la compatibilidad de su política; GA4 tagged no
+significa Ads habilitado. La revisión al publicar es hoy un paso del operador, no una autopolicy.
+
+[Inventario y pendientes 18/10](../../../docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):
+12 ampliaciones comerciales validadas en dry-run **sin publicar**. Lead Gen - Web conserva
+`lead_magnet` y requiere corrección gobernada antes de habilitarlo; esa corrección no está aplicada.
+No presentar el lote preparado como cobertura activa ni incorporar los ebooks por completar el catálogo.
+
+### Aprendizajes de operación de GTM 18/10
+
+Cargar `LEARNINGS.md` antes de editar: Google JavaScript serializa el reservado `user_data` como
+claves anidadas con metadata; no exigir `em` en la entrada GA4 ni ampliar parámetros ordinarios.
+El PUT de template puede rechazar `galleryReference`; sólo tras GET que pruebe ausencia de mutación
+preparar el cuerpo soportado. El fork local puede cambiar el tipo del tag: releer el pointer antes
+de editarlo. Admitir únicamente normalizaciones JSON/espacios acotadas y equivalencia demostrada;
+un hash diferente no se da por válido sin comparar código, permisos y secciones preservadas.
+Congelar y verificar ambos árboles antes de publicar Server→Web; ejecutar snapshot después de la
+publicación aprobada. Los tokens, cabeceras Preview y payloads con identidad permanecen privados.

@@ -10,6 +10,26 @@ verificada; la API sólo expone nombres y no acredita por sí sola el booleano c
 externas; primera ocurrencia comercial, recibo proveedor y atribución siguen pendientes. E2E abierto.
 [Auditoría de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
 
+## Cobertura comercial y ampliación pendiente
+
+**Performance** es el formulario de diagnóstico de pauta; **Discovery** es la agenda de descubrimiento.
+Son nombres de fuentes del sitio. El tipo de campaña Ads no determina qué fuente tiene cobertura.
+Actualmente son las dos fuentes con políticas Ads publicadas.
+
+El alcance solicitado para ampliar Forms comprende contacto, cotización, diagnósticos y briefs
+**comerciales** que captan solicitudes de servicios. Se reutiliza la acción «Solicitud comercial
+aceptada» y las etiquetas existentes, mediante política por fuente/versión/surface; no se necesita
+una etiqueta por formulario. Ebooks, descargas, newsletter, postulaciones, soporte y pruebas quedan
+fuera de esta ampliación. Discovery conserva su acción separada de reserva confirmada.
+
+En el inventario del 18/10 hay 13 Forms técnicamente elegibles: Performance y 12 propuestas adicionales
+validadas **sin publicar**. El gate técnico no decide intención comercial: AI Visibility Grader
+requiere revisión porque su propósito declara lead magnet, y Lead Gen - Web requiere conciliar su
+propósito comercial con la clasificación actual lead_magnet. No se han reclasificado ni activado.
+[Inventario, evidencia y pendientes](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+El control de cobertura automática de formularios futuros sigue **propuesto**; la publicación de una
+versión nueva requiere revisar su política. No se han cambiado objetivos ni pujas en esta ampliación.
+
 La arquitectura adoptada conecta la inversión de Google Ads con solicitudes comerciales, reuniones,
 calificación y negocios, conservando la fuente y el nivel de evidencia de cada hecho. El 17-10-2026
 se comprobó **acceso API de lectura de operador** a `686-253-9491`. La CLI local `pnpm google-ads`
@@ -34,7 +54,7 @@ borradores Web 8/Server 12 compilan. **En ese corte no hubo despliegue ni public
 La afirmación anterior de cero escrituras corresponde al probe/CLI previo; este delta sí creó dos
 acciones, sin enviar conversiones ni cambiar campañas. [Activación y límites](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
 
-El18/10 se completó la validación local/API y se preparó el
+El 18/10 se completó la validación local/API y se preparó el
 [paquete previo al release](../../operations/releases/google-ads-2026-10-18/README.md):499 pruebas
 focales y32 escenarios Chromium con respuestas simuladas y sin envíos externos. Términos aceptados
 confirmados por API; EC seguíaOFF. Faltaban compatibilidad servida en hosts, protocolo GTM real y
@@ -80,8 +100,8 @@ recepción, procesamiento y atribución se muestran separados. Un recibo HTTP o 
 no confirma una conversión individual atribuida. Consentimiento negado o desconocido bloquea la
 publicidad que corresponda y no impide enviar una solicitud comercial legítima.
 
-La cuenta inicial es nueva: API confirmó `Efeonce - Agencia`, CLP y America/Santiago, con dos
-acciones GA4 `HIDDEN`, ambas `primary_for_goal=false`, y estado `NOT_CONVERSION_TRACKED`.
+En la lectura inicial del 17/10, la cuenta era nueva: API confirmó `Efeonce - Agencia`, CLP y America/Santiago, con dos
+acciones GA4 `HIDDEN`, ambas `primary_for_goal=false`, y estado `NOT_CONVERSION_TRACKED` en aquel corte; no describe las acciones nativas ni EC del checkpoint actual.
 La lectura usa el manager `9531478329` como ruta de acceso al anunciante autorizado. No habilita
 otras cuentas ni activa campañas.
 
