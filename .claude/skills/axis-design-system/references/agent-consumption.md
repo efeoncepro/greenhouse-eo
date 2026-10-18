@@ -264,6 +264,22 @@ The 0.6.6 release succeeded but repeated 19 minutes of browser gates. Do not dis
 same-commit main CI is pending. Use `pnpm release:packages <version>` after commit/push: the local
 command waits for trusted successful exact-SHA main CI, then pushes the tag. A manual tag without
 successful CI fails before installing/building in the publication runner.
+Flow: bump package `package.json` versions and the README table → commit → push `main` →
+`pnpm release:packages <version>`. `release-packages.yml` publishes only packages whose version is not yet
+in the registry, so the tag `v<version>` only needs to name one package's version (mention set: `v0.7.5`, then
+`v0.6.9` for primitives alone).
+
+Lessons from the mention release (2026-10-18), now fixed in AXIS:
+- **Do not push between the fix and its tag.** A docs-only commit pushed after the fix left a CI run with no reusable
+  core checks, so the publication job ran `pnpm test` itself. That job used to build only packages, and the Lab test
+  that compares brand files byte for byte failed on the Factory copies, which are kept out of git on purpose and exist
+  only after `brand:sync`. `release-packages.yml` now syncs the Lab brand files before its tests (`b1cb16b`).
+- **The video browser suite was flaky on shared runners.** Two `role="status"` regions (load and review) made
+  `getByRole('status')` ambiguous when loading was slow, and media waits exceeded the default 5 s. The review asserts
+  now target `.axis-video__status`, CI assertions get 20 s, and CI retries once so a stall is reported as flaky
+  (`69492cf`). A red video suite after this is a real signal: read the trace, do not rerun blindly.
+- A failed publication run that published nothing leaves its tag: delete it (`git push origin :refs/tags/v<x>`) after
+  confirming the version is absent from the registry, then rerun `pnpm release:packages <x>` on the new commit.
 
 `ci-release-plan.mjs` compares the full diff from a verified successful ancestor release. Only unchanged
 families inherit its validation; affected families need exact-SHA CI plus identical build digest, or run.

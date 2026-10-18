@@ -117,7 +117,8 @@ Estas reglas no se repiten en cada tarjeta; se asumen siempre.
    estado de sala, el arco mide tiempo real (L 4.3 2/3).
 8. **Gramática de estado** (T `state`): **anillo = libre / abierto / pregunta**, **esfera = ocupado / decidido /
    respuesta**. Nunca colores de semáforo, y siempre con su etiqueta de texto.
-9. **Logo una vez por vista**, logo o isotipo, nunca los dos (M §8.1). En piezas gráficas la firma es el **logo de
+9. **Logo una vez por vista**, logo o isotipo, nunca los dos (M §8.1). Excepción en web (operador, 2026-10-18): la
+   Mención Efeonce (A14) convive con el logo de la página, porque es un enlace en el texto y no una firma. En piezas gráficas la firma es el **logo de
    Efeonce centrado abajo**; la burbuja URL lo reemplaza sólo si el logo ya está en la imagen (M §8.5).
 10. **El eslogan sólo en cierres** (M §5): final de video, última lámina, contratapa, firma de correo, recepción, merch.
     Nunca en cada post, nunca en la portada, nunca con esfera, nunca traducido ni en mayúsculas. En la contraportada de
@@ -498,6 +499,32 @@ vale en toda aplicación:
 - **Aplicaciones de la marca exploradas, no aprobadas como composiciones de la sala (2026-10-08):** canvas privado «Efeonce Rooms — Logo» (`https://claude.ai/artifact/GxQAjo17CqRKTDvQVMa8R1`; páginas Logo, Aplicaciones y Variantes del símbolo): imagen del enlace compartido 1200×630, invitación por correo, pestaña + ícono de app + avatar + stickers, portada del modo presentación 1920×1080, placa de sala en oficina («Medir.»), post de lanzamiento 1080×1350 y storyboard de apertura (dos órbitas se acercan, se enlazan y la esfera se posa a la 1:30; con movimiento reducido, sólo el cuadro final). Son exploraciones: no aprueban composiciones de la sala (siguen sujetas a los contratos de UI y al go de EPIC-052) ni una animación de logo nueva (las aprobadas siguen siendo reveal/apertura/sting).
 - **Producción y motion:** adapter nativo Rooms sobre packages, no copia de Lab; `efeonceGraphicLine.motion` para marca y `axisMotion`/contrato del componente para interacción. Pins, mappings y píxeles se validan al implementar.
 - **Estado/QA:** decisión de sistema y marca aceptadas; publicado en el release `v0.4.27` (2026-10-08, readback en GitHub Packages), prueba del símbolo sin contexto y búsqueda formal de marca pendientes; composición, runtime, GVC, fuente efectiva, accesibilidad y go final pendientes. Ningún cambio automático al theme de Greenhouse.
+
+
+### A14. Mención Efeonce en texto corrido (2026-10-18)
+
+- **Qué es:** un enlace dentro de un párrafo a un servicio o producto de Efeonce, con el **isotipo** delante y una
+  píldora en el acento de la línea de servicio. Marca «esto es Efeonce» sin salir del texto. Al pasar el puntero el
+  isotipo se inclina (−12°, escala 1,08, 400 ms, curva enfatizada); con movimiento reducido no se inclina.
+- **Origen:** nació en la landing Inbound del sitio público (aprobada por el operador el 2026-10-18) y ese mismo día
+  pasó a AXIS para usarla en todo el ecosistema (Think y otros hosts).
+- **Cuándo sí:** sólo hacia destinos de Efeonce (ruta propia o `efeoncepro.com` / `efeonce.org` y sus subdominios);
+  pocas por sección, con etiquetas cortas (2 a 4 palabras).
+- **Cuándo no:** no es un CTA (para la acción va el [botón de marca](#botones-de-marca-del-lab-axis-2026-10-04)) y nunca
+  apunta a un sitio externo; el contrato rechaza esos destinos.
+- **Color:** el de la línea que habla la página o la sección (`data-line`: growth, brand, engine, voice,
+  revenue-hubspot, revenue-salesforce) sobre su superficie (`data-surface` light/dark). El acento va sólo en el isotipo
+  (≥ 3:1 contra el fondo) y en el tinte de la píldora; el texto va en tinta, navy sobre claro y blanco sobre oscuro
+  (≥ 4,5:1 sobre la píldora), como pide la regla del acento (§0, regla 12).
+- **El isotipo nunca va en el marcado ni en el `alt`:** lo pinta el CSS como máscara generada desde el isotipo sellado
+  de `axis-brand-assets`. El marcado es sólo `<a class="axis-mention" href data-line data-surface>etiqueta</a>`.
+- **La API vive en AXIS:** contrato `efeonce.mention`, tokens `axisMention` y primitive de `axis-ui-primitives`
+  ([package-and-tokens.md](package-and-tokens.md#mención-efeonce--publicada-2026-10-18); consumo, versiones y hosts en
+  la skill `axis-design-system` → `references/ui-primitives.md`). Ninguna landing ni producto copia su CSS.
+- **Convive con el logo (excepción en web):** la regla «logo una vez por vista» (§0, regla 9) no la alcanza en web:
+  es un enlace dentro del texto, no una firma (operador, 2026-10-18). No vale para piezas gráficas, impresos ni video.
+- **Es un mecanismo, no una plantilla:** usarla no convierte el aspecto de la landing Inbound en patrón de otras
+  páginas (PDR-026).
 
 ## B. Presentaciones e informes
 
@@ -1099,6 +1126,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Favicon / ícono de app | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
 | Destacados de Instagram | — | mezcla de recursos, un color de luz por destacada, sin firma en el círculo; portada (cambiar) e historia completa 9:16 (crear) | A11 |
 | Escenario del login de Greenhouse (excepción en curso) | lente al canon (anillo 1,12, zoom, ancho/794); sin lente si la foto ya trae su órbita | foto de novedad, voz con anillo y esfera en el acento de la línea | A12 (`LoginLens.tsx`) |
+| Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
 | Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |

@@ -47,7 +47,9 @@ la casa ni punto de partida por defecto de otra.**
      snapshot);
    - el lanzador de reunión de la base común (`EO_Source_Led_Landing_Base_Widget`, `<gh-meeting-cta>` con override de
      ubicación por placement);
-   - la primitive de todo el sitio `EfeonceMention`;
+   - la primitive de todo el sitio `EfeonceMention`; desde el 2026-10-18 su dueño es AXIS (`efeonce.mention`,
+     `a.axis-mention`), así que todo host —WordPress, Think u otro— consume el mismo paquete y ninguna landing bifurca
+     su CSS;
    - la integración con Growth Forms y Growth CTA;
    - las lecciones técnicas registradas (por ejemplo, que `<greenhouse-cta>` necesita ancho explícito, o que un botón de
      contorno sobre el límite de una foto necesita fondo propio).

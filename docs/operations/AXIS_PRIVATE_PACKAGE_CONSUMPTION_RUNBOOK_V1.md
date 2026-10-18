@@ -1,6 +1,30 @@
 # AXIS Private Package Consumption Runbook V1
 
-## Corte vigente — replay 0.6.6 y publicación incremental (2026-10-07)
+## Corte vigente — Mención Efeonce: `v0.7.5` y primitives `0.6.9` (2026-10-18)
+
+La «Mención Efeonce» (enlace en línea a un servicio o producto Efeonce, con el isotipo delante y una pastilla en el
+acento de la línea) nació en el sitio público como `a.eo-mention` y el mismo día pasó a AXIS como `efeonce.mention`.
+
+| Entrega | Evidencia / estado |
+| --- | --- |
+| Tag `v0.7.5` (commit `dd833d5`; feature `108c6f1`) | `axis-tokens` `0.6.5` (`axisMention`), `axis-ui-contracts` `0.7.5` (contrato `efeonce.mention` 1.0.0 `candidate`), `axis-ui-registry` `0.7.3` (capacidad `efeonce.mention`), `axis-ui-primitives` `0.6.8`. CI y `release-packages` en verde |
+| Tag `v0.6.9` (commit `701a164`) | `axis-ui-primitives` `0.6.9`: la máscara del isotipo pasa a `url(data:…)` **sin comillas** y totalmente codificada; un test prohíbe urls entre comillas |
+| WordPress (`eo-elementor-widgets`) | `assets/css/axis-mention.css` = copia byte a byte de `dist/mention.css` de primitives `0.6.9`, con cabecera de versión y sha256 `baacdd7053ec7c6b70a881cefb32cae03b77ca8e77ca94c4d311fa8f0f8cee4f`; handle `axis-mention` encolado en todo el sitio (frontend, preview de Elementor, editor de bloques). Retirados `eo-mention.css` y el isotipo local. En vivo en Inbound (`/agencia-inbound-marketing/`, página `242601`): 10 menciones `data-line="revenue-hubspot" data-surface="dark"`, verificadas a 1440 y 390 sin desborde y sin la clase legada. Commit del runtime `5db8f64` |
+| Think | Fija `@efeoncepro/axis-ui-primitives` `0.6.9` exacto; componente `src/components/EfeonceMention.astro` sobre `mentionHtml` + `mention.css`; preview noindex `/preview/mention/`. Sin menciones en páginas de producción todavía |
+| Greenhouse | Sin adopción; `package.json` no fija `axis-ui-primitives` y sus pines AXIS no cambian |
+
+- **Por qué existe `0.6.9`:** con `0.6.8`, la pasada CSS de alias de tsconfig de Astro 7 (`astro:tsconfig-alias-css`)
+  intentó resolver como archivo el `url("…")` entre comillas y el build de Think cayó con `ENAMETOOLONG`. El Lab de AXIS
+  no tiene alias de tsconfig y no lo detectó. En hosts Astro usar `0.6.9` o superior, nunca `0.6.8`.
+- **Lección:** antes de publicar, validar el build de un consumidor real contra el `dist` local de AXIS; el Lab no basta.
+- **WordPress no instala el paquete:** consume la copia byte a byte. Nunca editarla: para actualizar, recopiar
+  `dist/mention.css` de la versión publicada y registrar en la cabecera la versión y el sha256 nuevos.
+- Flujo de publicación usado: bump de versiones + tabla del README → commit → push a `main` →
+  `pnpm release:packages <version>` (espera CI del mismo commit y empuja el tag; `release-packages.yml` publica sólo los
+  paquetes cuya versión aún no está en el registry).
+- Uso para autores y operadores: [manual de la mención](../manual-de-uso/plataforma/usar-mencion-efeonce.md).
+
+## Corte — replay 0.6.6 y publicación incremental (2026-10-07)
 
 Primitives 0.6.6 / tokens 0.6.1 publicados por release `37696704305` SUCCESS, tag en `5062ba9`.
 Think `d36ba40` y Studio `3ba7cff` adoptan pins registry con Vercel SUCCESS; WordPress sólo bundle candidato.

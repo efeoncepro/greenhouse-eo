@@ -1,5 +1,13 @@
 # Registro de decisiones y versiones
 
+### 2026-10-18 — Mención Efeonce: el isotipo en el texto convive con el logo (web)
+
+Decisión del operador: «Para el mention obviamente habría una excepción acá para web». La Mención Efeonce (enlace a un
+servicio o producto de Efeonce dentro del texto, con el isotipo delante; contrato AXIS `efeonce.mention`, A14) no rompe
+la regla «logo una vez por vista, logo o isotipo, nunca los dos» (M §8.1, §0 regla 9): en web es un enlace, no una
+firma, y convive con el logo de la página. La excepción es sólo para web; piezas gráficas, impresos y video siguen con la
+regla. Caso fuente: la landing Inbound (`/agencia-inbound-marketing/`), con logo en la cabecera y diez menciones.
+
 ### 2026-10-18 — Mega menú del sitio: el logo de Glitch donde se nombra Glitch
 
 Decisión del operador: «Donde se nombre a Glitch en el menú pon el logo de Glitch». En el mega menú «Recursos» de efeoncepro.com, Glitch se nombra con su logo oficial negativo (`@efeoncepro/axis-brand-assets` → `assets/glitch/glitch-logo-negative.svg`, letras blancas y la manzana verde) en la columna de formatos, el antetítulo, la tarjeta destacada y la franja inferior. Es el logo de un producto que acompaña, como el de Insights: no trae el resto de la sub-línea (verde de fondo, cabecera «EDICIÓN #N», falla en bytes) ni cuenta como esfera de La órbita. Vale para el menú del sitio; no autoriza mezclar elementos de Glitch en otras piezas de Efeonce.
