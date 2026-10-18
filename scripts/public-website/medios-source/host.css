@@ -22,12 +22,30 @@
 @keyframes gh-medios-panel-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .gh-medios [data-gh-panels][data-ready] > [data-gh-panel]:not([hidden]){animation:gh-medios-panel-in 420ms cubic-bezier(0.2,0,0,1) both}
 
-/* Growth Form host card: the renderer owns fields, consent, submit and the success state. */
-.gh-medios .gh-medios-form-card greenhouse-form{display:block;--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#023c70;--ghf-muted:#5c5866;--ghf-accent:#f83902;--ghf-accent-contrast:#ffffff;--ghf-field-bg:#f4f6f8;--ghf-border:rgba(2,60,112,0.18);--ghf-border-strong:#023c70;--ghf-radius:12px;--ghf-focus:rgba(2,60,112,0.18)}
-.gh-medios .gh-medios-form-card greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]){--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#023c70;--ghf-muted:#5c5866;--ghf-accent:#f83902;--ghf-accent-contrast:#ffffff;--ghf-field-bg:#f4f6f8;--ghf-border:rgba(2,60,112,0.18);--ghf-border-strong:#023c70;--ghf-focus:rgba(2,60,112,0.18)}
-.gh-medios .gh-medios-form-card greenhouse-form .ghf-actions{width:100%;--ghf-accent:#f83902;--ghf-accent-contrast:#ffffff;--ghf-action-shadow:0 12px 28px rgba(248,57,2,.28)}
-.gh-medios .gh-medios-form-card greenhouse-form .ghf-actions .ghf-btn:not(.ghf-btn--ghost){flex:1 1 0;min-height:58px;border-radius:14px}
-.gh-medios .gh-medios-form-fallback{margin:0;font-size:15px;line-height:1.5;color:#5c5866}
+/* Growth Form host card: the renderer owns fields, consent, submit and the success state. Dark like the canvas:
+   the variant re-declares --ghf-* on .ghf-root[data-ghf-style-variant], so the tokens go on both scopes. */
+.gh-medios .gh-medios-form-card greenhouse-form,
+.gh-medios .gh-medios-form-card greenhouse-form :is(.ghf-scope,.ghf-root[data-ghf-style-variant]){--ghf-font:'Poppins',system-ui,sans-serif;--ghf-fg:#ffffff;--ghf-muted:#cfe4fa;--ghf-bg:transparent;--ghf-field-bg:rgba(255,255,255,0.06);--ghf-border:rgba(255,255,255,0.28);--ghf-border-strong:rgba(255,255,255,0.6);--ghf-accent:#ffffff;--ghf-accent-contrast:#001a33;--ghf-focus:#ffffff;--ghf-error:#ff8f73;--ghf-error-bg:rgba(255,122,89,0.12);--ghf-radius:14px;--ghf-field-shadow:none;--ghf-field-shadow-focus:0 0 0 4px rgba(248,57,2,0.25)}
+.gh-medios .gh-medios-form-card greenhouse-form{display:block}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-label{color:#cfe4fa}
+.gh-medios .gh-medios-form-card greenhouse-form :is(input,textarea,select)::placeholder{color:rgba(207,228,250,0.55)}
+/* Consent as plain lines (canvas .chk-line), orange tick. */
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-check{border:0;background:transparent;padding:0;min-height:0}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-check:hover{background:transparent}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-check span{color:#cfe4fa;font-size:14px}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-check span::before{border-radius:6px;background:transparent;border-color:rgba(255,255,255,0.5)}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-check input:checked + span::before{background:#f83902;border-color:#f83902;box-shadow:none}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-check span::after{border-color:#ffffff}
+/* Primary action: white pill with the orange halo of the canvas. */
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-actions{width:100%;--ghf-action-shadow:0 0 0 5px rgba(248,57,2,0.4);--ghf-action-shadow-hover:0 0 0 7px rgba(248,57,2,0.45)}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-root[data-ghf-style-variant] .ghf-actions .ghf-btn:not(.ghf-btn--ghost){flex:1 1 0;min-height:56px!important;border-radius:999px!important;background:#ffffff;color:#001a33;font-size:17px!important}
+/* Lists over the dark card need their own solid surface (the field background is translucent), like the canvas picker. */
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-select-list{background:linear-gradient(160deg,#0b3460,#04213f)!important;border:1.5px solid rgba(255,255,255,0.22);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,0.6)}
+/* Ohio's global select color wins over the renderer on the phone prefix; native options stay dark on light. */
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-tel-country{color:#ffffff!important}
+.gh-medios .gh-medios-form-card greenhouse-form .ghf-tel-country option{color:#001a33}
+.gh-medios .gh-medios-form-fallback{margin:0;font-size:15px;line-height:1.5;color:#cfe4fa}
+.gh-medios .gh-medios-form-card greenhouse-form a{color:#ffffff}
 
 /* Editor switch «Animaciones» off stops every loop; reduced motion is handled by the canvas styles. */
 .gh-medios[data-motion="no"] *,.gh-medios[data-motion="no"] *::after{animation:none !important;transition:none !important}
