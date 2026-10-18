@@ -181,6 +181,17 @@ no reutilizar esas notas históricas como estado actual.
 > **Delta 2026-06-22 (TASK-1210, release develop→main `3a39c68ba`, sign-off CEO):** los 8 flags MXN+CLF — `FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_CORE_CLF_INDEXED_ENABLED`, `FINANCE_CLF_INCOME_PROJECTION_ENABLED`, `FINANCE_CLF_OBLIGATIONS_ENABLED`, `FINANCE_CLF_REPORTING_ENABLED` — pasaron a **ON en producción**: Vercel prod (agregados + redeploy `greenhouse-midjr78bo`) + ops-worker Cloud Run (persistente via `services/ops-worker/deploy.sh`, `:-true`). Los `*_BACKFILL_APPLY_ENABLED` (gates de script) siguen OFF. Verdad live: `vercel env ls` + `gcloud run services describe ops-worker`.
 > **Doc relacionado:** [GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md](../architecture/GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md) (los flags PG declarativos — mecanismo distinto, ver abajo)
 
+## Readback 18/10 — Google Ads online conserva OFF
+
+Código de Forms/Meetings en main `ec317c928`, deployment Production
+`dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt` READY y alias verificado. API Vercel 19:49:57.865Z:
+`GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` **ausente en Production**, sin bindings adicionales;
+el lector exige literal `true`, por lo que conserva **OFF**. No hubo flip ni publicación GTM.
+El canario admin expone el contrato nuevo. Orquestador 39159325900 SUCCESS y manifest
+`ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` released; health HTTP 200 y watchdog ok,
+6/6 recursos, drift 0 y datos faltantes 0. El release de código no activa la medición Ads.
+[Auditoría del release](../audits/releases/2026-10-18-full-develop-production-release.md).
+
 ## Readback14/10 — configuración escalable y CAPI
 
 PR255/main9690efad released (orquestador38591329633). Capture Production **ON** releída15:22Z,
@@ -299,7 +310,7 @@ live = `vercel env ls` con el proyecto de Studio y `gcloud run services describe
 
 | Flag | Owner | Estado actual | Acción pendiente | Nota |
 |---|---|---|---|---|
-| `GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` (Vercel, prepare de Forms/Meetings) | Growth / Measurement | Default **OFF**; sin activación en esta unidad; valor live no releído aquí | Aprobar rollout, hosts compatibles, Preview y políticas por fuente; releer valor efectivo antes de habilitar | [Paquete Ads](releases/google-ads-2026-10-18/README.md). Opt-in por fuente y versión además del flag; EC separado. Registrar no cambia runtime. |
+| `GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` (Vercel, prepare de Forms/Meetings) | Growth / Measurement | **OFF**: binding Production ausente, API 18/10 a las 19:49:57.865Z; lector en main `ec317c928` | Aprobar rollout, hosts compatibles, Preview y políticas por fuente; releer valor efectivo antes de habilitar | [Paquete Ads](releases/google-ads-2026-10-18/README.md). Opt-in por fuente y versión además del flag; EC separado. Release de código no activa Ads. |
 | `AEO_XRAY_SHARING_ENABLED` (Greenhouse/Vercel) | TASK-1950 / TASK-1951 | Lector local default OFF; estado live no consultado para este cambio | Migración, provider/Think, storage privado, actor real y canary documento/assets/revocación antes de abrir lectura | `src/lib/aeo-xray/public-reader.ts`; [traspaso de publicación](../think/aeo-xray-release-handoff.md). Sin habilitación ejecutada en esta sesión. |
 | `GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED` (Vercel + ops-worker compartido) | TASK-1863 | **02/10: ON en los tres** — Vercel staging, Vercel Production (`printf %s true`, redeploy `greenhouse-dmxm0wvix`) y ops-worker compartido (`deploy.sh` default `true` + revisión activa `ops-worker-00750-n9l`); autorizado por el operador. Antes (28/09): sólo staging Vercel | DDL/backfill y runtimes publicados. Canaries Efeonce, Sky seis mercados y BR por API verificados (Perplexity PE parcial explícito); recurrencia secundaria espera coordinación con main | Writer OFF limita a principal; scheduler OFF conserva recurrencia legacy, pero el drain procesa lotes ya encolados. El catálogo/snapshot requiere migración aun con OFF. `GROWTH_AI_VISIBILITY_BATCH_DAILY_BUDGET_USD=25` es configuración de gasto, no flag. |
 | `INSIGHTS_GENERATION_ENABLED` (**Vercel** — commands/API/MCP de Efeonce Insights; el worker de render lo declarará en TASK-1846) | TASK-1845 (EPIC-045) | **ON en `staging` y en `Production` desde 2026-09-15** (runtime **Vercel** únicamente; staging: canary sintético crea/replay/409 y deny 404; Production: release `9c094688309d` + `vercel env add … production` + redeploy `greenhouse-h2030d3bz`, create 202 `EO-INS-000014` por el lane ecosystem). Preview: **OFF** (no existe). Sin él `createEdition`/`revise` responden `insights_generation_disabled`. Gateway `efeonce-mcp` v1.5.0 ya desplegado (rev `00053-dsk`) y scope `efeonce.mcp.insights.write` en Entra: el lado MCP no bloquea el flip. | **Hecho 2026-09-15**: release PR #236 (manifest `9c094688309d-500ec9e7` released), flip ejecutado por Codex tras autorización del operador (el clasificador lo bloqueó al agente), valor `true` leído con `env pull`, redeploy `greenhouse-h2030d3bz` Ready y create 202 en producción. Emisión e IA siguen OFF hasta TASK-1846. | Independiente de emisión y de la IA de autoría. |
@@ -719,6 +730,12 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 ## § Inventario completo (referencia por dominio)
 
 > Todos los `*_ENABLED` referenciados en código. **Default = OFF** salvo nota. Owner = task ancla. El estado live por env está arriba (§ Snapshot) o en `vercel env ls`.
+
+**Growth / Google Ads online** (`src/lib/growth/measurement/prepare.ts`):
+`GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` — default OFF, Vercel, Forms/Meetings. Requiere además
+elegibilidad y policy publicada por fuente/versión; EC se decide por separado. Lector en main
+`ec317c928`; Production ausente/OFF verificado 18/10 a las 19:49:57Z. Owner Growth / Measurement;
+[arquitectura](../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
 
 **Nexa / Knowledge** (`src/lib/nexa/flags.ts`, `src/lib/knowledge/search/flags.ts`):
 ~~`NEXA_FLOATING_EXPANDABLE_ENABLED`~~ (panel B, TASK-1078 — **retirado 2026-08-05**, ya no se lee) · `NEXA_INTERACTION_LANE_ENABLED` (lane C, TASK-1079) · `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (TASK-1085) · `NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED` (TASK-1156) · `NEXA_AUTO_ROUTER_ENABLED` (TASK-1091) · `NEXA_SYSTEM_PROMPT_V2_ENABLED` (TASK-1124) · `NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED` (TASK-1124) · `NEXA_ACTION_RUNTIME_ENABLED` (TASK-1137) · `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` (TASK-1212) · `NEXA_PROPOSAL_ACTIONS_ENABLED` (TASK-1399) · `NEXA_ANSWERS_CANVAS_LENS_ENABLED` (TASK-1101) · `NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` (TASK-1087) · `KNOWLEDGE_SEARCH_HYBRID_ENABLED` (TASK-1151) · `KNOWLEDGE_SEARCH_RERANK_ENABLED` (TASK-1140) · `KNOWLEDGE_REACTIVE_EMBEDDING_ENABLED` (TASK-1155) · `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` (TASK-1094). Provider pin (no `*_ENABLED`): `NEXA_PROVIDER`.

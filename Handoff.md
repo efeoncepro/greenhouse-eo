@@ -1,5 +1,17 @@
 # Handoff
 
+## 2026-10-18 — Release completo de develop a producción
+
+Todo el candidato develop `77763331c` promovido a main `ec317c928` por PR #256: 1.583 archivos,
+árbol completo idéntico, sin exclusiones ni WIP ajeno. Orquestador `39159325900` SUCCESS;
+manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` **released**, health HTTP 200,
+watchdog ok (6/6, drift 0, datos faltantes 0). CI/Deep/smoke verdes y canarios del contrato PASS.
+Excepción auditada de batch autorizada por Julio; los demás gates pasaron. Dos expansiones SQL
+aditivas aplicadas y verificadas; sin replay manual ni certificación de entrega a proveedores.
+Ads **OFF**, GTM sin publicar: hosts/Preview/políticas por fuente/EC conservan su rollout pendiente.
+[Auditoría y límites](docs/audits/releases/2026-10-18-full-develop-production-release.md),
+[tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) y [historial](Handoff.archive.md).
+
 ## 2026-10-17 — Google Ads: acceso API de lectura probado y arquitectura adoptada
 
 Checkpoint18/10:499 tests y32 escenarios Chromium aislados PASS; API cuenta686/drafts verificada.
@@ -294,13 +306,6 @@ Sin PII exportada/descifrado/redispatch/CRM writes. Corte anterior: 172 tests/9 
 imports canónicos y ESLint propios PASS; source read/find y CLI full/source-only/evento verificados.
 [Relectura del último Performance](docs/audits/growth/2026-10-17-performance-latest-lead-trace.md): sigue fsub7d76a9ba, HubSpot recibido y Meta contabiliza 1 Lead servidor; sin fallos de entrega observados, binding exacto/atribución pendientes.
 Delta [ID nativo HubSpot](docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): código local, marcador por envío y recibo GET/CAS; SQL parqueado, propiedad/campo/mapping y release pendientes (Growth/Integrations). [Activación](docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md); plan privado Documents/Meta-Efeonce-Connection/occurrence-marker-2026-10-17/. Históricos no adquieren prueba exacta. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin GET por UUID; [recibo CAPI](docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md) ahora implementado localmente (header saneado, CAS por intento, CLI). Operador: commit sin activar/desplegar; checkbox OFF, SQL parqueado, sin envíos/publicaciones. [Revisión final](docs/audits/growth/2026-10-17-meta-cli-final-review.md): cobertura/paginación, multidestino, identidad nativa y coherencia de recibos corregidos; 426 Vitest +36 Node, TS/lint/SQL aislado PASS. Rollout pendiente.
-
-## 2026-10-13 — Fabrimetal: continuidad de largo plazo
-
-[Política aprobada](docs/operations/EFEONCE_LONG_TERM_PROSPECT_FOLLOWUP_POLICY_V1.md) y [caso](docs/commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md): proveedor vigente,
-comunicaciones detenidas y TASK HubSpot **118419088700**, **13/04/2027 09:00 Chile**, asignada a Julio/releída; duplicado Notion Cancelado.
-Nutrición por email pendiente de permiso; recontacto requiere razón nueva y autorización. Skills espejo y
-seguimiento conservan la cola futura aunque cambie el mes. Acuse puntual 13/10 enviado y EMAIL SENT verificado; cadencia detenida.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

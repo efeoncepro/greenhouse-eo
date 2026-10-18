@@ -4,7 +4,7 @@ La arquitectura adoptada conecta la inversión de Google Ads con solicitudes com
 calificación y negocios, conservando la fuente y el nivel de evidencia de cada hecho. El 17-10-2026
 se comprobó **acceso API de lectura de operador** a `686-253-9491`. La CLI local `pnpm google-ads`
 ya consulta esa cuenta y ofrece gestión por planes. Conexión multiorganización, panel/API/MCP de producto
-y sender de conversiones siguen pendientes.
+y sender de resultados CRM siguen pendientes; el canal online GTM conserva su activación independiente.
 
 El operador amplió expresamente la CLI a **lectura, creación y actualización**. Consultas: conexión,
 cuenta, campañas, presupuestos, grupos, metadatos de anuncios, conversiones/objetivos y reportes por
@@ -16,11 +16,11 @@ quedan PAUSED; activación, eliminación, creatividades e ingesta están fuera d
 En Cloud se guardó la identidad **Efeonce** y sus enlaces públicos; la marca «Claude» queda como
 antecedente del piloto. La verificación de Google de marca/scopes sigue pendiente. El grant Ads tiene
 secreto propio; GA4 y GSC Efeonce conservaron sus grants y pasaron lecturas reales después del cambio.
-Las pruebas live de esta sesión sólo consultaron: **ninguna escritura publicitaria ejecutada**.
+Las pruebas live del probe/CLI del 17/10 sólo consultaron: **ninguna escritura publicitaria ejecutada en ese corte**.
 
-Delta online del mismo día: Forms y agendas ya tienen implementación local del recibo Ads, contexto
+Delta online del 17/10: Forms y agendas ya tienen implementación local del recibo Ads, contexto
 consentido y canal EC reservado. Se crearon/verificaron las dos acciones nativas secundarias y los
-borradores Web8/Server12 compilan. **Sin despliegue ni publicación, captura Ads OFF; no está activo**.
+borradores Web 8/Server 12 compilan. **En ese corte no hubo despliegue ni publicación; captura Ads OFF**.
 La afirmación anterior de cero escrituras corresponde al probe/CLI previo; este delta sí creó dos
 acciones, sin enviar conversiones ni cambiar campañas. [Activación y límites](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
 
@@ -28,7 +28,20 @@ El18/10 se completó la validación local/API y se preparó el
 [paquete previo al release](../../operations/releases/google-ads-2026-10-18/README.md):499 pruebas
 focales y32 escenarios Chromium con respuestas simuladas y sin envíos externos. Términos aceptados
 confirmados por API; EC sigueOFF. Falta compatibilidad servida en hosts, protocolo GTM real y
-aprobación del candidato completo. No se publicaron tags, políticas ni cambios de infraestructura.
+aprobación del candidato completo en aquel corte. No se publicaron tags ni políticas en esa validación.
+
+**Checkpoint 18/10, 19:51Z: release de código RELEASED.** Main
+`ec317c928fffcb919d71bdb62821b80280af2347`; CI/Deep/smoke PASS, orquestador [39159325900](https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900)
+SUCCESS y manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` released a las 19:51:25.548Z,
+releído a las 19:51:44.315Z. Vercel Production `dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt` READY y alias
+releídos a las 19:49:59Z; health HTTP 200 y watchdog `ok`, 6/6 runtimes, `drift=0` y `dataMissing=0`.
+Canario admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store` PASS; sin crear lead
+ni reserva. Schema de recibos aplicado; excepción específica de batch autorizada a las 18:53:53Z.
+[Auditoría y límites](../../audits/releases/2026-10-18-full-develop-production-release.md).
+
+El flag Ads sigue ausente en Production (readback a las 19:49:57.865Z) y el lector exige `true`: Ads conserva OFF. GTM sigue sin
+publicación; opt-in por fuente, compatibilidad de hosts, Preview, EC efectiva y resultado positivo
+permanecen pendientes. El deploy Greenhouse no activa esos pasos ni acredita recepción/atribución.
 
 | Componente | Función en la arquitectura |
 | --- | --- |

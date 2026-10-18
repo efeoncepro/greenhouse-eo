@@ -1,15 +1,29 @@
 # Conversiones Google Ads para Forms y agendas
 
-Estado 17-10-2026: código local y workspaces preparados, **sin deploy ni publicación GTM**.
+Corte 17-10-2026: código local y workspaces preparados, entonces **sin deploy ni publicación GTM**.
 [ADR](../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
 [arquitectura](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
 [evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md).
 
 Validación18/10 y [paquete de release](../../operations/releases/google-ads-2026-10-18/README.md):
 Chromium aislado/API verificados; propuestas Performance/Discovery sin apply. Los hosts todavía
-sirven el bridge anterior. Release general bloqueado por alcance/CI/preflight; sin publicación.
+servían el bridge anterior. En ese corte el release general estaba bloqueado por alcance/CI/preflight; sin publicación GTM.
 Smoke reproducible: `pnpm exec tsx scripts/gtm/google-ads-browser-smoke.ts` (todo interceptado,
 respuestas simuladas; no certifica proveedor, GTM real ni atribución).
+
+**Checkpoint 18/10, 19:51Z: release de código RELEASED.** Main
+`ec317c928fffcb919d71bdb62821b80280af2347`; CI/Deep/smoke PASS; orquestador [39159325900](https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900)
+SUCCESS; manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` released a las 19:51:25.548Z,
+releído a las 19:51:44.315Z. Vercel Production `dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt` READY y alias
+releídos a las 19:49:59Z; health HTTP 200 y watchdog `ok`, 6/6 runtimes, `drift=0` y `dataMissing=0`.
+Canario admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store` PASS; sin lead ni reserva
+real. Las expansiones SQL de recibos están aplicadas; excepción específica de batch autorizada a las 18:53:53Z.
+[Auditoría y límites](../../audits/releases/2026-10-18-full-develop-production-release.md).
+
+`GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` sigue ausente en Production (readback a las 19:49:57.865Z)
+y conserva OFF. No se publicó GTM ni se activaron políticas Ads con este release de código. El opt-in, hosts compatibles,
+Preview funcional, EC efectiva y la primera solicitud/reserva real consentida conservan sus gates.
+El PASS del contrato servido no acredita conversión enviada, recepción ni atribución Ads.
 
 ## Qué registra
 

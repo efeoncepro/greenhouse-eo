@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-18 — Release completo de develop y cierre de recibos
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- PR #256 incorpora los 1.583 archivos del candidato develop a main `ec317c928`, sin exclusiones.
+- Orquestador `39159325900` SUCCESS; manifest released, salud HTTP 200 y watchdog ok 6/6, sin drift ni datos faltantes.
+- Migraciones aditivas de recibos HubSpot/Meta verificadas; código Forms/Meetings desplegado y canarios PASS. Ads sigue OFF y GTM sin publicar.
+- [Evidencia y rollback](docs/audits/releases/2026-10-18-full-develop-production-release.md); WIP ajeno preservado y cierre documentado sólo sobre los cambios propios.
+
 ## 2026-10-17 — Google Ads: arquitectura y prueba API de lectura
 
 - Checkpoint18/10:499 tests y32 escenarios Chromium/API PASS; [paquete previo al release](docs/operations/releases/google-ads-2026-10-18/README.md), propuestas/hashes/rollback. Sin publicación ni deploy; hosts/protocolo real/EC/CI y alcance general pendientes.
@@ -609,10 +618,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md): derivado `playback` (MP4 H.264, lado corto ≤ 720 px, faststart) en el worker con backfill por el barrido (6/6 videos de producción), `302` a URL firmada V4 (GCS atiende `Range`; ningún video pasa por Vercel), `Asset.playback`, API 1.5.0.
 - [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md): reproductor nativo en el panel de la pieza (feed y story, sin autoplay); el tablero muestra todas las piezas de un formato (la versión con intro para Instagram era invisible) y la duración.
-
-## 2026-10-04 — Build de fuentes independiente de Google Fonts
-
-- ISSUE-178: Geist/Poppins y Bricolage del login pasan a `next/font/local`, WOFF2 con origen/licencia/hash fijados. El build comprueba los archivos y bloquea la reintroducción de loaders remotos; roles y variables CSS preservados. Build completo, 90 tests y GVC en tres tamaños PASS; staging READY y fuentes/login/sesión verificados; producción sin promover.
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 
