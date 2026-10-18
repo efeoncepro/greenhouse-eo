@@ -1,5 +1,9 @@
 # Registro de decisiones y versiones
 
+### 2026-10-18 — Mega menú del sitio: el logo de Glitch donde se nombra Glitch
+
+Decisión del operador: «Donde se nombre a Glitch en el menú pon el logo de Glitch». En el mega menú «Recursos» de efeoncepro.com, Glitch se nombra con su logo oficial negativo (`@efeoncepro/axis-brand-assets` → `assets/glitch/glitch-logo-negative.svg`, letras blancas y la manzana verde) en la columna de formatos, el antetítulo, la tarjeta destacada y la franja inferior. Es el logo de un producto que acompaña, como el de Insights: no trae el resto de la sub-línea (verde de fondo, cabecera «EDICIÓN #N», falla en bytes) ni cuenta como esfera de La órbita. Vale para el menú del sitio; no autoriza mezclar elementos de Glitch en otras piezas de Efeonce.
+
 ### 2026-10-18 — Mega menú del sitio: dos esferas por panel, como excepción
 
 Decisión del operador: «Deja las dos esferas en el mega menú como excepción: titular y respuesta». En el panel «Soluciones» del mega menú de efeoncepro.com (canvas https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj) conviven la esfera como punto final del titular de la línea («Crecer con método●») y la de la respuesta (`Voice`) de la columna derecha, ambas en el acento de la línea. Vale sólo para ese panel; no autoriza dos esferas en otras piezas. En el mismo panel, el foco de servicio es un anillo sin esfera alrededor del ícono Trazo en reposo, y los íconos no pasan a «respuesta», para no sumar una tercera.
