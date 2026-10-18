@@ -1,5 +1,9 @@
 # Registro de decisiones y versiones
 
+### 2026-10-18 — Mega menú del sitio: dos esferas por panel, como excepción
+
+Decisión del operador: «Deja las dos esferas en el mega menú como excepción: titular y respuesta». En el panel «Soluciones» del mega menú de efeoncepro.com (canvas https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj) conviven la esfera como punto final del titular de la línea («Crecer con método●») y la de la respuesta (`Voice`) de la columna derecha, ambas en el acento de la línea. Vale sólo para ese panel; no autoriza dos esferas en otras piezas. En el mismo panel, el foco de servicio es un anillo sin esfera alrededor del ícono Trazo en reposo, y los íconos no pasan a «respuesta», para no sumar una tercera.
+
 ### 2026-10-13 — Privacidad pública: propuesta, aprobación y adopción publicada
 
 Decisión posterior del operador: «Vamos, ponla». Autoriza adopción en ambos sitios.

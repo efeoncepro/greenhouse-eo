@@ -221,6 +221,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **La excepción que confirma la regla:** en la firma de correo conviven el punto del nombre (la única voz de titular)
   y la línea que termina en la esfera; lo que **no** se repite es la línea con esfera. La regla de la zona de partners
   va sin esfera, porque «si la esfera se repite, deja de ser identidad» (manual §10.2).
+- **Segunda excepción, sólo el mega menú del sitio** (operador, 2026-10-18): en el panel «Soluciones» conviven la
+  esfera del titular de la línea y la de la respuesta; no se extiende a otras piezas ([ledger](ledger.md)).
 
 **Anillo propio de la esfera (`sphereRing`) — «en vivo»** (operador, 2026-09-26, D8):
 
