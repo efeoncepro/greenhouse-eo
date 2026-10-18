@@ -142,6 +142,14 @@ const tabCss = []
 
   if (button.length !== 1) throw new Error('Closing meeting button not found')
   button.replaceWith('<div class="meet-cta"><gh-meeting-cta></gh-meeting-cta></div>')
+
+  // Same native dialog from the hero's secondary button and the mobile dock (one CTA, one surface per landing).
+  const hero = $('section.hero-sec .hero-copy a.btn-s[href*="/agenda/"]')
+  const dock = $('nav.mbar a[href*="/agenda/"]')
+
+  if (hero.length !== 1 || dock.length !== 1) throw new Error('Hero or dock meeting link not found')
+  hero.replaceWith('<div class="meet-cta meet-cta--ghost"><gh-meeting-cta location="inbound_hero"></gh-meeting-cta></div>')
+  dock.replaceWith('<div class="meet-cta meet-cta--dock"><gh-meeting-cta location="inbound_mobile_dock"></gh-meeting-cta></div>')
 }
 
 if ($('sc-if, sc-for').length) throw new Error('Unexpanded canvas control left')
@@ -191,7 +199,7 @@ const result = compileSourceLedLanding({
   serviceDefaults: SERVICE_DEFAULTS,
   pageLayer: true,
   meeting: {
-    module: 'diagnostico',
+    modules: ['hero', 'diagnostico'],
     cta: 'inbound-discovery-meeting',
     location: 'inbound_closing',
     fallbackUrl: 'https://efeoncepro.com/agenda/',

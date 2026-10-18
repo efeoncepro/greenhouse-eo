@@ -47,3 +47,18 @@
 .gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:#f19ae0!important;transform:translateY(-1px);box-shadow:0 18px 40px rgba(232,107,208,.36)!important}
 .gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover::after{transform:translateX(.25rem)}
 .gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):focus-visible{outline:2px solid #ffffff;outline-offset:3px}
+
+/* Same launcher as the hero's secondary (outline) button and as half of the mobile dock. */
+.gh-inbound .meet-cta--ghost{flex:0 0 auto;width:min(100%,280px)} /* inside the hero's flex row the wrapper needs its own width */
+.gh-inbound .meet-cta--ghost greenhouse-cta{width:100%}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback){color:#ffffff!important;background:transparent!important;border:1px solid rgba(255,255,255,.55);box-shadow:none!important}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::before{background:#ffffff}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::after{content:none}
+.gh-inbound .meet-cta--ghost :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:rgba(255,255,255,.08)!important;border-color:#ffffff;box-shadow:none!important}
+.gh-inbound .meet-cta--dock{flex:1 1 50%;min-width:0}
+.gh-inbound .meet-cta--dock greenhouse-cta{flex:1 1 0;width:100%;min-width:0}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback){width:100%;min-height:56px;padding:0 6px;gap:.3rem;font-size:14px;white-space:nowrap;color:#ffffff!important;background:#001a33!important;border:1px solid rgba(255,255,255,.55);box-shadow:none!important}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::before{width:16px;height:16px;background:#ffffff}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::after{content:none}
+.gh-inbound .meet-cta--dock :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:#0a3157!important;transform:none;box-shadow:none!important}
+.gh-inbound nav.mbar>*{flex:1 1 50%!important;min-width:0}.gh-inbound nav.mbar>.btn-p{white-space:nowrap}

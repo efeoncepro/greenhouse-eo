@@ -68,7 +68,7 @@ const FORM_FALLBACK = 'Este formulario necesita JavaScript. Puedes escribirnos a
  * @param {object} o.faq            { repeaters, question, answer } field keys for FAQPage
  * @param {object} o.serviceDefaults schema_* defaults
  * @param {object} [o.repeatLabels] repeater key → editor label
- * @param {object}  [o.meeting]      { module, cta, location, fallbackUrl, fallbackLabel }: native meeting launcher fields
+ * @param {object}  [o.meeting]      { module | modules[], cta, location, fallbackUrl, fallbackLabel }: native meeting launcher fields
  * @param {boolean} [o.pageLayer]   append <sourceDir>/page.css unscoped
  * @param {string} [o.compilerFile] generator file name written in the CSS header
  */
@@ -138,7 +138,10 @@ function compileSourceLedLanding(o) {
       for (const attr of Object.keys(el.attribs || {})) if (/^on/i.test(attr)) node.removeAttr(attr)
 
       if (el.tagName === 'gh-meeting-cta') {
-        node.replaceWith(token('meeting_launcher'))
+        // Optional per-placement telemetry location: <gh-meeting-cta location="x"> → %%meeting_launcher__x%%.
+        const location = (node.attr('location') || '').toLowerCase().replace(/[^a-z0-9_]/g, '')
+
+        node.replaceWith(token(location ? 'meeting_launcher__' + location : 'meeting_launcher'))
 
         return
       }
@@ -282,7 +285,7 @@ function compileSourceLedLanding(o) {
       })
     }
 
-    if (o.meeting && key === o.meeting.module) {
+    if (o.meeting && [].concat(o.meeting.modules || o.meeting.module).includes(key)) {
       extra.push(...MEETING_FIELDS)
       Object.assign(extraDefaults, {
         meeting_cta: o.meeting.cta || '',

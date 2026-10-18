@@ -82,7 +82,7 @@ $elements = array();
 foreach ( $modules as $module => $title ) {
 	$widget_settings = array( '_title' => $title, '_margin' => $zero, '_padding' => $zero );
 	if ( 'diagnostico' === $module ) { $widget_settings += array( 'form_key' => $form_key, 'form_surface' => $form_surface ); }
-	if ( 'diagnostico' === $module && '' !== $meeting_key ) { $widget_settings += array( 'meeting_surface' => $meeting_surface, 'meeting_embed_key' => $meeting_key ); }
+	if ( in_array( $module, array( 'hero', 'diagnostico' ), true ) && '' !== $meeting_key ) { $widget_settings += array( 'meeting_surface' => $meeting_surface, 'meeting_embed_key' => $meeting_key ); }
 	$scheme     = in_array( $module, $light, true ) ? 'clb__light_section' : 'clb__dark_section';
 	$elements[] = array(
 		'id' => substr( md5( 'inbound-section-' . $module ), 0, 7 ), 'elType' => 'container', 'isInner' => false,

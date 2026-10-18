@@ -30,7 +30,11 @@
   it → republish with the 4th input of `publish-inbound-elementor-page.php`). It opens the native scheduler in a dialog
   skinned from `inbound-source/page.css` (operator, 2026-10-18: only the scheduler floating over the blurred page plus a
   round close button; no container, no repeated title). The dialog needs `height: fit-content` (a modal dialog has
-  `top:0;bottom:0`). Hero secondary button and mobile dock still link to `/agenda/`.
+  `top:0;bottom:0`). The same dialog opens from the hero secondary button and the mobile dock: one CTA, three
+  placements told apart by `cta-location` (`inbound_closing`, `inbound_hero`, `inbound_mobile_dock`); the compiler turns
+  `<gh-meeting-cta location>` into `%%meeting_launcher__<loc>%%` and the shared base renders each (fallback link to
+  `/agenda/`). Mobile dock: both halves use `flex:1 1 50%!important` (the canvas button has inline `flex:1`, and with
+  `flex-basis:0` its 16 px padding stays out of the split, so it took 34 px more and cut «Agenda una reunión»).
 - SEO (`configure-inbound-seo.php`, snapshot option `_gh_inbound_seo_before_20261018_111909`): title «Agencia de
   inbound marketing y Loop Marketing | Efeonce», focus «agencia de inbound marketing», OG/featured `252016`
   (`inbound-source/og/og.html`). `includes/inbound/seo.php` adds `about → #service` to Yoast's WebPage.
