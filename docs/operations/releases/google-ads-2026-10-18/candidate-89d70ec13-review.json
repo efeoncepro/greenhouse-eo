@@ -279,5 +279,17 @@
       "coverage": "v8_enabled",
       "changedFinancialRuntime": false
     }
+  },
+  "validationRef": {
+    "name": "codex/google-ads-release-preflight-20261018",
+    "pushAuthorized": false,
+    "pushed": false,
+    "githubPushDeployBranches": [
+      "develop",
+      "main"
+    ],
+    "vercelGuardPrepared": true,
+    "vercelGuard": "git.deploymentEnabled exact ref false",
+    "deploymentReadback": "required_after_authorized_push"
   }
 }

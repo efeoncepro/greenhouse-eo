@@ -164,7 +164,11 @@ aserciones, cobertura ni workflows. No se resuelve aumentando límites ni omitie
 Verificación local V8:138 casos PASS,9.34s; lint y typecheck del delta comprobados aparte.
 Para cerrar el CI remoto hace falta publicar el commit correctivo en una referencia de validación
 `codex/*`, sin mover develop/main, y ejecutar sólo CI/CI Deep. Se revisaron todos los triggers
-push: las ramas de despliegue son develop/main; ninguna coincide con esa referencia. La skill
+push: las ramas de despliegue son develop/main; ninguna coincide con esa referencia. La integración
+Git de Vercel puede generar Preview independientemente: se prepara un bloqueo exacto de esa
+rama mediante `git.deploymentEnabled=false` en el mapa de `vercel.json`, conforme al
+[contrato CI](../../architecture/GREENHOUSE_CI_COST_SIGNAL_GUARDRAILS_V1.md). Sin bloqueo Vercel no
+se considera seguro el push. Debe comprobarse después que no hay deployment para el SHA. La skill
 de release exige aprobación explícita del push; pendiente antes de esa mutación. El checkout
 compartido se conserva. CI verde del padre no se atribuye al commit nuevo.
 
@@ -180,3 +184,15 @@ Después de CI: mantener candidato identificado, schema antes de worker y autori
 antes de promover. Los prerequisitos Ads del paquete conservan sus gates independientes. No se
 aplican cambios a fuentes, hosts, Ads o GTM para producir un resultado verde. La reparación DB
 se autorizó aparte y se verificó contra el dispatcher existente.
+
+
+### Candidato correctivo y trabajo concurrente
+
+El commit correctivo `244652cb6` contiene sólo20 archivos propios (22 paths contando movimientos).
+El checkout compartido recibió, además, fuentes de assets del menú y ocho documentos AXIS de otras
+unidades. Se revisó el delta de160 entradas desde89d; no se alteró ese trabajo. Inventario de244:
+1.581 archivos netos, escaneo de credenciales y parseo JSON sin hallazgos. SHA-256 del inventario:
+`68415b91255c692b6ef1cd79c7b3b57301dd10d467b5f833208ad14001ce7b4f`.
+Los132 assets adicionales son fuentes HTML/JSON/texto, sin nuevos binarios; no nueva aprobación visual.
+La guarda de Vercel se prepara en un commit posterior antes de cualquier push. El CI futuro debe
+fijarse a ese SHA final, no heredar el resultado de89d ni244 por parentesco.

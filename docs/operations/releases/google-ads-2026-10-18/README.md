@@ -15,7 +15,8 @@ workflow de publicación, cambio de flag, nueva política publicada ni envío Ad
 candidato fijo89d70ec13 ya remoto,1.445 archivos netos revisados (el corte anterior tenía1.406).
 CI con build PASS; Deep falló por timeout agregado del corpus de pricing. Corrección local con
 138 casos instrumentados PASS; revalidación remota pendiente del push autorizado a una rama
-codex de validación, sin develop/main ni deploy. El
+codex de validación, sin develop/main ni deploy. Se prepara bloqueo Vercel explícito para esa
+rama; sus previews también deben quedar deshabilitados antes de publicar el commit. El
 [manifest de revisión](candidate-89d70ec13-review.json) conserva fuentes y resultados separados.
 
 **Schema reparado con autorización específica:** el worker compartido ya servido devolvía502
