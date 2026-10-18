@@ -2,12 +2,15 @@
 
 Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../audits/measurement/MEASUREMENT_DOCUMENTATION_CLOSURE_2026-10-14.md); estados publicados y límites comerciales conservados.
 
+- `TASK-2042` — [Navegación global: puesta en efeoncepro.com](to-do/TASK-2042-site-nav-wordpress-rollout.md), to-do; `EPIC-055`. Adaptador con interruptor y respaldo a Ohio, agendador del encabezado, medición, piloto y sitio completo. Siguiente ID libre `TASK-2043`.
+- `TASK-2041` — [Navegación global: plugin, documento y fotos](to-do/TASK-2041-eo-navegacion-plugin-content-photos.md), to-do; `EPIC-055`. Documento `site-nav.v1` con revisiones, admin, `wp eo-nav` y REST pública; fotos en el bucket de AXIS. Siguiente ID libre `TASK-2043`.
+- `TASK-2040` — [Navegación global: contrato y primitive en AXIS](to-do/TASK-2040-axis-site-nav-contract-primitive.md), to-do; `EPIC-055`. Contrato `efeonce.site-nav`, esquema, primitive portable y Lab. Siguiente ID libre `TASK-2043`.
 - `TASK-2039` — [Landings que alimentan su formulario](to-do/TASK-2039-landing-signals-prefill-growth-forms.md), to-do; paraguas Growth Forms. Las preguntas de cada landing precargan su Growth Form; piloto en inbound, API de señales coordinada con TASK-2038. Siguiente ID libre `TASK-2040`.
 - `TASK-2038` — [Renderer de Growth Forms en AXIS](to-do/TASK-2038-growth-forms-renderer-on-axis.md), to-do; `EPIC-035`. Fuente y build del renderer a AXIS, publicación por el carril de EPIC-035 sin release de Greenhouse. Siguiente ID libre `TASK-2040`.
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2040`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2043`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress; Meta/UPD activos, primera conversión comercial pendiente. Ads: [paquete previo al release18/10](../operations/releases/google-ads-2026-10-18/README.md),499 tests/32 escenarios Chromium y API PASS; sin publish/deploy/activación. Alcance/CI y protocolo real pendientes; umbrella `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.

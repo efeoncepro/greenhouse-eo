@@ -2,7 +2,10 @@
 
 > **Tipo:** Product Decision Record de plataforma del sitio público.
 > **Estado:** Proposed · 2026-10-18 · dos puntos esperan decisión del operador (§Decisiones abiertas).
-> **Ejecución:** programa por crear (épica y tareas por fase, §Fases). No hay ID reservado.
+> **Ejecución:** [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) con tres tasks: `TASK-2040`
+> (mecanismo en AXIS), `TASK-2041` (plugin, contenido y fotos) y `TASK-2042` (puesta en el sitio). Las siete fases de
+> §Fases se reparten entre esas tres tasks.
+> **Arquitectura:** [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
 > **Diseño aprobado:** canvas «Menú del sitio» —
 > [claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj) (versión 67 al
 > 2026-10-18). Tablero de referencia: «Menú completo · escritorio» (cápsula con mega menús + hamburguesa con onepage),
@@ -179,6 +182,16 @@ plugin, no en el término 61. Las reglas sobre landings sueltas no cambian: ning
 | F5 | Adaptador WordPress en piloto, en una página detrás de un interruptor, más la superficie del CTA del encabezado global. | runtime del sitio, interfaz |
 | F6 | Todo el sitio con release acotado por SSH, respaldo y rollback (apagar el interruptor devuelve el encabezado de Ohio). | runtime del sitio |
 | F7 | Adaptador Think, cuando el operador lo pida. | Think |
+
+Reparto en tasks (EPIC-055):
+
+| Task | Fases |
+|---|---|
+| `TASK-2040` | F1 y F2 |
+| `TASK-2041` | F3 y F4 |
+| `TASK-2042` | F5 y F6 |
+
+F7 queda como follow-up de la épica.
 
 ## Consecuencias
 
