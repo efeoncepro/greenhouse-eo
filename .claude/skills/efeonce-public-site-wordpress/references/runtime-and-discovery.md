@@ -166,6 +166,12 @@ Canonical evidence:
 Use this when the user asks how to add a URL to the public-site menu. Do not
 mutate the menu during discovery.
 
+> Planned, nothing in runtime as of 2026-10-18: [EPIC-055](../../../../docs/epics/to-do/EPIC-055-public-site-global-navigation.md)
+> and [PDR-027](../../../../docs/public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (Proposed)
+> propose replacing this Ohio header (term 61 and its mega menu) with the portable `efeonce.site-nav` navigation,
+> behind a switch and a pilot (TASK-2042). Until that reaches `on`, the facts in this section and the next remain
+> the source for operating the menu. See `native-navigation.md`.
+
 - WordPress uses the classic menu model here, not a block-theme
   `wp_navigation` source of truth.
 - Active location: `primary`.

@@ -276,3 +276,31 @@ Consumers (verified 2026-10-18):
 
 AXIS owns the mention; a landing or product never forks its CSS. The mention is a mechanism, not a template for
 the page that first used it.
+
+## Site navigation (`efeonce.site-nav`) — PLANNED, not built (TASK-2040)
+
+**Status as of 2026-10-18: it does not exist.** AXIS has no navigation contract, schema, primitive, tokens or Lab page
+today. What follows is the approved design and the plan in [TASK-2040](../../../../docs/tasks/to-do/TASK-2040-axis-site-nav-contract-primitive.md)
+(program EPIC-055, decision PDR-027 in Proposed status). Never cite exports, versions or the Lab route as available
+until there is a published release and a package readback.
+
+What it will be:
+
+| Layer (planned) | Responsibility |
+| --- | --- |
+| Contract `efeonce.site-nav` + schema `site-nav.v1` (JSON Schema) | Structure of the menu document, states, ARIA roles, emitted events (`site_nav_open`, `site_nav_line_view`, `site_nav_click`) and consumed tokens. Holds no content and knows nothing about WordPress. |
+| Tokens | Single glass recipe (capsule, «Agenda tu diagnóstico» button and hamburger), header heights 96/72, logo 164/140 and menu timings in `axisMotion`. Today they are literals in the canvas. |
+| Primitive in `@efeoncepro/axis-ui-primitives` | Server-side HTML render (pure function: links ship in the HTML), `site-nav.css` with the glass recipe from tokens, and a lightweight framework-free `site-nav.js` as progressive enhancement (hover intent, keyboard, focus, scroll, onepage, reduced motion). It fetches nothing and does not know the scheduler: it only exposes the CTA slot. |
+| Lab | `/patterns/efeonce.site-nav/` with a sample document and «Contexto» / «Cabecera» controls. |
+
+Why it lives in AXIS and not in the theme: it is written once and consumed by WordPress (adapter in `ohio-child`,
+TASK-2042) and, when requested, by Think through a thin wrapper. The public site does not allow React, so the render is
+server-side and the JS uses no framework. The precedent is `efeonce.mention` (above): born on a landing, promoted to
+AXIS, and each site pins the version and consumes it without forking its CSS.
+
+Do not confuse it with `efeonce.surface-composition`: its `nav` field is **descriptive** (a header drawn inside a
+composed hero), not a running menu. It is neither a base nor a substitute for site-nav.
+
+Visual source: canvas «Mega menú efeoncepro.com», version 67. Behavior, glass recipe and data model:
+[`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
+(proposed, not implemented). Brand criteria: [graphic-line applications](../../efeonce-graphic-line/references/applications.md#a15-encabezado-y-navegación-del-sitio-web-diseño-aprobado-2026-10-18-implementación-planificada).

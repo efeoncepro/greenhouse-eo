@@ -4,6 +4,17 @@ Use for an authorized menu label, destination or hierarchy change. A landing pub
 not prove it appears in navigation. Keep Ohio's existing menu rendering; do not replace global chrome
 or introduce a second navigation component for a new landing.
 
+> **Global header in transition (planned; nothing in runtime as of 2026-10-18).**
+> [PDR-027](../../../../docs/public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md) (status
+> **Proposed**), the architecture
+> [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
+> and [EPIC-055](../../../../docs/epics/to-do/EPIC-055-public-site-global-navigation.md) propose replacing Ohio's
+> header with a portable navigation (`efeonce.site-nav`). Until PDR-027 is **Accepted** and TASK-2042 sets the
+> `eo_site_nav_enabled` switch to `on`, the rule above stands: keep Ohio and make every menu change on term 61 with
+> this procedure. Once accepted, that rule is replaced **only for the global header**: landings still never create
+> their own navigation, and menu editing moves to the single document of the «EO Navegación» plugin
+> (`wp eo-nav export|validate|apply|revisions|restore`, TASK-2041) instead of Ohio's `nav_menu_item` posts.
+
 ## Discover and snapshot
 
 1. Resolve theme locations, the assigned menu, its complete item list and the destination page/permalink.

@@ -179,6 +179,14 @@ Todos los gráficos y el texto denso son Pizarra.
   - **Las seis identidades nuevas están aprobadas por el operador el 2026-09-29 sobre la ronda piloto (`ai-generations/2026-09-29_manzanitas-equipo/`)**; una persona nueva en el equipo pasa por su propia ronda. De Humberly y Luis sólo hay retratos antiguos (falta su foto actual);
     la foto actual de Melkin es la de `squad/` (el retrato antiguo lo muestra con otro peinado).
   - La estratega de la Escena interior aprobada sigue siendo una persona por rol, generada.
+- **Manzanas en la foto: siempre verdes** (operador, 2026-10-18). Cuando una foto de MCM muestra manzanas reales, son
+  verdes (piel verde brillante, tipo Granny Smith). Es la fruta fotografiada: la manzana **dibujada** (logo, Pizarra)
+  sigue tomando el acento de la línea del tema (§2), y el verde Glitch `#6ec207` sigue fuera de MCM (§11).
+- **Se prefiere una persona del elenco ficticio** (operador, 2026-10-18; caso: la foto de MCM del menú del sitio): se
+  usó **Karo con el hoodie de la línea `brand`**, poniendo en fila cinco manzanas verdes como los
+  pasos de una lección (`ai-generations/2026-10-18_menu-sitio/fichas/MN-MZN-45.json`). El elenco nunca se presenta
+  como equipo real ([`EFEONCE_BRAND_CAST_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_BRAND_CAST_V1.md)).
+  La foto se hace desde el concepto editorial de MCM, no desde portadas existentes.
 
 ### 4.3 Lente («Foto señalada»)
 

@@ -22,3 +22,7 @@ Use this folder when a reusable public landing component, Elementor widget, host
 - [Public Site Miscellaneous Surfaces V1](PUBLIC_MISCELLANEOUS_SURFACES_V1.md) — ownership propuesto para
   404, búsqueda, no-results y archivos; separa recovery, search, editorial archives y chrome global sin
   confundir composición visual con HTTP/SEO. Aún no implementado.
+- [Navegación global del sitio público V1](PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md) — navegación portable
+  `efeonce.site-nav` que reemplazaría el encabezado de Ohio: contrato y primitive en AXIS, documento único en el
+  plugin «EO Navegación», adaptador con interruptor y piloto en `ohio-child`, y Think más adelante. Propuesta según
+  PDR-027 (Proposed) y EPIC-055; aún no implementada.

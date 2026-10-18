@@ -294,3 +294,16 @@ private/no-store a memoria efímera y al user_data reservado Google, nunca telem
 estado confirmado UI. Destinos Meta/UPD y entrega CRM permanecen independientes. Sin migración ni
 nuevo worker. [Activación y límites](../manual-de-uso/growth/activar-conversiones-google-ads.md);
 no está publicado ni desplegado este delta.
+
+## Delta 2026-10-18 — consumidor planificado: encabezado global del sitio
+
+La [navegación global del sitio](public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador) (Propuesta, EPIC-055)
+suma un consumidor del agendador: el botón «Agenda tu diagnóstico» del encabezado de `efeoncepro.com`. Usa el
+contrato vigente (`<greenhouse-cta>` + `open_meeting_scheduler`); no cambia schemas, state machine ni medición del
+agendador. Al implementarlo en [TASK-2042](../tasks/to-do/TASK-2042-site-nav-wordpress-rollout.md):
+`cta-location` `menu_header|menu_mega|menu_onepage`; el menú cierra su panel y suelta su bloqueo de scroll **antes**
+de abrir el diálogo, para que el `<dialog>` nativo siga siendo el único dueño de scroll lock y foco; el lanzador queda
+montado para devolver el foco. Superficie de Growth CTA propia del encabezado global, con su binding y allowlist de
+origen para todas las páginas del menú; su clave nunca va a documentos, commits ni mensajes. La piel del diálogo sube
+desde `scripts/public-website/inbound-source/page.css` (alcance de landing) a una primitive compartida del sitio.
+Sin JS o sin superficie, enlace a `/agenda/`. **Planificado: nada de esto está implementado ni publicado.**

@@ -129,6 +129,11 @@ Para fotografía propia Efeonce, cargar
 **preflight visual**: abrir imágenes aprobadas comparables antes de generar, declarar cómo se integra el color en
 la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
 reutilizado un prompt no lo cumple.
+**UI de un producto Efeonce en una foto (phygital):** nunca mockup de dispositivo ni recortes de la página; se abstraen
+sus elementos (gauge, cifras, barras, logo) recreados con los tokens y datos reales, se componen sobre un plate con el
+aire vacío y el modelo sólo pone material y luz. Método y caso fuente (AI Visibility Report, 2026-10-18):
+[`references/efeonce-photographic-language.md`](references/efeonce-photographic-language.md) §10. Fotos para el menú
+del sitio (4:5 onepage, 16:9 mega): mismo archivo, §«Fotos para el menú del sitio».
 **Antes de producir, abre el banco aprobado y la guía «El porqué» en AXIS** ([banco](https://axis.efeonce.org/references/photography/) · [por qué](https://axis.efeonce.org/references/photography/why/) · agentes: `manifest.json`, `recipes/<slug>.json` y `why.json`): parte de la receta de la foto más cercana y cierra con su lista de control. Detalle en la referencia `design-studio/references/efeonce-photographic-language.md` §«Banco aprobado y guía «El porqué» en AXIS».
 
 **Cine con motor explícito:** la ficha y `foto:prompt` conservan el estilo y las referencias; Nano Banana 2.1 se

@@ -55,6 +55,25 @@ Load `axis-design-system` and `efeonce-graphic-line`; details and evidence live 
 `SCHEDULER_COMPOSITION_DECISION_V1.md`, `GROWTH_CTA_COMPOSITION_DECISION_V1.md` and their
 `docs/quality/` dossiers. Greenhouse continuity: TASK-2007.
 
+## Planned consumer: global site header (EPIC-055 / TASK-2042)
+
+**Planned, not built** (architecture proposed 2026-10-18). The «Agenda tu diagnóstico» button in the global header of
+`efeoncepro.com` will open this scheduler through `<greenhouse-cta>` with the `open_meeting_scheduler` action; there
+will be no other booking path. When implementing it in
+[TASK-2042](../../../docs/tasks/to-do/TASK-2042-site-nav-wordpress-rollout.md):
+
+- `cta-location` per entry point: `menu_header`, `menu_mega` or `menu_onepage`, to measure by entry point.
+- The menu closes its panel (mega or onepage) and releases its scroll lock **before** opening the dialog, so the native
+  `<dialog>` is the only owner of scroll lock and focus; the launcher stays mounted so focus returns to it on close.
+- A Growth CTA surface **owned by the global header** (do not reuse a landing's surface), with its
+  `meeting_surface_binding` and an origin allowlist covering every page where the menu appears. Its key is secret:
+  never in docs, commits or messages.
+- The dialog skin (the scheduler of `/agencia-inbound-marketing/`) lives today with landing scope in
+  `scripts/public-website/inbound-source/page.css`; it moves to a shared site primitive, it is not copied.
+- Without JavaScript or without a surface, the button is a plain link to `/agenda/`.
+
+Contract: [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Agendador](../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador).
+
 ## Operating loop
 
 1. **Resolve the boundary.** Identify whether the change belongs to provider policy, public transport,

@@ -526,6 +526,62 @@ vale en toda aplicación:
 - **Es un mecanismo, no una plantilla:** usarla no convierte el aspecto de la landing Inbound en patrón de otras
   páginas (PDR-026).
 
+### A15. Encabezado y navegación del sitio web (diseño aprobado 2026-10-18, implementación planificada)
+
+- **Estado:** diseño **aprobado en canvas** («Mega menú efeoncepro.com»,
+  [versión 67](https://claude.ai/artifact/FiyK4Uqrt8vqnSMw6qvgMj)); implementación **planificada** en EPIC-055
+  (contrato y primitive en AXIS, TASK-2040; plugin «EO Navegación», TASK-2041; adaptador WordPress, TASK-2042). Nada
+  está en runtime: `efeoncepro.com` sigue con el encabezado de Ohio. Contrato técnico:
+  [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`](../../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md)
+  (Propuesta) y PDR-027 (Proposed).
+- **Composición de escritorio** («Opción 2», operador 2026-10-17): hamburguesa · logo · cápsula de vidrio (Inicio,
+  Nosotros ▾, Soluciones ▾, Recursos ▾, Contacto) · botón «Agenda tu diagnóstico». La cápsula con sus mega menús
+  convive con la hamburguesa, que abre el onepage a pantalla completa; abrir uno cierra el otro. Bajo 1.181 px queda
+  sólo la hamburguesa.
+- **Cabecera en tres estados:** arriba transparente sobre el hero, 96 px; al bajar se oculta; al subir aparece fija y
+  sólida en navy `#001a33`, 72 px, con logo claro y el botón del agendador en sólido blanco.
+- **Logo:** 164 px arriba y 140 px en la cabecera fija (eran 148/128; se amplió el 2026-10-18 tras analizarlo a pedido
+  del operador); 152 px en los tableros de 1280 y 1200.
+- **Una sola receta de vidrio** para cápsula, botón y hamburguesa (aprobada el 2026-10-18, probada sobre navy, negro,
+  navy con resplandor y fotos):
+
+  ```css
+  background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+  backdrop-filter: blur(20px) saturate(160%) brightness(.54);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.03), 0 8px 24px rgba(0,8,20,.24);
+  ```
+
+  El botón usa el mismo material con relleno `.12→.04`, borde `.18` y canto `.34`. Estos valores pasan a tokens de
+  AXIS en TASK-2040; ningún CSS de sitio los repite a mano.
+- **Estados del botón «Agenda tu diagnóstico»:** en vidrio, el hover lo ilumina, refuerza el canto y lo sube 1 px; al
+  presionar escala a 98 %. En sólido blanco (cabecera fija) el hover pasa a `#cfe4fa` y sube 1 px. Foco `2px #72ded8`
+  en ambos. Con movimiento reducido no se desplaza ni escala.
+- **Lo que enseñó el vidrio** (por qué la receta es así):
+  1. un vidrio **tintado navy** se ve distinto en cada pieza (cápsula, botón y hamburguesa no parecen el mismo material);
+  2. un vidrio **gris sin saturación** (`saturate(0%)`) queda opaco y baja el contraste sobre fotos claras;
+  3. un vidrio **oscurecido** «se hunde» sobre navy o negro planos: parece un hoyo, no una superficie;
+  4. la solución es el **esmerilado claro** con `brightness` bajo en el backdrop;
+  5. bordes **sutiles** (pedido del operador: «más sutiles, más vidrio»): borde casi invisible y un canto de luz arriba.
+- **Contraste medido** del texto blanco sobre el vidrio, en el peor píxel:
+
+  | Fondo | Cápsula | Botón |
+  |---|---|---|
+  | Navy | 15,8 | 14,6 |
+  | Negro | 18,3 | 17,0 |
+  | Navy con resplandor | 12,8 | 12,2 |
+  | Foto con cara | 8,2 | 13,5 |
+  | Foto con indicador ámbar | 6,5 | 4,3 (promedio 6,1) |
+
+  El único caso bajo 4,5:1 es el peor píxel del botón sobre una foto con un indicador ámbar detrás; la QA del
+  piloto repite la medición sobre los heros reales.
+- **Error a no repetir:** el onepage cerrado dejaba su `clip-path: circle(24px)` navy detrás de la hamburguesa, un disco
+  que rompía el vidrio. Cerrado debe medir 0 px.
+- **Cuándo no:** las landings no crean su propia navegación ni copian este vidrio; el encabezado global es uno solo y lo
+  pinta el primitive de AXIS.
+- **Consumo y fronteras:** la API planificada vive en AXIS (skill `axis-design-system` → `references/ui-primitives.md`,
+  sección `efeonce.site-nav`); el agendador que abre el botón es Growth CTA (skill `greenhouse-growth-meetings`).
+
 ## B. Presentaciones e informes
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
@@ -1127,6 +1183,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Destacados de Instagram | — | mezcla de recursos, un color de luz por destacada, sin firma en el círculo; portada (cambiar) e historia completa 9:16 (crear) | A11 |
 | Escenario del login de Greenhouse (excepción en curso) | lente al canon (anillo 1,12, zoom, ancho/794); sin lente si la foto ya trae su órbita | foto de novedad, voz con anillo y esfera en el acento de la línea | A12 (`LoginLens.tsx`) |
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
+| Encabezado y navegación del sitio web (planificado) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS, planificado TASK-2040) · A15 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
 | Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |
