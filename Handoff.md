@@ -4,7 +4,8 @@
 
 GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
 completada con contexto visitante, CORS y recibo sólo tras persistencia; duplicados sin reenvío.
-Clasificación admin incluida en el candidato; release/API productivos aún pendientes.
+PR257 borrador sin auto-merge; release detenido por Julio. mainEC/aliasER5 conservados.
+Cinco deploys automáticos staging y preview cancelados; endpoint admin pendiente de publicación.
 69 pruebas aisladas PASS; sin leads, reservas ni conversiones ficticias. Contacto fueraAds.
 [Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 

@@ -12,7 +12,8 @@
 [Historial interno](docs/changelog/internal/README.md).
 
 - Fachada Grader reutiliza preparación/persistencia/recibo Forms y contexto visitante; CORS gobernado y respuestas privadas.
-- Think live confirmado en Forms portátil v8; política Ads vigente. Endpoint de clasificación en candidato, aún sin release nuevo.
+- Think live confirmado en Forms portátil v8; política Ads vigente. PR257 borrador: Julio retuvo el release; mainEC/aliasER5 conservados.
+- Cinco flujos staging y preview cancelados. Endpoint de clasificación aún sin publicar; sin dispatch de producción.
 - 69 pruebas aisladas PASS; sin tráfico comercial ficticio. [Contrato](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 
 ## 2026-10-18 — Políticas Ads comerciales publicadas y clasificación Web corregida
