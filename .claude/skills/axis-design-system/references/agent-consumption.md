@@ -277,7 +277,7 @@ Lessons from the mention release (2026-10-18), now fixed in AXIS:
 - **The video browser suite was flaky on shared runners.** Two `role="status"` regions (load and review) made
   `getByRole('status')` ambiguous when loading was slow, and media waits exceeded the default 5 s. The review asserts
   now target `.axis-video__status`, CI assertions get 20 s, and CI retries once so a stall is reported as flaky
-  (`69492cf`). A red video suite after this is a real signal: read the trace, do not rerun blindly.
+  (`bec3d01`). A red video suite after this is a real signal: read the trace, do not rerun blindly.
 - A failed publication run that published nothing leaves its tag: delete it (`git push origin :refs/tags/v<x>`) after
   confirming the version is absent from the registry, then rerun `pnpm release:packages <x>` on the new commit.
 

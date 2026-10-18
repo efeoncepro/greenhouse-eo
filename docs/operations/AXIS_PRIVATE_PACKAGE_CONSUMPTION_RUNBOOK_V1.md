@@ -8,15 +8,30 @@ acento de la línea) nació en el sitio público como `a.eo-mention` y el mismo 
 | Entrega | Evidencia / estado |
 | --- | --- |
 | Tag `v0.7.5` (commit `dd833d5`; feature `108c6f1`) | `axis-tokens` `0.6.5` (`axisMention`), `axis-ui-contracts` `0.7.5` (contrato `efeonce.mention` 1.0.0 `candidate`), `axis-ui-registry` `0.7.3` (capacidad `efeonce.mention`), `axis-ui-primitives` `0.6.8`. CI y `release-packages` en verde |
-| Tag `v0.6.9` (commit `701a164`) | `axis-ui-primitives` `0.6.9`: la máscara del isotipo pasa a `url(data:…)` **sin comillas** y totalmente codificada; un test prohíbe urls entre comillas |
+| Tag `v0.6.9` (commit `69492cf`; arreglo de la máscara en `701a164`) | `axis-ui-primitives` `0.6.9`: la máscara del isotipo pasa a `url(data:…)` **sin comillas** y totalmente codificada; un test prohíbe urls entre comillas |
 | WordPress (`eo-elementor-widgets`) | `assets/css/axis-mention.css` = copia byte a byte de `dist/mention.css` de primitives `0.6.9`, con cabecera de versión y sha256 `baacdd7053ec7c6b70a881cefb32cae03b77ca8e77ca94c4d311fa8f0f8cee4f`; handle `axis-mention` encolado en todo el sitio (frontend, preview de Elementor, editor de bloques). Retirados `eo-mention.css` y el isotipo local. En vivo en Inbound (`/agencia-inbound-marketing/`, página `242601`): 10 menciones `data-line="revenue-hubspot" data-surface="dark"`, verificadas a 1440 y 390 sin desborde y sin la clase legada. Commit del runtime `5db8f64` |
-| Think | Fija `@efeoncepro/axis-ui-primitives` `0.6.9` exacto; componente `src/components/EfeonceMention.astro` sobre `mentionHtml` + `mention.css`; preview noindex `/preview/mention/`. Sin menciones en páginas de producción todavía |
+| Think | En producción: commit `f603060` en `main`, Vercel Production Ready. Fija `@efeoncepro/axis-ui-primitives` `0.6.9` exacto; componente `src/components/EfeonceMention.astro` sobre `mentionHtml` + `mention.css`; preview noindex `https://think.efeoncepro.com/preview/mention` (sin barra final; con barra responde 308) verificada en vivo: 200, 3 menciones (engine/light, growth/light, growth/dark), tinte `rgba(3, 117, 219, 0.1)`, tinta navy, isotipo enmascarado, sin desborde a 1440, `noindex`; `astro check` 0 errores. Sin menciones en páginas de producción todavía |
 | Greenhouse | Sin adopción; `package.json` no fija `axis-ui-primitives` y sus pines AXIS no cambian |
 
 - **Por qué existe `0.6.9`:** con `0.6.8`, la pasada CSS de alias de tsconfig de Astro 7 (`astro:tsconfig-alias-css`)
   intentó resolver como archivo el `url("…")` entre comillas y el build de Think cayó con `ENAMETOOLONG`. El Lab de AXIS
   no tiene alias de tsconfig y no lo detectó. En hosts Astro usar `0.6.9` o superior, nunca `0.6.8`.
 - **Lección:** antes de publicar, validar el build de un consumidor real contra el `dist` local de AXIS; el Lab no basta.
+- **Mismo CSS en ambos hosts:** el sha256 de `dist/mention.css` publicado en `0.6.9` es `baacdd70…ee4f`, idéntico a la
+  copia de WordPress.
+- **Dos arreglos de pipeline para publicar `0.6.9`** (ambos en `main` de AXIS):
+  1. `b1cb16b` — `release-packages.yml` corre `pnpm --dir apps/lab brand:sync` antes de sus tests. Cuando CI no deja
+     checks core reutilizables (un commit sólo de docs empujado después del arreglo), el job de publicación corre
+     `pnpm test` tras construir sólo paquetes, y el test del Lab que compara archivos de marca byte a byte fallaba con
+     las copias de Factory, que están fuera de git a propósito (`f249e82`) y sólo las crea `brand:sync`.
+  2. `bec3d01` — suite de navegador del video estabilizada: los asserts de revisión apuntan a `.axis-video__status` (el
+     player tiene dos regiones `role="status"` y en runners lentos `getByRole('status')` caía en ambigüedad de modo
+     estricto); `expect.timeout` de CI en 20 s; `retries: 1` en CI con trace en el primer reintento. Local con `CI=1`:
+     86 pasan, 10 omitidas.
+- **Tag `v0.6.9` borrado y recreado:** una corrida de publicación falló sin publicar nada; tras confirmar que `0.6.9` no
+  estaba en el registry se borró el tag (`git push origin :refs/tags/v0.6.9`) y se re-corrió
+  `pnpm release:packages 0.6.9` sobre `69492cf` → éxito (`@efeoncepro/axis-ui-primitives@0.6.9` publicado).
+- **Lección de release:** no empujar nada entre un arreglo y su tag.
 - **WordPress no instala el paquete:** consume la copia byte a byte. Nunca editarla: para actualizar, recopiar
   `dist/mention.css` de la versión publicada y registrar en la cabecera la versión y el sha256 nuevos.
 - Flujo de publicación usado: bump de versiones + tabla del README → commit → push a `main` →

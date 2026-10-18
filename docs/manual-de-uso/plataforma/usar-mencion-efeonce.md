@@ -71,7 +71,10 @@ import EfeonceMention from '../components/EfeonceMention.astro'
 ```
 
 Las props son las de la mención: `label`, `href`, `line`, `surface` y `newTab`. Si el `href` no es de Efeonce, el build
-falla. Para revisar el aspecto, usa la preview noindex `/preview/mention/`.
+falla. Para revisar el aspecto, usa la preview noindex
+[`https://think.efeoncepro.com/preview/mention`](https://think.efeoncepro.com/preview/mention) (sin barra final: con
+barra responde 308). En producción desde el 2026-10-18 (commit `f603060`): responde 200 con 3 menciones, `noindex`, sin
+desborde a 1440 y `astro check` sin errores. El `mention.css` que carga es idéntico (mismo sha256) a la copia de WordPress.
 
 ### En React o HTML (cualquier otro producto)
 

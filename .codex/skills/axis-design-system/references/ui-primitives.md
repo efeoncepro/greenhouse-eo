@@ -258,7 +258,7 @@ urls. Never put the isotype in markup or alt text. The doubled selector `a.axis-
 on the anchor instead of forking the CSS.
 
 Published set: tag `v0.7.5` (`dd833d5`) = tokens 0.6.5, contracts 0.7.5, registry 0.7.3, primitives 0.6.8;
-tag `v0.6.9` (`701a164`) = primitives 0.6.9 with the unquoted mask (see the data-URI rule above). **Pin primitives
+tag `v0.6.9` (`69492cf`; mask fix `701a164`) = primitives 0.6.9 with the unquoted mask (see the data-URI rule above). **Pin primitives
 0.6.9 or later; never 0.6.8 in Astro hosts.**
 
 Consumers (verified 2026-10-18):
@@ -269,7 +269,10 @@ Consumers (verified 2026-10-18):
   the package, never edit it. `includes/eo-mention.php` enqueues handle `axis-mention` site-wide (frontend, Elementor
   preview, block editor). Live on the Inbound landing (`data-line="revenue-hubspot" data-surface="dark"`).
 - **Think**: exact pin 0.6.9; `src/components/EfeonceMention.astro` wraps `mentionHtml` + `mention.css` (props =
-  `MentionOptions`; a non-Efeonce href fails the build); noindex preview `/preview/mention/`.
+  `MentionOptions`; a non-Efeonce href fails the build); noindex preview `https://think.efeoncepro.com/preview/mention`
+  (Think routes have no trailing slash; `/preview/mention/` answers 308). Live: commit `f603060`, Vercel production
+  Ready, 200 with 3 mentions, noindex, no overflow, `astro check` 0 errors. Published 0.6.9 `mention.css` sha256 =
+  the WordPress copy's.
 
 AXIS owns the mention; a landing or product never forks its CSS. The mention is a mechanism, not a template for
 the page that first used it.
