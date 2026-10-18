@@ -5,6 +5,12 @@ Estado 17-10-2026: código local y workspaces preparados, **sin deploy ni public
 [arquitectura](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
 [evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md).
 
+Validación18/10 y [paquete de release](../../operations/releases/google-ads-2026-10-18/README.md):
+Chromium aislado/API verificados; propuestas Performance/Discovery sin apply. Los hosts todavía
+sirven el bridge anterior. Release general bloqueado por alcance/CI/preflight; sin publicación.
+Smoke reproducible: `pnpm exec tsx scripts/gtm/google-ads-browser-smoke.ts` (todo interceptado,
+respuestas simuladas; no certifica proveedor, GTM real ni atribución).
+
 ## Qué registra
 
 | Resultado confirmado | Acción nativa secundaria | ID |

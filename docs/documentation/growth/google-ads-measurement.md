@@ -24,6 +24,12 @@ borradores Web8/Server12 compilan. **Sin despliegue ni publicación, captura Ads
 La afirmación anterior de cero escrituras corresponde al probe/CLI previo; este delta sí creó dos
 acciones, sin enviar conversiones ni cambiar campañas. [Activación y límites](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
 
+El18/10 se completó la validación local/API y se preparó el
+[paquete previo al release](../../operations/releases/google-ads-2026-10-18/README.md):499 pruebas
+focales y32 escenarios Chromium con respuestas simuladas y sin envíos externos. Términos aceptados
+confirmados por API; EC sigueOFF. Falta compatibilidad servida en hosts, protocolo GTM real y
+aprobación del candidato completo. No se publicaron tags, políticas ni cambios de infraestructura.
+
 | Componente | Función en la arquitectura |
 | --- | --- |
 | Growth Forms / Meetings | Confirmar solicitudes y reservas, intención y consentimiento |

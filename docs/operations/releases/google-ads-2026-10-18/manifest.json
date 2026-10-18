@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "mode": "prepared_not_authorized_for_activation",
+  "preparedAt": "2026-10-18T15:09:22.483Z",
+  "codeCommit": "c92424961",
+  "termsCommit": "8b3217a91",
+  "verifiedCheckout": "b8cdf8b1f5aa0c891a978386b89bad816444cf36",
+  "mainBaseline": "9690efad0c1b9d70d9b168d41131857e686b0f81",
+  "customerId": "6862539491",
+  "adsPrincipal": "jreyes@efeoncepro.com",
+  "cloudPrincipal": "julio.reyes@efeonce.org",
+  "cloudProject": "efeonce-group",
+  "gtm": {
+    "web": {
+      "publicId": "GTM-NGHPGRLZ",
+      "workspaceId": "8",
+      "liveVersionId": "5"
+    },
+    "server": {
+      "publicId": "GTM-K2X4ZTTK",
+      "workspaceId": "12",
+      "liveVersionId": "9"
+    },
+    "published": false
+  },
+  "adsTermsAccepted": true,
+  "enhancedConversionsEffective": "OFF",
+  "releaseReady": false,
+  "assets": [
+    {
+      "source": "scripts/measurement/hubspot-consent-bridge.js",
+      "preparedFile": "/Users/jreye/Documents/google-ads-release-package-2026-10-18/consent-bridge.v1.js",
+      "sha256": "4250795666afcc6b54a08284f5f77919e8b754de87eb91674303abb0132559ba",
+      "bytes": 11898
+    },
+    {
+      "source": "public/growth-forms/renderer-preview.js",
+      "preparedFile": "/Users/jreye/Documents/google-ads-release-package-2026-10-18/growth-forms-renderer-preview.js",
+      "sha256": "871ffef3d644cb6623dc87885cee8de7dcdd5724caea9b81e4544c5c6c294c95",
+      "bytes": 163335
+    },
+    {
+      "source": "public/growth-meetings/renderer-preview.js",
+      "preparedFile": "/Users/jreye/Documents/google-ads-release-package-2026-10-18/growth-meetings-renderer-preview.js",
+      "sha256": "0d16c083a1985a15ab027d21ad17c133c52d6f746d114068fc2ca34220f2a18f",
+      "bytes": 133034
+    }
+  ],
+  "sources": [
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "97d75d87-0795-4c78-a490-9eba560bf559",
+        "surfaceId": "fhsf-efeonce-lead-gen-web"
+      },
+      "name": "Efeonce · Lead Gen - Web (Diseño de sitios web)",
+      "version": "fver-efeonce-lead-gen-web-v1",
+      "eligibleByType": false,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "b120566a-dd1a-43c8-956a-4e0121e805b8",
+        "surfaceId": "fhsf-efeonce-aeo-diagnostic"
+      },
+      "name": "Efeonce · Diagnostico AEO",
+      "version": "fver-0df81cf5-b580-49bd-b17b-c46aabd08765",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "69cd5269-5f97-4d32-99c4-0b23f41aa2f5",
+        "surfaceId": "fhsf-ai-visibility-grader"
+      },
+      "name": "AI Visibility Grader",
+      "version": "fver-ea1c2e5f-38e0-4ef6-b9eb-9b5fe1b9d6f3",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "00231d6c-e1a0-4857-ae5b-a27262ae8b69",
+        "surfaceId": "fhsf-2d4b97ad-7076-4958-8e0f-daf1c995e430"
+      },
+      "name": "Efeonce · Cotización desarrollo de sitios web",
+      "version": "fver-c2cfb2d7-c285-4924-aea2-b5d4f8313ce4",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "7772dcf4-e2ca-4f5b-b386-2db92659b050",
+        "surfaceId": "fhsf-48a4b95f-5f2a-453a-88d7-af3257e7c417"
+      },
+      "name": "Efeonce · Diagnóstico SEO",
+      "version": "fver-a7a91d8c-9467-49c1-b5bc-95b10754424f",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "f83cb310-2477-4776-adb0-57fb07e95594",
+        "surfaceId": "fhsf-cb40ce69-97a0-4a3a-8e0a-8e62dfc46c22"
+      },
+      "name": "Efeonce · Auditoría redes sociales",
+      "version": "fver-84224755-7b96-4163-b431-a5b0255a674b",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "db1e254c-e762-41ae-a85f-50b29dc33ba5",
+        "surfaceId": "fhsf-web-agentica-ebook"
+      },
+      "name": "Efeonce · Ebook El fin de la web",
+      "version": "fver-c5348278-06e3-4644-a3f5-e803fe317126",
+      "eligibleByType": false,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "e8d2bfcc-c4fe-4396-8f3b-08f5ac190409",
+        "surfaceId": "fhsf-surround-discovery-ebook"
+      },
+      "name": "Efeonce · Ebook Surround Discovery",
+      "version": "fver-00476c2f-ddd1-4c6d-8c8d-4df864d524fa",
+      "eligibleByType": false,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "d2c68012-2a6b-41d6-b3dd-4b8ccbff6ee3",
+        "surfaceId": "fhsf-efeonce-creator-influence"
+      },
+      "name": "Brief de Influencer Marketing, Creators y UGC",
+      "version": "fver-ffe2243d-5291-49d7-95ed-cfefe9589a2e",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "bb220383-530e-4b3c-891f-bbdc75d7d112",
+        "surfaceId": "fhsf-efeonce-hubspot-scope"
+      },
+      "name": "Reunión de alcance HubSpot",
+      "version": "fver-012acd39-cc01-4cb2-930c-9ca6a4cc34ca",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "18b228e9-106a-402e-a6f2-a8c5469e73d7",
+        "surfaceId": "fhsf-efeonce-content-marketing"
+      },
+      "name": "Conversación sobre operación de contenidos",
+      "version": "fver-83ffe3f9-ef8a-4419-bed0-cee1093c218b",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "5c7d7db7-be47-4137-b20a-b2a1f5be9ebd",
+        "surfaceId": "fhsf-efeonce-contacto"
+      },
+      "name": "Contacto Efeonce",
+      "version": "fver-901e53e5-25e1-4f64-81d0-5fed3c8616f1",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "e913d958-2ad7-48a5-8015-dbff53eca4a3",
+        "surfaceId": "fhsf-efeonce-creative-diagnostic"
+      },
+      "name": "Diagnóstico creativo · Agencia Creativa",
+      "version": "fver-79bbb3b4-a66e-4e23-9465-5344e6454b6d",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "d784b9e2-f6e4-4e24-b059-f164fc82f734",
+        "surfaceId": "fhsf-efeonce-media-diagnostic"
+      },
+      "name": "Diagnóstico de medios · Agencia de Medios",
+      "version": "fver-d448c02d-9fda-4612-9ba8-5bebd4a5139f",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "71ea684f-1ad9-4656-982b-159e4de46dd8",
+        "surfaceId": "fhsf-efeonce-performance-diagnostic"
+      },
+      "name": "Diagnóstico de pauta · Performance Marketing",
+      "version": "fver-e9f76dcb-3766-46e9-99b3-b880b3e3dca8",
+      "eligibleByType": true,
+      "proposedInitial": true
+    },
+    {
+      "scope": {
+        "sourceKind": "form_submission",
+        "sourceKey": "70dc185f-9903-4458-8aa5-323f6f827152",
+        "surfaceId": "fhsf-efeonce-inbound-diagnostic"
+      },
+      "name": "Diagnóstico de inbound · Inbound Marketing",
+      "version": "fver-31ffbbd1-6936-422b-ba97-210669a69821",
+      "eligibleByType": true,
+      "proposedInitial": false
+    },
+    {
+      "scope": {
+        "sourceKind": "meeting_booking",
+        "sourceKey": "discovery",
+        "surfaceId": "fhsf-efeonce-lead-gen-web"
+      },
+      "name": "discovery",
+      "version": "e177ad8f5c28a87aefef6311207758c95132897a025a148ce718a2df83dc2d47",
+      "eligibleByType": true,
+      "proposedInitial": true
+    }
+  ],
+  "activationOrder": [
+    "compatible_backend_and_renderers",
+    "wordpress_and_think_consent_bridge",
+    "preview_protocol_validation",
+    "server_gtm",
+    "web_gtm",
+    "effective_ec_setting_and_reviewed_policies",
+    "backend_ads_flag",
+    "real_consenting_occurrence_and_ads_diagnostics"
+  ],
+  "externalSends": 0,
+  "businessWrites": 0
+}

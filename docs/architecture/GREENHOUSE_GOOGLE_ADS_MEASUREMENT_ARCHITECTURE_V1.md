@@ -1,5 +1,9 @@
 # Google Ads — Arquitectura de medición comercial y conexión API V1
 
+Checkpoint18/10: [paquete previo al release](../operations/releases/google-ads-2026-10-18/README.md)
+y [validación](../audits/growth/2026-10-18-google-ads-prerelease-validation.md). Se mantiene el ADR
+y contrato existentes; evidencia local/API nueva, sin activación ni despliegue.
+
 ## 1. Estado, alcance y precedencia
 
 - Estado: `Accepted` como dirección arquitectónica por instrucción del operador el **2026-10-17**.

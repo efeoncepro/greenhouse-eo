@@ -2,6 +2,10 @@
 
 ## 2026-10-17 — Google Ads: acceso API de lectura probado y arquitectura adoptada
 
+Checkpoint18/10:499 tests y32 escenarios Chromium aislados PASS; API cuenta686/drafts verificada.
+[Paquete previo al release](docs/operations/releases/google-ads-2026-10-18/README.md) con propuestas,
+assets/hashes y rollback. Hosts/protocolo real/EC/CI pendientes; release general BLOCK. Sin activación.
+
 OAuth `jreyes@efeoncepro.com` verificado; Cloud siempre `julio.reyes@efeonce.org` / `efeonce-group`.
 API v26 PASS para **`6862539491`**, vía `login-customer-id: 9531478329` (directo 403); CLP,
 America/Santiago, owner de conversiones propio. Cuenta nueva según operador; tracking

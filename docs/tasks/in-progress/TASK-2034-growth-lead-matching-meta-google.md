@@ -16,7 +16,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Parcial: Meta/UPD publicados previamente; delta Ads online local17/10, dos acciones secundarias creadas/verificadas y GTM drafts Web8/Server12 compilados; Ads sin publish/deploy/flag ON. QA funcional/EC y primera conversión Ads pendientes.`
+- Status real: `Parcial: Meta/UPD publicados previamente; Ads local con acciones/drafts verificados por API18/10,499 tests y32 escenarios Chromium aislados PASS. Paquete preparado, términos aceptados/EC OFF; hosts/protocolo GTM real/CI y release general pendientes. Sin publish/deploy/activación Ads.`
 - Rank: `Now`
 - Domain: `data`
 - Blocked by: `none`
@@ -257,6 +257,11 @@ Ordering: source/worker → parked migration/secrets → Client preview → cont
 Flags: GROWTH_MEASUREMENT_CAPTURE_ENABLED, GROWTH_MEASUREMENT_META_ENABLED, GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED, GROWTH_MEASUREMENT_RETENTION_ENABLED default OFF; retention stays ON after rollout during rollback. Capture/send OFF restores data boundary; coordinate legacy Meta trigger restore with backend send disabled. Preserve receipts.
 
 ## Closing Protocol
+
+Checkpoint18/10: [validación previa y límites](../../audits/growth/2026-10-18-google-ads-prerelease-validation.md),
+[paquete de release](../../operations/releases/google-ads-2026-10-18/README.md). Dos propuestas offline
+Performance/Discovery preservan destinos. No cierran los acceptance de runtime/primera conversión;
+el lote general requiere revisión/CI y el bridge anterior sigue servido en WP/Think.
 
 - [ ] Runtime acceptance and current Status real recorded.
 - [x] Task index, audit/handoff, changelog and mirrored skills synchronized.
