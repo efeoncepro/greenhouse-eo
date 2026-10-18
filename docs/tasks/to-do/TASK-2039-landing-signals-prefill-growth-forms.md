@@ -1,5 +1,11 @@
 # TASK-2039 — Landings que alimentan su formulario (señales de la página → Growth Form)
 
+## Delta 2026-10-18
+
+- La landing de inbound quedó en producción con el formulario `efeonce-inbound-diagnostic` (form key `70dc185f…`, HubSpot
+  `direct`), que ya trae los campos que la hija B precargaría: `loopStage` (etapa del ciclo), `crm` y `country`. Falta la
+  parte de señales (marcado de la página + precarga); el formulario, su destino y la fila del plan de medición ya existen.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

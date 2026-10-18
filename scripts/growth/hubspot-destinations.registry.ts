@@ -282,4 +282,21 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       select('role', 'gh_form_performance_rol', 'Cargo (Performance)', 'Rango de cargo de la persona que pide el diagnóstico.'),
     ],
   },
+  {
+    formKey: '70dc185f-9903-4458-8aa5-323f6f827152',
+    slug: 'efeonce-inbound-diagnostic',
+    pageUrl: 'https://efeoncepro.com/agencia-inbound-marketing/',
+    hubspotForm: { name: 'Lead Gen - Inbound Marketing' },
+    fields: [
+      FIRST_NAME,
+      LAST_NAME,
+      EMAIL,
+      COMPANY,
+      WEBSITE,
+      existing('country', 'country', 'País'),
+      select('loopStage', 'gh_form_inbound_etapa', 'Dónde Se Rompe el Ciclo (Inbound)', 'Etapa del ciclo de marketing que más le duele: definir, adaptar, amplificar u optimizar.'),
+      select('crm', 'gh_form_inbound_crm', 'CRM que Usa (Inbound)', 'CRM declarado en el diagnóstico de inbound.'),
+      select('role', 'gh_form_inbound_rol', 'Cargo (Inbound)', 'Rango de cargo de la persona que pide el diagnóstico de inbound.'),
+    ],
+  },
 ]

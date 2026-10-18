@@ -59,6 +59,7 @@ namespace {
 	$landings = array(
 		'medios'      => array( 'base' => 'EO_Medios_Landing_Base_Widget', 'file' => 'class-eo-medios-landing-widgets.php' ),
 		'performance' => array( 'base' => 'EO_Performance_Landing_Base_Widget', 'file' => 'class-eo-performance-landing-widgets.php' ),
+		'inbound'     => array( 'base' => 'EO_Inbound_Landing_Base_Widget', 'file' => 'class-eo-inbound-landing-widgets.php' ),
 	);
 	$out = array();
 	foreach ( $landings as $landing => $cfg ) {
