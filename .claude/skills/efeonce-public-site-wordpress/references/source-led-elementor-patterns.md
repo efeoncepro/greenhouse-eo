@@ -35,6 +35,11 @@ Medios and Performance now share one core; new canvas landings must use it inste
   shared base is written **before** the landing bases so no request loads a base without its parent. Deployed
   2026-10-17 21:25 UTC (backup `/tmp/eo-source-led-core-before-20261017-212544.tar` on Kinsta); live module HTML of
   Medios (16) and Performance (10) identical before/after. The Medios and Performance packages also ship the shared base.
+- **Native meeting launcher (2026-10-18, first used by Inbound):** write `<gh-meeting-cta></gh-meeting-cta>` in stage 1
+  and pass `meeting: { module, cta, location, fallbackUrl, fallbackLabel }` to the core; the module gets `meeting_*` fields
+  (the embed key is never a schema default: the page publisher writes it from the 0600 file) and the base renders
+  `<greenhouse-cta … appearance="bare">` (or a plain fallback link) and loads the CTA renderer only for that module.
+  The `<greenhouse-cta>` contains its inline size: give it an explicit width in the host CSS or it collapses to 0.
 - **Republisher:** `republish-source-led-page.php <spec.json> <page-custom.css>` with specs in
   `<landing>-source/republish.json`. Requires `expectedDataSha` to write; keeps each module's live widget settings
   (`preserveWidgetSettings`, default true); does nothing when the rebuilt tree, custom CSS and featured image already

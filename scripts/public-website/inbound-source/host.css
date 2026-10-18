@@ -32,3 +32,18 @@
 /* Editor switch «Animaciones» off stops every loop; reduced motion is handled by the canvas styles. */
 .gh-inbound[data-motion="no"] *,.gh-inbound[data-motion="no"] *::after{animation:none !important;transition:none !important}
 @media (prefers-reduced-motion:reduce){.gh-inbound [data-gh-panels][data-ready] > [data-gh-panel]{animation:none !important}}
+
+/* «Agenda una reunión»: governed Growth CTA (open_meeting_scheduler) painted as the landing's primary button.
+   The renderer owns the action, the dialog and telemetry; the host only skins the launcher. */
+.gh-inbound .meet-cta{display:flex}
+.gh-inbound .meet-cta greenhouse-cta{display:flex;width:min(100%,300px);--gh-cta-reserve:56px} /* the renderer contains its inline size: it needs an explicit width */
+.gh-inbound .meet-cta greenhouse-cta .ghc-card{display:flex!important;gap:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important}
+.gh-inbound .meet-cta greenhouse-cta :is(.ghc-content,.ghc-dismiss){display:none!important}
+.gh-inbound .meet-cta greenhouse-cta .ghc-actions{width:100%;margin:0!important;padding:0!important}
+.gh-inbound .meet-cta greenhouse-cta .ghc-primary{width:100%}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback){display:inline-flex;align-items:center;justify-content:center;gap:.625rem;min-height:56px;padding:1rem 1.6rem;border:0;border-radius:12px;font-family:'Poppins',system-ui,sans-serif;font-size:1rem;font-weight:500;line-height:1.4;letter-spacing:0;text-transform:none;white-space:nowrap;text-decoration:none!important;color:#001a33!important;background:#e86bd0!important;box-shadow:0 14px 34px rgba(232,107,208,.28)!important;cursor:pointer;transition:background-color 150ms,transform 200ms cubic-bezier(.2,0,0,1),box-shadow 200ms}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::before{content:"";flex:none;width:18px;height:18px;background:#001a33;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 9.5h18M8 2.5v4M16 2.5v4'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 9.5h18M8 2.5v4M16 2.5v4'/%3E%3C/svg%3E") center/contain no-repeat}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback)::after{content:"→";font-size:1.125rem;line-height:1;transition:transform 200ms cubic-bezier(.4,0,.2,1)}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover{background:#f19ae0!important;transform:translateY(-1px);box-shadow:0 18px 40px rgba(232,107,208,.36)!important}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):hover::after{transform:translateX(.25rem)}
+.gh-inbound .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inbound-meeting-fallback):focus-visible{outline:2px solid #ffffff;outline-offset:3px}

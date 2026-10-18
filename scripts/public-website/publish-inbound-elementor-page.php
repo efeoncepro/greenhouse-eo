@@ -2,7 +2,8 @@
 /**
  * Publishes the Inbound Marketing modules (rediseño 2026-10-18) with Ohio's own header and footer.
  * Inputs (files, the wpcli wrapper forwards only files): <page-custom.css> (inbound-source/page-custom.css, __ID__ = page id),
- * <form.json> ({ "formKey", "surface" }) and <spec.json>:
+ * <form.json> ({ "formKey", "surface" }), <spec.json> and, optionally, <meeting.json> (the 0600 file written by
+ * scripts/growth/publish-inbound-meeting-cta.ts: { surfaceId, embedKey }) for the native meeting launcher:
  *   { "mode": "preview" }                                 → creates /inbound-preview-20261018/ (publish, noindex, not in menus) for QA.
  *   { "mode": "replace", "pageId": 242601, "expectedDataSha": "<sha256 of the live _elementor_data>" }
  *                                                          → replaces the body of /agencia-inbound-marketing/ in place.
@@ -11,13 +12,17 @@
  * Rollback (replace): restore the snapshot with rollback-inbound-elementor-page.php, purge Kinsta.
  */
 if ( ! defined( 'ABSPATH' ) || ! class_exists( 'WP_CLI' ) ) { exit; }
-if ( count( $args ?? array() ) !== 3 ) { WP_CLI::error( 'Expected: <page-custom.css> <form.json> <spec.json>.' ); }
+if ( ! in_array( count( $args ?? array() ), array( 3, 4 ), true ) ) { WP_CLI::error( 'Expected: <page-custom.css> <form.json> <spec.json> [<meeting.json>].' ); }
 $template     = trim( (string) file_get_contents( $args[0] ) );
 $form         = json_decode( (string) file_get_contents( $args[1] ), true );
 $spec         = json_decode( (string) file_get_contents( $args[2] ), true );
 $form_key     = (string) ( $form['formKey'] ?? '' );
 $form_surface = (string) ( $form['surface'] ?? '' );
 $mode         = (string) ( $spec['mode'] ?? '' );
+$meeting      = isset( $args[3] ) ? json_decode( (string) file_get_contents( $args[3] ), true ) : array();
+$meeting_surface = (string) ( $meeting['surfaceId'] ?? '' );
+$meeting_key     = (string) ( $meeting['embedKey'] ?? '' );
+if ( isset( $args[3] ) && ( ! preg_match( '/^csur-[0-9a-f-]{36}$/', $meeting_surface ) || strlen( $meeting_key ) < 20 ) ) { WP_CLI::error( 'Invalid meeting CTA surface or key.' ); }
 if ( ! preg_match( '/^[0-9a-f-]{36}$/', $form_key ) || ! preg_match( '/^fhsf-[a-z0-9-]+$/', $form_surface ) ) { WP_CLI::error( 'Invalid form key or surface.' ); }
 if ( ! in_array( $mode, array( 'preview', 'replace' ), true ) ) { WP_CLI::error( 'Unknown mode.' ); }
 if ( false === strpos( $template, '__ID__' ) || preg_match( '/<\/?(script|style)/i', $template ) ) { WP_CLI::error( 'Unexpected custom CSS input.' ); }
@@ -33,7 +38,7 @@ foreach ( array_keys( $modules ) as $module ) {
 	if ( ! isset( $widgets[ 'greenhouse_inbound_' . $module ] ) ) { WP_CLI::error( 'Widget absent: greenhouse_inbound_' . $module ); }
 	try {
 		$widgets[ 'greenhouse_inbound_' . $module ]->get_controls();
-		$probe = EO_Inbound_Landing_Base_Widget::render_module( $module, array( 'form_key' => $form_key, 'form_surface' => $form_surface ), 'preflight' );
+		$probe = EO_Inbound_Landing_Base_Widget::render_module( $module, array( 'form_key' => $form_key, 'form_surface' => $form_surface, 'meeting_surface' => $meeting_surface, 'meeting_embed_key' => $meeting_key ), 'preflight' );
 		if ( '' === $probe || preg_match( '/%%[^%\s]+%%/', $probe ) ) { WP_CLI::error( 'Render preflight failed: ' . $module ); }
 	} catch ( \Throwable $e ) {
 		WP_CLI::error( 'Control preflight failed for ' . $module . ': ' . $e->getMessage() );
@@ -77,6 +82,7 @@ $elements = array();
 foreach ( $modules as $module => $title ) {
 	$widget_settings = array( '_title' => $title, '_margin' => $zero, '_padding' => $zero );
 	if ( 'diagnostico' === $module ) { $widget_settings += array( 'form_key' => $form_key, 'form_surface' => $form_surface ); }
+	if ( 'diagnostico' === $module && '' !== $meeting_key ) { $widget_settings += array( 'meeting_surface' => $meeting_surface, 'meeting_embed_key' => $meeting_key ); }
 	$scheme     = in_array( $module, $light, true ) ? 'clb__light_section' : 'clb__dark_section';
 	$elements[] = array(
 		'id' => substr( md5( 'inbound-section-' . $module ), 0, 7 ), 'elType' => 'container', 'isInner' => false,
@@ -120,4 +126,4 @@ if ( function_exists( 'YoastSEO' ) ) { YoastSEO()->classes->get( 'Yoast\\WP\\SEO
 \Elementor\Plugin::$instance->files_manager->clear_cache();
 WP_CLI::runcommand( 'cache flush', array( 'return' => true ) );
 WP_CLI::runcommand( 'kinsta cache purge --all', array( 'return' => true ) );
-echo wp_json_encode( array( 'status' => $mode . '_verified', 'postId' => $id, 'url' => get_permalink( $id ), 'snapshot' => $snapshot_key, 'hash' => hash( 'sha256', (string) get_post_meta( $id, '_elementor_data', true ) ), 'widgets' => count( $actual ), 'protectedUnchanged' => true, 'globalChromePreserved' => true ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . PHP_EOL;
+echo wp_json_encode( array( 'status' => $mode . '_verified', 'postId' => $id, 'url' => get_permalink( $id ), 'snapshot' => $snapshot_key, 'meetingLauncher' => '' !== $meeting_key, 'hash' => hash( 'sha256', (string) get_post_meta( $id, '_elementor_data', true ) ), 'widgets' => count( $actual ), 'protectedUnchanged' => true, 'globalChromePreserved' => true ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . PHP_EOL;

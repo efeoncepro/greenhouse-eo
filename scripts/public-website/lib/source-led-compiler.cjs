@@ -41,6 +41,17 @@ const SERVICE_FIELDS = [
 // landing by the selector rewrite below; no landing link uses its own background image.
 const OHIO_LINK_GUARD = '/* Ohio link-underline guard */\na:hover,a:focus-visible{animation:none !important;background-image:none !important}\n'
 
+// Native meeting launcher (Growth CTA `open_meeting_scheduler`): written as <gh-meeting-cta> in stage 1. The embed
+// key is never a schema default: the page publisher writes it into the widget settings from the 0600 secret file.
+const MEETING_FIELDS = [
+  { key: 'meeting_cta', type: 'text', label: 'Reunión · CTA (slug)' },
+  { key: 'meeting_surface', type: 'text', label: 'Reunión · surface del CTA' },
+  { key: 'meeting_embed_key', type: 'text', label: 'Reunión · embed key del CTA' },
+  { key: 'meeting_location', type: 'text', label: 'Reunión · ubicación (telemetría)' },
+  { key: 'meeting_fallback_url', type: 'url', label: 'Reunión · enlace sin JavaScript' },
+  { key: 'meeting_fallback_label', type: 'text', label: 'Reunión · texto del enlace sin JavaScript' },
+]
+
 const FORM_FALLBACK = 'Este formulario necesita JavaScript. Puedes escribirnos a hola@efeoncepro.com o agendar en efeoncepro.com/agenda.'
 
 /**
@@ -57,6 +68,7 @@ const FORM_FALLBACK = 'Este formulario necesita JavaScript. Puedes escribirnos a
  * @param {object} o.faq            { repeaters, question, answer } field keys for FAQPage
  * @param {object} o.serviceDefaults schema_* defaults
  * @param {object} [o.repeatLabels] repeater key → editor label
+ * @param {object}  [o.meeting]      { module, cta, location, fallbackUrl, fallbackLabel }: native meeting launcher fields
  * @param {boolean} [o.pageLayer]   append <sourceDir>/page.css unscoped
  * @param {string} [o.compilerFile] generator file name written in the CSS header
  */
@@ -124,6 +136,12 @@ function compileSourceLedLanding(o) {
       const node = q(el)
 
       for (const attr of Object.keys(el.attribs || {})) if (/^on/i.test(attr)) node.removeAttr(attr)
+
+      if (el.tagName === 'gh-meeting-cta') {
+        node.replaceWith(token('meeting_launcher'))
+
+        return
+      }
 
       if (el.tagName === 'gh-growth-form') {
         node.replaceWith(token('growth_form'))
@@ -261,6 +279,18 @@ function compileSourceLedLanding(o) {
         form_key: process.env[envPrefix + '_FORM_KEY'] || '',
         form_surface: process.env[envPrefix + '_FORM_SURFACE'] || '',
         form_fallback: FORM_FALLBACK,
+      })
+    }
+
+    if (o.meeting && key === o.meeting.module) {
+      extra.push(...MEETING_FIELDS)
+      Object.assign(extraDefaults, {
+        meeting_cta: o.meeting.cta || '',
+        meeting_surface: '',
+        meeting_embed_key: '',
+        meeting_location: o.meeting.location || landing + '_meeting',
+        meeting_fallback_url: { url: o.meeting.fallbackUrl || 'https://efeoncepro.com/agenda/' },
+        meeting_fallback_label: o.meeting.fallbackLabel || 'Agenda una reunión',
       })
     }
 

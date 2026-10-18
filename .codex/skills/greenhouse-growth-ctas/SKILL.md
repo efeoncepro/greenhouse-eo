@@ -164,6 +164,13 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
 
 ## Estado de rollout (actualizar al cambiar)
 
+- **2026-10-18: CTA `inbound-discovery-meeting` publicado** (landing `/agencia-inbound-marketing/`, surface propia,
+  `cta-location=inbound_closing`). Primer consumidor del lanzador de reunión genérico de la base source-led
+  (`<gh-meeting-cta>` → `<greenhouse-cta appearance="bare">`). El diálogo se viste desde la capa de página del host
+  (sólo el scheduler + cierre circular, título visualmente oculto pero accesible); el bundle de producción aún no trae la
+  clase `ghc-meeting-titles` (selector usado: `.ghc-meeting-toolbar>:not(.ghc-meeting-close)`). Un `<dialog>` modal tiene
+  `top:0;bottom:0`: para ajustarlo al contenido el host usa `height: fit-content`, no `auto`.
+
 - **2026-10-16: bundle `1.3.1` code complete, rollout pendiente.** Corrige la cabecera del scheduler nativo en móvil
   (shorthands `font` inválidos + botón de cierre sin `flex: none`/`nowrap`). Verificado con el bundle local servido por
   interceptación sobre las páginas reales `/servicios-contratar-hubspot/` y `/contacto/` (390 y 820 px: botón en una

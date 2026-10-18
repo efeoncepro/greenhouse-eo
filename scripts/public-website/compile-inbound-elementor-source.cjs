@@ -136,6 +136,14 @@ const tabCss = []
 </div>`)
 }
 
+// «¿Prefieres conversarlo en vivo?»: the governed Growth CTA opens the native meeting scheduler in a dialog.
+{
+  const button = $('#diagnostico a.btn-p[href*="/agenda/"]')
+
+  if (button.length !== 1) throw new Error('Closing meeting button not found')
+  button.replaceWith('<div class="meet-cta"><gh-meeting-cta></gh-meeting-cta></div>')
+}
+
 if ($('sc-if, sc-for').length) throw new Error('Unexpanded canvas control left')
 if (/\{\{[^}]+\}\}/.test($('#__root').html())) throw new Error('Unresolved binding left in the markup')
 
@@ -182,6 +190,13 @@ const result = compileSourceLedLanding({
   faq: { repeaters: ['faq'], question: 'f001_subtitulo', answer: 'f002_descripcion' },
   serviceDefaults: SERVICE_DEFAULTS,
   pageLayer: true,
+  meeting: {
+    module: 'diagnostico',
+    cta: 'inbound-discovery-meeting',
+    location: 'inbound_closing',
+    fallbackUrl: 'https://efeoncepro.com/agenda/',
+    fallbackLabel: 'Agenda una reunión',
+  },
 })
 
 console.log(JSON.stringify(result, null, 2))

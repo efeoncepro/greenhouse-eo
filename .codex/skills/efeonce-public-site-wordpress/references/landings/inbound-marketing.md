@@ -24,7 +24,13 @@
   `fhsf-efeonce-inbound-diagnostic`, `hubspot_pillar` + `multi_step_light` (step 1: `loopStage`, `crm`, `country`;
   step 2: contact). HubSpot `direct` «Lead Gen - Inbound Marketing» (`gh_form_inbound_etapa|crm|rol`). Publisher
   `scripts/growth/publish-inbound-diagnostic-form.ts`; registry row in `hubspot-destinations.registry.ts`.
-- Meeting CTA: plain links to `/agenda/` (hero secondary, closing block, mobile dock). No Growth CTA surface yet.
+- Meeting CTA: the closing block's «Agenda una reunión» is the governed Growth CTA `inbound-discovery-meeting`
+  (`open_meeting_scheduler`, `fhsf-efeonce-lead-gen-web` + `discovery`, surface «Efeonce Inbound landing (WordPress)»,
+  key 0600 in `.auth/inbound-meeting-cta-surface.json`; rerunning `scripts/growth/publish-inbound-meeting-cta.ts` rotates
+  it → republish with the 4th input of `publish-inbound-elementor-page.php`). It opens the native scheduler in a dialog
+  skinned from `inbound-source/page.css` (operator, 2026-10-18: only the scheduler floating over the blurred page plus a
+  round close button; no container, no repeated title). The dialog needs `height: fit-content` (a modal dialog has
+  `top:0;bottom:0`). Hero secondary button and mobile dock still link to `/agenda/`.
 - SEO (`configure-inbound-seo.php`, snapshot option `_gh_inbound_seo_before_20261018_111909`): title «Agencia de
   inbound marketing y Loop Marketing | Efeonce», focus «agencia de inbound marketing», OG/featured `252016`
   (`inbound-source/og/og.html`). `includes/inbound/seo.php` adds `about → #service` to Yoast's WebPage.
