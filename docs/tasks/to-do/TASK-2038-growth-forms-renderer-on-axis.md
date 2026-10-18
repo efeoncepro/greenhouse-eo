@@ -31,6 +31,8 @@
 
 ## Delta 2026-10-18
 
+- Retirar al portar: `creativa-source/host.css` dibuja los íconos de las tres preguntas del paso 1 (`mainBlocker`, `marketingTeamSize`, `startTimeline`) con `::before` + máscara SVG, porque el set de `presentation.icon` no tiene glifos de objetivo ni de equipo. Al sumar esos íconos al renderer, declararlos en el contrato y borrar esas reglas.
+
 - El formulario de diagnóstico en dos pasos se publicó con el release de Greenhouse del 2026-10-18 (renderer con `ab622e958` en producción), no con esta task: `fver-7178aede-…` + política Meta revisión 2. El Slice 4 de esta task sólo debe verificar que el bundle de AXIS lo dibuje igual.
 
 ## Summary
