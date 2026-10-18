@@ -2,6 +2,34 @@
 
 Use this reference for any Efeonce public landing page on WordPress/Ohio/Elementor.
 
+## Start from the landing's need
+
+Operator doctrine (2026-10-18): each landing has its own need, and its design pattern is built from that need, never
+the other way around. Before choosing sections, order, color, type or interactions, establish:
+
+- **Audience:** who arrives and what they already know.
+- **Funnel stage:** discovery, comparison or decision; it sets how much the page explains versus asks.
+- **Offer:** what is sold or proposed on this page, and its unit (diagnostic, meeting, audit, quote).
+- **Proof available:** the real evidence this landing can show (cases, numbers, partner status, methodology); never
+  invent it to fill a slot borrowed from another page.
+- **The decision:** the one thing the visitor must decide here, and which conversion answers it.
+
+Derive the composition from those answers, then design it (canvas/Claude Design) for that need.
+
+Existing landings (Inbound, Performance, Medios, Content, HubSpot, Creativa…) are references for **mechanisms and
+lessons**, not layouts to copy. Their sections, order, hero, palette, button skins and dialog look belong to each of
+them; do not start from one and fill it in, and do not describe any of them as the site's pattern or template.
+
+Reusable mechanisms are optional building blocks; each landing decides whether to use them and skins them its own way:
+
+- Source-led compiler core + gates (`lib/source-led-compiler.cjs`, `verify-source-led-compilers.cjs`,
+  `verify-source-led-render.php`): `references/source-led-elementor-patterns.md` §Shared source-led core.
+- Scoped release rail (package → deploy → publish → rollback with SHA guards and snapshots): the landing files
+  under `references/landings/`.
+- Native meeting launcher of the shared base (`<gh-meeting-cta>`): `references/source-led-elementor-patterns.md`.
+- Site-wide `EfeonceMention` (`a.eo-mention`) for links to Efeonce services: `docs/architecture/public-site/PRIMITIVES.md`.
+- Growth Forms / Growth CTA integration: `references/growth-forms-wordpress.md` and skill `greenhouse-growth-ctas`.
+
 ## Standard Loop
 
 1. **Identify the surface**
@@ -93,6 +121,7 @@ references/landings/<slug>.md
 Minimum landing file sections:
 
 - URL/postId/status/owner.
+- The need it answers (audience, funnel stage, offer, proof, decision) — see §Start from the landing's need.
 - Do-not-touch surfaces and retired pages.
 - Section map with root ids/classes.
 - Special widgets/assets/forms.

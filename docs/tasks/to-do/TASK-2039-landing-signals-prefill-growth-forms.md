@@ -5,6 +5,9 @@
 - La landing de inbound quedó en producción con el formulario `efeonce-inbound-diagnostic` (form key `70dc185f…`, HubSpot
   `direct`), que ya trae los campos que la hija B precargaría: `loopStage` (etapa del ciclo), `crm` y `country`. Falta la
   parte de señales (marcado de la página + precarga); el formulario, su destino y la fila del plan de medición ya existen.
+- La misma landing lanza el CTA de reunión `inbound-discovery-meeting` (`open_meeting_scheduler`) desde tres placements,
+  distinguidos por `cta-location`: `inbound_closing`, `inbound_hero` e `inbound_mobile_dock`. Eso mide el placement, no
+  precarga nada: la precarga desde el host (el alcance de esta task) sigue sin implementar.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

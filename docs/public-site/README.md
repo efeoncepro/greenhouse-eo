@@ -74,6 +74,16 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   (`references/landings/performance-marketing.md`). Primer envío real, GA4 `generate_lead`, Rich Results y Search
   Console siguen pendientes.
 
+- **[Inbound Marketing vigente — Elementor](../documentation/public-site/inbound-marketing.md)** — página `242601` en
+  `/agencia-inbound-marketing/`, cuerpo reemplazado en el mismo lugar el 2026-10-18 (URL, padre e ítem de menú `243616`
+  sin cambios); once widgets nativos `greenhouse_inbound_*` compilados desde el canvas aprobado «La órbita» sobre el
+  núcleo común, el formulario propio `efeonce-inbound-diagnostic` (destino HubSpot directo «Lead Gen - Inbound
+  Marketing») y el CTA de reunión `inbound-discovery-meeting` en tres placements (hero, cierre y barra móvil). Publicada
+  e indexable. Su diseño es de esta landing, no una plantilla ([PDR-026](decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md)).
+  [Funcionamiento](../documentation/public-site/inbound-marketing.md), [operación](../manual-de-uso/public-site/operar-inbound-marketing.md)
+  y skill `efeonce-public-site-wordpress` (`references/landings/inbound-marketing.md`). Primer envío real, GA4
+  `generate_lead`, primera reserva, Rich Results y prueba de edición en Elementor siguen pendientes.
+
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
   identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).
@@ -117,6 +127,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-023 — Landing ASO](decisions/PDR-023-landing-aso-posicionamiento.md) — tercera superficie del grupo `Visibilidad` junto a SEO y AEO; página de expansión y citabilidad en español, no de captura (`aso` es ambiguo y `app store optimization` casi no se busca en español); publicación por fases atada a la extensión Search & App Visibility. Brief: [ASO Landing SEO/AEO Brief V1](ASO_LANDING_SEO_AEO_BRIEF_V1.md). Ejecución: `TASK-1862`.
 - [PDR-024 — AXIS en el sitio público: composición agéntica](decisions/PDR-024-axis-en-el-sitio-publico-composicion-agentica.md) — el sitio consume AXIS como versión fija incluida en `eo-elementor-widgets` y encolada sólo donde se usa (los packages son privados: nada de registry ni `-latest`); los agentes componen intents validados y el SVG se sirve en el HTML del servidor; AXIS es capa gráfica y de valores, nunca de texto ni de layout. Brecha previa: `tokens.css` no emite rampas, superficies ni tipografía. Ejecución: task por crear.
 - [PDR-025 — Landing Agencia de Medios](decisions/PDR-025-landing-agencia-de-medios-posicionamiento.md) — «agencia de medios» como categoría y frase clave, separada de Performance (sin dominios comunes en el top 10 chileno; «performance marketing» fuera de title, H1 y slug); slug `/servicios/agencia-de-medios/`; claims permitidos y prohibidos (tecnología ≠ alianza, sin promesa de rebates, sin caso Sky). Publicada el 2026-10-16. Brief: [Agencia de Medios Landing SEO/AEO Brief V1](AGENCIA_DE_MEDIOS_LANDING_SEO_AEO_BRIEF_V1.md).
+- [PDR-026 — Cada landing deriva su patrón de diseño de su necesidad](decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md) — doctrina aceptada el 2026-10-18 con Inbound Marketing como caso fuente: ninguna landing es plantilla ni «el estilo» del sitio; lo reutilizable son mecanismos (núcleo del compilador y sus guardas, carril de paquete/deploy/publicación/rollback, lanzador de reunión de la base común, `EfeonceMention`, Growth Forms y Growth CTA), que cada landing viste con su propio diseño.
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.

@@ -29,6 +29,7 @@ Load only the references required by the current landing, widget, or operation.
   Elementor may compose a template/shell, but must not duplicate the body, cluster registry, canonical or schema.
 - Do not use `efeonce-web` as deploy source for the live public site unless a new ADR moves the runtime to Astro/headless.
 - Treat direct Kinsta filesystem edits as emergency-only and backport governed runtime code changes to `efeoncepro/efeonce-public-site-runtime`.
+- Each landing derives its design pattern from its own need (audience, funnel stage, offer, proof, the decision the visitor must make). Never use an existing landing (Inbound, Performance, Medios, Content…) as a template or call it «the site's style»; reuse mechanisms, not looks: `references/landing-workflow.md` §Start from the landing's need.
 - For visual landing work, pair with `greenhouse-gvc-playwright`; close with Playwright/GVC-style evidence on desktop and mobile 390px, including overflow checks.
 - At closure for implementation, rollout, incident, workflow, skill, or docs changes, use `greenhouse-documentation-governor`.
 

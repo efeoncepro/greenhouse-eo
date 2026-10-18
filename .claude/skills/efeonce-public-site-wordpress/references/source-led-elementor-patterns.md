@@ -7,7 +7,9 @@ belong in `references/landings/home-claude-design-preview.md` and the linked aud
 Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
 and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
 `references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
-`references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17): `references/landings/performance-marketing.md`.
+`references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17): `references/landings/performance-marketing.md`. Fifth (Inbound
+Marketing, 2026-10-18, first with the native meeting launcher): `references/landings/inbound-marketing.md`. Each is a
+reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
 
 ## Shared source-led core (2026-10-17)
 
@@ -35,11 +37,36 @@ Medios and Performance now share one core; new canvas landings must use it inste
   shared base is written **before** the landing bases so no request loads a base without its parent. Deployed
   2026-10-17 21:25 UTC (backup `/tmp/eo-source-led-core-before-20261017-212544.tar` on Kinsta); live module HTML of
   Medios (16) and Performance (10) identical before/after. The Medios and Performance packages also ship the shared base.
-- **Native meeting launcher (2026-10-18, first used by Inbound):** write `<gh-meeting-cta></gh-meeting-cta>` in stage 1
-  and pass `meeting: { module, cta, location, fallbackUrl, fallbackLabel }` to the core; the module gets `meeting_*` fields
-  (the embed key is never a schema default: the page publisher writes it from the 0600 file) and the base renders
-  `<greenhouse-cta … appearance="bare">` (or a plain fallback link) and loads the CTA renderer only for that module.
-  The `<greenhouse-cta>` contains its inline size: give it an explicit width in the host CSS or it collapses to 0.
+- **Native meeting launcher (2026-10-18, first used by Inbound):** a mechanism, optional per landing. Write
+  `<gh-meeting-cta></gh-meeting-cta>` in stage 1 and pass `meeting: { module | modules: [...], cta, location,
+  fallbackUrl, fallbackLabel }` to the core; every listed module gets the `MEETING_FIELDS` (`meeting_cta`,
+  `meeting_surface`, `meeting_embed_key`, `meeting_location`, `meeting_fallback_url`, `meeting_fallback_label`). The
+  embed key is never a schema default: the page publisher writes surface + key from the 0600 file into the modules
+  that carry a launcher. The base renders `<greenhouse-cta cta surface embed-key cta-location locale="es-CL"
+  color-scheme="dark" appearance="bare">`, or the fallback link `a.gh-<landing>-meeting-fallback` (default `/agenda/`)
+  when settings are missing, and enqueues the CTA renderer only for modules with `meeting_cta`.
+  - **Location override:** `<gh-meeting-cta location="x">` compiles to `%%meeting_launcher__x%%` and overrides
+    `meeting_location`, so ONE CTA is measured per placement (Inbound: closing, hero, mobile dock).
+  - **Look is each landing's decision.** The launcher button skin and the dialog skin belong to the landing's design
+    (host CSS / unscoped `page.css` guarded by `body:has(.gh-<landing>)`); Inbound's floating scheduler and glass
+    close button are one example, not the standard.
+  - **Mechanism lessons (any landing):**
+    - `<greenhouse-cta>` contains its inline size (`container-type: inline-size`): give it an explicit width or it
+      measures 0; inside a flex row its wrapper needs its own width too.
+    - The dialog is `<dialog class="ghc-meeting-surface">` appended to `<body>` and opened with `showModal()` (top
+      layer, no z-index fights); style it from `page.css`, not from the scoped host CSS. A modal dialog has
+      `top:0;bottom:0`: it needs `height:fit-content` or it stretches.
+    - The production CTA bundle has no `ghc-meeting-titles` class; target `.ghc-meeting-toolbar>:not(.ghc-meeting-close)`.
+    - The renderer locks scroll with `html.style.overflow=hidden` (restores the previous value) and returns focus to the
+      launcher on close; on phones it sets `[data-full-screen]`.
+    - Splitting a flex row: `flex-basis:0` leaves padding outside the split, so a padded half grows; use
+      `flex:1 1 50%` + `min-width:0` on both halves.
+    - Inline styles copied from the canvas beat stylesheet rules: overriding them needs `!important`.
+    - An outline/transparent button over a photo or gradient boundary shows the seam through it: give it its own
+      backdrop (background + `backdrop-filter`).
+    - Cache-bust live checks with `?v=`; `?m=1` returns 404 on WordPress (date query var).
+    - PHP-FPM opcache: a change to an existing PHP file takes ~1–2 min to reach web requests.
+    - `sanitize_key` is not available in the render gate stub; sanitize with `preg_replace`.
 - **Republisher:** `republish-source-led-page.php <spec.json> <page-custom.css>` with specs in
   `<landing>-source/republish.json`. Requires `expectedDataSha` to write; keeps each module's live widget settings
   (`preserveWidgetSettings`, default true); does nothing when the rebuilt tree, custom CSS and featured image already

@@ -10,6 +10,14 @@ Public-site primitives are reusable modules for Efeonce public pages and landing
 
 The goal is to avoid one-off CSS/HTML drift on high-value public surfaces while respecting the actual runtime: WordPress, Ohio, Elementor, Kinsta cache, and the governed runtime plugin rail.
 
+**Doctrine — mechanisms, not looks ([PDR-026](../../public-site/decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md), operator, 2026-10-18).**
+Every landing derives its design pattern from its own need (audience, funnel stage, offer, available proof, what the
+visitor must decide). The primitives in this registry are mechanisms that a landing may adopt and skin for its own
+design; they are not a house style. A landing's composition (section order, hero, color, typography, component skins)
+belongs to that landing and is never promoted to a primitive just because it exists or was approved. No landing,
+including Inbound or Performance, is a template for another. When a landing introduces something reusable, register
+the mechanism (contract, overrides, a11y, gates), not the look it shipped with.
+
 ## Boundary
 
 Private Greenhouse UI primitives live in:
@@ -55,6 +63,7 @@ Do not copy private Greenhouse primitives directly into WordPress. Use their des
 | `PerformanceLandingModules` | `candidate/widget` (deployed) | `semantic-widget` | `eo-elementor-widgets`, 10 `greenhouse_performance_*` widgets (`hero`, `confianza`, `problema`, `solucion`, `plataformas`, `creatividad`, `autodiagnostico`, `recibes`, `condiciones`, `diagnostico`) compiled from `scripts/public-website/performance-source/Main.dc.html` by `compile-performance-elementor-source.cjs`; base `class-eo-performance-landing-base.php` (registers its own assets), `includes/performance/seo.php`, JS `performance-landing.js` (tabs + orbit); one repeater (FAQ) | `/servicios/performance-marketing/` (`251997`, child of `251077`, index eligible since 2026-10-17); replaces legacy `242862` (now `private`, plain 301) | [Functional doc](../../documentation/public-site/performance-marketing.md); [manual](../../manual-de-uso/public-site/operar-performance-marketing.md); release `performance-elementor-release.v1`; Growth Form host card `efeonce-performance-diagnostic` ([runtime contract](../growth-public-forms-runtime-contract.md#diagnóstico-de-pauta-performance-marketing)); `diagnostico` emits Service `#service` + FAQPage `#faq`; rail cloned from Agencia de Medios (shared core not extracted); since 2026-10-17 the compiler core (`scripts/public-website/lib/source-led-compiler.cjs`) and the widget base (`EO_Source_Led_Landing_Base_Widget`) are shared with Medios, gated by `verify-source-led-compilers.cjs` + `verify-source-led-render.php`; body changes via `republish-source-led-page.php` (shared base deployed 2026-10-17, live module HTML identical) | Live 2026-10-17: 1440/390 without horizontal overflow, 10 modules ready, one `h1`, canonical, OG, schema, 26-input form, menu from Home, sibling landings 200. Pending: real form submission + GA4 `generate_lead`, Rich Results/GSC, GVC 1536/890 + reduced motion + keyboard, in-editor save/reload, hash-guarded republisher (publisher only creates) |
 | `InboundLandingModules` | `candidate/widget` (deployed) | `semantic-widget` | `eo-elementor-widgets`, 11 `greenhouse_inbound_*` widgets (`hero`, `confianza`, `partida`, `vivo`, `cambio`, `rompe`, `metodo`, `ciclo`, `planes`, `reglas`, `diagnostico`) compiled from `scripts/public-website/inbound-source/Main.dc.html` by `compile-inbound-elementor-source.cjs` on the shared source-led core; base `class-eo-inbound-landing-base.php`, `includes/inbound/seo.php`, JS `inbound-landing.js` («Arma tu primer ciclo»: producto, mercado y pregunta a la IA); one repeater (FAQ) | `/agencia-inbound-marketing/` (`242601`, body replaced in place 2026-10-18; URL, menu item `243616` and parent unchanged) | Landing ref `efeonce-public-site-wordpress/references/landings/inbound-marketing.md`; release `inbound-elementor-release.v1`; Growth Form host card `efeonce-inbound-diagnostic`; `diagnostico` emits Service `#service` + FAQPage `#faq`; first consumer of `EfeonceMention` | Live 2026-10-18: 1440/390 without horizontal overflow, 11 modules, one `h1`, canonical, index, OG `252016`, Service + FAQPage, Growth Form rendered, cycle interaction verified. Pending: real form submission + GA4, Rich Results, in-editor save/reload, mobile dock hide-on-form |
 | `EfeonceMention` | `candidate/pattern` (deployed site-wide) | `asset-system` | `eo-elementor-widgets`: `includes/eo-mention.php` (registers + enqueues `eo-mention` on every frontend page, Elementor preview and block editor), `assets/css/eo-mention.css`, isotype `assets/img/brand/efeonce-isotype.svg` (AXIS `efeonce-isotype-negative.svg`) | Inbound `/agencia-inbound-marketing/` (10 service links); available to any landing, post or page | Contract below («`EfeonceMention` Contract») | Live 2026-10-18 on Inbound: stylesheet enqueued, pill + isotype painted, hover tilt; reduced motion stops the tilt. Pending: Gutenberg format «Mención de servicio» and Content Factory spec field |
+| `SourceLedMeetingLauncher` | `candidate/pattern` (deployed) | `host-adapter` | `eo-elementor-widgets`, shared base `includes/widgets/class-eo-source-led-landing-base.php` (`meeting_launcher()`); compiler option `meeting: { modules, cta, location, fallbackUrl, fallbackLabel }` in `scripts/public-website/lib/source-led-compiler.cjs` adds `meeting_cta`, `meeting_surface`, `meeting_embed_key`, `meeting_location`, `meeting_fallback_url`, `meeting_fallback_label` to the listed modules; renders Greenhouse's `<greenhouse-cta>` (Growth CTA `open_meeting_scheduler`) | First consumer: Inbound `/agencia-inbound-marketing/` (`242601`), CTA `inbound-discovery-meeting`, three placements `inbound_closing`, `inbound_hero`, `inbound_mobile_dock`; available to any source-led landing | Contract below («Source-led meeting launcher contract»); [Inbound manual](../../manual-de-uso/public-site/operar-inbound-marketing.md#rotar-el-key-del-botón-de-reunión); [native scheduler CTA](../../manual-de-uso/growth/configurar-cta-scheduler-nativo.md) | Live 2026-10-18 on Inbound: three launchers in the HTML, hero and dock open the native dialog, `Escape` closes and focus returns, dock opens full screen at 390; Medios and Performance render fingerprints unchanged after the base change. Pending: first real booking |
 | `ContentMarketingLandingModules` | `candidate/widget` (deployed) | `semantic-widget` | `eo-elementor-widgets`, trece `greenhouse_content_*`; captura como host Growth Forms | `/servicio-marketing-de-contenidos/` (`242603`) | [Contrato técnico](CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md); `contentMarketingModule.v1`; contenido y estados derivados del export aprobado, controles nativos, SSR y mejoras de interacción | [Corte 2026-08-31](../../audits/public-site/2026-08-31-content-marketing-publication.md): cuatro viewports, tabs/teclado/form sin envío; contraste, editor integral y conversión/GA4 pendientes; no graduado a primitive transversal |
 | `ComparisonTable` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_comparison_table`; PHP class under `includes/widgets/`; CSS/JS under plugin assets | No live surface since 2026-10-15 (the `/agencia-creativa/` body that used it was replaced by `CreativaLandingModules`; verified 0 occurrences in the served HTML) | Functional doc `docs/documentation/public-site/comparison-table-widget.md`; manual `docs/manual-de-uso/public-site/comparison-table-widget.md`; manifest governance family `comparisonTable.v1` | Table semantics, responsive card mode, scoped assets, `theme_schema()` parity, visual desktop/mobile evidence |
 | `GrowthFormEmbed` | `canonical/host-adapter` | `host-adapter` | Elementor widget `greenhouse_growth_form` + `<greenhouse-form>` renderer from Greenhouse Growth Forms | AEO `/aeo-2/` conversion and future public lead magnets | `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`; `docs/architecture/growth-public-forms-runtime-contract.md`; `docs/documentation/growth/motor-formularios-publicos.md` | `pnpm public-website:verify-aeo-live-contract` for AEO; proportional API/render/overflow/form gates for new forms |
@@ -89,6 +98,33 @@ color. Approved by the operator on 2026-10-18 (pill + isotype, tilt on hover; th
 - Deploy: the stylesheet is site-wide and shipped first with `inbound-elementor-release.v1`; a later landing release
   that changes it must include the three files in its allowlist. A loader change can take ~1–2 min to show on web
   requests (PHP-FPM opcache) even though WP-CLI already sees it.
+
+## Source-led meeting launcher contract
+
+Mechanism of the shared source-led base that lets a compiled landing open the native meeting scheduler (Growth CTA
+`open_meeting_scheduler`) in place. The look of the launcher buttons and of the dialog is each landing's own design
+([PDR-026](../../public-site/decisions/PDR-026-cada-landing-deriva-su-patron-de-diseno.md)); Inbound's skins live in
+`inbound-source/host.css` and `inbound-source/page.css` and are not a standard.
+
+- Canvas: write `<gh-meeting-cta></gh-meeting-cta>` (default location) or `<gh-meeting-cta location="x">`. The compiler
+  turns them into `%%meeting_launcher%%` / `%%meeting_launcher__x%%`.
+- Location override: one CTA and one surface per landing, measured per placement. The default comes from the compiler
+  option `location` (`meeting_location`); a tag's `location` overrides it for that placement and reaches telemetry as
+  `cta-location`.
+- Render: the base emits `<greenhouse-cta cta surface embed-key cta-location locale="es-CL" color-scheme="dark"
+  appearance="bare">`. Without CTA slug, surface or key it emits the fallback link `<a class="gh-<landing>-meeting-fallback">`
+  to `meeting_fallback_url`. The CTA renderer script is enqueued only for modules that carry `meeting_cta`.
+- Key: the embed key is a secret written 0600 by the landing's `scripts/growth/publish-*-meeting-cta.ts` and passed to
+  the page publisher as an input file (Inbound: optional 4th input of `publish-inbound-elementor-page.php`, written into
+  the modules that carry the launcher). Never print or copy it. Rerunning the CTA publisher rotates the key, so the page
+  must be republished in the same step.
+- Host notes: `<greenhouse-cta>` contains its inline size, so it needs an explicit width (and so does its wrapper in a
+  flex row). The dialog is `<dialog class="ghc-meeting-surface">` appended to `<body>` and opened with `showModal()`; a
+  modal dialog has `top:0;bottom:0`, so a skin needs `height: fit-content`. The production bundle has no
+  `ghc-meeting-titles` class (target `.ghc-meeting-toolbar>:not(.ghc-meeting-close)`). The renderer locks scroll with
+  `html.style.overflow=hidden` and returns focus to the launcher on close.
+- Gates: a base change must keep `verify-source-led-compilers.cjs` and `verify-source-led-render.php` green and the
+  sibling landings' render unchanged.
 
 ## `BrandProofAvatarGroup` Contract
 
