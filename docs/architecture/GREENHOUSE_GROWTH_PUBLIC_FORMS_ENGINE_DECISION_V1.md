@@ -1,5 +1,18 @@
 # Greenhouse Growth Public Forms Engine Decision V1
 
+## Delta18/10/2026 — corrección canónica de clasificación comercial
+
+El operador autorizó resolver Lead Gen Web comercial. `correctCommercialFormClassification` y el
+store Forms implementan sólo lead_magnet→quote_request, con intención confirmada por autor, hash
+íntegro esperado, definición activa/riesgo low-medium y única versión publicada fijada; locks y
+preservación de identidad, campos, consentimiento y destinos. CLI de mantenimiento explícita usa
+el mismo command/perfil ops y journal previo; nunca SQL de Forms desde el consumer ni retry unknown.
+La corrección de datos ya se aplicó/releyó. API admin protegida implementada **en código local, aún
+sin desplegar**; no se afirma disponible en main. [Manual](../manual-de-uso/growth/corregir-clasificacion-comercial.md),
+[contrato técnico](GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md)
+y [evidencia](../audits/growth/2026-10-18-commercial-forms-policy-publication.md). No cambia la
+inmutabilidad de versiones publicadas ni habilita automáticamente una política publicitaria.
+
 ## Status
 
 Accepted direction — no runtime changes yet.

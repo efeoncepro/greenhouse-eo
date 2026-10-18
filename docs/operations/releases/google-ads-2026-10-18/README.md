@@ -1,5 +1,12 @@
 # Paquete previo al release — Google Ads, 18-10-2026
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
 **Actualización posterior al release —18/10:** GTM Web6/Server10 publicado, EC ON y políticas
 Performance/Discovery rev2 publicadas; flag Production true leído20:36:20Z, companion Vercel del
 mismo mainEC READY con alias/SHA y cadena de configuración verificados20:43:28Z. [Activación y evidencia vigente](../../../audits/growth/2026-10-18-google-ads-activation.md).

@@ -1,10 +1,17 @@
 # Cobertura Ads de formularios comerciales — 18/10/2026
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](2026-10-18-commercial-forms-policy-publication.md).
+
+
 **Alcance confirmado por el operador: sólo formularios comerciales que generan leads.** No se amplía
 Ads a ebooks, postulaciones, newsletter, soporte o fixtures. Discovery conserva su conversión de reserva
 confirmada. Performance y Discovery son nombres de fuentes del sitio, no tipos de campaña Google Ads.
 
-## Estado construido y publicado
+## Histórico anterior a publicación — construido y publicado
 
 El [release completo](../releases/2026-10-18-full-develop-production-release.md) promovió todo el candidato
 develop a main `ec317c928fffcb919d71bdb62821b80280af2347`. La [activación posterior](2026-10-18-google-ads-activation.md)

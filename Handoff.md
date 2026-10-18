@@ -1,5 +1,16 @@
 # Handoff
 
+## 2026-10-18 — Ads publicado en todos los formularios comerciales validados
+
+API22:57Z:13 Forms comerciales y Discovery con Ads;12 altas adicionales, Grader comercial confirmado
+por Julio y Contacto general fueraAds. Lead Gen Web corregido por command/store Forms a quote_request,
+con key/slug/versión/destinos preservados y GET público verificado. Políticas por CAS/revisión/GET;
+Meta/UPD previos preservados. Sin GTM, puja, campaña o nuevo deploy. Nuevo API de clasificación sólo
+implementado localmente; corrección aplicada vía CLI canónica.53 tests/ESLint/tsc PASS.
+Primera recepción/atribución y ruta histórica propia Grader sin certificar; no fabricar leads/replays.
+[Publicación y evidencia](docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md),
+[manual de corrección](docs/manual-de-uso/growth/corregir-clasificacion-comercial.md) e [historial](Handoff.archive.md).
+
 ## 2026-10-18 — Medición: cierre documental y alcance comercial
 
 Arquitectura/ADRs, runtime/tracking, manuales OAuth/CLI/Ads, índices y cuatro pares de skills
@@ -255,10 +266,6 @@ Skill personal: dos playbooks de acción/frescura actualizados por aprobación p
 SKILL.md intacto, sin cambio de permisos persistentes o automatización. Bloqueo de escritura resuelto.
 Corrección directa de Julio 15/10 17:51 UTC: detección 06/10/2026 sin hora/zona, un día calendario tras
 cierre de interés 05/10, no 24 horas exactas. Radar horario/CRM del 10/10 posteriores, sin explicar esa tardanza.
-
-## 2026-10-14 — Footer público: composición compacta
-
-[Composición V2 publicada](docs/audits/public-site/2026-10-14-footer-composition-v2.md): «Explora», cuatro columnas, newsletter/empleo separados, partners gris y legales compactos. Desktop851→531px; QA1440/390/768/1920 y axe sin violaciones. CF7/delivery/Home preservados; rollback durable. Términos404 retirado, contenido aprobado pendiente.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

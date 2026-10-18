@@ -1,5 +1,14 @@
 # Medición Google Ads: alcance y estado
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+## Antecedentes de configuración antes de ampliar cobertura
+
+
 **Checkpoint 18/10, 20:43:28Z:** GTM Web **6** (`1792355588730`) y Server **10**
 (`1792355562526`) publicados y releídos; EC **ON** en6862539491. Bridge `4250795666af…` servido
 en ambos hosts. Performance y Discovery publicaron Ads rev2 con activación20:35Z, preservando los
@@ -22,11 +31,9 @@ aceptada» y las etiquetas existentes, mediante política por fuente/versión/su
 una etiqueta por formulario. Ebooks, descargas, newsletter, postulaciones, soporte y pruebas quedan
 fuera de esta ampliación. Discovery conserva su acción separada de reserva confirmada.
 
-En el inventario del 18/10 hay 13 Forms técnicamente elegibles: Performance y 12 propuestas adicionales
-validadas **sin publicar**. El gate técnico no decide intención comercial: AI Visibility Grader
-requiere revisión porque su propósito declara lead magnet, y Lead Gen - Web requiere conciliar su
-propósito comercial con la clasificación actual lead_magnet. No se han reclasificado ni activado.
-[Inventario, evidencia y pendientes](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+La publicación22:57Z dejó13 formularios comerciales y Discovery con Ads. AI Grader tiene intención
+comercial confirmada; Contacto es general y queda fueraAds. Lead Gen Web ya es quote_request,
+corregido sin cambiar versión/identidad. [Evidencia y límites](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
 El control de cobertura automática de formularios futuros sigue **propuesto**; la publicación de una
 versión nueva requiere revisar su política. No se han cambiado objetivos ni pujas en esta ampliación.
 

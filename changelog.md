@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-18 — Políticas Ads comerciales publicadas y clasificación Web corregida
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- 13 Forms comerciales+Discovery verificados por API;12 altas adicionales, Grader comercial incluido y Contacto general fueraAds.
+- Lead Gen Web quote_request con identidad/versión intactas; writer/CLI canónicos y nueva API interna implementada localmente, sin deploy.
+- 53 pruebas, ESLint y TypeScript PASS. Configuración no prueba recepción/atribución; sin conversiones ficticias ni replay.
+- [Publicación y límites](docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md); WIP ajeno preservado.
+
 ## 2026-10-18 — Documentación y skills de medición conciliadas
 
 [Historial interno](docs/changelog/internal/README.md).
@@ -606,10 +615,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 ## 2026-10-04 — TASK-2001: rollout de activaciones de Studio
 
 - Studio `aa6fa07` desplegado, API 1.7.0; cinco migraciones staging/prod, seis planes CL con evidencia legacy y eventos persona. Descubrimiento real62/replay0 cambios, scheduler OIDC, CLI y44 thumbs PASS. Email multiproveedor, owned y MCP delegado pendientes. [Evidencia](docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md).
-
-## 2026-10-04 — TASK-1899 retirada por el operador
-
-- Implementación local de escritura MCP revertida en Greenhouse y Studio; sin cambios de runtime desplegados. Se retira como requisito previo al desarrollo de Studio; futura federación pendiente de nueva decisión.
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 

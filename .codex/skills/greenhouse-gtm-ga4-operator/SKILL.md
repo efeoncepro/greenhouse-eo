@@ -426,8 +426,8 @@ El circuito online sigue dependiendo del navegador y no tiene retries backend.
 
 Checkpoint fechado 18/10: Web **6** / Server **10** publicados, Server primero; EC efectiva ON en
 **6862539491**, bridge compatible publicado en WordPress/Think y flag Production true con companion
-READY del mismo main liberado. Sólo Performance (formulario comercial) y Discovery (reserva) tienen
-política Ads rev2 publicada. Son nombres de fuentes del sitio, no tipos de campaña Ads. Ambas acciones
+READY del mismo main liberado. Cobertura ampliada22:57Z:13 formularios comerciales y Discovery
+(reserva) con Ads publicado. Son fuentes del sitio, no tipos de campaña Ads. Ambas acciones
 siguen secundarias, ONE_PER_CLICK y valor de medición 0 CLP; no se modificaron pujas ni campañas.
 Primera ocurrencia real, recepción proveedor y atribución siguen **sin verificar**; protocolo aislado,
 negativos, tag fired, un flag o HTTP 200 no sustituyen esa evidencia. Releer estado live antes de operar.
@@ -450,18 +450,10 @@ canónico dentro del alcance autorizado. El flag global no inscribe nuevas fuent
 versión Forms o cambiar un binding exige revisar la compatibilidad de su política; GA4 tagged no
 significa Ads habilitado. La revisión al publicar es hoy un paso del operador, no una autopolicy.
 
-[Inventario y pendientes 18/10](../../../docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):
-12 ampliaciones comerciales validadas en dry-run **sin publicar**. Lead Gen - Web conserva
-`lead_magnet` y requiere corrección gobernada antes de habilitarlo; esa corrección no está aplicada.
-No presentar el lote preparado como cobertura activa ni incorporar los ebooks por completar el catálogo.
-
-### Aprendizajes de operación de GTM 18/10
-
-Cargar `LEARNINGS.md` antes de editar: Google JavaScript serializa el reservado `user_data` como
-claves anidadas con metadata; no exigir `em` en la entrada GA4 ni ampliar parámetros ordinarios.
-El PUT de template puede rechazar `galleryReference`; sólo tras GET que pruebe ausencia de mutación
-preparar el cuerpo soportado. El fork local puede cambiar el tipo del tag: releer el pointer antes
-de editarlo. Admitir únicamente normalizaciones JSON/espacios acotadas y equivalencia demostrada;
-un hash diferente no se da por válido sin comparar código, permisos y secciones preservadas.
-Congelar y verificar ambos árboles antes de publicar Server→Web; ejecutar snapshot después de la
-publicación aprobada. Los tokens, cabeceras Preview y payloads con identidad permanecen privados.
+[Publicación de cobertura18/10](../../../docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md):
+12 formularios adicionales publicados y verificados,13 Forms comerciales+Discovery activos.
+AI Grader tiene intención comercial confirmada por el operador. Contacto es general y queda fueraAds.
+Lead Gen Web corregido a quote_request por command/store Forms, preservando identidad y versión;
+no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
+está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
+La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.

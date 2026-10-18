@@ -1,5 +1,12 @@
 # ADR — Integración Google Ads de Greenhouse
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
 - Status: `Accepted` — dirección aceptada por instrucción expresa del operador el 2026-10-17; CLI local y medición online inicial implementadas; integración multiorganización de producto pendiente.
 - Date: `2026-10-17`.
 - Owner: `Growth / Integrations / Marketing Operations`; Identity y Platform son responsables de credenciales y autoridad.
@@ -24,7 +31,8 @@ la primera recepción comercial y la atribución siguen pendientes.
 
 La ampliación solicitada después comprende sólo formularios comerciales de leads. Reutiliza acción y
 tags mediante políticas por fuente/versión; no incluye ebooks, newsletter, postulaciones ni soporte.
-Las 12 propuestas adicionales sólo fueron validadas, no publicadas; elegibilidad técnica no sustituye
+En el inventario previo las12 propuestas sólo estaban validadas. La publicación posterior habilitó
+13 Forms y Discovery, excluyó Contacto e incluyó Grader por decisión del operador; elegibilidad técnica no sustituye
 la revisión de intención comercial y las discrepancias de clasificación siguen pendientes.
 [Cobertura fechada](../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
 No cambia el estado Accepted ni habilita campañas, puja, ingesta CRM o nuevas cuentas.

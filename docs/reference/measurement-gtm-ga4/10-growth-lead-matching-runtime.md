@@ -1,6 +1,15 @@
 # Runtime de consentimiento y matching de Leads
 
-## Estado operativo al 18/10/2026
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+## Antecedentes de configuración antes de ampliar cobertura
+
+
+## Corte operativo inicial18/10, previo a la ampliación22:57Z
 
 Código liberado en main `ec317c928fffcb919d71bdb62821b80280af2347`; companion Production
 `dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk` READY, alias/SHA y cadena de configuración verificados,

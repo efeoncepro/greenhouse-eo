@@ -118,6 +118,7 @@ export type CanonicalErrorCode =
   // Growth Forms engine (TASK-1229).
   | 'growth_form_invalid_input'
   | 'growth_form_not_found'
+  | 'growth_form_classification_conflict'
   | 'growth_submission_not_found'
   | 'growth_lead_field_not_revealable'
   | 'growth_lead_reveal_reason_required'
@@ -548,6 +549,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   growth_form_not_found: {
     status: 404,
     message: 'No encontramos ese formulario. Puede que se haya archivado o no exista.',
+    actionable: false
+  },
+  growth_form_classification_conflict: {
+    status: 409,
+    message: 'El formulario cambió o no admite esta corrección. Revisa su versión y clasificación antes de continuar.',
     actionable: false
   },
   // TASK-1255 — Growth Forms PII reveal gobernado.

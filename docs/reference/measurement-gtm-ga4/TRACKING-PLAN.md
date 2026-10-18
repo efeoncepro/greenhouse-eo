@@ -43,14 +43,14 @@ Server y SDK Web live aislado4/4 PASS, sin salida de conversiones a proveedores;
 El genérico accepted→generate_lead de las filas siguientes sigue siendo GA4, no habilita Ads.
 El bridge Ads exige cuatro permisos/GPC y UUID durable, no convierte clics/aperturas/replays. User_data
 reservado sólo para EC; ninguna PII/hash/click ID en dataLayer o analítica ordinaria. Server agrega Ads
-Tracking/Linker y excluye el bridge del forwarder GA4. Sólo Performance/Discovery incorporaron el
+Tracking/Linker y excluye el bridge del forwarder GA4. En el checkpoint inicial sólo Performance/Discovery incorporaron el
 opt-in Ads; Meta/UPD y mappings previos se conservaron. No se habilitan otras fuentes por inferencia.
-La ampliación posterior pedida por el operador corresponde sólo a **Forms comerciales**: doce
-comandos de draft DRY_RUN validados, sin crear/publicar revisiones; no hay cobertura Ads adicional
-activada. `efeonce-lead-gen-web` continúa `lead_magnet`, con clasificación comercial pendiente.
-Ebooks, postulaciones, newsletter, soporte y pruebas no se incorporan a Ads. Contacto mezcla motivos:
-resolver los no comerciales antes de una activación; la compatibilidad de tipo no basta. Inventario,
-fuentes y límites: [auditoría de cobertura](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+Publicación18/10,22:57Z: **13 Forms comerciales y Discovery con Ads**,12 altas adicionales.
+AI Grader comercial confirmado por el operador; Contacto general excluidoAds. Lead Gen Web ahora
+quote_request, con identidad/versión preservadas; ebooks/careers/newsletter/soporte/pruebas fueraAds.
+El opt-in Performance/Discovery descrito arriba es el checkpoint inicial20:35Z; las demás fuentes
+ya están publicadas. Destinos/mappings anteriores preservados y fuentes nuevas Ads-only.
+[Readback por fuente/versión/revisión](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
 No crear etiquetas por slug ni equiparar el tagging GA4 de esta tabla a opt-in publicitario.
 Histórico17/10: acciones secundarias y drafts Web8/Server12 preparados, captura OFF y sin publish.
 [Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md) ·

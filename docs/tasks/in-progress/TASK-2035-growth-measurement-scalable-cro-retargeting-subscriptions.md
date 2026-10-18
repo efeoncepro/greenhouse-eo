@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Configuración/CAPI/agent-first publicada14/10 (TASK-2036/2037). Delta18/10 en TASK-2034: mainEC liberado, Web6/Server10, EC ON y Ads Performance/Discovery activos; HubSpot/Meta tracing configurados, primer recibo/atribución pendientes. Ampliación sólo comercial:12 propuestas DRY_RUN sin aplicar y clasificación Lead Gen Web pendiente. CRO/abandono/newsletter/CRM del paraguas conservan su alcance separado y pendientes.`
+- Status real: `Configuración/CAPI/agent-first publicada14/10 (TASK-2036/2037). Delta18/10 en TASK-2034: mainEC liberado, Web6/Server10, EC ON y Ads Performance/Discovery activos; HubSpot/Meta tracing configurados, primer recibo/atribución pendientes. Ampliación22:57Z publicada13 Forms+Discovery; Grader comercial incluido, Contacto fueraAds y Lead Gen Web corregido. CRO/abandono/newsletter/CRM del paraguas conservan su alcance separado y pendientes.`
 - Rank: `Now`
 - Domain: `data|growth|crm`
 - Blocked by: `none`

@@ -1,6 +1,15 @@
 # Configurar medición de conversiones
 
-## Estado actual y alcance comercial, 18/10/2026
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+## Antecedentes de configuración antes de ampliar cobertura
+
+
+## Corte inicial de configuración, antes de la ampliación22:57Z
 
 GTM **Web6/Server10** publicados, main `ec317c928` y companion Production ER5 READY con salud200
 /watchdog6/6. Ads `6862539491` tiene EC ON y flag de proyecto Ads `true`; cadena de configuración

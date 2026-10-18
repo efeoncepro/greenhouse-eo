@@ -1,5 +1,12 @@
 # Conversiones Google Ads para Forms y agendas
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
 **Checkpoint 18/10, 20:43:28Z: configuración de producción verificada; primera conversión pendiente.**
 Server **10** (`1792355562526`) se publicó primero y Web **6** (`1792355588730`) después,
 con readback live. La cuenta6862539491 tiene EC efectiva **ON** y términos aceptados. El bridge
@@ -124,7 +131,8 @@ soporte y pruebas no se incorporan. La reserva Discovery conserva `meeting_booki
 5. Repetir negativos y seguir la primera ocurrencia real consentida, sin leads ni GCLIDs fabricados.
    Guardar evidencia saneada de recepción; dejar atribución pendiente hasta disponer de evidencia Ads.
 
-El corte del 18/10 contiene 12 propuestas técnicamente validadas **sin publicar**, incluidas fuentes
+El corte previo del18/10 contenía12 propuestas validadas sin publicar; fue sustituido por la
+publicación22:57Z de13 Forms y Discovery. Las advertencias siguientes describen la revisión previa de fuentes
 cuya intención sigue pendiente de revisión. No son 12 activaciones ni 12 conversiones certificadas.
 [Inventario y alcance actual](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
 Una nueva versión publicada exige revisar su política; la inscripción y control automáticos para

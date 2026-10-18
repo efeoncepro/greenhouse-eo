@@ -1,5 +1,12 @@
 # Google Ads — Arquitectura de medición comercial y conexión API V1
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
 Checkpoint operativo 18/10, 20:43:28Z: **configuración Ads activada y cadena de despliegue verificada**.
 Anunciante6862539491, EC ON con método GTM, Web 6/Server 10 live y políticas Performance/Discovery
 rev2 publicadas (activationAt20:35Z). Bridge compatible publicado en WordPress/Think; HubSpot
@@ -27,7 +34,7 @@ resultado positivo conservaban gates independientes; su avance posterior figura 
 ## 1. Estado, alcance y precedencia
 
 - Estado: `Accepted` como dirección arquitectónica por instrucción del operador el **2026-10-17**.
-- Forms/Meetings: contrato online servido; configuración Ads activada para Performance y Discovery en el checkpoint operativo18/10, con companion deployment READY y cadena de configuración verificada.
+- Forms/Meetings: contrato online servido; configuración Ads ampliada a13 Forms comerciales y Discovery22:57Z, con companion deployment READY y cadena de configuración verificada.
   Conexión multiorganización, API/MCP de producto y sender de resultados CRM siguen **pendientes**.
   GTM6/10 publicado; nuevas organizaciones, puja y otras fuentes conservan sus gates propios. Primera recepción comercial sigue pendiente.
 - Delta operativo 17/10: CLI local de lectura y gestión implementada; OAuth renombrado **Efeonce**.
@@ -475,13 +482,10 @@ solicitudes comerciales de leads**: contacto, cotización, diagnóstico de servi
 Ebooks, descargas, newsletter, postulaciones, soporte y pruebas permanecen fuera de la acción
 `commercial_lead`; no se propone incorporarlos a Ads en esta ampliación.
 
-La elegibilidad técnica de `contact|diagnostic_intake|quote_request` y riesgo low/medium es una
-condición necesaria, no una declaración de intención comercial. Se revisan propósito, campos,
-versión publicada y surface. Contacto mixto y fuentes cuyo propósito declare contenido/lead magnet
-no se habilitan por el nombre o por superar `validate`. En el catálogo del 18/10, Lead Gen - Web
-presenta propósito comercial pero `form_kind=lead_magnet`; AI Visibility Grader pasa el gate técnico
-como diagnostic_intake aunque su propósito declara lead magnet. Ambas discrepancias requieren
-revisión de intención/clasificación antes de activar; no se ha corregido ninguna por inferencia.
+La elegibilidad técnica de contact/diagnostic_intake/quote_request y riesgo low-medium no sustituye
+intención comercial. El operador confirmó AI Grader comercial y Contacto general: Grader está
+incluido y Contacto fueraAds. Lead Gen Web se corrigió por el command/store Forms de lead_magnet a
+quote_request, con hash/versión fijados, sin cambiar identidad o versiones. No se exceptúan los ebooks.
 
 Se reutilizan la acción «Solicitud comercial aceptada», `conversionKey=commercial_lead` y los tags
 Web/Server ya publicados. Cada fuente conserva su política revisada/publicada, mapping y destinos
@@ -489,13 +493,11 @@ previos; no se crea una etiqueta, acción Ads o campaña por formulario. «Perfo
 el diagnóstico de pauta y «Discovery» la agenda: son fuentes del sitio, no tipos de campaña Ads.
 Discovery mantiene `meeting_booking` y su acción de reserva confirmada.
 
-El inventario distingue 13 Forms técnicamente elegibles, Performance activo y 12 propuestas validadas
-**sin publicar**. No equivale a 12 formularios comerciales aprobados: los casos ambiguos conservan
-su revisión. [Cobertura y plan pendientes](../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
-Una versión nueva de una fuente exige revisar el binding/política vigente antes de medirla.
-El control automático de cobertura al publicar formularios es **propuesta, no implementación**;
-no hay inscripción automática de fuentes actuales o futuras. Esta conciliación documental no
-publica políticas, cambia clasificación ni modifica objetivos de campaña o puja.
+API22:57:03Z verificó13 formularios comerciales y Discovery activos,12 altas adicionales,
+con destinos/mappings existentes preservados. [Publicación por fuente](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+Una versión nueva exige revisar su política. Inscripción automática y control de cobertura al
+publicar siguen como propuesta. La corrección de clasificación se aplicó por primitive canónico;
+la nueva API de mantenimiento está implementada localmente, sin desplegar. No se cambiaron pujas.
 
 ### 6.4 Unión con HubSpot Forms
 
