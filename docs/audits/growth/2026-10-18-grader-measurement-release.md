@@ -29,3 +29,34 @@ tras la retención conserva las revisiones/SHA anteriores Ready. Preview Vercel 
 continuar validando el candidato; no se declara verde por anticipado. No reintentar deploys ni
 publicar el endpoint hasta que Julio reanude. El cierre documental posterior queda local, sin push
 para evitar volver a disparar staging.
+
+
+## Validación previa ampliada — 18/10/2026
+
+Sin cambios funcionales adicionales:871 pruebas en99 archivos PASS (860 de Grader/medición y11
+fronteras renderer/CRM), TypeScript y ESLint PASS. Persistencia/proveedores sustituidos en las
+pruebas: no se crearon leads, submissions, reservas ni conversiones. Se cubren captcha, costes,
+email gate, aceptación/dedupe, identidad/versión, consentimiento/GPC, revocación, recibo post-commit,
+fallo del savepoint, cifrado, separación CRM/medición y ausencia de PII en analítica/polling.
+
+Lecturas API23:22Z: Think monta Forms portátil; contrato público v8/type diagnostic_intake y
+handoff tokenized_report correctos; renderer servido incluye contexto y canal reservado Ads.
+Preflight permitido204 con ACAO exacto y origin ajeno204 sin ACAO. El único POST vivo fue JSON
+malformado, rechazado400 antes del command/captcha/contabilidad/persistencia, sin receipt ni handle.
+Health200. Catálogo:13 Forms comerciales+Discovery; Grader rev2 vigente, Contacto/ebooks fueraAds,
+heads y destinos conservados. GTM Web6/Server10 sin drift; no publicación ni otra llamada comercial.
+
+CI: push39175317993 y PR39175342054 SUCCESS sobre0373930de (tests globales; el PR incluye build y control de footprint). El smoke39175318001 pasó. Los checks de deploy cancelados y VercelFAILURE por
+cancelación intencional no representan un fallo de código: permanecen detenidos por Julio.
+No se reejecutaron para pintar el PR verde. PR257 sigue draft/sin auto-merge; main no se promovió.
+
+El código y los inputs de build del candidato0373930de son iguales a los de develop en esta
+validación; las diferencias posteriores son documentación e integración de historial. Se conserva el
+SHA exacto de CI en la evidencia, sin presentar su resultado como una ejecución sobre otro SHA.
+Worktree de release retirado con snapshot recuperable e historial integrado en develop; el trabajo
+ajeno sin commit quedó preservado. No se hizo push que pudiera reactivar staging.
+
+Pendiente exclusivamente tras autorización de release: canarios productivos del contrato nuevo de
+la fachada y del endpoint de clasificación (incluido conflicto CAS, sin repetir la corrección Web).
+Primera recepción y atribución esperan una ocurrencia comercial real. Los checks de lectura y los
+fixtures unitarios no las certifican. [Evidencia saneada](2026-10-18-grader-validation.evidence.json).

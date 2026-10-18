@@ -14,7 +14,8 @@
 - Fachada Grader reutiliza preparación/persistencia/recibo Forms y contexto visitante; CORS gobernado y respuestas privadas.
 - Think live confirmado en Forms portátil v8; política Ads vigente. PR257 borrador: Julio retuvo el release; mainEC/aliasER5 conservados.
 - Cinco flujos staging y preview cancelados. Endpoint de clasificación aún sin publicar; sin dispatch de producción.
-- 69 pruebas aisladas PASS; sin tráfico comercial ficticio. [Contrato](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+- 871 pruebas locales, TypeScript/lint, CI push/PR0373930de y smoke PASS; GET/API/GTM verificados sin leads ficticios.
+- Worktree retirado; todo en develop, sin release. [Validación y límites](docs/audits/growth/2026-10-18-grader-measurement-release.md).
 
 ## 2026-10-18 — Políticas Ads comerciales publicadas y clasificación Web corregida
 
