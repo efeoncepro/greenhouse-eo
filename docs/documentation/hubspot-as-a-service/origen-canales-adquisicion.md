@@ -36,6 +36,22 @@ la persona realiza una reserva. Son hechos distintos:
 La relación entre esos hechos se conserva explícitamente. El canal primario del negocio requiere
 un criterio y evidencia; no se decide usando sólo el último valor del contacto.
 
+## Cómo se leerá en el CRM
+
+La propuesta incorpora presentación humana: **Origen comercial** con insignia de relleno,
+**Canal de adquisición** con texto y punto de color, y **Fuente concreta** como texto. Estilo y
+paleta de campos nuevos están propuestos, no guardados. Las etiquetas siempre acompañan al color;
+los colores distinguen categorías y no califican un negocio como bueno, malo o listo para avanzar.
+
+El editor del portal revisado19/10 ya muestra el legacy con Insignia y seis colores distintos.
+Para selección única ofrece Valor predeterminado, Con punto e Insignia; para el legacy múltiple,
+Valor predeterminado e Insignia. Se conserva lo existente durante la transición.
+
+La API/CLI permite revisar el diccionario, pero los contratos públicos inspeccionados no exponen
+esos ajustes de color/estilo. Su configuración se verificará por interfaz y su lectura en tabla y
+ficha, además del readback API de schema/valores. Esto aún no se ha aplicado ni validado en todas
+las vistas. [Evidencia y procedimiento visual](../../manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api).
+
 ## Histórico y cobertura
 
 Lectura readonly de293 negocios no archivados:175 tienen canal,118 están vacíos. Dos de los175

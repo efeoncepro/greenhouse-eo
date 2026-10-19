@@ -24,6 +24,8 @@ Discovery LinkedIn19/10: documentación oficial revisada con tres agentes; [prop
 InsightTag/CAPI/dedupe/HubSpot documentados; cuenta/Partner ID/acceso no verificados, sin instalar ni enviar.
 Adquisición19/10: [taxonomía conceptual aceptada](docs/architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md);293 Deals leídos,168 candidatos/125 revisión.
 Plan propio sin aplicar; consumers incompletos/workflows403. Sin cambio CRM, schema, fuentes nativas o histórico.
+UI19/10: legacy con Insignia/seis colores; selección única ofrece punto/insignia. API pública revisada no expone esos ajustes.
+[Contrato visual y QA](docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api) documentado en ADR/funcional/skills espejo; estilos nuevos propuestos, cero writes.
 
 ## 2026-10-18 — Ads publicado en todos los formularios comerciales validados
 

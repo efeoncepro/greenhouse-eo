@@ -69,6 +69,24 @@ No sobrescribir una atribución primaria por el último clic ni inferir ingreso 
 Una fuente de investigación se conserva como evidencia de señal; no se transforma en fuente de
 tráfico de un email posterior. El contexto debe indicar qué hecho y rol representa cada observación.
 
+## Human presentation candidate — no aplicado
+
+El schema incluye un contrato de lectura humana: estilo por propiedad, etiqueta visible y color
+por opción, separado del valor interno y de los writers. Propuesta: origen con insignia de relleno,
+canal con punto de color y fuente `string/text` sin color de enum; estilo/paleta aún por aprobar.
+No utilizar colores de adquisición como señales de calificación ni reemplazar texto por color.
+
+Revisión readonly19/10 del portal: el legacy ya usa Insignia y seis colores; `dealtype` muestra
+Valor predeterminado / Con punto / Insignia para selección única. Las lecturas CLI no devolvieron
+esa metadata visual. Los contratos públicos Properties create/update2026-09 revisados no exponen
+colores ni punto/insignia, y la CLI instalada no ofrece flags para escribirlos. No se certifica una
+vía pública soportada para automatizarlos; la interfaz es el carril verificado para esos ajustes.
+
+[Manual: evidencia, paleta y QA por superficie](../manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api).
+Schema/readback API y presentación/readback UI son verificaciones distintas. Conservar la paleta
+legacy; comprobar persistencia en editor y lectura en tabla/ficha tras cualquier cambio autorizado.
+No generar registros ficticios ni asumir que colores de opciones colorean informes o tarjetas.
+
 ## Historical mapping candidate
 
 | Legacy exacto, si es valor único | Origen candidato | Canal / fuente candidatos | Negocios |

@@ -24,6 +24,7 @@ For every requested field determine:
 | Internal name       | stable, lowercase and implementation-safe                  |
 | Field type          | string, number, date, boolean, enumeration, owner, etc.    |
 | Options             | labels, internal values, ordering and deprecation policy   |
+| Human presentation  | option style, colors, readable labels and API/UI verification route; see [property-types](property-types.md#enumeration-colors-and-human-presentation) |
 | Source              | human, form, workflow, integration, calculated or imported |
 | Ownership           | who maintains quality and approves changes                 |
 | Requiredness        | stage/process where it becomes mandatory                   |

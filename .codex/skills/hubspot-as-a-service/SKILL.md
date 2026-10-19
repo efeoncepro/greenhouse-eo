@@ -153,7 +153,7 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
    - Prospecting Agent (native sales outreach), voice, advanced instructions and meeting CTA: [functional reference](../hubspot-solutions-partner/references/prospecting-agent.md) + [voice calibration manual](../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md). This is neither Customer Agent nor Agent CLI. Verify saved play configuration separately from generated drafts and sending.
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
    - Prospect enrichment, native segments and preparation for personalized email: [prospecting-segmentation.md](references/prospecting-segmentation.md). Declare whether the universe is the entire CRM or a verified research cohort before creating filters; an active attribute segment alone does not restrict source or freshness.
-   - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
+   - Property types, enumeration colors/dot/badge styles, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md). Schema/value readback via API does not certify human presentation; verify supported API coverage and UI persistence separately.
    - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
    - ANAM: [anam-case.md](references/anam-case.md). Para la landing pública y su seam con Customer Agent,
