@@ -59,7 +59,7 @@ Ninguno de estos frentes requiere una inversión complementaria en herramientas:
 
 **4. Experiencia en el mercado peruano**
 
-Te lo digo con transparencia: Pibank sería nuestra primera cuenta de banca en Perú. Esto es lo que aportamos hoy al mercado peruano:
+Pibank sería nuestra cuenta de referencia en la banca peruana, con un equipo armado para ustedes y la dirección de Efeonce involucrada de cerca. Esto es lo que aportamos hoy al mercado peruano:
 
 - **Equipo en Perú:** contamos con especialistas en Perú, cerca de ustedes y con conocimiento directo del mercado local.
 - **Trabajo ya hecho sobre Pibank y el mercado peruano:** investigamos la demanda de búsqueda de ahorro en Google Perú. Además, el 06-10-2026 revisamos 17 búsquedas clave y Pibank no aparecía en ninguno de los 301 resultados. Con esa base armamos el diagnóstico de la propuesta y la muestra X-Ray sobre su propio sitio.
