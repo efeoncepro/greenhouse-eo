@@ -1,6 +1,121 @@
 {
-  "name": "2026-10-13 Efeonce consent + server CAPI recovery",
+  "name": "Efeonce Ads consented online + scoped receipts 2026-10-18",
   "tags": [
+    {
+      "name": "Efeonce Ads - confirmed conversion transport",
+      "type": "gaawe",
+      "notes": "Ads-only reserved user_data transport; excluded from GA4 forwarding in paired Server workspace. Requires coordinated release and explicit publish approval.",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "transaction_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{Efeonce Ads - transaction_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "ads_conversion_key"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{Efeonce Ads - ads_conversion_key}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "user_data"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{Efeonce Ads - reserved user_data}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "ads_conversion_allowed"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{Efeonce Ads - consent allowed}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "gh_ads_conversion"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "77"
+      ],
+      "consentSettings": {
+        "consentStatus": "needed",
+        "consentType": {
+          "type": "list",
+          "list": [
+            {
+              "type": "template",
+              "value": "ad_storage"
+            },
+            {
+              "type": "template",
+              "value": "analytics_storage"
+            },
+            {
+              "type": "template",
+              "value": "ad_user_data"
+            },
+            {
+              "type": "template",
+              "value": "ad_personalization"
+            }
+          ]
+        }
+      }
+    },
     {
       "name": "GA4 Config - canonical sites (consent routing)",
       "type": "googtag",
@@ -1620,6 +1735,74 @@
       ]
     },
     {
+      "name": "Efeonce Ads - confirmed conversion bridge",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_ads_conversion"
+            }
+          ]
+        }
+      ],
+      "filter": [
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - transaction_id}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-8][a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$"
+            }
+          ]
+        },
+        {
+          "type": "matchRegex",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - ads_conversion_key}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "^(commercial_lead|meeting_booking)$"
+            }
+          ]
+        },
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{Efeonce Ads - consent allowed}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "PV - canonical sites - consent-aware config",
       "type": "pageview",
       "filter": [
@@ -2217,6 +2400,70 @@
           "type": "template",
           "key": "name",
           "value": "variant_id"
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - ads_conversion_key",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "ads_conversion_key"
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - consent allowed",
+      "type": "jsm",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "javascript",
+          "value": "function() { var d=document.documentElement; var names=['ad-storage','analytics-storage','ad-user-data','ad-personalization']; if(navigator.globalPrivacyControl===true || !/^(efeoncepro\\.com|think\\.efeoncepro\\.com)$/.test(location.hostname)) return '0'; if(d.getAttribute('data-efeonce-ads-consent')!=='granted' || d.getAttribute('data-efeonce-analytics-consent')!=='granted')return '0'; for(var i=0;i<names.length;i++){if(d.getAttribute('data-efeonce-google-'+names[i])!=='granted')return '0';} return '1'; }"
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - reserved user_data",
+      "type": "jsm",
+      "parameter": [
+        {
+          "type": "template",
+          "key": "javascript",
+          "value": "function() {\n  var id = {{Efeonce Ads - transaction_id}};\n  if (typeof id !== 'string' || !id.match('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-8][a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$')) return;\n  if (typeof window.efeonceReadGoogleAdsUserData !== 'function') return;\n  return window.efeonceReadGoogleAdsUserData(id);\n}"
+        }
+      ]
+    },
+    {
+      "name": "Efeonce Ads - transaction_id",
+      "type": "v",
+      "parameter": [
+        {
+          "type": "integer",
+          "key": "dataLayerVersion",
+          "value": "2"
+        },
+        {
+          "type": "boolean",
+          "key": "setDefaultValue",
+          "value": "false"
+        },
+        {
+          "type": "template",
+          "key": "name",
+          "value": "transaction_id"
         }
       ]
     },

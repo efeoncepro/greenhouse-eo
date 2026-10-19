@@ -1,5 +1,37 @@
 # Runtime de consentimiento y matching de Leads
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+## Antecedentes de configuración antes de ampliar cobertura
+
+
+## Corte operativo inicial18/10, previo a la ampliación22:57Z
+
+Código liberado en main `ec317c928fffcb919d71bdb62821b80280af2347`; companion Production
+`dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk` READY, alias/SHA y cadena de configuración verificados,
+health200 y watchdog6/6 sin drift. GTM **Web6/Server10** publicados; Ads `6862539491` con EC ON,
+flag de proyecto Ads `true` y policies rev2 sólo para Performance y la agenda Discovery.
+La API de Vercel acredita proyecto/clave congelada/cadena; no expone el booleano congelado ni
+prueba una conversión. [Auditoría y evidencia](../../audits/growth/2026-10-18-google-ads-activation.md).
+
+HubSpot Performance tiene propiedad/campo oculto14/mapping `CONFIG_VERIFIED`; Meta tag6/template3
+captura recibos por intento en Server10. Siguen **UNVERIFIED** la primera identidad nativa HubSpot,
+el primer recibo Graph individual del nuevo carril y la recepción/atribución Ads. El Lead Meta
+agregado del17/10 mantiene su evidencia histórica; no se convierte retrospectivamente en un recibo.
+
+La ampliación solicitada comprende **sólo formularios comerciales que generan leads**: doce
+propuestas de draft pasaron DRY_RUN, sin crear/publicar revisiones. `efeonce-lead-gen-web` aún
+figura `lead_magnet`; corregir su clasificación comercial requiere un cambio separado y revalidar
+versión/política. Ebooks, postulaciones, newsletter, soporte y pruebas quedan fuera de esta
+ampliación. No interpretar un `kind` compatible como autorización suficiente de toda respuesta.
+[Inventario y límites de cobertura](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+
+## Antecedente publicado del 14/10/2026
+
 Publicado14/10/2026: PR255, main `9690efad0c1b9d70d9b168d41131857e686b0f81`,
 orquestador38591329633 success y manifest released. [Release y recibos](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md).
 GTM Server9 estricto v2; sólo template30 cambió, otros tags y Web5 preservados. Web/worker
@@ -13,8 +45,8 @@ Mejora EMQ y el envío real de Medios y HubSpot scope siguen pendientes.
 [consentimiento/hosts](09-hubspot-consent.md) ·
 [manual API/panel/CLI](../../manual-de-uso/growth/configurar-medicion-conversiones.md).
 [Recibo CAPI por intento](../../architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): implementación
-con opción GTM default OFF. El18/10 se aplicó sólo el schema con autorización específica para
-reparar el worker compatible ya servido; sin nuevo deploy, publicación ni activación GTM.
+con opción GTM default OFF. En el primer corte del18/10 se aplicó sólo el schema autorizado para
+reparar el worker compatible ya servido; la activación posterior de Server10 consta arriba.
 [Reparación y readback](../../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
 La propuesta anterior quedó formalizada e implementada: no hay listas fijas de formularios o
 scheduler en el sender. Una fuente nueva con mapping businessEmail se habilitó por datos después
@@ -35,8 +67,9 @@ MCP/OAuth. Growth Forms → HubSpot Forms → CRM conserva su mapping/outbox sep
 | Contexto publicitario | src/growth-measurement-context/context.ts; consentimiento/identificadores permitidos |
 | Matching/cola | src/lib/growth/measurement/* y proyección greenhouse_growth, sin segunda verdad de negocio |
 | Entrega | Ops existente, /growth/forms/dispatch, cadencia existente2min; no cron/servicio nuevo |
-| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live9 estricto policy v2 |
-| GA4 | Propiedad486264460, stream10593675149, G-KYPPY57M14; GTM Web NGHPGRLZ live5 |
+| Meta | GTM Server K2X4ZTTK, cuenta6068297031/container191286361, live10; Client estricto policy v2 |
+| GA4 | Propiedad486264460, stream10593675149, G-KYPPY57M14; GTM Web NGHPGRLZ live6 |
+| Ads online | Cuenta6862539491; recibo postcommit → navegador/Web6 → tags nativos Server10, separado de MP UPD |
 
 ```mermaid
 flowchart LR
@@ -50,12 +83,16 @@ flowchart LR
   R --> M["Client backend sGTM → Meta Lead"]
   R --> G["Google MP user_data sin events"]
   A --> E["Espejo browser generate_lead → GA4"]
+  A --> T["Recibo Ads de fuente elegible"]
+  T --> D["Navegador y GTM Web → GTM Server → Google Ads"]
   A --> O["Outbox comercial → HubSpot Forms secure-submit"]
   O --> C["CRM: contacto y propiedades, readback independiente"]
 ```
 
 El último espejo requiere que el browser procese la confirmación. El dataLayer no es prueba
 infalsificable de aceptación. El ingreso backend sGTM queda excluido del forwarding GA4.
+El recibo Ads usa otra ruta, UUID durable y gates propios; depende de que el navegador procese la respuesta. No tiene cola/retry
+backend ni se contabiliza como otro evento GA4. [Contrato Ads](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
 
 ## 2. Consentimiento, navegación y POST
 
@@ -213,9 +250,10 @@ filtros del espejo browserGA4, no autorización backend ni prueba de asociación
 Cuatro audiencias previas conservadas. No campañas/
 gasto, audienciasMeta/CustomerMatch ni importación CRM automáticas.
 
-## 7. Configuración vigente y antecedente de activación13/10
+## 7. Configuración y antecedentes de activación
 
-Cuatro flags prefijo GROWTH_MEASUREMENT_ / sufijo _ENABLED: CAPTURE en Vercel Production;
+Base13/10, conservada en el rollout18/10: cuatro flags prefijo GROWTH_MEASUREMENT_ / sufijo
+_ENABLED: CAPTURE en Vercel Production;
 META/GOOGLE_UPD/RETENTION en Ops y GitHub repo vars persistentes. Source-defaultOFF,
 valores live true exacto (no newline), código lector en main antes del flip. Deploy carga repo
 vars; update ad hoc sin SoT durable sería efímero.
@@ -235,6 +273,12 @@ catalogTASK1905 también aplicada por release completo, independiente de matchin
 Rollback capture/sendersOFF durable+live, redeploy según runtime, retenciónON. RestaurarServer5
 sólo tras backendMetaOFF; preservar SQL/recibos/key vigente48h. Downmatching rechaza drop.
 Rollbackrecuperación Server3/Web4/hosting/routing es histórico; no confundirlo con matching.
+
+El rollout18/10 añadió `GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED=true` en Vercel Production y
+redeploy del mismo main liberado; no añadió sender Ops para Ads. El default de código sigue OFF.
+Políticas Ads, consentimiento y backend acceptance mantienen sus gates independientes. La secuencia
+y rollback vigente están en la [auditoría18/10](../../audits/growth/2026-10-18-google-ads-activation.md);
+no ejecutar el rollback histórico a Server5 como instrucción actual.
 
 ## 8. Helpers construidos y uso seguro
 
@@ -289,7 +333,7 @@ La ruta compacta de project_context conserva aquí sus destinos anteriores:
 [Forms](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md).
 No cambia la autoridad de esos contratos ni la taxonomía/futuro del TrackingEngine.
 
-## Corrección inicial14/10 — Server7; estado actualServer9
+## Corrección inicial14/10 — Server7; cierre históricoServer9
 
 [Auditoría y estados de entrega](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md).
 Server7 sólo modifica customTemplate30; tags/Client31/activadores/transformaciones/GA4 idénticos

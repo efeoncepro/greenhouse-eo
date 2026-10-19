@@ -1,6 +1,13 @@
 # ADR — Integración Google Ads de Greenhouse
 
-- Status: `Accepted` — dirección aceptada por instrucción expresa del operador el 2026-10-17; implementación y rollout de producto pendientes.
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
+- Status: `Accepted` — dirección aceptada por instrucción expresa del operador el 2026-10-17; CLI local y medición online inicial implementadas; integración multiorganización de producto pendiente.
 - Date: `2026-10-17`.
 - Owner: `Growth / Integrations / Marketing Operations`; Identity y Platform son responsables de credenciales y autoridad.
 - Scope: lectura Google Ads, conexión por organización y separación de administración, instrumentación GTM e ingesta de conversiones; discovery operador Efeonce previo al runtime de producto.
@@ -12,7 +19,25 @@
 
 ## Context
 
-### Delta de ejecución 2026-10-17 — conversiones online y EC
+### Estado operativo 18/10 y alcance comercial
+
+La CLI local ofrece lectura y creación/actualización por plan, con journal y readback. La marca OAuth
+**Efeonce** se guardó preservando clientes, callbacks y grants separados; GA4/GSC e Insights Efeonce
+pasaron las lecturas de regresión documentadas. Verificación formal de Google pendiente.
+El 18/10 se liberó el código y se publicaron Web 6/Server 10, EC ON y las políticas Performance/Discovery;
+la primera recepción comercial y la atribución siguen pendientes.
+[Implementación OAuth/CLI](../audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md) y
+[activación online](../audits/growth/2026-10-18-google-ads-activation.md).
+
+La ampliación solicitada después comprende sólo formularios comerciales de leads. Reutiliza acción y
+tags mediante políticas por fuente/versión; no incluye ebooks, newsletter, postulaciones ni soporte.
+En el inventario previo las12 propuestas sólo estaban validadas. La publicación posterior habilitó
+13 Forms y Discovery, excluyó Contacto e incluyó Grader por decisión del operador; elegibilidad técnica no sustituye
+la revisión de intención comercial y las discrepancias de clasificación siguen pendientes.
+[Cobertura fechada](../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+No cambia el estado Accepted ni habilita campañas, puja, ingesta CRM o nuevas cuentas.
+
+### Delta histórico 2026-10-17 — conversiones online y EC
 
 El operador autorizó implementar GTM para Forms y agendas. Se conserva el baseline web→GA4 Client→
 Ads nativo servidor, con dos acciones secundarias propias y un recibo backend por ocurrencia.
@@ -26,8 +51,8 @@ revocación/GPC. GTM los obtiene por getter y los asigna exclusivamente al pará
 `gh_ads_conversion` se excluye del forwarding GA4. Es una entrega dependiente del navegador, no
 un sender backend durable ni ingesta Data Manager. [Contrato y rollout](../manual-de-uso/growth/activar-conversiones-google-ads.md).
 
-Las acciones nativas se crearon y verificaron; los workspaces compilan. **No publicados, sin deploy,
-sin conversión enviada ni EC efectiva acreditada**. [Evidencia](../audits/growth/2026-10-17-google-ads-online-conversions.md).
+En aquel corte, las acciones nativas estaban creadas/verificadas y los workspaces compilaban,
+**sin publicar, sin deploy, sin conversión enviada ni EC efectiva acreditada**. [Evidencia](../audits/growth/2026-10-17-google-ads-online-conversions.md).
 
 El operador pidió habilitar medición de Google Ads para la cuenta Efeonce **686-253-9491**, investigar
 GTM Web/Server, profundizar la conexión API y avanzar con autorización y una prueba de lectura antes

@@ -30,6 +30,25 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 
 Confusing ownership is the #1 bug source. Always ask: "which system above owns this change?" before touching code or config.
 
+## Growth Forms delivery and native receipts — separate ownership
+
+Growth Forms→HubSpot Forms delivery belongs to `src/lib/growth/forms/destinations/hubspot/**`
+and the ops-worker dispatcher, not this Python CRM bridge. Load `greenhouse-growth-forms` and
+[the native-receipt manual](../../../docs/manual-de-uso/growth/guardar-identidad-nativa-hubspot.md)
+before changing form mappings, technical markers or inspecting an occurrence. Never add a bridge
+route or POST a second form to obtain delivery evidence.
+
+Checkpoint 18/10: the additive receipt schema and compatible worker are served; Performance has
+`ef_greenhouse_submission_id`, a hidden optional native field and a CAS-configured destination
+mapping. This is configuration evidence only; the first native occurrence ID remains unverified.
+Each other destination requires its own schema/mapping check; a contact ID or matching email/time
+cannot substitute for the exact Forms occurrence. Historical markerless sends remain correlated.
+[Activation evidence](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).
+
+HubSpot owns commercial lifecycle truth. Sending qualification, opportunities or won-deal milestones
+to Google Ads is still future work; neither this bridge nor the active online Forms/Meetings channel
+implements that sender. Do not mutate CRM stages, contacts or click IDs to manufacture attribution.
+
 ## HubSpot Developer Platform 2026.09 (verified 2026-09-16)
 
 Developer Platform Projects version `2026.09` is generally available with an 18-month support window. Set

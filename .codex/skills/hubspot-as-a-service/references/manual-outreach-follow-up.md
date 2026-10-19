@@ -46,3 +46,17 @@ Comprobar ID/versión del documento y cuerpo final de inscripción; una personal
 plantilla y fijar horas dentro de la ventana. Firma HTML configurada y render de preview son pruebas distintas.
 Un 403 de secuencias con OAuth de usuario limita ese endpoint: usar el carril UI autorizado, sin escalar
 permisos, inventar soporte de escritura CLI ni cambiar de plataforma.
+
+## Borrador de texto, firma gráfica y readback por actividad
+
+Cuando el usuario pide enviar un borrador existente con firma gráfica, aplicar la
+[ruta de conversión HTML](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md#convertir-un-borrador-de-texto-a-firma-gráfica--18102026):
+conservar párrafos/enlaces y destinatarios; sustituir la firma de texto por una sola firma oficial instalada.
+Tras enviar, el ID de Enviados puede diferir del de Drafts y el enlace viejo puede mostrar contenido obsoleto.
+Conciliar con Elementos enviados antes de reintentar; no reenviar porque ese enlace siga pareciendo borrador.
+
+Si `objects search --type emails` devuelve vacío con OAuth, no concluir ausencia de logging. Consultar
+`hubspot activities list --contact <id> --activity-type EMAIL --format json` y recuperar el EMAIL por ID;
+verificar SENT, remitente, destinatario y asociaciones. Es un fallback de lectura, sin crear duplicados ni
+ampliar permisos. Un evento Documents/open tampoco demuestra lectura humana por sí solo.
+[Aplicación y límites](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).

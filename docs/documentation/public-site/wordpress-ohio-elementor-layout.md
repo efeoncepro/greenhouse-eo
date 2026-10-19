@@ -1,9 +1,9 @@
 # Public Site WordPress — Layout Ohio + Elementor
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-07-08 por Codex
+> **Ultima actualizacion:** 2026-10-18 por Claude (Opus 5.5)
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
@@ -100,6 +100,16 @@ probar first paint/no-JS y revisar el CSS inicial emitido por Ohio.
 7. Documentar backup, cache purge y captura desktop/mobile.
 
 ## Contrato: menu principal WordPress/Ohio
+
+> **Delta 2026-10-18 — navegación nueva planificada.** Ya hay una navegación nueva diseñada para todo el sitio
+> (cabecera de vidrio, mega menús con fotos y menú a pantalla completa), planificada en
+> [EPIC-055](../../epics/to-do/EPIC-055-public-site-global-navigation.md) y propuesta en
+> [PDR-027](../../public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md). Si se aprueba y se construye,
+> reemplazará el encabezado de Ohio con un interruptor (apagado, piloto en una página, todo el sitio) y la opción de
+> volver a Ohio. **Hoy no hay nada de eso en el sitio:** el encabezado y el menú siguen siendo los de Ohio y todo lo
+> que describe esta sección sigue vigente.
+
+> Detalle técnico: [Navegación global del sitio público V1](../../architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md).
 
 El sitio publico usa menu clasico de WordPress, no `wp_navigation` de block
 theme. El theme activo `ohio-child` registra la ubicacion `primary`; en la

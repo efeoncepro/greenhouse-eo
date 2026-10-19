@@ -123,3 +123,13 @@ Sus tres pasos y fechas son decisiones del caso, no una cadencia universal.
 Fuentes de comportamiento, contrastadas en el caso del 13/10: [crear/editar secuencias](https://knowledge.hubspot.com/sequences/create-and-edit-sequences)
 y [desinscripción](https://knowledge.hubspot.com/sequences/unenroll-from-sequence). Revalidar el portal y
 el carril efectivo cuando cambien. Autoridad: [mandato acotado](../../../../docs/architecture/GREENHOUSE_COMMERCIAL_FOLLOWUP_AGENT_DECISION_V1.md#mandato-separado-y-acotado--2026-10-13).
+
+## Un seguimiento condicionado, sin ampliar la cadencia
+
+Si el operador pide «un seguimiento si no responde», preparar un único correo futuro; no heredar los tres
+pasos de otros expedientes. El aporte puede ser un criterio concreto para comparar propuestas, seguido de
+una pregunta sobre admisión cuando la autora ya está revisando una shortlist. Confirmar que respuesta a
+cualquier correo cubra el mensaje inicial enviado por Outlook; reunión/baja/rebote conservan sus reglas.
+Tras Programado, reabrir Editar de la inscripción para leer hora/zona persistidas si la fila sólo muestra
+el día; salir sin guardar cambios. No interpretar «Procesando» o un ID viejo de borrador como fallo para
+repetir el envío. [Caso verificado](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).

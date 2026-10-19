@@ -316,3 +316,15 @@ chrome global sin cambios.
   desplegar el plugin. Backups `/tmp/eo-creativa-widgets-before-20261016-101813.tar` y `…-102106.tar`. Verificado
   en vivo a 1440, 900 y 390: sin scroll horizontal, 4/4 videos reproduciéndose, foto cargada, 0 tokens sin
   resolver, 0 errores de consola. El 94 % sigue pendiente de validación (el caso publicado dice 88 %).
+
+## Delta 2026-10-18 — Formulario en dos pasos publicado
+
+- El release de Greenhouse del 2026-10-18 llevó el renderer con `ab622e958` a producción (marcador CSS verificado
+  en `renderer-latest.js`). `activate-creative-diagnostic-two-step.ts --apply` publicó `fver-7178aede-93da-4f95-a00c-5b0225638583`
+  (depreca `fver-79bbb3b4-…`, destino HubSpot copiado).
+- Medición: política Meta `485f38e5` revisión 2 (`01e72899`) con la misma configuración y mapping, publicada por la
+  CLI con sesión del agente de producción (`.auth/creative-diagnostic-measurement-v2/`) y verificada con `verify`.
+- Verificado en vivo, sin enviar el formulario, en `/agencia-creativa/` y `/agencia-creativa-v2/` a 1440 y 390:
+  3 grupos de opciones (11 radios) y ninguna caja de texto en su lugar, stepper, avance al paso 2, 7 íconos SVG
+  de etiqueta, ejemplo de teléfono, «Política de privacidad», botón naranja, sin scroll horizontal y sin errores.
+- Pendiente: un envío real desde un navegador (HubSpot + conversión Meta).

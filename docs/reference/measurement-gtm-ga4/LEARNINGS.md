@@ -220,3 +220,23 @@ producto es un `<div class="... btn ...">` dentro de un `<a href="/productos/…
 - Borradores `GA4 - Tag`/`html` en el Default Workspace: NO publicar (duplicarían Site Kit); limpiar o dejar.
 - Google Ads (`AW-16796059774`): oportunidad de importar `generate_lead` como conversion para bidding.
 - Smoke-test forms en producción (`smoke-*`, `live-hs-*`): archivar.
+
+
+## 2026-10-18 — Ads reservado y fork de plantilla Server por API
+
+- Preview Web real serializa el objeto reservado como claves anidadas user_data con metadata. No exigir
+  em en ese transporte de entrada: el GA4 Client reconstruyó el objeto reservado en Server12.
+  Cuatro escenarios SDK Preview y cuatro LIVE pasaron con toda medición interceptada; el probe propio
+  usó allowed0/key técnica/transaction inválida. Ningún tag ni outgoing: no es una conversión Ads positiva.
+- templates.update rechazó galleryReference como campo no soportado. Tras GET que confirmó ausencia
+  de cambio, el PUT nuevo usó sólo name/templateData; no se reintentó un resultado desconocido.
+  Google hizo un fork local: quitó galleryReference y cambió automáticamente el tipo del tag6 de
+  cvt_NCN6S a cvt_191286361_3, conservando su fingerprint. Releer dependientes antes de guardar
+  checkbox; nunca reenviar el tipo gallery anterior sobre el puntero local observado.
+- El readback de template normaliza JSON de TEMPLATE_PARAMETERS (formato/escaping) y whitespace
+  exterior de SERVER_PERMISSIONS. Se probaron deepStrictEqual con orden de arrays conservado y
+  bytes exactos de JS/INFO/TOS/tests/notas; registrar SHA esperado y real distintos. No ignorar
+  secciones ni permisos arbitrarios para obtener PASS. El compilador y los árboles inmutables
+  Web6/Server10 se verificaron después. Evitar actualizaciones automáticas que borren el callback.
+
+[Auditoría de publicación y límites](../../audits/growth/2026-10-18-google-ads-activation.md).

@@ -403,7 +403,7 @@ Reglas obligatorias:
 
 - Montar el menú en el sitio, el interruptor y las variantes de Ohio: `TASK-2042`.
 - Superficie del agendador: `TASK-2042`.
-- Publicar la copia pública en el bucket (PDR-027, decisión abierta 3).
+- Publicar la copia pública en el bucket (PDR-027, punto abierto 3).
 - Herramienta de Greenhouse o MCP para editar el menú (follow-up de EPIC-055).
 - Cloud CDN con dominio propio.
 
@@ -509,7 +509,7 @@ Modelo del documento, reglas, plugin, REST y fotos:
 ## Follow-ups
 
 - Herramienta de Greenhouse o MCP que llame a la puerta de WP-CLI (EPIC-055).
-- Copia pública también en el bucket de AXIS si se decide (PDR-027, decisión abierta 3).
+- Copia pública también en el bucket de AXIS si se decide (PDR-027, punto abierto 3).
 - Lo que surja dentro de la frontera del contenido entra como slice o criterio de esta task (regla de EPIC-055).
 
 ## Open Questions

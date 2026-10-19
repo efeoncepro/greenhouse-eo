@@ -4,10 +4,16 @@
 - Date: `2026-10-17`.
 - Owner: Growth / Integrations.
 - Reversibility: `two-way`; columnas aditivas y mapping opt-in; rollback de código conserva recibos.
-- Confidence: `high` en contrato local; round-trip del marcador requiere readback del primer envío real.
+- Confidence: `high` en contrato y configuración Performance verificada18/10; identidad nativa requiere el primer envío real marcado.
 - Scope: Forms adapter/dispatcher y CLI local; sin nuevo servicio, secreto, endpoint público o cambio de consentimiento.
 - Modular placement: `src/lib/growth/forms/destinations/hubspot`; store canónico y worker existentes.
 - Extends: [rastreo de leads](GREENHOUSE_META_LEAD_TRACE_CLI_DECISION_V1.md).
+
+Checkpoint18/10: [activación y límites](../audits/growth/2026-10-18-google-ads-activation.md).
+SQL aplicada y worker compatible servido; propiedad `ef_greenhouse_submission_id`, campo nativo14
+oculto/opcional y mapping Performance `CONFIG_VERIFIED`, preservando13 campos/settings originales.
+No se certificó identidad nativa de una nueva ocurrencia. Las otras fuentes requieren su propia
+configuración; publicar Ads no configura automáticamente este marcador ni habilita un reenvío.
 
 ## Decisión
 
@@ -55,7 +61,8 @@ terminal/ID ausente/fuente ajena y CAS stale. El 18/10 el operador autorizó la
 [expansión versionada](../../migrations/20261018174803715_hubspot-native-form-receipts.sql) al
 confirmar que el worker compatible ya estaba servido y fallaba por schema ausente. Aplicada
 sin nuevo deploy ni POST manual. [Readback](../audits/releases/2026-10-18-candidate-89d70ec13-review.md).
-Provisión HubSpot, mapping opt-in y primer ID nativo exacto siguen pendientes.
+En el corte17/10 estaban pendientes provisión HubSpot, mapping opt-in y primer ID nativo exacto.
+La provisión/mapping Performance se verificaron18/10; primer ID exacto sigue pendiente.
 
 ## Alternativas
 

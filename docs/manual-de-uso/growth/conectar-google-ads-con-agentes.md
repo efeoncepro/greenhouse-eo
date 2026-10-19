@@ -1,10 +1,16 @@
-# Google Ads con agentes: autorización y verificación de lectura
+# Google Ads con agentes: OAuth, consultas y gestión por planes
 
 Estado al 17-10-2026: **CLI local `google-ads-agent.v1` implementada**, con lecturas reales comprobadas
 y catálogo de gestión por plan. Conexión multiorganización, endpoint/UI/MCP de producto e ingesta pendientes.
 El [ADR](../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md) y la
 [arquitectura](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) gobiernan
 la futura incorporación al producto. [Resultado funcional](../../documentation/growth/google-ads-measurement.md).
+
+El rollout online posterior tiene su propio [manual de activación](activar-conversiones-google-ads.md)
+y [evidencia del 18/10](../../audits/growth/2026-10-18-google-ads-activation.md): dos acciones nativas,
+Web 6/Server 10, EC ON y políticas Performance/Discovery activadas. No equivale a ingesta por la CLI,
+conexión multiorganización o primera conversión atribuida. La ampliación a otros formularios
+comerciales continúa en propuestas validadas sin publicar; [cobertura](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
 
 ## Antes de operar
 
@@ -34,10 +40,18 @@ acredita al usuario; no verifica la aplicación. En este piloto el operador conf
 completó el aviso/consentimiento. Para rollout, revisar marca y requisitos de verificación antes de
 presentarlo a más usuarios; no cambiar Cloud, audiencia o permisos para eludir ese proceso.
 
-El operador fijó **Efeonce** como marca obligatoria para la autorización de producción. La marca es
-del proyecto OAuth: renombrar solamente el client no cambia por sí solo la pantalla. Antes del cambio,
-inventariar consumidores compartidos y preparar readback/regresión de GA4/GSC, además del nuevo
-consentimiento Ads visible como Efeonce. La verificación de aplicación/scopes se comprueba aparte.
+El operador fijó **Efeonce** como marca para producción. El cambio de nombre público ya se guardó en
+Google Auth Platform, junto con homepage y política de privacidad existentes; no se renombraron los
+clientes técnicos ni cambiaron sus IDs, secretos, callbacks, scopes, audiencia o dominios. El nombre es
+del proyecto OAuth: renombrar sólo un client no cambia por sí solo la pantalla de consentimiento.
+Una apertura nueva mostró «Ir a Efeonce» y se cerró antes de conceder: fue prueba de marca, no un nuevo
+grant ni verificación formal Google. La CLI usa el grant Ads separado, refrescado y verificado.
+
+Después del cambio se probaron los grants existentes GA4/GSC Efeonce y la consulta GA4 usada por
+Insights: HTTP200, sin reconectar ni escribir esas conexiones. La prueba GSC no acredita frescura de
+su materialización ni un informe Insights renderizado. Verificación de marca/scopes por Google
+**pendiente**. Para nuevos cambios compartidos, repetir inventario y regresión antes de cerrar.
+[Readbacks y límites](../../audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
 
 ## Probar y leer el resultado
 
@@ -56,7 +70,7 @@ consentimiento Ads visible como Efeonce. La verificación de aplicación/scopes 
 7. Cerrar el listener local. Mantener recibos/credencial ignorados por Git con `0700`/`0600` y
    política de custodia; no promover automáticamente el grant a una conexión multiempresa.
 
-Resultado esperado de este snapshot: `Efeonce - Agencia`, CLP, America/Santiago, owner de conversiones
+Snapshot histórico inicial del 17/10: `Efeonce - Agencia`, CLP, America/Santiago, owner de conversiones
 `customers/6862539491`, tracking ID `18432951465`. La cuenta es nueva: `NOT_CONVERSION_TRACKED`,
 dos acciones GA4 `HIDDEN`, no primarias, y cero filas de campañas/goals en las consultas realizadas.
 Releer antes de actuar: son observaciones fechadas.
@@ -74,7 +88,7 @@ Releer antes de actuar: son observaciones fechadas.
 | `invalid_grant` / revocación | Detener requests; reautorizar sólo con el principal y permiso aprobados |
 | Se requiere Data Manager | Nueva API/scope y gate de acción propios; este grant no los autoriza |
 
-El siguiente trabajo implementa binding por organización y paridad API/MCP de producto sobre el adapter
+El trabajo de producto pendiente comprende binding por organización y paridad API/MCP de producto sobre el adapter
 de la CLI local, con revocación y aislamiento multiorganización. La activación publicitaria
 requiere además acción/owner/objetivo, intención, consentimiento, identidad, valor, escritor único,
 preview/readback y autorización de publicación. No usar un evento sintético o una escritura real
@@ -100,12 +114,16 @@ pnpm --silent google-ads budgets list
 pnpm --silent google-ads adgroups list
 pnpm --silent google-ads ads list
 pnpm --silent google-ads conversions list
+pnpm --silent google-ads conversions bindings
 pnpm --silent google-ads goals account
 pnpm --silent google-ads goals campaigns
 pnpm --silent google-ads goals config
 pnpm --silent google-ads goals custom
 pnpm --silent google-ads report get --days 7 --level campaign --daily
 ```
+
+`conversions bindings` relee owner/acciones nativas, AW y labels para el canal online; no publica
+GTM, no cambia políticas ni envía conversiones. Nunca construir el AW desde el customer ID.
 
 `discover` y `write plan` no requieren credenciales. Toda salida es JSON legible y versionada.
 `report get` acepta `--since YYYY-MM-DD --until YYYY-MM-DD` o `--days`, nunca ambos; rango máximo

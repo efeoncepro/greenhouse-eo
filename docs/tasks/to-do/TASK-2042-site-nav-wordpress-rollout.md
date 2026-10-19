@@ -506,7 +506,7 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] PDR-027 pasa a `Accepted` con las decisiones abiertas 1 y 2 resueltas
+- [x] PDR-027 pasa a `Accepted` con alcance y piloto decididos (operador, 2026-10-18)
 - [ ] EPIC-055 actualizada; si las tres tasks cerraron, la épica pasa a `complete`
 
 ## Follow-ups

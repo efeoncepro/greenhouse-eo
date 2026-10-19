@@ -74,12 +74,12 @@ copia exacta del CSS en WordPress y envoltura Astro en Think. Ver [PRIMITIVES.md
 |---|---|---|
 | Arriba | Transparente sobre el hero. Cápsula y botón de vidrio. El hero sube hasta el borde. | 96 px |
 | Bajando | Se oculta para no tapar la lectura. | — |
-| Subiendo | Aparece fija, sólida en navy Efeonce (`#001a33`), con borde inferior suave y logo claro. El botón del agendador pasa a sólido blanco. | 72 px |
+| Subiendo | Vuelve como una **isla de vidrio flotante** centrada, a 12 px del borde, que cambia de tono según la sección que tiene debajo (§Isla de vidrio). Reemplaza la barra navy sólida, aprobado por el operador el 2026-10-18. | isla de 61 px |
 
 Contenido de la cabecera de escritorio, de izquierda a derecha:
 
 1. **Hamburguesa:** convive con la cápsula en escritorio, según la «Opción 2» del operador del 2026-10-17.
-2. **Logo:** 164 px de ancho arriba y 140 px en la cabecera fija.
+2. **Logo:** 164 px de ancho arriba y 128 px en la isla de la cabecera fija.
 3. **Cápsula:** Inicio, Nosotros ▾, Soluciones ▾, Recursos ▾ y Contacto.
 4. **Botón «Agenda tu diagnóstico».**
 
@@ -186,7 +186,8 @@ Tokens de `axisMotion`:
 | Mega, cerrar | 300 ms después de salir, se recoge hacia arriba en 300 ms. |
 | Mega, cambio de línea | El contenido anterior se apaga en 150 ms y el nuevo sube, con los servicios cada 40 ms; foto, respuesta y caso relevan en ese orden. |
 | Fotos | Cruce con espera de carga: la foto anterior se queda hasta que la nueva cargó. |
-| Botón del agendador | En vidrio: al pasar el mouse se ilumina y sube 1 px; al presionar baja a 98 %. En sólido: pasa a `#cfe4fa` y sube 1 px (250 ms). |
+| Botón del agendador | En vidrio: al pasar el mouse se ilumina y sube 1 px; al presionar baja a 98 %. En la isla oscura es blanco y al pasar el mouse pasa a `#cfe4fa`; en la isla clara es navy y pasa a `#023c70`. En ambos sube 1 px (250 ms). |
+| Cambio de tono de la isla | Fondo, borde, sombra, texto, logo y botón cruzan de oscuro a claro (o al revés) en 300 ms `emphasized` cuando cambia la sección bajo la isla. |
 
 **Movimiento reducido:** sin desplazamientos y con cambios instantáneos. La cabecera aparece y desaparece sin deslizarse.
 
@@ -205,6 +206,50 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255
 El botón del agendador usa el mismo material con un relleno algo mayor (`.12`→`.04`), borde `.18` y canto `.34`. La
 hamburguesa abierta queda sólo con un anillo fino, sin relleno. Los valores pasan a tokens de AXIS en la fase del
 contrato. El CSS del sitio nunca los repite a mano.
+
+## Isla de vidrio (cabecera fija)
+
+Al subir, la cabecera no vuelve como barra de ancho completo: vuelve como **una sola isla de vidrio flotante** con
+hamburguesa, logo (128 px), cápsula y botón del agendador. Se aprobó el 2026-10-18 en reemplazo de la barra navy
+sólida, que el operador encontró poco premium. Se comparó con una barra de vidrio de ancho completo y con islas
+separadas: estas últimas se ven recargadas sobre el contenido.
+
+**Cambia de tono según lo que tiene debajo**, porque un vidrio oscuro sobre una sección clara se vuelve gris y el
+texto blanco pierde contraste:
+
+- **Tono oscuro**, sobre fotos y secciones oscuras: texto y logo blancos y botón del agendador blanco con texto navy.
+- **Tono claro**, sobre secciones claras: logo en versión navy, texto navy, hover de ítems `rgba(0,26,51,.06)`,
+  botón del agendador navy con texto blanco y hamburguesa con trazos navy sobre `rgba(0,26,51,.06)`.
+
+```css
+/* Isla: centrada, 12 px del borde, radio 24, alto 61 */
+top: 12px; width: min(1180px, 100% - 48px); border-radius: 24px; padding: 8px 8px 8px 72px; /* 24px sin hamburguesa */
+
+/* Tono oscuro (sobre fotos y secciones oscuras) */
+background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+backdrop-filter: blur(28px) saturate(170%) brightness(.48);
+border: 1px solid rgba(255,255,255,.12);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 16px 40px rgba(0,8,20,.30);
+
+/* Tono claro (sobre secciones claras) */
+background: rgba(255,255,255,.72);
+backdrop-filter: blur(28px) saturate(180%);
+border: 1px solid rgba(0,26,51,.08);
+box-shadow: 0 10px 30px rgba(0,26,51,.10);
+```
+
+**Cómo se decide el tono:** cada sección de la página declara `data-site-nav-tone="light|dark"`. El primitive mira qué
+sección queda bajo la línea media de la isla al hacer scroll y cambia el tono en 300 ms. Si una sección no lo declara,
+el primitive calcula la luminancia de su color de fondo (propuesto; se confirma en el Lab). En WordPress el adaptador
+(`TASK-2042`) marca las secciones de cada plantilla.
+
+**En el teléfono** es la misma isla con márgenes de 12 px, que lleva el logo y la hamburguesa; el botón del agendador
+sigue al pie del onepage.
+
+El mega menú y el desplegable de Nosotros caen desde la isla (panel a 84 px del borde superior). El círculo del onepage
+nace del centro de la hamburguesa dentro de la isla.
+
+Demostración aprobada: video de la sesión del 2026-10-18, con la variante «C · Una sola isla que cambia de tono».
 
 ## Modelo de datos — documento `site-nav.v1`
 
@@ -286,7 +331,7 @@ Plugin propio en `efeonce-public-site-runtime/wp-content/plugins/` (nombre de di
   previa del documento.
 - **Copia pública:** `GET /wp-json/eo/v1/site-nav`. Devuelve sólo el documento publicado, con `ETag` y
   `Cache-Control` corto. Es la lectura para Think y otros sitios. La publicación adicional en el bucket de AXIS es una
-  decisión abierta de PDR-027.
+  decisión abierta de PDR-027 (punto 3).
 - **Permisos:** escribir requiere `manage_options` o una capability propia (`eo_manage_site_nav`). La REST pública es de
   sólo lectura.
 
@@ -355,7 +400,7 @@ PII.
   ni registry.
 - **Render:** en PHP, desde el documento. Los enlaces salen en el HTML del servidor; `site-nav.js` sólo mejora.
 - **Variantes de Ohio por página:** encabezado transparente u oscuro y logo fijo, controlados por metas de Ohio y ACF.
-  Se inventarían y cada una se resuelve con un estado del primitive (arriba, fija o sólida) o se documenta como
+  Se inventarían y cada una se resuelve con un estado del primitive (arriba o isla, en tono oscuro o claro) o se documenta como
   excepción.
 - **Despliegue:** release acotado por SSH. Primero se exporta el código vivo, se arma el paquete con guarda
   `previousSha256` y se despliega con respaldo; después se resetea OPcache y se purga Kinsta. Ver la
@@ -397,8 +442,8 @@ PII.
 
 Vienen de la nota «Por confirmar» del canvas y de PDR-027:
 
-- Alcance en todo el sitio y piloto primero (PDR-027, decisiones abiertas 1 y 2).
-- Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, decisión abierta 3).
+- ~~Alcance en todo el sitio y piloto primero~~: decididos por el operador el 2026-10-18 (PDR-027, Accepted).
+- Destino de la copia pública: REST de WordPress sola, o también en el bucket (PDR-027, punto abierto 3).
 - Orden de los servicios por línea (Inbound quedó en Revenue).
 - Si las respuestas aprobadas por línea («Tu squad», «Visible»…) viven también en el menú.
 - URL real del canal de YouTube: hoy el sitio apunta a `facebook.com/colabrio`, un resto del tema.

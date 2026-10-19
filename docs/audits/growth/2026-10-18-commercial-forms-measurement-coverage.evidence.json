@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "greenhouse.commercial-form-ads-coverage.v1",
+  "asOf": "2026-10-18T21:43:19.305633+00:00",
+  "timestampSource": "local catalog GET receipt file mtime; not a provider conversion timestamp",
+  "customerId": "6862539491",
+  "scopeInstruction": "Only commercial forms generating leads; no ebook, careers, newsletter, support or test expansion",
+  "catalog": {
+    "forms": 16,
+    "meetingBindings": 1,
+    "publishedCurrentPolicies": 12,
+    "formsTechnicallyEligibleForAds": 13,
+    "formsAdsPublished": 1,
+    "meetingAdsPublished": 1,
+    "additionalDryRunValidated": 12,
+    "expansionApplied": 0
+  },
+  "runtimeCheckpoint": {
+    "source": "2026-10-18-google-ads-activation.evidence.json",
+    "gtmWebVersion": "6",
+    "gtmServerVersion": "10",
+    "enhancedConversions": "ON",
+    "productionMainSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+    "configurationVerifiedAt": "2026-10-18T20:43:28.677Z",
+    "positiveAdsReceptionVerified": false,
+    "attributionVerified": false
+  },
+  "sources": [
+    {
+      "slug": "efeonce-lead-gen-web",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-lead-gen-web",
+      "formKind": "lead_magnet",
+      "technicalAdsEligible": false,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": false,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_purpose_but_lead_magnet_classification_needs_canonical_correction"
+    },
+    {
+      "slug": "efeonce-aeo-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-aeo-diagnostic",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "ai-visibility-grader",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-ai-visibility-grader",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "purpose_describes_lead_magnet_review_commercial_intent_before_publication"
+    },
+    {
+      "slug": "efeonce-desarrollo-web-cotizacion",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-2d4b97ad-7076-4958-8e0f-daf1c995e430",
+      "formKind": "quote_request",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-seo-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-48a4b95f-5f2a-453a-88d7-af3257e7c417",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-social-audit",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-cb40ce69-97a0-4a3a-8e0a-8e62dfc46c22",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-web-agentica-ebook",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-web-agentica-ebook",
+      "formKind": "lead_magnet",
+      "technicalAdsEligible": false,
+      "publishedPolicy": false,
+      "adsPublished": false,
+      "destinations": [],
+      "dryRunValidated": false,
+      "appliedFromExpansionPlan": false,
+      "review": "out_of_requested_scope"
+    },
+    {
+      "slug": "efeonce-surround-discovery-ebook",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-surround-discovery-ebook",
+      "formKind": "lead_magnet",
+      "technicalAdsEligible": false,
+      "publishedPolicy": false,
+      "adsPublished": false,
+      "destinations": [],
+      "dryRunValidated": false,
+      "appliedFromExpansionPlan": false,
+      "review": "out_of_requested_scope"
+    },
+    {
+      "slug": "efeonce-creator-influence-brief",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-creator-influence",
+      "formKind": "quote_request",
+      "technicalAdsEligible": true,
+      "publishedPolicy": false,
+      "adsPublished": false,
+      "destinations": [],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-hubspot-scope",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-hubspot-scope",
+      "formKind": "quote_request",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-content-marketing",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-content-marketing",
+      "formKind": "quote_request",
+      "technicalAdsEligible": true,
+      "publishedPolicy": false,
+      "adsPublished": false,
+      "destinations": [],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-contacto",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-contacto",
+      "formKind": "contact",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "review_commercial_intent_for_mixed_contact_requests_before_publication"
+    },
+    {
+      "slug": "efeonce-creative-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-creative-diagnostic",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-media-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-media-diagnostic",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": false,
+      "destinations": [
+        "meta"
+      ],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "efeonce-performance-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-performance-diagnostic",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": true,
+      "destinations": [
+        "meta"
+      ],
+      "dryRunValidated": false,
+      "appliedFromExpansionPlan": false,
+      "review": "already_active"
+    },
+    {
+      "slug": "efeonce-inbound-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-inbound-diagnostic",
+      "formKind": "diagnostic_intake",
+      "technicalAdsEligible": true,
+      "publishedPolicy": false,
+      "adsPublished": false,
+      "destinations": [],
+      "dryRunValidated": true,
+      "appliedFromExpansionPlan": false,
+      "review": "commercial_policy_candidate"
+    },
+    {
+      "slug": "discovery",
+      "sourceKind": "meeting_booking",
+      "surfaceId": "fhsf-efeonce-lead-gen-web",
+      "formKind": null,
+      "technicalAdsEligible": true,
+      "publishedPolicy": true,
+      "adsPublished": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "dryRunValidated": false,
+      "appliedFromExpansionPlan": false,
+      "review": "already_active"
+    }
+  ],
+  "classificationReadAt": "2026-10-18T21:02:16.846Z",
+  "exclusions": {
+    "ebookDownloads": "not requested",
+    "careers": "not requested; active definition exists outside this measurement catalog",
+    "newsletter": "not requested",
+    "support": "not a commercial conversion by default",
+    "qaFixtures": "not requested; excluded from business coverage"
+  },
+  "remaining": {
+    "commercialPolicies": "12 proposals technically validated; none published; re-read and review intent before apply",
+    "legacyWebLeadForm": "classification lead_magnet conflicts with declared commercial service purpose; no canonical mutation applied",
+    "aiGrader": "technical diagnostic_intake eligibility does not settle the lead_magnet purpose; review intent",
+    "mixedContact": "technical contact eligibility does not settle each submission commercial intent",
+    "firstRealEvidence": "real Forms/Meeting occurrence and provider receipts/reception/attribution remain separate verification",
+    "futurePublishGuard": "proposal only; no automatic policy enrollment or new publication gate implemented"
+  },
+  "sanitization": {
+    "contactValues": false,
+    "visitorIdentifiers": false,
+    "credentials": false,
+    "rawProviderPayloads": false
+  },
+  "thisDocumentationRun": {
+    "remoteConfigurationWrites": 0,
+    "submissionsCreated": 0,
+    "bookingsCreated": 0
+  }
+}

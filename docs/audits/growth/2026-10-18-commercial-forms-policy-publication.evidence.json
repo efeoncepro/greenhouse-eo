@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "greenhouse.commercial-ads-publication.v1",
+  "verifiedAt": "2026-10-18T22:57:03.870Z",
+  "customerId": "6862539491",
+  "commercialFormsWithAds": 13,
+  "meetingBindingsWithAds": 1,
+  "newCommercialFormsPublished": 12,
+  "operatorDecisions": {
+    "aiGrader": "included: commercial intent confirmed by operator",
+    "contact": "general contact excluded from Ads",
+    "legacyWeb": "corrected lead_magnet to quote_request; source identity/version preserved"
+  },
+  "publicWebRender": {
+    "httpStatus": 200,
+    "formKind": "quote_request",
+    "versionPreserved": true
+  },
+  "sources": [
+    {
+      "slug": "efeonce-lead-gen-web",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-lead-gen-web",
+      "sourceVersion": "fver-efeonce-lead-gen-web-v1",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "bfe35158-a838-4f30-b415-d01922734c58",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-aeo-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-aeo-diagnostic",
+      "sourceVersion": "fver-0df81cf5-b580-49bd-b17b-c46aabd08765",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "55ccd57d-87f0-49de-961a-ef8b41c3626e",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "ai-visibility-grader",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-ai-visibility-grader",
+      "sourceVersion": "fver-ea1c2e5f-38e0-4ef6-b9eb-9b5fe1b9d6f3",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "9c1e3ef6-e1c3-4e62-991e-09923e02c41f",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-desarrollo-web-cotizacion",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-2d4b97ad-7076-4958-8e0f-daf1c995e430",
+      "sourceVersion": "fver-c2cfb2d7-c285-4924-aea2-b5d4f8313ce4",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "4e38aa7f-1684-477c-8f3a-210ac5080fab",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-seo-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-48a4b95f-5f2a-453a-88d7-af3257e7c417",
+      "sourceVersion": "fver-a7a91d8c-9467-49c1-b5bc-95b10754424f",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "a82e6e82-0f69-443c-8620-124a847d5b1c",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-social-audit",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-cb40ce69-97a0-4a3a-8e0a-8e62dfc46c22",
+      "sourceVersion": "fver-84224755-7b96-4163-b431-a5b0255a674b",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "70c587a0-4f3a-4de6-86ec-46ba76c8fd36",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-web-agentica-ebook",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-web-agentica-ebook",
+      "sourceVersion": "fver-c5348278-06e3-4644-a3f5-e803fe317126",
+      "googleAdsEligible": false,
+      "publishedRevisionId": null,
+      "revision": null,
+      "adsEnabled": false,
+      "destinations": [],
+      "newlyPublished": false,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-surround-discovery-ebook",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-surround-discovery-ebook",
+      "sourceVersion": "fver-00476c2f-ddd1-4c6d-8c8d-4df864d524fa",
+      "googleAdsEligible": false,
+      "publishedRevisionId": null,
+      "revision": null,
+      "adsEnabled": false,
+      "destinations": [],
+      "newlyPublished": false,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-creator-influence-brief",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-creator-influence",
+      "sourceVersion": "fver-ffe2243d-5291-49d7-95ed-cfefe9589a2e",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "befbedbd-75a3-47bc-9e14-b0788a715225",
+      "revision": 1,
+      "adsEnabled": true,
+      "destinations": [],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-hubspot-scope",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-hubspot-scope",
+      "sourceVersion": "fver-012acd39-cc01-4cb2-930c-9ca6a4cc34ca",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "b93dab43-ce84-4356-a6e8-d3251b9cd2a9",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-content-marketing",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-content-marketing",
+      "sourceVersion": "fver-83ffe3f9-ef8a-4419-bed0-cee1093c218b",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "79ddb890-a969-4d94-982f-42653f509048",
+      "revision": 1,
+      "adsEnabled": true,
+      "destinations": [],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-contacto",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-contacto",
+      "sourceVersion": "fver-901e53e5-25e1-4f64-81d0-5fed3c8616f1",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "cf4a32a4-d23a-4283-a724-0274ca0cc677",
+      "revision": 1,
+      "adsEnabled": false,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": false,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-creative-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-creative-diagnostic",
+      "sourceVersion": "fver-7178aede-93da-4f95-a00c-5b0225638583",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "961d3138-8fae-40d8-89af-c5c01379cd47",
+      "revision": 3,
+      "adsEnabled": true,
+      "destinations": [
+        "meta"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-media-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-media-diagnostic",
+      "sourceVersion": "fver-d448c02d-9fda-4612-9ba8-5bebd4a5139f",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "e51473dc-366f-4de1-93e9-1e3eff2c8177",
+      "revision": 3,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-performance-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-performance-diagnostic",
+      "sourceVersion": "fver-e9f76dcb-3766-46e9-99b3-b880b3e3dca8",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "0a2cefdc-febc-46d7-be87-38571cece549",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta"
+      ],
+      "newlyPublished": false,
+      "configurationVerified": true
+    },
+    {
+      "slug": "efeonce-inbound-diagnostic",
+      "sourceKind": "form_submission",
+      "surfaceId": "fhsf-efeonce-inbound-diagnostic",
+      "sourceVersion": "fver-31ffbbd1-6936-422b-ba97-210669a69821",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "d3841216-73ba-4d05-ae16-c2dd817a98fe",
+      "revision": 1,
+      "adsEnabled": true,
+      "destinations": [],
+      "newlyPublished": true,
+      "configurationVerified": true
+    },
+    {
+      "slug": "discovery",
+      "sourceKind": "meeting_booking",
+      "surfaceId": "fhsf-efeonce-lead-gen-web",
+      "sourceVersion": "e177ad8f5c28a87aefef6311207758c95132897a025a148ce718a2df83dc2d47",
+      "googleAdsEligible": true,
+      "publishedRevisionId": "07f0d10b-2bfa-480b-9000-14ec1f57a609",
+      "revision": 2,
+      "adsEnabled": true,
+      "destinations": [
+        "meta",
+        "google_upd"
+      ],
+      "newlyPublished": false,
+      "configurationVerified": true
+    }
+  ],
+  "preserved": {
+    "allExistingDestinations": true,
+    "nonTargetPolicies": true,
+    "legacyWebIdentity": true,
+    "legacyWebPublishedVersion": true
+  },
+  "classificationCorrection": {
+    "source": "efeonce-lead-gen-web",
+    "command": "correctCommercialFormClassification",
+    "executionLane": "explicit operator CLI using canonical Forms command/store and ops profile",
+    "state": "readback_verified",
+    "from": "lead_magnet",
+    "to": "quote_request",
+    "publishedVersionId": "fver-efeonce-lead-gen-web-v1",
+    "verifiedAt": "2026-10-18T22:55:42.420Z",
+    "beforeSha256": "679a9615b8e53ede570da63f8198bba9d690e6667234fc4cc32ac00816844b41",
+    "afterSha256": "21f00e813f72d4be43dfe58ca308fbfef7a2573f6ecbdb97a3f7dc8a0c1d43c2",
+    "newAdminApiRoute": "implemented in this commit; not deployed to production in this run"
+  },
+  "checks": {
+    "classificationTestsPassed": 20,
+    "eslint": "PASS",
+    "typescript": "PASS",
+    "apiConfiguration": "PASS"
+  },
+  "limits": {
+    "positiveAdsReceptionVerified": false,
+    "attributionVerified": false,
+    "testBusinessEventsCreated": 0,
+    "gtmPublishedThisRun": false,
+    "appDeploymentThisRun": false,
+    "legacyCustomGraderIntakeCertified": false
+  }
+}

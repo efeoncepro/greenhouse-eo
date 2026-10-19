@@ -116,19 +116,21 @@ function buildTabs({ name, group, options, panelsAfter }) {
   keys.forEach(k => ifs('not' + k).remove())
 }
 
-// 16 Agenda: the governed Growth Form renderer owns fields, consent, submit and the success state.
+// 16 Agenda: the governed Growth Form renderer owns fields, consent, submit and the success state. The card keeps the
+// canvas look (dark, title, trust line, calendar link); the renderer is themed dark with host tokens (host.css).
 {
   const card = $('section#agenda .formcard')
-  // The trust line sat above the canvas submit; the renderer owns the submit, so it closes the card on paper colours.
   const trust = card.find('div[aria-label="Por qué confiar"]').clone()
+  const heading = card.find('#form-h').parent().clone()
+  const calendar = card.find('p').filter((_, el) => $(el).text().includes('Prefieres elegir el horario')).clone()
 
-  trust.attr('style', 'display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 22px; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(2,60,112,0.16); background: #ffffff; color: #023c70')
-
-  // The renderer paints for light surfaces (color-scheme="light", like the other landings), so the card turns to paper.
-  card.empty().append('<p id="form-h" style="margin: 0; font-family: \'Bricolage Grotesque\', sans-serif; font-size: 30px; font-weight: 760; letter-spacing: -0.03em; color: #023c70">Agenda tu diagnóstico</p><p style="margin: 6px 0 22px; font-size: 14px; color: #5c5866">Los campos con * son obligatorios.</p><gh-growth-form></gh-growth-form>').append(trust)
+  calendar.find('a').attr('href', '/agenda/')
+  card.empty().append(heading).append('<gh-growth-form></gh-growth-form>').append(trust).append(calendar)
+  heading.attr('style', 'margin-bottom: 22px')
+  trust.attr('style', (trust.attr('style') || '') + '; margin-top: 20px')
+  calendar.attr('style', (calendar.attr('style') || '') + '; margin-top: 18px')
   card.attr('class', 'formcard gh-medios-form-card')
   card.attr('role', 'region').attr('aria-labelledby', 'form-h')
-  card.attr('style', 'padding: 40px 38px; border-radius: 28px; background: #f7f8f6; color: #023c70; box-shadow: 0 40px 100px rgba(0,0,0,0.5)')
 }
 
 if ($('sc-if').length) throw new Error('Unexpanded sc-if left: ' + $('sc-if').length)

@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-18",
+  "stage": "pre_release_validation",
+  "local": {
+    "unitTestsPassed": 860,
+    "boundaryTestsPassed": 11,
+    "totalTestsPassed": 871,
+    "failed": 0,
+    "files": 99,
+    "eslint": "passed",
+    "typescript": "passed"
+  },
+  "readOnlyApis": {
+    "at": "2026-10-18T23:22:34.555Z",
+    "allPassed": true,
+    "checks": [
+      {
+        "check": "liveGraderUsesPortableForms",
+        "passed": true,
+        "http": 200
+      },
+      {
+        "check": "liveFormContractAndCors",
+        "passed": true,
+        "http": 200,
+        "formVersionId": "fver-ea1c2e5f-38e0-4ef6-b9eb-9b5fe1b9d6f3",
+        "version": 8
+      },
+      {
+        "check": "servedRendererHasContextAndAdsReceiptBridge",
+        "passed": true,
+        "http": 200,
+        "sha256": "871ffef3d644cb6623dc87885cee8de7dcdd5724caea9b81e4544c5c6c294c95"
+      },
+      {
+        "check": "formsPreflight_allowed",
+        "passed": true,
+        "http": 204
+      },
+      {
+        "check": "formsPreflight_unknown",
+        "passed": true,
+        "http": 204
+      },
+      {
+        "check": "legacyMalformedJsonRejectedBeforeIntake",
+        "passed": true,
+        "http": 400,
+        "newContractServingVerified": false
+      },
+      {
+        "check": "productionHealth",
+        "passed": true,
+        "http": 200
+      }
+    ],
+    "policyReadAt": "2026-10-18T23:22:32.951Z",
+    "commercialFormCount": 13,
+    "meetingCount": 1,
+    "graderVersion": "fver-ea1c2e5f-38e0-4ef6-b9eb-9b5fe1b9d6f3",
+    "graderPublishedRevision": "9c1e3ef6-e1c3-4e62-991e-09923e02c41f",
+    "contactAds": false
+  },
+  "gtm": {
+    "web": "GTM-NGHPGRLZ",
+    "server": "GTM-K2X4ZTTK",
+    "drift": false,
+    "publishedThisRun": false
+  },
+  "ci": {
+    "candidate": "0373930de363c79ee3dbf5615abb89e9f3a3847c",
+    "pushRun": 39175317993,
+    "prRun": 39175342054,
+    "smokeRun": 39175318001,
+    "qualityStatus": "success",
+    "smokeStatus": "success",
+    "deploymentChecks": "cancelled_on_operator_instruction",
+    "verifiedAt": "2026-10-18T23:35:47.487147+00:00",
+    "runs": [
+      {
+        "databaseId": 39175317993,
+        "workflowName": "CI",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/39175317993",
+        "headSha": "0373930de363c79ee3dbf5615abb89e9f3a3847c"
+      },
+      {
+        "databaseId": 39175342054,
+        "workflowName": "CI",
+        "conclusion": "success",
+        "event": "pull_request",
+        "url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/39175342054",
+        "headSha": "0373930de363c79ee3dbf5615abb89e9f3a3847c"
+      },
+      {
+        "databaseId": 39175318001,
+        "workflowName": "Playwright E2E smoke",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/39175318001",
+        "headSha": "0373930de363c79ee3dbf5615abb89e9f3a3847c"
+      }
+    ],
+    "subsequentCommittedDiff": [
+      ".claude/skills/efeonce-graphic-line/references/criteria.md",
+      ".codex/skills/efeonce-graphic-line/references/criteria.md",
+      "Handoff.md",
+      "changelog.md",
+      "docs/audits/growth/2026-10-18-grader-measurement-release.md"
+    ],
+    "runtimeBuildInputsEqual": true
+  },
+  "boundaries": {
+    "testBusinessEventsCreated": 0,
+    "positiveIntakePosts": 0,
+    "providerConversionPosts": 0,
+    "deployed": false,
+    "releaseExecuted": false,
+    "newFacadeProductionContract": "deferred_until_authorized_release",
+    "classificationProductionContract": "deferred_until_authorized_release",
+    "providerReception": "await_first_real_occurrence",
+    "attribution": "not_verified"
+  },
+  "worktree": {
+    "currentBranch": "develop",
+    "additionalWorktreeCreated": false,
+    "previousReleaseWorktreeRemoved": true,
+    "concurrentWorkPreserved": true,
+    "developHeadAtVerification": "0199e8aab7939555c804fae5bc05214243e756da"
+  },
+  "verifiedAt": "2026-10-18T23:35:47.487147+00:00"
+}

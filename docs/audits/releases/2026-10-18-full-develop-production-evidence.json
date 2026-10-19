@@ -1,0 +1,903 @@
+{
+  "status": "released",
+  "mainSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+  "candidateSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+  "tree": "60471bfbbc4ea0c01936cda4db25d5197209d3cd",
+  "allCommittedDevelopIncluded": true,
+  "netChangedPaths": 1583,
+  "pr": 256,
+  "mergedAt": "2026-10-18T18:59:38Z",
+  "batchExceptionExplicitConsentObservedAt": "2026-10-18T18:53:53Z",
+  "candidateValidation": {
+    "ci": 39154145689,
+    "deep": 39154144028,
+    "smoke": 39154110809,
+    "testsPassed": 20817,
+    "testsSkipped": 616,
+    "testsFailed": 0,
+    "smokePassed": 50,
+    "smokeSkipped": 1
+  },
+  "mainValidation": {
+    "ci": 39156691813,
+    "deep": 39156691872,
+    "smoke": 39156727369,
+    "ciStatus": "success",
+    "deepStatus": "success",
+    "smokeStatus": "success",
+    "smokeTarget": "canonical staging",
+    "smokePassed": 50,
+    "smokeSkipped": 1,
+    "smokeFailed": 0,
+    "deepTestsPassed": 20817,
+    "deepTestsSkipped": 616,
+    "deepTestsFailed": 0,
+    "deepDurationSeconds": 1393.82,
+    "deepCoveragePercent": {
+      "lines": 68.79,
+      "statements": 67.39,
+      "functions": 64.1,
+      "branches": 53.35
+    },
+    "deepCoverageSummarySha256": "c6210fdce4dbaa85e1352cac033442efa1e3c7c3576878d614658fa5f38090ac",
+    "ciCompletedAt": "2026-10-18T19:32:54Z",
+    "ciJobDurationSeconds": 1989,
+    "ciBuildDurationSeconds": 366,
+    "ciBuild": "success",
+    "ciFunctionSizeGate": "success",
+    "ciTestsPassed": 20817,
+    "ciTestsSkipped": 616,
+    "ciTestsFailed": 0
+  },
+  "vercel": {
+    "deploymentId": "dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt",
+    "url": "https://greenhouse-3f6nalcrn-efeonce-7670142f.vercel.app",
+    "state": "READY",
+    "alias": "greenhouse.efeoncepro.com",
+    "aliasSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+    "observedAt": "2026-10-18T19:05:49Z",
+    "immutableAnonymousAssetComparison": "not_performed_protected_origin_HTTP302",
+    "finalReadbackAt": "2026-10-18T19:49:59.023Z",
+    "productionAlias": {
+      "alias": "greenhouse.efeoncepro.com",
+      "deploymentId": "dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt",
+      "url": "greenhouse-3f6nalcrn-efeonce-7670142f.vercel.app",
+      "sha": "ec317c928fffcb919d71bdb62821b80280af2347"
+    },
+    "validationRefDeploymentsAmongLast100": 0
+  },
+  "canaries": {
+    "admin": {
+      "at": "2026-10-18T19:06:08.834Z",
+      "httpStatus": 200,
+      "assertions": {
+        "optional": true,
+        "configField": true,
+        "receiptField": true,
+        "flag": true,
+        "commercialKey": true,
+        "meetingKey": true,
+        "permission": true
+      },
+      "verified": true,
+      "principal": "agent@greenhouse.efeonce.org"
+    },
+    "publicRead": {
+      "at": "2026-10-18T19:06:09.415Z",
+      "targetSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+      "targetShaIsOperatorLabel": true,
+      "mode": "--execute-read",
+      "base": "https://greenhouse.efeoncepro.com",
+      "immutableDeployment": null,
+      "observations": [
+        {
+          "name": "buildinfo_forms",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "\"6fed237d5c797edcdb7e7f5dbc0be868\"",
+            "last-modified": "Sun, 18 Oct 2026 19:06:07 GMT",
+            "x-vercel-id": "gru1::4g26z-1792350366648-aeee785f82d1",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "*",
+            "vary": null
+          },
+          "assertions": {
+            "http200": true,
+            "entry": true,
+            "channel": true
+          },
+          "channel": "preview",
+          "bytes": 163335
+        },
+        {
+          "name": "bundle_forms",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/javascript; charset=utf-8",
+            "etag": "W/\"48dd0f55faa4100e7c61d01a0c3854eb\"",
+            "last-modified": "Sun, 18 Oct 2026 19:06:07 GMT",
+            "x-vercel-id": "gru1::4g26z-1792350367312-68d622c12289",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "*",
+            "vary": null
+          },
+          "assertions": {
+            "http200": true,
+            "javascript": true,
+            "declaredVersionPresent": true,
+            "googleAdsReceiptContractPresent": true
+          },
+          "path": "/growth-forms/renderer-preview.js",
+          "sha256": "871ffef3d644cb6623dc87885cee8de7dcdd5724caea9b81e4544c5c6c294c95",
+          "bytes": 163335,
+          "expectedDeclaredVersion": "1.0.0-preview.1",
+          "versionAloneProvesNewBehavior": false
+        },
+        {
+          "name": "buildinfo_meetings",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "\"7d268182bd7e4345755bae71f41414a0\"",
+            "last-modified": "Sun, 18 Oct 2026 19:06:08 GMT",
+            "x-vercel-id": "gru1::x6kqs-1792350367706-739d0340e242",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "*",
+            "vary": null
+          },
+          "assertions": {
+            "http200": true,
+            "entry": true,
+            "channel": true
+          },
+          "channel": "preview",
+          "bytes": 133034
+        },
+        {
+          "name": "bundle_meetings",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/javascript; charset=utf-8",
+            "etag": "W/\"1c6497da9068b73844693f00a293c998\"",
+            "last-modified": "Sun, 18 Oct 2026 19:06:08 GMT",
+            "x-vercel-id": "gru1::jzbf8-1792350368278-135c3922a319",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "*",
+            "vary": null
+          },
+          "assertions": {
+            "http200": true,
+            "javascript": true,
+            "declaredVersionPresent": true,
+            "googleAdsReceiptContractPresent": true
+          },
+          "path": "/growth-meetings/renderer-preview.js",
+          "sha256": "0d16c083a1985a15ab027d21ad17c133c52d6f746d114068fc2ca34220f2a18f",
+          "bytes": 133034,
+          "expectedDeclaredVersion": "1.0.0-preview.1",
+          "versionAloneProvesNewBehavior": false
+        },
+        {
+          "name": "buildinfo_cta",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "\"284c9e5f047bf2efe6664b6b1d14fe19\"",
+            "last-modified": "Sun, 18 Oct 2026 19:06:08 GMT",
+            "x-vercel-id": "gru1::jq7k5-1792350368507-a31c40743114",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "*",
+            "vary": null
+          },
+          "assertions": {
+            "http200": true,
+            "entry": true,
+            "channel": true
+          },
+          "channel": "preview",
+          "bytes": 56285
+        },
+        {
+          "name": "bundle_cta",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/javascript; charset=utf-8",
+            "etag": "W/\"b14a518538eaa31f813711a3c3015dbb\"",
+            "last-modified": "Sun, 18 Oct 2026 19:06:09 GMT",
+            "x-vercel-id": "gru1::ffhlf-1792350368891-2b17e211a45d",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "*",
+            "vary": null
+          },
+          "assertions": {
+            "http200": true,
+            "javascript": true,
+            "declaredVersionPresent": true
+          },
+          "path": "/growth-cta/renderer-preview.js",
+          "sha256": "a808e6d21bba8368f7dc936f4b5eaacad01f4bed859334f0a0b70d5765bfc1a7",
+          "bytes": 56285,
+          "expectedDeclaredVersion": "1.3.1",
+          "versionAloneProvesNewBehavior": false
+        },
+        {
+          "name": "performance_render_contract",
+          "httpStatus": 200,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "application/json",
+            "etag": null,
+            "last-modified": null,
+            "x-vercel-id": "gru1::iad1::glgp4-1792350369129-6c16c3840b35",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "https://efeoncepro.com",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Origin"
+          },
+          "assertions": {
+            "http200": true,
+            "cors": true
+          },
+          "topLevelKeys": [
+            "composition",
+            "conditions",
+            "consent",
+            "contractVersion",
+            "copy",
+            "fields",
+            "form",
+            "security",
+            "steps",
+            "styleVariant",
+            "successBehavior",
+            "surfacePolicy",
+            "telemetryPolicy"
+          ]
+        }
+      ],
+      "allPassed": true,
+      "limits": [
+        "No positive lead/booking created",
+        "No Ads/Meta/GTM request emitted",
+        "No provider attribution or matching certified"
+      ]
+    },
+    "negativeNoBusinessPersistence": {
+      "at": "2026-10-18T19:06:15.368Z",
+      "targetSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+      "targetShaIsOperatorLabel": true,
+      "mode": "--execute-negative",
+      "base": "https://greenhouse.efeoncepro.com",
+      "immutableDeployment": null,
+      "observations": [
+        {
+          "name": "form_invalid_no_store",
+          "httpStatus": 400,
+          "headers": {
+            "cache-control": "private, no-store",
+            "content-type": "application/json",
+            "etag": null,
+            "last-modified": null,
+            "x-vercel-id": "gru1::iad1::ss4dt-1792350374043-701bd53e772a",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "https://efeoncepro.com",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Origin"
+          },
+          "assertions": {
+            "http400": true,
+            "invalid": true,
+            "privateNoStore": true,
+            "noAdsReceipt": true,
+            "noSubmission": true
+          },
+          "outcome": "invalid"
+        },
+        {
+          "name": "meeting_invalid_no_store",
+          "httpStatus": 400,
+          "headers": {
+            "cache-control": "private, no-store",
+            "content-type": "application/json",
+            "etag": null,
+            "last-modified": null,
+            "x-vercel-id": "gru1::iad1::bdlrn-1792350374478-3cbe03bd35de",
+            "x-vercel-cache": "MISS",
+            "access-control-allow-origin": "https://efeoncepro.com",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Origin"
+          },
+          "assertions": {
+            "http400": true,
+            "validationFailed": true,
+            "privateNoStore": true,
+            "noAdsReceipt": true
+          },
+          "outcome": "error",
+          "errorCode": "validation_failed"
+        }
+      ],
+      "allPassed": true,
+      "limits": [
+        "No positive lead/booking created",
+        "No Ads/Meta/GTM request emitted",
+        "No provider attribution or matching certified"
+      ]
+    }
+  },
+  "ads": {
+    "flag": "GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED",
+    "productionBinding": "absent",
+    "effective": "OFF",
+    "observedAt": "2026-10-18T19:49:57.865Z",
+    "gtmPublishedByThisRelease": false,
+    "providerConversionCertified": false,
+    "readerInMain": true,
+    "readerRequiresLiteralTrue": true
+  },
+  "orchestrator": {
+    "runId": 39159325900,
+    "url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900",
+    "dispatchedAt": "2026-10-18T19:33:41Z",
+    "status": "completed",
+    "preflight": {
+      "completedAt": "2026-10-18T19:35:52.336Z",
+      "readyToDeploy": false,
+      "overallStatus": "degraded",
+      "checks": [
+        {
+          "checkId": "target_sha_exists",
+          "severity": "ok"
+        },
+        {
+          "checkId": "ci_green",
+          "severity": "ok"
+        },
+        {
+          "checkId": "playwright_smoke",
+          "severity": "ok"
+        },
+        {
+          "checkId": "release_batch_policy",
+          "severity": "warning"
+        },
+        {
+          "checkId": "stale_approvals",
+          "severity": "ok"
+        },
+        {
+          "checkId": "pending_without_jobs",
+          "severity": "ok"
+        },
+        {
+          "checkId": "vercel_readiness",
+          "severity": "ok"
+        },
+        {
+          "checkId": "postgres_health",
+          "severity": "ok"
+        },
+        {
+          "checkId": "postgres_migrations",
+          "severity": "ok"
+        },
+        {
+          "checkId": "gcp_wif_subject",
+          "severity": "ok"
+        },
+        {
+          "checkId": "azure_wif_subject",
+          "severity": "ok"
+        },
+        {
+          "checkId": "sentry_critical_issues",
+          "severity": "ok"
+        }
+      ],
+      "sha256": "b5d9a551486535bd0db8de015a0b3efb2c86346afc4d8ab066494b26fe877616"
+    },
+    "productionApprovals": [
+      {
+        "at": "2026-10-18T19:38:14Z",
+        "environmentId": 12831857432,
+        "scope": "orchestrator workers"
+      },
+      {
+        "at": "2026-10-18T19:38:27Z",
+        "environmentId": 12831857432,
+        "scope": "Azure gated jobs"
+      }
+    ],
+    "releaseId": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+    "startedManifestAt": "2026-10-18T19:38:10.068Z",
+    "conclusion": "success",
+    "completedAt": "2026-10-18T19:51:35Z",
+    "workflowDurationSeconds": 1074,
+    "postReleaseHealth": {
+      "status": "success",
+      "httpStatus": 200,
+      "completedAt": "2026-10-18T19:49:44Z",
+      "source": "workflow job Ping production /api/auth/health"
+    },
+    "totalJobs": 24,
+    "failedJobs": 0
+  },
+  "manifest": {
+    "observedAt": "2026-10-18T19:51:44.315Z",
+    "release_id": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+    "target_sha": "ec317c928fffcb919d71bdb62821b80280af2347",
+    "target_branch": "main",
+    "state": "released",
+    "attempt_n": 1,
+    "triggered_by": "cesargrowth11",
+    "operator_member_id": null,
+    "started_at": "2026-10-18T19:38:10.068Z",
+    "completed_at": "2026-10-18T19:51:25.548Z",
+    "workflow_runs": [],
+    "vercel_deployment_url": null,
+    "worker_revisions": {},
+    "post_release_health": {},
+    "preflight_override": {
+      "actor": "cesargrowth11",
+      "reason": "Full develop release explicitly requested by Julio; receipt SQL already applied in shared Cloud SQL and re-read in pgmigrations. cloud_release is readonly GTM drift observer plus exact-ref Vercel validation guard. Rollback to captured Vercel and six Cloud Run digests, preserve additive receipt schema. No GTM publish or Ads activation. All other CI, Deep, smoke, health and readiness gates must pass independently.",
+      "bypassWarnings": true,
+      "overrideBatchPolicy": true
+    },
+    "durationSeconds": 795.48,
+    "transitions": [
+      {
+        "release_id": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+        "from_state": "unknown_legacy",
+        "to_state": "preflight",
+        "actor_kind": "member",
+        "actor_label": "cesargrowth11",
+        "reason": "Release iniciado: cesargrowth11",
+        "metadata_json": {
+          "override": {
+            "actor": "cesargrowth11",
+            "reason": "Full develop release explicitly requested by Julio; receipt SQL already applied in shared Cloud SQL and re-read in pgmigrations. cloud_release is readonly GTM drift observer plus exact-ref Vercel validation guard. Rollback to captured Vercel and six Cloud Run digests, preserve additive receipt schema. No GTM publish or Ads activation. All other CI, Deep, smoke, health and readiness gates must pass independently.",
+            "bypassWarnings": true,
+            "overrideBatchPolicy": true
+          },
+          "attempt_n": 1,
+          "target_sha": "ec317c928fffcb919d71bdb62821b80280af2347"
+        },
+        "transitioned_at": "2026-10-18T19:38:10.068Z"
+      },
+      {
+        "release_id": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+        "from_state": "preflight",
+        "to_state": "ready",
+        "actor_kind": "cli",
+        "actor_label": "orchestrator-workflow",
+        "reason": "Approval gate cleared (orchestrator workflow 39159325900)",
+        "metadata_json": {},
+        "transitioned_at": "2026-10-18T19:51:15.983Z"
+      },
+      {
+        "release_id": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+        "from_state": "ready",
+        "to_state": "deploying",
+        "actor_kind": "cli",
+        "actor_label": "orchestrator-workflow",
+        "reason": "Workers deploy started (orchestrator workflow 39159325900)",
+        "metadata_json": {},
+        "transitioned_at": "2026-10-18T19:51:19.103Z"
+      },
+      {
+        "release_id": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+        "from_state": "deploying",
+        "to_state": "verifying",
+        "actor_kind": "cli",
+        "actor_label": "orchestrator-workflow",
+        "reason": "Workers deploy completed (orchestrator workflow 39159325900)",
+        "metadata_json": {},
+        "transitioned_at": "2026-10-18T19:51:22.257Z"
+      },
+      {
+        "release_id": "ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b",
+        "from_state": "verifying",
+        "to_state": "released",
+        "actor_kind": "cli",
+        "actor_label": "orchestrator-workflow",
+        "reason": "Post-release health verified (orchestrator workflow 39159325900)",
+        "metadata_json": {},
+        "transitioned_at": "2026-10-18T19:51:25.548Z"
+      }
+    ]
+  },
+  "watchdog": {
+    "observedAt": "2026-10-18T19:51:49.822Z",
+    "aggregateSeverity": "ok",
+    "exitCode": 0,
+    "teamsDispatched": false,
+    "teamsSkippedReason": "no findings con severity > ok",
+    "signals": [
+      {
+        "signalId": "platform.release.stale_approval",
+        "severity": "ok",
+        "summary": "Sin runs production esperando approval > 24h. Workflows allowlist limpios.",
+        "evidence": [
+          {
+            "kind": "metric",
+            "label": "count",
+            "value": "0"
+          },
+          {
+            "kind": "doc",
+            "label": "Spec",
+            "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.9"
+          }
+        ]
+      },
+      {
+        "signalId": "platform.release.pending_without_jobs",
+        "severity": "ok",
+        "summary": "Sin runs pending > 5min con jobs vacios. Concurrency fix Opcion A (Slice 3) operando.",
+        "evidence": [
+          {
+            "kind": "metric",
+            "label": "count",
+            "value": "0"
+          },
+          {
+            "kind": "doc",
+            "label": "Spec",
+            "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.9"
+          }
+        ]
+      },
+      {
+        "signalId": "platform.release.worker_revision_drift",
+        "severity": "ok",
+        "summary": "6/6 workers synced. Cloud Run revision matchea ultimo workflow run success.",
+        "evidence": [
+          {
+            "kind": "metric",
+            "label": "workers_checked",
+            "value": "6"
+          },
+          {
+            "kind": "metric",
+            "label": "drift_count",
+            "value": "0"
+          },
+          {
+            "kind": "metric",
+            "label": "data_missing_count",
+            "value": "0"
+          },
+          {
+            "kind": "metric",
+            "label": "detail",
+            "value": "ops-worker: gh=ec317c928fff != run=77763331c361 (change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True) | commercial-cost-worker: gh=ec317c928fff == run=ec317c928fff (synced) | ico-batch-worker: gh=ec317c928fff == run=ec317c928fff (synced) | hubspot-greenhouse-integration: gh=ec317c928fff == run=ec317c928fff (synced) | auth-server: gh=ec317c928fff != run=77763331c361 (change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True) | artifact-worker: gh=ec317c928fff != run=77763331c361 (change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True)"
+          },
+          {
+            "kind": "doc",
+            "label": "Spec",
+            "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.9"
+          }
+        ]
+      }
+    ],
+    "reportSha256": "a8422c2fefa699f5484c5f3869991cfc7df9b792748f8e750268470574cd37aa"
+  },
+  "limits": [
+    "No positive commercial lead or booking created",
+    "No Ads/Meta provider attribution or native HubSpot submission certified",
+    "No GTM publication, Ads policy or flag activation",
+    "Anonymous immutable origin was protected; production alias SHA verified independently by Vercel API",
+    "Canonical manifest workflow_runs, worker_revisions, vercel_deployment_url and post_release_health remain empty; independent workflow/provider evidence attached, no synthetic SQL fill"
+  ],
+  "rollback": {
+    "vercelDeployment": "dpl_843eUPPMzYQdBgxt9ELX3WD5w9oQ",
+    "previousMainSha": "9690efad0c1b9d70d9b168d41131857e686b0f81",
+    "retainAdditiveReceiptSchema": true
+  },
+  "watchdogBeforeOrchestrator": {
+    "aggregateSeverity": "error",
+    "driftCount": 5,
+    "dataMissingCount": 0,
+    "workersChecked": 6,
+    "productionWorkflowBaselineSha": "9690efad0c1b9d70d9b168d41131857e686b0f81",
+    "sharedServingSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+    "interpretation": "Transitional state before canonical production orchestrator; must resolve at final closure. No ad hoc deploys or watchdog gate edits."
+  },
+  "candidatePreflight": {
+    "readyToDeploy": false,
+    "overallStatus": "degraded",
+    "confidence": "medium",
+    "cliExitCode": 0,
+    "allNonBatchChecksOk": true,
+    "override": {
+      "reason": "Full develop release explicitly requested by Julio; receipt SQL already applied in shared Cloud SQL and re-read in pgmigrations. cloud_release is readonly GTM drift observer plus exact-ref Vercel validation guard. Rollback to captured Vercel and six Cloud Run digests, preserve additive receipt schema. No GTM publish or Ads activation. All other CI, Deep, smoke, health and readiness gates must pass independently.",
+      "overrideBatchPolicy": true,
+      "bypassWarnings": true,
+      "actor": "jreye"
+    },
+    "batchCheck": {
+      "checkId": "release_batch_policy",
+      "severity": "warning",
+      "status": "ok",
+      "observedAt": "2026-10-18T18:59:21.415Z",
+      "durationMs": 1102,
+      "summary": "1583 archivo(s) clasificados vs 9690efad0c1b9d70d9b168d41131857e686b0f81 (release 9690efad0c1b-b80fdb2e-e48e-4d1b-9724-3dd3286b1baa); decision=requires_break_glass (Dominios irreversibles tocados: db_migrations: 3 archivo(s) afectados (revert requiere backfill u operacion manual); cloud_release: 2 archivo(s) afectados (revert requiere backfill u operacion manual). Operador debe poseer capability platform.release.preflight.override_batch_policy + reason >= 20 chars + audit row.)",
+      "error": null,
+      "evidence": {
+        "domains": {
+          "unclassified": 1170,
+          "cloud_release": 2,
+          "docs": 361,
+          "db_migrations": 3,
+          "config": 1,
+          "tests": 42,
+          "ui": 4
+        },
+        "sensitivePathsMatched": [
+          ".github/workflows/gtm-drift.yml",
+          "migrations/20261018174803715_hubspot-native-form-receipts.sql",
+          "migrations/20261018174804112_meta-event-receipts.sql",
+          "src/lib/finance/pricing-v3/__tests__/pricing-v3-market-floor.test.ts",
+          "vercel.json"
+        ],
+        "irreversibilityFlags": [
+          "db_migrations: 3 archivo(s) afectados (revert requiere backfill u operacion manual)",
+          "cloud_release: 2 archivo(s) afectados (revert requiere backfill u operacion manual)"
+        ],
+        "filesChanged": 1583,
+        "decision": "requires_break_glass",
+        "reasons": [
+          "Dominios irreversibles tocados: db_migrations: 3 archivo(s) afectados (revert requiere backfill u operacion manual); cloud_release: 2 archivo(s) afectados (revert requiere backfill u operacion manual). Operador debe poseer capability platform.release.preflight.override_batch_policy + reason >= 20 chars + audit row."
+        ],
+        "diffBase": "9690efad0c1b9d70d9b168d41131857e686b0f81",
+        "diffBaseSource": "last_released_manifest",
+        "diffBaseReleaseId": "9690efad0c1b-b80fdb2e-e48e-4d1b-9724-3dd3286b1baa"
+      },
+      "recommendation": "Override aceptado — verificar audit row + reason >= 20 chars en orchestrator manifest."
+    }
+  },
+  "mainPreflight": {
+    "completedAt": "2026-10-18T19:33:34.041Z",
+    "targetSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+    "readyToDeploy": false,
+    "overallStatus": "degraded",
+    "cliExitCode": 0,
+    "batchExceptionExplicitlyAuthorized": true,
+    "checks": [
+      {
+        "checkId": "target_sha_exists",
+        "severity": "ok",
+        "summary": "Commit ec317c928fff verificado en efeoncepro/greenhouse-eo"
+      },
+      {
+        "checkId": "ci_green",
+        "severity": "ok",
+        "summary": "6 workflow(s) CI verde en ec317c928fff"
+      },
+      {
+        "checkId": "playwright_smoke",
+        "severity": "ok",
+        "summary": "1 workflow(s) Playwright smoke verde en ec317c928fff"
+      },
+      {
+        "checkId": "release_batch_policy",
+        "severity": "warning",
+        "summary": "1583 archivo(s) clasificados vs 9690efad0c1b9d70d9b168d41131857e686b0f81 (release 9690efad0c1b-b80fdb2e-e48e-4d1b-9724-3dd3286b1baa); decision=requires_break_glass (Dominios irreversibles tocados: db_migrations: 3 archivo(s) afectados (revert requiere backfill u operacion manual); cloud_release: 2 archivo(s) afectados (revert requiere backfill u operacion manual). Operador debe poseer capability platform.release.preflight.override_batch_policy + reason >= 20 chars + audit row.)"
+      },
+      {
+        "checkId": "stale_approvals",
+        "severity": "ok",
+        "summary": "Sin runs production esperando approval > 24h"
+      },
+      {
+        "checkId": "pending_without_jobs",
+        "severity": "ok",
+        "summary": "Sin runs queued/in_progress con jobs vacios"
+      },
+      {
+        "checkId": "vercel_readiness",
+        "severity": "ok",
+        "summary": "Production + staging Vercel deployments READY"
+      },
+      {
+        "checkId": "postgres_health",
+        "severity": "ok",
+        "summary": "pg:doctor verde"
+      },
+      {
+        "checkId": "postgres_migrations",
+        "severity": "ok",
+        "summary": "Migrations al dia"
+      },
+      {
+        "checkId": "gcp_wif_subject",
+        "severity": "ok",
+        "summary": "WIF provider efeoncepro-greenhouse-eo ACTIVE con attribute mapping completo"
+      },
+      {
+        "checkId": "azure_wif_subject",
+        "severity": "ok",
+        "summary": "Azure WIF App bd8f1961… con 2 subject(s) production matched"
+      },
+      {
+        "checkId": "sentry_critical_issues",
+        "severity": "ok",
+        "summary": "Sin Sentry issues activas level=error/fatal"
+      }
+    ]
+  },
+  "azure": {
+    "notifications": {
+      "health": "success",
+      "validateBicep": "success",
+      "diff": "success",
+      "apply": "skipped",
+      "reason": "no_infra_diff",
+      "skipNoticeAt": "2026-10-18T19:41:44Z"
+    },
+    "bot": {
+      "health": "success",
+      "validateBicep": "success",
+      "diff": "success",
+      "apply": "skipped",
+      "reason": "no_infra_diff",
+      "skipNoticeAt": "2026-10-18T19:42:17Z"
+    }
+  },
+  "changeGatedResources": {
+    "names": [
+      "ops-worker",
+      "auth-server",
+      "artifact-worker"
+    ],
+    "workflowJobs": [
+      117770175583,
+      117770175531,
+      117770175436
+    ],
+    "deploymentSteps": "skipped",
+    "reason": "runtime unchanged; auth configuration also unchanged",
+    "servedSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+    "completeTreeDiffToTarget": "empty",
+    "servedTree": "60471bfbbc4ea0c01936cda4db25d5197209d3cd",
+    "targetTree": "60471bfbbc4ea0c01936cda4db25d5197209d3cd",
+    "healthAndReadySteps": "success",
+    "doesNotRelyOnlyOnDeclaredPathFilter": true
+  },
+  "cloudRun": {
+    "at": "2026-10-18T19:49:53.958Z",
+    "account": "julio.reyes@efeonce.org",
+    "project": "efeonce-group",
+    "resources": [
+      {
+        "name": "ops-worker",
+        "region": "us-east4",
+        "kind": "service",
+        "ready": "True",
+        "url": "https://ops-worker-y6egnifl6a-uk.a.run.app",
+        "latestReadyRevision": "ops-worker-00781-tjg",
+        "served": [
+          {
+            "revision": "ops-worker-00781-tjg",
+            "percent": 100,
+            "gitSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+            "image": "gcr.io/efeonce-group/ops-worker@sha256:6c57d1a80cb01a766ee65e596fe0fc28591f1933c05c4cde91245a4991acb649",
+            "imageDigest": "gcr.io/efeonce-group/ops-worker@sha256:6c57d1a80cb01a766ee65e596fe0fc28591f1933c05c4cde91245a4991acb649",
+            "ready": "True"
+          }
+        ]
+      },
+      {
+        "name": "commercial-cost-worker",
+        "region": "us-east4",
+        "kind": "service",
+        "ready": "True",
+        "url": "https://commercial-cost-worker-y6egnifl6a-uk.a.run.app",
+        "latestReadyRevision": "commercial-cost-worker-00699-9c2",
+        "served": [
+          {
+            "revision": "commercial-cost-worker-00699-9c2",
+            "percent": 100,
+            "gitSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+            "image": "gcr.io/efeonce-group/commercial-cost-worker@sha256:3a75431a6fda536da6d63ddce77c3adc3415f0b6f9955bb3a38c21f3e0b97cb9",
+            "imageDigest": "gcr.io/efeonce-group/commercial-cost-worker@sha256:3a75431a6fda536da6d63ddce77c3adc3415f0b6f9955bb3a38c21f3e0b97cb9",
+            "ready": "True"
+          }
+        ]
+      },
+      {
+        "name": "ico-batch-worker",
+        "region": "us-east4",
+        "kind": "service",
+        "ready": "True",
+        "url": "https://ico-batch-worker-y6egnifl6a-uk.a.run.app",
+        "latestReadyRevision": "ico-batch-worker-00511-5fm",
+        "served": [
+          {
+            "revision": "ico-batch-worker-00511-5fm",
+            "percent": 100,
+            "gitSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+            "image": "gcr.io/efeonce-group/ico-batch-worker@sha256:b6197477fbaed6873ad17fe30e6bb852af4a9bfbf3489fb7862635a41f7089a0",
+            "imageDigest": "gcr.io/efeonce-group/ico-batch-worker@sha256:b6197477fbaed6873ad17fe30e6bb852af4a9bfbf3489fb7862635a41f7089a0",
+            "ready": "True"
+          }
+        ]
+      },
+      {
+        "name": "hubspot-greenhouse-integration",
+        "region": "us-central1",
+        "kind": "service",
+        "ready": "True",
+        "url": "https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app",
+        "latestReadyRevision": "hubspot-greenhouse-integration-00200-6t4",
+        "served": [
+          {
+            "revision": "hubspot-greenhouse-integration-00200-6t4",
+            "percent": 100,
+            "gitSha": "ec317c928fffcb919d71bdb62821b80280af2347",
+            "image": "gcr.io/efeonce-group/hubspot-greenhouse-integration@sha256:6879bfb5efd7ee7670aa8f3476957eb83c5cd25e913e683a8afb816d0d73f507",
+            "imageDigest": "gcr.io/efeonce-group/hubspot-greenhouse-integration@sha256:6879bfb5efd7ee7670aa8f3476957eb83c5cd25e913e683a8afb816d0d73f507",
+            "ready": "True"
+          }
+        ]
+      },
+      {
+        "name": "auth-server",
+        "region": "us-east4",
+        "kind": "service",
+        "ready": "True",
+        "url": "https://auth-server-y6egnifl6a-uk.a.run.app",
+        "latestReadyRevision": "auth-server-00159-d9h",
+        "served": [
+          {
+            "revision": "auth-server-00159-d9h",
+            "percent": 100,
+            "gitSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+            "image": "gcr.io/efeonce-group/auth-server@sha256:d4cb0afbc2f06cd1d3a2c0acb00e3a1b6c3fef45b8ad1821ce2b5d7385882086",
+            "imageDigest": "gcr.io/efeonce-group/auth-server@sha256:d4cb0afbc2f06cd1d3a2c0acb00e3a1b6c3fef45b8ad1821ce2b5d7385882086",
+            "ready": "True"
+          }
+        ]
+      },
+      {
+        "name": "artifact-worker",
+        "region": "us-east4",
+        "kind": "job",
+        "ready": "True",
+        "gitSha": "77763331c3618ab774a061e6e6bec0b287be54ce",
+        "images": [
+          "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker:77763331c3618ab774a061e6e6bec0b287be54ce"
+        ],
+        "lastExecution": "artifact-worker-xpn62"
+      }
+    ]
+  },
+  "artifactImage": {
+    "digest": "sha256:bef8baca4156ba58fa9f3119492bd32ef28a3e9e5e2bae50d503a9ad24d0751c",
+    "fullyQualifiedDigest": "us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker@sha256:bef8baca4156ba58fa9f3119492bd32ef28a3e9e5e2bae50d503a9ad24d0751c"
+  },
+  "watchdogBeforeParentTerminal": {
+    "aggregateSeverity": "error",
+    "driftCount": 6,
+    "dataMissingCount": 0,
+    "explanation": "While canonical orchestrator was still running, watchdog compared to last successful production workflow9690. Re-read after completion is ok/0/0; no manual redeploy or detector change."
+  },
+  "timing": {
+    "agent": "Codex",
+    "startedAt": "2026-10-18T18:20:51Z",
+    "workflowElapsedSeconds": 1074,
+    "manifestElapsedSeconds": 795.48,
+    "runtimeGreenElapsedSeconds": 963,
+    "runtimeGreenAt": "2026-10-18T19:49:44Z",
+    "agentE2E": "final documentation timing ledger owns rounded E2E",
+    "documentationCutAt": "2026-10-18T19:53:58Z",
+    "measuredToDocumentationCutSeconds": 5588,
+    "estimatedAgentE2EMinutes": 96,
+    "finalChecksCommitResponseEstimatedMinutes": 2,
+    "estimateIsNotExactFinalReplyTimestamp": true
+  }
+}

@@ -1,5 +1,40 @@
 # Configurar medición de conversiones
 
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+## Antecedentes de configuración antes de ampliar cobertura
+
+
+## Corte inicial de configuración, antes de la ampliación22:57Z
+
+GTM **Web6/Server10** publicados, main `ec317c928` y companion Production ER5 READY con salud200
+/watchdog6/6. Ads `6862539491` tiene EC ON y flag de proyecto Ads `true`; cadena de configuración
+verificada, sin observación directa del booleano congelado ni recepción comercial todavía.
+Performance y la **agenda** Discovery tienen opt-in Ads rev2 publicado. Son fuentes del sitio,
+no tipos de campaña. HubSpot Performance tiene su marcador nativo configurado; Meta captura recibos
+individuales en Server10. [Activación y límites](../../audits/growth/2026-10-18-google-ads-activation.md).
+
+La siguiente ampliación cubre **sólo formularios comerciales que generan leads**. Doce comandos de
+draft pasaron validación DRY_RUN; no se guardaron/publicaron revisiones. Lead Gen - Web conserva su
+clasificación `lead_magnet`, aún sin corregir. Ebooks, postulaciones, newsletter, soporte y pruebas
+quedan fuera de esta ampliación. En fuentes que mezclan motivos comerciales y no comerciales,
+resolver la elegibilidad antes de publicar: el propósito se evalúa, no se deduce sólo del `kind`.
+[Inventario de cobertura](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+
+GA4 genérico, Meta backend, Google MP UPD y Ads online son destinos/carriles distintos. Una política
+Meta/UPD publicada o `generate_lead` en GA4 no habilita Ads. Para Ads usar el
+[manual específico](activar-conversiones-google-ads.md): configuración `googleAds` y recibo `googleAdsConversion`,
+consentimiento Google explícito/GPC, fuente y versión compatibles, recibo postcommit y bridge
+Web→Server. No hace falta un tag por formulario compatible ni publicar GTM para cada política;
+sí revisar/publish por datos y leer de vuelta su estado. El envío Ads depende del navegador y no
+tiene retry backend. Consentimiento ausente/revocado/GPC bloquea publicidad, conserva el negocio.
+
+## Antecedente del 14 y 17/10/2026
+
 Estado al 14/10/2026: **publicado en producción** mediante PR #255, main `9690efad`, orquestador
 `38591329633` y GTM Server 9 estricto. API, panel y CLI comparten el contrato. Se verificó una
 fuente creada después del release: alta y publicación por datos → Meta Test Events sin otro
@@ -17,7 +52,7 @@ Canon: [ADR de políticas](../../architecture/GREENHOUSE_GROWTH_MEASUREMENT_POLI
 2. En el inspector de Growth Forms, seleccionar formulario o agenda y surface. Se resuelve su identidad estable y versión publicada; no introducir slugs en código.
 3. Asignar correo/teléfono/nombre/apellido desde el catálogo tipado. El teléfono debe tener normalización internacional; nombres derivados sólo si la fuente declara namePolicy.
 4. Seleccionar destinos independientes, guardar borrador, revisar y publicar. La revisión actual permanece activa hasta publicar su reemplazo. Cada comando lleva expectedPublishedRevisionId e idempotencyKey.
-5. Leer de vuelta revisión y alcance. Probar con consentimiento publicitario y test_event_code temporal real; no crear conversiones comerciales ficticias. Para un envío real, seguir [Probar un formulario después de publicar su política](#probar-un-formulario-después-de-publicar-su-política).
+5. Leer de vuelta revisión y alcance. El helper Meta requiere test_event_code temporal real y una prueba autorizada; no crear conversiones comerciales ficticias ni usar Test Events como sandbox. Para un envío real, seguir [Probar un formulario después de publicar su política](#probar-un-formulario-después-de-publicar-su-política).
 
 Una versión nueva del formulario requiere revisar/publicar configuración, sin redeploy. Un cambio
 de código, evento, proveedor, campo de un tipo nuevo u origen fuera de los dos aprobados requiere
@@ -210,33 +245,40 @@ servidor; ninguna opción CLI ni campo actor/role amplía autoridad.
 
 ## Probar un formulario después de publicar su política
 
-Un formulario **sin política publicada** llega a HubSpot y a GA4 (`generate_lead`), pero **no a
-Meta**: el backend no encola conversión. Por eso la prueba va siempre después del publish y de su
-`verify`.
+La publicación de una política no prueba la entrega. GA4 depende de su propio permiso y bridge;
+la entrega HubSpot depende del destino comercial configurado. Meta/UPD requieren su destino
+opt-in y Ads su bloque `googleAds` publicado, además de los gates propios.
 
-1. **Usar un correo nuevo.** El formulario deduplica por formulario + correo (sin espacios y en
-   minúsculas) durante 60 minutos y responde «aceptado» reutilizando el envío anterior, sin crear
-   conversión. Si ya enviaste con ese correo, usa un alias `+` (por ejemplo `nombre+meta@…`) o
-   espera 60 minutos. El alias crea otro contacto en HubSpot: archívalo al terminar.
-2. **Aceptar la publicidad.** En el banner elige «Aceptar todas» (o al menos publicidad). Sin
-   publicidad consentida, o con GPC activo, no hay conversión aunque el envío sea aceptado.
-3. **Leer la cola.** En `greenhouse_growth.measurement_conversion` debe existir la conversión con
-   `advertisement=true`, y en `measurement_delivery` el destino `meta` debe pasar a
-   `http_accepted` (HTTP 200). Leer sólo estado y conteos por el acceso canónico; no seleccionar
-   contactos ni el sobre cifrado.
-4. **Leer Meta con paciencia.** `http_accepted` es el acuse HTTP, no la lectura del proveedor. En el
-   dataset `708931297255942` las estadísticas por hora tardaron ~1 hora en mostrar el Lead
-   (`event_source=SERVER_ONLY`). Una lectura vacía a los pocos minutos no es una falla. No usar el
-   pixel `859508457409711`: la API lo rechaza como dataset inválido.
+1. Observar una **ocurrencia real autorizada** posterior a la publicación y compatible con su
+   activationAt/versión/surface. No crear leads, contactos, reservas o click IDs ficticios para
+   completar evidencia. El formulario deduplica por form + email normalizado durante60min:
+   reutilizar el mismo envío no acredita una conversión nueva ni autoriza forzarla con alias.
+2. Leer el consentimiento publicitario válido y GPC de esa ocurrencia. `contact_permission` no
+   concede publicidad. Para Ads, analytics y los cuatro estados Google deben estar granted;
+   unknown/denied bloquea. Una aceptación comercial puede existir sin medición publicitaria.
+3. Para Meta/UPD, consultar conversión y deliveries mediante acceso canónico/CLI. UUID estable,
+   alcance y HTTP son evidencia local. `http_accepted` de sGTM no sustituye al recibo Graph:
+   [recibos individuales](conservar-recibos-meta.md). Stats tardías/vacías no autorizan replay.
+4. Para HubSpot, revisar el intento comercial y, donde el mapping técnico esté configurado, el
+   ID nativo por marcador exacto: [procedimiento](guardar-identidad-nativa-hubspot.md). Propiedad
+   actual del contacto o respuesta200 no acreditan la identidad histórica de la submission.
+5. Para Ads, seguir el recibo durable → navegador/Web → Server → recepción de la acción elegible.
+   No buscar un delivery Ads backend: este carril no tiene esa cola. La recepción y la atribución
+   publicitaria son verificaciones diferentes. Las acciones actuales son secundarias/0CLP; no
+   cambian por sí solas la puja de campañas. [Protocolo Ads](activar-conversiones-google-ads.md).
+
+Los SDK/Preview aislados y canarios negativos del18/10 acreditan transporte/gates sin enviar
+conversiones comerciales a proveedores. No cierran la primera ocurrencia real, recibo Graph,
+identidad nativa HubSpot o recepción/atribución Ads, que siguen pendientes.
 
 Caso de referencia (17/10/2026, Performance): primer envío sin política → HubSpot y GA4 sí, Meta
 no; política publicada a las 19:16 UTC; envío consentido con alias `+meta` a las 19:19 →
 `http_accepted` a las 19:20 → 1 Lead visible en Meta a las 20:27.
 [Evidencia](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md#primera-conversión-comercial-consentida--performance-2026-10-17).
 
-## Estado de políticas al 17/10/2026
+## Estado de políticas al 17/10/2026 (histórico)
 
-12 políticas publicadas de 18 filas. El 17/10 se publicaron (rev 1, destino `meta`) las de
+En ese corte: 12 políticas publicadas de 18 filas. El 17/10 se publicaron (rev 1, destino `meta`) las de
 `efeonce-performance-diagnostic`, `efeonce-media-diagnostic` y `efeonce-hubspot-scope`.
 
 | Formulario | Política | Envío real verificado en Meta |

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
+import { readVisitorMeasurementRequest } from '@/lib/growth/measurement/visitor-request'
 import { createPublicGraderRun } from '@/lib/growth/ai-visibility/public-intake'
 import { type PublicGraderRunInput, type PublicIntakeOutcome } from '@/lib/growth/ai-visibility/public-intake/contracts'
 import { createPublicGraderRunViaFormsEngine } from '@/lib/growth/ai-visibility/public-intake/forms-engine-binding'
@@ -20,8 +22,11 @@ export const dynamic = 'force-dynamic'
 const asString = (value: unknown): string | null =>
   typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
 
-const getClientIp = (request: Request): string | null =>
-  request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
+const METHODS = 'POST, OPTIONS'
+
+export function OPTIONS(request: Request) {
+  return publicFormsOptionsResponse(request, METHODS)
+}
 
 const STATUS_BY_OUTCOME: Record<PublicIntakeOutcome, number> = {
   accepted: 202,
@@ -52,15 +57,22 @@ interface IntakeBody {
   mainChallenge?: unknown
   captchaToken?: unknown
   idempotencyKey?: unknown
+  pageUri?: unknown
+  pageName?: unknown
+  measurementContext?: unknown
 }
 
 export async function POST(request: Request) {
+  const headers = { ...await publicFormsCorsHeaders(request, METHODS), 'Cache-Control': 'private, no-store' }
   let body: IntakeBody
 
   try {
-    body = (await request.json()) as IntakeBody
+    const parsed: unknown = await request.json()
+
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('invalid_body')
+    body = parsed as IntakeBody
   } catch {
-    return NextResponse.json({ error: 'Solicitud inválida.' }, { status: 400 })
+    return NextResponse.json({ error: 'Solicitud inválida.' }, { status: 400, headers })
   }
 
   const input: PublicGraderRunInput = {
@@ -88,7 +100,12 @@ export async function POST(request: Request) {
     // que persiste un submission del motor (el run lo encola un reactive consumer);
     // con OFF (default), usa el path a-medida que encola inline. Contrato HTTP estable.
     const intakeContext = {
-      ip: getClientIp(request),
+      ...readVisitorMeasurementRequest(request.headers),
+      origin: request.headers.get('origin'),
+      requestGlobalPrivacyControl: request.headers.get('sec-gpc')?.trim() === '1',
+      pageUri: asString(body.pageUri),
+      pageName: asString(body.pageName),
+      measurementContext: body.measurementContext,
       captchaToken: asString(body.captchaToken),
       idempotencyKey: asString(body.idempotencyKey)
     }
@@ -106,13 +123,14 @@ export async function POST(request: Request) {
         // La página hace poll a `GET /run/[pollToken ?? submissionId]`.
         pollToken: result.pollToken ?? null,
         submissionId: result.submissionId ?? null,
-        message: result.reason
+        message: result.reason,
+        ...(result.outcome === 'accepted' && result.googleAdsConversion ? { googleAdsConversion: result.googleAdsConversion } : {})
       },
-      { status: STATUS_BY_OUTCOME[result.outcome] }
+      { status: STATUS_BY_OUTCOME[result.outcome], headers }
     )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_public_intake_route' } })
 
-    return NextResponse.json({ error: 'No fue posible procesar tu solicitud. Intenta de nuevo en unos minutos.' }, { status: 502 })
+    return NextResponse.json({ error: 'No fue posible procesar tu solicitud. Intenta de nuevo en unos minutos.' }, { status: 502, headers })
   }
 }

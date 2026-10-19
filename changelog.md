@@ -1,11 +1,63 @@
 # changelog.md
 
+## 2026-10-18 — Indecaucho: outreach gráfico y seguimiento nativo
+
+- Katia/Company/Primary/segmento180 y primer correo Outlook con firma/CCO/EMAIL SENT verificados.
+- Un seguimiento HubSpot programado22Oct09:30Quito, salida por respuesta/reunión; deck360 original íntegro.
+- Skills espejo incorporan recuperación de publicaciones, calidad Apollo y readback de firma/envío/calendario.
+- [Evidencia y límites](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md); sin push ni nuevos permisos.
+
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
+
+## 2026-10-18 — Contexto comercial en la fachada Grader
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- Fachada Grader reutiliza preparación/persistencia/recibo Forms y contexto visitante; CORS gobernado y respuestas privadas.
+- Think live confirmado en Forms portátil v8; política Ads vigente. Julio reautoriza promover todo develop por PR257.
+- Clasificación administrativa incorpora auditoría API Platform en la misma transacción, sin migraciones;22 pruebas focales PASS.
+- Las871 pruebas/CI037 previas son históricas; candidato nuevo y canarios productivos aún en validación, sin leads ficticios.
+- Worktree retirado; todo en develop, WIP ajeno preservado. [Validación y límites](docs/audits/growth/2026-10-18-grader-measurement-release.md).
+
+## 2026-10-18 — Políticas Ads comerciales publicadas y clasificación Web corregida
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- 13 Forms comerciales+Discovery verificados por API;12 altas adicionales, Grader comercial incluido y Contacto general fueraAds.
+- Lead Gen Web quote_request con identidad/versión intactas; writer/CLI canónicos y nueva API interna implementada localmente, sin deploy.
+- 53 pruebas, ESLint y TypeScript PASS. Configuración no prueba recepción/atribución; sin conversiones ficticias ni replay.
+- [Publicación y límites](docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md); WIP ajeno preservado.
+
+## 2026-10-18 — Documentación y skills de medición conciliadas
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- Arquitectura/ADRs, runtime/tracking y manuales reflejan Web6/Server10, EC ON, OAuth Efeonce/CLI de gestión y tracing HubSpot/Meta; evidencias comerciales pendientes.
+- Cuatro pares Codex/Claude sincronizados; distingue fuentes Performance/Discovery de tipos de campaña y configuración de recepción/atribución.
+- [Cobertura sólo comercial](docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):12 propuestas DRY_RUN sin aplicar; Lead Gen Web pendiente de clasificación y revisión de intención en Grader/Contacto. Sin mutaciones runtime.
+
+## 2026-10-18 — Ads activado y trazabilidad preparada para ocurrencias reales
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- Ads686: EC ON, GTMWeb6/Server10 y políticas Performance/Discovery rev2 publicados; bridge compatible en WordPress/Think.
+- Tracing HubSpot y captura Meta configurados; flag true y companion ER5 del mainEC READY. Health200, watchdog6/6 y canarios PASS.
+- Snapshots GTM sin drift y plan offline actualizado. Primera ocurrencia/recibo/atribución pendientes; cero negocio ficticio o replay.
+- [Auditoría, evidencia y rollback](docs/audits/growth/2026-10-18-google-ads-activation.md). Cambios ajenos preservados.
+
+## 2026-10-18 — Release completo de develop y cierre de recibos
+
+[Historial interno](docs/changelog/internal/README.md).
+
+- PR #256 incorpora los 1.583 archivos del candidato develop a main `ec317c928`, sin exclusiones.
+- Orquestador `39159325900` SUCCESS; manifest released, salud HTTP 200 y watchdog ok 6/6, sin drift ni datos faltantes.
+- Migraciones aditivas de recibos HubSpot/Meta verificadas; código Forms/Meetings desplegado y canarios PASS. Ads sigue OFF y GTM sin publicar.
+- [Evidencia y rollback](docs/audits/releases/2026-10-18-full-develop-production-release.md); WIP ajeno preservado y cierre documentado sólo sobre los cambios propios.
 
 ## 2026-10-17 — Google Ads: arquitectura y prueba API de lectura
 
@@ -572,47 +624,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - Studio (local): el calendario pasa a ser de activaciones — vistas Mes, Semana, Día, Línea de tiempo y Pauta, filtros por dimensión en la URL, hoja con evidencia y tracking URL, bandeja «Ejecución sin activación», móvil y teclado. Las escrituras se muestran bloqueadas con su razón hasta que exista autoridad de escritura.
 - AXIS: `@efeoncepro/axis-brand-assets` 0.4.20 publica negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads, isotipos de Facebook y Threads y los logos de herramientas; `axis-tokens` 0.5.1.
-
-## 2026-10-04 — TASK-2001: conexiones owned locales
-
-- Resend/HubSpot con puerto Greenhouse autorizado por binding y evidencia completa/parcial; WordPress público paginado y cacheado. Marketing Cloud separado sin lector. API 1.8.0/catálogo aditivo, 288+7 Studio con PG, build y CLI/GVC básico PASS; navegación móvil en QA. Sin push ni rollout nuevo. [Evidencia](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
-
-## 2026-10-04 — TASK-2001: rollout de activaciones de Studio
-
-- Studio `aa6fa07` desplegado, API 1.7.0; cinco migraciones staging/prod, seis planes CL con evidencia legacy y eventos persona. Descubrimiento real62/replay0 cambios, scheduler OIDC, CLI y44 thumbs PASS. Email multiproveedor, owned y MCP delegado pendientes. [Evidencia](docs/audits/marketing-studio/TASK-2001-release-2026-10-04.md).
-
-## 2026-10-04 — TASK-1899 retirada por el operador
-
-- Implementación local de escritura MCP revertida en Greenhouse y Studio; sin cambios de runtime desplegados. Se retira como requisito previo al desarrollo de Studio; futura federación pendiente de nueva decisión.
-
-## 2026-10-04 — AXIS: recursos, agentes, tipografía y botones
-
-- [Entradas especializadas y Growth Forms](docs/audits/2026-10-04-axis-specialized-inputs.md): AXIS `a0c6130`/`6fff346` subido; teléfono/correo/URL/documentos/decimales, 245 países con búsqueda y filas alineadas. Adapter Greenhouse opt-in y skills Codex/Claude sincronizadas. Primitives 0.5.0 pendiente de publicación; sin cambio de pins ni activación en hosts.
-
-- Colores y ramps de La órbita, siete compactos y diez familias de formularios distribuidos desde AXIS; foco continuo, iconos de apoyo y selectores enriquecidos. Docs y skills Codex/Claude sincronizados con tres subagentes. [Estado de publicación, instalación y límites](docs/audits/2026-10-04-axis-forms-release.md). Adopción y pins consumidores separados.
-
-- Familia portable de botones: contexto heredado, radio/toolbar, menús controlados y top layer modal; 52 recorridos en cuatro perfiles y 32 referencias visuales. Lab desplegado; VoiceOver/NVDA manual y zoom nativo pendientes. La adopción mantiene sus pins. [Release y evidencia](docs/audits/2026-10-04-axis-buttons-release.md).
-
-- Iconos AEO/SEO/Autoridad, logos propios y terceros, búsqueda, navegación, capacidades para agentes y Bricolage editorial centralizados en AXIS. `aee99d2` pushed y Lab desplegado; `graphic-line@0.17.0` publicado, nueva API `/logos` pendiente de release. Docs y skills Codex/Claude reconciliados sin cambiar pins consumidores. [Cierre, evidencias y alcance](docs/audits/2026-10-04-axis-documentation-closure.md).
-
-## 2026-10-04 — Marketing Studio: catálogo en producción y CLI HTTP local
-
-- Delta TASK-2001: email con Resend (volumen principal), HubSpot, Marketing Cloud Engagement y Next; contrato común, adapters separados y evidencia/completitud por envío. Registrado en task/ADR/plan; implementación pendiente, el QA anterior no certifica esta ampliación.
-
-- Studio separa plan y ejecución: ocho estados, cuentas/mercado/hora local, versiones exactas, tracking congelada, calendario/avisos/eventos, blog por CMS cliente y draft Notion sólo como referencia. Backfill preserva posts y exige revisión personal. API/MCP parity y CLI HTTP verificados con PostgreSQL real; flags OFF, sin push. [QA, commits y pendientes de runtime](docs/audits/marketing-studio/TASK-2001-local-verification.md).
-
-- Cierre documental con tres subagentes: arquitectura/operación/skills y routers reconciliados; estado local/desplegado separado, MCP futuro no bloquea API/CLI/UI. [Mapa completo y gates](docs/audits/marketing-studio/2026-10-04-session-documentation-closure.md).
-
-- CLI HTTP local `pnpm studio`: descubrimiento de 59 operaciones de negocio, cargas verificadas, dryRun/If-Match/idempotencia y credenciales privadas. [Manual](docs/manual-de-uso/marketing-studio/operar-por-cli-api.md) · [QA](docs/audits/marketing-studio/2026-10-04-studio-api-cli.md).
-
-- TASK-1905: catálogo versionado, 52 canales, validación transaccional, backfill revisable, audiencias/ICP y API 1.6.0/59 tools desplegados en Studio (`74073de`). [Release y límites](docs/audits/marketing-studio/TASK-1905-release-2026-10-04.md); backfill humano, ICP y federación pendientes.
-
-- [TASK-1998](docs/tasks/complete/TASK-1998-marketing-studio-video-playback-rendition.md): derivado `playback` (MP4 H.264, lado corto ≤ 720 px, faststart) en el worker con backfill por el barrido (6/6 videos de producción), `302` a URL firmada V4 (GCS atiende `Range`; ningún video pasa por Vercel), `Asset.playback`, API 1.5.0.
-- [TASK-1999](docs/tasks/complete/TASK-1999-marketing-studio-video-player-ui.md): reproductor nativo en el panel de la pieza (feed y story, sin autoplay); el tablero muestra todas las piezas de un formato (la versión con intro para Instagram era invisible) y la duración.
-
-## 2026-10-04 — Build de fuentes independiente de Google Fonts
-
-- ISSUE-178: Geist/Poppins y Bricolage del login pasan a `next/font/local`, WOFF2 con origen/licencia/hash fijados. El build comprueba los archivos y bloquea la reintroducción de loaders remotos; roles y variables CSS preservados. Build completo, 90 tests y GVC en tres tamaños PASS; staging READY y fuentes/login/sesión verificados; producción sin promover.
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 

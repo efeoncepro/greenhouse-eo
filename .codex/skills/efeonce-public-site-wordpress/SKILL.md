@@ -44,6 +44,7 @@ Read the minimal set:
 | Home copy, comparison, FAQ emphasis or final editorial review | `references/home-editorial-maintenance.md` + `references/landings/home-claude-design-preview.md`; compose with `copywriting` and the typography skill |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
 | Native Ohio navigation, menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
+| Global site navigation (new header, mega menus, onepage, `wp eo-nav`, site-nav document) — EPIC-055, planned | `docs/public-site/decisions/PDR-027-navegacion-global-del-sitio-portable.md` + `docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` + `references/native-navigation.md`; Ohio stays the live header until PDR-027 is Accepted and TASK-2042 sets the switch to `on` |
 | Home/landing SEO, Yoast metadata, social previews or schema ownership | `../seo-aeo/references/home-landing-metadata-schema.md` + the landing reference; add `references/elementor-mutation.md` only for Elementor writes |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement, banner HubSpot, preferencias cookies o matching de Forms/Meetings | `greenhouse-gtm-ga4-operator` + `docs/reference/measurement-gtm-ga4/09-hubspot-consent.md` y `10-growth-lead-matching-runtime.md`; host sólo distribuye bridge/renderer, no guarda secretos ni decide elegibilidad |

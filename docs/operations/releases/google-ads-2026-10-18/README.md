@@ -1,15 +1,48 @@
 # Paquete previo al release — Google Ads, 18-10-2026
 
-**Preparado para revisión; NO habilitado para ejecutar el release.** Pedido del operador:
-validar y hacer commit propio, sin publicar GTM ni desplegar. No hay push, PR, merge,
-workflow de publicación, cambio de flag, nueva política publicada ni envío Ads en esta unidad.
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
+**Actualización posterior al release —18/10:** GTM Web6/Server10 publicado, EC ON y políticas
+Performance/Discovery rev2 publicadas; flag Production true leído20:36:20Z, companion Vercel del
+mismo mainEC READY con alias/SHA y cadena de configuración verificados20:43:28Z. [Activación y evidencia vigente](../../../audits/growth/2026-10-18-google-ads-activation.md).
+Primera ocurrencia, recepción positiva y atribución pendientes. Los cortes siguientes son históricos.
+
+
+Cobertura posterior acotada por Julio: [sólo formularios comerciales](../../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+Doce propuestas DRY_RUN validadas sin publicar; Lead Gen - Web necesita corrección canónica de tipo.
+No se crean acciones para ebooks/careers/newsletter ni se ejecuta el plan previo por leer este dossier.
+
+**Checkpoint 18/10, 19:51Z — release de código RELEASED; Ads sin activar.** El operador autorizó
+promover todo develop y confirmó la excepción específica de batch a las 18:53:53Z. PR #256 mergeado:
+main `ec317c928fffcb919d71bdb62821b80280af2347`, árbol idéntico al candidato 77763331.
+CI/Deep/smoke de main PASS; orquestador [39159325900](https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900) SUCCESS, actualizado a las 19:51:35Z.
+Manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` released a las 19:51:25.548Z,
+releído en PostgreSQL a las 19:51:44.315Z. Vercel Production `dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt`
+READY y alias releídos a las 19:49:59Z; health HTTP 200 PASS a las 19:49:44Z; watchdog final `ok`, 6/6 runtimes,
+`drift=0` y `dataMissing=0`. Canario admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store`
+PASS a las 19:06Z, sin lead ni reserva real. Schema de recibos aplicado.
+[Auditoría de cierre y límites](../../../audits/releases/2026-10-18-full-develop-production-release.md).
+
+Cloud Run final: seis recursos Ready y cinco servicios con el 100% del tráfico. Ops/Auth/Artifact retienen
+77763331 con árbol completo idéntico a main; Cost 00699-9c2, ICO 00511-5fm y HubSpot 00200-6t4 sirven
+main. La equivalencia es de árbol completo; no se deduce únicamente del skip del change-gate.
+
+El flag Ads sigue ausente/OFF en Production (readback a las 19:49:57.865Z). Sin publicación GTM ni nuevas políticas Ads;
+opt-in por fuente, compatibilidad de hosts, Preview funcional, EC y resultado positivo pendientes.
+El pedido inicial de esta preparación autorizaba sólo validación/commit, sin deploy; las secciones
+históricas siguientes conservan aquel alcance y se leen bajo este checkpoint posterior.
 
 [Evidencia y veredicto](../../../audits/growth/2026-10-18-google-ads-prerelease-validation.md) ·
 [Manifest](manifest.json) · [Propuestas de políticas](policy-proposals.json) ·
 [Manual canónico](../../../manual-de-uso/growth/activar-conversiones-google-ads.md) ·
 [ADR existente](../../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md).
 
-## Revisión ampliada del candidato18/10
+## Corte histórico — revisión ampliada del candidato 89d70ec13, 18/10
 
 [Revisión del lote y CI](../../../audits/releases/2026-10-18-candidate-89d70ec13-review.md):
 candidato fijo89d70ec13 ya remoto,1.445 archivos netos revisados (el corte anterior tenía1.406).
@@ -25,7 +58,8 @@ sin nuevo deploy ni publicación GTM; columnas/constraints/triggers verificados.
 existente respondió200 y las dos submissions quedaron delivered al ledger: cero destinos directos
 habilitados, sin envío de proveedor. La identidad nativa HubSpot
 y la recepción Graph no quedan certificadas por este resultado. Los gates de activación Ads y
-la autorización de promoción del lote siguen pendientes.
+la autorización de promoción del lote seguían pendientes en ese corte. La autorización posterior
+y el despliegue Greenhouse se registran en el checkpoint superior; Ads conserva sus gates.
 
 ## Corte inicial conservado — anterior a la revisión ampliada
 
@@ -132,8 +166,11 @@ primer grupo. Contacto genérico requiere revisar intención comercial y separar
   la publicación. Una reversión no elimina conversiones ya enviadas ni habilita backfill.
 - Sin replay de contactos/reservas históricas; sin rotaciones de OAuth para revertir medición.
 
-## Veredicto de preparación
+## Veredicto actual y corte de preparación
 
-**CONDITIONAL PASS para el paquete Ads previo al release; release general BLOCK.** Validaciones
-locales/API terminadas con sus límites. El gate de protocolo GTM real, EC efectiva, compatibilidad
-servida, CI del candidato y el alcance del lote general siguen abiertos. No se declara Ads operativo.
+La preparación Ads obtuvo **CONDITIONAL PASS** local/API con sus límites. El corte inicial dejó
+release general BLOCK; la autorización posterior y promoción completa se registran arriba.
+El release general de código está **RELEASED**, con CI/Deep/smoke, orquestador, manifest,
+salud y watchdog finales verificados. Los canarios confirman el contrato servido, no una conversión.
+Protocolo GTM real, EC efectiva, compatibilidad servida de hosts y opt-ins Ads siguen abiertos.
+**Rollout Ads pendiente**: no se declara Ads operativo ni recepción/atribución publicitaria acreditadas.

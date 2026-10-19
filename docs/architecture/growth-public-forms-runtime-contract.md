@@ -131,7 +131,7 @@ La previsualización por intercepción en el host real (manual
 [operar-motor-formularios.md](../manual-de-uso/growth/operar-motor-formularios.md)) destapó la primera
 antes de publicar una versión.
 
-**Versión en dos pasos preparada (2026-10-15, no publicada).**
+**Versión en dos pasos: publicada 2026-10-18** (`fver-7178aede-93da-4f95-a00c-5b0225638583`, depreca `fver-79bbb3b4-…`, destino HubSpot copiado; política Meta `485f38e5` revisión 2 `01e72899` publicada y verificada con la CLI, misma configuración y mapping; verificación live en ambas landings a 1440/390 sin envío). Historia de la preparación:
 `scripts/growth/activate-creative-diagnostic-two-step.ts` (commit `32395e5fb`; dry-run por defecto,
 `--apply` publica) clona la versión publicada esperada `fver-79bbb3b4-…` conservando destinos,
 seguridad, políticas y copy, y cambia a `composition: multi_step_light` con los pasos `operacion`

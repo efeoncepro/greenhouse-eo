@@ -26,18 +26,35 @@ Server/website8/9 claves según mapping real; no prueba de EMQ ni conversión co
 
 ---
 
-## Google Ads online — preparado, no publicado (17-10-2026)
+## Google Ads online — configuración publicada, primera ocurrencia pendiente (18-10-2026)
 
-| Fuente | Señal / acción | Estado |
+| Fuente autorizada | Señal / acción | Estado |
 | --- | --- | --- |
-| Form comercial con policy Ads opt-in | Recibo backend → gh_ads_conversion / commercial_lead | Código local; acción7852486523; GTM Web8/Server12 draft, captura OFF |
-| Reserva Scheduler confirmada con policy Ads opt-in | Recibo backend → gh_ads_conversion / meeting_booking | Código local; acción7852487186; mismos drafts, captura OFF |
+| Performance · `fhsf-efeonce-performance-diagnostic` | Recibo backend → gh_ads_conversion / commercial_lead · acción7852486523 | GTM Web6/Server10 publicado; policy Ads rev2, activation20:35Z; primera ocurrencia/recibo Ads pendientes |
+| Discovery · `fhsf-efeonce-lead-gen-web` | Reserva Scheduler confirmada → gh_ads_conversion / meeting_booking · acción7852487186 | Mismos tags publicados; policy Ads rev2, activation20:35Z; primera agenda/recibo Ads pendientes |
+
+Checkpoint20:43:28Z: Web6 fingerprint1792355588730 y Server10 fingerprint1792355562526 releídos;
+EC efectiva ON en6862539491 y bridge4250795666af… publicado en WordPress/Think. Flag de proyecto
+`true` guardado20:36:20Z; companion Vercel `dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk` del mismo mainEC
+READY con alias/SHA y cadena de configuración verificados (proyecto true + clave env/build).
+La API no expone el booleano congelado ni una conversión. Preview técnico
+Server y SDK Web live aislado4/4 PASS, sin salida de conversiones a proveedores; no cierran el E2E.
 
 El genérico accepted→generate_lead de las filas siguientes sigue siendo GA4, no habilita Ads.
 El bridge Ads exige cuatro permisos/GPC y UUID durable, no convierte clics/aperturas/replays. User_data
 reservado sólo para EC; ninguna PII/hash/click ID en dataLayer o analítica ordinaria. Server agrega Ads
-Tracking/Linker y excluye el bridge del forwarder GA4. **No se amplió ninguna policy publicada**.
-[Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
+Tracking/Linker y excluye el bridge del forwarder GA4. En el checkpoint inicial sólo Performance/Discovery incorporaron el
+opt-in Ads; Meta/UPD y mappings previos se conservaron. No se habilitan otras fuentes por inferencia.
+Publicación18/10,22:57Z: **13 Forms comerciales y Discovery con Ads**,12 altas adicionales.
+AI Grader comercial confirmado por el operador; Contacto general excluidoAds. Lead Gen Web ahora
+quote_request, con identidad/versión preservadas; ebooks/careers/newsletter/soporte/pruebas fueraAds.
+El opt-in Performance/Discovery descrito arriba es el checkpoint inicial20:35Z; las demás fuentes
+ya están publicadas. Destinos/mappings anteriores preservados y fuentes nuevas Ads-only.
+[Readback por fuente/versión/revisión](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+No crear etiquetas por slug ni equiparar el tagging GA4 de esta tabla a opt-in publicitario.
+Histórico17/10: acciones secundarias y drafts Web8/Server12 preparados, captura OFF y sin publish.
+[Manual, contratos y rollout](../../manual-de-uso/growth/activar-conversiones-google-ads.md) ·
+[auditoría18/10](../../audits/growth/2026-10-18-google-ads-activation.md).
 
 ## Forms
 
@@ -57,7 +74,7 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 | `efeonce-content-marketing`         | quote_request     | Conversación de Content Marketing             | `/servicio-marketing-de-contenidos/` · `fhsf-efeonce-content-marketing`         | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ◐ transporte sintético verificado; E2E pendiente | 2026-08-31: v3, Greenhouse-only, cero destinos/filas antes y después. Turnstile bloqueó el intento UI antes del POST; API rechazó honeypot y token ausente. `generate_lead` sintético (`smoke-test`, `measurement-smoke-content-marketing`) llegó a `G-KYPPY57M14` con 204. No es una aceptación de esta form ni confirmación Realtime; excluir smoke de métricas comerciales. [Evidencia](../../audits/public-site/2026-08-31-content-marketing-technical-closure.md). |
 | `efeonce-contacto`                  | contact           | Contacto Efeonce                              | `/contacto/` · `fhsf-efeonce-contacto`                                          | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ smoke de conversión pendiente                 | Formulario general de contacto; reutiliza el pipeline GTM genérico. 2026-10-16: verificado en vivo que emite `gh_form_viewed` con slug/surface y que `GA4 Event - generate_lead` (G-KYPPY57M14) dispara con `gh_form_submission_accepted` sin filtro de slug. Política Meta + Google UPD `89e531d8` publicada (rev 1, `fver-901e53e5…`, mapping email/phone/firstName/lastName) vía `pnpm --silent growth:measurement`. Ojo: el form mezcla motivos no comerciales (soporte, prensa) y todos cuentan como Lead. Pendiente: envío real en navegador → `/g/collect` + Meta Processed. Al publicar una versión nueva del form, revincular la política. El selector de país no agrega eventos ni transmite valores de campo a telemetría.                                                                                                                                                                                                                                                                                                                   |
 | `efeonce-hubspot-scope`             | quote_request     | Reunión de alcance HubSpot                    | `/servicios-contratar-hubspot/` · surface `fhsf-efeonce-hubspot-scope`          | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ smoke de conversión pendiente                 | Publicado 2026-08-30. Greenhouse-only; carga/API/validación verificadas sin crear un lead aceptado. Política de medición Meta publicada 2026-10-17 (rev 1, email/nombre/apellido); Lead Server en Meta pendiente de un envío con publicidad aceptada. |
-| `efeonce-creative-diagnostic`      | diagnostic_intake | Diagnóstico creativo · Agencia Creativa       | `/agencia-creativa/` · surface `fhsf-efeonce-creative-diagnostic`              | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente                                     | Publicado 2026-10-15 (v2, HubSpot `direct`, smoke secure-submit 200). Política Meta `485f38e5` publicada. Pendiente: embed en la landing (otra sesión) y envío real en navegador → `form_destination_attempt` + `/g/collect`. 2026-10-15: versión en dos pasos preparada (`scripts/growth/activate-creative-diagnostic-two-step.ts`, mismos `value` de opción), sin publicar hasta el release del renderer; al publicarla, revincular la política al nuevo `form_version_id` (`pnpm --silent growth:measurement`) y verificar en vivo las landings que lo incrustan. |
+| `efeonce-creative-diagnostic`      | diagnostic_intake | Diagnóstico creativo · Agencia Creativa       | `/agencia-creativa/` · surface `fhsf-efeonce-creative-diagnostic`              | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente                                     | Publicado 2026-10-15 (v2, HubSpot `direct`, smoke secure-submit 200). Política Meta `485f38e5` publicada. Pendiente: embed en la landing (otra sesión) y envío real en navegador → `form_destination_attempt` + `/g/collect`. 2026-10-15: versión en dos pasos preparada (`scripts/growth/activate-creative-diagnostic-two-step.ts`, mismos `value` de opción), publicada 2026-10-18 como `fver-7178aede-93da-4f95-a00c-5b0225638583`; política `485f38e5` revisión 2 (`01e72899`) revinculada y verificada (Meta, mismo mapping). Sigue pendiente el envío real en navegador. |
 | `efeonce-media-diagnostic`         | diagnostic_intake | Diagnóstico de medios · Agencia de Medios     | `/servicios/agencia-de-medios/` · surface `fhsf-efeonce-media-diagnostic`      | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pendiente                                     | Publicado 2026-10-16 (v2 `fver-d448c02d…`, `hubspot_pillar`, HubSpot `direct` «Lead Gen - Agencia de Medios», smoke secure-submit 200/200). Reutiliza el pipeline GTM genérico (`generate_lead` sin filtro de slug), no verificado en vivo para este form. Al 16/10 sin política Meta/Google UPD publicada. Pendiente: embed en la landing (operador) y envío real en navegador → `form_destination_attempt` + `/g/collect`. La casilla opcional de novedades no crea suscripción en HubSpot (adapter `communications: []`). Política de medición Meta publicada 2026-10-17 (rev 1, email/teléfono/nombre/apellido); Lead Server en Meta pendiente de un envío con publicidad aceptada. |
 | `efeonce-performance-diagnostic`   | diagnostic_intake | Diagnóstico de pauta · Performance Marketing  | `/servicios/performance-marketing/` · surface `fhsf-efeonce-performance-diagnostic` | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ✅ GA4 · ✅ Meta                                     | Publicado 2026-10-17 (form key `71ea684f…`, `hubspot_pillar` + `multi_step_light`, HubSpot `direct` «Lead Gen - Performance Marketing»; embebido en la landing, 26 inputs renderizados en vivo). Reutiliza el pipeline GTM genérico (`generate_lead` sin filtro de slug); Envío real 2026-10-17: `generate_lead` en GA4 realtime y HubSpot `succeeded`. El primer envío (antes de la política) no generó Lead en Meta. Ningún evento envía PII: el tag genérico manda a GA4 `form_slug`/`form_kind`/`surface_id` y la PII queda fuera del `dataLayer`; los datos de contacto sólo viajan server-side al destino HubSpot. Política Meta publicada 2026-10-17 (sin Google UPD). Sin casilla de novedades (sólo `contact_permission`). Reemplaza al `efeonce-performance-brief` del contrato original de TASK-1865, nunca publicado. Política de medición Meta publicada 2026-10-17 19:16 UTC (rev 1, email/nombre/apellido). Envío consentido 19:19 UTC: conversión encolada y entrega `meta` `http_accepted` (200) y **Meta registró 1 `Lead` SERVER_ONLY** en el bloque 19:00–20:00 UTC (leído 20:27 UTC; las estadísticas tardan ~1 h). Ojo: el form deduplica 60 min por email, un reenvío con el mismo correo no genera conversión. |
 | `efeonce-inbound-diagnostic`       | diagnostic_intake | Diagnóstico de inbound · Inbound Marketing     | `/agencia-inbound-marketing/` · surface `fhsf-efeonce-inbound-diagnostic` | ✅ default      | `gh_form_submission_accepted` → `generate_lead` | sí (previsto) | ⏳ pending                                          | Publicado 2026-10-18 (form key `70dc185f…`, `hubspot_pillar` + `multi_step_light`, dos pasos: etapa del ciclo que más duele, CRM y mercado; luego contacto). HubSpot `direct` «Lead Gen - Inbound Marketing» (propiedades `gh_form_inbound_etapa`, `gh_form_inbound_crm`, `gh_form_inbound_rol`). Reutiliza el pipeline GTM genérico (`generate_lead` sin filtro de slug), así que no requiere tag nuevo; **pendiente**: primer envío real → GA4 realtime + HubSpot `succeeded`, y política de medición Meta del formulario. Sin PII en el `dataLayer`. |
@@ -136,12 +153,12 @@ Registro independiente de GA4. [Canon](08-meta-conversions-api-server-side.md),
 
 | Destino | Evento | Origen requerido | Estado | Evidencia pendiente |
 | --- | --- | --- | --- | --- |
-| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server9/Web5; transporte previo conservado, Test Events Server y tags reales verificados | Volumen/calidad ordinaria |
+| Pixel/dataset708931297255942 vía GTM-K2X4ZTTK Server | PageView | Navegación con publicidad consentida, ambos hosts | Server10/Web6; transporte PageView conservado; pruebas Server previas registradas, sin nuevo positivo con esta publicación | Volumen/calidad ordinaria |
 | Mismo destino/servidor | Lead formulario | Aceptación backend comercial + snapshot ads consentido | Client31/trigger33 autenticado, cola cifrada/worker ON; legacyMeta12 retirado | Observada 2026-10-17 con Performance: fuente→ledger→provider, 1 `Lead` SERVER_ONLY en Meta (ver doc 10). Pendiente en Meetings y en las demás fuentes |
-| Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida post-flip y replay real |
+| Mismo destino/servidor | Lead reunión | Reserva confirmada elegible + snapshot ads consentido | Mismo Client31/trigger33, legacyMeta17 retirado; classifiers scheduler_key/lead_source | Primera reserva consentida real; no fabricar ni reenviar para completar evidencia |
 
 Tagging/preview mismo efeonce-group, min0/max1, 1CPU/512MiB, instance-based. Sin proyecto,
-servicio o cron nuevo para matching. GTM6 publicado sin Test Events code; tag6 sólo[11,33],
+servicio o cron nuevo para matching. Server10 conserva el tag6 sólo[11,33], sin Test Events code;
 PageView11 preservado. ForwardingGA4 exige Client Name=GA4, excluye Client backend.
 Incidente histórico: Lead QA sin Test Events pasó por regex .+; gate UUID corregido,
 no fue submission/reserva ni cuenta como conversión real. No repetir positivos fuera de Test Events.
@@ -168,4 +185,4 @@ Alta comercial compatible mediante API/panel/CLI, revisión y readback; nuevo ho
 requerir código. No activar automáticamente todas las fuentes ni convertir subscribe en Lead.
 Fixtures metadata-only del programa TASK-2036/2037 están archivadas/sin embed keys; no son nuevas
 superficies de captación comercial. Inventario/IDs/recibos y la prueba de fuente nueva posterior
-al contrato inicial en el release enlazado. Catálogo activo final13 fuentes/siete policies.
+al contrato inicial en el release enlazado. Catálogo de ese corte14/10:13 fuentes/siete policies; no representa el inventario actual.

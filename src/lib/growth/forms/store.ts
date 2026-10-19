@@ -10,8 +10,10 @@ import type { PreparedMeasurement } from '@/lib/growth/measurement/contracts'
 import { enqueueMeasurementConversion } from '@/lib/growth/measurement/store'
 
 import { query, withTransaction } from '@/lib/db'
+import { completeCommandExecution, IDEMPOTENCY_TTL_MS, recordCommandAudit } from '@/lib/api-platform/core/idempotency'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { parseHubSpotFormReceipt, type HubSpotFormReceipt } from './destinations/hubspot/receipts'
+import { commercialFormClassificationSchema, FormClassificationConflictError, formDefinitionFingerprint, type CommercialFormClassificationInput } from './classification-contract'
 
 import {
   FORM_SUBMISSION_ACCEPTED_EVENT,
@@ -229,6 +231,65 @@ export const listFormDefinitions = async (): Promise<FormDefinitionRow[]> =>
 
 export const archiveFormDefinition = async (formId: string): Promise<void> => {
   await query(`UPDATE greenhouse_growth.form_definition SET status = 'archived' WHERE form_id = $1`, [formId])
+}
+
+/** Narrow metadata repair, serialized with definition and published-version writers. */
+export const correctCommercialFormClassificationStore = async (raw: CommercialFormClassificationInput, actorId: string) => {
+  const input = commercialFormClassificationSchema.parse(raw)
+
+  if (!actorId.trim() || actorId.length > 180) throw new Error('actor_required')
+
+  return withTransaction(async client => {
+    const locked = await client.query<FormDefinitionRow>(
+      `SELECT * FROM greenhouse_growth.form_definition WHERE form_key=$1::uuid FOR UPDATE`, [input.formKey],
+    )
+
+    const before = locked.rows[0]
+
+    if (!before || before.status !== 'active' || before.form_kind !== input.fromFormKind ||
+      !['low', 'medium'].includes(before.risk_profile) || !before.purpose.trim() ||
+      formDefinitionFingerprint(before) !== input.expectedDefinitionSha256) throw new FormClassificationConflictError()
+
+    const versions = await client.query<{ form_version_id: string }>(
+      `SELECT form_version_id FROM greenhouse_growth.form_version WHERE form_id=$1 AND status='published' FOR SHARE`, [before.form_id],
+    )
+
+    if (versions.rows.length !== 1 || versions.rows[0].form_version_id !== input.expectedPublishedVersionId) throw new FormClassificationConflictError()
+
+    // The command audit and metadata repair commit or roll back together.
+    const executeAuditQuery: typeof query = async <T extends Record<string, unknown>>(text: string, values: unknown[] = []) =>
+      (await client.query<T>(text, values)).rows
+
+    const commandExecutionId = await recordCommandAudit({
+      principal: { lane: 'internal', principalKind: 'internal_actor', principalId: actorId, userId: actorId },
+      scope: { greenhouseScopeType: 'global' },
+      routeKey: 'growth.forms.classification.correct',
+      method: 'POST',
+      path: `/api/admin/growth/forms/${before.form_id}/classification`,
+      expiresAt: new Date(Date.now() + IDEMPOTENCY_TTL_MS),
+    }, executeAuditQuery)
+
+    const updated = await client.query<FormDefinitionRow>(
+      `UPDATE greenhouse_growth.form_definition SET form_kind=$1, updated_at=clock_timestamp()
+       WHERE form_id=$2 AND form_key=$3::uuid AND form_kind=$4 RETURNING *`,
+      [input.toFormKind, before.form_id, before.form_key, input.fromFormKind],
+    )
+
+    if (updated.rows.length !== 1) throw new FormClassificationConflictError()
+    const after = updated.rows[0]
+    const unchanged = (row: FormDefinitionRow) => Object.fromEntries(Object.entries(row).filter(([key]) => !['form_kind', 'updated_at'].includes(key)))
+
+    if (formDefinitionFingerprint(unchanged(before)) !== formDefinitionFingerprint(unchanged(after))) throw new FormClassificationConflictError()
+
+    const auditResult = { ok: true as const, commandExecutionId, formId: before.form_id, formKey: before.form_key,
+      publishedVersionId: input.expectedPublishedVersionId, previousKind: before.form_kind, formKind: after.form_kind,
+      actorId, reason: input.reason, beforeSha256: input.expectedDefinitionSha256, afterSha256: formDefinitionFingerprint(after),
+      sourceIdentityPreserved: true, publishedVersionPreserved: true }
+
+    await completeCommandExecution({ commandExecutionId, responseStatus: 200, responseBody: auditResult }, executeAuditQuery)
+
+    return { ...auditResult, definition: after }
+  })
 }
 
 // ─── Versions ─────────────────────────────────────────────────────────────────

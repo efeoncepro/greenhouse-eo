@@ -31,8 +31,8 @@ describe('Offline Google Ads GTM review plan', () => {
   it('pins both containers, observed version fingerprints and separately named normalized hashes', () => {
     const plan = buildGoogleAdsGtmPlan()
 
-    expect(plan.sourceEvidence.web).toMatchObject({ publicId: 'GTM-NGHPGRLZ', liveVersionId: '5', liveVersionFingerprint: '1791913373643' })
-    expect(plan.sourceEvidence.server).toMatchObject({ publicId: 'GTM-K2X4ZTTK', liveVersionId: '9', liveVersionFingerprint: '1791993298197' })
+    expect(plan.sourceEvidence.web).toMatchObject({ publicId: 'GTM-NGHPGRLZ', liveVersionId: '6', liveVersionFingerprint: '1792355588730' })
+    expect(plan.sourceEvidence.server).toMatchObject({ publicId: 'GTM-K2X4ZTTK', liveVersionId: '10', liveVersionFingerprint: '1792355562526' })
     expect(plan.sourceEvidence.web.normalizedSnapshotSha256).toMatch(/^[a-f0-9]{64}$/)
     expect(plan.blockers).toContain('verified_action_binding_missing:commercial_lead')
   })

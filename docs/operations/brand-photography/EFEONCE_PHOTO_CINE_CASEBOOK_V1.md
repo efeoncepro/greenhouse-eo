@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.7 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-16 por Claude (1.7: fallas 44 a 49 del brochure oficial «Agencia de Marketing 360°» — composición generativa con piezas reales del cliente, reponer su contenido exacto, el logo de cliente como vinilo, el punch cinematográfico, la producción creíble, la interfaz de vidrio y la mitad visible de la lámina. Antes, 2026-10-06, por Codex, 1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.8 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-18 por Claude (1.8: fallas 50 a 55 de las fotos del menú del sitio — la UI de producto como mockup o recorte, la pose que «presiona» la interfaz, la toma plana que se resuelve con acabado de luz, la placa descartada tomada de una carpeta mixta y el recorte del onepage. Antes, 2026-10-16, por Claude, 1.7: fallas 44 a 49 del brochure oficial «Agencia de Marketing 360°» — composición generativa con piezas reales del cliente, reponer su contenido exacto, el logo de cliente como vinilo, el punch cinematográfico, la producción creíble, la interfaz de vidrio y la mitad visible de la lámina. Antes, 2026-10-06, por Codex, 1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -92,7 +92,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»; 44–49 en «Brochure Agencia de Marketing 360°»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»; 44–49 en «Brochure Agencia de Marketing 360°»; 50–55 en «Fotos del menú del sitio»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -435,3 +435,47 @@ cliente**, con el mismo criterio de luz y profundidad. Fuente y cada paso en
 **Pendientes que este casebook no resuelve:** las cifras de ANAM (entregadas por el operador, no publicadas por ANAM) y
 el «12 meses» del caso Berel, antes de enviar el brochure afuera. Los logos de clientes están autorizados para este
 brochure (operador, 2026-10-16); la biblioteca formal es TASK-1937.
+
+## Fotos del menú del sitio (2026-10-18) — lo que aprendimos
+
+Las fotos del menú global de efeoncepro.com (onepage a pantalla completa y mega menús; PDR-027 aceptado y EPIC-055 planificada,
+sin implementar en el sitio), aprobadas por el operador el 2026-10-18. Todas las fichas declaran `"registro": "cine"`.
+Fichas, prompts, scripts y logs en `ai-generations/2026-10-18_menu-sitio/` (`fichas/`, `prompts/`, `ui/`,
+`compuestas/`; binarios fuera de git). Las reglas de formato del menú (4:5 con sujeto centro-derecha, 16:9 legible a
+~440 px, recorte 996 × 1080) y el método de la UI de producto viven en la skill `design-studio`,
+`references/efeonce-photographic-language.md` (§«Fotos para el menú del sitio» y §10).
+
+**Tres casos.**
+
+- **AI Visibility Report (phygital).** Nexa con la softshell, y alrededor los elementos del informe como luz en el aire:
+  el lockup, el gauge con 63 y su píldora «Atención», y cuatro filas de motores con logo, barra y fracción cerca del
+  lente. Pasó por tres rutas: paneles flotantes con recortes de la página (`MN-AVR`), elementos de luz (`MN-AVR2`) y la
+  aprobada, `MN-AVR3`, con pose relajada, elementos compuestos por `ui/avr-elementos/escena.cjs` sobre un plate con el
+  aire vacío y pasadas de acabado (`prompts/MN-AVR3-acabado.txt`: material, profundidad y luz; `MN-AVR3-acabado2.txt`:
+  el pelo por delante del arco y el ámbar más fuerte sobre su cara). La vertical llevó las dos; la horizontal sólo la
+  primera, porque ahí el arco no toca el pelo.
+- **Guías descargables.** Concepto nuevo, no un refrito de portadas viejas de ebooks: Sophia (línea Engine, elenco
+  ficticio) lee con calma una guía impresa. La primera toma salió plana; una pasada de acabado **sólo de luz**
+  (`prompts/MN-GD-acabado.txt`) volvió las páginas una fuente azul que la ilumina y levantó hojas de luz: «el
+  descargable llega a sus manos».
+- **Producción Creativa.** Reutiliza una placa de CMP-004. La primera elegida, `N03-45-campana-abanico`, estaba
+  **descartada**; la aprobada es `N03b-45-campana-escala`, una directora con el mismo corredor en una pantalla gigante y
+  en su celular.
+
+También del día: Marketing con Manzanitas con Karo (línea Brand) y manzanas **siempre verdes**; Glitch y Manzanitas
+fotografiados desde su concepto editorial, no desde sus portadas; y **nunca Julio** en estas fotos: Nexa o el elenco
+(`EFEONCE_BRAND_CAST_V1.md`), que nunca se presenta como equipo real.
+
+**Seis fallas nuevas, con su corrección.**
+
+| # | Síntoma | Causa | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 50 | **La UI del producto entra como mockup de dispositivo** (operador: «es tan 2010») | Se pensó la interfaz como pantalla que alguien sostiene | **Abstraer los elementos** de la UI al espacio físico (gauge con su número, estadísticas clave, barras por motor con logos, logo del producto), recreados con los tokens reales y los datos de la muestra oficial. Sin dispositivo | AI Visibility Report | ojo del operador |
+| 51 | **Los recortes de la página parecen capturas flotando** | Se pegaron trozos de la página real como paneles; el acabado los vuelve vidrio, pero siguen siendo capturas | Cada elemento como **PNG transparente** desde HTML/SVG propio (Playwright, `deviceScaleFactor: 2`), compuesto sobre un plate con el aire vacío con perspectiva CSS 3D y glow; acabado sólo de material y luz; **reponer** desde la capa exacta sólo si el modelo alteró un texto o una cifra. Implementación: `ui/avr-elementos/{elementos.mjs,render.cjs,escena.cjs,layout3-45.json,layout3-169.json}` | `MN-AVR` → `MN-AVR3` | QA al 100 % de cada cifra, del rostro y del emblema |
+| 52 | **Nexa «presiona» la interfaz**: la perspectiva y la pose la ponen a operar los elementos | La pose y la perspectiva la ponían a operar la UI como si fuera una pantalla táctil, y eso devuelve la imagen al dispositivo | **Pose relajada**: los elementos son luz en el aire, detrás y alrededor de ella; ella no los toca. La integración la da el acabado del modelo (el pelo pasa por delante del arco y el ámbar del gauge le cae en la cara), no la mano | `MN-AVR3` (`MN-AVR3-acabado.txt`, `MN-AVR3-acabado2.txt`) | ojo sobre la composición antes del acabado |
+| 53 | **La toma sale plana** aunque la escena esté bien | [inferencia] La guía impresa no funcionaba como llave: la escena tenía el gesto correcto pero no una fuente dominante | **Pasada de acabado sólo de luz** sobre el plate, que conserva todo idéntico: la fuente pasa a ser la llave (páginas azules que iluminan cara y manos desde abajo, hojas de luz sin texto, bruma y grano). No se regenera ni se suma otra palanca | Guías descargables (`MN-GD-acabado.txt`) | cara y emblema al 100 % después |
+| 54 | **Se reutiliza una placa descartada** | En `ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/` conviven aprobadas y descartadas, y el nombre no lo dice; el banco de AXIS muestra los anuncios con texto, no la foto | La aprobada es **la que cita** `composicion/piezas.json` (4:5) o `formatos/composicion/piezas-{11,191,916}.json`. El banco de AXIS sirve para ver qué se aprobó, **nunca** para reutilizar como foto | `N03-45-campana-abanico` → `N03b-45-campana-escala` | revisar el JSON de piezas antes de elegir |
+| 55 | **El recorte del onepage corta el logo o los datos** | Del 4:5 al recorte 996 × 1080 se pierde el borde, y la idea tiene que caer a la derecha del panel que tapa el 30 % izquierdo | Extender el lado izquierdo con **el mismo estudio espejado y desenfocado**, que queda bajo el panel; nunca achicar la foto ni correr al sujeto. **Simular el panel encima antes de aprobar** | onepage del menú | superponer el panel antes de aprobar |
+
+**Pendientes que este casebook no resuelve:** las fotos todavía no están en el bucket público (va con TASK-2041) y el
+menú no existe en el sitio: el encabezado de Ohio sigue vivo hasta que se acepte PDR-027.

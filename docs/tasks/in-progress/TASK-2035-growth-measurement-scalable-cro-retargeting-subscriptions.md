@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Status real: `Corrida acotada configuración/CAPI/agent-first publicada14/10: TASK-2036/2037 completas, PR255/main9690efad, Server9, watchdog6/6; CRO/abandono/newsletter/CRM y tráfico real permanecen pendientes.`
+- Status real: `Configuración/CAPI/agent-first publicada14/10 (TASK-2036/2037). Delta18/10 en TASK-2034: mainEC liberado, Web6/Server10, EC ON y Ads Performance/Discovery activos; HubSpot/Meta tracing configurados, primer recibo/atribución pendientes. Ampliación22:57Z publicada13 Forms+Discovery; Grader comercial incluido, Contacto fueraAds y Lead Gen Web corregido. CRO/abandono/newsletter/CRM del paraguas conservan su alcance separado y pendientes.`
 - Rank: `Now`
 - Domain: `data|growth|crm`
 - Blocked by: `none`
@@ -32,6 +32,11 @@ Coordinar el cierre completo de la medición Growth de Efeonce: configuración p
 formulario/calendario sin releases por cada alta, embudo CRO, retargeting de no convertidos,
 suscripción real al blog y señales de calidad desde HubSpot. Conserva GA4/Meta, consentimiento,
 matching y runtimes existentes; reúne dependencias y evidencia sin duplicar tasks dueñas.
+
+Checkpoint18/10: [activación](../../audits/growth/2026-10-18-google-ads-activation.md) y
+[cobertura comercial pendiente](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+La instrucción «sólo forms comerciales que generan leads» acota esta ampliación Ads; no activa
+suscripciones, ebooks, careers, soporte o todo el roadmap del paraguas. No cerrar por docs/configuración.
 
 ## Why This Task Exists
 

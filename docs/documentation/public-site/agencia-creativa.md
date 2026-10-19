@@ -70,21 +70,11 @@ más espacio para el formulario: sus campos se acomodan en dos columnas y el pla
 la persona baja. En pantallas más angostas ambas partes se apilan y el formulario usa todo el ancho. Como el
 módulo Diagnóstico es compartido, esto rige en las dos landings.
 
-El operador aprobó un diseño nuevo del formulario en dos pasos: primero «Tu operación» (qué te frena hoy, en
-tarjetas; tamaño del equipo y plazo, en píldoras) y luego «Tus datos», con íconos en las etiquetas, el botón
-naranja a todo el ancho y el texto legal en una línea.
-
-| | Lo que ve hoy la persona | Lo que verá cuando se publique la versión en dos pasos |
-| --- | --- | --- |
-| Pasos | Un solo paso con todos los campos | Dos pasos: «Tu operación» y «Tus datos» |
-| Preguntas de operación | Listas desplegables | Tarjetas (qué te frena) y píldoras (equipo y plazo) |
-| Botón | Naranja, a todo el ancho | Igual |
-| Legal | Casilla, aviso y enlace de privacidad, en ese orden | Igual, con el enlace como texto «Política de privacidad» |
-| Enlace de privacidad | Se muestra como dirección completa | Texto legible |
-
-La publicación de la versión en dos pasos espera una mejora del motor de formularios de Greenhouse que llega
-con su próxima publicación a producción; sin ella, las tarjetas se verían como cajas vacías. Los estilos de la
-tarjeta ya están listos y se activan solos cuando la versión nueva salga.
+El formulario va en dos pasos desde el 2026-10-18 (diseño aprobado por el operador): primero «Tu operación»
+(qué te frena hoy, en tarjetas; tamaño del equipo y plazo, en píldoras) y luego «Tus datos», con íconos en las
+etiquetas, un ejemplo de número en el teléfono, el botón naranja a todo el ancho y el texto legal en una línea con
+el enlace «Política de privacidad». Las respuestas que llegan a HubSpot son las mismas que antes: sólo cambió cómo
+se piden.
 
 > Detalle técnico: [contrato runtime del formulario](../../architecture/growth-public-forms-runtime-contract.md#diagnóstico-creativo-agencia-creativa).
 
@@ -92,10 +82,8 @@ tarjeta ya están listos y se activan solos cuando la versión nueva salga.
 
 - **Primer envío real:** falta que una persona envíe el formulario desde un navegador para confirmar que
   el lead llega a HubSpot (la verificación anti-bots impide hacerlo con automatización).
-- **Formulario en dos pasos:** publicar la versión aprobada cuando la mejora del motor de formularios llegue
-  a producción, volver a conectar la medición publicitaria a esa versión y revisar las dos landings en vivo.
-  Más adelante, el motor de formularios pasa al sistema de diseño AXIS
-  ([TASK-2038](../../tasks/to-do/TASK-2038-growth-forms-renderer-on-axis.md)).
+- **Formulario en dos pasos:** publicado el 2026-10-18 en las dos landings, con la medición publicitaria
+  conectada a la versión nueva. Más adelante, el motor de formularios pasa al sistema de diseño AXIS (TASK-2038).
 - **Contenido validado por el operador (2026-10-16):** se mantiene el 94 % de entregas a tiempo de Sky
   (el caso publicado dice 88 %; si aparece la fuente del 94 %, corregir el pie «Cifras: caso publicado…»),
   hay permiso para mostrar el trabajo de todos los clientes que aparecen, y se aprueban «aunque no trabajemos

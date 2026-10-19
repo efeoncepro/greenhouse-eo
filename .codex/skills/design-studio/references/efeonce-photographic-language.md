@@ -26,6 +26,16 @@ Complemento de esta guía, aprobado por el operador. Es lo primero que se abre a
 3. Escribe la ficha y genera con los comandos canónicos (`foto:prompt`, `foto:generar`, `foto:validar`).
 4. Antes de entregar, recorre las 11 preguntas de la lista de control.
 
+**Trampa: el banco no es una fuente de fotos, y algunas carpetas mezclan aprobadas con descartadas** **[operador,
+2026-10-18]**. Las piezas de campaña del banco (`cmp00N-*.webp` en `apps/lab/public/media/photography/`) son los
+**anuncios con texto** tal como se aprobaron: sirven para ver qué se aprobó, **nunca para reutilizarlas como foto**. La
+foto limpia está en la carpeta de producción, pero ahí el nombre del archivo no dice si se aprobó: en
+`ai-generations/2026-10-02_cmp004-cine-nativo/composicion/plates/` conviven placas aprobadas y descartadas, y **la
+aprobada es la que cita** `composicion/piezas.json` (4:5) o `formatos/composicion/piezas-{11,191,916}.json`. Caso: para
+Producción Creativa del menú del sitio se tomó primero `N03-45-campana-abanico`, descartada (la persona mostraba una
+imagen abstracta, no una campaña replicada); la aprobada es `N03b-45-campana-escala`, una directora con el mismo
+corredor en una pantalla gigante y en su celular.
+
 **Jerarquía.** El canon sigue siendo `docs/operations/brand-photography/`; «El porqué» lo explica para el equipo y el
 banco lo muestra aplicado. Si algo difiere, manda el canon y se corrige la guía en el mismo cambio.
 
@@ -584,7 +594,9 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 
 > **El oficio con IA no está en la máquina, está en la decisión.** Generar es barato y no se ve; elegir,
 > descartar, corregir y dirigir es el trabajo. **Nunca robots, circuitos ni interfaces flotantes**: es la parte
-> que no vale nada y la que hace todo el mundo (única excepción: los Sparks del kit, §11).
+> que no vale nada y la que hace todo el mundo (única excepción: los Sparks del kit, §11). Mostrar la UI de **un
+> producto de Efeonce** que la pieza tiene que enseñar es otro caso, con su propio método (§10, «UI de producto en
+> foto phygital»): elementos reales de ese producto, nunca una interfaz genérica inventada.
 > Cuatro palancas fotografían el juicio:
 
 - **Variantes** (`palanca: variantes`) — la misma pieza repetida con diferencias **mínimas** y **una** apartada.
@@ -653,6 +665,15 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > **UNA palanca dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena y el
 > resultado tiene un poco de cada una y lo mejor de ninguna **[medido 2026-09-20]**. El comando rechaza una lista.
 
+> **Acabado de luz cuando la toma sale plana** **[operador, 2026-10-18]**. Si el plate acierta en escena, persona,
+> gesto y encuadre pero se ve plano, no se regenera: una pasada de edición sobre el plate (`gpt-image-2.5-sunburst`)
+> que conserva todo idéntico y cambia **sólo la luz** le da el impacto. La fuente del fenómeno pasa a ser la llave, con
+> bruma, bloom, partículas finas y grano. No es una segunda palanca: termina la que ya estaba. Caso Guías descargables
+> del menú del sitio: Sophia (línea Engine, elenco ficticio) lee con calma una guía impresa; la primera toma salió
+> plana, y el acabado volvió las páginas una fuente azul `#0375DB` que la ilumina desde abajo y levantó tres o cuatro
+> hojas de luz sin texto («el descargable llega a sus manos»). Prompt:
+> `ai-generations/2026-10-18_menu-sitio/prompts/MN-GD-acabado.txt`. Después, cara y emblema al 100 %.
+
 > **«Épica» no es la palabra** (arrastra escala grandilocuente y horizonte, el stock premium que este lenguaje
 > rechaza). Lo que se busca es **realismo cinematográfico**, y son cuatro cosas distintas: **registro documental**
 > (la cámara llega a algo que ya pasaba), **momento decisivo** (el pico), **acción suspendida** (lo que vuela) y
@@ -701,13 +722,53 @@ eventos. Tampoco repetir el mismo objeto de acento ni el mismo panel azul de fon
 **compone** desde el archivo oficial (nunca lo genera el modelo) y mostrar su marca depende de su autorización
 (TASK-1937). La foto propia de Efeonce no cambia.
 
-## 10. Pantallas: curación generativa, nunca UI pegada
+## 10. Pantallas y UI de producto: curación generativa, nunca UI pegada
 
-Las composiciones deterministas sólo sirven **como referencia** para curar con IA. Método: plate con la pantalla en
+**Pantalla dentro de la escena** (un monitor, una tablet o un celular que ya están en la toma). Las composiciones
+deterministas sólo sirven **como referencia** para curar con IA. Método: plate con la pantalla en
 **chroma verde puro `#00FF00`** («entirely inside the frame, no reflections») → UI de referencia determinística →
 edición con plate + UI + **máscara** pidiendo glare, reflejo, perspectiva y oclusión → **restaurar** fuera de la
 pantalla desde el plate original. La máscara no preserva píxeles: verificar identidad al zoom. Receta técnica
 (máscara de un canal, gotchas): [greenhouse-ai-image-generator](../../greenhouse-ai-image-generator/SKILL.md#fotografía-de-marca-propia-efeonce).
+
+### UI de producto en foto phygital: elementos abstraídos, nunca dispositivo ni recorte **[operador, 2026-10-18]**
+
+Cuando la pieza tiene que **mostrar la interfaz de un producto de Efeonce** en el mundo físico (caso: el AI Visibility
+Report en el menú del sitio), la UI no entra como pantalla. Se **abstraen sus elementos** al espacio: el gauge con su
+número, las estadísticas clave, las barras por motor con sus logos y el logo del producto, recreados limpios con los
+**tokens reales del producto** y los **datos de la muestra oficial**. El operador: «exactamente así es como se deben
+ilustrar las UI cuando quieres que se muestren en un mundo phygital».
+
+**Rechazado:** el **mockup de dispositivo** («es tan 2010») y los **recortes de la página real** pegados como paneles
+flotantes (se leen como capturas flotando). Ninguno se arregla con un mejor acabado.
+
+**Método probado** (es el de «Componer lo sensible», más abajo, aplicado a una UI):
+
+1. **Cada elemento como PNG transparente** renderizado con Playwright (`deviceScaleFactor: 2`) desde HTML/SVG propio,
+   con la tipografía y los tokens del producto. Además, una variante **sólo texto** de cada elemento con la misma caja,
+   para reponer después.
+2. **Plate cine generado con el espacio vacío** donde van a vivir los elementos: la ficha reserva ese aire («EMPTY
+   dark studio space… no object, no screen, no panel») y pide ya la luz que el elemento va a echar (en el AVR, un ámbar
+   desde el aire vacío sobre su hombro). El modelo no dibuja ninguna UI.
+3. **Composición determinística** sobre el plate: perspectiva CSS 3D (`rotateY`/`rotateX` por elemento), glow con
+   `drop-shadow` y, en lo que queda cerca del lente, desenfoque. Salen tres capas: la composición, la capa sola con
+   alfa y la capa **exacta** sin filtros.
+4. **Una o dos pasadas de acabado** con el modelo (`gpt-image-2.5-sunburst`, edición) pidiendo **sólo material y luz**:
+   que el elemento sea luz real en el aire, que derrame su color sobre la persona, que el pelo pase por delante del
+   arco y que lo cercano al lente brille desenfocado. Se repite que ningún texto, número ni logo cambia.
+5. **QA al 100 %** de cada texto y cifra, del rostro y del emblema.
+6. **Reponer los elementos exactos sólo si el modelo los alteró**, desde la capa exacta o la variante sólo texto.
+
+**Implementación de referencia** (`ai-generations/2026-10-18_menu-sitio/ui/avr-elementos/`): `elementos.mjs` recrea
+los elementos con los datos de la muestra oficial (Nórtica, marca ficticia: score 63 «Atención», Share of Model 71 %,
+ChatGPT 18/24, Gemini 19/24, Claude 17/24, Perplexity 14/24), Geist, acento `#0375db`, warning `#ffb703`, logos de
+motores de `efeonce-think/public/logos/engines` y el lockup `ai-visibility-report-lockup-white.svg` de
+`@efeoncepro/axis-brand-assets`; `render.cjs` saca los PNG; `escena.cjs <plate> <salida> <layout>` compone con
+perspectiva y glow, y `layout3-45.json` y `layout3-169.json` fijan posición, ancho, giro y desenfoque de cada
+elemento. Las pasadas de acabado: `prompts/MN-AVR3-acabado.txt` y `prompts/MN-AVR3-acabado2.txt`. Si hay persona,
+la pose es **relajada**: una Nexa «presionando» la interfaz se rechazó (ver el
+[casebook cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md), «Fotos del menú del
+sitio»).
 
 ## 11. Personas: Julio y Nexa
 
@@ -960,6 +1021,28 @@ sesión las tenía delante al armar.
 - **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las seis reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
 - Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
 
+### Fotos para el menú del sitio **[operador, 2026-10-18]**
+
+El menú global de efeoncepro.com (PDR-027 aceptado y EPIC-055, **sin implementar**) lleva una foto por línea o
+recurso en dos superficies, y cada una se genera en su formato nativo:
+
+| Superficie | Formato | Cómo se ve | Regla de la toma |
+|---|---|---|---|
+| Onepage (hamburguesa, pantalla completa) | **4:5 vertical**, recorte `op` 996 × 1080 | El panel oscuro del menú tapa el **30 % izquierdo** con una esquina curva | Sujeto e idea en el **centro-derecha**; el tercio izquierdo es continuación tranquila de la misma escena, nunca vacío ni un bloque plano |
+| Mega menú (Soluciones, Recursos) | **16:9 horizontal**, recortes `mm` 880 × 472 y `card` 880 × 496 | Se ve a **~440 px** de ancho | **Un solo sujeto**, legible en la mitad derecha a ese tamaño |
+
+- **Del 4:5 al 996 × 1080:** si el recorte corta el logo del producto o un dato, no se achica la foto ni se mueve el
+  sujeto: se **extiende el lado izquierdo** con el mismo estudio espejado y desenfocado, que queda bajo el panel
+  (el principio de la base espejada de «Extender una foto aprobada a 9:16», en el registro Cine, más arriba).
+- **Simular el panel encima antes de aprobar.** Una foto que se ve bien suelta puede quedar con la idea bajo el panel.
+- **Quién sale:** Nexa o el elenco ficticio por línea (Hum = Growth, Karo = Brand, Sophia = Engine, Isabella = Voice,
+  Antonio = Revenue), **nunca Julio** en estas fotos y nunca el elenco presentado como equipo real.
+- **Conceptos propios:** Guías descargables, Glitch y Marketing con Manzanitas se fotografían desde su concepto y
+  propósito editorial, no desde portadas existentes (las de Glitch son del diseño anterior). En Manzanitas, las
+  manzanas de la foto son **siempre verdes** (detalle en `efeonce-graphic-line` → `manzanitas.md` §4.2).
+- Fuentes de la producción: `ai-generations/2026-10-18_menu-sitio/` (fichas, prompts, scripts y logs; binarios fuera de
+  git). Las fotos todavía no están subidas al bucket público: eso va con TASK-2041.
+
 ## La capa de composición no es sólo texto
 
 Una pieza puede llevar etiqueta (Poppins `structureLabel`), entrada/dominante/cierre (Bricolage `ideaLead`/
@@ -1077,12 +1160,40 @@ isotipo, nave o mascotas— carga el [contrato de selección de referencias](../
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
 corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
 
+### Caso de cliente con piezas reales: generar, componer, terminar, reponer **[brochure 360°, 2026-10-16]**
+
+Método aprobado en los casos Berel, Sky y ANAM del brochure oficial «Agencia de Marketing 360°»
+(`ai-generations/2026-10-12_brochure-efeonce-360/`, carpetas `caso-berel/`, `caso-sky/`, `caso-anam/`). Es la regla
+de arriba aplicada a material de un cliente:
+
+1. **Escena.** `gpt-image-2.5-sunburst` high genera la escena con la **referencia oficial del producto** (cubeta Berel
+   Insignia 19 L; A320 de Sky) o, si la marca va en un objeto, **sin logos** (ANAM).
+2. **Componer.** Las piezas reales del cliente (portadas y stories del blog, piezas de campaña) se ponen
+   determinísticas encima: borde, sombra, rotación y profundidad (lejos chicas y nítidas, cerca grandes y desenfocadas).
+3. **Terminar.** El modelo sólo integra luz y material.
+4. **Reponer.** El acabado deforma textos y precios: se vuelve a poner el contenido exacto de cada pieza nítida,
+   buscando el desplazamiento del modelo y corrigiendo sólo la media de color.
+5. **Logo sobre un objeto** (minivan de ANAM): el SVG oficial se compone por homografía y se integra como **vinilo**
+   con el sombreado real del panel y grano. **Nunca** se le pasa al acabado del modelo: deformó el símbolo y lo corrió.
+   Sin foto del rotulado real de la flota, sólo el logo, sin franjas inventadas.
+
+En la lámina, **lo clave cae en la mitad visible**, a la derecha de la curva del panel de papel: genera la escena con
+el sujeto u objeto clave **fuera del cuarto izquierdo**. Correcciones del operador que valen como regla: «muchísimo más
+punch, cinematográfico» (contraluz, destello, bruma, profundidad, toma baja); una estela ordenada de piezas se rechazó
+por su distribución; en una activación, una lata gigante de aluminio «es irreal» → producción creíble (contenedores,
+truss, sol LED); una tarjeta de UI blanca y plana «se ve muy 1995» → **panel de vidrio oscuro** con desenfoque de fondo
+y estado vivo. Usar logos y piezas de un cliente exige su autorización (TASK-1937).
+
 **El mismo método en pantallas** (brochure y landing «Agencia de Medios», 2026-10-16;
 `ai-generations/2026-10-13_brochure-agencia-medios/marca-ejemplo/`): el anuncio de una marca de ejemplo ficticia
 (Nórtica) se compone por homografía sobre la pantalla detectada, el modelo sólo termina, y **si el acabado reescribe el
 logo se repone el aviso exacto encima** (pasó: «NÁRTIKA»). Una pantalla fuera de foco se desenfoca dentro de su
 máscara; el inpainting dejaba rectángulos más claros. Para darle aire a un sujeto en un hero web,
 `pnpm foto:expandir` con `--reponer no` (el hero de la landing: escala 0,72, `--fundido 120`).
+
+**El mismo método con la UI de un producto propio** (AI Visibility Report, menú del sitio, 2026-10-18): sin pantalla
+ni dispositivo, con sus elementos abstraídos como luz en el espacio. Método e implementación de referencia en §10,
+«UI de producto en foto phygital».
 
 ## Paid media como consumidor: atención sin cambiar el lenguaje (2026-09-21)
 

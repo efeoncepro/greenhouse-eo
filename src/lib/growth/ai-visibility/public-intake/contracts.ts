@@ -6,6 +6,8 @@
  * prompt usa marca/categoría/mercado). `consent` es requerido.
  */
 
+import type { GoogleAdsConversionReceipt } from '@/lib/growth/measurement/google-ads-receipt'
+
 export interface PublicGraderRunInput {
   brandName: string
   websiteUrl: string | null
@@ -67,6 +69,8 @@ export interface PublicIntakeResult {
    * a-medida queda `null`.
    */
   submissionId?: string | null
+  /** Dedicated post-commit handoff; never ordinary analytics or the report/poll DTO. */
+  googleAdsConversion?: GoogleAdsConversionReceipt
   /** Mensaje es-CL sanitizado para el cliente. */
   reason: string
 }

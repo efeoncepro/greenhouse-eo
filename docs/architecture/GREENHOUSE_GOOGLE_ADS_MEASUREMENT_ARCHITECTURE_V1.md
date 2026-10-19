@@ -1,14 +1,42 @@
 # Google Ads — Arquitectura de medición comercial y conexión API V1
 
-Checkpoint18/10: [paquete previo al release](../operations/releases/google-ads-2026-10-18/README.md)
-y [validación](../audits/growth/2026-10-18-google-ads-prerelease-validation.md). Se mantiene el ADR
-y contrato existentes; evidencia local/API nueva, sin activación ni despliegue.
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
+Checkpoint operativo 18/10, 20:43:28Z: **configuración Ads activada y cadena de despliegue verificada**.
+Anunciante6862539491, EC ON con método GTM, Web 6/Server 10 live y políticas Performance/Discovery
+rev2 publicadas (activationAt20:35Z). Bridge compatible publicado en WordPress/Think; HubSpot
+submission tracing configurado y captura Meta incluida en Server10. Flag Production true leído
+20:36:20.421Z; companion deployment dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk del mismo mainEC READY,
+alias exacto y clave env/build presentes. API expone nombres, no el booleano congelado ni una conversión.
+Primera ocurrencia comercial, recibos positivos y atribución **pendientes**. El detalle vigente y
+sus límites están en la [auditoría de activación](../audits/growth/2026-10-18-google-ads-activation.md).
+
+Checkpoint histórico 18/10, 19:51Z: **release de código RELEASED**, main
+`ec317c928fffcb919d71bdb62821b80280af2347`. CI, Deep y smoke de main PASS; orquestador
+[39159325900](https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900) SUCCESS. Manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b`
+`released` a las 19:51:25.548Z, leído en PostgreSQL a las 19:51:44.315Z.
+Vercel Production `dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt` READY y alias releídos a las 19:49:59Z;
+health HTTP 200 PASS a las 19:49:44Z; watchdog final `ok`, 6/6 runtimes, `drift=0` y `dataMissing=0`.
+Canarios admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store` PASS a las 19:06Z;
+sin lead ni reserva real. Las expansiones SQL de recibos están aplicadas. Excepción específica
+de batch autorizada a las 18:53:53Z. [Auditoría y límites](../audits/releases/2026-10-18-full-develop-production-release.md).
+
+Readback histórico a las19:49:57.865Z: Ads conservaba flag ausente/OFF, sin publicación GTM ni políticas
+Ads nuevas en ese corte. Hosts compatibles, Preview funcional, opt-in por fuente, EC efectiva y primer
+resultado positivo conservaban gates independientes; su avance posterior figura en el checkpoint operativo. El [paquete previo](../operations/releases/google-ads-2026-10-18/README.md) y la
+[validación inicial](../audits/growth/2026-10-18-google-ads-prerelease-validation.md) conservan sus cortes fechados.
 
 ## 1. Estado, alcance y precedencia
 
 - Estado: `Accepted` como dirección arquitectónica por instrucción del operador el **2026-10-17**.
-- Implementación de producto: **pendiente**. Este documento no despliega un sender, publica GTM,
-  crea acciones, cambia puja ni habilita nuevas organizaciones.
+- Forms/Meetings: contrato online servido; configuración Ads ampliada a13 Forms comerciales y Discovery22:57Z, con companion deployment READY y cadena de configuración verificada.
+  Conexión multiorganización, API/MCP de producto y sender de resultados CRM siguen **pendientes**.
+  GTM6/10 publicado; nuevas organizaciones, puja y otras fuentes conservan sus gates propios. Primera recepción comercial sigue pendiente.
 - Delta operativo 17/10: CLI local de lectura y gestión implementada; OAuth renombrado **Efeonce**.
   [Evidencia y límites](../audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
 - Dueño: Growth / Measurement; corresponsables: RevOps / HubSpot, Platform / Identity, Data / Insights y Finance.
@@ -57,8 +85,13 @@ Las credenciales o grants privados no se copian al repositorio, documentación o
 
 El operador amplió posteriormente el alcance a OAuth Efeonce y CLI de lectura/gestión. Se autorizó el
 cambio de marca y la custodia propia del grant; ninguna mutación publicitaria concreta está autorizada
-por esa ampliación genérica. La prueba real de esta sesión se mantiene en lectura. El catálogo de gestión
+por esa ampliación genérica. La prueba inicial del 17/10 se mantuvo en lectura. El catálogo de gestión
 y la separación entre capacidad implementada y apply real se detallan en §5.4.
+
+La autorización posterior del operador cubre release completo, bridges compatibles, publicación GTM,
+EC y las dos políticas comerciales documentadas en la auditoría de activación. Se preservan las
+identidades y los límites por fuente; esta ampliación no autoriza campañas, presupuestos, otras cuentas,
+replay histórico ni fabricación de conversiones. Los párrafos anteriores conservan el alcance inicial.
 
 ## 2. Problema, resultados y dueños de verdad
 
@@ -118,7 +151,7 @@ Snapshot del **17-10-2026**; no es configuración garantizada para futuras ejecu
 | Growth Measurement | Políticas por fuente/surface/version, cifrado, worker y destinos `meta` / `google_upd` | No existe destino Google Ads equivalente |
 | `google_upd` | Envía `user_data` sin `events` a GA4 Measurement Protocol | No registra una conversión Ads |
 | Forms / CRM / Meta | Handoff actualizado: envíos reales TASK-1865 entregados a HubSpot, GA4 `generate_lead` y una `Lead` Meta Server observada | No acredita por sí solo identidad exacta HubSpot, atribución Ads ni mejora causada en performance |
-| Recibos nativos HubSpot y Meta | Código local y pruebas del 17/10; rollout expresamente pendiente | No describirlos como desplegados |
+| Recibos nativos HubSpot y Meta | Baseline 17/10: código local y pruebas; checkpoint 18/10: schema aplicado y worker compatible servido | En18/10, propiedad/mapping Performance y captura Meta configurados con opt-in; primera identidad nativa/recepción Graph pendientes |
 
 La entrada anterior de Handoff que mencionaba cero filas/ausencia de Lead es histórica y fue superada por
 el cierre de TASK-1865. La [relectura del último lead Performance](../audits/growth/2026-10-17-performance-latest-lead-trace.md)
@@ -442,6 +475,30 @@ Descargar contenido no implica pedir servicio ni estar calificado. No se introdu
 opaca sobre texto libre para decidir puja. Un formulario aceptado no comercial mantiene su CRM/operación
 y analítica apropiada, pero no genera la acción comercial Ads.
 
+### 6.3.1 Cobertura de formularios comerciales
+
+El alcance confirmado por el operador el 18/10 comprende **todos los formularios que reciben
+solicitudes comerciales de leads**: contacto, cotización, diagnóstico de servicio y brief comercial.
+Ebooks, descargas, newsletter, postulaciones, soporte y pruebas permanecen fuera de la acción
+`commercial_lead`; no se propone incorporarlos a Ads en esta ampliación.
+
+La elegibilidad técnica de contact/diagnostic_intake/quote_request y riesgo low-medium no sustituye
+intención comercial. El operador confirmó AI Grader comercial y Contacto general: Grader está
+incluido y Contacto fueraAds. Lead Gen Web se corrigió por el command/store Forms de lead_magnet a
+quote_request, con hash/versión fijados, sin cambiar identidad o versiones. No se exceptúan los ebooks.
+
+Se reutilizan la acción «Solicitud comercial aceptada», `conversionKey=commercial_lead` y los tags
+Web/Server ya publicados. Cada fuente conserva su política revisada/publicada, mapping y destinos
+previos; no se crea una etiqueta, acción Ads o campaña por formulario. «Performance» identifica
+el diagnóstico de pauta y «Discovery» la agenda: son fuentes del sitio, no tipos de campaña Ads.
+Discovery mantiene `meeting_booking` y su acción de reserva confirmada.
+
+API22:57:03Z verificó13 formularios comerciales y Discovery activos,12 altas adicionales,
+con destinos/mappings existentes preservados. [Publicación por fuente](../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+Una versión nueva exige revisar su política. Inscripción automática y control de cobertura al
+publicar siguen como propuesta. La corrección de clasificación se aplicó por primitive canónico;
+la nueva API de mantenimiento está implementada localmente, sin desplegar. No se cambiaron pujas.
+
 ### 6.4 Unión con HubSpot Forms
 
 Reutilizar el [ADR de identidad nativa](GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): marcador
@@ -449,7 +506,10 @@ Reutilizar el [ADR de identidad nativa](GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION
 match exacto/único y `provider_submission_id = conversionId`. Estados y CAS existentes preservan
 ambigüedad/denegación/exhaustion; un fallo del recibo no modifica entrega ni vuelve a ejecutar el POST.
 
-El opt-in y SQL están pendientes de rollout. Históricos sin marcador no se promueven por email/hora.
+Las expansiones SQL de recibos se aplicaron el 18/10 con autorización específica; el worker compatible
+está servido. La propiedad técnica y el opt-in de mapping de Performance se configuraron y releyeron el 18/10:13campos
+comerciales intactos y14º oculto/opcional. [Recibo operativo](../audits/growth/2026-10-18-google-ads-activation.md).
+Primera ocurrencia nativa pendiente; históricos sin marcador no se promueven por email/hora.
 El valor actual de la propiedad Contact tampoco prueba una submission anterior. Contact ID y deal ID
 se añaden al binding por evidencia independiente; no se interpreta `conversionId` como contact ID.
 
@@ -950,3 +1010,7 @@ Referencias de código: `src/lib/growth/measurement/{contracts,policy-contract,p
 Las referencias oficiales enlazadas en las secciones 5 y 9 fueron contrastadas en el discovery de esta
 sesión. Disponibilidad documental, acceso real, recepción, procesamiento y atribución se verifican por
 separado. No copiar versiones/snippets de una página vieja cuando contradicen su guía vigente.
+
+
+El [contrato Grader](GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md) fija la ruta portátil verificada y
+la compatibilidad de la fachada histórica: contexto visitante y recibo post-persistencia, sin otro sender.

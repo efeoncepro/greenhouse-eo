@@ -1,0 +1,395 @@
+{
+  "schemaVersion": "efeonce.google-ads-activation-evidence.v1",
+  "asOf": "2026-10-18",
+  "timezone": "America/Santiago",
+  "generatedAt": "2026-10-18T20:40:56.358968Z",
+  "scope": {
+    "customerId": "6862539491",
+    "cloudProject": "efeonce-group",
+    "commercialSubmissionsCreated": 0,
+    "bookingsCreated": 0,
+    "contactsCreated": 0,
+    "fabricatedAdClicks": 0
+  },
+  "googleAds": {
+    "customerId": "6862539491",
+    "conversionTrackingId": "AW-18432951465",
+    "acceptedCustomerDataTerms": true,
+    "enhancedConversions": {
+      "status": "ON",
+      "method": "GOOGLE_TAG_MANAGER",
+      "conversionTrackingStatus": "CONVERSION_TRACKING_MANAGED_BY_SELF"
+    },
+    "actions": [
+      {
+        "key": "commercial_lead",
+        "actionId": "7852486523",
+        "conversionId": "AW-18432951465",
+        "conversionLabel": "NnDACPveraAdEKmJwtVE",
+        "type": "WEBPAGE",
+        "primaryForGoal": false,
+        "countingType": "ONE_PER_CLICK",
+        "defaultValue": 0,
+        "currency": "CLP"
+      },
+      {
+        "key": "meeting_booking",
+        "actionId": "7852487186",
+        "conversionId": "AW-18432951465",
+        "conversionLabel": "kLr8CJLkraAdEKmJwtVE",
+        "type": "WEBPAGE",
+        "primaryForGoal": false,
+        "countingType": "ONE_PER_CLICK",
+        "defaultValue": 0,
+        "currency": "CLP"
+      }
+    ]
+  },
+  "gtm": {
+    "web": {
+      "containerPublicId": "GTM-NGHPGRLZ",
+      "versionId": "6",
+      "state": "live_verified",
+      "verifiedAt": "2026-10-18T20:33:47.333Z",
+      "fingerprint": "1792355588730",
+      "treeSha256": "09804b52476fc9541bc6b11d0720210e8f85190eee4d8bb411effe2096ae6c6b"
+    },
+    "server": {
+      "containerPublicId": "GTM-K2X4ZTTK",
+      "versionId": "10",
+      "state": "live_verified",
+      "verifiedAt": "2026-10-18T20:33:29.520Z",
+      "fingerprint": "1792355562526",
+      "treeSha256": "002671c2945945fdb86910a1b1a4b6f1af16f51fdd6a2fc3c9a4e572fca5624c"
+    }
+  },
+  "hosts": {
+    "bridgeSha256": "4250795666afcc6b54a08284f5f77919e8b754de87eb91674303abb0132559ba",
+    "bridgeBytes": 11898,
+    "wordpress": {
+      "host": "efeoncepro.com",
+      "repository": "efeoncepro/efeonce-public-site-runtime",
+      "pullRequest": 1,
+      "mainCommit": "b457e4bc49123a96b549d3027745de8b235260c0",
+      "state": "PUBLISHED",
+      "installedAt": "2026-10-18T20:10:29Z",
+      "publicAssetStatus": 200,
+      "matchesCanon": true,
+      "routingEnabled": true,
+      "pluginActive": true
+    },
+    "think": {
+      "host": "think.efeoncepro.com",
+      "repository": "efeoncepro/efeonce-think",
+      "pullRequest": 15,
+      "mainCommit": "f63af537d0e910738a7fa7f22c893c306c6538d3",
+      "state": "PUBLISHED",
+      "deploymentId": "dpl_EChG4gdjY5qe2tqkg5WUVKtn5Yof",
+      "deploymentState": "READY",
+      "publicAssetStatus": 200,
+      "matchesCanon": true
+    }
+  },
+  "quality": {
+    "nativeGoogleSdkPreview": {
+      "status": "PASS",
+      "cases": 4,
+      "observedAt": "2026-10-18T20:20:46.031Z",
+      "allMeasurementTransportIntercepted": true,
+      "externalMeasurementDispatches": 0,
+      "businessPosts": 0,
+      "providerConversions": 0,
+      "nativeAdsPositiveVerified": false,
+      "results": [
+        {
+          "scenario": "granted",
+          "bridgeEvents": 1,
+          "pageErrors": 0
+        },
+        {
+          "scenario": "denied_user_data",
+          "bridgeEvents": 0,
+          "pageErrors": 0
+        },
+        {
+          "scenario": "unknown_google",
+          "bridgeEvents": 0,
+          "pageErrors": 0
+        },
+        {
+          "scenario": "gpc",
+          "bridgeEvents": 0,
+          "pageErrors": 0
+        }
+      ]
+    },
+    "nativeGoogleSdkLive": {
+      "status": "PASS",
+      "cases": 4,
+      "observedAt": "2026-10-18T20:34:32.376Z",
+      "allMeasurementTransportIntercepted": true,
+      "externalMeasurementDispatches": 0,
+      "businessPosts": 0,
+      "providerConversions": 0,
+      "nativeAdsPositiveVerified": false,
+      "results": [
+        {
+          "scenario": "granted",
+          "bridgeEvents": 1,
+          "pageErrors": 0
+        },
+        {
+          "scenario": "denied_user_data",
+          "bridgeEvents": 0,
+          "pageErrors": 0
+        },
+        {
+          "scenario": "unknown_google",
+          "bridgeEvents": 0,
+          "pageErrors": 0
+        },
+        {
+          "scenario": "gpc",
+          "bridgeEvents": 0,
+          "pageErrors": 0
+        }
+      ]
+    },
+    "publicConsentUi": {
+      "status": "PASS",
+      "cases": 4,
+      "measurementTransportIntercepted": true,
+      "pageErrors": 0
+    },
+    "publicGoogleConsentPostGtm": {
+      "status": "PASS",
+      "cases": 12,
+      "webVersionId": "6",
+      "serverVersionId": "10",
+      "scenarios": [
+        "default",
+        "all-grant",
+        "ads-only",
+        "analytics-only",
+        "revoke",
+        "gpc"
+      ],
+      "hosts": 2,
+      "interceptedCollectRequests": 23,
+      "commercialWrites": 0,
+      "pageErrors": 0,
+      "providerDeliveryVerified": false
+    },
+    "structuralApiComparison": {
+      "status": "PASS",
+      "count": 173,
+      "source": "combined-gtm-readonly-comparison.json; 173 structural invariants, not unit tests"
+    },
+    "focalUnitTests": {
+      "status": "PASS",
+      "googleAdsOfflinePlan": 15,
+      "metaReceiptBuilder": 16,
+      "hubspotConfigurationGuard": 10
+    },
+    "gtmSnapshotCheck": {
+      "status": "PASS",
+      "webVersionId": "6",
+      "serverVersionId": "10",
+      "drift": false
+    },
+    "publicContractCanary": {
+      "status": "PASS",
+      "at": "2026-10-18T20:44:01.310Z",
+      "checks": 25,
+      "businessOccurrencesCreated": 0
+    },
+    "negativeCanary": {
+      "status": "PASS",
+      "at": "2026-10-18T20:43:38.725Z",
+      "checks": 9,
+      "businessOccurrencesCreated": 0
+    },
+    "adminContractCanary": {
+      "status": "PASS",
+      "at": "2026-10-18T20:43:37.780Z",
+      "checks": 7,
+      "businessOccurrencesCreated": 0
+    },
+    "productionHealth": {
+      "status": "PASS",
+      "httpStatus": 200,
+      "at": "2026-10-18T20:43:37.896409+00:00",
+      "endpointExposesSha": false
+    },
+    "watchdog": {
+      "status": "PASS",
+      "knownSignals": 3,
+      "workersChecked": 6,
+      "driftCount": 0,
+      "dataMissingCount": 0,
+      "teamsDispatched": false,
+      "mode": "dry-run"
+    }
+  },
+  "hubspot": {
+    "portalId": "48713323",
+    "appId": 33235280,
+    "formId": "89652ccf-8393-4361-a650-878982132cfe",
+    "destinationId": "fdst-563c7c71-fda6-4fde-a327-5786986b61ee",
+    "technicalProperty": "ef_greenhouse_submission_id",
+    "configurationStatus": "CONFIG_VERIFIED",
+    "checks": {
+      "property": true,
+      "form": true,
+      "mapping": true
+    },
+    "originalFieldsPreserved": 13,
+    "totalFields": 14,
+    "technicalFieldHidden": true,
+    "technicalFieldRequired": false,
+    "providerDefaultsReconciled": {
+      "groupType": "default_group",
+      "richTextType": "text"
+    },
+    "formPatchDispatches": 1,
+    "reconciliationMethod": "GET_ONLY",
+    "mappingMethod": "configureHubSpotSubmissionTracing_CAS",
+    "guardTestsPassed": 10,
+    "nativeOccurrenceVerified": false
+  },
+  "policies": {
+    "observedAt": "2026-10-18T20:35:12.925Z",
+    "activationAt": "2026-10-18T20:35:00.000Z",
+    "existingDestinationsAndMappingsPreserved": true,
+    "businessEventsSent": false,
+    "published": [
+      {
+        "source": "performance",
+        "policyId": "5266be6e-9340-4a63-8255-151c30812b88",
+        "revisionId": "0a2cefdc-febc-46d7-be87-38571cece549",
+        "revision": 2,
+        "state": "published",
+        "sourceKind": "form_submission",
+        "sourceKey": "71ea684f-1ad9-4656-982b-159e4de46dd8",
+        "surfaceId": "fhsf-efeonce-performance-diagnostic",
+        "existingDestinations": [
+          "meta"
+        ],
+        "googleAds": {
+          "conversionKey": "commercial_lead",
+          "enhancedConversions": true,
+          "activationAt": "2026-10-18T20:35:00.000Z"
+        }
+      },
+      {
+        "source": "discovery",
+        "policyId": "a3de5d64-9df7-4102-b36e-fbc238135f0e",
+        "revisionId": "07f0d10b-2bfa-480b-9000-14ec1f57a609",
+        "revision": 2,
+        "state": "published",
+        "sourceKind": "meeting_booking",
+        "sourceKey": "discovery",
+        "surfaceId": "fhsf-efeonce-lead-gen-web",
+        "existingDestinations": [
+          "meta",
+          "google_upd"
+        ],
+        "googleAds": {
+          "conversionKey": "meeting_booking",
+          "enhancedConversions": true,
+          "activationAt": "2026-10-18T20:35:00.000Z"
+        }
+      }
+    ]
+  },
+  "productionRuntimeActivation": {
+    "status": "CONFIGURATION_CHAIN_VERIFIED",
+    "projectFlag": {
+      "name": "GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED",
+      "value": true,
+      "previous": "ABSENT",
+      "verifiedAt": "2026-10-18T20:36:20.421Z"
+    },
+    "deployment": {
+      "id": "dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk",
+      "status": "READY",
+      "lastReviewedState": "READY",
+      "expectedCommit": "ec317c928fffcb919d71bdb62821b80280af2347",
+      "branch": "main",
+      "frozenRuntimeFlagVerified": false,
+      "productionAliasVerified": true,
+      "environmentKeyPresent": true,
+      "buildEnvironmentKeyPresent": true,
+      "configurationChainVerified": true
+    },
+    "note": "Project literal true plus new deployment created after flag change, frozen env/build key presence, exact released main and production alias verified. API exposes names only; frozen boolean and runtime conversion are not directly observed.",
+    "verifiedAt": "2026-10-18T20:43:28.677Z"
+  },
+  "commercialEvidence": {
+    "firstRealFormGoogleAdsConversion": {
+      "status": "UNVERIFIED",
+      "verified": false,
+      "providerFailureClaimed": false,
+      "reason": "Awaiting a real authorized form occurrence under this activation."
+    },
+    "firstRealMeetingGoogleAdsConversion": {
+      "status": "UNVERIFIED",
+      "verified": false,
+      "providerFailureClaimed": false,
+      "reason": "Awaiting a real authorized confirmed booking under this activation."
+    },
+    "firstHubSpotNativeOccurrenceIdentity": {
+      "status": "UNVERIFIED",
+      "verified": false,
+      "providerFailureClaimed": false,
+      "reason": "Configuration verified; an exact native ID requires the next real marked submission."
+    },
+    "graphIndividualEventReceipt": {
+      "status": "UNVERIFIED",
+      "verified": false,
+      "providerFailureClaimed": false,
+      "reason": "No new real event receipt was certified by this rollout."
+    },
+    "googleAdsReception": {
+      "status": "UNVERIFIED",
+      "verified": false,
+      "providerFailureClaimed": false,
+      "reason": "Intercepted SDK/context checks do not prove provider reception."
+    },
+    "googleAdsAttribution": {
+      "status": "UNVERIFIED",
+      "verified": false,
+      "providerFailureClaimed": false,
+      "reason": "Configuration and reception alone do not prove attribution."
+    },
+    "observedWindow": {
+      "from": "2026-10-18T20:35:00.000Z",
+      "to": "2026-10-18T20:44:18.926Z",
+      "method": "POSTGRES_READ_ONLY",
+      "sources": {
+        "performance": {
+          "occurrences": 0,
+          "measurementConversions": 0,
+          "deliveries": 0,
+          "nativeReceipts": 0
+        },
+        "discovery": {
+          "occurrences": 0,
+          "measurementConversions": 0,
+          "deliveries": 0,
+          "nativeReceipts": 0
+        }
+      },
+      "onlineAdsReceptionQueryableInTheseTables": false,
+      "providerFailureClaimed": false
+    }
+  },
+  "sanitization": {
+    "method": "Explicit allowlist projection; no source provider payload copied",
+    "containsCredentials": false,
+    "containsPersonalMatchingData": false,
+    "containsVisitorIdentifiers": false,
+    "containsPrivateUrls": false
+  },
+  "updatedAt": "2026-10-18T20:43:28.677Z"
+}

@@ -181,3 +181,12 @@ Con agencia recién contratada y sin hito, usar seis meses; hito del comprador y
 Mantener tarea en el seguimiento existente aunque cambie el mes; revisión no autoriza contacto.
 Nutrición por email requiere permiso verificable y autoridad de ejecución, distintos de presencia pública.
 Caso con tarea/readback: [Fabrimetal](../../commercial/follow-up-agent/runs/2026-10-13-fabrimetal-respuesta-parada.md).
+
+## Aplicación: búsqueda perdida, puentes y un seguimiento
+
+[Indecaucho/Katia,18Oct2026](../../commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md):
+actividad de la autora y actualización de shortlist; email publicado con atribución distinta de SMTP;
+dos créditos Apollo con un correo extrapolado y otro ausente, sin altas vacías. Primer envío Outlook
+con firma gráfica y EMAIL SENT leído; un seguimiento nativo futuro, desinscripción por respuesta/reunión.
+Los métodos reusables viven en los módulos de investigación, calidad y secuencias de la skill, y en la
+política Outlook. El expediente no renueva cobertura general ni autoriza contactar a los puentes.

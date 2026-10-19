@@ -60,3 +60,12 @@ Efeonce no acreditados para esa necesidad no descartan la cuenta: bloquean la of
 práctica dueña lo confirme, y sus contactos elegibles pueden registrarse si hay autorización.
 
 Para convertir evidencia en validación/acción, cargar [señal→acción](signal-to-action.md): vigencia, prueba contraria y siguiente chequeo.
+
+## Recuperar una publicación perdida
+
+Una búsqueda por empresa puede fallar si el texto de la persona no la menciona. Con autor identificado,
+leer su actividad pública y capturar el permalink de la publicación original; revisar actualizaciones
+posteriores de la misma búsqueda antes de presentarla como abierta. Conservar precisión relativa de
+fecha si eso es todo lo visible. Una actualización de revisión/shortlist no confirma admisión tardía:
+preparar una consulta proporcionada dentro del mandato. Vacío de búsqueda no significa cero demanda.
+Caso: [Indecaucho](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).

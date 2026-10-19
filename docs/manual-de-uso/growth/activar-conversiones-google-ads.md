@@ -1,15 +1,49 @@
 # Conversiones Google Ads para Forms y agendas
 
-Estado 17-10-2026: código local y workspaces preparados, **sin deploy ni publicación GTM**.
+Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
+AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
+corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
+adicionales; no se modificaron GTM, campañas, pujas o deployment. Primera recepción y atribución
+siguen pendientes. [Publicación y evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
+
+
+**Checkpoint 18/10, 20:43:28Z: configuración de producción verificada; primera conversión pendiente.**
+Server **10** (`1792355562526`) se publicó primero y Web **6** (`1792355588730`) después,
+con readback live. La cuenta6862539491 tiene EC efectiva **ON** y términos aceptados. El bridge
+`4250795666af…` está servido en WordPress y Think. Performance y Discovery tienen políticas Ads
+rev2 publicadas, con `activationAt=2026-10-18T20:35:00.000Z`; los destinos previos se conservaron.
+El flag de proyecto se guardó `true` a las20:36:20Z. El companion Vercel del mismo main
+`ec317c928fffcb919d71bdb62821b80280af2347`, `dpl_ER5v1bwisSTkfWE6BCd7jfJNLxvk`, está
+**READY** y el alias apunta a él (20:43:28Z). SHA exacto, proyecto true y claves congeladas env/build
+verifican la cadena de configuración; la API sólo expone nombres, no el booleano congelado ni ejecución
+de una conversión. Primera ocurrencia comercial, recibo proveedor y
+atribución siguen pendientes; el E2E no está cerrado. [Auditoría de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
+
+Corte 17-10-2026: código local y workspaces preparados, entonces **sin deploy ni publicación GTM**.
 [ADR](../../architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md),
 [arquitectura](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
 [evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md).
 
 Validación18/10 y [paquete de release](../../operations/releases/google-ads-2026-10-18/README.md):
 Chromium aislado/API verificados; propuestas Performance/Discovery sin apply. Los hosts todavía
-sirven el bridge anterior. Release general bloqueado por alcance/CI/preflight; sin publicación.
+servían el bridge anterior. En ese corte el release general estaba bloqueado por alcance/CI/preflight; sin publicación GTM.
 Smoke reproducible: `pnpm exec tsx scripts/gtm/google-ads-browser-smoke.ts` (todo interceptado,
 respuestas simuladas; no certifica proveedor, GTM real ni atribución).
+
+**Checkpoint 18/10, 19:51Z: release de código RELEASED.** Main
+`ec317c928fffcb919d71bdb62821b80280af2347`; CI/Deep/smoke PASS; orquestador [39159325900](https://github.com/efeoncepro/greenhouse-eo/actions/runs/39159325900)
+SUCCESS; manifest `ec317c928fff-33c067f4-bc76-4a21-a5e0-a37a99ac726b` released a las 19:51:25.548Z,
+releído a las 19:51:44.315Z. Vercel Production `dpl_F13UyAaTEjkcttFKc7aZjjtgTFNt` READY y alias
+releídos a las 19:49:59Z; health HTTP 200 y watchdog `ok`, 6/6 runtimes, `drift=0` y `dataMissing=0`.
+Canario admin 7/7, bundles Forms/Meetings/CTA y dos negativos `private, no-store` PASS; sin lead ni reserva
+real. Las expansiones SQL de recibos están aplicadas; excepción específica de batch autorizada a las 18:53:53Z.
+[Auditoría y límites](../../audits/releases/2026-10-18-full-develop-production-release.md).
+
+`GROWTH_MEASUREMENT_GOOGLE_ADS_ENABLED` estaba ausente en Production en ese checkpoint
+(readback a las19:49:57.865Z) y conservaba OFF. No se publicó GTM ni se activaron políticas Ads con este release de código. El opt-in, hosts compatibles,
+Preview funcional, EC efectiva y la primera solicitud/reserva real consentida conservaban sus gates
+en ese corte; el avance posterior se registra en el checkpoint actual.
+El PASS del contrato servido no acredita conversión enviada, recepción ni atribución Ads.
 
 ## Qué registra
 
@@ -59,23 +93,59 @@ La API y CLI comparten CAS, revisión/publicación y autorización existentes. P
   "googleAds": {
     "conversionKey": "commercial_lead",
     "enhancedConversions": true,
-    "activationAt": "2026-10-17T00:00:00.000Z"
+    "activationAt": "2026-10-18T20:35:00.000Z"
   }
 }
 ```
 
-Ese fragmento no es un comando completo ni activa nada por sí solo. Agendas usan `meeting_booking`.
+Ese fragmento muestra el corte histórico de las dos políticas activadas; no es un comando completo
+ni una fecha para reutilizar en nuevas fuentes. Revisar un activationAt propio, sin backfill.
+Agendas usan `meeting_booking`.
 Elegibilidad: Forms contact/diagnostic_intake/quote_request de riesgo low/medium y binding activo de
 Meetings, con intención comercial revisada. Excluir soporte, contenido/newsletter, careers y pruebas.
 La fuente/versión se comprueba de nuevo al preparar; destinos[] es válido para Ads-only.
 El panel conserva la configuración Ads al editar una policy, pero su autoría inicial Ads es por API/CLI;
 no se incorporó un formulario visual ni nueva tool MCP para este delta.
 
-## Borradores GTM y siguiente activación
+## Ampliar a los demás formularios comerciales
 
-- Web `GTM-NGHPGRLZ`, workspace8: cuatro variables, trigger77 y tag78.
-- Server `GTM-K2X4ZTTK`, workspace12: variables38–40, triggers41/42/44/46, tags43/45/47;
-  forwarder18 agrega sólo blockingTriggerId41. Live sigue Web5/Server9.
+Performance y Discovery nombran fuentes del sitio: el formulario de diagnóstico de pauta y la
+agenda de descubrimiento, respectivamente. No son tipos de campañas publicitarias.
+
+La ampliación solicitada se limita a formularios que captan solicitudes comerciales de servicios.
+Reutiliza `commercial_lead` y los tags publicados. Ebooks/descargas, newsletter, careers,
+soporte y pruebas no se incorporan. La reserva Discovery conserva `meeting_booking`.
+
+1. Releer por API el catálogo, fuente, propósito, clasificación, riesgo, versión y surface. Contrastar
+   intención comercial con campos y recorrido; superar el gate técnico no la acredita.
+2. Conciliar discrepancias antes de preparar apply. Lead Gen - Web declara propósito comercial pero
+   sigue lead_magnet; AI Visibility Grader es diagnostic_intake pero declara propósito lead magnet.
+   No reclasificar ni activar por deducción. Un contacto mixto requiere condiciones comerciales explícitas.
+3. Preparar la revisión de la política existente con `googleAds.conversionKey=commercial_lead`, EC,
+   activationAt revisado y mapping válido, preservando Meta/UPD y demás configuración. No crear un
+   segundo emisor ni una nueva etiqueta por formulario. La identidad nativa HubSpot se configura
+   por destino mediante su [manual](guardar-identidad-nativa-hubspot.md); la marca técnica configurada
+   en Performance no se presume provisionada en los demás formularios nativos.
+4. Validar y verificar la propuesta; publicar mediante el flujo canónico sólo con la revisión concreta
+   autorizada. Releer la revisión publicada y su binding de fuente/versión/surface/origin.
+5. Repetir negativos y seguir la primera ocurrencia real consentida, sin leads ni GCLIDs fabricados.
+   Guardar evidencia saneada de recepción; dejar atribución pendiente hasta disponer de evidencia Ads.
+
+El corte previo del18/10 contenía12 propuestas validadas sin publicar; fue sustituido por la
+publicación22:57Z de13 Forms y Discovery. Las advertencias siguientes describen la revisión previa de fuentes
+cuya intención sigue pendiente de revisión. No son 12 activaciones ni 12 conversiones certificadas.
+[Inventario y alcance actual](../../audits/growth/2026-10-18-commercial-forms-measurement-coverage.md).
+Una nueva versión publicada exige revisar su política; la inscripción y control automáticos para
+formularios futuros **no están implementados**. Esta ampliación no modifica campañas, goals ni puja.
+
+## GTM publicado y operación posterior
+
+- Web `GTM-NGHPGRLZ`, live6: cuatro variables, trigger77 y tag78, preparados en workspace8.
+- Server `GTM-K2X4ZTTK`, live10: variables38–40, triggers41/42/44/46, tags43/45/47,
+  preparados en workspace12; forwarder18 agrega sólo blockingTriggerId41. El readback combinado
+  previo al publish pasó173 checks. Preview técnico Server reconstruyó `user_data` con tres
+  supresiones, sin etiquetas ni salidas; SDK Web live pasó cuatro casos con todo envío interceptado.
+  Esto acredita protocolo/negativos, no entrega de una conversión Ads.
 - `pnpm --silent google-ads conversions bindings` relee y verifica owner, tipo, estado, categoría,
   conteo, primary, AW y labels; salida sin HTML. No derivar AW del customer/actionID.
 - `pnpm exec tsx scripts/gtm/google-ads-plan.ts` genera revisión offline con blockers. No publica ni
@@ -86,9 +156,9 @@ Antes de publicar: comparar cuerpos/fingerprints frescos con el plan, confirmar 
 ajenos y repetir compilación/Preview. Validar Tag Assistant y el protocolo GA4 Client→Ads; comprobar
 que el bridge no llega a GA4 ordinario ni Meta. La compilación no prueba entrega. Verificar en la
 cuenta Ads los términos aplicables y habilitación efectiva EC; no inferirla de un tag configurado.
-Actualización17/10: el operador autorizó aceptar los términos y se guardaron; el panel reabierto
-confirma «Has leído y aceptado estos términos». EC continúa OFF: esa habilitación y el rollout
-no se ejecutaron al aceptar el contrato. [Evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md#confirmación-posterior--términos-aceptados).
+Histórico17/10: el operador autorizó aceptar los términos y se guardaron; el panel reabierto
+confirmó «Has leído y aceptado estos términos». EC continuaba OFF en ese corte: la habilitación y el
+rollout se realizaron después, según el checkpoint18/10 de este manual. [Evidencia](../../audits/growth/2026-10-17-google-ads-online-conversions.md#confirmación-posterior--términos-aceptados).
 
 Coordinar release backend/renderers/bridge y sus hosts (WP/Think), publicar primero Server con la
 excepción, luego Web, y sólo después habilitar policy/flag del backend tras consent smoke. Registrar
