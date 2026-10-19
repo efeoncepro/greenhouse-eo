@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-19 — Partnerships: identidades, habilitación y expediente Nexsys
+
+Adobe `.com`/AM17480390 Registered: Code of Conduct100%, Certified recibido; aprobación pendiente.
+Nexsys: 12PDF enviados19:14Chile a Francisco, CC Jean/Javiera/Constanza, firma gráfica/CCO; Outlook y EMAIL118974219069 SENT verificados. Formulario sin firma para revisión; crédito/Marketplace/capacitación pendientes.
+Google `.org`: Cloud/Workspace indirecto activo/Ingram, handshake completo; respuesta comercial y formación pendientes.
+Microsoft `.com`: CSP activo/MPA aceptado, IDV nuevo pendiente; AWS SmartHub sin habilitación y Partner Central por verificar.
+[Registro y auditorías](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) · [manual y controles](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
+Skills Codex/Claude: identidad antes de altas, entrega externa sin notas internas, lista de adjuntos y evidencia por estado. Sin nuevos envíos ni contratos en este cierre.
+
 ## 2026-10-19 — ANAM: voz de Emma activa y conocimiento operativo
 
 600 con Emma primero, voz Lina, IA24/7 y humanos L–V09:00–18:00Santiago; sin menú IVR.
@@ -242,32 +251,6 @@ Outlook SENT y tres pasos HubSpot Programado, secuencia `316561523`, 21/28 de oc
 Parada por respuesta a cualquier correo verificada; sin duplicar desde el heartbeat ni contactar puentes.
 Brochure de 27 páginas identificado y firma oficial configurada; preview integrado sin render, entrega futura pendiente.
 Método y adapter espejados Codex/Claude, registro focal actualizado; no renueva corte global ni permisos.
-
-## 2026-10-15 — SKY: servicio SEO, skill y valor orgánico
-
-[Entrega y evidencia](docs/audits/growth/2026-10-15-sky-seo-service-and-organic-value.md):
-[marco de cuenta](docs/services/sky-blog-seo/README.md), skill espejo `sky-blog-seo`, método versionado,
-collector/cálculo/CLI y Excel actualizado conservando GA4/GSC. Piloto septiembre: USD2.116,38 sobre3.824
-clics valorados de28.718 (13,3157%); CPC Chile/Perú capturados15/10, proxy parcial sin extrapolación/ROI.
-Compra5tasks USD0,2406, snapshots1.505 leídos después; sin tracking recurrente. Pruebas69, tsc8GB,
-lint y espejos/contexto PASS; export leído y QA visual. Foundation local, sin panel/API/MCP/job, nueva edición
-Insights, push/deploy o envío. WP autenticado/anexo/historia de migración pendientes; expectativa3meses
-no es promesa de recuperación. [Manual](docs/manual-de-uso/growth/valorar-trafico-organico.md).
-
-[Auditoría orgánica e inventario](docs/audits/growth/2026-10-15-sky-organic-channel-audit.md): PDF14p +
-Excel1.697 posts; GA4−58,1% jul–ago→oct–nov2025, transición observada26–27sep. Sin atribución causal
-completa/penalización probada. Azure público duplicado,14layouts,68CTA y21destinos404 conocidos requieren owner SKY;
-remediación pendiente. DataForSEO12tasks USD0,491816. GSC anterior no disponible; logs/reporte previo pendientes; sin cambios al sitio.
-Profundización sin GSC anterior: [complemento y evidencia](docs/audits/growth/2026-10-15-sky-organic-channel-audit.md#profundización-posterior-sin-propiedad-gsc-anterior).
-Canales no caen uniformemente; no sostener fallo generalGA4 por agregados. Inicio orgánico−53,86% en28d;
-regresiones archivadas y916redirects verificados. ComplementoPDF4p, coste adicional0; fuentes previas intactas.
-Primer lote preparado: [plan y aceptación](docs/services/sky-blog-seo/PLAN_RECUPERACION_PRIMER_LOTE_2026-10-15.md),
-20 URLs priorizadas / 10 iniciales (9 artículos + 1 decisión 404), fichas, PDF6p, Excel y manifiestos técnicos.
-GSC4fases reconciliadas; detalle consulta-país cubre35,93% de32.800clics, países por artículo parciales.
-Sin cambios CMS/infra; congelar baseline al implementar, registrar fecha real y revisar28/56d; accesos/validación SKY pendientes.
-Estado corregido: diagnóstico base entregado y auditoría integral parcial. [Siete frentes y aceptación](docs/services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md).
-Skills `sky-blog-seo`/`seo-aeo` Codex–Claude y modelo compartido separan cobertura, preparación, aplicación y resultado;
-censo no equivale a revisión editorial; blog no acredita SEO completo de SKY. GSC anterior no bloquea profundizar.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

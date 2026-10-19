@@ -48,6 +48,29 @@ Esta variante conserva los datos y enlaces; no incluye foto, logo ni diseño gr�
 
 ## Procedimiento antes de enviar
 
+### Expedientes y formularios externos — precisión del 19/10/2026
+
+Julio confirmó retirar del entregable todas las notas internas de búsqueda/QA y descripciones innecesarias
+como «oficina virtual arrendada». No convertir esta corrección editorial en datos falsos: los campos
+exigidos se responden con evidencia o se dejan pendientes con el operador. Aplicar el
+[manual de partnerships y distribuidores](../manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
+
+- Antes de adjuntar, revisar todas las páginas y campos del PDF final; preparar lista exacta de archivos,
+  versiones/períodos y destinatarios autorizados. No incluir manifiestos internos, comentarios de búsqueda
+  ni respaldos adicionales fuera del alcance. Informar al operador qué documentos se transmitirán.
+- En Outlook, comprobar que el cuerpo preceda a una única firma nueva. Si el cursor/atajo coloca texto
+  después de la firma, corregir el orden y verificar visualmente; un atajo ejecutado no prueba ubicación.
+- Para varios archivos, usar el selector soportado y **Adjuntar como una copia** cuando se solicitaron PDF,
+  sin convertirlos en vínculos públicos. Esperar la carga completa. Nombres, cantidad y tamaños se verifican
+  de nuevo mediante `list_attachments` en la copia enviada; no basta `has_attachments=true`.
+- Enviar documentación para revisión no firma el formulario ni acepta contratos. La firma gráfica del
+  correo no se traslada al espacio de firma del PDF. Mantener ese estado explícito en el expediente interno.
+- Tras timeout o resultado incierto, buscar primero en Enviados. El enlace de origen puede mostrar el
+  mensaje anterior; abrir el ID nuevo confirmado. CCO no demuestra registro CRM: comprobarlo aparte.
+
+### Secuencia de envío
+
+
 1. Confirmar mailbox, destinatarios, asunto y contenido autorizado. Mantener los cambios dentro de lo pedido; «envíalo» después de revisar el texto ya es autorización, no pedirla otra vez por esta norma.
 2. Revisar la capacidad real de la herramienta. El conector Outlook `send_email` observado el 2026-10-08 admite `text_content` y BCC, pero **sólo texto plano**: no preserva una firma HTML ni añade la firma configurada en Outlook. No pasar HTML en `text_content` ni asumir que Outlook la incorporará después.
    **Delta 2026-10-19:** en otra sesión, el conector Microsoft 365 de claude.ai (app `07c030f6-5743-41b7-ba00-0a6e85f37c17`) tenía sólo permisos de lectura: `Mail.Read`, sin `Mail.ReadWrite`. `outlook_create_reply_draft` respondió `FORBIDDEN: Missing scope 'Mail.ReadWrite'`. Los permisos dependen del consentimiento otorgado: verificarlos en cada sesión (`get_granted_scopes`), sin asumir que la capacidad del 08-10 sigue vigente. Si no hay escritura, entregar el texto final (incluida la firma en texto y el CCO anotado), dejar que Julio envíe desde Outlook web y hacer el readback de Enviados con el conector. Dar consentimiento en Entra es una decisión de seguridad del administrador, nunca de un agente. Caso: respuesta a Pibank del 19-10 (destinatario, CCO y adjunto verificados en Enviados).

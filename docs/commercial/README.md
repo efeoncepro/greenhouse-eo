@@ -1,5 +1,7 @@
 # Commercial
 
+- [Partnerships y distribuidores: operación](../manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) · [registro vigente](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md): Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL; identidad, formación, crédito, archivos externos y evidencia de envío.
+
 Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
 aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;

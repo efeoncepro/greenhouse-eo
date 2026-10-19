@@ -5,6 +5,19 @@ description: 'Deliver and operate HubSpot as a managed client service across Sma
 
 # HubSpot as a Service
 
+
+## Partnerships, distribuidores y expedientes externos
+
+Para recuperar membresías, completar altas/crédito o preparar documentos para distribuidores, cargar el
+[manual de operación](../../../docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) y el registro de partnerships. Cruzar cuenta, razón social/RUT e ID antes
+de registrar, formar o pedir un upgrade; no crear duplicados ni usar una membresía de otra empresa.
+Separar estado del programa, curso, distribución, Marketplace, crédito y capacidad de ordenar.
+Los formularios externos sólo llevan datos pertinentes: notas de búsqueda, pendientes y QA quedan en el
+expediente interno. No inventar datos ni aplicar la firma del correo como firma contractual. Revisar todas
+las páginas y la lista exacta de adjuntos; comprobar Enviados, archivos y CRM por separado.
+Los estados y contactos variables viven en el registro/auditoría, no se copian como defaults a la skill.
+
+
 ## LinkedIn Ads: distinguir pixel, lifecycle y Lead Sync
 
 Antes de conectar o recomendar configuración, leer [preparación LinkedIn](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md)

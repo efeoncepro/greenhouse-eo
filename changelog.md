@@ -2,6 +2,13 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-19 — Partnerships y expedientes de distribuidores
+
+- Conciliados Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL con identidad, evidencia y pendientes separados.
+- Nexsys: formulario corregido y once respaldos enviados; readback Outlook/adjuntos y HubSpot SENT confirmado.
+- [Manual](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md), política Outlook y cuatro skills en Codex/Claude incorporan revisión integral, separación de notas internas, autoridad de firma y control de adjuntos.
+- Sin nuevos envíos, contratos, pedidos ni cambios de acceso en el cierre documental.
+
 ## 2026-10-19 — Customer Agent Voice: caso ANAM y guía operativa
 
 - Documentada la activación de Emma en el 600, llamada real y correo enviado con firma gráfica/CCO.
@@ -629,10 +636,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 ## 2026-10-05 — TASK-2002: calendario de activaciones v3 en producción (sólo lectura)
 
 - Studio `main` `d0ec7e0`: `studio.efeonce.org/calendar` sigue la dirección v3 aprobada en Mes, Semana, Día, Línea de tiempo, Paid, Hoja, Popover del día, estados, filtros móvil y preview por formato, con barra inferior propia de evidencia de ejecución. Diálogos de escritura (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución) verificados en local; en producción no se montan hasta que exista login (TASK-1898). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
-
-## 2026-10-05 — TASK-2001: lectores de hojas email y landing
-
-- Local: API 1.9.0 amplía ActivationDto con email literal/límites/audiencias/métricas y web con destinos/Growth Forms validado. UI intacta, null ausente, sin series ni SQL entre productos. Postgres/check/build/CLI PASS; rollout pendiente. [Contrato y evidencia](docs/audits/marketing-studio/TASK-2001-activation-reader-sheets-2026-10-05.md).
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 
