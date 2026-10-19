@@ -1,5 +1,9 @@
 # Registro operativo general de negocios CRM
 
+## UTEM · resultado perdido — actualización puntual 19-10-2026
+
+Proceso **5251-1060-COT26**, Deal **65832566144**: Julio informa pérdida; consulta actual de LicitaLAB confirma **Proveedor seleccionado: PROMO GIFT SPA**, CLP2.290.000 netos, frente a Efeonce CLP4.800.000. Efeonce figura no seleccionada y quinta por precio entre diez ofertas; no es ranking técnico. [Análisis documental y límites](tenders/utem-seo-aeo-2026/ANALISIS-PROMOGIFT-2026-10-19-INTERNO.md). Este resultado sustituye «en evaluación» en los cortes históricos siguientes. **HubSpot cerrado como perdido (`closedlost`) por autorización de Julio**, con motivo, descripción y siguiente paso conciliados; dos readbacks CLI/MCP. Monto propio CLP4.800.000 preservado. Sin acciones comerciales pendientes para esta compra. [Evidencia de cierre](tenders/utem-seo-aeo-2026/hubspot-perdida-2026-10-19.json). Fundamentación oficial/OC de UTEM no recuperadas.
+
 Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
 aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
