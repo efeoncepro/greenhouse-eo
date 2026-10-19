@@ -62,6 +62,8 @@ Pibank sería nuestra cuenta de referencia en la banca peruana, con un equipo ar
 - **Trabajo ya hecho sobre Pibank y el mercado peruano:** investigamos la demanda de búsqueda de ahorro en Google Perú. Además, el 06-10-2026 revisamos 17 búsquedas clave y Pibank no aparecía en ninguno de los 301 resultados. Con esa base armamos el diagnóstico de la propuesta y la muestra X-Ray sobre su propio sitio.
 - **Sector financiero:** trabajamos con Banco BICE y BICECORP en Chile con el mismo reto que hoy tiene Pibank: sumar cuentas desde la búsqueda, con condiciones exactas y revisión de Cumplimiento.
 
+Te adjunto además una lectura breve del ahorrista peruano, preparada por nuestro equipo con datos de búsqueda e IA en Perú: qué busca, con qué productos compara y de qué fuentes saca hoy sus respuestas la IA de Google.
+
 Si les ayuda, podemos revisar estos puntos en una llamada corta antes del jueves 22.
 
 Un abrazo,
@@ -79,4 +81,4 @@ Partner oficial de HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Cla
 
 ---
 
-**Antes de enviar:** cerrar todos los corchetes, añadir el CCO `48713323@bcc.hubspot.com` y confirmar que no quede ninguna marca interna en el cuerpo.
+**Antes de enviar:** adjuntar `Pibank-Anexo-ahorrista-peruano-2026-10-19.pdf` (carpeta comercial Banco Pichincha en OneDrive; fuente en `../anexo-ahorrista-peruano/`). Añadir el CCO `48713323@bcc.hubspot.com` y confirmar que no quede ninguna marca interna en el cuerpo.
