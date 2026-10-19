@@ -1,5 +1,8 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta anuncios de alianza verificado contra: correcciones y aprobación del operador en la corrida
+> `ai-generations/2026-10-19_google-partner-freeze/` (rondas 1–5), greenhouse-eo `develop` en `cb9a8e666` — 2026-10-19.
+
 > Delta mate uniforme verificado contra: petición y aprobación de cuatro bases planas por el operador,
 > AXIS `de34866` y catálogo live de 134 entradas — 2026-10-12. Prueba de nuevos volúmenes, sin alta/publicación.
 
@@ -330,7 +333,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   Greenhouse orbitan con su isotipo: **son contexto, no firma** (lámina 3.2; Lab 3.2).
 - **Nunca:** logos de terceros presentados como alianzas. «Los satélites de canales muestran dónde medimos, no con quién
   nos asociamos» (lámina 0.2, «No hacer»). Las alianzas reales sólo se declaran en la zona de partners de la firma de
-  correo, con el registro de partnerships (manual §10.2).
+  correo, con el registro de partnerships (manual §10.2), y en un **anuncio de alianza** (aprobado el 2026-10-19, ver
+  «Anuncios de alianza» al final de este archivo), que también se respalda en ese registro.
 
 #### Marcas de terceros y claims de partner (deck de práctica Salesforce, operador 2026-09-29)
 
@@ -556,6 +560,7 @@ conclusión) donde la receta lo permita.
 | Contexto | Voz pregunta-respuesta |
 |---|---|
 | Portada de brochure, anuncio, social, apertura de sección | Sí, con un par aprobado o escrito para esa pieza |
+| Anuncio de alianza o partnership | **No.** El lockup y el eyebrow dicen lo que es («Efeonce \| Google» + «Oficialmente partners»); «¿Quién lleva Google a mi empresa? / Nosotros» fue «absurda» (operador, 2026-10-19) |
 | Portada de propuesta para un cliente | **No.** Dice lo que es: «Propuesta», qué resuelve y para quién (operador, 2026-10-19: «lo mejor para la portada es decir lo que es: una propuesta, o decir en qué basamos la propuesta») |
 | Lámina de decisión (precio, próximos pasos, plan, por qué esta opción) | Sí, si la pregunta es real |
 | Lámina que explica (diagrama, tabla, condiciones, responsabilidades, anexos) | No: título declarativo con su conclusión |
@@ -928,6 +933,8 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce; el login V4 (TASK-1964) es la única excepción en curso, sin canon todavía ([applications.md](applications.md) §A12) | ADR, decisión 6 |
 | **Un par del catálogo como portada de perfil social** («¿Qué hace Efeonce? Crecer.») | la portada pide una idea propia | operador 2026-10-01 (§4) |
 | **Destacados de Instagram con la misma toma o con íconos planos**, o firma en el círculo | mezcla de recursos, una escena y un color de luz por destacado; la marca la pone el avatar | operador 2026-10-01 (§7) |
+| **Anuncio de alianza con «×»**, un logo recortado o a color junto al otro en blanco, o la fila de productos lejos del lockup | filete vertical, dos logos completos en blanco, un solo bloque focal | operador 2026-10-19 («Anuncios de alianza») |
+| **La órbita fina como único recurso de un anuncio de alianza**, o voz pregunta-respuesta en él | «le falta muchísimo punch»; el par es «absurdo» en un anuncio que sólo declara la alianza | operador 2026-10-19 («Anuncios de alianza») |
 
 ---
 
@@ -1142,3 +1149,33 @@ Título aprobado por ejecución: «Explora». Autoriza recomponer todo el footer
 equilibradas, newsletter y empleo independientes, tipografía unificada, fila de partners compacta
 y cierre legal discreto. Reducir vacío sin propósito; controles flotantes fuera del cierre mientras
 se lee. No extrapolar ocultamiento global ni borrar funciones fuera del footer.
+
+### Anuncios de alianza (partnership) — 2026-10-19
+
+Caso fuente: «Efeonce | Google — Oficialmente partners» (post 4:5 + reel 9:16), aprobado en la ronda 5 tras cuatro
+rechazadas. La tarjeta de producción es [applications.md](applications.md) §A16; las decisiones con fecha, en
+[ledger.md](ledger.md). El criterio:
+
+- **El lockup es el mensaje.** «Efeonce | Google» con **filete vertical**, nunca «×»: la × se lee como colaboración tipo
+  drop/streetwear; el filete es la convención corporativa y la misma de la familia H3. Los dos logos van **completos**
+  (nunca sólo el isotipo de uno) y **en blanco monocromo** sobre oscuro, los dos iguales: «pon el logo de Google en
+  blanco igual que el de Efeonce». El eyebrow dice el hecho: «OFICIALMENTE PARTNERS» (Poppins 600, tracking .14em).
+- **Un solo bloque focal.** Los logos de productos del partner (aquí Gemini, Google Cloud, Google Workspace) van
+  pequeños, en gris azulado claro, **justo debajo** del lockup; con la fila al pie de la pieza «el ojo va a fijar la
+  vista a dos lugares». La fila nunca es más ancha que el lockup. El énfasis sigue la oferta, no el orden alfabético:
+  Gemini y Google Cloud por sobre Workspace (la primera versión «está muy inclinada a Google Workspace»).
+- **Sin voz pregunta-respuesta.** No hay pregunta real del lector que el anuncio conteste: declara un hecho. «¿Quién
+  lleva Google a mi empresa? / Nosotros» fue «absurda» (§4, «Cuándo sí y cuándo no»).
+- **Cuándo la órbita no basta.** Una órbita de trazo fino como único recurso visual de un anuncio de alianza no tiene
+  impacto: «le falta muchísimo punch». La pieza aprobada no lleva órbita: el impacto lo da una escena con profundidad
+  (íconos oficiales de los productos en tres planos, luz de cine) y el lockup en el centro oscuro.
+- **Lo que delata que no se entendió** (rechazos del 2026-10-19): tipografía que imita el logo del partner («Google» en
+  Bricolage con barrido de colores); esferas 3D en los colores del partner («parecen globos de pintura»); estética de
+  banco de imágenes (explosión de objetos de oficina); la mascota de consumo del partner (Gigi, campaña para
+  estudiantes) en un anuncio B2B y Efeonce ausente de la imagen; contenido generado dentro de pantallas de laptop o
+  teléfono («quedó horrible, quítaselo»).
+- **Las marcas del partner son claim** (§3.7, «Marcas de terceros y claims de partner»): procedencia por archivo y,
+  antes de pauta pagada, archivos oficiales del portal de partners en lugar de reproducciones. El acabado generativo
+  (material acrílico brillante, rim light) se aplica a los íconos del partner como escena, no a la órbita ni a la
+  marca de Efeonce, y lo pidió el operador; [inferido] por eso no choca con «discos rellenos, brillos, reflejos» de §10,
+  que es gramática de la órbita.

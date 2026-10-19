@@ -157,6 +157,14 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
   el modelo sólo termina luz y material, y después se **repone** el contenido exacto; el logo sobre un objeto va como
   vinilo compuesto, nunca terminado por el modelo; una tarjeta de UI va en vidrio oscuro, no blanca plana. Método:
   `design-studio` → `references/efeonce-photographic-language.md` §«Caso de cliente con piezas reales».
+- **Íconos oficiales de un partner como escena** (anuncio «Efeonce | Google — Oficialmente partners», 2026-10-19):
+  fondo con Flare, íconos compuestos de forma determinística en capas de profundidad y pasada de **acabado Sunburst**
+  sobre la escena compuesta (sólo luz y lente, íconos idénticos; el operador: «no se ve bien así determinístico»).
+  Luego QA al 100 % contra la escena y reposición de lo que el acabado cambió (borró el contorno de tinta de una
+  mascota), contraste medido bajo la caja del lockup **antes** de componer (una luz detrás del logo blanco dio 1,3:1) y
+  lockup, eyebrow y fila de productos determinísticos. Criterio del lockup (filete, logos en blanco, un solo bloque
+  focal, sin pregunta-respuesta): `efeonce-graphic-line` → `references/applications.md` §A16.
+- 🔴 `pnpm ai:image` sin `--model` genera con `gpt-image-2`: nombra siempre el modelo 2.5 que quieres.
 - Plate cotidiano → GPT Image 2.5 Flare; edición precisa, máscara o master final → 2.5 Sunburst
   (`pnpm ai:image --model gpt-image-2.5-sunburst`); material/atmósfera → Seedream 5 Pro; divergencia barata →
   Seedream 5 Lite (`pnpm ai:fal`).

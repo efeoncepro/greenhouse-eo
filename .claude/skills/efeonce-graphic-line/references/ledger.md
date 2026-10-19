@@ -1,5 +1,29 @@
 # Registro de decisiones y versiones
 
+### 2026-10-19 — Anuncio de alianza «Efeonce | Google — Oficialmente partners» (post 4:5 + reel 9:16)
+
+Aprobada por el operador la ronda 5 («cine») tras rechazar cuatro rondas. Decisiones del operador, con su frase:
+
+- **Lockup «Efeonce | Google» con filete vertical, no «×»** (la × se lee como colaboración tipo drop/streetwear; el
+  filete es la convención corporativa y la de la familia H3). Ambos logos **completos** y **en blanco monocromo** sobre
+  oscuro: «pon el logo de Google en blanco igual que el de Efeonce». Eyebrow «OFICIALMENTE PARTNERS».
+- **Un solo bloque focal:** la fila de productos (Gemini, Google Cloud, Google Workspace), pequeña y en gris azulado
+  claro, va justo debajo del lockup; con la fila abajo «el ojo va a fijar la vista a dos lugares». Nunca más ancha que
+  el lockup. Énfasis en Gemini y Google Cloud: la primera versión «está muy inclinada a Google Workspace».
+- **Acabado generativo obligatorio sobre la escena compuesta:** «tienes que pedir el acabado a Sunburst porque no se ve
+  bien así determinístico». Firma y textos siguen fuera del modelo.
+- **Rechazos** (criterio en [criteria.md](criteria.md), «Anuncios de alianza»): órbita de trazo fino como único recurso
+  («le falta muchísimo punch»); el par «¿Quién lleva Google a mi empresa? / Nosotros» («absurda»); tipográfico con
+  «Google» en Bricolage y barrido de colores (imita el logo); esferas 3D en colores Google («parecen globos de
+  pintura»); explosión de objetos de oficina con Gigi; contenido generado dentro de pantallas («quedó horrible,
+  quítaselo»).
+
+Receta y producción: [applications.md](applications.md) §A16; trampas: [lessons.md](lessons.md) (2026-10-19).
+Archivos: `ai-generations/2026-10-19_google-partner-freeze/` (`r5-cine/`, `export/`); canvas
+[rondas 1–5](https://claude.ai/artifact/ETWw3CfFq7QPCVLHq7GssH). **Pendiente antes de pauta pagada:** reemplazar las
+reproducciones de íconos (Iconify, Wikimedia) por archivos oficiales del portal de partners de Google. El claim de
+partner se rige por el registro de partnerships (§3.7 de criteria); este registro no lo verifica.
+
 ### 2026-10-19 — La voz pregunta-respuesta tiene cuándo sí y cuándo no (propuesta SGS Chile)
 
 Operador, sobre la portada «¿Se ve cada contacto? Todos.»: «Necesito que encuentres una dinámica de que esto de la
@@ -81,6 +105,7 @@ solo en memoria y no escribe consentimiento real. Dirección y QA en
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-19 | **Anuncio de alianza** («Efeonce \| Google — Oficialmente partners», post + reel): lockup con **filete vertical** (no «×»), los dos logos completos **en blanco** sobre oscuro, eyebrow «OFICIALMENTE PARTNERS», fila de productos chica en gris azulado **justo debajo** del lockup (un solo bloque focal, nunca más ancha que el lockup), sin voz pregunta-respuesta; la escena compuesta pasa por **acabado Sunburst** («no se ve bien así determinístico»). Detalle arriba (entrada del 2026-10-19) y [applications.md](applications.md) §A16. |
 | 2026-10-17 | **Kit de componentes de video aprobado completo** (lámina «Componentes de video · v4» del canvas «¿Para cuándo?»; «Todos están aprobados, importante que tenemos color de esfera y/o acento con las líneas»). 18 componentes en 4:5, 9:16 y 16:9 a 1080 de lado corto: zócalos de lugar (con pin `ubicacion` en reposo si la palabra es un lugar), persona y canal; remate y remate con pregunta; cita; burbujas de voz; super de dato; comparación (la etiqueta acepta ícono en reposo, logo o isotipo); cartela de capítulo; cierre con CTA (antes del reveal); barrido e iris; lista de pasos con íconos; momento protagonista; Plastilina en volumen; callout con gesto; pantalla dividida («Antes.» con punto, «Ahora» con esfera). **La línea decide el acento; el fondo sigue siendo el navy de Efeonce** (también el vidrio del subtítulo). **Siempre que va la dirección, va la burbuja URL** (2026-10-17). En AXIS: delta (z), `surfaces.audiovisual.videoKit` + recetas `video-*`, `content.video` en el manifiesto (`axis-tokens` 0.6.4, `axis-ui-contracts` 0.7.4; publicación pendiente de confirmación). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.5, delta 2026-10-17 (b). |
 | 2026-10-13 | Privacidad pública: tras pedir una experiencia moderna/premium/elegante afín a La órbita, el operador autoriza «Vamos, ponla». Se adopta papel/navy, Bricolage/Poppins, aviso compacto y preferencias responsive en WordPress/Think. El footer conserva el enlace legal discreto; HubSpot conserva consentimiento y persistencia. Aplicación publicada y verificada; no habilita la propuesta escalable de medición ni migra otros productos. [Aplicación y mantenimiento](applications.md#producción-y-mantenimiento-de-esta-aplicación). |
 | 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |

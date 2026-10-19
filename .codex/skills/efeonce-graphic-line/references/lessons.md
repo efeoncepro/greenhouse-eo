@@ -1,5 +1,8 @@
 # Lecciones (trampas que ya costaron tiempo)
 
+> Delta 2026-10-19 (anuncio de alianza Efeonce | Google) verificado contra: greenhouse-eo `develop` en `cb9a8e666` y la
+> corrida `ai-generations/2026-10-19_google-partner-freeze/`.
+
 > Verificado contra: greenhouse-eo `develop` en `b0efd42a3` (árbol local de TASK-1964, sin commit propio todavía) —
 > 2026-10-02 (última entrada: el login V4 de Greenhouse); antes, `d1a41babb` — 2026-10-01 (los perfiles sociales y los
 > destacados de Instagram); antes, `b84ec7084` — 2026-09-30 (el deck SEO/AEO, TASK-1949); antes, AXIS `c92160b` (tag `v0.3.38`) — 2026-09-29, noche (el camino recorrido y los
@@ -810,3 +813,30 @@ láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-genera
   `growth`, igual que en el deck HubSpot; `decision-plan` antepone «n · » al `range` dentro del máximo de 16;
   `content-pricing` exige 4 o 5 prestaciones por plan; `cover-proposal` no pinta la insignia de partner (va en la
   contraportada).
+
+## 2026-10-19 — Anuncio de alianza «Efeonce | Google» (post + reel)
+
+Carpeta: `ai-generations/2026-10-19_google-partner-freeze/` (`r4-impacto-premium/`, `r5-cine/`, `export/`). Tarjeta:
+[applications.md](applications.md) §A16.
+
+- **El acabado Sunburst borró el contorno de tinta de Gigi** (ronda de objetos con Gigi, luego rechazada). Síntoma: la mascota perdió su trazo negro
+  exterior tras la pasada de acabado. Causa: la pasada redibuja todo; un trazo fino de identidad no sobrevive.
+  Regla: después de todo acabado generativo, comparar al 100 % cada marca, mascota o ícono contra la escena compuesta;
+  lo que cambió se **repone componiendo** el original (aquí, el contorno de la pose original), no regenerando.
+- **Un núcleo de luz detrás del logo blanco dejaba 1,3:1.** Síntoma: el fondo con la luz concentrada en el centro se
+  comía el lockup. Causa: la luz ocupaba la caja de la firma. Regla: el fondo se pide con la luz como **horizonte bajo**
+  (≈ 60–64 % del alto) y el **centro oscuro** para el título, y el contraste se **mide bajo la caja de la firma antes de
+  componer** (la versión final quedó en 15–19:1 de media). Nunca rescatar con scrim.
+- **`pnpm ai:inpaint expand` no corrió: fal sin saldo.** Síntoma: «User is locked. Exhausted balance» en la cuenta
+  `FAL_API_KEY_B` (el expand usa Flux Fill por fal). Regla: `pnpm ai:fal --balance` antes de planear un expand; recargar
+  lo hace el operador. El fallback usado: extender el 4:5 a 9:16 **de forma determinística** (color por columna +
+  grano), válido porque el fondo era un espacio vacío sin objetos que continuar.
+- **`pnpm ai:inpaint image` abortó porque el prompt decía «logos»**, aunque fuera en negativo («sin logos»). Causa: la
+  guarda de marca lee la palabra, no la intención. Regla: si la edición toca el contexto y el prompt tiene que nombrar
+  marcas o logos, `--allow-brand`; nunca para generar o reconstruir una marca.
+- **`pnpm ai:image` generó con `gpt-image-2`** (carpeta `v1-gpt-image-2/`). Causa: es el default del CLI. El operador
+  esperaba GPT Image 2.5. Regla: pedir siempre `--model gpt-image-2.5-flare` (fondo) o `--model gpt-image-2.5-sunburst`
+  (acabado o edición final).
+- **El isotipo de Google Cloud salió cortado a la derecha.** Causa: se recortó de `google_cloud_logo.svg` con un
+  `viewBox` escrito a mano. Regla: usar el ícono completo (OneDrive `Workspace/Portafolio/03 DDSoft/Recursos}/google-cloud-1.svg`)
+  o calcular el bbox real del trazo antes de recortar; nunca estimar el `viewBox` a ojo.

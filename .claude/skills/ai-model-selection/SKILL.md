@@ -140,6 +140,15 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 - 🔴 **Para expandir, Flux Fill, no GPT Image** (canario 2026-10-03, misma foto y prompt): Flare achicó la escena
   (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
   (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
+- 🔴 **El default de `pnpm ai:image` es `gpt-image-2`, la generación anterior** (2026-10-19, anuncio Efeonce | Google:
+  la primera ronda salió con ese modelo y el operador esperaba 2.5). Nombra siempre el modelo con `--model`; la guía ya
+  recomienda Flare para generar y Sunburst para editar o terminar.
+- 🔴 **Un carril depende del saldo de su proveedor, no sólo del modelo** (2026-10-19): `pnpm ai:inpaint expand` corre
+  Flux Fill por fal y no salió con `FAL_API_KEY_B` en «User is locked. Exhausted balance». Antes de planear una ruta
+  por fal, `pnpm ai:fal --balance`; ten una alternativa (allí, extensión determinística del fondo vacío).
+- 🔴 **Un acabado generativo sobre una escena compuesta puede borrar detalles finos** (2026-10-19: Sunburst borró el
+  contorno de tinta de una mascota). Elegir Sunburst para el acabado no exime de comparar al 100 % y reponer lo
+  exacto; el oficio vive en `greenhouse-ai-image-generator` §«Acabado Sunburst sobre una escena compuesta».
 
 ### Video: clasificar por operación y fase
 

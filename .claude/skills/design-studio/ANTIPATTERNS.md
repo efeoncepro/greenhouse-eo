@@ -37,6 +37,11 @@
 - ❌ **Llamar “capas” a un raster de Seedream Pro.** ✅ Es edición regional semántica; no hay PSD, layer IDs,
   máscara pública ni preservación pixel-perfect.
 - ❌ **Hornear copy/logo/legal en el master generativo.** ✅ Clean plate + composición determinística por canal.
+- ❌ **Entregar plana una escena compuesta determinísticamente cuando la pieza pide impacto** (operador, 2026-10-19:
+  «no se ve bien así determinístico»). ✅ Acabado Sunburst de sólo luz sobre la escena compuesta, QA al 100 % contra
+  ella y reposición de lo que cambió (`modules/13`, receta «componer determinístico → acabado Sunburst»).
+- ❌ **Generar contenido dentro de las pantallas de una laptop o un teléfono con inpaint** (rechazo del operador,
+  2026-10-19: «quedó horrible, quítaselo»). ✅ Sin pantalla, o la interfaz real compuesta.
 
 ## Boundaries (duras)
 
@@ -60,5 +65,9 @@
 - ❌ **Entregar sin spec** (resolución/color-space/formato/safe zone equivocados; RGB a print, sin sangrado).
   ✅ Cierra con `templates/asset-delivery-spec.md` y checklist de pre-entrega.
 - ❌ **Prometer un look sin auditar el resultado.** ✅ Audita el KV con la rúbrica (`modules/05`) antes de aprobar.
+- ❌ **Anunciar una alianza B2B con recursos que no son de Efeonce** (rechazos del 2026-10-19): tipografía que imita
+  el logo del partner, esferas en sus colores («parecen globos de pintura»), explosión de objetos de banco de imágenes o
+  la mascota de consumo del partner con Efeonce ausente. ✅ Lockup de alianza + escena con sus íconos oficiales
+  (`efeonce-graphic-line` → `applications.md` §A16).
 - ❌ **Universalizar una paleta contextual.** El vino/naranja/lavanda de HubSpot puede enriquecer una pieza sobre
   HubSpot, pero rompe la identidad si se vuelve default Efeonce. ✅ Gramática agnóstica; skin decidido por tema.

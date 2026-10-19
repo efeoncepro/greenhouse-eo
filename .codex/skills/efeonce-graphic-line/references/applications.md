@@ -584,6 +584,60 @@ vale en toda aplicación:
 - **Consumo y fronteras:** la API planificada vive en AXIS (skill `axis-design-system` → `references/ui-primitives.md`,
   sección `efeonce.site-nav`); el agendador que abre el botón es Growth CTA (skill `greenhouse-growth-meetings`).
 
+### A16. Anuncio de alianza / partnership (post + reel) (aprobado 2026-10-19)
+
+> Verificado contra: la corrida aprobada `ai-generations/2026-10-19_google-partner-freeze/` (`r5-cine/`, `export/`) y
+> greenhouse-eo `develop` en `cb9a8e666` — 2026-10-19. Caso fuente: «Efeonce | Google — Oficialmente partners».
+> Criterio: [criteria.md](criteria.md), «Anuncios de alianza»; decisiones: [ledger.md](ledger.md) (2026-10-19).
+
+- **Para qué:** anunciar una alianza oficial con un partner (programa de partners real, registrado).
+- **Lienzo:** post 4:5 **1080×1350** y reel/story 9:16 **1080×1920**; video MP4 de 9,3 s a 30 fps por formato, con
+  portadas (LinkedIn 4:5, reel de Instagram 9:16).
+- **Va (de atrás hacia adelante):**
+  1. **Fondo** generado: espacio de cine azul `#001a33` **vacío**, una línea de luz anamórfica como **horizonte bajo**
+     (≈ 60–64 % del alto) y el **centro oscuro** reservado al título.
+  2. **Íconos oficiales de los productos del partner**, compuestos en tres planos: cerca, grandes con blur 24 px; medio,
+     nítidos; lejos, chicos y teñidos a navy (brightness .5, saturate .35, opacidad .6).
+  3. **Acabado generativo** sobre esa escena compuesta (sólo luz y lente; los íconos quedan idénticos).
+  4. **Lockup** «Efeonce | Google» con **filete vertical**, los dos logos completos y en blanco; eyebrow
+     «OFICIALMENTE PARTNERS» (Poppins 600, tracking .14em); y **justo debajo**, la fila de productos (Gemini, Google
+     Cloud, Google Workspace) pequeña en gris azulado claro `#b4c6da`, nunca más ancha que el lockup, con Gemini y
+     Google Cloud por sobre Workspace. Esta capa es determinística: nunca pasa por el modelo.
+- **Órbita:** ninguna. La órbita fina sola «le falta muchísimo punch» (operador).
+- **Voz:** sin pregunta-respuesta: el lockup y el eyebrow dicen lo que es.
+- **Animación:** los íconos parten chicos desde el punto de fuga del horizonte y vuelan a su lugar escalonados (lejos →
+  medio → cerca), se congelan con golpe de obturador (flash 0,28), sacudida de cámara y crossfade al cuadro con el
+  acabado; luego entran lockup, eyebrow y fila. Loop de 10 s; el export es de 9,3 s.
+- **Cómo se produce:**
+  1. Fondo con `pnpm ai:image --model gpt-image-2.5-flare` (pedir el modelo explícito: el default del CLI es
+     `gpt-image-2`).
+  2. Componer los íconos en tres planos de forma determinística.
+  3. Acabado con `--model gpt-image-2.5-sunburst` pasando la escena compuesta: material acrílico brillante, rim light,
+     profundidad de campo, haze, aberración cromática y grano, «íconos idénticos» (prompt de la corrida:
+     `r5-cine/acabado.txt`). Decisión del operador: «tienes que pedir el acabado a Sunburst porque no se ve bien así
+     determinístico».
+  4. Comparar al 100 % cada ícono contra la escena compuesta; lo que el acabado cambió se repone componiendo.
+  5. Medir el contraste bajo la caja del lockup **antes** de componer (final: 15–19:1 de media).
+  6. Componer lockup, eyebrow y fila. Para el video: animación en HTML, captura cuadro a cuadro con Playwright
+     (`document.getAnimations()`, pausa + `currentTime`) y `ffmpeg` libx264 crf 16.
+- **Formato 9:16 desde el 4:5:** si `pnpm ai:inpaint expand` no está disponible (fal sin saldo), el fondo vacío se
+  extiende de forma determinística (color por columna + grano). Sólo sirve con un fondo sin objetos que continuar.
+- **Logos de terceros usados** (procedencia; antes de pauta pagada, reemplazar las reproducciones por archivos
+  oficiales del portal de partners): wordmark Google, OneDrive `Alineación/7. Branding & Diseño/04. Logos &
+  Partnership/Logos/Google_2015_logo.svg`; Workspace y Looker, `…/02. Herramientas/Google_Workspace_Logo.svg` y
+  `Looker.svg` (isotipo extraído quitando el texto gris); Gemini isotipo/logotipo, `@efeoncepro/axis-brand-assets`
+  `tools/`; Google Cloud, `Workspace/Portafolio/03 DDSoft/Recursos}/google-cloud-1.svg` (completo; no recortar
+  `google_cloud_logo.svg` a mano); Gmail, Drive, Meet, Calendar, Cloud Run y Cloud Functions, `@iconify-json/logos`
+  (CC0, reproducciones fieles, no archivos de Google); Docs/Sheets/Slides 2020, SVG de Wikimedia Commons
+  (reproducciones). Variantes para oscuro: texto gris o negro de los wordmarks pasado a blanco; fila en gris monocromo.
+- **Nunca:** «×» en el lockup · un logo a color y el otro en blanco · la fila de productos al pie (dos focos) ·
+  tipografía que imita el logo del partner · esferas 3D en sus colores · objetos de oficina de banco de imágenes ·
+  mascota de consumo del partner en un anuncio B2B · contenido generado dentro de pantallas · luz detrás del logo
+  blanco.
+- **Archivos:** `ai-generations/2026-10-19_google-partner-freeze/export/` (MP4, PNG y portadas); canvas con las cinco
+  rondas: [artifact](https://claude.ai/artifact/ETWw3CfFq7QPCVLHq7GssH). Publicación y copy social: skill
+  `social-media-studio`.
+
 ## B. Presentaciones e informes
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
@@ -1198,6 +1252,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
 | Encabezado y navegación del sitio web (planificado) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS, planificado TASK-2040) · A15 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
+| Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
 | Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |
 | Fila de íconos (deck, lámina, servicios) | ninguna propia | una voz, 48–56 px, responde uno solo o ninguno | `resolveIcon` + `auditIconGroup` |

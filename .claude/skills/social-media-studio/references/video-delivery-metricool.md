@@ -210,6 +210,41 @@ corrida, no valores por defecto: resolver marca y cuentas con `getBrandSettings`
 Naming en el copy: la marca que habla es **Efeonce** y el servicio se escribe **«Efeonce | AEO»**. El video del caso
 dice «Efeonce AEO» en voz y subtítulos quemados y no se re-renderizó; la corrección vive en los copies.
 
+### Receta: video 4:5 en LinkedIn + Reel 9:16 en Instagram con portada propia y menciones (2026-10-19)
+
+Caso: anuncio «Efeonce | Google — Oficialmente partners». Bitácora:
+`docs/operations/social/2026-10-19-google-partner-announcement-production-method.md`. Estado al documentar:
+**programado** (`PENDING`), no publicado; menciones aceptadas por API pero sin verificar en el post publicado. Los IDs
+son evidencia de esa corrida, no valores por defecto.
+
+| Red | Marca | Hora Chile (20-10-2026) | ID | Forma |
+|---|---|---|---|---|
+| LinkedIn página Efeonce (`urn:li:organization:20503593`) | `3961547` | 11:00 | `400571153` | video 4:5 1080×1350, `linkedinData.previewIncluded:false` |
+| Instagram `efeoncepro` | `3961547` | 11:00 | `400571274` | `REEL` 9:16 1080×1920, `showReelOnFeed:true`, `isAiGenerated:true` |
+| LinkedIn personal de Julio | `5105024` | 11:30 | `400580359` | mismo video 4:5 y portada, 30 min después del de la página |
+
+1. **Una llamada a `createScheduledPost` por red.** Cada post lleva su MP4 en `media` y su portada en
+   **`videoThumbnailUrl`** (nunca como segundo elemento de `media`), con `autoPublish:true`. En Instagram:
+   `instagramData:{type:"REEL", showReelOnFeed:true, isAiGenerated:true}` cuando el arte es generado.
+2. **Portada con la misma proporción del video en cada red** (specs abajo). LinkedIn 4:5 → portada 4:5; Reel 9:16 →
+   portada 9:16 diseñada para sobrevivir el recorte 3:4 de la grilla.
+3. **Transporte:** `gs://efeonce-group-greenhouse-public-media-prod/campaigns/2026-10-google-partner/` con nombres
+   versionados `…-v1.{mp4,jpg}` y HTTP 200 por URL antes de programar. Con `gcloud` vencido,
+   `pnpm gcloud:auth:playwright -- --force`.
+4. **Menciones en el texto** con los IDs de la tabla de la sección «Menciones» (Google, Google Cloud, Ingram Micro).
+5. **Desvío a no repetir:** las portadas se subieron en JPG sin un rechazo observado. Por la regla dura de §3, la
+   próxima vez van en PNG (el PNG 4:5 del caso pesaba 1,29 MB, bajo el límite de 2 MB de LinkedIn).
+
+**Specs de portada de video** *(as-of 2026-10-19; guías de terceros, ni Meta ni LinkedIn las confirmaron
+oficialmente; las guías no coinciden en las zonas seguras exactas, así que todo lo importante va al centro)*:
+
+| Red | Video | Portada | Recortes que debe sobrevivir |
+|---|---|---|---|
+| Instagram Reel | 9:16, 1080×1920 | 1080×1920 | grilla del perfil 3:4 (1080×1440: 240 px menos arriba y abajo); feed 4:5 |
+| LinkedIn video | 4:5, 1080×1350 | misma proporción del video, JPG o PNG de menos de 2 MB | — |
+
+Fuentes en [SOURCES.md](../SOURCES.md) §«Portadas de video y menciones».
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:
@@ -244,8 +279,21 @@ Conservar el ratio pedido; REEL con un MP4 4:5 no se documenta como un master 9:
 
 - LinkedIn: resolver primero el URN de organización y nombre exacto. La sintaxis documentada por Metricool es
   `@[urn:li:organization:ID|Nombre]`; Efeonce se verificó como `@[urn:li:organization:20503593|Efeonce]`.
-- Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación.
-- Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi.
+- IDs de organización obtenidos del HTML público de LinkedIn el 2026-10-19 (el nombre distingue mayúsculas; el
+  formato se usó por API en el post `400571153`, aunque Metricool lo documenta para programación por CSV):
+
+  | Página | Mención |
+  |---|---|
+  | Efeonce | `@[urn:li:organization:20503593\|Efeonce]` |
+  | Google | `@[urn:li:organization:1441\|Google]` |
+  | Google Cloud | `@[urn:li:organization:3648281\|Google Cloud]` |
+  | Ingram Micro (página global; no existe una de Ingram Micro Chile) | `@[urn:li:organization:2576\|Ingram Micro]` |
+
+- Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación. Verificadas como cuentas oficiales
+  conocidas: `@google` y `@googlecloud`. `@ingrammicro` **no se pudo verificar** (Instagram bloquea las consultas
+  automáticas); el operador decidió usarlo igual el 2026-10-19.
+- Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi (versión
+  citada el 19/10/2026: https://help.metricool.com/en/article/mention-and-tag-other-accounts-tl3osr).
   La sintaxis documentada y preservada en readback no acredita por sí sola el enlace en el post publicado.
 - Copy aprobado: preservar literalmente salvo cambios pedidos; registrar URL exacta, no añadir UTMs en silencio.
   Un URL en caption no prueba un enlace clicable en Instagram ni autoriza cambiar la bio.

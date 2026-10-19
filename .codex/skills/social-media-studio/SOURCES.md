@@ -64,6 +64,15 @@
 - Aspire — 4 Influencer Marketing Strategies 2026 — https://www.aspire.io/blog/influencer-marketing-strategies-2026
 - SocialBook — Influencer Marketing Trends 2026 (micro/nano/UGC/ROI) — https://socialbook.io/blog/influencer-marketing-trends-2026-micro-creators-ugc-and-measurable-roi/
 
+**Portadas de video y menciones (as-of 2026-10-19 — guías de terceros, no documentación oficial de Meta ni LinkedIn;
+no coinciden en zonas seguras exactas)**
+- Hopper HQ — Instagram Reel size — https://hopperhq.com/blog/instagram-reel-size/
+- Oktopost — Instagram grid size guide — https://oktopost.com/blog/instagram-grid-size-guide/
+- Postfast — Instagram Reel cover size and safe zones — https://postfa.st/blog/instagram-reel-cover-size-safe-zones
+- Brandwatch — LinkedIn video specs — https://brandwatch.com/blog/linkedin-video-specs/
+- Postiz — LinkedIn post dimensions — https://postiz.com/blog/linkedin-post-dimensions
+- Metricool (oficial) — mencionar y etiquetar otras cuentas — https://help.metricool.com/en/article/mention-and-tag-other-accounts-tl3osr
+
 ## Datos clave estampados (as-of 2026-07 — reverificar según tabla)
 
 - **Señales universales que rankean**: watch time/completion, saves, shares/sends, dwell.

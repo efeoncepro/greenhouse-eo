@@ -1,6 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
-> **as-of 2026-10-03** (TASK-1965 + TASK-1973). Esto es el playbook operativo: intención → comando → modelo → flags →
+> **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
+> `ai-generations/2026-10-19_google-partner-freeze/`). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -87,6 +88,9 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
   `--reference` empiezan en la **3**. Un prompt que diga «la mujer de la imagen 2» apunta a la guía.
 - **El guardián de marca bloquea el nombre «Nexa»** (lo lee como asset/logo). Para un retoque de persona, no nombrarla:
   describir la identidad y pasarla por `--reference`. `--allow-brand` es para ediciones de contexto, no para esto.
+- **La guarda también aborta si el prompt dice «logos» en negativo** («sin logos», «no logos»; caso anuncio
+  Efeonce | Google, 2026-10-19): lee la palabra, no la intención. Si la edición toca el contexto y hay que nombrar
+  marcas, `--allow-brand`.
 - **Piel craquelada / «papel arrugado»** en una foto IA es artefacto de upscaler; se corrige con la misma ruta. Si la
   persona además no es la canónica, cambiar la cara por las anclas resuelve las dos cosas en una pasada.
 
@@ -94,6 +98,11 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 área nueva (Flux Fill). `foto:expandir` (Sunburst, `--reponer no`) **redibuja** la escena entera y es el flujo aprobado
 de las horizontales 1,91:1 de CMP-004 (`efeonce-advertising-creative` → `paid-format-safe-zones-and-craft.md` §0c).
 Unificarlos es decisión de TASK-1925; no cambies uno por otro en una serie ya aprobada.
+
+**`expand` sin saldo en fal (2026-10-19):** `expand` usa Flux Fill por fal; si la cuenta responde «User is locked.
+Exhausted balance», el comando no corre (`pnpm ai:fal --balance` antes de planearlo). Con un fondo vacío, sin objetos
+que continuar, el formato se extendió de forma determinística (color por columna + grano), fuera de este pipeline y
+sin su verificación: caso del 9:16 del anuncio Efeonce | Google.
 
 ## 3. Máscaras — `pnpm ai:mask`
 

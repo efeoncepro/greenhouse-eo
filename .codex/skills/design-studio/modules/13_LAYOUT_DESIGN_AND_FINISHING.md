@@ -83,6 +83,29 @@ detener la generación.
 7. Masterizar por destino: color, contraste, tamaño, compresión, naming y package.
 8. Ejecutar QA técnico y revisión humana del set completo.
 
+### Receta «componer determinístico → acabado Sunburst» (caso Efeonce | Google, 2026-10-19)
+
+Cuando la escena se arma con **elementos exactos** (íconos oficiales de productos, piezas de un cliente) y la versión
+determinística se ve plana, el acabado lo da una pasada generativa **sobre la escena ya compuesta**, no una
+generación desde cero. Decisión del operador: «tienes que pedir el acabado a Sunburst porque no se ve bien así
+determinístico».
+
+1. **Fondo** limpio con `pnpm ai:image --model gpt-image-2.5-flare` (el default del CLI es `gpt-image-2`: pedir el
+   modelo siempre). Si el título va sobre luz, pedir la luz como horizonte bajo y el centro oscuro.
+2. **Componer** los elementos exactos en capas de profundidad (en el caso fuente: cerca con blur 24 px, medio nítido,
+   lejos teñido a navy).
+3. **Acabado** con `--model gpt-image-2.5-sunburst` y la escena como referencia: sólo luz y lente (rim light,
+   profundidad de campo, haze, aberración cromática, grano), «íconos idénticos» en silueta, color, tamaño y posición, y
+   las bandas del título y la firma vacías. Sin texto ni firma en la pasada.
+4. **QA al 100 %** contra la escena compuesta: todo elemento que cambió se **repone componiendo** el original (en una
+   ronda previa el acabado borró el contorno de tinta de una mascota y se repuso desde la pose original).
+5. **Medir el contraste bajo la caja de la firma** antes de componerla: un núcleo de luz detrás de un logo blanco dio
+   1,3:1; con la luz como horizonte bajo quedó en 15–19:1 de media.
+6. Texto, lockup y firma al final, determinísticos.
+
+Detalle de la pieza: `efeonce-graphic-line` → `references/applications.md` §A16. Para el caso con piezas reales de un
+cliente: `references/efeonce-photographic-language.md` §«Caso de cliente con piezas reales».
+
 ## Campaign Layout Compiler V1
 
 Después de aprobar los finishes, convertir el contrato en outputs reproducibles con:

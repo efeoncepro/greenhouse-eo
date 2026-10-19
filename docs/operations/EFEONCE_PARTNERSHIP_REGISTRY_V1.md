@@ -2,7 +2,7 @@
 
 > **Estado:** `Activo — requiere actualización por evidencia`
 > **Owner:** Strategy + Commercial + práctica dueña + Finance/Legal
-> **Última revisión:** 2026-10-19 (Adobe: Registered y solicitud Certified recibida; Nexsys: expediente crédito enviado 19:14 Chile; Google/Ingram: reventa indirecta activa y circuito comercial pendiente; Microsoft: MPA aceptado e identidad pendiente; AWS/LOL: habilitación operativa pendiente); 2026-10-16 (BytePlus: Order Form firmado y designación pública «partner», declarado por el operador); 2026-10-12 (reunión Basis, ruta acompañada en evaluación y demo registrada; condiciones pendientes); 2026-10-09 (programmatic: ambos proveedores seleccionados; términos pendientes); 2026-09-29 (insignia «Salesforce Partner» autorizada por Salesforce, declarado por el operador; referencia `salesforce-partner-authorization-2026-09-29`); 2026-09-26 (Adobe, AWS y Microsoft declarados; Salesforce y Google Cloud confirmados por el operador); 2026-09-24 (BytePlus); 2026-09-21 (uso de la mascota Gigi / Google Gemini); 2026-09-19 (programmatic: Real Audiences y Basis); 2026-09-10 (plataformas publicitarias y retail media); resto 2026-08-28
+> **Última revisión:** 2026-10-19 (Google: anuncio público «Efeonce | Google — Oficialmente partners» programado en Metricool para el 20-10-2026, sin insignia del programa; Adobe: Registered y solicitud Certified recibida; Nexsys: expediente crédito enviado 19:14 Chile; Google/Ingram: reventa indirecta activa y circuito comercial pendiente; Microsoft: MPA aceptado e identidad pendiente; AWS/LOL: habilitación operativa pendiente); 2026-10-16 (BytePlus: Order Form firmado y designación pública «partner», declarado por el operador); 2026-10-12 (reunión Basis, ruta acompañada en evaluación y demo registrada; condiciones pendientes); 2026-10-09 (programmatic: ambos proveedores seleccionados; términos pendientes); 2026-09-29 (insignia «Salesforce Partner» autorizada por Salesforce, declarado por el operador; referencia `salesforce-partner-authorization-2026-09-29`); 2026-09-26 (Adobe, AWS y Microsoft declarados; Salesforce y Google Cloud confirmados por el operador); 2026-09-24 (BytePlus); 2026-09-21 (uso de la mascota Gigi / Google Gemini); 2026-09-19 (programmatic: Real Audiences y Basis); 2026-09-10 (plataformas publicitarias y retail media); resto 2026-08-28
 > **Empresa:** Efeonce Group SpA · RUT 77.357.182-1 · 55 personas · Santiago, Chile
 > **Contacto operativo:** Julio César Reyes Rangel, CEO · `julio.reyes@efeonce.org`
 
@@ -34,7 +34,7 @@ Operación de altas, identidad, formación, crédito y documentos externos: [man
 
 | Relación | Programa o vía | Estado al 2026-08-28 | Rol para Efeonce | Próximo paso / owner | Evidencia |
 | --- | --- | --- | --- | --- | --- |
-| **Google Cloud** | Google Cloud Partner Network / Partner Network Hub | **Cuenta Verificada; Cloud y Workspace Activa como revendedor indirecto**, revisado en vivo 2026-10-19 después de 19:55 UTC con julio.reyes@efeonce.org. Ingram Chile listado en ambos; handshake completado; nivel Registrado | Servicios, Cloud/AI y reventa por distribución. Gemini Enterprise sujeto al catálogo comercial Ingram | Concretar circuito comercial, precios y soporte con Ingram. Google Skills accesible; perfil corporativo completado, capacitación pendiente. Gigi mantiene su gobernanza separada de marca y uso | [ficha detallada](#google-cloud) · [Checklist vigente](../audits/commercial/INGRAM_MICRO_ONBOARDING_2026-10-19.md) |
+| **Google Cloud** | Google Cloud Partner Network / Partner Network Hub | **Cuenta Verificada; Cloud y Workspace Activa como revendedor indirecto**, revisado en vivo 2026-10-19 después de 19:55 UTC con julio.reyes@efeonce.org. Ingram Chile listado en ambos; handshake completado; nivel Registrado | Servicios, Cloud/AI y reventa por distribución. Gemini Enterprise sujeto al catálogo comercial Ingram | Concretar circuito comercial, precios y soporte con Ingram. Google Skills accesible; perfil corporativo completado, capacitación pendiente. Gigi mantiene su gobernanza separada de marca y uso | [ficha detallada](#google-cloud) · [Checklist vigente](../audits/commercial/INGRAM_MICRO_ONBOARDING_2026-10-19.md) · [anuncio público 2026-10-20](social/2026-10-19-google-partner-announcement-production-method.md) |
 | **Ingram Micro Chile** | Alta sin crédito y reventa indirecta Google | **Joelvis confirmó habilitación a las 19:55:21 UTC del 2026-10-19**. Cloud/Workspace Activa e Ingram Chile en Hub; handshake cloudcl.im completado | Distribución/licencias y consumo Google en Chile | Pendientes número de cliente, circuito/portal de cotizaciones-pedidos, condiciones económicas y soporte. Respuesta revisada y autorizada enviada a Joelvis a las 20:27:26 UTC, CC Víctor/Nicolás, firma gráfica y BCC HubSpot; EMAIL 118931883347 SENT. Julio excluyó la mención a TD SYNNEX del correo. No exige giro TI; otros países requieren revisión específica | [Estado y evidencia](../audits/commercial/INGRAM_MICRO_ONBOARDING_2026-10-19.md) |
 | **Google for Education / Chrome** | Partner Advantage / Chrome y soluciones de administración | Onboarding iniciado; credenciales y autorizaciones no confirmadas | Educación, Chrome Enterprise y distribución | Verificar si sigue siendo una vía estratégica separada de Google Cloud | Correo de Arthur Guedes, 2025-11-17 |
 | **Google Ads** | Google Partners | Bienvenida recibida en 2024; badge y estado actual no verificados. Requisitos vigentes verificados 2026-09-10: optimization score ≥70% en la cuenta de administrador, USD 10.000 de gasto en 90 días y ≥50% de strategists certificados. Premier = top 3% del país: no es objetivo planificable | Performance & Commerce, ambos motions; piso de credibilidad | Verificar estado y cuenta de administrador en el portal de Partners; si cumple, mantener; owner: Julio + owner comercial de Performance | Correo `partners-noreply@google.com`, 2024-06-07; [market update 2026-09-10](../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md) |
@@ -79,6 +79,29 @@ requiere homologación y condiciones externas por campaña.
 ## Google Cloud
 
 **Actualización 2026-10-19, después de 19:55 UTC:** Joelvis confirmó habilitación; en Partner Network Hub Efeonce Group Spa figura **Verificada**, y Cloud/Workspace **Activa como revendedor indirecto**, con Ingram Chile. Handshake completado. La FAQ vigente permite reventa desde Registrado sin nivel/competencia específicos; el negocio nuevo y condiciones se tramitan con el distribuidor. Google Skills accesible tras aceptación de términos por Julio; perfil corporativo completado. Falta concretar el circuito comercial, condiciones y acceso con Ingram. [Checklist y fuentes](../audits/commercial/INGRAM_MICRO_ONBOARDING_2026-10-19.md). **El análisis siguiente es histórico y queda subordinado a esta verificación; no implica due diligence aún pendiente ni una nueva solicitud necesaria.**
+
+**Anuncio público — delta 2026-10-19.** Se programó en Metricool (marca «Efeonce Group», `3961547`, zona
+`America/Santiago`, `autoPublish`) el anuncio «Efeonce | Google — Oficialmente partners» para el **20-10-2026**:
+
+| Canal | Hora Chile | ID Metricool | Forma |
+|---|---|---|---|
+| LinkedIn página Efeonce (`urn:li:organization:20503593`) | 11:00 | `400571153` | video 4:5 1080×1350 + portada propia |
+| Instagram `@efeoncepro` | 11:00 | `400571274` | Reel 9:16 1080×1920, visible en feed, marcado como generado con IA, portada propia |
+| LinkedIn personal de Julio (marca «Julio Reyes», `5105024`) | 11:30 | `400580359` | mismo video 4:5 + portada; menciona a Efeonce, Google, Google Cloud e Ingram Micro |
+
+- **Claims usados:** «Efeonce es partner de Google» (LinkedIn) / «ahora somos partner de Google» (Instagram), y
+  «comercializamos e implementamos en Chile las soluciones de Google para empresas: Gemini Enterprise, Google Cloud y
+  Google Workspace» (LinkedIn; Instagram nombra las mismas soluciones). Agradecimiento a Google, Google Cloud e
+  Ingram Micro.
+- **Advertencia registrada:** este registro mantiene Gemini Enterprise «sujeto al catálogo comercial Ingram»; el
+  operador decidió conservar «comercializamos e implementamos». Además, el gate de abajo dice que no se publica
+  «Google Cloud Partner» como claim pleno mientras el nivel siga `Registrado`: el copy publicado dice «partner de
+  Google» con nivel `Registrado`. Queda para que Commercial lo concilie; no se modificó el gate.
+- **Marca:** se usaron logos nominativos de Google; **no se usó ninguna insignia del programa**, porque no hay
+  autorización registrada.
+- `PENDING` en Metricool significa programado, no publicado: confirmar la publicación y que las menciones quedaron
+  enlazadas con un readback posterior a la hora. Método completo:
+  [`2026-10-19-google-partner-announcement-production-method.md`](social/2026-10-19-google-partner-announcement-production-method.md).
 
 ### Estado confirmado por revisión del portal — 2026-08-05
 

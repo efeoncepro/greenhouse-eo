@@ -139,6 +139,9 @@ Para entregar un video por red y programarlo con portada, cargar
 PNG master y transporte, autorización existente, cuenta/zona, duplicados y readback de media,
 portada y estado. Una instrucción explícita de programar satisface la confirmación humana de §4;
 no pedirla otra vez para la misma acción autorizada.
+Para video 4:5 en LinkedIn + Reel 9:16 en Instagram con portada propia, specs de portada (recorte 3:4 de la grilla)
+y menciones de LinkedIn con IDs de organización (Google, Google Cloud, Ingram Micro), usar la receta del 2026-10-19
+de esa misma referencia.
 
 ### Entrega de imágenes al equipo de Marketing
 
