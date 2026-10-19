@@ -267,6 +267,12 @@ Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (
 alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
 enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
 No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.
+Cuando el comprador, después de recibir la propuesta, pide precisiones (impuestos o retenciones para un cliente
+fuera de Chile, costos extra, herramientas AEO aparte, referencias locales), cargar
+[precisiones-post-propuesta.md](precisiones-post-propuesta.md) (caso fuente: Pibank, 19-10-2026). Ahí están la
+respuesta tributaria Chile–Perú ya investigada con sus fuentes, el riesgo de establecimiento permanente si hay equipo en
+el país del cliente, el anexo de lectura de mercado como sustituto de una referencia (**nunca inventar una**) y el
+límite de sólo lectura del conector de Outlook.
 Para presentar la agencia completa, el brochure oficial es «Agencia de Marketing 360°» (aprobado 2026-10-16; skill
 `deck-studio`); su lámina del caso ANAM es la prueba visual de una implementación HubSpot. Sus cifras de ANAM y el
 «12 meses» de Berel siguen pendientes antes de entregarlo afuera.

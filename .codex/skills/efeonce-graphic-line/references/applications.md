@@ -652,6 +652,17 @@ vale en toda aplicación:
 - **Cómo se produce:** catálogos del Artifact Composer (`src/lib/artifact-composer/catalogs/insights-report/`), render
   en el `artifact-worker`; informes que no son Insights, skill `report-studio`.
 - **Fuente:** L 5.1, L 7.1, L 7.2; M §1.3; `EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` (Delta 2026-09-25).
+- **Anexo comercial A4 fuera de Insights (2026-10-19, caso Pibank):** documento breve de lectura de mercado que acompaña
+  una propuesta. La portada lleva **una** órbita de medida sobre un dato con fuente (el número dentro del anillo, la
+  frase y la fuente al lado) y las interiores no llevan órbita. Pregunta Poppins Light + respuesta Bricolage con su
+  esfera (`answerHtml`, el texto sin punto final). Barras y tablas en navy, con el acento sólo en la serie que se
+  destaca. Pie completo en las tres páginas. Renderer de referencia:
+  `docs/commercial/prospects/banco-pichincha-peru-seo-2026/anexo-ahorrista-peruano/render.mjs`. Dos trampas:
+  (1) `measureSvg` **se dibuja a escala de página** (794 × 1123, la base de la órbita) y se posiciona en coordenadas de
+  página; en un lienzo chico de 300 px el trazo canónico casi desaparece. (2) Greenhouse fija `axis-graphic-line` 0.11.0,
+  que **no pinta el camino recorrido** (regla del 2026-09-29, contrato de la órbita 0.5.0). Hasta que TASK-2014 suba el
+  juego AXIS, ese anexo importó `measureSvg` del build de AXIS main (0.17.0, checkout hermano) y lo registró en su
+  manifiesto. Es una solución local del documento, nunca un `file:` en `package.json`.
 
 ### B3b. Marca de producto de Efeonce Insights — dónde se aplica (2026-09-28)
 

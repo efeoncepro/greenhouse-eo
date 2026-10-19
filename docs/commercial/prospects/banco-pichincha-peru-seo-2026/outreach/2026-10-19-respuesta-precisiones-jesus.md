@@ -1,6 +1,6 @@
 # Pibank · Respuesta a las precisiones de Jesús Vargas · borrador 19-10-2026
 
-**Uso interno · Owner: Julio Reyes · Estado: versión final aprobada por Julio el 19-10, sin enviar.** Responde el correo «RE: Pibank | SEO Efeonce» del 19-10-2026 (plazo del cliente: 22-10). Decisiones de Julio (19-10): si hay retención, se ajusta el monto facturado para mantener el neto; el fee absorbe las herramientas (confirmado); no se ofrece contacto de referencia.
+**Uso interno · Owner: Julio Reyes · Estado: ENVIADO el 19-10-2026 a las 17:49 (Chile) por Julio desde Outlook web, con CCO HubSpot y el anexo PDF; verificado en Enviados.** Responde el correo «RE: Pibank | SEO Efeonce» del 19-10-2026 (plazo del cliente: 22-10). Decisiones de Julio (19-10): si hay retención, se ajusta el monto facturado para mantener el neto; el fee absorbe las herramientas (confirmado); no se ofrece contacto de referencia.
 
 ## Investigación tributaria (19-10-2026)
 
