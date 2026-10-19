@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-18 — Indecaucho: Katia contactada y un seguimiento programado
+
+Company59393386572/Contact255985568411/Primary/segmento180 verificados. Dos puentes Apollo investigados,
+sin correo utilizable ni alta;2 créditos. Primer Outlook21:06Chile con firma gráfica/CCO; EMAIL118844303672 SENT.
+Secuencia316810121: Programado1/Error0, único22Oct09:30Quito=11:30Chile, firma y deck360 íntegro;
+respuesta a cualquier email o reunión desinscribe. No duplicar, contactar puentes ni reinscribir.
+[Expediente y siguiente paso](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
+
 ## 2026-10-18 — Grader: transporte medido y candidato de publicación
 
 GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
@@ -252,13 +260,6 @@ censo no equivale a revisión editorial; blog no acredita SEO completo de SKY. G
 API4–300s frente a ficha UI120s, recuperación y derechos. Skills e índices enlazados. Modelo `Disabled` en
 cuenta; CLI Ark/Speech sin OmniHuman. AI Creative Operations continúa con unidad de implementación si se pide:
 activación, credencial mínima, consumidor, presupuesto y canario. Sin activación, gasto, código ni ruta Globe.
-
-## 2026-10-15 — Convención de negocios y leads adoptada
-
-[Política](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md) aceptada por Julio; skills Codex/Claude,
-manuales y routers enlazados. Nuevas altas autorizadas: marca/cuenta, país, iniciativa/necesidad,
-referencia/persona. Gana66065702426 renombrado y leído live; resto del histórico pendiente de lote,
-sin cambios de schema, automatizaciones ni calificación. [Caso](docs/commercial/tenders/gana-programatica-colombia-1541-2026/README.md).
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

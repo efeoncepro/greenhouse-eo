@@ -49,3 +49,11 @@ Presupuesto agotado, fuente inaccesible, resultado vacío repetido o identidad a
 cuáles adicionales siguen pendientes, alternativa investigable y costo para el siguiente paso. No convertir
 esa limitación en cero demanda. No elevar permisos o cambiar suscripción como recuperación automática.
 Datos de contactos viven en CRM/dossier privado autorizado; fixtures del repo usan placeholders y anonimización.
+
+## Match de identidad y utilidad del enriquecimiento
+
+En Apollo, confianza alta del match no equivale a email verificado. Leer el estado específico del correo:
+`extrapolated` sigue siendo inferido, aunque el proveedor haya consumido créditos; `unavailable` no es una
+dirección. Registrar costo real y cobertura útil por separado. Conservar el rol como puente hipotético,
+sin crear un Contact vacío, completar por patrón o interpretar colegas como introducciones confirmadas.
+Caso: [dos puentes de Indecaucho](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).

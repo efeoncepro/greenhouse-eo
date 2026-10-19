@@ -1,5 +1,7 @@
 # Registro de seguimiento comercial
 
+**Delta focal18/10 · Indecaucho/Katia:** primer correo21:06Chile enviado con firma gráfica/CCO; EMAIL118844303672 SENT. Secuencia316810121, una inscripción Programado1/Error0, único22Oct09:30Quito=11:30Chile; respuesta a cualquier correo o reunión desinscribe. Firma y deck360 íntegro verificados en preview; envío futuro pendiente. No duplicar ni contactar puentes. [IDs, autorización y evidencia](runs/2026-10-18-indecaucho-katia-hubspot.md). No renueva el corte global.
+
 **Delta focal 16/10, 10:06 UTC · Fabricio / Toyota del Bajío:** correo inicial Outlook enviado y leído en
 Enviados; tres seguimientos nativos HubSpot **Programado**, secuencia `316561523`, sólo Fabricio.
 21/28 de octubre y 4 de noviembre a las 10:00 México; brochure web 27p y firma predeterminada configurada.

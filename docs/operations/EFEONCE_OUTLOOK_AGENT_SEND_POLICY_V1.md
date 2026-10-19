@@ -110,6 +110,18 @@ Es una observación de esta sesión: comprobar identidad y conexión de nuevo, s
 
 Resultado de referencia: [seis envíos, materiales, actividades CRM y límites](../commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md).
 
+### Convertir un borrador de texto a firma gráfica — 18/10/2026
+
+Cuando el pedido exige firma gráfica y el borrador nació por conector en texto, abrir ese borrador en
+Outlook web, elegir **Opciones → Cambiar a HTML** y conservar cuerpo, párrafos, enlaces y destinatarios.
+Retirar sólo la firma de texto del mensaje nuevo e insertar la firma oficial instalada mediante
+**Mensaje → Firma → Julio** (nombre observado; verificar el actual). Pegar contenido enriquecido cuando
+sea necesario: reemplazar texto plano de todo el editor puede colapsar párrafos o destruir la firma.
+Comprobar una sola firma gráfica y CCO antes de enviar. No cambiar preferencias globales para resolver
+un envío puntual. Tras enviar, buscar Elementos enviados por identidad/asunto/fecha: el ID puede cambiar
+y el enlace del borrador puede conservar una vista obsoleta. No reenviar por esa vista.
+[Envío y lectura independientes del caso](../commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
+
 ### Seguimiento nativo autorizado en HubSpot — 13/10/2026
 
 El operador precisó que las secuencias de seguimiento se ejecutan **en HubSpot, no Apollo**.

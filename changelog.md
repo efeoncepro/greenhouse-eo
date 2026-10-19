@@ -1,5 +1,12 @@
 # changelog.md
 
+## 2026-10-18 — Indecaucho: outreach gráfico y seguimiento nativo
+
+- Katia/Company/Primary/segmento180 y primer correo Outlook con firma/CCO/EMAIL SENT verificados.
+- Un seguimiento HubSpot programado22Oct09:30Quito, salida por respuesta/reunión; deck360 original íntegro.
+- Skills espejo incorporan recuperación de publicaciones, calidad Apollo y readback de firma/envío/calendario.
+- [Evidencia y límites](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md); sin push ni nuevos permisos.
+
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
@@ -617,10 +624,6 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
 
 - Studio (local): el calendario pasa a ser de activaciones — vistas Mes, Semana, Día, Línea de tiempo y Pauta, filtros por dimensión en la URL, hoja con evidencia y tracking URL, bandeja «Ejecución sin activación», móvil y teclado. Las escrituras se muestran bloqueadas con su razón hasta que exista autoridad de escritura.
 - AXIS: `@efeoncepro/axis-brand-assets` 0.4.20 publica negativos de Instagram, LinkedIn, Meta, ChatGPT, TikTok y Threads, isotipos de Facebook y Threads y los logos de herramientas; `axis-tokens` 0.5.1.
-
-## 2026-10-04 — TASK-2001: conexiones owned locales
-
-- Resend/HubSpot con puerto Greenhouse autorizado por binding y evidencia completa/parcial; WordPress público paginado y cacheado. Marketing Cloud separado sin lector. API 1.8.0/catálogo aditivo, 288+7 Studio con PG, build y CLI/GVC básico PASS; navegación móvil en QA. Sin push ni rollout nuevo. [Evidencia](docs/audits/marketing-studio/TASK-2001-owned-connections-2026-10-04.md).
 
 ## 2026-10-04 — AI Visibility Report: hero, ancho y hover
 
