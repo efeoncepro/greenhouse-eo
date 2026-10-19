@@ -61,7 +61,7 @@ Ninguno de estos frentes requiere una inversión complementaria en herramientas:
 
 Te lo digo con transparencia: Pibank sería nuestra primera cuenta de banca en Perú. Esto es lo que aportamos hoy al mercado peruano:
 
-- **Equipo para la cuenta:** si avanzamos, sumaremos al equipo especialistas basados en Perú, para trabajar cerca de ustedes y con conocimiento directo del mercado local.
+- **Equipo en Perú:** contamos con especialistas en Perú, cerca de ustedes y con conocimiento directo del mercado local.
 - **Trabajo ya hecho sobre Pibank y el mercado peruano:** investigamos la demanda de búsqueda de ahorro en Google Perú. Además, el 06-10-2026 revisamos 17 búsquedas clave y Pibank no aparecía en ninguno de los 301 resultados. Con esa base armamos el diagnóstico de la propuesta y la muestra X-Ray sobre su propio sitio.
 - **Sector financiero:** trabajamos con Banco BICE y BICECORP en Chile con el mismo reto que hoy tiene Pibank: sumar cuentas desde la búsqueda, con condiciones exactas y revisión de Cumplimiento.
 - [OPCIONAL · CONFIRMAR JULIO] Si les sirve, podemos coordinar una conversación de referencia con [contacto de BICE/BICECORP, solo con su autorización].
