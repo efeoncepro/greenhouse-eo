@@ -16,7 +16,8 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Documentación
 
-[Ads/Grader](docs/documentation/growth/google-ads-measurement.md): main2559 publicado; skills Forms/Meetings/GTM conciliadas.
+[Ads](docs/documentation/growth/google-ads-measurement.md).
+[LinkedIn](docs/documentation/growth/linkedin-ads-measurement.md).
 CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
 

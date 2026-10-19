@@ -206,6 +206,7 @@ La diferencia con otras capas de documentacion:
 
 ### Growth
 
+- [Preparar medición LinkedIn Ads](growth/preparar-medicion-linkedin.md) — inventario de cuenta/Partner ID, reglas/campañas, consentimiento, rutas web/servidor y validación previa; sin instalación.
 - [Activar/verificar conversiones Google Ads](growth/activar-conversiones-google-ads.md) — políticas comerciales, consentimiento, recibos, Web/Server y evidencia de recepción/atribución.
 - [Conectar Google Ads y operar su CLI](growth/conectar-google-ads-con-agentes.md) — identidades Ads/Cloud separadas, target6862539491 y escrituras por plan/hash/validación/readback.
 - [Corregir clasificación comercial Forms](growth/corregir-clasificacion-comercial.md) — mantenimiento interno acotado, CAS y auditoría transaccional; no publica políticas.

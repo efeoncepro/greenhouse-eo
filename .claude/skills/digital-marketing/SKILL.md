@@ -39,6 +39,9 @@ argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid med
 
 # Marketing Digital — Skill operativa 2026
 
+LinkedIn Ads: para tracking/medición cargar [discovery oficial](../../../docs/reference/measurement-gtm-ga4/11-linkedin-insight-tag-conversions-api.md)
+y módulo paid media. Propuesta19/10/2026; no hay instalación ni conexión verificada de Efeonce.
+
 > **Naming Efeonce para campañas:** **Efeonce | AEO** = servicio (con barra; en copy de campaña habla Efeonce, nunca «Efeonce AEO» como marca o emisor, delta 2026-10-03); **Efeonce AEO Assessment** = diagnóstico público; **Efeonce AI Visibility Report** = informe compartible. Los nombres `AI Visibility Grader` y `AEO Grader` siguen como aliases técnicos/históricos. **Search Visibility 360** conserva la oferta SEO + AEO amplia. Canon: `docs/architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md`.
 
 > **📊 Medición GTM/GA4 — reference canónico.** Para martech/tag management, taxonomía UTM, medición de campañas y eventos: la documentación completa de Google Tag Manager + GA4 + naming + la house style `gh_<object>_<action>` de Efeonce vive en **`docs/reference/measurement-gtm-ga4/`** (canónica, dueña = skill `growth-marketing-cro`). Cargarlo al taggear/medir. Empezar por `04-greenhouse-gh-event-convention.md`.

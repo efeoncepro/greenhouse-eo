@@ -738,6 +738,16 @@ Provider delivery and real commercial outcomes require their own readback; CLI s
 that evidence. Release proofs and pending real traffic/EMQ stay in the linked runtime/audit.
 
 
+## LinkedIn Ads — preparación propuesta19/10/2026
+
+Cargar [manual LinkedIn](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md) y
+[arquitectura Proposed](../../../docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
+Forms accepted; Grader comercial sí, Contacto general/ebooks/empleo/newsletter/soporte no.
+No existen policy/destino/recibo/bridge LinkedIn en este motor; no transformar `googleAdsConversion`,
+`gh_ads_conversion` ni generate_lead genérico en permiso LinkedIn. Requiere cuenta/reglas/consentimiento
+propios y eventId durable del hecho compartido con CAPI si se adopta; duplicados/polling no reemiten.
+La cobertura Google no inscribe LinkedIn. No crear leads/reservas ficticios ni publicar al documentar.
+
 ## Google Ads online y EC — contrato y checkpoint 18-10-2026
 
 Cierre vigente: [release Grader/clasificación main2559e9242](../../../docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md), manifest released y canarios negativos.

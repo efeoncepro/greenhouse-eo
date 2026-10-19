@@ -24,6 +24,7 @@ Al instrumentar, medir, taggear o razonar sobre eventos/conversiones de cualquie
 
 | Doc | Qué cubre |
 |---|---|
+| [LinkedIn: Insight Tag y CAPI](11-linkedin-insight-tag-conversions-api.md) | Discovery oficial19/10/2026: IDs, consentimiento, dedupe, templates y CRM. Propuesta; no instalado ni conexión de cuenta verificada. |
 | [Arquitectura Google Ads](../../architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) | Ads API/CLI, GTM web/server y CRM; identidad, consentimiento y emisor único. Online publicado en `6862539491` para 13 Forms comerciales + Discovery; recepción/atribución real y conexión multiorganización conservan evidencia y gates propios. |
 | **[TRACKING-PLAN.md](TRACKING-PLAN.md)** | **Registro vivo OBLIGATORIO** de forms & CTAs con su estado de tagging. Leer antes de crear un form/CTA; registrar su fila al crearlo (taggeado o no). |
 | **[LEARNINGS.md](LEARNINGS.md)** | Build-log de aprendizajes reales operando GTM/GA4 en runtime (gotchas verificados). Leer antes de construir tags. |

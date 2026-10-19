@@ -20,6 +20,8 @@ Cierre documental19/10: arquitectura, funcionales, manuales, índices, TASK-2034
 primera recepción/atribución real sigue pendiente. Checkout principal develop, WIP ajeno preservado.
 [Release](docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 [Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+Discovery LinkedIn19/10: documentación oficial revisada con tres agentes; [propuesta y pendientes](docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
+InsightTag/CAPI/dedupe/HubSpot documentados; cuenta/Partner ID/acceso no verificados, sin instalar ni enviar.
 
 ## 2026-10-18 — Ads publicado en todos los formularios comerciales validados
 

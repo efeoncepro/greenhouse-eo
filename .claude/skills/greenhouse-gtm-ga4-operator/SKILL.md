@@ -9,6 +9,20 @@ Use this skill to **operate measurement instrumentation** for Efeonce: build and
 
 > **Efeonce tagging is immature.** Assume nothing is tagged until verified. Build in the workspace, verify, and only publish with human confirmation.
 
+## LinkedIn Ads — discovery, no conexión implementada
+
+Cargar [fuentes y contratos LinkedIn](../../../docs/reference/measurement-gtm-ga4/11-linkedin-insight-tag-conversions-api.md)
+y [preparación](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md) antes de recomendar tags.
+InsightTag2.0 es web; CAPI puede usar backend directo o template oficial sGTM revisado. La
+[arquitectura es Proposed](../../../docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md),
+no una instalación activa. Cuenta/Partner ID/reglas/roles/HubSpot siguen sin verificar; Google no los concede.
+Un instalador del tag; revisar HubSpot Pixels antes de duplicar. Tag+CAPI redundantes usan dos reglas,
+misma cuenta y eventId canónico, no una regla compartida ni la ventana Meta. Enhanced tracking
+li_fat_id, enhanced matching web y hashes CAPI son distintos. Consentimiento LinkedIn/CMP y GPC
+se prueban explícitamente; no heredar permiso/bloqueo Google. No PII/hashes en dataLayer ni tokens
+web. No activar, publicar o crear leads ficticios desde el discovery; `growth:measurement` no acepta
+LinkedIn hoy. Backend directo es candidato CAPI, no sender añadido por actualizar esta skill.
+
 ## When to invoke
 
 Google Ads: `pnpm --silent google-ads discover` y el

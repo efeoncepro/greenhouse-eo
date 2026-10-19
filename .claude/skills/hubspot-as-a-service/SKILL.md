@@ -5,6 +5,17 @@ description: 'Deliver and operate HubSpot as a managed client service across Sma
 
 # HubSpot as a Service
 
+## LinkedIn Ads: distinguir pixel, lifecycle y Lead Sync
+
+Antes de conectar o recomendar configuración, leer [preparación LinkedIn](../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md)
+y sus fuentes oficiales. Discovery19/10/2026: conexión Efeonce, cuenta/Partner ID, permisos y tier no
+verificados; ninguna activación. HubSpot puede instalar Insight Tag: inventariar Pixels para no
+cargarlo también por GTM. Lifecycle→CAPI y LinkedIn Lead Gen Forms→HubSpot son sentidos/capacidades
+separados. Un emisor por etapa, HubSpot nativo o propio; no presumir que comparte eventId Greenhouse.
+Exigir propiedad/evidencia de consentimiento de compartición, alcance de contactos y datos revisados;
+el campo opcional del proveedor y “todos los contactos” no amplían el mandato. Conectar no acredita
+recepción/atribución; Replace event puede eliminar el anterior. No tocar grants Google para esto.
+
 ## Nombres de negocios y leads Efeonce
 
 Antes de preparar o escribir `dealname` / `hs_lead_name`, aplicar la

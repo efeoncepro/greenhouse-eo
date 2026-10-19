@@ -5,6 +5,8 @@ Cobertura API:13 Forms comerciales + Discovery, Grader incluido y Contacto gener
 Web6/Server10 y EC ON. [Contrato y alcance](../../documentation/growth/google-ads-measurement.md) ·
 [release Grader/clasificación auditada](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 Recepción/atribución real Ads aún sin verificar; no fabricar envíos para cambiar un estado de tagging.
+LinkedIn permanece **planned / no implementado**, no tagged: [discovery y fuentes](11-linkedin-insight-tag-conversions-api.md).
+Sin Partner ID/cuenta/reglas verificados ni política LinkedIn; no hereda las13 Forms/Discovery de Google.
 
 Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
 Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; operación de

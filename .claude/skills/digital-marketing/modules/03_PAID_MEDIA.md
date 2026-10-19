@@ -58,6 +58,17 @@ IP/UA y cookies consentidas corresponden al visitante; hashes de contacto sólo 
 dedicado. Test Events fue verificado en ambos hosts y una fuente nueva sin redeploy.
 Primera conversión comercial consentida y evolución de calidad requieren tráfico real.
 
+### LinkedIn Ads: Insight Tag y CAPI son una integración propia
+
+Para Efeonce, cargar [discovery LinkedIn](../../../../docs/reference/measurement-gtm-ga4/11-linkedin-insight-tag-conversions-api.md)
+y [preparación](../../../../docs/manual-de-uso/growth/preparar-medicion-linkedin.md). Estado19/10/2026:
+Proposed, sin cuenta/Partner ID/acceso verificados ni instalación. Insight Tag2.0 corre en GTM Web;
+CAPI tiene sender backend o template oficial sGTM evaluable. Enhanced tracking li_fat_id no es
+Enhanced Conversions Google; enhanced matching web con email es otra capacidad. Dos reglas por
+hecho browser/server, misma cuenta/eventId, consentimiento LinkedIn explícito y ningún doble sender
+CRM. Lead Gen Forms nativos y formularios del sitio son entradas distintas. No recomendar importar
+Google/Meta settings, activar todos los contactos/campañas o declarar conversión por tag fired.
+
 ## 4. Signal loss post-cookie (los tres pilares)
 
 Para 2026, el éxito se apoya en:
