@@ -22,6 +22,8 @@ primera recepción/atribución real sigue pendiente. Checkout principal develop,
 [Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 Discovery LinkedIn19/10: documentación oficial revisada con tres agentes; [propuesta y pendientes](docs/architecture/GREENHOUSE_LINKEDIN_ADS_MEASUREMENT_ARCHITECTURE_V1.md).
 InsightTag/CAPI/dedupe/HubSpot documentados; cuenta/Partner ID/acceso no verificados, sin instalar ni enviar.
+Adquisición19/10: [taxonomía conceptual aceptada](docs/architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md);293 Deals leídos,168 candidatos/125 revisión.
+Plan propio sin aplicar; consumers incompletos/workflows403. Sin cambio CRM, schema, fuentes nativas o histórico.
 
 ## 2026-10-18 — Ads publicado en todos los formularios comerciales validados
 

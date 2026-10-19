@@ -14,6 +14,8 @@ Indice maestro de la documentacion no operativa del repo.
 
 ## Medición comercial: Forms, agendas y anuncios
 
+[Taxonomía comercial CRM](architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md): separación aceptada; schema y transición aún sin aplicar.
+
 [Arquitectura](architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md) ·
 [funcionamiento](documentation/growth/google-ads-measurement.md) ·
 [manual Ads](manual-de-uso/growth/activar-conversiones-google-ads.md) ·

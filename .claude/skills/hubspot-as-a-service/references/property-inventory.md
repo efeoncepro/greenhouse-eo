@@ -1,5 +1,9 @@
 # Diccionario efectivo y captura comercial
 
+Origen/canales: [ADR aceptado19/10](../../../../docs/architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md).
+Separación conceptual vigente; schema/backfill aún propuestos. No reinterpretar canal_de_adqusicion,
+Traffic Source o Record Source. Conservar histórico; Marketing/multiselect/vacíos requieren evidencia.
+
 ## Nombre de Deal y Lead
 
 Aplicar la [convención de nombres](../../../../docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md)
