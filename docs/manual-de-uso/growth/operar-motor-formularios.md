@@ -34,6 +34,20 @@ Para revisar o modificar su configuración:
    El rollout del 2026-08-31 no realizó estos últimos; la fila de
    [TRACKING-PLAN.md](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md) sigue pendiente.
 
+## Medición comercial Ads y corrección de clasificación
+
+Usar el [manual Ads](activar-conversiones-google-ads.md) para descubrir la fuente/versión y verificar
+su política `googleAds`, consentimiento y recibo dedicado. Google UPD, Meta, GA4 y entrega a HubSpot
+se comprueban por separado; no deducir Ads desde `generate_lead` ni aplicar a formularios generales.
+El release2559e9242 sirve Grader y la API de clasificación auditada;13 Forms comerciales + Discovery
+están configurados. La recepción y atribución real aún requieren evidencia de una ocurrencia legítima.
+
+Si una definición comercial heredada tiene clasificación incorrecta, seguir
+[corregir clasificación comercial](corregir-clasificacion-comercial.md): descubrir primero,
+confirmar propósito, fijar versión/hash, aplicar con autoridad y leer resultado/`commandExecutionId`.
+Un409 obliga a reconciliar; no reintentar cambiando el hash a ciegas. Lead Gen Web ya es
+`quote_request`. No usar SQL directo ni enviar un lead ficticio para verificar el endpoint.
+
 ## Verificar matching publicitario de un formulario
 
 Leer el [contrato runtime](../../reference/measurement-gtm-ga4/10-growth-lead-matching-runtime.md)

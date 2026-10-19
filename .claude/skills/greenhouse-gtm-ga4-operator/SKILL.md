@@ -414,6 +414,10 @@ that evidence. Release proofs and pending real traffic/EMQ stay in the linked ru
 
 ## Google Ads online y EC — contrato y checkpoint 18-10-2026
 
+Cierre vigente: [release Grader/clasificación main2559e9242](../../../docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md), manifest released y canarios negativos.
+Antes de operar, releer estado real; no repetir correcciones/planes históricos ni crear leads para
+completar evidencia. TASK-2034 sigue parcial por recepción/atribución y recibos reales pendientes.
+
 Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
 [arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
 y [evidencia de activación](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).

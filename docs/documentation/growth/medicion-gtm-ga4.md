@@ -23,6 +23,15 @@ Mide qué pasa en los sitios públicos de Efeonce (`efeoncepro.com` + `think.efe
 - Cuando el backend **acepta un formulario válido** y el transporte analítico tiene consentimiento, el espejo existente envía `generate_lead`, con `form_slug` para identificar el formulario. Un clic o intento fallido no es esa conversión. Una reserva confirmada usa el mismo evento GA4 con `lead_source=meeting_booking`; abrir la agenda no cuenta como conversión.
 - Un formulario nuevo compatible puede aprovechar el evento genérico de GA4 en un host instalado y autorizado; hay que verificarlo. **Eso no habilita matching Meta/Google automáticamente**: las fuentes elegibles siguen siendo explícitas. Un host nuevo requiere instalar, configurar y verificar su medición.
 
+## Conversiones nativas de Google Ads
+
+El [canal Ads online](google-ads-measurement.md) usa un recibo de aceptación o reserva confirmada,
+política por fuente y consentimiento propio; no importa automáticamente el `generate_lead` genérico.
+Checkpoint del release2559e9242: Web6/Server10 publicados, EC ON y13 Forms comerciales + Discovery;
+Grader incluido y Contacto general excluido. El navegador procesa el recibo y los tags nativos de
+servidor envían la conversión; no hay retry backend de ese canal. Configuración, recepción y
+atribución se verifican por separado. La primera evidencia real Ads sigue sin verificar.
+
 ## Configuración escalable y operación por agentes
 
 Las políticas publicadas definen fuente, versión, surface/origen, campos tipados y destinos

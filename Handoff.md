@@ -8,7 +8,7 @@ Secuencia316810121: Programado1/Error0, único22Oct09:30Quito=11:30Chile, firma 
 respuesta a cualquier email o reunión desinscribe. No duplicar, contactar puentes ni reinscribir.
 [Expediente y siguiente paso](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
 
-## 2026-10-18 — Grader: transporte medido y candidato de publicación
+## 2026-10-18/19 — Grader: transporte medido y release completado
 
 GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
 completada con contexto visitante, CORS y recibo sólo tras persistencia; duplicados sin reenvío.
@@ -16,7 +16,8 @@ PR257 promueve todo develop81f6ba525 a main2559e9242, árboles idénticos. Verce
 Grader y clasificación auditada servidos, canarios negativos y smoke productivo PASS.
 Manifest released; orquestador39190761785, CI/Deep/smoke PASS, health200 y watchdog6/6 drift0.
 Sin leads ficticios, replay, nuevo GTM ni otra corrección Web.
-Checkout principal en develop y WIP ajeno preservado.
+Cierre documental19/10: arquitectura, funcionales, manuales, índices, TASK-2034 y skills espejo conciliados;
+primera recepción/atribución real sigue pendiente. Checkout principal develop, WIP ajeno preservado.
 [Release](docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 [Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 

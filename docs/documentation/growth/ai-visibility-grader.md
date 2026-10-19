@@ -97,6 +97,21 @@ Hay primitives server-side gobernados y todos los entrypoints consumen esos cami
 - **CLI de smoke:** `pnpm growth:ai-visibility:smoke` (ver el [manual](../../manual-de-uso/growth/ai-visibility-grader-smoke.md)).
 - **UI/report surfaces:** la pantalla publica, el portal cliente, PDF/email y artefactos Fix-It leen DTOs public-safe/client-safe; ninguno llama proveedores por su cuenta.
 
+## Captura comercial y conversiones publicitarias
+
+El diagnóstico público tiene intención comercial confirmada. Think `/brand-visibility` usa el
+formulario portátil Forms, versión8 y respuesta `tokenized_report`; consultar el estado o abrir el
+informe no cuenta como otra conversión. La fachada histórica `POST /api/public/growth/ai-visibility/run`
+conserva su compatibilidad y está publicada en main2559e9242: con Forms habilitado reutiliza identidad,
+versión y preparación de medición canónicas. Un duplicado no vuelve a emitir el recibo.
+
+Ads exige política publicada para la fuente y consentimiento publicitario vigente, con veto GPC.
+Sólo una aceptación persistida permite devolver el recibo dedicado; el navegador debe procesarlo.
+La aceptación comercial continúa aunque falle la instrumentación. Las pruebas de publicación fueron
+negativas, sin leads ficticios; recepción/atribución de Ads aún sin verificar.
+[Contrato de transporte](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md) ·
+[medición y cobertura](google-ads-measurement.md).
+
 ## Mercados, idiomas y estado de disponibilidad
 
 TASK-1863 está desplegada y verificada en staging al 2026-09-28; su promoción a `main` permanece en

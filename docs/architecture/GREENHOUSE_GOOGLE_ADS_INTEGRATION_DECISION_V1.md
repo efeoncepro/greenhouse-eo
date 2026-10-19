@@ -1,5 +1,23 @@
 # ADR — Integración Google Ads de Greenhouse
 
+## Delta de evidencia — 19/10/2026, cierre productivo (18/10 Chile)
+
+La dirección Accepted se conserva. La implementación de Grader y clasificación comercial se publicó
+con todo develop en **main `2559e9242`** y manifest **released**; CI, Deep, smoke, health y watchdog
+verificados en la [auditoría de release](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+El endpoint administrativo registra auditoría API Platform y UPDATE Forms en la misma transacción,
+con `commandExecutionId`; las referencias inferiores a mantenimiento local o discrepancias pendientes
+describen cortes anteriores. [Contrato de clasificación](GROWTH_FORMS_COMMERCIAL_CLASSIFICATION_CORRECTION_V1.md).
+
+La relectura conserva 13 Forms comerciales y Discovery, Web 6/Server 10, EC ON y cuenta 6862539491.
+AI Grader es comercial y Think usa Forms portátil; Contacto general permanece fuera de Ads.
+[Contrato Grader](GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md). No se fabricaron leads, reservas ni
+conversiones, ni se republicó GTM en este release. Primera recepción real, matching y atribución no
+verificados permanecen separados de la implementación publicada. La conexión multiorganización y
+la ingesta de resultados CRM continúan fuera de esta unidad; no se amplió autoridad OAuth/API/MCP.
+
+## Evidencia histórica de publicación — 18/10/2026
+
 Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
 AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
 corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios

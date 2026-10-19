@@ -54,6 +54,24 @@ La nueva fuente por datos y Meta Test Events se verificaron en producción. Las 
 no sustituyen la primera conversión comercial real consentida ni demuestran mejora de EMQ o
 una audiencia elegible. CRO, abandono, suscripciones y resultados CRM siguen fuera de este release.
 
+## Google Ads online y clasificación comercial
+
+Ads online tiene su propio recibo postpersistencia, separado de Google UPD y del espejo GA4.
+Una aceptación comercial elegible devuelve `googleAdsConversion`; el navegador revalida permiso y
+lo transporta mediante Web6 a los tags nativos Server10. Ese canal no tiene retry backend;
+los hashes de EC usan un canal reservado y nunca dataLayer ni parámetros GA4 ordinarios.
+La exigencia de client ID GA4 descrita para UPD no se traslada automáticamente al canal Ads.
+
+Cobertura verificada en el release2559e9242:13 Forms comerciales y Discovery; Grader comercial,
+Contacto general excluido. Una fuente o versión futura requiere revisar/publicar su política.
+[Alcance, consentimiento y límites](google-ads-measurement.md).
+
+La corrección administrativa de una clasificación heredada permite únicamente
+`lead_magnet` → `quote_request`, con intención confirmada, razón y precondiciones vigentes.
+Preserva identidad, versión, consentimiento y destinos; no publica Ads automáticamente. Requiere
+actor interno con permiso de autor y registra auditoría en la misma transacción. Lead Gen Web
+ya fue corregido; no repetirlo. [Manual de corrección](../../manual-de-uso/growth/corregir-clasificacion-comercial.md).
+
 ## Como funciona (flujo)
 
 1. Un operador **crea** un formulario (borrador) y define sus campos, su consentimiento y a donde va lo que se envia.

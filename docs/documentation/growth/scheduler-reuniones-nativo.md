@@ -45,6 +45,27 @@ material cifrado a 48 h. La confirmación de transporte no acredita audiencia pu
 La primera reserva comercial consentida y su conciliación con cada proveedor siguen pendientes
 de observar; las pruebas aisladas no crean bookings ni contactos comerciales.
 
+### Google Ads online y conversiones mejoradas
+
+La conversión Ads `meeting_booking` requiere una respuesta válida del proveedor, la transición
+persistida `provider_dispatched → succeeded` y la proyección de medición guardada. Sólo entonces
+la primera respuesta puede incluir el recibo dedicado `googleAdsConversion`; replay, apertura del
+calendario o un booking ambiguo no lo emiten. El recibo comercial de la reserva conserva su
+contrato independiente.
+
+La policy publicada debe corresponder al binding, surface y origen vigentes, con captura y Ads
+habilitados, los cuatro permisos Google explícitos y sin veto GPC. El navegador transporta
+`gh_ads_conversion` por GTM Web hacia el tag Ads de GTM Server; no deriva esta conversión del
+`generate_lead` genérico. Los hashes EC opcionales usan el canal reservado `user_data`, no dataLayer;
+GCLID/GBRAID/WBRAID se observan con consentimiento, nunca se fabrican. Este envío online depende
+del navegador y no usa los reintentos backend de Meta/UPD descritos arriba.
+
+El [cierre del release](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+releyó Web6/Server10, Ads6862539491 y13 Forms comerciales+Discovery sin modificar esas políticas.
+Discovery es la agenda del sitio, no un tipo de campaña Ads. La recepción, matching y atribución de
+una reserva real no quedaron verificadas con esos canarios; no se crearon reservas ficticias.
+[Activación y verificación](../../manual-de-uso/growth/activar-conversiones-google-ads.md).
+
 ## Estados y adaptación
 
 El mismo controlador proyecta recetas `guided`, `split` o `command` según la caja disponible. Cambiar tamaño o cerrar/reabrir no crea otro booking intent ni repite pasos del funnel.

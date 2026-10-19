@@ -250,8 +250,11 @@ that evidence. Release proofs and pending real traffic/EMQ stay in the linked ru
 Cargar [contrato/activación](../../../docs/manual-de-uso/growth/activar-conversiones-google-ads.md),
 [arquitectura](../../../docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md)
 y [evidencia de activación](../../../docs/audits/growth/2026-10-18-google-ads-activation.md).
-Recibo Ads postcommit con UUID/key, nunca en dedupe/replay; policy opt-in y flag global default OFF.
-Exigir los cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el canal reservado
+Para `meeting_booking`, exigir respuesta válida del proveedor, transición durable
+`provider_dispatched → succeeded` y proyección de medición persistida antes de devolver
+`googleAdsConversion` con UUID/key; nunca en dedupe/replay. El recibo comercial de booking y el
+recibo Ads son contratos distintos. Exigir policy publicada para el binding vigente, flags de captura
+y Ads habilitados (default OFF), cuatro permisos Google explícitos y GPC sin veto. Hashes sólo en el canal reservado
 `user_data`, con memoria privada ≤10 s; nunca en dataLayer ni telemetría ordinaria. El evento dedicado
 `gh_ads_conversion` queda excluido del forwarding GA4. No derivar Ads del `generate_lead` genérico
 ni mezclar UPD/Meta. GCLID/GBRAID/WBRAID se observan con consentimiento; no se generan ni se disparan.
@@ -288,5 +291,8 @@ significa Ads habilitado. La revisión al publicar es hoy un paso del operador, 
 AI Grader tiene intención comercial confirmada por el operador. Contacto es general y queda fueraAds.
 Lead Gen Web corregido a quote_request por command/store Forms, preservando identidad y versión;
 no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
-está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
-La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.
+está publicada y su auditoría API Platform comparte transacción con el UPDATE Forms; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
+El [release de cierre](../../../docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+publicó main `2559e9242`: Grader y clasificación auditada servidos, CI/Deep/smoke y manifest released.
+Releyó Web6/Server10 y las14 fuentes sin nuevas publicaciones. La configuración y canarios
+negativos no certifican una reserva comercial real, recepción, matching o atribución Ads.

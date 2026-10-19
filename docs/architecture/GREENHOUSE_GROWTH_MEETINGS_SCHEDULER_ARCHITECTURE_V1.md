@@ -285,15 +285,21 @@ They describe exposure context, not identity. A recipe change is diagnostic stat
 Each recipe is captured at its lower bound, midpoint and one pixel around a threshold, plus 200% zoom where practical. GVC must verify keyboard flow, focus return, reduced motion, zero horizontal overflow, stable selection across resize and exactly-once telemetry. The current `appearance` observation without recipe consumption and full `replaceChildren` rendering are implementation gaps, not the target architecture.
 
 
-## Delta 2026-10-17 — recibo Google Ads online preparado
+## Google Ads online — contrato publicado y verificación de cierre
 
 El [contrato Ads](GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md#92-captación-mediante-gtm)
-agrega opt-in publicado y gate global default OFF. Sólo commit comercial y enqueue real habilitan
-`googleAdsConversion`; replays/dedupe no repiten. Hashes EC opcionales viajan en respuesta dedicada
+agrega opt-in publicado y gates de captura/Ads default OFF. Para `meeting_booking`, respuesta
+válida del proveedor, transición `provider_dispatched → succeeded` persistida y proyección de
+medición guardada habilitan `googleAdsConversion`; replays/dedupe no repiten. La policy debe
+corresponder al binding/surface/origen vigentes y exigir cuatro permisos Google explícitos sin GPC. Hashes EC opcionales viajan en respuesta dedicada
 private/no-store a memoria efímera y al user_data reservado Google, nunca telemetría ordinaria o
 estado confirmado UI. Destinos Meta/UPD y entrega CRM permanecen independientes. Sin migración ni
 nuevo worker. [Activación y límites](../manual-de-uso/growth/activar-conversiones-google-ads.md);
-no está publicado ni desplegado este delta.
+El [cierre main2559e9242](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md)
+releyó flags habilitados, Web6/Server10 y13 Forms comerciales+Discovery con políticas Ads publicadas;
+Discovery es la agenda, no un tipo de campaña Ads. El envío online depende del navegador y no usa
+los reintentos backend Meta/UPD. Configuración y canarios negativos no acreditan recepción,
+matching o atribución de una reserva real; no se fabricaron bookings para producir evidencia.
 
 ## Delta 2026-10-18 — consumidor planificado: encabezado global del sitio
 

@@ -1,5 +1,11 @@
 # Tracking Plan — Registro de Forms & CTAs (SoT de la capa de medición)
 
+Checkpoint19/10: Ads online usa política/recibo propios, no el estado tagged de esta tabla GA4.
+Cobertura API:13 Forms comerciales + Discovery, Grader incluido y Contacto general fueraAds;
+Web6/Server10 y EC ON. [Contrato y alcance](../../documentation/growth/google-ads-measurement.md) ·
+[release Grader/clasificación auditada](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+Recepción/atribución real Ads aún sin verificar; no fabricar envíos para cambiar un estado de tagging.
+
 Delta14/10: [corrección de contexto Lead](../../audits/measurement/META_LEAD_VISITOR_CONTEXT_2026-10-14.md):
 Server9 estricto, IP/UA original, atribución consentida y external_id SHA256; operación de
 políticas por API/panel/CLI. [Release PR255/main9690efad](../../audits/releases/2026-10-14-scalable-measurement-agent-first-release.md)

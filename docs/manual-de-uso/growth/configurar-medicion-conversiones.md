@@ -1,5 +1,15 @@
 # Configurar medición de conversiones
 
+## Checkpoint de publicación — 19/10/2026
+
+El release de todo develop está publicado en main `2559e9242`, con manifest `released`,
+CI/Deep/smoke y salud verificados. La fachada Grader y la clasificación administrativa auditada
+están servidas. La cobertura leída por API es **13 Forms comerciales + la agenda Discovery**;
+Grader comercial incluido, Contacto general fuera de Ads, Web6/Server10 y EC ON.
+No se generaron leads ni reservas ficticias. Primera recepción y atribución de una conversión
+real siguen sin verificar. [Evidencia y límites](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+Los cortes anteriores que siguen describen su fecha; no son instrucciones para repetir el rollout.
+
 Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
 AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
 corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios

@@ -44,7 +44,7 @@ CORS/no-store/body/permisos/conflicto PASS, sin captación ficticia.
 [Cierre formal y evidencia](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 
 Validación inicial:69 pruebas aisladas de fachada/receipt/prepare, transporte y clasificación; mocks de persistencia
-y proveedores, sin escribir leads. Validación productiva prevista: GET contrato/políticas, OPTIONS,
+y proveedores, sin escribir leads. Validación productiva ejecutada en el release2559e9242: GET contrato/políticas, OPTIONS,
 JSON malformado antes de command, permisos y conflicto CAS de clasificación antes de UPDATE. Cero
 pruebas positivas de captación o replay. [Auditoría del release](../audits/growth/2026-10-18-grader-measurement-release.md).
 Recepción Ads/Meta, identidad HubSpot y atribución requieren la primera ocurrencia real; no se
