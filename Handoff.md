@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-19 — ANAM: voz de Emma activa y conocimiento operativo
+
+600 con Emma primero, voz Lina, IA24/7 y humanos L–V09:00–18:00Santiago; sin menú IVR.
+Llamada real41s: ticket/transcripción y primera respuesta verificados; grabación disponible; handoff y buzón pendientes.
+Correo a Oscar/María Paz enviado con firma gráfica/CCO, EMAIL118930883467 SENT en Efeonce.
+Caso y skills espejo actualizados; [manual reutilizable](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
+y [evidencia/pendientes](docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md). Kortex hibernado.
+
 ## 2026-10-18 — Indecaucho: Katia contactada y un seguimiento programado
 
 Company59393386572/Contact255985568411/Primary/segmento180 verificados. Dos puentes Apollo investigados,
@@ -260,15 +268,6 @@ Sin cambios CMS/infra; congelar baseline al implementar, registrar fecha real y 
 Estado corregido: diagnóstico base entregado y auditoría integral parcial. [Siete frentes y aceptación](docs/services/sky-blog-seo/COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md).
 Skills `sky-blog-seo`/`seo-aeo` Codex–Claude y modelo compartido separan cobertura, preparación, aplicación y resultado;
 censo no equivale a revisión editorial; blog no acredita SEO completo de SKY. GSC anterior no bloquea profundizar.
-
-## 2026-10-15 — OmniHuman 2.0: API investigada y agentes canalizados
-
-[Manual API](docs/manual-de-uso/creative-studio/omnihuman-2-api.md),
-[contrato](docs/architecture/creative-studio/BYTEPLUS_OMNIHUMAN_2_API_CONTRACT_V1.md) y
-[auditoría](docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md): dos auth de Vision AI,
-API4–300s frente a ficha UI120s, recuperación y derechos. Skills e índices enlazados. Modelo `Disabled` en
-cuenta; CLI Ark/Speech sin OmniHuman. AI Creative Operations continúa con unidad de implementación si se pide:
-activación, credencial mínima, consumidor, presupuesto y canario. Sin activación, gasto, código ni ruta Globe.
 
 ## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
 

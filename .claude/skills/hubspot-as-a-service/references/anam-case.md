@@ -8,8 +8,10 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 
 - HubSpot portal: `19893546`
 - Customer Agent: `Emma` (renamed live from `Agente de clientes de ANAM` on 2026-09-01)
-- Human handoff: ticket workflow `1876744588`; customer-facing copy remains role-neutral because the assignee
-  depends on intent and availability.
+- Chat human handoff: ticket workflow `1876744588`; customer-facing copy remains role-neutral because the assignee
+  depends on intent and availability. Voice uses its own channel routing, not this workflow.
+- Voice channel: `Anam - Emma`, ID `4316530466`, number `+56-6-0091-42234`, Help Desk / Asistencia al cliente.
+  Current configuration and evidence: [Voice state — 2026-10-19](#voice-state--2026-10-19).
 - Public chat landing: `https://anam-2.hubspotpagebuilder.com/agente-anam`
 - CMS project: `kortex-cms-react`, project `103589049`
 - CLI account/profile: `anam-19893546` / `anam`; never replace the Kortex/Efeonce default.
@@ -46,6 +48,9 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`
 - `docs/audits/ANAM_CUSTOMER_AGENT_EMMA_IDENTITY_QA_2026-09-01.md`
 - `docs/audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md`
+- `docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md`
+- `docs/audits/ANAM_EMMA_VOICE_CORREO_OSCAR_MARIA_PAZ_2026-10-19.md`
+- `docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-follow-up-change-set-2026-07-24.md`
 - `docs/audits/ANAM_COMMERCIAL_BACKLOG_DASHBOARD_QA_2026-07-24.md`
 - `docs/audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`
@@ -153,6 +158,69 @@ Do not confuse this feature with workflow `1852406585`: that workflow is the con
 activation-review queue and does not route conversations or deploy the Customer Agent. Channel configuration
 alone never proves handling; use the 2026-07-24 operational readback and real-conversation evidence.
 
+## Voice state — 2026-10-19
+
+Current dated evidence lives in `docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md`; the exact sent
+communication is `docs/audits/ANAM_EMMA_VOICE_CORREO_OSCAR_MARIA_PAZ_2026-10-19.md`. Re-read the portal before
+future changes. These records supersede the historical pending 600 activation, not the separate chat contract.
+
+- Portal `19893546` and approved Chile regulatory verification were read back. The target number initially had
+  the label `Anam - Emma` but was **unassigned**, with no IVR: a number label did not connect Emma.
+- The operator explicitly chose **Emma first**, approved Customer Agent Voice beta terms and 50 credits/minute
+  using existing capacity, without purchasing credits or changing limits. Voice is published, all hours, 100%
+  coverage, on calling channel `4316530466`. No keypad IVR was created.
+- AI reception is configured 24/7, subject to available credits and service availability. This is not a promise
+  of 24/7 ANAM human, laboratory or operational service.
+- Human transfers: Monday–Friday, 09:00–18:00, Santiago timezone; simultaneous ringing to available Marco
+  Jiménez Venegas, Pablo Puga and Maria Paz Haeger. This does **not** inherit intent routing from chat workflow
+  `1876744588`. Availability must be set in HubSpot; Teams status is not evidence. Recipients need their calling
+  tab open and audio permissions enabled.
+- Outside human hours Emma remains first; when human help is needed, voicemail is the configured fallback.
+  No human answer during hours also routes to voicemail. Those paths were saved/reopened, not call-tested.
+- Voice `Lina`: female, Spanish, Colombian accent, accepted by the operator after the call. Saved parameters:
+  speed 1, stability 0.5, similarity 0.75, style 0, speaker boost enabled. The account's Spanish selector showed
+  six voices and no Chilean option; do not imply that an import/custom Chilean voice is supported.
+- Published greeting: “Hola, soy Emma, el agente de inteligencia artificial de ANAM. ¿En qué puedo ayudarte hoy?”
+  Spanish recording notice and voicemail were saved and reread; exact scripts are in the audit. Voicemail asks
+  name, company, phone and reason, states human hours and offers `ventas@anam.cl`.
+- Ticket defaults: Support Pipeline / New / no priority. The second number `+56-6-0091-42321`, existing chat and
+  `Ventas@anam.cl` channel were not changed. September 9/14 Notion meetings already reported chat and email
+  operating; earlier local “chat only” snapshots are historical, not the current channel inventory.
+
+**Runtime evidence:** the operator made a real incoming call on 19 October at 12:02 America/Santiago and
+reported satisfactory attention. Ticket `49630925083`, thread `11315753837`, call `118907575473` were independently
+read back: 41 seconds, ticket New and owned by Emma, recording player available and transcript with three turns.
+Emma disclosed AI identity, received a quotation request and asked matrix/objective, with water/soil/air examples,
+without inventing price or timing. This proves reception, a relevant first intake response and CRM traceability;
+it does not prove a complete quotation, knowledge coverage, human transfer, voicemail or resolution. The recording
+was not played/downloaded for an independent auditory assessment. Structured 12:02 GMT-3 prevails over the
+AI summary's inconsistent 11:02.
+
+**Credits snapshot, not a standing balance:** 19 October, period 8 October–7 November: 33,000 monthly, 250 used,
+32,750 globally available; Customer Agent voice 1 unit / 50 credits, text resolutions 0; workflows 60 and data
+agent 140. Voice rounds up to whole minutes and AI minute consumption stops on human transfer; text is 50 credits
+per qualifying resolution, not per message. The aggregate 50-credit voice unit is consistent with the 41-second
+call, not a per-call billing receipt. Customer Agent's 33,000 limit shares account capacity, without reserving it
+against other features. Account maximum 33,000 and automatic expansion mode were preexisting and unchanged.
+30,000 additional credits were already contracted at US$3,240 annual billing (arithmetic US$270/month; tax
+classification not verified). Telephony minutes are separate: the portal showed 7/3,000, not 3,000 free AI minutes.
+Re-read current usage and limits before sizing; no subscription, budget or credit expansion is authorized here.
+
+**Open acceptance checks:** multi-turn service/knowledge QA; transfer to an available human during hours;
+voicemail with no human available and outside hours, including resulting ticket/recording; responsible person for
+reviewing new tickets and voicemail; continuing credit monitoring. Preserve these as unverified until tested.
+
+**Communication:** the operator approved sending the complete configuration, evidence, cost explanation and
+pending checks to Oscar Carrasco and María Paz Haeger. Outlook sent it on 19 October at 12:16:41 America/Santiago,
+with official graphical Julio signature and mandatory BCC `48713323@bcc.hubspot.com`; UI and connector read back
+the sent copy. Efeonce portal `48713323` recorded EMAIL `118930883467` as `SENT` via BCC, without a duplicate note.
+This is an Efeonce outbound communication record, not an ANAM data integration, and proves neither delivery nor
+reading. Recipient details and exact content remain in the communication audit.
+
+Kortex remains hibernated and was neither used nor restarted. The old Aircall proposal does not establish the
+current telephony implementation. Recovery means reviewing removal of only Emma's voice deployment and verifying
+the remaining call destination before use; never delete the number or alter chat/email as an implicit rollback.
+
 ## Customer Agent capability backlog
 
 The 2026-07-24 readback shows the Customer Agent operational with 23 active sources, live chat configured all
@@ -170,17 +238,17 @@ case reached Maria Paz. The original failed probe `48103382175` exposed and drov
 the test chats were ended after verification. This proves routing, ticket ownership and the customer-facing owner
 label; it does not prove that a human replied or that a second human accepted a reassignment in the same chat.
 
-The configured mode is live handoff. While the chat remains open, the first human may manually reassign its ticket
+The configured chat mode is live handoff. While the chat remains open, the first human may manually reassign its ticket
 owner in Help Desk and the second human can continue in the same thread. Do not end a chat that needs this
 continuity because an ended chat cannot be reopened. The current workflow routes by intent and availability; it
 does not resolve arbitrary free-text names to Pablo, Marco or Maria Paz. A named-person request triggers human
 handoff, but the exact person requires a governed condition or manual reassignment and runtime proof before the
 public copy confirms the name.
 
-Credit-behavior monitoring remains open. There is still no
-documented runtime proof for CRM
-permissions, reply recommendations, contact/segment-aware testing, analytics/coaching, lead qualification or
-additional channels.
+Credit-behavior monitoring remains open; the 19 October voice usage snapshot above is the latest recorded
+evidence, not ongoing monitoring. CRM permissions, reply recommendations, contact/segment-aware testing,
+analytics/coaching and lead qualification still lack documented runtime proof. Voice reception and first intake
+are now verified within the bounded evidence above; transfer, voicemail and broader knowledge QA remain open.
 
 Use this sequence after a read-only portal inventory:
 
@@ -188,14 +256,14 @@ Use this sequence after a read-only portal inventory:
 2. Pilot reply recommendations for Maria Paz and repeat QA as a governed CRM test Contact/segment, including safe attachments and Testing Insights. These are human-in-the-loop/preview experiments, not autonomous rollout.
 3. Inspect historical reports, knowledge gaps, coaching opportunities and source usage. Establish resolution, necessary/premature handoff, unresolved, feedback and source-quality baselines; never equate deflection with resolution.
 4. Propose a small, separately approved Contact-property allowlist. Default to view-only; HubSpot's documented native permission does not expose Company, Deal, Ticket, Service or billing ledgers.
-5. Design the first external action as a read-only `GET` status lookup through a portal-bound Kortex endpoint with verified email, response allowlist, audit and human fallback. Do not publish either existing `Nueva acción` draft until its purpose, endpoint and security contract are known.
+5. The historical external-action candidate was a read-only `GET` status lookup through a portal-bound Kortex endpoint with verified email, response allowlist, audit and human fallback. Kortex is hibernated: do not exercise that route or either `Nueva acción` draft. Any future action needs its own approved runtime, purpose, endpoint, security contract and QA.
 6. Verify real conversations and credit behavior on the active channel before expanding coverage or channels.
-7. Evaluate email/form deployment, then WhatsApp. Treat calling and custom channels as eligibility-dependent betas and prove whether they satisfy the separate 600-number requirement.
+7. Finish voice transfer/voicemail and knowledge QA on channel `4316530466` before expanding its design. Reconcile email operation reported in September with current portal evidence; forms, WhatsApp and custom channels remain separate eligibility/design/approval work. The 600 voice activation is no longer pending.
 8. Keep lead qualification beta last. The current operating model assigns qualification, commitments and exceptions to people; changing lifecycle or routing from the agent requires explicit ANAM ratification and CRM-write QA.
 
-No item in this backlog authorizes a CRM permission, action publication, beta opt-in, new channel, handoff rewrite
-or deployment change. Operational status does not remove the remaining real-conversation and credit-monitoring
-gate.
+No item in this backlog authorizes further CRM permissions, action publication, beta opt-ins, new channels,
+handoff rewrites or deployment changes. The explicit 19 October authorization covered only the voice slice above.
+Operational status does not remove the remaining real-conversation and credit-monitoring gate.
 
 ## Operational lessons
 

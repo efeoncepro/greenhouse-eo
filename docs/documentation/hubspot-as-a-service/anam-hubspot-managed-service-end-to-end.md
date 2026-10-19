@@ -1,8 +1,8 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 2.0
-> **Actualizado:** 2026-09-02
+> **Versión:** 2.1
+> **Actualizado:** 2026-10-19
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
@@ -25,6 +25,26 @@ Contacto -> Lead -> Empresa -> Negocio -> Cotización + líneas -> Servicio -> r
 El Negocio representa oportunidad y adjudicación; la línea conserva el componente vendido; Service representa
 el alcance contratado/entregado; Ticket representa una acción humana con SLA; el futuro Billing Event representa
 un ítem fuente de facturación. No se deben aplanar estos hechos en Company o Deal.
+
+## Atención telefónica con Emma
+
+Desde el 19-10-2026, el 600 `+56-6-0091-42234` recibe llamadas con Emma primero, sin menú IVR inicial.
+Emma usa la voz Lina en español y atiende a todas horas mientras exista capacidad de créditos. Las
+transferencias humanas se configuran de lunes a viernes 09:00–18:00, zona Santiago, a Pablo Puga,
+María Paz Haeger y Marco Jiménez Venegas disponibles, con timbre simultáneo y buzón como respaldo.
+Esto no promete atención humana ni ejecución de servicios ANAM 24/7.
+
+Una llamada real de 41 segundos confirmó saludo, primera respuesta de cotización, ticket, grabación y
+transcripción. Emma pidió matriz y objetivo del análisis sin inventar precios ni plazos. Transferencia
+humana y buzón siguen pendientes de prueba específica. El routing por intención del chat no se aplica
+por inferencia al teléfono; el canal Calling gobierna su equipo y horarios.
+
+La tarifa leída ese día fue 50 créditos por minuto de voz, redondeado hacia arriba, frente a 50 por
+resolución de texto. Comparten créditos; los minutos de telefonía son otro contador. Consultar el
+[registro fechado](../../audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md) para saldos, IDs,
+autorizaciones, fuentes y límites, y el [manual de configuración](../../manual-de-uso/hubspot/configurar-customer-agent-llamadas.md)
+antes de modificar la línea. Oscar y María Paz recibieron el correo operativo; envío y registro CRM
+verificados, sin afirmar entrega ni lectura.
 
 ## Customer Agent y landing
 
@@ -59,7 +79,7 @@ vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron p
 cero borradores; el preflight conservó dos advertencias anteriores sobre `Registraré tu consulta`, por lo que la
 regresión conversacional y la corrección de esa promesa siguen pendientes como trabajo separado.
 
-El handoff ya no usa una única propietaria. Emma invoca el workflow de tickets `1876744588`, que clasifica la
+El handoff del chat ya no usa una única propietaria. Emma invoca el workflow de tickets `1876744588`, que clasifica la
 necesidad y distribuye con disponibilidad: cotización/nuevo negocio a Pablo Puga con María Paz Haeger como
 reemplazo; seguimiento a Marco Jiménez Venegas con Pablo como reemplazo; y Calidad, facturación u otros a María
 Paz con Marco como reemplazo. Antes de asignar, el workflow elimina a Emma como propietaria del ticket; luego la

@@ -149,7 +149,8 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
 2. Read [service-delivery.md](references/service-delivery.md) for the delivery loop and evidence contract.
    For direct portal operations, read [`HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md`](../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) for the current CLI/MCP route and per-portal access evidence.
 3. Load only the workstream reference needed:
-   - Customer Agent: [customer-agent.md](references/customer-agent.md)
+   - Customer Agent: [customer-agent.md](references/customer-agent.md). Para llamadas entrantes, cargar el
+     [manual de Customer Agent Voice](../../../docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md): número, canal, implementación, horarios humanos, créditos y QA son verificaciones separadas.
    - Prospecting Agent (native sales outreach), voice, advanced instructions and meeting CTA: [functional reference](../hubspot-solutions-partner/references/prospecting-agent.md) + [voice calibration manual](../../../docs/manual-de-uso/hubspot/ajustar-voz-prospecting-agent.md). This is neither Customer Agent nor Agent CLI. Verify saved play configuration separately from generated drafts and sending.
    - RevOps/schema: [revops-schema.md](references/revops-schema.md)
    - Prospect enrichment, native segments and preparation for personalized email: [prospecting-segmentation.md](references/prospecting-segmentation.md). Declare whether the universe is the entire CRM or a verified research cohort before creating filters; an active attribute segment alone does not restrict source or freshness.

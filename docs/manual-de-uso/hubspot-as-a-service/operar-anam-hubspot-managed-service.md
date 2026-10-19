@@ -1,18 +1,36 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 2.0
-> **Actualizado:** 2026-09-02
+> **Versión:** 2.1
+> **Actualizado:** 2026-10-19
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 > **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 
 ## Antes de empezar
 
-1. Verifica que la cuenta/perfil resuelva a `19893546`; `48713323` es Greenhouse y no se usa para ANAM.
+1. Verifica que la cuenta/perfil resuelva a `19893546`; `48713323` es Efeonce/Kortex y no habilita operaciones en ANAM. Kortex permanece hibernado; usa sólo un carril autenticado independientemente para el portal objetivo.
 2. Lee handoff, modelo vivo y roadmap. Para decisiones de reuniones, revisa Notion live; lo local es un índice.
 3. Clasifica la acción: lectura, schema, records/asociaciones, workflow, publicación o knowledge.
 4. Antes de escribir, prepara change set con lote, impacto, aprobación, evidencia y rollback.
+
+## Línea de Emma y próxima validación
+
+La configuración del 600 está activa desde el 19-10-2026. Antes de tocar números, canales o transferencia,
+lee el [caso y evidencia actual](../../audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md) y sigue el
+[procedimiento reutilizable de llamadas](../hubspot/configurar-customer-agent-llamadas.md).
+No volver a aceptar términos, comprar créditos ni reasignar el número por el solo hecho de retomar este caso.
+
+1. Comprueba el canal `4316530466`, número `+56-6-0091-42234` y Emma desplegada al 100% a todas horas.
+2. Conserva voz Lina, elegida por el operador. Humanos: lunes–viernes 09:00–18:00 Santiago;
+   Pablo, María Paz y Marco, simultáneamente según disponibilidad HubSpot.
+3. Coordina una llamada con un destinatario disponible y pide atención humana; verifica receptor real,
+   ticket y transcripción. Luego prueba buzón sin disponibilidad y fuera de horario. Aún no están certificados.
+4. Usa el ticket `49630925083` y la llamada `118907575473` como evidencia de primera recepción/respuesta,
+   no como prueba de handoff o cotización completa. Revisa nuevos tickets y mensajes de voz con el equipo.
+5. Lee período, saldo global, límite de Customer Agent y máximo mensual. Tarifa observada: 50 créditos/minuto
+   de voz redondeado hacia arriba; 50/resolución de texto, no por mensaje. No modificar ampliación automática
+   o límites sin una instrucción aplicable; no deducir saldo exclusivo de Emma desde su límite.
 
 ## Cadencia operativa
 
@@ -24,7 +42,7 @@ acción y cadencia; no un score cosmético ni una atribución automática de cul
 ### Diaria
 
 - Revisa disponibilidad, créditos, conversaciones no resueltas y transferencias de Customer Agent.
-- Para diagnosticar el routing de Emma, sigue la
+- Para diagnosticar el routing de Emma **en chat**, sigue la
   [secuencia técnica de `1876744588`](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md):
   inscripción, resumen, clasificación, borrado del owner, rama, principal, reemplazo y owner efectivo.
 - Revisa tareas de `1852406585`: una tarea solicita validar; no vuelve al Service activo ni apto para KPI.
