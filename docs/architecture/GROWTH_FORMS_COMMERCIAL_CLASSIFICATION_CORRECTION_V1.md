@@ -10,7 +10,8 @@ comercial aunque el tipo heredado era lead_magnet. [Aplicación y readback](../a
 - Command compartido: `classification.ts`; SQL sólo en `correctCommercialFormClassificationStore` de `store.ts`.
 - CLI explícita de mantenimiento: `scripts/growth/correct-commercial-form-kind.ts`, perfil ops.
 - API admin: `/api/admin/growth/forms/{formId}/classification`, contexto interno + growth.forms.author,
-  actor de sesión y path/key coincidentes; implementada localmente, todavía no desplegada.
+  actor de sesión y path/key coincidentes; servida en main2559e9242, canarios negativos PASS.
+  [Cierre productivo](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 
 La CLI llama el primitive canónico como los otros scripts de mantenimiento Forms. El identificador
 actor registra quién opera; no reemplaza la credencial ni el permiso PG. La API no acepta identidad,
@@ -37,12 +38,13 @@ AI Grader conserva diagnostic_intake y su intención comercial confirmada por el
 La CLI reserva journal0600 con wx antes de ejecutar. Si ya existe, no repite la mutación; unknown
 exige leer/reconciliar. Tras commit conserva resultado y GET canónico independiente. El journal
 contiene metadatos de definición, hashes, actor, razón y versión; nunca valores de una submission.
-El nuevo endpoint comparte command y devuelve409 canónico sin detalle SQL. Su código está listo para
-un release futuro; la corrección aplicada no dependió de desplegarlo. GET del catálogo y GET público
+El nuevo endpoint comparte command y devuelve409 canónico sin detalle SQL. Su código está servido por
+el release main2559e9242; la corrección histórica aplicada no dependió de desplegarlo. GET del catálogo y GET público
 productivos verificaron quote_request con la misma versión. No se envía un lead para comprobarlo.
 
-20 pruebas nuevas cubren permisos/identidad, schema, CAS, riesgo/estado, unicidad de versión y campos
-preservados; regresión focal53 PASS y TypeScript/ESLint PASS. Configuración no prueba recepción Ads
+22 pruebas focales cubren permisos/identidad, schema, CAS, riesgo/estado, unicidad de versión, campos
+preservados y fallos de auditoría que revierten. TypeScript/ESLint PASS; regresión53 del primer corte
+conservada como antecedente. Configuración no prueba recepción Ads
 ni atribución. [Manual operativo](../manual-de-uso/growth/corregir-clasificacion-comercial.md).
 
 

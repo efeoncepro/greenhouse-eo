@@ -455,8 +455,10 @@ significa Ads habilitado. La revisión al publicar es hoy un paso del operador, 
 AI Grader tiene intención comercial confirmada por el operador. Contacto es general y queda fueraAds.
 Lead Gen Web corregido a quote_request por command/store Forms, preservando identidad y versión;
 no se exceptúa globalmente lead_magnet ni se publica el plan viejo. La API nueva de clasificación
-está preparada en código local, aún sin deploy; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
-La política configurada no certifica el intake histórico propio del Grader, recepción o atribución.
+está servida en main2559e9242, con auditoría API Platform en la misma transacción que el UPDATE
+y commandExecutionId para correlación; usar el [manual](../../../docs/manual-de-uso/growth/corregir-clasificacion-comercial.md).
+Canarios negativos de Grader/clasificación PASS, sin leads ficticios ni corrección positiva de prueba.
+La política y los canarios no certifican recepción ni atribución de conversiones reales.
 
 
 Grader: cargar [contrato de transporte](../../../docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).

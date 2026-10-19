@@ -12,10 +12,12 @@ respuesta a cualquier email o reunión desinscribe. No duplicar, contactar puent
 
 GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
 completada con contexto visitante, CORS y recibo sólo tras persistencia; duplicados sin reenvío.
-Julio reautoriza todo develop→main. Auditoría administrativa transaccional añadida sin migraciones;
-22 pruebas focales PASS y revisión arquitectónica aprobada. CI del nuevo candidato y canarios
-productivos pendientes; las871 pruebas/CI037 anteriores son evidencia histórica.
-Sin leads ficticios. Worktree retirado; todo en develop, WIP ajeno preservado.
+PR257 promueve todo develop81f6ba525 a main2559e9242, árboles idénticos. Vercel4He READY;
+Grader y clasificación auditada servidos, canarios negativos y smoke productivo PASS.
+Manifest released; orquestador39190761785, CI/Deep/smoke PASS, health200 y watchdog6/6 drift0.
+Sin leads ficticios, replay, nuevo GTM ni otra corrección Web.
+Checkout principal en develop y WIP ajeno preservado.
+[Release](docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 [Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 
 ## 2026-10-18 — Ads publicado en todos los formularios comerciales validados

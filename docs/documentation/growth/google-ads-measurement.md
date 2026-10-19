@@ -1,5 +1,9 @@
 # Medición Google Ads: alcance y estado
 
+Checkpoint de release18/10 (19/10 02:11Z): main2559e9242 y deployment4He READY; fachada
+Grader y clasificación administrativa servidas, canarios negativos PASS sin leads ficticios.
+CI/Deep y cierre formal: [evidencia del release](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
+
 Verificación API18/10,22:57:03Z: **13 formularios comerciales y Discovery con Ads publicado**.
 AI Grader incluido por decisión comercial del operador; Contacto general fuera de Ads. Lead Gen Web
 corregido a quote_request con key/slug/versión/destinos preservados. Se publicaron12 formularios
@@ -19,11 +23,12 @@ verificada; la API sólo expone nombres y no acredita por sí sola el booleano c
 externas; primera ocurrencia comercial, recibo proveedor y atribución siguen pendientes. E2E abierto.
 [Auditoría de activación](../../audits/growth/2026-10-18-google-ads-activation.md).
 
-## Cobertura comercial y ampliación pendiente
+## Cobertura comercial y fuentes futuras
 
 **Performance** es el formulario de diagnóstico de pauta; **Discovery** es la agenda de descubrimiento.
 Son nombres de fuentes del sitio. El tipo de campaña Ads no determina qué fuente tiene cobertura.
-Actualmente son las dos fuentes con políticas Ads publicadas.
+La cobertura vigente es13 formularios comerciales y Discovery, verificada por API.
+Performance es uno de esos formularios; no limita la cobertura a dos fuentes.
 
 El alcance solicitado para ampliar Forms comprende contacto, cotización, diagnósticos y briefs
 **comerciales** que captan solicitudes de servicios. Se reutiliza la acción «Solicitud comercial

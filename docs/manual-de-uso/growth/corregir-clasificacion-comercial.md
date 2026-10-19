@@ -3,7 +3,8 @@
 Operación interna acotada `lead_magnet → quote_request`, con decisión comercial explícita; no habilita
 Ads ni acepta un lead por sí sola. Lead Gen Web fue corregido18/10 mediante command canónico local y
 releído por las APIs productivas. [Evidencia](../../audits/growth/2026-10-18-commercial-forms-policy-publication.md).
-La nueva ruta admin está en código local de este commit y requiere release antes de usarse por HTTP.
+La ruta admin está servida en main2559e9242; permisos, schema y conflicto fueron verificados por HTTP.
+[Cierre y límites](../../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md).
 
 ## Antes de operar
 
@@ -29,7 +30,7 @@ Entrada JSON0600: formKey, commercialIntentConfirmed=true y reason del operador,
 5. Confirmar key/slug/version/payload/destinos preservados por readers y GET público. Después se valida
    y publica la política Ads con su propio CAS, activationAt, revisión e idempotencia.
 
-## API de producto preparada, aún sin desplegar
+## API administrativa publicada
 
 `POST /api/admin/growth/forms/{formId}/classification`: contexto interno, capability growth.forms.author
 sobre tenant y actor de sesión. Body estricto: formKey, expectedDefinitionSha256,

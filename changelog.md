@@ -19,10 +19,11 @@
 [Historial interno](docs/changelog/internal/README.md).
 
 - Fachada Grader reutiliza preparación/persistencia/recibo Forms y contexto visitante; CORS gobernado y respuestas privadas.
-- Think live confirmado en Forms portátil v8; política Ads vigente. Julio reautoriza promover todo develop por PR257.
-- Clasificación administrativa incorpora auditoría API Platform en la misma transacción, sin migraciones;22 pruebas focales PASS.
-- Las871 pruebas/CI037 previas son históricas; candidato nuevo y canarios productivos aún en validación, sin leads ficticios.
-- Worktree retirado; todo en develop, WIP ajeno preservado. [Validación y límites](docs/audits/growth/2026-10-18-grader-measurement-release.md).
+- PR257 promueve todo develop81f6ba525 a main2559e9242, árboles idénticos y Vercel4He READY.
+- Grader y clasificación administrativa con auditoría transaccional servidos; canarios y smoke productivo PASS sin leads ficticios.
+- Orquestador39190761785 SUCCESS, manifest released; CI/Deep/smoke PASS, health200 y watchdog6/6 drift0.
+- Sin nuevas migraciones, publicación GTM ni replay; cierre documental propio en develop.
+- [Release](docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md); checkout principal develop, WIP ajeno preservado. [Validación y límites](docs/audits/growth/2026-10-18-grader-measurement-release.md).
 
 ## 2026-10-18 — Políticas Ads comerciales publicadas y clasificación Web corregida
 
