@@ -162,3 +162,39 @@ CLP 10.237.200, total CLP 64.117.200), costo CLP 2.810.980 al mes, margen 37,4 %
 `cotizacion-2027-sin-lider.document-brief.json` (Equipo: «supervisión directa de Efeonce») →
 `cotizacion-2027-sin-lider.document.json` → `../cotizacion/v5/`, copiado a OneDrive como
 «Efeonce - Oferta Económica Social Care SKY 2027 (14-10-2026).pdf». Las variantes `redclick*` quedan como historia.
+
+### Palancas de costo medidas (19/10/2026)
+
+Corridas sobre `cotizacion-2027-sin-lider.demand.json` (Sprout Advanced mensual, agentes al 10 %), guardadas sólo en
+el scratchpad de la sesión. Costo mensual promedio calculado:
+
+| Estructura | Costo mensual | Precio al 40 % | Precio al 45 % |
+| --- | --- | --- | --- |
+| Persona dedicada + refuerzo de campaña | CLP 2.810.980 | CLP 4.685.000 | CLP 5.111.000 |
+| Persona dedicada, sin refuerzo | CLP 2.639.570 | CLP 4.399.000 | CLP 4.799.000 |
+| Especialista asignado al 60 % + refuerzo | CLP 2.234.371 | CLP 3.724.000 | CLP 4.062.000 |
+| Especialista al 60 %, sin refuerzo | CLP 2.064.090 | CLP 3.440.000 | CLP 3.753.000 |
+
+- El líder pesaba unos CLP 437.000 al mes, el refuerzo de campaña unos CLP 171.000 y pasar la persona de dedicada
+  al 60 % ahorra unos CLP 577.000. El 60 % sale de 1.300 conversaciones a unos 3 minutos con agentes (≈ 65 h de
+  ≈ 125 h productivas); no está medido.
+- Referencia de Jaime (14/10): CLP 1.800–2.300 por comentario, es decir CLP 2,34–2,99 millones al mes con 1.300.
+
+### Propuesta vigente: especialista asignado a CLP 3.990.000 (19/10/2026)
+
+El CEO eligió la estructura de especialista asignado al 60 % + refuerzo de campaña dentro del fee + agentes al 10 %,
+sin líder. `cotizacion-2027-asignado.*`: fee CLP 3.990.000 al mes (neto 12 meses CLP 47.880.000, IVA CLP 9.097.200,
+total CLP 56.977.200), costo CLP 2.234.371 al mes promedio (mes normal ≈ 2.064.000, mes de campaña ≈ 2.473.000),
+margen 44,0 %. Documento en `../cotizacion/v6/` («Equipo: Especialista asignado…»), copiado a OneDrive como
+«Efeonce - Oferta Económica Social Care SKY 2027 (19-10-2026).pdf». La versión de CLP 4.490.000 (v5) no se envió.
+
+- El 44 % supone que el 40 % restante del especialista se factura en otra cuenta; con la persona sólo para SKY, el
+  margen cae a cerca de 30 %.
+- Piso de negociación conversado: unos CLP 3.700.000 (40 %).
+- 19/10/2026: la oferta pasó a `../cotizacion/v7/` (`cotizacion-2027-asignado-v7.document.json`), que agrega «campañas
+  especiales a demanda» al refuerzo, con el mismo tope de cinco semanas. Reemplazó en OneDrive a la v6 antes de enviarse.
+  El deck se ajustó al mismo alcance (canvas versión 108) y su PDF quedó como
+  «Efeonce - Propuesta Social Care SKY 2027 (19-10-2026).pdf».
+- 19/10/2026, 10:48 (hora de Chile): enviada a Jaime Herrera y Dianesty Santander, con CCO a HubSpot, la respuesta
+  con CLP 3.990.000 más IVA al mes. Los documentos van como enlaces de HubSpot: propuesta técnica
+  https://hubs.ly/Q04BxQjx0 y oferta económica https://hubs.ly/Q04BxQFM0. Verificado en Enviados.

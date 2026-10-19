@@ -283,20 +283,20 @@ def _hy_pair(person, agent):
 
 S["07b-equipo-hibrido.dc.html"] = page("Equipo híbrido", voice(
     "El equipo", "¿Quién hace el trabajo?", ["Equipo", "híbrido"],
-    "Dos personas y dos agentes de IA, cada uno con su tarea. Los agentes leen y proponen; las personas <span style=\"font-weight: 600\">deciden y responden</span>.", size=120,
+    "Personas y agentes de IA, cada uno con su tarea. Los agentes leen y proponen; las personas <span style=\"font-weight: 600\">deciden y responden</span>.", size=120,
     extras=["Cada agente tiene una persona que responde por él", "En las campañas grandes se suma una persona entrenada"])
     + zone(f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px">'
-           + _hy_pair(_hy_person("audifonos", "Especialista dedicado", "Aprueba y envía cada respuesta, deriva los reclamos y mantiene la base al día."),
+           + _hy_pair(_hy_person("audifonos", "Especialista asignado", "Aprueba y envía cada respuesta, deriva los reclamos y mantiene la base al día."),
                       _hy_agent("9c504f3a6656923e74648dbfa53a1dc9", "Spark de servicio: un robot esférico blanco de Efeonce que saluda y sostiene una burbuja de conversación.", "Redactor",
                                 "Lee el hilo, busca la entrada vigente y propone la respuesta con su fuente.",
                                 "Proponer un borrador, con la fuente citada.", "Enviar, dar un precio fuera de la base ni pedir datos personales."))
-           + _hy_pair(_hy_person("estrella", "Líder de servicio", "Revisa la calidad, toma los casos sensibles y reemplaza al especialista en sus ausencias."),
+           + _hy_pair(_hy_person("estrella", "Dirección de cuenta", "Supervisa la calidad, toma los casos sensibles y responde por los agentes ante SKY."),
                       _hy_agent("d4e8828cd04c6ffb7f9fb4f348889be7", "Spark de investigación: un robot esférico blanco de Efeonce que examina con una lupa.", "Clasificador",
                                 "Lee todo lo que entra y lo etiqueta por tipo, mercado, idioma y prioridad.",
                                 "Leer, etiquetar y avisar lo crítico.", "Ocultar, borrar ni responder."))
            + '</div>'
            f'<div style="{LINE}; padding: 20px 30px; display: flex; align-items: center; gap: 18px">{ico("carpeta", 34)}'
-           f'<div style="{P}; font-size: 19px; font-weight: 300; line-height: 1.38; color: #ffffff">Detrás del equipo: responsable de cuenta, operación de agentes y base de conocimiento, y medición en Efeonce Insights.</div></div>', top=110, height=840, gap=18)
+           f'<div style="{P}; font-size: 19px; font-weight: 300; line-height: 1.38; color: #ffffff">Detrás del equipo: un respaldo entrenado, operación de agentes y base de conocimiento, y medición en Efeonce Insights.</div></div>', top=110, height=840, gap=18)
     + note("Los Sparks son los personajes con que Efeonce representa a sus agentes."))
 
 # =============================================================== 10g herramientas (anexo)
@@ -331,7 +331,7 @@ S["10g-herramientas.dc.html"] = page("Herramientas", voice(
            + _tool(f'<img src="{BLOB("e049b1b50443f77efc55c5b616513462")}" alt="Efeonce Insights" style="width: 70px; height: 70px">', "Medición", "Efeonce Insights",
                    "Los 27 indicadores del servicio, con las mismas cifras en todos los formatos.", ["Web", "PDF", "MCP", "API"])
            + _tool(ico("rayo", 66), "Alertas", "Aviso automático",
-                   "Lo crítico llega a SKY y al líder de servicio, también fuera de horario.", ["En 30 minutos"])
+                   "Lo crítico llega a SKY y a la dirección de cuenta, también fuera de horario.", ["En 30 minutos"])
            + _tool(_LOCK, "Accesos", "Usuarios con nombre",
                    "Rol de socio en las cuentas sociales, sin contraseñas compartidas.", ["Doble factor", "Baja en 24 horas"])
            + '</div>', top=100, height=870, gap=18))
@@ -352,9 +352,9 @@ S["07c-agentes-ficha.dc.html"] = page("Ficha de rol de cada agente", voice(
     + f'<div style="position: absolute; left: 790px; top: 196px; width: 1010px; height: 764px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px">'
     + role_card(("d4e8828cd04c6ffb7f9fb4f348889be7", "Spark de investigación: un robot esférico blanco de Efeonce que examina con una lupa."), "Clasificador", "Agente 1 · lee y etiqueta", [
         ("Tarea", "Etiqueta tipo, mercado, idioma, ruta, tono y prioridad de todo lo que entra."),
-        ("Puede", "Leer y etiquetar. Avisar lo crítico a SKY y al líder de servicio."),
+        ("Puede", "Leer y etiquetar. Avisar lo crítico a SKY y a la dirección de cuenta."),
         ("No puede", "Ocultar, borrar ni responder."),
-        ("Responde por él", "El líder de servicio."),
+        ("Responde por él", "La dirección de cuenta de Efeonce."),
         ("Se retira si", "Pierde una alerta crítica o baja del umbral dos semanas seguidas."),
     ])
     + role_card(("9c504f3a6656923e74648dbfa53a1dc9", "Spark de servicio: un robot esférico blanco de Efeonce que saluda y sostiene una burbuja de conversación."), "Redactor", "Agente 2 · propone", [
@@ -391,17 +391,16 @@ S["08b-base.dc.html"] = page("Base de conocimiento", voice(
 front = "".join(
     f'<div style="{WHITE}; padding: 28px 32px; display: flex; gap: 22px; align-items: center">{ico("audifonos", 74, True)}<div><div style="{B}; font-size: 34px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05; color: #001a33">{t}</div>'
     f'<div style="margin-top: 8px; {P}; font-size: 19.5px; font-weight: 400; line-height: 1.38; color: #33475f">{d}</div></div></div>'
-    for t, d in (("Especialista dedicado", "Aprueba y envía, deriva y mantiene la base al día."), ("Líder de servicio y calidad", "Calidad y casos sensibles. Reemplaza al especialista en sus ausencias.")))
+    for t, d in (("Especialista asignado", "Aprueba y envía, deriva y mantiene la base al día."), ("Dirección de cuenta", "Calidad, casos sensibles y relación con SKY: alcance, riesgos y revisiones.")))
 back = "".join(
     f'<div style="flex: 1; display: flex; align-items: center; gap: 24px; border-top: 1px solid {RULE}"><div style="width: 360px; flex-shrink: 0; {B}; font-size: 26px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{a}</div>'
     f'<div style="{P}; font-size: 20px; font-weight: 300; color: {SOFT}">{b}</div></div>'
-    for a, b in (("Responsable de cuenta", "El interlocutor de SKY: alcance, riesgos y revisiones."),
-                 ("Operación de agentes y base", "Fichas, pruebas e incidentes de los agentes."), ("Medición", "Efeonce Insights calcula los indicadores directo de los datos."), ("Refuerzo de campaña", "Una persona entrenada más en cada campaña grande.")))
+    for a, b in (("Operación de agentes y base", "Fichas, pruebas e incidentes de los agentes."), ("Medición", "Efeonce Insights calcula los indicadores directo de los datos."), ("Refuerzo de campaña", "Una persona entrenada más en cada campaña grande.")))
 guar = "".join(
     f'<div style="{LINE}; padding: 18px 24px"><div style="{B}; font-size: 26px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{t}</div><div style="margin-top: 4px; {P}; font-size: 17px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div>'
-    for t, d in (("Respaldo entrenado", "El líder cubre vacaciones, licencias y días de alto volumen."), ("Certificación", "50 respuestas de práctica antes de responder solo."), ("Portugués", "Lo redacta el agente; lo revisa quien domina el idioma.")))
+    for t, d in (("Respaldo entrenado", "Cubre vacaciones, licencias y días de alto volumen."), ("Certificación", "50 respuestas de práctica antes de responder solo."), ("Portugués", "Lo redacta el agente; lo revisa quien domina el idioma.")))
 S["08c-equipo.dc.html"] = page("El equipo detrás del servicio", voice(
-    "Equipo", "¿Quién está detrás?", ["Equipo", "dedicado"], "Un especialista dedicado responde, con un líder que lo respalda. Detrás hay cuenta, agentes y medición, y un refuerzo listo para las campañas.")
+    "Equipo", "¿Quién está detrás?", ["Equipo", "asignado"], "Un especialista asignado responde, supervisado por la dirección de cuenta. Detrás hay agentes, medición y un refuerzo listo para las campañas.")
     + zone(f'{kick("En la primera línea")}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px">{front}</div>'
            f'<div style="{GLASS}; flex: 1; padding: 22px 34px 6px; display: flex; flex-direction: column">{kick("Detrás")}<div style="margin-top: 12px; flex: 1; display: flex; flex-direction: column">{back}</div></div>'
            f'<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px">{guar}</div>', gap=16))
@@ -568,12 +567,12 @@ S["10e-seguridad.dc.html"] = page("Seguridad y datos", voice(
 S["10f-continuidad.dc.html"] = page("Continuidad operativa", voice(
     "Continuidad", "¿Y si algo falla?", ["Hay", "respaldo"], "Cada falla previsible tiene un procedimiento escrito y ensayado. El servicio sigue aunque falte una persona o una herramienta.")
     + zone(ifthen("Seis escenarios", "Qué pasa en cada falla", "Si", "Entonces", [
-        ("Falta una persona", "El líder de servicio cubre el turno. Refuerzo si dura más de tres días."),
+        ("Falta una persona", "El respaldo entrenado cubre el turno. Refuerzo si dura más de tres días."),
         ("Cae la bandeja", "Respuesta directa en las plataformas, con registro manual."),
         ("Cae el agente o su proveedor", "Operación manual con el mismo equipo, y aviso a SKY."),
         ("Se pierde un acceso", "Cuenta de respaldo con rol equivalente y solicitud a SKY."),
         ("Llega un pico no previsto", "Refuerzo y prioridad a lo sensible. Si triplica, modo contingencia."),
-        ("Sale un especialista", "El líder asume mientras se selecciona y se entrena el reemplazo."),
+        ("Sale un especialista", "El respaldo asume mientras se selecciona y se entrena el reemplazo."),
     ], left_w=360, a_fs=28, b_fs=21), height=880)
     + note("Los procedimientos manuales se ensayan antes de partir y una vez por semestre."))
 
@@ -1054,9 +1053,9 @@ S["14d-preguntas-riesgo.dc.html"] = page("Preguntas frecuentes: riesgo y contrat
 # =============================================================== 14 inversión
 _price = (f'<div style="{WHITE}; padding: 30px 36px 26px; display: flex; flex-direction: column">{kick("Servicio base · fee mensual", "#52647c")}'
           f'<div style="margin-top: 14px; display: flex; align-items: baseline; gap: 14px"><span style="{P}; font-size: 26px; font-weight: 500; color: #33475f">CLP</span>'
-          f'<span style="{B}; font-size: 108px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.95; color: #001a33">4.990.000</span></div>'
+          f'<span style="{B}; font-size: 108px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.95; color: #001a33">3.990.000</span></div>'
           f'<div style="margin-top: 8px; {P}; font-size: 21px; font-weight: 500; color: #001a33">más IVA, al mes · todo incluido</div>'
-          f'<div style="margin-top: 16px; align-self: flex-start; padding: 9px 16px; border-radius: 12px; background: #eaf1f9; {P}; font-size: 19px; font-weight: 500; color: #001a33">12 meses de servicio: CLP 59.880.000 más IVA</div>'
+          f'<div style="margin-top: 16px; align-self: flex-start; padding: 9px 16px; border-radius: 12px; background: #eaf1f9; {P}; font-size: 19px; font-weight: 500; color: #001a33">12 meses de servicio: CLP 47.880.000 más IVA</div>'
           f'<div style="margin-top: auto; padding-top: 16px; border-top: 1px solid #dbe3ee; {P}; font-size: 18px; font-weight: 400; line-height: 1.38; color: #33475f">'
           'Hasta 1.300 conversaciones al mes. Lunes a viernes, de 09:00 a 18:00, y con el equipo reforzado en las campañas grandes.</div></div>')
 _setup = (f'<div style="{GLASS}; padding: 30px 30px 26px; display: flex; flex-direction: column">{kick("Puesta en marcha", SOFT)}'
@@ -1071,7 +1070,7 @@ extra = "".join(
                        ("Sobre 1.300 conversaciones", "Aviso al llegar al 80 % del tope. El exceso se atiende por bloques de 200 conversaciones.", "CLP 290.000", "más IVA, por bloque")))
 S["14-inversion.dc.html"] = page("Inversión", voice(
     "Inversión", "¿Cuánto cuesta?", ["Un fee", "fijo"], "Un valor mensual, todo incluido, para las 13 cuentas. <span style=\"font-weight: 600\">No se cobra por comentario</span> ni por réplica.", size=120,
-    extras=["Especialista dedicado, con respaldo y supervisión", "Refuerzo incluido en Travel Sale, Cyber SKY y Black Friday", "Agentes de IA, base de conocimiento y plataforma", "27 indicadores en Efeonce Insights"])
+    extras=["Especialista asignado, con respaldo y supervisión", "Refuerzo incluido en Travel Sale, Cyber SKY, Black Friday y campañas especiales", "Agentes de IA, base de conocimiento y plataforma", "27 indicadores en Efeonce Insights"])
     + zone(f'<div style="flex: 0.86; display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px">{_price}{_setup}</div>'
            f'<div style="{GLASS}; flex: 1; padding: 18px 34px 4px; display: flex; flex-direction: column">{kick("Opcionales y excesos")}<div style="margin-top: 10px; flex: 1; display: flex; flex-direction: column">{extra}</div></div>', gap=16)
     + note("Valores netos, más IVA. El refuerzo de campaña cubre hasta cinco semanas al año. Vigencia: 2027, desde la fecha de inicio que defina SKY. Contrato a 12 meses."))
@@ -1219,7 +1218,7 @@ kb = (f'<div style="width: 226px; flex-shrink: 0; padding: 16px 16px; display: f
 window = (f'<div style="position: absolute; left: 0; top: 0; width: 1010px; height: 660px; border-radius: 20px; overflow: hidden; display: flex; background: #f4f6fa; box-shadow: 0 60px 150px rgba(3, 117, 219, 0.5), 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 2px rgba(114, 222, 216, 0.55)">{rail}'
           f'<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">{topbar}<div style="flex: 1; min-height: 0; display: flex">{lista}{hilo}{kb}</div></div></div>')
 toast = (f'<div style="position: absolute; right: -44px; top: 508px; width: 300px; box-sizing: border-box; border-radius: 16px; padding: 14px 16px; background: #001a33; border: 1px solid rgba(114, 222, 216, 0.4); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55)">'
-         f'<div style="display: flex; align-items: center; gap: 9px; {P}; font-size: 13.5px; font-weight: 700; color: #ffffff"><span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5a7a; box-shadow: 0 0 0 5px rgba(255, 90, 122, 0.22)"></span>Alerta P1 · aviso al líder</div>'
+         f'<div style="display: flex; align-items: center; gap: 9px; {P}; font-size: 13.5px; font-weight: 700; color: #ffffff"><span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5a7a; box-shadow: 0 0 0 5px rgba(255, 90, 122, 0.22)"></span>Alerta P1 · aviso a SKY</div>'
          f'<div style="margin-top: 6px; {P}; font-size: 13px; line-height: 1.4; color: {SOFT}">«La promoción no existe, es un engaño». No se responde sin revisión.</div></div>')
 done = (f'<div style="position: absolute; left: -34px; top: 636px; display: flex; align-items: center; gap: 10px; border-radius: 999px; padding: 11px 18px 11px 12px; background: #ffffff; box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5)">'
         f'<svg viewBox="0 0 16 16" width="22" height="22"><circle cx="8" cy="8" r="8" fill="#0d6b3f"></circle><path d="M4.5 8.3l2.3 2.3 4.6-5" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
@@ -1255,7 +1254,7 @@ S["00-resumen.dc.html"] = page("Resumen", voice(
     + zone(f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 16px">{_sum_cells}</div>'
            f'<div style="{WHITE}; padding: 24px 34px; display: flex; align-items: center; gap: 28px"><div style="flex: 1">{kick("Inversión", "#52647c")}'
            f'<div style="margin-top: 6px; {B}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; color: #001a33">Fee mensual fijo, todo incluido</div></div>'
-           f'<div style="{B}; font-size: 30px; font-weight: 740; color: #001a33; white-space: nowrap">CLP 4.990.000 + IVA</div></div>', gap=16))
+           f'<div style="{B}; font-size: 30px; font-weight: 740; color: #001a33; white-space: nowrap">CLP 3.990.000 + IVA</div></div>', gap=16))
 
 # =============================================================== 03b el costo de no responder
 S["03b-sin-respuesta.dc.html"] = page("El costo de no responder", voice(
@@ -1298,10 +1297,10 @@ S["12b-caso.dc.html"] = page("El caso de negocio", voice(
            + _step("Cada mes", "650", "personas preguntan un precio en los comentarios", "comentario")
            + _next + _step("Si compra 1 de cada 20", "32", "reservas al mes, con la tarifa vigente y el enlace", "cursor")
            + _next + _step("En un año", "61", "millones de pesos en pasajes vendidos", "trofeo", white=True) + "</div>"
-           f'<div style="{LINE}; padding: 22px 6px 22px 0; display: flex">{_if("1 de cada 50", 13, "CLP 25 M", "0,4 veces")}{_if("1 de cada 20", 32, "CLP 61 M", "1 vez", hot=True)}{_if("1 de cada 10", 65, "CLP 125 M", "2,1 veces")}</div>'
+           f'<div style="{LINE}; padding: 22px 6px 22px 0; display: flex">{_if("1 de cada 50", 13, "CLP 25 M", "0,5 veces")}{_if("1 de cada 20", 32, "CLP 61 M", "1,3 veces", hot=True)}{_if("1 de cada 10", 65, "CLP 125 M", "2,6 veces")}</div>'
            f'<div style="{GLASS}; padding: 22px 32px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 34px; align-items: center">'
-           f'<div>{kick("Retorno sobre la inversión")}<div style="margin-top: 8px; {B}; font-size: 29px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.12; color: #ffffff">Con 1 de cada 20, las ventas igualan la inversión del año</div></div>'
-           f'<div style="{P}; font-size: 18.5px; font-weight: 300; line-height: 1.42; color: {SOFT}">La inversión anual es de CLP 59,9 millones. Con 1 de cada 10, los pasajes vendidos la duplican. Y si cada reserva lleva dos pasajeros, el retorno se duplica otra vez.</div></div>', top=100, height=870, gap=18)
+           f'<div>{kick("Retorno sobre la inversión")}<div style="margin-top: 8px; {B}; font-size: 29px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.12; color: #ffffff">Con 1 de cada 20, las ventas superan la inversión del año</div></div>'
+           f'<div style="{P}; font-size: 18.5px; font-weight: 300; line-height: 1.42; color: {SOFT}">La inversión anual es de CLP 47,9 millones. Con 1 de cada 10, los pasajes vendidos la multiplican por 2,6. Y si cada reserva lleva dos pasajeros, el retorno se duplica otra vez.</div></div>', top=100, height=870, gap=18)
     + note("Ejemplo ilustrativo, no un pronóstico. 650 es una hipótesis: la mitad de las 1.300 conversaciones. Reserva de ida y vuelta a la tarifa «desde» promedio de las 55 rutas desde Chile que entregó SKY (CLP 80.012 por tramo, mayo de 2026); sin equipaje, asientos ni acompañantes. No cuenta a quienes leen la respuesta sin preguntar.", top=1000))
 
 
