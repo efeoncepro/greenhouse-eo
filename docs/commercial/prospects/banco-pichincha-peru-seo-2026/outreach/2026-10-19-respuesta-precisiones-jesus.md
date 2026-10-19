@@ -1,9 +1,6 @@
 # Pibank · Respuesta a las precisiones de Jesús Vargas · borrador 19-10-2026
 
-**Uso interno · Owner: Julio Reyes · Estado: borrador, sin enviar.** Responde el correo «RE: Pibank | SEO Efeonce» del 19-10-2026 (plazo del cliente: 22-10). Los corchetes marcan lo que falta confirmar antes de enviar:
-
-- `[DECISIÓN JULIO]`: qué pasa con el precio si de todos modos hay retención (recomendado: ajustar al alza para mantener el neto).
-- `[CONFIRMAR JULIO]`: herramientas absorbidas por el fee (la economía interna todavía marca su costo «por comprobar»), la experiencia en Perú del equipo y el contacto de referencia.
+**Uso interno · Owner: Julio Reyes · Estado: versión final aprobada por Julio el 19-10, sin enviar.** Responde el correo «RE: Pibank | SEO Efeonce» del 19-10-2026 (plazo del cliente: 22-10). Decisiones de Julio (19-10): si hay retención, se ajusta el monto facturado para mantener el neto; el fee absorbe las herramientas (confirmado); no se ofrece contacto de referencia.
 
 ## Investigación tributaria (19-10-2026)
 
@@ -33,14 +30,14 @@ Gracias por la revisión. Respondo las cuatro precisiones en orden.
 - **IVA en Chile:** facturamos desde Efeonce Group SpA, empresa chilena (RUT 77.357.182-1), con factura de exportación de servicios. Está exenta de IVA chileno, así que la factura no lleva impuesto chileno.
 - **IGV en Perú:** para Pibank, el servicio es una utilización en el Perú de servicios prestados por un no domiciliado. El IGV (18%, con el IPM incluido) no va en nuestra factura: lo declara y paga el banco como usuario del servicio, y puede usarlo como crédito fiscal según sus propias reglas.
 - **Impuesto a la renta:** rige el Convenio entre Chile y Perú para evitar la doble tributación. Nuestros servicios son beneficios empresariales de una empresa residente en Chile (artículo 7 del Convenio). No son regalías, porque la definición de regalías del Convenio no incluye la prestación de servicios. Por eso no corresponde retención en Perú, siempre que acreditemos nuestra residencia en Chile: antes de cada pago entregaremos el certificado de residencia emitido por el SII, con la vigencia que exige la norma peruana.
-- Si aun así el banco tuviera que aplicar alguna retención, ajustaríamos el monto facturado para que el neto acordado se mantenga. [DECISIÓN JULIO: esta es la opción recomendada; la alternativa es aceptar el descuento y usar la retención como crédito en Chile.]
+- Si aun así el banco tuviera que aplicar alguna retención, ajustaríamos el monto facturado para que el neto acordado se mantenga.
 - Antes de la orden de compra coordinaremos con sus equipos de Compras y Tributación la entidad contratante, el RUC y el documento tributario, para que el total facturable quede definido antes de empezar.
 
 **2. Costos adicionales durante la ejecución**
 
 No hay costos fuera del fee y de los módulos que ya figuran en la cotización. El fee base de US$4.500 al mes incluye:
 
-- las herramientas y licencias que usamos para investigar, auditar, monitorear y reportar, sin traslado de ese costo al banco [CONFIRMAR JULIO];
+- las herramientas y licencias que usamos para investigar, auditar, monitorear y reportar, sin traslado de ese costo al banco;
 - hasta cinco artículos al mes, sesenta en el año, con investigación, redacción, edición, metadatos, enlaces internos y carga en el CMS;
 - SEO técnico continuo y hasta ocho horas al mes de ajustes en el CMS;
 - el monitoreo de visibilidad en IA y el reporte mensual en Efeonce Insights.
@@ -64,7 +61,6 @@ Pibank sería nuestra cuenta de referencia en la banca peruana, con un equipo ar
 - **Equipo en Perú:** contamos con especialistas en Perú, cerca de ustedes y con conocimiento directo del mercado local.
 - **Trabajo ya hecho sobre Pibank y el mercado peruano:** investigamos la demanda de búsqueda de ahorro en Google Perú. Además, el 06-10-2026 revisamos 17 búsquedas clave y Pibank no aparecía en ninguno de los 301 resultados. Con esa base armamos el diagnóstico de la propuesta y la muestra X-Ray sobre su propio sitio.
 - **Sector financiero:** trabajamos con Banco BICE y BICECORP en Chile con el mismo reto que hoy tiene Pibank: sumar cuentas desde la búsqueda, con condiciones exactas y revisión de Cumplimiento.
-- [OPCIONAL · CONFIRMAR JULIO] Si les sirve, podemos coordinar una conversación de referencia con [contacto de BICE/BICECORP, solo con su autorización].
 
 Si les ayuda, podemos revisar estos puntos en una llamada corta antes del jueves 22.
 
