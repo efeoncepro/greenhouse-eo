@@ -56,7 +56,7 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - **Cinco capítulos con una pregunta cada uno**, una lámina «Cómo leer esta propuesta» y navegación de capítulo con
   la órbita. Anexos al final: supuestos y fuentes, glosario.
 - **Pregunta y respuesta con lógica:** la respuesta contesta la pregunta. Rechazada en UTEM: «¿Dónde se elige un
-  programa? Al buscar»; vigente: «¿Dónde nace una postulación? En la búsqueda».
+  programa? Al buscar»; vigente: «¿Dónde nace una postulación? En la búsqueda». Cuándo va la voz y cuándo un título declarativo: las cuatro pruebas de `efeonce-graphic-line`, `references/criteria.md` §4, «Cuándo sí y cuándo no» (operador, 2026-10-19).
 - **Lámina «Búsqueda hoy» con revisión pública real:** DataForSEO `serp-compare` (top 20 + AI Overview) sobre las
   búsquedas del cliente y Semrush para volumen. Se rotula **revisión pública** con fecha, nunca auditoría. UTEM:
   15 búsquedas, presente entre los 20 primeros en 2, respuesta de IA en 15, citado por la IA en 3.

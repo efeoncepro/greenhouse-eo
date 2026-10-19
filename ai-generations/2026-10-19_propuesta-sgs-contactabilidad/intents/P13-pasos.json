@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "decision",
+  "recipe": "decision-next-steps",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "¿Y ahora qué sigue?",
+    "answer": [
+      "Revisarlo"
+    ]
+  },
+  "body": "Una revisión de **30 minutos** para ajustarlo a su operación.",
+  "agenda": {
+    "kicker": "01 · Revisión del caso",
+    "title": "Agenda la revisión",
+    "descriptor": "30 min por Teams · con excelencia comercial y las jefaturas",
+    "days": [
+      {
+        "weekday": "Lun",
+        "day": "26"
+      },
+      {
+        "weekday": "Mar",
+        "day": "27"
+      },
+      {
+        "weekday": "Mié",
+        "day": "28"
+      },
+      {
+        "weekday": "Jue",
+        "day": "29"
+      },
+      {
+        "weekday": "Vie",
+        "day": "30"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 2,
+      "time": 2
+    },
+    "summary": "Martes 27 · 11:30 · hora de Chile",
+    "cta": "Agenda la revisión"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Datos del piloto",
+      "title": "Equipo piloto",
+      "desc": "Quiénes entran al piloto y con qué números de empresa."
+    },
+    {
+      "number": "03",
+      "label": "Con la región",
+      "title": "Habilitaciones",
+      "desc": "La solicitud a la región, con los datos del piloto."
+    }
+  ],
+  "line": "revenue-salesforce"
+}

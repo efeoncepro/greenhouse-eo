@@ -534,6 +534,40 @@ decisión, no en la duda. Es la misma gramática del anillo y la esfera, dicha e
 **Sí / no** (lámina 5.6): pregunta chica, respuesta grande de una a tres palabras · **no:** pregunta grande, respuesta
 larga y chica. Bricolage para decir, Poppins para explicar · **no:** Bricolage en párrafos ni monoespaciada.
 
+**Cuándo sí y cuándo no (operador, 2026-10-19, propuesta SGS Chile).** «Todos los agentes por seguir la regla ponen
+cosas así; si lo ves en contexto es súper absurdo». La voz pregunta-respuesta no es un relleno obligatorio de cada
+título: es una conversación con el lector **en ese punto del documento**. Antes de escribir un par, pasa las cuatro
+pruebas; si una falla, se reescribe el par, y si ninguno pasa, la lámina va con título declarativo (afirma su
+conclusión) donde la receta lo permita.
+
+1. **¿La haría el lector, con esas palabras, en ese momento?** Quien abre una propuesta pregunta «¿Qué nos
+   proponen?»; nadie pregunta «¿Se ve cada contacto?». Pregunta de la persona que lee, no del redactor.
+2. **¿La respuesta contesta la forma de la pregunta?** Sí/no → «Sí», «Ya no», «Con el piloto» (un sí con condición);
+   ¿qué? → una cosa; ¿cómo? → una manera; ¿dónde? → un lugar; ¿por qué? → una razón; ¿X o Y? → X o Y. «¿Se ve cada
+   contacto? Todos.» contesta un sí/no con una cantidad; «¿Cómo va el equipo? Cada semana.» contesta «cómo» con una
+   frecuencia; «¿Aircall o solo Salesforce? Por el celular.» contesta una elección con una razón.
+3. **¿El par dice la tesis de esta lámina y no sirve igual en otra?** «Poco», «Juntos», «Todos» son comodines: caben en
+   cualquier propuesta y no dicen nada de esta. La respuesta tiene que ser verificable en la lámina o el documento.
+4. **¿La lámina decide o explica?** La voz es para un momento de decisión o de duda (portada, apertura de sección,
+   precio, próximos pasos, un riesgo que el cliente planteó). Una lámina que explica —arquitectura, tablas, condiciones,
+   responsabilidades, anexos, glosario— lleva título declarativo. En un documento que se lee sin presentador, la
+   mayoría de las láminas explica.
+
+| Contexto | Voz pregunta-respuesta |
+|---|---|
+| Portada de brochure, anuncio, social, apertura de sección | Sí, con un par aprobado o escrito para esa pieza |
+| Portada de propuesta para un cliente | **No.** Dice lo que es: «Propuesta», qué resuelve y para quién (operador, 2026-10-19: «lo mejor para la portada es decir lo que es: una propuesta, o decir en qué basamos la propuesta») |
+| Lámina de decisión (precio, próximos pasos, plan, por qué esta opción) | Sí, si la pregunta es real |
+| Lámina que explica (diagrama, tabla, condiciones, responsabilidades, anexos) | No: título declarativo con su conclusión |
+| Etiqueta o rótulo de producto | No: sin anillo (§ login V4, abajo) |
+
+Corregidos en el caso fuente: la portada «¿Se ve cada contacto? Todos.» y sus dos reemplazos («¿Qué nos proponen? Un piloto.», «¿Qué no queda en Salesforce? Lo del celular.») fueron rechazados: el problema era la voz en la portada, no las palabras. Quedó eyebrow «Trazabilidad comercial · Octubre 2026», título **Propuesta.** y evidencia con qué resuelve y para quién. **Pendiente en AXIS:** `cover-proposal` exige `voice.question` (`layout-field-required`); hasta que exista un layout de portada sin pregunta, la pregunta se compone y se retira con `ai-generations/2026-10-19_propuesta-sgs-contactabilidad/quitar-pregunta-portada.mjs` (temporal). En el resto del deck: «¿Cómo va el
+equipo? Cada semana.» → «¿Dónde lo ve la jefatura? **En su panel.**»; «¿Aircall o solo Salesforce? Por el celular.» →
+«¿Por qué Aircall? **Por el celular.**»; «¿Queda cada contacto? Sin anotar.» → «¿Hay que anotar cada contacto? **Ya
+no.**». Rechazadas sin reemplazo (la lámina pasó a título declarativo): «¿Qué les pedimos? Poco.» y «¿Cómo se
+adopta? Juntos.». Los pares aprobados de las tablas de abajo también pasan estas pruebas en su lámina: copiarlos a
+otra pieza no los exime.
+
 **Banco de pares (candidatos, sin aprobar;** lámina 2.1**; el operador lo revisa y aprobará 2 pares por línea con
 respuestas verificables, D12):** ¿Lo medimos? Siempre · ¿Quién decide? Tú, con evidencia ·
 ¿Y si después lo hago yo? Esa es la idea · ¿Y el reporte del viernes? Ya lo viste · ¿Cuánto rindió? Te mostramos todo ·
@@ -879,6 +913,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Anillo propio de la esfera** (`sphereRing`) en algo que no está en vivo | está reservado al eco del impacto y al estado «en el aire» | operador 2026-09-26 (D8); `sphere-ring-only-live` |
 | **Eslogan en mayúsculas, con esfera, traducido o rearmado**, o en cada post | sólo el bloque oficial, sólo en cierres | láminas 2.2, 5.6 |
 | **Pregunta grande y respuesta larga y chica**, dos preguntas seguidas, pregunta retórica o chiste | la respuesta domina; la pregunta es real | láminas 2.1, 5.6 |
+| **Par que no pasa las cuatro pruebas**: pregunta que el lector no haría ahí, respuesta que no contesta su forma («¿Se ve…? Todos.»), comodín («Poco», «Juntos») o voz en una lámina que explica | pregunta del lector en ese momento, respuesta de su misma forma, específica de la lámina; si no, título declarativo | operador 2026-10-19 (§4, «Cuándo sí y cuándo no») |
 | **«Te hacemos visible» sin «Y lo medimos.»** ni mecanismo | anti-humo: la visibilidad se mide | lámina 1.4 |
 | **Logos de terceros como satélites-alianza** | los satélites muestran dónde medimos, no con quién | lámina 0.2 |
 | **Insignia de partner fija o sin autorización ni readback**, o marca de tercero sin autorización de su titular | la insignia es un claim: opcional en la receta, con la referencia de su autorización o readback (la de Salesforce, autorizada: `salesforce-partner-authorization-2026-09-29`) y respaldo «Operamos sobre»; cada marca lleva procedencia y autorización | operador 2026-09-29; regla `partner-claim-readback` |

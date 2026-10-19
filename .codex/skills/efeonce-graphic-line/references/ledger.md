@@ -1,5 +1,14 @@
 # Registro de decisiones y versiones
 
+### 2026-10-19 — La voz pregunta-respuesta tiene cuándo sí y cuándo no (propuesta SGS Chile)
+
+Operador, sobre la portada «¿Se ve cada contacto? Todos.»: «Necesito que encuentres una dinámica de que esto de la
+pregunta y respuesta tenga sus casos de uso de cuando sí y cuando no y que haga sentido, porque todos los agentes por
+seguir la regla ponen cosas así». Se fijan cuatro pruebas (pregunta del lector en ese momento, respuesta de la misma
+forma, específica de la lámina, sólo donde la lámina decide) y una tabla de contextos en [criteria.md](criteria.md) §4,
+«Cuándo sí y cuándo no». Pares corregidos en el canvas de SGS el mismo día. Ese mismo día el operador rechazó la voz en la portada de propuesta para un cliente («lo mejor para la portada es decir lo que es»): queda «Propuesta.» con su evidencia. **Pendiente:** layout de `cover-proposal` sin `voice.question` en AXIS (hoy obligatoria); interino, retirar la pregunta tras componer. La regla escrita es inferencia del agente
+sobre el pedido; la aprobación de su redacción queda con el operador.
+
 ### 2026-10-18 — Mención Efeonce: el isotipo en el texto convive con el logo (web)
 
 Decisión del operador: «Para el mention obviamente habría una excepción acá para web». La Mención Efeonce (enlace a un

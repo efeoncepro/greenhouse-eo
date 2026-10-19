@@ -1,0 +1,47 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Cómo están hoy",
+    "question": "¿Qué queda en Salesforce?",
+    "answer": [
+      "Muy poco"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 1
+  },
+  "items": [
+    {
+      "title": "Reuniones",
+      "desc": "Se registran solas cuando el ejecutivo agenda con el cliente."
+    },
+    {
+      "title": "Correo",
+      "desc": "Tiene seguimiento, aunque falta confirmar que esté activo para todo el equipo."
+    },
+    {
+      "title": "Llamadas y negocios",
+      "desc": "Se anotan a mano: compiten con el tiempo de venta y el historial queda incompleto."
+    },
+    {
+      "title": "WhatsApp",
+      "desc": "No queda registro: hoy no se sabe cuántas veces se contactó a un cliente ni por qué canal."
+    }
+  ],
+  "selected": 4,
+  "selection": {
+    "target": "object",
+    "label": "Comercial",
+    "participantKind": "department",
+    "anchor": "bottom-start"
+  },
+  "line": "revenue-salesforce"
+}

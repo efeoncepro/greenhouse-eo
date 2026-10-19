@@ -788,3 +788,25 @@ láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-genera
   `ground-family` y los contrastes de Engine (3,8:1) y Voice (4,7:1) medidos sobre `ground`.
 - **Misma pasada:** en un menú, los nombres de línea son navegación y van en Poppins (Bricolage sólo para títulos y voz
   editorial, [criteria.md](criteria.md), «Rooms: design system de producto»).
+
+## 2026-10-19 — Deck para un cliente armado a mano en un canvas de Design (propuesta SGS Chile)
+
+- **Síntoma:** el operador pidió «con /design arma un canvas con la propuesta en un deck» y la sesión dibujó las 14
+  láminas a mano en `.dc.html` con los componentes del design system La órbita en Claude. El operador lo rechazó:
+  portada y contraportada distintas de las canónicas (se copió la voz de la portada de SKY, la contraportada no era la
+  `close-proposal-horizon` de la línea), y selección, cursores y etiquetas dibujados a mano («cambiaste hasta los
+  bounding box»).
+- **Causa:** no se cargó esta skill antes de componer; se tomó el design system como kit de piezas sueltas y no como el
+  catálogo de recetas aprobadas.
+- **Regla:** un deck de marca propia, aunque se vaya a mostrar en un canvas, se compone con `pnpm brand:compose` sobre
+  recetas aprobadas: plan con `pnpm brand:deck-plan -- --plan` → un intent por lámina partiendo del ejemplo más cercano
+  de `src/lib/brand-surfaces/examples/` → PNG compuesto → canvas que sólo muestra esos PNG (patrón de
+  `ai-generations/2026-10-06_deck-hubspot/build-canvas.py`). El canvas nunca redibuja una lámina.
+- **Trampas medidas en esta corrida** (carpeta `ai-generations/2026-10-19_propuesta-sgs-contactabilidad/`):
+  `selected`, `selectedVerdict` y `selectedStep` son base 1; una selección en la columna derecha de `content-bullets`
+  sale del lienzo con el ancla por defecto (`top-end`) y pide `selection.anchor` (`bottom-start` en la fila de abajo,
+  `top-start` en la de arriba, para que la etiqueta no tape el texto vecino); `decision-risk` sólo existe en claro y una
+  pieza de línea debe ir en oscuro (`line-piece-keeps-efeonce-dark`), así que se compone como lámina de Efeonce en
+  `growth`, igual que en el deck HubSpot; `decision-plan` antepone «n · » al `range` dentro del máximo de 16;
+  `content-pricing` exige 4 o 5 prestaciones por plan; `cover-proposal` no pinta la insignia de partner (va en la
+  contraportada).

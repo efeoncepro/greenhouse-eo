@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "use": "proposal",
+  "role": "content",
+  "recipe": "content-text",
+  "voice": {
+    "eyebrow": "Adopción",
+    "question": "¿Cómo se adopta?",
+    "answer": [
+      "Juntos"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 3
+  },
+  "body": "Alineamos procesos, capacitamos por rol y acompañamos al equipo hasta que la nueva forma quede.",
+  "points": [
+    {
+      "name": "Procesos",
+      "text": "definiciones y reglas comunes"
+    },
+    {
+      "name": "Capacitación",
+      "text": "por rol, en vivo y en video"
+    },
+    {
+      "name": "Acompañamiento",
+      "text": "convivencia y soporte semanal"
+    }
+  ],
+  "selection": {
+    "target": "answer",
+    "label": "SGS",
+    "participantKind": "role"
+  },
+  "line": "revenue-salesforce"
+}
