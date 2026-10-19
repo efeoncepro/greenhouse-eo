@@ -10,6 +10,7 @@ import type { PreparedMeasurement } from '@/lib/growth/measurement/contracts'
 import { enqueueMeasurementConversion } from '@/lib/growth/measurement/store'
 
 import { query, withTransaction } from '@/lib/db'
+import { completeCommandExecution, IDEMPOTENCY_TTL_MS, recordCommandAudit } from '@/lib/api-platform/core/idempotency'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { parseHubSpotFormReceipt, type HubSpotFormReceipt } from './destinations/hubspot/receipts'
 import { commercialFormClassificationSchema, FormClassificationConflictError, formDefinitionFingerprint, type CommercialFormClassificationInput } from './classification-contract'
@@ -255,6 +256,19 @@ export const correctCommercialFormClassificationStore = async (raw: CommercialFo
 
     if (versions.rows.length !== 1 || versions.rows[0].form_version_id !== input.expectedPublishedVersionId) throw new FormClassificationConflictError()
 
+    // The command audit and metadata repair commit or roll back together.
+    const executeAuditQuery: typeof query = async <T extends Record<string, unknown>>(text: string, values: unknown[] = []) =>
+      (await client.query<T>(text, values)).rows
+
+    const commandExecutionId = await recordCommandAudit({
+      principal: { lane: 'internal', principalKind: 'internal_actor', principalId: actorId, userId: actorId },
+      scope: { greenhouseScopeType: 'global' },
+      routeKey: 'growth.forms.classification.correct',
+      method: 'POST',
+      path: `/api/admin/growth/forms/${before.form_id}/classification`,
+      expiresAt: new Date(Date.now() + IDEMPOTENCY_TTL_MS),
+    }, executeAuditQuery)
+
     const updated = await client.query<FormDefinitionRow>(
       `UPDATE greenhouse_growth.form_definition SET form_kind=$1, updated_at=clock_timestamp()
        WHERE form_id=$2 AND form_key=$3::uuid AND form_kind=$4 RETURNING *`,
@@ -267,10 +281,14 @@ export const correctCommercialFormClassificationStore = async (raw: CommercialFo
 
     if (formDefinitionFingerprint(unchanged(before)) !== formDefinitionFingerprint(unchanged(after))) throw new FormClassificationConflictError()
 
-    return { ok: true as const, formId: before.form_id, formKey: before.form_key, publishedVersionId: input.expectedPublishedVersionId,
-      previousKind: before.form_kind, formKind: after.form_kind, actorId, reason: input.reason,
-      beforeSha256: input.expectedDefinitionSha256, afterSha256: formDefinitionFingerprint(after),
-      sourceIdentityPreserved: true, publishedVersionPreserved: true, definition: after }
+    const auditResult = { ok: true as const, commandExecutionId, formId: before.form_id, formKey: before.form_key,
+      publishedVersionId: input.expectedPublishedVersionId, previousKind: before.form_kind, formKind: after.form_kind,
+      actorId, reason: input.reason, beforeSha256: input.expectedDefinitionSha256, afterSha256: formDefinitionFingerprint(after),
+      sourceIdentityPreserved: true, publishedVersionPreserved: true }
+
+    await completeCommandExecution({ commandExecutionId, responseStatus: 200, responseBody: auditResult }, executeAuditQuery)
+
+    return { ...auditResult, definition: after }
   })
 }
 

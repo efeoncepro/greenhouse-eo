@@ -37,3 +37,10 @@ expectedPublishedVersionId, fromFormKind=lead_magnet, toFormKind=quote_request,
 commercialIntentConfirmed=true, reason. No acepta actor, destinos, flags de autorización o riesgo.
 Path y key deben corresponder. El409 `growth_form_classification_conflict` exige redescubrir/revisar.
 La lectura posterior de una corrección no prueba recepción o atribución de conversiones publicitarias.
+
+## Auditoría transaccional
+
+API y CLI reciben `commandExecutionId` y guardan actor, razón, versión y hashes en la auditoría
+canónica de API Platform dentro de la misma transacción que la corrección. Un fallo de auditoría
+revierte el cambio; no hay fallback sin registro. Conservar también el journal local para reconciliar
+una respuesta de resultado desconocido. El registro no incluye valores de leads.

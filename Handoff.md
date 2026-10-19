@@ -12,10 +12,10 @@ respuesta a cualquier email o reunión desinscribe. No duplicar, contactar puent
 
 GET live confirma Think→Forms portátil, versión8 y política Ads publicada. Fachada histórica
 completada con contexto visitante, CORS y recibo sólo tras persistencia; duplicados sin reenvío.
-PR257 borrador sin auto-merge; release detenido por Julio. mainEC/aliasER5 conservados.
-Cinco deploys automáticos staging y preview cancelados; endpoint admin pendiente de publicación.
-871 pruebas locales, TypeScript/lint y CI push/PR0373930de + smoke PASS; API/GTM sin drift.
-Sin leads ficticios. Worktree retirado; todo en develop. Release y canarios nuevos de producción retenidos.
+Julio reautoriza todo develop→main. Auditoría administrativa transaccional añadida sin migraciones;
+22 pruebas focales PASS y revisión arquitectónica aprobada. CI del nuevo candidato y canarios
+productivos pendientes; las871 pruebas/CI037 anteriores son evidencia histórica.
+Sin leads ficticios. Worktree retirado; todo en develop, WIP ajeno preservado.
 [Contrato y verificación](docs/architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 
 ## 2026-10-18 — Ads publicado en todos los formularios comerciales validados

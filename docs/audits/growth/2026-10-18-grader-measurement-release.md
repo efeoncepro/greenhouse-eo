@@ -1,6 +1,6 @@
 # Grader y clasificación administrativa — verificación 18/10/2026
 
-Estado: promoción detenida por el operador; publicación productiva pendiente. [Contrato dueño](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
+Estado: operador reautorizó promover todo develop; candidato en validación, publicación productiva pendiente. [Contrato dueño](../../architecture/GROWTH_GRADER_COMMERCIAL_MEASUREMENT_V1.md).
 
 - GET Think y render público:200; key/surface/version8 y handoff del informe confirmados. El frontend vigente usa Forms portátil.
 - GET catálogo/políticas23:06:29Z:13 formularios y Discovery con Ads; Contacto/ebooks fueraAds; heads/destinos preservados.
@@ -60,3 +60,16 @@ Pendiente exclusivamente tras autorización de release: canarios productivos del
 la fachada y del endpoint de clasificación (incluido conflicto CAS, sin repetir la corrección Web).
 Primera recepción y atribución esperan una ocurrencia comercial real. Los checks de lectura y los
 fixtures unitarios no las certifican. [Evidencia saneada](2026-10-18-grader-validation.evidence.json).
+
+## Reanudación autorizada y auditoría administrativa
+
+Julio reautorizó promover todo develop a main el18/10. Se preserva arriba la evidencia de la
+retención anterior; ya no es la instrucción vigente. Revisión arquitectónica detectó falta de
+auditoría durable de clasificación: resuelta con los helpers canónicos de API Platform sobre el
+mismo PoolClient/transacción Forms, sin schema nuevo. Fallo de registro impide UPDATE; fallo de
+cierre revierte todo. Resultado agrega commandExecutionId y guarda actor/razón/hashes, sin PII.
+22 pruebas focales PASS, incluyendo ambas ramas de fallo; revisión arquitectónica aprobada.
+Metadatos PG01:29:29Z confirman tabla canónica y permisos runtime SELECT/INSERT/UPDATE;
+perfil del operador también tiene INSERT. Lectura exclusiva de permisos, sin mutar datos.
+El nuevo código requiere CI del candidato actualizado; los871 resultados previos son históricos.
+Canarios productivos y cierre del release se documentarán tras deployment, sin leads ficticios.

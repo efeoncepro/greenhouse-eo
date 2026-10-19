@@ -47,5 +47,13 @@ ni atribución. [Manual operativo](../manual-de-uso/growth/corregir-clasificacio
 
 
 Publicación y canarios del endpoint: [release Grader/clasificación](../audits/growth/2026-10-18-grader-measurement-release.md).
-El resultado HTTP registra actor/razón/hashes, pero no agrega auditoría durable server-side: conservar
-el resultado en el journal del operador. La CLI sí reserva journal antes de ejecutar.
+La corrección registra auditoría durable en el store neutral canónico
+`greenhouse_core.api_platform_command_executions` ([API Platform](GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md)).
+`recordCommandAudit` y `completeCommandExecution` usan el mismo PoolClient que el UPDATE Forms:
+si cualquiera falla, se revierte la transacción completa. El principal interno proviene del actor
+validado; la ruta `growth.forms.classification.correct` conserva actor, razón, identidad, versión y
+hashes antes/después en el resultado auditado, sin valores de submissions ni definición completa.
+La respuesta agrega `commandExecutionId` para correlación. No incorpora migraciones ni un almacén
+paralelo. Es auditoría transaccional durable; la tabla canónica no es append-only. El TTL es lógico,
+no una garantía de inmutabilidad. CAS conserva el rechazo del retry; no se promete replay200.
+La CLI conserva además su journal previo a la ejecución.
