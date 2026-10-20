@@ -39,7 +39,7 @@ Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../a
 
 - `TASK-2015` — [CLI de Excel pricing](complete/TASK-2015-pricing-workbook-agent-cli.md), completa y verificada localmente; costeo sin UI/DB.
 
-- `TASK-2012` — [La órbita: voz de decisión y acento como puntuación](to-do/TASK-2012-orbit-decision-voice-and-accent-punctuation.md), to-do; reglas vigentes en el manual de la línea desde el 2026-10-06, falta llevarlas a AXIS, recetas, compositor y gates; espera el OK del operador para empezar.
+- `TASK-2012` — [La órbita: voz de decisión y acento como puntuación](in-progress/TASK-2012-orbit-decision-voice-and-accent-punctuation.md), in-progress; Slice 2 empezado: portada de propuesta sin pregunta (`cover-proposal` · `orbit-decision`) publicada en AXIS 0.6.6/0.7.6; Greenhouse la adopta con TASK-2014.
 - `TASK-2014` — [adoptar los paquetes AXIS publicados y retirar la copia generada del informe AI Visibility](to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md), to-do; release AXIS `v0.4.27` publicado el 2026-10-08, lista para tomar.
 - `TASK-2009` — [corrección contractor server/Finance](in-progress/TASK-2009-contractor-command-payment-integrity.md), corregido y verificado localmente; release/readback pendientes.
 - `TASK-2010` — [consumer contractor/reintentos/CTA](in-progress/TASK-2010-contractor-submission-retry-period-actions.md), regresiones y GVC premium PASS; sin release.

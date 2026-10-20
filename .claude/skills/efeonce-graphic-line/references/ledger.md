@@ -1,5 +1,16 @@
 # Registro de decisiones y versiones
 
+### 2026-10-20 — Propuesta Assetplan: portada sin pregunta y la órbita completa en foto
+
+Operador, sobre la portada: «Pon Servicio Managed CRM, y quita estos textos». La portada de propuesta para un cliente va
+en la voz de decisión (eyebrow · titular con su esfera · evidencia), sin pregunta: composición `cover-proposal` ·
+`orbit-decision` publicada en AXIS 0.6.6/0.7.6 (TASK-2012, Slice 2). Greenhouse la ve al adoptar AXIS (TASK-2014);
+hasta entonces, lámina a mano con las medidas del token. Borrar la pregunta después de componer es parche («no
+parches»). Contraportada BR3h: el operador rechazó la v1 («se ve súper artificial la órbita con ese punto rosado
+allí»); en foto, la órbita lleva su anatomía completa (hilo tenue en la luz de Efeonce, arco corto en el acento y la
+esfera en la punta del arco). Rosado «sólo en la esfera» no alcanza: la esfera suelta se lee pegada. BR3 aprobada tiene
+la misma esfera suelta (pregunta abierta al operador). Norma: delta 2026-10-20 de `EFEONCE_SURFACE_COMPOSITION_V1.md`.
+
 ### 2026-10-20 — Landing `/agenda/`: par de voz, sin lima y Nexa lejos
 
 Decisiones del operador al revisar el canvas «Landing Agendar — Efeonce» y publicarla en `efeoncepro.com/agenda/`:

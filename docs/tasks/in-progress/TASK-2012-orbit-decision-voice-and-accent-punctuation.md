@@ -1,5 +1,20 @@
 # TASK-2012 — La órbita: voz de decisión por defecto y acento como puntuación en contrato, recetas, compositor y gates
 
+## Delta 2026-10-20
+
+- **Arranque autorizado por el operador** (2026-10-20, en esta sesión): empezar por la portada de propuesta sin
+  pregunta y publicar AXIS. Lo pidió la propuesta de Assetplan: «Pon Servicio Managed CRM, y quita estos textos».
+- **Slice 2, primera pieza, en AXIS:** `cover-proposal` suma la composición `orbit-decision` (eyebrow, titular en
+  `voice.answer` a 92 px en hasta 2 líneas con su esfera, evidencia; sin pregunta) y el contrato admite la voz `decision`
+  por composición, con la dominancia 3× medida sobre la evidencia. Commit AXIS `9e72d38`, `axis-tokens` 0.6.6 y
+  `axis-ui-contracts` 0.7.6, tag `v0.7.6`; delta (aa) de `SURFACE_COMPOSITION_DECISION_V1.md`. `orbit` y `dawn` siguen
+  exigiendo la pregunta.
+- **Greenhouse no la ve todavía:** fija `axis-ui-contracts` 0.3.40 y `axis-tokens` 0.3.41. Llega con TASK-2014 (adopción
+  de los paquetes publicados); el Slice 4 de esta task depende de esa adopción. Mientras tanto la portada de Assetplan
+  se arma a mano en su canvas con las medidas del token, documentada como lámina a mano.
+- **Pendiente del Slice 2:** el titular de decisión en las demás recetas del deck (hoy sólo la portada de propuesta) y el
+  tope de palabras propio, que propone esta task y decide el operador.
+
 ## Delta 2026-10-15
 
 - **Evidencia de la etapa 2 (voz de decisión en el compositor):** el brochure «Agencia de Marketing 360°» v9 tiene 11
@@ -20,7 +35,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
