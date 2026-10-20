@@ -70,6 +70,7 @@ Read the minimal set:
 | Performance Marketing `/servicios/performance-marketing/` | `references/landings/performance-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Inbound Marketing `/agencia-inbound-marketing/` | `references/landings/inbound-marketing.md` + `references/source-led-elementor-patterns.md` |
 | Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
+| Agenda `/agenda/` (landing around the real native scheduler) | `references/landings/agenda.md` + `references/source-led-elementor-patterns.md` |
 
 If several domains apply, load the smallest union. Do not preload every reference.
 

@@ -638,6 +638,29 @@ vale en toda aplicación:
   rondas: [artifact](https://claude.ai/artifact/ETWw3CfFq7QPCVLHq7GssH). Publicación y copy social: skill
   `social-media-studio`.
 
+### A17. Landing web de servicio o de agenda con el agendador nativo (aprobada 2026-10-20)
+
+> Verificado contra: la landing publicada `efeoncepro.com/agenda/` (WordPress page 251583) y greenhouse-eo `develop`
+> en `17bf00f2a` — 2026-10-20. Criterio: [criteria.md](criteria.md), «Landing de agenda», «Titulares de landing» y «CTA
+> de landing: sin verde lima»; decisiones: [ledger.md](ledger.md) (2026-10-20).
+
+- **Para qué:** una landing cuyo trabajo es que la persona reserve. La landing **enmarca el agendador real**
+  (`<efeonce-meeting-scheduler>` de Growth Meetings), nunca uno dibujado: el canvas de diseño deja el hueco y la
+  composición se resuelve alrededor del componente vivo.
+- **Va:** hero oscuro (`#001a33`) con la **órbita de retrato de Nexa** (pieza `portrait`, Nexa con aire dentro de su
+  órbita) y el par de voz de la landing; el agendador montado bajo el hero (puede montarse sobre su borde), tematizado
+  sólo con sus variables `--gh-meeting-*` en el acento de la línea; secciones en papel («Cómo es la reunión», preguntas)
+  y un cierre oscuro con la llamada a elegir horario.
+- **Titulares:** cada H1/H2 en Bricolage cierra con la **esfera** en el acento de la línea, **salvo el del hero**, que
+  lleva punto tipeado porque la órbita de retrato ya pone la esfera en esa pieza.
+- **CTA:** en `accent-growth` con texto `ground`; nunca el lima `cta-growth` (`#7ed600`).
+- **Firma:** no lleva eslogan suelto ni logo propio; firman la cabecera y el footer globales del sitio.
+- **Copy:** sólo hechos verificables del servicio (duración, canal de la reunión); nada que el agendador no haga.
+- **Nunca:** un agendador dibujado en el canvas como si fuera el producto · el eslogan como titular · una navegación
+  propia de la landing (A15).
+- **Producción y publicación:** skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`; el agendador
+  y su contrato, skill `greenhouse-growth-meetings`.
+
 ## B. Presentaciones e informes
 
 ### B1. Deck 16:9 (portada, sección, contenido, cierre)
@@ -1251,6 +1274,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Escenario del login de Greenhouse (excepción en curso) | lente al canon (anillo 1,12, zoom, ancho/794); sin lente si la foto ya trae su órbita | foto de novedad, voz con anillo y esfera en el acento de la línea | A12 (`LoginLens.tsx`) |
 | Mención Efeonce en texto corrido | ninguna (el isotipo ya es órbita) | isotipo + etiqueta corta en la píldora de la línea; sólo destinos Efeonce, no CTA | `efeonce.mention` (AXIS) · A14 |
 | Encabezado y navegación del sitio web (planificado) | — | logo 164/140, cápsula de vidrio, botón «Agenda tu diagnóstico» y hamburguesa con una sola receta de vidrio | `efeonce.site-nav` (AXIS, planificado TASK-2040) · A15 |
+| Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |

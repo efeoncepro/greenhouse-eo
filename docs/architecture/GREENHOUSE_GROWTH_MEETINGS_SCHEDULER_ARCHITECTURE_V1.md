@@ -313,3 +313,19 @@ montado para devolver el foco. Superficie de Growth CTA propia del encabezado gl
 origen para todas las páginas del menú; su clave nunca va a documentos, commits ni mensajes. La piel del diálogo sube
 desde `scripts/public-website/inbound-source/page.css` (alcance de landing) a una primitive compartida del sitio.
 Sin JS o sin superficie, enlace a `/agenda/`. **Planificado: nada de esto está implementado ni publicado.**
+
+## Delta 2026-10-20 — `/agenda/` deja de ser un piloto aislado: landing indexable con el mismo agendador
+
+`/agenda/` (WordPress page 251583) es ahora la landing de agenda rediseñada con la línea gráfica «La órbita»,
+indexable (`index, follow`, título y OG propios, en `page-sitemap.xml`) y fuera de menús por decisión del operador; el
+botón «Agenda tu diagnóstico» del encabezado global (TASK-2042, delta anterior) la enlazará. La landing monta en línea
+el **mismo** host del piloto, sin cambios de comportamiento: `<efeonce-meeting-scheduler>` con surface
+`fhsf-efeonce-lead-gen-web`, scheduler `discovery`, placement `agenda_pilot`, `activation-mode="page"` y receta máxima
+`command`, cargado por el loader de `efeonce-public-renderers`. No usa `efeonce-discovery-30` ni el lanzador
+`<greenhouse-cta>`. La landing sólo enmarca el componente y lo tematiza desde el host con las variables
+`--gh-meeting-*` (acento Growth y superficie), con alcance de página.
+
+**No cambió el renderer ni el contrato** (schemas, state machine, binding, DTOs ni medición). En vivo se ve el renderer
+de producción; la composición AXIS aprobada del agendador sigue pendiente de adopción (TASK-2007). **No hubo booking
+controlado**: el operador lo difirió («no por ahora»), así que sigue abierto como gate separado del estado vigente del
+rollout. Contrato de la landing: skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`.

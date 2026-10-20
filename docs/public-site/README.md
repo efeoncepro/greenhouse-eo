@@ -84,6 +84,15 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   y skill `efeonce-public-site-wordpress` (`references/landings/inbound-marketing.md`). Primer envío real, GA4
   `generate_lead`, primera reserva, Rich Results y prueba de edición en Elementor siguen pendientes.
 
+- **[Agenda vigente — Elementor](../documentation/public-site/agenda.md)** — página `251583` en `/agenda/`, cuerpo
+  reemplazado en el mismo lugar el 2026-10-20 con «La órbita» (canvas «Landing Agendar — Efeonce»): cuatro widgets
+  `greenhouse_agenda_*` compilados sobre el núcleo común y el agendador nativo real del piloto `TASK-1510` en un widget
+  HTML propio, sin cambios de comportamiento. Indexable desde el 2026-10-20 y fuera de los menús por decisión del
+  operador (la enlazará el botón «Agenda tu diagnóstico» del header de `EPIC-055`). [Funcionamiento](../documentation/public-site/agenda.md),
+  [operación](../manual-de-uso/public-site/operar-agenda.md) y skill `efeonce-public-site-wordpress`
+  (`references/landings/agenda.md`). Sin reserva controlada (decisión del operador); composición AXIS del agendador
+  pendiente (`TASK-2007`).
+
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
   identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).

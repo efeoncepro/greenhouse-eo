@@ -1,7 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
 > **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
-> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541). Esto es el playbook operativo: intención → comando → modelo → flags →
+> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -134,6 +134,12 @@ sin su verificación: caso del 9:16 del anuncio Efeonce | Google.
   cambio de tono.
 - **Borrar:** sin fantasma ni silueta de otro objeto; la sombra proyectada se fue con el objeto; la sombra del vecino
   sigue (el comando nunca toma la sombra de un vecino ni pisa otro objeto, pero míralo).
+- **Borrar una línea de luz del fondo** (2026-10-20, retrato de Nexa para `/agenda/`, carpeta
+  `ai-generations/2026-10-20_agenda-nexa-retrato/`): `ai:inpaint erase --fill model` (Sunburst high, ~USD 0,04) con una
+  máscara **por color** de la línea, **restringida al fondo**: la piel se excluye por región, para que el color no la
+  tome. La zona protegida salió idéntica bit a bit. El comando avisó «la zona casi no cambió» y salió con **código 3**:
+  quedaban restos tenues de la línea fuera de la máscara (fuera del recorte usado). Ese 3 no prueba que el borrado
+  falló: se revisa la imagen al 100 % y se decide por lo que se ve.
 - **Mover / incorporar:** sombra de contacto y reflejo coherentes con la luz; con `--finish element`, que la forma del
   elemento no haya cambiado.
 - **Fondo:** pelo y transparencias contra el fondo nuevo (la costura media viene en el reporte). Con personas reales del

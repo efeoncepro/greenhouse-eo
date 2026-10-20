@@ -37,7 +37,8 @@ placement `embedded` y style `minimal`, y reduce el card a su botón desde el CS
 Caso fuente: el dock móvil de `/servicios-contratar-hubspot/` (CTA `hubspot-discovery-meeting`, `cta-location=hubspot_mobile_dock`)
 reduce el CTA a un botón de 48 px junto a «Ir al formulario»; `/contacto/` usa el mismo patrón. El botón sigue abriendo el
 scheduler nativo en full-screen y la conversión sigue siendo el receipt `gh_meeting_*`, nunca el click. Si el host no tiene
-surface/key, el hueco debe caer a un enlace a `/agenda/`.
+surface/key, el hueco debe caer a un enlace a `/agenda/`, que desde el 2026-10-20 es la landing de agenda indexable
+(monta el mismo agendador en línea; ya no es sólo el piloto).
 
 ## Problemas comunes
 

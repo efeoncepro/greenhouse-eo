@@ -168,6 +168,10 @@ Agenda y los CTA de reunión conservan el motor existente en `/agenda/`; ningún
 un formulario de éxito simulado. El showreel autorizado es `https://www.youtube.com/watch?v=yHUystNmtcQ`:
 no se describe como demo funcional de Greenhouse ni se le atribuye una duración no medida.
 
+**Delta 2026-10-20:** `/agenda/` (`251583`) se rediseñó con «La órbita» sobre el núcleo source-led (sexto
+compilador desde canvas, `compile-agenda-elementor-source.cjs`) y es indexable; la URL y el agendador nativo no
+cambiaron, así que los destinos de la Home siguen válidos. Contrato: `AgendaLandingModules` en [PRIMITIVES](PRIMITIVES.md#registry).
+
 ## Fuente y mantenimiento
 
 Fuente: `/Users/jreye/Documents/agencia/Landing - Agencia/Landing Agencia.dc.html`, SHA-256

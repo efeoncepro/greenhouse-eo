@@ -74,6 +74,16 @@ will be no other booking path. When implementing it in
 
 Contract: [`PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md` §Agendador](../../../docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md#agendador).
 
+## Inline host: `/agenda/` landing (2026-10-20)
+
+`/agenda/` (WordPress page 251583) is no longer an isolated pilot: it is an indexable «La órbita» landing that mounts
+the scheduler **inline** with the same pilot host, unchanged — `<efeonce-meeting-scheduler>` with surface
+`fhsf-efeonce-lead-gen-web`, scheduler `discovery`, placement `agenda_pilot`, `activation-mode="page"`,
+`max-recipe="command"` (no `<greenhouse-cta>`, no `efeonce-discovery-30`). The host only frames it and themes it
+through the `--gh-meeting-*` variables, page-scoped; renderer and contract did not change, and no controlled booking
+was made. Production still shows the current renderer: the AXIS composition remains pending adoption (TASK-2007).
+Landing contract: skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`.
+
 ## Operating loop
 
 1. **Resolve the boundary.** Identify whether the change belongs to provider policy, public transport,

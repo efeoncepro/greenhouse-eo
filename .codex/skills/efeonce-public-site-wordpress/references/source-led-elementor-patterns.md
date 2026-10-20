@@ -8,7 +8,15 @@ Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKE
 and `references/landings/content-marketing.md`. Second canvas compiler (Agencia de Medios, 2026-10-16):
 `references/landings/agencia-de-medios.md`; third (HubSpot v2, 2026-10-16, with a page layer and a mobile dock):
 `references/landings/hubspot-services.md`; fourth (Performance Marketing, 2026-10-17): `references/landings/performance-marketing.md`. Fifth (Inbound
-Marketing, 2026-10-18, first with the native meeting launcher): `references/landings/inbound-marketing.md`. Each is a
+Marketing, 2026-10-18, first with the native meeting launcher): `references/landings/inbound-marketing.md`. Sixth
+(Agenda `/agenda/`, 2026-10-20, on the shared core): `references/landings/agenda.md`. Lessons: the core only has the
+dialog launcher, so an **inline** scheduler is not a module — the publisher places the pilot's host adapter
+(`agenda-source/scheduler-host.html`) in its own Elementor HTML widget between two compiled modules and the page layer
+only frames and themes it (`--gh-meeting-*`, guarded by `body:has(.gh-agenda)`); a frame that overlaps the previous
+section with a negative margin needs `display:flow-root` on its own section, or the margin collapses through it and the
+section background rises with the card (fixed live 2026-10-20). Rail: `compile-agenda-elementor-source.cjs` →
+`build-agenda-elementor-package.cjs <live baseline>` → `deploy-agenda-elementor-package.php` → hash-guarded
+`publish-agenda-elementor-page.php` → `rollback-agenda-elementor-page.php`; both core gates include `agenda`. Each is a
 reference for mechanisms and lessons, not a layout to copy (`references/landing-workflow.md` §Start from the landing's need).
 
 ## Shared source-led core (2026-10-17)

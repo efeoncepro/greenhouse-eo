@@ -840,3 +840,19 @@ Carpeta: `ai-generations/2026-10-19_google-partner-freeze/` (`r4-impacto-premium
 - **El isotipo de Google Cloud salió cortado a la derecha.** Causa: se recortó de `google_cloud_logo.svg` con un
   `viewBox` escrito a mano. Regla: usar el ícono completo (OneDrive `Workspace/Portafolio/03 DDSoft/Recursos}/google-cloud-1.svg`)
   o calcular el bbox real del trazo antes de recortar; nunca estimar el `viewBox` a ojo.
+
+## 2026-10-20 — Landing `/agenda/`: el agendador dibujado y el verde lima
+
+Tarjeta: [applications.md](applications.md) §A17. Decisiones: [ledger.md](ledger.md) (2026-10-20).
+
+- **El agendador dibujado en el canvas no es el agendador.** Síntoma: la corrección del operador: la landing tiene que
+  funcionar con el agendador real, nunca con uno dibujado. Causa: tratar el componente vivo como una ilustración más de
+  la composición. Regla: la fuente del carril (`agenda-source/Main.dc.html`) va sin agendador dibujado y la landing se
+  diseña **alrededor del componente real** (`<efeonce-meeting-scheduler>`): el canvas deja el hueco, el host sólo lo
+  enmarca y lo tematiza con `--gh-meeting-*`, y la evidencia se toma con el agendador cargado con disponibilidad real.
+  Tampoco se promete en el copy lo que el agendador no hace (se retiró «Quién te recibe»: Nexa no acompaña dentro).
+- **El verde lima `cta-growth` se coló en el CTA.** Síntoma: el CTA de la landing salió en `#7ed600`; el operador: «Este
+  verde no lo usamos en ninguna parte de nuestra línea gráfica». Causa: se tomó el token `cta-growth` oscuro porque
+  existe en `tokens.json`. Regla: el CTA Growth sobre oscuro va en `accent-growth` con texto `ground`; antes de usar un
+  token `cta-*`, comprobar que aparece en una pieza aprobada ([criteria.md](criteria.md), «CTA de landing: sin verde
+  lima»).

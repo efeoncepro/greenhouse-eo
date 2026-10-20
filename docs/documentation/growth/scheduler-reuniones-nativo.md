@@ -13,6 +13,11 @@ Growth CTA puede publicar dos comportamientos distintos:
 
 El CTA permanece compacto. En desktop abre un diálogo bounded y en móvil una superficie full-screen. Cerrar no borra el flujo: al reabrir se conserva la selección, el formulario y cualquier confirmación en curso durante la sesión del documento.
 
+Además del diálogo, el agendador puede vivir en línea dentro de una página. Desde el 2026-10-20, `/agenda/` es la
+landing de agenda del sitio, indexable y con la línea gráfica «La órbita»: monta el mismo agendador del piloto (misma
+surface, misma agenda y mismo comportamiento) y sólo lo enmarca y le ajusta colores con las variables del agendador.
+No usa el botón de Growth CTA y no cambió cómo se reserva ni cómo se mide.
+
 ## Reglas de confianza
 
 - La agenda no consulta disponibilidad por una simple impresión del CTA.

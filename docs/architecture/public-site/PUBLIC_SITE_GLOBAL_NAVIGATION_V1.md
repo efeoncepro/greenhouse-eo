@@ -376,6 +376,9 @@ validación. Una herramienta de Greenhouse o MCP podrá llamar a esa misma puert
   cerrar de vidrio). Hoy está con alcance de esa landing en `scripts/public-website/inbound-source/page.css` y se sube a
   una primitive compartida del sitio.
 - **Respaldo:** sin JavaScript o sin superficie, el botón es un enlace normal a `/agenda/`.
+  **Delta 2026-10-20:** `/agenda/` ya no es el piloto aislado `noindex`: es la landing rediseñada con «La órbita»,
+  indexable, que monta el mismo agendador nativo en línea. Queda fuera de los menús por decisión del operador; este
+  botón será el que la enlace. Detalle: [landing Agenda](../../documentation/public-site/agenda.md).
 
 ## Medición
 
