@@ -1,5 +1,17 @@
 # Registro de decisiones y versiones
 
+### 2026-10-20 — Landing `/agenda/`: par de voz, sin lima y Nexa lejos
+
+Decisiones del operador al revisar el canvas «Landing Agendar — Efeonce» y publicarla en `efeoncepro.com/agenda/`:
+
+- **Par aprobado:** «¿Por dónde empiezo? **Por aquí.**» (punto tipeado: la órbita de retrato de Nexa ya lleva la esfera).
+- **El verde lima (`cta-growth` oscuro, `#7ed600`) no se usa en la línea:** «Este verde no lo usamos en ninguna parte». El CTA Growth sobre oscuro va en `accent-growth` con texto `ground` ([criteria.md](criteria.md), «CTA de landing: sin verde lima»).
+- **El eslogan no se pone suelto como titular** («Nuestro eslogan no se pone así»): en la landing no va; firman cabecera y footer del sitio.
+- **Nexa más lejos dentro de su órbita:** cabeza, mano y hombros con aire, desde el hero canónico de `/contacto/` (`ai-generations/2026-10-20_agenda-nexa-retrato/`).
+- **No prometer lo que no existe:** se retiró «Quién te recibe» (Nexa no acompaña dentro del agendador).
+
+Publicación y carril: skill `efeonce-public-site-wordpress` → `references/landings/agenda.md`.
+
 ### 2026-10-19 — Anuncio de alianza «Efeonce | Google — Oficialmente partners» (post 4:5 + reel 9:16)
 
 Aprobada por el operador la ronda 5 («cine») tras rechazar cuatro rondas. Decisiones del operador, con su frase:

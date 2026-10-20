@@ -4,7 +4,7 @@
 
 - URL: `https://efeoncepro.com/agenda/`
 - WordPress `postId`: `251583`
-- Status: `publish`, `noindex, follow` (rediseño 2026-10-20: see the last section; the pilot sections below are history)
+- Status: `publish`, indexable since 2026-10-20 (rediseño: see the last section; the pilot sections below are history)
 - Owner: `TASK-1510` native meeting scheduler pilot.
 - Runtime rail: WordPress/Kinsta; Elementor document saved through `Document::save()`.
 - Renderer rail: `https://efeonce-public-renderers.vercel.app/loader.js` resolves the immutable stable release independently of Greenhouse application deploys. The scheduler `base-url` remains `https://greenhouse.efeoncepro.com` for API calls.
@@ -19,7 +19,7 @@
 - Keep page-specific root correction `body.page-id-251583 .elementor.elementor-251583` to prevent Canvas-era
   negative margins from creating horizontal overflow.
 - The host is a focused booking canvas: one H1, no inherited page headline/breadcrumb/sidebar and native header navigation. Its footer is the unmodified global Efeonce/Ohio footer used across the site; do not add agenda-specific footer CSS or restore the rejected prefooter.
-- Do not add the page to navigation or remove `noindex` without explicit product/SEO approval.
+- Not in navigation (operator decision 2026-10-20: the global header's «Agenda tu diagnóstico» will link it, EPIC-055). Indexing was approved on 2026-10-20.
 
 ## Rollback and verification
 
@@ -41,7 +41,7 @@
   puts the real scheduler on the first screens and offers the written channel (`/contacto/`) as alternative.
 - Design: canvas «Landing Agendar — Efeonce» (La órbita): voz «¿Por dónde empiezo? / Por aquí.» (punto tipeado: la órbita
   de retrato de Nexa ya lleva la esfera), Nexa en la pieza `portrait`, H2 cierran con esfera Growth, sin eslogan suelto,
-  CTA en acento Growth (nunca `cta-growth` lima). The new voice pair is pending operator approval.
+  CTA en acento Growth (nunca `cta-growth` lima). Voice pair approved by the operator on 2026-10-20.
 - Source and rail: `scripts/public-website/agenda-source/` (Main.dc.html without site chrome and without the drawn
   scheduler, assets.json, host.css, page.css, page-custom.css, scheduler-host.html) → `compile-agenda-elementor-source.cjs`
   → `build-agenda-elementor-package.cjs <live baseline>` → `deploy-agenda-elementor-package.php` (contract
@@ -59,3 +59,4 @@
 - Live 2026-10-20: deploy backups on Kinsta `/tmp/eo-agenda-widgets-before-20261020-163436.tar` and `-163607.tar`; page
   snapshot `_gh_agenda_v2_before_20261020_163500`; Elementor data hash `9084291e…`; 1440 and 375 px overflow 0, scheduler
   loaded with real availability, no console errors, no HubSpot links; no booking was created.
+- SEO 2026-10-20 (operator: indexable, no menu): `configure-agenda-seo.php` with the OG from `agenda-source/og/og.html` (`og-agenda.png`, attachment `252024`, also the featured image). Title «Agenda tu diagnóstico de marketing | Efeonce», robots `index, follow`, canonical `/agenda/`, listed in `page-sitemap.xml`. Rollback: restore fields from option `_gh_agenda_seo_before_20261020_165619` (re-add `_yoast_wpseo_meta-robots-noindex=1`). No controlled booking was made (operator: not for now).

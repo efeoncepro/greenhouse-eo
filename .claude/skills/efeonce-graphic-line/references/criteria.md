@@ -611,6 +611,8 @@ objetada (el operador notó que Efeonce no hace sólo eso; ledger, 2026-09-29). 
 **Todos.**» y «¿Entre cientos de marcas, a quién cita la IA? **A ti.**», con Nexa en registro cine. Un par aprobado en una lámina o en otra pieza no se traslada solo a una portada social: se escribe para
 ella ([applications.md](applications.md) §A11).
 
+**Landing de agenda (operador, 2026-10-20).** Aprobado para el hero de `efeoncepro.com/agenda/`: «¿Por dónde empiezo? **Por aquí.**». La respuesta lleva **punto tipeado**, no esfera, porque el hero ya tiene la esfera de la órbita de retrato de Nexa (regla de titulares de landing del 2026-10-18). El par vive en esa landing; como los demás, no se traslada solo a otra pieza.
+
 **En una pantalla del producto (login V4, 2026-10-02; riesgo abierto).** El operador pidió la voz completa sobre la
 novedad del escenario: «El ring y la esfera faltan como manda /efeonce-graphic-line». El anillo pequeño va delante del
 kicker y la esfera es el punto del titular, en el acento de la línea. Lo que aún no cumple la gramática, y queda
