@@ -11,7 +11,7 @@ const os = require('node:os')
 const path = require('node:path')
 const cp = require('node:child_process')
 
-const LANDINGS = ['medios', 'performance', 'inbound']
+const LANDINGS = ['medios', 'performance', 'inbound', 'agenda']
 const runtime = process.env.PUBLIC_SITE_RUNTIME_ROOT || '/Users/jreye/Documents/efeonce-public-site-runtime'
 const plugin = path.join(runtime, 'wp-content/plugins/eo-elementor-widgets')
 const list = dir => fs.existsSync(dir) ? fs.readdirSync(dir, { recursive: true }).filter(f => fs.statSync(path.join(dir, f)).isFile()) : []

@@ -1179,3 +1179,11 @@ rechazadas. La tarjeta de producción es [applications.md](applications.md) §A1
   (material acrílico brillante, rim light) se aplica a los íconos del partner como escena, no a la órbita ni a la
   marca de Efeonce, y lo pidió el operador; [inferido] por eso no choca con «discos rellenos, brillos, reflejos» de §10,
   que es gramática de la órbita.
+
+### CTA de landing: sin verde lima — corrección del operador, 2026-10-20
+
+El operador, revisando la landing `/agenda/`: «Este verde no lo usamos en ninguna parte de nuestra línea gráfica». El
+token `cta-growth` oscuro (`#7ed600`) existe en el set de tokens, pero **no se usa en piezas ni landings de Efeonce**.
+El CTA principal de la línea Growth sobre oscuro va en el acento Growth (`accent-growth` oscuro) con texto en `ground`,
+igual que el botón «Continuar» del agendador AXIS. Antes de usar un token `cta-*`, comprobar que aparece en una pieza
+aprobada; que exista en `tokens.json` no prueba que la línea lo use.
