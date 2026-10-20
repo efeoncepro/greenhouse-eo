@@ -54,3 +54,22 @@ final result: passed
 - [ ] Publicación y pruebas reales HubSpot/GA4 con autorización separada.
 
 **PolishP3:** el crop del hero generado no es idéntico píxel a píxel al estudio; conserva dirección, protagonistas y reserva. No se requiere otra generación para esta revisión.
+
+## Iteración por anotaciones · 20/10/2026
+
+**Resultado: passed para revisión local; aceptación visual del operador pendiente.**
+
+Referencia: seis anotaciones del operador sobre la versión anterior, más `blog-option2/blog-full-1440.jpg`. Comparación conjunta: `blog-annotations/qa-resources-subscription-before-after.png` (anterior izquierda, nueva derecha; misma escala de escritorio, altura de las secciones deliberadamente distinta). Se revisaron también página completa y cabecera en móvil390, formulario320 y cabecera1024.
+
+Hallazgos resueltos:
+
+1. Eyebrow redundante de cabecera retirado.
+2. Temas: 48px de alto, flex centrado, padding simétrico16px. Label24px e icon16px comparten centro vertical. Disclosure conserva Enter y12 enlaces.
+3. Menú interno: destinos a las secciones existentes. «Lecturas por tema» explicita su propósito.
+4. Objetivos parecía oferta de servicios: títulos por disciplinas y copy editorial, con los mismos archivos de categorías reales.
+5. Recursos sin jerarquía visual: título56px máximo, portada real de guía, marca AEO oficial, superficies navy y enlaces legibles. En móvil se apilan y el título de la guía se acortó para evitar el corte aislado «web».
+6. Suscripción débil: marca Glitch protagonista, headline mayor y panel claro de conversión. Se reforzó la especificidad del headline para que la regla móvil genérica no redujera su jerarquía. Sin huecos de altura fija en el formulario.
+
+Verificación:21 checksPHP de selección/render +6 del widget, PHP lint y ESLint build. Sin overflow a320/390/1024/1440; imágenes del blog cargadas, anchors válidos, un Growth Form, email vacío y checkbox desmarcado; consola sin errores. No se ejercitó envío positivo. Tag Growth Form idéntico alcommit anterior; los campos/consentimiento/medición no cambian. El footer global sigue siendo el real, fuera de este alcance.
+
+No hay diferencias P0/P1/P2 pendientes en el alcance de estas anotaciones. No se acredita integración Elementor publicada, aceptación HubSpot ni GA4 DebugView; permanecen en PUBLICATION-CHECKLIST.md.

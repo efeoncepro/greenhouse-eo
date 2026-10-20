@@ -86,3 +86,13 @@ La elección visual autoriza implementar; **no autoriza publicar ni promover a m
 - Preview navegable local: `pnpm exec tsx scripts/public-website/blog-phase1/serve-preview.ts` → `http://127.0.0.1:8842/blog/`. Usa GET del shell público, renderer PHP local y fixture de Forms; bloquea escrituras, elimina trackers y limita conexiones a la propia preview. El `base-url` local sólo se sustituye en la respuesta de preview; el runtime conserva el destino canónico.
 - Capturas finales reales en `.captures/2026-10-20-blog-option2/`: escritorio 1440, móvil390, primera vista320/1024 y QA. Servidor ligado sólo a127.0.0.1; no se sube ni expone públicamente.
 - Pruebas:21 selección/render +6 widget. UI:12 temas,9 lecturas únicas, sin overflow a320/390/1024/1440; Gmail válido sin consentimiento queda bloqueado. HubSpot/GA4 real y editor Elementor siguen pendientes según checklist.
+
+
+## Revisión de las seis anotaciones del operador (20/10/2026)
+
+- Cabecera: retirada la línea redundante «El blog de Efeonce». El disclosure «Todos los temas» usa caja, padding y centrado explícitos; conserva teclado/foco y las doce categorías reales.
+- Navegación local: «Lecturas por tema» sustituye «Según tu objetivo»; lleva a `#goals`. Esa sección presenta categorías editoriales (SEO/AEO, HubSpot/CRM, IA, Diseño/Contenidos), no fichas de servicios.
+- Recursos: portada existente de la guía Web Agéntica y logo AEO oficial, jerarquía mayor y dos composiciones navy. Se conservan los dos destinos reales y sus markers de medición.
+- Suscripción: cierre Glitch en navy con panel claro y copy explícito «Suscríbete a Glitch». El elemento Growth Form, key, surface y atributos permanecen byte-for-byte; host.css también sigue intacto. No se tocan consentimiento, validaciones ni eventos.
+- Evidencia de esta iteración: `.captures/2026-10-20-blog-annotations/`, página completa 1440/390, cabecera y formulario a320; comparación anterior/nuevo y verificación a1024.
+- Sólo preparación local en develop. No WordPress/HubSpot/GTM writes, publicación, push, merge o release. Los gates del checklist de publicación permanecen pendientes.

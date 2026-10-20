@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { efeonceGraphicLine as brand, efeonceTokens as tokens, axisTypography as type } from '@efeoncepro/axis-tokens'
-import { glitchAssetUrl, manzanitasAssetUrl } from '@efeoncepro/axis-brand-assets'
+import { brandAssetUrl, glitchAssetUrl, manzanitasAssetUrl } from '@efeoncepro/axis-brand-assets'
 
 const runtime = resolve(process.env.BLOG_RUNTIME_DIR || '../efeonce-public-site-runtime-develop')
 const plugin = resolve(runtime, 'wp-content/plugins/eo-elementor-widgets')
@@ -32,6 +32,7 @@ const roles = {
 
 mkdirSync(resolve(plugin, 'assets/img/blog'), { recursive: true })
 copyFileSync(glitchAssetUrl('glitch-logo-negative'), resolve(plugin, 'assets/img/blog/glitch-logo-negative.svg'))
+copyFileSync(brandAssetUrl('aeo-logo-negative'), resolve(plugin, 'assets/img/blog/aeo-logo-negative.svg'))
 copyFileSync(
   manzanitasAssetUrl('manzanitas-wordmark-negative'),
   resolve(plugin, 'assets/img/blog/manzanitas-wordmark-negative.svg')
