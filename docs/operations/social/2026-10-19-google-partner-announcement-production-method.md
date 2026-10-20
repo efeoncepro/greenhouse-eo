@@ -133,5 +133,5 @@ en PNG.
 - [ ] Comprobar en Instagram que `@ingrammicro` es la cuenta correcta.
 - [ ] Comprobar que la portada de cada red quedó aplicada y que el recorte 3:4 de la grilla de Instagram no corta el
       lockup.
-- [ ] Commercial: conciliar el claim «partner de Google» con el gate del registro, que no permite publicar «Google
-      Cloud Partner» como claim pleno mientras el nivel sea `Registrado`.
+- [x] Claim «partner de Google» frente al gate del registro: resuelto el 2026-10-20. El operador declara que Efeonce
+      es partner completo de Google (no `Registrado`) y el gate quedó levantado en el registro de partnerships.
