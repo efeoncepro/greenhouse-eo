@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-service-lanes",
+  "voice": {
+    "eyebrow": "Alcance del servicio",
+    "question": "¿Qué cubren las 25 horas?",
+    "answer": [
+      "La operación"
+    ]
+  },
+  "lanes": [
+    {
+      "icon": "sales",
+      "title": "Operación y solicitudes",
+      "products": "Canal del equipo comercial",
+      "description": "Dudas, incidencias y ajustes de usuarios, permisos, propiedades, pipelines y listas."
+    },
+    {
+      "icon": "data",
+      "title": "Automatización y datos",
+      "products": "Workflows · Calidad del dato",
+      "description": "Workflows, calidad y arquitectura del dato y objetos personalizados."
+    },
+    {
+      "icon": "revenue",
+      "title": "Reportería",
+      "products": "Reportes · Dashboards",
+      "description": "Reportes y seguimiento del funnel comercial, ajustados a tus prioridades."
+    },
+    {
+      "icon": "data",
+      "title": "Integraciones",
+      "products": "WhatsApp · Herramientas",
+      "description": "Diagnóstico de conexiones existentes e integraciones nativas compatibles con tus licencias."
+    },
+    {
+      "icon": "service",
+      "title": "Agentes y automatizaciones",
+      "products": "Agent Hub",
+      "description": "Dónde los agentes de IA pueden quitar tareas repetitivas, dentro de la bolsa y previa evaluación."
+    },
+    {
+      "icon": "service",
+      "title": "Calidad y visibilidad",
+      "products": "Pruebas · Documentación",
+      "description": "Cada cambio probado y documentado, con registro de solicitudes y horas."
+    }
+  ],
+  "phases": [
+    "Arranque",
+    "Solicitudes del día a día",
+    "Proyectos priorizados",
+    "Cierre mensual"
+  ]
+}

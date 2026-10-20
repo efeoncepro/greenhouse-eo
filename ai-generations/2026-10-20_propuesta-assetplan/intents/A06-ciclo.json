@@ -1,0 +1,42 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-plan",
+  "voice": {
+    "eyebrow": "Un ciclo cada mes",
+    "question": "¿Cómo se organiza el mes?",
+    "answer": [
+      "Por etapas"
+    ]
+  },
+  "body": "Cada mes ordenamos, ejecutamos y revisamos **contigo**. Tiempos de respuesta y criticidad se acuerdan antes de empezar.",
+  "horizon": 30,
+  "currentStop": 1,
+  "stops": [
+    {
+      "range": "Semana 1",
+      "title": "Ordenar",
+      "desc": "Accesos, solicitudes abiertas, canal y criticidad acordados."
+    },
+    {
+      "range": "Todo el mes",
+      "title": "Ejecutar",
+      "desc": "Solicitudes en horario de Chile, con el plazo de cada trabajo comunicado."
+    },
+    {
+      "range": "Cierre",
+      "title": "Revisar",
+      "desc": "Registro de consumo y avances; prioridades del siguiente ciclo."
+    }
+  ],
+  "progress": {
+    "sections": 4,
+    "current": 3
+  }
+}

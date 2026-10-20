@@ -146,6 +146,40 @@ un envío puntual. Tras enviar, buscar Elementos enviados por identidad/asunto/f
 y el enlace del borrador puede conservar una vista obsoleta. No reenviar por esa vista.
 [Envío y lectura independientes del caso](../commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
 
+### Delta 2026-10-20 — Outlook web: DOM antes que captura, CCO resuelto y adjuntos
+
+Lecciones del envío de la propuesta a Assetplan desde Outlook web en el navegador integrado:
+
+- **Sesión.** Outlook no tenía sesión iniciada en el navegador integrado; Julio la inició. El agente no
+  ingresa contraseñas: si falta la sesión, pedirla y esperar.
+- **La captura puede ir atrasada.** Con un viewport emulado (`resize_window` 1440×900), las capturas
+  llegaron atrasadas respecto del DOM: parecía que el texto no se escribía, se reescribió y el destinatario
+  quedó duplicado. Verificar Para, CCO y cuerpo leyendo el DOM (`innerText` de los `contenteditable` con
+  `aria-label` «Para», «CCO» y «Cuerpo del mensaje»), no la captura. Trabajar sin emulación o tratar la
+  captura como no confiable.
+- **Foco antes de teclear.** Unas teclas de borrado cayeron en el cuerpo porque el foco estaba ahí.
+  Antes de escribir o borrar, confirmar `document.activeElement`.
+- **El CCO escrito no es un destinatario hasta ser píldora.** El borrador guardado, leído con el conector
+  (`read_resource`), mostraba `bccRecipients: []` aunque la dirección estaba escrita. Se resolvió escribiendo
+  la dirección y pulsando **Enter** sobre la sugerencia; luego Enviados mostró el CCO correcto. Hacer clic en la
+  sugerencia abrió el complemento HubSpot Sales y una ventana de inicio de sesión de HubSpot que el agente no
+  puede cerrar y que bloquea el JavaScript de la página; Julio la cerró. Resolver con teclado y comprobar el
+  CCO en el borrador guardado por conector antes de enviar.
+- **Espacios entre párrafos.** Julio corrigió: «No estás dejando nada de espacios». El cuerpo lleva una línea en
+  blanco entre saludo, introducción, resumen con viñetas, inversión, invitación y despedida. Verificarlo leyendo
+  el borrador guardado por conector, no sólo el editor.
+- **Adjuntos.** En esta sesión, **Examinar este equipo** abrió un diálogo nativo que el navegador integrado no
+  controla, y el selector **OneDrive** abrió el OneDrive personal, mientras `Alineación/4. Comercial/...` vive
+  en la biblioteca SharePoint GrowthMarketing (Documentos compartidos). Julio adjuntó los PDF y envió. Si el
+  agente no puede adjuntar, dejar el borrador verificado y pedirle al operador que adjunte y envíe.
+- **Readback después del envío humano.** Por conector se comprobó remitente, Para, CC vacío, CCO, asunto y los
+  dos adjuntos con nombre y tamaño; en HubSpot `48713323`, la actividad EMAIL `SENT` asociada al Deal.
+- **Dirección inferida.** La dirección de la destinataria seguía inferida (patrón nombre.apellido), no
+  verificada. Se avisó al operador antes de enviar y se comprobó que el correo anterior no había rebotado; eso
+  no la convierte en dirección verificada.
+
+[Caso, adjuntos y readback](../commercial/prospecting-agent/runs/2026-10-20-1221-assetplan-deal.md#propuesta-enviada--20102026).
+
 ### Seguimiento nativo autorizado en HubSpot — 13/10/2026
 
 El operador precisó que las secuencias de seguimiento se ejecutan **en HubSpot, no Apollo**.

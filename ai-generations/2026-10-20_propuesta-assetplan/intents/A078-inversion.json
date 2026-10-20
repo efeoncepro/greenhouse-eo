@@ -1,0 +1,31 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-focus",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cuánto invierto al mes?",
+    "answer": [
+      "30 UF"
+    ]
+  },
+  "figures": [
+    {
+      "value": "−25 %",
+      "label": "sobre 40 UF + IVA, por 4 meses. Primer mes sin permanencia.",
+      "source": "Cotización Efeonce ASSETPLAN-2026-10-20-v2"
+    }
+  ],
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+    "alt": "Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "proposal",
+  "recipe": "proposal-service",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · RevOps",
+    "question": "¿Quién te respalda?",
+    "answer": [
+      "Un equipo"
+    ]
+  },
+  "body": "Tú llevas la estrategia y los lineamientos. Nosotros, la operación de HubSpot: una contraparte que coordina y especialistas detrás.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí",
+      "name": "Arranque",
+      "desc": "Accesos, solicitudes abiertas y prioridades."
+    },
+    {
+      "kicker": "Día a día",
+      "name": "Solicitudes",
+      "desc": "El canal de tu equipo comercial, al día."
+    },
+    {
+      "kicker": "Proyectos",
+      "name": "Especialistas",
+      "desc": "Datos, reportes, integraciones y agentes."
+    },
+    {
+      "kicker": "Cada mes",
+      "name": "Cierre",
+      "desc": "Consumo, avances y prioridades del siguiente ciclo."
+    }
+  ],
+  "note": "Con acceso Partner de HubSpot: no necesitas asignarnos una licencia.",
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+    "alt": "Una estratega de growth con el polo navy de Efeonce, de pie tras una mesa de nogal en el estudio de noche"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Assetplan",
+    "participantKind": "department"
+  }
+}

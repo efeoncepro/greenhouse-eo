@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · RevOps",
+    "question": "¿Qué operan en mi HubSpot?",
+    "answer": [
+      "Todo el CRM"
+    ]
+  },
+  "body": "Integraciones, desarrollos a medida, landing pages, automatizaciones, agentes de IA y parametrización.",
+  "steps": [
+    {
+      "glyph": "automatizacion",
+      "kicker": "Conecta",
+      "name": "Integraciones"
+    },
+    {
+      "glyph": "web",
+      "kicker": "A medida",
+      "name": "Desarrollos y landings"
+    },
+    {
+      "glyph": "embudo",
+      "kicker": "Automatiza",
+      "name": "Workflows y agentes"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "Ordena",
+      "name": "Parametrización"
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png",
+    "alt": "Antonio, con la chaqueta de Efeonce, ordena con la mano partículas de datos en una red de capas de luz azul"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Assetplan",
+    "participantKind": "department"
+  }
+}

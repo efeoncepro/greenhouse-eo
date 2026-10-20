@@ -1,5 +1,8 @@
 # Lecciones (trampas que ya costaron tiempo)
 
+> Delta 2026-10-20 (propuesta Assetplan) verificado contra: greenhouse-eo `develop` en `697fbecb6` (receta
+> `content-live-chat` en `c0e435b38`), AXIS `9e72d38` y la corrida `ai-generations/2026-10-20_propuesta-assetplan/`.
+
 > Delta 2026-10-19 (anuncio de alianza Efeonce | Google) verificado contra: greenhouse-eo `develop` en `cb9a8e666` y la
 > corrida `ai-generations/2026-10-19_google-partner-freeze/`.
 
@@ -856,3 +859,49 @@ Tarjeta: [applications.md](applications.md) §A17. Decisiones: [ledger.md](ledge
   existe en `tokens.json`. Regla: el CTA Growth sobre oscuro va en `accent-growth` con texto `ground`; antes de usar un
   token `cta-*`, comprobar que aparece en una pieza aprobada ([criteria.md](criteria.md), «CTA de landing: sin verde
   lima»).
+
+## 2026-10-20 — Propuesta Assetplan (deck de 22 láminas, `revenue-hubspot`)
+
+Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md` lista cada ajuste fuera de receta). Recetas:
+[README de recetas](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md), «La propuesta Assetplan».
+
+- **El chip de `content-live-chat` mostraba la nube de Salesforce en un deck HubSpot.** Síntoma: el operador lo
+  rechazó: «no forces nada, sino consigues la receta haz una nueva, no parches». Causa: el logo de la plataforma
+  estaba fijo en la receta. Regla: corregir la receta, no la lámina. Desde `c0e435b38`
+  (`src/lib/brand-surfaces/recipes/line-stage/content-live-chat.ts`) el logo sigue a la línea con
+  `productPartnerOf(line)` (isotipo de HubSpot en `revenue-hubspot`, Salesforce en las demás) y el wordmark Claudeforce
+  (`platformMark`) se rechaza con `invalid-intent` fuera de Salesforce.
+- **Una cifra sobre foto no muestra una inversión.** Síntoma: el precio en `content-focus` fue rechazado: «no se detalla
+  bien ni el precio real ni la oferta… agarra alguna adecuada de pricing». Regla: cuando la propuesta necesita el precio
+  a la vista, la receta es `content-pricing` live (líneas con monto, total, CTA «Aprobar propuesta», chips laterales).
+  Los montos van como `[MONTO]` (`src/lib/brand-surfaces/recipes/close.ts`, `AMOUNT`); montos reales sólo con excepción
+  explícita del operador, documentada en el `LEEME.md` de la corrida, y con un script que sólo reemplaza el marcador
+  sobre el builder y la plantilla canónicos (aquí, `render-eyebrow-chip.ts --montos`).
+- **La respuesta señalaba como equipo a personajes generados.** Síntoma: en `section-cine` `team` (foto del elenco
+  ficticio con Nexa), «Este equipo» fue rechazado porque «los de la foto son personajes generados con IA». Regla: nunca
+  una respuesta que presente a las personas de una foto de elenco ficticio o generado como el equipo real; la
+  respuesta nombra la capacidad («Expertos.», con «**Multidisciplinarios** en CRM, desarrollo, integraciones y datos,
+  con una contraparte.»). Ojo: el `example` de la receta `section-cine-team` es justamente «Este equipo», y la respuesta
+  admite 16 caracteres («multidisciplinarios», 19, no cabe: va en la evidencia).
+- **Pregunta en tres líneas pegada a la respuesta gigante.** Síntoma: «¿Tengo que reemplazar mis sistemas?» en
+  `decision-platform-coexistence` se partía en tres líneas y tocaba la respuesta; el operador: «Esto se ve mal».
+  Regla: la pregunta va en una o dos líneas; si llega a tres, se acorta (quedó «¿Y mis otros sistemas?»), no se mueve
+  la respuesta.
+- **La órbita en una foto no es un aro con una esfera suelta.** Síntoma: la contraportada BR3h v1, un aro grueso con la
+  esfera rosada aparte, fue rechazada: «se ve super artificial la órbita con ese punto rosado allí, no estás sabiendo
+  cómo funciona la órbita». Regla (§1.3): anillo fino y tenue, un arco corto (≈ 50°) en el acento que termina en la
+  esfera, del mismo color y trazo; nunca una esfera suelta. Recolorear una foto de otra línea tampoco sirve (rotación de
+  tono: «se nota mucho, sobre todo en la esfera»; inpaint: «en exceso rosado»): se regenera la foto. La norma de foto y
+  el registro cine los lleva la sesión de fotografía.
+- **El eyebrow como chip de contorno sin relleno no es estándar.** Fue un pedido del operador sólo para esta propuesta,
+  hecho clonando el catálogo `graphic-line-deck` en una carpeta temporal (`render-eyebrow-chip.ts`); el catálogo del
+  repo no cambió. Regla: no aplicarlo en otro deck hasta que el operador lo apruebe para todos; si se adopta, va como
+  propuesta a AXIS.
+- **Portada de propuesta sin pregunta, sin parche.** El script de SGS que retira la pregunta
+  (`quitar-pregunta-portada.mjs`) es el parche que el operador no quiere. AXIS ya tiene `cover-proposal` ·
+  `orbit-decision` (`axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`), pero Greenhouse fija 0.3.4x y
+  no la ve hasta TASK-2014. Regla mientras tanto: armar la portada a mano con las medidas del token
+  (`portada-orbit-decision.css` de la corrida), como la A01 aprobada ([criteria.md](criteria.md), caso SGS).
+- **El compositor no emite enlaces en el PDF.** Para que la tarjeta de agenda de `decision-next-steps` lleve a
+  `https://efeoncepro.com/agenda/` se agregó una anotación URI con pdf-lib al armar el PDF (`pdf-sprocket.mjs`,
+  constante `LINKS`) y un `<a>` sobre la tarjeta en el canvas.

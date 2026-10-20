@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "layout": "live",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cuánto es al mes?",
+    "answer": [
+      "30 UF"
+    ]
+  },
+  "body": "Precio de lista: **40 UF + IVA** al mes. Del mes 1 al 4 tienes 25 % de descuento; después, mes a mes.",
+  "quote": {
+    "kicker": "Cotización · v2",
+    "title": "Para Assetplan",
+    "lines": [
+      {
+        "name": "Operación HubSpot",
+        "desc": "25 h al mes: canal, soporte y proyectos",
+        "period": "/ mes"
+      },
+      {
+        "name": "Descuento inicial",
+        "desc": "−25 % sobre el precio de lista, meses 1 a 4",
+        "period": "/ mes"
+      },
+      {
+        "name": "Primer mes",
+        "desc": "Sin permanencia: si no funciona, terminamos",
+        "period": "· incluido"
+      },
+      {
+        "name": "Bolsa ajustable",
+        "desc": "Desde el mes 2, con aviso de 15 días",
+        "period": "· incluido"
+      }
+    ],
+    "totalLabel": "Meses 1 a 4",
+    "tax": "neto + IVA",
+    "cta": "Aprobar propuesta"
+  },
+  "chips": [
+    {
+      "kicker": "Desde el mes 5",
+      "text": "40 UF + IVA,\nmes a mes"
+    },
+    {
+      "kicker": "Plazo inicial",
+      "text": "Cuatro meses;\nvigencia al 04/11/2026"
+    }
+  ],
+  "selection": {
+    "target": "cta"
+  }
+}

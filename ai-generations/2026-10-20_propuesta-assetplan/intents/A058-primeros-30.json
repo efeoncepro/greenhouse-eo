@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-waves",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Los primeros 30 días",
+    "question": "¿Cómo partimos?",
+    "answer": [
+      "Con",
+      "orden"
+    ]
+  },
+  "body": "Antes de atender el canal, ordenamos el **portal** y acordamos cómo trabajar contigo.",
+  "steps": [
+    {
+      "kicker": "Semana 1",
+      "name": "Accesos y revisión",
+      "desc": "Acceso Partner y revisión de usuarios, permisos, duplicados y workflows."
+    },
+    {
+      "kicker": "Semana 2",
+      "name": "Canal y teamspace",
+      "desc": "Canal de Teams o Slack y teamspace de Notion con el backlog priorizado."
+    },
+    {
+      "kicker": "Semana 3",
+      "name": "Primeras entregas",
+      "desc": "Solicitudes del canal y los primeros ajustes del portal, probados."
+    },
+    {
+      "kicker": "Semana 4",
+      "name": "Primer cierre",
+      "desc": "Revisión de consumo, avances y prioridades del siguiente mes."
+    }
+  ],
+  "selectedStep": 1
+}

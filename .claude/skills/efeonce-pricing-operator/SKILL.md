@@ -100,6 +100,15 @@ M3 y decisión en M6, renovación trimestral con aviso de 30 días, base sin rec
 se descartó. La regla de forma (lámina «Cómo empezar») vive en `deck-studio`,
 `references/propuesta-tecnica-seo-sin-presentador.md`.
 
+## Descuento de entrada antes que bajar la base (delta 2026-10-20)
+
+Si el operador duda del precio de un servicio gestionado mensual («¿lo ves caro?, ¿bajamos?»), no rebajar la base:
+anclar el precio de lista, dar un descuento temporal y nombrado por un plazo inicial, y bajar el riesgo de entrada con
+condiciones (primer mes sin permanencia, bolsa ajustable con aviso, luego mes a mes, vigencia corta). Informar el
+margen estimado con y sin descuento frente al piso. Monto CRM = proyección del horizonte con el descuento aplicado;
+fecha de cierre = vigencia, no cierre pactado. Caso Assetplan (operación HubSpot, 40 UF/mes con −10 UF los meses 1–4):
+[patrón medido](references/general-pricing-patterns.md#patrón-medido-descuento-de-entrada-en-lugar-de-bajar-la-base-operación-crm-gestionada).
+
 ## Guardrails
 
 - ASaaS no equivale a SaaS, ARR ni producto software.

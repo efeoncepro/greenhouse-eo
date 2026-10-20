@@ -1,0 +1,101 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "live-progress",
+  "voice": {
+    "eyebrow": "Vívelo · cómo operamos",
+    "question": "¿Cuándo veo el avance?",
+    "answer": [
+      "En",
+      "vivo"
+    ]
+  },
+  "body": "Trabajamos en **sprints**: el backlog vive en Notion y cada cambio lo ves en Loom antes de publicarlo.",
+  "plan": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "name": "Notion"
+    },
+    "kicker": "En Notion",
+    "title": "Sprint de CRM",
+    "meta": "Sprint 2 de 4",
+    "columns": [
+      {
+        "name": "En curso",
+        "cards": [
+          {
+            "title": "Integración WhatsApp",
+            "tag": "Integraciones"
+          },
+          {
+            "title": "Workflow de arriendos",
+            "tag": "Automatización"
+          }
+        ]
+      },
+      {
+        "name": "En revisión",
+        "cards": [
+          {
+            "title": "Nuevo pipeline",
+            "tag": "Esperando tu visto bueno",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "name": "Listo",
+        "cards": [
+          {
+            "title": "Permisos por equipo",
+            "tag": "Parametrización"
+          },
+          {
+            "title": "Reporte de funnel",
+            "tag": "Reportería"
+          }
+        ]
+      }
+    ]
+  },
+  "review": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/loom-isotype.svg",
+      "name": "Loom"
+    },
+    "kicker": "En Loom",
+    "title": "Nuevo pipeline",
+    "versions": [
+      "v1",
+      "v2"
+    ],
+    "piece": {
+      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/CMP-crm-B.png",
+      "alt": "El cambio en revisión: un registro del CRM que se llena solo"
+    },
+    "pin": "1",
+    "comments": [
+      {
+        "mark": "1",
+        "author": "Tú",
+        "version": "v1",
+        "text": "¿Sumamos la etapa de visita?"
+      },
+      {
+        "own": true,
+        "author": "Efeonce",
+        "version": "v2",
+        "text": "Listo, quedó en la v2."
+      }
+    ],
+    "secondary": "Comentar",
+    "primary": "Aprobar"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-agent-supervisor",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Agentes para tu canal",
+    "question": "¿Quién responde las dudas repetidas?",
+    "answer": [
+      "Un",
+      "agente"
+    ]
+  },
+  "body": "El agente responde lo frecuente con tu base de conocimiento y **escala** a una persona lo que no sabe.",
+  "note": "Ejemplo ilustrativo · cada ficha se define con tu equipo",
+  "supervisor": {
+    "kicker": "Persona responsable",
+    "role": "Líder de CRM",
+    "initials": "KG",
+    "duty": "Aprueba, corrige y detiene"
+  },
+  "agents": [
+    {
+      "title": "Dudas del canal",
+      "job": "Responde preguntas frecuentes de los equipos comerciales.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Base de conocimiento",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Respuesta paso a paso",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Responde lo frecuente",
+          "state": "y"
+        },
+        {
+          "kind": "Nunca",
+          "value": "Inventar una respuesta",
+          "state": "n"
+        }
+      ]
+    },
+    {
+      "title": "Calidad del dato",
+      "job": "Detecta duplicados y campos vacíos en contactos y negocios.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Contactos y negocios",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Fusiones y correcciones",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Sólo tareas de revisión",
+          "state": "h"
+        },
+        {
+          "kind": "Nunca",
+          "value": "Fusionar sin revisión",
+          "state": "n"
+        }
+      ]
+    },
+    {
+      "title": "Seguimiento",
+      "job": "Recuerda al ejecutivo el siguiente paso de cada negocio.",
+      "levels": [
+        {
+          "kind": "Lee",
+          "value": "Actividad del negocio",
+          "state": "y"
+        },
+        {
+          "kind": "Propone",
+          "value": "Siguiente paso",
+          "state": "y"
+        },
+        {
+          "kind": "Ejecuta",
+          "value": "Nada sin aprobación",
+          "state": "n"
+        }
+      ]
+    }
+  ],
+  "pendingApproval": "Respuesta propuesta a una duda del canal"
+}
