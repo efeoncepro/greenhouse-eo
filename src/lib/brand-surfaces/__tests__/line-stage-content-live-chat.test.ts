@@ -117,6 +117,15 @@ describe('deck · content-live-chat (TASK-1942)', () => {
     expect(filesOf(piece)).toEqual(['public/images/logos/partners/salesforce.com_logo.svg'])
   })
 
+  it('el logo del chip de conexión sigue a la línea: HubSpot en revenue-hubspot, sin Claudeforce', () => {
+    const { piece, violations } = plan({ ...example(), line: 'revenue-hubspot' } as Intent)
+
+    expect(violations).toEqual([])
+    expect(filesOf(piece)).toEqual(['public/images/logos/axis/hubspot-isotype.svg'])
+    expect(fs.existsSync(path.resolve(__dirname, '../../../..', 'public/images/logos/axis/hubspot-isotype.svg'))).toBe(true)
+    expectCode(() => plan({ ...example(), line: 'revenue-hubspot', platformMark: AUTH } as Intent), 'invalid-intent')
+  })
+
   it('con su autorización, el logotipo del asistente y el wordmark Claudeforce componen', () => {
     const { slots, piece, violations } = plan({ ...example(), assistantMark: AUTH, platformMark: AUTH } as Intent)
 
