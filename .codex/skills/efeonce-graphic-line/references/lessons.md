@@ -899,7 +899,7 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md` lista cada
   propuesta a AXIS.
 - **Portada de propuesta sin pregunta, sin parche.** El script de SGS que retira la pregunta
   (`quitar-pregunta-portada.mjs`) es el parche que el operador no quiere. AXIS ya tiene `cover-proposal` ·
-  `orbit-decision` (`axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`), pero Greenhouse fija 0.3.4x y
+  `orbit-decision` (publicada en AXIS v0.7.6: `axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`; referencia aprobada `cover-proposal-orbit-decision-assetplan`), pero Greenhouse fija 0.3.4x y
   no la ve hasta TASK-2014. Regla mientras tanto: armar la portada a mano con las medidas del token
   (`portada-orbit-decision.css` de la corrida), como la A01 aprobada ([criteria.md](criteria.md), caso SGS).
 - **El compositor no emite enlaces en el PDF.** Para que la tarjeta de agenda de `decision-next-steps` lleve a

@@ -528,16 +528,16 @@ la corrida. No promueve recetas nuevas ni registra `approvedUses`.
 
 - **Portada sin pregunta (a mano, aprobada).** Una portada de propuesta no lleva voz pregunta-respuesta
   ([criteria](../../../../.claude/skills/efeonce-graphic-line/references/criteria.md), caso SGS). AXIS ya tiene la
-  composición: `cover-proposal` · layout `orbit-decision` (AXIS `axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit
-  `9e72d38`): titular de decisión con su esfera, eyebrow y evidencia, sin pregunta ni anillo. Greenhouse fija
+  composición: `cover-proposal` · layout `orbit-decision` (publicada en AXIS v0.7.6: `axis-ui-contracts` 0.7.6 /
+  `axis-tokens` 0.6.6, commit `9e72d38`): titular de decisión con su esfera, eyebrow y evidencia, sin pregunta ni anillo. Greenhouse fija
   `axis-tokens` 0.3.41 / `axis-ui-contracts` 0.3.40 y no la ve hasta
   [TASK-2014](../../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md). Mientras
   tanto, A01 se compuso con la receta `cover-proposal` (`orbit`) y la hoja de la corrida
   `portada-orbit-decision.css`, que oculta la pregunta y aplica las medidas del token: titular «Servicio / Managed CRM»
   en Bricolage 760, 92 px / 0,95, desde y 458, con la esfera `#e86bd0` de 0,2 em; eyebrow como chip en 404–446;
-  evidencia en y 667, 28 px / 1,3, ancho 724. La **referencia aprobada** de `orbit-decision` será esta A01, con la nota
-  de que su eyebrow como chip de contorno es un pedido del operador sólo para este deck; la sube a AXIS la sesión de
-  línea gráfica cuando salga v0.7.6. El script `quitar-pregunta-portada.mjs` de la propuesta SGS no se usa: es el
+  evidencia en y 667, 28 px / 1,3, ancho 724. La **referencia aprobada** de `orbit-decision` es esta A01
+  (`cover-proposal-orbit-decision-assetplan`, commit AXIS `e1d392c`, sale con `axis-tokens` 0.6.7), con la nota de que
+  su eyebrow como chip de contorno es una variante pedida por el operador sólo para este deck. El script `quitar-pregunta-portada.mjs` de la propuesta SGS no se usa: es el
   parche que el operador no quiere.
 - **`content-live-chat` sirve para HubSpot.** El chip «Conectado a…» tenía fijo el logo de Salesforce; el operador lo
   rechazó en este deck («no forces nada, sino consigues la receta haz una nueva, no parches»). Desde `c0e435b38` el
@@ -766,7 +766,7 @@ La aprobación visual de las seis familias de TASK-1928 y de la portada con sele
 | Pendiente | Dónde | Estado |
 |---|---|---|
 | Logo dentro de la órbita en el cierre | contraportadas | **sin resolver**: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
-| Portada de propuesta sin pregunta | `cover-proposal` (`cover-proposal-orbit`, `-dawn`) | **abierto en Greenhouse:** los layouts `orbit` y `dawn` exigen `voice.question`. AXIS `axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6 (commit `9e72d38`) suma `orbit-decision`, sin pregunta ni anillo; entra con [TASK-2014](../../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md). Hasta entonces, la portada se arma a mano con las medidas del token (caso Assetplan, «La propuesta Assetplan»), nunca retirando la pregunta con un script |
+| Portada de propuesta sin pregunta | `cover-proposal` (`cover-proposal-orbit`, `-dawn`) | **abierto en Greenhouse:** los layouts `orbit` y `dawn` exigen `voice.question`. AXIS v0.7.6 publicada (`axis-ui-contracts` 0.7.6 / `axis-tokens` 0.6.6, commit `9e72d38`) suma `orbit-decision` (referencia aprobada `cover-proposal-orbit-decision-assetplan`), sin pregunta ni anillo; entra con [TASK-2014](../../../tasks/to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md). Hasta entonces, la portada se arma a mano con las medidas del token (caso Assetplan, «La propuesta Assetplan»), nunca retirando la pregunta con un script |
 | Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2, LN4 y CR4 sin isotipo compuesto (en `CR4` el bordado ya era el oficial y la `b` de `foto:isotipo` traía un parche: registro cine §16.7) | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
 | Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck. **Resuelto el 2026-09-28** el caso de `cover-brochure-line-brand`, que repetía `CR2b` con `proposal-cinematic-creative`: la portada tiene su plate propio, `CR4` ([registro cine §16.7](../../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto)) |
 
