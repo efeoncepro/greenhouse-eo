@@ -26,7 +26,8 @@ permissions:
 jobs:
   coverage:
     name: Coverage and deep test observability
-    runs-on: ubuntu-latest
+    # Playwright 1.59.1 has no chromium-headless-shell build for Ubuntu 26.04.
+    runs-on: ubuntu-24.04
     # 2026-07-18: subido de 20 junto con el timeout del step Coverage (10→17);
     # setup (checkout+install+playwright) toma ~3 min — 20 quedaba sin holgura.
     # 2026-10-12: 25 → 40, junto con el step Coverage (21 → 32).

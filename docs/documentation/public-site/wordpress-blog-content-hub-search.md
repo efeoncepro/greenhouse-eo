@@ -351,3 +351,7 @@ no duplicar contenido indexado.
 - `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
 - `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`
 - `docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`
+
+## Suscripción del blog — estado 20/10/2026
+
+Publicación detenida por el operador; el reemplazo por Growth Forms queda en develop y en revisión visual: un correo personal o corporativo y consentimiento explícito. El sitio continúa usando CF7. [Preparación, evidencia y bloqueos](../../audits/public-site/2026-10-20-blog-growth-form-preparation.md); no hay suscripción HubSpot ni medición GA4 certificadas todavía.

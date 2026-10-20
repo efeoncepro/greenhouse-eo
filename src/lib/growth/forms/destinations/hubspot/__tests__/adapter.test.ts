@@ -87,6 +87,71 @@ describe('buildSecureSubmitBody', () => {
   })
 })
 
+describe('legalConsentOptions.communications (suscripción de marketing)', () => {
+  const MARKETING_TEXT = 'Quiero recibir novedades y contenidos de Efeonce. Puedes darte de baja cuando quieras.'
+
+  const MARKETING_MAPPING = {
+    ...VALID_MAPPING,
+    communications: [{ checkboxKey: 'marketing_updates', subscriptionTypeId: 535702717, text: MARKETING_TEXT }],
+  }
+
+  const consentWith = (checkboxes: unknown): FormConsentSnapshotRow => ({ ...consent(), checkboxes_json: checkboxes })
+
+  const communicationsOf = (body: Record<string, unknown>) =>
+    (body.legalConsentOptions as { consent: { communications: unknown[] } }).consent.communications
+
+  it('casilla marcada + subscriptionTypeId declarado → envía la suscripción con el texto exacto', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith(['contact_permission', 'marketing_updates']), MARKETING_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([{ value: true, subscriptionTypeId: 535702717, text: MARKETING_TEXT }])
+    expect((body.legalConsentOptions as { consent: { consentToProcess: boolean } }).consent.consentToProcess).toBe(true)
+  })
+
+  it('casilla NO marcada → no envía suscripción', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith(['contact_permission']), MARKETING_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([])
+  })
+
+  it('casilla marcada pero el destino no declara subscriptionTypeId → no envía suscripción', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith(['contact_permission', 'marketing_updates']), VALID_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([])
+  })
+
+  it('snapshot con checkboxes_json no-array → no envía suscripción', () => {
+    const body = buildSecureSubmitBody(submission(), consentWith({ marketing_updates: true }), MARKETING_MAPPING)
+
+    expect(communicationsOf(body)).toEqual([])
+  })
+
+  it('declaración mal formada → failed invalid_communications_mapping antes del POST', async () => {
+    vi.stubGlobal('fetch', vi.fn())
+
+    const result = await deliverToHubSpotForms({
+      submission: submission(),
+      consent: consentWith(['marketing_updates']),
+      destination: destination({ ...VALID_MAPPING, communications: [{ checkboxKey: 'marketing_updates', subscriptionTypeId: '535702717', text: MARKETING_TEXT }] }),
+      env: ENV_ON,
+    })
+
+    expect(result).toMatchObject({ status: 'failed', errorClass: 'invalid_communications_mapping', retryable: false })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('entrega real: el POST lleva la suscripción sólo cuando la casilla viene marcada', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 }))
+
+    await deliverToHubSpotForms({ submission: submission(), consent: consentWith(['marketing_updates']), destination: destination(MARKETING_MAPPING), env: ENV_ON })
+    await deliverToHubSpotForms({ submission: submission(), consent: consentWith([]), destination: destination(MARKETING_MAPPING), env: ENV_ON })
+
+    const [marked, unmarked] = (fetch as ReturnType<typeof vi.fn>).mock.calls.map(call => JSON.parse(call[1].body))
+
+    expect(marked.legalConsentOptions.consent.communications).toEqual([{ value: true, subscriptionTypeId: 535702717, text: MARKETING_TEXT }])
+    expect(unmarked.legalConsentOptions.consent.communications).toEqual([])
+  })
+})
+
 describe('deliverToHubSpotForms', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())

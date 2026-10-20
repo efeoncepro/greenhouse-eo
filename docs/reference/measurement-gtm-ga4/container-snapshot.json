@@ -1,5 +1,5 @@
 {
-  "name": "Efeonce Ads consented online + scoped receipts 2026-10-18",
+  "name": "Blog Glitch subscription sign_up 2026-10-20",
   "tags": [
     {
       "name": "Efeonce Ads - confirmed conversion transport",
@@ -1525,6 +1525,159 @@
       "consentSettings": {
         "consentStatus": "notSet"
       }
+    },
+    {
+      "name": "GA4 Event - sign_up",
+      "type": "gaawe",
+      "parameter": [
+        {
+          "type": "boolean",
+          "key": "sendEcommerceData",
+          "value": "false"
+        },
+        {
+          "type": "list",
+          "key": "eventSettingsTable",
+          "list": [
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_slug"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_slug}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "form_kind"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - form_kind}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "surface_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - surface_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "event_id"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - correlation_id}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "meta_ads_consent"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - meta_ads_consent}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "analytics_consent"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "{{DLV - analytics_consent}}"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "meta_only"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "0"
+                }
+              ]
+            },
+            {
+              "type": "map",
+              "map": [
+                {
+                  "type": "template",
+                  "key": "parameter",
+                  "value": "meta_capi_page_view"
+                },
+                {
+                  "type": "template",
+                  "key": "parameterValue",
+                  "value": "0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "template",
+          "key": "eventName",
+          "value": "sign_up"
+        },
+        {
+          "type": "template",
+          "key": "measurementIdOverride",
+          "value": "G-KYPPY57M14"
+        }
+      ],
+      "firingTriggerId": [
+        "80"
+      ],
+      "consentSettings": {
+        "consentStatus": "notSet"
+      }
     }
   ],
   "triggers": [
@@ -1544,6 +1697,28 @@
               "type": "template",
               "key": "arg1",
               "value": "gh_form_submission_accepted"
+            }
+          ]
+        }
+      ],
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{DLV - form_kind}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "subscribe"
+            },
+            {
+              "type": "boolean",
+              "key": "negate",
+              "value": "true"
             }
           ]
         }
@@ -1691,6 +1866,44 @@
               "type": "template",
               "key": "arg1",
               "value": "greenhouse_cta_viewed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CE - Growth Forms subscription accepted",
+      "type": "customEvent",
+      "customEventFilter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{_event}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "gh_form_submission_accepted"
+            }
+          ]
+        }
+      ],
+      "filter": [
+        {
+          "type": "equals",
+          "parameter": [
+            {
+              "type": "template",
+              "key": "arg0",
+              "value": "{{DLV - form_kind}}"
+            },
+            {
+              "type": "template",
+              "key": "arg1",
+              "value": "subscribe"
             }
           ]
         }
