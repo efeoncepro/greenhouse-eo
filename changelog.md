@@ -2,12 +2,12 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
-## 2026-10-19 — Partnerships y expedientes de distribuidores
+## 2026-10-20 — Partnerships y expedientes de distribuidores
 
 - Conciliados Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL con identidad, evidencia y pendientes separados.
 - Nexsys: formulario corregido y once respaldos enviados; readback Outlook/adjuntos y HubSpot SENT confirmado.
 - [Manual](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md), política Outlook y cuatro skills en Codex/Claude incorporan revisión integral, separación de notas internas, autoridad de firma y control de adjuntos.
-- Sin nuevos envíos, contratos, pedidos ni cambios de acceso en el cierre documental.
+- [Directorio](docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md): 27 personas, 8 buzones, fuentes y rebotes; cuatro skills Codex/Claude enlazadas. Microsoft verificado y Geraldine informada. Sin nuevos envíos al consolidar contactos.
 
 ## 2026-10-19 — Customer Agent Voice: caso ANAM y guía operativa
 

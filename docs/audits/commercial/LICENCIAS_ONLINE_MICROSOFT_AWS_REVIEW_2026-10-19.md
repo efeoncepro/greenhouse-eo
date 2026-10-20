@@ -3,11 +3,11 @@ Fecha de revisión: 2026-10-19. Fuentes: Outlook de Julio, documentación oficia
 
 ## Resultado
 
-**Corte documental de cierre 19/10:** las observaciones posteriores de portales sustituyen las incertidumbres iniciales del correo. No se hizo una nueva revisión de respuestas en este cierre.
+**Estado Microsoft actualizado al 20/10, 17:21 Chile:** verificación completa, Partner/Reseller Authorized e Indirect Reseller Active. Geraldine y Camila ya recibieron la captura y la consulta de habilitación comercial. Los demás carriles conservan la fecha de evidencia indicada; el historial inferior distingue cada revisión.
 
 | Pendiente vigente | Responsable / acción |
 |---|---|
-| Microsoft IDV del perfil 6857772 | Julio: Account Settings → Legal Entity Info → Verification Summary → Identity Verification; aviso posterior al estado Active |
+| Microsoft IDV y autorización | **Completado 20/10:** todas las verificaciones Verified; Partner/Reseller Authorized e Indirect Reseller Active; correo Microsoft confirma perfil 6857773 |
 | CSP: MFA e ingresos TTM | Julio + Diana/Daniela/CSP Chile: comprobar requisito concreto y atribución al CSP ID 6857773 |
 | Azure y facturación LOL | LOL: conciliar dirección antigua, pago/crédito, circuito de pedidos y soporte. Catálogo AZURE PLAN visible; sin aprovisionamiento |
 | AWS Partner Central | Julio: completar acceso/verificación vigente; no reutilizar el código histórico |
@@ -16,7 +16,7 @@ Fecha de revisión: 2026-10-19. Fuentes: Outlook de Julio, documentación oficia
 
 No repetir aceptación del MPA ni crear otra cuenta. [Procedimiento y control de identidades](../../manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
 
-- **Microsoft:** Partner Center autenticado con `jreyes@efeoncepro.com` confirma Efeonce Group SpA, verificación legal **Authorized** y **Indirect Reseller Active**. Contacto de seguridad completado y guardado. Microsoft Partner Agreement mayo 2026 v7 **aceptado con autorización explícita de Julio**, readback 19/10/2026; MFA e ingresos TTM todavía sin verificar.
+- **Microsoft, readback 20/10:** Partner Center autenticado con `jreyes@efeoncepro.com` confirma Efeonce Group SpA, verificación legal **Authorized** y **Indirect Reseller Active**. Contacto de seguridad completado y guardado. Microsoft Partner Agreement mayo 2026 v7 **aceptado con autorización explícita de Julio**, readback 19/10/2026; MFA e ingresos TTM todavía sin verificar.
 - **AWS:** términos aceptados el 06-10-2025 y relación de distribución con LOL Chile ejecutada/autorizada por Amazon el 08-10-2025. No se encontró revocación en la búsqueda; estado operativo actual y crédito sin readback.
 - **Azure:** SmartHub autenticado `.com`/CL muestra **AZURE PLAN, SKU AAA-14108**, en Microsoft CSP for VARs. Catálogo disponible no acredita suscripción aprovisionada, crédito ni circuito de facturación acordado con LOL.
 - **Crédito LOL:** pendiente según última evidencia localizada del 01-09-2026; separado del registro y acceso al portal, que Julio declaró ya habilitado el 31-08-2026.
@@ -132,3 +132,32 @@ Partner Center → Customers → Indirect providers confirma **Licencias On Line
 Por solicitud de Julio se revisaron correo y Correo no deseado: sin código AWS previo. Se solicitó **un** reenvío en Partner Central; el portal confirmó envío y Outlook recibió `AWS Partner Network Login Email Verification` de `apn-no-reply@amazon.com` a las **21:00:40 UTC / 18:00:40 Chile**, mensaje terminado en `AQRIanuAAA=`. Código no registrado en documentación. Verificación pendiente de Julio en Site Login; no se cambió contraseña.
 
 Se detectaron nuevos avisos de Microsoft a las 20:50–20:51 UTC para **Efeonce Group SpA, perfil 6857772**: requieren verificación de identidad de al menos un usuario y credenciales verificables con Microsoft Authenticator/proveedor IDV. Correo leído terminado en `AQRI4oPAAA=`. Ruta indicada: Account Settings → Legal Entity Info → Verification Summary → Identity Verification. Este es un requisito adicional pendiente; no invalida por inferencia la aceptación MPA ni la relación LOL ya verificadas, y el estado Active observado anteriormente no prueba cumplimiento de esta nueva exigencia.
+
+## Capturas y respuesta a Geraldine — 2026-10-20
+
+- Geraldine Gonzalez (`gvgonzalez@licenciasonline.com`) confirmó que es la AM asignada y que Efeonce Group SpA está registrada con su MPN ID en LOL. Pidió capturas de CSP y Account Settings para comprobar la autorización Reseller; Camila Orellana queda en copia.
+- Readback autenticado de hoy: Overview identifica **jreyes@efeoncepro.com**; Identifiers → CSP conserva **6857773**, Efeonce Group SpA, Santiago CL. El contacto `.cl` es histórico y no corresponde al login utilizado.
+- **Estado actual observado:** Legal info → Partner y Reseller muestran **Verification status Pending**, con aviso para completar la verificación. El estado Authorized/Active del 19-10 queda como observación histórica y no debe presentarse como estado vigente. No se modificaron datos, permisos ni acuerdos durante esta revisión.
+- Julio autorizó capturar y responder. Enviado a Geraldine el **20-10-2026 a las 11:42:36 Chile / 14:42:36 UTC**, CC `corellana@licenciasonline.com`, CCO `48713323@bcc.hubspot.com`, firma gráfica oficial. Se consultó qué falta para resolver Pending, su efecto sobre las transacciones y la habilitación de Microsoft 365/Azure Plan.
+- Readback independiente de Enviados confirmó destinatarios, firma y tres adjuntos JPEG: `01-Account-Settings-cuenta.jpg` (76.488 bytes), `03-Account-Settings-Reseller.jpg` (101.861 bytes), `04-CSP-MPN-6857773.jpg` (69.094 bytes). [Correo enviado](https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQSWNuFAAA%3D&exvsurl=1&viewmodel=ReadMessageItem).
+- HubSpot confirmó **EMAIL SENT 119068669763**. [Registro](https://app.hubspot.com/contacts/48713323/objects/0-49?filters=%5B%7B%22property%22%3A%22hs_object_id%22%2C%22operator%22%3A%22EQ%22%2C%22value%22%3A%22119068669763%22%7D%5D&utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=search). Envío y registro confirmados; respuesta, regularización y autorización operativa pendientes.
+
+## Verificación presentada — 2026-10-20, revisión 16:57 Chile
+
+Julio autorizó enviar solo el certificado de vigencia que había cargado. Cuenta confirmada `jreyes@efeoncepro.com`. Se corrigió la dirección histórica con el e-RUT leído localmente: Dr. Manuel Barros Borgoño 71, oficina 1105, piso 11, Providencia, Región Metropolitana, Chile; código postal opcional vacío. Nombre de contacto completado a Julio César Reyes Rangel. El portal indica que Next designa a este contacto como primario y que la información empresarial también actualiza la cuenta de facturación Microsoft.
+
+Se confirmó la declaración de exactitud y representación y se pulsó Submit una vez. **Submitted details** confirmó la presentación, con único archivo `Vigencia-Octube-26CReX5XJmqpB5.pdf`; no se adjuntó e-RUT ni documento de dominio.
+
+Readback final en Verification status: **In progress**, contacto **Verified**, identidad **In progress**, empresa **In Progress - Microsoft Action**. Microsoft informa: **Verification has started. No further actions are needed from you at this time.** Presentación recibida, aprobación pendiente; no equivale a autorización comercial o activación de Azure. WHOIS/factura/registro de dominio eran respaldos complementarios y el portal aceptó continuar sin ellos. Sin nuevos correos. Evidencia local: `microsoft-2026-10-20/08-verificacion-en-proceso.jpg` en las visualizaciones de esta conversación.
+
+
+## Verificación aprobada y respuesta a Geraldine — 2026-10-20, 17:21 Chile
+
+- Microsoft confirmó por correo a las 17:16 la verificación del perfil **Efeonce Group SpA, 6857773**. Readback autenticado: Verification Summary **Verified**, con Contact, Identity, Business y Additional verification **Verified**. El certificado de vigencia fue el único respaldo presentado; no se necesitó adjuntar WHOIS ni e-RUT para obtener este resultado.
+- Partner Center → Legal info → Partner y Reseller muestran **Authorized**. Reseller → Program info muestra **Indirect Reseller: Active**. El MPA conserva la aceptación del **19/10/2026** por Julio Reyes Rangel; no hay nueva aceptación pendiente observada. Esta evidencia sustituye Pending/In progress de las revisiones anteriores.
+- Discrepancia pendiente de conciliar: Partner Center todavía muestra la dirección histórica Las Bellotas 199 y el contacto primario `.cl`, aunque la solicitud de verificación se corrigió con el domicilio de Providencia. No se afirma que la actualización se haya propagado ni se hicieron nuevos cambios. Login utilizado: `jreyes@efeoncepro.com`.
+- MFA e ingresos CSP TTM siguen sin comprobar: la página MFA está retirada y Eligibility Dashboard corresponde a Direct Bill. Esto no contradice el estado Active, pero tampoco acredita esos requisitos. La relación con Licencias On Line S.A ya estaba verificada; aún faltan confirmación comercial, condiciones de pago/facturación y circuito de primer cliente/aprovisionamiento.
+- Con autorización expresa de Julio, respuesta enviada **17:21:47 Chile / 20:21:47 UTC** desde `jreyes@efeoncepro.com` a **Geraldine Gonzalez** (`gvgonzalez@licenciasonline.com`), CC **Camila Orellana** (`corellana@licenciasonline.com`), CCO `48713323@bcc.hubspot.com`, con firma gráfica oficial. Informa Authorized/Active y pregunta qué falta para cotizar/vender Microsoft 365 y Azure, habilitación SmartHub, primer cliente, aprovisionamiento, pago y facturación.
+- Enviados y listado de adjuntos verificados independientemente: un único JPEG **10-csp-authorized-active.jpg**, **78.410 bytes**, no inline. Firma gráfica y destinatarios comprobados visualmente en la copia enviada. [Correo enviado](https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQSWNuJAAA%3D&exvsurl=1&viewmodel=ReadMessageItem).
+- HubSpot portal **48713323** confirma **EMAIL 119142026297 — SENT**, creado 20:22:09 UTC, con asunto y cuerpo coincidentes. [Registro](https://app.hubspot.com/contacts/48713323/objects/0-49?filters=%5B%7B%22property%22%3A%22hs_object_id%22%2C%22operator%22%3A%22EQ%22%2C%22value%22%3A%22119142026297%22%7D%5D&utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=search). Envío y registro confirmados; no equivalen a respuesta ni a un primer pedido aprobado por LOL.
+- Evidencia local en visualizaciones de esta conversación: `microsoft-2026-10-20/10-csp-authorized-active.jpg` y `11-geraldine-enviado.jpg`.

@@ -1,13 +1,13 @@
 # Handoff
 
-## 2026-10-19 — Partnerships: identidades, habilitación y expediente Nexsys
+## 2026-10-20 — Partnerships: contactos, habilitación y expediente Nexsys
 
 Adobe `.com`/AM17480390 Registered: Code of Conduct100%, Certified recibido; aprobación pendiente.
 Nexsys: 12PDF enviados19:14Chile a Francisco, CC Jean/Javiera/Constanza, firma gráfica/CCO; Outlook y EMAIL118974219069 SENT verificados. Formulario sin firma para revisión; crédito/Marketplace/capacitación pendientes.
 Google `.org`: Cloud/Workspace indirecto activo/Ingram, handshake completo; respuesta comercial y formación pendientes.
-Microsoft `.com`: CSP activo/MPA aceptado, IDV nuevo pendiente; AWS SmartHub sin habilitación y Partner Central por verificar.
+Microsoft `.com` 20/10: Verified, Authorized e Indirect Reseller Active; correo a Geraldine/CC Camila enviado17:21 con captura/firma, EMAIL119142026297 SENT. Respuesta comercial LOL pendiente; AWS SmartHub/Partner Central por verificar.
 [Registro y auditorías](docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) · [manual y controles](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
-Skills Codex/Claude: identidad antes de altas, entrega externa sin notas internas, lista de adjuntos y evidencia por estado. Sin nuevos envíos ni contratos en este cierre.
+[Directorio](docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md):27 personas,8 buzones, fuentes/rebotes; índice nominal en cuatro skills Codex/Claude. Antes de contactar, leer ficha e hilo; sin nuevos envíos en la consolidación del directorio.
 
 ## 2026-10-19 — ANAM: voz de Emma activa y conocimiento operativo
 

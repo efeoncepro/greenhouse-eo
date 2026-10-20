@@ -6,7 +6,9 @@ Método consolidado el 19-10-2026 a partir de Adobe/Nexsys, Google/Ingram y Micr
 ## Fuentes y continuidad
 
 El [registro maestro](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) posee el estado vigente;
-las auditorías fechadas conservan evidencia y cronología. Este manual posee el procedimiento reusable.
+las auditorías fechadas conservan evidencia y cronología. El [directorio de contactos](../../operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md)
+conserva todas las personas identificadas, correos, funciones, mesas y rebotes de estos carriles.
+Este manual posee el procedimiento reusable.
 Aplica el [modelo de partners/providers](../../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md)
 y la [decisión de envío Outlook](../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Antes de continuar, leer el resumen vigente de la auditoría, no ejecutar otra vez sus pasos históricos.
@@ -29,7 +31,7 @@ Identidades verificadas en este caso (recomprobar al operar; estado en el regist
 |---|---|
 | Adobe / Nexsys | `jreyes@efeoncepro.com`, Efeonce Group SpA, AM17480390. AM17088718 abandonada; AM17452854 corresponde a otra razón social según Jean |
 | Google / Ingram | Google con `julio.reyes@efeonce.org`; correo comercial/alta Ingram con `.com`. No intercambiar ambos por conveniencia |
-| Microsoft / LOL | Login `.com`; CSP transaccional 6857773. Perfil legal 6857772 tiene un requerimiento separado de identidad; contacto histórico `.cl` no cambia el login |
+| Microsoft / LOL | Login `.com`; CSP transaccional 6857773. Perfil legal 6857772 y CSP 6857773 se trazan por separado; consultar el estado de verificación vigente en el registro, no reabrir el requerimiento histórico resuelto. Contacto histórico `.cl` no cambia el login |
 | AWS / SmartHub LOL | `.com`, país CL. Acceso SmartHub y autenticación Partner Central se verifican por separado |
 
 ## Estados que deben registrarse por separado
