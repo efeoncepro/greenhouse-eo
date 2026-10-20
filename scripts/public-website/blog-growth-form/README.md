@@ -1,6 +1,6 @@
 # Suscripción del blog → Growth Forms
 
-Estado: **publicación detenida; trabajo conservado en develop y preview para revisión**. No reanudar release ni cutover sin nueva instrucción. Pedido del operador del 20/10/2026.
+Estado: **diseño aprobado y preparación verificada en develop; publicación detenida**. No reanudar release ni cutover sin nueva instrucción. Pedido del operador del 20/10/2026.
 
 ## Contrato preparado
 
@@ -32,6 +32,16 @@ pnpm exec tsx scripts/public-website/blog-growth-form/preview.ts
 ```
 
 Sin flag, el preparador no escribe en Greenhouse. `--apply-draft` crea/reusa un único draft y lo deja en revisión; nunca publica. Rechaza versiones/ownership inesperados. Preview usa el renderer de producción y contrato interceptado sobre el blog real, bloquea cualquier POST de Forms y sólo elige cookies esenciales. No prueba aceptación ni entrega. Artefactos en `.captures/2026-10-20-blog-growth-form/`.
+
+## Verificar preparación sin publicar
+
+```sh
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/verify-blog-subscription-prepared.ts
+pnpm gtm:snapshot --check
+pnpm exec tsx scripts/public-website/blog-growth-form/build-host-styles.ts --check
+```
+
+El primer comando sólo lee Forms/HubSpot/GTM y escribe evidencia local. Verifica review sin versiones publicadas, igualdad del contrato con la preview, campos, consentimiento, captcha, destino, exclusión comercial y vínculo tag→trigger. Prepara la corrección local de medición: `gh_newsletter_subscription_accepted`, no `sign_up` (alta de cuenta). Web7 sigue con el nombre anterior; el snapshot no se modifica para fingir una publicación. El activador histórico GTM rechaza flags de escritura. [Estado completo y pendientes](../../../docs/audits/public-site/2026-10-20-blog-growth-form-preparation.md).
 
 ## Activación y verificación
 

@@ -1,6 +1,41 @@
 # Growth Form de suscripción del blog — preparación 20/10/2026
 
-**Status real: publicación detenida por el operador; conservar trabajo en develop y revisar preview.** Sin merge ni release a main, sin cutover WordPress y sin envío real. HubSpot nativo y GTM Web7 ya estaban aplicados antes de la detención. Forms permanece review y el blog conserva CF7. La autorización de publicación anterior quedó revocada; no reanudarla sin instrucción nueva. Los apartados siguientes conservan el historial.
+**Status real: diseño aceptado por el operador y preparación verificada en develop; publicación detenida.** Sin merge, push, release a main, cutover WordPress ni envío real en esta revisión. El blog conserva CF7 y Forms permanece en review. HubSpot nativo y GTM Web7 fueron aplicados antes de la detención. La autorización anterior de publicación sigue revocada.
+
+## Verificación final de preparación — 20/10/2026, 22:14 UTC
+
+- [x] Diseño aceptado en móvil/escritorio; composición de marca guardada en `038316cfe`, sólo develop local.
+- [x] Lectura independiente de Forms: versión `fver-c6b28627-385c-43fc-995d-588bc0290fd0` en review, ninguna versión publicada. Compilación para publicación PASS y contrato idéntico al de la preview aprobada.
+- [x] Email único requerido, sintaxis de correo y emailPolicy off: admite Gmail/personal/corporativo. Consentimiento requerido y sin preselección, privacidad visible, Turnstile requerido.
+- [x] HubSpot portal48713323 releído: formulario `8c7cf91b-a1c9-4cbe-9d8c-cac773692561`, email sin dominios bloqueados, marcador oculto de ocurrencia, consentimiento al tipo activo535702717 y lifecycle subscriber. Mapping de consentimiento y texto idénticos al contrato del motor.
+- [x] Fuera de publicidad: fuente no comercial, Google Ads no elegible, cero políticas comerciales publicadas para esta identidad. Sin activar Meta/UPD/Ads.
+- [x] GTM Web7/Server10 sin drift con los snapshots. Lectura del vínculo real tag→trigger confirma aceptación servidor + kind subscribe, excluida de generate_lead. El tag de Meetings generate_lead conserva su disparador separado.
+- [x] Browser1440/390/320: correo inválido rechazado, Gmail válido exige consentimiento, cero POST submit y cero eventos accepted. Verificación opcional de email interceptada y abortada, sin tráfico de prueba hacia Forms. TypeScript y ESLint PASS.
+- [x] 133 pruebas PASS: renderer/compilador/adapter HubSpot (103), telemetría y políticas (30). Sin contactos ni conversiones sintéticos enviados.
+- [ ] Publicación del evento editorial corregido: pendiente de autorización y preview gobernada.
+- [ ] Release compatible del worker, publicación Forms y sustitución WP: detenidos por el operador.
+- [ ] Turnstile real, entrega/ocurrencia HubSpot, estado SUBSCRIBED y recepción GA4 de la misma suscripción: requieren el flujo publicado y un envío autorizado; no acreditados por estas pruebas.
+
+### Corrección semántica de medición
+
+El operador observó que `sign_up` corresponde al alta de una cuenta. Confirmado en la [referencia oficial de GA4](https://developers.google.com/analytics/devguides/collection/ga4/reference/recommended-events); Google muestra un evento custom para newsletter en su [guía de eventos](https://developers.google.com/analytics/devguides/collection/ga4/events). La elección inicial fue incorrecta.
+
+La preparación local corrige **el mismo tag**, sin añadir otro: `gh_form_submission_accepted` + `form_kind=subscribe` → **`gh_newsletter_subscription_accepted`**, conforme a la gramática custom `gh_` del repositorio. Significa solicitud aceptada por Greenhouse, no creación de cuenta ni entrega/suscripción confirmada en HubSpot. Conserva `form_slug`, `form_kind`, `surface_id` y correlación, sin correo ni PII; no se marca key event ni se activa publicidad en esta operación.
+
+**La versión activa Web7 aún usa `sign_up`.** El snapshot se conserva como verdad de lo publicado. `measurement-correction.preview.json` es sólo una propuesta local con versión/fingerprint esperados; no acredita workspace, Quick Preview ni publicación. El activador histórico Web7 rechaza sus flags de escritura para impedir reutilizar esa taxonomía por accidente. No activar el formulario antes de revisar y publicar la corrección con autorización nueva.
+
+Verificador reproducible (lectura de Forms/HubSpot/GTM y escritura de evidencia local solamente):
+
+```sh
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/verify-blog-subscription-prepared.ts
+pnpm gtm:snapshot --check
+pnpm exec tsx scripts/public-website/blog-growth-form/build-host-styles.ts --check
+pnpm exec tsx scripts/public-website/blog-growth-form/preview.ts
+```
+
+Evidencia local: `.captures/2026-10-20-blog-growth-form/{prepared-readback.json,measurement-correction.preview.json,preview-evidence.json}`. Ningún comando de esta lista publica ni envía una suscripción. La preview bloquea todos los POST de Forms, incluida la verificación opcional del email.
+
+## Historial de preparación (los estados de abajo son del momento descrito)
 
 ## Hechos verificados
 
@@ -26,7 +61,7 @@ El snapshot versionado GTM tiene `generate_lead` con trigger genérico `gh_form_
 
 ## Corrección visual solicitada por el operador
 
-Primera preview vertical rechazada como pesada. La composición candidata usa `host.css` con correo y botón contiguos, consentimiento sin tarjeta y jerarquía compacta; mantiene controles/estado/validación en el renderer. El preview verifica alineación de input/CTA además de overflow y errores. No está publicada ni aprobada visualmente por el operador.
+Primera preview vertical rechazada como pesada. La composición candidata usa `host.css` con correo y botón contiguos, consentimiento sin tarjeta y jerarquía compacta; mantiene controles/estado/validación en el renderer. El preview verifica alineación de input/CTA además de overflow y errores. En este corte inicial aún no estaba aprobada; la versión refinada fue aceptada posteriormente, como se registra arriba.
 
 ## Activación autorizada — 20/10/2026
 

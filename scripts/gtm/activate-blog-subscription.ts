@@ -10,6 +10,8 @@ const base = 'accounts/6291647045/containers/218104216',
   out = '.captures/2026-10-20-blog-growth-form/gtm-state.json'
 
 async function main() {
+  assert(!process.argv.some(flag => ['--build', '--freeze', '--publish'].includes(flag)),
+    'Historical Web7 sign_up activator retired. Use verify-blog-subscription-prepared.ts for the local newsletter correction; publication requires new operator authorization.')
   const source = await new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] }).getClient()
 
   const auth = new Impersonated({

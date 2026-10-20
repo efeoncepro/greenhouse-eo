@@ -15,10 +15,12 @@ async function main() {
     for (const width of [1440, 390, 320]) {
       const page = await browser.newPage({ viewport: { width, height: 1000 } })
       let blockedSubmits = 0
+      const blockedPaths: string[] = []
 
       await page.route('**/api/public/growth/forms/**', async route => {
         if (route.request().method() !== 'GET') {
-          blockedSubmits++
+          if (new URL(route.request().url()).pathname.endsWith('/submit')) blockedSubmits++
+          blockedPaths.push(new URL(route.request().url()).pathname)
           await route.abort()
 
           return
@@ -85,7 +87,7 @@ async function main() {
         formKey: node.querySelector('greenhouse-form')?.getAttribute('form-key'),
         fieldCount: node.querySelectorAll('input[type="email"]').length,
         checkboxes: node.querySelectorAll('input[type="checkbox"]').length,
-        checked: node.querySelector('input[type="checkbox"]')?.hasAttribute('checked'),
+        checked: node.querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked,
         submit: node.querySelector('button[type="submit"]')?.textContent,
         formOverflow: node.scrollWidth > node.clientWidth,
         controlStyles: Array.from(node.querySelectorAll('.ghf-control,.ghf-input,.ghf-btn')).map(n => ({
@@ -162,6 +164,30 @@ async function main() {
       const errors = await target.locator('[aria-invalid="true"]').count()
 
       assert(errors > 0, 'Missing inline errors')
+      await target.locator('input[type="email"]').fill('invalid-email')
+      await target.locator('button[type="submit"]').click()
+      assert((await target.locator('[aria-invalid="true"]').count()) > 0, 'Invalid email must be rejected')
+      await target.locator('input[type="email"]').fill('preview+newsletter@gmail.com')
+      await target.locator('button[type="submit"]').click()
+      assert(
+        (await target.textContent())?.includes(contract.copy['newsletter_consent.error.required']),
+        'Consent must remain required with a valid Gmail address'
+      )
+      assert.equal(blockedSubmits, 0, 'Invalid input and missing consent must not reach submit')
+      assert(
+        blockedPaths.every(path => path.endsWith('/verify-email')),
+        'Only optional email verification may be attempted; every request stays blocked'
+      )
+      assert.equal(
+        await page.evaluate(
+          () =>
+            ((window as unknown as { dataLayer?: Record<string, unknown>[] }).dataLayer ?? []).filter(
+              event => event.event === 'gh_form_submission_accepted'
+            ).length
+        ),
+        0,
+        'Validation must not emit a conversion'
+      )
 
       const events = await page.evaluate(() =>
         ((window as unknown as { dataLayer?: Record<string, unknown>[] }).dataLayer ?? [])
@@ -169,7 +195,18 @@ async function main() {
           .map(e => ({ event: e.event, form_kind: e.form_kind, form_slug: e.form_slug }))
       )
 
-      evidence.push({ width, ...info, errorsOnEmptySubmit: errors, blockedSubmits, events, previewOnly: true })
+      evidence.push({
+        width,
+        ...info,
+        errorsOnEmptySubmit: errors,
+        invalidEmailRejected: true,
+        gmailRequiresConsent: true,
+        acceptedEvents: 0,
+        blockedSubmits,
+        blockedFormsRequests: blockedPaths.length,
+        events,
+        previewOnly: true
+      })
       await page.close()
     }
   } finally {

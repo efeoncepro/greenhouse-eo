@@ -102,9 +102,9 @@ Leyenda tagging: `✅` taggeado y verificado en GA4 · `⏳` pendiente · `n/a` 
 
 | Formulario | Kind / surface | Estado dataLayer | GA4 previsto | Key event | Tagging |
 | --- | --- | --- | --- | --- | --- |
-| `efeonce-blog-subscription` | `subscribe` / `fhsf-efeonce-blog-subscription` | `gh_form_viewed` verificado en preview desktop/390; sin envío | `gh_form_submission_accepted` → `sign_up`, excluido de `generate_lead` | no | ⏳ GTM Web7 publicado; form en review y primer evento real pendiente |
+| `efeonce-blog-subscription` | `subscribe` / `fhsf-efeonce-blog-subscription` | `gh_form_viewed` verificado en preview desktop/390; sin envío | `gh_form_submission_accepted` → `gh_newsletter_subscription_accepted` (preparado local); excluido de `generate_lead` | no | ⏳ Corrección de Web7 pendiente: live aún sign_up; form review, sin publicación autorizada |
 
-[Estado, identidad y bloqueos](../../audits/public-site/2026-10-20-blog-growth-form-preparation.md). Google renovado; Web7 verificado live: subscribe → sign_up, excluido de generate_lead. Server10 preservado. No activar Ads/Meta/UPD para esta suscripción ni declarar tagging efectivo desde la preview.
+[Estado, identidad y bloqueos](../../audits/public-site/2026-10-20-blog-growth-form-preparation.md). Readback20/10: Web7 todavía subscribe → sign_up, excluido de generate_lead; Server10 sin drift. El nombre sign_up es incorrecto para newsletter: corrección local al evento custom `gh_newsletter_subscription_accepted`, pendiente de publicación autorizada. El evento mide la solicitud aceptada, no la preferencia SUBSCRIBED de HubSpot. No activar Ads/Meta/UPD ni declarar tagging efectivo desde la preview.
 
 ## CTAs
 

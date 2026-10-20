@@ -71,6 +71,10 @@ GA4 publica un **vocabulario de eventos recomendados** (`generate_lead`, `sign_u
 2. **Si NO existe equivalente GA4** (comportamiento propio del producto: `gh_form_viewed`, `gh_form_submission_rejected`, `gh_cta_viewed`) → **evento custom `gh_<object>_<action>`**.
 3. **Patrón dual (recomendado para el momento de conversión):** mantener el `gh_*` granular para gobernanza/funnel interno **y** disparar/derivar el recomendado GA4 para reporting. En GA4 se puede hacer con un GA4 Event tag adicional en GTM, o con "Create event" derivando `generate_lead` desde `gh_form_submission_accepted`. Pro: conservas granularidad interna + heredas features GA4. Contra: dos eventos que mantener alineados.
 
+### Newsletter no es alta de cuenta — precisión20/10/2026
+
+`sign_up` corresponde a una cuenta nueva ([Google](https://developers.google.com/analytics/devguides/collection/ga4/reference/recommended-events)). Para newsletter, Google ejemplifica un custom event ([guía](https://developers.google.com/analytics/devguides/collection/ga4/events)); Greenhouse aplica su gramática `gh_`. La solicitud aceptada de una suscripción editorial se reporta como `gh_newsletter_subscription_accepted`, reutilizando el evento interno genérico y `form_kind=subscribe`. No implica entrega ni opt-in confirmado por HubSpot. La corrección del blog está preparada sólo en develop; Web7 todavía tiene el mapping anterior ([estado](../../audits/public-site/2026-10-20-blog-growth-form-preparation.md)).
+
 ### Tabla de mapeo Greenhouse (canónica)
 
 | Evento interno `gh_*` | Momento | GA4 recomendado | Key event | Trato |
@@ -79,6 +83,7 @@ GA4 publica un **vocabulario de eventos recomendados** (`generate_lead`, `sign_u
 | `gh_form_started` | primera interacción | (GA4 auto `form_start` existe, reservado) | no | custom `gh_` (no colisiona; el reservado es de enhanced measurement) |
 | `gh_form_submitted` | click submit (intent) | (GA4 auto `form_submit` existe, reservado) | no | custom `gh_` |
 | **`gh_form_submission_accepted`** | **lead válido (outcome)** | **`generate_lead`** | **sí** | **dual → dispara también `generate_lead`** |
+| `gh_form_submission_accepted` + `form_kind=subscribe` | solicitud editorial aceptada por el motor | —; custom `gh_newsletter_subscription_accepted` | no por defecto | Excluir de `generate_lead` y `sign_up`; entrega/preferencia HubSpot se verifican aparte. Preparado local20/10, publicación pendiente. |
 | `gh_form_submission_rejected` | rechazo servidor | — | no | custom |
 | `gh_form_asset_accessed` | descarga lead magnet | `select_content` (opcional) | opcional | custom, dual si aplica |
 | `gh_cta_clicked` | click CTA | `select_content` (opcional) | opcional | custom; dual solo si el CTA representa selección de contenido |
