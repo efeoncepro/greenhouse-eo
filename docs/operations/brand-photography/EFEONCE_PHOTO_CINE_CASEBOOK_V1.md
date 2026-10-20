@@ -1,7 +1,7 @@
 # Registro cine · el casebook — cómo se hace, en la práctica
 
-> **Tipo:** guía operativa (oficio) · **Versión:** 1.8 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
-> **Última actualización:** 2026-10-18 por Claude (1.8: fallas 50 a 55 de las fotos del menú del sitio — la UI de producto como mockup o recorte, la pose que «presiona» la interfaz, la toma plana que se resuelve con acabado de luz, la placa descartada tomada de una carpeta mixta y el recorte del onepage. Antes, 2026-10-16, por Claude, 1.7: fallas 44 a 49 del brochure oficial «Agencia de Marketing 360°» — composición generativa con piezas reales del cliente, reponer su contenido exacto, el logo de cliente como vinilo, el punch cinematográfico, la producción creíble, la interfaz de vidrio y la mitad visible de la lámina. Antes, 2026-10-06, por Codex, 1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
+> **Tipo:** guía operativa (oficio) · **Versión:** 1.9 · **Creado:** 2026-10-02 por la sesión de la línea gráfica
+> **Última actualización:** 2026-10-20 por Claude (1.9: fallas 56 a 58 de la contraportada de propuesta Revenue — recolorear no sirve, la órbita lleva su anatomía completa y el cierre no es un retrato; receta `BR3h` y dos huecos del compilador para tomas de espaldas. Antes, 2026-10-18, 1.8: fallas 50 a 55 de las fotos del menú del sitio — la UI de producto como mockup o recorte, la pose que «presiona» la interfaz, la toma plana que se resuelve con acabado de luz, la placa descartada tomada de una carpeta mixta y el recorte del onepage. Antes, 2026-10-16, por Claude, 1.7: fallas 44 a 49 del brochure oficial «Agencia de Marketing 360°» — composición generativa con piezas reales del cliente, reponer su contenido exacto, el logo de cliente como vinilo, el punch cinematográfico, la producción creíble, la interfaz de vidrio y la mitad visible de la lámina. Antes, 2026-10-06, por Codex, 1.6: prueba Nexa Nano Banana 2.1, puente explícito al CLI local y comparación visual acotada con NX7d; APROBABLE no incorpora receta. 1.5: `SA1` aprobada por el operador — falla 40 decidida como precedente acotado — y séptima receta cine del brochure en el índice. 1.4: fallas 36 a 43 del brochure Agencia Creativa — la deriva al centro por geometría, la mirada hacia el texto como tic, la identidad de Julio exagerada a distancia media, el monitor como llave con `luz-motivada`, las personas del cliente como extras, el modelo que dibuja marcas, el equipo vintage y la mano de «Aprobación»; seis recetas cine nuevas (`SA1` quedó fuera del índice hasta la decisión del operador). 1.3: fallas 32 a 35 del brochure de servicios HubSpot — el objeto deriva hacia la reserva, el objeto al otro lado del sujeto, el acento como puntuación y el tic de pose. 1.2: fallas 29 a 31 — el modelo esquiva la oclusión, la pose repetida de Nexa por expresiones en tres cuartos puestas primeras y la cara afinada por un ancla frontal más estrecha que el canon: [Nexa: pose y proporción](#nexa-pose-y-proporción-2026-10-03--lo-que-aprendimos). Las filas 21–28 del elenco en grupo son del mismo día. 1.1: el escenario del login de Greenhouse, TASK-1964 — fallas 14 a
 > 20, personajes de casting con retrato ancla, el alcance que falta para una superficie de producto y tres fotos
 > aprobadas: [Escenario del login](#escenario-del-login-de-greenhouse-2026-10-02--lo-que-aprendimos))
 > **Canon que manda:** [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) (alcance, cámara, luz, color, plantilla).
@@ -92,7 +92,7 @@ hay una prenda del kit **o el traje biónico de Nexa**, y el lecho «matte, non-
 light». Con el traje, además, quita el smartwatch y el anillo de los accesorios de Nexa (los antebrazos son placas y la
 pantalla del reloj competía con la única fuente de luz; prueba ciega del 2026-10-02).
 
-## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»; 44–49 en «Brochure Agencia de Marketing 360°»; 50–55 en «Fotos del menú del sitio»)
+## Las fallas, con su corrección (1–10 aquí; 11–13 en «Prueba ciega del 2026-10-02»; 14–20 en «Escenario del login»; 21–29 en «Elenco en grupo»; 30–31 en «Nexa: pose y proporción»; 32–35 en «Brochure de servicios HubSpot»; 36–43 en «Brochure Agencia Creativa»; 44–49 en «Brochure Agencia de Marketing 360°»; 50–55 en «Fotos del menú del sitio»; 56–58 en «Contraportada de propuesta Revenue»)
 
 Cada fila es un caso real. **La columna «chequeo» dice quién la atrapa hoy.**
 
@@ -139,6 +139,7 @@ foto cine nueva, se agrega ahí **y** en esta tabla.
 | `WB1c` | portada Engine, `proposal-cinematic-web` | desarrollador | el polo del kit editado: bordado en el pecho | `2026-09-26_deck-web/fichas/WB1c/` |
 | `LG1` | escenario del login, novedad AI Visibility (`alcance: nexa`) | Nexa (traje) + 1 Spark en el hombro | atrapa UNA tarjeta de respuesta entre miles congeladas en el aire; un haz azul engine; la tarjeta es la llave | `2026-10-02_login-escenario/fichas/LG1-ai-visibility-nexa.json` |
 | `LG2e` | escenario del login, novedad «Escalar producción creativa» (`alcance: producto`) | directora creativa de **casting** con hoodie | UNA órbita naranja cerrada de larga exposición cerrada con flash de segunda cortina; la esfera sobre la palma es la llave; seis piezas de campaña sobre el anillo. Parte de `NX6b`: la órbita cerrada dice «ella dirige» | `2026-10-02_login-escenario/fichas/LG2e-escalar-produccion-orbita.json` |
+| `BR3h` | contraportada de propuesta `revenue-hubspot` (`close-proposal` · `horizon`; reemplaza a BR3 en esa línea) | Nexa de espaldas (softshell, `espalda-mujer`) | último cuadro de película: camina hacia el anillo en bruma; órbita con su anatomía completa (hilo tenue azul, arco corto rosado, esfera en la punta) | `2026-10-20_propuesta-assetplan/fichas/BR3h.json` |
 
 Aprobadas por el operador el 2026-10-02 (TASK-1964). **Pendiente:** sumar `LG1` y `LG2e` a
 `scripts/foto/cine-recetas.json` (lo hace la sesión dueña del índice). `LG3e`, la tercera foto aprobada del login, **no
@@ -479,3 +480,35 @@ fotografiados desde su concepto editorial, no desde sus portadas; y **nunca Juli
 
 **Pendientes que este casebook no resuelve:** las fotos todavía no están en el bucket público (va con TASK-2041) y el
 menú no existe en el sitio: el encabezado de Ohio sigue vivo hasta que se acepte PDR-027.
+
+## Contraportada de propuesta Revenue (2026-10-20) — lo que aprendimos
+
+Propuesta de Assetplan (Managed CRM, línea `revenue-hubspot`). BR3, la contraportada de horizonte aprobada el
+2026-09-27, tiene la luz teal de Growth, y el operador la rechazó para Revenue. La aprobada, `BR3h` («Me quedo con esta»),
+salió en la cuarta ruta. Ficha, prompt y la cadena completa de pasos en `ai-generations/2026-10-20_propuesta-assetplan/`
+(`fichas/BR3h.json`, `LEEME.md`).
+
+**Tres fallas nuevas, con su corrección.**
+
+| # | Síntoma | Causa | Corrección | Caso | Chequeo |
+|---|---|---|---|---|---|
+| 56 | **Recolorear una foto aprobada para otra línea se nota** (operador: «se nota mucho, sobre todo en la esfera»; y después: «quedó en exceso rosado») | Una rotación de tono cambia todo lo teal y la esfera queda con un color falso; repintar la luz por inpaint convierte el acento en la luz de la escena (contra la regla del 2026-10-06) | **No recolorear**: se genera la toma de nuevo desde una receta de la línea con la luz de Efeonce (`--desde CMP-crm-B`) y la composición de la foto original | BR3r, BR3r2 (descartadas) | ojo del operador |
+| 57 | **La órbita se ve artificial con el punto de acento suelto** (operador: «se ve súper artificial la órbita con ese punto rosado allí») | Pedir «rosado sólo en la esfera» dio un aro de neón grueso con la esfera suelta arriba, sin arco: contra el manual §1.3 («siempre en la punta del arco, nunca suelta») | En la escena, la **anatomía completa**: hilo fino y tenue de luz de Efeonce (`#0375DB` y blanco frío) · **arco corto en el acento** (unos 50°, arriba a la izquierda, 200° a 250°) · **esfera en la punta del arco**, del mismo trazo y apenas más ancha · halo bajo, sin partículas ni destellos. El acento como puntuación es el arco y la esfera, nunca la esfera sola. **BR3 y BR4 tienen la esfera suelta**: su revisión queda como pregunta al operador | BR3h v1 (descartada) → v2 → v3 | ojo al 100 % sobre la órbita |
+| 58 | **La contraportada se lee como retrato** | Al pedir más presencia, Nexa ocupó tres cuartos del alto y el cierre perdió la sensación de final | Escala de BR3 (Nexa ≈ 54 a 60 % del alto, medido en el plate y no en la ficha: la ficha de BR3 pide «un cuarto» y el plate no lo cumple), centrada en el anillo, con bruma que envuelve la órbita y **sin primer plano** (`lecho: "sin-lecho"` con `sinLechoPorque`): una tarima junto al lente se leía como un recorte negro de canto duro | BR3h v2 → v3 | medir la altura del sujeto en el plate |
+
+**También del caso.** En la vista de espaldas, el modelo inventó un isotipo corrido al hombro. Se borró con
+`pnpm ai:inpaint erase` y se compuso el logotipo oficial con `pnpm foto:isotipo --marca logotipo --sin-limpiar --acabado`:
+con la limpieza automática los hombros quedaban cuadrados contra la bruma. La regla 8 (ningún texto cruza la órbita) se
+mide en la pieza **compuesta**, no en el plate: el compositor recorta el plate y el anillo puede quedar sobre el eslogan
+(la v2 lo tocaba: «Revenue» termina en x 1035). Se corrigió corriendo la escena a la derecha con espejo del borde oscuro.
+
+**Dos huecos del compilador** (los levantó `cine-reviewer`; **sin corregir**, porque tocan `scripts/foto/build-prompt.mjs`
+y lo usan todas las fotos):
+
+- La softshell, y probablemente la bomber, no declaran `tipoPorVista` para las vistas de espalda con logotipo: el macro
+  pide «NO letters» aunque la espalda lleve «efeonce» y «Empower your Growth».
+- Con el sujeto de espaldas, los bloques KEY LIGHT y MOTIVATED LIGHT siguen pidiendo la cara modelada.
+
+Mientras no se corrijan: en una toma de espaldas, declara en la escena que la cara no se ve y que el contraluz no tiene
+relleno, y revisa la marca de la espalda al 100 %.
+
