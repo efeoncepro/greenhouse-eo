@@ -160,6 +160,33 @@ ahí se justifica más el monto».
 - Si hay **UF/UTM**, exprésalo como piden (ver indexación en `pricing-garantias-finance.md`).
 - Firma/timbre según se exija.
 
+### Cargos de terceros, línea única del portal y documento aparte (Gana GRD-1541, 20/10/2026)
+
+Caso: programática para Gana / Grupo Réditos (Colombia), oferta conjunta Efeonce · Basis DSP, enviada en
+Wherex el 20/10/2026. Expediente: `docs/commercial/tenders/gana-programatica-colombia-1541-2026/README.md`.
+
+- **Cuando el RFP pide discriminar «honorarios, comisiones, costos tecnológicos»**, la línea de Efeonce se
+  nombra «Fee de gestión Efeonce (honorarios)». Todos los cargos se presentan como contratados y facturados
+  por Efeonce: en la lámina al cliente no va «según proveedor» ni «al costo sin recargo». Es un cambio de
+  rótulo y presentación; los montos no se tocan.
+- **Si el portal pide la «Propuesta económica» como documento aparte**, se genera un PDF de una página con la
+  lámina económica del deck.
+- **La línea única del portal no siempre puede llevar el total facturable.** Se ofertó sólo el fee mensual
+  (COP 4.500.000) y el comentario de la línea declaró los demás cargos al costo: medios (COP 30 M/mes),
+  plataforma DSP (5 %) e inventario premium (20 % por deal). Alternativas evaluadas y descartadas: el total
+  facturable (quedaba sobre el presupuesto del comprador) y un «todo incluido» dentro del tope (contradecía
+  la lámina económica). La elección es del operador; lo que no se transa es que portal, comentario y lámina
+  digan lo mismo.
+
+### RFP en Excel del comprador: llenar sólo lo del oferente
+
+Si el comprador entrega un .xlsx de requisitos, se llena **sólo la hoja del oferente** (en el caso
+«Requisitos técnicos»: Cumple con la lista CUMPLE/NO CUMPLE, página del PDF donde se acredita y
+observación). Se edita el XML interno del .xlsx para conservar logo, comentarios y validaciones de datos:
+openpyxl no estaba instalado y exceljs pierde partes del archivo. Se guarda como copia con el nombre del
+oferente; el original del comprador no se toca. Cada «CUMPLE» apunta a una página real del PDF entregado
+y entra a la matriz de cumplimiento.
+
 ## Oferta administrativa — anexos y declaraciones juradas
 
 Los típicos (varían por bases — lee siempre):

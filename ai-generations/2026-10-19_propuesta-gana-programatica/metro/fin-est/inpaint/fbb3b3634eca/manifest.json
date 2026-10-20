@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "fbb3b3634eca",
+  "key": "fbb3b3634ecaa3b177908d90337060323d0190f34facc2bffe728c3ec86fe591",
+  "status": "completed",
+  "createdAt": "2026-10-20T11:42:52.737Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-comp.png",
+    "imageSha256": "df762636e52d4f17df7b0e17305d646a1d00a8674a340a114e504ba1ba3a2206",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-est-fin.png",
+    "maskSha256": "cf3c45dd950ed17388fcdb20612ab715aa9f7b2700a29e5bb4a06e6e6ac72eff",
+    "maskConvention": "white-editable",
+    "width": 3264,
+    "height": 2448,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Photographic finishing only. Inside the masked areas there are LED advertising surfaces that are already correct: a row of pitch-side LED perimeter boards and the giant video scoreboard. Keep their layout, every word, the logo, the colors and their position exactly as they are. Only make them look physically photographed in this stadium at night by this same phone camera: the bright emissive glow of LED panels, faint visible LED module grid and the small seams between board segments, the slight bloom and haze typical of LED screens under floodlights, the same sharpness, noise and white balance as the rest of the photo, and a soft green light spill from the boards onto the track and grass right in front of them. Do not redraw, restyle or move any text or logo.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nPhotographic finishing only. Inside the masked areas there are LED advertising surfaces that are already correct: a row of pitch-side LED perimeter boards and the giant video scoreboard. Keep their layout, every word, the logo, the colors and their position exactly as they are. Only make them look physically photographed in this stadium at night by this same phone camera: the bright emissive glow of LED panels, faint visible LED module grid and the small seams between board segments, the slight bloom and haze typical of LED screens under floodlights, the same sharpness, noise and white balance as the rest of the photo, and a soft green light spill from the boards onto the track and grass right in front of them. Do not redraw, restyle or move any text or logo.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.015575314582532359,
+    "editable": 122540,
+    "soft": 1911,
+    "protected": 7865821
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3264,
+      "height": 2448
+    },
+    "target": {
+      "width": 2208,
+      "height": 1664
+    },
+    "aspectError": 0.0048309178743961186,
+    "reason": "la zona con contexto ocupa 54 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0736,
+    "basis": "1 × salida 2208x1664 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 41.1,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.26,
+        "bestError": 3.26,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -2.63,
+        6.88,
+        -1.42
+      ],
+      "protected": {
+        "pixels": 7865821,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 122540,
+        "maxDelta": 235,
+        "meanDelta": 41.65,
+        "worst": {
+          "x": 1128,
+          "y": 1756
+        }
+      },
+      "seam": {
+        "pixels": 1911,
+        "maxDelta": 49,
+        "meanDelta": 5.857,
+        "worst": {
+          "x": 1531,
+          "y": 1913
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7865821,
+        "maxDelta": 248,
+        "meanDelta": 9.46,
+        "worst": {
+          "x": 1777,
+          "y": 2246
+        }
+      },
+      "outputUsd": 0.0736,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3362,
+        "input_tokens_details": {
+          "image_tokens": 3060,
+          "text_tokens": 302
+        },
+        "output_tokens": 2452,
+        "output_tokens_details": {
+          "image_tokens": 2452,
+          "text_tokens": 0
+        },
+        "total_tokens": 5814
+      },
+      "meta": {
+        "size": "2208x1664",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

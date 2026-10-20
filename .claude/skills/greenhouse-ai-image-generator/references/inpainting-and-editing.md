@@ -1,7 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
 > **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
-> `ai-generations/2026-10-19_google-partner-freeze/`). Esto es el playbook operativo: intención → comando → modelo → flags →
+> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -26,6 +26,7 @@ Herramienta **out-of-band** (`scripts/ai/inpaint/**`): nunca la importa `src/app
 | Retocar la piel de una cara | ❌ medido 2026-10-02: no la arregla; la piel se resuelve en el **retrato ancla** |
 | Generar, borrar, mover o reconstruir un **logo o marca** | ❌ nunca con IA: la guarda de marca lo bloquea; el logo es el vector compuesto después. `--allow-brand` sólo si el prompt nombra la marca y la edición toca el **contexto** |
 | Reiluminar un objeto pegado | `place --finish element --model gpt-image-2.5-sunburst` (único que conservó el objeto, 2026-10-03); `fal:iclight-v2` y `fal:image-apps-relighting` conectados pero deforman o recolorean (§7) |
+| Mostrar un anuncio **exacto** en una superficie real (DOOH, mockup en foto) | ✅ composición geométrica + acabado Sunburst y traslado de luz (§9) |
 
 ## 1. La garantía y cómo leer el resultado
 
@@ -177,3 +178,37 @@ pipeline ya hace). El canon cine no cambia: el plate se regenera, no se relumina
 - BFL FLUX Tools (outpainting y erase propios, fuera de fal): requiere cuenta BFL del operador. Sin conectar.
 - `foto:expandir` delegando en el núcleo → TASK-1925. Video con VACE + SAM2 → task aparte. `--batch` → pendiente.
 - `fal:seedance25-edit` en video: sólo contrato, sin canario.
+
+## 9. Simular un anuncio exacto en una superficie real (DOOH, mockup en foto)
+
+Caso fuente: propuesta Gana GRD-1541 (2026-10-19/20), cuatro simulaciones en Medellín (Metro estación Bello,
+estadio Atanasio Girardot, estación Aguacatala, C. C. Santafé). Herramientas y salidas:
+`ai-generations/2026-10-19_propuesta-gana-programatica/metro/` (ver `LEEME.md` del expediente).
+
+**El principio:** la pieza del cliente es **exacta** (texto, cifras, logo, legales); la IA sólo aporta **luz y
+acabado**. Nunca se le pide al modelo que dibuje el anuncio.
+
+1. **Foto con licencia:** buscarla en Wikimedia Commons por API y anotar autor + licencia (`FUENTE-foto.txt`); la
+   **atribución va en la lámina**. **CC BY-SA obliga a publicar la imagen intervenida bajo la misma licencia**;
+   CC BY sólo pide atribución.
+2. **Revisar marcas de terceros visibles en la foto** antes de usarla: en el estadio se veía un tapete de Betsson,
+   competidor directo del cliente.
+3. **Pieza exacta:** el anuncio del cliente en HTML → PNG a su tamaño de referencia.
+4. **Composición geométrica (sin IA):** homografía con supersampling (`metro/tools/warp.cjs`; para superficies
+   curvas, por franjas). Para dejar delante plantas, focos o personas, máscara de recorte por color de la superficie
+   original.
+5. **Acabado:** `pnpm ai:inpaint image` con `--model gpt-image-2.5-sunburst` sobre la composición, para que la pieza
+   tome la luz, el reflejo y el grano de la escena.
+6. **Sunburst reescribe el texto chico** (legales, eslóganes, cifras pequeñas). Por eso la salida final **no** es el
+   acabado: se conserva la pieza exacta y sólo se traslada la luz del acabado.
+   - Texto grande — `metro/tools/transfer.cjs`: dentro de la máscara, `exacto + k · (blur(acabado) − blur(compuesto))`;
+     fuera, el acabado. Sigma ≈ 8.
+   - Texto chico — `metro/tools/transfer-light.cjs`: sólo luz difusa positiva y derrame, con la pieza apenas suavizada.
+7. **Superficie que no existe en la foto** (pantalla nueva colgada): `pnpm ai:inpaint image` con
+   `gpt-image-2.5-flare` y máscara; el resto queda idéntico bit a bit (PASS, delta 0). Después se compone la pieza
+   exacta encima, como en el paso 4.
+
+🔴 **Trampa medida (sharp):** un PNG de máscara de un canal se lee con **3 canales** si no se usa
+`.extractChannel(0)`; los índices por píxel se desalinean y la máscara sale vacía o corrida, sin error.
+
+**Costo:** las cuatro simulaciones, con iteraciones, ≈ USD 0,50 en total. La lámina se rotula como simulación.

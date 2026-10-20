@@ -1,0 +1,16 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "voice",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-agenda",
+  "voice": { "eyebrow": "Agenda", "question": "¿Qué propone Efeonce?", "answer": ["Cinco", "temas"] },
+  "progress": { "sections": 5, "current": 0 },
+  "topics": ["Lo que necesita Gana", "Modelo y tecnología", "Formatos y DOOH", "Plan y medición", "Inversión y requisitos"],
+  "selected": 0,
+  "selection": { "target": "object", "label": "Gana", "participantKind": "department" }
+}

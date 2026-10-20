@@ -1,0 +1,32 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "voice",
+  "voice": {
+    "eyebrow": "Propuesta técnica y económica · Octubre 2026",
+    "question": "¿Dónde invierto?",
+    "answer": [
+      "Donde rinde"
+    ]
+  },
+  "body": "Preparada para **Gana** · Proceso GRD-1541",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce",
+    "participantKind": "role"
+  },
+  "column": {
+    "topPx": 220
+  },
+  "clientLogo": {
+    "path": "ai-generations/2026-10-19_propuesta-gana-programatica/logos/gana-on-dark.svg",
+    "alt": "Gana"
+  }
+}

@@ -103,6 +103,73 @@ Esta ruta no crea `quoteId`, no costea ni valida margen, no aprueba precios ni e
    hechos confirmados, versión y ruta del resultado, sin copiar el recurso privado de firma al repo.
 6. Firmado no significa presentado: actualizar estado sólo con evidencia de cada acción.
 
+### Oferente extranjero: identidad tributaria y legal (operador, 20/10/2026)
+
+Si las bases piden RUT/NIT y Cámara de Comercio del país del comprador (Colombia, en el caso) y Efeonce oferta
+desde Chile, se cargan en esos campos los equivalentes chilenos de Efeonce Group SpA (77.357.182-1):
+**e-RUT**, **certificado de vigencia** y **certificado de estatuto actualizado** (Registro de Empresas y
+Sociedades). Fuente: OneDrive `Alineación/4. Comercial/Legales/Documentos Efeonce/`.
+
+- Elegir la emisión más reciente leyendo «Fecha de Emisión del Certificado» con `pdftotext`, no por el nombre
+  del archivo: el nombre no garantiza la fecha.
+- Es una práctica confirmada por el operador, no una equivalencia declarada por el comprador. Si las bases
+  exigen registro local como requisito excluyente, se trata como requisito real (consulta o bloqueo).
+
+### Experiencia certificada: sólo evidencia real (Gana GRD-1541, 20/10/2026)
+
+El comprador pidió «Experiencia certificada publicidad programática (2)». Ningún partner entregó certificados
+(ni Basis ni Real Audiences enviaron; Real Audiences tiene casos en su web, sin métricas por NDA). Se cargaron
+referencias reales de clientes de Efeonce aunque no son de programática: carta firmada de SKY Airline (agencia
+creativa 2025, mercados incluida Colombia) y certificado de recibo conforme del Gobierno de Santiago (EP9,
+enero de 2026). El Anexo J de la licitación Agencia Digital de Réditos (oct-2025) se descartó: es una
+autodeclaración de Efeonce y estaba desactualizada.
+
+- 🔴 Nunca inventar experiencia, clientes, nombres ni certificaciones, ni reetiquetar un caso como de otra disciplina.
+- En una oferta conjunta, los clientes del partner se presentan como «clientes de la alianza Efeonce · <partner>»,
+  nunca como experiencia propia de Efeonce sola, y sólo con la evidencia que el partner entregó.
+- Una autodeclaración vieja no es un certificado. Si lo que hay no calza exacto con lo pedido, se carga lo real y
+  se informa al operador el riesgo de puntaje o admisibilidad; no se rellena el hueco.
+
+## Postular en Wherex: runbook medido (Gana / Grupo Réditos GRD-1541, oferta 7543223, 20/10/2026)
+
+Enviada el 20/10/2026 a las 12:09 (Santiago). Expediente:
+[gana-programatica-colombia-1541-2026](../../../docs/commercial/tenders/gana-programatica-colombia-1541-2026/README.md).
+La interfaz cambia entre licitaciones; esto dice dónde mirar, no es contrato del portal. Complementa la anatomía
+medida en Sika 1164 (`wherex-radar-chrome-playwright.md`).
+
+**Navegador.** El navegador del panel de la app (Claude Browser) no sirve para postular: el paso «1. Servicio
+licitado» no dibujó el formulario y no tiene herramienta para adjuntar archivos. Se usa **Claude in Chrome** con
+la sesión del operador: el operador inicia sesión y el agente nunca escribe contraseñas. La sesión de un
+navegador no pasa al otro.
+
+**Paso 1 «Servicio licitado».**
+- Entrar por `?tab=information` y pulsar «Siguiente»: la URL directa `?tab=products` deja el `ui-view` vacío;
+  navegando con «Siguiente» queda `?tab=products#!/index` y la tabla carga.
+- «Ofertar» abre «Nueva Oferta»: Código/SKU (opcional), nombre o descripción corta, cantidad ofrecida, precio
+  unitario sin IVA, moneda (COP por defecto en el caso), comentarios y archivos por línea. «Crear oferta» guarda
+  la línea en el borrador; no envía. «Total Oferta» no considera IVA.
+
+**Paso 2 «Condiciones y archivos adjuntos».**
+- Condiciones: precio incluye entrega (Sí/Otro), plazo de pago (aceptar los 30 días del cliente u «Otro»),
+  validez en días corridos y comentario general. Ninguna se acepta sin aprobación (Comercial/Finance).
+- «Archivos requeridos por el comprador»: cada obligatorio admite **un** archivo. Si uno pide dos documentos
+  (p. ej. «Experiencia certificada (2)»), unirlos en un PDF con `pdfunite`. Opcionales en Administrativos,
+  Técnicos y Económicos. Peso máximo por archivo: 20 MB.
+- Los inputs de los obligatorios son `input[type=file]` ocultos (ng-file-upload), en el mismo orden que las
+  filas. Para cargarlos con `file_upload` se les puso `aria-label` por JS y, **tras cada carga**, se comprobó que
+  la fila correcta quedara en verde «Archivo cargado». Los opcionales entran por `#admFilesInput`,
+  `#tecFilesInput` y `#ecoFilesInput`. Wherex renombra los caracteres no permitidos: registrar el nombre final.
+
+**Paso 3 «Resumen y enviar oferta».** Muestra condiciones, conteo de archivos, la línea y el total, la comisión
+de Wherex si se adjudica (en el caso $72.000 = 1,75 UF), la casilla «He leído y acepto» (bases del comprador y
+términos de Wherex) y «Enviar Propuesta». Antes de marcar y enviar, mostrar ese resumen al operador y obtener
+su OK explícito en el chat: aceptar términos y enviar son el acto de presentación. Tras enviar: estado
+«Enviada» y «Oferta enviada por … el …». Para editar hay que «Retirar oferta» y reenviar antes del cierre.
+
+**Hora de cierre.** En el caso la UI mostró «20/10/2026 18:00» sin zona mientras la invitación decía 14:00 hora
+de Colombia; en Sika 1164 la UI mostró hora de Santiago. No persistir en el CRM una hora dudosa: registrar
+ambas fuentes como «por conciliar» y postular temprano.
+
 ## Seguimiento y continuidad
 
 Leer [follow-up-agent/README.md](../../../docs/commercial/follow-up-agent/README.md) y su registro antes de

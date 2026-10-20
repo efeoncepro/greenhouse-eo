@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "513066d5ae75f14a0872edbaff09d80e36a94715f43a2f9e66015c6bd905d3af",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:gana-on-dark",
+      "path": "ai-generations/2026-10-19_propuesta-gana-programatica/logos/gana-on-dark.svg",
+      "sha256": "c1446aa4203cebb74deade4755a7473681372a5e040b96a309405d8e7edecd37"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}
