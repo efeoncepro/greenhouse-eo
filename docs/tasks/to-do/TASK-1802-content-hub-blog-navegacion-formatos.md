@@ -1,5 +1,17 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-10-20
+
+- **Cabecera y pie: los del sitio, nunca propios.** El hub se arma sin shell propio: hereda la navegación global de
+  PDR-027 (EPIC-055, TASK-2040/2041/2042, sin fecha; hasta entonces `/blog` sigue con el header-6 de Ohio). Deja
+  ~85 px libres arriba para la isla y marca cada sección con `data-site-nav-tone="light|dark"` (arranca en light). El
+  pie no cambia en este programa. La búsqueda del hub va en la portada del hub, porque el menú global no trae búsqueda.
+  Fuente: `docs/architecture/public-site/PUBLIC_SITE_GLOBAL_NAVIGATION_V1.md`.
+- **Una sola suscripción en `/blog` (operador, 2026-10-20):** la del blog, que es la misma que la de Glitch (misma
+  lista: se recibe Glitch cada lunes). La franja de Glitch del mega menú Recursos apunta a ella; el bloque de
+  newsletter del pie lo resuelve quien mantiene el pie.
+- Artifact convergido actualizado: [Content Hub · La órbita](https://claude.ai/artifact/3sQNzMA9kwiqcvdwnVa63D) v5.
+
 ## Delta 2026-10-09
 
 - **Dirección visual convergida con La órbita (en exploración, sin aprobar).** Diseño de partida:
