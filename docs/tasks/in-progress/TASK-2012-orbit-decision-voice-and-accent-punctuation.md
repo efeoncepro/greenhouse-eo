@@ -7,8 +7,12 @@
 - **Slice 2, primera pieza, en AXIS:** `cover-proposal` suma la composición `orbit-decision` (eyebrow, titular en
   `voice.answer` a 92 px en hasta 2 líneas con su esfera, evidencia; sin pregunta) y el contrato admite la voz `decision`
   por composición, con la dominancia 3× medida sobre la evidencia. Commit AXIS `9e72d38`, `axis-tokens` 0.6.6 y
-  `axis-ui-contracts` 0.7.6, tag `v0.7.6`; delta (aa) de `SURFACE_COMPOSITION_DECISION_V1.md`. `orbit` y `dawn` siguen
-  exigiendo la pregunta.
+  `axis-ui-contracts` 0.7.6, tag `v0.7.6` **publicado** (CI con un reintento de una prueba de Firefox de growth, sin
+  relación); delta (aa) de `SURFACE_COMPOSITION_DECISION_V1.md`. `orbit` y `dawn` siguen exigiendo la pregunta.
+- **Referencia aprobada:** la portada de Assetplan, aprobada por el operador («Apruebo»), es
+  `cover-proposal-orbit-decision-assetplan` (commit AXIS `e1d392c`, `axis-tokens` 0.6.7). Se armó a mano con la receta
+  `orbit` más una hoja de estilos que oculta la pregunta: es temporal y se retira con TASK-2014. El eyebrow en chip de
+  contorno es variante de ese deck, no del token.
 - **Greenhouse no la ve todavía:** fija `axis-ui-contracts` 0.3.40 y `axis-tokens` 0.3.41. Llega con TASK-2014 (adopción
   de los paquetes publicados); el Slice 4 de esta task depende de esa adopción. Mientras tanto la portada de Assetplan
   se arma a mano en su canvas con las medidas del token, documentada como lámina a mano.
