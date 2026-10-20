@@ -1,5 +1,17 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Avance acotado — etapa 1 local, 20/10/2026
+
+El operador autorizó implementar la primera etapa en develop y mostrar el blog completo, sin publicar.
+[Candidato, contrato y pendientes](../../../scripts/public-website/blog-phase1/README.md) ·
+[revisión visual](../../ui/reviews/2026-10-20-blog-phase1.md). Runtime en worktree propio develop;
+preparación en Greenhouse develop. No cierra esta task multiformato: búsqueda, filtros, colecciones,
+registro completo de recursos y gates de publicación siguen pendientes. No se modifica el lifecycle global.
+
+### Dirección visual elegida después de la primera revisión
+
+El operador rechazó el candidato inicial por falta de impacto de agencia y seleccionó la **opción 2 de Product Design**. Implementada localmente con portada navy, imagen protagonista y texto editorial editable; `data-site-nav-tone` del intro ahora es `dark`. El shell global sigue heredado. [QA y capturas de la implementación](../../../scripts/public-website/blog-phase1/design-qa.md). No cambia el lifecycle: gates Elementor/Forms/HubSpot/GA4 y publicación continúan abiertos.
+
 ## Delta 2026-10-20
 
 - **Cabecera y pie: los del sitio, nunca propios.** El hub se arma sin shell propio: hereda la navegación global de

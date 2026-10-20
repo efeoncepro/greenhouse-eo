@@ -4,6 +4,12 @@
 > Runtime repo: `/Users/jreye/Documents/efeonce-public-site-runtime`.
 > This registry is the public-site counterpart to `docs/architecture/ui-platform/PRIMITIVES.md`; it does not govern the private Greenhouse app primitives.
 
+## Candidato local: BlogSection — 20/10/2026
+
+`greenhouse_blog_section` en `eo-elementor-widgets`, sólo en develop y sin desplegar.
+SSR con lecturas WordPress, selector nativo de sección, assets scoped y host Growth Forms existente.
+No reemplaza primitivas compartidas. [Contrato técnico y gates pendientes](../../../scripts/public-website/blog-phase1/README.md).
+
 ## Purpose
 
 Public-site primitives are reusable modules for Efeonce public pages and landings. They may be Elementor widgets, host adapters for Greenhouse-owned renderers, or approved landing patterns that have not yet graduated into their own widget.

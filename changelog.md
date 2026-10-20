@@ -1,5 +1,10 @@
 # changelog.md
 
+## 2026-10-20 — Blog etapa 1: consultas y composición preparadas
+
+- Candidato local en develop: seis artículos y tres Glitch sin duplicados, temas dinámicos, objetivos con destinos,
+  recursos verificados y suscripción aprobada. Opción 2 elegida: portada navy y hero editorial. QA 1440/1024/390/320; no publicación. [Paquete](scripts/public-website/blog-phase1/README.md).
+
 [Historial interno](docs/changelog/internal/README.md).
 
 ## 2026-10-20 — Partnerships y expedientes de distribuidores

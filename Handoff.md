@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-20 — Blog etapa 1: candidato local en develop
+
+Implementación y preview autorizadas, publicación no autorizada. Runtime aislado en
+`../efeonce-public-site-runtime-develop` (`develop`); Greenhouse en `develop`. Consultas dinámicas,
+Glitch, temas, objetivos, recursos y formulario aprobado. Opción 2 de Product Design elegida e implementada: portada navy y arte protagonista; [QA](scripts/public-website/blog-phase1/design-qa.md). [Contrato, evidencia y pendientes](scripts/public-website/blog-phase1/README.md).
+No push, CMS write, merge, release, GTM ni envío real. Etapa 2 y validación productiva pendientes.
+
 ## 2026-10-20 — Partnerships: contactos, habilitación y expediente Nexsys
 
 Adobe `.com`/AM17480390 Registered: Code of Conduct100%, Certified recibido; aprobación pendiente.

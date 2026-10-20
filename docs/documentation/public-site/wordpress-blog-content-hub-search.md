@@ -9,6 +9,14 @@
 > `ohio-child`, parent `ohio`
 > **Auditoria base:** `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
 
+## Preparación local — etapa 1, 20/10/2026
+
+Candidato en `develop`, sin publicar: consultas dinámicas, carril Glitch, temas no vacíos,
+objetivos con destinos reales, dos recursos y formulario aprobado. Novedades se oculta
+sin posts de los últimos 120 días; los archivos existentes se conservan. Búsqueda,
+filtros y colecciones quedan en etapa 2. [Contrato, estado y reproducción](../../../scripts/public-website/blog-phase1/README.md).
+El modelo vigente descrito abajo sigue siendo el productivo hasta un cutover autorizado.
+
 ## Para Que Sirve
 
 Este documento fija como funciona hoy el blog publico de Efeonce en WordPress y
