@@ -12,7 +12,7 @@ async function main() {
   const evidence = []
 
   try {
-    for (const width of [1440, 390]) {
+    for (const width of [1440, 390, 320]) {
       const page = await browser.newPage({ viewport: { width, height: 1000 } })
       let blockedSubmits = 0
 
@@ -56,6 +56,9 @@ async function main() {
           form.textContent = 'Activa JavaScript para cargar el formulario de suscripción.'
           host.append(form)
           node.replaceChildren(host)
+          // Match the planned Elementor HTML widget, including its outer identity.
+          node.parentElement?.classList.replace('elementor-widget-ohio_contact_form', 'elementor-widget-html')
+          node.parentElement?.setAttribute('data-widget_type', 'html.default')
         },
         { key: contract.form.formKey, surface: contract.surfacePolicy.surfaceId }
       )
@@ -74,6 +77,7 @@ async function main() {
         .locator('#hs-eu-cookie-confirmation')
         .waitFor({ state: 'hidden', timeout: 10000 })
         .catch(() => undefined)
+      await page.evaluate(() => document.fonts.ready)
       await target.scrollIntoViewIfNeeded()
       await page.waitForTimeout(800)
 
@@ -93,15 +97,15 @@ async function main() {
           transform: getComputedStyle(n).transform,
           display: getComputedStyle(n).display
         })),
-        tallNodes: Array.from(node.querySelectorAll('*'))
-          .filter(n => n.getBoundingClientRect().height > 450)
-          .map(n => ({
-            tag: n.tagName,
-            cls: n.className,
-            height: n.getBoundingClientRect().height,
-            minHeight: getComputedStyle(n).minHeight
-          })),
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        widgetHeight: node.parentElement!.getBoundingClientRect().height,
+        formHeight: node.querySelector('greenhouse-form')!.getBoundingClientRect().height,
+        bandHeight: node.closest('.elementor-element-2ee4ef0')!.getBoundingClientRect().height,
+        fonts: Array.from(document.fonts)
+          .filter(font => font.family.startsWith('EoBlog'))
+          .map(font => ({ family: font.family, status: font.status })),
+        actionColor: getComputedStyle(node.querySelector('.ghf-btn')!).backgroundColor,
+        actionInk: getComputedStyle(node.querySelector('.ghf-btn')!).color,
         renderer: (customElements.get('greenhouse-form') as unknown as { version?: string })?.version
       }))
 
@@ -114,7 +118,9 @@ async function main() {
       const emailTop = info.controlStyles.find(c => c.cls === 'ghf-input')!.top
       const buttonTop = info.controlStyles.find(c => c.cls === 'ghf-btn')!.top
 
-      assert(Math.abs(emailTop - buttonTop) < 1, 'Email and button must align')
+      if (width > 320) assert(Math.abs(emailTop - buttonTop) < 1, 'Email and button must align')
+      assert(Math.abs(info.widgetHeight - info.formHeight) < 1, 'Host must follow natural form height')
+      assert(info.fonts.length === 3 && info.fonts.every(font => font.status === 'loaded'), 'Brand fonts must load')
       await target.locator('greenhouse-form').screenshot({ path: resolve(out, `form-${width}.png`) })
       await page.screenshot({ path: resolve(out, `blog-${width}.png`) })
 
@@ -138,6 +144,19 @@ async function main() {
 
       if (band)
         await page.locator('[data-eo-blog-preview-band]').screenshot({ path: resolve(out, `band-${width}.png`) })
+
+      // Load images along the existing page before capturing the full blog context.
+      const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+
+      for (let y = 0; y < pageHeight; y += 800) {
+        await page.evaluate(top => window.scrollTo(0, top), y)
+        await page.waitForTimeout(120)
+      }
+
+      await page.evaluate(() => window.scrollTo(0, 0))
+      await page.waitForTimeout(400)
+      await page.screenshot({ path: resolve(out, `blog-full-${width}.png`), fullPage: true })
+      await target.scrollIntoViewIfNeeded()
       await target.locator('button[type="submit"]').click()
       assert.equal(blockedSubmits, 0, 'Empty form must not reach submit')
       const errors = await target.locator('[aria-invalid="true"]').count()

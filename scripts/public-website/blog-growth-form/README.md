@@ -14,11 +14,20 @@ Estado: **publicación detenida; trabajo conservado en develop y preview para re
 
 El operador rechazó la primera preview vertical. `host.css` conserva la banda y el texto del blog; correo y botón forman una fila unificada, sin sombras grandes ni tarjeta alrededor del consentimiento. Label y aviso siguen accesibles; privacidad visible. La clase local `.eo-blog-subscription` limita la composición al bloque. No modifica controles ni validación del renderer. Su CSS está preparado localmente y todavía no distribuido en WordPress.
 
+### Refinamiento visual local — 20/10/2026
+
+`host-layout.css` compone el bloque y `build-host-styles.ts` genera `host.css` con roles del paquete AXIS instalado: papel, azul y acción turquesa Growth con tinta oscura. No utiliza negro ni el token lima `cta-growth`. Bricolage Grotesque y Poppins consumen los archivos de marca existentes del plugin de consentimiento, con nombres de fuente aislados al bloque. La preview verifica su carga.
+
+La columna Elementor del formulario deja el flex con wrap y utiliza flujo de bloque; el widget recupera altura natural. El estado de respuesta vacío no reserva una fila. Se conserva la validación al aparecer mensajes. El título separa introducción e idea principal por peso, y el espaciado móvil usa la escala de AXIS.
+
+Verificación local: 1440, 390 y 320 px, altura del widget igual al formulario, sin desbordes, consentimiento sin preselección y errores de envío vacío. Capturas del bloque y del blog completo en `.captures/2026-10-20-blog-growth-form/`. Son previews en navegador con contrato interceptado; no acreditan publicación, entrega a HubSpot ni conversión GA4.
+
 ## Preparar y previsualizar
 
 ```sh
 pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/prepare-blog-subscription-form.ts
 pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/prepare-blog-subscription-form.ts --apply-draft
+pnpm exec tsx scripts/public-website/blog-growth-form/build-host-styles.ts
 pnpm exec tsx scripts/public-website/blog-growth-form/preview.ts
 ```
 
@@ -26,11 +35,11 @@ Sin flag, el preparador no escribe en Greenhouse. `--apply-draft` crea/reusa un 
 
 ## Activación y verificación
 
-Autorización del operador: renovar Google, release, reemplazar el bloque y verificar HubSpot/medición. CLI y ADC renovados y comprobados el 20/10.
+La autorización inicial de release y reemplazo fue revocada por el operador. Esta sección conserva el historial y la secuencia pendiente; no autoriza ejecutarla. CLI y ADC se renovaron y comprobaron el 20/10.
 
 1. `scripts/growth/activate-blog-subscription.ts --apply-hubspot` creó y releyó «Suscripción - Glitch | Blog Efeonce» (`8c7cf91b-a1c9-4cbe-9d8c-cac773692561`, portal `48713323`). Un correo visible, marcador de ocurrencia oculto, consentimiento al tipo activo `535702717`, lifecycle `subscriber`. Acepta Gmail. `--prepare` creó la versión review, destino y surface.
 2. `scripts/gtm/activate-blog-subscription.ts` publicó Web7: `gh_form_submission_accepted` + `form_kind=subscribe` → `sign_up`; excluye subscribe de `generate_lead`. Sin PII ni Ads/Meta Lead. Server10 conservado; Web6 es rollback. Primera recepción GA4 todavía pendiente.
-3. PR258 libera el mapping explícito `communications` del adapter con sus pruebas. Dos workflows de pruebas fijan Ubuntu24.04 porque Ubuntu26.04 no soporta el browser de la versión instalada. No cambia workflows productivos, flags ni migraciones. Release canónico y readback del worker pendientes.
+3. PR258 fue cerrada sin merge. El commit local `ae4a64767` en develop conserva el mapping explícito `communications` del adapter con sus pruebas. Dos workflows de pruebas fijan Ubuntu24.04 porque Ubuntu26.04 no soporta el browser de la versión instalada. No cambia workflows productivos, flags ni migraciones. Release canónico y readback del worker pendientes.
 4. `--publish` exige `.captures/2026-10-20-blog-growth-form/release-readback.json` con evidencia real: `released`, `workerCompatible`, `targetSha`, `workerRevision`. No fabricar este recibo desde pruebas locales. Después, GET público independiente del contrato.
 5. `replace.php` exige hash fresco, gates verdaderos y preflight controles/render. Guarda snapshot durable y usa `Document::save`, verifica hermanos/settings/metas/CF7, purga caché. Inputs: spec JSON y `host.css`; `apply:false` sólo verifica. Wrapper canónico `pnpm public-website:wpcli -- --eval-file scripts/public-website/blog-growth-form/replace.php --input-file <spec> --input-file scripts/public-website/blog-growth-form/host.css --wp-user 12`.
 6. `verify-live.ts` revisa la URL pública a 1440/390 sin interceptar contrato ni escribir DOM. `--submit` hace un único envío interno controlado con consentimiento/cookies elegidos en UI y Turnstile real. Si ya existe una submission aceptada, prohíbe repetir. Una dificultad del captcha nunca autoriza evadirlo.
