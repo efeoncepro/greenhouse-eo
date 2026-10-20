@@ -2,6 +2,10 @@
 
 Estado: **diseño aprobado y preparación verificada en develop; publicación detenida**. No reanudar release ni cutover sin nueva instrucción. Pedido del operador del 20/10/2026.
 
+## Pendientes de publicación
+
+[Checklist de publicación y verificación HubSpot/GA4](PUBLICATION-CHECKLIST.md). Todos los pasos de ejecución permanecen pendientes de autorización explícita; documentarlos no autoriza ejecutarlos.
+
 ## Contrato preparado
 
 - WordPress: `/blog/`, página `18456`, widget `4246f0d`, `ohio_contact_form` → CF7 `17852`.
@@ -53,7 +57,7 @@ La autorización inicial de release y reemplazo fue revocada por el operador. Es
 4. `--publish` exige `.captures/2026-10-20-blog-growth-form/release-readback.json` con evidencia real: `released`, `workerCompatible`, `targetSha`, `workerRevision`. No fabricar este recibo desde pruebas locales. Después, GET público independiente del contrato.
 5. `replace.php` exige hash fresco, gates verdaderos y preflight controles/render. Guarda snapshot durable y usa `Document::save`, verifica hermanos/settings/metas/CF7, purga caché. Inputs: spec JSON y `host.css`; `apply:false` sólo verifica. Wrapper canónico `pnpm public-website:wpcli -- --eval-file scripts/public-website/blog-growth-form/replace.php --input-file <spec> --input-file scripts/public-website/blog-growth-form/host.css --wp-user 12`.
 6. `verify-live.ts` revisa la URL pública a 1440/390 sin interceptar contrato ni escribir DOM. `--submit` hace un único envío interno controlado con consentimiento/cookies elegidos en UI y Turnstile real. Si ya existe una submission aceptada, prohíbe repetir. Una dificultad del captcha nunca autoriza evadirlo.
-7. `scripts/growth/verify-blog-subscription.ts` relee submission, consentimiento, attempt, preferencia SUBSCRIBED y ocurrencia nativa única por marcador. Releer GA4 realtime y conservar el hit `sign_up` de la misma sesión sin correo ni payload crudo.
+7. `scripts/growth/verify-blog-subscription.ts` relee submission, consentimiento, attempt, preferencia SUBSCRIBED y ocurrencia nativa única por marcador. Releer GA4 realtime y conservar el evento `gh_newsletter_subscription_accepted` de la misma sesión, una vez publicada la corrección de GTM sin correo ni payload crudo.
 
 Los scripts de Growth usan `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs`; los de navegador `pnpm exec tsx`. Artefactos operativos en `.captures/2026-10-20-blog-growth-form/` (ignorados).
 

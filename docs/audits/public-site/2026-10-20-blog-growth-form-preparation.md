@@ -2,6 +2,8 @@
 
 **Status real: diseño aceptado por el operador y preparación verificada en develop; publicación detenida.** Sin merge, push, release a main, cutover WordPress ni envío real en esta revisión. El blog conserva CF7 y Forms permanece en review. HubSpot nativo y GTM Web7 fueron aplicados antes de la detención. La autorización anterior de publicación sigue revocada.
 
+Pendientes operativos y criterios de evidencia: [checklist junto al formulario](../../../scripts/public-website/blog-growth-form/PUBLICATION-CHECKLIST.md). Documentado por pedido del operador; no ejecutado ni autorizado para publicación.
+
 ## Verificación final de preparación — 20/10/2026, 22:14 UTC
 
 - [x] Diseño aceptado en móvil/escritorio; composición de marca guardada en `038316cfe`, sólo develop local.
