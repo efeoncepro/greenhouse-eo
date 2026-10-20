@@ -13,6 +13,8 @@ const roles = {
   ink: brand.color.navy,
   dark: brand.color.dark,
   white: tokens.color.surface,
+  'error-on-dark': `color-mix(in srgb, ${tokens.color.danger} 50%, ${tokens.color.surface})`,
+  'error-bg-dark': `color-mix(in srgb, ${tokens.color.danger} 15%, ${brand.color.dark})`,
   line: `color-mix(in srgb, ${brand.color.navy} 22%, transparent)`,
   soft: `color-mix(in srgb, ${brand.color.navy} 5%, ${brand.color.paper})`,
   unit: tokens.spacing[4],

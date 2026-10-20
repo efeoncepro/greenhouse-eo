@@ -96,3 +96,12 @@ La elección visual autoriza implementar; **no autoriza publicar ni promover a m
 - Suscripción: cierre Glitch en navy con panel claro y copy explícito «Suscríbete a Glitch». El elemento Growth Form, key, surface y atributos permanecen byte-for-byte; host.css también sigue intacto. No se tocan consentimiento, validaciones ni eventos.
 - Evidencia de esta iteración: `.captures/2026-10-20-blog-annotations/`, página completa 1440/390, cabecera y formulario a320; comparación anterior/nuevo y verificación a1024.
 - Sólo preparación local en develop. No WordPress/HubSpot/GTM writes, publicación, push, merge o release. Los gates del checklist de publicación permanecen pendientes.
+
+
+### Segunda revisión de anotaciones (20/10/2026)
+
+Se retira también «Por Efeonce». Categorías pasa del índice numerado a cuatro piezas editoriales con imagen propia y títulos grandes; se conservan archivos de categorías y markers. Artes conceptuales ImageGen, procedencia en el runtime `assets/img/blog/PROVENANCE.md`, WebP960, lazy-load, aproximadamente310KB combinados.
+
+La suscripción elimina tarjeta clara y eyebrow auxiliar. Campo, botón y consentimiento se integran sobre navy mediante roles de host; errores y foco se adaptan al contraste oscuro. El tag Growth Form permanece byte-for-byte, y no se cambian campos/consentimiento/eventos/endpoints ni host.css compartido. La validación vacía sólo se ejercita en localhost con escrituras bloqueadas.
+
+Evidencia nueva en `.captures/2026-10-20-blog-annotations-v2/`: página completa1440/390, detalles de temas/suscripción, cabeceras,320 y error. Ver [QA](design-qa.md). Estado: develop local, pendiente de aceptación visual, sin publicación/push/main ni conversión real.

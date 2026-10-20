@@ -73,3 +73,16 @@ Hallazgos resueltos:
 Verificación:21 checksPHP de selección/render +6 del widget, PHP lint y ESLint build. Sin overflow a320/390/1024/1440; imágenes del blog cargadas, anchors válidos, un Growth Form, email vacío y checkbox desmarcado; consola sin errores. No se ejercitó envío positivo. Tag Growth Form idéntico alcommit anterior; los campos/consentimiento/medición no cambian. El footer global sigue siendo el real, fuera de este alcance.
 
 No hay diferencias P0/P1/P2 pendientes en el alcance de estas anotaciones. No se acredita integración Elementor publicada, aceptación HubSpot ni GA4 DebugView; permanecen en PUBLICATION-CHECKLIST.md.
+
+## Segunda iteración por anotaciones · 20/10/2026
+
+**Resultado: passed para revisión local; aceptación del operador pendiente.**
+
+Referencia: tres nuevas anotaciones sobre atribución, impacto de temas e integración de suscripción. Antes: `.captures/2026-10-20-blog-annotations/blog-full-1440.jpg`; después: `blog-annotations-v2/blog-full-1440.jpg`. Comparaciones conjuntas inspeccionadas: `qa-topics-before-after.png` y `qa-subscription-before-after.png`, misma escala1440, anterior izquierda/nuevo derecha. Temas aumenta deliberadamente su altura para mostrar cuatro artes editoriales; no es un objetivo de paridad con el índice anterior.
+
+- «Por Efeonce» retirado del renderer y CSS, en escritorio/móvil.
+- Categorías: cuatro imágenes conceptuales propias, tipos grandes y destinos editoriales conservados; no son fichas de servicios ni cifras inventadas. El título de sección se balanceó en dos líneas después de revisar la primera captura. Sin iconografía oficial reinterpretada ni logos generados.
+- Glitch: eliminados panel claro y eyebrow redundante. Formulario sobre el mismo navy, con roles explícitos para campo, texto, borde y errores. No cambia el tag Growth Form ni el contrato de integración.
+- Checks:21PHP selección/render +6widget; PHP lint/ESLint;0overflow a320/390/1024/1440; imágenes cargadas, anchors válidos, un formulario vacío con consentimiento inicialmente desmarcado; consola sin errores. Validación negativa por correo/consentimiento visibles, sin envío positivo.
+- Contrastes calculados desde colores observados/tokens: texto del campo15.07:1, placeholder8.72:1, borde contra sección7.88:1, texto de error contra su fondo7.36:1. Esto no acredita auditoríaWCAG completa.
+- Capturas completas y detalles finales guardados en `blog-annotations-v2/`; versión móvil inspeccionada. No pendientes P0/P1/P2 observados en el alcance de estas tres anotaciones. Publicación/Elementor/HubSpot/GA4 real siguen pendientes de autorización y checklist.
