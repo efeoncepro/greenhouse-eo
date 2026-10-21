@@ -21,6 +21,10 @@
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-10-20 — Blog: preview Growth Forms en develop
+
+- Diseño compacto desktop/móvil preparado; publicación detenida por el operador. HubSpot y GTM Web7 aplicados previamente; Forms review, CF7 live, sin merge/release a main ni envío real. [Estado](docs/audits/public-site/2026-10-20-blog-growth-form-preparation.md).
+
 ## 2026-10-20 — Partnerships y expedientes de distribuidores
 
 - Conciliados Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL con identidad, evidencia y pendientes separados.
@@ -41,13 +45,6 @@
 - Un seguimiento HubSpot programado22Oct09:30Quito, salida por respuesta/reunión; deck360 original íntegro.
 - Skills espejo incorporan recuperación de publicaciones, calidad Apollo y readback de firma/envío/calendario.
 - [Evidencia y límites](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md); sin push ni nuevos permisos.
-
-> Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
-> [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
-> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
->
-> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
-> `pnpm docs:context-rotate --apply`.
 
 ## 2026-10-18 — Contexto comercial en la fachada Grader
 
@@ -98,6 +95,27 @@
 - Orquestador `39159325900` SUCCESS; manifest released, salud HTTP 200 y watchdog ok 6/6, sin drift ni datos faltantes.
 - Migraciones aditivas de recibos HubSpot/Meta verificadas; código Forms/Meetings desplegado y canarios PASS. Ads sigue OFF y GTM sin publicar.
 - [Evidencia y rollback](docs/audits/releases/2026-10-18-full-develop-production-release.md); WIP ajeno preservado y cierre documentado sólo sobre los cambios propios.
+
+## 2026-10-18 — Negocios compartidos HubSpot
+
+- Julio ordenó verificar adjudicación, contrato y fechas antes de recomendar/invertir/crear Deal. Gate guardado en el prompt real del radar y skills/playbooks, con readback y horario/permisos preservados. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1128-control-adjudicacion-automatizacion.md).
+
+- Flujo observado y preferencia de Julio **liderazgo Partner** documentados en [manual](docs/manual-de-uso/hubspot/convertir-negocio-compartido.md) y skill de Solutions Partner. Esenttia convertido y leído; cierre local31/12/2026, discrepancia tarjeta30/12 registrada. Sin nuevas altas o envíos separados.
+
+> Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
+> [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
+> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
+>
+> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
+> `pnpm docs:context-rotate --apply`.
+
+## 2026-10-18 — Footer público: selector compatible con monitores legacy
+
+- `widget_block[34]` reemplaza únicamente el `querySelector(...:has(...))` del bootstrap por marcador simple +
+  `closest('#colophon')`; CSS, composición, copy, enlaces, formulario y assets permanecen idénticos.
+- Publicado en WordPress con snapshot independiente `eo_footer_compat_20261018`, cache purge y readback PASS.
+  Home y landing HubSpot verificadas a 1440/390 sin overflow ni errores de consola.
+- [Evidencia y rollback](docs/audits/public-site/2026-10-14-footer-composition-v2.md#compatibilidad-del-bootstrap-2026-10-18).
 
 ## 2026-10-17 — Google Ads: arquitectura y prueba API de lectura
 
@@ -639,16 +657,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 ## 2026-10-05 — títulos de pestaña del portal (local)
 
 - Título general `Efeonce | Greenhouse`; acceso, proyectos y resumen de finanzas usan Efeonce primero y etiquetas ES/EN. Copy centralizado, sin plantilla global que duplique marcas. ESLint y TypeScript PASS. Commit y push a `develop` autorizados; despliegue no verificado. [Detalle](docs/audits/ui/2026-10-05-portal-metadata.md).
-
-## 2026-10-05 — identidad del menú y footer de Greenhouse (local)
-
-- Por decisión del operador, Efeonce firma el menú (logo expandido, isotipo colapsado); Greenhouse pasa al footer vertical/horizontal, con variante clara/oscura. Assets existentes, texto alternativo corregido y canon de marca actualizado. Commit y push a `develop` autorizados; despliegue no verificado. [Evidencia](docs/audits/ui/2026-10-05-portal-brand-chrome.md).
-
-## 2026-10-05 — TASK-2002: calendario de activaciones v3 en producción (sólo lectura)
-
-- Studio `main` `d0ec7e0`: `studio.efeonce.org/calendar` sigue la dirección v3 aprobada en Mes, Semana, Día, Línea de tiempo, Paid, Hoja, Popover del día, estados, filtros móvil y preview por formato, con barra inferior propia de evidencia de ejecución. Diálogos de escritura (planificar, editar, reprogramar, cancelar, vincular, crear desde ejecución) verificados en local; en producción no se montan hasta que exista login (TASK-1898). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
-
-## 2026-10-04 — AI Visibility Report: hero, ancho y hover
-
-- Hero con demostración interactiva y pausa directa; shell/escena acotados en pantallas amplias. Think `6aab907`/`56a300a` publicados y verificados en producción a 1710/2560 px. Hover primario azul profundo `06449ca` validado y comprometido sólo local, pendiente de push.
-- [TASK-1966 y evidencia](docs/tasks/complete/TASK-1966-ai-visibility-report-landing-la-orbita.md): docs funcionales, motion, wireframe y skill espejo alineados. Contrato Marca primero sin activar; producción conserva Entrega primero. Sin envío real ni cambios de backend/PDF.

@@ -22,6 +22,12 @@ No push, CMS write, merge, release, GTM ni envío real. Etapa 2 y validación pr
 Anotaciones del operador atendidas: cabecera limpia, temas centrados, categorías editoriales explícitas, recursos visuales y cierre Glitch protagonista. Runtime `a10c85e`;27 checks y capturas completas1440/390 en `.captures/2026-10-20-blog-annotations/`. Aceptación visual final pendiente; contrato Forms intacto.
 Segunda ronda (`3d9ee81` runtime): sin «Por Efeonce», temas con arte editorial propio y formulario integrado en el navy de Glitch. Evidencia `.captures/2026-10-20-blog-annotations-v2/`;27 checks, contraste/validación negativa local. Todo en develop, sin push/publicación; aceptación visual pendiente.
 
+## 2026-10-20 — Blog: preview en develop; publicación detenida
+
+Operador detuvo el release y pidió conservar el trabajo en develop y revisar diseño. No merge/release a main ni cutover WordPress.
+HubSpot Glitch creado y GTM Web7 ya publicado antes del stop; Forms review y CF7 live. No envío real.
+No retomar publicación sin nueva autorización. [Vista previa y estado](docs/audits/public-site/2026-10-20-blog-growth-form-preparation.md).
+
 ## 2026-10-20 — Partnerships: contactos, habilitación y expediente Nexsys
 
 Adobe `.com`/AM17480390 Registered: Code of Conduct100%, Certified recibido; aprobación pendiente.
@@ -111,6 +117,23 @@ aditivas aplicadas y verificadas; sin replay manual ni certificación de entrega
 Ads **OFF**, GTM sin publicar: hosts/Preview/políticas por fuente/EC conservan su rollout pendiente.
 [Auditoría y límites](docs/audits/releases/2026-10-18-full-develop-production-release.md),
 [tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md) y [historial](Handoff.archive.md).
+
+## 2026-10-18 — Shared deal HubSpot: liderazgo Partner
+
+Automatización del radar actualizada y leída de vuelta: control adjudicación/contrato/fechas previo a recomendar, créditos o Deal; adjudicada=descartar, evidencia pendiente=HOLD. MismoID/09:00Santiago/permisos. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1128-control-adjudicacion-automatizacion.md).
+
+**RECTIFICACIÓN:** Esenttia5600218590 ya adjudicadaDACARTEC(firma10Oct/inicio15Oct). Julio cerróDeal10:32; sinsync. No pendiente de admisión/POI; llamada nativa anulada. Mala calificación del agente. [Cierre corregido](docs/commercial/prospecting-agent/runs/2026-10-18-1036-esenttia-adjudicada-rectificacion.md).
+
+Julio pidió aprender el flujo; [procedimiento](docs/manual-de-uso/hubspot/convertir-negocio-compartido.md) y skills actualizados. Esenttia66218288550 convertido10:08GMT-3 con liderazgoPartner, fecha local31/12/2026 y declaración confirmadas. TarjetaHubSpot muestra30/12: agente debe conciliar, sin falsear cierre local. Admisión/POI pendientes; no repetir consulta ni contactar automáticamente. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1002-esenttia-shared-deal.md).
+
+## 2026-10-18 — Footer público compatible sin cambio visual
+
+Publicado en WordPress el ajuste mínimo de `widget_block[34]`: el bootstrap ya localiza
+`data-eo-footer-partners="v2"` y asciende a `#colophon`, sin `:has()` en `querySelector`. Snapshot/rollback
+independiente `eo_footer_compat_20261018`; cache WordPress/Kinsta purgada y readback PASS. Home y
+`/servicios-contratar-hubspot/` verificadas a 1440/390: layout intacto, cero overflow, nueve partners,
+un Careers, newsletter presente y cero errores de consola. La alerta de cPanel puede permanecer visible hasta
+su siguiente corrida; no silenciarla manualmente. [Evidencia](docs/audits/public-site/2026-10-14-footer-composition-v2.md#compatibilidad-del-bootstrap-2026-10-18).
 
 ## 2026-10-17 — Google Ads: acceso API de lectura probado y arquitectura adoptada
 
@@ -234,32 +257,3 @@ Pendiente: envío real del form (HubSpot + GA4 `generate_lead`), casilla de nove
 Results/GSC. Operador 2026-10-16: rebates nunca al cliente (regla vigente en todo); «programática secundaria de
 Medios» confirmada (PDR-025/022). Schema: cinco países + catálogo + `about`; sitio: Yoast «Efeonce», `og:locale`
 `es_LA` (mu-plugin). Commits locales, sin push.
-
-## 2026-10-16 — GTM: drift con mecanismo (web + servidor) y auditoría brand-visibility
-
-`pnpm gtm:snapshot` versiona los dos containers (web `GTM-NGHPGRLZ` y servidor `GTM-K2X4ZTTK`, nuevo
-`server-container-snapshot.json`) con secretos tapados como huella; `--check` falla con resumen por colección.
-Workflow nuevo `gtm-drift.yml` diario 12:00 UTC (tooling), WIF directo a `greenhouse-gtm-publisher` con scope
-readonly; `roles/iam.workloadIdentityUser` concedido al repo. Commits `e791942ea` y `5d28dda76` en develop, sin push.
-Ambos containers sin drift al 16/10. Think: «Preferencias de cookies» sólo en host legal declarado (main `425a1de`).
-[Snapshot y drift](docs/reference/measurement-gtm-ga4/README.md#snapshot-y-drift-de-los-dos-containers) ·
-[qué hacer si falla](docs/manual-de-uso/growth/operar-meta-capi-servidor.md#si-falla-el-chequeo-diario-gtm-drift).
-Pendiente: release a `main` para activar el cron (aún no ha corrido en GitHub); token Meta literal en el tag
-servidor (decisión del operador: Secret Manager + Firestore Lookup después); form `ai-visibility-grader`
-de think/brand-visibility sin envío real que pruebe la cadena Lead (0 filas en `measurement_conversion`).
-
-## 2026-10-16 — Fabricio: seguimiento web programado
-
-[Caso y límites](docs/commercial/follow-up-agent/runs/2026-10-16-fabricio-web-hubspot.md): un envío inicial
-Outlook SENT y tres pasos HubSpot Programado, secuencia `316561523`, 21/28 de octubre y 4 de noviembre a las 10:00 México.
-Parada por respuesta a cualquier correo verificada; sin duplicar desde el heartbeat ni contactar puentes.
-Brochure de 27 páginas identificado y firma oficial configurada; preview integrado sin render, entrega futura pendiente.
-Método y adapter espejados Codex/Claude, registro focal actualizado; no renueva corte global ni permisos.
-
-## 2026-10-13 — Radar comercial: tarea por corrida y registro semanal
-
-[Contrato y registro](docs/commercial/prospecting-agent/README.md): mismo scheduler convertido a cron ACTIVE,
-09:00 Santiago, tarea nueva por corrida en greenhouse-eo y consultas saneadas en repo. Nuevas convocatorias
-para postular sólo de la semana calendario; cinco líneas × cuatro mercados. Históricos para credenciales.
-INTURSA/Alfin: altas autorizadas de dos empresas y cuatro contactos; detalles privados y [reporte](docs/commercial/prospecting-agent/runs/2026-10-13-privadas.md).
-Primera corrida futura aún no observada. Sin nuevos envíos ni Deals; no commit automático.
