@@ -3,9 +3,11 @@ import 'server-only'
 import type { CloudGcpAuthPosture } from '@/lib/cloud/contracts'
 import { getGoogleCredentialSource, isWorkloadIdentityConfigured, shouldUseWorkloadIdentity } from '@/lib/google-credentials'
 
+import type { EnvSource } from '@/types/env-source'
+
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
-export const getCloudGcpAuthPosture = (env: NodeJS.ProcessEnv = process.env): CloudGcpAuthPosture => {
+export const getCloudGcpAuthPosture = (env: EnvSource = process.env): CloudGcpAuthPosture => {
   const providerConfigured =
     hasValue(env.GCP_WORKLOAD_IDENTITY_PROVIDER) ||
     (hasValue(env.GCP_PROJECT_NUMBER) && hasValue(env.GCP_WORKLOAD_IDENTITY_POOL_ID) && hasValue(env.GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID))

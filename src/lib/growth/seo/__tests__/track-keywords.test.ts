@@ -143,10 +143,10 @@ import {
   untrackKeywords
 } from '../track-keywords'
 
-const ENV_ON = { GROWTH_SEO_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
+const ENV_ON = { GROWTH_SEO_ENABLED: 'true' }
 
 const envWithCapacity = (capacity: number) =>
-  ({ GROWTH_SEO_ENABLED: 'true', [TRACKED_KEYWORDS_CAPACITY_ENV]: String(capacity) }) as unknown as NodeJS.ProcessEnv
+  ({ GROWTH_SEO_ENABLED: 'true', [TRACKED_KEYWORDS_CAPACITY_ENV]: String(capacity) })
 
 const statusOf = (outcomes: Array<{ keyword: string; status: string }>, keyword: string) =>
   outcomes.find(outcome => outcome.keyword === keyword)?.status
@@ -170,7 +170,7 @@ beforeEach(() => {
 describe('trackKeywords — puertas de acceso', () => {
   it('con el módulo apagado no toca la base', async () => {
     const result = await trackKeywords('seot-1', ['berel'], 'user-1', {
-      env: {} as unknown as NodeJS.ProcessEnv
+      env: {}
     })
 
     expect(result).toEqual({ ok: false, errorCode: 'disabled', status: null })
@@ -644,7 +644,7 @@ describe('untrackKeywords — el reverso del compromiso de gasto', () => {
 
   it('con el módulo apagado no toca la base', async () => {
     const result = await untrackKeywords('seot-1', ['berel'], 'user-1', {
-      env: {} as unknown as NodeJS.ProcessEnv
+      env: {}
     })
 
     expect(result).toEqual({ ok: false, errorCode: 'disabled', status: null })

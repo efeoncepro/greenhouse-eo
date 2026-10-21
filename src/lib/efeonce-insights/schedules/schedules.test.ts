@@ -39,7 +39,7 @@ const infra = vi.hoisted(() => ({ withTx: vi.fn(async (fn: (client: unknown) => 
 vi.mock('@/lib/postgres/client', () => ({ withGreenhousePostgresTransaction: infra.withTx, runGreenhousePostgresQuery: infra.pgQuery }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: infra.publish }))
 
-const ENV_ON = { INSIGHTS_SCHEDULES_ENABLED: 'true', INSIGHTS_RENDER_ENABLED: 'true', INSIGHTS_GENERATION_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
+const ENV_ON = { INSIGHTS_SCHEDULES_ENABLED: 'true', INSIGHTS_RENDER_ENABLED: 'true', INSIGHTS_GENERATION_ENABLED: 'true' }
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
 
 const template = { modules: ['seo'], comparison: { kind: 'previous_period' }, audience: 'client', locale: 'es-CL', depth: 'standard', outputs: ['deck_pdf'], policy: { allowPartial: true } }
@@ -84,7 +84,7 @@ describe('createInsightSchedule', () => {
     const { createInsightSchedule } = await import('./commands')
     const scope = { subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a' }
 
-    await expect(createInsightSchedule({ ...scope, env: {} as NodeJS.ProcessEnv, body: { label: 'Mensual', cadence: 'monthly', requestTemplate: template } })).rejects.toMatchObject({ code: 'schedules_disabled' })
+    await expect(createInsightSchedule({ ...scope, env: {}, body: { label: 'Mensual', cadence: 'monthly', requestTemplate: template } })).rejects.toMatchObject({ code: 'schedules_disabled' })
     await expect(createInsightSchedule({ ...scope, env: ENV_ON, body: { label: 'Mensual', cadence: 'monthly', requestTemplate: { ...template, modules: ['nope'] } } })).rejects.toMatchObject({ code: 'invalid_request' })
 
     const created = await createInsightSchedule({ ...scope, env: ENV_ON, body: { label: 'Mensual', cadence: 'monthly', requestTemplate: template } })
@@ -114,7 +114,7 @@ describe('runInsightSchedulesTick', () => {
 
   it('flag OFF: purga la retención igual, no genera', async () => {
     const { runInsightSchedulesTick } = await import('./tick')
-    const result = await runInsightSchedulesTick({} as NodeJS.ProcessEnv, new Date('2026-09-18T12:00:00Z'))
+    const result = await runInsightSchedulesTick({}, new Date('2026-09-18T12:00:00Z'))
 
     expect(result).toMatchObject({ skipped: 'flag_off', retention: { accessEvents: 2, rateBuckets: 5 } })
     expect(store.listActiveInsightSchedules).not.toHaveBeenCalled()

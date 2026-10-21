@@ -41,8 +41,8 @@ vi.mock('@/lib/postgres/client', () => ({
 import { readSeoAeoGap } from '../read-seo-aeo-gap'
 import { classifyQuadrant } from '../quadrant'
 
-const ENV_ON = { GROWTH_SEO_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
-const ENV_OFF = {} as NodeJS.ProcessEnv
+const ENV_ON = { GROWTH_SEO_ENABLED: 'true' }
+const ENV_OFF = {}
 
 const seoRow = (keyword: string, position: number, impressions = 100) => ({
   keyword,

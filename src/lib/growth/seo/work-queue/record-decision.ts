@@ -27,6 +27,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { isSeoModuleEnabled, isSeoWorkQueueEnabled } from '../flags'
 import { WORK_QUEUE_DECISIONS, type SeoWorkQueueDecision, type SeoWorkQueueOrigin } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type RecordSeoWorkQueueDecisionErrorCode =
   | 'disabled'
   | 'invalid_input'
@@ -47,7 +49,7 @@ export interface RecordSeoWorkQueueDecisionInput {
   decision: SeoWorkQueueDecision
   actor: string
   note?: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export const recordSeoWorkQueueDecision = async (

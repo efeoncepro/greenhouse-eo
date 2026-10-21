@@ -6,7 +6,7 @@ import type { FormConsentSnapshotRow, FormDestinationRow, FormSubmissionRow } fr
 const ENV_ON = {
   GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED: 'true',
   HUBSPOT_ACCESS_TOKEN: 'test-token',
-} as unknown as NodeJS.ProcessEnv
+}
 
 const submission = (fields: Record<string, unknown> = { email: 'lead@example.com', name: 'Lead' }): FormSubmissionRow => ({
   submission_id: 'fsub-1',
@@ -158,7 +158,7 @@ describe('deliverToHubSpotForms', () => {
   })
 
   it('flag OFF → skipped (sin llamar a HubSpot)', async () => {
-    const r = await deliverToHubSpotForms({ submission: submission(), consent: consent(), destination: destination(VALID_MAPPING), env: {} as NodeJS.ProcessEnv })
+    const r = await deliverToHubSpotForms({ submission: submission(), consent: consent(), destination: destination(VALID_MAPPING), env: {} })
 
     expect(r.status).toBe('skipped')
     expect(fetch).not.toHaveBeenCalled()

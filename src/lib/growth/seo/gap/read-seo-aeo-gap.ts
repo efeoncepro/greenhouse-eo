@@ -37,6 +37,8 @@ import { type SeoAeoGapResult, type SeoAeoKeywordStanding, type SeoAeoQuadrantEn
 import { isSeoModuleEnabled } from '../flags'
 import { classifyQuadrant, DEFAULT_QUADRANT_THRESHOLDS, type QuadrantThresholds } from './quadrant'
 
+import type { EnvSource } from '@/types/env-source'
+
 const DEFAULT_WINDOW_DAYS = 28
 const DEFAULT_KEYWORD_LIMIT = 50
 /** Piso de impresiones en ventana: bajo esto la posición ponderada no es interpretable. */
@@ -70,7 +72,7 @@ interface AeoLensRow extends Record<string, unknown> {
 export const readSeoAeoGap = async (
   seoTargetId: string,
   options: ReadSeoAeoGapOptions = {},
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<SeoAeoGapResult> => {
   if (!isSeoModuleEnabled(env)) {
     return { ok: false, errorCode: 'disabled', status: null }

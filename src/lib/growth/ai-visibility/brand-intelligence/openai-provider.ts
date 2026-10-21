@@ -23,7 +23,9 @@ import {
   buildBrandIntelligencePrompt
 } from './prompt'
 
-export const resolveOpenAiBrandIntelligenceModel = (env: NodeJS.ProcessEnv = process.env): string | undefined =>
+import type { EnvSource } from '@/types/env-source'
+
+export const resolveOpenAiBrandIntelligenceModel = (env: EnvSource = process.env): string | undefined =>
   env.GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_MODEL_OPENAI?.trim() || undefined
 
 export const openAiBrandIntelligenceProvider: BrandIntelligenceProvider = {

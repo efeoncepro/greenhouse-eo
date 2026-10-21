@@ -9,7 +9,7 @@ describe('resolveGreenhouseDeepLink', () => {
   it('resolves ops health to a canonical internal route and absolute url', () => {
     const result = resolveGreenhouseDeepLink(
       { kind: 'ops_health', audience: 'teams' },
-      { env: { NEXTAUTH_URL: 'https://greenhouse.efeoncepro.com/' } as NodeJS.ProcessEnv }
+      { env: { NEXTAUTH_URL: 'https://greenhouse.efeoncepro.com/' } }
     )
 
     expect(result.status).toBe('resolved')

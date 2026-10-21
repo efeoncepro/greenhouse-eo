@@ -6,6 +6,8 @@
 
 import { generateOpaqueToken, hashSensitiveValue, sha256Hex } from '@/lib/auth-server/oauth/primitives'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const INSIGHT_SHARE_TOKEN_PREFIX = 'isg'
 
 /** `isg_` + 43 chars base64url (32 bytes sin padding). Cualquier otra forma no toca la base. */
@@ -21,7 +23,7 @@ export const digestInsightShareToken = (token: string): string => sha256Hex(toke
 export const hashInsightShareSubject = (value: string, salt: string): string => hashSensitiveValue(`${salt}:${value}`) ?? ''
 
 /** Base pública del visor compartido (Think). Configurable por entorno; nunca derivada de la request. */
-export const resolveInsightShareBaseUrl = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveInsightShareBaseUrl = (env: EnvSource = process.env): string =>
   (env.INSIGHTS_SHARE_PUBLIC_BASE_URL?.trim() || 'https://think.efeoncepro.com').replace(/\/+$/, '')
 
-export const buildInsightShareUrl = (token: string, env: NodeJS.ProcessEnv = process.env): string => `${resolveInsightShareBaseUrl(env)}/insights/r/${token}`
+export const buildInsightShareUrl = (token: string, env: EnvSource = process.env): string => `${resolveInsightShareBaseUrl(env)}/insights/r/${token}`

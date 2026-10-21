@@ -40,6 +40,8 @@ import {
 import { digestInsightShareToken, hashInsightShareSubject, isWellFormedInsightShareToken } from './token'
 import { buildInsightWebModel, formatInsightPeriodLabel } from './web-model'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type SharedInsightDenial = 'not_found' | 'gone' | 'rate_limited'
 
 export interface SharedInsightRequestContext {
@@ -47,7 +49,7 @@ export interface SharedInsightRequestContext {
   /** IP del visitante (o del proxy de Think): sólo se usa hasheada. */
   clientIp: string | null
   clientHint: InsightShareClientHint
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 const numberFromEnv = (value: string | undefined, fallback: number): number => {
@@ -56,7 +58,7 @@ const numberFromEnv = (value: string | undefined, fallback: number): number => {
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
 }
 
-const rateSalt = (env: NodeJS.ProcessEnv): string => env.INSIGHTS_SHARE_RATE_SALT?.trim() || 'insights-share-public-v1'
+const rateSalt = (env: EnvSource): string => env.INSIGHTS_SHARE_RATE_SALT?.trim() || 'insights-share-public-v1'
 
 /**
  * Dos cubetas: por grant (protege un enlace filtrado) y por IP (protege la base de un barrido de

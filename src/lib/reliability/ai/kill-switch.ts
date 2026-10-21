@@ -1,3 +1,5 @@
+import type { EnvSource } from '@/types/env-source'
+
 const TRUE_VALUES = new Set(['1', 'true', 'yes', 'on'])
 
 /**
@@ -10,7 +12,7 @@ const TRUE_VALUES = new Set(['1', 'true', 'yes', 'on'])
  * Para activar: setear `RELIABILITY_AI_OBSERVER_ENABLED=true` en envs del
  * Cloud Run service `ops-worker` (vía deploy.sh o gcloud).
  */
-export const isReliabilityAiObserverEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
+export const isReliabilityAiObserverEnabled = (env: EnvSource = process.env): boolean => {
   const raw = env.RELIABILITY_AI_OBSERVER_ENABLED
 
   if (!raw) return false

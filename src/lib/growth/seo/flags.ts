@@ -23,12 +23,14 @@
  * Los env-knobs de allowance/budget de TASK-1301 (`GROWTH_SEO_*_PER_MONTH`) NO son flags
  * y no viven acá.
  */
+import type { EnvSource } from '@/types/env-source'
+
 export const GROWTH_SEO_FLAG = 'GROWTH_SEO_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del módulo SEO. Default OFF. */
-export const isSeoModuleEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isTrue(env[GROWTH_SEO_FLAG])
+export const isSeoModuleEnabled = (env: EnvSource = process.env): boolean => isTrue(env[GROWTH_SEO_FLAG])
 
 /**
  * TASK-1661 — Captura de datos de mercado por keyword (DataForSEO Labs). Default OFF.
@@ -50,7 +52,7 @@ export const isSeoModuleEnabled = (env: NodeJS.ProcessEnv = process.env): boolea
 export const GROWTH_SEO_KEYWORD_MARKET_DATA_FLAG = 'GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED'
 
 /** Gate de la captura de mercado. Default OFF: prenderlo compromete gasto de proveedor. */
-export const isSeoKeywordMarketDataEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoKeywordMarketDataEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_KEYWORD_MARKET_DATA_FLAG])
 
 /**
@@ -73,7 +75,7 @@ export const isSeoKeywordMarketDataEnabled = (env: NodeJS.ProcessEnv = process.e
 export const GROWTH_SEO_KEYWORD_DISCOVERY_FLAG = 'GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED'
 
 /** Gate del keyword discovery. Default OFF: prenderlo compromete gasto de proveedor. */
-export const isSeoKeywordDiscoveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoKeywordDiscoveryEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_KEYWORD_DISCOVERY_FLAG])
 
 /**
@@ -93,7 +95,7 @@ export const isSeoKeywordDiscoveryEnabled = (env: NodeJS.ProcessEnv = process.en
 export const GROWTH_SEO_DOMAIN_OVERVIEW_FLAG = 'GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED'
 
 /** Gate de la foto de dominio. Default OFF: prenderlo compromete gasto de proveedor. */
-export const isSeoDomainOverviewEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoDomainOverviewEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_DOMAIN_OVERVIEW_FLAG])
 
 /**
@@ -108,7 +110,7 @@ export const isSeoDomainOverviewEnabled = (env: NodeJS.ProcessEnv = process.env)
 export const GROWTH_SEO_URL_VISIBILITY_FLAG = 'GROWTH_SEO_URL_VISIBILITY_ENABLED'
 
 /** Gate de la visibilidad por sujeto-página. Default OFF: prenderlo compromete gasto. */
-export const isSeoUrlVisibilityEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoUrlVisibilityEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_URL_VISIBILITY_FLAG])
 
 /**
@@ -124,7 +126,7 @@ export const isSeoUrlVisibilityEnabled = (env: NodeJS.ProcessEnv = process.env):
 export const GROWTH_SEO_BACKLINK_DETAIL_FLAG = 'GROWTH_SEO_BACKLINK_DETAIL_ENABLED'
 
 /** Gate del drill-down de enlaces. Default OFF: prenderlo compromete gasto condicional. */
-export const isSeoBacklinkDetailEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoBacklinkDetailEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_BACKLINK_DETAIL_FLAG])
 
 /**
@@ -147,7 +149,7 @@ export const isSeoBacklinkDetailEnabled = (env: NodeJS.ProcessEnv = process.env)
 export const GROWTH_SEO_PROSPECT_DIAGNOSTIC_FLAG = 'GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED'
 
 /** Gate del diagnóstico de prospecto. Default OFF: prenderlo compromete gasto por corrida. */
-export const isSeoProspectDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoProspectDiagnosticEnabled = (env: EnvSource = process.env): boolean =>
   isSeoModuleEnabled(env) && isTrue(env[GROWTH_SEO_PROSPECT_DIAGNOSTIC_FLAG])
 
 /**
@@ -166,7 +168,7 @@ export const isSeoProspectDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.
 export const GROWTH_SEO_COMPETITOR_GAP_FLAG = 'GROWTH_SEO_COMPETITOR_GAP_ENABLED'
 
 /** Gate de la cobertura de competidores. Default OFF: prenderlo empieza a gastar. */
-export const isSeoCompetitorGapEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoCompetitorGapEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_COMPETITOR_GAP_FLAG])
 
 /**
@@ -187,7 +189,7 @@ export const isSeoCompetitorGapEnabled = (env: NodeJS.ProcessEnv = process.env):
 export const GROWTH_SEO_SERP_TOP_RESULTS_FLAG = 'GROWTH_SEO_SERP_TOP_RESULTS_ENABLED'
 
 /** Gate de la persistencia del top-N. No gasta: gatea escritura ya pagada y lectura. */
-export const isSeoSerpTopResultsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoSerpTopResultsEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_SERP_TOP_RESULTS_FLAG])
 
 /**
@@ -217,7 +219,7 @@ export const isSeoSerpTopResultsEnabled = (env: NodeJS.ProcessEnv = process.env)
 export const GROWTH_SEO_WORK_QUEUE_FLAG = 'GROWTH_SEO_WORK_QUEUE_ENABLED'
 
 /** Gate de la cola priorizada. Default OFF. No gasta: gatea orden y lectura. */
-export const isSeoWorkQueueEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoWorkQueueEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_WORK_QUEUE_FLAG])
 
 /**
@@ -250,5 +252,5 @@ export const isSeoWorkQueueEnabled = (env: NodeJS.ProcessEnv = process.env): boo
 export const GROWTH_SEO_SITE_FINDINGS_FLAG = 'GROWTH_SEO_SITE_FINDINGS_ENABLED'
 
 /** Gate de la materialización de hallazgos de sitio. Default OFF. */
-export const isSeoSiteFindingsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isSeoSiteFindingsEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_SEO_SITE_FINDINGS_FLAG])

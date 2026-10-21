@@ -8,6 +8,8 @@ import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
 import { extractNotionVerificationToken, validateNotionSignature } from './notion-auth'
 
+import type { EnvSource } from '@/types/env-source'
+
 const CLOUD_PLATFORM_SCOPE = 'https://www.googleapis.com/auth/cloud-platform'
 const DEFAULT_QUEUE = 'notion-webhook-ingestion'
 const DEFAULT_LOCATION = 'us-east4'
@@ -39,7 +41,7 @@ export const isAsyncNotionEndpoint = (endpointKey: string): endpointKey is Async
   endpointSet.has(endpointKey)
 
 export const isNotionWebhookAsyncIngestionEnabled = (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): boolean => env.NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED?.trim().toLowerCase() === 'true'
 
 const parsePayload = (rawBody: string): unknown => {
@@ -61,7 +63,7 @@ const extractSourceEventId = (payload: unknown): string | null => {
 
 const resolveSigningSecretRef = (
   endpointKey: AsyncNotionEndpoint,
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 ): string | null => {
   const value = endpointKey === 'notion-tasks-demo'
     ? env.NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF
@@ -70,7 +72,7 @@ const resolveSigningSecretRef = (
   return value?.trim() || null
 }
 
-const resolveTargetBaseUrl = (env: NodeJS.ProcessEnv): string => {
+const resolveTargetBaseUrl = (env: EnvSource): string => {
   const candidate = env.NOTION_WEBHOOK_TASKS_TARGET_BASE_URL?.trim()
     || env.GREENHOUSE_PUBLIC_BASE_URL?.trim()
     || env.NEXTAUTH_URL?.trim()
@@ -88,7 +90,7 @@ const resolveTargetBaseUrl = (env: NodeJS.ProcessEnv): string => {
   return parsed.toString().replace(/\/$/u, '')
 }
 
-export const getNotionWebhookWorkerUrl = (env: NodeJS.ProcessEnv = process.env): string =>
+export const getNotionWebhookWorkerUrl = (env: EnvSource = process.env): string =>
   `${resolveTargetBaseUrl(env)}/api/internal/webhooks/notion-ingestion`
 
 const buildTaskName = (
@@ -113,7 +115,7 @@ const isAlreadyExistsError = (error: unknown): boolean => {
 export const enqueueNotionWebhookRequest = async (
   endpointKey: AsyncNotionEndpoint,
   request: Request,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<AsyncIngestionResult> => {
   const rawBody = await request.text()
 

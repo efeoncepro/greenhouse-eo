@@ -2,6 +2,8 @@ import 'server-only'
 
 import { HiringValidationError } from '@/lib/hiring/errors'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface HiringFairnessPolicy {
   policyVersion: string
   retentionDays: number
@@ -9,7 +11,7 @@ export interface HiringFairnessPolicy {
 }
 const KEY_PATTERN = /^[a-z][a-z0-9_]{1,63}$/
 
-export const isHiringFairnessMonitorEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isHiringFairnessMonitorEnabled = (env: EnvSource = process.env): boolean =>
   env.HIRING_FAIRNESS_MONITOR_ENABLED === 'true'
 
 const parseAllowedCategories = (raw: string | undefined): ReadonlyMap<string, ReadonlySet<string>> => {
@@ -64,7 +66,7 @@ const parseAllowedCategories = (raw: string | undefined): ReadonlyMap<string, Re
   return dimensions
 }
 
-export const requireHiringFairnessPolicy = (env: NodeJS.ProcessEnv = process.env): HiringFairnessPolicy => {
+export const requireHiringFairnessPolicy = (env: EnvSource = process.env): HiringFairnessPolicy => {
   if (!isHiringFairnessMonitorEnabled(env)) {
     throw new HiringValidationError(
       'El monitor de fairness no está habilitado.',

@@ -54,7 +54,7 @@ import {
   resolveProspectDiagnosticEntitlement
 } from '../entitlement'
 
-const ENV = {} as NodeJS.ProcessEnv
+const ENV = {}
 
 const contractedAssignment = () => ({
   assignment_id: 'cpma-efeonce',
@@ -73,7 +73,7 @@ describe('knobs de configuración', () => {
   it('ceiling default USD 1.00, overridable por env', () => {
     expect(resolveProspectDiagnosticCeilingUsd(ENV)).toBe(1)
     expect(
-      resolveProspectDiagnosticCeilingUsd({ GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD: '0.5' } as unknown as NodeJS.ProcessEnv)
+      resolveProspectDiagnosticCeilingUsd({ GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD: '0.5' })
     ).toBe(0.5)
   })
 
@@ -82,7 +82,7 @@ describe('knobs de configuración', () => {
     expect(
       resolveProspectDiagnosticDailyActorCap({
         GROWTH_SEO_PROSPECT_DIAGNOSTIC_DAILY_ACTOR_CAP: '3'
-      } as unknown as NodeJS.ProcessEnv)
+      })
     ).toBe(3)
   })
 })

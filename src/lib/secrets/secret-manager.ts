@@ -8,6 +8,8 @@ import {
   type SecretFormatViolation
 } from '@/lib/secrets/format-validators'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type SecretResolutionSource = 'secret_manager' | 'env' | 'unconfigured'
 
 export interface SecretResolution {
@@ -23,7 +25,7 @@ export interface SecretResolution {
 type SecretResolutionOptions = {
   envVarName: string
   secretRefEnvVarName?: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   cacheTtlMs?: number
 }
 
@@ -139,7 +141,7 @@ export const isCanonicalSecretRefShape = (value: string | undefined): boolean =>
   return normalizeSecretRefValue(value) !== null
 }
 
-const normalizeSecretRef = (ref: string, env: NodeJS.ProcessEnv) => {
+const normalizeSecretRef = (ref: string, env: EnvSource) => {
   const trimmed = ref.trim()
 
   if (!trimmed) {
@@ -175,7 +177,7 @@ const getCacheKey = ({
 }: {
   envVarName: string
   secretRefEnvVarName: string
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 }) => {
   const envValue = normalizeSecretValue(env[envVarName])
   const secretRefValue = normalizeSecretRefValue(env[secretRefEnvVarName])
@@ -221,7 +223,7 @@ export const clearSecretManagerResolutionCache = () => {
 }
 
 type SecretByRefOptions = {
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
   cacheTtlMs?: number
 }
 
@@ -438,7 +440,7 @@ export interface CreateSecretResult {
 export const createOrAddSecretVersion = async (
   secretId: string,
   value: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<CreateSecretResult> => {
   const id = (secretId || '').trim()
 

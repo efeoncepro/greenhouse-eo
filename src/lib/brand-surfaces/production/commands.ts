@@ -31,6 +31,8 @@ import { glitchPhotoPaths, planBrandRender, type PlannedBrandRender } from './pl
 import { attachBrandSources, readBrandSourceImageSizes, resolveBrandSources } from './sources'
 import { findBrandRenderRequestByIdempotency, insertBrandRenderRequest, listBrandRenderJobs, type BrandRenderJobRecord, type BrandRenderRequestRecord } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 
 const AXIS_PACKAGES = ['@efeoncepro/axis-tokens', '@efeoncepro/axis-ui-contracts', '@efeoncepro/axis-graphic-line', '@efeoncepro/axis-brand-assets'] as const
 
@@ -91,7 +93,7 @@ export const requestBrandRender = async (input: {
   subject: TenantEntitlementSubject
   body: unknown
   actorKind?: BrandRenderActorKind
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<RequestBrandRenderResult> => {
   if (!isBrandRenderEnabled(input.env)) throw new BrandRenderDisabledError()
 

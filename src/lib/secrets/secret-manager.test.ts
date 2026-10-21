@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { EnvSource } from '@/types/env-source'
+
 const { accessSecretVersion } = vi.hoisted(() => ({
   accessSecretVersion: vi.fn()
 }))
@@ -12,7 +14,7 @@ vi.mock('@google-cloud/secret-manager', () => ({
 
 vi.mock('@/lib/google-credentials', () => ({
   createGoogleAuth: vi.fn(() => ({ mocked: true })),
-  getGoogleProjectId: vi.fn((env?: NodeJS.ProcessEnv) => env?.GCP_PROJECT || 'efeonce-group')
+  getGoogleProjectId: vi.fn((env?: EnvSource) => env?.GCP_PROJECT || 'efeonce-group')
 }))
 
 describe('resolveSecret', () => {

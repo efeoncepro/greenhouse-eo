@@ -29,6 +29,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { buildSeoProviderSpendMonthlySumSql } from './provider-spend'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * Clave canónica del módulo. **Es la de ESCRITURA**: toda asignación nueva nace `seo_v2`.
  */
@@ -147,7 +149,7 @@ const toPositiveInt = (raw: string | undefined, fallback: number): number => {
  * Config de allowance/budget por tier. Son knobs de configuración con default (NO
  * feature flags `*_ENABLED`); ajustables por env sin deploy de código.
  */
-export const resolveSeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env): SeoAllowanceConfig => ({
+export const resolveSeoAllowanceConfig = (env: EnvSource = process.env): SeoAllowanceConfig => ({
   contractedAuditRunsPerMonth: toPositiveInt(env.GROWTH_SEO_CONTRACTED_AUDIT_RUNS_PER_MONTH, 8),
   trialAuditRunsPerMonth: toPositiveInt(env.GROWTH_SEO_TRIAL_AUDIT_RUNS_PER_MONTH, 1),
   pilotAuditRunsPerMonth: toPositiveInt(env.GROWTH_SEO_PILOT_AUDIT_RUNS_PER_MONTH, 2),
@@ -219,7 +221,7 @@ const resolveBudgetCap = (tier: SeoTier, config: SeoAllowanceConfig): number => 
  */
 export const resolveSeoEntitlement = async (
   organizationId: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<SeoEntitlement> => {
   const config = resolveSeoAllowanceConfig(env)
 
@@ -363,7 +365,7 @@ export const resolveSeoEntitlement = async (
 export const enforceSeoRunEntitlement = async (
   organizationId: string,
   options: { estimatedCostUsd?: number; consumesAuditAllowance?: boolean } = {},
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<SeoRunGate> => {
   const entitlement = await resolveSeoEntitlement(organizationId, env)
   const consumesAuditAllowance = options.consumesAuditAllowance !== false
@@ -434,11 +436,11 @@ export const enforceSeoRunEntitlement = async (
 export const EFEONCE_CANONICAL_ORG_PUBLIC_ID = 'EO-ORG-0007'
 
 /** Knob de configuración con default (NO es un flag `*_ENABLED`). */
-export const resolveProspectDiagnosticCeilingUsd = (env: NodeJS.ProcessEnv = process.env): number =>
+export const resolveProspectDiagnosticCeilingUsd = (env: EnvSource = process.env): number =>
   toPositiveFloat(env.GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD, 1)
 
 /** Tope diario de diagnósticos por actor (freno de abuso, knob con default). */
-export const resolveProspectDiagnosticDailyActorCap = (env: NodeJS.ProcessEnv = process.env): number =>
+export const resolveProspectDiagnosticDailyActorCap = (env: EnvSource = process.env): number =>
   toPositiveInt(env.GROWTH_SEO_PROSPECT_DIAGNOSTIC_DAILY_ACTOR_CAP, 10)
 
 export type ProspectDiagnosticBlockedReason = 'no_entitlement' | 'budget_exhausted' | 'cost_blocked'
@@ -464,7 +466,7 @@ interface CanonicalOrgRow extends Record<string, unknown> {
  * canónica de Efeonce, que sí es per-org.
  */
 export const resolveProspectDiagnosticEntitlement = async (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<ProspectDiagnosticEntitlement> => {
   const ceilingUsd = resolveProspectDiagnosticCeilingUsd(env)
 
@@ -527,7 +529,7 @@ export interface ProspectDiagnosticGate {
  */
 export const enforceProspectDiagnosticBudget = async (
   forecastUsd: number,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<ProspectDiagnosticGate> => {
   const entitlement = await resolveProspectDiagnosticEntitlement(env)
 

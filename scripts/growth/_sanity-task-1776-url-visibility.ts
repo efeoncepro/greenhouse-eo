@@ -37,7 +37,7 @@ const fail = (message: string): never => {
 }
 
 // TASK-1805 — todo writer exige la identidad metodológica; la sanity usa la de la policy (legacy explícito).
-const ETV_STAMP = toPersistedEtvMethodology(buildEtvMethodologyRequest({ endpoint: '/v3/dataforseo_labs/google/ranked_keywords/live', env: {} as NodeJS.ProcessEnv }))
+const ETV_STAMP = toPersistedEtvMethodology(buildEtvMethodologyRequest({ endpoint: '/v3/dataforseo_labs/google/ranked_keywords/live', env: {} }))
 
 const main = async () => {
   const orgs = await runGreenhousePostgresQuery<{ organization_id: string }>(

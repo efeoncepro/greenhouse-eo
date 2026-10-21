@@ -8,9 +8,11 @@ import type {
 } from '@/lib/cloud/contracts'
 import { getSecretSource, resolveSecret } from '@/lib/secrets/secret-manager'
 
+import type { EnvSource } from '@/types/env-source'
+
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
-type ObservabilityEnv = Partial<NodeJS.ProcessEnv>
+type ObservabilityEnv = EnvSource
 
 type SentryIssueTag = {
   key?: string
@@ -147,15 +149,15 @@ export const getCloudObservabilityPosture = async (env: ObservabilityEnv = proce
   const [sentryDsnSource, slackWebhookSource, sentryIncidentsAuthTokenSource] = await Promise.all([
     getSecretSource({
       envVarName: 'SENTRY_DSN',
-      env: env as NodeJS.ProcessEnv
+      env
     }),
     getSecretSource({
       envVarName: 'SLACK_ALERTS_WEBHOOK_URL',
-      env: env as NodeJS.ProcessEnv
+      env
     }),
     getSecretSource({
       envVarName: 'SENTRY_INCIDENTS_AUTH_TOKEN',
-      env: env as NodeJS.ProcessEnv
+      env
     })
   ])
 
@@ -225,7 +227,7 @@ export const getCloudSentryIncidents = async (
 ): Promise<CloudSentryIncidentsSnapshot> => {
   const incidentsTokenResolution = await resolveSecret({
     envVarName: 'SENTRY_INCIDENTS_AUTH_TOKEN',
-    env: env as NodeJS.ProcessEnv
+    env
   })
 
   const sentryAuthToken = incidentsTokenResolution.value?.trim() || env.SENTRY_AUTH_TOKEN?.trim()

@@ -27,10 +27,12 @@ import {
   buildProseExtractionPrompt
 } from './prompt'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Modelo de extracción Anthropic (Haiku — barato dentro de la familia premium). Override por env. */
 export const PROSE_EXTRACTION_ANTHROPIC_DEFAULT_MODEL = 'claude-haiku-4-5-20251001'
 
-export const resolveAnthropicExtractionModel = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveAnthropicExtractionModel = (env: EnvSource = process.env): string =>
   env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MODEL_ANTHROPIC?.trim() || PROSE_EXTRACTION_ANTHROPIC_DEFAULT_MODEL
 
 export const anthropicProseProvider: ProseExtractionProvider = {

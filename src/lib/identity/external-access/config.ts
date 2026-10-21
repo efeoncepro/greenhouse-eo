@@ -14,6 +14,8 @@
  * mientras nadie envía; gatearlo en el `ops-worker` habría creado el riesgo multi-runtime del ledger
  * (flag ON en Vercel, drenaje muerto en el worker) sin proteger nada.
  */
+import type { EnvSource } from '@/types/env-source'
+
 
 export type ExternalInvitationConfig = {
   systemDeliveryEnabled: boolean
@@ -31,7 +33,7 @@ export type ExternalInvitationConfig = {
 const parseFlag = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Gate independiente del carril canary. Default OFF en todo runtime. */
-export const isExternalIdentityCanaryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isExternalIdentityCanaryEnabled = (env: EnvSource = process.env): boolean =>
   parseFlag(env.EXTERNAL_IDENTITY_CANARY_ENABLED)
 
 const parsePositiveInt = (value: string | undefined, fallback: number): number => {
@@ -47,7 +49,7 @@ export const EXTERNAL_INVITATION_CONFIG_DEFAULTS = {
   revealedLinkTtlHours: 1
 } as const
 
-export const readExternalInvitationConfig = (env: NodeJS.ProcessEnv = process.env): ExternalInvitationConfig => ({
+export const readExternalInvitationConfig = (env: EnvSource = process.env): ExternalInvitationConfig => ({
   systemDeliveryEnabled: parseFlag(env.EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED),
   delegatedAuthorityEnabled: parseFlag(env.EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED),
   resendLimitPerChain: EXTERNAL_INVITATION_CONFIG_DEFAULTS.resendLimitPerChain,

@@ -9,6 +9,8 @@
 
 import type { GrowthAiVisibilityProviderId } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const GROWTH_AI_VISIBILITY_GRADER_FLAG = 'GROWTH_AI_VISIBILITY_GRADER_ENABLED'
 
 export const GROWTH_AI_VISIBILITY_PROVIDER_FLAGS: Record<GrowthAiVisibilityProviderId, string> = {
@@ -22,13 +24,13 @@ export const GROWTH_AI_VISIBILITY_PROVIDER_FLAGS: Record<GrowthAiVisibilityProvi
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch global. Default OFF. */
-export const isGraderEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isGraderEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_GRADER_FLAG])
 
 /** Flag del provider (solo cuenta si el grader global está ON). Default OFF. */
 export const isProviderFlagEnabled = (
   provider: GrowthAiVisibilityProviderId,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): boolean => isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROVIDER_FLAGS[provider]])
 
 /**
@@ -38,7 +40,7 @@ export const isProviderFlagEnabled = (
  */
 export const GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG = 'GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED'
 
-export const isLlmExtractionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isLlmExtractionEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG])
 
 /**
@@ -49,7 +51,7 @@ export const isLlmExtractionEnabled = (env: NodeJS.ProcessEnv = process.env): bo
  */
 export const GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG = 'GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED'
 
-export const isAsyncExecutionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isAsyncExecutionEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG])
 
 /**
@@ -60,7 +62,7 @@ export const isAsyncExecutionEnabled = (env: NodeJS.ProcessEnv = process.env): b
  */
 export const GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG = 'GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED'
 
-export const isPublicIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isPublicIntakeEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG])
 
 /**
@@ -75,7 +77,7 @@ export const isPublicIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boo
  */
 export const GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG = 'GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED'
 
-export const isGraderIntakeOnFormsEngineEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isGraderIntakeOnFormsEngineEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG])
 
 /**
@@ -93,7 +95,7 @@ export const isGraderIntakeOnFormsEngineEnabled = (env: NodeJS.ProcessEnv = proc
  */
 export const GROWTH_AEO_FORM_GRADER_INTAKE_FLAG = 'GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED'
 
-export const isAeoFormGraderIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isAeoFormGraderIntakeEnabled = (env: EnvSource = process.env): boolean =>
   env[GROWTH_AEO_FORM_GRADER_INTAKE_FLAG]?.trim().toLowerCase() !== 'false'
 
 /**
@@ -105,7 +107,7 @@ export const isAeoFormGraderIntakeEnabled = (env: NodeJS.ProcessEnv = process.en
  */
 export const GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG = 'GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED'
 
-export const isLeadHandoffEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isLeadHandoffEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG])
 
 /**
@@ -119,7 +121,7 @@ export const isLeadHandoffEnabled = (env: NodeJS.ProcessEnv = process.env): bool
  */
 export const GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG = 'GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED'
 
-export const isReportEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isReportEmailDeliveryEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG])
 
 /**
@@ -133,7 +135,7 @@ export const isReportEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.en
  */
 export const GROWTH_AI_VISIBILITY_PROBES_FLAG = 'GROWTH_AI_VISIBILITY_PROBES_ENABLED'
 
-export const isProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isProbesEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROBES_FLAG])
 
 /**
@@ -144,7 +146,7 @@ export const isProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =
  */
 export const GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG = 'GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED'
 
-export const isAgenticReadinessEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isAgenticReadinessEnabled = (env: EnvSource = process.env): boolean =>
   isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG])
 
 /**
@@ -158,7 +160,7 @@ export const isAgenticReadinessEnabled = (env: NodeJS.ProcessEnv = process.env):
  */
 export const GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG = 'GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED'
 
-export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isEntityProbesEnabled = (env: EnvSource = process.env): boolean =>
   isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG])
 
 /**
@@ -177,7 +179,7 @@ export { GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG, isProbeFetchStrictNetworkEnable
  */
 export const GROWTH_AI_VISIBILITY_FIX_IT_FLAG = 'GROWTH_AI_VISIBILITY_FIX_IT_ENABLED'
 
-export const isFixItArtifactsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isFixItArtifactsEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_FIX_IT_FLAG])
 
 /**
@@ -190,7 +192,7 @@ export const isFixItArtifactsEnabled = (env: NodeJS.ProcessEnv = process.env): b
  */
 export const GROWTH_AI_VISIBILITY_PORTAL_RUN_FLAG = 'GROWTH_AI_VISIBILITY_PORTAL_RUN_ENABLED'
 
-export const isPortalRunEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isPortalRunEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PORTAL_RUN_FLAG])
 
 /**
@@ -201,7 +203,7 @@ export const isPortalRunEnabled = (env: NodeJS.ProcessEnv = process.env): boolea
  */
 export const GROWTH_AI_VISIBILITY_TRIAL_FLAG = 'GROWTH_AI_VISIBILITY_TRIAL_ENABLED'
 
-export const isTrialTierEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isTrialTierEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_TRIAL_FLAG])
 
 /**
@@ -210,7 +212,7 @@ export const isTrialTierEnabled = (env: NodeJS.ProcessEnv = process.env): boolea
  */
 export const GROWTH_AI_VISIBILITY_REGRADE_FLAG = 'GROWTH_AI_VISIBILITY_REGRADE_ENABLED'
 
-export const isRecurringRegradeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isRecurringRegradeEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_REGRADE_FLAG])
 
 /**
@@ -223,7 +225,7 @@ export const isRecurringRegradeEnabled = (env: NodeJS.ProcessEnv = process.env):
  */
 export const GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG = 'GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED'
 
-export const isOperatorSendEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isOperatorSendEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG])
 
 /**
@@ -234,7 +236,7 @@ export const isOperatorSendEnabled = (env: NodeJS.ProcessEnv = process.env): boo
  */
 export const GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG = 'GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED'
 
-export const isCategoryGuardEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isCategoryGuardEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG])
 
 /**
@@ -246,7 +248,7 @@ export const isCategoryGuardEnabled = (env: NodeJS.ProcessEnv = process.env): bo
  */
 export const GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG = 'GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED'
 
-export const isArchetypePromptsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isArchetypePromptsEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG])
 
 /**
@@ -257,7 +259,7 @@ export const isArchetypePromptsEnabled = (env: NodeJS.ProcessEnv = process.env):
  */
 export const GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_FLAG = 'GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED'
 
-export const isPromptAuthoringEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isPromptAuthoringEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_FLAG])
 
 /**
@@ -268,7 +270,7 @@ export const isPromptAuthoringEnabled = (env: NodeJS.ProcessEnv = process.env): 
  */
 export const GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_FLAG = 'GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED'
 
-export const isBrandIntelligenceEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isBrandIntelligenceEnabled = (env: EnvSource = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_FLAG])
 
 /**
@@ -315,7 +317,7 @@ const toPositiveFloat = (value: string | undefined, fallback: number): number =>
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
 }
 
-export const resolveAeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env): AeoAllowanceConfig => ({
+export const resolveAeoAllowanceConfig = (env: EnvSource = process.env): AeoAllowanceConfig => ({
   trialRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_TRIAL_RUNS_PER_MONTH, 1),
   contractedRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_CONTRACTED_RUNS_PER_MONTH, 20),
   pilotRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_PILOT_RUNS_PER_MONTH, 3),
@@ -351,14 +353,14 @@ export const GROWTH_AI_VISIBILITY_BUDGET_GATE_FLAG = 'GROWTH_AI_VISIBILITY_BUDGE
 export const GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED_FLAG = 'GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED'
 
 /** Shadow: computa y registra el presupuesto AEO. NO bloquea. Default OFF. */
-export const isAeoBudgetGateEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isAeoBudgetGateEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_BUDGET_GATE_FLAG])
 
 /**
  * Enforce: bloquea cuando el presupuesto se agotó. Default OFF y SUBORDINADO al anterior —
  * prenderlo solo no hace nada, porque sin el shadow no hay cómputo que consultar.
  */
-export const isAeoBudgetGateEnforced = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isAeoBudgetGateEnforced = (env: EnvSource = process.env): boolean =>
   isAeoBudgetGateEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED_FLAG])
 
 export interface RecurringRegradeConfig {
@@ -371,7 +373,7 @@ export interface RecurringRegradeConfig {
  * propio además del cost ceiling per-run de policy.ts. Defaults conservadores y
  * override-ables por env; con flag OFF no se consulta ni gasta.
  */
-export const resolveRecurringRegradeConfig = (env: NodeJS.ProcessEnv = process.env): RecurringRegradeConfig => ({
+export const resolveRecurringRegradeConfig = (env: EnvSource = process.env): RecurringRegradeConfig => ({
   batchSize: Math.max(1, Math.min(50, toPositiveInt(env.GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE, 5))),
   monthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD, 50)
 })
@@ -396,7 +398,7 @@ export type ProseExtractionProviderFlagValue = (typeof PROSE_EXTRACTION_PROVIDER
 
 /** Proveedor productivo del extractor. Default `anthropic`; valor desconocido → `anthropic`. */
 export const resolveProseExtractionProvider = (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): ProseExtractionProviderFlagValue => {
   const raw = env[GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER_FLAG]?.trim().toLowerCase()
 
@@ -405,7 +407,7 @@ export const resolveProseExtractionProvider = (
     : 'anthropic'
 }
 
-export const isProseExtractionShadowEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isProseExtractionShadowEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG])
 
 export interface ProseExtractionConfig {
@@ -421,7 +423,7 @@ export interface ProseExtractionConfig {
  * extracción es cognitivamente simple → 1024 tokens basta; el cost ceiling es un
  * guard de presupuesto, no contabilidad exacta.
  */
-export const resolveProseExtractionConfig = (env: NodeJS.ProcessEnv = process.env): ProseExtractionConfig => ({
+export const resolveProseExtractionConfig = (env: EnvSource = process.env): ProseExtractionConfig => ({
   provider: resolveProseExtractionProvider(env),
   maxOutputTokens: Math.max(
     256,
@@ -431,5 +433,5 @@ export const resolveProseExtractionConfig = (env: NodeJS.ProcessEnv = process.en
 })
 
 /** TASK-1863. Controls additional markets and batches, not geographic correctness. */
-export const isMultiMarketEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isMultiMarketEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env.GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED)

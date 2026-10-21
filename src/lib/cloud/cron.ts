@@ -1,6 +1,8 @@
-export const getCronSecretValue = (env: NodeJS.ProcessEnv = process.env) => env.CRON_SECRET?.trim() || ''
+import type { EnvSource } from '@/types/env-source'
 
-export const getCronSecretState = (env: NodeJS.ProcessEnv = process.env) => {
+export const getCronSecretValue = (env: EnvSource = process.env) => env.CRON_SECRET?.trim() || ''
+
+export const getCronSecretState = (env: EnvSource = process.env) => {
   const secret = getCronSecretValue(env)
 
   return {
@@ -9,7 +11,7 @@ export const getCronSecretState = (env: NodeJS.ProcessEnv = process.env) => {
   } as const
 }
 
-export const hasCronSecretConfigured = (env: NodeJS.ProcessEnv = process.env) => getCronSecretState(env).configured
+export const hasCronSecretConfigured = (env: EnvSource = process.env) => getCronSecretState(env).configured
 
 export const isVercelCronRequest = (request: Request) => {
   const vercelCronHeader = request.headers.get('x-vercel-cron')?.trim() || ''

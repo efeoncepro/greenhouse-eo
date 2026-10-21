@@ -5,6 +5,8 @@ import { GoogleGenAI } from '@google/genai'
 import { resolveNexaModel } from '@/config/nexa-models'
 import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
 
+import type { EnvSource } from '@/types/env-source'
+
 let googleGenAIClient: GoogleGenAI | undefined
 
 const getProjectId = () => {
@@ -64,7 +66,7 @@ export const getGoogleGenAIClient = async () => {
 export const GEMINI_GROUNDED_DEFAULT_MODEL = 'gemini-3-flash-preview'
 
 /** Resuelve el modelo de grounding: env override → default Gemini 3. */
-export const resolveGeminiGroundedModel = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveGeminiGroundedModel = (env: EnvSource = process.env): string =>
   env.GREENHOUSE_GEMINI_GROUNDED_MODEL?.trim() || GEMINI_GROUNDED_DEFAULT_MODEL
 
 export interface GeminiGroundedCitation {

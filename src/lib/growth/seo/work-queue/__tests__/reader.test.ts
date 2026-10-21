@@ -22,7 +22,7 @@ const ENV_ON = {
   ...process.env,
   GROWTH_SEO_ENABLED: 'true',
   GROWTH_SEO_WORK_QUEUE_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 const snapshotRow = (over: Record<string, unknown> = {}) => ({
   snapshot_id: 'seowqs-1',

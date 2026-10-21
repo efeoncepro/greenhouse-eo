@@ -81,7 +81,7 @@ describe('resolveAeoBudget (TASK-1696)', () => {
   it('wouldBlock queda en true cuando el consumo agota el tope, con enforce APAGADO', async () => {
     usageRow = { ...usageRow, invoiced_usd: 40, estimated_llm_usd: 30 }
 
-    const state = await resolveAeoBudget('org-1', {} as NodeJS.ProcessEnv)
+    const state = await resolveAeoBudget('org-1', {})
 
     expect(state.wouldBlock).toBe(true)
     // Éste es el contrato del shadow: se sabe que habría bloqueado, y no bloquea.
@@ -92,7 +92,7 @@ describe('resolveAeoBudget (TASK-1696)', () => {
   it('enforce sólo se enciende con LAS DOS banderas', async () => {
     const soloEnforced = await resolveAeoBudget('org-1', {
       GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED: 'true'
-    } as unknown as NodeJS.ProcessEnv)
+    })
 
     // Prender el enforce sin el shadow no hace nada: sin cómputo no hay qué exigir.
     expect(soloEnforced.enforced).toBe(false)
@@ -100,7 +100,7 @@ describe('resolveAeoBudget (TASK-1696)', () => {
     const ambas = await resolveAeoBudget('org-1', {
       GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED: 'true',
       GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED: 'true'
-    } as unknown as NodeJS.ProcessEnv)
+    })
 
     expect(ambas.enforced).toBe(true)
   })

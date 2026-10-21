@@ -25,6 +25,8 @@ import {
 } from './store'
 import { normalizeMeetingBookingRequest, parseMeetingBookingRequest } from './validation'
 
+import type { EnvSource } from '@/types/env-source'
+
 type BookingResult = MeetingBookingConfirmed | MeetingPublicError
 
 const error = (
@@ -33,7 +35,7 @@ const error = (
   retryable: boolean,
 ): MeetingPublicError => ({ outcome: 'error', error: { code, recovery, retryable } })
 
-const resolveLimits = (env: NodeJS.ProcessEnv) => ({
+const resolveLimits = (env: EnvSource) => ({
   email: Number(env.GROWTH_MEETING_BOOK_PER_EMAIL_PER_DAY) || 3,
   ip: Number(env.GROWTH_MEETING_BOOK_PER_IP_PER_DAY) || 10,
 })
@@ -129,7 +131,7 @@ export const bookMeeting = async (
     ip: string | null
     userAgent?: string | null
     requestGlobalPrivacyControl?: boolean
-    env?: NodeJS.ProcessEnv
+    env?: EnvSource
     provider?: MeetingSchedulingProvider
     hasher?: MeetingPrivacyHasher
     captchaVerifier?: CaptchaVerifier

@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { EnvSource } from '@/types/env-source'
+
 const TRUE_VALUES = new Set(['1', 'true', 'yes', 'on'])
 
 /**
@@ -8,7 +10,7 @@ const TRUE_VALUES = new Set(['1', 'true', 'yes', 'on'])
  * Default: enabled. Para apagar el sweep en producción sin redeploy, setear
  * RELIABILITY_SYNTHETIC_ENABLED=false en Vercel envs.
  */
-export const isReliabilitySyntheticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
+export const isReliabilitySyntheticEnabled = (env: EnvSource = process.env): boolean => {
   const raw = env.RELIABILITY_SYNTHETIC_ENABLED
 
   if (raw === undefined) return true

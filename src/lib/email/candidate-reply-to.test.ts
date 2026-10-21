@@ -33,19 +33,19 @@ describe('reply-to de correos a candidatos', () => {
   })
 
   it('la dirección es configurable por env y NO se hardcodea en templates', () => {
-    expect(resolveCandidateReplyToAddress({ HIRING_CANDIDATE_REPLY_TO_EMAIL: 'talento@efeoncepro.com' } as unknown as NodeJS.ProcessEnv))
+    expect(resolveCandidateReplyToAddress({ HIRING_CANDIDATE_REPLY_TO_EMAIL: 'talento@efeoncepro.com' }))
       .toBe('talento@efeoncepro.com')
   })
 
   it('sin env configurada cae al buzón de People, nunca a la dirección de envío', () => {
-    const resolved = resolveCandidateReplyToAddress({} as unknown as NodeJS.ProcessEnv)
+    const resolved = resolveCandidateReplyToAddress({})
 
     expect(resolved).toBe('people@efeoncepro.com')
     expect(resolved).not.toContain('greenhouse@')
   })
 
   it('un valor en blanco no deja al candidato sin buzón', () => {
-    expect(resolveCandidateReplyToAddress({ HIRING_CANDIDATE_REPLY_TO_EMAIL: '   ' } as unknown as NodeJS.ProcessEnv))
+    expect(resolveCandidateReplyToAddress({ HIRING_CANDIDATE_REPLY_TO_EMAIL: '   ' }))
       .toBe('people@efeoncepro.com')
   })
 })

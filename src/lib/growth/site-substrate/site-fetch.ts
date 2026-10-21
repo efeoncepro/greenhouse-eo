@@ -55,6 +55,12 @@ import { assessHtmlObservability } from './html'
 import { readBodyWithCap } from './read-body'
 import { isPathAllowed, parseRobotsPolicy, type RobotsPolicyGroup } from './robots-policy'
 
+/**
+ * Forma de `EnvSource` (`@/types/env-source`), declarada local: el sustrato no importa alias `@/` fuera de
+ * observability/capture (carta del paquete, `__tests__/package-boundary.test.ts`).
+ */
+type EnvSource = Readonly<Record<string, string | undefined>>
+
 const DEFAULT_TIMEOUT_MS = 8000
 const MAX_TIMEOUT_MS = 20000
 
@@ -84,7 +90,7 @@ const DEFAULT_ACCEPT = 'text/html,application/xhtml+xml,application/xml,text/pla
  */
 export const GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG = 'GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED'
 
-export const isProbeFetchStrictNetworkEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isProbeFetchStrictNetworkEnabled = (env: EnvSource = process.env): boolean =>
   env[GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG]?.trim().toLowerCase() === 'true'
 
 /** Product token propio para el matching de robots.txt (NUNCA el de un bot de terceros). */

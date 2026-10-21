@@ -4,9 +4,11 @@ import { OAuth2Client } from 'google-auth-library'
 
 import { getNotionWebhookWorkerUrl } from './notion-async-ingestion'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const verifyNotionWebhookTaskRequest = async (
   request: Request,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<boolean> => {
   const authorization = request.headers.get('authorization') || ''
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : ''

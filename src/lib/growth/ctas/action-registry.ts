@@ -34,6 +34,8 @@ import {
   ctaOpenThinkToolPolicySchema,
 } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ─── Resultado canónico de resolución ─────────────────────────────────────────
 
 export type CtaActionResolution =
@@ -100,7 +102,7 @@ export const validateGovernedDestination = (
 /** Hub Think gobernado (repo `efeonce-think`): la policy guarda un PATH, jamás un host arbitrario. */
 const THINK_HUB_URL_DEFAULT = 'https://think.efeoncepro.com'
 
-export const resolveThinkHubBase = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveThinkHubBase = (env: EnvSource = process.env): string =>
   (env.GROWTH_CTA_THINK_HUB_URL?.trim() || env.PUBLIC_GRADER_HUB_URL?.trim() || THINK_HUB_URL_DEFAULT).replace(
     /\/+$/,
     '',
@@ -113,7 +115,7 @@ export const resolveThinkHubBase = (env: NodeJS.ProcessEnv = process.env): strin
  */
 const BOOKING_HOST_PATTERN = /^meetings(-[a-z0-9]+)?\.hubspot\.com$/
 
-export const isGovernedBookingHost = (hostname: string, env: NodeJS.ProcessEnv = process.env): boolean => {
+export const isGovernedBookingHost = (hostname: string, env: EnvSource = process.env): boolean => {
   const normalized = hostname.toLowerCase()
 
   if (BOOKING_HOST_PATTERN.test(normalized)) return true

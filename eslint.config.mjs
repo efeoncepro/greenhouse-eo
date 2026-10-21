@@ -407,6 +407,10 @@ export default [
       // los cuatro deep-imports vivos migraron a `pure` en el mismo cambio. El motor y los tests
       // quedan exentos por path dentro de la propia regla.
       'greenhouse/no-worker-only-module-in-vercel-code': 'error',
+      // 2026-10-21 — el env inyectado se tipa `EnvSource` (@/types/env-source): `NodeJS.ProcessEnv` exige
+      // NODE_ENV (Next) y obligaba a castear en los tests. `error` desde commit-1 (cero usos tras migrar
+      // ~260 firmas y ~120 casts); una API de terceros que exija ProcessEnv se desactiva por línea con motivo.
+      'greenhouse/no-process-env-type': 'error',
       // TASK-1033 — views/app/components NO importan @floating-ui/* directo;
       // consumir GreenhouseFloatingSurface. Mode `error` desde commit-1 (cero
       // violaciones en superficies de producto: pilotos migrados; el resto son

@@ -156,9 +156,9 @@ beforeEach(() => {
 
 describe('resolveRowLimit / estimateUrlVisibilityCost', () => {
   it('default 100, knob respetado y clampeado al máximo del proveedor', () => {
-    expect(resolveRowLimit({} as NodeJS.ProcessEnv)).toBe(100)
-    expect(resolveRowLimit({ GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT: '250' } as unknown as NodeJS.ProcessEnv)).toBe(250)
-    expect(resolveRowLimit({ GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT: '5000' } as unknown as NodeJS.ProcessEnv)).toBe(1000)
+    expect(resolveRowLimit({})).toBe(100)
+    expect(resolveRowLimit({ GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT: '250' })).toBe(250)
+    expect(resolveRowLimit({ GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT: '5000' })).toBe(1000)
   })
 
   it('el costo estimado es peor caso: setup + limit filas por sujeto', () => {

@@ -6,7 +6,7 @@ const makeEnv = (overrides: Record<string, string> = {}) =>
   ({
     NODE_ENV: 'test',
     ...overrides
-  }) as NodeJS.ProcessEnv
+  })
 
 describe('buildCanaryTargetUrl', () => {
   it('builds the bare canary target when no bypass secret is configured', () => {

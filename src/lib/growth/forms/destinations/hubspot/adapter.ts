@@ -20,6 +20,8 @@ import type { FormConsentSnapshotRow, FormDestinationRow, FormSubmissionRow } fr
 import { getHubSpotAccessToken } from '@/lib/hubspot/access-token'
 import { createHubSpotFormReceipt, HUBSPOT_SUBMISSION_ID_PROPERTY, type HubSpotFormReceipt } from './receipts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const HUBSPOT_FORMS_ADAPTER_KIND = 'hubspot_forms_secure_submit' as const
 export const HUBSPOT_FORMS_ADAPTER_VERSION = 'hsforms-v3-secure-submit' as const
 
@@ -179,7 +181,7 @@ export interface DeliverInput {
   submission: FormSubmissionRow
   consent: FormConsentSnapshotRow | null
   destination: FormDestinationRow
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /**

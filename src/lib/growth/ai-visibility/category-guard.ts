@@ -20,6 +20,8 @@ import {
 } from './taxonomy'
 import { isCategoryGuardEnabled } from './flags'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface RunCategoryInput {
   /** Resolved node from the profile (portal/operator paths). */
   categoryNodeId?: string | null
@@ -78,7 +80,7 @@ export const resolveRunCategory = (input: RunCategoryInput): ResolvedRunCategory
 /** True when a run's category is unresolved (would produce garbage prompts). */
 export const isRunCategoryBlocked = (
   input: RunCategoryInput,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): boolean => isCategoryGuardEnabled(env) && !resolveRunCategory(input).resolved
 
 export class GraderCategoryUnresolvedError extends Error {
@@ -99,7 +101,7 @@ export class GraderCategoryUnresolvedError extends Error {
  */
 export const assertRunCategoryResolved = (
   resolved: ResolvedRunCategory,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): void => {
   if (isCategoryGuardEnabled(env) && !resolved.resolved) {
     throw new GraderCategoryUnresolvedError(resolved.nodeId)

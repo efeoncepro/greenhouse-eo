@@ -12,13 +12,15 @@ import { isSeoProspectDiagnosticEnabled } from '../flags'
 import type { ProspectDiagnostic } from './contracts'
 import { getProspectDiagnostic, listProspectDiagnostics as listFromStore } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type ProspectReaderResult<T> =
   | { ok: true; data: T }
   | { ok: false; errorCode: 'disabled' | 'not_found' }
 
 export const readProspectDiagnostic = async (input: {
   diagnosticId: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }): Promise<ProspectReaderResult<ProspectDiagnostic>> => {
   if (!isSeoProspectDiagnosticEnabled(input.env ?? process.env)) {
     return { ok: false, errorCode: 'disabled' }
@@ -34,7 +36,7 @@ export const readProspectDiagnostic = async (input: {
 }
 
 export const listProspectDiagnostics = async (
-  input: { limit?: number; rootDomain?: string; env?: NodeJS.ProcessEnv } = {}
+  input: { limit?: number; rootDomain?: string; env?: EnvSource } = {}
 ): Promise<ProspectReaderResult<ProspectDiagnostic[]>> => {
   if (!isSeoProspectDiagnosticEnabled(input.env ?? process.env)) {
     return { ok: false, errorCode: 'disabled' }

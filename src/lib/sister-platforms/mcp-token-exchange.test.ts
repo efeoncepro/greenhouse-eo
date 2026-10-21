@@ -54,7 +54,7 @@ const env = {
   GREENHOUSE_MCP_ENTRA_AUDIENCE: 'api://mcp-resource',
   GREENHOUSE_MCP_ENTRA_AZP: 'mcp-client-app-id',
   GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS: MCP_GATEWAY_OAUTH_CLIENT_ID
-} as unknown as NodeJS.ProcessEnv
+}
 
 const client = {
   oauthClientId: 'spoauth-client-mcp',
@@ -477,7 +477,7 @@ describe('MCP RFC8693 token exchange', () => {
     const dependencies = baseDependencies()
 
     await expect(
-      exchangeMcpGatewayToken(request, dependencies, { NODE_ENV: 'test' } as NodeJS.ProcessEnv)
+      exchangeMcpGatewayToken(request, dependencies, { NODE_ENV: 'test' })
     ).rejects.toMatchObject({
       code: 'exchange_disabled'
     })

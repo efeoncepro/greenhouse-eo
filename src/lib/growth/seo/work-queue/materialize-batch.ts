@@ -18,6 +18,8 @@ import { SEO_MODULE_KEYS_READ } from '../entitlement'
 import { isSeoModuleEnabled, isSeoWorkQueueEnabled } from '../flags'
 import { materializeSeoWorkQueue } from './materialize'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface SeoWorkQueueBatchOutcome {
   seoTargetId: string
   organizationId: string
@@ -69,7 +71,7 @@ const listEligibleTargets = async (maxTargets?: number): Promise<EligibleTargetR
 }
 
 export const runSeoWorkQueueMaterializeBatch = async (
-  options: { maxTargets?: number; force?: boolean; env?: NodeJS.ProcessEnv } = {}
+  options: { maxTargets?: number; force?: boolean; env?: EnvSource } = {}
 ): Promise<SeoWorkQueueBatchResult> => {
   const env = options.env ?? process.env
 

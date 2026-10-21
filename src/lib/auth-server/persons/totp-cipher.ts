@@ -22,6 +22,8 @@ import type { KeyManagementServiceClient } from '@google-cloud/kms'
 
 import type { AuthServerPersonAuthConfig } from './config'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface TotpSecretCipherPort {
   encrypt(input: { plaintext: Uint8Array; environmentId: string; subject: string }): Promise<{
     ciphertext: Uint8Array<ArrayBuffer>
@@ -50,7 +52,7 @@ export const isTotpCipherUnavailableError = (value: unknown): value is TotpCiphe
  * Nombre completo de la llave. Se lee del entorno para que staging y producción puedan apuntar a
  * llaves distintas sin tocar código; el SoT de la variable es `services/auth-server/deploy.sh`.
  */
-export const getTotpEnvelopeKeyName = (env: NodeJS.ProcessEnv = process.env): string => {
+export const getTotpEnvelopeKeyName = (env: EnvSource = process.env): string => {
   const configured = env.AUTH_SERVER_TOTP_KMS_KEY?.trim()
 
   if (!configured) {

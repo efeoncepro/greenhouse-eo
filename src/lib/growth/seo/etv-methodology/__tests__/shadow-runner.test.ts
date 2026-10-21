@@ -58,9 +58,9 @@ const ON_CONFIG = resolveEtvEvaluatorConfig({
   GROWTH_SEO_ETV_EVALUATOR_SUBJECT_ALLOWLIST: 'efeoncepro.com,berel.com',
   GROWTH_SEO_ETV_EVALUATOR_MAX_REQUESTS: '30',
   GROWTH_SEO_ETV_EVALUATOR_BUDGET_USD: '2'
-} as unknown as NodeJS.ProcessEnv)
+})
 
-const OFF_CONFIG = resolveEtvEvaluatorConfig({} as NodeJS.ProcessEnv)
+const OFF_CONFIG = resolveEtvEvaluatorConfig({})
 
 const cohort = (cells: EtvShadowCohort['cells']): EtvShadowCohort =>
   assertEtvShadowCohort({

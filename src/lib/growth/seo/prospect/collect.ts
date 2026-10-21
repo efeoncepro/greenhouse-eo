@@ -39,6 +39,8 @@ import {
   PROSPECT_RANKED_KEYWORDS_LIMIT
 } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface ProspectSourceOutcome {
   source: ProspectSource
   ok: boolean
@@ -128,7 +130,7 @@ export interface CollectProspectMarketEvidenceInput {
    * request coincidan aunque la configuración cambie entre ambos instantes.
    */
   etvMethodologyVersion?: EtvMethodologyVersion
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 /**

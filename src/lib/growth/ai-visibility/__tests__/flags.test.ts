@@ -7,7 +7,9 @@ import {
   isProviderFlagEnabled
 } from '../flags'
 
-const env = (overrides: Record<string, string>): NodeJS.ProcessEnv => ({ ...overrides }) as NodeJS.ProcessEnv
+import type { EnvSource } from '@/types/env-source'
+
+const env = (overrides: Record<string, string>): EnvSource => ({ ...overrides })
 
 describe('growth/ai-visibility — feature flags (default OFF)', () => {
   it('grader OFF por defecto (sin env)', () => {

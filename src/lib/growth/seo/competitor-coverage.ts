@@ -56,6 +56,8 @@ import {
 } from './keyword-market-data'
 import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from './provider-pricing'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Espeja la ventana Labs mensual (misma constante conceptual que el hecho de mercado). */
 export const COMPETITOR_COVERAGE_FRESHNESS_DAYS = 30
 
@@ -69,7 +71,7 @@ const DEFAULT_COVERAGE_ROW_LIMIT = 500
 
 const DOMAIN_INTERSECTION_ENDPOINT = '/v3/dataforseo_labs/google/domain_intersection/live'
 
-export const resolveCoverageRowLimit = (env: NodeJS.ProcessEnv = process.env): number => {
+export const resolveCoverageRowLimit = (env: EnvSource = process.env): number => {
   const parsed = Number.parseInt(env[COMPETITOR_COVERAGE_ROW_LIMIT_KNOB] ?? '', 10)
 
   return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 1000) : DEFAULT_COVERAGE_ROW_LIMIT
@@ -239,7 +241,7 @@ export type CaptureCompetitorCoverageResult =
 /** DRY RUN: qué se compraría y a qué costo, sin gastar. La primera corrida real va después. */
 export const previewCompetitorCoverageCapture = async (
   seoCompetitorId: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<
   | { ok: false; errorCode: 'disabled' | 'competitor_not_found' }
   | {
@@ -325,7 +327,7 @@ const insertCoverageRun = async (input: {
  */
 export const captureCompetitorCoverage = async (
   seoCompetitorId: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<CaptureCompetitorCoverageResult> => {
   if (!isSeoModuleEnabled(env) || !isSeoCompetitorGapEnabled(env)) {
     return { status: 'disabled' }
@@ -569,7 +571,7 @@ export interface CompetitorCoverageBatchSummary {
  * de UN competidor antes de escalar; subirlo es una decisión del operador, no un default.
  */
 export const runCompetitorCoverageBatch = async (
-  options: { maxCompetitors?: number; dryRun?: boolean; env?: NodeJS.ProcessEnv } = {}
+  options: { maxCompetitors?: number; dryRun?: boolean; env?: EnvSource } = {}
 ): Promise<CompetitorCoverageBatchSummary> => {
   const env = options.env ?? process.env
 

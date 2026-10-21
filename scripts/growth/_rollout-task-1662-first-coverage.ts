@@ -31,7 +31,7 @@ const ENV_ON = {
   ...process.env,
   GROWTH_SEO_ENABLED: 'true',
   GROWTH_SEO_COMPETITOR_GAP_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 const berelLedgerToday = async (): Promise<number> => {
   const rows = await runGreenhousePostgresQuery<{ total: number }>(

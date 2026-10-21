@@ -30,6 +30,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { isAeoBudgetGateEnforced, resolveAeoAllowanceConfig } from './flags'
 import { resolveAeoEntitlement, type AeoTier } from './entitlement'
 
+import type { EnvSource } from '@/types/env-source'
+
 export interface AeoBudgetState {
   organizationId: string
   tier: AeoTier | null
@@ -121,7 +123,7 @@ const resolveBudgetCap = (
  */
 export const resolveAeoBudget = async (
   organizationId: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<AeoBudgetState> => {
   const config = resolveAeoAllowanceConfig(env)
   const entitlement = await resolveAeoEntitlement(organizationId, env)

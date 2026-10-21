@@ -45,7 +45,7 @@ const env = {
   NOTION_WEBHOOK_TASKS_SERVICE_ACCOUNT_EMAIL: 'greenhouse-webhook-worker@efeonce-group.iam.gserviceaccount.com',
   NOTION_DEMO_WEBHOOK_SIGNING_SECRET_REF: 'notion-demo-secret',
   NOTION_STATUS_TRANSITIONS_WEBHOOK_SIGNING_SECRET_REF: 'notion-prod-secret'
-} as NodeJS.ProcessEnv
+}
 
 describe('notion async webhook ingestion', () => {
   beforeEach(() => {
@@ -55,11 +55,11 @@ describe('notion async webhook ingestion', () => {
   })
 
   it('is opt-in', () => {
-    expect(isNotionWebhookAsyncIngestionEnabled({} as NodeJS.ProcessEnv)).toBe(false)
+    expect(isNotionWebhookAsyncIngestionEnabled({})).toBe(false)
     expect(isNotionWebhookAsyncIngestionEnabled({
       NODE_ENV: 'test',
       NOTION_WEBHOOK_ASYNC_INGESTION_ENABLED: 'true'
-    } as NodeJS.ProcessEnv)).toBe(true)
+    })).toBe(true)
   })
 
   it('validates HMAC and creates a deterministic OIDC Cloud Task', async () => {

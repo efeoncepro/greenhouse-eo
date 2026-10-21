@@ -7,6 +7,8 @@ import sharp from 'sharp'
 
 import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type OpenAIImageModel =
   | 'gpt-image-2.5-sunburst'
   | 'gpt-image-2.5-sunburst-2026-09-08'
@@ -407,7 +409,7 @@ export const isOpenAIImageModel = (value: string): value is OpenAIImageModel =>
  * `gpt-image-2.5-flare` generaba con `gpt-image-2` y se pagaba otro modelo del que se creía. Fallar acá es
  * ruidoso al arranque del consumer, que es exactamente donde se quiere descubrir una env mal escrita.
  */
-export const getOpenAIImageModel = (env: NodeJS.ProcessEnv = process.env): OpenAIImageModel => {
+export const getOpenAIImageModel = (env: EnvSource = process.env): OpenAIImageModel => {
   const requested = sanitizeEnvValue(env.OPENAI_IMAGE_MODEL)
 
   if (!requested) return DEFAULT_OPENAI_IMAGE_MODEL
@@ -418,7 +420,7 @@ export const getOpenAIImageModel = (env: NodeJS.ProcessEnv = process.env): OpenA
   )
 }
 
-export const getOpenAIImageResponsesModel = (env: NodeJS.ProcessEnv = process.env): string =>
+export const getOpenAIImageResponsesModel = (env: EnvSource = process.env): string =>
   sanitizeEnvValue(env.OPENAI_IMAGE_RESPONSES_MODEL) || DEFAULT_OPENAI_IMAGE_RESPONSES_MODEL
 
 export const resolveOpenAIImageSize = ({

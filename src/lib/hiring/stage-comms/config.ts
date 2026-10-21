@@ -14,9 +14,11 @@
  * correo genérico de avance de etapa igual que antes. El flag decide únicamente si además
  * se asigna el test. Por eso apagarlo nunca deja al candidato sin comunicación.
  */
+import type { EnvSource } from '@/types/env-source'
+
 export const HIRING_STAGE_TEST_ASSIGNMENT_FLAG = 'HIRING_STAGE_TEST_ASSIGNMENT_ENABLED'
 
-export const isHiringStageTestAssignmentEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isHiringStageTestAssignmentEnabled = (env: EnvSource = process.env): boolean =>
   env[HIRING_STAGE_TEST_ASSIGNMENT_FLAG]?.trim().toLowerCase() === 'true'
 
 /**

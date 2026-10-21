@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system' | 'growth' | 'insights'
 
 export type EmailType =
@@ -233,7 +235,7 @@ export const AGENCY_FROM_ADDRESS = 'Efeonce <greenhouse@efeoncepro.com>'
  *
  * Configurable por env; NUNCA hardcodear el literal en consumers ni en templates.
  */
-export const resolveCandidateReplyToAddress = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveCandidateReplyToAddress = (env: EnvSource = process.env): string =>
   env.HIRING_CANDIDATE_REPLY_TO_EMAIL?.trim() || 'people@efeoncepro.com'
 
 /**

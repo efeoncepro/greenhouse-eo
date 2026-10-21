@@ -36,7 +36,7 @@ vi.mock('@/lib/postgres/client', () => ({
 
 import { resolveAeoEntitlement } from '../entitlement'
 
-const ENV = {} as NodeJS.ProcessEnv // defaults: trial 1, contracted 20, pilot 3, budget $25
+const ENV = {} // defaults: trial 1, contracted 20, pilot 3, budget $25
 
 beforeEach(() => {
   state.assignment = null

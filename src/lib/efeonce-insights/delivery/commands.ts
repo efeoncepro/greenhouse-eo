@@ -59,11 +59,13 @@ import {
   setInsightDeliveryIntentState
 } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 interface DeliveryScope {
   subject: TenantEntitlementSubject
   actorOrganizationId: string | null
   organizationId: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value)

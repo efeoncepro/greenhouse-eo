@@ -22,6 +22,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { isUniqueViolation, withUniqueShortCode } from '@/lib/shared/short-code'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Longitud canónica del código (dentro del CHECK `[a-zA-Z0-9]{10,14}` de la migración). */
 const SHORT_CODE_LENGTH = 12
 const SHORT_CODE_PATTERN = /^[a-zA-Z0-9]{10,14}$/
@@ -238,7 +240,7 @@ export const trackAiVisibilityReportShortLinkUse = async (shortCode: string): Pr
  * en staging tras el smoke del resolve; producción solo con release explícito. Registrado en
  * `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
  */
-export const isAiVisibilityShortLinksEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isAiVisibilityShortLinksEnabled = (env: EnvSource = process.env): boolean =>
   env.GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED === 'true'
 
 /** Reader del link activo de un reporte (o null). Expuesto para consumers que resuelven la URL. */

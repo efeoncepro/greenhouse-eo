@@ -35,7 +35,7 @@ describe('TASK-1805 — collectProspectMarketEvidence y la policy ETV', () => {
       subject: SUBJECT,
       acquisitionOrganizationId: 'org-efeonce',
       competitorDomains: ['rival.cl'],
-      env: {} as NodeJS.ProcessEnv
+      env: {}
     })
 
     const calls = providerMock.mock.calls.map(call => call[0] as { endpoint: string; tasks: Array<Record<string, unknown>> })
@@ -61,7 +61,7 @@ describe('TASK-1805 — collectProspectMarketEvidence y la policy ETV', () => {
       subject: SUBJECT,
       acquisitionOrganizationId: 'org-efeonce',
       competitorDomains: ['rival.cl'],
-      env: {} as NodeJS.ProcessEnv,
+      env: {},
       etvMethodologyVersion: 'improved_layout_clickstream_v2'
     })
 
@@ -77,7 +77,7 @@ describe('TASK-1805 — collectProspectMarketEvidence y la policy ETV', () => {
       collectProspectMarketEvidence({
         subject: SUBJECT,
         acquisitionOrganizationId: 'org-efeonce',
-        env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'v3' } as unknown as NodeJS.ProcessEnv
+        env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'v3' }
       })
     ).rejects.toMatchObject({ code: 'invalid_etv_methodology_config' })
 

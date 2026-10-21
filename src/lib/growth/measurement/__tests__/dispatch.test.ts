@@ -9,6 +9,7 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 import { assertMetaReceiptStorageReady, claimMeasurementDeliveries, expireMeasurementDeliveries, finishMeasurementDelivery } from '../store'
 import { META_RECEIPT_HEADER } from '../meta-receipt'
 import { measurementPolicyAllowsDelivery } from '../policy-store'
+import type { EnvSource } from '@/types/env-source'
 
 describe('destination acknowledgements', () => {
   const context = { eventId: '11111111-1111-4111-8111-111111111111', eventTime: 1792254000, attemptId: '22222222-2222-4222-8222-222222222222', attempt: 1 }
@@ -117,7 +118,7 @@ describe('destination acknowledgements', () => {
 
 describe('shared cadence and destination isolation', () => {
  beforeEach(() => vi.resetAllMocks())
- const env: NodeJS.ProcessEnv = {NODE_ENV:'test',GROWTH_MEASUREMENT_META_ENABLED:'true',GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED:'true'}
+ const env: EnvSource = {NODE_ENV:'test',GROWTH_MEASUREMENT_META_ENABLED:'true',GROWTH_MEASUREMENT_GOOGLE_UPD_ENABLED:'true'}
 
  it('continues Meta when Google secret resolution fails', async () => {
   vi.mocked(resolveSecret).mockImplementation(async ({envVarName}) => {

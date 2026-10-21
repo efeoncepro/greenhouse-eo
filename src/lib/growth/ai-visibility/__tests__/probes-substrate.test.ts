@@ -16,6 +16,8 @@ import { runProbes } from '../probes/gatherer'
 import { createProbeFetcher, resolveSubjectSite } from '../probes/safe-fetch'
 import { createProbeRegistry } from '../probes/registry'
 
+import type { EnvSource } from '@/types/env-source'
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const makeCtx = (overrides: Partial<ProbeContext> = {}): ProbeContext => ({
@@ -130,7 +132,7 @@ describe('TASK-1266 · probe registry', () => {
 // ── Flags: defaults OFF + gating jerárquico ──────────────────────────────────
 
 describe('TASK-1266 · probe flags', () => {
-  const env = (overrides: Record<string, string>): NodeJS.ProcessEnv => ({ ...overrides }) as NodeJS.ProcessEnv
+  const env = (overrides: Record<string, string>): EnvSource => ({ ...overrides })
   const base = { GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true' }
 
   it('probes default OFF', () => {

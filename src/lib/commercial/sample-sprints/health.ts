@@ -3,6 +3,8 @@ import 'server-only'
 import { query } from '@/lib/db'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
+import type { EnvSource } from '@/types/env-source'
+
 const ACTIVE_ELIGIBLE_NON_REGULAR_SERVICE_PREDICATE = `
   s.active = TRUE
   AND s.status != 'legacy_seed_archived'
@@ -99,7 +101,7 @@ const toNumber = (value: number | string | null | undefined): number => {
 }
 
 export const resolveCommercialEngagementConversionRateThreshold = (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): number => {
   const raw = env[COMMERCIAL_HEALTH_CONVERSION_RATE_THRESHOLD_ENV]?.trim()
 

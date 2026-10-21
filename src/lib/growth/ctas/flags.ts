@@ -8,12 +8,14 @@
  * (gate docs:closure-check). Runtime que lo lee: Vercel (rutas API); no hay consumer
  * en workers Cloud Run.
  */
+import type { EnvSource } from '@/types/env-source'
+
 export const GROWTH_CTA_ENGINE_FLAG = 'GROWTH_CTA_ENGINE_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del motor de CTAs (público + admin). Default OFF. */
-export const isCtaEngineEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isCtaEngineEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_CTA_ENGINE_FLAG])
 
 /**
@@ -22,17 +24,17 @@ export const isCtaEngineEnabled = (env: NodeJS.ProcessEnv = process.env): boolea
  * opera el rate-limit). Consumido por el core compartido `decideAbuse`
  * (`src/lib/growth/public-submission`).
  */
-export const resolveCtaAbuseLimits = (env: NodeJS.ProcessEnv = process.env) => ({
+export const resolveCtaAbuseLimits = (env: EnvSource = process.env) => ({
   perVisitorPerDay: Number(env.GROWTH_CTA_PER_VISITOR_PER_DAY) || 120,
   perIpPerDay: Number(env.GROWTH_CTA_PER_IP_PER_DAY) || 600,
 })
 
 /** Ventana de dedupe/idempotencia del ingest (minutos): mismo visitor+kind+versión ⇒ evento idempotente. */
-export const resolveCtaDedupeWindowMinutes = (env: NodeJS.ProcessEnv = process.env): number =>
+export const resolveCtaDedupeWindowMinutes = (env: EnvSource = process.env): number =>
   Number(env.GROWTH_CTA_DEDUPE_WINDOW_MINUTES) || 30
 
 /** Tope de escrituras de rechazo por IP/hora (evita que la forja infle el propio ledger de rechazos). */
-export const resolveCtaRejectionWriteCapPerHour = (env: NodeJS.ProcessEnv = process.env): number =>
+export const resolveCtaRejectionWriteCapPerHour = (env: EnvSource = process.env): number =>
   Number(env.GROWTH_CTA_REJECTION_WRITE_CAP_PER_HOUR) || 20
 
 /**
@@ -44,7 +46,7 @@ export const resolveCtaRejectionWriteCapPerHour = (env: NodeJS.ProcessEnv = proc
  */
 export const GROWTH_CTA_SUPPRESSION_ENFORCEMENT_FLAG = 'GROWTH_CTA_SUPPRESSION_ENFORCEMENT_ENABLED'
 
-export const isCtaSuppressionEnforcementEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isCtaSuppressionEnforcementEnabled = (env: EnvSource = process.env): boolean =>
   isTrue(env[GROWTH_CTA_SUPPRESSION_ENFORCEMENT_FLAG])
 
 /**
@@ -52,7 +54,7 @@ export const isCtaSuppressionEnforcementEnabled = (env: NodeJS.ProcessEnv = proc
  * el adapter de exposición (rollback <5 min sin redeploy de código). El rollup
  * registra observed + estimated (observed/rate) para reconciliación.
  */
-export const resolveCtaExposureSampleRate = (env: NodeJS.ProcessEnv = process.env): number => {
+export const resolveCtaExposureSampleRate = (env: EnvSource = process.env): number => {
   const raw = Number(env.GROWTH_CTA_EXPOSURE_SAMPLE_RATE)
 
   if (!Number.isFinite(raw)) return 1
@@ -65,5 +67,5 @@ export const resolveCtaExposureSampleRate = (env: NodeJS.ProcessEnv = process.en
  * `cta_id IS NULL` del visitor state). Complementa el cap per-CTA de la suppression
  * policy — un visitante nunca ve más de N prompts interruptivos al día en total.
  */
-export const resolveCtaGlobalInterruptiveCapPerDay = (env: NodeJS.ProcessEnv = process.env): number =>
+export const resolveCtaGlobalInterruptiveCapPerDay = (env: EnvSource = process.env): number =>
   Number(env.GROWTH_CTA_INTERRUPTIVE_PER_SUBJECT_PER_DAY) || 3

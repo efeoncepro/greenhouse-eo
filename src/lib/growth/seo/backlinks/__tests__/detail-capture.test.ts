@@ -200,8 +200,8 @@ describe('estimateDetailCost / resolveDetailRowLimit', () => {
   })
 
   it('knob respetado y clampeado', () => {
-    expect(resolveDetailRowLimit({} as NodeJS.ProcessEnv)).toBe(100)
-    expect(resolveDetailRowLimit({ GROWTH_SEO_BACKLINK_DETAIL_ROW_LIMIT: '5000' } as unknown as NodeJS.ProcessEnv)).toBe(1000)
+    expect(resolveDetailRowLimit({})).toBe(100)
+    expect(resolveDetailRowLimit({ GROWTH_SEO_BACKLINK_DETAIL_ROW_LIMIT: '5000' })).toBe(1000)
   })
 })
 

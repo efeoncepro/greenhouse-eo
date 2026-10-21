@@ -19,6 +19,8 @@ import {
   recordSweepStarted
 } from './persist'
 
+import type { EnvSource } from '@/types/env-source'
+
 const PROBE_TIMEOUT_MS = 8_000
 const DEFAULT_AGENT_EMAIL = 'agent@greenhouse.efeonce.org'
 
@@ -50,7 +52,7 @@ const stripTrailingSlash = (url: string) => url.replace(/\/+$/, '')
  *  3) `VERCEL_URL` con https:// (preview/staging deploy actual)
  *  4) `http://localhost:3000` (desarrollo local)
  */
-export const resolveBaseUrl = (env: NodeJS.ProcessEnv = process.env): BaseUrlConfig => {
+export const resolveBaseUrl = (env: EnvSource = process.env): BaseUrlConfig => {
   const explicit = env.RELIABILITY_SYNTHETIC_BASE_URL?.trim()
   const appUrl = env.NEXT_PUBLIC_APP_URL?.trim()
   const vercelUrl = env.VERCEL_URL?.trim()
@@ -85,7 +87,7 @@ export const resolveBaseUrl = (env: NodeJS.ProcessEnv = process.env): BaseUrlCon
  * Ambos casos producen logs específicos en `signAgentSessionInProcess`.
  */
 const acquireAgentSession = async (
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 ): Promise<AgentAuthCookie | null> => {
   const email = env.AGENT_AUTH_EMAIL?.trim() || DEFAULT_AGENT_EMAIL
 
@@ -212,7 +214,7 @@ export interface RunReliabilitySyntheticSweepResult {
 export const runReliabilitySyntheticSweep = async ({
   triggeredBy = 'cron',
   env = process.env
-}: { triggeredBy?: SyntheticTriggerSource; env?: NodeJS.ProcessEnv } = {}): Promise<RunReliabilitySyntheticSweepResult> => {
+}: { triggeredBy?: SyntheticTriggerSource; env?: EnvSource } = {}): Promise<RunReliabilitySyntheticSweepResult> => {
   const startedAt = new Date()
   const sweepRunId = generateSweepRunId()
 

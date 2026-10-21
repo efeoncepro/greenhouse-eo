@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { EnvSource } from '@/types/env-source'
+
 /**
  * TASK-1689 — Config de los emails transaccionales del ciclo de Hiring.
  *
@@ -9,7 +11,7 @@ import 'server-only'
  */
 export const HIRING_LIFECYCLE_EMAILS_FLAG = 'HIRING_LIFECYCLE_EMAILS_ENABLED'
 
-export const isHiringLifecycleEmailsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isHiringLifecycleEmailsEnabled = (env: EnvSource = process.env): boolean =>
   env[HIRING_LIFECYCLE_EMAILS_FLAG]?.trim().toLowerCase() === 'true'
 
 /**
@@ -26,11 +28,11 @@ export const isHiringAssessmentPublicSessionLinksEnabled = (): boolean =>
  * Buzón interno de People para el aviso de postulación nueva. Configurable por env;
  * NUNCA hardcodear el literal en consumers/templates.
  */
-export const resolveHiringInternalNotificationsEmail = (env: NodeJS.ProcessEnv = process.env): string =>
+export const resolveHiringInternalNotificationsEmail = (env: EnvSource = process.env): string =>
   env.HIRING_INTERNAL_NOTIFICATIONS_EMAIL?.trim() || 'people@efeoncepro.com'
 
 /** Base pública del portal para armar links absolutos en emails (patrón ebook-delivery). */
-export const hiringPublicBaseUrl = (env: NodeJS.ProcessEnv = process.env): string =>
+export const hiringPublicBaseUrl = (env: EnvSource = process.env): string =>
   (env.GREENHOUSE_PUBLIC_APP_URL || env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com').replace(/\/$/, '')
 
 /**
@@ -46,10 +48,10 @@ export const hiringPublicBaseUrl = (env: NodeJS.ProcessEnv = process.env): strin
  */
 export const HIRING_OPENING_CAPACITY_CLOSURE_FLAG = 'HIRING_OPENING_CAPACITY_CLOSURE_ENABLED'
 
-export const isHiringOpeningCapacityClosureEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isHiringOpeningCapacityClosureEnabled = (env: EnvSource = process.env): boolean =>
   env[HIRING_OPENING_CAPACITY_CLOSURE_FLAG]?.trim().toLowerCase() === 'true'
 
 export const HIRING_CAPACITY_FILLED_EMAIL_FLAG = 'HIRING_CAPACITY_FILLED_EMAIL_ENABLED'
 
-export const isHiringCapacityFilledEmailEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+export const isHiringCapacityFilledEmailEnabled = (env: EnvSource = process.env): boolean =>
   env[HIRING_CAPACITY_FILLED_EMAIL_FLAG]?.trim().toLowerCase() === 'true'

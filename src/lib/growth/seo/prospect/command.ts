@@ -41,6 +41,8 @@ import {
   getProspectDiagnostic
 } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type ProspectDiagnosticErrorCode =
   | 'disabled'
   | 'invalid_domain'
@@ -60,7 +62,7 @@ export interface RunProspectDiagnosticInput {
   competitorDomains?: string[]
   /** Quién dispara (persona u `mcp:<consumer>`); siempre hay un humano detrás del confirm. */
   actor: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export type RunProspectDiagnosticResult =

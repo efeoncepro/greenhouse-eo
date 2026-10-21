@@ -24,6 +24,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveAeoAllowanceConfig, type AeoAllowanceConfig } from './flags'
 import { resolveProviderPolicy } from './policy'
 
+import type { EnvSource } from '@/types/env-source'
+
 export const AI_VISIBILITY_MODULE_KEY = 'ai_visibility_v1' as const
 
 export type AeoTier = 'contracted' | 'trial' | 'pilot'
@@ -100,7 +102,7 @@ const resolveCap = (tier: AeoTier, metadata: Record<string, unknown> | null, con
  */
 export const resolveAeoEntitlement = async (
   organizationId: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<AeoEntitlement> => {
   const config = resolveAeoAllowanceConfig(env)
 

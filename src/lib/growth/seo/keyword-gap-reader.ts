@@ -46,6 +46,8 @@ import { isSeoModuleEnabled } from './flags'
 import { deriveLinkBarrier } from './keyword-market-data'
 import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from './lens'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Ventana GSC para la exclusión por demanda medida — misma ventana que el gap SEO↔AEO. */
 export const KEYWORD_GAP_GSC_WINDOW_DAYS = 28
 
@@ -206,7 +208,7 @@ export interface ReadKeywordGapOptions {
   seoCompetitorId?: string
   /** Techo de filas por lista y competidor (default 500, máx 1000). El resto se declara. */
   limit?: number
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export const readKeywordGap = async (

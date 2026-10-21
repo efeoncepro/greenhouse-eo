@@ -96,7 +96,7 @@ const enabledEnv = {
   NODE_ENV: 'test',
   GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true',
   GROWTH_AI_VISIBILITY_FIX_IT_ENABLED: 'true'
-} as NodeJS.ProcessEnv
+}
 
 beforeEach(() => {
   calls.getRun = []
@@ -119,7 +119,7 @@ describe('TASK-1269 — fix-it command', () => {
     const { FixItArtifactsError, generateFixItArtifactsForPublicToken } = await import('../fix-it/command')
 
     await expect(
-      generateFixItArtifactsForPublicToken({ reportToken: 'grt-token', env: { NODE_ENV: 'test' } as NodeJS.ProcessEnv })
+      generateFixItArtifactsForPublicToken({ reportToken: 'grt-token', env: { NODE_ENV: 'test' } })
     ).rejects.toBeInstanceOf(FixItArtifactsError)
   })
 })

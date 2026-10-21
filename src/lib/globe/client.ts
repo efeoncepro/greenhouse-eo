@@ -14,6 +14,8 @@ import {
 } from '@/lib/google-credentials'
 import type { GlobeTenancyReconcileCommand } from './tenancy-reconciler'
 
+import type { EnvSource } from '@/types/env-source'
+
 export type GreenhouseGlobeCredentialSource = 'wif' | 'ambient_adc'
 
 export type GreenhouseGlobeClientConfig = Readonly<{
@@ -46,7 +48,7 @@ export class GreenhouseGlobeConfigurationError extends Error {
 }
 
 export function readGreenhouseGlobeClientConfig(
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): GreenhouseGlobeClientConfig {
   if (env.VERCEL_ENV?.trim().toLowerCase() === 'production') {
     throw new GreenhouseGlobeConfigurationError('globe_production_forbidden')
@@ -88,7 +90,7 @@ export function readGreenhouseGlobeClientConfig(
 }
 
 export function createGreenhouseGlobeClient(
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvSource = process.env,
   dependencies: GreenhouseGlobeClientDependencies = {}
 ) {
   const config = readGreenhouseGlobeClientConfig(env)
@@ -107,7 +109,7 @@ export function createGreenhouseGlobeClient(
 
 /** Canonical typed SDK seam for the continuous tenancy reconciler. */
 export function createGreenhouseGlobeTenancyReconcileCommand(
-  env: NodeJS.ProcessEnv = process.env,
+  env: EnvSource = process.env,
   dependencies: GreenhouseGlobeClientDependencies = {}
 ): GlobeTenancyReconcileCommand {
   const { client } = createGreenhouseGlobeClient(env, dependencies)
@@ -130,7 +132,7 @@ export function createGreenhouseGlobeTenancyReconcileCommand(
 
 function createGoogleIdTokenClientFactory(
   config: GreenhouseGlobeClientConfig,
-  env: NodeJS.ProcessEnv
+  env: EnvSource
 ): GoogleIdTokenClientFactory {
   if (config.credentialSource === 'ambient_adc') {
     if (config.serviceAccountEmail) {

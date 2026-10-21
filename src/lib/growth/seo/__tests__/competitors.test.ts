@@ -262,8 +262,8 @@ describe('retireCompetitors', () => {
 
 describe('resolveCompetitorCapacity', () => {
   it('default conservador y override por env', () => {
-    expect(resolveCompetitorCapacity({} as NodeJS.ProcessEnv)).toBe(5)
-    expect(resolveCompetitorCapacity({ GROWTH_SEO_COMPETITORS_PER_TARGET: '12' } as unknown as NodeJS.ProcessEnv)).toBe(12)
-    expect(resolveCompetitorCapacity({ GROWTH_SEO_COMPETITORS_PER_TARGET: '-1' } as unknown as NodeJS.ProcessEnv)).toBe(5)
+    expect(resolveCompetitorCapacity({})).toBe(5)
+    expect(resolveCompetitorCapacity({ GROWTH_SEO_COMPETITORS_PER_TARGET: '12' })).toBe(12)
+    expect(resolveCompetitorCapacity({ GROWTH_SEO_COMPETITORS_PER_TARGET: '-1' })).toBe(5)
   })
 })

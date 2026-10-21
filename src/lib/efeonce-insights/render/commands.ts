@@ -60,11 +60,13 @@ import {
   retryFailedInsightOutputs
 } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 interface RenderScope {
   subject: TenantEntitlementSubject
   actorOrganizationId: string | null
   organizationId: string
-  env?: NodeJS.ProcessEnv
+  env?: EnvSource
 }
 
 export interface RequestInsightRenderInput extends RenderScope {

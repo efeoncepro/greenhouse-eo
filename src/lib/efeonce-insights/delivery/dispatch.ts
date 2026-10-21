@@ -43,6 +43,8 @@ import {
   setInsightDeliveryIntentState
 } from './store'
 
+import type { EnvSource } from '@/types/env-source'
+
 const SOURCE_ENTITY = 'insight_delivery_recipients'
 const SYSTEM_ACTOR = { kind: 'system' as const, userId: null, memberId: null }
 
@@ -301,7 +303,7 @@ const refreshIntentState = async (intent: InsightDeliveryIntentRecord) => {
   }
 }
 
-export const dispatchInsightDeliveryIntent = async (deliveryIntentId: string, env: NodeJS.ProcessEnv = process.env): Promise<DispatchInsightDeliveryResult> => {
+export const dispatchInsightDeliveryIntent = async (deliveryIntentId: string, env: EnvSource = process.env): Promise<DispatchInsightDeliveryResult> => {
   const result: DispatchInsightDeliveryResult = { accepted: 0, failed: 0, ambiguous: 0, skippedRecipients: 0 }
 
   if (!isInsightsDeliveryEnabled(env)) return { ...result, skipped: 'flag_off' }

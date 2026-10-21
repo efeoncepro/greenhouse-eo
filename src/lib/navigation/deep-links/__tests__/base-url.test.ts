@@ -13,7 +13,7 @@ describe('resolveGreenhouseBaseUrl', () => {
         env: {
           NEXTAUTH_URL: 'https://auth.example.com/',
           NEXT_PUBLIC_APP_URL: 'https://app.example.com'
-        } as unknown as NodeJS.ProcessEnv
+        }
       })
     ).toBe('https://auth.example.com')
   })
@@ -23,7 +23,7 @@ describe('resolveGreenhouseBaseUrl', () => {
       resolveGreenhouseBaseUrl({
         env: {
           NEXT_PUBLIC_APP_URL: 'https://app.example.com/'
-        } as unknown as NodeJS.ProcessEnv
+        }
       })
     ).toBe('https://app.example.com')
   })
@@ -33,13 +33,13 @@ describe('resolveGreenhouseBaseUrl', () => {
       resolveGreenhouseBaseUrl({
         env: {
           VERCEL_URL: 'greenhouse-preview.vercel.app'
-        } as unknown as NodeJS.ProcessEnv
+        }
       })
     ).toBe('https://greenhouse-preview.vercel.app')
   })
 
   it('falls back to localhost in tests/dev', () => {
-    expect(resolveGreenhouseBaseUrl({ env: {} as NodeJS.ProcessEnv })).toBe('http://localhost:3000')
+    expect(resolveGreenhouseBaseUrl({ env: {} })).toBe('http://localhost:3000')
   })
 })
 

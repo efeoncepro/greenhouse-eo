@@ -20,6 +20,8 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 import { SEARCH_CONSOLE_SCOPE } from './contracts'
 
+import type { EnvSource } from '@/types/env-source'
+
 const OAUTH_CALLBACK_PATH = '/api/admin/growth/search-console/oauth/callback'
 
 export interface SearchConsoleOAuthConfig {
@@ -30,7 +32,7 @@ export interface SearchConsoleOAuthConfig {
 
 /** Resuelve la config OAuth; `null` si falta client id/secret (no configurado). */
 export const resolveSearchConsoleOAuthConfig = async (
-  env: NodeJS.ProcessEnv = process.env
+  env: EnvSource = process.env
 ): Promise<SearchConsoleOAuthConfig | null> => {
   const clientIdResolution = await resolveSecret({
     envVarName: 'GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID',

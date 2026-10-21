@@ -54,6 +54,8 @@ import {
   type VisibilitySubjectKind
 } from './resolve-subject'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Espejo del patrón TASK-1303/1661: re-consulta del gate cada K llamadas cobradas. */
 const SPEND_FENCE_RECHECK_EVERY = 10
 
@@ -66,7 +68,7 @@ export const URL_VISIBILITY_ROW_LIMIT_KNOB = 'GROWTH_SEO_URL_VISIBILITY_ROW_LIMI
 export const URL_VISIBILITY_DEFAULT_ROW_LIMIT = 100
 const PROVIDER_MAX_ROW_LIMIT = 1000
 
-export const resolveRowLimit = (env: NodeJS.ProcessEnv = process.env): number => {
+export const resolveRowLimit = (env: EnvSource = process.env): number => {
   const raw = Number(env[URL_VISIBILITY_ROW_LIMIT_KNOB])
 
   if (!Number.isFinite(raw) || raw <= 0) return URL_VISIBILITY_DEFAULT_ROW_LIMIT

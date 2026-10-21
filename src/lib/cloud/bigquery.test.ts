@@ -4,17 +4,17 @@ import { getBigQueryMaximumBytesBilled, getBigQueryQueryOptions } from './bigque
 
 describe('cloud bigquery helpers', () => {
   it('uses the default maximum bytes billed when env is absent', () => {
-    expect(getBigQueryMaximumBytesBilled({} as unknown as NodeJS.ProcessEnv)).toBe(1_000_000_000)
+    expect(getBigQueryMaximumBytesBilled({})).toBe(1_000_000_000)
   })
 
   it('uses the env override when valid', () => {
-    expect(getBigQueryMaximumBytesBilled({ BIGQUERY_MAX_BYTES_BILLED: '2500000000' } as unknown as NodeJS.ProcessEnv)).toBe(
+    expect(getBigQueryMaximumBytesBilled({ BIGQUERY_MAX_BYTES_BILLED: '2500000000' })).toBe(
       2_500_000_000
     )
   })
 
   it('falls back to the default when env is invalid', () => {
-    expect(getBigQueryMaximumBytesBilled({ BIGQUERY_MAX_BYTES_BILLED: 'not-a-number' } as unknown as NodeJS.ProcessEnv)).toBe(
+    expect(getBigQueryMaximumBytesBilled({ BIGQUERY_MAX_BYTES_BILLED: 'not-a-number' })).toBe(
       1_000_000_000
     )
   })
