@@ -1,5 +1,17 @@
 # Registro operativo CRM de licitaciones
 
+## Sika LIC-1184 — descartada por admisibilidad; cierre perdido — 19-10-2026
+
+Por instrucción expresa de Julio, Deal **[66308025451](https://app.hubspot.com/contacts/48713323/record/0-3/66308025451)** cerrado como **`closedlost`**. Motivo: Sika responde **«NO, SOLO MÉXICO»** a participación de empresas constituidas en Chile y facturación desde el extranjero. Estado local **NO-BID**, sin oferta presentada ni derrota competitiva inferida. Se detienen preparación, búsqueda de excepciones y seguimiento; reapertura sólo por nueva instrucción. [Decisión, fuente y verificación](sika-mexico-landing-ecommerce-1184/research/CIERRE-2026-10-19-INTERNO.md). El HOLD y los próximos pasos de los cortes anteriores quedan históricos.
+
+## Sika LIC-1184 — aclaraciones y admisibilidad — 19-10-2026
+
+Deal `66308025451`: **HOLD de preparación por requisito «NO, SOLO MÉXICO»** ante consulta de empresa chilena/facturación extranjera; Julio debe verificar entidad mexicana elegible o excepción expresa. [Captura y aclaraciones](sika-mexico-landing-ecommerce-1184/bases/ACLARACIONES-2026-10-19.md), respuesta visible 19/10 19:18 sin zona. Paquete completo a cargo del proveedor con gestión posterior; landing desde cero y tres adaptaciones, tres videos Meta con tres formatos, sincronización desde cero de12 SKU, API/accesos ofrecidos por Sika; plazo1–2 semanas. Oferta **MXN**, sin importe; pago hasta60 días desde **aprobación final**, que difiere de la ficha inicial. Descripción, próximo paso y moneda actualizados en el mismo Deal; etapa y valor preservados, sin cierre perdido ni envío. Las menciones iniciales de moneda/pago/pendientes en los cortes siguientes son históricas.
+
+## Sika México — LIC-1184 — alta 19-10-2026
+
+[Deal 66308025451](https://app.hubspot.com/contacts/48713323/record/0-3/66308025451) creado por mandato expreso de Julio para trabajo futuro; [expediente y brief](sika-mexico-landing-ecommerce-1184/README.md). Company mexicana `59084984648` Primary, owner `75788512`; `default/appointmentscheduled` como etapa inicial administrativa, sin cita ni calificación inferidas. Wherex LIC-1184 / oferta7561688, Editando; publicación19/10 18:15 y cierre **22/10/2026 19:00, zona pendiente**. Pago60 días desde factura; selector MXN sin IVA, sin monto ni moneda contractual. `newbusiness` / `Strategic Bets` en primera lectura; readback final en registro interno del expediente. Sin closedate ni datetime inferido. Brief íntegro/captura preservados; propuesta, GO y responsables compradores pendientes. Sin contactos nuevos, oferta presentada ni envío.
+
 ## UTEM · resultado perdido — actualización puntual 19-10-2026
 
 Proceso **5251-1060-COT26**, Deal **65832566144**: Julio informa pérdida; consulta actual de LicitaLAB confirma **Proveedor seleccionado: PROMO GIFT SPA**, CLP2.290.000 netos, frente a Efeonce CLP4.800.000. Efeonce figura no seleccionada y quinta por precio entre diez ofertas; no es ranking técnico. [Análisis documental y límites](utem-seo-aeo-2026/ANALISIS-PROMOGIFT-2026-10-19-INTERNO.md). Este resultado sustituye «en evaluación» en los cortes históricos siguientes. **HubSpot cerrado como perdido (`closedlost`) por autorización de Julio**, con motivo, descripción y siguiente paso conciliados; dos readbacks CLI/MCP. Monto propio CLP4.800.000 preservado. Sin acciones comerciales pendientes para esta compra. [Evidencia de cierre](utem-seo-aeo-2026/hubspot-perdida-2026-10-19.json). Fundamentación oficial/OC de UTEM no recuperadas.

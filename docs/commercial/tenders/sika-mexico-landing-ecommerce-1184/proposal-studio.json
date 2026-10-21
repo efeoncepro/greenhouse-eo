@@ -1,0 +1,20 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "sika-mexico-landing-ecommerce-1184",
+  "workspacePath": "docs/commercial/tenders/sika-mexico-landing-ecommerce-1184",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Intake autorizado el 19/10/2026: Deal registrado y brief preservado; propuesta no iniciada. No existe Proposal, cotización, deck ni entregable cliente.",
+    "Aclaraciones del comprador aportadas el 19/10/2026: HOLD de preparación por requisito solo México; paquete completo, 1–2 semanas, oferta MXN y pago desde aprobación final. Sin GO ni Proposal.",
+    "Decisión final 19/10/2026: Julio descarta LIC-1184 por requisito solo México; Deal cerrado como perdido. No preparar ni reabrir sin nueva instrucción. workshop_only sólo indica ausencia de registro Proposal, no trabajo activo."
+  ]
+}
