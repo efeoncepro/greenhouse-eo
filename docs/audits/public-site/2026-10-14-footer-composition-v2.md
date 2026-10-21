@@ -25,3 +25,26 @@ PHP syntax y ESLint PASS. CSS fuente incluido exactamente en payload; JS fuente 
 [QA de navegador](2026-10-14-footer-composition-v2-browser.json): Home/HubSpot landing × 1440/390, más Home1920 y768. Los seis casos sin overflow, nueve imágenes cargadas en gris, una suscripción, un Careers, un control de cookies y chrome flotante oculto/inert. Capturas finales [desktop](2026-10-14-footer-composition-v2/desktop.png) y [móvil](2026-10-14-footer-composition-v2/mobile.png), también revisadas visualmente tablet y pantalla amplia. Sin inyección de preview en la prueba final. Playwright focal se usa por inspección de render CMS/CF7, payload de assets e interacción con HubSpot; el helper GVC no representa este flujo WordPress. Originales en `.captures/footer-refinement-2026-10-14/`.
 
 Teclado email→Suscribirme con foco teal2px; top alcanza scroll0 y recupera chrome sin inert. Preferencias abre el diálogo nativo; QA elige «Solo esenciales». Axe sobre footer: **0 violaciones, 30 checks PASS**; único incomplete de contraste corresponde a flecha decorativa `aria-hidden`, verificada manualmente (~10,16:1 para el tono heredado). La primera búsqueda por texto de Rechazar no coincidió con aria-label «Solo esenciales»; se corrigió el locator, sin fallo del producto. Privacidad/portafolio/blog200; términos404 retirado. No submissions, reservas, contactos o pruebas nuevas de recepción Meta/GA4. Sin build pesado.
+
+## Compatibilidad del bootstrap — 2026-10-18
+
+Site Quality Monitoring abrió una incidencia porque su motor no acepta `:has()` dentro de
+`document.querySelector`, aunque el selector funciona en navegadores modernos. El bootstrap era válido pero
+innecesariamente frágil. Se reemplazó sólo esa expresión por selección del marcador
+`[data-eo-footer-partners="v2"]` seguida de `closest('#colophon')`; el CSS conserva `:has()` y no cambió ninguna
+regla visual.
+
+La escritura se limitó a `widget_block[34]` con guarda sobre el bloque completo, comparación de delta exacto y
+snapshot no-autoload `eo_footer_compat_20261018` con before/after y rollback. El primer intento fue detenido antes
+de escribir porque la guarda comparaba el hash del registro contra el contenido; corregida la granularidad, el
+apply y el readback quedaron PASS. Se purgaron cache WordPress y Kinsta. Las respuestas sin caché de Home y de la
+landing HubSpot sirven el selector nuevo.
+
+QA Playwright focal —porque el flujo es WordPress/Ohio y no una ruta Greenhouse representable por GVC— sobre Home
+y `/servicios-contratar-hubspot/` en 1440×1100 y 390×844: `data-eo-footer-ready=true`, cero overflow horizontal,
+nueve logos, un enlace Careers, newsletter intacta y cero errores de consola. Capturas:
+[`Home desktop`](../../../.captures/footer-compat-20261018/home-desktop-1440.png),
+[`Home móvil`](../../../.captures/footer-compat-20261018/home-mobile-390.png),
+[`HubSpot desktop`](../../../.captures/footer-compat-20261018/hubspot-desktop-1440.png) y
+[`HubSpot móvil`](../../../.captures/footer-compat-20261018/hubspot-mobile-390.png). La composición y estética
+coinciden con la V2 aprobada; no hubo envío de formulario, cambios de tracking ni modificación de contenido.
