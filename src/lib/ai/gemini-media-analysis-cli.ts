@@ -4,6 +4,8 @@
  */
 import { extname } from 'node:path'
 
+import type { EnvSource } from '@/types/env-source'
+
 /** Verificado en Vertex `global` el 2026-10-20: 3.8 Flash responde; 3.8 Pro y 3.5 Pro dan 404. */
 export const GEMINI_MEDIA_DEFAULT_MODEL = 'gemini-3.8-flash'
 
@@ -57,7 +59,7 @@ export const LISTEN_USAGE = `pnpm ai:listen — Gemini escucha o mira archivos y
 Ejemplo:
   pnpm ai:listen --file mezcla.wav --file video.mp4 --prompt-file critica.txt --out critica.md`
 
-export const parseListenArgs = (argv: string[], env: NodeJS.ProcessEnv = process.env): ListenArgs => {
+export const parseListenArgs = (argv: string[], env: EnvSource = process.env): ListenArgs => {
   const args: ListenArgs = {
     files: [],
     model: env.GREENHOUSE_GEMINI_MEDIA_MODEL?.trim() || GEMINI_MEDIA_DEFAULT_MODEL,
