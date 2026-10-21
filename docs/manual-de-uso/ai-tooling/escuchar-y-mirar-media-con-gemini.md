@@ -1,10 +1,10 @@
 # Escuchar y mirar media con Gemini (`pnpm ai:listen`)
 
 > **Tipo de documento:** Manual de uso
-> **Versión:** 2.1
+> **Versión:** 2.2
 > **Creado:** 2026-10-21 por Claude (sesión de la serie de partners)
-> **Última actualización:** 2026-10-21 por Claude (v2.1: `--measure-only`, control de la pieza sin Gemini)
-> **Código:** `scripts/ai/listen.ts` · `src/lib/ai/gemini-media-analysis.ts` · `src/lib/ai/gemini-media-analysis-cli.ts` · `src/lib/ai/gemini-media-verify.ts` · `src/lib/ai/gemini-media-presets.ts`
+> **Última actualización:** 2026-10-21 por Claude (v2.2: cortes de música con `pnpm ai:audio-edits`)
+> **Código:** `scripts/ai/audio-edits.ts` · `scripts/ai/audio-edits-lib.ts` · `scripts/ai/listen.ts` · `src/lib/ai/gemini-media-analysis.ts` · `src/lib/ai/gemini-media-analysis-cli.ts` · `src/lib/ai/gemini-media-verify.ts` · `src/lib/ai/gemini-media-presets.ts`
 > **Documentación técnica:** [Guía de selección de modelos §5.10](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
 > **Documentación funcional:** [Revisión de piezas con Gemini](../../documentation/ai-tooling/revision-de-piezas-con-gemini.md)
 
@@ -176,6 +176,43 @@ el primero.
 - **Modo agéntico:** `--count-tokens` no refleja su ahorro. En la generación real usó 246 tokens contra 719 en modo
   estático.
 
+## Cortar música sin que se oiga (`pnpm ai:audio-edits`)
+
+Una música generada casi nunca dura lo que la pieza. Para acortarla hay que cortarla, y un corte mal puesto se oye
+aunque el tempo y el nivel calcen. **Regla: la música sólo se corta justo antes de un ataque (el golpe del tiempo
+siguiente), en la salida y en la entrada.** El golpe tapa la unión. Cortar en medio de una nota deja una cola, un resto
+o un truncamiento que se oye «mal cortado».
+
+Un silencio de montaje (stop-time) también es un corte: la música vuelve a media nota. Tampoco se arranca la pieza a
+mitad de la toma: se parte del primer golpe propio de la toma.
+
+1. **Mira dónde se puede cortar:** `pnpm ai:audio-edits ataques --source <toma.wav>` lista los ataques. Con
+   `envolvente --source <toma.wav> --from 15 --to 21` ves el nivel por ventana, para ubicar el acorde final y cuánto
+   resuena.
+2. **Escribe el plan** en segundos, de la fuente a la salida: `{ "segments": [{ "in": 0, "out": 9.99, "at": 0.05 },
+   { "in": 15.99, "out": 21, "at": 10.04 }] }`. Lo normal es un solo empalme, de compás a compás.
+3. **Ajústalo, ármalo y revísalo de una vez:** `pnpm ai:audio-edits revisar --source <toma.wav> --plan plan.json
+   --ajustar plan-ajustado.json --render musica.wav`. `--ajustar` lleva cada corte al punto de menor energía de los
+   30 ms previos al ataque más cercano (±120 ms). `--render` arma la edición con fundidos de 5 ms y revisa las uniones.
+   Sale con 1 si un corte falla. Repite con el plan ajustado como `--plan` para dejar constancia.
+4. **Revisa la mezcla final:** `pnpm ai:audio-edits uniones --mix <master.wav> --at 10.043` busca clics, escalones sin
+   ataque y bordes de silencio digital en las uniones.
+
+Qué marca como falla:
+
+| Señal | Qué se oye |
+|---|---|
+| `entrada` sin ataque en los 30 ms siguientes | el tramo arranca a media nota |
+| `entrada` con ataque que sube menos de 3 dB | el golpe no tapa la cola que arrastra |
+| `salida` sin ataque a continuación y con sonido | la nota se corta truncada |
+| `union` con clic | un chasquido en la unión |
+| `union` contra silencio digital | un hueco: el stop-time que vuelve a media nota |
+
+Caso fuente (pieza ChatGPT Ads, 2026-10-21): la v9 arrancaba la toma en su segundo 6,06 y metía dos stop-time. El
+operador oyó restos y cortes. La herramienta marcó los cinco cortes como malos. La v10 parte del primer golpe de la toma
+y tiene un solo empalme: sale 14 ms antes del tiempo fuerte de 9,99 s y entra 12 ms antes del acorde final (16,005 s).
+Pasa las cinco revisiones.
+
 ## Qué no hacer
 
 - **No tomes la crítica como medición.** Usa `--verify`. Caso real del 2026-10-21 sobre la pieza AWS: Gemini afirmó con
@@ -190,6 +227,9 @@ el primero.
   ×2,86 con `atempo` (que conserva el tono) se oía distorsionado para el operador, y Gemini lo calificó de «natural, sin
   artefactos». La escucha a 1 kbps y su criterio no detectan artefactos de time-stretch: no estires música para alargarla;
   usa el final natural o una toma con el final más largo.
+- **No muestres una música cortada sin pasarla por `pnpm ai:audio-edits revisar`.** Un corte puede calzar en tempo y
+  nivel y aun así oírse: cortar a media nota no lo detecta ni el oído apurado ni Gemini. Tampoco uses stop-time para
+  meter un golpe en la grilla.
 - **No uses zsh con `$var:` en rutas o URLs.** zsh lo lee como modificador; escribe `${var}`.
 
 ## Problemas comunes

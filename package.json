@@ -317,6 +317,7 @@
     "ai:byteplus": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/byteplus.ts",
     "ai:omni": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts",
     "ai:listen": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/listen.ts",
+    "ai:audio-edits": "tsx scripts/ai/audio-edits.ts",
     "ai:higgsfield:sync-schemas": "tsx scripts/ai/higgsfield-sync-schemas.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
     "ai:inpaint": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/inpaint/cli.ts",

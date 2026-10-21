@@ -212,6 +212,12 @@ Antes de mostrar al operador una mezcla montada sobre video, correr primero el c
 segunda opinión de criterio y siempre con `--verify`. Detalle en el
 [manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
+Si la música se acorta, **sólo se corta justo antes de un ataque**, en la salida y en la entrada; nunca a media nota,
+nunca arrancando a mitad de la toma y nunca con stop-time. El plan se arma y se verifica con
+`pnpm ai:audio-edits revisar --source toma.wav --plan plan.json --ajustar plan-ajustado.json --render musica.wav`
+(sale con 1 si un corte falla) antes de mezclar. Caso fuente: ChatGPT Ads, 2026-10-21; receta en el manual
+§«Cortar música sin que se oiga».
+
 ## Locución comercial y música para un video corto (2026-10-12)
 
 Locución para un mercado: voz **de ese país** y en registro de locutor, no coloquial; por el conector de claude.ai el
