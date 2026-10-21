@@ -221,6 +221,31 @@ Kortex remains hibernated and was neither used nor restarted. The old Aircall pr
 current telephony implementation. Recovery means reviewing removal of only Emma's voice deployment and verifying
 the remaining call destination before use; never delete the number or alter chat/email as an implicit rollback.
 
+## Voice follow-up — 2026-10-21
+
+The [21 October case record](../../../../docs/audits/ANAM_EMMA_VOICE_SOPORTE_Y_CORRESPONDENCIA_2026-10-21.md)
+owns the reviewed findings, exact outbound text, sent evidence and latest inbound question. The 19 October
+snapshot below remains historical setup evidence. No configuration was changed during this review.
+
+Julio limits agency work to minor support: greeting/voicemail copy, narrow repetition/verbosity fixes that
+preserve technical intake, and correction of discrepancies in existing recipients, hours or ringing.
+Do not promise a new IVR, named-client-executive routing, a voice-only identify-and-transfer design, new
+workflows/integrations or channel migration. Evaluate feasibility, impact and scope first; quote separately
+when the change exceeds delivered-scope support. Shared agent instructions must not be simplified globally
+to solve a phone-only concern. Independent per-channel questionnaires remain unverified, not proven impossible.
+
+Reviewed calls attempted human handoff and ended in voicemail; this does not establish the cause or prove
+an answered human transfer. The prior channel review placed voice/chat in Help Desk and Sales email in Inbox;
+do not assume all three already share a destination or migrate them as an incidental correction.
+Requesting caller data is separate from matching a CRM contact and resolving their executive.
+
+Julio's reply was sent on 21 October at 18:20:34 America/Santiago to Maria Paz and Oscar with his official
+graphical signature and BCC `48713323@bcc.hubspot.com`. Outlook readback and Efeonce EMAIL `119253278227`
+(`SENT`) were verified. Maria Paz replied at 18:28:40 asking how users enable availability/receive calls.
+This is an operating-support question, not approval of redesign. The record contains official Help Desk/browser
+instructions for a short response; that new response is still unsent. No new configuration or send authority
+follows from her inbound email.
+
 ## Customer Agent capability backlog
 
 The 2026-07-24 readback shows the Customer Agent operational with 23 active sources, live chat configured all

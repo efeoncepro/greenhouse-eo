@@ -45,6 +45,12 @@ The service owns the business contract and evidence. Each underlying platform ow
 
 ## ANAM implementation
 
+The [21 October voice/support follow-up](../../../audits/ANAM_EMMA_VOICE_SOPORTE_Y_CORRESPONDENCIA_2026-10-21.md)
+records the reviewed calls, shared-agent/channel distinction, minor support versus scope evaluation,
+Julio's sent reply (Outlook and HubSpot verified) and Maria Paz's new question about receiving calls.
+No configuration change was made. Her operating-support question remains unanswered; broader routing,
+IVR or channel redesign is not promised or authorized.
+
 Voice is active as of 2026-10-19 in ANAM, independently of the CMS/chat seam below. The
 [voice configuration and runtime evidence](../../../audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md)
 record the approved design: Emma first, AI reception at all hours, human transfer on business hours, no initial
