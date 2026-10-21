@@ -1,7 +1,7 @@
 # Revisión de piezas con Gemini — QA de audio, video e imagen
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-10-21 por Claude
 > **Última actualización:** 2026-10-21 por Claude (v2 de la CLI: verificación automática, cues, rúbricas)
 > **Documentación técnica:** [Guía de selección de modelos §5.10](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
@@ -71,6 +71,23 @@ planeado por su cuenta, sin depender de Gemini.
 > Ejemplo real (pieza AWS, octubre de 2026): Gemini aseguró que la imagen quedaba congelada en los últimos segundos. La
 > medición mostró que nunca se congela, así que esa crítica se descartó. Las cues medidas confirmaron que el silencio,
 > los dos golpes y el remate sonoro caen exactamente donde se planearon.
+
+## Revisar sin Gemini: solo medición
+
+La parte más confiable de la herramienta no necesita a Gemini. Con `--measure-only`, mide la pieza en menos de un
+segundo y sin costo:
+- dónde suena cada golpe;
+- dónde hay silencio;
+- dónde cambia la imagen;
+- si hay cuadros congelados;
+- si el sonido va en sincronía con la imagen.
+
+Si se le entrega la hoja de cues, confirma cada momento planeado.
+
+Por eso el orden de trabajo es:
+1. **Primero, la medición**, como control de calidad estándar antes de mostrar una pieza.
+2. **Después, Gemini como segunda opinión**, para lo que solo se puede juzgar mirando: si algo se siente plano, si un
+   texto se lee o si el ritmo engancha.
 
 ## Rúbricas fijas
 

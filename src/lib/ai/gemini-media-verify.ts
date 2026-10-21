@@ -239,6 +239,105 @@ export const verifyExpectation = (expectation: CueExpectation, m: Measurements):
 export const verifyCues = (cues: Cue[], m: Measurements) =>
   cues.flatMap(cue => cueExpectations(cue).map(expectation => ({ cue: cue.t, ...expectation, ...verifyExpectation(expectation, m) })))
 
+// ── Mapa de eventos (`--measure-only`): la pieza medida sin preguntarle a ningún modelo ─────────
+
+export interface Span {
+  t: number
+  tFin: number
+}
+
+/** Tramos de silencio (RMS ≤ −50 dB) de al menos `minSec`. */
+export const detectSilences = (env: AudioWindow[], minSec = 0.1): Span[] => {
+  const out: Span[] = []
+  let start: number | undefined
+
+  env.forEach((w, i) => {
+    const silent = w.rms <= VERIFY_THRESHOLDS.silenceRmsDb
+
+    if (silent && start === undefined) start = w.t
+
+    if ((!silent || i === env.length - 1) && start !== undefined) {
+      const end = silent ? w.t + 0.01 : w.t
+
+      if (end - start >= minSec) out.push({ t: start, tFin: end })
+      start = undefined
+    }
+  })
+
+  return out
+}
+
+/** Tramos de cuadros quietos: dos o más diferencias seguidas bajo el umbral. */
+export const detectFrozenSpans = (motion: MotionFrame[]): Span[] => {
+  const out: Span[] = []
+  let run: MotionFrame[] = []
+
+  const flush = () => {
+    if (run.length >= 2) out.push({ t: run[0].t, tFin: run[run.length - 1].t })
+    run = []
+  }
+
+  for (const frame of motion) {
+    if (frame.diff < VERIFY_THRESHOLDS.frozenDiff) run.push(frame)
+    else flush()
+  }
+
+  flush()
+
+  return out
+}
+
+export interface SyncSummary {
+  pairs: number
+  medianMs: number | null
+  worstMs: number | null
+  inSync: boolean | null
+}
+
+/** Sincronía general: cada ataque contra su evento visual más cercano (±0,15 s). */
+export const summarizeSync = (onsets: number[], visualEvents: number[]): SyncSummary => {
+  const deltas = onsets
+    .map(onset => {
+      const visual = nearest(visualEvents.filter(v => Math.abs(v - onset) <= 0.15), onset)
+
+      return visual === undefined ? undefined : onset - visual
+    })
+    .filter((d): d is number => d !== undefined)
+    .sort((a, b) => a - b)
+
+  if (deltas.length === 0) return { pairs: 0, medianMs: null, worstMs: null, inSync: null }
+
+  const median = deltas[Math.floor(deltas.length / 2)]
+  const worst = deltas.reduce((max, d) => (Math.abs(d) > Math.abs(max) ? d : max), 0)
+
+  return { pairs: deltas.length, medianMs: Math.round(median * 1000), worstMs: Math.round(worst * 1000), inSync: Math.abs(median) <= VERIFY_THRESHOLDS.syncToleranceSec }
+}
+
+export interface EventMap {
+  durationSec: number | null
+  onsets: number[]
+  silences: Span[]
+  cuts: number[]
+  visualEvents: number[]
+  frozen: Span[]
+  sync: SyncSummary
+}
+
+export const buildEventMap = (m: Measurements): EventMap => {
+  const lastAudio = m.env?.[m.env.length - 1]?.t
+  const lastFrame = m.motion?.[m.motion.length - 1]?.t
+
+  return {
+    durationSec: lastAudio ?? lastFrame ?? null,
+    onsets: m.onsets,
+    silences: m.env ? detectSilences(m.env) : [],
+    cuts: m.cuts,
+    visualEvents: m.visualEvents,
+    frozen: m.motion ? detectFrozenSpans(m.motion) : [],
+    sync: m.env && m.motion ? summarizeSync(m.onsets, m.visualEvents) : { pairs: 0, medianMs: null, worstMs: null, inSync: null }
+  }
+}
+
 // ── Mediciones con ffmpeg ────────────────────────────────────────────────────
 
 const runFfmpeg = (args: string[]) => {

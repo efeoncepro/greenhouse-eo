@@ -196,7 +196,7 @@ de fotografía de marca no cambia: el plate cine se **regenera**, no se relumina
 
 Para que Gemini escuche o mire una pieza ya hecha, el carril es `pnpm ai:listen` (guía canónica §5.10; manual
 `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`). Modelo por defecto `gemini-3.8-flash`, con
-reintento automático ante 429/503. 🔴 Su crítica es **criterio, no medición**: usa `--verify`, que mide con ffmpeg cada
+reintento automático ante 429/503. 🔴 El control estándar es `--measure-only` (solo ffmpeg, sin modelo). La crítica de Gemini es **criterio, no medición**: úsala con `--verify`, que mide con ffmpeg cada
 afirmación (caso AWS: un «congelado» de severidad alta quedó refutado). En la familia 3.x `temperature` se ignora y el
 video se mira a 1 fps salvo `--fps` (hasta 24) o `--clip` [verificado 2026-10-21].
 

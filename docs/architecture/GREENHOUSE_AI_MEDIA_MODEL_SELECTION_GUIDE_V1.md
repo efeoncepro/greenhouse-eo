@@ -976,6 +976,15 @@ precisión temporal, hallazgos estructurados y **verificación con ffmpeg de cad
 **Modelos que responden en `global` [verificado 2026-10-20].** 3.8 Flash, 3.5 Flash, 3.1 Pro preview y 2.5 Pro sí;
 3.8 Pro no (404). El modo agéntico es solo de 3.8 Flash, 3.6 Flash y 3.5 Flash Lite [doc oficial].
 
+**Modo solo medición (`--measure-only`) [verificado 2026-10-21].** Mide la pieza con ffmpeg sin consultar a ningún modelo:
+- **qué entrega:** ataques, silencios, cortes, eventos visuales, cuadros quietos, sincronía general (`buildEventMap` en
+  `gemini-media-verify.ts`) y el veredicto de cada cue;
+- **salida:** código 2 si alguna cue no se confirma;
+- **pieza AWS:** 4 de 4 cues confirmadas y sincronía de +8 ms, medido en 384 ms contra los ~166 s de la consulta con
+  razonamiento alto.
+
+🔴 **Es el control estándar antes de mostrar una pieza.** Gemini queda como segunda opinión de criterio, con `--verify`.
+
 **Cuándo SÍ.**
 - Criterio de oficio que no se puede medir: si una pieza se siente estática, si el cierre se lee o qué toma encaja mejor.
 - Sincronía y tirones con `--fps`/`--clip` más `--verify`.

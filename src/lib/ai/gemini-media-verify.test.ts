@@ -2,14 +2,18 @@ import { describe, expect, it } from 'vitest'
 
 import {
   type AudioWindow,
+  buildEventMap,
   checkDesync,
   checkFrozen,
   checkPeak,
   checkSilence,
   detectCuts,
+  detectFrozenSpans,
+  detectSilences,
   detectOnsets,
   detectVisualEvents,
   type MotionFrame,
+  summarizeSync,
   verifyFinding
 } from './gemini-media-verify'
 
@@ -105,5 +109,24 @@ describe('ai:listen — verificación con mediciones', () => {
     const m = { env, motion: frames, onsets, cuts, visualEvents: detectVisualEvents(frames) }
 
     expect(verifyFinding({ t: 5, tipo: 'juicio', severidad: 'baja', afirmacion: 'el cierre es plano', medible: true }, m).estado).toBe('no_medible')
+  })
+
+  it('arma el mapa de eventos sin consultar a ningún modelo (--measure-only)', () => {
+    const map = buildEventMap({ env, motion: frames, onsets, cuts, visualEvents: detectVisualEvents(frames) })
+
+    expect(map.silences).toEqual([{ t: 1.75, tFin: expect.closeTo(2.0, 2) }])
+    expect(map.frozen.length).toBe(1)
+    expect(map.frozen[0].t).toBeCloseTo(6.0, 2)
+    expect(map.sync.inSync).toBe(true)
+    expect(map.durationSec).toBeCloseTo(7.99, 2)
+  })
+
+  it('distingue tramos de silencio cortos y largos, y sincronía de desfase', () => {
+    const short: AudioWindow[] = [0, 0.01, 0.02, 0.03].map(t => ({ t, rms: -Infinity, peak: -Infinity }))
+
+    expect(detectSilences(short, 0.1)).toEqual([])
+    expect(detectFrozenSpans([{ t: 0, diff: 0.1 }, { t: 0.04, diff: 2 }])).toEqual([])
+    expect(summarizeSync([0.55, 1.05], [0.5, 1.0])).toMatchObject({ pairs: 2, medianMs: 50, inSync: false })
+    expect(summarizeSync([], [0.5])).toMatchObject({ pairs: 0, inSync: null })
   })
 })

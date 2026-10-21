@@ -64,6 +64,16 @@ describe('ai:listen — argumentos', () => {
     expect(parseListenArgs(['--file', 'v.mp4', '--preset', 'lockup'], {}).warnings).toEqual([])
   })
 
+  it('--measure-only no necesita prompt ni consulta a Gemini', () => {
+    const args = parseListenArgs(['--file', 'm.wav', '--file', 'v.mp4', '--measure-only', '--preset', 'sync'], {})
+
+    expect(args.measureOnly).toBe(true)
+    expect(args.warnings.join(' ')).toMatch(/se ignoran --preset/)
+    expect(() => parseListenArgs(['--file', 'gs://b/v.mp4', '--measure-only'], {})).toThrow(/locales/)
+    expect(() => parseListenArgs(['--file', 'v.mp4', '--measure-only', '--count-tokens'], {})).toThrow(/tokens/)
+    expect(() => parseListenArgs(['--file', 'v.psd', '--measure-only'], {})).toThrow(/no soportado/)
+  })
+
   it('mapea formatos, URIs y respeta el tope inline', () => {
     expect(mimeForPath('X.WAV')).toBe('audio/wav')
     expect(mimeForPath('gs://b/p/clip.mp4')).toBe('video/mp4')

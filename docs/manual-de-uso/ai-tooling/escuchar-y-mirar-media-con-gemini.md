@@ -1,9 +1,9 @@
 # Escuchar y mirar media con Gemini (`pnpm ai:listen`)
 
 > **Tipo de documento:** Manual de uso
-> **Versión:** 2.0
+> **Versión:** 2.1
 > **Creado:** 2026-10-21 por Claude (sesión de la serie de partners)
-> **Última actualización:** 2026-10-21 por Claude (v2: precisión temporal, hallazgos verificados con ffmpeg, cues, rúbricas, modo agéntico, GCS)
+> **Última actualización:** 2026-10-21 por Claude (v2.1: `--measure-only`, control de la pieza sin Gemini)
 > **Código:** `scripts/ai/listen.ts` · `src/lib/ai/gemini-media-analysis.ts` · `src/lib/ai/gemini-media-analysis-cli.ts` · `src/lib/ai/gemini-media-verify.ts` · `src/lib/ai/gemini-media-presets.ts`
 > **Documentación técnica:** [Guía de selección de modelos §5.10](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
 > **Documentación funcional:** [Revisión de piezas con Gemini](../../documentation/ai-tooling/revision-de-piezas-con-gemini.md)
@@ -30,7 +30,34 @@ Es una herramienta local de oficio: no cambia ningún default de producto.
 - `--verify` usa `ffmpeg` local.
 - Los archivos van inline hasta ~19 MB en total. Para archivos más grandes usa `--gcs` (ver abajo).
 
+## El orden recomendado
+
+1. **Primero, solo medición** (`--measure-only`): es instantánea (menos de 1 s), gratis y no se equivoca. Entrega el mapa
+   de eventos y verifica la grilla. **Es el control estándar antes de mostrar una pieza**: si sale con código 2, alguna
+   cue falló.
+2. **Después, Gemini como segunda opinión de criterio**, siempre con `--verify`. Sus juicios («se siente plano», «no se
+   lee») se consideran; sus números se descartan si la medición no los respalda.
+
+Por qué este orden: en la serie de partners de octubre de 2026, la mayoría de las afirmaciones medibles de Gemini fueron
+falsas, mientras la medición de la grilla acertó al milisegundo. El valor de Gemini está en la percepción, no en los
+números.
+
 ## Recetas
+
+**Control estándar de una pieza (sin Gemini):**
+
+```bash
+pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json
+```
+
+Entrega:
+- los ataques de sonido, los silencios, los cortes, los eventos visuales y los cuadros quietos;
+- la sincronía general (desfase mediano y peor desfase entre cada ataque y su evento visual);
+- el veredicto de cada cue.
+
+Sale con código 2 si alguna cue no se confirma. Pieza AWS: 4 de 4 cues confirmadas, en sincronía (+8 ms), medida en
+384 ms.
+
 
 **Sincronía de una pieza con su hoja de cues (la receta más completa):**
 
@@ -84,6 +111,7 @@ pnpm ai:listen --file v1.mp4 --file v2.mp4 --preset impacto --findings
 | `--verify` | Mide con ffmpeg cada hallazgo medible (activa `--findings`) |
 | `--cues <json>` | Hoja de cues: veredicto de Gemini por cue y, con `--verify`, medición independiente de cada cue |
 | `--gcs gs://bucket/prefijo/` | Sube los archivos locales y los pasa por URI; los borra al terminar salvo `--keep-gcs` |
+| `--measure-only` | Mide la pieza con ffmpeg sin llamar a Gemini: mapa de eventos y, con `--cues`, la grilla. Ignora `--prompt`, `--preset`, `--fps` y los demás flags de Gemini (y avisa) |
 | `--count-tokens` | Solo cuenta tokens de entrada, sin generar |
 | `--json` / `--out` | Salida JSON completa (con `meta` para comparar corridas) o guardada en archivo |
 
@@ -130,6 +158,7 @@ el primero.
 | `↻ error transitorio (429/503)` | Cuota agotada o servicio no disponible | La CLI reintenta a los 20 y 40 s. Si persiste, cambia de modelo: cada uno tiene su propia cuota |
 | `⚠ … ~N cuadros` | La consulta mira más de 600 cuadros | Acota con `--clip` o baja `--fps` |
 | `⚠ … 1 kbps mono` | Pediste criticar el sonido solo con el audio del video | Pasa también el WAV con `--file` |
+| Código de salida 2 en `--measure-only` | Alguna cue de la grilla no se confirmó | Revisa la tabla «Cues medidos» antes de mostrar la pieza |
 | `⚠ --temperature se ignora` | Gemini 3.x no usa temperatura | Usa `--thinking` y `--findings` |
 | `404` | El modelo no existe en el proyecto | Verificado el 2026-10-20 en `global`: 3.8 Flash, 3.5 Flash, 3.1 Pro preview y 2.5 Pro responden; 3.8 Pro no |
 

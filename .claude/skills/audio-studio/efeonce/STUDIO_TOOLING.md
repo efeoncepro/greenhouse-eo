@@ -167,7 +167,8 @@ recortar medios, nunca bajo el Drop): `EFEONCE_OVERLAY.md` §Glitch.
 **QA sin oído** (el agente no escucha): ebur128 (sonoridad), autocorrelación de ataques (tempo), balance espectral por
 bandas (medios 300 Hz–3 kHz ≥ ~35 %), juntura del bucle (transiente contra un tiempo fuerte normal) y sha256
 descargando del bucket. `pnpm ai:listen` aporta una escucha de criterio, pero sus tiempos y niveles se contrastan con
-ffmpeg; `pnpm ai:listen --preset sync --cues … --verify` lo hace solo (delta 2026-10-21). Cómo suena lo aprueba siempre el operador. Reglas en `EFEONCE_OVERLAY.md` §Glitch.
+ffmpeg; `pnpm ai:listen --cues … --measure-only` mide la grilla sin Gemini en menos de 1 s (código 2 si una cue falla), y
+`--preset sync --verify` suma la opinión de Gemini (delta 2026-10-21). Cómo suena lo aprueba siempre el operador. Reglas en `EFEONCE_OVERLAY.md` §Glitch.
 
 ## Router de producción (elige la mano correcta)
 

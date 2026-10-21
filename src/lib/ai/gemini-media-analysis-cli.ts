@@ -80,6 +80,8 @@ export interface ListenArgs {
   gcs?: string
   keepGcs: boolean
   countTokens: boolean
+  /** Mide la pieza con ffmpeg sin llamar a Gemini (mapa de eventos + cues). */
+  measureOnly: boolean
   out?: string
   json: boolean
   /** Aceptado por compatibilidad; la familia Gemini 3.x lo ignora (se avisa). */
@@ -107,6 +109,10 @@ export const LISTEN_USAGE = `pnpm ai:listen — Gemini escucha o mira archivos y
   --verify                  Contrasta cada hallazgo medible con ffmpeg: confirmado | refutado | no_medible
   --cues <audio-cues.json>  Beat sheet: veredicto por cue; con --verify, además se mide cada cue
 
+  Solo medición (sin Gemini, instantáneo y gratis):
+  --measure-only            Mapa de eventos con ffmpeg: ataques, silencios, cortes, cuadros quietos y sincronía;
+                            con --cues, verifica cada cue de la grilla
+
   Archivos y costo:
   --gcs gs://bucket/pref/   Sube los archivos locales a ese prefijo y los pasa por URI (para > 19 MB)
   --keep-gcs                No borra los archivos subidos al terminar
@@ -116,6 +122,7 @@ export const LISTEN_USAGE = `pnpm ai:listen — Gemini escucha o mira archivos y
 
 Ejemplos:
   pnpm ai:listen --file mezcla.wav --file video.mp4 --preset sync --cues audio-cues.json --verify --out qa.json
+  pnpm ai:listen --file mezcla.wav --file video.mp4 --cues audio-cues.json --measure-only
   pnpm ai:listen --file video.mp4 --clip 1.5-2.5 --fps 24 --thinking high --prompt "¿El golpe cae con el corte?"`
 
 const THINKING: readonly ThinkingLevelName[] = ['low', 'medium', 'high']
@@ -148,6 +155,7 @@ export const parseListenArgs = (argv: string[], env: EnvSource = process.env): L
     verify: false,
     keepGcs: false,
     countTokens: false,
+    measureOnly: false,
     json: false,
     warnings: []
   }
@@ -191,6 +199,7 @@ export const parseListenArgs = (argv: string[], env: EnvSource = process.env): L
     else if (flag === '--gcs') args.gcs = next()
     else if (flag === '--keep-gcs') args.keepGcs = true
     else if (flag === '--count-tokens') args.countTokens = true
+    else if (flag === '--measure-only') args.measureOnly = true
     else if (flag === '--out') args.out = next()
     else if (flag === '--temperature') args.temperature = Number(next())
     else if (flag === '--json') args.json = true
@@ -198,7 +207,21 @@ export const parseListenArgs = (argv: string[], env: EnvSource = process.env): L
   }
 
   if (args.files.length === 0) throw new Error(`Falta al menos un --file.\n\n${LISTEN_USAGE}`)
-  if (!args.prompt && !args.promptFile && !args.preset) throw new Error('Falta --prompt, --prompt-file o --preset.')
+
+  if (args.measureOnly) {
+    if (args.files.every(isGcsUri)) throw new Error('--measure-only mide archivos locales con ffmpeg: pasa al menos un --file local.')
+    if (args.countTokens) throw new Error('--measure-only no consulta a Gemini: no hay tokens que contar.')
+    args.files.forEach(mimeForPath)
+
+    const ignored = [args.prompt || args.promptFile ? '--prompt' : '', args.preset ? '--preset' : '', args.thinking ? '--thinking' : '', args.fps !== undefined ? '--fps' : '', args.clip ? '--clip' : '', args.agentic ? '--agentic' : '', args.gcs ? '--gcs' : '']
+      .filter(Boolean)
+
+    if (ignored.length) args.warnings.push(`--measure-only no consulta a Gemini: se ignoran ${ignored.join(', ')}.`)
+
+    return args
+  }
+
+  if (!args.prompt && !args.promptFile && !args.preset) throw new Error('Falta --prompt, --prompt-file o --preset (o usa --measure-only).')
   if (args.prompt && args.promptFile) throw new Error('Usa --prompt o --prompt-file, no ambos.')
 
   const kinds = args.files.map(kindForPath)

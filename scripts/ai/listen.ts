@@ -24,7 +24,7 @@ import {
   shortHash
 } from '@/lib/ai/gemini-media-analysis-cli'
 import { GEMINI_MEDIA_PRESETS } from '@/lib/ai/gemini-media-presets'
-import { collectMeasurements, type Measurements, verifyCues, verifyFinding } from '@/lib/ai/gemini-media-verify'
+import { buildEventMap, collectMeasurements, type Measurements, verifyCues, verifyFinding } from '@/lib/ai/gemini-media-verify'
 
 loadEnv({ path: join(process.cwd(), '.env.local'), quiet: true })
 
@@ -33,6 +33,73 @@ const probeDuration = (path: string) => {
   const value = Number(result.stdout.trim())
 
   return Number.isFinite(value) ? value : undefined
+}
+
+const fmtT = (t: number) => t.toFixed(2)
+
+/** `--measure-only`: la pieza medida con ffmpeg, sin consultar a Gemini. */
+const measureOnly = async (args: ReturnType<typeof parseListenArgs>) => {
+  for (const warning of args.warnings) console.error(`  ⚠ ${warning}`)
+
+  const localAudio = args.files.find(f => kindForPath(f) === 'audio' && !isGcsUri(f))
+  const localVideo = args.files.find(f => kindForPath(f) === 'video' && !isGcsUri(f))
+  const audioPath = localAudio ?? localVideo
+
+  if (!localAudio && localVideo) console.error('  ⚠ Sin WAV aparte: el audio se mide sobre la pista del video.')
+
+  const started = Date.now()
+  const measurements = collectMeasurements({ audioPath, videoPath: localVideo })
+  const map = buildEventMap(measurements)
+  const cues = args.cues ? parseCues(JSON.parse(await readFile(args.cues, 'utf8'))) : undefined
+  const cuesMedidos = cues ? verifyCues(cues, measurements) : undefined
+
+  const meta = {
+    mode: 'measure-only',
+    audio: audioPath ?? null,
+    video: localVideo ?? null,
+    files: args.files.filter(f => !isGcsUri(f)).map(path => ({ path })),
+    latencyMs: Date.now() - started
+  }
+
+  const report = { meta, mapa: map, cuesMedidos }
+
+  if (args.out) await writeFile(args.out, JSON.stringify(report, null, 2) + '\n')
+
+  if (args.json) {
+    console.log(JSON.stringify(report, null, 2))
+
+    return
+  }
+
+  console.log(`\nMapa de eventos (${map.durationSec !== null ? `${map.durationSec.toFixed(2)} s` : 'sin duración'}, medido en ${meta.latencyMs} ms, sin Gemini)`)
+
+  if (measurements.env) {
+    console.log(`  Ataques de sonido: ${map.onsets.map(fmtT).join(' · ') || 'ninguno'}`)
+    console.log(`  Silencios: ${map.silences.map(s => `${fmtT(s.t)}–${fmtT(s.tFin)}`).join(' · ') || 'ninguno'}`)
+  }
+
+  if (measurements.motion) {
+    console.log(`  Cortes: ${map.cuts.map(fmtT).join(' · ') || 'ninguno'}`)
+    console.log(`  Eventos visuales: ${map.visualEvents.map(fmtT).join(' · ') || 'ninguno'}`)
+    console.log(`  Cuadros quietos: ${map.frozen.map(s => `${fmtT(s.t)}–${fmtT(s.tFin)}`).join(' · ') || 'ninguno'}`)
+  }
+
+  if (map.sync.pairs > 0) {
+    console.log(
+      `  Sincronía: ${map.sync.inSync ? 'EN SINCRONÍA' : 'DESFASADA'} · ${map.sync.pairs} par(es) · desfase mediano ${map.sync.medianMs} ms · peor ${map.sync.worstMs} ms (tolerancia ±42 ms)`
+    )
+  }
+
+  if (cuesMedidos?.length) {
+    console.log('\nCues medidos:')
+    for (const c of cuesMedidos) console.log(`  ${fmtT(c.cue).padEnd(6)} ${c.kind.padEnd(9)} ${c.estado.toUpperCase().padEnd(11)} ${c.medido}`)
+    const failed = cuesMedidos.filter(c => c.estado !== 'confirmado').length
+
+    console.log(`\nGrilla: ${cuesMedidos.length - failed} de ${cuesMedidos.length} cues confirmados.`)
+    if (failed > 0) process.exitCode = 2
+  }
+
+  if (args.out) console.error(`  → ${args.out}`)
 }
 
 const main = async () => {
@@ -45,6 +112,13 @@ const main = async () => {
   }
 
   const args = parseListenArgs(argv)
+
+  if (args.measureOnly) {
+    await measureOnly(args)
+
+    return
+  }
+
   const preset = args.preset ? GEMINI_MEDIA_PRESETS[args.preset] : undefined
   const hasVideo = args.files.some(file => kindForPath(file) === 'video')
 

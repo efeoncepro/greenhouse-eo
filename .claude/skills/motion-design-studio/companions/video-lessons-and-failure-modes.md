@@ -594,4 +594,7 @@ Fuentes fuera de git en `ai-generations/2026-10-21_aws-partner/` (`edit/rampa.py
   y el clic suena con él). Retocar la mezcla por esa crítica habría sido un error.
 - `temperature` no hace nada en Gemini 3.x; la consistencia sale de `--thinking` y de `--findings`, con `preset@versión`
   y hashes en `meta`.
+- 🔴 **Control estándar antes de mostrar una pieza: `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues
+  audio-cues.json --measure-only`.** Es solo ffmpeg (menos de 1 s), entrega el mapa de eventos y la grilla, y sale con
+  código 2 si una cue falla. Gemini va después, como segunda opinión de criterio.
 - Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.

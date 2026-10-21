@@ -6,6 +6,11 @@ Caso creativo completo: [Fiestas Patrias](../../../../docs/operations/social/202
 
 ## 1. Cerrar el paquete antes de programar
 
+**Control previo de una pieza con sonido en grilla:** `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues
+audio-cues.json --measure-only`. Sin Gemini, en menos de 1 s, confirma silencios, golpes y picos de la grilla, la
+sincronía y la ausencia de cuadros congelados; un código 2 bloquea la entrega hasta revisar (manual
+`docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`).
+
 Identificar por red el video aprobado, portada, copy y fecha. Una adaptación 9:16 tiene composición,
 acción y zonas de texto propias: si el usuario exige una adaptación real, producir el video vertical;
 no completar un 4:5 con bandas, relleno de color o un fondo difuminado para llamarlo Reel nativo.
