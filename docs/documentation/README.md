@@ -321,6 +321,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   clean plates, acabado Seedream/GPT, composición exacta, mastering y QA en sets estáticos premium.
 - [Creative Operations y agentes](../research/RESEARCH-009-creative-operations-agentic-workflows.md) — investigación activa que distingue exploración creativa de producción repetible, documenta builder → runner y evalúa el mercado de agentes/workflows antes de convertir hipótesis en runtime.
 - [Previsualización 3D con Seedance](ai-tooling/previs-3d-y-referencias-seedance.md) — capacidad investigada de reference-to-video: un playblast/viewport exportado orienta cámara, blocking y timing, mientras un keyframe define el look. No es importación `.blend`, receta validada ni autorización para reutilizar el blocking Glitch rechazado.
+- [Revisión de piezas con Gemini](ai-tooling/revision-de-piezas-con-gemini.md) — qué hace `pnpm ai:listen` (Gemini escucha o mira audio, video e imagen y responde en texto), para qué sirve en el QA de piezas de video y sonido, y por qué su crítica orienta pero no reemplaza la medición.
 
 ### Creative Studio (Efeonce Globe — plataforma hermana)
 

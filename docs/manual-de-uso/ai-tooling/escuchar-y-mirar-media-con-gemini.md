@@ -5,6 +5,8 @@
 > **Creado:** 2026-10-21 por Claude (sesión de la serie de partners)
 > **Última actualización:** 2026-10-21 por Claude (caso de QA de la pieza AWS)
 > **Código:** `scripts/ai/listen.ts` · `src/lib/ai/gemini-media-analysis.ts` · `src/lib/ai/gemini-media-analysis-cli.ts`
+> **Documentación técnica:** [Guía de selección de modelos §5.10](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
+> **Documentación funcional:** [Revisión de piezas con Gemini](../../documentation/ai-tooling/revision-de-piezas-con-gemini.md)
 
 ## Para qué sirve
 

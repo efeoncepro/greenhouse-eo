@@ -941,6 +941,49 @@ pnpm ai:higgsfield:sync-schemas
 
 **Fuentes.** Corrida del spot Sparks en `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` §5); corrida de Glitch en `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/ai-music.ts`); norma de Glitch `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.12; skill `audio-studio`.
 
+### 5.10 Revisión de piezas con Gemini (`pnpm ai:listen`): escuchar y mirar, no generar
+
+**Qué es.** Gemini recibe audio, video o imagen inline junto a un prompt y responde en texto. Es el carril de **QA**
+de una pieza que el agente no puede oír ni mirar en tiempo real: criticar una mezcla contra su video y su hoja de cues,
+elegir entre tomas de SFX o puntuar el impacto visual de un montaje [contrato]. **No genera media** y no cambia ningún
+default de producto [contrato].
+
+**Cómo está construido [contrato].**
+- **Helper:** `analyzeMediaWithGemini` en `src/lib/ai/gemini-media-analysis.ts` (`server-only`). Usa el cliente canónico
+  `getGoogleGenAIClient()` (Vertex, ADC): ningún SDK paralelo ni llave en el código.
+- **CLI:** `scripts/ai/listen.ts`, invocada como `pnpm ai:listen`.
+- **Lógica pura con test:** `src/lib/ai/gemini-media-analysis-cli.ts`, que resuelve el tipo MIME por extensión, el tope
+  inline de ~19 MB por llamada y el modelo por defecto.
+- **Modelo por defecto:** `gemini-3.8-flash`, sobreescribible con `--model` o con `GREENHOUSE_GEMINI_MEDIA_MODEL`.
+- **Errores:** lanza ante error de SDK, de credencial o respuesta vacía.
+
+**Modelos que responden en `global` [verificado 2026-10-20].** 3.8 Flash, 3.5 Flash, 3.1 Pro preview y 2.5 Pro sí;
+3.8 Pro no (404). Cada modelo tiene su propia cuota: ante un `429 RESOURCE_EXHAUSTED` se cambia de modelo, no se
+reintenta el mismo.
+
+**Cuándo SÍ.**
+- Criterio de oficio que no se puede medir: si una pieza se siente estática, si el cierre se lee o qué toma de SFX
+  encaja mejor.
+- Comparar versiones con **el mismo modelo y el mismo prompt**.
+
+**Cuándo NO.** 🔴 **Nunca como medición.** Los tiempos y niveles que afirma se equivocan con frecuencia; toda
+afirmación verificable se contrasta con ffmpeg (astats, ebur128, tblend + signalstats) antes de actuar.
+- **Claude [verificado 2026-10-21]:** dijo tres veces que el sting estaba «enterrado»; la medición por pistas lo dio
+  dominante.
+- **AWS [verificado 2026-10-21]:** pidió «profundizar el silencio» en un tramo que medía −inf. En cambio, su observación
+  de un cierre estático era real y se corrigió.
+- Tampoco se comparan notas entre modelos distintos: un 9/10 de 3.5 Flash y un 7,5/10 de 3.1 Pro sobre el mismo corte
+  no son comparables [verificado 2026-10-21].
+
+**Costo.** Por tokens de Vertex, según el modelo. Un video de 8 s en 1080p entra inline con holgura y la llamada tarda
+~2 min con 3.8 Flash [verificado 2026-10-21].
+
+**Fuentes.**
+- Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
+- Doc funcional: `docs/documentation/ai-tooling/revision-de-piezas-con-gemini.md`.
+- Casos: métodos de Claude, Microsoft y AWS en `docs/operations/social/`.
+- Commit de origen: `c8aca7233`.
+
 ---
 
 ## 6. Recetas por caso de uso

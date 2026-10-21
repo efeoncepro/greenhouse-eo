@@ -192,6 +192,13 @@ Método si se conecta uno: reiluminar y **volver a pegar el objeto exacto** (el 
 mirarlo al 100 %. Lo más cercano hoy es `pnpm ai:inpaint place --finish element` (puede cambiar la forma). El canon
 de fotografía de marca no cambia: el plate cine se **regenera**, no se relumina.
 
+### Revisar una pieza (no generarla): `pnpm ai:listen`
+
+Para que Gemini escuche o mire una pieza ya hecha (mezcla, montaje, tomas de SFX), el carril es `pnpm ai:listen`
+(guía canónica §5.10; manual `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`). El modelo por
+defecto es `gemini-3.8-flash`, y ante un `429` se cambia a `gemini-3.1-pro-preview` o `gemini-3.5-flash`. 🔴 Su crítica
+es **criterio, no medición**: los tiempos y niveles se verifican con ffmpeg [verificado 2026-10-21].
+
 ## 3. Quién decide qué (boundaries)
 
 | Pregunta | Dueño |
