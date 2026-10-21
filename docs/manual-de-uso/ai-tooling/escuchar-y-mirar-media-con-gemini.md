@@ -186,6 +186,10 @@ el primero.
   (el plano cambiaba de dirección); se corrigió. Lo que es juicio puede servir; lo medible se mide.
 - **No compares notas entre modelos, presets o niveles de razonamiento distintos.** Revisa el `meta` de cada JSON.
 - **No subas a 24 fps una pieza completa larga sin necesidad**: usa `--clip` sobre el tramo que importa.
+- **No le pidas a Gemini que apruebe un procesamiento de audio.** Caso real del 2026-10-21: un acorde final estirado
+  ×2,86 con `atempo` (que conserva el tono) se oía distorsionado para el operador, y Gemini lo calificó de «natural, sin
+  artefactos». La escucha a 1 kbps y su criterio no detectan artefactos de time-stretch: no estires música para alargarla;
+  usa el final natural o una toma con el final más largo.
 - **No uses zsh con `$var:` en rutas o URLs.** zsh lo lee como modificador; escribe `${var}`.
 
 ## Problemas comunes
