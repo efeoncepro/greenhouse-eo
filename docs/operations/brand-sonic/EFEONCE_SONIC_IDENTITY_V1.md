@@ -314,6 +314,13 @@ sting sereno sobre otra música. Medido: los tres Mi caen en 8,38 · 8,50 · 8,6
 del motivo es su vuelo) y el La en 9,00 (`pnpm ai:listen --measure-only`, 2/2 cues, en sincronía, −14,0 LUFS, −1,35 dBTP).
 No cambia las reglas hasta que el operador apruebe la pieza.
 
+**Resultado [decisión del operador, 2026-10-21]: rechazada.** La v5 con la pieza larga de energía y el cierre de energía
+fue rechazada: «es un refrito y se ve que no encaja, de hecho termina súper extraño». Lección: el kit no reemplaza
+una música compuesta para la línea de tiempo de la pieza; reutilizar la pieza larga suena a algo ya oído y su forma no
+coincide con lo que pasa en pantalla. La v6 usa un tema rock nuevo (ElevenLabs, instrumental verificado) **sin logo
+sonoro**, y la imagen se ajustó a sus ataques medidos (4,00 · 6,00 · 10,25). El criterio de «dónde suena el logo» queda
+sin aprobar.
+
 ## Qué no hacer
 
 - Regenerar el logo, la voz o la esfera: se usan los archivos del kit.
