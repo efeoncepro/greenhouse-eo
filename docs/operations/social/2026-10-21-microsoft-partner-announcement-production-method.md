@@ -7,14 +7,17 @@
 Efeonce es Indirect Reseller activo en el CSP de Microsoft, a través de Licencias OnLine, desde el 20-10-2026. Por eso
 el copy dice «comercializamos e implementamos» Azure, Microsoft 365 y Dynamics 365.
 
-**Serie:** sexta pieza. Antes vienen [Google](2026-10-19-google-partner-announcement-production-method.md),
-[BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md),
-[Adobe](2026-10-20-adobe-partner-announcement-production-method.md),
-[Claude](2026-10-21-claude-partner-announcement-production-method.md) y
-[OpenAI](2026-10-20-openai-partner-announcement-production-method.md).
+**Serie:** séptima pieza. Orden vigente de publicación (actualizado el 2026-10-21):
+1. [Google](2026-10-19-google-partner-announcement-production-method.md), 20-10.
+2. [BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md), 29-10.
+3. [Adobe](2026-10-20-adobe-partner-announcement-production-method.md), 05-11.
+4. [Claude](2026-10-21-claude-partner-announcement-production-method.md), 19-11.
+5. [OpenAI](2026-10-20-openai-partner-announcement-production-method.md), 26-11.
+6. [AWS](2026-10-21-aws-partner-announcement-production-method.md), 03-12.
+7. Microsoft (esta pieza), 10-12.
 
-Es la segunda pieza de la **trilogía cloud**, junto con Google Cloud y AWS. AWS va propuesta para el jueves 03-12, antes
-que esta.
+Es la tercera pieza de la **trilogía cloud**, después de Google Cloud y AWS. AWS va programada para el jueves 03-12, antes
+que esta, sujeta a que Licencias OnLine confirme que AWS ya se transacciona.
 
 ## Estado
 

@@ -245,6 +245,42 @@ oficialmente; las guías no coinciden en las zonas seguras exactas, así que tod
 
 Fuentes en [SOURCES.md](../SOURCES.md) §«Portadas de video y menciones».
 
+### Serie «Efeonce | Partner»: un anuncio por partner (calendario al 2026-10-21)
+
+La receta de arriba se repite una vez por partner. Cada pieza tiene su método en `docs/operations/social/`; el más
+completo es el de AWS
+([método](../../../../docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md)). Estados al
+documentar; `PENDING` ≠ publicado, releer por ID después de la hora.
+
+| Partner | Fecha | Estado al 2026-10-21 | IDs (LI Efeonce / LI Julio / IG) |
+|---|---|---|---|
+| Google | 20-10 | publicado | ver receta de arriba |
+| BytePlus | 29-10 | programado | en su método |
+| Adobe | 05-11 | programado | en su método |
+| Claude | 19-11 | programado | `402024265` / `402024305` / `402024348` |
+| OpenAI | 26-11 | programado | en su método |
+| AWS | 03-12 | programado, **condicionado** a que Licencias OnLine confirme que AWS ya se transacciona (si no, reprogramar o pausar) | `402111783` / `402111851` / `402111909` |
+| Microsoft | 10-12 | programado; confirmar antes con Licencias OnLine que Dynamics 365 se transacciona por CSP (si no, sacarlo del copy) | `402061083` / `402061135` / `402061180` |
+
+- **La pieza sale del mundo visual de ESE partner** (regla del operador), no de una estética genérica: Microsoft,
+  glasmorfismo Fluent (no un «vidrio» cliché); AWS, el diagrama de arquitectura que se vuelve infraestructura y planeta.
+  Los íconos de producto del tercero van en grises modelados (Microsoft) o en sus colores oficiales cuando el cierre
+  repite el diagrama (AWS). Marca del tercero: `efeonce-graphic-line` → criteria.md §«Anuncios de alianza».
+- **Trilogía cloud:** Google (íconos en profundidad) → AWS (oscuro, metálico, luz naranja) → Microsoft (glasmorfismo
+  claro, escala). El copy de Efeonce de AWS cierra con «Y pronto, una tercera» y el de Microsoft nombra «Google Cloud,
+  AWS y Microsoft Azure»: ambos suponen ese orden. Si una pieza se mueve, revisar el copy de las otras.
+- **Tres copies por pieza:** LinkedIn de la página Efeonce, LinkedIn personal de Julio (menciona a Efeonce) e
+  Instagram, cada uno con sus menciones.
+- **Horarios de la serie** (Metricool, `autoPublish:true`, `America/Santiago`): LinkedIn Efeonce **11:00**, LinkedIn
+  Julio **11:30**, Instagram Reel **14:00**. Google fue la excepción (Instagram a las 11:00, receta de arriba). Antes
+  de programar, revisar la cola de ese día por marca.
+- **Portadas:** PNG del último cuadro del lockup, comprimido con `sharp` (paleta, quality 92).
+- **Media pública:** `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<aaaa-mm>-<partner>-partner/`. Verificar
+  HTTP 200 por URL y, después de programar, que los archivos que guardó Metricool **pesan lo mismo en bytes** que el
+  original (AWS: los seis archivos, tres videos y tres portadas, iguales byte a byte el 21-10). Si el peso no coincide,
+  comparar SHA-256 y, si tampoco coincide, la firma de imagen del 2026-09-19 (arriba) antes de suponer un archivo
+  equivocado.
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:
@@ -289,9 +325,17 @@ Conservar el ratio pedido; REEL con un MP4 4:5 no se documenta como un master 9:
   | Google Cloud | `@[urn:li:organization:3648281\|Google Cloud]` |
   | Ingram Micro (página global; no existe una de Ingram Micro Chile) | `@[urn:li:organization:2576\|Ingram Micro]` |
 
+  Agregados el 2026-10-21 para la serie de partners (ID de organización; la mención lleva el nombre exacto de la
+  página): Amazon Web Services (AWS) `2382910` (leído de la página pública), Licencias OnLine `2453600`, Microsoft
+  `1035`, Microsoft Azure `96411081`.
+
 - Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación. Verificadas como cuentas oficiales
   conocidas: `@google` y `@googlecloud`. `@ingrammicro` **no se pudo verificar** (Instagram bloquea las consultas
   automáticas); el operador decidió usarlo igual el 2026-10-19.
+- **El handle de Instagram de un partner se verifica en el enlace oficial de su sitio** (pie o encabezado), porque la
+  API pública de Instagram y su HTML no responden a `curl`. Caso 2026-10-21: el oficial de AWS es
+  `@amazonwebservices` (enlace del pie de aws.amazon.com), **no** `@awscloud`, que es su cuenta de X/Twitter y fue el
+  que puso el borrador. Usados en la serie: `@amazonwebservices`, `@licenciasonline`, `@microsoft`, `@microsoftazure`.
 - Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi (versión
   citada el 19/10/2026: https://help.metricool.com/en/article/mention-and-tag-other-accounts-tl3osr).
   La sintaxis documentada y preservada en readback no acredita por sí sola el enlace en el post publicado.

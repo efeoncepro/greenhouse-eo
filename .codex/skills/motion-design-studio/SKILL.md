@@ -119,6 +119,9 @@ El **orden de preproducción común a todo video** está en el companion de prep
 con mascotas/logos compuestos, usa `workflows/animated-2d-spot-composed-brand-assets.md`. Para un **reel de muestra para
 un cliente** (cuadros fijos → planos Seedance 2.5 → capa de motion con los elementos aprobados de su campaña → voz y
 música), usa `workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md` (validado 2026-10-12).
+Para **rampas de velocidad continuas, zoom lento sin saltos, story 9:16 desde tomas 3:4 y QA de movimiento medido**
+(criterio: 0 cuadros < 0,15), usa [lecciones §14](companions/video-lessons-and-failure-modes.md) (serie de anuncios de
+partners, 2026-10-21).
 
 
 Para **cinematic ads, video de performance o híbridos foto-video**, carga

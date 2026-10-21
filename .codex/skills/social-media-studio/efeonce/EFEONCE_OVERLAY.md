@@ -274,6 +274,10 @@ negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../.
   espectro completo de Google, así que con ella en cuadro es el **único acento de color** y Efeonce vive en el
   navy y la estructura; buscar otro portador para el azul de Efeonce es competir con un degradado de tres colores
   y perder. Es propiedad de Google: interpretación 3D de uso interno y orgánico, y orgánico aprobado no es pauta.
+- **Serie de anuncios «Efeonce | Partner»** (un reel/video por partner, octubre–diciembre 2026): cada pieza sale del
+  mundo visual de **ese** partner, nunca de una estética genérica, y se programa con tres copies (LinkedIn Efeonce,
+  LinkedIn de Julio, Instagram). Calendario, horarios, verificación de media en bytes y handles de Instagram:
+  [video-delivery-metricool.md](../references/video-delivery-metricool.md) §«Serie «Efeonce | Partner»».
 
 ## Coherencia con las skills hermanas del repo
 

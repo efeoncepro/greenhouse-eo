@@ -1,5 +1,9 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta caso AWS (marcas de tercero en anuncio de alianza) verificado contra: método
+> `docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md` y decisiones del operador de esa
+> corrida — 2026-10-21.
+
 > Delta anuncios de alianza verificado contra: correcciones y aprobación del operador en la corrida
 > `ai-generations/2026-10-19_google-partner-freeze/` (rondas 1–5), greenhouse-eo `develop` en `cb9a8e666` — 2026-10-19.
 
@@ -1181,6 +1185,15 @@ rechazadas. La tarjeta de producción es [applications.md](applications.md) §A1
   (material acrílico brillante, rim light) se aplica a los íconos del partner como escena, no a la órbita ni a la
   marca de Efeonce, y lo pidió el operador; [inferido] por eso no choca con «discos rellenos, brillos, reflejos» de §10,
   que es gramática de la órbita.
+- **Caso AWS (2026-10-21, programado para el 03-12-2026; [método](../../../../docs/operations/social/2026-10-21-aws-partner-announcement-production-method.md)
+  §«Marca de AWS»).** Logo: el **SVG del encabezado de aws.amazon.com**, extraído del HTML; la versión para fondo oscuro
+  sólo cambia las letras a blanco y deja la sonrisa en `#FF9900`; la sonrisa no se anima ni se imita en arcos de luz.
+  Íconos: el **paquete oficial AWS Architecture Icons**, sin modificar (AWS los permite para diagramas de
+  arquitectura, que es lo que muestra la pieza). **Ninguna IA dibujó logos ni íconos de AWS:** keyframes y video van sin
+  marcas y todo lo de AWS se compone después. Las normas de marca de AWS (aws.amazon.com/trademark-guidelines) piden
+  **licencia** para el logo de la sonrisa (badge de la APN o marcas del contrato de reventa) y los nombres de servicio
+  sin licencia van en texto plano; el operador autorizó usar el logo oficial igual: **riesgo aceptado** en este caso,
+  no una autorización de AWS. Pendiente decidir si se reemplaza por el badge de la APN cuando llegue.
 
 ### CTA de landing: sin verde lima — corrección del operador, 2026-10-20
 

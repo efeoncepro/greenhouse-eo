@@ -13,10 +13,14 @@ Estado al producir la pieza: **Registered Partner** del OpenAI Partner Network. 
 decidió armarlo igual («No dejes el espacio reservado, armalo»). Mitigación posible antes del 26-11: pedirle a Support
 que lo apruebe.
 
-**Serie:** quinta pieza. Antes vienen [Google](2026-10-19-google-partner-announcement-production-method.md),
-[BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md) y
-[Adobe](2026-10-20-adobe-partner-announcement-production-method.md). Claude queda propuesta para el 19-11, todavía sin
-producir; AWS y Microsoft van en diciembre.
+**Serie:** quinta pieza. Orden vigente de publicación (actualizado el 2026-10-21):
+1. [Google](2026-10-19-google-partner-announcement-production-method.md), 20-10.
+2. [BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md), 29-10.
+3. [Adobe](2026-10-20-adobe-partner-announcement-production-method.md), 05-11.
+4. [Claude](2026-10-21-claude-partner-announcement-production-method.md), 19-11.
+5. OpenAI (esta pieza), 26-11.
+6. [AWS](2026-10-21-aws-partner-announcement-production-method.md), 03-12.
+7. [Microsoft](2026-10-21-microsoft-partner-announcement-production-method.md), 10-12.
 
 ## Estado
 

@@ -5,6 +5,15 @@
 (receta del 2026-10-19 y sección de menciones). Esta bitácora conserva la evidencia del caso; el método reutilizable
 vive en la skill.
 
+**Serie:** primera pieza. Orden vigente de publicación (actualizado el 2026-10-21):
+1. Google (esta pieza), 20-10.
+2. [BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md), 29-10.
+3. [Adobe](2026-10-20-adobe-partner-announcement-production-method.md), 05-11.
+4. [Claude](2026-10-21-claude-partner-announcement-production-method.md), 19-11.
+5. [OpenAI](2026-10-20-openai-partner-announcement-production-method.md), 26-11.
+6. [AWS](2026-10-21-aws-partner-announcement-production-method.md), 03-12.
+7. [Microsoft](2026-10-21-microsoft-partner-announcement-production-method.md), 10-12.
+
 ## Estado
 
 - **Programado, todavía sin publicar**, para el **martes 20-10-2026** en Metricool (`autoPublish`, zona

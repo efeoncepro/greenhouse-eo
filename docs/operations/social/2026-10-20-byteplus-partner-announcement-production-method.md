@@ -8,6 +8,15 @@ Reglas de comunicación vigentes:
 
 **Pieza hermana y receta de serie:** [anuncio Efeonce | Google](2026-10-19-google-partner-announcement-production-method.md).
 
+**Serie:** segunda pieza. Orden vigente de publicación (actualizado el 2026-10-21):
+1. [Google](2026-10-19-google-partner-announcement-production-method.md), 20-10.
+2. BytePlus (esta pieza), 29-10.
+3. [Adobe](2026-10-20-adobe-partner-announcement-production-method.md), 05-11.
+4. [Claude](2026-10-21-claude-partner-announcement-production-method.md), 19-11.
+5. [OpenAI](2026-10-20-openai-partner-announcement-production-method.md), 26-11.
+6. [AWS](2026-10-21-aws-partner-announcement-production-method.md), 03-12.
+7. [Microsoft](2026-10-21-microsoft-partner-announcement-production-method.md), 10-12.
+
 ## Estado
 
 - **Programado y todavía sin publicar** para el **jueves 29-10-2026**. Metricool, `autoPublish`, zona `America/Santiago`.

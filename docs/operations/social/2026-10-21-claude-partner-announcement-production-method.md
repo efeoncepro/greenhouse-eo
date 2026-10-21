@@ -8,10 +8,14 @@ Efeonce es **Registered** en el Claude Partner Network. Por eso:
 - el copy dice «implementamos», nunca «vendemos licencias», porque no hay acuerdo de reventa;
 - no lleva la insignia «Claude Partner», que se otorga recién en Certified.
 
-**Serie:** cuarta pieza. Antes vienen [Google](2026-10-19-google-partner-announcement-production-method.md),
-[BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md) y
-[Adobe](2026-10-20-adobe-partner-announcement-production-method.md); después,
-[OpenAI](2026-10-20-openai-partner-announcement-production-method.md) el 26-11.
+**Serie:** cuarta pieza. Orden vigente de publicación (actualizado el 2026-10-21):
+1. [Google](2026-10-19-google-partner-announcement-production-method.md), 20-10.
+2. [BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md), 29-10.
+3. [Adobe](2026-10-20-adobe-partner-announcement-production-method.md), 05-11.
+4. Claude (esta pieza), 19-11.
+5. [OpenAI](2026-10-20-openai-partner-announcement-production-method.md), 26-11.
+6. [AWS](2026-10-21-aws-partner-announcement-production-method.md), 03-12.
+7. [Microsoft](2026-10-21-microsoft-partner-announcement-production-method.md), 10-12.
 
 ## Estado
 

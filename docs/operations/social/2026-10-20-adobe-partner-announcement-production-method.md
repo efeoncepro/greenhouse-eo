@@ -9,11 +9,14 @@ Estado al producir la pieza:
 Por eso el copy dice «sumamos las soluciones de Adobe a nuestra oferta» y no «comercializamos». Si el día del
 lanzamiento ya están aprobados el Certified y Nexsys, se puede subir a «comercializamos e implementamos».
 
-**Serie:** tercera pieza de la serie de partners, después de [Google](2026-10-19-google-partner-announcement-production-method.md)
-y [BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md). Orden declarado por el operador:
-1. Google, BytePlus y Adobe.
-2. Claude y OpenAI, hacia fin de noviembre.
-3. AWS y Microsoft, en diciembre.
+**Serie:** tercera pieza. Orden vigente de publicación (actualizado el 2026-10-21):
+1. [Google](2026-10-19-google-partner-announcement-production-method.md), 20-10.
+2. [BytePlus](2026-10-20-byteplus-partner-announcement-production-method.md), 29-10.
+3. Adobe (esta pieza), 05-11.
+4. [Claude](2026-10-21-claude-partner-announcement-production-method.md), 19-11.
+5. [OpenAI](2026-10-20-openai-partner-announcement-production-method.md), 26-11.
+6. [AWS](2026-10-21-aws-partner-announcement-production-method.md), 03-12.
+7. [Microsoft](2026-10-21-microsoft-partner-announcement-production-method.md), 10-12.
 
 ## Estado
 
