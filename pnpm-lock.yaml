@@ -114,8 +114,8 @@ importers:
         specifier: ^6.1.1
         version: 6.1.1
       '@google/genai':
-        specifier: ^1.45.0
-        version: 1.45.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))
+        specifier: ^2.30.0
+        version: 2.30.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))
       '@gsap/react':
         specifier: ^2.1.2
         version: 2.1.2(gsap@3.15.0)(react@19.2.3)
@@ -261,8 +261,8 @@ importers:
         specifier: ^12.38.0
         version: 12.38.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       google-auth-library:
-        specifier: ^10.6.1
-        version: 10.6.1
+        specifier: ^10.9.0
+        version: 10.9.0
       gsap:
         specifier: ^3.15.0
         version: 3.15.0
@@ -1485,8 +1485,8 @@ packages:
     resolution: {integrity: sha512-S5xdF4DrELQwY2186vishZ9ZHxzMo7eikM8FHFNDS87oULElLDF5eko33DPCXtWyzEPyzkZWuUTpm/M0pPtbNQ==}
     hasBin: true
 
-  '@google/genai@1.45.0':
-    resolution: {integrity: sha512-+sNRWhKiRibVgc4OKi7aBJJ0A7RcoVD8tGG+eFkqxAWRjASDW+ktS9lLwTDnAxZICzCVoeAdu8dYLJVTX60N9w==}
+  '@google/genai@2.30.0':
+    resolution: {integrity: sha512-Gkv1ix8iZey/V3WF4lHaRS8C71P533jenDT/lA+fdPTCfXYfmCVHvo+0H5jTgzonqsmROQG7QpzLJkpoP/x7bg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -6869,10 +6869,6 @@ packages:
   globjoin@0.1.4:
     resolution: {integrity: sha512-xYfnw62CKG8nLkZBfWbhWwDw02CHty86jfPcc2cr3ZfeuK9ysoVPPEUxf21bAD/rWAgk52SuBrLJlefNy8mvFg==}
 
-  google-auth-library@10.6.1:
-    resolution: {integrity: sha512-5awwuLrzNol+pFDmKJd0dKtZ0fPLAtoA5p7YO4ODsDu6ONJUVqbYwvv8y2ZBO5MBNp9TJXigB19710kYpBPdtA==}
-    engines: {node: '>=18'}
-
   google-auth-library@10.9.0:
     resolution: {integrity: sha512-xtvUqvINPhTaBm7nXqlYPcrMHJPm1lCNdSovxnKKhTm+4JsvQ+KGVYJViLoH9Yxu8w+T0Qv5HubzYT9BLrppJg==}
     engines: {node: '>=18'}
@@ -10615,18 +10611,6 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.19.0:
-    resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   ws@8.20.0:
     resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
     engines: {node: '>=10.0.0'}
@@ -11608,7 +11592,7 @@ snapshots:
     dependencies:
       '@googleapis/sqladmin': 35.2.0
       gaxios: 7.1.3
-      google-auth-library: 10.6.1
+      google-auth-library: 10.9.0
       p-throttle: 7.0.0
     transitivePeerDependencies:
       - supports-color
@@ -11620,7 +11604,7 @@ snapshots:
       arrify: 2.0.1
       duplexify: 4.1.3
       extend: 3.0.2
-      google-auth-library: 10.6.1
+      google-auth-library: 10.9.0
       html-entities: 2.6.0
       retry-request: 8.0.2
       teeny-request: 10.1.0
@@ -11680,12 +11664,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@google/genai@1.45.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))':
+  '@google/genai@2.30.0(@modelcontextprotocol/sdk@1.29.0(zod@3.25.76))':
     dependencies:
-      google-auth-library: 10.6.1
+      google-auth-library: 10.9.0
       p-retry: 4.6.2
       protobufjs: 7.5.4
-      ws: 8.19.0
+      ws: 8.18.3
     optionalDependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
     transitivePeerDependencies:
@@ -17369,17 +17353,6 @@ snapshots:
 
   globjoin@0.1.4: {}
 
-  google-auth-library@10.6.1:
-    dependencies:
-      base64-js: 1.5.1
-      ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.1.3
-      gcp-metadata: 8.1.2
-      google-logging-utils: 1.1.3
-      jws: 4.0.1
-    transitivePeerDependencies:
-      - supports-color
-
   google-auth-library@10.9.0:
     dependencies:
       base64-js: 1.5.1
@@ -17407,7 +17380,7 @@ snapshots:
       '@grpc/grpc-js': 1.14.3
       '@grpc/proto-loader': 0.8.0
       duplexify: 4.1.3
-      google-auth-library: 10.6.1
+      google-auth-library: 10.9.0
       google-logging-utils: 1.1.3
       node-fetch: 3.3.2
       object-hash: 3.0.0
@@ -17441,7 +17414,7 @@ snapshots:
   googleapis-common@8.0.1:
     dependencies:
       extend: 3.0.2
-      gaxios: 7.1.3
+      gaxios: 7.2.0
       google-auth-library: 10.9.0
       qs: 6.15.0
       url-template: 2.0.8
@@ -21906,8 +21879,6 @@ snapshots:
       signal-exit: 4.1.0
 
   ws@8.18.3: {}
-
-  ws@8.19.0: {}
 
   ws@8.20.0: {}
 

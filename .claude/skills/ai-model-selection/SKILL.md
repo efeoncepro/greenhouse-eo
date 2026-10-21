@@ -194,10 +194,11 @@ de fotografía de marca no cambia: el plate cine se **regenera**, no se relumina
 
 ### Revisar una pieza (no generarla): `pnpm ai:listen`
 
-Para que Gemini escuche o mire una pieza ya hecha (mezcla, montaje, tomas de SFX), el carril es `pnpm ai:listen`
-(guía canónica §5.10; manual `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`). El modelo por
-defecto es `gemini-3.8-flash`, y ante un `429` se cambia a `gemini-3.1-pro-preview` o `gemini-3.5-flash`. 🔴 Su crítica
-es **criterio, no medición**: los tiempos y niveles se verifican con ffmpeg [verificado 2026-10-21].
+Para que Gemini escuche o mire una pieza ya hecha, el carril es `pnpm ai:listen` (guía canónica §5.10; manual
+`docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`). Modelo por defecto `gemini-3.8-flash`, con
+reintento automático ante 429/503. 🔴 Su crítica es **criterio, no medición**: usa `--verify`, que mide con ffmpeg cada
+afirmación (caso AWS: un «congelado» de severidad alta quedó refutado). En la familia 3.x `temperature` se ignora y el
+video se mira a 1 fps salvo `--fps` (hasta 24) o `--clip` [verificado 2026-10-21].
 
 ## 3. Quién decide qué (boundaries)
 

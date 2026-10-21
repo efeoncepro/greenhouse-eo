@@ -943,46 +943,65 @@ pnpm ai:higgsfield:sync-schemas
 
 ### 5.10 Revisión de piezas con Gemini (`pnpm ai:listen`): escuchar y mirar, no generar
 
-**Qué es.** Gemini recibe audio, video o imagen inline junto a un prompt y responde en texto. Es el carril de **QA**
-de una pieza que el agente no puede oír ni mirar en tiempo real: criticar una mezcla contra su video y su hoja de cues,
-elegir entre tomas de SFX o puntuar el impacto visual de un montaje [contrato]. **No genera media** y no cambia ningún
-default de producto [contrato].
+**Qué es.** Gemini recibe audio, video o imagen junto a un prompt y critica la pieza. Es el carril de **QA** de una
+pieza que el agente no puede oír ni mirar en tiempo real: sincronía de golpes y cortes, tirones, legibilidad del lockup
+e impacto [contrato]. **No genera media** ni cambia ningún default de producto [contrato]. La v2 (2026-10-21) agrega
+precisión temporal, hallazgos estructurados y **verificación con ffmpeg de cada afirmación medible** [verificado 2026-10-21].
 
 **Cómo está construido [contrato].**
-- **Helper:** `analyzeMediaWithGemini` en `src/lib/ai/gemini-media-analysis.ts` (`server-only`). Usa el cliente canónico
-  `getGoogleGenAIClient()` (Vertex, ADC): ningún SDK paralelo ni llave en el código.
-- **CLI:** `scripts/ai/listen.ts`, invocada como `pnpm ai:listen`.
-- **Lógica pura con test:** `src/lib/ai/gemini-media-analysis-cli.ts`, que resuelve el tipo MIME por extensión, el tope
-  inline de ~19 MB por llamada y el modelo por defecto.
-- **Modelo por defecto:** `gemini-3.8-flash`, sobreescribible con `--model` o con `GREENHOUSE_GEMINI_MEDIA_MODEL`.
-- **Errores:** lanza ante error de SDK, de credencial o respuesta vacía.
+- **Helper:** `src/lib/ai/gemini-media-analysis.ts` (`server-only`), con `analyzeMedia`, `countMediaTokens`,
+  `prepareMedia` (inline o staging `gs://`) y `withQuotaRetry` (reintenta 429/503 a los 20 y 40 s).
+- **Cliente:** `@google/genai` 2.30.0 contra Vertex **`v1beta1`**, con las credenciales canónicas de
+  `google-credentials`. El modo agéntico responde «Unknown name mediaProcessing» en `v1` y funciona en `v1beta1`
+  [verificado 2026-10-21]. Seguimiento: llevar el parámetro de versión al cliente canónico `google-genai.ts` y retirar
+  la fábrica local.
+- **Lógica pura con test:** `src/lib/ai/gemini-media-analysis-cli.ts` (argumentos, límites, partes, schema de hallazgos,
+  cues) y `src/lib/ai/gemini-media-verify.ts` (decisiones de verificación sobre mediciones de ffmpeg).
+- **Rúbricas versionadas:** `src/lib/ai/gemini-media-presets.ts` (`sync`, `impacto`, `cierre`, `tiron`, `lockup`).
+- **CLI:** `scripts/ai/listen.ts`.
+
+**Hechos de Gemini 3.8 Flash que gobiernan la CLI.**
+
+| Hecho | Consecuencia | Evidencia |
+|---|---|---|
+| `temperature`, `top_p` y `top_k` se ignoran en la familia 3.x | El determinismo sale de `thinkingLevel` (LOW, MEDIUM, HIGH; MINIMAL da error) más un schema; `--temperature` solo avisa | [doc oficial 2026-10-21] |
+| El video se muestrea a 1 fps por defecto | Un silencio de 0,25 s o un tirón de 2 cuadros no se ven; esto explica errores de tiempo previos | [doc oficial 2026-10-21] |
+| `VideoMetadata.fps` admite (0, 24] | 60 fps devuelve 400 | [verificado 2026-10-21] |
+| El recorte `startOffset`/`endOffset` funciona | 1 s a 24 fps cuesta 1.998 tokens | [verificado 2026-10-21] |
+| La resolución por defecto del video es la baja; `HIGH` la triplica | `ULTRA_HIGH` da 400 en video y solo vale para imágenes | [verificado 2026-10-21] |
+| El audio de un video llega a 1 kbps mono; se admite 1 audio por prompt | La mezcla se pasa como WAV aparte | [doc oficial 2026-10-21] |
+| Hasta 10 videos por prompt | Sirve para A/B en una sola consulta | [doc oficial 2026-10-21] |
+| Modo agéntico (`mediaProcessing: AGENTIC`) en 3.8 Flash | 246 tokens contra 719 en estático sobre 8 s; `countTokens` no refleja el ahorro | [verificado 2026-10-21] |
 
 **Modelos que responden en `global` [verificado 2026-10-20].** 3.8 Flash, 3.5 Flash, 3.1 Pro preview y 2.5 Pro sí;
-3.8 Pro no (404). Cada modelo tiene su propia cuota: ante un `429 RESOURCE_EXHAUSTED` se cambia de modelo, no se
-reintenta el mismo.
+3.8 Pro no (404). El modo agéntico es solo de 3.8 Flash, 3.6 Flash y 3.5 Flash Lite [doc oficial].
 
 **Cuándo SÍ.**
-- Criterio de oficio que no se puede medir: si una pieza se siente estática, si el cierre se lee o qué toma de SFX
-  encaja mejor.
-- Comparar versiones con **el mismo modelo y el mismo prompt**.
+- Criterio de oficio que no se puede medir: si una pieza se siente estática, si el cierre se lee o qué toma encaja mejor.
+- Sincronía y tirones con `--fps`/`--clip` más `--verify`.
+- Comparar versiones con el mismo `preset@versión`, modelo y nivel de razonamiento (todo queda en `meta`).
 
-**Cuándo NO.** 🔴 **Nunca como medición.** Los tiempos y niveles que afirma se equivocan con frecuencia; toda
-afirmación verificable se contrasta con ffmpeg (astats, ebur128, tblend + signalstats) antes de actuar.
-- **Claude [verificado 2026-10-21]:** dijo tres veces que el sting estaba «enterrado»; la medición por pistas lo dio
-  dominante.
-- **AWS [verificado 2026-10-21]:** pidió «profundizar el silencio» en un tramo que medía −inf. En cambio, su observación
-  de un cierre estático era real y se corrigió.
-- Tampoco se comparan notas entre modelos distintos: un 9/10 de 3.5 Flash y un 7,5/10 de 3.1 Pro sobre el mismo corte
-  no son comparables [verificado 2026-10-21].
+**Cuándo NO.** 🔴 **Nunca como medición sin `--verify`.** Casos medidos:
+- **Claude [verificado 2026-10-21]:** dijo tres veces que el sting estaba «enterrado»; la medición por pistas lo dio dominante.
+- **AWS, v1 de la CLI [verificado 2026-10-21]:** pidió «profundizar el silencio» en un tramo que medía −inf.
+- **AWS, v2 [verificado 2026-10-21]:** afirmó con severidad alta que la Tierra se congelaba de 5,33 a 8,00 s, y
+  `--verify` lo refutó (cero cuadros quietos). Su «desfase de los íconos» también quedó refutado: +8 ms. En cambio, las
+  cues medidas confirmaron el silencio de 1,75 a 2,0 s, los golpes en 2,00 y 4,00 s y el pico del sting en 5,00 s.
+- No se comparan notas entre modelos distintos [verificado 2026-10-21].
 
-**Costo.** Por tokens de Vertex, según el modelo. Un video de 8 s en 1080p entra inline con holgura y la llamada tarda
-~2 min con 3.8 Flash [verificado 2026-10-21].
+**Costo [verificado 2026-10-21, pieza de 8 s].** Entrada: 867 tokens por defecto · 2.547 en `high` · 15.467 a 24 fps ·
+1.998 a 24 fps en 1 s. Con razonamiento alto, el preset `sync` gastó 8.255 tokens de razonamiento y tardó 166 s.
+
+**SDK.** El 2026-10-21 se actualizó `@google/genai` de 1.45 a 2.30 (para `Part.mediaProcessing`) y
+`google-auth-library` a 10.9.0, para que quede una sola copia (con dos, el typecheck fallaba en BigQuery y Secret
+Manager). Validado con typecheck, 1.531 tests de `ai`, `nexa`, `reliability` y `secrets`, los gates de dependencias de
+workers y un smoke en vivo del tool-calling de Nexa y de la búsqueda con grounding.
 
 **Fuentes.**
 - Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
 - Doc funcional: `docs/documentation/ai-tooling/revision-de-piezas-con-gemini.md`.
+- Documentación de Vertex para Gemini 3.8 Flash (ficha del modelo y guía de desarrollador) y *video understanding* de la Gemini API.
 - Casos: métodos de Claude, Microsoft y AWS en `docs/operations/social/`.
-- Commit de origen: `c8aca7233`.
 
 ---
 

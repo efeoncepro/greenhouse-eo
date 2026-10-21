@@ -1,47 +1,167 @@
 import 'server-only'
 
+import { spawnSync } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
+import { basename, resolve } from 'node:path'
 
-import { getGoogleGenAIClient } from '@/lib/ai/google-genai'
-import { assertInlineBudget, GEMINI_MEDIA_DEFAULT_MODEL, mimeForPath } from '@/lib/ai/gemini-media-analysis-cli'
+import { GoogleGenAI } from '@google/genai'
+
+import {
+  assertInlineBudget,
+  buildMediaPart,
+  GEMINI_MEDIA_DEFAULT_MODEL,
+  isGcsUri,
+  type ListenArgs,
+  type MediaSource,
+  mimeForPath,
+  shortHash,
+  type ThinkingLevelName
+} from '@/lib/ai/gemini-media-analysis-cli'
+import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
+
+/**
+ * Cliente de revisión de medios. Usa las MISMAS credenciales canónicas que `getGoogleGenAIClient()`
+ * (`google-credentials`), pero contra Vertex `v1beta1`: el modo agéntico (`mediaProcessing: AGENTIC`) da
+ * «Unknown name» en `v1` y responde en `v1beta1` (verificado 2026-10-21). Seguimiento: llevar el parámetro de versión
+ * al cliente canónico de `google-genai.ts` y retirar esta fábrica.
+ */
+let mediaClient: GoogleGenAI | undefined
+
+const getMediaAnalysisClient = () => {
+  if (mediaClient) return mediaClient
+
+  const project = getGoogleProjectId()
+
+  if (!project) throw new Error('Falta GCP_PROJECT o GOOGLE_CLOUD_PROJECT para Gemini.')
+
+  mediaClient = new GoogleGenAI({
+    vertexai: true,
+    project,
+    location: process.env.GOOGLE_CLOUD_LOCATION?.trim() || 'global',
+    apiVersion: 'v1beta1',
+    googleAuthOptions: getGoogleAuthOptions()
+  })
+
+  return mediaClient
+}
+
+const THINKING_LEVEL: Record<ThinkingLevelName, string> = { low: 'LOW', medium: 'MEDIUM', high: 'HIGH' }
+
+export interface PreparedMedia {
+  sources: MediaSource[]
+  staged: string[]
+  hashes: Array<{ path: string; sha256: string }>
+}
+
+const runGcloud = (args: string[]) => {
+  const result = spawnSync('gcloud', args, { encoding: 'utf8', timeout: 300_000 })
+
+  if (result.error || result.status !== 0) {
+    throw new Error(`gcloud ${args.slice(0, 2).join(' ')} falló: ${(result.stderr || String(result.error)).slice(-240)}. Revisa la sesión de gcloud y el acceso al bucket.`)
+  }
+}
+
+/** Lee o sube los archivos: inline si caben, por URI gs:// si se pasó --gcs o si ya son gs://. */
+export const prepareMedia = async (files: string[], gcs?: string): Promise<PreparedMedia> => {
+  const sources: MediaSource[] = []
+  const staged: string[] = []
+  const hashes: Array<{ path: string; sha256: string }> = []
+  const inlineSizes: number[] = []
+
+  for (const path of files) {
+    const mimeType = mimeForPath(path)
+
+    if (isGcsUri(path)) {
+      sources.push({ path, mimeType, uri: path })
+      continue
+    }
+
+    const buffer = await readFile(path)
+
+    hashes.push({ path, sha256: shortHash(buffer) })
+
+    if (gcs) {
+      const uri = `${gcs.replace(/\/?$/, '/')}${randomUUID()}-${basename(path)}`
+
+      runGcloud(['storage', 'cp', resolve(path), uri])
+      staged.push(uri)
+      sources.push({ path, mimeType, uri })
+    } else {
+      inlineSizes.push(buffer.byteLength)
+      sources.push({ path, mimeType, data: buffer.toString('base64') })
+    }
+  }
+
+  assertInlineBudget(inlineSizes)
+
+  return { sources, staged, hashes }
+}
+
+export const cleanupStaged = (uris: string[]) => {
+  for (const uri of uris) {
+    try {
+      runGcloud(['storage', 'rm', uri])
+    } catch {
+      // El borrado es higiene: si falla, se informa en el log del llamador y el archivo queda en el prefijo de staging.
+    }
+  }
+}
+
+type RequestOptions = Pick<ListenArgs, 'fps' | 'clip' | 'resolution' | 'agentic' | 'model'> & {
+  thinking: ThinkingLevelName
+  prompt: string
+  schema?: object
+  onRetry?: (attempt: number, waitMs: number) => void
+}
+
+const buildContents = (sources: MediaSource[], options: RequestOptions) => [
+  { role: 'user', parts: [...sources.map(source => buildMediaPart(source, options)), { text: options.prompt }] }
+]
+
+/** Reintenta ante cuota agotada (429) o servicio no disponible (503): ambos son transitorios en Vertex y suelen pasar en segundos. */
+export const QUOTA_RETRY_DELAYS_MS = [20_000, 40_000]
+
+const isTransientError = (error: unknown) => /\b(429|503)\b|RESOURCE_EXHAUSTED|UNAVAILABLE/.test(error instanceof Error ? error.message : String(error))
+
+export const withQuotaRetry = async <T>(call: () => Promise<T>, onRetry?: (attempt: number, waitMs: number) => void, delays = QUOTA_RETRY_DELAYS_MS): Promise<T> => {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await call()
+    } catch (error) {
+      if (!isTransientError(error) || attempt >= delays.length) throw error
+      onRetry?.(attempt + 1, delays[attempt])
+      await new Promise(resolveWait => setTimeout(resolveWait, delays[attempt]))
+    }
+  }
+}
 
 export interface GeminiMediaAnalysisResult {
   model: string
   text: string
-  usage: { inputTokens: number; outputTokens: number }
+  usage: { inputTokens: number; outputTokens: number; thoughtTokens: number }
   latencyMs: number
 }
 
 /**
- * Envía audio, video o imagen inline a Gemini (Vertex, cliente canónico) junto a un prompt y
- * devuelve la respuesta en texto. LANZA en error de SDK, credencial o respuesta vacía.
+ * Envía los medios a Gemini (Vertex) con los controles de video y razonamiento. LANZA en error de SDK, credencial o
+ * respuesta vacía. No envía `temperature`: Gemini 3.x la ignora.
  */
-export const analyzeMediaWithGemini = async (input: {
-  files: string[]
-  prompt: string
-  model?: string
-  temperature?: number
-}): Promise<GeminiMediaAnalysisResult> => {
-  const buffers = await Promise.all(input.files.map(path => readFile(path)))
-
-  assertInlineBudget(buffers.map(buffer => buffer.byteLength))
-
-  const parts = [
-    ...input.files.map((path, index) => ({
-      inlineData: { mimeType: mimeForPath(path), data: buffers[index].toString('base64') }
-    })),
-    { text: input.prompt }
-  ]
-
-  const client = await getGoogleGenAIClient()
-  const model = input.model?.trim() || GEMINI_MEDIA_DEFAULT_MODEL
+export const analyzeMedia = async (sources: MediaSource[], options: RequestOptions): Promise<GeminiMediaAnalysisResult> => {
+  const client = getMediaAnalysisClient()
+  const model = options.model?.trim() || GEMINI_MEDIA_DEFAULT_MODEL
   const started = Date.now()
 
-  const response = await client.models.generateContent({
+  const request = {
     model,
-    contents: [{ role: 'user', parts }],
-    config: { temperature: input.temperature ?? 0.2 }
-  })
+    contents: buildContents(sources, options) as never,
+    config: {
+      thinkingConfig: { thinkingLevel: THINKING_LEVEL[options.thinking] as never },
+      ...(options.schema ? { responseMimeType: 'application/json', responseJsonSchema: options.schema } : {})
+    }
+  }
+
+  const response = await withQuotaRetry(() => client.models.generateContent(request), options.onRetry)
 
   const text = response.text?.trim()
 
@@ -53,9 +173,29 @@ export const analyzeMediaWithGemini = async (input: {
     model,
     text,
     usage: {
-      inputTokens: typeof usage?.promptTokenCount === 'number' ? usage.promptTokenCount : 0,
-      outputTokens: typeof usage?.candidatesTokenCount === 'number' ? usage.candidatesTokenCount : 0
+      inputTokens: usage?.promptTokenCount ?? 0,
+      outputTokens: usage?.candidatesTokenCount ?? 0,
+      thoughtTokens: usage?.thoughtsTokenCount ?? 0
     },
     latencyMs: Date.now() - started
   }
+}
+
+/** Cuenta los tokens de entrada sin generar. */
+export const countMediaTokens = async (sources: MediaSource[], options: RequestOptions): Promise<number> => {
+  const client = getMediaAnalysisClient()
+
+  const response = await client.models.countTokens({
+    model: options.model?.trim() || GEMINI_MEDIA_DEFAULT_MODEL,
+    contents: buildContents(sources, options) as never
+  })
+
+  return response.totalTokens ?? 0
+}
+
+/** Compatibilidad con la API previa (`analyzeMediaWithGemini`): inline, sin controles de video. */
+export const analyzeMediaWithGemini = async (input: { files: string[]; prompt: string; model?: string; thinking?: ThinkingLevelName }) => {
+  const { sources } = await prepareMedia(input.files)
+
+  return analyzeMedia(sources, { model: input.model ?? GEMINI_MEDIA_DEFAULT_MODEL, thinking: input.thinking ?? 'medium', prompt: input.prompt, agentic: false })
 }

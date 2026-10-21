@@ -1,55 +1,168 @@
 # Escuchar y mirar media con Gemini (`pnpm ai:listen`)
 
 > **Tipo de documento:** Manual de uso
-> **Versión:** 1.1
+> **Versión:** 2.0
 > **Creado:** 2026-10-21 por Claude (sesión de la serie de partners)
-> **Última actualización:** 2026-10-21 por Claude (caso de QA de la pieza AWS)
-> **Código:** `scripts/ai/listen.ts` · `src/lib/ai/gemini-media-analysis.ts` · `src/lib/ai/gemini-media-analysis-cli.ts`
+> **Última actualización:** 2026-10-21 por Claude (v2: precisión temporal, hallazgos verificados con ffmpeg, cues, rúbricas, modo agéntico, GCS)
+> **Código:** `scripts/ai/listen.ts` · `src/lib/ai/gemini-media-analysis.ts` · `src/lib/ai/gemini-media-analysis-cli.ts` · `src/lib/ai/gemini-media-verify.ts` · `src/lib/ai/gemini-media-presets.ts`
 > **Documentación técnica:** [Guía de selección de modelos §5.10](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
 > **Documentación funcional:** [Revisión de piezas con Gemini](../../documentation/ai-tooling/revision-de-piezas-con-gemini.md)
 
 ## Para qué sirve
 
-Le pasa a Gemini archivos de audio, video o imagen junto a un prompt y devuelve su respuesta en texto.
-Sirve para el QA de una pieza que uno no puede escuchar ni mirar en tiempo real. Por ejemplo:
+Le pasa a Gemini archivos de audio, video o imagen junto a una pregunta, y devuelve su crítica. Sirve para el QA de una
+pieza que uno no puede escuchar ni mirar en tiempo real:
 
-- criticar una mezcla de sonido contra su video y su hoja de cues;
-- elegir entre tomas de SFX;
-- puntuar el impacto visual de un montaje.
+- revisar si los golpes de sonido caen con los cortes de imagen;
+- detectar tirones o cuadros congelados;
+- revisar la legibilidad de un lockup;
+- puntuar el impacto.
+
+Desde la v2 hace algo más importante: con `--verify` **mide con ffmpeg cada afirmación comprobable** y la marca como
+confirmada o refutada. La crítica de un modelo es criterio, no medición, y ahora la herramienta lo aplica sola.
 
 Es una herramienta local de oficio: no cambia ningún default de producto.
 
 ## Antes de empezar
 
-- Hace falta ADC de gcloud vigente. Si falla la autenticación, corre `pnpm gcloud:auth:playwright -- --force`.
+- Hace falta ADC de gcloud vigente. Si la autenticación falla, corre `pnpm gcloud:auth:playwright -- --force`.
 - `.env.local` debe tener `GCP_PROJECT`.
-- Los archivos van inline y suman como máximo ~19 MB por llamada. Un video de 8 s en 1080p entra con holgura.
+- `--verify` usa `ffmpeg` local.
+- Los archivos van inline hasta ~19 MB en total. Para archivos más grandes usa `--gcs` (ver abajo).
 
-## Paso a paso
+## Recetas
+
+**Sincronía de una pieza con su hoja de cues (la receta más completa):**
 
 ```bash
-pnpm ai:listen --file mezcla.wav --file video.mp4 --prompt-file critica.txt --out critica.md
+pnpm ai:listen --file mezcla.wav --file pieza.mp4 --preset sync --cues audio-cues.json --verify --out qa.json
 ```
 
-- `--file` se repite; Gemini recibe los archivos en el orden dado. Conviene numerarlos en el prompt.
-- `--model` cambia el modelo. El default es `gemini-3.8-flash`, y también se puede fijar con la variable `GREENHOUSE_GEMINI_MEDIA_MODEL`.
-- `--json` devuelve modelo, uso de tokens y texto.
+**¿El golpe cae con el corte? Mirar un tramo cuadro a cuadro:**
+
+```bash
+pnpm ai:listen --file pieza.mp4 --clip 1.5-2.5 --fps 24 --thinking high --prompt "¿El golpe cae en el mismo cuadro que el corte?"
+```
+
+**Tirones o congelados en toda la pieza:**
+
+```bash
+pnpm ai:listen --file pieza.mp4 --preset tiron --verify
+```
+
+**Cierre y legibilidad del lockup:**
+
+```bash
+pnpm ai:listen --file pieza.mp4 --preset cierre --verify
+```
+
+**Video largo (webinar, podcast): que Gemini decida qué mirar:**
+
+```bash
+pnpm ai:listen --file webinar.mp4 --agentic --prompt "Resume y marca los momentos de mayor energía"
+```
+
+**Comparar versiones A/B en una sola consulta** (hasta 10 videos):
+
+```bash
+pnpm ai:listen --file v1.mp4 --file v2.mp4 --preset impacto --findings
+```
+
+## Opciones
+
+| Opción | Qué hace |
+|---|---|
+| `--file <ruta\|gs://>` | Archivo a revisar; se repite y Gemini los recibe en orden. Máximo 1 audio y 10 videos por consulta |
+| `--prompt` / `--prompt-file` | La pregunta. Con `--preset`, se suma como contexto del autor |
+| `--preset` | Rúbrica versionada: `sync`, `impacto`, `cierre`, `tiron`, `lockup` (ver abajo) |
+| `--thinking low\|medium\|high` | Cuánto razona. `high` para análisis cuadro a cuadro (~2-3 min); default `medium` |
+| `--fps <n>` | Cuadros por segundo que mira (default 1, máximo 24) |
+| `--clip <ini>-<fin>` | Tramo en segundos. Los tiempos de la respuesta siguen siendo del archivo completo |
+| `--resolution low\|medium\|high\|ultra` | Detalle por cuadro. El video viene en `low`; `high` triplica tokens; `ultra` solo vale para imágenes |
+| `--agentic` | Gemini navega el video y decide qué mirar. No admite `--fps` ni `--clip` |
+| `--findings` | Respuesta en JSON: resumen, puntajes y hallazgos con tiempo, tipo, severidad y si es medible |
+| `--verify` | Mide con ffmpeg cada hallazgo medible (activa `--findings`) |
+| `--cues <json>` | Hoja de cues: veredicto de Gemini por cue y, con `--verify`, medición independiente de cada cue |
+| `--gcs gs://bucket/prefijo/` | Sube los archivos locales y los pasa por URI; los borra al terminar salvo `--keep-gcs` |
+| `--count-tokens` | Solo cuenta tokens de entrada, sin generar |
+| `--json` / `--out` | Salida JSON completa (con `meta` para comparar corridas) o guardada en archivo |
+
+El modelo por defecto es `gemini-3.8-flash` (se cambia con `--model` o `GREENHOUSE_GEMINI_MEDIA_MODEL`).
+
+## Rúbricas (`--preset`)
+
+Cada rúbrica tiene versión. Dos notas solo se comparan si salieron del mismo `preset@versión`, el mismo modelo y el
+mismo nivel de razonamiento: la salida JSON los guarda en `meta`, junto al hash del prompt y de cada archivo.
+
+| Preset | Revisa | Defaults |
+|---|---|---|
+| `sync` | Golpes, cortes, silencios, música en tiempo | thinking high · 12 fps |
+| `impacto` | Enganche, momento más fuerte, tramos planos | thinking medium · 4 fps |
+| `cierre` | Lockup legible, sting con la marca, final abrupto o estático | thinking medium · 6 fps · resolución high |
+| `tiron` | Congelados, saltos de velocidad, zoom a saltos, rebotes | thinking high · 24 fps |
+| `lockup` | Transcripción exacta del texto, logos, bordes, contraste | thinking medium · 2 fps · resolución high |
+
+Un flag explícito siempre gana sobre el default del preset.
+
+## Qué mide `--verify`
+
+| Tipo de hallazgo | Cómo se mide | Cuándo es «confirmado» |
+|---|---|---|
+| `silencio` | RMS en ventanas de 10 ms del tramo | RMS máximo ≤ −50 dB |
+| `golpe` | Ataques: subida de pico ≥ 10 dB o salto de RMS ≥ 12 dB | Hay un ataque a ±84 ms (2 cuadros) |
+| `corte` | Picos de diferencia entre cuadros consecutivos | Hay un corte a ±63 ms |
+| `cuadro_quieto` | Diferencia entre cuadros (`tblend` + `signalstats`) | 2 o más cuadros seguidos bajo 0,15 |
+| `desfase` | Cada ataque del tramo contra su evento visual más cercano | Desfase mediano > 42 ms (un cuadro) |
+| `nivel`, `legibilidad`, `ritmo`, `juicio` | No se miden | Quedan como `no_medible` |
+
+Las cues se miden por su texto, sin importar lo que diga Gemini:
+- un cue que dice «silencio» se mide como silencio (y si declara el tramo, por ejemplo «silencio 1,75-2,0», se usa ese);
+- un cue puntual con «golpe», «impacto» o «drop» se mide como golpe;
+- un cue con «pico» o «sting» se mide como pico.
+
+Si hay audio aparte, `--verify` mide el audio sobre ese archivo; si no, sobre el audio del video. Con varios videos, mide
+el primero.
 
 ## Qué significan las señales
 
 | Señal | Qué es | Qué hacer |
 |---|---|---|
-| `429 RESOURCE_EXHAUSTED` | Se agotó la cuota del modelo en Vertex | Cambia de modelo con `--model gemini-3.1-pro-preview` o `gemini-3.5-flash`; cada modelo tiene su propia cuota |
+| `↻ error transitorio (429/503)` | Cuota agotada o servicio no disponible | La CLI reintenta a los 20 y 40 s. Si persiste, cambia de modelo: cada uno tiene su propia cuota |
+| `⚠ … ~N cuadros` | La consulta mira más de 600 cuadros | Acota con `--clip` o baja `--fps` |
+| `⚠ … 1 kbps mono` | Pediste criticar el sonido solo con el audio del video | Pasa también el WAV con `--file` |
+| `⚠ --temperature se ignora` | Gemini 3.x no usa temperatura | Usa `--thinking` y `--findings` |
 | `404` | El modelo no existe en el proyecto | Verificado el 2026-10-20 en `global`: 3.8 Flash, 3.5 Flash, 3.1 Pro preview y 2.5 Pro responden; 3.8 Pro no |
+
+## Costos medidos (pieza AWS, 8 s, 1080×1350, 2026-10-21)
+
+| Configuración | Tokens de entrada |
+|---|---|
+| Default (1 fps, resolución baja) | 867 |
+| `--resolution high` | 2.547 |
+| `--fps 24` | 15.467 |
+| `--fps 24 --clip 1.5-2.5` | 1.998 |
+| WAV de 8 s aparte | 176 |
+
+- **Razonamiento alto:** suma tokens propios. En `sync` fueron 8.255 de razonamiento y la consulta tardó 166 s.
+- **Modo agéntico:** `--count-tokens` no refleja su ahorro. En la generación real usó 246 tokens contra 719 en modo
+  estático.
 
 ## Qué no hacer
 
-- **No tomes la crítica como medición.** Los modelos se equivocan en los tiempos y a veces afirman cosas falsas. Caso del 2026-10-21: tres pasadas dijeron que el sting estaba «enterrado» y la medición de pistas separadas mostró que era el elemento dominante en ese tramo. Contrasta cada afirmación verificable con ffmpeg antes de actuar.
-- **Separa el criterio de la cifra.** Caso de la pieza AWS (2026-10-21): la crítica pidió «profundizar el silencio» antes del primer golpe, pero ese tramo medía −inf (silencio absoluto), así que se descartó. En cambio, su observación de que el cierre se sentía estático era real: el plano se alejaba y el cierre empujaba hacia adentro, y se corrigió continuando la dirección del movimiento. Lo que es juicio puede servir; lo que se puede medir se mide.
-- **No mezcles evaluadores al comparar versiones.** Un 9/10 de 3.5 Flash y un 7,5/10 de 3.1 Pro sobre el mismo corte no se comparan entre sí. Para medir si una versión mejoró, usa el mismo modelo y el mismo prompt.
-- **No uses zsh con `$var:` en URLs o rutas.** zsh lo lee como modificador; escribe `${var}`.
+- **No tomes la crítica como medición.** Usa `--verify`. Caso real del 2026-10-21 sobre la pieza AWS: Gemini afirmó con
+  severidad alta que la Tierra quedaba congelada de 5,33 a 8,00 s, y la medición lo refutó (cero cuadros quietos;
+  diferencia mínima 0,86). También describió un desfase de los íconos que la medición refutó: el ícono aparece un cuadro
+  después de la grilla y el clic suena con él (+8 ms). Corregir la mezcla por esa crítica habría sido un error.
+- **Separa el criterio de la cifra.** En la misma pieza, Gemini dijo antes que el cierre se sentía estático, y era real
+  (el plano cambiaba de dirección); se corrigió. Lo que es juicio puede servir; lo medible se mide.
+- **No compares notas entre modelos, presets o niveles de razonamiento distintos.** Revisa el `meta` de cada JSON.
+- **No subas a 24 fps una pieza completa larga sin necesidad**: usa `--clip` sobre el tramo que importa.
+- **No uses zsh con `$var:` en rutas o URLs.** zsh lo lee como modificador; escribe `${var}`.
 
 ## Problemas comunes
 
 - `Missing GCP_PROJECT`: el script no encontró `.env.local`. Córrelo desde la raíz del repo.
+- `--verify` sin efecto: necesita archivos locales; con solo `gs://` no puede medir.
 - La respuesta llega vacía: reintenta con otro modelo.
+- El prefijo de staging recomendado es `gs://efeonce-group-greenhouse-private-assets-dev/ai-listen/` (privado y de dev).
+  La CLI borra lo que sube.

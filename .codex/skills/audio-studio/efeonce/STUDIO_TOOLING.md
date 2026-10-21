@@ -123,7 +123,9 @@ que leen, no: si faltan en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_br
     −2,2 dBTP.
   - **`pnpm ai:listen` (Gemini) sirve de criterio, no de medición:** su observación de que el cierre se sentía estático
     era real y se aplicó; su pedido de «profundizar el silencio» no, porque el silencio medía −inf. Todo tiempo o
-    nivel que afirme se verifica con ffmpeg antes de actuar.
+    nivel que afirme se verifica con ffmpeg antes de actuar. Desde la v2 lo hace la propia CLI: `--verify` (silencio,
+    golpe, desfase) y `--cues audio-cues.json` (cada cue de la grilla medido sin depender del modelo); la mezcla se
+    pasa como WAV aparte porque el audio de un video le llega a 1 kbps mono.
   - **zsh en las recetas:** `$R:a` y `$BG:s` son modificadores (ruta absoluta y sustitución), no texto: `r=$R:a=0.5`
     se expandió a una ruta. Siempre `${VAR}` antes de `:`.
 - **Método «maqueta propia → re-grabación IA → sello propio encima»:** la estructura y el tiempo salen de una
@@ -165,7 +167,7 @@ recortar medios, nunca bajo el Drop): `EFEONCE_OVERLAY.md` §Glitch.
 **QA sin oído** (el agente no escucha): ebur128 (sonoridad), autocorrelación de ataques (tempo), balance espectral por
 bandas (medios 300 Hz–3 kHz ≥ ~35 %), juntura del bucle (transiente contra un tiempo fuerte normal) y sha256
 descargando del bucket. `pnpm ai:listen` aporta una escucha de criterio, pero sus tiempos y niveles se contrastan con
-ffmpeg (delta 2026-10-21). Cómo suena lo aprueba siempre el operador. Reglas en `EFEONCE_OVERLAY.md` §Glitch.
+ffmpeg; `pnpm ai:listen --preset sync --cues … --verify` lo hace solo (delta 2026-10-21). Cómo suena lo aprueba siempre el operador. Reglas en `EFEONCE_OVERLAY.md` §Glitch.
 
 ## Router de producción (elige la mano correcta)
 

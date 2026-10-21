@@ -1,9 +1,9 @@
 # Revisión de piezas con Gemini — QA de audio, video e imagen
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-21 por Claude
-> **Última actualización:** 2026-10-21 por Claude
+> **Última actualización:** 2026-10-21 por Claude (v2 de la CLI: verificación automática, cues, rúbricas)
 > **Documentación técnica:** [Guía de selección de modelos §5.10](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
 > **Manual de uso:** [Escuchar y mirar media con Gemini](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)
 
@@ -49,8 +49,38 @@ Por eso:
 > [Microsoft](../../operations/social/2026-10-21-microsoft-partner-announcement-production-method.md) y
 > [AWS](../../operations/social/2026-10-21-aws-partner-announcement-production-method.md).
 
+## Cómo comprueba lo que dice Gemini
+
+Desde la versión 2, la herramienta no se queda con la palabra de Gemini. Con `--verify`, cada afirmación que se puede
+medir pasa por una medición real del audio y la imagen, y queda marcada como **confirmada** o **refutada**:
+
+| Gemini dice | La herramienta mide |
+|---|---|
+| «Hay silencio aquí» | Si el volumen de ese tramo baja de verdad al silencio |
+| «El golpe cae en este segundo» | Si hay un ataque de sonido a menos de dos cuadros |
+| «Hay un corte de plano» | Si la imagen cambia de golpe en ese momento |
+| «Se congela la imagen» | Si hay cuadros idénticos seguidos |
+| «El sonido va desfasado» | Cuántos milisegundos separan el sonido del cambio de imagen |
+
+Las opiniones («el cierre se siente plano», «el texto es chico») quedan marcadas como juicio: no se miden, pero se
+consideran.
+
+Si se le entrega la **hoja de cues** de la pieza (el plan de qué pasa en cada segundo), además mide cada momento
+planeado por su cuenta, sin depender de Gemini.
+
+> Ejemplo real (pieza AWS, octubre de 2026): Gemini aseguró que la imagen quedaba congelada en los últimos segundos. La
+> medición mostró que nunca se congela, así que esa crítica se descartó. Las cues medidas confirmaron que el silencio,
+> los dos golpes y el remate sonoro caen exactamente donde se planearon.
+
+## Rúbricas fijas
+
+Para comparar piezas con la misma vara, la herramienta trae revisiones predefinidas: sincronía, impacto, cierre, tirones
+y legibilidad. Cada una tiene versión. Una nota solo se compara con otra si salió de la misma rúbrica, la misma versión
+y el mismo modelo.
+
 ## Límites
 
-- Los archivos de una revisión suman como máximo cerca de 19 MB. Un video de 8 segundos en 1080p entra sin problema.
+- Directamente se pueden enviar cerca de 19 MB por revisión. Los archivos más grandes se suben primero a un almacenamiento privado y se borran al terminar.
+- Se puede revisar un solo audio y hasta 10 videos por vez (por ejemplo, dos versiones para compararlas).
 - Cada modelo de Gemini tiene su propia cuota. Si una se agota, se cambia de modelo.
 - Es una herramienta de trabajo local: no está en el portal ni cambia el comportamiento de Greenhouse.

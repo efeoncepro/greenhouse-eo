@@ -581,3 +581,17 @@ Fuentes fuera de git en `ai-generations/2026-10-21_aws-partner/` (`edit/rampa.py
 
 - **Síntoma:** `r=$R:a=0.5` se expandió a una ruta absoluta (`:a`) y `c=$BG:s=…` aplicó una sustitución (`:s`).
 - **Prevención:** en zsh, siempre `${VAR}` cuando lo que sigue es `:` (`${R}:a=0.5`, `${BG}:s=…`).
+
+### 14.x QA con `pnpm ai:listen` v2 (Gemini 3.8, verificado 2026-10-21)
+
+- **Gemini mira el video a 1 fps por defecto:** no ve un silencio de 0,25 s ni un tirón de dos cuadros. Para sincronía
+  o tirones, usa `--fps` (hasta 24) sobre un `--clip` del tramo; para toda la pieza, los presets `sync` (12 fps) y
+  `tiron` (24 fps).
+- **`--verify` mide cada afirmación con ffmpeg:** silencio, golpe, corte, cuadro quieto y desfase quedan confirmados o
+  refutados. Con `--cues audio-cues.json`, además mide cada cue de la grilla sin depender del modelo.
+- **Caso fuente (AWS):** Gemini afirmó con severidad alta un congelado de 5,33 a 8,00 s; `--verify` lo refutó (cero
+  cuadros quietos). Su desfase de íconos también quedó refutado (+8 ms: el ícono aparece un cuadro después de la grilla
+  y el clic suena con él). Retocar la mezcla por esa crítica habría sido un error.
+- `temperature` no hace nada en Gemini 3.x; la consistencia sale de `--thinking` y de `--findings`, con `preset@versión`
+  y hashes en `meta`.
+- Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
