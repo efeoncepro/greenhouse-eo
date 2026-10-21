@@ -30,8 +30,10 @@ No estás vendiendo HubSpot — estás vendiendo **el Hub que le falta**.
 - **Registra el deal el día que lo detectas.** El deal registration es obligatorio y exclusivo ✅.
 - **Consigue el POI firmado.** Rige **Best Partner Wins**: gana quien obtiene la firma del cliente, no quien
   trabajó más.
-- **Coordina el shared deal con el Growth Specialist** que gestiona la cuenta. ❌ El proceso operativo no está
-  publicado — **pídeselo al PDM y documéntalo en `modules/02` § 5.**
+- **Registra el shared deal por el flujo oficial**, con liderazgo **Partner** según Julio (18/10/2026).
+  [Procedimiento y readback](../../../../docs/manual-de-uso/hubspot/convertir-negocio-compartido.md).
+  Coordinar con el equipo HubSpot existente cuando la interfaz lo indique; no asumir asignación,
+  participación del cliente o elegibilidad a comisión. `modules/02` § 5 distingue estos estados.
 
 ### Y la advertencia que corta para tu lado
 **Tus cuentas también son territorio de otros.** Un cliente tuyo que sigue en HubSpot y al que dejaste de

@@ -1,0 +1,44 @@
+{
+  "run_id": "2026-10-18-1128-control-adjudicacion-automatizacion",
+  "at": "2026-10-18T11:28:47.673468-03:00",
+  "timezone": "America/Santiago",
+  "scope": "authorized automation instructions update; no discovery",
+  "week_window": {
+    "from": "2026-10-12T00:00:00-03:00",
+    "to": "2026-10-18T11:28:47.673468-03:00"
+  },
+  "operations": [
+    {
+      "id": "A001",
+      "operation": "automation_update view",
+      "target": "prospecci-n-hubspot-reporte-diario",
+      "result": "existing automation found; no duplicate"
+    },
+    {
+      "id": "A002",
+      "operation": "read automation.toml and prior memory/method",
+      "result": "configuration and exclusions recovered"
+    },
+    {
+      "id": "A003",
+      "operation": "automation_update update same ID",
+      "result": "new mandatory gate inserted; ACTIVE preserved"
+    },
+    {
+      "id": "A004",
+      "operation": "persistent configuration readback",
+      "result": "exact newprompt match; otherfields preserved"
+    },
+    {
+      "id": "A005",
+      "operation": "method documentation sync",
+      "result": "README, personalSKILLand3playbooks updated; otherWIP preserved"
+    }
+  ],
+  "queries_executed_for_discovery": [],
+  "new_coverage": 0,
+  "new_credit_usage": 0,
+  "new_crm_writes": 0,
+  "approval": "explicit user instruction to change automation; no authority expansion",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/automation-guard-2026-10-18"
+}

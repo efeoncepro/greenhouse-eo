@@ -1,0 +1,368 @@
+{
+  "run_id": "2026-10-18-0946-esenttia-crm",
+  "type": "approved_execution",
+  "started_at": "2026-10-18T12:46:30.332Z",
+  "closed_at": "2026-10-18T10:00:07.507740-03:00",
+  "timezone": "America/Santiago",
+  "week_start": "2026-10-12T00:00:00-03:00",
+  "week_end": "2026-10-18T10:00:07.507740-03:00",
+  "scope": "one known account, no discovery20cell sweep",
+  "operations": [
+    {
+      "id": "O01",
+      "tool": "Outlook profile",
+      "result": "Julio work mailbox verified",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "O02",
+      "tool": "Outlook send",
+      "result": "single specifically approved supplier-admission inquiry; sender/recipient/BCC private; sent09:46:31Santiago",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "O03",
+      "tool": "Outlook search",
+      "query": "subject:[asunto de consulta de participación] to:[casilla institucional redactada]",
+      "pii_redacted": true,
+      "result": "one matching Sentmessage, no more pages",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "O04",
+      "tool": "Outlook fetch_message",
+      "query": "exact returned messageID, redacted",
+      "result": "full body/signature/from/to/BCC independently verified",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "A01",
+      "tool": "Apollo People API Search",
+      "filter": {
+        "domains": [
+          "esenttia.co"
+        ],
+        "titles": [
+          "marketing",
+          "mercadeo",
+          "experiencia",
+          "compras",
+          "abastecimiento",
+          "tecnología",
+          "tecnologia",
+          "comercial"
+        ],
+        "include_similar_titles": true,
+        "page": 1,
+        "per_page": 50
+      },
+      "result": "29people, 4role-based shortlist",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "A02",
+      "tool": "Apollo profile include_credit_usage",
+      "result": "cost and total authorization check; account values private",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "A03",
+      "tool": "Apollo bulk people enrichment",
+      "query": "four exact personIDs from search, redacted",
+      "pii_redacted": true,
+      "result": "4matches,4verified corporateemails,no catch-all,4credits; personalemail/phonefalse",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "W01",
+      "tool": "web open",
+      "query": "four profileURLs returned by provider, redacted",
+      "pii_redacted": true,
+      "result": "four999responses; no bypass",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "W02",
+      "tool": "web search",
+      "queries": [
+        "[nombre redactado] Esenttia Marketing [apellido redactado]",
+        "[nombre completo redactado] Esenttia",
+        "[nombre completo redactado] Esenttia",
+        "[nombre completo redactado] Esenttia"
+      ],
+      "pii_redacted": true,
+      "result": "public named profiles and corporate-role corroboration; marketingURL discrepancy resolved",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "W03",
+      "tool": "web search",
+      "queries": [
+        "[nombre completo redactado] Esenttia experiencia",
+        "[nombre completo redactado] site:esenttia.co",
+        "[nombre redactado] site:esenttia.co"
+      ],
+      "pii_redacted": true,
+      "result": "public university author record2023 and current indexed professional profile; unrelated results excluded",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H01",
+      "tool": "HubSpot get_user_details/discover schema",
+      "result": "portal48713323; CompanyContactDealEmail write availability,deal pipelines; malformed first user request resolved with required include field",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H02",
+      "tool": "HubSpot search Company",
+      "filter": "domain EQ esenttia.co OR name CONTAINS_TOKEN Esenttia",
+      "result": "1nativeCompany, no pending page",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H03",
+      "tool": "HubSpot search Contact",
+      "filter": "email IN [four individualemails redacted]",
+      "pii_redacted": true,
+      "result": "0matches before create; schema reverified",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H04",
+      "tool": "HubSpot search Deal",
+      "query": "Esenttia",
+      "result": "0matches",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H05",
+      "tool": "HubSpot search Deal",
+      "query": "5600218590",
+      "result": "0matches immediately before create",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H06",
+      "tool": "AgentCLI properties",
+      "queries": [
+        "properties get companies industry",
+        "properties list companies",
+        "properties list contacts",
+        "properties list deals"
+      ],
+      "result": "native fields, writable flags and exact enums saved privately",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H07",
+      "tool": "AgentCLI segments get",
+      "ids": [
+        180,
+        181,
+        182,
+        183,
+        185,
+        186,
+        187
+      ],
+      "result": "read existing definitions; no changes",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H08",
+      "tool": "HubSpot Email properties",
+      "properties": [
+        "hs_email_subject",
+        "hs_email_status",
+        "hs_email_direction",
+        "hs_email_headers"
+      ],
+      "result": "schema verified",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H09",
+      "tool": "AgentCLI email search",
+      "filter": "hs_email_subject=[exact approved subject]",
+      "result": "EMAIL118837076021SENT, total1, no pending page; header rawprivate",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H10",
+      "tool": "AgentCLI association reference reads",
+      "queries": [
+        "existing deal→Company",
+        "existing contact→Company",
+        "existing deal→Contact"
+      ],
+      "result": "native primarytype5, primarytype1 and defaulttype3 verified; no reference recordchanged",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "59392757641",
+      "tool": "CRM Company read/update/readback",
+      "result": "native record reused; only research date updated with digest; correctcountry/industry/owner retained",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H12",
+      "tool": "CRM Contact create/readback/associations",
+      "ids": [
+        "255915524509",
+        "255915524508",
+        "255915524507",
+        "255915524510"
+      ],
+      "result": "4created, properties+Primary independently verified; providerURLs corrected where sourceconflicted",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "66218288550",
+      "tool": "CRM Deal create/readback/associations",
+      "result": "1created aftercontacts, CompanyPrimary and4Contacts verified; amount/dateempty",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "66218288550",
+      "tool": "CRM Deal forecast update/readback",
+      "result": "native overridePIPELINE corrected toOMIT and confirmed, no globalsettingschanged",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H15",
+      "tool": "AgentCLI effective membership searches",
+      "filters": [
+        "ilsListIds180 AND objectID IN approved4",
+        "ilsListIds181 AND objectID IN approved4",
+        "ilsListIds183 AND objectID IN approved4",
+        "ilsListIds187 AND companyID=59392757641"
+      ],
+      "result": "4/4/3/1, exact setsverified, no pendingpage",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "H16",
+      "tool": "HubSpot BCC-generated Contact reconciliation",
+      "filter": "email EQ [institutionalsharedmailboxredacted]",
+      "pii_redacted": true,
+      "result": "1BCC_TO_CRMsharedinbox record, not created/duplicated asindividual",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    },
+    {
+      "id": "U01",
+      "tool": "HubSpot UI read only",
+      "urls": [
+        "https://app.hubspot.com/pipelines-settings/48713323/object/0-1/contacts-lifecycle-pipeline/automation",
+        "https://app.hubspot.com/pipelines-settings/48713323/object/0-136/lead-pipeline-id/automation"
+      ],
+      "result": "CreateLeadDESACTIVADA; Opportunity lifecycle-on-dealACTIVADA. No settingschanged.",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "account_id": "HSP-0034",
+      "time_precision": "within execution interval; actual provider/create times in private evidence"
+    }
+  ],
+  "approval": {
+    "email": true,
+    "four_person_enrichment_maxcredits": 4,
+    "contact_crm": true,
+    "deal_crm": true,
+    "extra_outreach_or_sequences": false,
+    "ariba_or_bid_submission": false,
+    "notes": false
+  },
+  "outcomes": {
+    "new_individual_contacts": 4,
+    "native_company_reused": "59392757641",
+    "new_deal": "66218288550",
+    "credits_consumed": 4,
+    "emails_sent": 1,
+    "notes_created": 0,
+    "lead_objects_created": 0
+  },
+  "uncertainties": [
+    "buyer reply/invitation/admission",
+    "specific authority and interest of contacts",
+    "process deadline",
+    "delivery/read status of inquiry"
+  ],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/crm-2026-10-18-esenttia"
+}

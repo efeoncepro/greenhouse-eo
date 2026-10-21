@@ -430,9 +430,11 @@ descuento de partner, el **neto** puede caer bajo USD 400 y pierdes el waiver �
 - 🔴 **"Best Partner Wins"**: cuando dos o más partners van por el mismo deal, *"the partner who obtains
   the client's signature on the **Proof of Involvement (POI)** will receive the applicable sold credit."*
   **Corta para los dos lados.** La velocidad y la relación con el cliente son ahora **defensivas**.
-- **Cross-sell a cuenta existente**: se envía un **shared deal**; ⚠️ terceros describen coordinación con el
-  **Growth Specialist** que gestiona la cuenta + link de confirmación del cliente. ❌ El proceso operativo
-  **no está en la página oficial**. **Pídeselo al PDM por escrito.**
+- **Shared deal: creación oficial verificada 18/10/2026**. La documentación incluye conversión de Deal
+  existente: [Create shared partner deals](https://knowledge.hubspot.com/partner-tools/create-shared-partner-deals)
+  (actualizada 28/09/2026). Procedimiento observado y preferencia de Julio **liderazgo Partner** en el
+  [manual local](../../../docs/manual-de-uso/hubspot/convertir-negocio-compartido.md).
+  La coordinación particular de cross-sell, POI y comisión se acredita por separado.
 
 ---
 

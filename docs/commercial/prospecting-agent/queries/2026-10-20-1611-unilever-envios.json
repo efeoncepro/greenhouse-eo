@@ -1,0 +1,103 @@
+{
+  "run_at": "2026-10-20T16:11:30.099688-03:00",
+  "timezone": "America/Santiago",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-20T16:11:30.099688-03:00"
+  },
+  "scope": "HSP-0040 first send readback",
+  "discovery_queries": 0,
+  "coverage": "México × creatividad/contenidos; verificación de tres envíos existentes",
+  "queries": [
+    {
+      "tool": "HubSpot get_user_details",
+      "query": "USER_INFORMATION",
+      "result": "Identidad y portal correctos",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook get_profile",
+      "query": "perfil conectado",
+      "result": "Identidad correcta",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "HubSpot search_crm_objects",
+      "query": "EMAIL asociados a tres CONTACT [identidades redactadas]",
+      "result": "total=3: SENT 2; BOUNCED 1",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook find_mail_folder",
+      "query": "Sent Items",
+      "result": "cero resultados; no prueba ausencia",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook find_mail_folder",
+      "query": "Enviados",
+      "result": "Elementos enviados encontrado",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook search_messages",
+      "query": "to:[correo individual redactado] received>=2026-10-20",
+      "result": "un correo enviado y una notificación de no entrega",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook search_messages",
+      "query": "Unilever received>=2026-10-20",
+      "result": "tres envíos y una notificación de no entrega",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook list_messages",
+      "query": "Elementos enviados; sentDateTime ge 2026-10-20T19:00:00Z",
+      "result": "3 mensajes; has_more=false",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "HubSpot search_properties",
+      "query": "CONTACT: hs_email_hard_bounce_reason, hs_sequences_is_enrolled, hs_latest_sequence_enrolled",
+      "result": "Definiciones disponibles",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "HubSpot get_crm_objects",
+      "query": "CONTACT ×3: inscripción vigente, última secuencia, fin y motivo de rebote [PII redactada]",
+      "result": "dos activos; objetivo fuera; UNKNOWN_USER",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    }
+  ],
+  "sources_blocked": [],
+  "result": {
+    "sent": 2,
+    "bounced": 1,
+    "active_contacts": 2,
+    "credits": 0,
+    "crm_writes": 0,
+    "manual_resends": 0
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/2026-10-20-1611-unilever-envios-readback.json"
+}

@@ -1,0 +1,23 @@
+{
+  "run_at": "2026-10-20T17:45:05.823673-03:00",
+  "timezone": "America/Santiago",
+  "scope": "HSP-0040 envío InMail solicitado por operador",
+  "queries": [
+    {
+      "tool": "LinkedIn native UI",
+      "query": "Compositor existente objetivo [PII redactada]; remitente, asunto, texto y costo",
+      "result": "Destinatario correcto;1crédito InMail; autorización expresa vigente"
+    },
+    {
+      "tool": "LinkedIn native UI",
+      "query": "Enviar una vez; lectura del hilo de conversación",
+      "result": "Mensaje saliente persistido17:44Santiago; texto íntegro y asunto verificados; sin respuesta"
+    }
+  ],
+  "discovery_queries": 0,
+  "sends": 1,
+  "inmail_credits": 1,
+  "apollo_credits": 0,
+  "crm_writes": 0,
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/linkedin-correo-inmail-enviado.json"
+}

@@ -1,0 +1,51 @@
+{
+  "run_id": "2026-10-20-1032-assetplan-patron-correo",
+  "hsp_id": "HSP-0039",
+  "date_santiago": "2026-10-20T10:33:48.432091-03:00",
+  "type": "operator_requested_corporate_email_pattern_research",
+  "queries": [
+    {
+      "q": "Assetplan <CORPORATE_DOMAIN_EMAIL_PATTERN> -contactdirectories",
+      "pii_redacted": true
+    },
+    {
+      "q": "assetplan.cl correo gerente",
+      "pii_redacted": false
+    },
+    {
+      "q": "<TARGET> email Assetplan",
+      "pii_redacted": true
+    },
+    {
+      "q": "site:blog.assetplan.cl <CORPORATE_EMAIL_PATTERN> excludegeneralmailboxes and <EXAMPLE_PERSON>",
+      "pii_redacted": true
+    },
+    {
+      "q": "site:assetplan.cl <TARGET_SURNAME>",
+      "pii_redacted": true
+    }
+  ],
+  "sources_read": [
+    {
+      "url": "https://blog.assetplan.cl/propiedad/propietarios/your-blog-post-title-here",
+      "result": "Exactindividualemailpublished; patternname.surname; contactdetailsprivate"
+    },
+    {
+      "url": "https://cl.linkedin.com/jobs/view/corredor-de-arriendos-freelance-at-assetplan-4288465277",
+      "result": "Exactindividualemailhistoricalrecruitmentpublication; onlyformatuse"
+    }
+  ],
+  "result": {
+    "published_examples": 2,
+    "pattern": "first_name.first_surname@company_domain",
+    "inferred_target_candidate_stored_separately": true,
+    "target_email_verified": false,
+    "target_email_property_remains_null": true,
+    "actualmailboxcheck": false
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1032-assetplan-patron-correo.json",
+  "crm_writes": 0,
+  "outreach": 0,
+  "paid_calls": 0,
+  "privacy": "Noindividualemail/names in versionablerecord; irrelevanttenantcontractsnotreadorused"
+}

@@ -150,9 +150,12 @@ olvidaste que el legacy se va a cero.
 **Regla operativa:** POI firmado **antes** de que el deal cierre. No después. No "cuando se dé".
 
 ### Cross-sell a cuenta existente
-Se envía un **shared deal**. ⚠️ Terceros describen coordinación con el **Growth Specialist** que gestiona la
-cuenta + un link de confirmación del cliente. ❌ **El proceso operativo no está en la página oficial.**
-**Pídeselo al PDM por escrito y documéntalo acá** — es el flujo que habilita toda la motion de base instalada.
+La creación de un **shared deal** sí está documentada oficialmente y fue observada en el portal el
+18/10/2026. Para un Deal existente: «Negocios compartidos» → «Convertir en negocio compartido»;
+por instrucción de Julio, liderazgo **Partner**. Seguir el
+[manual verificado](../../../../docs/manual-de-uso/hubspot/convertir-negocio-compartido.md).
+La coordinación específica de cross-sell, asignación y elegibilidad/POI sigue requiriendo evidencia del
+cliente y del equipo HubSpot; registrar no acredita comisión ni interés confirmado.
 
 ---
 
@@ -232,8 +235,9 @@ licencia → implementación → managed ops → intelligence → **expansión d
 Cosas que ❌ **no están publicadas** y que cambian decisiones de plata. **Pídelas por escrito.**
 
    reduce a la mitad el esfuerzo de cada tier. **Necesitas esto por escrito.**
-2. **El proceso operativo del shared deal para cross-sell** a cuentas existentes (Growth Specialist, link de
-   confirmación, plazos). Habilita toda la motion de base instalada.
+2. **La coordinación específica de cross-sell** en una cuenta existente: representante, elegibilidad,
+   confirmación del cliente/POI y plazos. La creación del shared deal ya está documentada en § 5;
+   no confundirla con la acreditación de esos requisitos.
 3. **El onboarding fee del bundle Customer Platform** (Pro y Enterprise). ❌ No publicado. Es la diferencia
    entre USD 7K y USD 14K+ en la primera factura del cliente.
 4. **El precio real de los contactos de marketing adicionales.** Las fuentes públicas discrepan **10×**.

@@ -1,0 +1,413 @@
+{
+  "run_id": "2026-10-21-0924-privados",
+  "parent_run": "2026-10-21-0905",
+  "checked_at": "2026-10-21T12:28:37.754Z",
+  "source_observations_completed_before": "2026-10-21T09:24:43-03:00",
+  "window": {
+    "week_start": "2026-10-19T00:00:00-03:00",
+    "cutoff": "2026-10-21T09:24:43-03:00"
+  },
+  "correction": "Runnerlocalblockeddoesnotmeanbrowserblocked; existingChrome authenticatedasJulio/EfeonceGroupSpA accessedreadonly.",
+  "coverage": {
+    "new_visible": 29,
+    "editing_visible": 2,
+    "submitted_visible": 1,
+    "all_market_or_all_Wherex": false,
+    "scope": "accountvisiblefilteredview,29inonepage50"
+  },
+  "queries": [
+    {
+      "id": "PW1",
+      "country": "Colombia",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "site:linkedin.com/posts (\"buscamos agencia\" OR \"busco agencia\" OR \"recomendaciones agencia\") Colombia after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:57.949Z",
+      "result_group": "private_country_Colombia",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW2",
+      "country": "Colombia",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "Colombia (\"RFP\" OR \"licitación privada\") (agencia OR SEO OR HubSpot OR programática) after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:57.949Z",
+      "result_group": "private_country_Colombia",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW3",
+      "country": "Chile",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "site:linkedin.com/posts (\"buscamos agencia\" OR \"recomiendan agencia\" OR \"busco partner\") (Chile OR Santiago) after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:57.978Z",
+      "result_group": "private_country_Chile",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW4",
+      "country": "Chile",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "Chile (\"RFP\" OR \"licitación privada\") (marketing OR web OR CRM OR medios) after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:57.978Z",
+      "result_group": "private_country_Chile",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW5",
+      "country": "Perú",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "site:linkedin.com/posts (\"buscamos agencia\" OR \"busco agencia\" OR \"recomienden\") (Perú OR Lima) after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:58.187Z",
+      "result_group": "private_country_Perú",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW6",
+      "country": "Perú",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "Perú (\"convocatoria agencia\" OR \"selección de agencia\") (creativa OR marketing OR digital) after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:58.187Z",
+      "result_group": "private_country_Perú",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW7",
+      "country": "México",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "site:linkedin.com/posts (\"buscamos agencia\" OR \"busco agencia\" OR \"recomendaciones\") (\"contenido\" OR \"CRM\" OR \"web\") México after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:58.858Z",
+      "result_group": "private_country_México",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    },
+    {
+      "id": "PW8",
+      "country": "México",
+      "service_lines": [
+        "seo_aeo",
+        "web",
+        "creative",
+        "crm_hubspot",
+        "media"
+      ],
+      "q": "México (\"licitación agencia\" OR \"selección agencia\" OR \"RFP\") (medios OR creativa OR digital) after:2026-10-18",
+      "recency": 7,
+      "weekly": true,
+      "checked_at": "2026-10-21T12:19:58.858Z",
+      "result_group": "private_country_México",
+      "result": "No newqualifiedweeklyprivatebuy;historical/provider/freelance/offmarketresults;fullresultprivate",
+      "pii_redacted": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "HSP-0043",
+      "entity": "Esval S.A. / Aguas del Valle S.A.",
+      "country": "Chile",
+      "domain": null,
+      "code": "5693",
+      "source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/423649?from=list",
+      "published_at": "2026-10-14T15:54:00",
+      "deadline_at": "2026-10-26T16:00:00",
+      "stage": "one_round_service_RFP",
+      "need": "Productora de eventos para fiesta corporativa2026,1200–1300asistentes,7Dic19:30Valparaíso",
+      "budget": {
+        "amount": 140000000,
+        "currency": "CLP",
+        "tax_basis": "unknown",
+        "scope": "buyerbudgetnotagencyfee"
+      },
+      "company_id": "57897950377",
+      "size": "local/groupunknown",
+      "first_seen_at": "2026-10-21",
+      "first_seen_precision": "day; publicationpriorweek",
+      "milestones": {
+        "meeting": "19Oct12h,past,mandatoryunknown",
+        "visits": "comments20+22Oct11–12:30;formalfield20Octonly",
+        "answers": "22Oct12hformalvs16hcomments"
+      },
+      "reason": "Fuera ventana nuevaspostulaciones;originales/admisión/contratono verificados;calendariocontradictorio.",
+      "document": "Primary buyerfiche/comments read;no decisivecontractoriginal",
+      "service_lines": [
+        "creative"
+      ],
+      "primary_service_line": "creative",
+      "procurement_control": {
+        "result": "hold",
+        "checked_at": "2026-10-21T12:28:37.754Z",
+        "source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/423649?from=list",
+        "fields": {
+          "selected_supplier": "no_verificado",
+          "award_act": "no_verificado",
+          "purchase_order": "no_verificado",
+          "contract_exists_and_status": "no_verificado",
+          "signed_at": "no_verificado",
+          "execution_start_actual": "no_verificado",
+          "execution_end_actual": "no_verificado"
+        },
+        "facts": "Productora de eventos para fiesta corporativa2026,1200–1300asistentes,7Dic19:30Valparaíso",
+        "document_read_or_block": "Primary buyerfiche/comments read;no decisivecontractoriginal",
+        "reason": "Fuera ventana nuevaspostulaciones;originales/admisión/contratono verificados;calendariocontradictorio.",
+        "recommend_bid": false
+      },
+      "timezone": "notlabelledbyWherex;retainshownUI",
+      "outreach_authorized": false,
+      "crm_writes": 0,
+      "paid_enrichment_authorized": false
+    },
+    {
+      "id": "HSP-0044",
+      "entity": "Simoniz S.A.",
+      "country": "Colombia",
+      "domain": "simonizco.com",
+      "code": "113",
+      "source": "https://system.wherex.com/secured/supplier_user/proposal/get/7552519",
+      "published_at": "2026-10-16T11:37:00",
+      "deadline_at": "2026-10-30T18:00:00",
+      "stage": "RFI_prior_information",
+      "need": "Servicioagenciacreativamarca;eventualconvenio6meses",
+      "budget": null,
+      "company_id": "39129628052",
+      "size": "CRMfield323employees;notexternallyverified;groupunknown",
+      "first_seen_at": null,
+      "first_seen_precision": "knownradar17Oct; operatoropened16Oct12:31notexactradardetection",
+      "milestones": {
+        "future_agreement": "6monthsfromeventualaward,notacontractalreadysigned"
+      },
+      "reason": "Priorweek;briefopenedinPDFviewerbutreadingblockedbyextensionUI;threequestionsnotread;contract/selectionunknown.",
+      "document": "RFP_Solicitud_de_cotizacion - TI - SIMONIZCO --202610160935550810.pdf visibleandopened, NOTread; no signedcontract",
+      "service_lines": [
+        "creative"
+      ],
+      "primary_service_line": "creative",
+      "procurement_control": {
+        "result": "hold",
+        "checked_at": "2026-10-21T12:28:37.754Z",
+        "source": "https://system.wherex.com/secured/supplier_user/proposal/get/7552519",
+        "fields": {
+          "selected_supplier": "no_verificado",
+          "award_act": "no_verificado",
+          "purchase_order": "no_verificado",
+          "contract_exists_and_status": "no_verificado",
+          "signed_at": "no_verificado",
+          "execution_start_actual": "no_verificado",
+          "execution_end_actual": "no_verificado"
+        },
+        "facts": "Servicioagenciacreativamarca;eventualconvenio6meses",
+        "document_read_or_block": "RFP_Solicitud_de_cotizacion - TI - SIMONIZCO --202610160935550810.pdf visibleandopened, NOTread; no signedcontract",
+        "reason": "Priorweek;briefopenedinPDFviewerbutreadingblockedbyextensionUI;threequestionsnotread;contract/selectionunknown.",
+        "recommend_bid": false
+      },
+      "timezone": "notlabelledbyWherex;retainshownUI",
+      "outreach_authorized": false,
+      "crm_writes": 0,
+      "paid_enrichment_authorized": false
+    },
+    {
+      "id": "HSP-0045",
+      "entity": "PRIMAX COLOMBIA S.A.",
+      "country": "Colombia",
+      "domain": null,
+      "code": "43",
+      "source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/424703?from=list",
+      "published_at": "2026-10-19T18:42:00",
+      "deadline_at": "2026-11-09T18:00:00",
+      "stage": "one_round_service_RFQ",
+      "need": "130decoracionesnavideñas;distribuciónnacionaloficinas/terminales/estaciones;buyerHRnotvacancy",
+      "budget": null,
+      "company_id": null,
+      "size": "local/groupunknown",
+      "first_seen_at": null,
+      "first_seen_precision": "alreadymentioned20Octfollowup;notnewcommercialdiscovery",
+      "milestones": {
+        "samples": "26Oct–3Nov",
+        "payment": "45daysfrominvoice"
+      },
+      "reason": "Weeklypublicationbutfit/ICP/originalsandcontractfileunverified;notqualifiedagencycampaign.",
+      "document": "Primarybuyerfiche/comments;1commercialofferrequired;no originals/contractsread",
+      "service_lines": [
+        "creative"
+      ],
+      "primary_service_line": "creative",
+      "procurement_control": {
+        "result": "hold",
+        "checked_at": "2026-10-21T12:28:37.754Z",
+        "source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/424703?from=list",
+        "fields": {
+          "selected_supplier": "no_verificado",
+          "award_act": "no_verificado",
+          "purchase_order": "no_verificado",
+          "contract_exists_and_status": "no_verificado",
+          "signed_at": "no_verificado",
+          "execution_start_actual": "no_verificado",
+          "execution_end_actual": "no_verificado"
+        },
+        "facts": "130decoracionesnavideñas;distribuciónnacionaloficinas/terminales/estaciones;buyerHRnotvacancy",
+        "document_read_or_block": "Primarybuyerfiche/comments;1commercialofferrequired;no originals/contractsread",
+        "reason": "Weeklypublicationbutfit/ICP/originalsandcontractfileunverified;notqualifiedagencycampaign.",
+        "recommend_bid": false
+      },
+      "timezone": "notlabelledbyWherex;retainshownUI",
+      "outreach_authorized": false,
+      "crm_writes": 0,
+      "paid_enrichment_authorized": false
+    }
+  ],
+  "other_controls": [
+    {
+      "code": "SKY1547",
+      "source": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/424192?from=list",
+      "result": "hold",
+      "checked_at": "2026-10-21T12:28:37.754Z",
+      "published_at": "2026-10-16T12:44:00",
+      "deadline_at": "2026-10-21T16:00:00",
+      "stage": "round1",
+      "facts": "Measures/technicalproposal/graphicproduction/materials/installation/finishes;compliancerequired",
+      "fields": {
+        "selected_supplier": "no_verificado",
+        "award_act": "no_verificado",
+        "purchase_order": "no_verificado",
+        "contract_exists_and_status": "no_verificado",
+        "signed_at": "no_verificado",
+        "execution_start_actual": "no_verificado",
+        "execution_end_actual": "no_verificado"
+      },
+      "document_read_or_block": "primaryfiche;originals/contractnotread"
+    },
+    {
+      "code": "GRD1541",
+      "source": "https://system.wherex.com/secured/supplier_user/proposal/get/7543223?tab=summary",
+      "result": "hold_current_contract_notverified",
+      "checked_at": "2026-10-21T12:28:37.754Z",
+      "submission": "Enviada20Oct12:09;5/5mandatoryfiles",
+      "fee": {
+        "amount": 4500000,
+        "currency": "COP",
+        "tax_basis": "withoutIVA",
+        "period": "monthly"
+      },
+      "deadline": "priorbuyerextension22Oct14Colombia=16Santiago;notrereadinthisview",
+      "fields": {
+        "selected_supplier": "no_verificado",
+        "award_act": "no_verificado",
+        "purchase_order": "no_verificado",
+        "contract_exists_and_status": "no_verificado",
+        "signed_at": "no_verificado",
+        "execution_start_actual": "no_verificado",
+        "execution_end_actual": "no_verificado"
+      },
+      "document_read_or_block": "nativeoffer_summaryread;noactualcontract"
+    },
+    {
+      "code": "Sika1184",
+      "result": "operator_no_bid_preserved",
+      "facts": "Editandoportaldoesnotreactivateclosedlostdecision;no mutation"
+    }
+  ],
+  "listing_codes": [
+    "SKY1547",
+    "PRIMAX41",
+    "Nuam340",
+    "ACP14082",
+    "CMF1197",
+    "USM442",
+    "Esval5419",
+    "Ripley575",
+    "Metrogas1561",
+    "Esval4940",
+    "QROMA40",
+    "JRC14",
+    "CPS2700",
+    "Sika1179",
+    "Schindler44",
+    "Esval5693",
+    "Polpaico6741",
+    "PRIMAX530",
+    "Esval5716",
+    "Ajinomoto1039",
+    "OXZO63",
+    "ACHS149",
+    "CPS2706",
+    "ICB113",
+    "Metlen16",
+    "OXZO61",
+    "CPS2704",
+    "PRIMAX43",
+    "USM446"
+  ],
+  "editing_codes": [
+    "Sika1184",
+    "Simoniz113"
+  ],
+  "privacy": "NoindividualemailsphonesmeetingaccesssecretsorsignedviewerURLs;PIIandrawsearchresultsprivate0600",
+  "actions": {
+    "crm_writes": 0,
+    "send": 0,
+    "paid_enrichment": 0,
+    "participation": 0,
+    "additional_tasks": 0
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-privados-ampliacion-evidence.json"
+}

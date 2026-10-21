@@ -1,0 +1,246 @@
+{
+  "run_id": "2026-10-21-seguimientos-enviados",
+  "checked_at": "2026-10-21T10:28:09.802098-03:00",
+  "timezone": "America/Santiago",
+  "type": "authorized_followup_execution",
+  "discovery_queries": 0,
+  "scope": "14 textos previamente preparados menos Momentum; adelanto explícito para hoy",
+  "queries": [
+    {
+      "source": "Outlook",
+      "operation": "profile",
+      "result": "identidad laboral comprobada"
+    },
+    {
+      "source": "HubSpot",
+      "operation": "portal_identity",
+      "result": "portal 48713323, owner75788512 comprobados"
+    },
+    {
+      "source": "Outlook",
+      "operation": "list_messages",
+      "folder": "sentitems",
+      "filter": "receivedDateTime ge 2026-10-21T13:00:00Z",
+      "order_by": "receivedDateTime desc",
+      "top": 50,
+      "result": "14 copias enviadas verificadas; varias lecturas progresivas"
+    },
+    {
+      "source": "Outlook",
+      "operation": "search_messages",
+      "query": "[destinatarios y remitentes redactados] received>=2026-10-21",
+      "result": "sin respuesta nueva localizada en control previo al envío; consultas con PII redactadas"
+    },
+    {
+      "source": "HubSpot",
+      "operation": "CONTACT search",
+      "query": "email IN [14 destinatarios, CC y contacto regional; redactados]",
+      "result": "sin secuencia/agente activo en el lote; contacto regional sí activo"
+    },
+    {
+      "source": "Outlook UI",
+      "operation": "reply_all_and_send",
+      "targets": "14 destinatarios de negocio redactados; Pierre Fabre por conector, resto por UI",
+      "result": "14 enviados; CCO verificado; 13 firmas gráficas y una textual previa a la corrección"
+    },
+    {
+      "source": "HubSpot Documents UI",
+      "operation": "create_recipient_links",
+      "count": 11,
+      "result": "documentos aprobados originales, sin requisito de correo, descarga habilitada; dos enlaces web propios y uno de credenciales reutilizados"
+    },
+    {
+      "source": "HubSpot CLI",
+      "operation": "activities list --contact [ID] --activity-type EMAIL --limit 5 --format json",
+      "count": 15,
+      "result": "14 EMAIL SENT de hoy comprobados; contacto regional muestra dos envíos previos"
+    }
+  ],
+  "results": [
+    {
+      "account": "Pierre Fabre — agencia",
+      "sent_at": "2026-10-21T13:07:38Z",
+      "sent_at_santiago": "2026-10-21T10:07:38-03:00",
+      "graphic_signature": false,
+      "bcc_verified": true,
+      "contact_id": 254011713292,
+      "crm_email_ids": [
+        "119205315147"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Yanbal",
+      "sent_at": "2026-10-21T13:18:39Z",
+      "sent_at_santiago": "2026-10-21T10:18:39-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 253779289495,
+      "crm_email_ids": [
+        "119206687021"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Olivos del Sur",
+      "sent_at": "2026-10-21T13:19:51Z",
+      "sent_at_santiago": "2026-10-21T10:19:51-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 253263177790,
+      "crm_email_ids": [
+        "119205947397"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Haulmer",
+      "sent_at": "2026-10-21T13:19:58Z",
+      "sent_at_santiago": "2026-10-21T10:19:58-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254049641307,
+      "crm_email_ids": [
+        "119206549576"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "UCSH / búsqueda de Octavia",
+      "sent_at": "2026-10-21T13:21:01Z",
+      "sent_at_santiago": "2026-10-21T10:21:01-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254068886277,
+      "crm_email_ids": [
+        "119205418766"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Aseguradora Solidaria",
+      "sent_at": "2026-10-21T13:21:41Z",
+      "sent_at_santiago": "2026-10-21T10:21:41-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 255100754245,
+      "crm_email_ids": [
+        "119205917077"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Align / partner por identificar",
+      "sent_at": "2026-10-21T13:22:05Z",
+      "sent_at_santiago": "2026-10-21T10:22:05-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 255247873398,
+      "crm_email_ids": [
+        "119206533456"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Metalhsa",
+      "sent_at": "2026-10-21T13:23:00Z",
+      "sent_at_santiago": "2026-10-21T10:23:00-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 250971957541,
+      "crm_email_ids": [
+        "119205601841"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "INTURSA",
+      "sent_at": "2026-10-21T13:23:26Z",
+      "sent_at_santiago": "2026-10-21T10:23:26-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254685594941,
+      "crm_email_ids": [
+        "119205629588"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Alfin Banco",
+      "sent_at": "2026-10-21T13:23:45Z",
+      "sent_at_santiago": "2026-10-21T10:23:45-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254680830337,
+      "crm_email_ids": [
+        "119205753377"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "INGIMEX",
+      "sent_at": "2026-10-21T13:24:06Z",
+      "sent_at_santiago": "2026-10-21T10:24:06-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254675150874,
+      "crm_email_ids": [
+        "119206797719"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Aloja Host",
+      "sent_at": "2026-10-21T13:24:19Z",
+      "sent_at_santiago": "2026-10-21T10:24:19-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 255793944973,
+      "crm_email_ids": [
+        "119205908026"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "UNIMINUTO",
+      "sent_at": "2026-10-21T13:24:37Z",
+      "sent_at_santiago": "2026-10-21T10:24:37-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254935102797,
+      "crm_email_ids": [
+        "119205803116"
+      ],
+      "crm_status": "VERIFIED"
+    },
+    {
+      "account": "Continente",
+      "sent_at": "2026-10-21T13:24:53Z",
+      "sent_at_santiago": "2026-10-21T10:24:53-03:00",
+      "graphic_signature": true,
+      "bcc_verified": true,
+      "contact_id": 254187252266,
+      "crm_email_ids": [
+        "119206485161"
+      ],
+      "crm_status": "VERIFIED"
+    }
+  ],
+  "excluded": [
+    "Momentum, exclusión expresa",
+    "Contacto regional ya inscrito: dos envíos anteriores, condición para manual no cumplida",
+    "Teva, secuencia vigente",
+    "Rebotes, negativas, Prospecting Agent activo y Esenttia STOP preservados"
+  ],
+  "approval": {
+    "status": "executed_verified",
+    "authority": "instrucciones explícitas de Julio en esta tarea",
+    "outlook_sends": 14,
+    "manual_crm_writes": 0,
+    "paid_enrichment": 0,
+    "new_deals": 0,
+    "new_sequences": 0
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-seguimientos-enviados",
+  "publication_window": "no aplica: ejecución de seguimientos autorizados, sin descubrimiento nuevo"
+}

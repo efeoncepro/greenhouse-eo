@@ -1,0 +1,172 @@
+{
+  "run_at": "2026-10-20T17:41:07.255311-03:00",
+  "timezone": "America/Santiago",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-20T17:41:07.255311-03:00"
+  },
+  "scope": "HSP-0040 recuperación de dirección después de rebote",
+  "coverage": "Focalizada México × creatividad/contenidos; no nuevo radar20celdas",
+  "queries": [
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] [empresa] email",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] Key Account contacto",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] dominio corporativo",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre completo candidato redactado] correo",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] [empresa] @",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre y dominio redactados] email contacto",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[perfil individual redactado] email",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] email marketing [empresa]",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre completo candidato redactado] [empresa] contacto correo",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] Busco agencia",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre objetivo redactado] [empresa] email RocketReach SignalHire ContactOut",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.search_query",
+      "query": "[nombre completo candidato redactado] dominio corporativo",
+      "result": "Sin correo alternativo atribuible; homónimos descartados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Apollo contacts_search",
+      "query": "q_keywords=[nombre individual redactado]; page1/per_page10",
+      "result": "1 registro importado de CRM; repite correo rebotado, sin nueva validación",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Apollo mixed_people_api_search",
+      "query": "person_linkedin_urls=[perfil individual redactado]; page1/per_page5",
+      "result": "1 identidad exacta; has_email=false",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Outlook search_messages",
+      "query": "[nombre individual redactado]",
+      "result": "4 resultados: 3 envíos propios y NDR; sin correo alternativo",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "LinkedIn UI contact-info",
+      "query": "Perfil objetivo [URL individual redactada]",
+      "result": "Sólo enlace al perfil; sin correo",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "web.open + LinkedIn UI",
+      "query": "https://www.linkedin.com/feed/update/urn:li:activity:7518040999206674432/",
+      "result": "web404; UI autenticada informa publicación retirada o eliminada",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "HubSpot get_user_details + get_crm_objects",
+      "query": "portal48713323; CONTACT objetivo [identidad redactada], correo/inscripción/rebote",
+      "result": "Lectura sin modificación; expediente de rebote conservado",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    },
+    {
+      "tool": "Apollo tool metadata",
+      "query": "people_match, people_bulk_match, email_validation_validate, contacts_search, mixed_people_api_search",
+      "result": "Sin dirección nueva para validar; no ejecutados match, bulk ni validación pagada; waterfall referido en descripción, no expuesto en schemas consultados",
+      "country": "México",
+      "service": "creatividad/contenidos",
+      "PII": "redactada"
+    }
+  ],
+  "new_verified_email": false,
+  "credits": 0,
+  "crm_mutations": 0,
+  "sends": 0,
+  "blocked_sources": [
+    "Publicación LinkedIn original: no encontrada en UI autenticada y 404 en lector web"
+  ],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1426-denis-unilever/2026-10-20-1741-denis-correo.json"
+}

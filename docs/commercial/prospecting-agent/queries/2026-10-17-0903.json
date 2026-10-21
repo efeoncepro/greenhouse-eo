@@ -1,0 +1,4895 @@
+{
+  "schema_version": 1,
+  "run_id": "automation-2026-10-17-0903",
+  "timezone": "America/Santiago",
+  "first_clock_at": "2026-10-17T09:03:42.488714-03:00",
+  "research_cutoff_at": "2026-10-17T09:09:50-03:00",
+  "week_start_local": "2026-10-12T00:00:00-03:00",
+  "week_end_local": "2026-10-17T09:09:50-03:00",
+  "first_pass_48h": {
+    "from": "2026-10-15T09:03:42.488714-03:00",
+    "to": "2026-10-17T09:03:42.488714-03:00",
+    "filter_precision": "day-bounded superset plus recency2; exact timestamps must be validated on primary sources"
+  },
+  "continuity_overlap_from": "2026-10-13T09:19:09-03:00",
+  "discovery_queries": 68,
+  "current_week_discovery_queries": 56,
+  "current_week_discovery_percent": 82.35,
+  "qualification_queries": 4,
+  "queries": [
+    {
+      "country": "Chile",
+      "service": "seo_aeo",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Chile (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D01",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 1,
+      "result_summary": "Proveedores, empleos y procesos antiguos; Metro junio y UNICEF julio no semanales.",
+      "result_sources_ref": {
+        "batch": 1
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "web",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Chile (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D02",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 1,
+      "result_summary": "Proveedores, empleos y procesos antiguos; Metro junio y UNICEF julio no semanales.",
+      "result_sources_ref": {
+        "batch": 1
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "creative",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Chile (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D03",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 1,
+      "result_summary": "Proveedores, empleos y procesos antiguos; Metro junio y UNICEF julio no semanales.",
+      "result_sources_ref": {
+        "batch": 1
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "crm",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Chile (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D04",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 1,
+      "result_summary": "Proveedores, empleos y procesos antiguos; Metro junio y UNICEF julio no semanales.",
+      "result_sources_ref": {
+        "batch": 1
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "media",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Chile (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D05",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 2,
+      "result_summary": "Estímulos/premios, proveedores y convocatorias antiguas; sin nueva candidata apta.",
+      "result_sources_ref": {
+        "batch": 2
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "seo_aeo",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Perú (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D06",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 2,
+      "result_summary": "Estímulos/premios, proveedores y convocatorias antiguas; sin nueva candidata apta.",
+      "result_sources_ref": {
+        "batch": 2
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "web",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Perú (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D07",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 2,
+      "result_summary": "Estímulos/premios, proveedores y convocatorias antiguas; sin nueva candidata apta.",
+      "result_sources_ref": {
+        "batch": 2
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "creative",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Perú (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D08",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 2,
+      "result_summary": "Estímulos/premios, proveedores y convocatorias antiguas; sin nueva candidata apta.",
+      "result_sources_ref": {
+        "batch": 2
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "crm",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Perú (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D09",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 3,
+      "result_summary": "CRM freelancer/empleo, oferentes y resultados sin comprador/ICP verificables.",
+      "result_sources_ref": {
+        "batch": 3
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "media",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Perú (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D10",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 3,
+      "result_summary": "CRM freelancer/empleo, oferentes y resultados sin comprador/ICP verificables.",
+      "result_sources_ref": {
+        "batch": 3
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "seo_aeo",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Colombia (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D11",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 3,
+      "result_summary": "CRM freelancer/empleo, oferentes y resultados sin comprador/ICP verificables.",
+      "result_sources_ref": {
+        "batch": 3
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "web",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Colombia (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D12",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 3,
+      "result_summary": "CRM freelancer/empleo, oferentes y resultados sin comprador/ICP verificables.",
+      "result_sources_ref": {
+        "batch": 3
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "creative",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Colombia (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D13",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 4,
+      "result_summary": "UNFPA25mayo vencida; OPS audiovisual con fecha por confirmar; ofertas laborales y estímulos.",
+      "result_sources_ref": {
+        "batch": 4
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "crm",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Colombia (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D14",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 4,
+      "result_summary": "UNFPA25mayo vencida; OPS audiovisual con fecha por confirmar; ofertas laborales y estímulos.",
+      "result_sources_ref": {
+        "batch": 4
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "media",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "Colombia (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D15",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 4,
+      "result_summary": "UNFPA25mayo vencida; OPS audiovisual con fecha por confirmar; ofertas laborales y estímulos.",
+      "result_sources_ref": {
+        "batch": 4
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "seo_aeo",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "México (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D16",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 4,
+      "result_summary": "UNFPA25mayo vencida; OPS audiovisual con fecha por confirmar; ofertas laborales y estímulos.",
+      "result_sources_ref": {
+        "batch": 4
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "web",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "México (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D17",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 5,
+      "result_summary": "Oferentes, concursos/empleo y procesos antiguosMéxico; no compra semanal acreditada.",
+      "result_sources_ref": {
+        "batch": 5
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "creative",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "México (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D18",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 5,
+      "result_summary": "Oferentes, concursos/empleo y procesos antiguosMéxico; no compra semanal acreditada.",
+      "result_sources_ref": {
+        "batch": 5
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "crm",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "México (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D19",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 5,
+      "result_summary": "Oferentes, concursos/empleo y procesos antiguosMéxico; no compra semanal acreditada.",
+      "result_sources_ref": {
+        "batch": 5
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "media",
+      "phase": "48h",
+      "purpose": "discovery",
+      "q": "México (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-14 before:2026-10-18",
+      "recency": 2,
+      "filter_note": "Filtro de días y recency2; comprobar instante15Oct09:03:42 y publicación primaria; filtro no prueba fecha.",
+      "id": "D20",
+      "executed_at": "2026-10-17 12:04:30 UTC",
+      "batch": 5,
+      "result_summary": "Oferentes, concursos/empleo y procesos antiguosMéxico; no compra semanal acreditada.",
+      "result_sources_ref": {
+        "batch": 5
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "seo_aeo",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Chile (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D21",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 6,
+      "result_summary": "Repetición semanalChile: oferentes/vacantes/históricos, sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 6
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "web",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Chile (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D22",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 6,
+      "result_summary": "Repetición semanalChile: oferentes/vacantes/históricos, sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 6
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "creative",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Chile (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D23",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 6,
+      "result_summary": "Repetición semanalChile: oferentes/vacantes/históricos, sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 6
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "crm",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Chile (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D24",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 6,
+      "result_summary": "Repetición semanalChile: oferentes/vacantes/históricos, sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 6
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "media",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Chile (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D25",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 7,
+      "result_summary": "Perú y mediosChile: HI audiovisual antigua, premios/empleo/proveedores; no nueva apta.",
+      "result_sources_ref": {
+        "batch": 7
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "seo_aeo",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Perú (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D26",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 7,
+      "result_summary": "Perú y mediosChile: HI audiovisual antigua, premios/empleo/proveedores; no nueva apta.",
+      "result_sources_ref": {
+        "batch": 7
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "web",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Perú (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D27",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 7,
+      "result_summary": "Perú y mediosChile: HI audiovisual antigua, premios/empleo/proveedores; no nueva apta.",
+      "result_sources_ref": {
+        "batch": 7
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "creative",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Perú (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D28",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 7,
+      "result_summary": "Perú y mediosChile: HI audiovisual antigua, premios/empleo/proveedores; no nueva apta.",
+      "result_sources_ref": {
+        "batch": 7
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "crm",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Perú (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D29",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 8,
+      "result_summary": "PerúCRM/medios y ColombiaSEO/web: oferentes, vacantes y comprador sin verificar.",
+      "result_sources_ref": {
+        "batch": 8
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "media",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Perú (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D30",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 8,
+      "result_summary": "PerúCRM/medios y ColombiaSEO/web: oferentes, vacantes y comprador sin verificar.",
+      "result_sources_ref": {
+        "batch": 8
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "seo_aeo",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Colombia (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D31",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 8,
+      "result_summary": "PerúCRM/medios y ColombiaSEO/web: oferentes, vacantes y comprador sin verificar.",
+      "result_sources_ref": {
+        "batch": 8
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "web",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Colombia (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D32",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 8,
+      "result_summary": "PerúCRM/medios y ColombiaSEO/web: oferentes, vacantes y comprador sin verificar.",
+      "result_sources_ref": {
+        "batch": 8
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "creative",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Colombia (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D33",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 9,
+      "result_summary": "Colombia: UNFPA histórica, OPS primaria403 posterior; estímulos yempleo.",
+      "result_sources_ref": {
+        "batch": 9
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "crm",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Colombia (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D34",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 9,
+      "result_summary": "Colombia: UNFPA histórica, OPS primaria403 posterior; estímulos yempleo.",
+      "result_sources_ref": {
+        "batch": 9
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Colombia",
+      "service": "media",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "Colombia (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D35",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 9,
+      "result_summary": "Colombia: UNFPA histórica, OPS primaria403 posterior; estímulos yempleo.",
+      "result_sources_ref": {
+        "batch": 9
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "seo_aeo",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "México (SEO OR AEO OR \"posicionamiento web\") (licitación OR convocatoria OR \"buscamos agencia\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D36",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 9,
+      "result_summary": "Colombia: UNFPA histórica, OPS primaria403 posterior; estímulos yempleo.",
+      "result_sources_ref": {
+        "batch": 9
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "web",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "México (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D37",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 10,
+      "result_summary": "México: oferentes, reclutamiento y convocatorias antiguas; sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 10
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "creative",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "México (\"agencia creativa\" OR audiovisual OR \"agencia de contenidos\") (buscamos OR licitación OR convocatoria OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D38",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 10,
+      "result_summary": "México: oferentes, reclutamiento y convocatorias antiguas; sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 10
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "crm",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "México (CRM OR HubSpot) (implementación OR integración OR migración) (licitación OR \"buscamos\" OR RFP OR recomendaciones) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D39",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 10,
+      "result_summary": "México: oferentes, reclutamiento y convocatorias antiguas; sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 10
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "media",
+      "phase": "week",
+      "purpose": "discovery",
+      "q": "México (\"agencia de medios\" OR programática OR \"paid media\" OR DOOH) (licitación OR convocatoria OR buscamos OR RFP) after:2026-10-11 before:2026-10-18",
+      "recency": 6,
+      "filter_note": "SemanaSantiago12Oct00:00–17Octcorte; filtro de días sólo preselección.",
+      "id": "D40",
+      "executed_at": "2026-10-17 12:04:43 UTC",
+      "batch": 10,
+      "result_summary": "México: oferentes, reclutamiento y convocatorias antiguas; sin nueva apta.",
+      "result_sources_ref": {
+        "batch": 10
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D41",
+      "country": "Chile",
+      "service": "creative,media",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "site:linkedin.com/posts Chile (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria agencias\") after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 11,
+      "result_summary": "LinkedIn indexado: Teva conocida, Metro junio, Socopur STOP y otros históricos/fuera deoficio.",
+      "result_sources_ref": {
+        "batch": 11
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0027",
+        "HSP-0017"
+      ]
+    },
+    {
+      "id": "D42",
+      "country": "Perú",
+      "service": "creative,media",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "site:linkedin.com/posts Perú (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria agencias\") after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 11,
+      "result_summary": "LinkedIn indexado: Teva conocida, Metro junio, Socopur STOP y otros históricos/fuera deoficio.",
+      "result_sources_ref": {
+        "batch": 11
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0027",
+        "HSP-0017"
+      ]
+    },
+    {
+      "id": "D43",
+      "country": "Colombia",
+      "service": "creative,media",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "site:linkedin.com/posts Colombia (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria agencias\") after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 11,
+      "result_summary": "LinkedIn indexado: Teva conocida, Metro junio, Socopur STOP y otros históricos/fuera deoficio.",
+      "result_sources_ref": {
+        "batch": 11
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0027",
+        "HSP-0017"
+      ]
+    },
+    {
+      "id": "D44",
+      "country": "México",
+      "service": "creative,media",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "site:linkedin.com/posts México (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria agencias\") after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 11,
+      "result_summary": "LinkedIn indexado: Teva conocida, Metro junio, Socopur STOP y otros históricos/fuera deoficio.",
+      "result_sources_ref": {
+        "batch": 11
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0027",
+        "HSP-0017"
+      ]
+    },
+    {
+      "id": "D45",
+      "country": "Chile",
+      "service": "seo_aeo,web,crm",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "\"Chile\" (\"buscamos\" OR \"recomendación\" OR \"RFP\") (\"agencia SEO\" OR \"rediseño web\" OR \"partner HubSpot\") \"octubre\" \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 12,
+      "result_summary": "Cero resultados del lote semanal con servicio+octubre2026.",
+      "result_sources_ref": {
+        "batch": 12
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D46",
+      "country": "Perú",
+      "service": "seo_aeo,web,crm",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "\"Perú\" (\"buscamos\" OR \"recomendación\" OR \"RFP\") (\"agencia SEO\" OR \"rediseño web\" OR \"partner HubSpot\") \"octubre\" \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 12,
+      "result_summary": "Cero resultados del lote semanal con servicio+octubre2026.",
+      "result_sources_ref": {
+        "batch": 12
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D47",
+      "country": "Colombia",
+      "service": "seo_aeo,web,crm",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "\"Colombia\" (\"buscamos\" OR \"recomendación\" OR \"RFP\") (\"agencia SEO\" OR \"rediseño web\" OR \"partner HubSpot\") \"octubre\" \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 12,
+      "result_summary": "Cero resultados del lote semanal con servicio+octubre2026.",
+      "result_sources_ref": {
+        "batch": 12
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D48",
+      "country": "México",
+      "service": "seo_aeo,web,crm",
+      "phase": "week_variant",
+      "purpose": "discovery",
+      "q": "\"México\" (\"buscamos\" OR \"recomendación\" OR \"RFP\") (\"agencia SEO\" OR \"rediseño web\" OR \"partner HubSpot\") \"octubre\" \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:05:11 UTC",
+      "batch": 12,
+      "result_summary": "Cero resultados del lote semanal con servicio+octubre2026.",
+      "result_sources_ref": {
+        "batch": 12
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "seo_aeo,web",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Chile (\"licitación\" OR \"convocatoria\" OR \"buscamos\") (\"SEO\" OR \"AEO\" OR \"desarrollo web\" OR \"rediseño sitio\") \"octubre 2026\"",
+      "recency": null,
+      "id": "D49",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 13,
+      "result_summary": "Chile+PerúSEO: fuentes históricas, directorios/oferentes, no nueva calificada.",
+      "result_sources_ref": {
+        "batch": 13
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "creative,media",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Chile (\"buscamos agencia\" OR \"licitación agencia\" OR \"RFP\") (contenidos OR audiovisual OR creatividad OR medios OR programática OR DOOH)",
+      "recency": null,
+      "id": "D50",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 13,
+      "result_summary": "Chile+PerúSEO: fuentes históricas, directorios/oferentes, no nueva calificada.",
+      "result_sources_ref": {
+        "batch": 13
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Chile",
+      "service": "crm",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Chile (\"buscamos partner\" OR \"recomiendan\" OR \"licitación\") (HubSpot OR CRM)",
+      "recency": null,
+      "id": "D51",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 13,
+      "result_summary": "Chile+PerúSEO: fuentes históricas, directorios/oferentes, no nueva calificada.",
+      "result_sources_ref": {
+        "batch": 13
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "seo_aeo,web",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Perú (\"licitación\" OR \"convocatoria\" OR \"buscamos\") (\"SEO\" OR \"AEO\" OR \"desarrollo web\" OR \"rediseño sitio\") \"octubre 2026\"",
+      "recency": null,
+      "id": "D52",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 13,
+      "result_summary": "Chile+PerúSEO: fuentes históricas, directorios/oferentes, no nueva calificada.",
+      "result_sources_ref": {
+        "batch": 13
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "Perú",
+      "service": "creative,media",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Perú (\"buscamos agencia\" OR \"licitación agencia\" OR \"RFP\") (contenidos OR audiovisual OR creatividad OR medios OR programática OR DOOH)",
+      "recency": null,
+      "id": "D53",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 14,
+      "result_summary": "Socopur ya cerrada, FCFjunio, FENAVIhistórica, proveedores y contratación genérica.",
+      "result_sources_ref": {
+        "batch": 14
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0017"
+      ]
+    },
+    {
+      "country": "Perú",
+      "service": "crm",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Perú (\"buscamos partner\" OR \"recomiendan\" OR \"licitación\") (HubSpot OR CRM)",
+      "recency": null,
+      "id": "D54",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 14,
+      "result_summary": "Socopur ya cerrada, FCFjunio, FENAVIhistórica, proveedores y contratación genérica.",
+      "result_sources_ref": {
+        "batch": 14
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0017"
+      ]
+    },
+    {
+      "country": "Colombia",
+      "service": "seo_aeo,web",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Colombia (\"licitación\" OR \"convocatoria\" OR \"buscamos\") (\"SEO\" OR \"AEO\" OR \"desarrollo web\" OR \"rediseño sitio\") \"octubre 2026\"",
+      "recency": null,
+      "id": "D55",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 14,
+      "result_summary": "Socopur ya cerrada, FCFjunio, FENAVIhistórica, proveedores y contratación genérica.",
+      "result_sources_ref": {
+        "batch": 14
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0017"
+      ]
+    },
+    {
+      "country": "Colombia",
+      "service": "creative,media",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Colombia (\"buscamos agencia\" OR \"licitación agencia\" OR \"RFP\") (contenidos OR audiovisual OR creatividad OR medios OR programática OR DOOH)",
+      "recency": null,
+      "id": "D56",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 14,
+      "result_summary": "Socopur ya cerrada, FCFjunio, FENAVIhistórica, proveedores y contratación genérica.",
+      "result_sources_ref": {
+        "batch": 14
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "HSP-0017"
+      ]
+    },
+    {
+      "country": "Colombia",
+      "service": "crm",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "Colombia (\"buscamos partner\" OR \"recomiendan\" OR \"licitación\") (HubSpot OR CRM)",
+      "recency": null,
+      "id": "D57",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 15,
+      "result_summary": "BritishCouncil sin año/publicación y restricción proveedoresmexicanos; partners/oferentes/históricos.",
+      "result_sources_ref": {
+        "batch": 15
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "seo_aeo,web",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "México (\"licitación\" OR \"convocatoria\" OR \"buscamos\") (\"SEO\" OR \"AEO\" OR \"desarrollo web\" OR \"rediseño sitio\") \"octubre 2026\"",
+      "recency": null,
+      "id": "D58",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 15,
+      "result_summary": "BritishCouncil sin año/publicación y restricción proveedoresmexicanos; partners/oferentes/históricos.",
+      "result_sources_ref": {
+        "batch": 15
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "creative,media",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "México (\"buscamos agencia\" OR \"licitación agencia\" OR \"RFP\") (contenidos OR audiovisual OR creatividad OR medios OR programática OR DOOH)",
+      "recency": null,
+      "id": "D59",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 15,
+      "result_summary": "BritishCouncil sin año/publicación y restricción proveedoresmexicanos; partners/oferentes/históricos.",
+      "result_sources_ref": {
+        "batch": 15
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "country": "México",
+      "service": "crm",
+      "purpose": "discovery",
+      "phase": "unfiltered",
+      "q": "México (\"buscamos partner\" OR \"recomiendan\" OR \"licitación\") (HubSpot OR CRM)",
+      "recency": null,
+      "id": "D60",
+      "executed_at": "2026-10-17 12:05:22 UTC",
+      "batch": 15,
+      "result_summary": "BritishCouncil sin año/publicación y restricción proveedoresmexicanos; partners/oferentes/históricos.",
+      "result_sources_ref": {
+        "batch": 15
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D61",
+      "country": "Chile",
+      "service": "all_five",
+      "lane": "public",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "(site:mercadopublico.cl OR site:chilecompra.cl) (SEO OR \"sitio web\" OR audiovisual OR CRM OR \"plan de medios\") \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:17 UTC",
+      "batch": 16,
+      "result_summary": "Cero resultados indexados para fuentespúblicas filtradas; no prueba ausencia decompra.",
+      "result_sources_ref": {
+        "batch": 16
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D62",
+      "country": "Perú",
+      "service": "all_five",
+      "lane": "public",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "(site:gob.pe OR site:seace.gob.pe) (\"sitio web\" OR \"campaña\" OR CRM OR \"medios\") \"octubre\" \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:17 UTC",
+      "batch": 16,
+      "result_summary": "Cero resultados indexados para fuentespúblicas filtradas; no prueba ausencia decompra.",
+      "result_sources_ref": {
+        "batch": 16
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D63",
+      "country": "Colombia",
+      "service": "all_five",
+      "lane": "public",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "(site:community.secop.gov.co OR site:colombiacompra.gov.co) (\"agencia\" OR \"SEO\" OR \"desarrollo web\" OR \"CRM\" OR \"medios\") \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:17 UTC",
+      "batch": 16,
+      "result_summary": "Cero resultados indexados para fuentespúblicas filtradas; no prueba ausencia decompra.",
+      "result_sources_ref": {
+        "batch": 16
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D64",
+      "country": "México",
+      "service": "all_five",
+      "lane": "public",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "(site:comprasmx.buengobierno.gob.mx OR site:gob.mx) (\"agencia de medios\" OR \"desarrollo web\" OR CRM OR \"producción audiovisual\") \"octubre\" \"2026\" after:2026-10-11 before:2026-10-18",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:17 UTC",
+      "batch": 16,
+      "result_summary": "Cero resultados indexados para fuentespúblicas filtradas; no prueba ausencia decompra.",
+      "result_sources_ref": {
+        "batch": 16
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D65",
+      "country": "Chile",
+      "service": "all_five",
+      "lane": "private",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "Chile empresa (\"convocatoria\" OR \"buscamos agencia\" OR \"RFP\") (marketing OR SEO OR CRM OR web OR audiovisual OR medios) after:2026-10-11 before:2026-10-18 -site:workana.com -site:reddit.com -empleo",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:19 UTC",
+      "batch": 17,
+      "result_summary": "Empleos/proveedores; LaCasaInteligente pide agenciasIA pero sin entidad/50+/fecha acreditados.",
+      "result_sources_ref": {
+        "batch": 17
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D66",
+      "country": "Perú",
+      "service": "all_five",
+      "lane": "private",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "Perú empresa (\"convocatoria\" OR \"buscamos agencia\" OR \"RFP\") (marketing OR SEO OR CRM OR web OR audiovisual OR medios) after:2026-10-11 before:2026-10-18 -site:workana.com -site:reddit.com -empleo",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:19 UTC",
+      "batch": 17,
+      "result_summary": "Empleos/proveedores; LaCasaInteligente pide agenciasIA pero sin entidad/50+/fecha acreditados.",
+      "result_sources_ref": {
+        "batch": 17
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D67",
+      "country": "Colombia",
+      "service": "all_five",
+      "lane": "private",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "Colombia empresa (\"convocatoria\" OR \"buscamos agencia\" OR \"RFP\") (marketing OR SEO OR CRM OR web OR audiovisual OR medios) after:2026-10-11 before:2026-10-18 -site:workana.com -site:reddit.com -empleo",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:19 UTC",
+      "batch": 17,
+      "result_summary": "Empleos/proveedores; LaCasaInteligente pide agenciasIA pero sin entidad/50+/fecha acreditados.",
+      "result_sources_ref": {
+        "batch": 17
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "D68",
+      "country": "México",
+      "service": "all_five",
+      "lane": "private",
+      "phase": "week_primary",
+      "purpose": "discovery",
+      "q": "México empresa (\"convocatoria\" OR \"buscamos agencia\" OR \"RFP\") (marketing OR SEO OR CRM OR web OR audiovisual OR medios) after:2026-10-11 before:2026-10-18 -site:workana.com -site:reddit.com -empleo",
+      "recency": null,
+      "executed_at": "2026-10-17 12:06:19 UTC",
+      "batch": 17,
+      "result_summary": "Empleos/proveedores; LaCasaInteligente pide agenciasIA pero sin entidad/50+/fecha acreditados.",
+      "result_sources_ref": {
+        "batch": 17
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": []
+    },
+    {
+      "id": "V1",
+      "country": "Colombia",
+      "service": "validation",
+      "purpose": "qualification",
+      "subject": "Simoniz entidad y tamaño",
+      "q": "site:simonizco.com nosotros historia Simoniz Colombia empleados",
+      "phase": "validation",
+      "executed_at": "2026-10-17 12:08:33 UTC",
+      "batch": 18,
+      "result_summary": "Simoniz banda501–1000 primaria posterior; CRM323 discrepante. GrupoRéditos2024 no2025; SKY sin fuente2025 suficiente.",
+      "result_sources_ref": {
+        "batch": 18
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "Company39129628052",
+        "Company34264439413",
+        "Company30825221458"
+      ]
+    },
+    {
+      "id": "V2",
+      "country": "Colombia",
+      "service": "validation",
+      "purpose": "qualification",
+      "subject": "Simoniz tamaño",
+      "q": "site:linkedin.com/company Simoniz Colombia 201 500",
+      "phase": "validation",
+      "executed_at": "2026-10-17 12:08:33 UTC",
+      "batch": 18,
+      "result_summary": "Simoniz banda501–1000 primaria posterior; CRM323 discrepante. GrupoRéditos2024 no2025; SKY sin fuente2025 suficiente.",
+      "result_sources_ref": {
+        "batch": 18
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "Company39129628052",
+        "Company34264439413",
+        "Company30825221458"
+      ]
+    },
+    {
+      "id": "V3",
+      "country": "Colombia",
+      "service": "validation",
+      "purpose": "qualification",
+      "subject": "Grupo Réditos escala",
+      "q": "site:gruporeditos.com \"colaboradores\" \"2025\"",
+      "phase": "validation",
+      "executed_at": "2026-10-17 12:08:33 UTC",
+      "batch": 18,
+      "result_summary": "Simoniz banda501–1000 primaria posterior; CRM323 discrepante. GrupoRéditos2024 no2025; SKY sin fuente2025 suficiente.",
+      "result_sources_ref": {
+        "batch": 18
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "Company39129628052",
+        "Company34264439413",
+        "Company30825221458"
+      ]
+    },
+    {
+      "id": "V4",
+      "country": "Chile",
+      "service": "validation",
+      "purpose": "qualification",
+      "subject": "SKY escala",
+      "q": "site:skyairline.com \"colaboradores\" \"2025\"",
+      "phase": "validation",
+      "executed_at": "2026-10-17 12:08:33 UTC",
+      "batch": 18,
+      "result_summary": "Simoniz banda501–1000 primaria posterior; CRM323 discrepante. GrupoRéditos2024 no2025; SKY sin fuente2025 suficiente.",
+      "result_sources_ref": {
+        "batch": 18
+      },
+      "individual_result_attribution": "not_available_combined_batch",
+      "pii_redacted_in_query": false,
+      "filter_is_publication_proof": false,
+      "stable_ids": [
+        "Company39129628052",
+        "Company34264439413",
+        "Company30825221458"
+      ]
+    }
+  ],
+  "source_batches": [
+    {
+      "kind": "search_batch",
+      "batch": 2,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:30 UTC",
+      "sources": [
+        {
+          "url": "https://estimuloseconomicos.cultura.gob.pe/2026/concursos/concurso-de-coproducciones-minoritarias",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://licitacionesperu.pe/licitaciones/6375a4b6d11c069d/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://vitria.cl/agencias/servicio/publicidad",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.prochile.gob.cl/convocatorias/detalle/muestras-para-promoci%C3%B3n-del-pisco-en-espa%C3%B1a",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://redinfor.com.pe/portal/2026/10/10/peru-contratacion-del-servicio-de-diseno-produccion-e-implementacion-de-campana-de-comunicacion-por-el-dia-de-la-mujer-emprendedora/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://dafo.cultura.pe/convocatorias",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://apap.org.pe/pages/premio-apap",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://cooperaccion.org.pe/convocatorias/terminos-de-referencia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://cazvid.com/es/empleo/creador-a-de-contenido-audiovisual-para-agencia-de-publicidad-35caa92b",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://ccn.web.tr/web-api/iframe-proxy?url=https%3A%2F%2Fwww.gob.pe%2F8192-buscar-procedimientos-de-seleccion-de-entidades-publicas",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://semanacreativalatam.com/convocatoria/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://lacura.pe/trabaja-con-nosotros/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGCForTech/comments/1x6at7n/buscamos_creadores_de_contenido_ugc_y/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1w2gcbh/hiring_latam_ugc_creators_spokespersons_actors/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Direcci%C3%B3n_del_Audiovisual%2C_la_Fonograf%C3%ADa_y_los_Nuevos_Medios",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.nj.gov/state/assets/pdf/chprd/insider-nj-2019-insider-100-policymakers.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://www.cms.gov/priorities/innovation/files/mdpp-removal-once-lifetime-removal-webinar-slides.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 2,
+            "label": null,
+            "source_ordinal": 19
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 5,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:30 UTC",
+      "sources": [
+        {
+          "url": "https://ecosystem.hubspot.com/es/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=5&eco_PROFILE_INDUSTRIES=ECOMMERCE&eco_PROFILE_LOCATION_COUNTRY=MX",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/solutions/business-services-general/mexico?eco_agency_tier=elite&eco_language=es",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.black-n-orange.com/boost",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://expansion.mx/mercadotecnia/2026/07/03/convocatoria-agencias-transformadoras-2026",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://orbis.agency/servicios/paid-media/agencia-paid-media",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://momagency.mx/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://comprasestatal.durango.gob.mx/consulta/ProcedimientosDeContratacion/10296",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.gob.mx/fonatur/documentos/bases-y-convocatoria-de-la-licitacion-publica-no-fonatur-lp-dc-003-2026",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.cultura.gob.mx/licitaciones/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://convocatorias.cultura.gob.mx/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/buscamos-especialista-senior-zoho-crm-zoho-one-para-migracion-automatizaciones-e-integraciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.cofece.mx/cofece/images/Transparencia/PNT/Fraccion_28/CO-LP15-16.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/ForHireFreelance/comments/1x6xblb/audiovisual_job_hiring/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1w2gcbh/hiring_latam_ugc_creators_spokespersons_actors/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wrlwbc/hiring_se_buscan_creadores_de_habla_hispana_para/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Televisa",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 19
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/startupsArgentina/comments/1x6zds0/busco_gente_para_crear_una_agencia_horizontal_360/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 20
+          }
+        },
+        {
+          "url": "https://www.ftc.gov/sites/default/files/documents/reports/self-regulation-alcohol-industry-federal-trade-commission-report-congress/appendixe.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 21
+          }
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1810447/000166516021000941/offeringmemoformc.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 5,
+            "label": null,
+            "source_ordinal": 22
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 1,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:30 UTC",
+      "sources": [
+        {
+          "url": "https://www.prochile.gob.cl/herramientas/concursos/servicios",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.revenuehublatam.com/industrias/energia-infraestructura",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.ungm.org/Public/Notice/307956",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://www.dive.cl/trabaja-con-nosotros/content-creator",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/especialista-em-implementacao-hubspot-crm-para-consultoria-de-investimento",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/buscamos-especialista-senior-zoho-crm-zoho-one-para-migracion-automatizaciones-e-integraciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=6&eco_PROFILE_LOCATION_COUNTRY=CO&eco_agency_tier=diamond&eco_certification=AcademyClientManagementCertification",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.workana.com/es/job/especialista-en-integracion-y-automatizacion-hubspot-woztel-y-agente-de-ia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://cl.linkedin.com/jobs/view/ejecutivo-a-de-%C3%A9xito-de-clientes-en-hubspot-y-automatizaci%C3%B3n-at-revenue-hub-consulting-4235991587",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.workana.com/es/job/buscamos-especialista-en-automatizacion-whatsapp-hubspot-google-sheets-con-opcion-de-de-flujo",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Creativi%C3%B1a",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/chile/comments/1rfqbqf/no_puedo_encontrar_pega_de_publicista/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 1,
+            "label": null,
+            "source_ordinal": 15
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 3,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:30 UTC",
+      "sources": [
+        {
+          "url": "https://www.workana.com/job/consultor-crm-experto-para-evaluacion-y-tdr-de-plataforma-omnicanal",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://pe.linkedin.com/jobs/view/especialista-crm-hubspot-at-qds-quality-development-software-sac-4426571803",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.odoo.com/es/partners/grupo-quanam-1729730",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=18&eco_PROFILE_INDUSTRIES=EDUCATION&eco_PROFILE_LOCATION_COUNTRY=MX",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://lacura.pe/blog/cuanto-cuesta-contratar-agencia-publicidad-peru/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://redinfor.com.pe/portal/2026/10/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.workana.com/es/job/migracion-sistema-de-reservas-iris-php-mysql-aws-a-zoho-one-con-consultoria-capacitacion-y-soporte",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://vinculate.concytec.gob.pe/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/implementacion-y-automatizacion-de-procesos-con-microsoft-365-para-mype",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://humaura.com.pe/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://lacura.pe/cifras/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1810447/000166516021000941/offeringmemoformc.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://tobaccocontrol.bmj.com/content/tobaccocontrol/30/4/413/DC1/embed/inline-supplementary-material-1.pdf?download=true",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 3,
+            "label": null,
+            "source_ordinal": 15
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 4,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:30 UTC",
+      "sources": [
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=6&eco_PROFILE_LOCATION_COUNTRY=CO&eco_agency_tier=diamond&eco_certification=AcademyClientManagementCertification",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://colombia.unfpa.org/es/submission/solicitud-de-propuesta-rfp-unfpa-col-entityentityentityentity5%C2%A0servicios-integrales-de",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.elempleo.com/co/ofertas-empleo/bogota/trabajo-implementador-crm-bogota",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.canalcapital.gov.co/actualidad/canal-capital-abre-convocatoria-publica-para-produccion-de-contenidos-2/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/buscamos-especialista-senior-zoho-crm-zoho-one-para-migracion-automatizaciones-e-integraciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://sistemaconvocatorias.mincultura.gov.co/verConvocatoria/1118",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://sistemaconvocatorias.mincultura.gov.co/verConvocatoria/1121",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://bogota.gov.co/boletin-oferta-internacional/convocatoria-ibermedia-2026-para-el-sector-audiovisual",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://invitaciones.scrd.gov.co/verInvitacion/1158",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://www.paho.org/es/contratos-servicios/ops-colombia-busca-contratar-persona-juridica-para-realizar-guion-preproduccion",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.medellin.gov.co/es/sala-de-prensa/noticias/medellin-abre-la-convocatoria-de-la-rueda-de-negocios-audiovisuales-y-cinematograficos-2026/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGCForTech/comments/1x5e2es/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/techugc/comments/1x1brv0/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/techugc/comments/1x0xrix/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/techugc/comments/1x5e1hr/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1w2gcbh/hiring_latam_ugc_creators_spokespersons_actors/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 19
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wrlwbc/hiring_se_buscan_creadores_de_habla_hispana_para/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 20
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Plural_Comunicaciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 4,
+            "label": null,
+            "source_ordinal": 21
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 10,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:43 UTC",
+      "sources": [
+        {
+          "url": "https://ecosystem.hubspot.com/es/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=5&eco_PROFILE_INDUSTRIES=ECOMMERCE&eco_PROFILE_LOCATION_COUNTRY=MX",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.gob.mx/cultura/prensa/la-secretaria-de-cultura-del-gobierno-de-mexico-abre-la-convocatoria-economia-creativa-2026?idiom=es-MX",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/solutions/business-services-general/mexico?eco_agency_tier=elite&eco_language=es",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.black-n-orange.com/boost",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://expansion.mx/mercadotecnia/2026/07/03/convocatoria-agencias-transformadoras-2026",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://orbis.agency/servicios/paid-media/agencia-paid-media",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://momagency.mx/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.gob.mx/fonatur/documentos/bases-y-convocatoria-de-la-licitacion-publica-no-fonatur-lp-dc-003-2026",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.cultura.gob.mx/licitaciones/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://mx.linkedin.com/jobs/view/consultor-de-implementaci%C3%B3n-hubspot-arquitecto-de-soluciones-at-zubia-people-business-4310754321",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://convocatorias.cultura.gob.mx/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.cofece.mx/cofece/images/Transparencia/PNT/Fraccion_28/CO-LP15-16.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/ForHireFreelance/comments/1x6xblb/audiovisual_job_hiring/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1w2gcbh/hiring_latam_ugc_creators_spokespersons_actors/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wrlwbc/hiring_se_buscan_creadores_de_habla_hispana_para/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Televisa",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/startupsArgentina/comments/1x6zds0/busco_gente_para_crear_una_agencia_horizontal_360/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 19
+          }
+        },
+        {
+          "url": "https://public-inspection.federalregister.gov/2023-27665.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 20
+          }
+        },
+        {
+          "url": "https://www.ftc.gov/sites/default/files/documents/reports/self-regulation-alcohol-industry-federal-trade-commission-report-congress/appendixe.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 21
+          }
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1810447/000166516021000941/offeringmemoformc.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 10,
+            "label": null,
+            "source_ordinal": 22
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 7,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:43 UTC",
+      "sources": [
+        {
+          "url": "https://estimuloseconomicos.cultura.gob.pe/2026/concursos/concurso-de-coproducciones-minoritarias",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://licitacionesperu.pe/licitaciones/6375a4b6d11c069d/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://vitria.cl/agencias/servicio/publicidad",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.prochile.gob.cl/convocatorias/detalle/muestras-para-promoci%C3%B3n-del-pisco-en-espa%C3%B1a",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://dafo.cultura.pe/convocatorias",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://apap.org.pe/pages/premio-apap",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://ccn.web.tr/web-api/iframe-proxy?url=https%3A%2F%2Fwww.gob.pe%2F8192-buscar-procedimientos-de-seleccion-de-entidades-publicas",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://semanacreativalatam.com/convocatoria/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://lacura.pe/trabaja-con-nosotros/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGCForTech/comments/1x6at7n/buscamos_creadores_de_contenido_ugc_y/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://pe.linkedin.com/jobs/view/coordinador-a-creador-a-de-contenido-audiovisual-para-agencia-de-publicidad-at-erizarte-%C2%B7-agencia-de-publicidad-y-marketing-4476694404",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://latingroup.pe/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://hi-lac.org/licitaciones/consultoria-para-produccion-audiovisual-y-registro-fotografico-peru/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1w2gcbh/hiring_latam_ugc_creators_spokespersons_actors/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Direcci%C3%B3n_del_Audiovisual%2C_la_Fonograf%C3%ADa_y_los_Nuevos_Medios",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.nj.gov/state/assets/pdf/chprd/insider-nj-2019-insider-100-policymakers.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://www.cms.gov/priorities/innovation/files/mdpp-removal-once-lifetime-removal-webinar-slides.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 7,
+            "label": null,
+            "source_ordinal": 19
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 9,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:43 UTC",
+      "sources": [
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=6&eco_PROFILE_LOCATION_COUNTRY=CO&eco_agency_tier=diamond&eco_certification=AcademyClientManagementCertification",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://colombia.unfpa.org/es/submission/solicitud-de-propuesta-rfp-unfpa-col-entityentityentityentity5%C2%A0servicios-integrales-de",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://conectapais.gov.co/formulario/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.canalcapital.gov.co/actualidad/canal-capital-abre-convocatoria-publica-para-produccion-de-contenidos-2/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://sistemaconvocatorias.mincultura.gov.co/verConvocatoria/1126",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://sistemaconvocatorias.mincultura.gov.co/verConvocatoria/1118",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.workana.com/es/job/implementacion-completa-de-hubspot-crm-e-integracion-con-meta-y-whatsapp",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://invitaciones.scrd.gov.co/verInvitacion/1158",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.paho.org/es/contratos-servicios/ops-colombia-busca-contratar-persona-juridica-para-realizar-guion-preproduccion",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://co.linkedin.com/jobs/view/experto-en-integraci%C3%B3n-de-zoho-one-at-migraci%C3%B3n-sin-filtros-4316361011",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.medellin.gov.co/es/sala-de-prensa/noticias/medellin-abre-la-convocatoria-de-la-rueda-de-negocios-audiovisuales-y-cinematograficos-2026/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGCForTech/comments/1x5e2es/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/techugc/comments/1x1brv0/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/techugc/comments/1x0xrix/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/techugc/comments/1x5e1hr/buscamos_creadores_ugc_en_colombia/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1wqrmxv/colombian_ugc_creator_looking_for_collaborations/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/BrandsCreators/comments/1w2gcbh/hiring_latam_ugc_creators_spokespersons_actors/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 19
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 20
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wrlwbc/hiring_se_buscan_creadores_de_habla_hispana_para/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 21
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Plural_Comunicaciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 9,
+            "label": null,
+            "source_ordinal": 22
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 6,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:43 UTC",
+      "sources": [
+        {
+          "url": "https://www.prochile.gob.cl/herramientas/concursos/servicios",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.revenuehublatam.com/industrias/energia-infraestructura",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://cl.linkedin.com/jobs/view/ingeniero-de-procesos-crm-at-pera-y-manzanas-4299457682",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.ungm.org/Public/Notice/307956",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/consultor-hubspot-experto-para-optimizacion-de-crm-y-adopcion-del-equipo-comercial",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://www.dive.cl/trabaja-con-nosotros/content-creator",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://www.getonbrd.com/jobs/innovation-agile/lider-proyecto-crm-salesforce-bc-tecnologia-santiago",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/especialista-em-implementacao-hubspot-crm-para-consultoria-de-investimento",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.workana.com/en/job/configuracion-de-embudos-y-pipeline-en-hubspot-con-integracion-a-trello-para-e-commerce",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=6&eco_PROFILE_LOCATION_COUNTRY=CO&eco_agency_tier=diamond&eco_certification=AcademyClientManagementCertification",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://www.workana.com/es/job/especialista-en-integracion-y-automatizacion-hubspot-woztel-y-agente-de-ia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://cntv.cl/concurso-fondo-cntv-2026/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/UGC_forhire/comments/1wnncf4/buscamos_creadores_de_habla_hispana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Creativi%C3%B1a",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/chile/comments/1rfqbqf/no_puedo_encontrar_pega_de_publicista/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 6,
+            "label": null,
+            "source_ordinal": 15
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 8,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:04:43 UTC",
+      "sources": [
+        {
+          "url": "https://www.workana.com/job/consultor-crm-experto-para-evaluacion-y-tdr-de-plataforma-omnicanal",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.odoo.com/es/partners/grupo-quanam-1729730",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://ecosystem.hubspot.com/marketplace/explore/solutions-partners?eco_PROFILE_CATALOG_SERVICES=18&eco_PROFILE_INDUSTRIES=EDUCATION&eco_PROFILE_LOCATION_COUNTRY=MX",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://lacura.pe/blog/cuanto-cuesta-contratar-agencia-publicidad-peru/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://www.bumeran.com.pe/empleos-busqueda-crm.html",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://redinfor.com.pe/portal/2026/10/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://www.siteperu.com.pe/plataformas-de-contact-center-con-crm-y-software-personalizado/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.workana.com/es/job/implementacion-y-ajuste-de-crm-para-agencia-de-viajes",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://pe.linkedin.com/jobs/view/trafficker-at-agencia-scrabble-4414052533",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.workana.com/job/implementacion-y-automatizacion-de-procesos-con-microsoft-365-para-mype",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://humaura.com.pe/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://lacura.pe/cifras/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://aws.state.ak.us/OnlinePublicNotices/Notices/Attachment.aspx?id=164548",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1810447/000166516021000941/offeringmemoformc.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://www.cms.gov/priorities/innovation/files/mdpp-removal-once-lifetime-removal-webinar-slides.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 8,
+            "label": null,
+            "source_ordinal": 15
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 12,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:05:11 UTC",
+      "sources": [],
+      "status": "no_results",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 11,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:05:11 UTC",
+      "sources": [
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://pe.linkedin.com/company/gruposocopur",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 11,
+            "label": null,
+            "source_ordinal": 12
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 15,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:05:22 UTC",
+      "sources": [
+        {
+          "url": "https://repositoriodocumental.ine.mx/xmlui/bitstream/handle/123456789/134606/lp-ine-107-2021-fallo.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://orbis.agency/programa-partners",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.hint.mx/crm-y-automatizacion/implementacion-y-personalizacion",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.ungm.org/Public/Notice/240743",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://www.britishcouncil.org.mx/agencia-de-comunicacion-digital-fullstack",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://postor.com.mx/mercado/publicidad-y-difusion",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://exaltia.com.mx/programa-exaltia-partners",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://prebasestianguisdigital.cdmx.gob.mx/download/licitacion-publica-nacional-no-30001026-016-25-correspondiente-al-servicio-de-diseno-y-desarrollo-de-campanas.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.licitaya.com.mx/conteudo.php?country=mexico&idLj=9jFUEG&veja=licitaciones+de+agencias+publicidad+licitaciones+97589",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://bluecolombia.co/industrias/sistemas-crm/software-saas-desarrollo-de-software/colombia/bogota",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://webbooster.com.co/crm/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.hint.mx/preguntas-frecuentes",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://community.hubspot.com/t/diferenciar-contactos/44435",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://partners.thesigndigital.com/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://juarez.gob.mx/licitaciones/docs/licitacion_CA-OM-014-2026_bases_6984f48886bf2.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://licitaciones.puebla.gob.mx/images/BASES2025/mayo/GEP-SPFA-LPN-104-380-2025_DIFUSION.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://repository.uniminuto.edu/bitstreams/d151675d-1ee1-4dbc-8c0b-34f8423c21a6/download",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.montevideo.gub.uy/asl/sistemas/siab/Cartelera.nsf/cf9cf918dd8a2dec03256a7d006d2c72/de570363e54b296903258386005299fa/%24FILE/PLIEGO%20LA%20352639.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/XHFAMX-TDT",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 19
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Televisi%C3%B3n_en_M%C3%A9xico",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 20
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Televisa",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 21
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/POLACA/comments/iz27ae",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 22
+          }
+        },
+        {
+          "url": "https://www.reddit.com/r/POLACA/comments/ud5it6",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 15,
+            "label": null,
+            "source_ordinal": 23
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 13,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:05:22 UTC",
+      "sources": [
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.claroestado.cl/licitaciones/medios-campanas",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.dualmedia.cl/conocenos",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.sii.cl/pagina/licitaciones/especif_17.htm",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://impulsify.cl/servicios/transformacion-digital/ia-automatizacion-crm",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://www.licitauno.cl/conteudo.php?country=chile&idLj=ttNRdM&veja=licitaciones+de+publicidad+online+licitaciones+79513",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://community.hubspot.com/t/diferenciar-contactos/44435",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://static.todolicitaciones.cl/busqueda/licitaciones/producto/categoria/servicios-editoriales-de-diseno-publicidad-graficos-y-artistas-publicidad-inserciones-publicitarias-en-medios?currentPage=1",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://chile.agencia.blue/implementacion-de-crm-zoho-hubspot-odoo-salesforce",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.yourdevs.cl/servicios/implementacion-erp-crm",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://fundacioneschile.cl/proveedores",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?qs=vPEi7ejs0jwvtOSjJWx3eqQ+famefuwf%2Ft8REWb6M4P93ajgYIDXoqSL64ofUsWW",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://repositoriodocumental.ine.mx/xmlui/bitstream/handle/123456789/134606/lp-ine-107-2021-fallo.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?DocumentIdParam=9363e990-8856-46e5-8693-5a52b991729c&cmpntname=GetDocumentsById&source=library&srv=cmpnt",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://idus.us.es/server/api/core/bitstreams/84db5504-5df7-4810-9690-8b4661441ed9/content",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://centrocompetencia.com/wp-content/uploads/2022/03/Sentencia-CS-Sent_TDLC_128.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://sumandovalor.cl/wp-content/uploads/2023/11/EFE_2022-1.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://fenavi.org/wp-content/uploads/2023/10/TERMINOS-AGENCIA-MEDIOS-2024.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 13,
+            "label": null,
+            "source_ordinal": 18
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 14,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:05:22 UTC",
+      "sources": [
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://fcf.com.co/2026/06/09/licitacion-para-la-contratacion-de-una-agencia-productora-de-la-fiesta-sudamericana-barranquilla-2026/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://oei.int/pt/escritorios/colombia/contratacoes/024-2021/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.temploapp.co/procesos/prestar-los-servicios-de-agencia-central-de-medios-consejo-nacional-electoral/81e8f1bb-49d1-4fc1-8c0e-8eef9b71a8c9",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://peru.agencia.blue/implementacion-de-crm-zoho-hubspot-odoo-salesforce-en-lima",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://lacura.pe/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://www.respondo.pe/partners",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://fenavi.org/contrataciones/terminos-de-referencia-agencia-creativa-2023-programa-huevo/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.transcaribe.gov.co/documentos/Licitaciones%202016/TC-LPN-001-16/Pliegos/ACTA%20DE%20AUDIENCIA%20DE%20ADJUDICACION.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://operaciones.colombiacompra.gov.co/content/publicacion-de-la-informacion-contractual",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://www.mincultura.gov.co/transparencia/Documents/4-planeacion-presupuesto-e-informes/plan-anual-de-adquisiones/2017/Plan%20Anual%20de%20Adquisiciones%202017.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.apccolombia.gov.co/Avisos-de-Licitaciones-Publicas",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.lawinsider.com/es/contracts/43c9R7YIlHA",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 13
+          }
+        },
+        {
+          "url": "https://www.derechodeautor.gov.co/es/transparencia-y-acceso-la-informacion-publica/3-contratacion/contratacion-dnda",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 14
+          }
+        },
+        {
+          "url": "https://community.secop.gov.co/Public/Archive/RetrieveFile/Index?DocumentId=588961382",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 15
+          }
+        },
+        {
+          "url": "https://eadn-wc04-6524493.nxedge.io/wp-content/uploads/2024/06/Informe-Final-Piloto-Flexibles.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 16
+          }
+        },
+        {
+          "url": "https://repositoriodocumental.ine.mx/xmlui/bitstream/handle/123456789/134606/lp-ine-107-2021-fallo.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 17
+          }
+        },
+        {
+          "url": "https://www.montevideo.gub.uy/asl/sistemas/siab/Cartelera.nsf/cf9cf918dd8a2dec03256a7d006d2c72/de570363e54b296903258386005299fa/%24FILE/PLIEGO%20LA%20352639.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 18
+          }
+        },
+        {
+          "url": "https://es.wikipedia.org/wiki/Programadora",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 14,
+            "label": null,
+            "source_ordinal": 19
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "open_batch",
+      "batch": null,
+      "label": "qualification",
+      "executed_at_utc": "2026-10-17 12:05:33 UTC",
+      "sources": [
+        {
+          "url": "https://colombia.unfpa.org/es/submission/solicitud-de-propuesta-rfp-unfpa-col-entityentityentityentity5%C2%A0servicios-integrales-de",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "qualification",
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://hi-lac.org/licitaciones/consultoria-para-produccion-audiovisual-y-registro-fotografico-peru/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "qualification",
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "qualification",
+            "source_ordinal": 3
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual.",
+      "purpose": "source_read_or_attempt"
+    },
+    {
+      "kind": "open_batch",
+      "batch": null,
+      "label": "continuity",
+      "executed_at_utc": "2026-10-17 12:05:33 UTC",
+      "sources": [
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "continuity",
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.tvn.cl/corporativo/licitaciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "continuity",
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.unicef.org/peru/licitaciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "continuity",
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://iniciativaclimatica.org/bolsa-de-trabajo/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "continuity",
+            "source_ordinal": 4
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual.",
+      "purpose": "source_read_or_attempt"
+    },
+    {
+      "kind": "search_batch",
+      "batch": 16,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:06:17 UTC",
+      "sources": [],
+      "status": "no_results",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "search_batch",
+      "batch": 17,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:06:19 UTC",
+      "sources": [
+        {
+          "url": "https://elitetrece.com/trabaja-con-nosotros/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.dive.cl/trabaja-con-nosotros/content-manager-bilingue",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.damos.co/contacto/trabaja-con-nosotros",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.libertemarketing.com/freelancer-audiovisuales/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://mx.webedia-group.com/news/unete/project-manager-digital/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://www.lacasainteligente.live/app/postular.php?tipo=agencia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://givemeservicesas.com/trabaja-con-nosotros/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": "https://www.subeagenciadigital.com/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://www.publipega.com/empleos/especialista-seo-trabajo-remoto-en-peru/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://www.kitempleo.pe/empleo/71545397/jefe-de-marketing-tour-operador-agencia-de-viajes-cusco",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://e-press.cl/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.squadraconsulting.cl/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 17,
+            "label": null,
+            "source_ordinal": 12
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "open_batch",
+      "batch": null,
+      "label": "current_known",
+      "executed_at_utc": "2026-10-17 12:06:40 UTC",
+      "sources": [
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "current_known",
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "current_known",
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "current_known",
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/feed/update/urn%3Ali%3Aactivity%3A7515885381322530816/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "current_known",
+            "source_ordinal": 4
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual.",
+      "purpose": "source_read_or_attempt"
+    },
+    {
+      "kind": "open_batch",
+      "batch": null,
+      "label": "listings",
+      "executed_at_utc": "2026-10-17 12:06:40 UTC",
+      "sources": [
+        {
+          "url": "https://convocatorias.compras.care.org.pe/licitaciones-publicas",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "listings",
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.cultura.gob.mx/licitaciones/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "listings",
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.britishcouncil.org.mx/agencia-de-comunicacion-digital-fullstack",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "listings",
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.unicef.org/peru/licitaciones",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "listings",
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://iniciativaclimatica.org/bolsa-de-trabajo/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "listings",
+            "source_ordinal": 5
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual.",
+      "purpose": "source_read_or_attempt"
+    },
+    {
+      "kind": "click_open_batch",
+      "batch": null,
+      "label": "unicef_and_unknown",
+      "executed_at_utc": "2026-10-17 12:07:12 UTC",
+      "sources": [
+        {
+          "url": "https://www.lacasainteligente.live/app/postular.php?tipo=agencia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "unicef_and_unknown",
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.ungm.org/Public/Notice/317123",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "unicef_and_unknown",
+            "source_ordinal": 2
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual.",
+      "purpose": "source_read_or_attempt"
+    },
+    {
+      "kind": "search_batch",
+      "batch": 18,
+      "label": null,
+      "executed_at_utc": "2026-10-17 12:08:33 UTC",
+      "sources": [
+        {
+          "url": "https://www.linkedin.com/company/simonizcolombia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 1
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/company/soneparcolombia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 2
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/company/autocolombiana/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 3
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/company/autocolombiana",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 4
+          }
+        },
+        {
+          "url": "https://tw.linkedin.com/company/simonizcolombia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 5
+          }
+        },
+        {
+          "url": "https://co.linkedin.com/company/soneparcolombia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 6
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/company/autocolombiana/?originalSubdomain=co",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 7
+          }
+        },
+        {
+          "url": null,
+          "redaction": "URL personal o mixta de LinkedIn redactada; original sólo en evidencia privada",
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 8
+          }
+        },
+        {
+          "url": "https://my.linkedin.com/company/simoniz-usa-inc-",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 9
+          }
+        },
+        {
+          "url": "https://simonizco.com/nosotros/",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 10
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/company/autocom-colombia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 11
+          }
+        },
+        {
+          "url": "https://www.linkedin.com/company/representaciones-continental/?originalSubdomain=co",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 12
+          }
+        },
+        {
+          "url": "https://www.gruporeditos.com/wp-content/uploads/2024/09/Informe-Gestion-Grupo-Reditos-2024-1-sitio-web.pdf",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": 18,
+            "label": null,
+            "source_ordinal": 13
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual."
+    },
+    {
+      "kind": "open_batch",
+      "batch": null,
+      "label": "simoniz_size",
+      "executed_at_utc": "2026-10-17 12:08:56 UTC",
+      "sources": [
+        {
+          "url": "https://www.linkedin.com/company/simonizcolombia",
+          "redaction": null,
+          "private_evidence_locator": {
+            "batch": null,
+            "label": "simoniz_size",
+            "source_ordinal": 1
+          }
+        }
+      ],
+      "status": "results_returned",
+      "attribution": "El proveedor devuelve resultados combinados por lote; no hay asignación inequívoca de resultado a consulta individual.",
+      "purpose": "source_read_or_attempt"
+    }
+  ],
+  "browser_checks": [
+    {
+      "at": "2026-10-17 12:09:50 UTC",
+      "url": "https://system.wherex.com/secured/supplier_user/purchase-bids/get/424167",
+      "tool": "cua_repl",
+      "surface": "Chrome Julio",
+      "result": "redirect_to_login",
+      "observed_title": "Wherex | Inicio de Sesión",
+      "redirect_origin": "https://login.wherex.com/",
+      "nueva_editando_read": false,
+      "commercial_mutations": 0,
+      "prior_success": {
+        "report": "docs/commercial/follow-up-agent/runs/2026-10-16-1600.md",
+        "observed_day": "2026-10-16",
+        "time_precision": "report_cutoff_not_individual_fetch"
+      },
+      "note": "No sesión Wherex autenticada actual; no escribir credenciales, reintentar rutas equivalentes ni avanzar marcadores de éxito."
+    }
+  ],
+  "precheck_blocks_without_request": [
+    {
+      "source": "LicitaLAB",
+      "reason": "previous403subscription_expired",
+      "new_http_request": false
+    },
+    {
+      "source": "Socopur LinkedIn",
+      "reason": "previous429 and buyerSTOP",
+      "new_http_request": false
+    },
+    {
+      "source": "FENAVI",
+      "reason": "previous timeout",
+      "new_http_request": false
+    },
+    {
+      "source": "UNICEFColombia",
+      "reason": "previous reader block",
+      "new_http_request": false
+    },
+    {
+      "source": "HEINEKEN procurement/post expansion",
+      "reason": "previous blocked or partial failure",
+      "new_http_request": false
+    },
+    {
+      "source": "BritishCouncil annex",
+      "reason": "previous reader block",
+      "new_http_request": false
+    }
+  ],
+  "outcomes": {
+    "new_qualified_weekly_calls": 0,
+    "new_hsp_ids": [],
+    "new_crm_objects_proposed": 0,
+    "carried_hsp_count": 32,
+    "known_processes_reconciled": [
+      "Simoniz113/Company39129628052",
+      "SKY1547/Company30825221458"
+    ],
+    "crm_writes": 0,
+    "outreach": 0,
+    "paid_enrichment": 0,
+    "new_chats_or_tasks": 0,
+    "commit_push": false
+  },
+  "crm_reads": {
+    "portal_id": 48713323,
+    "identity_verified": true,
+    "record_searches": 3,
+    "unique_companies": 15,
+    "deals": 8,
+    "pagination_complete": true
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json",
+  "coverage_caveat": "Veinte celdas consultadas; no exhaustivo. Wherex redirige a login; CARE0líneas; OPS403. Fuentes bloqueadas no son cero demanda. Datos personales y URLsLinkedIn individuales sólo en evidencia privada.",
+  "crm_queries": [
+    {
+      "sequence": 1,
+      "executed_at_utc": "2026-10-17 12:06:17 UTC",
+      "tool": "hubspot.search_crm_objects",
+      "arguments": {
+        "objectType": "COMPANY",
+        "filterGroups": [
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "hs_object_id",
+                "operator": "IN",
+                "value": null,
+                "highValue": null,
+                "values": [
+                  "59086736953",
+                  "59076520008",
+                  "59118554799",
+                  "59116694288",
+                  "59098790832",
+                  "59145902993",
+                  "53966854218",
+                  "59204233570",
+                  "59209671002",
+                  "59297260367",
+                  "59391176252"
+                ]
+              }
+            ]
+          }
+        ],
+        "limit": 100,
+        "offset": 0,
+        "query": null,
+        "properties": [
+          "name",
+          "domain",
+          "country",
+          "numberofemployees",
+          "hs_employee_range"
+        ],
+        "sorts": []
+      },
+      "result_summary": {
+        "total": 11,
+        "complete": true
+      }
+    },
+    {
+      "sequence": 2,
+      "executed_at_utc": "2026-10-17 12:06:52 UTC",
+      "tool": "hubspot.search_crm_objects",
+      "arguments": {
+        "objectType": "DEAL",
+        "filterGroups": [
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "dealname",
+                "operator": "CONTAINS_TOKEN",
+                "value": "Gana",
+                "values": [],
+                "highValue": null
+              }
+            ]
+          },
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "dealname",
+                "operator": "CONTAINS_TOKEN",
+                "value": "FUCOA",
+                "values": [],
+                "highValue": null
+              }
+            ]
+          },
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "dealname",
+                "operator": "CONTAINS_TOKEN",
+                "value": "SUBDERE",
+                "values": [],
+                "highValue": null
+              }
+            ]
+          },
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "dealname",
+                "operator": "CONTAINS_TOKEN",
+                "value": "Tarapacá",
+                "values": [],
+                "highValue": null
+              }
+            ]
+          }
+        ],
+        "query": null,
+        "limit": 100,
+        "offset": 0,
+        "properties": [
+          "dealname",
+          "dealstage",
+          "fecha_de_cierre_de_licitacion",
+          "closedate",
+          "amount",
+          "deal_currency_code"
+        ],
+        "sorts": []
+      },
+      "result_summary": {
+        "total": 8,
+        "complete": true
+      }
+    },
+    {
+      "sequence": 3,
+      "executed_at_utc": "2026-10-17 12:08:00 UTC",
+      "tool": "hubspot.search_crm_objects",
+      "arguments": {
+        "objectType": "COMPANY",
+        "filterGroups": [
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "hs_object_id",
+                "operator": "IN",
+                "value": null,
+                "highValue": null,
+                "values": [
+                  "39129628052",
+                  "34264439413",
+                  "30825221458"
+                ]
+              }
+            ]
+          },
+          {
+            "associatedWith": [],
+            "filters": [
+              {
+                "propertyName": "domain",
+                "operator": "EQ",
+                "value": "win.com.pe",
+                "highValue": null,
+                "values": []
+              }
+            ]
+          }
+        ],
+        "limit": 100,
+        "offset": 0,
+        "query": null,
+        "properties": [
+          "name",
+          "domain",
+          "country",
+          "numberofemployees",
+          "hs_employee_range"
+        ],
+        "sorts": []
+      },
+      "result_summary": {
+        "total": 4,
+        "complete": true
+      }
+    }
+  ],
+  "crm_preflight": {
+    "portal_id": 48713323,
+    "identity": "verified current caller; personal fields omitted",
+    "tool_calls": [
+      "get_user_details: USER_INFORMATION+TOOL_INFORMATION",
+      "search_properties COMPANY: name/domain/numberofemployees/country",
+      "search_properties DEAL: dealname/closedate/gh_tender/amount/deal_currency_code"
+    ],
+    "executed_at_precision": "during preflight; exact individual time not captured",
+    "write_calls": 0
+  },
+  "primary_source_checks": [
+    {
+      "source_id": "care-peru-public-procurement",
+      "url": "https://convocatorias.compras.care.org.pe/licitaciones-publicas",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:06:40 UTC",
+      "access_status": "reader_empty",
+      "observation": "Respuesta0líneas; no inventario verificable. NO-BID previo intacto.",
+      "successful_marker_advanced": false,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "icm-procurement",
+      "url": "https://iniciativaclimatica.org/bolsa-de-trabajo/",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_primary",
+      "observation": "Mismo listado mixto sinvacantes+tarjetas; no se detecta llamada semanal apta ni se supone vigencia por tarjetas.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "laboratorio-chile-digital-agency",
+      "url": null,
+      "pii_url_redacted": true,
+      "checked_at": "2026-10-17 12:06:40 UTC",
+      "access_status": "accessible_primary_relative",
+      "observation": "Original1semana; licitación3años Rx/HCP; sin fecha absoluta ni cierre.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "win-fitness-content-agency",
+      "url": null,
+      "pii_url_redacted": true,
+      "checked_at": "2026-10-17 12:06:40 UTC",
+      "access_status": "accessible_primary_relative",
+      "observation": "Original6díasEditado; contenido/redesPerúUSA; asunto/portafolio. Seguimiento16Oct conciliado documentalmente.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "uniminuto-influencer-agency",
+      "url": null,
+      "pii_url_redacted": true,
+      "checked_at": "2026-10-17 12:06:40 UTC",
+      "access_status": "accessible_primary_relative",
+      "observation": "Original2días relativo; no redatar intervalo previo13–14Oct; deadline desconocido.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "pierre-fabre-media-2027",
+      "url": null,
+      "pii_url_redacted": true,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_primary",
+      "observation": "Calendario06Oct–30Oct sin hora/zona; envío19Oct programado según canon16Oct.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "british-council-mx-fullstack",
+      "url": "https://www.britishcouncil.org.mx/agencia-de-comunicacion-digital-fullstack",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:06:40 UTC",
+      "access_status": "accessible_page_annex_not_retried",
+      "observation": "Página:17/19nov23:59 sin año/zona, MXN485000IVA; proveedoresmexicanos; anexo bloqueado previo no reintentado.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "tvn-procurement",
+      "url": "https://www.tvn.cl/corporativo/licitaciones",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_primary",
+      "observation": "CRMregistro29Sep2029–05Oct2026 incoherente; vehículos15–19Oct fuera de servicios. Negativa06Oct en continuidad, no reapertura.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "unicef-peru-tenders",
+      "url": "https://www.unicef.org/peru/licitaciones",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_primary",
+      "observation": "Listado e-learning9206550 y SaaSdonantes previo; enlace9206550 seguido.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "unicef-peru-9206550",
+      "url": "https://www.ungm.org/Public/Notice/317123",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:07:12 UTC",
+      "access_status": "accessible_primary",
+      "observation": "Published06Oct,deadline27Oct23:59GMT-5; consultas13Octpasadas; ya conocida16Oct, no semanal.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "wherex-private-radar",
+      "url": "https://app.wherex.com/",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:09:50 UTC",
+      "access_status": "blocked_login_no_authenticated_session",
+      "observation": "Chrome inventory sin pestañaWherex; apertura ficha113 redirige aWherexInicioSesión. NoNueva/Editando; sin credenciales/rutasalternativas.",
+      "successful_marker_advanced": false,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "aloja-host-request",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7515885381322530816/",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:09:50 UTC",
+      "access_status": "accessible_primary_relative",
+      "observation": "Original3días; contenidosUGC/portafolioInbox;50+ y deadline sin comprobar, Company existente.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "mx-cultura-procurement",
+      "url": "https://www.cultura.gob.mx/licitaciones/",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:06:40 UTC",
+      "access_status": "accessible_generic_index",
+      "observation": "Página genérica deprebases/adquisiciones; no proceso semanal apto observado; enlaces internos no seguidos.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "unfpa-colombia-00005",
+      "url": "https://colombia.unfpa.org/es/submission/solicitud-de-propuesta-rfp-unfpa-col-entityentityentityentity5%C2%A0servicios-integrales-de",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_historical",
+      "observation": "Fecha25May2026 y cierre25May17Colombia. Quantum exclusivo; vencida, no reactivar.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "hi-peru-audiovisual-2026",
+      "url": "https://hi-lac.org/licitaciones/consultoria-para-produccion-audiovisual-y-registro-fotografico-peru/",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_historical",
+      "observation": "Página01Sep,TdR31Aug;deadline10Sep23:59Lima. Vencida.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "paho-colombia-five-videos",
+      "url": "https://www.paho.org/es/contratos-servicios/ops-colombia-busca-contratar-persona-juridica-para-realizar-guion-preproduccion",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:09:50 UTC",
+      "access_status": "blocked_http403",
+      "observation": "Primaria403; snippet no verifica fecha/vigencia; sin reintentos equivalentes.",
+      "successful_marker_advanced": false,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "metro-agency-june2026",
+      "url": null,
+      "pii_url_redacted": true,
+      "checked_at": "2026-10-17 12:05:33 UTC",
+      "access_status": "accessible_historical",
+      "observation": "Original corporativo:inicio04Jun,inscripcióncharla15Jun2026; no semanal.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "la-casa-inteligente-agencies",
+      "url": "https://www.lacasainteligente.live/app/postular.php?tipo=agencia",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:07:12 UTC",
+      "access_status": "accessible_unqualified",
+      "observation": "FormularioagenciasIA;V42026-09 nofecha. Comprador/tamaño50+/mercado/deadline desconocidos; no enviar.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "simoniz-corporate-profile",
+      "url": "https://www.linkedin.com/company/simonizcolombia",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:08:56 UTC",
+      "access_status": "accessible_primary",
+      "observation": "Banda501–1000,Mosquera;334perfiles no nómina. CRM323/rango251–1K discrepantes; RFI113 conocida en seguimiento16Oct, no compra por vacante.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    },
+    {
+      "source_id": "simoniz-corporate-site",
+      "url": "https://simonizco.com/nosotros/",
+      "pii_url_redacted": false,
+      "checked_at": "2026-10-17 12:09:50 UTC",
+      "access_status": "accessible_primary",
+      "observation": "Binner marca delgrupo; sin nómina global ni nueva compra acreditadas.",
+      "successful_marker_advanced": true,
+      "evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-17-0903-evidence.json"
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "schema_version": 2,
+  "run_id": "2026-10-19-1241-fitflow",
+  "scope": "operator_directed_focal_account_not_recurring_discovery",
+  "timezone": "America/Santiago",
+  "last_checked_at": "2026-10-19T15:44:55.880Z",
+  "id": "HSP-0035",
+  "account": "FITFLOW",
+  "domain": "fitflow.com",
+  "authorization": {
+    "research": true,
+    "apollo_enrichment": {
+      "profiles": 4,
+      "max_credits": 4,
+      "actual_credits": 4,
+      "personal_emails": false,
+      "phones": false
+    },
+    "send": {
+      "count": 1,
+      "channel": "buyer_designated_marketing_shared_mailbox",
+      "approved_brochure": 357058081
+    },
+    "manual_crm_intake": false,
+    "sequences": false
+  },
+  "queries": [
+    {
+      "id": "FFQ01",
+      "query": "Fitflow [NOMBRE_REDACTADO] [NOMBRE_REDACTADO] agencia diseño gráfico marketing 6 octubre 2026",
+      "country": [
+        "Perú",
+        "Chile"
+      ],
+      "service": "creative",
+      "pii_redacted": true,
+      "result": "Originalpublicbuyerpostfound;deadline6Oct"
+    },
+    {
+      "id": "FFQ02",
+      "query": "Fitflow company empleados Chile Perú marketing [NOMBRE_REDACTADO]",
+      "pii_redacted": true,
+      "result": "Corporate51–200,Perudated130workers/8providers;notglobalpayroll"
+    },
+    {
+      "id": "FFQ03",
+      "query": "[NOMBRE_REDACTADO] Fitflow marketing",
+      "pii_redacted": true,
+      "result": "Nousefulcurrentidentityresult;historicalirrelevantresultsnotused"
+    },
+    {
+      "id": "FFQ04",
+      "query": "Fitflow [NOMBRE_REDACTADO] [NOMBRE_REDACTADO] gerente marketing [NOMBRE_REDACTADO]",
+      "pii_redacted": true,
+      "result": "Nocontractualdossierevidence"
+    },
+    {
+      "id": "FFQ05",
+      "query": "site:fitflow.com \"marketing\" \"proveedores\" agencia",
+      "result": "Corporatecontactpageforproposalsandsharedmailboxverified"
+    },
+    {
+      "id": "FFQ06",
+      "query": "site:fitflow.com \"agencia\" \"2026\" adjudicada diseño",
+      "result": "No verifiedaward/contractfound;notabsenceproof"
+    },
+    {
+      "id": "FFQ07",
+      "query": "site:linkedin.com/in/ [PERSONA_REDACTADA] FITFLOW",
+      "pii_redacted": true,
+      "result": "Commercialcurrentemploymentpublicprofile;authoritynotverified"
+    },
+    {
+      "id": "FFQ08",
+      "query": "site:linkedin.com/in/ [PERSONA_REDACTADA] FITFLOW",
+      "pii_redacted": true,
+      "result": "Marketingcurrentemploymentpublicprofile;authoritynotverified"
+    }
+  ],
+  "source_reads": [
+    {
+      "source": "Originalbuyerpost",
+      "url": "[PERSONAL_URL_REDACTED; exactURLprivateevidence]",
+      "publication_precision": "2weeksrelative",
+      "result": "Reads6Octdeadline;centralizedemailonly;noawardannouncedinvisibleportion"
+    },
+    {
+      "source": "CorporateLinkedIn",
+      "url": "https://www.linkedin.com/company/fitflow",
+      "result": "51–200band;regionaloperations;FitflowFireSchoolcontent"
+    },
+    {
+      "source": "Corporatecontactpage",
+      "url": "https://fitflow.com/contactanos/",
+      "result": "SamepublishedsharedmailboxChile/Peru;proposalsofprovidersaccepted"
+    },
+    {
+      "source": "Personalprofilesoftworesponsibles",
+      "url": "[PERSONAL_URLS_REDACTED]",
+      "result": "999;notbypassed"
+    },
+    {
+      "source": "www.fitflow.com",
+      "result": "readerfailed;canonicalcontactpagefoundnormallybysearchandread"
+    }
+  ],
+  "procurement_control": {
+    "result": "expired_selection_current_status_unverified;operatorauthorizedcredentials_statusinquiryandfutureprospecting",
+    "published_at": null,
+    "first_seen_at": "2026-10-19",
+    "deadline_at": "2026-10-06",
+    "deadline_timezone": null,
+    "deadline_year_precision": "contextual",
+    "last_checked_at": "2026-10-19T15:44:55.880Z",
+    "awardee": "no_verificado",
+    "award_act_or_order": "no_verificado",
+    "contract_status": "no_verificado",
+    "signed_at": "no_verificado",
+    "execution_start": "no_verificado",
+    "execution_end": "no_verificado",
+    "documents_read": "Originalpost,corporateprofile,contactpage;contractdocumentnotread",
+    "blocker": "No verifiedcontractualdossieravailableinreadsurfaces;noabsenceassertion",
+    "recommended_to_bid": false
+  },
+  "apollo_calls": [
+    {
+      "operation": "people_search",
+      "scope": "accountdomain,marketing/commercial/generalmanagement",
+      "returned": 8,
+      "enriched": 4,
+      "pii_private": true
+    },
+    {
+      "operation": "users_profile",
+      "include_credit_usage": true,
+      "balance_in_repo": false
+    },
+    {
+      "operation": "bulk_match",
+      "profiles": 4,
+      "credits_consumed": 4,
+      "verified_emails": 3,
+      "extrapolated_emails": 1,
+      "catchall_domain": true,
+      "pii_private": true
+    }
+  ],
+  "crm_reads": {
+    "portal": 48713323,
+    "before": {
+      "company_name_total": 0,
+      "company_domain_total": 0,
+      "shared_contact_total": 0
+    },
+    "after": {
+      "company_id": 59473706752,
+      "shared_contact_id": 256144201116,
+      "email_id": 118902967845,
+      "email_status": "SENT",
+      "email_contact_association": true,
+      "contact_company_association": true
+    },
+    "manual_writes": 0,
+    "automatic_native_effects": "recipient-specificdocumentlinkcreatedsharedContactandCompany;BCCingestedemail",
+    "errors": [
+      {
+        "operation": "CONTACTsearch",
+        "result": "timeout;exactsamereadcompletedonsubsequentcall"
+      }
+    ]
+  },
+  "send": {
+    "sent_at": "2026-10-19T15:41:23Z",
+    "sent_local": "2026-10-19T12:41:23-03:00",
+    "subject": "Fitflow | Diseño gráfico y marketing B2B con Efeonce",
+    "recipient_type": "buyer_designated_shared_marketing",
+    "to_count": 1,
+    "cc_count": 0,
+    "bcc_registration": true,
+    "signature": "full_approved_text",
+    "transport": "Outlookconnector",
+    "attachments": 0,
+    "brochure_link": "https://hubs.ly/Q04BzjMS0",
+    "document_id": 357058081,
+    "pages": 27,
+    "sent_folder_readback": true,
+    "full_content_readback": true,
+    "crm_ingestion": true,
+    "delivery": "unverified",
+    "response": "notobserved"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-19-fitflow/evidence.json",
+  "next_action": "Waitforreply;norepeat/noindividualoutreach/nosequences;revalidatebuyerprocurementbeforeanyproposal/Deal."
+}

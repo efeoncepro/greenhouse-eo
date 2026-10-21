@@ -1,0 +1,514 @@
+{
+  "run_id": "2026-10-20-1048-assetplan-alta-borrador",
+  "hsp_id": "HSP-0039",
+  "date_santiago": "2026-10-20T10:48:51.629307-03:00",
+  "window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-20T10:48:51.629307-03:00",
+    "timezone": "America/Santiago"
+  },
+  "scope": "targeted intake and draft; no twenty-cell rerun",
+  "queries": [
+    {
+      "channel": "local",
+      "query": "Search ZeroBounce tools, configuration key names and relevant docs/scripts",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "No callableZeroBounce tool or credential found; no secrets printed",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "gcloud-read",
+      "query": "Secret name filter zero OR bounce in verified project",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "No matching secret names; not proof of no account elsewhere",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "web",
+      "query": "OfficialZeroBounce API validate documentation",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "API requires key; no usable key in inspected scope",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "web",
+      "query": "OfficialZeroBounce homepage -> FreeEmailVerifier",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Public form available; consulted with one inferred candidate",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "browser",
+      "query": "ZeroBounce form <INFERRED_TARGET_EMAIL> -> Verify",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "No visible verdict returned; no valid/invalid inference; console no errors",
+      "pii_redacted": true,
+      "blocked": true,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-read",
+      "query": "get_user_details",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Portal48713323 owner75788512 CONTACTwrite available",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-read",
+      "query": "Contact duplicate exact <INFERRED_TARGET_EMAIL> OR surname <TARGET_SURNAME>",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "0 matching contacts pre-create",
+      "pii_redacted": true,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-read",
+      "query": "Contact property metadata: zero/validation keywords; complete metadata; firstname lastname email jobtitle company hs_linkedin_url owner research_date contact_kind fit lifecycle",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Exact schema/enums read; no ZeroBounce field found; no schema writes",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-read",
+      "query": "Company exact27777097504 and current properties",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "ExistingCompany reconciled; countryChile industryREAL_ESTATE",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "outlook-read",
+      "query": "get_profile",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Correct sender verified; private identity",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "local-read",
+      "query": "hubspot whoami/help associations/workflows/segments/objects search",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "OAuth portal48713323; supported syntax read",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-cli-read",
+      "query": "workflows list --limit100",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "403 insufficient scopes; no auth expansion",
+      "pii_redacted": false,
+      "blocked": true,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-cli-read",
+      "query": "associations labels-list contacts->companies",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "UserOAuth unsupported; no servicekey bypass",
+      "pii_redacted": false,
+      "blocked": true,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "browser",
+      "query": "Company settings -> Leads -> Leadpipeline -> Automate",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "NativecreateLead at lifecyclechange DISABLED; domainCompanyassociation ENABLED",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "sharepoint-read",
+      "query": "Search exact approved HubSpotbrochure title",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "0 results; existingHubSpotdocument located instead",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "local-read",
+      "query": "Search approvedbrochure references and current prospecting/signaturepolicies",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Originalbrochure identified; fullplaintextsignature allowed",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "browser",
+      "query": "Documents searchHubSpot -> document357058079 summary",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Originalapprovedfilename verified; no PDF edits",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "browser-mutation",
+      "query": "Document357058079 CreateLink <TARGET_EMAIL> requireEmailfalse allowDownloadtrue",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Newlink generated for one recipient; privateURL",
+      "pii_redacted": true,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-mutation",
+      "query": "CreateCONTACT <TARGET> with inferred email and Company27777097504",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Contact256447052473 created; one association successful; provisional identity_pending",
+      "pii_redacted": true,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-read",
+      "query": "get_crm_objects CONTACT256447052473 and Company27777097504",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Fields independentlyread; nativeinitialsalesqualifiedlead observed",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-mutation",
+      "query": "CONTACT lifecyclelead; Company researched_on2026-10-20",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Companydate persisted; direct lifecyclebackwardignored",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-mutation",
+      "query": "ClearCONTACT lifecycle then assignlead sequentially with readback",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Finallead verified; no nativeautomaticLead created",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-cli-read",
+      "query": "associations CONTACT256447052473 -> companies; -> leads",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Company27777097504 Primary types1/279; no associatedLeads returned",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "outlook-mutation",
+      "query": "draft_email <TARGET_EMAIL> + <APPROVED_BCC> subject/body/brochure",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Savedone draft; no send",
+      "pii_redacted": true,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "outlook-read",
+      "query": "fetch_message <DRAFT_ID> and UIread",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Recipients, CCO, signature, link and unsentdraft independently verified",
+      "pii_redacted": true,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-cli-read",
+      "query": "segments get 180,181,183,184,186,187",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "NativeACTIVEdefinitions read, no changes",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "hubspot-cli-read",
+      "query": "objects search exactCONTACTID AND ilsListIds180/181/183/186; exactCompanyID AND187",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Contactmembers180+186, excluded181+183; Companymember187",
+      "pii_redacted": false,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    },
+    {
+      "channel": "operator-question",
+      "query": "Apollo validation of <INFERRED_TARGET_EMAIL>, 1credit",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "filters": "exact target/account/scope; no discovery time filter",
+      "result": "Exactmandatorycostconfirmation displayed; pending reply, endpointnotcalled",
+      "pii_redacted": true,
+      "blocked": false,
+      "last_checked_at": "2026-10-20T10:48:51.629307-03:00"
+    }
+  ],
+  "sources_read": [
+    "https://www.zerobounce.net/free-email-verifier",
+    "https://www.zerobounce.net/docs/email-validation-api-quickstart/v2-validate-emails",
+    "https://app.hubspot.com/documents/48713323/summary/357058079",
+    "https://app.hubspot.com/pipelines-settings/48713323/object/0-136/lead-pipeline-id"
+  ],
+  "approval": {
+    "contact_and_verified_company": "explicitoperatorinstruction; executed",
+    "inferred_email": "onecontactexception; not verified",
+    "zerobounce_public": "authorized; noverdict",
+    "apollo_validation": "pending1creditconfirmation",
+    "draft": "authorized; saved",
+    "send": false,
+    "bridges": false,
+    "deal": false
+  },
+  "crm": {
+    "contact_created": 256447052473,
+    "company_reused": 27777097504,
+    "primary_verified": true,
+    "lifecycle": "lead",
+    "marketing_contact": false,
+    "provisional": true,
+    "segments_in": [
+      180,
+      186
+    ],
+    "segments_excluded": [
+      181,
+      183
+    ],
+    "company_segment": 187
+  },
+  "validation": {
+    "provider": "ZeroBouncepublic",
+    "result": "no_verdict",
+    "last_checked_at": "2026-10-20T10:48:51.629307-03:00",
+    "apollo_called": false,
+    "credits_spent_this_step": 0
+  },
+  "outlook": {
+    "drafts_created": 1,
+    "sends": 0,
+    "bcc_verified": true,
+    "body_and_signature_verified": true
+  },
+  "procurement_control": {
+    "result": "informalrecommendationrequest; no formal tenderverified",
+    "last_checked_at": "2026-10-20T10:48:51.629307-03:00",
+    "selected_supplier": "unknown",
+    "contract": "unknown",
+    "participation_calendar": "unknown",
+    "formal_documents": "notapplicable to observed informalrequest; not proof of no procurement"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/crm-draft-readback.json",
+  "privacy": "Individualemail/names/recipientlinks omitted; personal queriesredacted",
+  "followup_operations": [
+    {
+      "at": "2026-10-20T10:54:46.519353-03:00",
+      "scope": "operatorrequestedgraphicalsignature",
+      "transport": "OutlookUI",
+      "actions": [
+        "convert existingdraft toHTML",
+        "remove plain signature; preserve originalcopy/paragraphs/link",
+        "Message->Signature->Julio",
+        "save and reopenexistingdraft",
+        "independentconnectorreadback of sameID and recipients"
+      ],
+      "result": "singleofficialgraphicalsignature; unsentdraftverified",
+      "recipients_unchanged": true,
+      "bcc_verified": true,
+      "sends": 0,
+      "crm_writes": 0,
+      "credits": 0,
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/firma-grafica-readback.json"
+    },
+    {
+      "at": "2026-10-20T10:57:41.130775-03:00",
+      "scope": "operatorsingleemailsend",
+      "authority": "explicitoperatorOk_send",
+      "queries": [
+        "Outlookget_profile",
+        "Outlooksearchto:<TARGET_EMAIL>subject:<APPROVED_SUBJECT>date20Oct;onlyexistingdraftpre-send",
+        "UIreadsamegraphicaldraftandSendonce",
+        "OutlooksearchsentcopynewID",
+        "OutlookfindSentItemsfolder",
+        "OutlooklistSentItemsfilterexactsubject;onecopy",
+        "Outlookfetchsentmessagefullsignature/recipient/CCO",
+        "HubSpotsearchEMAILassociatedContact256447052473 twice:0then1SENT"
+      ],
+      "pii_redacted": true,
+      "result": "onesend10:55:47Santiago;SentItemsverified;HubSpot119042603592SENT",
+      "delivery": "notverified",
+      "email_validation": "stillinferredunverified",
+      "credits": 0,
+      "crm_manual_writes": 0,
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/envio-readback.json"
+    },
+    {
+      "at": "2026-10-20T11:37:50.995895-03:00",
+      "scope": "approved_single_email_validation",
+      "authorization": "explicitasyncapproval max1credit",
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "queries": [
+        {
+          "tool": "apollo_email_validation_validate",
+          "email": "<TARGET_INFERRED_EMAIL>",
+          "pii_redacted": true,
+          "result": "HTTP403 accessdenied; structured INVALID_ARGUMENT; norequest_id/mcp_credits"
+        },
+        {
+          "tool": "apollo_feedback_log",
+          "pii_redacted": true,
+          "result": "loggedtrue; no contactdetails shared in feedback"
+        }
+      ],
+      "attempts": 1,
+      "retried": false,
+      "polling_started": false,
+      "verdict": null,
+      "credits_reported": null,
+      "crm_writes": 0,
+      "sends": 0,
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/apollo-validation-access-denied.json"
+    },
+    {
+      "at": "2026-10-20T11:52:21.920799-03:00",
+      "scope": "readbuyerLinkedInreply; draftrecommendation only",
+      "queries": [
+        "OpenLinkedInMessaging; read targetconversation currentlyactive and fullthread",
+        "Read responsehandling andCRMcapacity canon"
+      ],
+      "pii_redacted": true,
+      "result": "Humanreply confirmsAssetplan;25hmonthly operations;90HubSpotusers selfreported; price/experience/availabilityrequested",
+      "sends": 0,
+      "crm_writes": 0,
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/linkedin-reply-2026-10-20.json"
+    },
+    {
+      "at": "2026-10-20T12:03:04.139479-03:00",
+      "scope": "findpartnershipletter_and_tailoredreply",
+      "queries": [
+        "Localrepo searchGrupoReditosCRM/cartaHubSpot; no applicablelettermemory",
+        "SharePointHubSpot+carta",
+        "SharePointRéditos",
+        "SharePointHubSpot constrainedGrupoReditos:0",
+        "SharePointHubSpot+partner+Efeonce:officialletterfound",
+        "Fetch exactletterprimarydriveitem",
+        "LocalOneDriveCRMproposalPDFs read forreference only",
+        "OriginalHubSpotbrochure PDF27pages imagebased; visualread5/6/11/21",
+        "Live EfeonceHubSpotlandingread",
+        "HubSpotofficialdirectoryGoldread",
+        "OfficialAgentHubannouncementopened; insufficientbodyextraction"
+      ],
+      "sources": [
+        "https://efeoncepro.com/servicios-contratar-hubspot/",
+        "https://ecosystem.hubspot.com/es/marketplace/solutions/efeoncepro",
+        "https://www.hubspot.com/company-news/meet-agent-hub-and-agent-builder"
+      ],
+      "result": "OfficialGoldmembershipletter06Jan2026 found; currentGoldconfirmed; responsepreparednot sent",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/support-research/source-and-draft.json",
+      "pii_redacted": true,
+      "crm_writes": 0,
+      "outreach": 0,
+      "credits": 0
+    },
+    {
+      "at": "2026-10-20T12:10:42.609335-03:00",
+      "scope": "authorized_single_linkedin_reply",
+      "authorization": "Operator expressly approved reply to HSP-0039 with original partnership letter, brochure link and request to confirm individual corporate email",
+      "queries": [
+        "Read exact existing buyer conversation before send; no duplicate outgoing reply",
+        "Upload original Efeonce Group SpA Proof of Partnership Letter .docx.pdf",
+        "Send approved message once",
+        "Read outgoing message, brochure/landing links, email confirmation question and downloadable PDF; composer empty"
+      ],
+      "result": "sent_visible_in_thread at displayed12:09; buyer email confirmation pending",
+      "attachment_sha256": "2a02746d9f87623d31881f8ebcdc1012def2a1e931ab078d900a871cd0a1c3e4",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-20-1026-assetplan/linkedin-envio-readback.json",
+      "pii_redacted": true,
+      "redactions": [
+        "individual email",
+        "recipient personal identity",
+        "private conversation URL",
+        "message body"
+      ],
+      "crm_writes": 0,
+      "outreach": 1,
+      "credits": 0,
+      "remaining": "25h monthly proposal to prepare and review; no automatic follow-up authorized"
+    }
+  ]
+}

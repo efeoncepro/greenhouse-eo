@@ -27,6 +27,10 @@ Para ABM/ABS, selecciona cuentas por fit y prioriza inversión por problema, acc
 mapea cada iniciativa y mantén una tesis coordinada. Los tiers de inversión no sustituyen ICP ni relación.
 Mantén automática la selección de esta skill; su invocación no concede permisos externos.
 
+## Compra abierta: descartar publicidad de adjudicaciones
+
+Antes de invertir en una señal de compra, leer proveedor adjudicado, firma, inicio y documento contractual del comprador. Compra ya asignada/firmada/en ejecución no es convocatoria abierta aunque el feed diga Publicado/Abierto o tenga publicación reciente. Si la evidencia decisiva está bloqueada o contradice el feed, mantener HOLD sin avance comercial hasta resolverla. La autorización del operador para ejecutar no valida la calificación que el agente le presentó. Aplicar el gate del [radar](../../../docs/commercial/prospecting-agent/README.md#gate-de-adjudicación-antes-de-invertir-en-una-compra--corrección18102026).
+
 ## Entradas y contrato esencial
 
 Parte de cuenta, persona, URL/señal o micro-ICP; mercado, servicio, relación conocida y acciones autorizadas.

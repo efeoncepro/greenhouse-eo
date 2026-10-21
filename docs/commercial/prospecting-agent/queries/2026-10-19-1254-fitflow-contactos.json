@@ -1,0 +1,136 @@
+{
+  "run": "2026-10-19-1254-fitflow-contactos",
+  "timezone": "America/Santiago",
+  "checked_at": "2026-10-19T12:54:47-03:00",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-19T12:54:47-03:00"
+  },
+  "scope": "Focal operator-authorized individual outreach; not daily discovery rerun",
+  "country": [
+    "Perú",
+    "Chile"
+  ],
+  "service": "creative",
+  "opportunity_id": "HSP-0035",
+  "queries": [
+    {
+      "method": "Outlook get_profile",
+      "purpose": "verify sender identity",
+      "result": "Julio verified"
+    },
+    {
+      "method": "HubSpot get_user_details",
+      "purpose": "verify portal",
+      "portal": 48713323
+    },
+    {
+      "method": "Outlook search_messages",
+      "query": "fitflow received>=2026-10-19",
+      "result": "prior central presentation found; no reply/bounce observed in result"
+    },
+    {
+      "method": "HubSpot search CONTACT",
+      "query": "exact IN [3 professional emails REDACTED]",
+      "pii_redacted": true,
+      "result": "0 pre-link contacts; no duplicates found"
+    },
+    {
+      "method": "web search",
+      "query": "\"[CONTACT NAME REDACTED]\" \"fitflow.com\"",
+      "pii_redacted": true,
+      "result": "no exact professional email verification"
+    },
+    {
+      "method": "web search",
+      "query": "\"[CONTACT FULL NAME REDACTED]\" correo Fitflow",
+      "pii_redacted": true,
+      "result": "no exact professional email verification"
+    },
+    {
+      "method": "HubSpot Documents UI",
+      "count": 3,
+      "document_id": 357058081,
+      "query": "Create recipient-specific links for [EMAILS REDACTED]",
+      "pii_redacted": true,
+      "result": "3 links created; 3 native contacts; require_email false download true"
+    },
+    {
+      "method": "Outlook UI",
+      "count": 3,
+      "query": "Individual role-specific messages, installed graphical signature, brochure links and mandatory BCC",
+      "result": "sent once each"
+    },
+    {
+      "method": "Outlook list_messages Sent Items",
+      "count": 3,
+      "filter": "sentDateTime ge 2026-10-19T15:45:00Z",
+      "result": "first 1, then 2, then 3 complete Sent copies verified"
+    },
+    {
+      "method": "HubSpot search EMAIL subjects",
+      "count": 2,
+      "query": "IN [3 exact contextual subjects; personal names REDACTED]",
+      "pii_redacted": true,
+      "result": "2 then 3 SENT objects; ingestion completed"
+    },
+    {
+      "method": "HubSpot search CONTACT",
+      "query": "IN [3 professional emails REDACTED]",
+      "pii_redacted": true,
+      "result": "3 native contacts found"
+    },
+    {
+      "method": "HubSpot search EMAIL with CONTACT association",
+      "count": 3,
+      "query": "exact subject plus respective contact ID",
+      "result": "1/1 for each"
+    },
+    {
+      "method": "HubSpot search CONTACT with COMPANY association",
+      "query": "company 59473706752 AND hs_object_id IN [256144999055,256152424223,256144626299]",
+      "result": "3/3"
+    },
+    {
+      "method": "Outlook UI read",
+      "query": "Exact Sent copy via connector-returned web link",
+      "result": "commercial recipient, content and graphical signature read; screenshot saved privately"
+    }
+  ],
+  "procurement_control": {
+    "result": "INVESTIGACION INCOMPLETA / HOLD for purchase availability",
+    "source": "buyer post and corporate sources from previous evidence; not reopened during this phase",
+    "last_checked_at": "2026-10-19T12:54:47-03:00",
+    "primary_source_checked_at": "See prior evidence; no new primary contractual read",
+    "published_at": null,
+    "first_seen_at": "2026-10-19",
+    "deadline_at": "2026-10-06",
+    "deadline_timezone": null,
+    "deadline_precision": "day; year contextual",
+    "awardee": "not_verified",
+    "award_act_or_order": "not_verified",
+    "contract_status": "not_verified",
+    "signature_at": "not_verified",
+    "execution_start": "not_verified",
+    "execution_end": "not_verified",
+    "document_read": "No contractual document",
+    "participation_route": "prior official centralized channel; admission unknown",
+    "rationale": "Past deadline; operator expressly authorized relational credentials outreach; no open purchase recommendation, bid, Deal or additional enrichment"
+  },
+  "blocked": [
+    "Fourth contact email remains extrapolated; free verification unsuccessful; not sent"
+  ],
+  "approvals": {
+    "source": "Direct current instruction to send contextually to remaining contacts",
+    "executed": "3 individualized verified-email sends",
+    "crm": "Native Documents contacts and BCC EMAIL only; no manual intake/properties",
+    "new_credits": 0,
+    "sequences": 0
+  },
+  "coverage": {
+    "discovery_queries": 0,
+    "contact_verification_searches": 2,
+    "cells": "Focal Peru/Chile creative context; 20-cell daily coverage in 0900 report"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-19-fitflow/individual-outreach-2026-10-19.json"
+}

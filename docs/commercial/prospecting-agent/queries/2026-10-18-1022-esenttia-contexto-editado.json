@@ -1,0 +1,53 @@
+{
+  "run_id": "2026-10-18-1022-esenttia-contexto-editado",
+  "at": "2026-10-18T10:22:27.052430-03:00",
+  "timezone": "America/Santiago",
+  "window": {
+    "from": "2026-10-12T00:00:00-03:00",
+    "to": "2026-10-18T10:22:27.052430-03:00"
+  },
+  "scope": "focused correction of shared deal context; no new discovery",
+  "opportunity_ids": [
+    "HSP-0034"
+  ],
+  "queries": [
+    {
+      "id": "C001",
+      "source": "HubSpot authenticated UI",
+      "query": "Deal66218288550 shared message Actions menu",
+      "result": "no edit item; initial incorrect conclusion corrected later"
+    },
+    {
+      "id": "C002",
+      "source": "HubSpot UI write",
+      "query": "Publish commercial clarification for existing shared deal",
+      "result": "shared message10:19GMT-3, readback verified; audiences existing PDM and growth specialist"
+    },
+    {
+      "id": "C003",
+      "source": "operator instruction and HubSpot UI",
+      "query": "User clicked body and explicitly instructed edit",
+      "result": "body opens inline editor; clarification edited and saved"
+    },
+    {
+      "id": "C004",
+      "source": "HubSpot UI write/readback",
+      "query": "Click original context body, replace commercial text, Guardar, reread",
+      "result": "original context edited successfully; no additional message after edit instruction"
+    },
+    {
+      "id": "C005",
+      "source": "local documentation",
+      "query": "Persist audience/style and verified inline edit procedure",
+      "result": "manual and skill pointers updated"
+    }
+  ],
+  "blocked_sources": [],
+  "approval": "user feedback to correct context, followed by explicit edit instruction; existing deal only",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/shared-deal-2026-10-18-esenttia",
+  "uncertainties": [
+    "buyer admission/calendar",
+    "shared card date discrepancy unchanged"
+  ],
+  "crm_result": "two existing shared messages edited; one clarification had been published before explicit inline-edit steering; no deletion"
+}

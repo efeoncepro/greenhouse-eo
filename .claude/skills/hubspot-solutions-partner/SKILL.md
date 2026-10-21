@@ -26,6 +26,16 @@ separados por ` | `. La marca del alcance precede al holding; conservar Company 
 El formato no autoriza altas, calificación ni renombrados masivos. Nuevas altas autorizadas lo adoptan;
 registros existentes sólo cambian nombre dentro del mandato expreso, con antes/después y readback.
 
+## Negocios compartidos: liderazgo del partner
+
+Instrucción de Julio del 18/10/2026: en cada conversión autorizada usar «Negocios compartidos» →
+«Convertir en negocio compartido» y seleccionar **Partner** como liderazgo. No confundir el tipo
+«Colaboración iniciada por el partner» con la pregunta de liderazgo. Aplicar el
+[procedimiento verificado](../../../docs/manual-de-uso/hubspot/convertir-negocio-compartido.md), completar
+sólo hechos sustentados y leer de vuelta el mensaje compartido. La preferencia no amplía el lote autorizado.
+El contexto se redacta para el especialista de crecimiento, con lenguaje comercial y un pedido concreto.
+Para corregir un mensaje, hacer clic en su cuerpo → editar → Guardar; no concluir que es ineditable por el menú Acciones.
+
 ## Envíos desde el Outlook de Julio
 
 Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [política obligatoria](../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica oficial siempre y CCO `48713323@bcc.hubspot.com`, incluidos correos nuevos, respuestas, reenvíos y seguimientos manuales, programados o por secuencias (Julio, 21/10/2026). Usar Outlook UI o transporte HTML autorizado que conserve la firma; texto plano no es alternativa. Si la herramienta no la preserva, dejar el correo pendiente sin enviarlo. Verificar firma y BCC antes del envío, Enviados después y registro HubSpot por separado. Esta regla no autoriza envíos nuevos ni aplica la identidad de Julio a otros remitentes.

@@ -1,0 +1,88 @@
+{
+  "run": "2026-10-19-1502-agrocompra-envio-pendiente",
+  "opportunity_id": "HSP-0036",
+  "timezone": "America/Santiago",
+  "checked_at": "2026-10-19T15:02:21-03:00",
+  "weekly_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-19T15:02:21-03:00"
+  },
+  "scope": "Authorized focal enrichment/outreach preparation; factual gate unresolved",
+  "queries": [
+    {
+      "method": "Automation memory and private dossier read",
+      "result": "Prior HOLD and4main people plus2support roles recovered; no approval reconstructed"
+    },
+    {
+      "method": "LinkedIn primary UI",
+      "query": "Exact buyer post, chronological comments",
+      "result": "21comments read, author thank-you; no new contractual/calendar evidence. Firstdegree connection observed; no send"
+    },
+    {
+      "method": "Outlook get_profile",
+      "result": "Julio work mailbox verified"
+    },
+    {
+      "method": "HubSpot get_user_details",
+      "result": "Portal48713323 identity verified; no onboarding performed"
+    },
+    {
+      "method": "HubSpot Documents UI",
+      "query": "Servicios-Web",
+      "result": "Original357053321 identified under Sales enablement; no new links or upload"
+    },
+    {
+      "method": "Apollo contacts_search",
+      "query": "cnagro.cl; page1/per_page25",
+      "result": "0savedcontacts, totalpages0; no paid enrichment"
+    },
+    {
+      "method": "Apollo feedback_log",
+      "result": "Empty savedcontactsearch logged; no data revelation"
+    },
+    {
+      "method": "Local preparation",
+      "query": "Approved original signature HTML v3.1",
+      "result": "4role-specific complete HTML drafts,9signatureimages preserved; to=null, recipientlinks=null; notsent"
+    }
+  ],
+  "procurement_control": {
+    "result": "hold",
+    "source": "https://www.linkedin.com/feed/update/urn:li:activity:7516598217699155969/",
+    "last_checked_at": "2026-10-19T15:02:21-03:00",
+    "facts": "Buyer asks for technological partner;21comments; no calendar or decisive contract document",
+    "awardee": "not_verified",
+    "award_act_order": "not_found_in_read_surface; existence_not_verified",
+    "contract_status": "not_verified",
+    "signed_at": null,
+    "execution_start": null,
+    "execution_end": null,
+    "published_at": null,
+    "published_precision": "3days relative",
+    "deadline_at": null,
+    "current_stage": "informal search, availability not verified",
+    "participation_route": "Comments invited; current proposal reception/calendar notverified",
+    "documents_read": [
+      "Buyer post",
+      "21comments"
+    ],
+    "blocker": "Current selection, contract and calendar missing; operational approval does not replace factual verification"
+  },
+  "authorization": {
+    "source": "Direct current Julio instruction",
+    "paid_enrichment": true,
+    "send": true,
+    "scope": "4maincontacts; brochureoriginalHubSpot; robustindividualmessages; graphicssignature",
+    "execution": "pending_factual_gate"
+  },
+  "actions": {
+    "paid_enrichment_calls": 0,
+    "paid_credits": 0,
+    "emails_sent": 0,
+    "crm_writes": 0,
+    "recipient_links_created": 0,
+    "drafts_prepared": 4
+  },
+  "pending_question": "Buyer confirmation requested asynchronously, not a repeated permission request",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-19-agrocompra/outreach-autorizado-2026-10-19/mail-plans.json"
+}

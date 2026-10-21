@@ -1,0 +1,367 @@
+{
+  "run_id": "interactive-2026-10-16-2127-aloja-host",
+  "checked_at": "2026-10-16T21:27:28-03:00",
+  "timezone": "America/Santiago",
+  "scope": "single_account_user_directed",
+  "week_start_local": "2026-10-12T00:00:00-03:00",
+  "week_end_at_cutoff": "2026-10-16T21:27:28-03:00",
+  "last48h_intersection_start": "2026-10-14T21:27:28-03:00",
+  "weekly_discovery_percentage": null,
+  "weekly_discovery_percentage_reason": "No corrida del radar; validación de cuenta aportada por operador sin barrido de descubrimiento",
+  "country_service_coverage": {
+    "Perú": [
+      "creative"
+    ],
+    "Chile": [],
+    "Colombia": [],
+    "México": []
+  },
+  "covered_cells": 1,
+  "untouched_cells": 19,
+  "account_id": "HSP-0032",
+  "queries": [
+    {
+      "id": "WEB-01",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"agencia\" contenidos [PERSONA REDACTADA]",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-02",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" [PERSONA REDACTADA]",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-03",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" empleados empresa",
+      "pii_redacted": false,
+      "exact_query_private": null,
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-04",
+      "tool": "web.search_query",
+      "query": "\"[PERSONA REDACTADA]\" \"Busco agencia de contenidos\"",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-05",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"UGC\"",
+      "pii_redacted": false,
+      "exact_query_private": null,
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-06",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"[PERSONA REDACTADA]\" \"[PERSONA REDACTADA]\"",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-07",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"[PERSONA REDACTADA]\"",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-08",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"[PERSONA REDACTADA]\" gerente",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-09",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"[PERSONA REDACTADA]\" marketing",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-10",
+      "tool": "web.search_query",
+      "query": "\"Aloja Host\" \"[PERSONA REDACTADA]\"",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-11",
+      "tool": "web.search_query",
+      "query": "\"[PERSONA REDACTADA]\" \"Aloja\"",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "id": "WEB-12",
+      "tool": "web.search_query",
+      "query": "\"[PERSONA REDACTADA]\" \"Jefe Comercial\" \"Aloja\"",
+      "pii_redacted": true,
+      "exact_query_private": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json",
+      "market": "Perú",
+      "service_line": "creative",
+      "filters": {
+        "recency": null,
+        "absolute_dates": null
+      },
+      "purpose": "Validación focal de señal/cuenta/personas, no barrido semanal",
+      "outcome": "Señal/entidad/personas verificadas o incertidumbres descritas en reporte; WEB-11 y WEB-12 sin resultados pertinentes"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "perfil profesional objetivo conservado en privado",
+      "role": "objetivo",
+      "status": "reader_HTTP999_UI_accessible"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "https://aloja-host.com/quienes-somos/",
+      "status": "accessible",
+      "findings": "Entidad, fundadores, equipos, escala operativa declarada"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "https://pe.linkedin.com/company/aloja-host",
+      "status": "accessible",
+      "findings": "11–50 y 13 perfiles vinculados, industria, dominio, vacantes separadas"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7515885381322530816/",
+      "status": "accessible_web_and_UI",
+      "findings": "Solicitud B2B, inbox y portafolio, fecha relativa discrepante"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7515885381322530816/",
+      "status": "accessible_public_reader",
+      "findings": "Mismo post; fecha índice 1 día, no absoluta"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "perfil profesional cofundador conservado en privado",
+      "status": "search_excerpt_and_UI_accessible"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "perfil profesional comercial conservado en privado",
+      "status": "reader_HTTP999_UI_accessible"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "perfil profesional adicional conservado en privado",
+      "status": "reader_HTTP999_not_verified"
+    },
+    {
+      "tool": "web.open_or_click_and_optional_normal_UI",
+      "country": "Perú",
+      "service_line": "creative",
+      "checked_at": "2026-10-16T21:27:28-03:00",
+      "checked_at_precision": "run_cutoff_not_per_source",
+      "url": "https://aloja-host.com/",
+      "status": "accessible",
+      "findings": "Operación y geografía; cifras propias no auditadas"
+    },
+    {
+      "tool": "hubspot.get_user_details",
+      "calls": 2,
+      "outcome": "Portal48713323, owner75788512; identidad verificada"
+    },
+    {
+      "tool": "hubspot.search_crm_objects",
+      "object": "COMPANY",
+      "query": "Aloja",
+      "total": 0
+    },
+    {
+      "tool": "hubspot.search_crm_objects",
+      "object": "COMPANY",
+      "query": "Fanfour",
+      "total": 0
+    },
+    {
+      "tool": "hubspot.search_crm_objects",
+      "object": "COMPANY",
+      "filter": "domain EQ aloja-host.com",
+      "total": 0
+    },
+    {
+      "tool": "hubspot.search_crm_objects",
+      "object": "CONTACT",
+      "query": "[PERSONA OBJETIVO REDACTADA]",
+      "pii_redacted": true,
+      "total": 0
+    },
+    {
+      "tool": "hubspot.search_crm_objects",
+      "object": "CONTACT",
+      "filter": "email CONTAINS_TOKEN aloja-host.com",
+      "total": 0
+    },
+    {
+      "tool": "hubspot.search_crm_objects",
+      "object": "COMPANY",
+      "query": "Aloja",
+      "status": "invalid_parameters_missing_sorts_filterGroups",
+      "count_as_success": false,
+      "resolved": "Una nueva llamada con schema completo"
+    },
+    {
+      "tool": "apollo.mixed_people_api_search",
+      "filter": {
+        "q_organization_domains_list": [
+          "aloja-host.com"
+        ],
+        "page": 1,
+        "per_page": 10
+      },
+      "total": 7,
+      "enrichment": false,
+      "data": "Profesionales con apellidos enmascarados; no revela email ni teléfono"
+    },
+    {
+      "tool": "apollo.contacts_search",
+      "filter": {
+        "q_keywords": "Aloja Host",
+        "page": 1,
+        "per_page": 10
+      },
+      "total": 0,
+      "enrichment": false,
+      "outcome": "Sin contactos guardados coincidentes; estado vacío esperado"
+    }
+  ],
+  "approval": {
+    "research": true,
+    "crm": false,
+    "outreach": false,
+    "paid_enrichment": false
+  },
+  "report": "docs/commercial/prospecting-agent/runs/2026-10-16-2127-aloja-host.md",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/research-2026-10-16-aloja-host/evidence.json"
+}

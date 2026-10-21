@@ -1,0 +1,220 @@
+{
+  "run_id": "2026-10-18-0937-esenttia-admisibilidad",
+  "type": "operator_requested_admissibility_check",
+  "account_id": "HSP-0034",
+  "started_at": "2026-10-18T12:37:50.721Z",
+  "closed_at": "2026-10-18T09:42:51.301016-03:00",
+  "timezone": "America/Santiago",
+  "week_start": "2026-10-12T00:00:00-03:00",
+  "week_end": "2026-10-18T09:42:51.301016-03:00",
+  "discovery_sweep": false,
+  "queries": [
+    {
+      "id": "B01",
+      "q": "site:esenttia.co \"5600218590\"",
+      "executed_at": "2026-10-18T12:37:50.727Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B02",
+      "q": "site:esenttia.co proveedores extranjeros registro Ariba participación requisitos",
+      "executed_at": "2026-10-18T12:37:50.727Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B03",
+      "q": "\"CO1.REQ.11210476\" \"ODS\"",
+      "executed_at": "2026-10-18T12:37:50.727Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B04",
+      "q": "site:esenttia.co \"requisiciones\" \"2026\"",
+      "executed_at": "2026-10-18T12:37:50.727Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B05",
+      "q": "\"5600218590\" \"HubSpot\"",
+      "executed_at": "2026-10-18T12:38:45.772Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B06",
+      "q": "\"CO1.REQ.11210476\" \"DACARTEC\"",
+      "executed_at": "2026-10-18T12:38:45.772Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B07",
+      "q": "site:esenttia.co/requisiciones/ Hubspot licenciamiento marketing service",
+      "executed_at": "2026-10-18T12:38:45.772Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "B08",
+      "q": "site:esenttia.co \"Manual de Contratación\" \"extranjera\"",
+      "executed_at": "2026-10-18T12:38:45.772Z",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "filters": "as written; no date filter",
+      "purpose": "specific_process_admissibility_validation",
+      "account_id": "HSP-0034"
+    },
+    {
+      "id": "M01",
+      "source": "Outlook",
+      "query": "Esenttia",
+      "from_index": 0,
+      "size": 20,
+      "scope": "Julio work mailbox; no sender PII in query",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "executed_at_precision": "within this run; raw result timestamp not provided",
+      "results": 0,
+      "has_more": false,
+      "next_from_index": null
+    },
+    {
+      "id": "M02",
+      "source": "Outlook",
+      "query": "Ariba",
+      "from_index": 0,
+      "size": 20,
+      "scope": "Julio work mailbox; no sender PII in query",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "executed_at_precision": "within this run; raw result timestamp not provided",
+      "results": 20,
+      "has_more": true,
+      "next_from_index": 20
+    },
+    {
+      "id": "M03",
+      "source": "Outlook",
+      "query": "esenttia.co",
+      "from_index": 0,
+      "size": 20,
+      "scope": "Julio work mailbox; no sender PII in query",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "executed_at_precision": "within this run; raw result timestamp not provided",
+      "results": 0,
+      "has_more": false,
+      "next_from_index": null
+    },
+    {
+      "id": "M04",
+      "source": "Outlook",
+      "query": "5600218590",
+      "from_index": 0,
+      "size": 20,
+      "scope": "Julio work mailbox; no sender PII in query",
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "executed_at_precision": "within this run; raw result timestamp not provided",
+      "results": 0,
+      "has_more": false,
+      "next_from_index": null
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.esenttia.co/transparencia/",
+      "status": "read_primary",
+      "result": "Section5.3 Regimen Especial(Sin ofertas), publicity not transaction"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2026/03/ESE-A-POL-001-19-A-POL-COMPRAS-Y-ABASTECIMIENTO-1.pdf",
+      "status": "read_primary_local_pdf",
+      "result": "27pages; foreign legal entity p8; process-specific submission and onboarding rules"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2025/05/ESE-A-MAP-005-01-Manual-de-Contratacion-Esenttia.pdf",
+      "status": "read_primary",
+      "result": "14pages, relevant definitions/terms sections read"
+    },
+    {
+      "url": "https://www.esenttia.co/wp-content/uploads/2026/04/Como-ser-proveedor-Instructivo-de-Ariba-.pdf",
+      "status": "read_primary_local_pdf",
+      "result": "All3pages extracted, p3 visually checked; invited processes, Ariba supplier registration, shared support address"
+    },
+    {
+      "url": "https://www.esenttia.co/home-proveedores/?seccion=2",
+      "status": "read_primary",
+      "result": "Corporate supplier portal and requisitions routing"
+    },
+    {
+      "url": "https://www.esenttia.co/quiero-ser-proveedor/",
+      "status": "search_snippet_then_timeout",
+      "result": "Registration support mailbox corroborated in complete instructional PDF; page direct reader timed out"
+    },
+    {
+      "url": "https://www.esenttia.co/requisiciones/",
+      "status": "search_snippet_then_reader_error",
+      "result": "No full current inventory verified; no accessible HubSpot invitation found in targeted searches"
+    },
+    {
+      "url": "https://colombialicita.com/licitacion/313798692",
+      "status": "search_secondary",
+      "result": "ODS-Dacartec filename and recommendation5Nov; not buyer deadline or award proof"
+    },
+    {
+      "url": "https://el-vinculo.com/co/licitacion/servicio-de-licenciamiento-hubspot-cms-hub-marketing-hub-professional-service-hu-97938849",
+      "status": "search_secondary",
+      "result": "Aggregated open label not sufficient; primary buyer statement governs actual route"
+    }
+  ],
+  "sources_in_search_results_not_read": [
+    "Old2020Ariba manual; current2026instruction used",
+    "Client-credit requirements; excluded as wrong buyer/supplier direction",
+    "Other procurement categories; not evidence of HubSpot process requirements"
+  ],
+  "blocks": [
+    "SECOP prior CAPTCHA preserved, no new attempt",
+    "Requisitions/full inventory unavailable",
+    "No current Ariba login or invitation verified"
+  ],
+  "result": "foreign bidders contemplated generally; SECOP not offer channel; current competitive event unverified; concrete supplier support inquiry ready for review",
+  "next_action": "Approval to send one specified inquiry; then buyer invitation/terms/current-account check",
+  "approval": {
+    "send": "not_approved",
+    "crm_writes": "not_approved",
+    "registration": "not_approved"
+  },
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/admission-2026-10-18-esenttia",
+  "new_ids": [],
+  "crm_writes": 0,
+  "emails_sent": 0,
+  "forms_submitted": 0,
+  "paid_enrichment": 0,
+  "crm_read": "Not repeated; prior09:24–09:35 read preserved with timestamp"
+}
