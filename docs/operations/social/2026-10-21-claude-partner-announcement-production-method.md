@@ -29,6 +29,7 @@ Efeonce es **Registered** en el Claude Partner Network. Por eso:
 | LinkedIn página Efeonce | Efeonce Group `3961547` | 11:00 | `402024265` | video 4:5 con sonido y portada PNG; `previewIncluded=false` |
 | LinkedIn personal de Julio | Julio Reyes `5105024` | 11:30 | `402024305` | el mismo video 4:5 con portada |
 | Instagram `@efeoncepro` | Efeonce Group `3961547` | 14:00 | `402024348` | `REEL` 9:16, `showReelOnFeed=true`, `isAiGenerated=true`, portada PNG |
+| Historia de Instagram `@efeoncepro` | Efeonce Group `3961547` | 14:30 | `402122855` | `STORY` con el mismo video 9:16 del Reel, sin texto (Metricool rechaza texto en historias autopublicadas); agregada el 21-10 |
 
 ## Cómo se llegó al concepto (lo que no se deduce del resultado)
 

@@ -34,6 +34,7 @@ que lo apruebe.
 | LinkedIn página Efeonce | Efeonce Group `3961547` | 11:00 | `401634027` | video 4:5 con sonido y portada PNG; `previewIncluded=false` |
 | LinkedIn personal de Julio | Julio Reyes `5105024` | 11:30 | `401634041` | el mismo video 4:5 con portada |
 | Instagram `@efeoncepro` | Efeonce Group `3961547` | 14:00 | `401634087` | `REEL` 9:16, `showReelOnFeed=true`, `isAiGenerated=true`, portada PNG |
+| Historia de Instagram `@efeoncepro` | Efeonce Group `3961547` | 14:30 | `402122924` | `STORY` con el mismo video 9:16 del Reel, sin texto (Metricool rechaza texto en historias autopublicadas); agregada el 21-10 |
 
 ## Concepto: «Velocidad de luz», v2
 

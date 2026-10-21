@@ -272,7 +272,7 @@ documentar; `PENDING` ≠ publicado, releer por ID después de la hora.
 - **Tres copies por pieza:** LinkedIn de la página Efeonce, LinkedIn personal de Julio (menciona a Efeonce) e
   Instagram, cada uno con sus menciones.
 - **Horarios de la serie** (Metricool, `autoPublish:true`, `America/Santiago`): LinkedIn Efeonce **11:00**, LinkedIn
-  Julio **11:30**, Instagram Reel **14:00**. Google fue la excepción (Instagram a las 11:00, receta de arriba). Antes
+  Julio **11:30**, Instagram Reel **14:00** e **historia de Instagram 14:30** con el mismo video 9:16 (`instagramData.type: "STORY"`, `text: ""`: con texto Metricool responde `INSTAGRAM:TEXT_NOT_ALLOWED` cuando Instagram es la única red; se agregaron el 21-10 para BytePlus, Adobe, Claude, OpenAI, AWS y Microsoft). Google fue la excepción (Instagram a las 11:00, receta de arriba). Antes
   de programar, revisar la cola de ese día por marca.
 - **Portadas:** PNG del último cuadro del lockup, comprimido con `sharp` (paleta, quality 92).
 - **Media pública:** `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<aaaa-mm>-<partner>-partner/`. Verificar
