@@ -491,6 +491,9 @@ trabajo real.
   PNG**: es lo unico que dice donde va cada capa.
 - Mira el resultado. En capas, confirma que la transparencia sea real (tambien en huecos internos). En video,
   revisa primer, medio y ultimo cuadro, y confirma resolucion y duracion (por ejemplo con `ffprobe`).
+- Siguiente paso si el video lleva sonido o animación: `pnpm ai:listen --measure-only` antes de mostrarlo (sincronía,
+  silencios, cortes, cuadros quietos; grilla con `--cues`). Gemini sólo como segunda opinión y con `--verify`. Ver
+  [escuchar y mirar media](escuchar-y-mirar-media-con-gemini.md).
 
 ## Que significan las senales
 

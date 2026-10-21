@@ -78,7 +78,10 @@ Inspeccionar lienzo y previews de recorte, sin asumir que todos los clientes de 
 
 Decodificar MP4 completo, comprobar duración/resolución/fps/códecs/audio, extraer muestras del export
 y revisar transiciones y cierre. Escuchar cuando esté disponible; diferenciar escucha del usuario,
-medición y revisión del agente. Los contact sheets no sustituyen revisión temporal completa.
+medición y revisión del agente. Los contact sheets no sustituyen revisión temporal completa. La medición
+estándar de un video con sonido o animación es `pnpm ai:listen --measure-only` (sincronía, silencios, cortes,
+cuadros quietos y grilla con `--cues`, sin costo), antes de mostrarlo; Gemini es segunda opinión y siempre con
+`--verify`. Ver [escuchar y mirar media](../ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
 ## 6. Guardar el paquete final
 

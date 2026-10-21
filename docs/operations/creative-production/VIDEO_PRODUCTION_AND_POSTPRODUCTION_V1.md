@@ -149,6 +149,9 @@ aprueba una variante. Reusar autorización previa compatible, identificando a qu
 
 El diseño sonoro comienza en el guion, pero su generación/mezcla final sigue el corte real. Si luego cambia
 la imagen, invalida los cues afectados y revisa la sincronía; no reutilices ciegamente el reporte anterior.
+La revisión de sincronía, tirones y cierre se mide con `pnpm ai:listen --measure-only` (ffmpeg, sin costo; con
+`--cues` sale con código 2 si una cue no se confirma) antes de mostrar la pieza; Gemini es segunda opinión de
+criterio y siempre con `--verify`. Manual: [escuchar y mirar media](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 Un rodaje con playback o una pieza coreografiada a música aprobada debe declarar esa dependencia desde el
 brief: cambia el orden de decisiones, no elimina la revisión conjunta final.
 

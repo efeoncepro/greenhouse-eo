@@ -229,6 +229,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
 6. **Revisa en el tamaño de uso.** Comprueba composición completa y vista reducida, safe areas, ritmo,
    desbordes, solapamientos, contraste, logo, subtítulos y `prefers-reduced-motion` cuando corresponda.
    Ningún texto de diagnóstico, caja de selección o guía puede quedar dentro del entregable.
+   Si la pieza tiene sonido o animación, antes de mostrarla corre el control estándar sin Gemini
+   (`pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`); Gemini va
+   después, opcional y siempre con `--verify` ([manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)).
 7. **Entrega evidencia honesta.** Muestra la pieza y conserva formato, fuente editable/export, decisiones
    tipográficas, provenance y resultado del gate. Distingue prueba producida, revisada, aprobada, programada,
    publicada y medida.

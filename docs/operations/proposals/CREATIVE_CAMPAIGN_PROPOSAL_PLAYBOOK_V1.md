@@ -144,7 +144,7 @@ Reglas **[operador]** que salieron de la revisión:
 | **No inventar variantes de un elemento aprobado.** El sello se toma del generador del manual; un elemento que el manual reserva para la firma no se usa suelto | El agente había inventado una caja «2 EN 1»; se reemplazó por el sello aprobado |
 | **La voz es del país del cliente, en registro no coloquial, con el motor más avanzado disponible** | «tiene que ser de un mexicano (no coloquial) y… el motor más avanzado de Eleven Labs que es el V4» |
 
-**El agente no puede oír.** La sincronía de voz, golpes y música la juzga el operador **[no verificado por el agente]**.
+**El agente no puede oír.** En el caso fuente, la sincronía de voz, golpes y música la juzgó el operador **[no verificado por el agente]**. Desde el 2026-10-21 el agente la mide antes de mostrar el reel: `pnpm ai:listen --file mezcla.wav --file reel.mp4 --cues audio-cues.json --measure-only` (ffmpeg, sin costo: ataques, silencios, cortes, cuadros quietos, desfase entre golpe y corte, y cada cue de la grilla). Gemini, si se usa, es segunda opinión de criterio y siempre con `--verify`. La medición no reemplaza la aprobación del operador. Manual: [escuchar y mirar media](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 
 ### 4.5 Página del reel y QR
 
@@ -250,6 +250,7 @@ Reel, página y QR
 
 - [ ] Etiqueta del producto revisada al 100 % en los cuadros fijos y en movimiento.
 - [ ] La capa de motion usa los elementos del manual de la campaña.
+- [ ] `pnpm ai:listen --measure-only` corrido sobre la mezcla y el reel antes de mostrarlos: todas las cues confirmadas y sincronía dentro de tolerancia.
 - [ ] El operador oyó la mezcla final y la aprobó.
 - [ ] Página con `noindex, nofollow`; MP4 con rangos; VTT y póster responden; reproducción comprobada.
 - [ ] QR escaneado con un teléfono real (en el caso quedó **[no verificado]**).

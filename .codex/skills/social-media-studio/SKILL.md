@@ -142,6 +142,10 @@ no pedirla otra vez para la misma acción autorizada.
 Para video 4:5 en LinkedIn + Reel 9:16 en Instagram con portada propia, specs de portada (recorte 3:4 de la grilla)
 y menciones de LinkedIn con IDs de organización (Google, Google Cloud, Ingram Micro), usar la receta del 2026-10-19
 de esa misma referencia.
+Antes de mostrar al operador un video, reel o story con sonido o animación, correr el control estándar sin Gemini:
+`pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`.
+Gemini va después, opcional, como segunda opinión de criterio y siempre con `--verify`
+([manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)).
 
 ### Entrega de imágenes al equipo de Marketing
 

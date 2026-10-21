@@ -1,5 +1,15 @@
 # changelog.md
 
+## 2026-10-21 — `pnpm ai:listen`: QA de piezas de video y audio
+
+- Control estándar sin Gemini (`--measure-only`): mapa de eventos y grilla de cues medidos con ffmpeg en menos de 1 s;
+  código 2 si una cue falla. Gemini 3.8 queda como segunda opinión con `--verify`, que confirma o refuta cada
+  afirmación medible (pieza AWS: un «congelado» de severidad alta quedó refutado).
+- v2: `--fps` hasta 24, `--clip`, rúbricas versionadas, modo agéntico (`v1beta1` vía el cliente canónico) y GCS.
+  `@google/genai` 2.30 con Nexa verificado en vivo. [Manual](docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
+
+[Historial interno](docs/changelog/internal/README.md).
+
 ## 2026-10-21 — Firma gráfica obligatoria en todos los correos de Julio
 
 - Sustituida la alternativa textual por firma gráfica siempre, incluidos seguimientos manuales, programados y secuencias; transporte sin HTML deja el envío pendiente. [Decisión y procedimiento](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Routers y skills actualizados, sin envíos ni cambios de configuración.
@@ -653,7 +663,3 @@ Footer 14/10: composición V2 publicada, «Explora», newsletter/empleo independ
 ## 2026-10-05 — TASK-2002: filtros, formulario, fecha y hora (v3.4/v3.5) y ventana de escritura temporal
 
 - Studio `c767283`…`5d962c4` en producción: filtros en español con menú propio (lista estable, conteo del período, cero elegible, plataformas con y sin cuenta, banderas de los cinco mercados), formulario con el mismo menú y selectores de fecha, hora e inicio/fin (puntos por día de la cuenta, hora ocupada con aviso, flight de la campaña). AXIS 0.4.21 suma el isotipo de X. Ventana de escritura en modo open para Efeonce hasta 2026-10-12T10:00Z (decisión del operador; vuelve sola a solo lectura). [Task](docs/tasks/in-progress/TASK-2002-marketing-studio-activations-calendar-ui.md).
-
-## 2026-10-05 — títulos de pestaña del portal (local)
-
-- Título general `Efeonce | Greenhouse`; acceso, proyectos y resumen de finanzas usan Efeonce primero y etiquetas ES/EN. Copy centralizado, sin plantilla global que duplique marcas. ESLint y TypeScript PASS. Commit y push a `develop` autorizados; despliegue no verificado. [Detalle](docs/audits/ui/2026-10-05-portal-metadata.md).

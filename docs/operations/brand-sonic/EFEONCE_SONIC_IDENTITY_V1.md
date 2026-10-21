@@ -218,7 +218,11 @@ contrato algo que todavía es recomendación.
    fin. Una frase nueva: tres tomas → pausa «Empower»→«your» a 0,14 s recortando sólo silencio → palabra final por STT →
    esfera de la línea en ese instante → `master.sh` a −14 LUFS → el operador escucha y aprueba → bucket y JSON de AXIS.
 4. **QA sin oído.** El agente no escucha: verifica con espectrograma, medición de bandas y de LUFS, y transcripción. Lo
-   perceptual lo decide el operador.
+   perceptual lo decide el operador. Cuando el sonido va sobre motion o video (logo, cierre, spot), la grilla se
+   controla con `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only` antes de
+   mostrar la pieza: confirma cada silencio, golpe y pico del sting contra su cue y el desfase entre ataque y evento
+   visual (tolerancia ±42 ms), sin costo; sale con código 2 si una cue no se confirma. Gemini, si se usa, va siempre con
+   `--verify`. Manual: [escuchar y mirar media](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
 5. **Nivelar por sonoridad, nunca por pico.** `master.sh <in> <out> <LUFS> [shelf]`, loudnorm en dos pasadas, al
    objetivo del destino.
 

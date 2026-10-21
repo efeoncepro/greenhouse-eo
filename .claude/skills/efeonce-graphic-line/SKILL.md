@@ -228,7 +228,11 @@ fuente portable; Lab los proyecta; checkout ejecuta CLIs; cada consumidor implem
    aprobada por superficie, `pnpm brand:compose -- --intent <intent.json>`** la entrega entera (ejemplos en
    `src/lib/brand-surfaces/examples/`). Los íconos, con `resolveIcon` de `@efeoncepro/axis-graphic-line` (Greenhouse lo
    usa en `src/lib/brand-surfaces`; fuera de esa ruta, `pnpm icons:export` en AXIS).
-4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales.
+4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales. Si la pieza tiene motion o
+   sonido (reveal, apertura, sting, motion de Glitch), antes de mostrarla corre el control estándar sin Gemini:
+   `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`
+   (el golpe del sting se verifica como cue). Gemini va después, opcional y siempre con `--verify`
+   ([manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)).
 5. Si aprendiste algo, actualiza esta skill (abajo).
 
 ## Dónde viven los archivos de `ai-generations/`

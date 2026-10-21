@@ -123,7 +123,8 @@ Después de aprobada la pieza, y sólo con autorización para publicarla:
 - **Cada toma de video dura como máximo 15 s** (límite del motor en fal y en Higgsfield). Por eso la historia se cuenta
   en escenas cortas.
 - **El agente no escucha el audio y no hay transcripción automática local.** Que la voz diga lo que dice el guion lo
-  confirma la escucha del operador.
+  confirma la escucha del operador. Lo que sí se mide antes de mostrar (silencios, golpes, cortes y su sincronía) lo
+  revisa la herramienta `pnpm ai:listen` en modo de medición ([revisión de piezas](../ai-tooling/revision-de-piezas-con-gemini.md)).
 - **La IA de video no sostiene la marca:** gira los personajes en 3D, cambia la paleta o inventa texto si no se lo
   impide. Por eso lo exacto se compone y cada toma se revisa.
 - El modelo de video no entrega 1080 de forma nativa en la ruta usada: se sube de resolución en posproducción.

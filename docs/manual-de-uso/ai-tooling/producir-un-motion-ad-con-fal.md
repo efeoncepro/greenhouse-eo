@@ -411,6 +411,10 @@ Dos advertencias:
   techo digital. Si vas a pautar, revisa picos en post.
 - El LEEME registro −163,9 dB de silencio en el material previo al encode; el master entregado mide −91 dB en la
   ventana de sosten. El criterio util es el **contraste** entre el sosten y los golpes, no el valor absoluto.
+- Desde el 2026-10-21, `pnpm ai:listen --file pieza.mp4 --cues audio-cues.json --measure-only` saca el mapa de
+  ataques, silencios, cortes, cuadros quietos y sincronia en menos de 1 s, y verifica cada cue de la partitura (sale con
+  codigo 2 si una no se confirma). Es el control estandar antes de mostrar la pieza; Gemini, si se usa, va con
+  `--verify`. Ver [escuchar y mirar media](escuchar-y-mirar-media-con-gemini.md).
 
 ---
 

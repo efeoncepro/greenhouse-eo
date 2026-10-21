@@ -206,6 +206,12 @@ se mueve o cambia; verificar márgenes inicial/final y no desplazar el foley int
 LUFS, true peak, ASR y hashes son evidencia técnica específica, nunca sustitutos de naturalidad o impacto.
 El template compartido de Motion es `templates/video-postproduction-review.md` en esa skill.
 
+Antes de mostrar al operador una mezcla montada sobre video, correr primero el control estándar sin Gemini:
+`pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json`
+(silencios, golpes, picos y sincronía ±42 ms; código 2 si una cue no se confirma). Gemini va después, opcional, como
+segunda opinión de criterio y siempre con `--verify`. Detalle en el
+[manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
+
 ## Locución comercial y música para un video corto (2026-10-12)
 
 Locución para un mercado: voz **de ese país** y en registro de locutor, no coloquial; por el conector de claude.ai el

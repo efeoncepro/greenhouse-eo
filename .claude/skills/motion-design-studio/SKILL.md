@@ -123,6 +123,13 @@ Para **rampas de velocidad continuas, zoom lento sin saltos, story 9:16 desde to
 (criterio: 0 cuadros < 0,15), usa [lecciones §14](companions/video-lessons-and-failure-modes.md) (serie de anuncios de
 partners, 2026-10-21).
 
+**QA de sonido y animación antes de mostrar (desde 2026-10-21).** Toda pieza con audio o motion pasa primero por el
+control estándar, sin Gemini y sin costo: `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json
+--measure-only --out medicion.json` (mapa de eventos, sincronía ±42 ms y cues; código 2 si una cue no se confirma).
+Recién después, opcional, Gemini como segunda opinión de criterio y SIEMPRE con `--verify`: sus juicios se consideran,
+sus números se descartan si la medición no los respalda. Presets y flags en el
+[manual](../../../docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md).
+
 
 Para **cinematic ads, video de performance o híbridos foto-video**, carga
 [palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md),

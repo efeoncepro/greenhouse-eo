@@ -151,7 +151,10 @@ source of truth runtime, autonomía, allowlists, presupuesto, compiler ni derech
 
 Social mantiene el ownership y carga el [workflow audiovisual](../../.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md)
 (espejo Claude). Extiende este protocolo a storyboard/contact sheet, keyframes, preflight, generación,
-marca exacta, audio, revisión temporal y entrega. Un render es candidato, no aprobación. La ejecución
+marca exacta, audio, revisión temporal y entrega. Un render es candidato, no aprobación. La revisión temporal
+de una pieza con sonido o animación empieza con `pnpm ai:listen --measure-only` (ffmpeg, sin costo: sincronía,
+silencios, cortes, cuadros quietos y grilla con `--cues`) antes de mostrarla al operador; Gemini es segunda
+opinión opcional y siempre con `--verify` ([manual](../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md)). La ejecución
 Seedance 2.5 del 2026-09-12 conserva limitaciones y hashes en el workflow. Este aprendizaje artesanal
 no modifica compiler, autoridad MCP ni runtime del contrato multimodal. ADR de referencia:
 `GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` (Proposed; no implica aprobación del proveedor).

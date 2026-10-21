@@ -1167,6 +1167,10 @@ deterministic and are composed after any generative finish.
    When the image contains channel iconography or marks, inspect every light/white
    interior (for example the LinkedIn “in” and YouTube play) after matting; a clean
    silhouette with erased logo details is a failed asset.
+   Para texto, logos y lockups, `pnpm ai:listen --file pieza.png --preset lockup` (Gemini) transcribe el
+   texto visible y opina sobre logos, bordes y contraste en teléfono. Es una segunda opinión de criterio, no una
+   medición: no reemplaza la revisión al 100 % ni la composición determinista. Ver
+   `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md`.
 8. Refine with single-change follow-ups; restate invariants on every edit. In multi-model flows,
    carry `anchor_id`, parent asset, reference roles, precedence, locks, one delta, safe zones and
    acceptance criteria at every handoff; derive every ratio from the approved anchor using star topology,

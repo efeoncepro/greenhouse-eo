@@ -26,6 +26,7 @@ domain risk is high.
 | Release/production | production-release skill, `pnpm release:preflight`, orchestrator/watchdog evidence, Vercel READY, Cloud Run SHA checks |
 | Docs/task lifecycle | `pnpm docs:closure-check`, `pnpm ops:lint --changed`, task lint when task docs changed, handoff/changelog/project_context sync |
 | Security/secrets | secret hygiene skill, no raw secrets in diff/logs, authz failure smoke, sanitized error handling |
+| Pieza creativa con video, audio o animación | `pnpm ai:listen --file mezcla.wav --file pieza.mp4 --cues audio-cues.json --measure-only --out medicion.json` (ffmpeg, sin Gemini ni costo): código 2 = alguna cue no se confirma → `BLOCK`. Gemini (`--preset … --verify`) es solo segunda opinión de criterio; sus números sin respaldo de la medición no son evidencia. Manual: `docs/manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md` · guía §5.10 de `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md` |
 
 ## Runtime Completeness Checklist
 
