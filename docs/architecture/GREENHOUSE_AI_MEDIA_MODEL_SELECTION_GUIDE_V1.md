@@ -951,10 +951,10 @@ precisión temporal, hallazgos estructurados y **verificación con ffmpeg de cad
 **Cómo está construido [contrato].**
 - **Helper:** `src/lib/ai/gemini-media-analysis.ts` (`server-only`), con `analyzeMedia`, `countMediaTokens`,
   `prepareMedia` (inline o staging `gs://`) y `withQuotaRetry` (reintenta 429/503 a los 20 y 40 s).
-- **Cliente:** `@google/genai` 2.30.0 contra Vertex **`v1beta1`**, con las credenciales canónicas de
-  `google-credentials`. El modo agéntico responde «Unknown name mediaProcessing» en `v1` y funciona en `v1beta1`
-  [verificado 2026-10-21]. Seguimiento: llevar el parámetro de versión al cliente canónico `google-genai.ts` y retirar
-  la fábrica local.
+- **Cliente:** el canónico `getGoogleGenAIClient({ apiVersion: 'v1beta1' })` de `src/lib/ai/google-genai.ts` (`@google/genai`
+  2.30.0, credenciales de `google-credentials`). El modo agéntico responde «Unknown name mediaProcessing» en `v1` y
+  funciona en `v1beta1` [verificado 2026-10-21]. El resto de los consumidores (Nexa, AI Observer, embeddings) sigue en
+  `v1`, que es el default.
 - **Lógica pura con test:** `src/lib/ai/gemini-media-analysis-cli.ts` (argumentos, límites, partes, schema de hallazgos,
   cues) y `src/lib/ai/gemini-media-verify.ts` (decisiones de verificación sobre mediciones de ffmpeg).
 - **Rúbricas versionadas:** `src/lib/ai/gemini-media-presets.ts` (`sync`, `impacto`, `cierre`, `tiron`, `lockup`).

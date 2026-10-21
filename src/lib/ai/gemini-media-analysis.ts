@@ -5,8 +5,6 @@ import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 
-import { GoogleGenAI } from '@google/genai'
-
 import {
   assertInlineBudget,
   buildMediaPart,
@@ -18,33 +16,13 @@ import {
   shortHash,
   type ThinkingLevelName
 } from '@/lib/ai/gemini-media-analysis-cli'
-import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
+import { getGoogleGenAIClient } from '@/lib/ai/google-genai'
 
 /**
- * Cliente de revisión de medios. Usa las MISMAS credenciales canónicas que `getGoogleGenAIClient()`
- * (`google-credentials`), pero contra Vertex `v1beta1`: el modo agéntico (`mediaProcessing: AGENTIC`) da
- * «Unknown name» en `v1` y responde en `v1beta1` (verificado 2026-10-21). Seguimiento: llevar el parámetro de versión
- * al cliente canónico de `google-genai.ts` y retirar esta fábrica.
+ * Revisión de medios contra Vertex `v1beta1` del cliente canónico: el modo agéntico (`mediaProcessing: AGENTIC`) da
+ * «Unknown name» en `v1` y responde en `v1beta1` (verificado 2026-10-21).
  */
-let mediaClient: GoogleGenAI | undefined
-
-const getMediaAnalysisClient = () => {
-  if (mediaClient) return mediaClient
-
-  const project = getGoogleProjectId()
-
-  if (!project) throw new Error('Falta GCP_PROJECT o GOOGLE_CLOUD_PROJECT para Gemini.')
-
-  mediaClient = new GoogleGenAI({
-    vertexai: true,
-    project,
-    location: process.env.GOOGLE_CLOUD_LOCATION?.trim() || 'global',
-    apiVersion: 'v1beta1',
-    googleAuthOptions: getGoogleAuthOptions()
-  })
-
-  return mediaClient
-}
+const getMediaAnalysisClient = () => getGoogleGenAIClient({ apiVersion: 'v1beta1' })
 
 const THINKING_LEVEL: Record<ThinkingLevelName, string> = { low: 'LOW', medium: 'MEDIUM', high: 'HIGH' }
 
@@ -148,7 +126,7 @@ export interface GeminiMediaAnalysisResult {
  * respuesta vacía. No envía `temperature`: Gemini 3.x la ignora.
  */
 export const analyzeMedia = async (sources: MediaSource[], options: RequestOptions): Promise<GeminiMediaAnalysisResult> => {
-  const client = getMediaAnalysisClient()
+  const client = await getMediaAnalysisClient()
   const model = options.model?.trim() || GEMINI_MEDIA_DEFAULT_MODEL
   const started = Date.now()
 
@@ -183,7 +161,7 @@ export const analyzeMedia = async (sources: MediaSource[], options: RequestOptio
 
 /** Cuenta los tokens de entrada sin generar. */
 export const countMediaTokens = async (sources: MediaSource[], options: RequestOptions): Promise<number> => {
-  const client = getMediaAnalysisClient()
+  const client = await getMediaAnalysisClient()
 
   const response = await client.models.countTokens({
     model: options.model?.trim() || GEMINI_MEDIA_DEFAULT_MODEL,
