@@ -176,6 +176,14 @@ por alcance. No sumar fees completos por canal ni convertir ejemplos de fees ext
 [Pricing Integrity Pack](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md) ·
 [Guía para ofrecerlo](../../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 
+#### ChatGPT Ads
+
+**Oferta propia desde el 21-10-2026** (`Approved for validation`), el mismo día en que OpenAI habilitó ChatGPT Ads en
+Chile, Perú, Colombia y otros países de LATAM. Tiene cuatro ofertas: Readiness, Pilot de 6 semanas, Managed y la
+composición con Search Visibility 360. La cuenta es del cliente y la inversión es pass-through; se mide con pixel y
+Conversions API. No es AEO ni autoriza a decir que Efeonce es partner oficial de ChatGPT Ads.
+[Ficha de servicio](CHATGPT_ADS_SERVICE_V1.md).
+
 #### Evolución del servicio: Performance & Commerce moderno
 
 La operación de campañas, la segmentación manual y el ajuste de pujas son capacidades necesarias, pero cada vez
