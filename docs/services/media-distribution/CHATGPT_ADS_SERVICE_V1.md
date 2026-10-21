@@ -18,6 +18,17 @@ anunciantes en la plataforma y más de 1.200 millones de usuarios semanales de C
 No prometemos CPC, CPM, volumen de conversiones ni un retorno universal. La plataforma está en beta y el piloto existe
 precisamente para medirlo con el negocio de cada cliente.
 
+## ChatGPT Ads + HubSpot
+
+HubSpot lanzó el 16-09-2026 «la primera integración CRM con ChatGPT Ads» ([comunicado oficial](https://ir.hubspot.com/news-releases/news-release-details/hubspot-and-openai-deepen-partnership-bring-ai-transformation)),
+en beta pública y sólo en países donde ChatGPT Ads está habilitado; OpenAI nombró a HubSpot y Shopify sus primeros
+partners de CRM y ecommerce. Con Chile habilitado desde el 21-10-2026, la integración ya se puede usar con clientes
+chilenos que tengan HubSpot. Requisitos, consentimiento y límites (5/50/100 eventos según la edición de Marketing Hub)
+en [HubSpot Fall 2026](../hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md#chatgpt-ads-dentro-de-hubspot).
+
+**Claim permitido:** «HubSpot es el primer CRM integrado con ChatGPT Ads» y «somos HubSpot Gold Partner». **No** decir
+«el único CRM»: no hay evidencia de exclusividad (búsqueda del 21-10-2026 sin otros CRM integrados, que no la prueba).
+
 ## Qué es y qué no es
 
 - El anuncio aparece **debajo** de la respuesta, rotulado como patrocinado, y **no cambia lo que ChatGPT responde**.
@@ -44,7 +55,8 @@ precisamente para medirlo con el negocio de cada cliente.
 | 1 | **ChatGPT Ads Readiness** | cuenta de Ads Manager lista (entidad, verificación de identidad, facturación), pixel + Conversions API, UTMs y GA4/CRM, mapa de intents y *context hints*, revisión de landings y de políticas de la categoría, plan del piloto | 2–3 semanas, precio fijo |
 | 2 | **ChatGPT Ads Pilot** | Readiness más 1–2 campañas con el objetivo según la etapa (Views, Clicks o Conversions), grupos de anuncios por tema, matriz creativa, lectura semanal y readout final con la decisión de escalar, ajustar o detener | 6 semanas, precio fijo más inversión del cliente |
 | 3 | **Managed ChatGPT Ads** | operación continua: testing de temas y creatividades, optimización, reporting mensual y gobierno trimestral | mensual; como canal de Managed Performance o como fee de canal |
-| 4 | **Composición con Search Visibility 360** | visibilidad orgánica en respuestas de IA y presencia pagada junto a ellas, con un mismo mapa de prompts y un tablero común | se compone con un SV360 activo |
+| 4 | **ChatGPT Ads + HubSpot** | la campaña se crea, publica y mide desde HubSpot; los eventos de conversión (formulario o cambio de lifecycle stage, con consentimiento por contacto) vuelven a ChatGPT Ads y la atribución llega a contacto, deal y ROI junto a Google, Meta y LinkedIn | se compone con HubSpot as a Service; Efeonce es HubSpot Gold Solutions Partner |
+| 5 | **Composición con Search Visibility 360** | visibilidad orgánica en respuestas de IA y presencia pagada junto a ellas, con un mismo mapa de prompts y un tablero común | se compone con un SV360 activo |
 
 La puerta de entrada recomendada es **Pilot**. Readiness se vende solo cuando falta la medición o la cuenta, o cuando
 la categoría tiene riesgo de política.
@@ -120,7 +132,7 @@ El piloto cierra con un readout que separa lo medido de lo inferido y recomienda
 
 ## Continuidad
 
-`Readiness → Pilot → Managed ChatGPT Ads`, y la composición con SV360 cuando la marca también trabaja visibilidad
+`Readiness → Pilot → Managed ChatGPT Ads`, la composición con HubSpot cuando el cliente lo usa, y con SV360 cuando la marca también trabaja visibilidad
 orgánica. La renovación exige evidencia del ciclo anterior.
 
 ## Fuentes

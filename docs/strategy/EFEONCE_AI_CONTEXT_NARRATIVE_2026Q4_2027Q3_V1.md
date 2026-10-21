@@ -221,7 +221,7 @@ exista una nueva SKU conjunta. Cada oferta conserva su alcance, estado comercial
 |---|---|---|---|---|
 | 1 | Historias de negocios cerrados por WhatsApp; serie «El criterio de tu mejor vendedor» | LinkedIn Ads a gerencia; Meta con anuncios que abren chat de WhatsApp | Autodiagnóstico de contexto | 25 % |
 | 2 | Carrusel «El mismo cliente, tres versiones» | Retargeting a quienes interactuaron con 1 y 4 | Chequeo de salud de datos | 15 % |
-| 3 | Índice mensual de qué dicen los asistentes de IA sobre una categoría | Search y Microsoft Ads; ChatGPT Ads sólo en mercados habilitados (hoy no Chile) | Radiografía AEO | 20 % |
+| 3 | Índice mensual de qué dicen los asistentes de IA sobre una categoría | Search y Microsoft Ads; ChatGPT Ads (Chile habilitado desde el 21-10-2026) | Radiografía AEO | 20 % |
 | 4 | Serie «Así trabaja un equipo humano-agente»: un proceso, ficha de rol, excepción, supervisor y medición; variante de marketing con brief, claims y autoridad de publicación; contraste de proveedores sólo cuando ayuda a elegir | LinkedIn por job a operaciones, revenue, servicio **o CMO/Marketing Ops**; retargeting sólo con audiencia y consentimiento elegibles | Landing neutral del servicio verificada → conversación de fit → Blueprint o primer equipo; CMO puede entrar antes por AEO/campaña | 25 % orientativo, sin autorización de gasto |
 | 5 | «Del output a la pieza»: build completo, descartes diagnosticados y Behind the Build; comparación con/sin contexto rotulada como demostración | Meta/Instagram y LinkedIn a marketing | Sprint «Campaña en 5 días» · Creative Diagnostic · Kit de contexto de marca para IA | 15 % |
 
