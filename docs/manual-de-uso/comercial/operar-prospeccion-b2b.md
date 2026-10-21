@@ -190,3 +190,21 @@ dos créditos Apollo con un correo extrapolado y otro ausente, sin altas vacías
 con firma gráfica y EMAIL SENT leído; un seguimiento nativo futuro, desinscripción por respuesta/reunión.
 Los métodos reusables viven en los módulos de investigación, calidad y secuencias de la skill, y en la
 política Outlook. El expediente no renueva cobertura general ni autoriza contactar a los puentes.
+
+## Aplicación: Agencia Creativa, patrón y lote izipay — 21/10/2026
+
+[Registro consolidado](../../commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md):
+Ana Paula por InMail sin alta ficticia; Andrés por email/CRM, antes de la corrección de capacidad;
+izipay con cuatro contactos, cuatro correos iniciales, tres secuencias programadas y Laura sin inscripción
+por rebote. Correos/cuerpos privados en CRM y expediente; IDs, estados y fechas en el registro.
+
+- Aplicar [producción/fabricación local vigente](../../operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md)
+  sin negar capacidad ni inferir propiedad, ausencia de intermediarios o cumplimiento de un proyecto.
+- Patrón repetido por Apollo sin evidencia independiente sigue inferido. Una excepción expresa e informada
+  conserva alcance individual y calidad pendiente; no modifica el gate normal ni se acredita por envío.
+- Clonar plantillas además de secuencia; personalizar por rol y comprobar independencia. Guardar ajustes
+  de secuencia por separado del texto; releer fechas finales e inscripción Programado antes de cerrar.
+- `verified` anterior no invalida un NDR posterior. Conservar secuencia preparada sin enrollment de la
+  dirección afectada, cero inscritos verificado y diagnóstico privado; no reintentar para comprobar.
+- La asociación Company puede existir aunque el reader omita `associatedcompanyid`: verificar etiqueta
+  Principal en el registro, no crear otra Company ni afirmar herencia sectorial sin evidencia.

@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-21 — Agencia Creativa: outreach y secuencias izipay
+
+Ana Paula: InMail verificado, sin Contact; Andrés/Odoo: correo y Contact verificados, sin nuevo seguimiento.
+izipay: cuatro contactos/Primary y correos registrados; Iris, Ariana y Diego con dos seguimientos cada uno
+(27/29/30Oct y 3/5/6Nov, Perú). Laura rebotó: secuencia creada, cero inscritos, no reintentar.
+Iris conserva correo inferido y excepción expresa; Programado no es enviado. Owner Julio / Commercial.
+[Registro, IDs y pendientes](docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+[Capacidad local corregida](docs/operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md); docs/skills espejo, sin nuevo envío.
+
 ## 2026-10-20 — Blog etapa 1: candidato local en develop
 
 Implementación y preview autorizadas, publicación no autorizada. Runtime aislado en
@@ -234,24 +243,6 @@ Ambos containers sin drift al 16/10. Think: «Preferencias de cookies» sólo en
 Pendiente: release a `main` para activar el cron (aún no ha corrido en GitHub); token Meta literal en el tag
 servidor (decisión del operador: Secret Manager + Firestore Lookup después); form `ai-visibility-grader`
 de think/brand-visibility sin envío real que pruebe la cadena Lead (0 filas en `measurement_conversion`).
-
-## 2026-10-16 — Contacto: Nexa canónica, voz y medición
-
-Live en `/contacto/` y verificado en navegador/CDN: hero con rostro canónico de Nexa, voz Lucía es-MX (26 s), OG
-adjunto `251980` (v3), widget con `?ver=filemtime` en hero y audio. Backups en `/tmp/eo-contacto-widgets-before-*`
-del servidor; snapshot OG `_gh_contacto_before_og_rotation_20261016_163140`. Política medición `89e531d8`
-(Meta + Google UPD) publicada; recibos en `.auth/contacto-measurement/`. [Detalle](.claude/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
-Pendiente: envío real del form → GA4 DebugView + Meta Processed; key del MCP local ElevenLabs (tiene el ID, no `sk_`);
-saldo fal `FAL_API_KEY_B`; `contact-landing.js` local sin desplegar no es de esta sesión. Commits locales, sin push.
-
-## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°» aprobado
-
-Aprobado y canonizado: «este es el brochure oficial de la agencia 360° con todos nuestros servicios». Completo 84
-láminas y corto 26, ambos con índice linkeable (órbita → portadas; lámina 5 → secciones) verificado. OneDrive
-`4. Comercial/Brochures/2026/Agencia de Marketing 360/`; canvas https://claude.ai/artifact/Xy1LjqUHZRsJbtcTUP9jB3;
-fuente y scripts en [LEEME](ai-generations/2026-10-12_brochure-efeonce-360/LEEME.md). Registrado en la norma
-(delta 2026-10-16 b), funcional, manual y `docs/services/README.md`. Logos de clientes autorizados por el operador
-(2026-10-16). Antes de enviarlo afuera: cifras ANAM y plazo Berel. Commits locales, sin push.
 
 ## 2026-10-16 — Fabricio: seguimiento web programado
 

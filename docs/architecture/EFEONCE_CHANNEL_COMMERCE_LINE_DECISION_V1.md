@@ -118,3 +118,11 @@ Que ningún diagnóstico se venda en la ventana de 12 semanas con menos de 5 con
 la revisión legal declare inviable la figura para los servicios con personas en faena; que un cliente existente
 pida ejecución de canal (cambia el motor comercial de new business a expansión); o que cambie la regulación de
 subcontratación en Chile.
+
+## Aclaración de capacidad — 21/10/2026
+
+Julio confirmó producción y fabricación local en los cinco mercados del
+[registro de capacidad vigente](../operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md).
+El límite anterior sobre producción como servicio propio no autoriza afirmar ausencia de producción local.
+La declaración no precisa propiedad de talleres ni elimina back-to-back, estructura de ejecución o
+validaciones por proyecto; se conserva el contrato de esta línea sin extrapolarlo a una negación comercial.

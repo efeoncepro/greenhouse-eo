@@ -123,3 +123,22 @@ Para varios correos programados, cargar [seguimientos HubSpot](hubspot-follow-up
 Cada paso necesita un aporte nuevo ligado a su contexto, empatía y una razón concreta para elegir Efeonce.
 Si se pidió brochure en cada mensaje, explicar su utilidad antes del enlace nativo; no reutilizar tracking
 ajeno ni repetir la presentación. Personalización completa por persona, no sólo nombres/empresas.
+
+## Agencia Creativa y capacidad local vigente
+
+Para búsqueda de agencia publicitaria, diseño o campañas, contextualizar el brochure original **Agencia
+Creativa** (`357058081` en el portal Efeonce al 21/10/2026); reabrir su identidad al operar, sin revalidar
+contenido aprobado. Compras necesita alcance/proceso; Marketing, concepto y producción de campañas;
+Marca, coherencia y adaptación. Mantener la tesis común sin atribuirles a todos la solicitud de la autora.
+Un «por qué elegirnos» conecta capacidad y forma de trabajo con esa decisión; no inventa resultados.
+
+Aplicar la [capacidad local confirmada por Julio](../../../../docs/operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md):
+producción y fabricación en México, Perú, Chile, Colombia y Ecuador desde octubre de 2026. No repetir
+la premisa anterior de ausencia; tampoco inferir talleres propios, montaje o ausencia de intermediarios.
+La corrección de capacidades no autoriza reenviar un correo anterior ni alterar el brochure.
+
+Si se autoriza LinkedIn al no haber correo vigente, no crear un Contact ficticio para compartir el brochure.
+Si HubSpot exige un email para generar un enlace, usar un mecanismo real permitido y dejar registrada su
+atribución; nunca introducir un correo inventado del prospecto. Un enlace creado con email del remitente
+no identifica al visitante como destinatario. Verificar la conversación enviada y separar visitas del
+agente/escáner, visualizaciones, lectura humana y respuesta. [Caso completo](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).

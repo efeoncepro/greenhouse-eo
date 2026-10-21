@@ -57,3 +57,17 @@ En Apollo, confianza alta del match no equivale a email verificado. Leer el esta
 dirección. Registrar costo real y cobertura útil por separado. Conservar el rol como puente hipotético,
 sin crear un Contact vacío, completar por patrón o interpretar colegas como introducciones confirmadas.
 Caso: [dos puentes de Indecaucho](../../../../docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md).
+
+## Patrón solicitado y excepción individual explícita
+
+Si el operador pide seguir el patrón, separar candidato de evidencia: devolver al proveedor una dirección
+que nosotros construimos no la verifica cuando sólo la repite con `match_confidence=none`, sin estado de
+email ni atributos independientes. No gastar en variantes equivalentes ni usar el envío como verificador.
+
+Si el operador, informado de esa incertidumbre, autoriza expresamente alta, envío y secuencia para esa
+persona/dirección, ejecutar ese alcance sin pedir el mismo permiso otra vez. Registrar la excepción con
+fuente/fecha, dirección inferida y calidad pendiente; no etiquetarla `verified`. Usar los campos vigentes
+del portal y una nota que distinga identidad profesional conocida de atribución de correo pendiente.
+El permiso sólo de envío no se amplía a CRM o secuencia, y la excepción individual no cambia la admisión
+normal de otros contactos. Ausencia de rebote o visualización del brochure tampoco verifica identidad.
+[Aplicación izipay](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).

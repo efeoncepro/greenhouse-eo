@@ -24,7 +24,7 @@ CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Prospección, secuencias y brochures aprobados](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
+[Prospección y capacidad local](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
 [CRM](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
 [Outlook y altas](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md).
 [Customer Agent: llamadas](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md).

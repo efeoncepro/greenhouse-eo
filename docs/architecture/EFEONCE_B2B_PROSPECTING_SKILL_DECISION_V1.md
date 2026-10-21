@@ -266,3 +266,16 @@ no 24 horas exactas. Radar horario y alta CRM del 10/10 son posteriores y no exp
 Publicación, primera disponibilidad/indexación, primer aviso exacto y causa siguen sin acreditar.
 Las conclusiones previas que no tenían acreditada la fecha se conservan como cortes históricos;
 esta confirmación acredita la fecha, no un timestamp, latencia exacta o causa.
+
+## Delta de operación documentado — 21/10/2026
+
+Julio pidió consolidar docs y skills después del [lote Agencia Creativa/izipay](../commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
+Se conserva el ADR del método y su admisión normal. La excepción informada de correo inferido se registra
+por persona y acción, sin promoverla a verificación ni autorización global. NDR posterior y estado Apollo
+se conservan con fecha; el canal afectado no se inscribe por tener una secuencia creada.
+
+El módulo HubSpot incorpora clonación de plantillas independientes, guardados separados y lectura de
+Programado por contacto. Plantilla, configuración, inscripción, envío y entrega siguen siendo estados
+separados. La [capacidad local](../operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md) corrige la premisa
+comercial anterior, sin probar propiedad de talleres ni modificar el contrato de ejecución de terceros.
+Es consolidación del mandato y evidencia del caso, sin nuevo schema, API, scheduler o autorización externa.
