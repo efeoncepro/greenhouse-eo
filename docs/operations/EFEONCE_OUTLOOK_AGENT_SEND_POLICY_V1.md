@@ -1,9 +1,11 @@
 # Correos de Julio por Outlook: firma oficial y registro HubSpot
 
-## Decisión 2026-10-08 — Accepted: dos vías de envío
+## Decisión 2026-10-21 — Accepted: firma gráfica obligatoria siempre
+
+Julio instruyó: «Deja registrado que todos mis correos deben salir siempre con mi firma gráfica, incluidos los seguimientos». Esta decisión sustituye la autorización del 08/10/2026 de usar firma en texto por conector. Rige para todos sus correos nuevos, respuestas, reenvíos y seguimientos, tanto manuales como programados o enviados por secuencias.
 
 - **Autoridad y owner:** Julio Reyes, instrucción explícita en conversación con Codex.
-- **Alcance:** todo correo que un agente prepare para enviar o envíe desde `jreyes@efeoncepro.com` por Outlook/Microsoft 365, incluidos nuevos mensajes, respuestas y reenvíos.
+- **Alcance:** todo correo que un agente prepare para enviar o envíe desde `jreyes@efeoncepro.com` por Outlook/Microsoft 365, incluidos nuevos mensajes, respuestas, reenvíos y seguimientos, manuales o programados y mediante secuencias.
 - **Estado:** contrato documental vigente; no instala una firma ni cambia automáticamente el conector o las preferencias de Outlook.
 - **Reversibilidad:** instrucción operativa reversible por el operador; confidence alta sobre la preferencia, capacidades del transporte a verificar en cada sesión.
 
@@ -13,9 +15,9 @@
 
 ## Contrato obligatorio
 
-1. **Firma completa de Julio en una de las dos vías aprobadas:** conector Outlook con la firma en texto de abajo, u Outlook UI con la firma gráfica oficial. Ambas son válidas de forma permanente por instrucción del operador; no pedir otra aprobación sólo por elegir la vía. Respetar una vía o formato específico si el pedido lo indica. No reducirla a «Saludos, Julio» ni inventar datos o diseño. Saludos y despedida pertenecen al cuerpo; insertar la firma una sola vez en el mensaje nuevo, sin borrar firmas del historial citado.
+1. **Firma gráfica oficial de Julio siempre:** usar Outlook UI o un transporte HTML autorizado que conserve el diseño completo. El texto plano no es una alternativa permitida. Comprobar foto, nombre/cargo, datos, marca, eslogan, enlaces y franja de partners; insertar una sola firma nueva, sin borrar las del historial citado. Si la herramienta no puede conservarla, dejar el correo pendiente y explicar el bloqueo, sin enviarlo con firma textual. Esta regla también se comprueba antes de programar o activar seguimientos/secuencias.
 2. **BCC/CCO `48713323@bcc.hubspot.com`** para registro en el portal Efeonce `48713323`. Debe estar en destinatarios ocultos, nunca en Para/CC ni escrito como parte del cuerpo. Si ya existe, no duplicarlo. Preservar otros destinatarios autorizados.
-3. Aplicar ambos requisitos también a borradores preparados para envío y a respuestas/reenvíos. Para estos envíos por agentes, la firma completa prevalece sobre la recomendación histórica de firma abreviada. Una excepción debe venir de una instrucción explícita posterior del operador para ese envío.
+3. Aplicar ambos requisitos también a borradores preparados para envío, respuestas, reenvíos y seguimientos. Para estos envíos por agentes, la firma gráfica completa prevalece sobre la recomendación histórica de firma abreviada. Una excepción debe venir de una instrucción explícita posterior del operador para ese envío.
 4. Esta preferencia autoriza añadir ese BCC al correo cuyo envío esté autorizado; **no autoriza nuevos envíos**, respuestas automáticas, ampliar destinatarios de negocio, cambiar otro portal, activar tracking ni modificar deals. No extender la identidad/firma/BCC de Julio a otros remitentes, clientes o emails transaccionales de Greenhouse/Resend.
 
 ## Fuente de la firma
@@ -27,24 +29,7 @@ Instalador: [`julio-reyes.html`](../../ai-generations/2026-09-29_avatares-equipo
 Reusar el HTML/fragmento aprobado y sus PNG HTTPS; no reconstruir el diseño ni copiar enlaces de tracking de un correo viejo.
 Si falta el archivo local, seguir [AI Generations Storage](AI_GENERATIONS_STORAGE_V1.md) (`ai-gen:where` / `ai-gen:pull`), sin regenerar la firma.
 
-Identidad contrastada en un correo enviado el 2026-10-07: **Julio Reyes**, **Managing & GTM Director · Efeonce**, `+56 9 3480 2860`, `jreyes@efeoncepro.com`; foto/órbita, web, LinkedIn, logo, «Empower your Growth» y franja de partners. Para la vía gráfica, los datos y activos se toman del archivo vigente. Para el conector, usar la siguiente versión completa en texto, probada y aceptada por el operador el 2026-10-08; actualizar ambas si cambia la identidad aprobada.
-
-### Firma en texto aprobada para el conector
-
-```text
-Julio Reyes
-Managing & GTM Director · Efeonce
-Teléfono: +56 9 3480 2860
-Correo: jreyes@efeoncepro.com
-Web: https://efeoncepro.com
-LinkedIn: https://linkedin.com/in/cesargrowth
-
-Efeonce — Empower your Growth
-
-Partner oficial de HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus.
-```
-
-Esta variante conserva los datos y enlaces; no incluye foto, logo ni diseño gráfico. La firma gráfica oficial se conserva para la vía Outlook UI o un transporte HTML ya autorizado.
+Identidad contrastada en un correo enviado el 2026-10-07: **Julio Reyes**, **Managing & GTM Director · Efeonce**, `+56 9 3480 2860`, `jreyes@efeoncepro.com`; foto/órbita, web, LinkedIn, logo, «Empower your Growth» y franja de partners. Tomar los datos y activos del archivo gráfico vigente. La versión textual autorizada el 08/10 queda sustituida por la decisión del 21/10; no reutilizarla como alternativa de envío.
 
 ## Procedimiento antes de enviar
 
@@ -73,10 +58,10 @@ exigidos se responden con evidencia o se dejan pendientes con el operador. Aplic
 
 1. Confirmar mailbox, destinatarios, asunto y contenido autorizado. Mantener los cambios dentro de lo pedido; «envíalo» después de revisar el texto ya es autorización, no pedirla otra vez por esta norma.
 2. Revisar la capacidad real de la herramienta. El conector Outlook `send_email` observado el 2026-10-08 admite `text_content` y BCC, pero **sólo texto plano**: no preserva una firma HTML ni añade la firma configurada en Outlook. No pasar HTML en `text_content` ni asumir que Outlook la incorporará después.
-   **Delta 2026-10-19:** en otra sesión, el conector Microsoft 365 de claude.ai (app `07c030f6-5743-41b7-ba00-0a6e85f37c17`) tenía sólo permisos de lectura: `Mail.Read`, sin `Mail.ReadWrite`. `outlook_create_reply_draft` respondió `FORBIDDEN: Missing scope 'Mail.ReadWrite'`. Los permisos dependen del consentimiento otorgado: verificarlos en cada sesión (`get_granted_scopes`), sin asumir que la capacidad del 08-10 sigue vigente. Si no hay escritura, entregar el texto final (incluida la firma en texto y el CCO anotado), dejar que Julio envíe desde Outlook web y hacer el readback de Enviados con el conector. Dar consentimiento en Entra es una decisión de seguridad del administrador, nunca de un agente. Caso: respuesta a Pibank del 19-10 (destinatario, CCO y adjunto verificados en Enviados).
-3. Elegir la vía indicada por el usuario o la disponible adecuada. **Conector:** añadir explícitamente la firma completa en texto al cuerpo. **Outlook UI o integración HTML autorizada:** comprobar la firma gráfica insertada automáticamente o insertar la oficial; verificar render, imágenes y enlaces. En ambas, una sola firma en el mensaje nuevo. No inventar endpoints, credenciales ni permisos para sortear una limitación.
+   **Delta 2026-10-19:** en otra sesión, el conector Microsoft 365 de claude.ai (app `07c030f6-5743-41b7-ba00-0a6e85f37c17`) tenía sólo permisos de lectura: `Mail.Read`, sin `Mail.ReadWrite`. `outlook_create_reply_draft` respondió `FORBIDDEN: Missing scope 'Mail.ReadWrite'`. Los permisos dependen del consentimiento otorgado: verificarlos en cada sesión (`get_granted_scopes`), sin asumir que la capacidad del 08-10 sigue vigente. Si no hay escritura, preparar el cuerpo y dejar que Julio envíe desde Outlook web con la firma gráfica oficial y el CCO comprobados; hacer el readback de Enviados con el conector. Dar consentimiento en Entra es una decisión de seguridad del administrador, nunca de un agente. Caso: respuesta a Pibank del 19-10 (destinatario, CCO y adjunto verificados en Enviados).
+3. Usar Outlook UI o una integración HTML autorizada que conserve la firma gráfica oficial. Comprobar su inserción automática o insertar el fragmento oficial; verificar diseño, imágenes y enlaces. Un conector que sólo admite texto plano no sirve para enviar estos correos; puede usarse para lectura o preparación del cuerpo. No inventar endpoints, credenciales ni permisos para sortear una limitación.
 4. Abrir/comprobar el campo CCO: debe contener exactamente `48713323@bcc.hubspot.com`. Confirmar el resto de destinatarios y la correspondencia entre enlaces/adjuntos y el contenido aprobado.
-5. Enviar una sola vez. Si ninguna de las vías aprobadas permite incluir su firma correspondiente y BCC, conservar el borrador y explicar la limitación concreta. El texto completo por conector es una opción aprobada; no exige permiso adicional salvo que el pedido requiera específicamente firma gráfica. Tras un resultado incierto, buscar la copia enviada antes de reintentar.
+5. Enviar una sola vez. Si ninguna vía disponible conserva la firma gráfica y el BCC, mantener el correo pendiente y explicar la limitación concreta. No degradar a firma en texto. Tras un resultado incierto, buscar la copia enviada antes de reintentar.
 6. Leer **Elementos enviados** para comprobar remitente, destinatario, asunto, cuerpo/firma y BCC. Un envío aceptado, la entrega al destinatario y el registro en HubSpot son estados distintos.
 7. Verificar, cuando el acceso lo permita, la actividad de correo asociada en HubSpot. **BCC enviado no prueba ingestión, asociación a contacto/empresa/deal, apertura, clic ni seguimiento automático**. Si no hay readback CRM, informar «enviado por Outlook con BCC; registro en HubSpot pendiente de verificación».
 
@@ -85,7 +70,7 @@ exigidos se responden con evidencia o se dejan pendientes con el operador. Aplic
 Julio pidió primeros contactos individualizados, empáticos, con un motivo concreto para elegir Efeonce,
 diferenciadores pertinentes y **al menos un brochure relacionado con el contexto**, enviado desde su
 mailbox con la firma gráfica instalada. Aplicar este criterio al preparar próximos correos comerciales;
-conserva las dos vías aprobadas y la autorización específica de cada envío.
+aplica la firma gráfica obligatoria siempre y conserva la autorización específica de cada envío.
 
 - Leer la señal original y el historial de la cuenta. Una búsqueda de un colega no se atribuye al
   destinatario; una vacante no se presenta como solicitud de agencia. Formular las inferencias como tales.
@@ -136,7 +121,7 @@ Resultado de referencia: [seis envíos, materiales, actividades CRM y límites](
 
 ### Convertir un borrador de texto a firma gráfica — 18/10/2026
 
-Cuando el pedido exige firma gráfica y el borrador nació por conector en texto, abrir ese borrador en
+Todo borrador nacido por conector en texto debe convertirse antes de enviarse. Abrir ese borrador en
 Outlook web, elegir **Opciones → Cambiar a HTML** y conservar cuerpo, párrafos, enlaces y destinatarios.
 Retirar sólo la firma de texto del mensaje nuevo e insertar la firma oficial instalada mediante
 **Mensaje → Firma → Julio** (nombre observado; verificar el actual). Pegar contenido enriquecido cuando
@@ -193,7 +178,7 @@ no concede autorización general de futuros mensajes ni sustituye el readback de
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.
 
-La decisión inicial de exigir sólo HTML quedó sustituida el mismo 2026-10-08 tras la prueba por conector con firma completa en texto y BCC, verificada en Enviados. El operador aceptó permanentemente ambas vías: «podemos usar las dos vías, la del conector y la otra donde no usas el conector y pones mi firma». Sigue descartado confiar en que el conector añadirá por sí solo la firma configurada en Outlook. Se comprueba la firma correspondiente a la vía y el BCC antes del envío.
+La decisión inicial de exigir sólo HTML quedó sustituida el mismo 2026-10-08 tras la prueba por conector con firma completa en texto y BCC, verificada en Enviados. El operador aceptó entonces ambas vías (autorización sustituida el 21/10/2026): «podemos usar las dos vías, la del conector y la otra donde no usas el conector y pones mi firma». Sigue descartado confiar en que el conector añadirá por sí solo la firma configurada en Outlook. Desde el 21/10/2026 se comprueba siempre la firma gráfica oficial y el BCC antes del envío.
 
 Revisar esta decisión si cambia el remitente, la firma aprobada, la dirección de registro de HubSpot o el soporte HTML del conector. La documentación no demuestra instalación, automatización técnica ni recepción de un nuevo correo.
 

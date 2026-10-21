@@ -25,7 +25,7 @@ la [regla completa de auto-load, subagentes y gobernanza](docs/operations/CLAUDE
 | Payroll/Workforce participation/exit/leave/contract-type/approval | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` |
 | Payroll receipts + Legal docs/Finiquito | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md` |
 | Notion sync / integrations | `notion-platform` | `architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` |
-| Outlook: firma y CCO HubSpot | `copywriting` | [Política](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) |
+| Outlook: firma gráfica siempre (incluidos seguimientos) y CCO HubSpot | `copywriting` | [Política](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md) |
 | HubSpot bridge / intake / CRM (CLI o MCP) | `hubspot-greenhouse-bridge` + `hubspot-as-a-service` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` + `operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md`; nombres de Deal/Lead: [convención](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md). |
 | Prospección B2B | `efeonce-b2b-prospecting` | [Skill](.claude/skills/efeonce-b2b-prospecting/SKILL.md) · [Brochures aprobados: íntegros, sin revalidar ni recortar](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md) |
 | HubSpot portfolio / Solutions Partner / agents / public offer / sectors | `hubspot-solutions-partner` + `hubspot-as-a-service` | `services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + skill `SOURCES.md` |

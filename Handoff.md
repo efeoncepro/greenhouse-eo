@@ -1,5 +1,9 @@
 # Handoff
 
+## 2026-10-21 — Correos de Julio: firma gráfica siempre
+
+Mandato permanente: firma gráfica oficial en todo correo, incluidos respuestas, reenvíos y seguimientos manuales, programados o por secuencias. Texto plano deja de ser alternativa; si la herramienta no conserva la firma, mantener pendiente. [Política vigente](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Routers y referencias de skills alineados; no se enviaron correos ni se modificaron secuencias por registrar esta regla.
+
 ## 2026-10-21 — Agencia Creativa: outreach y secuencias izipay
 
 Ana Paula: InMail verificado, sin Contact; Andrés/Odoo: correo y Contact verificados, sin nuevo seguimiento.
@@ -259,10 +263,3 @@ Método y adapter espejados Codex/Claude, registro focal actualizado; no renueva
 para postular sólo de la semana calendario; cinco líneas × cuatro mercados. Históricos para credenciales.
 INTURSA/Alfin: altas autorizadas de dos empresas y cuatro contactos; detalles privados y [reporte](docs/commercial/prospecting-agent/runs/2026-10-13-privadas.md).
 Primera corrida futura aún no observada. Sin nuevos envíos ni Deals; no commit automático.
-
-## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
-
-El operador presentó la oferta el 13/10 a las 08:56 (estado «Enviada», leído en el portal sin tocar campos): un servicio, MXN 64.000 netos, tres archivos
-técnicos y uno económico; el video no se adjuntó (límite de 20 MB) y se ve por QR. [Registro](docs/commercial/tenders/sika-mexico-campana-creativa-1164/PRESENTACION-2026-10-13.md).
-Sin verificar: versión de cada adjunto. HubSpot: deal en `presentationscheduled` (lo movió el operador), con MXN 64.000 y cierre 16/10 cargados a su pedido y releídos. Resultado pendiente; cierre 16/10 a las 16:00 de Ciudad de México.
-Playbook, manual de Wherex y skills actualizados con el estado y con lo nuevo del portal (límite de adjuntos, condiciones, retirar para editar).

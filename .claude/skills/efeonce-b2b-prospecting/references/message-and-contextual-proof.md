@@ -58,7 +58,7 @@ aseguradora. Cuando pida un correo comercial **robusto**, usar esta arquitectura
    y respuesta por correo como alternativas de la misma conversación.
 8. **Cierre e identidad:** despedida cordial, firma oficial y CCO según la
    [política Outlook](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
-   Si el pedido exige firma gráfica, comprobar su render y no sustituirla por texto.
+   La firma gráfica es obligatoria siempre, incluidos seguimientos (Julio, 21/10/2026); comprobar su render y no sustituirla por texto.
 
 Voz personal de Julio: cercana, profesional, específica y con párrafos cortos; suficiente detalle para
 defender la propuesta, sin catálogo completo ni fórmulas copiadas entre cuentas. La preferencia es por
