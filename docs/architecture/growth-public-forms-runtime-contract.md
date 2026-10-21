@@ -33,6 +33,8 @@ pillar, «¿Cómo vendes?» e «Inversión mensual» (diseño: listas desplegabl
 selección única; «País» usa `country_select`. Los `value` son estables, así que cambiar variante o control
 más adelante no toca HubSpot ni la medición.
 
+**Control `premium_select` (2026-10-18, code complete, pendiente de release).** `presentation.control: 'premium_select'` pide el listbox premium (sin banderas) para un `type: 'select'` en cualquier variante —en pillar, sin control, un `select` sale como chips—; en otro tipo el compiler bloquea (`presentation_control_type_mismatch`) y un renderer viejo o un valor desconocido caen al control por defecto. Su uso en medios (`salesModel`, `monthlyMediaBudget`) espera el release: `scripts/growth/activate-media-diagnostic-premium-select.ts --apply`, que se niega mientras `renderer-latest.js` de producción no contenga `"premium_select"`.
+
 **Consentimiento.** El motor exige un consentimiento de procesamiento obligatorio para aceptar el envío
 (`contact_permission`). La casilla opcional `marketing_updates` (novedades) queda en el snapshot de
 consentimiento de Greenhouse, pero el adapter HubSpot envía `communications: []`: **no crea suscripción en

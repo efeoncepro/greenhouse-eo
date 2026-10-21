@@ -108,6 +108,21 @@ const validateUploadFields = (fields: FieldDefinition[]): CompileWarning[] => {
 }
 
 /**
+ * `presentation.control: 'premium_select'` sólo tiene sentido en un `select` simple (listbox de una
+ * opción). Se valida sólo ese valor: `country_select` conserva su contrato previo y ninguna versión
+ * existente cambia de veredicto.
+ */
+const validatePresentationControls = (fields: FieldDefinition[]): CompileWarning[] =>
+  fields
+    .filter(field => field.presentation?.control === 'premium_select' && field.type !== 'select')
+    .map(field => ({
+      code: 'presentation_control_type_mismatch',
+      dimension: 'fields' as const,
+      message: `campo ${field.key}: presentation.control=premium_select sólo aplica a type=select`,
+      blocking: true,
+    }))
+
+/**
  * Compila la versión. `forPublication=true` aplica el gate completo (errores
  * bloquean). `forPublication=false` (preview/draft) compila best-effort y reporta
  * warnings sin bloquear el render.
@@ -179,6 +194,9 @@ export const compileFormVersion = (
 
   // — Upload policy (solo si hay campos de archivo) —
   validateUploadFields(fields).forEach(addWarning)
+
+  // — Controles de presentación (premium_select sólo en select) —
+  validatePresentationControls(fields).forEach(addWarning)
 
   // — Consent display (browser-safe) —
   const consentDisplay = consentDisplaySchema.safeParse({

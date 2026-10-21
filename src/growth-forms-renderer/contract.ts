@@ -100,8 +100,12 @@ export interface RendererFileUploadPolicy {
 
 export interface RendererFieldPresentation {
   icon?: RendererFieldPresentationIcon
-  /** Opt-in de control especializado; conserva el valor y la semántica en el renderer. */
-  control?: 'country_select'
+  /**
+   * Opt-in de control especializado; conserva el valor y la semántica en el renderer.
+   * `country_select` = listbox premium con banderas; `premium_select` = listbox premium para cualquier
+   * `select` en cualquier variante. Un valor desconocido se ignora (control por defecto de la variante).
+   */
+  control?: 'country_select' | 'premium_select'
 }
 
 export interface RendererFieldDefinition {

@@ -137,6 +137,68 @@ describe('render_contract — browser-safe', () => {
     })
   })
 
+  it('preserves presentation.control premium_select on a select', () => {
+    const result = compileFormVersion(
+      definition({ form_kind: 'contact' }),
+      version({
+        style_variant: 'hubspot_pillar',
+        field_schema_json: [
+          {
+            key: 'salesModel',
+            type: 'select',
+            label: '¿Cómo vendes?',
+            presentation: { control: 'premium_select' },
+            options: [{ value: 'b2b', label: 'A empresas' }]
+          }
+        ]
+      }),
+      [destination()],
+      { forPublication: true }
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.fields[0]).toMatchObject({ presentation: { control: 'premium_select' } })
+  })
+
+  it('blocks premium_select declared on a non-select field', () => {
+    const result = compileFormVersion(
+      definition({ form_kind: 'contact' }),
+      version({
+        style_variant: 'hubspot_pillar',
+        field_schema_json: [
+          {
+            key: 'channels',
+            type: 'multiselect',
+            label: 'Canales',
+            presentation: { control: 'premium_select' },
+            options: [{ value: 'Google', label: 'Google' }]
+          }
+        ]
+      }),
+      [destination()],
+      { forPublication: true }
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.warnings.map(warning => warning.code)).toContain('presentation_control_type_mismatch')
+  })
+
+  it('rejects an unknown presentation.control as an invalid field', () => {
+    const result = compileFormVersion(
+      definition({ form_kind: 'contact' }),
+      version({
+        field_schema_json: [
+          { key: 'salesModel', type: 'select', label: 'X', presentation: { control: 'future_select' }, options: [{ value: 'a' }] }
+        ]
+      }),
+      [destination()],
+      { forPublication: true }
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.warnings.map(warning => warning.code)).toContain('fields_invalid')
+  })
+
   it('NUNCA expone destination mapping ni el property name de HubSpot', () => {
     const result = compileFormVersion(definition(), version(), [destination()], { forPublication: true })
     const serialized = JSON.stringify(result.renderContract)

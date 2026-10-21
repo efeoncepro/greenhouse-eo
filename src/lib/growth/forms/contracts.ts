@@ -137,6 +137,18 @@ export const FIELD_PRESENTATION_ICONS = [
 ] as const
 export type FieldPresentationIcon = (typeof FIELD_PRESENTATION_ICONS)[number]
 
+/**
+ * Controles especializados opt-in (`presentation.control`). Conservan el `value` y la semántica del
+ * campo; sólo cambian cómo se dibuja.
+ *   - `country_select`: listbox premium con banderas (`options[].countryCode`).
+ *   - `premium_select`: el mismo listbox premium, sin banderas, para cualquier `select` en cualquier
+ *     `styleVariant` (en `hubspot_pillar` un `select` sin control se dibuja como chips). Sólo aplica a
+ *     `type: 'select'`; el compiler bloquea la publicación si se declara en otro tipo.
+ * Un renderer que no conoce el valor lo ignora y dibuja el control por defecto de la variante.
+ */
+export const FIELD_PRESENTATION_CONTROLS = ['country_select', 'premium_select'] as const
+export type FieldPresentationControl = (typeof FIELD_PRESENTATION_CONTROLS)[number]
+
 export const FILE_UPLOAD_STORAGE_CONTEXTS = ['hiring_application_cv_draft'] as const
 export type FileUploadStorageContext = (typeof FILE_UPLOAD_STORAGE_CONTEXTS)[number]
 
@@ -161,7 +173,7 @@ export type FileUploadPolicy = z.infer<typeof fileUploadPolicySchema>
 export const fieldPresentationSchema = z
   .object({
     icon: z.enum(FIELD_PRESENTATION_ICONS).optional(),
-    control: z.enum(['country_select']).optional()
+    control: z.enum(FIELD_PRESENTATION_CONTROLS).optional()
   })
   .strict()
 export type FieldPresentation = z.infer<typeof fieldPresentationSchema>

@@ -29,6 +29,27 @@ export const HUBSPOT_PROPERTY_GROUP = {
  */
 export const HUBSPOT_REFERENCE_FORM_ID = '8bee8dca-27f2-4ca5-ac09-7606351c7e72'
 
+/**
+ * Subscription types del portal (`GET /communication-preferences/v3/definitions`, leído
+ * 2026-10-18). Al 2026-10-18 el portal tiene uno solo de marketing no interno; los otros dos
+ * («One to One», «Customer Service Communication») son internos y no se ofrecen en formularios.
+ */
+export const HUBSPOT_SUBSCRIPTION_TYPES = {
+  /** «Marketing Information» — purpose Marketing, canal Email, activo, no interno. */
+  marketingInformation: 535702717,
+} as const
+
+/**
+ * Casilla OPCIONAL del consentimiento publicado → subscription type de HubSpot. El texto que
+ * viaja a HubSpot NO se declara acá: la activación lo toma de la etiqueta publicada de la casilla
+ * (`copy_refs_json.checkboxes`), para que sea siempre el texto exacto que vio el visitante.
+ * Una casilla de comunicaciones nunca autoriza publicidad (no toca el matching publicitario).
+ */
+export interface HubSpotCommunicationSpec {
+  checkboxKey: string
+  subscriptionTypeId: number
+}
+
 export type HubSpotDestinationFieldKind =
   /** Property que ya existe en el portal (estándar o custom previa). Nunca se crea ni se edita. */
   | 'existing'
@@ -57,6 +78,8 @@ export interface HubSpotDestinationSpec {
     name: string
   }
   fields: HubSpotDestinationFieldSpec[]
+  /** Suscripciones que se crean en HubSpot sólo si el visitante marca la casilla. */
+  communications?: HubSpotCommunicationSpec[]
 }
 
 const existing = (ghKey: string, property: string, label: string): HubSpotDestinationFieldSpec => ({
@@ -260,6 +283,7 @@ export const HUBSPOT_DESTINATION_SPECS: HubSpotDestinationSpec[] = [
       select('monthlyMediaBudget', 'gh_form_medios_inversion_mensual', 'Inversión Mensual en Medios (Agencia de Medios)', 'Rango de inversión mensual en medios declarado, en USD.'),
       existing('context', 'message', 'Qué quiere resolver'),
     ],
+    communications: [{ checkboxKey: 'marketing_updates', subscriptionTypeId: HUBSPOT_SUBSCRIPTION_TYPES.marketingInformation }],
   },
   {
     formKey: '71ea684f-1ad9-4656-982b-159e4de46dd8',

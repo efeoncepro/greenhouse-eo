@@ -992,6 +992,9 @@ export class FormRenderer {
   private usesPremiumSelect(field?: RendererFieldDefinition): boolean {
     return (
       field?.presentation?.control === 'country_select' ||
+      // Listbox premium opt-in para un `select` simple en cualquier variante (en pillar, sin esto, chips).
+      // En otro tipo se ignora; un valor de control desconocido también cae al control por defecto.
+      (field?.type === 'select' && field.presentation?.control === 'premium_select') ||
       this.contract.styleVariant === 'diagnostic_premium' ||
       this.contract.styleVariant === 'careers-html-fidelity'
     )
