@@ -295,6 +295,25 @@ Corrida: `ai-generations/2026-10-03_sparks-aeo-60s/` (`INVENTARIO-DE-HECHOS.md` 
 - **[pendiente]** El master quedó a −16 LUFS; la norma pide −14 LUFS para video y redes. La decisión del operador no
   cubrió ese punto: revisar el nivel antes de subir la pieza a redes.
 
+### 2026-10-21 · Pieza «Preguntando» (ChatGPT Ads, 12 s) — dirección del operador, en prueba
+
+Corrida: `ai-generations/2026-10-21_chatgpt-ads/v5/` (`audio/mezcla.py`, `audio-cues.json`, `export/qa-measure-only-*.json`).
+
+El operador rechazó la primera banda sonora («parece titular de TV»), pidió rock o punk y dijo que el logo sonoro al
+final «se siente muy forzado»: «hay que flexibilizar las reglas del brandsonic para algo que encaje más».
+
+| Qué cambió | Antes | En esta pieza | Estado |
+|---|---|---|---|
+| Fuente musical | música generada (ElevenLabs) + sting del registro sereno pegado al final | **sólo el kit, registro de energía**: la pieza larga de energía (sha256 `1b23b0a1…`) desde el segundo 0; a 120 BPM su banda entra en el 4,0, que es el golpe de la imagen | **[dirección del operador]** en prueba |
+| Dónde cae el logo sonoro | sting al final, encima del lockup | el **cierre de energía** (sha256 `0a643922…`) entra cuando la banda se corta en el 8,0; su **La cae en el 9,0, cuando la esfera visual aterriza** como punto de la respuesta, y el acorde sostiene el cierre | **[dirección del operador]** en prueba |
+
+**Criterio propuesto [pendiente de aprobación]:** la melodía, la pausa y los archivos del kit no cambian; lo que se
+flexibiliza es **dónde** suena el logo. Puede caer en el evento de marca de la narrativa (la esfera que responde) y no
+necesariamente sobre la firma final. Si la pieza va con banda, el logo sonoro es el del **registro de energía**, nunca el
+sting sereno sobre otra música. Medido: los tres Mi caen en 8,38 · 8,50 · 8,63 s; la esfera despega en 8,625 (la pausa
+del motivo es su vuelo) y el La en 9,00 (`pnpm ai:listen --measure-only`, 2/2 cues, en sincronía, −14,0 LUFS, −1,35 dBTP).
+No cambia las reglas hasta que el operador apruebe la pieza.
+
 ## Qué no hacer
 
 - Regenerar el logo, la voz o la esfera: se usan los archivos del kit.
