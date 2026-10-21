@@ -130,6 +130,23 @@ El piloto cierra con un readout que separa lo medido de lo inferido y recomienda
   según las reglas de marca del tercero.
 - Mientras no haya un caso propio, no se citan resultados de clientes.
 
+## Lanzamiento orgánico (2026-10-22)
+
+La pieza animada «Ese anuncio puede ser el tuyo» (v10, aprobada el 2026-10-21) quedó programada en Metricool para el
+22-10-2026, hora de Chile. Al documentar, los cuatro posts estaban en `PENDING`: **programados, no publicados**. Los IDs se
+releen después de la hora.
+
+| Hora | Red | ID | Menciones |
+|---|---|---|---|
+| 09:00 | LinkedIn página Efeonce (video 4:5) | `402619520` | OpenAI `urn:li:organization:11130470`, HubSpot `68529` |
+| 09:30 | LinkedIn personal de Julio | `402619546` | Efeonce `20503593`, OpenAI, HubSpot |
+| 12:30 | Instagram Reel 4:5 (también en el feed) | `402619564` | `@openai`, `@hubspot` (handles tomados del sitio oficial de cada empresa) |
+| 12:35 | Instagram Story 9:16 | `402619597` | — |
+
+Medios: `gs://efeonce-group-greenhouse-public-media-prod/campaigns/2026-10-chatgpt-ads/` (MP4 y portadas PNG v10).
+El copy no dice «partner oficial» ni «aparecer en la respuesta». HubSpot aparece como el primer CRM integrado, nunca
+como el único.
+
 ## Continuidad
 
 `Readiness → Pilot → Managed ChatGPT Ads`, la composición con HubSpot cuando el cliente lo usa, y con SV360 cuando la marca también trabaja visibilidad

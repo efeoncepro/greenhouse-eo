@@ -321,6 +321,13 @@ coincide con lo que pasa en pantalla. La v6 usa un tema rock nuevo (ElevenLabs, 
 sonoro**, y la imagen se ajustó a sus ataques medidos (4,00 · 6,00 · 10,25). El criterio de «dónde suena el logo» queda
 sin aprobar.
 
+**Versión aprobada [decisión del operador, 2026-10-21]: v10.** Usa la toma 2 de `eleven_music_v2_5`, sin logo sonoro. Arranca
+en el primer golpe propio de la toma y tiene un solo empalme, compás a compás, que entra 12 ms antes del acorde final. El
+acorde cae en el 10,06 s, cuando aterriza la esfera, y se apaga solo bajo la tapa, hacia el 14,6 s. No lleva stop-time
+ni estiramiento. La v9, que arrancaba la toma a mitad de canción y tenía dos stop-time, fue rechazada: se oían restos y
+cortes. El empalme se verifica con `pnpm ai:audio-edits`, según el
+[manual](../../manual-de-uso/ai-tooling/escuchar-y-mirar-media-con-gemini.md) §«Cortar música sin que se oiga».
+
 ## Qué no hacer
 
 - Regenerar el logo, la voz o la esfera: se usan los archivos del kit.
