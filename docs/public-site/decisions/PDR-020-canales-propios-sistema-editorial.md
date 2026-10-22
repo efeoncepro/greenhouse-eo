@@ -82,7 +82,14 @@ blog 1, YouTube 1 tutorial al mes + 1 Short por semana.
 y respuestas; el equipo comparte con su propia voz, de forma voluntaria; los encuentros trimestrales se transmiten
 también por LinkedIn Live. Detalle en la [estrategia de love brand §8.1](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#81-linkedin-donde-el-fan-se-vuelve-conversación-operador-2026-10-22).
 
-**8. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
+**8. Blog y newsletters.** El blog es la casa donde todo llega y convierte visitas en audiencia propia con un orden
+fijo: primero suscribirse a Glitch, después una herramienta, al final el diagnóstico; cada artículo lleva autor real.
+**Glitch es el newsletter canónico** y el único correo de Efeonce (actualidad: lo que pasó y qué significa). El
+newsletter Marketing con Manzanitas del LinkedIn de Julio (evergreen: cómo se hace) es la puerta de entrada y cada
+edición invita a Glitch, porque su audiencia es de LinkedIn. No se crea un segundo correo de Marketing con
+Manzanitas. Detalle en la [estrategia de love brand §8.2](../../strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md#82-blog-y-newsletters-donde-el-fan-se-vuelve-audiencia-propia-operador-2026-10-22).
+
+**9. La línea «IA con contexto».** Nombre aprobado para la serie de implementación de IA empresarial: Gemini
 Enterprise, Claude Enterprise, ChatGPT Enterprise, agentes propios y de plataforma, y la nube donde corren. Línea
 de servicio **Engine** (la familia técnica es *Agent Systems & Platforms* de la marca de producto Wave).
 

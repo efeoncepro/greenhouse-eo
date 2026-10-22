@@ -194,6 +194,42 @@ las personas, y tiene que ser reconocible para el fan que llega desde Instagram:
   con fuente LinkedIn. Julio — mensajes directos, reuniones que nacen de un post, comentarios de compradores y
   suscriptores del newsletter. Puente — contactos de LinkedIn con paso previo por Instagram o YouTube.
 
+### 8.2 Blog y newsletters: donde el fan se vuelve audiencia propia `[operador, 2026-10-22]`
+
+**El blog es la casa donde todo llega:** lo único que es nuestro, se busca y la IA cita. Hace dos trabajos:
+
+1. **Generosidad.** Responde la pregunta desde la primera línea, explicada simple, con la voz de Marketing con
+   Manzanitas: el artículo semanal de la serie que corre en LinkedIn, los casos completos, las herramientas y el
+   artículo de cada tutorial de YouTube.
+2. **Peldaño 5 («es nuestro»).** Quien llega desde Google, ChatGPT o Gemini casi nunca nos conoce. El orden de las
+   invitaciones es fijo: **primero suscribirse a Glitch**, después probar una herramienta y al final el diagnóstico.
+   Pedir el diagnóstico antes de entregar valor rompe el Why.
+
+Cada artículo lleva **autor real** (Julio o alguien del equipo) con su ficha: suma caras al love brand y señales de
+experiencia para buscadores e IA.
+
+**Dos newsletters que nunca compiten:**
+
+| | **Glitch** (correo) | **Marketing con Manzanitas** (LinkedIn de Julio) |
+|---|---|---|
+| **Qué es** | el magazine semanal: **lo que pasó** y qué significa | **cómo se hace**: una idea explicada simple y a fondo |
+| **Contenido** | actualidad: top 8 con punto de vista + Glitch Flash para una noticia grande | evergreen |
+| **Voz** | el equipo editorial de Glitch (Efeonce) | Julio, en primera persona |
+| **Frecuencia** | semanal, edición numerada | quincenal, jueves |
+| **Dónde vive** | correo, con archivo en el blog (`/glitch/`) | artículo de LinkedIn |
+| **Audiencia** | **propia** (la lista es nuestra) | **arrendada** (es de LinkedIn) |
+| **Cierra con** | leer el análisis completo en el blog | suscribirse a Glitch y leer el artículo del blog |
+| **Se mide en** | suscriptores netos, apertura, clics, respuestas | suscriptores, clics y **cuántos pasan a Glitch** |
+
+- **Glitch es el newsletter canónico** y el único correo de Efeonce. **El de LinkedIn es la puerta de entrada:**
+  aprovecha el alcance de LinkedIn y cada edición termina invitando a Glitch, para que la audiencia arrendada se
+  vuelva propia.
+- **Dos marcas editoriales hermanas:** Marketing con Manzanitas explica *cómo* (blog, newsletter de LinkedIn,
+  YouTube) y Glitch cuenta *qué pasó*. Cada una conserva su línea gráfica y no se mezclan; se recomiendan con un
+  enlace en el texto.
+- **No hay un segundo correo de Marketing con Manzanitas.** Dos correos de la misma marca compiten por la misma
+  bandeja. Si hiciera falta, lo evergreen entra a Glitch como sección.
+
 ---
 
 ## 9. Mecánicas de comunidad
