@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-2040-site-nav-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-055`
-- Status real: `Slices 1 y 2 code complete en local (runtime 5ca3637 + 1b26063 + archivos de AXIS publicado; AXIS primitives 0.7.8 publicado bajo `v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
+- Status real: `Slices 1 y 2 en producción con el interruptor en off desde 2026-10-22 23:55 UTC (plugin eo-site-nav + adaptador de ohio-child, runtime 27c3b0c, AXIS primitives 0.7.8); el sitio sigue con el encabezado de Ohio. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto en una página con autorización`v0.7.8` el 2026-10-22); sin escrituras en WordPress de producción. Pendiente: Slice 3 (agendador), Slice 4 (alta GTM/GA4) y piloto con autorización`
 - Rank: `TBD`
 - Domain: `content`
 - Blocked by: `none`
@@ -410,6 +410,16 @@ Reglas obligatorias:
 
 ### Slice 5 — Piloto
 
+> Avance 2026-10-22: primer paso hecho. Release acotado por SSH con el interruptor en `off`, autorizado por el
+> operador. Plugin con `deploy-site-nav-plugin-package.php` (cambió `eo-site-nav.php`, se crearon el render y sus
+> datos; respaldo `/tmp/eo-site-nav-before-20261022-235438.tar`). Tema con el carril nuevo
+> `build-site-nav-theme-package.cjs` + `deploy-site-nav-theme-package.php` (allowlist, sha256, guarda de deriva,
+> exige las 8 partes de cabecera de Ohio vivas y el interruptor en `off`, `functions.php` al final; 20 archivos
+> creados y `functions.php` cambiado; respaldo `/tmp/ohio-child-site-nav-before-20261022-235504.tar`). El despliegue
+> creó `eo_site_nav_enabled=off` y `eo_site_nav_pilot_pages=[]`. Sonda de sólo lectura en producción: el render pinta
+> el documento vivo (100 enlaces) y el REST responde 200. Vuelta atrás: restaurar los tar y borrar las rutas creadas
+> que listan.
+
 - Release acotado por SSH con el interruptor en `off`; luego `pilot` en la página elegida con el operador.
 - Captura y revisión en los viewports del plan.
 - Prueba de vuelta a `off` y regreso a `pilot`.
@@ -503,7 +513,10 @@ Montaje, estados del host, agendador y medición: `docs/ui/wireframes/TASK-2042-
 - [ ] La evidencia visual de cierre se captura sin el aviso de depuración del Lab ni otros superpuestos: en 1280×720 tapaba «Ver todas las soluciones» y no dejaba ver su subrayado (pedido de la sesión del menú, contralora de fidelidad, 2026-10-22).
 
 - [x] Con `eo_site_nav_enabled=off` el sitio sirve el encabezado de Ohio sin assets de AXIS. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): sin
-  `data-axis-site-nav` ni `site-nav.css`, con `#site-navigation` de Ohio. Falta repetirlo en producción en el Slice 5.
+  `data-axis-site-nav` ni `site-nav.css`, con `#site-navigation` de Ohio. En producción con el interruptor en `off` (2026-10-22, tras el
+  despliegue y otra vez 2 min después): `/`, `/agencia-creativa/`, `/blog/`, `/contacto/`,
+  `/servicios/performance-marketing/` y un 404 responden igual que antes, con `#site-navigation` de Ohio y sin
+  assets de AXIS.
 - [x] Con `pilot`, sólo las páginas de la lista muestran el menú nuevo. Evidencia (Playground local con Ohio 3.7.0 real, el plugin `eo-site-nav` y `ohio-child`, 2026-10-22): la página de la lista
   pinta el menú y la otra conserva Ohio.
 - [ ] Con `on`, todo el sitio muestra el menú nuevo, y volver a `off` restaura Ohio (verificado al menos una vez en
