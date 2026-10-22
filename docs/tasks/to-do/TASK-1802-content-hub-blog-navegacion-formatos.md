@@ -1,5 +1,13 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-10-22
+
+- PDR-020 decisión 1 (dónde vive canónicamente un video) quedó **cerrada**: el video vive en YouTube y el blog lo
+  incrusta dentro de un artículo que responde la misma pregunta, con transcripción; el texto que se cita es el del
+  blog — cerrado por la revisión 2.0 de `PDR-020` (sesión de planificación social del operador). Siguen abiertas la
+  decisión 2 (inventario de tools y webinars) y la 6 (naming visible). Marketing con Manzanitas queda confirmado como
+  familia editorial de blog, newsletter de LinkedIn y YouTube.
+
 ## Avance acotado — etapa 1 local, 20/10/2026
 
 El operador autorizó implementar la primera etapa en develop y mostrar el blog completo, sin publicar.
